@@ -1027,7 +1027,10 @@ components:
           type: string
         status:
           type: string
-          enum: [draft, unlocked, pending_payment]
+          enum: [draft, unlocked, pending_payment, accepted]
+        acceptedByName:
+          type: string
+          nullable: true
         pdfUrl:
           type: string
           nullable: true
@@ -1173,7 +1176,7 @@ components:
           type: string
         status:
           type: string
-          enum: [draft, unlocked, pending_payment]
+          enum: [draft, unlocked, pending_payment, accepted]
         templateId:
           type: string
           enum: [standard, arosio, mariagrazia]
@@ -1294,7 +1297,7 @@ components:
       properties:
         status:
           type: string
-          enum: [draft, unlocked, pending_payment]
+          enum: [draft, unlocked, pending_payment, accepted]
       required:
         - status
 
@@ -1784,6 +1787,9 @@ components:
           type: string
           nullable: true
         businessNumber:
+          type: string
+          nullable: true
+        postalCode:
           type: string
           nullable: true
       required:

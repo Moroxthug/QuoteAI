@@ -28,6 +28,7 @@ router.get("/clients", requireAuth, async (req, res) => {
         indirizzo: sql<string | null>`max(${quotesTable.clientData}->>'indirizzo')`,
         city: sql<string | null>`max(${quotesTable.clientData}->>'city')`,
         province: sql<string | null>`max(${quotesTable.clientData}->>'province')`,
+        postalCode: sql<string | null>`max(${quotesTable.clientData}->>'postalCode')`,
         partitaIva: sql<string | null>`max(${quotesTable.clientData}->>'partitaIva')`,
         businessNumber: sql<string | null>`max(${quotesTable.clientData}->>'businessNumber')`,
       })
@@ -59,6 +60,7 @@ router.get("/clients", requireAuth, async (req, res) => {
         indirizzo: r.indirizzo || null,
         city: r.city || null,
         province: r.province || null,
+        postalCode: r.postalCode || null,
         partitaIva: r.partitaIva || null,
         businessNumber: r.businessNumber || null,
       }))

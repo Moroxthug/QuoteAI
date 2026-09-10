@@ -75,6 +75,7 @@ export const QuoteStatus = {
   draft: 'draft',
   unlocked: 'unlocked',
   pending_payment: 'pending_payment',
+  accepted: 'accepted',
 } as const;
 
 export type QuoteTemplateId = typeof QuoteTemplateId[keyof typeof QuoteTemplateId] | null;
@@ -105,6 +106,7 @@ export interface Quote {
   totale: number;
   note: string;
   status: QuoteStatus;
+  acceptedByName?: string | null;
   pdfUrl?: string | null;
   rawInput: string;
   pdfDownloadedAt?: string | null;
@@ -165,6 +167,7 @@ export const UpdateQuoteBodyStatus = {
   draft: 'draft',
   unlocked: 'unlocked',
   pending_payment: 'pending_payment',
+  accepted: 'accepted',
 } as const;
 
 export type UpdateQuoteBodyTemplateId = typeof UpdateQuoteBodyTemplateId[keyof typeof UpdateQuoteBodyTemplateId];
@@ -264,6 +267,7 @@ export const PaymentVerifyResultStatus = {
   draft: 'draft',
   unlocked: 'unlocked',
   pending_payment: 'pending_payment',
+  accepted: 'accepted',
 } as const;
 
 export interface PaymentVerifyResult {
@@ -495,6 +499,7 @@ export interface Client {
   province?: string | null;
   partitaIva?: string | null;
   businessNumber?: string | null;
+  postalCode?: string | null;
 }
 
 export type SendQuotePdfEmail200 = {

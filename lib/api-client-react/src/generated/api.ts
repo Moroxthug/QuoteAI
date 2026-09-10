@@ -428,7 +428,7 @@ export const createManualQuote = async (createManualQuoteBody: CreateManualQuote
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -516,7 +516,7 @@ export const suggestItemDescription = async (suggestItemDescriptionBody: Suggest
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -682,7 +682,7 @@ export const updateQuote = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -919,7 +919,7 @@ export const sendQuotePdfEmail = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1082,7 +1082,7 @@ export const regenerateQuote = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1395,7 +1395,7 @@ export const updateBusinessProfile = async (updateBusinessProfileBody: UpdateBus
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1561,7 +1561,7 @@ export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, optio
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1649,7 +1649,7 @@ export const createCheckoutSession = async (createCheckoutBody: CreateCheckoutBo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2042,7 +2042,7 @@ export const unlockQuoteWithSubscription = async (unlockQuoteBody: UnlockQuoteBo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2358,7 +2358,7 @@ export const createCatalogItem = async (createCatalogItemBody: CreateCatalogItem
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2446,7 +2446,7 @@ export const bulkCreateCatalogItems = async (createCatalogItemBody: CreateCatalo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2611,7 +2611,7 @@ export const connectWhatsapp = async (whatsappConnectBody: WhatsappConnectBody, 
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2699,7 +2699,7 @@ export const verifyWhatsapp = async (whatsappVerifyBody: WhatsappVerifyBody, opt
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2938,7 +2938,7 @@ export const toggleWhatsapp = async (whatsappToggleBody: WhatsappToggleBody, opt
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3633,7 +3633,7 @@ export const updateCatalogItem = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),

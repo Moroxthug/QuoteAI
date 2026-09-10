@@ -74,7 +74,8 @@ export const ListQuotesResponseItem = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -167,7 +168,8 @@ export const CreateQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -255,7 +257,8 @@ export const GetQuoteStatsResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -377,7 +380,8 @@ export const CreateManualQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -473,7 +477,8 @@ export const GetQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -545,7 +550,7 @@ export const UpdateQuoteBody = zod.object({
   "ivaValore": zod.number().optional(),
   "totale": zod.number().optional(),
   "note": zod.string().optional(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']).optional(),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']).optional(),
   "templateId": zod.enum(['standard', 'arosio', 'mariagrazia']).optional()
 })
 
@@ -605,7 +610,8 @@ export const UpdateQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -656,7 +662,7 @@ export const SendQuotePdfEmailParams = zod.object({
 })
 
 export const SendQuotePdfEmailBody = zod.object({
-  "toEmail": zod.email(),
+  "toEmail": zod.string().email(),
   "clientName": zod.string().optional()
 })
 
@@ -728,7 +734,8 @@ export const DuplicateQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -816,7 +823,8 @@ export const RegenerateQuoteResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -899,7 +907,8 @@ export const UpgradeToCapitolatoProResponse = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),
@@ -990,7 +999,7 @@ export const UploadBusinessProfileLogoResponse = zod.object({
  */
 export const RequestUploadUrlBody = zod.object({
   "name": zod.string(),
-  "size": zod.int(),
+  "size": zod.number().int(),
   "contentType": zod.string()
 })
 
@@ -999,7 +1008,7 @@ export const RequestUploadUrlResponse = zod.object({
   "objectPath": zod.string(),
   "metadata": zod.object({
   "name": zod.string(),
-  "size": zod.int(),
+  "size": zod.number().int(),
   "contentType": zod.string()
 }).optional()
 })
@@ -1033,7 +1042,7 @@ export const VerifyPaymentParams = zod.object({
 })
 
 export const VerifyPaymentResponse = zod.object({
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment'])
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted'])
 })
 
 
@@ -1076,7 +1085,7 @@ export const UnlockQuoteWithSubscriptionBody = zod.object({
 })
 
 export const UnlockQuoteWithSubscriptionResponse = zod.object({
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment'])
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted'])
 })
 
 
@@ -1242,7 +1251,7 @@ export const ListDocumentsResponseItem = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1275,7 +1284,7 @@ export const UploadDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1325,7 +1334,7 @@ export const ExtractDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1373,7 +1382,8 @@ export const ListClientsResponseItem = zod.object({
   "city": zod.string().nullish(),
   "province": zod.string().nullish(),
   "partitaIva": zod.string().nullish(),
-  "businessNumber": zod.string().nullish()
+  "businessNumber": zod.string().nullish(),
+  "postalCode": zod.string().nullish()
 })
 export const ListClientsResponse = zod.array(ListClientsResponseItem)
 
@@ -1441,7 +1451,8 @@ export const ListClientQuotesResponseItem = zod.object({
   "ivaValore": zod.number(),
   "totale": zod.number(),
   "note": zod.string(),
-  "status": zod.enum(['draft', 'unlocked', 'pending_payment']),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
   "rawInput": zod.string(),
   "pdfDownloadedAt": zod.string().nullish(),

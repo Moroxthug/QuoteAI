@@ -41,6 +41,7 @@ export default function PrivacyPage() {
               <li><strong>Business profile information:</strong> company name, Business Number / GST-HST number, address, phone number, business email, and company logo.</li>
               <li><strong>Quote data:</strong> job descriptions, client (customer) information, amounts, and line items on quotes you generate.</li>
               <li><strong>Payment information:</strong> handled directly by Stripe Inc. — we never access your full credit card details.</li>
+              <li><strong>Authentication credentials:</strong> your password is stored as a salted hash on our own servers; we do not send it to any third-party identity provider.</li>
               <li><strong>Technical information:</strong> IP address, browser type, pages visited, and session duration (via system logs).</li>
             </ul>
           </section>
@@ -82,7 +83,6 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">5. Who we share information with</h2>
             <p>Personal information may be shared with the following categories of recipients:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>Clerk Inc.</strong> — authentication and user account management.</li>
               <li><strong>Stripe Inc.</strong> — payment processing.</li>
               <li><strong>OpenAI, LLC</strong> — AI-generated quotes. Only the job description text is sent.</li>
               <li><strong>Cloud hosting providers</strong> — infrastructure and hosting.</li>
@@ -127,7 +127,7 @@ export default function PrivacyPage() {
             <p>
               We use appropriate technical and organizational safeguards to protect personal information against
               unauthorized access, loss, or alteration: encrypted connections (TLS/HTTPS), access controls, and
-              secure authentication through Clerk.
+              hashed credential storage on our own infrastructure.
             </p>
           </section>
 

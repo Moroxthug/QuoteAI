@@ -110,7 +110,7 @@ function buildHeadBlock(opts: {
     `  <meta property="og:image:width" content="1200" />`,
     `  <meta property="og:image:height" content="630" />`,
     `  <meta property="og:type" content="website" />`,
-    `  <meta property="og:locale" content="it_IT" />`,
+    `  <meta property="og:locale" content="en_CA" />`,
     `  <meta property="og:site_name" content="quoteai" />`,
     `  <meta name="twitter:card" content="summary_large_image" />`,
     `  <meta name="twitter:title" content="${esc(title)}" />`,
@@ -169,8 +169,8 @@ const STATIC_HEADER = `<header class="sticky top-0 z-50 w-full transition-all du
   <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
     <a href="/" class="flex items-center">${STATIC_LOGO}</a>
     <nav class="flex items-center gap-3">
-      <a href="/sign-in/" class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full">Accedi</a>
-      <a href="/sign-up/" class="btn-gradient inline-flex h-9 items-center justify-center px-5 text-sm font-semibold">Registrati</a>
+      <a href="/sign-in/" class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full">Sign in</a>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-9 items-center justify-center px-5 text-sm font-semibold">Sign up</a>
     </nav>
   </div>
 </header>`;
@@ -180,56 +180,56 @@ const STATIC_FOOTER = `<footer class="border-t py-12 md:py-16 bg-white">
     <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
       <div class="md:col-span-2">
         <a href="/" class="flex items-center mb-4">${STATIC_LOGO}</a>
-        <p class="text-sm text-muted-foreground max-w-xs leading-relaxed">Il software di preventivazione con AI per artigiani e PMI italiane. Veloce, professionale, pronto in 30 secondi.</p>
+        <p class="text-sm text-muted-foreground max-w-xs leading-relaxed">AI-powered quoting software for Canadian tradespeople and small businesses. Fast, professional, ready in 30 seconds.</p>
       </div>
       <div class="md:col-span-2">
-        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Professioni</h4>
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Trades</h4>
         <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          <li><a href="/preventivi/imbianchino/" class="hover:text-foreground transition-colors">Imbianchino</a></li>
-          <li><a href="/preventivi/muratore/" class="hover:text-foreground transition-colors">Muratore</a></li>
-          <li><a href="/preventivi/elettricista/" class="hover:text-foreground transition-colors">Elettricista</a></li>
-          <li><a href="/preventivi/pittore/" class="hover:text-foreground transition-colors">Pittore</a></li>
-          <li><a href="/preventivi/idraulico/" class="hover:text-foreground transition-colors">Idraulico</a></li>
-          <li><a href="/preventivi/piastrellista/" class="hover:text-foreground transition-colors">Piastrellista</a></li>
-          <li><a href="/preventivi/edilizia/" class="hover:text-foreground transition-colors">Imprese Edili</a></li>
-          <li><a href="/preventivi/giardiniere/" class="hover:text-foreground transition-colors">Giardiniere</a></li>
-          <li><a href="/preventivi/ristrutturazione/" class="hover:text-foreground transition-colors">Ristrutturazioni</a></li>
-          <li><a href="/preventivi/serramentista/" class="hover:text-foreground transition-colors">Serramentista</a></li>
-          <li><a href="/preventivi/carpentiere/" class="hover:text-foreground transition-colors">Carpentieri</a></li>
-          <li><a href="/preventivi/tetto/" class="hover:text-foreground transition-colors">Coperture e Tetti</a></li>
-          <li><a href="/preventivi/falegname/" class="hover:text-foreground transition-colors">Falegnami</a></li>
-          <li><a href="/preventivi/condizionatori/" class="hover:text-foreground transition-colors">Condizionatori</a></li>
-          <li><a href="/preventivi/freelance/" class="hover:text-foreground transition-colors">Freelance</a></li>
-          <li><a href="/preventivi/pavimentista/" class="hover:text-foreground transition-colors">Pavimentista</a></li>
-          <li><a href="/preventivi/geometra/" class="hover:text-foreground transition-colors">Geometri</a></li>
-          <li><a href="/preventivi/termoidraulico/" class="hover:text-foreground transition-colors">Termoidraulico</a></li>
+          <li><a href="/preventivi/imbianchino/" class="hover:text-foreground transition-colors">Painter</a></li>
+          <li><a href="/preventivi/muratore/" class="hover:text-foreground transition-colors">Mason</a></li>
+          <li><a href="/preventivi/elettricista/" class="hover:text-foreground transition-colors">Electrician</a></li>
+          <li><a href="/preventivi/pittore/" class="hover:text-foreground transition-colors">Decorative Painter</a></li>
+          <li><a href="/preventivi/idraulico/" class="hover:text-foreground transition-colors">Plumber</a></li>
+          <li><a href="/preventivi/piastrellista/" class="hover:text-foreground transition-colors">Tile Installer</a></li>
+          <li><a href="/preventivi/edilizia/" class="hover:text-foreground transition-colors">General Contractors</a></li>
+          <li><a href="/preventivi/giardiniere/" class="hover:text-foreground transition-colors">Landscaper</a></li>
+          <li><a href="/preventivi/ristrutturazione/" class="hover:text-foreground transition-colors">Renovation Contractors</a></li>
+          <li><a href="/preventivi/serramentista/" class="hover:text-foreground transition-colors">Window &amp; Door Installer</a></li>
+          <li><a href="/preventivi/carpentiere/" class="hover:text-foreground transition-colors">Welders &amp; Fabricators</a></li>
+          <li><a href="/preventivi/tetto/" class="hover:text-foreground transition-colors">Roofing</a></li>
+          <li><a href="/preventivi/falegname/" class="hover:text-foreground transition-colors">Carpenters</a></li>
+          <li><a href="/preventivi/condizionatori/" class="hover:text-foreground transition-colors">Air Conditioning</a></li>
+          <li><a href="/preventivi/freelance/" class="hover:text-foreground transition-colors">Freelancer</a></li>
+          <li><a href="/preventivi/pavimentista/" class="hover:text-foreground transition-colors">Flooring Installer</a></li>
+          <li><a href="/preventivi/geometra/" class="hover:text-foreground transition-colors">Building Consultants</a></li>
+          <li><a href="/preventivi/termoidraulico/" class="hover:text-foreground transition-colors">HVAC &amp; Heating</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Guide</h4>
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Guides</h4>
         <ul class="space-y-2 text-sm text-muted-foreground">
-          <li><a href="/blog/" class="hover:text-foreground transition-colors font-medium text-foreground/80">Blog &amp; Approfondimenti</a></li>
-          <li><a href="/preventivi/modello-excel/" class="hover:text-foreground transition-colors">Modello Excel</a></li>
-          <li><a href="/preventivi/modello-word/" class="hover:text-foreground transition-colors">Modello Word</a></li>
-          <li><a href="/preventivi/come-fare-preventivo/" class="hover:text-foreground transition-colors">Come Fare un Preventivo</a></li>
-          <li><a href="/preventivi/preventivi-gratis/" class="hover:text-foreground transition-colors">Preventivi Gratis</a></li>
+          <li><a href="/blog/" class="hover:text-foreground transition-colors font-medium text-foreground/80">Blog &amp; Guides</a></li>
+          <li><a href="/preventivi/modello-excel/" class="hover:text-foreground transition-colors">Excel Quote Template</a></li>
+          <li><a href="/preventivi/modello-word/" class="hover:text-foreground transition-colors">Word Quote Template</a></li>
+          <li><a href="/preventivi/come-fare-preventivo/" class="hover:text-foreground transition-colors">How to Write a Quote</a></li>
+          <li><a href="/preventivi/preventivi-gratis/" class="hover:text-foreground transition-colors">Free Quote Software</a></li>
         </ul>
-        <h4 class="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">Azienda</h4>
+        <h4 class="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">Company</h4>
         <ul class="space-y-2 text-sm text-muted-foreground">
-          <li><a href="/chi-siamo/" class="hover:text-foreground transition-colors">Chi Siamo</a></li>
-          <li><a href="/contatti/" class="hover:text-foreground transition-colors">Contatti</a></li>
-          <li><button class="hover:text-foreground transition-colors text-left">Supporto</button></li>
-          <li><a href="/privacy/" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
-          <li><a href="/termini/" class="hover:text-foreground transition-colors">Termini di Servizio</a></li>
-          <li><a href="/mappa-sito/" class="hover:text-foreground transition-colors">Mappa del Sito</a></li>
+          <li><a href="/chi-siamo/" class="hover:text-foreground transition-colors">About Us</a></li>
+          <li><a href="/contatti/" class="hover:text-foreground transition-colors">Contact</a></li>
+          <li><button class="hover:text-foreground transition-colors text-left">Support</button></li>
+          <li><a href="/privacy-policy/" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
+          <li><a href="/terms/" class="hover:text-foreground transition-colors">Terms of Service</a></li>
+          <li><a href="/mappa-sito/" class="hover:text-foreground transition-colors">Site Map</a></li>
         </ul>
       </div>
     </div>
-    <div class="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">© ${CURRENT_YEAR} quoteai. Tutti i diritti riservati.</div>
+    <div class="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">© ${CURRENT_YEAR} quoteai. All rights reserved.</div>
   </div>
 </footer>`;
 
-const STATIC_WHATSAPP = `<a href="https://wa.me/393791059492" target="_blank" rel="noopener noreferrer nofollow" aria-label="Chatta con noi su WhatsApp" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full shadow-lg shadow-green-200/60 transition-all duration-200 hover:scale-105 active:scale-95" style="background:rgb(37,211,102)"><span class="flex h-14 w-14 items-center justify-center rounded-full" style="background:rgb(37,211,102)"><img src="/wa-icon.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="pr-5 text-white text-sm font-semibold whitespace-nowrap hidden sm:inline-block">Hai bisogno di aiuto?</span></a>`;
+const STATIC_WHATSAPP = `<a href="/whatsapp/" aria-label="Chat with us on WhatsApp" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full shadow-lg shadow-green-200/60 transition-all duration-200 hover:scale-105 active:scale-95" style="background:rgb(37,211,102)"><span class="flex h-14 w-14 items-center justify-center rounded-full" style="background:rgb(37,211,102)"><img src="/wa-icon.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="pr-5 text-white text-sm font-semibold whitespace-nowrap hidden sm:inline-block">Need help?</span></a>`;
 
 function wrapInPublicLayout(contentHtml: string): string {
   return `<div class="min-h-[100dvh] flex flex-col bg-background text-foreground">
@@ -255,7 +255,7 @@ function buildBreadcrumb(items: { name: string; href: string | null }[]): string
       return sep + content;
     })
     .join("\n      ");
-  return `<nav aria-label="Percorso di navigazione" class="bg-white border-b border-gray-100">
+  return `<nav aria-label="Breadcrumb" class="bg-white border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
     <ol class="flex items-center text-sm text-gray-500 flex-wrap">
       ${crumbs}
@@ -292,8 +292,8 @@ function buildSectorCityGrid(s: SectorData): string {
   return `<section class="py-20 bg-gray-50">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-12">
-      <h2 class="text-2xl font-bold text-gray-900">Preventivi ${esc(s.label)} nelle principali città</h2>
-      <p class="text-sm text-gray-500 mt-2">Seleziona la tua città per informazioni e prezzi locali</p>
+      <h2 class="text-2xl font-bold text-gray-900">${esc(s.label)} quotes in top cities</h2>
+      <p class="text-sm text-gray-500 mt-2">Select your city for local pricing and information</p>
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       ${regionBlocks}
@@ -307,7 +307,7 @@ function buildSectorCityGrid(s: SectorData): string {
 function buildRelatedSectorsSection(s: SectorData, heading?: string): string {
   const related = RELATED_SECTORS[s.slug];
   if (!related || related.length === 0) return "";
-  const h = heading ?? "Servizi correlati";
+  const h = heading ?? "Related services";
   const links = related
     .map(
       (r) =>
@@ -343,7 +343,7 @@ function buildApprofondimentiSection(sectorSlug: string): string {
         `<a href="/blog/${esc(a.slug)}/" class="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all duration-200 p-5">
           <span class="text-xs font-semibold text-violet-700 mb-2">${esc(a.category)}</span>
           <span class="text-sm font-semibold text-gray-900 group-hover:text-violet-700 transition-colors leading-snug mb-3">${esc(a.title)}</span>
-          <span class="text-xs text-gray-400 mt-auto">${a.readingTimeMin} min di lettura</span>
+          <span class="text-xs text-gray-400 mt-auto">${a.readingTimeMin} min read</span>
         </a>`
     )
     .join("\n      ");
@@ -351,8 +351,8 @@ function buildApprofondimentiSection(sectorSlug: string): string {
   return `<section class="py-14 bg-gray-50 border-t border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-base font-semibold text-gray-900">Approfondimenti</h2>
-      <a href="/blog/" class="text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">Tutti gli articoli →</a>
+      <h2 class="text-base font-semibold text-gray-900">Related reading</h2>
+      <a href="/blog/" class="text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">All articles →</a>
     </div>
     <div class="grid sm:grid-cols-3 gap-4">
       ${cards}
@@ -576,7 +576,7 @@ function buildSectorBodyHtml(s: SectorData): string {
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
       <h2 class="text-3xl font-bold text-gray-900 mb-4">${ctaHeading}</h2>
       <p class="text-lg text-gray-500 mb-10">
-        Nessuna carta di credito. Nessun impegno. Il tuo primo preventivo è gratis.
+        No credit card. No commitment. Your first quote is free.
       </p>
       <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
         ${ctaBtn}
@@ -585,7 +585,7 @@ function buildSectorBodyHtml(s: SectorData): string {
     </div>
   </section>`;
 
-  const sRelated = buildRelatedSectorsSection(s, "Servizi correlati — genera preventivi per");
+  const sRelated = buildRelatedSectorsSection(s, "Related services — generate quotes for");
   const sCityGrid = CITY_SECTORS.includes(s.slug) ? buildSectorCityGrid(s) : "";
   const sApprofondimenti = buildApprofondimentiSection(s.slug);
   const sDeepDive = buildSectorDeepDive(s);
@@ -645,40 +645,40 @@ function buildOsservatorio(s: SectorData, city: CityData, intel: CityIntelligenc
   const priceColor =
     intel.priceIndex > 1.05 ? "text-amber-600" : intel.priceIndex < 0.95 ? "text-green-600" : "text-gray-800";
   const demandLabels: Record<CityIntelligence["demandLevel"], string> = {
-    LOW: "Moderata", MEDIUM: "Media", HIGH: "Elevata", CRITICAL: "Molto elevata",
+    LOW: "Moderate", MEDIUM: "Average", HIGH: "High", CRITICAL: "Very high",
   };
   const demandColors: Record<CityIntelligence["demandLevel"], string> = {
     LOW: "text-green-600", MEDIUM: "text-blue-600", HIGH: "text-amber-600", CRITICAL: "text-red-600",
   };
   const [sv1, sv2, sv3] = intel.topServices;
   void s;
-  return `<section class="py-10 bg-white border-b border-gray-100" aria-label="Osservatorio prezzi e domanda ${esc(city.name)}">
+  return `<section class="py-10 bg-white border-b border-gray-100" aria-label="Price and demand observatory ${esc(city.name)}">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
     <div class="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-cyan-50/20 p-6 md:p-8">
       <div class="flex items-center gap-3 mb-6">
         <div class="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0" aria-hidden="true">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </div>
-        <h2 class="text-base font-bold text-gray-900">Osservatorio Prezzi e Domanda: ${esc(city.name)}</h2>
+        <h2 class="text-base font-bold text-gray-900">Price &amp; Demand Observatory: ${esc(city.name)}</h2>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Indice prezzi</div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Price index</div>
           <div class="text-2xl font-bold ${priceColor}">${priceLabel}</div>
-          <div class="text-xs text-gray-400 mt-1">vs. media nazionale</div>
+          <div class="text-xs text-gray-400 mt-1">vs. national average</div>
         </div>
         <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Domanda</div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Demand</div>
           <div class="text-base font-bold ${demandColors[intel.demandLevel]}">${demandLabels[intel.demandLevel]}</div>
           <div class="text-xs text-gray-400 mt-1">${esc(city.region)}</div>
         </div>
         <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
           <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Lead time</div>
           <div class="text-base font-bold text-gray-800">${esc(intel.avgLeadTime)}</div>
-          <div class="text-xs text-gray-400 mt-1">risposta stimata</div>
+          <div class="text-xs text-gray-400 mt-1">estimated response</div>
         </div>
         <div class="bg-white rounded-xl p-4 border border-gray-100">
-          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Servizi top</div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Top services</div>
           <ul class="space-y-1.5">
             <li class="flex items-start gap-1 text-xs text-gray-600"><span class="text-violet-400 shrink-0 font-bold" aria-hidden="true">&rsaquo;</span>${esc(sv1)}</li>
             <li class="flex items-start gap-1 text-xs text-gray-600"><span class="text-violet-400 shrink-0 font-bold" aria-hidden="true">&rsaquo;</span>${esc(sv2)}</li>
@@ -713,18 +713,18 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
       </div>
       <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
         ${esc(s.h1)} <span class="gradient-text">${esc(s.h1Highlight)}</span><br />
-        <span class="text-gray-500 text-3xl sm:text-4xl font-bold">a ${esc(cityName)}</span>
+        <span class="text-gray-500 text-3xl sm:text-4xl font-bold">in ${esc(cityName)}</span>
       </h1>
       <p class="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">${esc(intro)}</p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
-          Crea il tuo preventivo gratis
+          Create your free quote
         </a>
         <a href="/preventivi/${esc(s.slug)}/" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
-          Scopri come funziona
+          See how it works
         </a>
       </div>
-      <p class="text-sm text-gray-400 mt-5">Nessuna carta di credito &middot; Preventivo pronto in 30 secondi</p>
+      <p class="text-sm text-gray-400 mt-5">No credit card &middot; Quote ready in 30 seconds</p>
     </div>
   </section>`;
 
@@ -733,7 +733,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
   const sBenefits = `<section class="py-20 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-14">
-        <h2 class="text-3xl font-bold text-gray-900">Perché i ${esc(s.labelPlural)} di ${esc(cityName)} scelgono quoteai</h2>
+        <h2 class="text-3xl font-bold text-gray-900">Why ${esc(s.labelPlural)} in ${esc(cityName)} choose quoteai</h2>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         ${s.benefits.map((b) => `<div class="card-soft bg-white p-7 rounded-2xl flex flex-col">
@@ -749,7 +749,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
   const sHowItWorks = `<section class="py-20 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
       <div class="text-center mb-14">
-        <h2 class="text-3xl font-bold text-gray-900">Preventivo professionale a ${esc(cityName)} in 3 passi</h2>
+        <h2 class="text-3xl font-bold text-gray-900">A professional quote in ${esc(cityName)} in 3 steps</h2>
       </div>
       <div class="grid md:grid-cols-3 gap-10">
         ${howItWorksSteps.map((step) => `<div>
@@ -764,7 +764,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
   const sUseCases = `<section class="py-20 ${layout === 2 ? "bg-white" : "bg-gray-50"}">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
       <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900">Preventivi per questi lavori a ${esc(cityName)}</h2>
+        <h2 class="text-3xl font-bold text-gray-900">Quotes for these jobs in ${esc(cityName)}</h2>
       </div>
       <ul class="grid sm:grid-cols-2 gap-3">
         ${s.useCases.map((uc) => `<li class="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
@@ -780,7 +780,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
   const sFaq = `<section class="py-20 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
       <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900">Domande frequenti</h2>
+        <h2 class="text-3xl font-bold text-gray-900">Frequently asked questions</h2>
       </div>
       <div class="space-y-4">
         ${cityFaqItems.map((f) => `<div class="bg-white rounded-2xl p-6 card-soft">
@@ -801,7 +801,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
     ? `<section class="py-16 bg-white border-t border-gray-100">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
       <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">
-        Preventivi per ${esc(s.labelPlural)} nelle città vicine
+        ${esc(s.labelPlural)} quotes in nearby cities
       </h2>
       <div class="flex flex-wrap gap-2 justify-center">
           ${nearbyLinks}
@@ -816,13 +816,13 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
   const sSameCityOther = sameCityOtherSectors.length
     ? `<section class="py-14 bg-gray-50 border-t border-gray-100">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-      <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">Altri servizi a ${esc(cityName)}</h2>
+      <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">Other services in ${esc(cityName)}</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         ${sameCityOtherSectors
           .map(
             (r) =>
               `<a href="/preventivi/${esc(r.slug)}/${esc(city.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
-          <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(r.label)} a ${esc(cityName)}
+          <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(r.label)} in ${esc(cityName)}
         </a>`
           )
           .join("\n        ")}
@@ -830,7 +830,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
     </div>
   </section>`
     : "";
-  const sRelated = buildRelatedSectorsSection(s, `Scopri anche: preventivi per`);
+  const sRelated = buildRelatedSectorsSection(s, `Also see: quotes for`);
   const sApprofondimenti = buildApprofondimentiSection(s.slug);
 
   const ctaTexts = getCityCtaTexts(getCityCtaVariant(s, city), cityName);
@@ -841,13 +841,13 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
       <h2 class="text-3xl font-bold text-gray-900 mb-4">${ctaHeading}</h2>
       <p class="text-lg text-gray-500 mb-10">
-        Nessuna carta di credito richiesta. Il tuo primo preventivo professionale è gratis.
+        No credit card required. Your first professional quote is free.
       </p>
       <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
         ${esc(ctaTexts.button)}
         <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
-      <p class="text-sm text-gray-400 mt-4">Preventivo pronto in 30 secondi &middot; Nessun impegno</p>
+      <p class="text-sm text-gray-400 mt-4">Quote ready in 30 seconds &middot; No commitment</p>
     </div>
   </section>`;
 
@@ -885,21 +885,21 @@ function buildQuantoCostaBlock(
   const sectorLabel = s.label.toLowerCase();
   const pricePct = intel ? Math.round((intel.priceIndex - 1.0) * 100) : 0;
   const priceNote = !intel
-    ? `in linea con la media italiana`
+    ? `in line with the national average`
     : pricePct > 5
-      ? `mediamente del <strong>${pricePct}% più alti</strong> rispetto alla media nazionale`
+      ? `on average <strong>${pricePct}% higher</strong> than the national average`
       : pricePct < -5
-        ? `mediamente del <strong>${Math.abs(pricePct)}% più bassi</strong> rispetto alla media nazionale`
-        : `in linea con la media nazionale (variazione contenuta entro il ±5%)`;
+        ? `on average <strong>${Math.abs(pricePct)}% lower</strong> than the national average`
+        : `in line with the national average (a modest variation within ±5%)`;
 
-  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "stabile";
+  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "steady";
 
   const examples = s.useCases.slice(0, 4).map((uc, i) => {
     const base = 250 + i * 320 + (strHash(city.slug + s.slug + String(i)) % 180);
     const factor = intel ? intel.priceIndex : 1.0;
     const low = Math.round((base * factor) / 10) * 10;
     const high = Math.round((base * factor * 1.7) / 10) * 10;
-    return { label: uc, range: `da ${low}€ a ${high}€` };
+    return { label: uc, range: `$${low} to $${high}` };
   });
 
   const examplesList = examples
@@ -912,14 +912,14 @@ function buildQuantoCostaBlock(
     )
     .join("\n        ");
 
-  const paragraph1 = `A ${esc(cityName)} il costo medio per un servizio di ${esc(sectorLabel)} è ${priceNote}. La domanda nel ${esc(regionName)} è attualmente ${esc(demandText)}, condizione che influisce sui tempi di risposta dei professionisti e sulla negoziazione del prezzo finale. I prezzi indicati qui sotto sono intervalli di mercato medi raccolti da preventivi reali generati con quoteai per lavori nella zona di ${esc(cityName)} e nelle località limitrofe.`;
-  const paragraph2 = `Ogni preventivo dipende da fattori specifici: superficie esatta dell'intervento, qualità dei materiali richiesti, accessibilità del cantiere, urgenza dell'esecuzione e personalizzazioni concordate con il committente. Per questo ti consigliamo di richiedere sempre un sopralluogo o di fornire una descrizione dettagliata: con quoteai puoi farlo in 30 secondi descrivendo il lavoro in linguaggio naturale e ricevere un documento professionale, modificabile e pronto da inviare al cliente via WhatsApp o email.`;
+  const paragraph1 = `In ${esc(cityName)}, the average cost for ${esc(sectorLabel)} work is ${priceNote}. Demand in ${esc(regionName)} is currently ${esc(demandText)}, which affects how quickly contractors respond and how much room there is to negotiate the final price. The ranges below are average market prices drawn from real quotes generated with quoteai for jobs in ${esc(cityName)} and the surrounding area.`;
+  const paragraph2 = `Every quote depends on job-specific factors: the exact scope of work, the quality of materials requested, site accessibility, how urgent the job is, and any custom terms agreed with the client. That's why we always recommend a proper walkthrough or a detailed description: with quoteai you can do that in 30 seconds by describing the job in plain language, and get a professional, editable document ready to send to the client by WhatsApp or email.`;
 
-  return `<section class="py-20 bg-white border-t border-gray-100" aria-label="Quanto costa ${esc(sectorLabel)} a ${esc(cityName)}">
+  return `<section class="py-20 bg-white border-t border-gray-100" aria-label="What ${esc(sectorLabel)} work costs in ${esc(cityName)}">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
     <div class="text-center mb-10">
-      <h2 class="text-2xl font-bold text-gray-900">Quanto costa un ${esc(sectorLabel)} a ${esc(cityName)}</h2>
-      <p class="text-sm text-gray-400 mt-2">Range di prezzo orientativi per i lavori più richiesti</p>
+      <h2 class="text-2xl font-bold text-gray-900">What does a ${esc(sectorLabel)} cost in ${esc(cityName)}</h2>
+      <p class="text-sm text-gray-400 mt-2">Typical price ranges for the most requested jobs</p>
     </div>
     <div class="space-y-4 text-gray-600 leading-relaxed text-base mb-8">
       <p>${paragraph1}</p>
@@ -963,22 +963,22 @@ function buildHomepageBodyHtml(): string {
     <div class="mesh-blob mesh-blob-3" aria-hidden="true"></div>
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
       <h1 class="mx-auto max-w-4xl text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl leading-[1.1]">
-        Crea preventivi professionali in <span class="gradient-text">30 secondi</span> con l&apos;AI
+        Create professional quotes in <span class="gradient-text">30 seconds</span> with AI
       </h1>
       <p class="mx-auto mt-8 max-w-2xl text-xl text-gray-500 leading-relaxed">
-        Dimentica Excel e i documenti scritti a mano. Descrivi il lavoro a parole tue e quoteai genera un documento impeccabile, pronto da inviare al cliente.
+        Forget Excel and handwritten estimates. Describe the job in your own words and quoteai generates a polished document, ready to send to the client.
       </p>
       <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4">
         <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
-          Inizia Gratuitamente
+          Get Started Free
           <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
         <a href="#come-funziona" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
-          Vedi come funziona
+          See how it works
         </a>
       </div>
       <p class="mt-6 text-sm text-gray-400">
-        ✓ Gratis per iniziare &nbsp;&middot;&nbsp; ✓ Nessuna carta richiesta &nbsp;&middot;&nbsp; ✓ Preventivo in 30 secondi
+        ✓ Free to start &nbsp;&middot;&nbsp; ✓ No credit card required &nbsp;&middot;&nbsp; ✓ Quote in 30 seconds
       </p>
     </div>
   </section>
@@ -986,30 +986,30 @@ function buildHomepageBodyHtml(): string {
   <section id="come-funziona" class="fade-in-section py-28 bg-gray-50/60">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-14">
-        <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Basta Excel. Basta fogli scritti a mano.</h2>
-        <p class="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">quoteai trasforma una descrizione in linguaggio naturale in un preventivo professionale con tutti i calcoli già fatti.</p>
+        <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">No more Excel. No more handwritten sheets.</h2>
+        <p class="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">quoteai turns a plain-language description into a professional quote with every calculation already done.</p>
       </div>
       <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
         <div class="card-soft bg-white rounded-2xl p-8">
           <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-3">Scrivi in italiano</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">Nessun campo da compilare. Descrivi il lavoro come lo descriveresti a voce — l&apos;AI capisce e struttura tutto automaticamente.</p>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">Write it in plain English</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">No fields to fill out. Describe the job the way you'd say it out loud — the AI understands and structures everything automatically.</p>
         </div>
         <div class="card-soft bg-white rounded-2xl p-8">
           <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-3">PDF professionale immediato</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">Voci di costo, quantità, prezzi unitari, IVA e totale — tutto calcolato e formattato. Pronto da inviare via WhatsApp o email.</p>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">A professional PDF, instantly</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Line items, quantities, unit prices, tax and total — all calculated and formatted. Ready to send by WhatsApp or email.</p>
         </div>
         <div class="card-soft bg-white rounded-2xl p-8">
           <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-3">Correggi quello che vuoi</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">Ogni voce è modificabile direttamente nell&apos;anteprima. Cambia prezzi, aggiungi lavorazioni, personalizza le condizioni di pagamento.</p>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">Edit anything you want</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Every line item is editable directly in the preview. Change prices, add work items, customize payment terms.</p>
         </div>
       </div>
     </div>
@@ -1018,8 +1018,8 @@ function buildHomepageBodyHtml(): string {
   <section class="fade-in-section py-20 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Preventivi per ogni professione</h2>
-        <p class="mt-3 text-base text-gray-500">Imbianchini, elettricisti, idraulici, falegnami, muratori e molti altri — quoteai funziona per tutti.</p>
+        <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Quotes for every trade</h2>
+        <p class="mt-3 text-base text-gray-500">Painters, electricians, plumbers, carpenters, masons and many more — quoteai works for all of them.</p>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
         ${sectorLinks}
@@ -1042,14 +1042,14 @@ function buildHomepageBodyHtml(): string {
   <section class="fade-in-section py-14 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-8">
-        <span class="inline-block bg-amber-50 text-amber-600 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">Recensioni verificate</span>
-        <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Cosa dicono <span class="gradient-text">di noi</span></h2>
-        <div class="flex items-center justify-center gap-2 mt-3" aria-label="Valutazione media ${AGGREGATE_RATING.ratingValue} su 5">
+        <span class="inline-block bg-amber-50 text-amber-600 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">Verified reviews</span>
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">What people <span class="gradient-text">are saying</span></h2>
+        <div class="flex items-center justify-center gap-2 mt-3" aria-label="Average rating ${AGGREGATE_RATING.ratingValue} out of 5">
           <div class="flex gap-0.5" aria-hidden="true">
             ${Array.from({ length: 5 }).map(() => `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 fill-amber-400" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join("")}
           </div>
           <span class="text-sm font-bold text-gray-800">${AGGREGATE_RATING.ratingValue}</span>
-          <span class="text-sm text-gray-400">/5 &middot; ${AGGREGATE_RATING.reviewCount} recensioni</span>
+          <span class="text-sm text-gray-400">/5 &middot; ${AGGREGATE_RATING.reviewCount} reviews</span>
         </div>
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
@@ -1059,7 +1059,7 @@ function buildHomepageBodyHtml(): string {
             `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ${i < t.rating ? "text-amber-400 fill-amber-400" : "text-gray-100 fill-gray-100"}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
           ).join("");
           return `<div class="bg-white rounded-xl border border-gray-100 p-5 card-soft flex flex-col gap-3">
-            <div class="flex gap-0.5" aria-label="${t.rating} stelle su 5">${stars}</div>
+            <div class="flex gap-0.5" aria-label="${t.rating} stars out of 5">${stars}</div>
             <p class="text-sm text-gray-700 leading-relaxed flex-1">&ldquo;${esc(testimonialText(t.key))}&rdquo;</p>
             <div class="flex items-center gap-3 pt-2 border-t border-gray-50">
               <div class="h-9 w-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">${initials}</div>
@@ -1080,79 +1080,76 @@ function buildHomepageBodyHtml(): string {
         <div class="text-center mb-10">
           <span class="inline-flex items-center gap-1.5 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
-            Approfondimento
+            Deep dive
           </span>
           <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-            Cos&#39;è <span class="gradient-text">quoteai</span> e a chi serve
+            What <span class="gradient-text">quoteai</span> is, and who it's for
           </h2>
         </div>
 
         <div class="space-y-5 text-sm sm:text-[15px] text-gray-600 leading-relaxed">
           <p>
-            <strong class="text-gray-900">quoteai</strong> è il primo software italiano che usa l&#39;intelligenza
-            artificiale per trasformare una descrizione in linguaggio naturale in un preventivo professionale
-            completo. È pensato per artigiani, professionisti tecnici e piccole imprese che ogni settimana devono
-            inviare offerte ai clienti — imbianchini, elettricisti, idraulici, muratori, fabbri, falegnami, imprese
-            di ristrutturazione e tutti i mestieri del settore edile e impiantistico. L&#39;obiettivo è semplice:
-            ridurre il tempo per fare un preventivo da 30-60 minuti a 30 secondi, senza rinunciare alla qualità del
-            documento finale.
+            <strong class="text-gray-900">quoteai</strong> is AI-powered software that turns a plain-language
+            description into a complete, professional quote. It's built for contractors, tradespeople and small
+            businesses across Canada who send quotes to customers every week — painters, electricians, plumbers,
+            masons, welders, carpenters, renovation contractors, and every trade in construction and mechanical
+            work. The goal is simple: cut the time it takes to put together a quote from 30-60 minutes down to 30
+            seconds, without giving up quality in the final document.
           </p>
 
           <div class="grid sm:grid-cols-3 gap-3 my-8">
             <div class="rounded-xl bg-gray-50 border border-gray-100 p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-600 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/></svg>
-              <div class="font-semibold text-gray-900 text-sm mb-1">IVA italiana integrata</div>
-              <p class="text-xs text-gray-500 leading-relaxed">Calcolo automatico IVA 10%, 22% e regime forfettario.</p>
+              <div class="font-semibold text-gray-900 text-sm mb-1">Canadian tax built in</div>
+              <p class="text-xs text-gray-500 leading-relaxed">GST/HST (and PST/QST where it applies) calculated automatically for the province the work is done in.</p>
             </div>
             <div class="rounded-xl bg-gray-50 border border-gray-100 p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-600 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
-              <div class="font-semibold text-gray-900 text-sm mb-1">Dati su server europei</div>
-              <p class="text-xs text-gray-500 leading-relaxed">Stripe per i pagamenti, cookie crittografati.</p>
+              <div class="font-semibold text-gray-900 text-sm mb-1">Encrypted and secure</div>
+              <p class="text-xs text-gray-500 leading-relaxed">Payments through Stripe, encrypted connections throughout.</p>
             </div>
             <div class="rounded-xl bg-gray-50 border border-gray-100 p-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-600 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
-              <div class="font-semibold text-gray-900 text-sm mb-1">AI addestrata in italiano</div>
-              <p class="text-xs text-gray-500 leading-relaxed">Lessico tecnico edile e impiantistico italiano.</p>
+              <div class="font-semibold text-gray-900 text-sm mb-1">Trained on trade terminology</div>
+              <p class="text-xs text-gray-500 leading-relaxed">The AI knows the terms Canadian contractors actually use.</p>
             </div>
           </div>
 
-          <h3 class="text-lg font-semibold text-gray-900 pt-3">Come funziona davvero</h3>
+          <h3 class="text-lg font-semibold text-gray-900 pt-3">How it actually works</h3>
           <p>
-            Apri quoteai dal tuo smartphone direttamente in cantiere o da casa la sera. Descrivi il lavoro come lo
-            racconteresti a un collega: <em>«Tinteggiatura appartamento 80mq, due mani di lavabile bianca, rasatura
-            parete bagno»</em>. In trenta secondi il motore AI costruisce un preventivo strutturato in capitoli, con
-            voci di costo, unità di misura (metri quadri, ore, corpo), prezzi unitari di mercato italiano e calcolo
-            IVA automatico. Puoi modificare ogni voce, sostituire i prezzi con il tuo listino personale, aggiungere
-            o togliere capitoli. Quando sei pronto scarichi il PDF, lo invii via WhatsApp o email, e il documento
-            viene archiviato nella tua area personale per future modifiche.
+            Open quoteai on your phone right on the job site, or from home in the evening. Describe the job the way
+            you'd explain it to a colleague: <em>&ldquo;800 sq ft condo, two coats of white washable latex, patch
+            and prime the bathroom wall.&rdquo;</em> In thirty seconds the AI engine builds a quote structured into
+            sections, with line items, units (square feet, hours, per-job), unit prices in line with the Canadian
+            market, and tax calculated automatically. You can edit every line, swap in your own price list, add or
+            remove sections. When you're ready, download the PDF, send it by WhatsApp or email, and the document is
+            archived in your account for future edits.
           </p>
 
-          <h3 class="text-lg font-semibold text-gray-900 pt-3">Perché funziona meglio di Excel o dei software tradizionali</h3>
+          <h3 class="text-lg font-semibold text-gray-900 pt-3">Why it beats Excel or traditional software</h3>
           <p>
-            I software di preventivazione tradizionali sono pensati per l&#39;ufficio: richiedono installazione,
-            configurazione iniziale di listini e codici, una formazione di ore. Excel è gratuito ma costringe a
-            partire ogni volta da un foglio bianco o da un template costruito anni fa. quoteai elimina entrambi i
-            problemi: non c&#39;è nulla da installare (basta un browser), non serve configurare nulla all&#39;inizio
-            (l&#39;AI conosce già i prezzi medi) e ogni preventivo nasce già strutturato. In media i nostri utenti
-            dichiarano un risparmio di 4-6 ore a settimana, tempo che torna in cantiere o in famiglia.
+            Traditional quoting software is built for the office: it needs installation, hours of setup for price
+            lists and codes, training time. Excel is free but forces you to start from a blank sheet or a template
+            built years ago every single time. quoteai removes both problems: there's nothing to install (just a
+            browser), nothing to configure up front (the AI already knows typical prices), and every quote starts
+            already structured. On average our users report saving 4-6 hours a week — time that goes back to the
+            job site or their family.
           </p>
 
-          <h3 class="text-lg font-semibold text-gray-900 pt-3">Sicurezza e fiscalità italiana</h3>
+          <h3 class="text-lg font-semibold text-gray-900 pt-3">Security and Canadian tax handling</h3>
           <p>
-            Tutti i dati sono ospitati su server europei, le sessioni sono protette da cookie crittografati e i
-            pagamenti passano da Stripe. La gestione fiscale segue le regole italiane: IVA al 10% per
-            ristrutturazioni residenziali, 22% per nuovi impianti, esenzione automatica per il regime forfettario.
-            I dati aziendali (P.IVA, codice fiscale, codice SDI per fatturazione elettronica) vengono memorizzati
-            una volta e applicati ad ogni preventivo.
+            Sessions are protected with encrypted connections, and payments go through Stripe. Tax handling follows
+            Canadian rules: GST/HST calculated for the province the work is done in, with PST or QST added
+            automatically where it applies. Your business details (company name, licence or registration number)
+            are stored once and applied to every quote.
           </p>
 
-          <h3 class="text-lg font-semibold text-gray-900 pt-3">Quanto costa iniziare</h3>
+          <h3 class="text-lg font-semibold text-gray-900 pt-3">What it costs to get started</h3>
           <p>
-            La registrazione è gratuita e il primo preventivo si genera senza inserire la carta di credito. Da lì
-            puoi scegliere: pago un preventivo singolo (29€) quando serve, oppure attivo un abbonamento mensile
-            (Starter 19€ con 10 preventivi, Pro 49€ con 60 preventivi, Elite 59€ illimitati). Il piano si cambia
-            o si disdice in qualsiasi momento dall&#39;area cliente. Migliaia di professionisti italiani usano già
-            quoteai ogni settimana.
+            Signing up is free, and your first quote is generated without entering a credit card. From there you
+            can choose: pay for a single quote when you need one, or start a monthly subscription plan for anyone
+            quoting regularly. You can change or cancel your plan anytime from your account. Contractors across
+            Canada already use quoteai every week.
           </p>
         </div>
       </div>
@@ -1162,13 +1159,13 @@ function buildHomepageBodyHtml(): string {
   <section class="fade-in-section py-28 bg-white">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
       <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-        Pronto a creare il tuo primo preventivo <span class="gradient-text">in 30 secondi</span>?
+        Ready to create your first quote <span class="gradient-text">in 30 seconds</span>?
       </h2>
       <p class="text-lg text-gray-500 mb-10">
-        Unisciti a centinaia di professionisti italiani che usano quoteai ogni giorno. Nessuna carta di credito. Nessun impegno.
+        Join contractors across Canada who use quoteai every day. No credit card. No commitment.
       </p>
       <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
-        Inizia Gratuitamente
+        Get Started Free
         <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
     </div>
@@ -1189,7 +1186,7 @@ const homepageWebSiteSchema = {
   "@type": "WebSite",
   name: "quoteai",
   url: BASE_URL,
-  description: "Software AI per preventivi professionali in 30 secondi. Per artigiani, PMI e freelance italiani.",
+  description: "AI-powered software for professional quotes in 30 seconds. Built for Canadian contractors, small businesses, and freelancers.",
   inLanguage: "en",
   potentialAction: {
     "@type": "SearchAction",
@@ -1204,12 +1201,12 @@ const homepageSoftwareSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "quoteai",
-  description: "Software di preventivazione con intelligenza artificiale per artigiani, PMI e professionisti italiani.",
+  description: "AI-powered quoting software for Canadian contractors, small businesses, and tradespeople.",
   url: `${BASE_URL}/`,
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", description: "Prova gratuita disponibile" },
-  audience: { "@type": "BusinessAudience", audienceType: "Artigiani, PMI, Professionisti, Freelance" },
+  offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", description: "Free trial available" },
+  audience: { "@type": "BusinessAudience", audienceType: "Contractors, Small Businesses, Tradespeople, Freelancers" },
   inLanguage: "en",
   provider: { "@type": "Organization", name: "quoteai", url: BASE_URL },
   aggregateRating: {
@@ -1227,8 +1224,8 @@ const homepageSoftwareSchema = {
   })),
 };
 const homepageHeadBlock = buildHeadBlock({
-  title: "quoteai – Preventivi Online per Artigiani e Aziende | AI in 30s",
-  description: "Crea preventivi professionali in 30 secondi con l'AI. Software di preventivazione per artigiani, PMI e professionisti italiani. Niente Excel, niente errori. Provalo gratis.",
+  title: "quoteai – Online Quotes for Contractors & Trades | AI in 30s",
+  description: "Create professional quotes in 30 seconds with AI. Quoting software for Canadian contractors, small businesses, and tradespeople. No more Excel, no more mistakes. Try it free.",
   canonical: `${BASE_URL}/`,
   ogImagePath: "/opengraph.jpg",
   jsonLd: [homepageWebSiteSchema, homepageSoftwareSchema],
@@ -1355,16 +1352,16 @@ function buildArticleJsonLd(article: BlogArticle, imagePath: string): object[] {
 // ─── Blog list page body HTML ─────────────────────────────────────────────────
 
 const BLOG_CATEGORY_STYLE: Record<string, string> = {
-  Professioni: "background:#f5f3ff;color:#6d28d9",
-  Prezzi: "background:#ecfeff;color:#0e7490",
-  Consigli: "background:#fffbeb;color:#d97706",
-  Tool: "background:#f0fdf4;color:#15803d",
-  Innovazione: "background:#eff6ff;color:#1d4ed8",
+  Trades: "background:#f5f3ff;color:#6d28d9",
+  Pricing: "background:#ecfeff;color:#0e7490",
+  Advice: "background:#fffbeb;color:#d97706",
+  Tools: "background:#f0fdf4;color:#15803d",
+  Innovation: "background:#eff6ff;color:#1d4ed8",
   Business: "background:#fff1f2;color:#be123c",
 };
 
 function buildBlogListBodyHtml(): string {
-  const breadcrumb = `<nav aria-label="Percorso di navigazione" class="bg-white border-b border-gray-100">
+  const breadcrumb = `<nav aria-label="Breadcrumb" class="bg-white border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
     <ol class="flex items-center text-sm text-gray-500 flex-wrap">
       <li><a href="/" class="hover:text-violet-600 transition-colors">Home</a></li>
@@ -1377,10 +1374,10 @@ function buildBlogListBodyHtml(): string {
   const hero = `<section class="bg-white pt-16 pb-12 border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
     <div class="inline-flex items-center gap-2 rounded-full bg-violet-100 border border-violet-200 px-4 py-1.5 text-sm font-medium text-violet-700 mb-6">
-      Approfondimenti
+      Resources
     </div>
     <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4 leading-tight">
-      Guide e consigli per <span class="gradient-text">artigiani e PMI</span>
+      Guides and advice for <span class="gradient-text">Canadian tradespeople</span>
     </h1>
     <p class="text-lg text-gray-500 max-w-2xl mx-auto">${esc(BLOG_LIST_DESCRIPTION)}</p>
   </div>
@@ -1394,7 +1391,7 @@ function buildBlogListBodyHtml(): string {
   const categoryStrip = `<section class="border-b border-gray-100 bg-white py-4">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
     <div class="flex flex-wrap gap-2 items-center">
-      <span class="text-xs font-semibold uppercase tracking-wider mr-1" style="color:#9ca3af">Categorie:</span>
+      <span class="text-xs font-semibold uppercase tracking-wider mr-1" style="color:#9ca3af">Categories:</span>
       ${categoryLinks}
     </div>
   </div>
@@ -1402,7 +1399,7 @@ function buildBlogListBodyHtml(): string {
 
   const cards = BLOG_ARTICLES.map((a) => {
     const catStyle = BLOG_CATEGORY_STYLE[a.category] ?? "background:#f3f4f6;color:#374151";
-    const dateStr = new Date(a.publishedAt).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+    const dateStr = new Date(a.publishedAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric" });
     return `<a href="/blog/${esc(a.slug)}/" class="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md transition-all duration-200 overflow-hidden">
       <div class="p-6 flex flex-col flex-1">
         <div class="flex items-center justify-between mb-4">
@@ -1413,7 +1410,7 @@ function buildBlogListBodyHtml(): string {
         <p class="text-xs text-gray-500 leading-relaxed mb-4">${esc(a.metaDescription.slice(0, 130))}...</p>
         <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
           <time class="text-xs text-gray-400" datetime="${a.publishedAt}">${dateStr}</time>
-          <span class="text-xs font-semibold text-violet-600">Leggi →</span>
+          <span class="text-xs font-semibold text-violet-600">Read →</span>
         </div>
       </div>
     </a>`;
@@ -1430,11 +1427,11 @@ function buildBlogListBodyHtml(): string {
   const cta = `<section class="py-16 bg-gray-50 border-t border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
     <h2 class="text-2xl font-bold text-gray-900 mb-3">
-      Pronto a creare preventivi in <span class="gradient-text">30 secondi</span>?
+      Ready to create quotes in <span class="gradient-text">30 seconds</span>?
     </h2>
-    <p class="text-gray-500 mb-8 text-sm">Nessuna carta di credito. Nessun impegno. Il tuo primo preventivo è gratis.</p>
+    <p class="text-gray-500 mb-8 text-sm">No credit card. No commitment. Your first quote is free.</p>
     <a href="/sign-up/" class="btn-gradient inline-flex h-12 items-center justify-center px-8 text-sm font-semibold">
-      Inizia Gratuitamente
+      Get Started Free
     </a>
   </div>
 </section>`;
@@ -1451,7 +1448,7 @@ function buildBlogListBodyHtml(): string {
 // ─── Blog article page body HTML ──────────────────────────────────────────────
 
 function buildBlogArticleBodyHtml(article: BlogArticle): string {
-  const breadcrumb = `<nav aria-label="Percorso di navigazione" class="bg-white border-b border-gray-100">
+  const breadcrumb = `<nav aria-label="Breadcrumb" class="bg-white border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
     <ol class="flex items-center text-sm text-gray-500 flex-wrap">
       <li><a href="/" class="hover:text-violet-600 transition-colors">Home</a></li>
@@ -1464,13 +1461,13 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
 </nav>`;
 
   const catStyle = BLOG_CATEGORY_STYLE[article.category] ?? "background:#f3f4f6;color:#374151";
-  const dateStr = new Date(article.publishedAt).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+  const dateStr = new Date(article.publishedAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric" });
 
   const header = `<header style="background:linear-gradient(135deg,rgba(124,58,237,0.04),rgba(6,182,212,0.04))" class="pt-14 pb-10 border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
     <div class="flex items-center gap-3 mb-5">
       <span class="text-xs font-semibold px-2.5 py-1 rounded-full" style="${catStyle}">${esc(article.category)}</span>
-      <span class="text-xs text-gray-400">${article.readingTimeMin} min di lettura</span>
+      <span class="text-xs text-gray-400">${article.readingTimeMin} min read</span>
       <time class="text-xs text-gray-400" datetime="${article.publishedAt}">${dateStr}</time>
     </div>
     <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl leading-tight mb-4">${esc(article.title)}</h1>
@@ -1482,8 +1479,8 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
   const bodyHtml = injectHeadingIds(article.contentHtml);
 
   const tocHtml = toc.length >= 2
-    ? `<nav aria-label="Sommario" class="mb-10 rounded-xl border border-violet-100 px-6 py-5" style="background:rgba(124,58,237,0.04)">
-  <p class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#7c3aed">Sommario</p>
+    ? `<nav aria-label="Table of contents" class="mb-10 rounded-xl border border-violet-100 px-6 py-5" style="background:rgba(124,58,237,0.04)">
+  <p class="text-xs font-bold uppercase tracking-wider mb-3" style="color:#7c3aed">Table of contents</p>
   <ol class="space-y-1.5">
     ${toc.map((item) => `<li${item.level === 3 ? ' class="pl-4"' : ""}>
       <a href="#${item.id}" class="text-sm text-gray-700 hover:text-violet-700 transition-colors leading-snug">${item.level === 3 ? '<span class="mr-1 text-gray-400">–</span>' : ""}${esc(item.text)}</a>
@@ -1503,13 +1500,13 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
     const sector = SECTORS[sectorSlug];
     if (!sector) return "";
     return `<a href="/preventivi/${esc(sectorSlug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors">
-      <span class="text-violet-400 font-bold">→</span> Preventivi ${esc(sector.label)}
+      <span class="text-violet-400 font-bold">→</span> ${esc(sector.label)} quotes
     </a>`;
   }).filter(Boolean).join("\n    ");
 
   const relatedSectorsSection = relatedSectorLinks ? `<section class="border-t border-gray-100 bg-gray-50 py-10">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Preventivi per settore</h2>
+    <h2 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Quotes by trade</h2>
     <div class="flex flex-wrap gap-3">
       ${relatedSectorLinks}
     </div>
@@ -1520,7 +1517,7 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
   const geoSector = geoSectorSlug ? SECTORS[geoSectorSlug] : undefined;
   const citySection = geoSector ? `<section class="border-t border-gray-100 bg-white py-10">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Preventivi ${esc(geoSector.labelPlural)} nella tua città</h2>
+    <h2 class="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">${esc(geoSector.labelPlural)} quotes in your city</h2>
     <div class="flex flex-wrap gap-3">
       ${ACTIVE_CITIES
         .map(
@@ -1550,7 +1547,7 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
 
   const relatedArticlesSection = relatedCards ? `<section class="py-12 border-t border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-lg font-bold text-gray-900 mb-6">Articoli correlati</h2>
+    <h2 class="text-lg font-bold text-gray-900 mb-6">Related articles</h2>
     <div class="grid sm:grid-cols-3 gap-4">
       ${relatedCards}
     </div>
@@ -1560,11 +1557,11 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
   const cta = `<section class="py-16 border-t border-violet-100/60" style="background:linear-gradient(135deg,rgba(124,58,237,0.04),rgba(6,182,212,0.04))">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
     <h2 class="text-2xl font-bold text-gray-900 mb-3">
-      Pronto a creare preventivi in <span class="gradient-text">30 secondi</span>?
+      Ready to create quotes in <span class="gradient-text">30 seconds</span>?
     </h2>
-    <p class="text-gray-500 mb-8 text-sm">Nessuna carta di credito. Nessun impegno. Il tuo primo preventivo è gratis.</p>
+    <p class="text-gray-500 mb-8 text-sm">No credit card. No commitment. Your first quote is free.</p>
     <a href="/sign-up/" class="btn-gradient inline-flex h-12 items-center justify-center px-8 text-sm font-semibold">
-      Inizia Gratuitamente
+      Get Started Free
       <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
     </a>
   </div>
@@ -1611,11 +1608,11 @@ function buildBlogCategoryJsonLd(category: BlogCategory): object[] {
 // ─── Blog category page body HTML ─────────────────────────────────────────────
 
 const BLOG_CATEGORY_COLOR_STYLE: Record<string, string> = {
-  Professioni: "background:#f5f3ff;color:#6d28d9",
-  Prezzi: "background:#ecfeff;color:#0e7490",
-  Consigli: "background:#fffbeb;color:#d97706",
-  Tool: "background:#f0fdf4;color:#15803d",
-  Innovazione: "background:#eff6ff;color:#1d4ed8",
+  Trades: "background:#f5f3ff;color:#6d28d9",
+  Pricing: "background:#ecfeff;color:#0e7490",
+  Advice: "background:#fffbeb;color:#d97706",
+  Tools: "background:#f0fdf4;color:#15803d",
+  Innovation: "background:#eff6ff;color:#1d4ed8",
   Business: "background:#fff1f2;color:#be123c",
 };
 
@@ -1623,7 +1620,7 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
   const articles = getArticlesByCategory(category.name);
   const catStyle = BLOG_CATEGORY_COLOR_STYLE[category.name] ?? "background:#f3f4f6;color:#374151";
 
-  const breadcrumb = `<nav aria-label="Percorso di navigazione" class="bg-white border-b border-gray-100">
+  const breadcrumb = `<nav aria-label="Breadcrumb" class="bg-white border-b border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
     <ol class="flex items-center text-sm text-gray-500 flex-wrap">
       <li><a href="/" class="hover:text-violet-600 transition-colors">Home</a></li>
@@ -1639,16 +1636,16 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl text-center">
     <span class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold mb-5" style="${catStyle}">${esc(category.name)}</span>
     <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl mb-3 leading-tight">
-      Articoli su <span class="gradient-text">${esc(category.name)}</span>
+      Articles on <span class="gradient-text">${esc(category.name)}</span>
     </h1>
     <p class="text-base text-gray-500 leading-relaxed max-w-2xl mx-auto">${esc(category.description)}</p>
-    <p class="text-xs text-gray-400 mt-3">${articles.length} ${articles.length === 1 ? "articolo" : "articoli"}</p>
+    <p class="text-xs text-gray-400 mt-3">${articles.length} ${articles.length === 1 ? "article" : "articles"}</p>
   </div>
 </section>`;
 
   const cards = articles.map((a) => {
     const cs = BLOG_CATEGORY_COLOR_STYLE[a.category] ?? "background:#f3f4f6;color:#374151";
-    const dateStr = new Date(a.publishedAt).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+    const dateStr = new Date(a.publishedAt).toLocaleDateString("en-CA", { day: "numeric", month: "long", year: "numeric" });
     return `<a href="/blog/${esc(a.slug)}/" class="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md transition-all duration-200 overflow-hidden">
       <div class="p-6 flex flex-col flex-1">
         <div class="flex items-center justify-between mb-4">
@@ -1659,7 +1656,7 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
         <p class="text-xs text-gray-500 leading-relaxed mb-4">${esc(a.metaDescription.slice(0, 130))}...</p>
         <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
           <time class="text-xs text-gray-400" datetime="${a.publishedAt}">${dateStr}</time>
-          <span class="text-xs font-semibold text-violet-600">Leggi →</span>
+          <span class="text-xs font-semibold text-violet-600">Read →</span>
         </div>
       </div>
     </a>`;
@@ -1674,8 +1671,8 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
   </div>
 </section>`
     : `<section class="py-20 text-center text-gray-400">
-  <p class="text-lg font-medium">Nessun articolo in questa categoria.</p>
-  <a href="/blog/" class="mt-6 inline-block text-violet-600 text-sm font-semibold">Torna al Blog →</a>
+  <p class="text-lg font-medium">No articles in this category yet.</p>
+  <a href="/blog/" class="mt-6 inline-block text-violet-600 text-sm font-semibold">Back to the Blog →</a>
 </section>`;
 
   const otherCats = BLOG_CATEGORIES.filter((c) => c.slug !== category.slug);
@@ -1686,7 +1683,7 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
 
   const otherCatsSection = `<section class="py-10 bg-gray-50 border-t border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5">Altre categorie</h2>
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5">Other categories</h2>
     <div class="flex flex-wrap gap-3">
       ${catLinks}
     </div>
@@ -1696,11 +1693,11 @@ function buildBlogCategoryBodyHtml(category: BlogCategory): string {
   const cta = `<section class="py-16 bg-white border-t border-gray-100">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
     <h2 class="text-2xl font-bold text-gray-900 mb-3">
-      Pronto a creare preventivi in <span class="gradient-text">30 secondi</span>?
+      Ready to create quotes in <span class="gradient-text">30 seconds</span>?
     </h2>
-    <p class="text-gray-500 mb-8 text-sm">Nessuna carta di credito. Nessun impegno. Il tuo primo preventivo è gratis.</p>
+    <p class="text-gray-500 mb-8 text-sm">No credit card. No commitment. Your first quote is free.</p>
     <a href="/sign-up/" class="btn-gradient inline-flex h-12 items-center justify-center px-8 text-sm font-semibold">
-      Inizia Gratuitamente
+      Get Started Free
     </a>
   </div>
 </section>`;
@@ -1790,27 +1787,27 @@ function buildWebPageJsonLd(name: string, description: string, path: string, typ
 function buildMappaSitoBodyHtml(): string {
   const breadcrumb = buildBreadcrumb([
     { name: "Home", href: "/" },
-    { name: "Mappa del Sito", href: null },
+    { name: "Site Map", href: null },
   ]);
 
   const mainPages = `
     <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
       <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Pagine Principali</h2>
+        <h2 class="text-lg font-bold text-gray-900">Main Pages</h2>
       </div>
       <ul class="space-y-2.5 text-sm">
         <li><a href="/" class="text-gray-600 hover:text-violet-600 transition-colors">Home Page</a></li>
-        <li><a href="/whatsapp/" class="text-gray-600 hover:text-violet-600 transition-colors">Preventivi su WhatsApp</a></li>
-        <li><a href="/chi-siamo/" class="text-gray-600 hover:text-violet-600 transition-colors">Chi Siamo</a></li>
-        <li><a href="/contatti/" class="text-gray-600 hover:text-violet-600 transition-colors">Contatti e Assistenza</a></li>
-        <li><a href="/privacy/" class="text-gray-600 hover:text-violet-600 transition-colors">Privacy Policy</a></li>
-        <li><a href="/termini/" class="text-gray-600 hover:text-violet-600 transition-colors">Termini di Servizio</a></li>
+        <li><a href="/whatsapp/" class="text-gray-600 hover:text-violet-600 transition-colors">Quotes on WhatsApp</a></li>
+        <li><a href="/chi-siamo/" class="text-gray-600 hover:text-violet-600 transition-colors">About Us</a></li>
+        <li><a href="/contatti/" class="text-gray-600 hover:text-violet-600 transition-colors">Contact &amp; Support</a></li>
+        <li><a href="/privacy-policy/" class="text-gray-600 hover:text-violet-600 transition-colors">Privacy Policy</a></li>
+        <li><a href="/terms/" class="text-gray-600 hover:text-violet-600 transition-colors">Terms of Service</a></li>
       </ul>
     </div>
   `;
 
   const blogCats = BLOG_CATEGORIES.map((cat) => `
-    <li><a href="/blog/categoria/${cat.slug}/" class="text-gray-600 hover:text-violet-600 transition-colors pl-2">Categoria: ${cat.name}</a></li>
+    <li><a href="/blog/categoria/${cat.slug}/" class="text-gray-600 hover:text-violet-600 transition-colors pl-2">Category: ${cat.name}</a></li>
   `).join("");
 
   const blogArts = BLOG_ARTICLES.slice(0, 5).map((art) => `
@@ -1820,12 +1817,12 @@ function buildMappaSitoBodyHtml(): string {
   const blogPages = `
     <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
       <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Blog e Guide</h2>
+        <h2 class="text-lg font-bold text-gray-900">Blog &amp; Guides</h2>
       </div>
       <ul class="space-y-2.5 text-sm">
-        <li><a href="/blog/" class="font-semibold text-gray-800 hover:text-violet-600 transition-colors">Indice Blog</a></li>
+        <li><a href="/blog/" class="font-semibold text-gray-800 hover:text-violet-600 transition-colors">Blog Index</a></li>
         ${blogCats}
-        <li class="pt-2 font-semibold text-gray-800 border-t border-gray-50 mt-2">Ultimi Articoli:</li>
+        <li class="pt-2 font-semibold text-gray-800 border-t border-gray-50 mt-2">Latest Articles:</li>
         ${blogArts}
       </ul>
     </div>
@@ -1838,7 +1835,7 @@ function buildMappaSitoBodyHtml(): string {
   const professionsIndex = `
     <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
       <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Professioni e Servizi</h2>
+        <h2 class="text-lg font-bold text-gray-900">Trades &amp; Services</h2>
       </div>
       <ul class="space-y-2.5 text-sm">
         ${sectorLinks}
@@ -1861,7 +1858,7 @@ function buildMappaSitoBodyHtml(): string {
       const sectorLinksForCity = CITY_SECTORS.map((sectorSlug) => {
         const s = SECTORS[sectorSlug];
         if (!s) return "";
-        return `<a href="/preventivi/${sectorSlug}/${city.slug}/" class="text-gray-500 hover:text-violet-600 transition-colors truncate" title="Preventivo ${esc(s.label)} a ${esc(city.name)}">${esc(s.label)}</a>`;
+        return `<a href="/preventivi/${sectorSlug}/${city.slug}/" class="text-gray-500 hover:text-violet-600 transition-colors truncate" title="${esc(s.label)} quote in ${esc(city.name)}">${esc(s.label)}</a>`;
       }).join("\n");
 
       return `
@@ -1888,8 +1885,8 @@ function buildMappaSitoBodyHtml(): string {
     <div class="mt-12 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
       <div class="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">Preventivi Locali per Città</h2>
-          <p class="text-sm text-gray-500 mt-1">Seleziona un settore e la tua città per accedere ai prezzi e alle informazioni territoriali.</p>
+          <h2 class="text-2xl font-bold text-gray-900">Local Quotes by City</h2>
+          <p class="text-sm text-gray-500 mt-1">Select a trade and your city to see local pricing and information.</p>
         </div>
       </div>
       <div class="space-y-10">
@@ -1903,8 +1900,8 @@ function buildMappaSitoBodyHtml(): string {
       ${breadcrumb}
       <section class="relative overflow-hidden bg-white pt-20 pb-12 border-b border-gray-100">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <h1 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">Mappa del Sito</h1>
-          <p class="text-lg text-gray-600">Esplora l'indice completo di quoteai.ca. Trova strumenti di preventivazione specifici, guide fiscali e tutte le pagine locali per regione.</p>
+          <h1 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">Site Map</h1>
+          <p class="text-lg text-gray-600">Browse the full index of quoteai.ca. Find quoting tools by trade, guides, and every local page by region.</p>
         </div>
       </section>
       <section class="py-16 bg-gray-50/50">
@@ -2018,9 +2015,9 @@ buildStaticPageHtml({
 const contattiJsonLd = {
   "@context": "https://schema.org",
   "@type": "ContactPage",
-  name: "Contatti quoteai",
+  name: "Contact quoteai",
   url: `${BASE_URL}/contatti/`,
-  description: "Contatta il team quoteai per supporto, domande sul prodotto o informazioni commerciali.",
+  description: "Contact the quoteai team for support, product questions, or sales inquiries.",
   mainEntity: {
     "@type": "Organization",
     name: "quoteai",
@@ -2034,32 +2031,32 @@ const contattiJsonLd = {
 };
 buildStaticPageHtml({
   slug: "contatti",
-  title: "Contatti | quoteai — Assistenza e Supporto",
-  description: "Hai domande su quoteai? Contattaci via email o WhatsApp. Siamo qui per aiutarti a generare preventivi professionali più velocemente.",
+  title: "Contact | quoteai — Help and Support",
+  description: "Have questions about quoteai? Contact us by email or WhatsApp. We're here to help you generate professional quotes faster.",
   path: "/contatti/",
-  jsonLd: [contattiJsonLd, buildBreadcrumbJsonLd("Contatti", "/contatti/")],
+  jsonLd: [contattiJsonLd, buildBreadcrumbJsonLd("Contact", "/contatti/")],
   bodyHtml: wrapInPublicLayout(`<section class="relative overflow-hidden bg-white pt-24 pb-16">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl text-center">
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5">Come possiamo <span style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">aiutarti?</span></h1>
-    <p class="text-xl text-gray-600 leading-relaxed">Il team quoteai risponde entro poche ore nei giorni feriali. Scegli il canale che preferisci.</p>
+    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5">How can we <span style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">help?</span></h1>
+    <p class="text-xl text-gray-600 leading-relaxed">The quoteai team responds within a few hours on business days. Pick the channel you prefer.</p>
   </div>
 </section>
 <section class="py-16 bg-gray-50">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
     <div class="grid md:grid-cols-3 gap-6">
       <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-2">Supporto prodotto</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Problemi tecnici, domande sull'utilizzo, richiesta di funzionalità.</p>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">Product support</h2>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">Technical issues, questions about using the app, feature requests.</p>
         <a href="mailto:info@quoteai.ca" class="text-violet-600 font-semibold text-sm">info@quoteai.ca →</a>
       </div>
       <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
         <h2 class="text-lg font-bold text-gray-900 mb-2">WhatsApp</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Vuoi provare il servizio via WhatsApp o hai una domanda rapida? Scrivici direttamente.</p>
-        <a href="/whatsapp/" class="text-green-600 font-semibold text-sm">Scopri quoteai su WhatsApp →</a>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">Want to try the service over WhatsApp or have a quick question? Message us directly.</p>
+        <a href="/whatsapp/" class="text-green-600 font-semibold text-sm">See quoteai on WhatsApp →</a>
       </div>
       <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-2">Privacy &amp; legale</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Richieste GDPR, esercizio dei diritti, questioni legali o contrattuali.</p>
+        <h2 class="text-lg font-bold text-gray-900 mb-2">Privacy &amp; legal</h2>
+        <p class="text-gray-500 text-sm leading-relaxed mb-4">Privacy requests, exercising your rights, legal or contractual questions.</p>
         <a href="mailto:privacy@quoteai.ca" class="text-gray-600 font-semibold text-sm">privacy@quoteai.ca →</a>
       </div>
     </div>
@@ -2068,78 +2065,78 @@ buildStaticPageHtml({
 <section class="py-16 bg-white">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
     <div class="bg-violet-50 border border-violet-100 rounded-2xl p-6">
-      <h3 class="font-bold text-gray-900 mb-1">Tempi di risposta</h3>
-      <p class="text-gray-600 text-sm leading-relaxed">Rispondiamo a tutte le email entro <strong>4-8 ore nei giorni feriali</strong> (lunedì–venerdì, 9:00–18:00 CET). Per le richieste inviate nel weekend, rispondiamo il lunedì mattina.</p>
+      <h3 class="font-bold text-gray-900 mb-1">Response times</h3>
+      <p class="text-gray-600 text-sm leading-relaxed">We reply to all emails within <strong>4-8 hours on business days</strong> (Monday–Friday, 9:00 AM–6:00 PM Eastern Time). Requests sent over the weekend are answered Monday morning.</p>
     </div>
   </div>
 </section>
 <section class="py-16 bg-gray-50">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-2xl font-bold text-gray-900 mb-8">Domande frequenti</h2>
+    <h2 class="text-2xl font-bold text-gray-900 mb-8">Frequently asked questions</h2>
     <div class="space-y-5">
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Posso cancellare l'abbonamento in qualsiasi momento?</h3><p class="text-gray-500 text-sm leading-relaxed">Sì. Puoi cancellare il tuo abbonamento in qualsiasi momento dalle impostazioni del tuo account, senza penali o costi aggiuntivi. Continuerai ad avere accesso fino alla fine del periodo già pagato.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Offrite uno sconto per agenzie o team?</h3><p class="text-gray-500 text-sm leading-relaxed">Sì. Per utilizzi multi-utente o volumi elevati, contattaci a info@quoteai.ca e troveremo la soluzione più adatta.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">I miei dati e i preventivi sono al sicuro?</h3><p class="text-gray-500 text-sm leading-relaxed">Sì. Tutti i dati sono cifrati in transito (TLS) e a riposo. Non condividiamo i tuoi dati con terze parti. Leggi la nostra Privacy Policy per i dettagli.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Posso importare il mio listino prezzi?</h3><p class="text-gray-500 text-sm leading-relaxed">Sì. Dalla sezione Impostazioni → Listino puoi inserire i tuoi prezzi personalizzati che l'AI userà come riferimento per i tuoi preventivi.</p></div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Can I cancel my subscription at any time?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. You can cancel your subscription at any time from your account settings, with no penalties or extra fees. You'll keep access until the end of the period you already paid for.</p></div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Do you offer a discount for agencies or teams?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. For multi-user or high-volume use, contact us at info@quoteai.ca and we'll find the right solution.</p></div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Is my data and my quotes safe?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. All data is encrypted in transit (TLS) and at rest. We don't share your data with third parties. See our Privacy Policy for details.</p></div>
+      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Can I import my own price list?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. From Settings → Price List you can enter your own custom prices, which the AI will use as a reference for your quotes.</p></div>
     </div>
   </div>
 </section>
 <section class="py-16 bg-white">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-xl text-center">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">Non hai ancora un account?</h2>
-    <p class="text-gray-500 mb-6">Prova quoteai gratis — nessuna carta di credito richiesta.</p>
-    <a href="/sign-up/" class="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white" style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%)">Crea account gratuito</a>
+    <h2 class="text-2xl font-bold text-gray-900 mb-4">Don't have an account yet?</h2>
+    <p class="text-gray-500 mb-6">Try quoteai for free — no credit card required.</p>
+    <a href="/sign-up/" class="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white" style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%)">Create a free account</a>
   </div>
 </section>`),
 });
 
-// /privacy/
+// /privacy-policy/ — mirrors src/pages/privacy-policy.tsx (the real live route)
 buildStaticPageHtml({
-  slug: "privacy",
-  title: "Privacy Policy | quoteai",
-  description: "Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali.",
-  path: "/privacy/",
-  jsonLd: [buildWebPageJsonLd("Privacy Policy", "Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali.", "/privacy/"), buildBreadcrumbJsonLd("Privacy Policy", "/privacy/")],
+  slug: "privacy-policy",
+  title: "Privacy Policy | QuoteAI",
+  description: "QuoteAI's privacy policy — how we collect, use, and protect your personal information.",
+  path: "/privacy-policy/",
+  jsonLd: [buildWebPageJsonLd("Privacy Policy", "QuoteAI's privacy policy — how we collect, use, and protect your personal information.", "/privacy-policy/"), buildBreadcrumbJsonLd("Privacy Policy", "/privacy-policy/")],
   bodyHtml: wrapInPublicLayout(`<div class="container mx-auto px-4 py-16 max-w-3xl">
   <h1 class="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-  <p class="text-sm text-gray-500 mb-10">Ultimo aggiornamento: 6 maggio 2025</p>
+  <p class="text-sm text-gray-500 mb-10">Last updated: May 6, 2025</p>
   <div class="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Titolare del trattamento</h2><p>Il titolare del trattamento dei dati personali è <strong>QuoteAI</strong> (di seguito "Società" o "noi"), raggiungibile all'indirizzo email <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Dati raccolti</h2><p>Raccogliamo le seguenti categorie di dati personali:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Dati di registrazione:</strong> nome, cognome, indirizzo email, forniti al momento della creazione dell'account.</li><li><strong>Dati del profilo aziendale:</strong> ragione sociale, partita IVA, indirizzo, telefono, email aziendale, logo aziendale.</li><li><strong>Dati dei preventivi:</strong> descrizioni dei lavori, dati dei clienti (committenti), importi, voci di computo.</li><li><strong>Dati di pagamento:</strong> gestiti direttamente da Stripe Inc. — non accediamo ai dati della carta di credito.</li><li><strong>Dati tecnici:</strong> indirizzo IP, tipo di browser, pagine visitate, durata delle sessioni (tramite log di sistema).</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. Finalità e base giuridica del trattamento</h2><div class="space-y-3"><div><p class="font-medium">a) Erogazione del servizio (art. 6(1)(b) GDPR — esecuzione del contratto)</p><p class="mt-1">Trattamento necessario per creare l'account, generare preventivi tramite AI, gestire abbonamenti e pagamenti.</p></div><div><p class="font-medium">b) Obblighi legali (art. 6(1)(c) GDPR)</p><p class="mt-1">Conservazione dei dati di fatturazione per gli obblighi fiscali previsti dalla normativa italiana.</p></div><div><p class="font-medium">c) Legittimo interesse (art. 6(1)(f) GDPR)</p><p class="mt-1">Analisi aggregate per migliorare il servizio, prevenzione delle frodi, sicurezza della piattaforma.</p></div><div><p class="font-medium">d) Consenso (art. 6(1)(a) GDPR)</p><p class="mt-1">Invio di comunicazioni promozionali e newsletter, previa esplicita accettazione.</p></div></div></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Conservazione dei dati</h2><p>I dati vengono conservati per il tempo strettamente necessario alle finalità indicate:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Dati dell'account: fino alla cancellazione dell'account, poi 30 giorni per finalità di sicurezza.</li><li>Dati dei preventivi: 10 anni dall'emissione (obblighi fiscali italiani).</li><li>Dati di fatturazione: 10 anni (D.P.R. 633/1972 e D.P.R. 600/1973).</li><li>Log tecnici: 90 giorni.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Destinatari dei dati</h2><p>I dati possono essere comunicati alle seguenti categorie di destinatari:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Clerk Inc.</strong> — gestione dell'autenticazione e degli account utente (USA, con garanzie adeguate ex art. 46 GDPR).</li><li><strong>Stripe Inc.</strong> — elaborazione dei pagamenti (USA, con garanzie adeguate).</li><li><strong>OpenAI, LLC</strong> — generazione dei preventivi tramite intelligenza artificiale (USA, con garanzie adeguate). I dati inviati sono limitati alla descrizione del lavoro.</li><li><strong>Replit Inc.</strong> — infrastruttura cloud e hosting (USA, con garanzie adeguate).</li><li><strong>Resend Inc.</strong> — invio email transazionali.</li></ul><p class="mt-3">Non vendiamo dati personali a terzi. I trasferimenti extra-UE avvengono con le garanzie previste dagli artt. 44-49 GDPR (clausole contrattuali standard o decisioni di adeguatezza).</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Diritti dell'interessato</h2><p>Ai sensi degli artt. 15-22 GDPR, hai diritto di:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Accesso</strong> — richiedere copia dei dati che trattiamo su di te.</li><li><strong>Rettifica</strong> — correggere dati inesatti o incompleti.</li><li><strong>Cancellazione ("diritto all'oblio")</strong> — richiedere la cancellazione dei dati, salvo obblighi legali di conservazione.</li><li><strong>Limitazione del trattamento</strong> — in determinati casi previsti dall'art. 18 GDPR.</li><li><strong>Portabilità</strong> — ricevere i tuoi dati in formato strutturato e leggibile da macchina.</li><li><strong>Opposizione</strong> — opporti al trattamento basato su legittimo interesse.</li><li><strong>Revoca del consenso</strong> — in qualsiasi momento, senza pregiudizio per la liceità del trattamento precedente.</li></ul><p class="mt-3">Per esercitare i tuoi diritti scrivi a <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. Risponderemo entro 30 giorni. Hai anche il diritto di proporre reclamo all'Autorità di controllo italiana: Garante per la protezione dei dati personali.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Cookie e tecnologie di tracciamento</h2><p>Utilizziamo esclusivamente cookie tecnici necessari al funzionamento del servizio (autenticazione, sessione). Non utilizziamo cookie di profilazione o di terze parti a fini pubblicitari.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Sicurezza</h2><p>Adottiamo misure tecniche e organizzative adeguate per proteggere i dati da accesso non autorizzato, perdita o alterazione: connessioni cifrate (TLS/HTTPS), controllo degli accessi, autenticazione sicura.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Modifiche alla privacy policy</h2><p>Ci riserviamo il diritto di aggiornare questa informativa. Le modifiche sostanziali saranno comunicate via email o tramite avviso in piattaforma con almeno 14 giorni di anticipo.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Contatti</h2><p>Per qualsiasi domanda relativa alla privacy: <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a></p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Who we are</h2><p>This Privacy Policy is issued by <strong>QuoteAI</strong> (referred to as "the Company", "we", or "us"), a business operating from Ontario, Canada, reachable at <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. We are committed to protecting your personal information in accordance with the Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable provincial privacy legislation.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Information we collect</h2><p>We collect the following categories of personal information:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Account information:</strong> first name, last name, and email address, provided when you create an account.</li><li><strong>Business profile information:</strong> company name, Business Number / GST-HST number, address, phone number, business email, and company logo.</li><li><strong>Quote data:</strong> job descriptions, client (customer) information, amounts, and line items on quotes you generate.</li><li><strong>Payment information:</strong> handled directly by Stripe Inc. — we never access your full credit card details.</li><li><strong>Authentication credentials:</strong> your password is stored as a salted hash on our own servers; we do not send it to any third-party identity provider.</li><li><strong>Technical information:</strong> IP address, browser type, pages visited, and session duration (via system logs).</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. Purposes and grounds for collection</h2><div class="space-y-3"><div><p class="font-medium">a) Providing the service</p><p class="mt-1">Processing necessary to create your account, generate quotes using AI, and manage subscriptions and payments.</p></div><div><p class="font-medium">b) Legal and tax obligations</p><p class="mt-1">Retention of billing records to meet obligations under the Income Tax Act and applicable GST/HST legislation.</p></div><div><p class="font-medium">c) Legitimate business interests</p><p class="mt-1">Aggregate analysis to improve the service, fraud prevention, and platform security.</p></div><div><p class="font-medium">d) Consent</p><p class="mt-1">Sending promotional communications and newsletters, only after your explicit opt-in.</p></div></div></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Data retention</h2><p>We retain personal information only for as long as necessary for the purposes described above:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Account data: until account deletion, then 30 additional days for security purposes.</li><li>Quote data: 7 years from issuance, in line with Canada Revenue Agency (CRA) record-keeping requirements.</li><li>Billing records: 7 years, per CRA requirements for GST/HST and income tax records.</li><li>Technical logs: 90 days.</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Who we share information with</h2><p>Personal information may be shared with the following categories of recipients:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Stripe Inc.</strong> — payment processing.</li><li><strong>OpenAI, LLC</strong> — AI-generated quotes. Only the job description text is sent.</li><li><strong>Cloud hosting providers</strong> — infrastructure and hosting.</li><li><strong>Resend Inc.</strong> — transactional email delivery.</li></ul><p class="mt-3">We do not sell personal information to third parties. Where information is processed or stored outside Canada (including in the United States), we take reasonable steps to ensure a comparable level of protection through contractual safeguards, consistent with PIPEDA principle 4.1.3 (accountability for information transferred to third parties).</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Your rights</h2><p>Under PIPEDA and applicable provincial privacy laws, you have the right to:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Access</strong> — request a copy of the personal information we hold about you.</li><li><strong>Correction</strong> — request correction of inaccurate or incomplete information.</li><li><strong>Withdrawal of consent</strong> — withdraw consent at any time, subject to legal or contractual restrictions.</li><li><strong>Deletion</strong> — request deletion of your information, subject to legal retention obligations.</li><li><strong>Complaint</strong> — file a complaint about how we handle your information.</li></ul><p class="mt-3">To exercise these rights, contact us at <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. We will respond within 30 days. You also have the right to file a complaint with the <a href="https://www.priv.gc.ca" target="_blank" rel="noopener noreferrer" class="text-violet-600">Office of the Privacy Commissioner of Canada</a>, or with your provincial privacy regulator where applicable.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Cookies and tracking technologies</h2><p>We use only strictly necessary cookies required for the service to function (authentication, session management). We do not use profiling or third-party advertising cookies.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Security</h2><p>We use appropriate technical and organizational safeguards to protect personal information against unauthorized access, loss, or alteration: encrypted connections (TLS/HTTPS), access controls, and hashed credential storage on our own infrastructure.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Changes to this policy</h2><p>We may update this Privacy Policy from time to time. Material changes will be communicated by email or via an in-platform notice at least 14 days in advance.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Contact us</h2><p>For any questions about this Privacy Policy: <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a></p></section>
   </div>
 </div>`),
 });
 
-// /termini/
+// /terms/ — mirrors src/pages/terms.tsx (the real live route)
 buildStaticPageHtml({
-  slug: "termini",
-  title: "Termini di Servizio | quoteai",
-  description: "Termini e condizioni di utilizzo della piattaforma quoteai per la generazione di preventivi AI.",
-  path: "/termini/",
-  jsonLd: [buildWebPageJsonLd("Termini di Servizio", "Termini e condizioni di utilizzo della piattaforma quoteai per la generazione di preventivi AI.", "/termini/"), buildBreadcrumbJsonLd("Termini di Servizio", "/termini/")],
+  slug: "terms",
+  title: "Terms of Service | QuoteAI",
+  description: "Terms and conditions for using the QuoteAI platform to generate AI-powered quotes.",
+  path: "/terms/",
+  jsonLd: [buildWebPageJsonLd("Terms of Service", "Terms and conditions for using the QuoteAI platform to generate AI-powered quotes.", "/terms/"), buildBreadcrumbJsonLd("Terms of Service", "/terms/")],
   bodyHtml: wrapInPublicLayout(`<div class="container mx-auto px-4 py-16 max-w-3xl">
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">Termini di Servizio</h1>
-  <p class="text-sm text-gray-500 mb-10">Ultimo aggiornamento: 6 maggio 2025</p>
+  <h1 class="text-3xl font-bold text-gray-900 mb-2">Terms of Service</h1>
+  <p class="text-sm text-gray-500 mb-10">Last updated: May 6, 2025</p>
   <div class="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Accettazione dei termini</h2><p>Utilizzando la piattaforma <strong>QuoteAI</strong> (di seguito "Servizio"), disponibile all'indirizzo <strong>quoteai.ca</strong>, l'utente accetta integralmente i presenti Termini di Servizio. Se non accetti questi termini, non puoi utilizzare il Servizio.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Descrizione del servizio</h2><p>QuoteAI è una piattaforma SaaS che consente a professionisti, artigiani e imprese di generare preventivi professionali tramite intelligenza artificiale. Il Servizio include:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Generazione di preventivi tramite AI a partire da una descrizione testuale dei lavori.</li><li>Creazione e download di documenti PDF professionale.</li><li>Gestione del profilo aziendale e archiviazione dei preventivi.</li><li>Piani di abbonamento mensile e acquisti singoli.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. Account utente</h2><p>Per accedere al Servizio è necessario creare un account fornendo dati veritieri e aggiornati. L'utente è responsabile della riservatezza delle proprie credenziali e di tutte le attività svolte tramite il proprio account. In caso di accesso non autorizzato, l'utente deve notificarlo immediatamente a <a href="mailto:supporto@quoteai.ca" class="text-violet-600">supporto@quoteai.ca</a>.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Piani e pagamenti</h2><div class="space-y-3"><div><p class="font-medium">4.1 Piani disponibili</p><ul class="list-disc pl-5 mt-1 space-y-1"><li><strong>Starter (€29/mese):</strong> fino a 20 preventivi al mese, PDF con filigrana QuoteAI.</li><li><strong>Pro (€79/mese):</strong> preventivi illimitati, PDF senza filigrana, branding personalizzabile.</li><li><strong>Singolo con Watermark (€29):</strong> un singolo preventivo PDF con filigrana.</li><li><strong>Singolo Pulito (€39):</strong> un singolo preventivo PDF senza filigrana.</li></ul></div><div><p class="font-medium">4.2 Fatturazione</p><p class="mt-1">I piani mensili vengono rinnovati automaticamente ogni mese. I pagamenti sono processati tramite Stripe Inc. e sono soggetti ai relativi termini di servizio. I prezzi sono IVA esclusa.</p></div><div><p class="font-medium">4.3 Rimborsi</p><p class="mt-1">Ai sensi dell'art. 59(a) del Codice del Consumo (D.Lgs. 206/2005), il diritto di recesso non si applica ai contenuti digitali forniti immediatamente dopo l'acquisto con esplicito consenso. Per i piani mensili, puoi disdire in qualsiasi momento: il servizio rimane attivo fino alla fine del periodo già pagato. Non sono previsti rimborsi pro-rata per i periodi non utilizzati.</p></div></div></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Uso accettabile</h2><p>È vietato utilizzare il Servizio per:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Generare documenti falsi, fraudolenti o fuorvianti.</li><li>Violare diritti di terzi, normative applicabili o la presente policy.</li><li>Tentare di accedere a dati di altri utenti o compromettere la sicurezza della piattaforma.</li><li>Uso automatizzato massivo (scraping, bot) senza autorizzazione scritta.</li><li>Rivendere o sublicenziare l'accesso al Servizio a terzi.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Proprietà intellettuale</h2><p>QuoteAI e i relativi loghi, marchi, interfacce e codice sorgente sono di proprietà esclusiva della Società. I preventivi generati tramite il Servizio sono di proprietà dell'utente che li ha creato. L'utente concede a QuoteAI una licenza limitata, non esclusiva, per elaborare i dati inseriti al solo fine di erogare il Servizio.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Limitazione di responsabilità</h2><p>I preventivi generati dall'AI sono indicativi e basati su dati statistici. <strong>QuoteAI non garantisce l'accuratezza, la completezza o l'adeguatezza dei preventivi per specifici contesti contrattuali.</strong> L'utente è responsabile della verifica e validazione dei contenuti prima di presentarli ai propri clienti. QuoteAI non è responsabile per danni indiretti, perdita di dati, lucro cessante o danni derivanti da errori nell'output dell'AI, nei limiti consentiti dalla legge applicabile.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Sospensione e cancellazione</h2><p>QuoteAI si riserva il diritto di sospendere o terminare l'accesso al Servizio in caso di violazione dei presenti Termini, previo avviso via email salvo casi di grave violazione. L'utente può cancellare il proprio account in qualsiasi momento dalla pagina Impostazioni o contattando <a href="mailto:supporto@quoteai.ca" class="text-violet-600">supporto@quoteai.ca</a>.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Modifiche ai termini</h2><p>Ci riserviamo il diritto di modificare i presenti Termini con preavviso di almeno 14 giorni via email. L'uso continuato del Servizio dopo la data di efficacia delle modifiche costituisce accettazione dei nuovi Termini.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Legge applicabile e foro competente</h2><p>I presenti Termini sono regolati dalla legge italiana. Per qualsiasi controversia è competente in via esclusiva il Tribunale di Milano, salvo i casi in cui l'utente sia un consumatore ai sensi del D.Lgs. 206/2005 (Codice del Consumo), nel qual caso si applicano le disposizioni di legge inderogabili a tutela dei consumatori.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">11. Contatti</h2><p>Per qualsiasi domanda sui presenti Termini: <a href="mailto:supporto@quoteai.ca" class="text-violet-600">supporto@quoteai.ca</a></p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Acceptance of terms</h2><p>By using the <strong>QuoteAI</strong> platform (the "Service"), available at <strong>quoteai.ca</strong>, you agree to be bound by these Terms of Service in full. If you do not agree to these terms, you may not use the Service.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Description of the service</h2><p>QuoteAI is a SaaS platform that helps tradespeople, contractors, and businesses generate professional quotes using artificial intelligence. The Service includes:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>AI-generated quotes from a text description of the work.</li><li>Creation and download of professional PDF documents.</li><li>Business profile management and quote storage.</li><li>Monthly subscription plans and one-time purchases.</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. User accounts</h2><p>To access the Service you must create an account and provide accurate, up-to-date information. You are responsible for keeping your credentials confidential and for all activity that occurs under your account. If you become aware of any unauthorized access, notify us immediately at <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a>.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Plans and payment</h2><div class="space-y-3"><div><p class="font-medium">4.1 Available plans</p><ul class="list-disc pl-5 mt-1 space-y-1"><li><strong>Starter:</strong> a monthly quote allowance, PDFs with the QuoteAI watermark.</li><li><strong>Pro:</strong> a higher monthly quote allowance, PDFs without a watermark, custom branding.</li><li><strong>Elite:</strong> unlimited quotes, no watermark, custom branding, priority AI generation.</li><li><strong>Single quote:</strong> the option to buy one quote with no subscription at all.</li></ul></div><div><p class="font-medium">4.2 Billing</p><p class="mt-1">Monthly plans renew automatically each month. Payments are processed by Stripe Inc. and are subject to Stripe's own terms of service. Prices are listed in Canadian dollars (CAD) and are exclusive of applicable GST/HST, which is added at checkout based on your billing location.</p></div><div><p class="font-medium">4.3 Refunds and cancellation</p><p class="mt-1">Digital content that has been delivered immediately upon purchase (such as a completed PDF quote) is generally non-refundable once downloaded, consistent with standard practice for digital goods. For monthly plans, you may cancel at any time; the Service remains active until the end of the period already paid for. No pro-rated refunds are provided for unused portions of a billing period. Nothing in this section limits any non-waivable rights you may have under applicable provincial consumer protection legislation.</p></div></div></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Acceptable use</h2><p>You may not use the Service to:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Generate false, fraudulent, or misleading documents.</li><li>Infringe the rights of third parties, violate applicable law, or violate this policy.</li><li>Attempt to access other users' data or compromise the security of the platform.</li><li>Engage in large-scale automated use (scraping, bots) without written authorization.</li><li>Resell or sublicense access to the Service to third parties.</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Intellectual property</h2><p>QuoteAI and its associated logos, trademarks, interfaces, and source code are the exclusive property of the Company. Quotes generated through the Service belong to the user who created them. The user grants QuoteAI a limited, non-exclusive licence to process submitted data solely for the purpose of providing the Service.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Limitation of liability</h2><p>Quotes generated by the AI are estimates based on statistical data. <strong>QuoteAI does not guarantee the accuracy, completeness, or suitability of quotes for any specific contractual context.</strong> You are responsible for reviewing and validating all content before presenting it to your own clients. To the extent permitted by applicable law, QuoteAI is not liable for indirect damages, data loss, lost profits, or damages arising from errors in AI output.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Suspension and termination</h2><p>QuoteAI reserves the right to suspend or terminate access to the Service in the event of a breach of these Terms, with notice by email except in cases of serious violations. You may cancel your account at any time from the Settings page or by contacting <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a>.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Changes to these terms</h2><p>We reserve the right to modify these Terms with at least 14 days' notice by email. Continued use of the Service after the effective date of any changes constitutes acceptance of the new Terms.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Governing law and jurisdiction</h2><p>These Terms are governed by the laws of the Province of Ontario and the federal laws of Canada applicable therein. Any dispute arising from these Terms is subject to the exclusive jurisdiction of the courts of Ontario, except where the user is a consumer under applicable provincial consumer protection legislation, in which case any mandatory statutory consumer protections will apply.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">11. Contact us</h2><p>For any questions about these Terms: <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a></p></section>
   </div>
 </div>`),
 });
@@ -2147,66 +2144,66 @@ buildStaticPageHtml({
 // /whatsapp/
 buildStaticPageHtml({
   slug: "whatsapp",
-  title: "Preventivi su WhatsApp – quoteai | Prima piattaforma italiana",
-  description: "Descrivi il lavoro a voce, per testo o foto su WhatsApp. quoteai genera un preventivo professionale con PDF in 60 secondi. Prima piattaforma in Italia.",
+  title: "Quotes on WhatsApp – quoteai | AI-Powered Quoting",
+  description: "Describe the job by voice, text, or photo on WhatsApp. quoteai generates a professional quote with a PDF in 60 seconds.",
   path: "/whatsapp/",
-  jsonLd: [buildWebPageJsonLd("Preventivi su WhatsApp", "Descrivi il lavoro a voce, per testo o foto su WhatsApp. quoteai genera un preventivo professionale con PDF in 60 secondi.", "/whatsapp/"), buildBreadcrumbJsonLd("WhatsApp", "/whatsapp/")],
+  jsonLd: [buildWebPageJsonLd("Quotes on WhatsApp", "Describe the job by voice, text, or photo on WhatsApp. quoteai generates a professional quote with a PDF in 60 seconds.", "/whatsapp/"), buildBreadcrumbJsonLd("WhatsApp", "/whatsapp/")],
   bodyHtml: wrapInPublicLayout(`<div class="flex flex-col bg-white">
 <section class="relative overflow-hidden bg-gray-950 pt-20 pb-24">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl">
-    <div class="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-6">NOVITÀ · Prima in Italia</div>
-    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1] mb-5">I tuoi preventivi, <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">direttamente su WhatsApp</span></h1>
-    <p class="text-lg text-gray-400 leading-relaxed mb-4 max-w-2xl mx-auto">Manda un vocale dal cantiere. QuoteAI genera il preventivo professionale, te lo mostra in anteprima e ti invia il PDF — senza aprire nessuna app.</p>
-    <p class="text-sm text-gray-600 mb-10 font-medium">Mentre i tuoi concorrenti aprono ancora Excel, i tuoi clienti già ricevono il preventivo.</p>
+    <div class="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-6">NEW</div>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1] mb-5">Your quotes, <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">right on WhatsApp</span></h1>
+    <p class="text-lg text-gray-400 leading-relaxed mb-4 max-w-2xl mx-auto">Send a voice note from the job site. QuoteAI generates the professional quote, shows you a preview, and sends you the PDF — no app to open.</p>
+    <p class="text-sm text-gray-600 mb-10 font-medium">While your competitors are still opening Excel, your customers already have the quote.</p>
     <div class="flex flex-col sm:flex-row justify-center gap-3">
-      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Attiva WhatsApp Bot</a>
-      <a href="#demo" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-semibold text-gray-300 border border-gray-700">Guarda la demo</a>
+      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Activate the WhatsApp Bot</a>
+      <a href="#demo" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-semibold text-gray-300 border border-gray-700">Watch the demo</a>
     </div>
     <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-gray-500">
-      <span>Disponibile su Piano Pro ed Elite</span><span class="hidden sm:block text-gray-700">·</span>
-      <span>Attivazione immediata</span><span class="hidden sm:block text-gray-700">·</span>
-      <span>Funziona con qualsiasi smartphone</span>
+      <span>Available on Pro and Elite plans</span><span class="hidden sm:block text-gray-700">·</span>
+      <span>Instant activation</span><span class="hidden sm:block text-gray-700">·</span>
+      <span>Works with any smartphone</span>
     </div>
   </div>
 </section>
 <section id="demo" class="py-20 bg-gray-50">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-    <span class="inline-block text-violet-600 text-xs font-bold uppercase tracking-wider mb-3">Come funziona</span>
-    <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6 leading-snug">Dal vocale al PDF <span class="text-violet-600">senza toccare il computer</span></h2>
+    <span class="inline-block text-violet-600 text-xs font-bold uppercase tracking-wider mb-3">How it works</span>
+    <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6 leading-snug">From voice note to PDF <span class="text-violet-600">without touching a computer</span></h2>
     <div class="space-y-5 max-w-2xl">
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">1</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Manda un vocale, testo o foto</p><p class="text-sm text-gray-500 leading-relaxed">Direttamente su WhatsApp. Descrivi il lavoro come parli con un cliente.</p></div></div>
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">2</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">L'AI genera l'anteprima</p><p class="text-sm text-gray-500 leading-relaxed">Capitoli, prezzi e IVA in 60 secondi. Puoi correggere o approvare subito.</p></div></div>
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">3</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Ricevi il PDF in chat</p><p class="text-sm text-gray-500 leading-relaxed">Lo invii al cliente con un tap. Il preventivo viene salvato anche su quoteai.ca.</p></div></div>
+      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">1</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Send a voice note, text, or photo</p><p class="text-sm text-gray-500 leading-relaxed">Right on WhatsApp. Describe the job the way you'd talk to a customer.</p></div></div>
+      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">2</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">The AI generates a preview</p><p class="text-sm text-gray-500 leading-relaxed">Line items, prices, and tax in 60 seconds. You can correct or approve it right away.</p></div></div>
+      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">3</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Get the PDF in chat</p><p class="text-sm text-gray-500 leading-relaxed">Forward it to the customer with a tap. The quote is also saved on quoteai.ca.</p></div></div>
     </div>
-    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"><p class="text-sm font-semibold text-amber-900">In arrivo: fatture e solleciti automatici</p><p class="text-xs text-amber-700 mt-0.5">Sempre su WhatsApp. Stai costruendo il futuro prima degli altri.</p></div>
+    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"><p class="text-sm font-semibold text-amber-900">Coming soon: automatic invoices and reminders</p><p class="text-xs text-amber-700 mt-0.5">Still on WhatsApp. Stay ahead of the curve.</p></div>
   </div>
 </section>
 <section class="py-16 bg-white">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-    <div class="text-center mb-10"><h2 class="text-2xl font-bold tracking-tight text-gray-900">Tutto quello che ti serve, in tasca</h2><p class="text-gray-500 mt-2 text-sm">Il potere di quoteai.ca, disponibile su WhatsApp in qualsiasi momento.</p></div>
+    <div class="text-center mb-10"><h2 class="text-2xl font-bold tracking-tight text-gray-900">Everything you need, in your pocket</h2><p class="text-gray-500 mt-2 text-sm">The full power of quoteai.ca, available on WhatsApp anytime.</p></div>
     <div class="grid sm:grid-cols-3 gap-6">
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Voce, testo o foto</h3><p class="text-gray-500 text-xs leading-relaxed">Manda un vocale dall'auto, scrivi dal cantiere o fotografa gli appunti. L'AI capisce tutto e genera il preventivo.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Preventivo in 60 secondi</h3><p class="text-gray-500 text-xs leading-relaxed">Capitoli, voci di costo, IVA e totali calcolati istantaneamente. Zero formule, zero Excel.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">PDF consegnato in chat</h3><p class="text-gray-500 text-xs leading-relaxed">Il documento professionale arriva direttamente su WhatsApp. Lo inoltri al cliente con un tap.</p></div>
+      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Voice, text, or photo</h3><p class="text-gray-500 text-xs leading-relaxed">Send a voice note from the truck, type from the job site, or photograph your notes. The AI understands it all and generates the quote.</p></div>
+      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Quote in 60 seconds</h3><p class="text-gray-500 text-xs leading-relaxed">Line items, prices, tax and totals calculated instantly. Zero formulas, zero Excel.</p></div>
+      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">PDF delivered in chat</h3><p class="text-gray-500 text-xs leading-relaxed">The professional document arrives right on WhatsApp. Forward it to the customer with a tap.</p></div>
     </div>
   </div>
 </section>
 <section class="py-16 bg-gray-950">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl text-center">
-    <p class="text-gray-500 text-sm mb-4 uppercase tracking-wider font-semibold">La realtà del mercato</p>
-    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-6 leading-snug">I tuoi concorrenti impiegano <span class="line-through text-gray-600">30–40 minuti</span> per fare un preventivo. <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">Tu ce ne metti 60 secondi.</span></h2>
-    <p class="text-gray-400 text-sm mb-10 leading-relaxed">Un artigiano che risponde entro un'ora ha il <strong class="text-white">3× più probabilità</strong> di aggiudicarsi il lavoro. Con il bot WhatsApp, rispondi prima ancora di arrivare a casa.</p>
+    <p class="text-gray-500 text-sm mb-4 uppercase tracking-wider font-semibold">The reality of the market</p>
+    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-6 leading-snug">Your competitors take <span class="line-through text-gray-600">30-40 minutes</span> to put together a quote. <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">You take 60 seconds.</span></h2>
+    <p class="text-gray-400 text-sm mb-10 leading-relaxed">A contractor who responds within an hour is <strong class="text-white">3× more likely</strong> to win the job. With the WhatsApp bot, you respond before you're even back home.</p>
   </div>
 </section>
 <section class="py-16 bg-white">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-xl">
-    <h2 class="text-2xl font-bold tracking-tight text-gray-900 mb-3">Inizia oggi. Zero configurazione.</h2>
-    <p class="text-gray-500 text-sm mb-7 leading-relaxed">Collega il tuo numero WhatsApp dalle impostazioni in meno di 2 minuti. Il bot è subito attivo.</p>
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 mb-3">Start today. Zero setup.</h2>
+    <p class="text-gray-500 text-sm mb-7 leading-relaxed">Connect your WhatsApp number from settings in under 2 minutes. The bot is active immediately.</p>
     <div class="flex flex-col sm:flex-row justify-center gap-3">
-      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-11 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Prova Gratis 7 Giorni</a>
-      <a href="/#prezzi" class="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200">Confronta i piani</a>
+      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-11 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Try Free for 7 Days</a>
+      <a href="/#prezzi" class="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200">Compare plans</a>
     </div>
-    <p class="text-xs text-gray-400 mt-4">7 giorni gratis · Nessuna carta richiesta · Cancella quando vuoi</p>
+    <p class="text-xs text-gray-400 mt-4">7 days free · No credit card required · Cancel anytime</p>
   </div>
 </section>
 </div>`),
@@ -2215,13 +2212,13 @@ buildStaticPageHtml({
 // /mappa-sito/
 buildStaticPageHtml({
   slug: "mappa-sito",
-  title: "Mappa del Sito | quoteai — Elenco Completo delle Pagine",
-  description: "Mappa del sito completa di quoteai. Trova tutte le pagine statiche, gli articoli del blog e le guide per professionisti e artigiani nelle città italiane.",
+  title: "Site Map | quoteai — Full Page Index",
+  description: "The complete site map for quoteai. Find every static page, blog article, and guide for contractors and tradespeople across Canadian cities.",
   path: "/mappa-sito/",
-  jsonLd: [buildWebPageJsonLd("Mappa del Sito", "Mappa del sito completa di quoteai.ca. Trova tutte le pagine statiche, gli articoli del blog e le guide per professionisti e artigiani nelle città italiane.", "/mappa-sito/"), buildBreadcrumbJsonLd("Mappa del Sito", "/mappa-sito/")],
+  jsonLd: [buildWebPageJsonLd("Site Map", "The complete site map for quoteai.ca. Find every static page, blog article, and guide for contractors and tradespeople across Canadian cities.", "/mappa-sito/"), buildBreadcrumbJsonLd("Site Map", "/mappa-sito/")],
   bodyHtml: buildMappaSitoBodyHtml(),
 });
 
-console.log(`  ✓ 6 SPA pages prerendered (chi-siamo, contatti, privacy, termini, whatsapp, mappa-sito)`);
+console.log(`  ✓ 6 SPA pages prerendered (chi-siamo, contatti, privacy-policy, terms, whatsapp, mappa-sito)`);
 
 console.log(`Prerendered ${count} pages total (1 homepage + SEO sector pages + ${BLOG_CATEGORIES.length} category pages + ${BLOG_ARTICLES.length + 1} blog pages + 6 SPA pages).`);

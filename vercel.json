@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm --filter @workspace/api-server build && pnpm --filter @workspace/quote-ai build",
+  "outputDirectory": "artifacts/quote-ai/dist/public",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 60,
+      "includeFiles": "artifacts/api-server/dist/{node_modules,data}/**"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/((?!api/)(?!.*\\.)[^/]+(?:/[^/]+)*)",
+      "destination": "/$1/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "VERCEL_SKIP_TYPECHECK": "1"
+  }
+}

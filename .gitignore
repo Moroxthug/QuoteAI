@@ -1,34 +1,11 @@
 # See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# compiled output
+# compiled output — Vercel's own buildCommand (see vercel.json) rebuilds
+# api-server and quote-ai from source on every deploy, so nothing under
+# dist/ needs to be committed.
 dist
 tmp
 api/data/
-
-
-# Un-ignore pre-built api-server dist (needed for Vercel deployment)
-!artifacts/api-server/dist/
-!artifacts/api-server/dist/**
-# But ignore nested node_modules inside dist except the ones we need
-artifacts/api-server/dist/node_modules/
-!artifacts/api-server/dist/node_modules/
-!artifacts/api-server/dist/node_modules/**
-
-# Track prerendered SEO HTML (needed for static serving / crawlers)
-# Un-ignore only the seo subtree; re-ignore everything else in dist/
-!artifacts/quote-ai/dist/
-!artifacts/quote-ai/dist/public/
-!artifacts/quote-ai/dist/public/seo/
-!artifacts/quote-ai/dist/public/seo/**
-artifacts/quote-ai/dist/*.mjs
-artifacts/quote-ai/dist/*.cjs
-artifacts/quote-ai/dist/public/index.html
-artifacts/quote-ai/dist/public/assets/
-artifacts/quote-ai/dist/public/favicon.svg
-artifacts/quote-ai/dist/public/opengraph.jpg
-artifacts/quote-ai/dist/public/quoteai-logo.png
-artifacts/quote-ai/dist/public/robots.txt
-artifacts/quote-ai/dist/public/sitemap.xml
 out-tsc
 *.tsbuildinfo
 .expo

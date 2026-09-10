@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+  <head>
+  <title>Privacy Policy | quoteai</title>
+  <meta name="description" content="Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali." />
+  <link rel="canonical" href="https://quoteai.ca/privacy/" />
+  <link rel="alternate" hreflang="en-CA" href="https://quoteai.ca/privacy/" />
+  <link rel="alternate" hreflang="x-default" href="https://quoteai.ca/privacy/" />
+  <meta property="og:title" content="Privacy Policy | quoteai" />
+  <meta property="og:description" content="Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali." />
+  <meta property="og:url" content="https://quoteai.ca/privacy/" />
+  <meta property="og:image" content="https://quoteai.ca/opengraph.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="it_IT" />
+  <meta property="og:site_name" content="quoteai" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Privacy Policy | quoteai" />
+  <meta name="twitter:description" content="Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali." />
+  <meta name="twitter:image" content="https://quoteai.ca/opengraph.jpg" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Privacy Policy","description":"Informativa sulla privacy di quoteai — come raccogliamo e trattiamo i tuoi dati personali.","url":"https://quoteai.ca/privacy/","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"quoteai","url":"https://quoteai.ca"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://quoteai.ca/"},{"@type":"ListItem","position":2,"name":"Privacy Policy","item":"https://quoteai.ca/privacy/"}]}</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary SEO -->
+    
+    
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="quoteai" />
+    <!--
+      Production: the prerender pipeline (`scripts/prerender-seo.ts`)
+      writes the correct per-route  directly into
+      every prerendered HTML file, so the snippet below is stripped/
+      replaced and never reaches a crawler in prod.
+
+      Dev/preview: the SPA shell is served for every route. The inline
+      script below sets a canonical that matches the current URL before
+      React mounts, so SEO audits (Lighthouse, Semrush) running against
+      the dev preview don't see every page canonicalizing to "/".
+      <SeoHead> (react-helmet-async) then refines it per-route after
+      hydration.
+    -->
+    
+    <script>
+      (function () {
+        try {
+          var origin = "https://quoteai.ca";
+          var p = window.location.pathname || "/";
+          if (p.length > 1 && p.charAt(p.length - 1) !== "/" && p.lastIndexOf(".") <= p.lastIndexOf("/")) {
+            p = p + "/";
+          }
+          var links = document.head.querySelectorAll('link[rel="canonical"]');
+          var keep = document.getElementById("__canonical");
+          if (!keep && links.length > 0) keep = links[0];
+          if (!keep) {
+            keep = document.createElement("link");
+            keep.setAttribute("rel", "canonical");
+            document.head.appendChild(keep);
+          }
+          keep.setAttribute("id", "__canonical");
+          keep.setAttribute("href", origin + p);
+          for (var i = 0; i < links.length; i++) {
+            if (links[i] !== keep && links[i].parentNode) {
+              links[i].parentNode.removeChild(links[i]);
+            }
+          }
+          var noindexPrefixes = ["/dashboard", "/sign-in", "/sign-up", "/onboarding", "/admin", "/reset-password", "/forgot-password"];
+          for (var j = 0; j < noindexPrefixes.length; j++) {
+            if (p === noindexPrefixes[j] + "/" || p.indexOf(noindexPrefixes[j] + "/") === 0) {
+              var robots = document.head.querySelector('meta[name="robots"]');
+              if (!robots) {
+                robots = document.createElement("meta");
+                robots.setAttribute("name", "robots");
+                document.head.appendChild(robots);
+              }
+              robots.setAttribute("content", "noindex, nofollow");
+              break;
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D2B39E0ELW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D2B39E0ELW');
+    </script>
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#7C3AED" />
+
+    <!-- Resource hints -->
+    <link rel="dns-prefetch" href="https://wa.me" />
+
+    <!-- Self-hosted Inter Variable — preloaded for zero render-blocking -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/fonts/inter-latin-wght-normal.woff2"
+    />
+    <script type="module" crossorigin src="/assets/index-BUaYWaRz.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor-react-Cp4VPQ7z.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-query-BHOha31k.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-radix-C7uRPxXo.js">
+    <link rel="modulepreload" crossorigin href="/assets/vendor-icons-B-Vhl0Xh.js">
+    
+    <link rel="modulepreload" crossorigin href="/assets/seo-B6jIXwbC.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-VhV20PwC.css">
+  </head>
+  <body>
+    <div id="root"><div class="min-h-[100dvh] flex flex-col bg-background text-foreground">
+<header class="sticky top-0 z-50 w-full transition-all duration-300 bg-transparent border-b border-transparent">
+  <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <a href="/" class="flex items-center"><img src="/quoteai-logo.png" alt="quoteai" width="144" height="72" style="height: 72px; width: auto; object-fit: contain;"></a>
+    <nav class="flex items-center gap-3">
+      <a href="/sign-in/" class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full">Accedi</a>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-9 items-center justify-center px-5 text-sm font-semibold">Registrati</a>
+    </nav>
+  </div>
+</header>
+<main class="flex-1 flex flex-col"><div class="container mx-auto px-4 py-16 max-w-3xl">
+  <h1 class="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
+  <p class="text-sm text-gray-500 mb-10">Ultimo aggiornamento: 6 maggio 2025</p>
+  <div class="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Titolare del trattamento</h2><p>Il titolare del trattamento dei dati personali è <strong>QuoteAI</strong> (di seguito "Società" o "noi"), raggiungibile all'indirizzo email <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Dati raccolti</h2><p>Raccogliamo le seguenti categorie di dati personali:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Dati di registrazione:</strong> nome, cognome, indirizzo email, forniti al momento della creazione dell'account.</li><li><strong>Dati del profilo aziendale:</strong> ragione sociale, partita IVA, indirizzo, telefono, email aziendale, logo aziendale.</li><li><strong>Dati dei preventivi:</strong> descrizioni dei lavori, dati dei clienti (committenti), importi, voci di computo.</li><li><strong>Dati di pagamento:</strong> gestiti direttamente da Stripe Inc. — non accediamo ai dati della carta di credito.</li><li><strong>Dati tecnici:</strong> indirizzo IP, tipo di browser, pagine visitate, durata delle sessioni (tramite log di sistema).</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. Finalità e base giuridica del trattamento</h2><div class="space-y-3"><div><p class="font-medium">a) Erogazione del servizio (art. 6(1)(b) GDPR — esecuzione del contratto)</p><p class="mt-1">Trattamento necessario per creare l'account, generare preventivi tramite AI, gestire abbonamenti e pagamenti.</p></div><div><p class="font-medium">b) Obblighi legali (art. 6(1)(c) GDPR)</p><p class="mt-1">Conservazione dei dati di fatturazione per gli obblighi fiscali previsti dalla normativa italiana.</p></div><div><p class="font-medium">c) Legittimo interesse (art. 6(1)(f) GDPR)</p><p class="mt-1">Analisi aggregate per migliorare il servizio, prevenzione delle frodi, sicurezza della piattaforma.</p></div><div><p class="font-medium">d) Consenso (art. 6(1)(a) GDPR)</p><p class="mt-1">Invio di comunicazioni promozionali e newsletter, previa esplicita accettazione.</p></div></div></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Conservazione dei dati</h2><p>I dati vengono conservati per il tempo strettamente necessario alle finalità indicate:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Dati dell'account: fino alla cancellazione dell'account, poi 30 giorni per finalità di sicurezza.</li><li>Dati dei preventivi: 10 anni dall'emissione (obblighi fiscali italiani).</li><li>Dati di fatturazione: 10 anni (D.P.R. 633/1972 e D.P.R. 600/1973).</li><li>Log tecnici: 90 giorni.</li></ul></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Destinatari dei dati</h2><p>I dati possono essere comunicati alle seguenti categorie di destinatari:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Clerk Inc.</strong> — gestione dell'autenticazione e degli account utente (USA, con garanzie adeguate ex art. 46 GDPR).</li><li><strong>Stripe Inc.</strong> — elaborazione dei pagamenti (USA, con garanzie adeguate).</li><li><strong>OpenAI, LLC</strong> — generazione dei preventivi tramite intelligenza artificiale (USA, con garanzie adeguate). I dati inviati sono limitati alla descrizione del lavoro.</li><li><strong>Replit Inc.</strong> — infrastruttura cloud e hosting (USA, con garanzie adeguate).</li><li><strong>Resend Inc.</strong> — invio email transazionali.</li></ul><p class="mt-3">Non vendiamo dati personali a terzi. I trasferimenti extra-UE avvengono con le garanzie previste dagli artt. 44-49 GDPR (clausole contrattuali standard o decisioni di adeguatezza).</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Diritti dell'interessato</h2><p>Ai sensi degli artt. 15-22 GDPR, hai diritto di:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Accesso</strong> — richiedere copia dei dati che trattiamo su di te.</li><li><strong>Rettifica</strong> — correggere dati inesatti o incompleti.</li><li><strong>Cancellazione ("diritto all'oblio")</strong> — richiedere la cancellazione dei dati, salvo obblighi legali di conservazione.</li><li><strong>Limitazione del trattamento</strong> — in determinati casi previsti dall'art. 18 GDPR.</li><li><strong>Portabilità</strong> — ricevere i tuoi dati in formato strutturato e leggibile da macchina.</li><li><strong>Opposizione</strong> — opporti al trattamento basato su legittimo interesse.</li><li><strong>Revoca del consenso</strong> — in qualsiasi momento, senza pregiudizio per la liceità del trattamento precedente.</li></ul><p class="mt-3">Per esercitare i tuoi diritti scrivi a <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. Risponderemo entro 30 giorni. Hai anche il diritto di proporre reclamo all'Autorità di controllo italiana: Garante per la protezione dei dati personali.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Cookie e tecnologie di tracciamento</h2><p>Utilizziamo esclusivamente cookie tecnici necessari al funzionamento del servizio (autenticazione, sessione). Non utilizziamo cookie di profilazione o di terze parti a fini pubblicitari.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Sicurezza</h2><p>Adottiamo misure tecniche e organizzative adeguate per proteggere i dati da accesso non autorizzato, perdita o alterazione: connessioni cifrate (TLS/HTTPS), controllo degli accessi, autenticazione sicura.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Modifiche alla privacy policy</h2><p>Ci riserviamo il diritto di aggiornare questa informativa. Le modifiche sostanziali saranno comunicate via email o tramite avviso in piattaforma con almeno 14 giorni di anticipo.</p></section>
+    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Contatti</h2><p>Per qualsiasi domanda relativa alla privacy: <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a></p></section>
+  </div>
+</div></main>
+<footer class="border-t py-12 md:py-16 bg-white">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div class="md:col-span-2">
+        <a href="/" class="flex items-center mb-4"><img src="/quoteai-logo.png" alt="quoteai" width="144" height="72" style="height: 72px; width: auto; object-fit: contain;"></a>
+        <p class="text-sm text-muted-foreground max-w-xs leading-relaxed">Il software di preventivazione con AI per artigiani e PMI italiane. Veloce, professionale, pronto in 30 secondi.</p>
+      </div>
+      <div class="md:col-span-2">
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Professioni</h4>
+        <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
+          <li><a href="/preventivi/imbianchino/" class="hover:text-foreground transition-colors">Imbianchino</a></li>
+          <li><a href="/preventivi/muratore/" class="hover:text-foreground transition-colors">Muratore</a></li>
+          <li><a href="/preventivi/elettricista/" class="hover:text-foreground transition-colors">Elettricista</a></li>
+          <li><a href="/preventivi/pittore/" class="hover:text-foreground transition-colors">Pittore</a></li>
+          <li><a href="/preventivi/idraulico/" class="hover:text-foreground transition-colors">Idraulico</a></li>
+          <li><a href="/preventivi/piastrellista/" class="hover:text-foreground transition-colors">Piastrellista</a></li>
+          <li><a href="/preventivi/edilizia/" class="hover:text-foreground transition-colors">Imprese Edili</a></li>
+          <li><a href="/preventivi/giardiniere/" class="hover:text-foreground transition-colors">Giardiniere</a></li>
+          <li><a href="/preventivi/ristrutturazione/" class="hover:text-foreground transition-colors">Ristrutturazioni</a></li>
+          <li><a href="/preventivi/serramentista/" class="hover:text-foreground transition-colors">Serramentista</a></li>
+          <li><a href="/preventivi/carpentiere/" class="hover:text-foreground transition-colors">Carpentieri</a></li>
+          <li><a href="/preventivi/tetto/" class="hover:text-foreground transition-colors">Coperture e Tetti</a></li>
+          <li><a href="/preventivi/falegname/" class="hover:text-foreground transition-colors">Falegnami</a></li>
+          <li><a href="/preventivi/condizionatori/" class="hover:text-foreground transition-colors">Condizionatori</a></li>
+          <li><a href="/preventivi/freelance/" class="hover:text-foreground transition-colors">Freelance</a></li>
+          <li><a href="/preventivi/pavimentista/" class="hover:text-foreground transition-colors">Pavimentista</a></li>
+          <li><a href="/preventivi/geometra/" class="hover:text-foreground transition-colors">Geometri</a></li>
+          <li><a href="/preventivi/termoidraulico/" class="hover:text-foreground transition-colors">Termoidraulico</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Guide</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li><a href="/blog/" class="hover:text-foreground transition-colors font-medium text-foreground/80">Blog &amp; Approfondimenti</a></li>
+          <li><a href="/preventivi/modello-excel/" class="hover:text-foreground transition-colors">Modello Excel</a></li>
+          <li><a href="/preventivi/modello-word/" class="hover:text-foreground transition-colors">Modello Word</a></li>
+          <li><a href="/preventivi/come-fare-preventivo/" class="hover:text-foreground transition-colors">Come Fare un Preventivo</a></li>
+          <li><a href="/preventivi/preventivi-gratis/" class="hover:text-foreground transition-colors">Preventivi Gratis</a></li>
+        </ul>
+        <h4 class="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">Azienda</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li><a href="/chi-siamo/" class="hover:text-foreground transition-colors">Chi Siamo</a></li>
+          <li><a href="/contatti/" class="hover:text-foreground transition-colors">Contatti</a></li>
+          <li><button class="hover:text-foreground transition-colors text-left">Supporto</button></li>
+          <li><a href="/privacy/" class="hover:text-foreground transition-colors">Privacy Policy</a></li>
+          <li><a href="/termini/" class="hover:text-foreground transition-colors">Termini di Servizio</a></li>
+          <li><a href="/mappa-sito/" class="hover:text-foreground transition-colors">Mappa del Sito</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">© 2026 quoteai. Tutti i diritti riservati.</div>
+  </div>
+</footer>
+<a href="https://wa.me/393791059492" target="_blank" rel="noopener noreferrer nofollow" aria-label="Chatta con noi su WhatsApp" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full shadow-lg shadow-green-200/60 transition-all duration-200 hover:scale-105 active:scale-95" style="background:rgb(37,211,102)"><span class="flex h-14 w-14 items-center justify-center rounded-full" style="background:rgb(37,211,102)"><img src="/wa-icon.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="pr-5 text-white text-sm font-semibold whitespace-nowrap hidden sm:inline-block">Hai bisogno di aiuto?</span></a>
+</div></div>
+  </body>
+</html>

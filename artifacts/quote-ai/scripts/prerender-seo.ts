@@ -42,6 +42,11 @@ import {
   TESTIMONIALS,
   AGGREGATE_RATING,
 } from "../src/components/testimonials-section.js";
+import { translations } from "../src/i18n/translations.js";
+
+function testimonialText(key: string): string {
+  return translations.en[`testimonials.${key}.text`] ?? "";
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, "../dist/public");
@@ -1055,7 +1060,7 @@ function buildHomepageBodyHtml(): string {
           ).join("");
           return `<div class="bg-white rounded-xl border border-gray-100 p-5 card-soft flex flex-col gap-3">
             <div class="flex gap-0.5" aria-label="${t.rating} stelle su 5">${stars}</div>
-            <p class="text-sm text-gray-700 leading-relaxed flex-1">&ldquo;${esc(t.text)}&rdquo;</p>
+            <p class="text-sm text-gray-700 leading-relaxed flex-1">&ldquo;${esc(testimonialText(t.key))}&rdquo;</p>
             <div class="flex items-center gap-3 pt-2 border-t border-gray-50">
               <div class="h-9 w-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">${initials}</div>
               <div>
@@ -1218,7 +1223,7 @@ const homepageSoftwareSchema = {
     "@type": "Review",
     author: { "@type": "Person", name: t.name },
     reviewRating: { "@type": "Rating", ratingValue: String(t.rating), bestRating: "5", worstRating: "1" },
-    reviewBody: t.text,
+    reviewBody: testimonialText(t.key),
   })),
 };
 const homepageHeadBlock = buildHeadBlock({

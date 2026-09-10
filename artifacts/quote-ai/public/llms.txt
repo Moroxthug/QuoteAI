@@ -1,0 +1,50 @@
+# quoteai
+
+> quoteai è un software italiano di preventivazione con intelligenza artificiale per artigiani, PMI e professionisti. Descrivi il lavoro in linguaggio naturale e ottieni in 30 secondi un preventivo professionale in PDF con voci di costo, quantità, prezzi unitari e IVA.
+
+quoteai (https://quoteai.ca) è pensato per il mercato italiano: terminologia tecnica di settore, prezzi di riferimento per area geografica, fatturazione conforme alla normativa nazionale e integrazione con WhatsApp Business per l'invio dei preventivi ai clienti.
+
+## Prodotto
+
+- [Home](https://quoteai.ca/): panoramica del prodotto, benefici, prezzi e demo di un preventivo generato dall'AI.
+- [Blog & Approfondimenti](https://quoteai.ca/blog/): guide pratiche su preventivazione, prezzi di mercato e gestione cantieri.
+- [Chi siamo](https://quoteai.ca/chi-siamo/): missione, team e filosofia di prodotto.
+- [Contatti](https://quoteai.ca/contatti/): canali di supporto e collaborazioni.
+- [WhatsApp](https://quoteai.ca/whatsapp/): genera preventivi direttamente dalla chat WhatsApp Business.
+
+## Settori coperti
+
+- [Imbianchini](https://quoteai.ca/seo/imbianchino/): tinteggiature, rasature, finiture decorative.
+- [Pittori](https://quoteai.ca/seo/pittore/): verniciature interne ed esterne, smalti, decorazioni.
+- [Elettricisti](https://quoteai.ca/seo/elettricista/): impianti civili e industriali, quadri, cablaggi.
+- [Idraulici](https://quoteai.ca/seo/idraulico/): impianti idrici, sanitari, riparazioni.
+- [Termoidraulici](https://quoteai.ca/seo/termoidraulico/): caldaie, riscaldamento, impianti termici.
+- [Muratori](https://quoteai.ca/seo/muratore/): opere murarie, fondazioni, ripristini.
+- [Imprese edili](https://quoteai.ca/seo/edilizia/): cantieri completi, computi metrici, costruzioni.
+- [Ristrutturazioni](https://quoteai.ca/seo/ristrutturazione/): interventi multi-categoria, bonus edilizi.
+- [Carpentieri e fabbri](https://quoteai.ca/seo/carpentiere/): strutture metalliche, cancelli, recinzioni.
+- [Falegnami](https://quoteai.ca/seo/falegname/): mobili su misura, serramenti in legno, restauri.
+- [Geometri](https://quoteai.ca/seo/geometra/): rilievi, pratiche edilizie, computi.
+- [Freelance](https://quoteai.ca/seo/freelance/): preventivi per servizi professionali.
+- [Giardinieri](https://quoteai.ca/seo/giardiniere/): manutenzione del verde, potature, irrigazione.
+- [Piastrellisti](https://quoteai.ca/seo/piastrellista/): pavimenti e rivestimenti, posa gres e ceramica.
+- [Pavimentisti](https://quoteai.ca/seo/pavimentista/): parquet, resine, levigature.
+- [Serramentisti](https://quoteai.ca/seo/serramentista/): infissi, porte, vetrate.
+- [Coperture e tetti](https://quoteai.ca/seo/tetto/): rifacimento, manutenzione, lattoneria.
+- [Condizionatori](https://quoteai.ca/seo/condizionatori/): installazione e manutenzione climatizzatori.
+
+## Risorse pratiche
+
+- [Come fare un preventivo](https://quoteai.ca/seo/come-fare-preventivo/): guida passo-passo per creare un preventivo professionale.
+- [Modello Excel](https://quoteai.ca/seo/modello-excel/): template scaricabile in formato Excel.
+- [Modello Word](https://quoteai.ca/seo/modello-word/): template scaricabile in formato Word.
+- [Preventivi gratis](https://quoteai.ca/seo/preventivi-gratis/): come ottenere preventivi gratuiti.
+
+## Legale
+
+- [Privacy Policy](https://quoteai.ca/privacy/): trattamento dei dati personali.
+- [Termini di servizio](https://quoteai.ca/termini/): condizioni d'uso del servizio.
+
+## Indice completo
+
+- [Sitemap XML](https://quoteai.ca/sitemap.xml): elenco completo di tutte le pagine indicizzabili (oltre 1000 URL fra settori, città e articoli del blog).

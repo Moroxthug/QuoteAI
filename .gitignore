@@ -1,0 +1,93 @@
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# compiled output
+dist
+tmp
+api/data/
+
+
+# Un-ignore pre-built api-server dist (needed for Vercel deployment)
+!artifacts/api-server/dist/
+!artifacts/api-server/dist/**
+# But ignore nested node_modules inside dist except the ones we need
+artifacts/api-server/dist/node_modules/
+!artifacts/api-server/dist/node_modules/
+!artifacts/api-server/dist/node_modules/**
+
+# Track prerendered SEO HTML (needed for static serving / crawlers)
+# Un-ignore only the seo subtree; re-ignore everything else in dist/
+!artifacts/quote-ai/dist/
+!artifacts/quote-ai/dist/public/
+!artifacts/quote-ai/dist/public/seo/
+!artifacts/quote-ai/dist/public/seo/**
+artifacts/quote-ai/dist/*.mjs
+artifacts/quote-ai/dist/*.cjs
+artifacts/quote-ai/dist/public/index.html
+artifacts/quote-ai/dist/public/assets/
+artifacts/quote-ai/dist/public/favicon.svg
+artifacts/quote-ai/dist/public/opengraph.jpg
+artifacts/quote-ai/dist/public/quoteai-logo.png
+artifacts/quote-ai/dist/public/robots.txt
+artifacts/quote-ai/dist/public/sitemap.xml
+out-tsc
+*.tsbuildinfo
+.expo
+.expo-shared
+
+# dependencies
+node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
+
+# Replit
+.cache/
+.local/
+
+.vercel
+
+# Local Claude Code dev-server launch config — personal, not project source
+.claude/
+
+# Google service account keys — never commit
+*service-account*.json
+gen-lang-client-*.json
+**/google-indexing-key.json
+
+# Secrets / environment files — never commit
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example

@@ -1,0 +1,1796 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: PreventivoAI API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: quotes
+    description: Quote management
+  - name: business-profile
+    description: Business profile management
+  - name: payments
+    description: Stripe payment operations
+  - name: storage
+    description: Object storage upload and serving endpoints
+  - name: catalog
+    description: Price catalog management
+  - name: whatsapp
+    description: WhatsApp integration
+  - name: clients
+    description: Client aggregation from quotes
+  - name: documents
+    description: Document upload and price intelligence extraction
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /quotes:
+    get:
+      operationId: listQuotes
+      tags: [quotes]
+      summary: List all quotes for the authenticated user
+      responses:
+        "200":
+          description: List of quotes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Quote"
+    post:
+      operationId: createQuote
+      tags: [quotes]
+      summary: Create a new AI-generated quote
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateQuoteBody"
+      responses:
+        "201":
+          description: Created quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/stats:
+    get:
+      operationId: getQuoteStats
+      tags: [quotes]
+      summary: Get summary statistics for the user's quotes
+      responses:
+        "200":
+          description: Quote statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteStats"
+
+  /quotes/manual:
+    post:
+      operationId: createManualQuote
+      tags: [quotes]
+      summary: Create a new manually-built quote (no AI generation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateManualQuoteBody"
+      responses:
+        "201":
+          description: Created quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/suggest-item-description:
+    post:
+      operationId: suggestItemDescription
+      tags: [quotes]
+      summary: Get an AI-generated professional description for a quote line item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestItemDescriptionBody"
+      responses:
+        "200":
+          description: Suggested description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuggestItemDescriptionResult"
+
+  /quotes/{id}:
+    get:
+      operationId: getQuote
+      tags: [quotes]
+      summary: Get a single quote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+    put:
+      operationId: updateQuote
+      tags: [quotes]
+      summary: Update a quote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateQuoteBody"
+      responses:
+        "200":
+          description: Updated quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+    delete:
+      operationId: deleteQuote
+      tags: [quotes]
+      summary: Delete a quote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /quotes/{id}/generate-pdf:
+    post:
+      operationId: generateQuotePdf
+      tags: [quotes]
+      summary: Generate PDF for a quote (requires paid status)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PdfResult"
+
+  /quotes/{id}/send-pdf-email:
+    post:
+      operationId: sendQuotePdfEmail
+      tags: [quotes]
+      summary: Send the quote PDF to the client via email
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendQuotePdfEmailBody"
+      responses:
+        "200":
+          description: Email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /quotes/{id}/duplicate:
+    post:
+      operationId: duplicateQuote
+      tags: [quotes]
+      summary: Duplicate a quote as a new draft (clears client data and pdfDownloadedAt)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: Newly created duplicate quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/{id}/regenerate:
+    post:
+      operationId: regenerateQuote
+      tags: [quotes]
+      summary: Regenerate a quote using AI (replaces AI content in-place)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegenerateQuoteBody"
+      responses:
+        "200":
+          description: Updated quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/{id}/upgrade-to-capitolato:
+    post:
+      operationId: upgradeToCapitolatoPro
+      tags: [quotes]
+      summary: Upgrade quote descriptions to professional capitolato style using AI (Pro only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Upgraded quote with professional capitolato descriptions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/{id}/generate-pdf-pro:
+    post:
+      operationId: generateQuotePdfPro
+      tags: [quotes]
+      summary: Generate a server-side PDF for a capitolato quote and persist the URL (Pro only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: PDF stored and URL returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapitolatoPdfResult"
+
+  /business-profile:
+    get:
+      operationId: getBusinessProfile
+      tags: [business-profile]
+      summary: Get the authenticated user's business profile
+      responses:
+        "200":
+          description: Business profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProfile"
+    put:
+      operationId: updateBusinessProfile
+      tags: [business-profile]
+      summary: Create or update business profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBusinessProfileBody"
+      responses:
+        "200":
+          description: Updated business profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProfile"
+
+  /business-profile/logo:
+    post:
+      operationId: uploadBusinessProfileLogo
+      tags: [business-profile]
+      summary: Upload or replace the company logo
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                logo:
+                  type: string
+                  format: binary
+              required:
+                - logo
+      responses:
+        "200":
+          description: Logo uploaded and profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoUploadResult"
+
+  /storage/uploads/request-url:
+    post:
+      operationId: requestUploadUrl
+      tags: [storage]
+      summary: Request a presigned URL for file upload
+      description: |
+        Returns a presigned GCS URL for direct upload. The client sends JSON
+        metadata here, then uploads the file directly to the returned URL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
+      responses:
+        "200":
+          description: Presigned upload URL generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+
+  /payments/checkout:
+    post:
+      operationId: createCheckoutSession
+      tags: [payments]
+      summary: Create a Stripe checkout session to unlock a PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCheckoutBody"
+      responses:
+        "200":
+          description: Stripe checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutResult"
+
+  /payments/webhook:
+    post:
+      operationId: stripeWebhook
+      tags: [payments]
+      summary: Stripe webhook handler
+      responses:
+        "200":
+          description: OK
+
+  /payments/verify/{quoteId}:
+    get:
+      operationId: verifyPayment
+      tags: [payments]
+      summary: Verify a Stripe payment and unlock the quote if paid
+      parameters:
+        - in: path
+          name: quoteId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentVerifyResult"
+
+  /payments/plans:
+    get:
+      operationId: getPlans
+      tags: [payments]
+      summary: Get available pricing plans
+      responses:
+        "200":
+          description: Pricing plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plan"
+
+  /payments/subscription:
+    get:
+      operationId: getSubscription
+      tags: [payments]
+      summary: Get the current user subscription status
+      responses:
+        "200":
+          description: Subscription info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionInfo"
+
+  /payments/unlock-quote:
+    post:
+      operationId: unlockQuoteWithSubscription
+      tags: [payments]
+      summary: Unlock a quote using an active subscription
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnlockQuoteBody"
+      responses:
+        "200":
+          description: Quote unlocked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentVerifyResult"
+
+  /payments/trial-status:
+    get:
+      operationId: getTrialStatus
+      tags: [payments]
+      summary: Get the current user's free-trial status
+      responses:
+        "200":
+          description: Trial status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrialStatus"
+
+  /payments/portal:
+    post:
+      operationId: createCustomerPortalSession
+      tags: [payments]
+      summary: Create a Stripe Customer Portal session for subscription management
+      responses:
+        "200":
+          description: Portal URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortalSessionResult"
+
+  /catalog:
+    get:
+      operationId: listCatalogItems
+      tags: [catalog]
+      summary: List price catalog items for the authenticated user
+      responses:
+        "200":
+          description: List of catalog items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogItem"
+    post:
+      operationId: createCatalogItem
+      tags: [catalog]
+      summary: Create a new price catalog item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCatalogItemBody"
+      responses:
+        "201":
+          description: Created catalog item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogItem"
+
+  /catalog/bulk:
+    post:
+      operationId: bulkCreateCatalogItems
+      tags: [catalog]
+      summary: Bulk create price catalog items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/CreateCatalogItemBody"
+      responses:
+        "201":
+          description: Created catalog items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogItem"
+
+
+  /whatsapp/status:
+    get:
+      operationId: getWhatsappStatus
+      tags: [whatsapp]
+      summary: Get WhatsApp connection status for the authenticated user
+      responses:
+        "200":
+          description: Connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappStatus"
+
+  /whatsapp/connect:
+    post:
+      operationId: connectWhatsapp
+      tags: [whatsapp]
+      summary: Generate an OTP and send it to the user's WhatsApp number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappConnectBody"
+      responses:
+        "200":
+          description: OTP sent via WhatsApp
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappConnectResult"
+
+  /whatsapp/verify:
+    post:
+      operationId: verifyWhatsapp
+      tags: [whatsapp]
+      summary: Verify the OTP entered in the UI and link the WhatsApp number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappVerifyBody"
+      responses:
+        "200":
+          description: Account linked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+
+  /whatsapp/disconnect:
+    delete:
+      operationId: disconnectWhatsapp
+      tags: [whatsapp]
+      summary: Unlink WhatsApp from the user account
+      responses:
+        "200":
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+
+  /whatsapp/usage:
+    get:
+      operationId: getWhatsappUsage
+      tags: [whatsapp]
+      summary: Get WhatsApp quote usage for the current month
+      responses:
+        "200":
+          description: Usage stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WhatsappUsage"
+
+  /whatsapp/toggle:
+    patch:
+      operationId: toggleWhatsapp
+      tags: [whatsapp]
+      summary: Enable or disable the WhatsApp integration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WhatsappToggleBody"
+      responses:
+        "200":
+          description: Toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List uploaded documents for the authenticated user
+      responses:
+        "200":
+          description: List of uploaded documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UploadedDocument"
+
+  /documents/upload:
+    post:
+      operationId: uploadDocument
+      tags: [documents]
+      summary: Upload a PDF or image document for price intelligence extraction
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        "201":
+          description: Document uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadedDocument"
+
+  /documents/price-summary:
+    get:
+      operationId: getPriceSummary
+      tags: [documents]
+      summary: Get aggregated price intelligence summary from all processed documents
+      responses:
+        "200":
+          description: Price intelligence summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceSummary"
+
+  /documents/{id}/extract:
+    post:
+      operationId: extractDocument
+      tags: [documents]
+      summary: Trigger AI extraction on an uploaded document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Extraction complete
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadedDocument"
+
+  /documents/{id}:
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete an uploaded document and its price intelligence data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List clients aggregated from quotes
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+
+  /clients/{id}/quotes:
+    get:
+      operationId: listClientQuotes
+      tags: [clients]
+      summary: List quotes for a specific client by stable id (md5 of normalized name)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of quotes for the client
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Quote"
+
+  /catalog/import-from-quotes:
+    post:
+      operationId: importCatalogFromQuotes
+      tags: [catalog]
+      summary: Import unique price items from existing quotes into the catalog
+      responses:
+        "200":
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportCatalogResult"
+
+  /catalog/{id}:
+    put:
+      operationId: updateCatalogItem
+      tags: [catalog]
+      summary: Update a price catalog item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCatalogItemBody"
+      responses:
+        "200":
+          description: Updated catalog item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogItem"
+    delete:
+      operationId: deleteCatalogItem
+      tags: [catalog]
+      summary: Delete a price catalog item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    QuoteItem:
+      type: object
+      properties:
+        descrizione:
+          type: string
+        quantita:
+          type: number
+        unita:
+          type: string
+        prezzoUnitario:
+          type: number
+        totale:
+          type: number
+      required:
+        - descrizione
+        - quantita
+        - unita
+        - prezzoUnitario
+        - totale
+
+    QuoteChapterItem:
+      type: object
+      properties:
+        descrizione:
+          type: string
+        um:
+          type: string
+        quantita:
+          type: number
+        prezzoUnitario:
+          type: number
+        totale:
+          type: number
+      required:
+        - descrizione
+        - um
+        - quantita
+        - prezzoUnitario
+        - totale
+
+    QuoteChapter:
+      type: object
+      properties:
+        lettera:
+          type: string
+        titolo:
+          type: string
+        voci:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapterItem"
+        subtotale:
+          type: number
+        osservazione:
+          type: string
+      required:
+        - lettera
+        - titolo
+        - voci
+        - subtotale
+
+    QuoteDiscount:
+      type: object
+      properties:
+        percentuale:
+          type: number
+        importoScontato:
+          type: number
+      required:
+        - percentuale
+        - importoScontato
+
+    QuoteClientData:
+      type: object
+      properties:
+        nome:
+          type: string
+        indirizzo:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        businessNumber:
+          type: string
+        partitaIva:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        province:
+          type: string
+      required:
+        - nome
+        - indirizzo
+
+    QuoteCompanySnapshot:
+      type: object
+      properties:
+        companyName:
+          type: string
+        vatNumber:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        logoUrl:
+          type: string
+      required:
+        - companyName
+
+    QuoteAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        fileUrl:
+          type: string
+        fileSize:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - fileName
+        - mimeType
+        - fileUrl
+        - createdAt
+
+    Quote:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        clientData:
+          $ref: "#/components/schemas/QuoteClientData"
+        descrizioneGenerale:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItem"
+        capitoli:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapter"
+        sconto:
+          $ref: "#/components/schemas/QuoteDiscount"
+          nullable: true
+        condizioniPagamento:
+          type: array
+          items:
+            type: string
+        titoloPreventivoRiga1:
+          type: string
+          nullable: true
+        titoloPreventivoRiga2:
+          type: string
+          nullable: true
+        numeroPreventivoData:
+          type: string
+          nullable: true
+        companySnapshot:
+          $ref: "#/components/schemas/QuoteCompanySnapshot"
+          nullable: true
+        subtotale:
+          type: number
+        ivaPercentuale:
+          type: number
+        ivaValore:
+          type: number
+        totale:
+          type: number
+        note:
+          type: string
+        status:
+          type: string
+          enum: [draft, unlocked, pending_payment]
+        pdfUrl:
+          type: string
+          nullable: true
+        rawInput:
+          type: string
+        pdfDownloadedAt:
+          type: string
+          nullable: true
+        capitolatoPro:
+          type: boolean
+        capitolatoPdfUrl:
+          type: ["string", "null"]
+        templateId:
+          type: string
+          enum: [standard, arosio, mariagrazia]
+          nullable: true
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuoteAttachment'
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - clientData
+        - descrizioneGenerale
+        - items
+        - capitoli
+        - condizioniPagamento
+        - subtotale
+        - ivaPercentuale
+        - ivaValore
+        - totale
+        - note
+        - status
+        - rawInput
+        - capitolatoPro
+        - createdAt
+        - updatedAt
+
+    QuoteStats:
+      type: object
+      properties:
+        total:
+          type: number
+        draft:
+          type: number
+        unlocked:
+          type: number
+        pendingPayment:
+          type: number
+        totalRevenue:
+          type: number
+        unlockedRevenue:
+          type: number
+        thisMonth:
+          type: number
+        avgValue:
+          type: number
+        recentQuotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Quote"
+      required:
+        - total
+        - draft
+        - unlocked
+        - pendingPayment
+        - totalRevenue
+        - unlockedRevenue
+        - thisMonth
+        - avgValue
+        - recentQuotes
+
+    CreateQuoteBody:
+      type: object
+      properties:
+        rawInput:
+          type: string
+        clientData:
+          type: string
+          description: JSON-encoded QuoteClientData object
+        companySnapshot:
+          type: string
+          description: JSON-encoded QuoteCompanySnapshot object
+        images:
+          type: array
+          description: Up to 3 image files (JPG, PNG, WEBP, HEIC) passed to OpenAI vision
+          maxItems: 3
+          items:
+            type: string
+            format: binary
+        templateId:
+          type: string
+          enum: [standard, arosio, mariagrazia]
+          description: Template ID for the quote layout (affects both AI generation style and PDF layout)
+        targetTotalEur:
+          type: number
+          description: Optional target total (IVA inclusa) in euros. When provided, unit prices are scaled proportionally to hit this total.
+      required:
+        - rawInput
+
+    UpdateQuoteBody:
+      type: object
+      properties:
+        clientData:
+          $ref: "#/components/schemas/QuoteClientData"
+        descrizioneGenerale:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItem"
+        capitoli:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapter"
+        sconto:
+          $ref: "#/components/schemas/QuoteDiscount"
+          nullable: true
+        condizioniPagamento:
+          type: array
+          items:
+            type: string
+        titoloPreventivoRiga1:
+          type: string
+          nullable: true
+        titoloPreventivoRiga2:
+          type: string
+          nullable: true
+        subtotale:
+          type: number
+        ivaPercentuale:
+          type: number
+        ivaValore:
+          type: number
+        totale:
+          type: number
+        note:
+          type: string
+        status:
+          type: string
+          enum: [draft, unlocked, pending_payment]
+        templateId:
+          type: string
+          enum: [standard, arosio, mariagrazia]
+
+    RegenerateQuoteBody:
+      type: object
+      properties:
+        newDescription:
+          type: string
+          description: Optional new description; if omitted, the original rawInput is reused
+        keepClientData:
+          type: boolean
+          description: If true, existing client data is preserved (default true)
+
+    PdfResult:
+      type: object
+      properties:
+        pdfUrl:
+          type: string
+        isDraft:
+          type: boolean
+      required:
+        - pdfUrl
+
+    BusinessProfile:
+      type: object
+      properties:
+        userId:
+          type: string
+        companyName:
+          type: string
+        vatNumber:
+          type: string
+        address:
+          type: string
+        logoUrl:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        apiKey:
+          type: string
+          nullable: true
+      required:
+        - userId
+        - companyName
+
+    UpdateBusinessProfileBody:
+      type: object
+      properties:
+        companyName:
+          type: string
+        vatNumber:
+          type: string
+        address:
+          type: string
+        logoUrl:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+
+    SubscriptionInfo:
+      type: object
+      properties:
+        plan:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        periodEnd:
+          type: string
+          nullable: true
+        isActive:
+          type: boolean
+        quotaUsed:
+          type: number
+          nullable: true
+        quotaLimit:
+          type: number
+          nullable: true
+        quotaRemaining:
+          type: number
+          nullable: true
+        quotaResetDate:
+          type: string
+          nullable: true
+      required:
+        - isActive
+
+    UnlockQuoteBody:
+      type: object
+      properties:
+        quoteId:
+          type: string
+      required:
+        - quoteId
+
+    CreateCheckoutBody:
+      type: object
+      properties:
+        quoteId:
+          type: string
+        planType:
+          type: string
+          enum: [monthly_starter, monthly_pro, monthly_elite, oneshot_watermark, oneshot_clean]
+      required:
+        - planType
+
+    PaymentVerifyResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [draft, unlocked, pending_payment]
+      required:
+        - status
+
+    CheckoutResult:
+      type: object
+      properties:
+        url:
+          type: string
+        sessionId:
+          type: string
+      required:
+        - url
+        - sessionId
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        currency:
+          type: string
+        interval:
+          type: string
+          nullable: true
+        features:
+          type: array
+          items:
+            type: string
+        hasWatermark:
+          type: boolean
+        quotaPerMonth:
+          type: number
+          nullable: true
+      required:
+        - id
+        - name
+        - price
+        - currency
+        - features
+        - hasWatermark
+
+    CapitolatoPdfResult:
+      type: object
+      properties:
+        pdfUrl:
+          type: string
+        quoteId:
+          type: string
+      required:
+        - pdfUrl
+        - quoteId
+
+    SendQuotePdfEmailBody:
+      type: object
+      properties:
+        toEmail:
+          type: string
+          format: email
+        clientName:
+          type: string
+      required:
+        - toEmail
+
+    CreateManualQuoteBody:
+      type: object
+      properties:
+        templateId:
+          type: string
+          enum: [standard, arosio, mariagrazia]
+        capitoli:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapter"
+        clientData:
+          $ref: "#/components/schemas/QuoteClientData"
+        companySnapshot:
+          $ref: "#/components/schemas/QuoteCompanySnapshot"
+        titoloPreventivoRiga1:
+          type: string
+        titoloPreventivoRiga2:
+          type: string
+        descrizioneGenerale:
+          type: string
+        ivaPercentuale:
+          type: number
+        condizioniPagamento:
+          type: array
+          items:
+            type: string
+        note:
+          type: string
+      required:
+        - capitoli
+
+    SuggestItemDescriptionBody:
+      type: object
+      properties:
+        brief:
+          type: string
+          description: Short description of the work item
+        context:
+          type: string
+          description: Optional context about the overall project
+      required:
+        - brief
+
+    SuggestItemDescriptionResult:
+      type: object
+      properties:
+        description:
+          type: string
+      required:
+        - description
+
+    PortalSessionResult:
+      type: object
+      properties:
+        url:
+          type: string
+      required:
+        - url
+
+    LogoUploadResult:
+      type: object
+      properties:
+        logoUrl:
+          type: string
+      required:
+        - logoUrl
+
+    UploadUrlRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        size:
+          type: integer
+        contentType:
+          type: string
+      required:
+        - name
+        - size
+        - contentType
+
+    UploadUrlResponse:
+      type: object
+      properties:
+        uploadURL:
+          type: string
+        objectPath:
+          type: string
+        metadata:
+          $ref: "#/components/schemas/UploadUrlRequest"
+      required:
+        - uploadURL
+        - objectPath
+
+    CatalogItem:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        nome:
+          type: string
+        categoria:
+          type: string
+          nullable: true
+        um:
+          type: string
+        prezzoUnitario:
+          type: number
+        note:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - nome
+        - um
+        - prezzoUnitario
+        - createdAt
+        - updatedAt
+
+    CreateCatalogItemBody:
+      type: object
+      properties:
+        nome:
+          type: string
+        categoria:
+          type: string
+        um:
+          type: string
+        prezzoUnitario:
+          type: number
+        note:
+          type: string
+      required:
+        - nome
+        - um
+        - prezzoUnitario
+
+    UpdateCatalogItemBody:
+      type: object
+      properties:
+        nome:
+          type: string
+        categoria:
+          type: string
+        um:
+          type: string
+        prezzoUnitario:
+          type: number
+        note:
+          type: string
+
+    ImportCatalogResult:
+      type: object
+      properties:
+        imported:
+          type: number
+        skipped:
+          type: number
+      required:
+        - imported
+        - skipped
+
+    WhatsappStatus:
+      type: object
+      properties:
+        connected:
+          type: boolean
+        phoneNumber:
+          type: string
+          nullable: true
+        isEnabled:
+          type: boolean
+          nullable: true
+        businessNumber:
+          type: string
+          nullable: true
+      required:
+        - connected
+
+    WhatsappConnectBody:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+      required:
+        - phoneNumber
+
+    WhatsappConnectResult:
+      type: object
+      properties:
+        sent:
+          type: boolean
+        phoneNumber:
+          type: string
+      required:
+        - sent
+        - phoneNumber
+
+    WhatsappVerifyBody:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+        otp:
+          type: string
+      required:
+        - phoneNumber
+        - otp
+
+    WhatsappUsage:
+      type: object
+      properties:
+        used:
+          type: number
+        limit:
+          type: number
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+      required:
+        - used
+
+    WhatsappToggleBody:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+      required:
+        - isEnabled
+
+    SuccessResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    TrialStatus:
+      type: object
+      properties:
+        isTrialActive:
+          type: boolean
+        trialStartedAt:
+          type: string
+          nullable: true
+        trialDownloadsUsed:
+          type: number
+        trialDownloadsLimit:
+          type: number
+        trialDaysLeft:
+          type: number
+          nullable: true
+        trialExpiresAt:
+          type: string
+          nullable: true
+      required:
+        - isTrialActive
+        - trialDownloadsUsed
+        - trialDownloadsLimit
+
+    UploadedDocument:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        fileName:
+          type: string
+        fileSize:
+          type: integer
+          nullable: true
+        mimeType:
+          type: string
+        fileUrl:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, done, error]
+        extractedData:
+          $ref: "#/components/schemas/ExtractedDocumentData"
+          nullable: true
+        errorMessage:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - userId
+        - fileName
+        - mimeType
+        - fileUrl
+        - status
+        - createdAt
+        - updatedAt
+
+    ExtractedDocumentData:
+      type: object
+      properties:
+        lavorazioni:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExtractedLavorazione"
+          nullable: true
+        totale:
+          type: number
+          nullable: true
+        zona:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+
+    ExtractedLavorazione:
+      type: object
+      properties:
+        tipo:
+          type: string
+        prezzoUnitario:
+          type: number
+        um:
+          type: string
+          nullable: true
+        zona:
+          type: string
+          nullable: true
+      required:
+        - tipo
+        - prezzoUnitario
+
+    PriceSummary:
+      type: object
+      properties:
+        totalDocuments:
+          type: number
+        processedDocuments:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceSummaryItem"
+      required:
+        - totalDocuments
+        - processedDocuments
+        - items
+
+    PriceSummaryItem:
+      type: object
+      properties:
+        workType:
+          type: string
+        avgUnitPrice:
+          type: number
+        minPrice:
+          type: number
+        maxPrice:
+          type: number
+        count:
+          type: number
+        unit:
+          type: string
+          nullable: true
+        zones:
+          type: array
+          items:
+            type: string
+      required:
+        - workType
+        - avgUnitPrice
+        - minPrice
+        - maxPrice
+        - count
+
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+        clientName:
+          type: string
+        email:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        quoteCount:
+          type: number
+        unlockedCount:
+          type: number
+        totalValue:
+          type: number
+        unlockedValue:
+          type: number
+        lastQuoteDate:
+          type: string
+        indirizzo:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        province:
+          type: string
+          nullable: true
+        partitaIva:
+          type: string
+          nullable: true
+        businessNumber:
+          type: string
+          nullable: true
+      required:
+        - id
+        - clientName
+        - quoteCount
+        - unlockedCount
+        - totalValue
+        - unlockedValue
+        - lastQuoteDate

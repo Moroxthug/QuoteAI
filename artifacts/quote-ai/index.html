@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary SEO -->
+    <title>quoteai – Instant Quotes for Canadian Contractors | AI in 30s</title>
+    <meta name="description" content="Create professional quotes in 30 seconds with AI. Quoting software for Canadian contractors, tradespeople and small businesses. No Excel, no mistakes. Try it free." />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="quoteai" />
+    <!--
+      Production: the prerender pipeline (`scripts/prerender-seo.ts`)
+      writes the correct per-route <link rel="canonical"> directly into
+      every prerendered HTML file, so the snippet below is stripped/
+      replaced and never reaches a crawler in prod.
+
+      Dev/preview: the SPA shell is served for every route. The inline
+      script below sets a canonical that matches the current URL before
+      React mounts, so SEO audits (Lighthouse, Semrush) running against
+      the dev preview don't see every page canonicalizing to "/".
+      <SeoHead> (react-helmet-async) then refines it per-route after
+      hydration.
+    -->
+    <link id="__canonical" rel="canonical" href="https://quoteai.ca/" />
+    <script>
+      (function () {
+        try {
+          var origin = "https://quoteai.ca";
+          var p = window.location.pathname || "/";
+          if (p.length > 1 && p.charAt(p.length - 1) !== "/" && p.lastIndexOf(".") <= p.lastIndexOf("/")) {
+            p = p + "/";
+          }
+          var links = document.head.querySelectorAll('link[rel="canonical"]');
+          var keep = document.getElementById("__canonical");
+          if (!keep && links.length > 0) keep = links[0];
+          if (!keep) {
+            keep = document.createElement("link");
+            keep.setAttribute("rel", "canonical");
+            document.head.appendChild(keep);
+          }
+          keep.setAttribute("id", "__canonical");
+          keep.setAttribute("href", origin + p);
+          for (var i = 0; i < links.length; i++) {
+            if (links[i] !== keep && links[i].parentNode) {
+              links[i].parentNode.removeChild(links[i]);
+            }
+          }
+          var noindexPrefixes = ["/dashboard", "/sign-in", "/sign-up", "/onboarding", "/admin", "/reset-password", "/forgot-password"];
+          for (var j = 0; j < noindexPrefixes.length; j++) {
+            if (p === noindexPrefixes[j] + "/" || p.indexOf(noindexPrefixes[j] + "/") === 0) {
+              var robots = document.head.querySelector('meta[name="robots"]');
+              if (!robots) {
+                robots = document.createElement("meta");
+                robots.setAttribute("name", "robots");
+                document.head.appendChild(robots);
+              }
+              robots.setAttribute("content", "noindex, nofollow");
+              break;
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D2B39E0ELW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D2B39E0ELW');
+    </script>
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#7C3AED" />
+
+    <!-- Resource hints -->
+    <link rel="dns-prefetch" href="https://wa.me" />
+
+    <!-- Self-hosted Inter Variable — preloaded for zero render-blocking -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/fonts/inter-latin-wght-normal.woff2"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

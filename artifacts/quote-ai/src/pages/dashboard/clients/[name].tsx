@@ -2,9 +2,9 @@ import { useParams, Link } from "wouter";
 import { useListClientQuotes, getListClientQuotesQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Euro, FileText, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, FileText, Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
-import { it } from "date-fns/locale";
+import { enCA } from "date-fns/locale";
 
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
@@ -54,7 +54,7 @@ export default function ClientDetailPage() {
             ) : (
               <>
                 <h1 className="text-2xl font-bold tracking-tight leading-tight truncate">
-                  {clientName || "Cliente"}
+                  {clientName || "Client"}
                 </h1>
                 {(email || phone || city || indirizzo) && (
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
@@ -90,7 +90,7 @@ export default function ClientDetailPage() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Preventivi</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quotes</span>
               <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
                 <FileText className="h-4 w-4 text-violet-500" />
               </div>
@@ -103,7 +103,7 @@ export default function ClientDetailPage() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Accettati</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Accepted</span>
               <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" />
               </div>
@@ -116,9 +116,9 @@ export default function ClientDetailPage() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Valore totale</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total value</span>
               <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                <Euro className="h-4 w-4 text-blue-500" />
+                <DollarSign className="h-4 w-4 text-blue-500" />
               </div>
             </div>
             {isLoading ? <Skeleton className="h-8 w-24" /> : (
@@ -129,9 +129,9 @@ export default function ClientDetailPage() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sbloccato</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Unlocked</span>
               <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                <Euro className="h-4 w-4 text-amber-500" />
+                <DollarSign className="h-4 w-4 text-amber-500" />
               </div>
             </div>
             {isLoading ? <Skeleton className="h-8 w-24" /> : (
@@ -159,7 +159,7 @@ export default function ClientDetailPage() {
             )}
             {indirizzo && (
               <div className="text-sm">
-                <div className="text-xs text-muted-foreground mb-0.5">Indirizzo</div>
+                <div className="text-xs text-muted-foreground mb-0.5">Address</div>
                 <div className="font-medium">{indirizzo}{city ? `, ${city}` : ""}</div>
               </div>
             )}
@@ -170,7 +170,7 @@ export default function ClientDetailPage() {
       {/* Quotes list */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">Preventivi</CardTitle>
+          <CardTitle className="text-base font-semibold">Quotes</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {isLoading ? (
@@ -184,7 +184,7 @@ export default function ClientDetailPage() {
             </div>
           ) : !quotes || quotes.length === 0 ? (
             <div className="py-10 text-center text-sm text-muted-foreground">
-              Nessun preventivo trovato per questo cliente.
+              No quotes found for this client.
             </div>
           ) : (
             <div className="divide-y">
@@ -196,10 +196,10 @@ export default function ClientDetailPage() {
                 >
                   <div className="min-w-0 flex-1">
                     <div className="font-medium text-sm truncate">
-                      {q.titoloPreventivoRiga2 || q.descrizioneGenerale || "Preventivo"}
+                      {q.titoloPreventivoRiga2 || q.descrizioneGenerale || "Quote"}
                     </div>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      {format(new Date(q.createdAt), "dd MMM yyyy", { locale: it })}
+                      {format(new Date(q.createdAt), "dd MMM yyyy", { locale: enCA })}
                       {q.numeroPreventivoData && (
                         <span className="ml-2 text-gray-400">— {q.numeroPreventivoData}</span>
                       )}
@@ -211,7 +211,7 @@ export default function ClientDetailPage() {
                       q.status === "pending_payment" ? "bg-amber-100 text-amber-700" :
                       "bg-slate-100 text-slate-600"
                     }`}>
-                      {q.status === "unlocked" ? "Sbloccato" : q.status === "pending_payment" ? "In attesa" : "Bozza"}
+                      {q.status === "unlocked" ? "Unlocked" : q.status === "pending_payment" ? "Pending" : "Draft"}
                     </span>
                     <span className="font-semibold text-sm">{formatCurrency(q.totale)}</span>
                     <ChevronRight className="h-4 w-4 text-gray-300" />

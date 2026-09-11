@@ -555,7 +555,7 @@ async function handleGreeting(from: string, userId: string, profile: typeof busi
 async function sendMainMenu(from: string, userId: string, prefs: WhatsappPreferences) {
   const defaultTmpl = templateLabel(prefs.defaultTemplate ?? "standard");
   const defaultClient = prefs.defaultClient?.nome || "none";
-  const defaultIva = prefs.defaultIva ?? 22;
+  const defaultIva = prefs.defaultIva ?? 13;
 
   await sendWhatsappText(from, [
     `📋 *QUOTEAI MENU*`,
@@ -821,14 +821,16 @@ async function handleTemplateMenuReply(
   await deleteSession(from);
 }
 
-// ── Menu: IVA ───────────────────────────────────────────────────────────────────
+// ── Menu: tax rate ────────────────────────────────────────────────────────────
 
-const IVA_OPTIONS = [4, 5, 10, 22];
+// Common combined GST/HST/PST rates across Canadian provinces: 5% (GST only —
+// AB, territories), 12% (BC), 13% (Ontario HST), 15% (Atlantic HST).
+const TAX_RATE_OPTIONS = [5, 12, 13, 15];
 
 async function handleIvaMenu(from: string, userId: string, prefs: WhatsappPreferences) {
-  const currentIva = prefs.defaultIva ?? 22;
-  const lines = IVA_OPTIONS.map((iva, i) =>
-    `*${i + 1}* — ${iva}%${iva === currentIva ? " ✓" : ""}`
+  const currentRate = prefs.defaultIva ?? 13;
+  const lines = TAX_RATE_OPTIONS.map((rate, i) =>
+    `*${i + 1}* — ${rate}%${rate === currentRate ? " ✓" : ""}`
   );
 
   await sendWhatsappText(from, [
@@ -837,7 +839,7 @@ async function handleIvaMenu(from: string, userId: string, prefs: WhatsappPrefer
     ...lines,
     ``,
     `Choose the tax rate to apply automatically to future quotes.`,
-    `_(construction work standard: 10% — generic standard: 22%)_`,
+    `_(GST only: 5% — most provinces (HST): 13-15%)_`,
   ].join("\n"));
 
   await upsertSession(from, userId, "menu_iva", {}, 0);
@@ -846,13 +848,13 @@ async function handleIvaMenu(from: string, userId: string, prefs: WhatsappPrefer
 async function handleIvaMenuReply(from: string, userId: string, text: string) {
   const choice = parseInt(text.trim(), 10);
 
-  if (choice >= 1 && choice <= IVA_OPTIONS.length) {
-    const iva = IVA_OPTIONS[choice - 1]!;
-    await setPreferences(userId, { defaultIva: iva });
-    await sendWhatsappText(from, `✅ Default tax rate set to *${iva}%*.\n\n_Type *menu* for settings or *P* for a new quote._`);
+  if (choice >= 1 && choice <= TAX_RATE_OPTIONS.length) {
+    const rate = TAX_RATE_OPTIONS[choice - 1]!;
+    await setPreferences(userId, { defaultIva: rate });
+    await sendWhatsappText(from, `✅ Default tax rate set to *${rate}%*.\n\n_Type *menu* for settings or *P* for a new quote._`);
     await deleteSession(from);
   } else {
-    await sendWhatsappText(from, `🤔 Reply with *1* (4%), *2* (5%), *3* (10%) or *4* (22%).`);
+    await sendWhatsappText(from, `🤔 Reply with *1* (5%), *2* (12%), *3* (13%) or *4* (15%).`);
   }
 }
 
@@ -1033,9 +1035,9 @@ async function handleJobInputReply(
 
   await sendWhatsappText(from, "⏳ Generating your quote, give me a few seconds...");
 
-  // Prepend default IVA hint to rawInput if user has set a non-default rate
+  // Prepend default tax-rate hint to rawInput if user has set a non-default rate
   const prefs = await getPreferences(userId);
-  const ivaHint = prefs.defaultIva && prefs.defaultIva !== 22
+  const ivaHint = prefs.defaultIva && prefs.defaultIva !== 13
     ? `[Use a tax rate of ${prefs.defaultIva}%]\n`
     : "";
   const augmentedInput = `${ivaHint}${rawInput}`;

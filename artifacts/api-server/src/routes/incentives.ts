@@ -270,7 +270,14 @@ async function ensureDefaultIncentives() {
 // GET /api/public/incentives - Returns active incentives filtered by province/city/category
 router.get("/public/incentives", async (req, res) => {
   try {
-    await ensureDefaultIncentives();
+    // DISABLED (2026-09-11): the seeded catalog (see ensureDefaultIncentives)
+    // models the Italian tax-incentive system (Ecobonus, regional "fondo
+    // perduto" grants tied to Lombardia/Milano/etc.), which is wrong for
+    // Canadian customers regardless of what's already seeded in the DB.
+    // Returning an empty list unconditionally until this is redesigned
+    // around real Canadian federal/provincial rebate programs.
+    res.json({ success: true, count: 0, incentives: [] });
+    return;
 
     const provinceParam = req.query.province ? String(req.query.province).trim() : null;
     const cityParam = req.query.city ? String(req.query.city).trim() : null;
@@ -322,214 +329,22 @@ router.get("/public/incentives", async (req, res) => {
 });
 
 // POST /api/public/quotes/:quoteId/incentives - Calculates the bonuses on the quote and updates the lead
-router.post("/public/quotes/:quoteId/incentives", async (req, res) => {
+router.post("/public/quotes/:quoteId/incentives", async (_req, res) => {
   try {
-    const quoteId = req.params.quoteId;
-    const apiKeyHeader = req.headers["x-api-key"] || req.query.apiKey;
-    
-    // Find the quote
-    const [quote] = await db
-      .select()
-      .from(quotesTable)
-      .where(eq(quotesTable.id, quoteId));
+    // DISABLED (2026-09-11): the calculation below models the Italian
+    // government tax-incentive system (Ecobonus, Bonus Ristrutturazione,
+    // IRPEF deductions, regional "fondo perduto" grants tied to Italian
+    // provinces/cities) inherited from the original Italian product — see
+    // the comment on ensureDefaultIncentives() above. It was still wired
+    // into real outbound emails to contractors and their clients
+    // (sendWidgetLeadNotification / sendWidgetClientConfirmationEmail),
+    // which meant Canadian leads could receive emails claiming fabricated
+    // Italian government benefits. Short-circuiting here until this is
+    // redesigned around real Canadian federal/provincial rebate programs —
+    // a research/product decision, not something to guess at in code.
+    res.json({ success: true, available: false, reason: "not_yet_available_for_region" });
+    return;
 
-    if (!quote) {
-      res.status(404).json({ error: "Quote not found." });
-      return;
-    }
-
-    const {
-      tipoImmobile = "prima_casa",
-      obiettivoLavori = "ristrutturazione",
-      fasciaIsee = "sopra_30k",
-      province = "",
-      postalCode = "",
-      totalePreventivo,
-    } = req.body;
-
-    const totaleLavori = Number(totalePreventivo) || Number(quote.totale) || 0;
-
-    // 1. Calculate the reduced VAT/tax discount (10% for residential primary/secondary home vs. 22% standard)
-    const isResidenziale = tipoImmobile === "prima_casa" || tipoImmobile === "seconda_casa" || tipoImmobile === "condominio";
-    const scontoIvaStimato = isResidenziale ? Math.round(totaleLavori * 0.10) : 0; // Net savings ~10% on the taxable amount
-
-    // 2. Calculate the compatible national bonus/deduction
-    // The tax deduction underlying Ristrutturazione/Ecobonus is reserved
-    // for individuals on residential-use properties: an office/commercial
-    // property doesn't qualify. Between primary and secondary residence, the
-    // full rate applies only to the primary residence/condo; on a secondary
-    // residence it's reduced (indicative rate, to be confirmed once the actual
-    // regulatory rules are formalized — see TODO item 3). The accessibility
-    // barrier-removal bonus, on the other hand, stays unchanged: the regulation
-    // doesn't limit it to the primary residence only.
-    const isUfficio = tipoImmobile === "ufficio";
-    const isSecondaCasa = tipoImmobile === "seconda_casa";
-
-    let bonusStataleApplicato = "Bonus Ristrutturazione Edilizia 50% (Detrazione 10 anni)";
-    let bonusStataleCodice = "BONUS_CASA_50";
-    let percentualeBonusStatale = 0.50;
-    let percentualeSecondaCasa = 0.36;
-
-    if (obiettivoLavori === "efficienza" || obiettivoLavori === "efficienza_energetica") {
-      bonusStataleApplicato = "Ecobonus 65% / Conto Termico GSE (Incentivo Diretto)";
-      bonusStataleCodice = "ECOBONUS_65";
-      percentualeBonusStatale = 0.65;
-      percentualeSecondaCasa = 0.50;
-    } else if (obiettivoLavori === "barriere" || obiettivoLavori === "barriere_architettoniche") {
-      bonusStataleApplicato = "Bonus Abbattimento Barriere Architettoniche 75%";
-      bonusStataleCodice = "BARRIERE_75";
-      percentualeBonusStatale = 0.75;
-      percentualeSecondaCasa = 0.75; // the regulation doesn't reduce this bonus for a secondary residence
-    }
-
-    const bonusBarriere = bonusStataleCodice === "BARRIERE_75";
-    if (isUfficio && !bonusBarriere) {
-      bonusStataleApplicato = `${bonusStataleApplicato} — non applicabile: detrazione riservata a immobili ad uso abitativo`;
-      percentualeBonusStatale = 0;
-    } else if (isSecondaCasa && !bonusBarriere) {
-      percentualeBonusStatale = percentualeSecondaCasa;
-      bonusStataleApplicato = `${bonusStataleApplicato} — aliquota ridotta ${Math.round(percentualeSecondaCasa * 100)}% per seconda casa`;
-    }
-
-    let importoBonusStatale = Math.round(totaleLavori * percentualeBonusStatale);
-
-    // Cap at the standard maximum
-    if (importoBonusStatale > 48000) importoBonusStatale = 48000;
-
-    // 3. Match with a regional or municipal grant program
-    await ensureDefaultIncentives();
-    const allIncentives = await db
-      .select()
-      .from(incentivesCatalogTable)
-      .where(ne(incentivesCatalogTable.stato, "closed"));
-
-    // Verification status of the applied national bonus: reflects whether an admin
-    // has manually checked the corresponding catalog entry (see humanVerified).
-    const bonusStataleRecord = allIncentives.find(inc => inc.codice === bonusStataleCodice);
-    const bonusStataleHumanVerified = bonusStataleRecord?.humanVerified ?? false;
-
-    let bandoRegionaleApplicato = "Nessun bando regionale a sportello specifico individuato (si applicano i Bonus Statali)";
-    let importoBandoRegionale = 0;
-    let bandoRegionaleHumanVerified: boolean | null = null;
-
-    if (province || postalCode) {
-      const matchReg = allIncentives.find(inc =>
-        (inc.level === "regionale" || inc.level === "comunale") &&
-        ((province && inc.province?.toLowerCase().includes(province.toLowerCase())) ||
-         (province && province.toLowerCase().includes(inc.province?.toLowerCase() || "")) ||
-         (inc.city && postalCode.startsWith("20") && inc.city.toLowerCase() === "milano") ||
-         (inc.city && postalCode.startsWith("40") && inc.city.toLowerCase() === "bologna"))
-      );
-
-      if (matchReg) {
-        bandoRegionaleApplicato = `${matchReg.titolo} (${matchReg.tipoAgevolazione === 'fondo_perduto' ? 'Fondo Perduto' : 'Contributo'})`;
-        importoBandoRegionale = Number(matchReg.massimaleContributo) || 3000;
-        bandoRegionaleHumanVerified = matchReg.humanVerified;
-        if (fasciaIsee === "sotto_30k") {
-          importoBandoRegionale = Math.round(importoBandoRegionale * 1.25); // Maggiorazione sociale ISEE
-        }
-      }
-    }
-
-    // Immediate out-of-pocket cost: only what actually reduces the payment during
-    // the work (non-repayable grant and reduced tax rate). Tax deductions are recovered over 10 years
-    // of tax returns and must NOT be subtracted as an upfront discount.
-    const esborsoImmediatoStimato = Math.max(0, Math.round(totaleLavori - importoBandoRegionale - scontoIvaStimato));
-    const detrazioneFiscaleAnnua = Math.round(importoBonusStatale / 10);
-
-    const incentivesData = {
-      tipoImmobile,
-      obiettivoLavori,
-      fasciaIsee,
-      province,
-      postalCode,
-      bonusStataleApplicato: `${bonusStataleApplicato} (~€${importoBonusStatale.toLocaleString("it-IT")})`,
-      bonusStataleHumanVerified,
-      bandoRegionaleApplicato: importoBandoRegionale > 0 ? `${bandoRegionaleApplicato} (~€${importoBandoRegionale.toLocaleString("it-IT")})` : bandoRegionaleApplicato,
-      bandoRegionaleHumanVerified,
-      scontoIvaStimato,
-      esborsoImmediatoStimato,
-      detrazioneFiscaleDecennale: importoBonusStatale,
-      detrazioneFiscaleAnnua,
-    };
-
-    // Update the quote with the incentive responses
-    const currentClientData = quote.clientData || { nome: "", indirizzo: "" };
-    const updatedClientData = {
-      ...currentClientData,
-      incentivesData,
-    };
-
-    await db
-      .update(quotesTable)
-      .set({
-        clientData: updatedClientData,
-        updatedAt: new Date(),
-      })
-      .where(eq(quotesTable.id, quoteId));
-
-    // Email notification to the company (if we found the partner's email)
-    const [profile] = await db
-      .select()
-      .from(businessProfilesTable)
-      .where(eq(businessProfilesTable.userId, quote.userId));
-
-    if (profile && profile.email) {
-      sendWidgetLeadNotification({
-        toEmail: profile.email,
-        companyName: profile.companyName,
-        clientName: currentClientData.nome || "Lead Widget",
-        clientEmail: currentClientData.email || "No email provided",
-        clientPhone: currentClientData.phone || "No phone provided",
-        rawInput: quote.rawInput || "",
-        totale: quote.totale,
-        prezzoMinimo: (Number(quote.totale) * 0.9).toFixed(2),
-        prezzoMassimo: (Number(quote.totale) * 1.25).toFixed(2),
-        incentivesSummary: `🏛️ STIMA PRELIMINARE AGEVOLAZIONI (da confermare in sede di sopralluogo tecnico e fiscale):\n` +
-          `• Immobile: ${tipoImmobile} | Obiettivo: ${obiettivoLavori} | ISEE: ${fasciaIsee}\n` +
-          `• Bonus Statale Compatibile: ${bonusStataleApplicato} (~€${importoBonusStatale.toLocaleString("it-IT")}, detrazione IRPEF in 10 quote annuali da ~€${detrazioneFiscaleAnnua.toLocaleString("it-IT")})\n` +
-          `• Bando Regionale/Comunale: ${importoBandoRegionale > 0 ? `${bandoRegionaleApplicato} (~€${importoBandoRegionale.toLocaleString("it-IT")})` : 'Nessuno a sportello'}\n` +
-          `• Risparmio IVA 10%: ~€${scontoIvaStimato.toLocaleString("it-IT")}\n` +
-          `👉 ESBORSO IMMEDIATO STIMATO (esclusa detrazione, recuperata in 10 anni): ~€${esborsoImmediatoStimato.toLocaleString("it-IT")}`
-      }).catch(err => {
-        logger.error({ err }, "Failed to send updated incentives email notification to contractor");
-      });
-    }
-
-    // Email notification to the end client, if they provided an address, including the incentives summary
-    const clientEmail = currentClientData.email;
-    if (clientEmail && clientEmail.includes("@") && profile) {
-      sendWidgetClientConfirmationEmail({
-        toEmail: clientEmail,
-        clientName: currentClientData.nome || "Customer",
-        companyName: profile.companyName,
-        companyPhone: profile.phone ?? null,
-        companyEmail: profile.email ?? null,
-        prezzoMinimo: (Number(quote.totale) * 0.9).toFixed(2),
-        prezzoMassimo: (Number(quote.totale) * 1.25).toFixed(2),
-        incentivesSummary: `Immobile: ${tipoImmobile} | Obiettivo: ${obiettivoLavori}\n` +
-          `• Bonus Statale Compatibile: ${bonusStataleApplicato} (~€${importoBonusStatale.toLocaleString("it-IT")}, detrazione IRPEF in 10 quote annuali da ~€${detrazioneFiscaleAnnua.toLocaleString("it-IT")})\n` +
-          `• Bando Regionale/Comunale: ${importoBandoRegionale > 0 ? `${bandoRegionaleApplicato} (~€${importoBandoRegionale.toLocaleString("it-IT")})` : 'Nessuno a sportello'}\n` +
-          `• Risparmio IVA 10%: ~€${scontoIvaStimato.toLocaleString("it-IT")}\n` +
-          `• Esborso immediato stimato (esclusa detrazione, recuperata in 10 anni): ~€${esborsoImmediatoStimato.toLocaleString("it-IT")}`,
-      }).catch(err => {
-        logger.error({ err }, "Failed to send incentives confirmation email to client");
-      });
-    }
-
-    res.json({
-      success: true,
-      quoteId,
-      totaleLavori,
-      scontoIvaStimato,
-      bonusStataleApplicato: incentivesData.bonusStataleApplicato,
-      bonusStataleHumanVerified,
-      bandoRegionaleApplicato: incentivesData.bandoRegionaleApplicato,
-      bandoRegionaleHumanVerified,
-      esborsoImmediatoStimato,
-      detrazioneFiscaleDecennale: importoBonusStatale,
-      detrazioneFiscaleAnnua,
-    });
   } catch (err) {
     logger.error({ err }, "Error calculating incentives for quote");
     res.status(500).json({ error: "Internal server error" });

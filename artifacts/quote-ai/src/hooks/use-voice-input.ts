@@ -33,7 +33,7 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
     try {
       const formData = new FormData();
       const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("ogg") ? "ogg" : "webm";
-      formData.append("audio", blob, `registrazione.${ext}`);
+      formData.append("audio", blob, `recording.${ext}`);
 
       const res = await fetch("/api/speech/transcribe", {
         method: "POST",
@@ -43,16 +43,16 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        onError?.(data.error || "Trascrizione non riuscita. Riprova.");
+        onError?.(data.error || "Transcription failed. Please try again.");
         return;
       }
       if (data.text && typeof data.text === "string" && data.text.trim()) {
         onTranscribed(data.text.trim());
       } else {
-        onError?.("Non ho capito, riprova a parlare più chiaramente.");
+        onError?.("Didn't catch that — try speaking more clearly.");
       }
     } catch {
-      onError?.("Errore di connessione. Riprova.");
+      onError?.("Connection error. Please try again.");
     } finally {
       setIsTranscribing(false);
     }
@@ -61,7 +61,7 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
   const startRecording = useCallback(async () => {
     if (isRecording) return;
     if (!navigator.mediaDevices?.getUserMedia) {
-      onError?.("Il tuo browser non supporta la registrazione audio.");
+      onError?.("Your browser doesn't support audio recording.");
       return;
     }
     try {
@@ -88,7 +88,7 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
       recorder.start();
       setIsRecording(true);
     } catch {
-      onError?.("Impossibile accedere al microfono. Controlla i permessi del browser.");
+      onError?.("Couldn't access the microphone. Check your browser permissions.");
       cleanupStream();
     }
   }, [isRecording, cleanupStream, transcribe, onError]);

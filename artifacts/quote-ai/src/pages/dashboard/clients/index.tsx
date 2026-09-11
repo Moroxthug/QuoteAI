@@ -2,9 +2,9 @@ import { useListClients } from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
-import { Users, ChevronRight, Euro, FileText, Clock, MapPin, Mail, Phone, CheckCircle2 } from "lucide-react";
+import { Users, ChevronRight, DollarSign, FileText, Clock, MapPin, Mail, Phone, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
-import { it } from "date-fns/locale";
+import { enCA } from "date-fns/locale";
 
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
@@ -15,9 +15,9 @@ export default function ClientsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Clienti</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Clients</h1>
         <p className="text-muted-foreground mt-1">
-          Tutti i clienti estratti dai tuoi preventivi.
+          All clients extracted from your quotes.
         </p>
       </div>
 
@@ -39,13 +39,13 @@ export default function ClientsPage() {
               <Users className="h-6 w-6 text-violet-400" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">Nessun cliente ancora</p>
+              <p className="font-semibold text-gray-800">No clients yet</p>
               <p className="text-sm text-muted-foreground mt-1">
-                I clienti appariranno qui non appena crei preventivi con un nome cliente.
+                Clients will show up here as soon as you create quotes with a client name.
               </p>
             </div>
             <Link href="/dashboard/new" className="btn-gradient inline-flex h-9 items-center px-4 text-sm font-semibold mt-2">
-              Crea il tuo primo preventivo
+              Create your first quote
             </Link>
           </CardContent>
         </Card>
@@ -89,27 +89,27 @@ export default function ClientsPage() {
                           </span>
                         )}
                         {client.partitaIva && (
-                          <span className="text-xs text-muted-foreground">P.IVA {client.partitaIva}</span>
+                          <span className="text-xs text-muted-foreground">Tax ID: {client.partitaIva}</span>
                         )}
                       </div>
                       <div className="flex items-center gap-4 mt-1.5">
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <FileText className="h-3 w-3" />
-                          {client.quoteCount} {client.quoteCount === 1 ? "preventivo" : "preventivi"}
+                          {client.quoteCount} {client.quoteCount === 1 ? "quote" : "quotes"}
                         </span>
                         {client.unlockedCount > 0 && (
                           <span className="flex items-center gap-1 text-xs text-violet-600">
                             <CheckCircle2 className="h-3 w-3" />
-                            {client.unlockedCount} {client.unlockedCount === 1 ? "accettato" : "accettati"}
+                            {client.unlockedCount} accepted
                           </span>
                         )}
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Euro className="h-3 w-3" />
+                          <DollarSign className="h-3 w-3" />
                           {formatCurrency(client.totalValue)}
                         </span>
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />
-                          {format(new Date(client.lastQuoteDate), "dd MMM yyyy", { locale: it })}
+                          {format(new Date(client.lastQuoteDate), "dd MMM yyyy", { locale: enCA })}
                         </span>
                       </div>
                     </div>

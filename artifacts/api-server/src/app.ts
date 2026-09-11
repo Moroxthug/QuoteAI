@@ -199,7 +199,7 @@ app.post(
               .where(eq(authUsersTable.id, userId));
 
             const email = authUser?.email;
-            const name = authUser?.name || "Cliente";
+            const name = authUser?.name || "Customer";
 
             if (email) {
               const planInfo: Record<string, { name: string; price: number; interval: string | null }> = {

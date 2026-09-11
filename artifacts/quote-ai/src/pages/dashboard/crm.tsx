@@ -196,14 +196,14 @@ export default function CrmPage() {
     setIsLoadingProjects(true);
     crmFetch<Project[]>("/api/crm/projects")
       .then((data) => { if (!cancelled) setProjects(data); })
-      .catch((err) => { console.error("Errore caricamento cantieri", err); if (!cancelled) setCrmError(t("dashboard.crm.errors.loadProjects")); })
+      .catch((err) => { console.error("Error loading projects", err); if (!cancelled) setCrmError(t("dashboard.crm.errors.loadProjects")); })
       .finally(() => { if (!cancelled) setIsLoadingProjects(false); });
     crmFetch<Collaborator[]>("/api/crm/collaborators")
       .then((data) => { if (!cancelled) setCollaborators(data); })
-      .catch((err) => console.error("Errore caricamento collaboratori", err));
+      .catch((err) => console.error("Error loading workers", err));
     crmFetch<Supplier[]>("/api/crm/suppliers")
       .then((data) => { if (!cancelled) setSuppliers(data); })
-      .catch((err) => console.error("Errore caricamento fornitori", err));
+      .catch((err) => console.error("Error loading suppliers", err));
     return () => { cancelled = true; };
   }, []);
 
@@ -248,7 +248,7 @@ export default function CrmPage() {
     if (!selectedProjectId || assignments[selectedProjectId]) return;
     crmFetch<ProjectAssignment[]>(`/api/crm/projects/${selectedProjectId}/assignments`)
       .then((data) => setAssignments((prev) => ({ ...prev, [selectedProjectId]: data })))
-      .catch((err) => console.error("Errore caricamento assegnazioni", err));
+      .catch((err) => console.error("Error loading assignments", err));
   }, [selectedProjectId]);
 
   // Forms toggles
@@ -307,7 +307,7 @@ export default function CrmPage() {
       setNewProjBudget("");
       setIsAddingProj(false);
     } catch (err) {
-      console.error("Errore creazione cantiere", err);
+      console.error("Error creating project", err);
       setCrmError(t("dashboard.crm.errors.createProject"));
     }
   };
@@ -320,7 +320,7 @@ export default function CrmPage() {
       });
       setProjects((prev) => prev.map((p) => (p.id === projectId ? updated : p)));
     } catch (err) {
-      console.error("Errore aggiornamento stato cantiere", err);
+      console.error("Error updating project status", err);
       setCrmError(t("dashboard.crm.errors.updateProjectStatus"));
     }
   };
@@ -335,7 +335,7 @@ export default function CrmPage() {
       setProjectTasks((prev) => ({ ...prev, [projectId]: [...(prev[projectId] ?? []), created] }));
       setNewTaskTitle("");
     } catch (err) {
-      console.error("Errore creazione scadenza", err);
+      console.error("Error creating deadline", err);
       setCrmError(t("dashboard.crm.errors.addTask"));
     }
   };
@@ -352,7 +352,7 @@ export default function CrmPage() {
         [projectId]: (prev[projectId] ?? []).map((t) => (t.id === task.id ? updated : t)),
       }));
     } catch (err) {
-      console.error("Errore aggiornamento scadenza", err);
+      console.error("Error updating deadline", err);
       setCrmError(t("dashboard.crm.errors.updateTask"));
     }
   };
@@ -369,7 +369,7 @@ export default function CrmPage() {
       setNewExtraCostDesc("");
       setNewExtraCostAmount("");
     } catch (err) {
-      console.error("Errore registrazione costo extra", err);
+      console.error("Error recording extra cost", err);
       setCrmError(t("dashboard.crm.errors.addExtraCost"));
     }
   };
@@ -385,7 +385,7 @@ export default function CrmPage() {
       setNewAssignCollabId("");
       setNewAssignRole("");
     } catch (err) {
-      console.error("Errore assegnazione collaboratore", err);
+      console.error("Error assigning worker", err);
       setCrmError(t("dashboard.crm.errors.assignCollaborator"));
     }
   };
@@ -395,7 +395,7 @@ export default function CrmPage() {
       await crmFetch(`/api/crm/projects/${projectId}/assignments/${assignmentId}`, { method: "DELETE" });
       setAssignments((prev) => ({ ...prev, [projectId]: (prev[projectId] ?? []).filter((a) => a.id !== assignmentId) }));
     } catch (err) {
-      console.error("Errore rimozione assegnazione", err);
+      console.error("Error removing assignment", err);
       setCrmError(t("dashboard.crm.errors.removeAssignment"));
     }
   };
@@ -408,7 +408,7 @@ export default function CrmPage() {
         method: "POST",
         body: JSON.stringify({
           name: newCollabName,
-          role: "Dipendente",
+          role: "Employee",
           hourlyRate: euroToCents(parseFloat(newCollabRate) || 0),
           phone: newCollabPhone || null,
         }),
@@ -419,7 +419,7 @@ export default function CrmPage() {
       setNewCollabPhone("");
       setIsAddingCollab(false);
     } catch (err) {
-      console.error("Errore creazione collaboratore", err);
+      console.error("Error creating worker", err);
       setCrmError(t("dashboard.crm.errors.addCollaborator"));
     }
   };
@@ -441,7 +441,7 @@ export default function CrmPage() {
       setNewSupplierContact("");
       setIsAddingSupplier(false);
     } catch (err) {
-      console.error("Errore creazione fornitore", err);
+      console.error("Error creating supplier", err);
       setCrmError(t("dashboard.crm.errors.addSupplier"));
     }
   };
@@ -459,7 +459,7 @@ export default function CrmPage() {
       );
       setInvoiceResults((prev) => ({ ...prev, [projectId]: result.invoice }));
     } catch (err) {
-      console.error("Errore generazione fattura", err);
+      console.error("Error generating invoice", err);
       setCrmError(t("dashboard.crm.errors.generateInvoice"));
     } finally {
       setIsInvoicing(false);
@@ -475,7 +475,7 @@ export default function CrmPage() {
         title: newPraticaTitle,
         status: "In Progress",
         date: new Date().toISOString().split("T")[0],
-        prot: newPraticaProt || "PROT-N/D",
+        prot: newPraticaProt || "N/A",
       },
     ]);
     setNewPraticaTitle("");
@@ -782,14 +782,14 @@ export default function CrmPage() {
               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2.5 pb-2">CRM CORE</p>
             )}
             {[
-              { id: "dashboard", label: "Dashboard Generale", icon: LayoutDashboard },
-              { id: "clienti", label: "Clienti & Lead", icon: UserPlus },
-              { id: "cantieri", label: "Gestione Cantieri", icon: Briefcase },
-              { id: "lavoratori", label: "Gestione Lavoratori", icon: Users },
-              { id: "finanze", label: "Gestione Finanze", icon: TrendingUp },
-              { id: "costi_extra", label: "Costi Extra", icon: AlertCircle },
-              { id: "fornitori", label: "Fornitori", icon: Building2 },
-              { id: "listino", label: "Listino Prezzi", icon: BookOpen },
+              { id: "dashboard", label: "Overview", icon: LayoutDashboard },
+              { id: "clienti", label: "Clients & Leads", icon: UserPlus },
+              { id: "cantieri", label: "Project Management", icon: Briefcase },
+              { id: "lavoratori", label: "Workforce Management", icon: Users },
+              { id: "finanze", label: "Finance Management", icon: TrendingUp },
+              { id: "costi_extra", label: "Extra Costs", icon: AlertCircle },
+              { id: "fornitori", label: "Suppliers", icon: Building2 },
+              { id: "listino", label: "Price List", icon: BookOpen },
             ].map((item) => {
               const Icon = item.icon;
               const active = activeSection === item.id;
@@ -829,15 +829,15 @@ export default function CrmPage() {
 
           <div className="space-y-1 pt-4 border-t border-white/5">
             {!isSidebarCollapsed && (
-              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2.5 pb-2">AMMINISTRAZIONE</p>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2.5 pb-2">ADMINISTRATION</p>
             )}
             {[
-              { id: "sal", label: "Stato Avanzamento (SAL)", icon: FileText },
-              { id: "fatturazione", label: "Fatturazione Elettronica", icon: Receipt },
-              { id: "pratiche", label: "Gestione Pratiche", icon: FolderOpen },
+              { id: "sal", label: "Progress Billing (SAL)", icon: FileText },
+              { id: "fatturazione", label: "Electronic Invoicing", icon: Receipt },
+              { id: "pratiche", label: "Permit Management", icon: FolderOpen },
               { id: "analytics", label: "KPI & Analytics", icon: BarChart3 },
-              { id: "calendario", label: "Calendario Scadenze", icon: Calendar },
-              { id: "impostazioni", label: "Impostazioni API", icon: Settings },
+              { id: "calendario", label: "Deadline Calendar", icon: Calendar },
+              { id: "impostazioni", label: "API Settings", icon: Settings },
             ].map((item) => {
               const Icon = item.icon;
               const active = activeSection === item.id;
@@ -1281,14 +1281,14 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-150 shadow-xs">
                 <div>
-                  <h3 className="font-extrabold text-gray-800">Collaboratori e Ore</h3>
-                  <p className="text-xs text-slate-500">Gestisci i dipendenti e collaboratori dell'azienda</p>
+                  <h3 className="font-extrabold text-gray-800">Workers & Hours</h3>
+                  <p className="text-xs text-slate-500">Manage your company's employees and contractors</p>
                 </div>
                 <button
                   onClick={() => setIsAddingCollab(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-750 transition"
                 >
-                  <UserPlus className="h-4 w-4" /> Aggiungi Collaboratore
+                  <UserPlus className="h-4 w-4" /> Add Worker
                 </button>
               </div>
 
@@ -1300,17 +1300,17 @@ export default function CrmPage() {
                       className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end"
                     >
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Nome e Cognome</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Full Name</label>
                         <input
                           type="text"
-                          placeholder="Marco Rossi"
+                          placeholder="John Smith"
                           value={newCollabName}
                           onChange={(e) => setNewCollabName(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Tariffa ($/ora)</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Rate ($/hr)</label>
                         <input
                           type="number"
                           placeholder="25"
@@ -1320,17 +1320,17 @@ export default function CrmPage() {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Telefono</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Phone</label>
                         <input
                           type="text"
-                          placeholder="+39 333..."
+                          placeholder="+1 416..."
                           value={newCollabPhone}
                           onChange={(e) => setNewCollabPhone(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <button type="submit" className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-bold hover:bg-violet-750">
-                        Salva
+                        Save
                       </button>
                     </form>
                   </CardContent>
@@ -1338,7 +1338,7 @@ export default function CrmPage() {
               )}
 
               {collaborators.length === 0 ? (
-                <p className="text-xs text-gray-400">Nessun collaboratore ancora. Aggiungine uno con "Aggiungi Collaboratore".</p>
+                <p className="text-xs text-gray-400">No workers yet. Add one with "Add Worker".</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {collaborators.map((c) => (
@@ -1347,10 +1347,10 @@ export default function CrmPage() {
                         <div>
                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{c.role}</span>
                           <h4 className="font-extrabold text-gray-900 text-sm mt-1">{c.name}</h4>
-                          <p className="text-xs text-gray-500 mt-0.5">{c.phone || "Nessun telefono"}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{c.phone || "No phone"}</p>
                         </div>
                         <div className="pt-3 border-t border-gray-100 text-xs">
-                          <p className="text-gray-400">Tariffa</p>
+                          <p className="text-gray-400">Rate</p>
                           <p className="font-extrabold text-gray-700 mt-0.5">${centsToEuro(c.hourlyRate)}/h</p>
                         </div>
                       </CardContent>
@@ -1367,25 +1367,25 @@ export default function CrmPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="border-gray-150 bg-gradient-to-tr from-slate-900 to-slate-800 text-white shadow-sm">
                   <CardContent className="p-5 space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Entrate Certificate</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Confirmed Revenue</p>
                     <h3 className="text-2xl font-black">${centsToEuro(entrateTotali).toLocaleString("en-CA")}</h3>
-                    <p className="text-[10px] text-slate-450">Commesse sbloccate o in corso</p>
+                    <p className="text-[10px] text-slate-450">Unlocked or in-progress projects</p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-gray-150 shadow-xs bg-white">
                   <CardContent className="p-5 space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Margine di Cassa</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Net Margin</p>
                     <h3 className="text-2xl font-black text-emerald-600">${centsToEuro(margineNetto).toLocaleString("en-CA")}</h3>
-                    <p className="text-[10px] text-gray-500">Entrate meno costi extra registrati</p>
+                    <p className="text-[10px] text-gray-500">Revenue minus recorded extra costs</p>
                   </CardContent>
                 </Card>
 
                 <Card className="border-gray-150 shadow-xs bg-white">
                   <CardContent className="p-5 space-y-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Costi Extra Commesse</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Project Extra Costs</p>
                     <h3 className="text-2xl font-black text-rose-600">${centsToEuro(costiExtraTotali).toLocaleString("en-CA")}</h3>
-                    <p className="text-[10px] text-gray-500">Spese impreviste registrate sui cantieri</p>
+                    <p className="text-[10px] text-gray-500">Unforeseen expenses recorded on projects</p>
                   </CardContent>
                 </Card>
               </div>
@@ -1393,10 +1393,10 @@ export default function CrmPage() {
               {/* Cashflow bar representation */}
               <Card className="border-gray-150 shadow-xs bg-white">
                 <CardContent className="p-6 space-y-4">
-                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Flussi Finanziari Commesse</h3>
+                  <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">Project Cash Flow</h3>
                   <div className="space-y-4 pt-2">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-semibold text-gray-600">Margine Operativo ({Math.round((margineNetto / Math.max(1, entrateTotali)) * 100)}%)</span>
+                      <span className="font-semibold text-gray-600">Operating Margin ({Math.round((margineNetto / Math.max(1, entrateTotali)) * 100)}%)</span>
                       <span className="font-bold text-emerald-600">${centsToEuro(margineNetto).toLocaleString("en-CA")}</span>
                     </div>
                     <div className="h-3 w-full bg-rose-100 rounded-full overflow-hidden border border-rose-200 flex">
@@ -1413,11 +1413,11 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-150 shadow-xs">
                 <div>
-                  <h3 className="font-extrabold text-gray-800">Storico Costi Extra Cantieri</h3>
-                  <p className="text-xs text-gray-500">Visualizza tutte le spese impreviste sostenute al di fuori del preventivo iniziale</p>
+                  <h3 className="font-extrabold text-gray-800">Project Extra Costs History</h3>
+                  <p className="text-xs text-gray-500">View all unforeseen expenses incurred outside the initial quote</p>
                 </div>
                 <span className="text-xs font-extrabold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full">
-                  Speso Extra: ${centsToEuro(costiExtraTotali).toLocaleString("en-CA")}
+                  Extra Spend: ${centsToEuro(costiExtraTotali).toLocaleString("en-CA")}
                 </span>
               </div>
 
@@ -1428,7 +1428,7 @@ export default function CrmPage() {
                       <CardContent className="p-4 flex justify-between items-center text-xs font-semibold">
                         <div>
                           <p className="text-gray-900 font-bold">{c.description}</p>
-                          <p className="text-[10px] text-gray-450 mt-1">Cantiere: {p.name} | Data: {new Date(c.date).toLocaleDateString("it-IT")}</p>
+                          <p className="text-[10px] text-gray-450 mt-1">Project: {p.name} | Date: {new Date(c.date).toLocaleDateString("en-CA")}</p>
                         </div>
                         <span className="font-bold text-rose-600">- ${centsToEuro(c.amount).toLocaleString("en-CA")}</span>
                       </CardContent>
@@ -1436,7 +1436,7 @@ export default function CrmPage() {
                   ))
                 )}
                 {projects.every((p) => (extraCosts[p.id] ?? []).length === 0) && (
-                  <p className="text-xs text-gray-400">Nessun costo extra registrato.</p>
+                  <p className="text-xs text-gray-400">No extra costs recorded.</p>
                 )}
               </div>
             </div>
@@ -1447,14 +1447,14 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-150 shadow-xs">
                 <div>
-                  <h3 className="font-extrabold text-gray-800">Rubrica Fornitori Partner</h3>
-                  <p className="text-xs text-gray-500">Fornitori di fiducia per materiali edili, noleggio e tecnologia</p>
+                  <h3 className="font-extrabold text-gray-800">Partner Supplier Directory</h3>
+                  <p className="text-xs text-gray-500">Trusted suppliers for building materials, equipment rental, and technology</p>
                 </div>
                 <button
                   onClick={() => setIsAddingSupplier(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-750 transition"
                 >
-                  <Building2 className="h-4 w-4" /> Nuovo Fornitore
+                  <Building2 className="h-4 w-4" /> New Supplier
                 </button>
               </div>
 
@@ -1466,27 +1466,27 @@ export default function CrmPage() {
                       className="flex flex-col sm:flex-row gap-4 items-end"
                     >
                       <div className="flex-1 space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Ragione Sociale</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Company Name</label>
                         <input
                           type="text"
-                          placeholder="es. Ferramenta Rossi S.a.s."
+                          placeholder="e.g. Smith Hardware Ltd."
                           value={newSupplierName}
                           onChange={(e) => setNewSupplierName(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <div className="w-64 space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Contatto Info</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Contact Info</label>
                         <input
                           type="text"
-                          placeholder="E-mail o indirizzo..."
+                          placeholder="Email or address..."
                           value={newSupplierContact}
                           onChange={(e) => setNewSupplierContact(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <button type="submit" className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-bold hover:bg-violet-750">
-                        Aggiungi
+                        Add
                       </button>
                     </form>
                   </CardContent>
@@ -1494,7 +1494,7 @@ export default function CrmPage() {
               )}
 
               {suppliers.length === 0 ? (
-                <p className="text-xs text-gray-400">Nessun fornitore ancora. Aggiungine uno con "Nuovo Fornitore".</p>
+                <p className="text-xs text-gray-400">No suppliers yet. Add one with "New Supplier".</p>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {suppliers.map((s) => (
@@ -1531,14 +1531,14 @@ export default function CrmPage() {
                     </p>
                   </div>
                   <span className="px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold rounded-full shrink-0">
-                    Simulazione
+                    Simulated
                   </span>
                 </div>
               </div>
 
-              {/* Invoices created list (solo per la sessione corrente: il backend non le persiste ancora) */}
+              {/* Invoices created list (session-only: the backend doesn't persist them yet) */}
               <div className="space-y-3">
-                <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Documenti Generati in Questa Sessione</h3>
+                <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Documents Generated This Session</h3>
                 {Object.entries(invoiceResults).map(([projectId, inv]) => {
                   const proj = projects.find((p) => p.id === projectId);
                   return (
@@ -1546,10 +1546,10 @@ export default function CrmPage() {
                       <CardContent className="p-4 flex justify-between items-center text-xs">
                         <div>
                           <div className="flex items-center gap-1.5">
-                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-150 text-[9px] font-black rounded uppercase">BOZZA SIMULATA</span>
+                            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-150 text-[9px] font-black rounded uppercase">SIMULATED DRAFT</span>
                             <span className="font-extrabold text-gray-800">{inv.number}</span>
                           </div>
-                          <p className="text-[10px] text-gray-500 mt-1">Cantiere: {proj?.name ?? "N/D"}</p>
+                          <p className="text-[10px] text-gray-500 mt-1">Project: {proj?.name ?? "N/A"}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-gray-800">${inv.total.toLocaleString("en-CA")}</span>
@@ -1567,7 +1567,7 @@ export default function CrmPage() {
                   );
                 })}
                 {Object.keys(invoiceResults).length === 0 && (
-                  <p className="text-xs text-gray-400">Nessun documento generato. Aprine uno da "Gestione Cantieri" → dettaglio cantiere.</p>
+                  <p className="text-xs text-gray-400">No documents generated yet. Create one from "Project Management" → project detail.</p>
                 )}
               </div>
             </div>
@@ -1578,14 +1578,14 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-150 shadow-xs">
                 <div>
-                  <h3 className="font-extrabold text-gray-800">Pratiche Edilizie (CILA, SCIA, APE)</h3>
-                  <p className="text-xs text-gray-500">Archivio e scadenze dei permessi comunali</p>
+                  <h3 className="font-extrabold text-gray-800">Building Permits & Approvals</h3>
+                  <p className="text-xs text-gray-500">Archive and deadlines for municipal permits</p>
                 </div>
                 <button
                   onClick={() => setIsAddingPratica(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-750 transition"
                 >
-                  <Plus className="h-4 w-4" /> Nuova Pratica
+                  <Plus className="h-4 w-4" /> New Permit
                 </button>
               </div>
 
@@ -1594,27 +1594,27 @@ export default function CrmPage() {
                   <CardContent className="p-4">
                     <form onSubmit={handleAddPratica} className="flex flex-col sm:flex-row gap-4 items-end">
                       <div className="flex-1 space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Titolo Pratica / Immobile</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Permit Title / Property</label>
                         <input
                           type="text"
-                          placeholder="es. CILA - Via Manzoni 12"
+                          placeholder="e.g. Building Permit - 12 Main St"
                           value={newPraticaTitle}
                           onChange={(e) => setNewPraticaTitle(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <div className="w-56 space-y-1">
-                        <label className="text-xs font-bold text-gray-600 uppercase">Protocollo Comune</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase">Permit Number</label>
                         <input
                           type="text"
-                          placeholder="PROT-2026/..."
+                          placeholder="PERMIT-2026/..."
                           value={newPraticaProt}
                           onChange={(e) => setNewPraticaProt(e.target.value)}
                           className="w-full bg-white border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
                         />
                       </div>
                       <button type="submit" className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-bold hover:bg-violet-750">
-                        Aggiungi
+                        Add
                       </button>
                     </form>
                   </CardContent>
@@ -1627,7 +1627,7 @@ export default function CrmPage() {
                     <CardContent className="p-4 flex justify-between items-center text-xs font-semibold">
                       <div>
                         <p className="text-gray-900 font-bold">{p.title}</p>
-                        <p className="text-[10px] text-gray-450 mt-1">Prot: {p.prot} | Data: {p.date}</p>
+                        <p className="text-[10px] text-gray-450 mt-1">No: {p.prot} | Date: {p.date}</p>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
                         p.status === "Approved" ? "bg-green-50 text-green-700 border border-green-200" :
@@ -1678,13 +1678,13 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <Card className="border-gray-150 shadow-xs">
                 <CardContent className="p-6">
-                  <h3 className="text-sm font-bold text-gray-850 uppercase tracking-wider mb-5">Scadenze Cronologiche</h3>
+                  <h3 className="text-sm font-bold text-gray-850 uppercase tracking-wider mb-5">Upcoming Deadlines</h3>
                   <div className="relative border-l border-gray-200 pl-6 ml-3 space-y-6">
                     {[
-                      { date: "02 Luglio 2026", type: "Pratica", title: "Approvazione CILA - Villa Roma" },
-                      { date: "05 Luglio 2026", type: "Cantiere", title: "Posa del massetto autolivellante - Cantiere Via Roma" },
-                      { date: "10 Luglio 2026", type: "Fattura", title: "Acconto 30% - Condominio Aurora" },
-                      { date: "15 Luglio 2026", type: "Tasse", title: "F24 Ritenute d'acconto dipendenti" },
+                      { date: "Jul 2, 2026", type: "Permit", title: "Building permit approval - Maple Residence" },
+                      { date: "Jul 5, 2026", type: "Project", title: "Self-levelling underlayment pour - Main St project" },
+                      { date: "Jul 10, 2026", type: "Invoice", title: "30% deposit - Aurora Condominiums" },
+                      { date: "Jul 15, 2026", type: "Taxes", title: "Payroll source deductions remittance" },
                     ].map((item, idx) => (
                       <div key={idx} className="relative">
                         <div className="absolute -left-[30px] top-1.5 h-3 w-3 rounded-full border-2 border-violet-500 bg-white" />
@@ -1732,7 +1732,7 @@ export default function CrmPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Seleziona Cantiere</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Select Project</label>
                     <select
                       value={selectedSalProjId}
                       onChange={(e) => setSelectedSalProjId(e.target.value)}
@@ -1778,7 +1778,7 @@ export default function CrmPage() {
                   const totalEseguito = (budgetEuro * pct) / 100;
                   const retentionVal = totalEseguito * (garanziaRetention / 100);
                   const nettoDaPagare = totalEseguito - retentionVal;
-                  const startDateLabel = proj.startDate ? new Date(proj.startDate).toLocaleDateString("it-IT") : "N/D";
+                  const startDateLabel = proj.startDate ? new Date(proj.startDate).toLocaleDateString("en-CA") : "N/A";
 
                   return (
                     <div className="space-y-6">
@@ -1788,32 +1788,32 @@ export default function CrmPage() {
                         <div className="flex flex-col sm:flex-row justify-between gap-4 border-b-2 border-violet-600 pb-4">
                           <div>
                             <div className="text-lg font-black text-violet-750 uppercase tracking-wide">QuoteAI</div>
-                            <div className="text-[9px] text-gray-400 mt-0.5">Costruzioni & Ristrutturazioni</div>
+                            <div className="text-[9px] text-gray-400 mt-0.5">Smart Construction Solutions</div>
                           </div>
                           <div className="text-left sm:text-right text-[10px] text-gray-500">
-                            <strong>QuoteAI Costruzioni S.r.l.</strong><br />
-                            P.IVA 01234567890<br />
-                            Via dell'Artigianato 12, Milano
+                            <strong>QuoteAI Construction Inc.</strong><br />
+                            Business No.: 012345678<br />
+                            123 Craftsman Ave, Toronto, ON
                           </div>
                         </div>
 
                         <div className="text-center font-bold text-base text-gray-900 uppercase tracking-wider py-2">
-                          Stato Avanzamento Lavori (S.A.L.) N. {salNumber}
+                          Progress Report (S.A.L.) No. {salNumber}
                         </div>
 
                         {/* Info details */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="bg-gray-50 border border-gray-150 p-4 rounded-xl space-y-1">
-                            <h4 className="text-[9px] font-bold text-violet-600 uppercase tracking-wider">Cantiere</h4>
+                            <h4 className="text-[9px] font-bold text-violet-600 uppercase tracking-wider">Project Details</h4>
                             <p className="font-bold text-gray-900">{proj.name}</p>
-                            <p>Budget di Contratto: ${budgetEuro.toLocaleString("en-CA")}</p>
-                            <p>Data inizio: {startDateLabel}</p>
+                            <p>Contract Budget: ${budgetEuro.toLocaleString("en-CA")}</p>
+                            <p>Start date: {startDateLabel}</p>
                           </div>
                           <div className="bg-gray-50 border border-gray-150 p-4 rounded-xl space-y-1">
-                            <h4 className="text-[9px] font-bold text-violet-600 uppercase tracking-wider">Committente</h4>
-                            <p className="font-bold text-gray-900">Impresa Committente S.p.A.</p>
-                            <p>CF / P.IVA: IT889922110</p>
-                            <p>Stato Lavori Globale: {pct}%</p>
+                            <h4 className="text-[9px] font-bold text-violet-600 uppercase tracking-wider">Client Details</h4>
+                            <p className="font-bold text-gray-900">Client Company Inc.</p>
+                            <p>Tax ID: 889922110</p>
+                            <p>Overall Progress: {pct}%</p>
                           </div>
                         </div>
 
@@ -1822,10 +1822,10 @@ export default function CrmPage() {
                           <table className="w-full border-collapse border border-gray-200 min-w-[600px]">
                             <thead>
                               <tr className="bg-gray-50 text-[10px] font-bold text-gray-600 uppercase">
-                                <th className="border border-gray-200 p-2 text-left">Descrizione Voce / Lavorazione</th>
-                                <th className="border border-gray-200 p-2 text-right">Quota Contratto</th>
-                                <th className="border border-gray-200 p-2 text-center">Stato</th>
-                                <th className="border border-gray-200 p-2 text-right">Importo Maturato</th>
+                                <th className="border border-gray-200 p-2 text-left">Work Description</th>
+                                <th className="border border-gray-200 p-2 text-right">Contract Amount</th>
+                                <th className="border border-gray-200 p-2 text-center">Progress</th>
+                                <th className="border border-gray-200 p-2 text-right">Amount Earned</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1855,24 +1855,24 @@ export default function CrmPage() {
                         {/* Calculation summary */}
                         <div className="w-full sm:w-64 ml-auto space-y-1.5 border-t border-gray-200 pt-3">
                           <div className="flex justify-between gap-4">
-                            <span className="text-gray-500">Importo Lavori Maturati:</span>
+                            <span className="text-gray-500">Total Work Completed:</span>
                             <span className="font-mono font-bold">${totalEseguito.toLocaleString("en-CA", { minimumFractionDigits: 2 })}</span>
                           </div>
                           <div className="flex justify-between gap-4">
-                            <span className="text-gray-500">Ritenuta Garanzia ({garanziaRetention}%):</span>
+                            <span className="text-gray-500">Retention Holdback ({garanziaRetention}%):</span>
                             <span className="font-mono text-rose-600">- ${retentionVal.toLocaleString("en-CA", { minimumFractionDigits: 2 })}</span>
                           </div>
                           <div className="flex justify-between border-t border-violet-200 pt-2 font-bold text-sm text-violet-750 gap-4">
-                            <span>Importo Netto da Liquidare:</span>
+                            <span>Net SAL Amount:</span>
                             <span className="font-mono">${nettoDaPagare.toLocaleString("en-CA", { minimumFractionDigits: 2 })}</span>
                           </div>
                         </div>
 
                         {/* Signatures */}
                         <div className="flex flex-col sm:flex-row justify-between gap-8 sm:gap-4 pt-12 text-[10px] text-center text-gray-500">
-                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">Il Direttore dei Lavori</div>
-                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">L'Impresa Appaltatrice</div>
-                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">Il Committente</div>
+                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">Site Supervisor</div>
+                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">Contractor</div>
+                          <div className="w-full sm:w-40 border-t border-gray-300 pt-1.5">Client</div>
                         </div>
                       </div>
 
@@ -1882,7 +1882,7 @@ export default function CrmPage() {
                           onClick={() => handlePrintSal(proj, tasks)}
                           className="flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition shadow-md hover:shadow-violet-600/10"
                         >
-                          <FileText className="h-4 w-4" /> Genera & Stampa PDF SAL
+                          <FileText className="h-4 w-4" /> Generate & Print PDF
                         </button>
                       </div>
                     </div>
@@ -1890,7 +1890,7 @@ export default function CrmPage() {
                 })()
               ) : (
                 <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500 shadow-xs">
-                  Seleziona un cantiere in alto per configurare ed elaborare lo Stato Avanzamento Lavori.
+                  Select a project above to configure and process the progress billing statement.
                 </div>
               )}
             </div>
@@ -1901,8 +1901,8 @@ export default function CrmPage() {
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="bg-white border border-gray-150 p-6 rounded-xl shadow-xs">
                 <div className="mb-4">
-                  <h3 className="font-bold text-gray-800 text-lg">Gestione Listino Prezzi</h3>
-                  <p className="text-xs text-gray-500 mt-1">Gestisci le lavorazioni e i prezzi unitari del tuo archivio. Le modifiche si riflettono istantaneamente sia nel CRM che nella generazione dei preventivi AI.</p>
+                  <h3 className="font-bold text-gray-800 text-lg">Price List Management</h3>
+                  <p className="text-xs text-gray-500 mt-1">Manage the work items and unit prices in your catalog. Changes apply instantly across the CRM and AI quote generation.</p>
                 </div>
                 <PriceCatalogSection />
               </div>

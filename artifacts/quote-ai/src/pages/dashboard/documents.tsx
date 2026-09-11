@@ -28,27 +28,27 @@ const formatCurrency = (v: number) =>
   new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 2 }).format(v);
 
 const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("it-IT", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(iso));
+  new Intl.DateTimeFormat("en-CA", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(iso));
 
 function StatusBadge({ status }: { status: UploadedDocument["status"] }) {
   if (status === "done") return (
     <Badge className="gap-1 bg-green-100 text-green-700 border-0">
-      <CheckCircle2 className="h-3 w-3" /> Elaborato
+      <CheckCircle2 className="h-3 w-3" /> Processed
     </Badge>
   );
   if (status === "processing") return (
     <Badge className="gap-1 bg-blue-100 text-blue-700 border-0 animate-pulse">
-      <Loader2 className="h-3 w-3 animate-spin" /> Elaborazione...
+      <Loader2 className="h-3 w-3 animate-spin" /> Processing...
     </Badge>
   );
   if (status === "error") return (
     <Badge className="gap-1 bg-red-100 text-red-700 border-0">
-      <AlertCircle className="h-3 w-3" /> Errore
+      <AlertCircle className="h-3 w-3" /> Error
     </Badge>
   );
   return (
     <Badge className="gap-1 bg-gray-100 text-gray-500 border-0">
-      <Clock className="h-3 w-3" /> In coda
+      <Clock className="h-3 w-3" /> Queued
     </Badge>
   );
 }
@@ -63,9 +63,9 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getListDocumentsQueryKey() });
         qc.invalidateQueries({ queryKey: getGetPriceSummaryQueryKey() });
-        toast({ title: "Elaborazione completata" });
+        toast({ title: "Processing complete" });
       },
-      onError: () => toast({ title: "Errore durante l'elaborazione", variant: "destructive" }),
+      onError: () => toast({ title: "Error while processing", variant: "destructive" }),
     },
   });
 
@@ -75,7 +75,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
         qc.invalidateQueries({ queryKey: getListDocumentsQueryKey() });
         qc.invalidateQueries({ queryKey: getGetPriceSummaryQueryKey() });
       },
-      onError: () => toast({ title: "Errore durante l'eliminazione", variant: "destructive" }),
+      onError: () => toast({ title: "Error while deleting", variant: "destructive" }),
     },
   });
 
@@ -110,7 +110,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
               <span className="text-xs text-gray-400">{formatFileSize(doc.fileSize)}</span>
             )}
             {doc.status === "done" && lavorazioni.length > 0 && (
-              <span className="text-xs text-green-600 font-medium">{lavorazioni.length} voci estratte</span>
+              <span className="text-xs text-green-600 font-medium">{lavorazioni.length} items extracted</span>
             )}
           </div>
           {doc.errorMessage && (
@@ -123,7 +123,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
               onClick={() => setExpanded(v => !v)}
             >
               {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              {expanded ? "Nascondi voci" : "Mostra voci estratte"}
+              {expanded ? "Hide items" : "Show extracted items"}
             </button>
           )}
 
@@ -132,9 +132,9 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-100/60">
-                    <th className="text-left px-3 py-1.5 font-semibold text-gray-600">Lavorazione</th>
-                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">Prezzo</th>
-                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">UM</th>
+                    <th className="text-left px-3 py-1.5 font-semibold text-gray-600">Work item</th>
+                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">Price</th>
+                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">Unit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -165,7 +165,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
               ) : (
                 <Zap className="h-3 w-3 text-violet-500" />
               )}
-              Elabora
+              Process
             </Button>
           )}
           <Button
@@ -196,10 +196,10 @@ export default function DocumentsPage() {
     mutation: {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getListDocumentsQueryKey() });
-        toast({ title: "Documento caricato — clicca Elabora per estrarre i prezzi" });
+        toast({ title: "Document uploaded — click Process to extract prices" });
       },
       onError: (err) => {
-        const msg = err instanceof Error ? err.message : "Errore caricamento";
+        const msg = err instanceof Error ? err.message : "Upload error";
         toast({ title: msg, variant: "destructive" });
       },
     },
@@ -225,9 +225,9 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Archivio Preventivi</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Quote Archive</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Carica preventivi esistenti per estrarre i tuoi prezzi di mercato e migliorare le stime AI.
+          Upload existing quotes to extract your market prices and improve AI estimates.
         </p>
       </div>
 
@@ -260,7 +260,7 @@ export default function DocumentsPage() {
           )}
           <div>
             <p className="font-semibold text-gray-800 text-sm">
-              {uploadMut.isPending ? "Caricamento in corso..." : "Trascina i file qui o clicca per selezionare"}
+              {uploadMut.isPending ? "Uploading..." : "Drag files here or click to select"}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               PDF, DOCX, XLSX, JPG, PNG o WEBP — max 10 MB per file
@@ -285,16 +285,16 @@ export default function DocumentsPage() {
             <div>
               {hasEnoughForIntelligence ? (
                 <>
-                  <p className="text-sm font-semibold text-violet-800">Price intelligence attiva</p>
+                  <p className="text-sm font-semibold text-violet-800">Price intelligence active</p>
                   <p className="text-xs text-violet-600 mt-0.5">
-                    {doneCount} documenti elaborati — i tuoi prezzi medi vengono usati nei nuovi preventivi AI.
+                    {doneCount} documents processed — your average prices are now used in new AI quotes.
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm font-semibold text-amber-800">Quasi pronto ({doneCount}/3 documenti)</p>
+                  <p className="text-sm font-semibold text-amber-800">Almost ready ({doneCount}/3 documents)</p>
                   <p className="text-xs text-amber-600 mt-0.5">
-                    Elabora almeno 3 documenti per attivare la price intelligence nei preventivi AI.
+                    Process at least 3 documents to activate price intelligence in AI quotes.
                   </p>
                 </>
               )}
@@ -309,7 +309,7 @@ export default function DocumentsPage() {
           <CardHeader className="pb-2 pt-4 px-5">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-violet-500" />
-              Prezzi medi estratti
+              Average extracted prices
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-4">
@@ -325,7 +325,7 @@ export default function DocumentsPage() {
                     <span className="text-[10px] text-gray-400">
                       {formatCurrency(item.minPrice)} – {formatCurrency(item.maxPrice)}
                     </span>
-                    <span className="text-[10px] text-gray-400">({item.count} doc)</span>
+                    <span className="text-[10px] text-gray-400">({item.count} docs)</span>
                   </div>
                   {item.zones && item.zones.length > 0 && (
                     <p className="text-[10px] text-gray-400 mt-0.5 truncate">{item.zones.join(", ")}</p>
@@ -342,13 +342,13 @@ export default function DocumentsPage() {
         <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-gray-400" />
-            Documenti caricati
+            Uploaded documents
             {docs.length > 0 && (
               <Badge className="bg-gray-100 text-gray-500 border-0 text-xs">{docs.length}</Badge>
             )}
           </CardTitle>
           {pendingCount > 0 && (
-            <span className="text-xs text-amber-600">{pendingCount} in attesa di elaborazione</span>
+            <span className="text-xs text-amber-600">{pendingCount} pending processing</span>
           )}
         </CardHeader>
         <CardContent className="px-5 pb-5">
@@ -359,9 +359,9 @@ export default function DocumentsPage() {
           ) : docs.length === 0 ? (
             <div className="py-12 text-center">
               <FolderOpen className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Nessun documento caricato</p>
+              <p className="text-sm text-muted-foreground">No documents uploaded</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Carica i tuoi preventivi precedenti per estrarre i prezzi di mercato
+                Upload your past quotes to extract market prices
               </p>
             </div>
           ) : (

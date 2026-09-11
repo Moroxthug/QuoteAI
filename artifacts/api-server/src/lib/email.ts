@@ -314,11 +314,11 @@ function buildQuoteEmailHtml(params: {
   const clientName = escapeHtml(params.clientName);
   const { quoteNumber, totale } = params;
   return `<!DOCTYPE html>
-<html lang="it">
+<html lang="en-CA">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Preventivo da ${companyName}</title>
+<title>Quote from ${companyName}</title>
 <style>
   body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
   .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }

@@ -4,16 +4,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from "recharts";
 import { format, subMonths, startOfMonth } from "date-fns";
 import { it } from "date-fns/locale";
-import { TrendingUp, FileText, Euro, CheckCircle2 } from "lucide-react";
+import { TrendingUp, FileText, DollarSign, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
 
 const STATUS_COLORS: Record<string, string> = {
-  Bozza: "#94a3b8",
-  Sbloccato: "#7c3aed",
-  "In attesa": "#f59e0b",
+  Draft: "#94a3b8",
+  Unlocked: "#7c3aed",
+  Pending: "#f59e0b",
 };
 
 export default function AnalyticsPage() {
@@ -46,38 +46,38 @@ export default function AnalyticsPage() {
 
   const statusData = stats
     ? [
-        { name: "Bozza", value: stats.draft },
-        { name: "Sbloccato", value: stats.unlocked },
-        { name: "In attesa", value: stats.pendingPayment },
+        { name: "Draft", value: stats.draft },
+        { name: "Unlocked", value: stats.unlocked },
+        { name: "Pending", value: stats.pendingPayment },
       ].filter(d => d.value > 0)
     : [];
 
   const statCards = [
     {
-      label: "Preventivi totali",
+      label: "Total quotes",
       value: stats?.total ?? 0,
-      sub: `${stats?.thisMonth ?? 0} questo mese`,
+      sub: `${stats?.thisMonth ?? 0} this month`,
       icon: <FileText className="h-5 w-5 text-violet-500" />,
       format: (v: number) => String(v),
     },
     {
-      label: "Fatturato quotato",
+      label: "Quoted revenue",
       value: stats?.totalRevenue ?? 0,
-      sub: `${formatCurrency(stats?.unlockedRevenue ?? 0)} sbloccato`,
-      icon: <Euro className="h-5 w-5 text-emerald-500" />,
+      sub: `${formatCurrency(stats?.unlockedRevenue ?? 0)} unlocked`,
+      icon: <DollarSign className="h-5 w-5 text-emerald-500" />,
       format: formatCurrency,
     },
     {
-      label: "Valore medio",
+      label: "Average value",
       value: stats?.avgValue ?? 0,
-      sub: "per preventivo",
+      sub: "per quote",
       icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
       format: formatCurrency,
     },
     {
-      label: "Sbloccati",
+      label: "Unlocked",
       value: stats?.unlocked ?? 0,
-      sub: stats?.total ? `${Math.round((stats.unlocked / stats.total) * 100)}% del totale` : "—",
+      sub: stats?.total ? `${Math.round((stats.unlocked / stats.total) * 100)}% of total` : "—",
       icon: <CheckCircle2 className="h-5 w-5 text-amber-500" />,
       format: (v: number) => String(v),
     },
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-        <p className="text-muted-foreground mt-1">Statistiche dettagliate sui tuoi preventivi.</p>
+        <p className="text-muted-foreground mt-1">Detailed statistics about your quotes.</p>
       </div>
 
       {/* Stat cards */}
@@ -113,10 +113,10 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Bar chart: preventivi per mese */}
+        {/* Bar chart: quotes per month */}
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Preventivi per mese</CardTitle>
+            <CardTitle className="text-base font-semibold">Quotes per month</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
                   <XAxis dataKey="label" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                   <Tooltip
-                    formatter={(v: number) => [v, "Preventivi"]}
+                    formatter={(v: number) => [v, "Quotes"]}
                     contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12 }}
                   />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]} fill="#7c3aed" maxBarSize={40} />
@@ -140,13 +140,13 @@ export default function AnalyticsPage() {
         {/* Donut: status breakdown */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-semibold">Distribuzione stato</CardTitle>
+            <CardTitle className="text-base font-semibold">Status breakdown</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <Skeleton className="h-48 w-full" />
             ) : statusData.length === 0 ? (
-              <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">Nessun dato</div>
+              <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No data</div>
             ) : (
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
       {stats && stats.recentQuotes.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Preventivi recenti</CardTitle>
+            <CardTitle className="text-base font-semibold">Recent quotes</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y">
@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
                       q.status === "pending_payment" ? "bg-amber-100 text-amber-700" :
                       "bg-slate-100 text-slate-600"
                     }`}>
-                      {q.status === "unlocked" ? "Sbloccato" : q.status === "pending_payment" ? "In attesa" : "Bozza"}
+                      {q.status === "unlocked" ? "Unlocked" : q.status === "pending_payment" ? "Pending" : "Draft"}
                     </span>
                     <span className="font-semibold text-sm">{formatCurrency(q.totale)}</span>
                   </div>

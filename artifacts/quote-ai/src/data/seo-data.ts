@@ -22,8 +22,8 @@ export interface SectorData {
 }
 
 export const SECTORS: Record<string, SectorData> = {
-  imbianchino: {
-    slug: "imbianchino",
+  painter: {
+    slug: "painter",
     sectorType: "professional",
     label: "Painter",
     labelPlural: "painters",
@@ -73,8 +73,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian painters. Generates professional painting quotes in 30 seconds.",
   },
 
-  elettricista: {
-    slug: "elettricista",
+  electrician: {
+    slug: "electrician",
     sectorType: "professional",
     label: "Electrician",
     labelPlural: "electricians",
@@ -124,8 +124,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian electricians.",
   },
 
-  idraulico: {
-    slug: "idraulico",
+  plumber: {
+    slug: "plumber",
     sectorType: "professional",
     label: "Plumber",
     labelPlural: "plumbers",
@@ -175,8 +175,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian plumbers.",
   },
 
-  edilizia: {
-    slug: "edilizia",
+  "general-contractor": {
+    slug: "general-contractor",
     sectorType: "service",
     label: "General Contractor",
     labelPlural: "general contractors",
@@ -226,8 +226,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian general contractors.",
   },
 
-  ristrutturazione: {
-    slug: "ristrutturazione",
+  "renovation-contractor": {
+    slug: "renovation-contractor",
     sectorType: "service",
     label: "Renovation Contractor",
     labelPlural: "renovation contractors",
@@ -277,8 +277,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for renovation contractors across Canada.",
   },
 
-  carpentiere: {
-    slug: "carpentiere",
+  "welder-fabricator": {
+    slug: "welder-fabricator",
     sectorType: "professional",
     label: "Welder & Metal Fabricator",
     labelPlural: "welders and metal fabricators",
@@ -328,8 +328,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian welders and metal fabricators.",
   },
 
-  falegname: {
-    slug: "falegname",
+  "carpenter-cabinetmaker": {
+    slug: "carpenter-cabinetmaker",
     sectorType: "professional",
     label: "Carpenter & Cabinetmaker",
     labelPlural: "carpenters and cabinetmakers",
@@ -379,8 +379,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian carpenters and cabinetmakers.",
   },
 
-  termoidraulico: {
-    slug: "termoidraulico",
+  "hvac-technician": {
+    slug: "hvac-technician",
     sectorType: "professional",
     label: "HVAC & Heating Technician",
     labelPlural: "HVAC and heating technicians",
@@ -481,8 +481,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian freelancers and consultants.",
   },
 
-  geometra: {
-    slug: "geometra",
+  "building-consultant": {
+    slug: "building-consultant",
     sectorType: "professional",
     label: "Building Consultant",
     labelPlural: "building consultants and home inspectors",
@@ -532,8 +532,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian building consultants and home inspectors.",
   },
 
-  muratore: {
-    slug: "muratore",
+  mason: {
+    slug: "mason",
     sectorType: "professional",
     label: "Mason & Concrete Contractor",
     labelPlural: "masons and concrete contractors",
@@ -583,8 +583,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian masons and concrete contractors.",
   },
 
-  giardiniere: {
-    slug: "giardiniere",
+  landscaper: {
+    slug: "landscaper",
     sectorType: "professional",
     label: "Landscaper",
     labelPlural: "landscapers",
@@ -634,8 +634,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian landscapers.",
   },
 
-  piastrellista: {
-    slug: "piastrellista",
+  "tile-installer": {
+    slug: "tile-installer",
     sectorType: "professional",
     label: "Tile Installer",
     labelPlural: "tile installers",
@@ -685,8 +685,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian tile installers.",
   },
 
-  serramentista: {
-    slug: "serramentista",
+  "window-door-installer": {
+    slug: "window-door-installer",
     sectorType: "professional",
     label: "Window & Door Installer",
     labelPlural: "window and door installers",
@@ -736,8 +736,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian window and door installers.",
   },
 
-  tetto: {
-    slug: "tetto",
+  roofer: {
+    slug: "roofer",
     sectorType: "service",
     label: "Roofer",
     labelPlural: "roofing companies",
@@ -787,8 +787,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian roofing companies.",
   },
 
-  condizionatori: {
-    slug: "condizionatori",
+  "air-conditioning-installer": {
+    slug: "air-conditioning-installer",
     sectorType: "service",
     label: "Air Conditioning Installer",
     labelPlural: "air conditioning and HVAC installers",
@@ -838,8 +838,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian air conditioning and HVAC installers.",
   },
 
-  pittore: {
-    slug: "pittore",
+  "decorative-painter": {
+    slug: "decorative-painter",
     sectorType: "professional",
     label: "Painter & Decorative Finisher",
     labelPlural: "painters and decorative finishers",
@@ -889,8 +889,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian painters and decorative finishers.",
   },
 
-  pavimentista: {
-    slug: "pavimentista",
+  "flooring-installer": {
+    slug: "flooring-installer",
     sectorType: "professional",
     label: "Flooring Installer",
     labelPlural: "flooring installers",
@@ -940,8 +940,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI quoting software for Canadian flooring installers.",
   },
 
-  "modello-excel": {
-    slug: "modello-excel",
+  "excel-template": {
+    slug: "excel-template",
     sectorType: "service",
     label: "Excel Quote Template",
     labelPlural: "Excel users",
@@ -991,8 +991,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI alternative to Excel quote templates. Generates professional quotes in 30 seconds, no formulas and no mistakes.",
   },
 
-  "modello-word": {
-    slug: "modello-word",
+  "word-template": {
+    slug: "word-template",
     sectorType: "service",
     label: "Word Quote Template",
     labelPlural: "Word users",
@@ -1042,8 +1042,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "AI alternative to Word quote templates. Generates professional quotes in 30 seconds with no manual formatting.",
   },
 
-  "come-fare-preventivo": {
-    slug: "come-fare-preventivo",
+  "how-to-quote": {
+    slug: "how-to-quote",
     sectorType: "service",
     label: "Professional Quote",
     labelPlural: "contractors",
@@ -1093,8 +1093,8 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "A practical guide on how to write a professional quote. AI software for Canadian tradespeople and small businesses: quotes in 30 seconds.",
   },
 
-  "preventivi-gratis": {
-    slug: "preventivi-gratis",
+  "free-quote": {
+    slug: "free-quote",
     sectorType: "service",
     label: "Free Quotes",
     labelPlural: "contractors and small businesses",
@@ -1153,35 +1153,35 @@ export interface SectorReview {
 }
 
 export const SECTOR_REVIEWS: Record<string, SectorReview[]> = {
-  imbianchino: [
+  painter: [
     { authorName: "Mark R.", ratingValue: "5", reviewBody: "Finally software that gets what painting work actually involves. I describe 'two coats white washable latex on 900 sq ft plus ceilings' and in 30 seconds I have a quote ready with quantities and prices. Customers sign it right away.", datePublished: "2024-10-12" },
     { authorName: "Lucy F.", ratingValue: "5", reviewBody: "I used to lose an hour to a spreadsheet for every quote. With quoteai I do it from my phone while I'm still on site. I send it to the customer by text before I'm out the door. Great tool.", datePublished: "2024-11-03" },
   ],
-  elettricista: [
+  electrician: [
     { authorName: "John M.", ratingValue: "5", reviewBody: "The AI knows electrical terminology: panels, breakers, pot lights. I described a condo rewire and the quote was better structured than the ones I used to make by hand. Impressive.", datePublished: "2024-09-20" },
     { authorName: "Steve C.", ratingValue: "5", reviewBody: "I expected trouble with large commercial jobs, but it handles multi-section quotes well. Started on the Starter plan, upgraded to Pro right away.", datePublished: "2024-11-18" },
   ],
-  idraulico: [
+  plumber: [
     { authorName: "Rob V.", ratingValue: "5", reviewBody: "I've been a plumber for 20 years and never made a quote this fast. I describe a furnace replacement and quoteai builds it all: furnace, fittings, commissioning, disposal. Nailed it.", datePublished: "2024-10-08" },
     { authorName: "Andrew P.", ratingValue: "4", reviewBody: "Really useful for emergency calls: I get to the customer, see the issue, write the description, and send the quote before I'm back in the truck. Customers appreciate the speed.", datePublished: "2024-11-22" },
   ],
-  edilizia: [
+  "general-contractor": [
     { authorName: "Luke B.", ratingValue: "5", reviewBody: "As a general contractor I needed a multi-section itemized quote. quoteai generates foundations, framing, drywall, and finishes as separate sections. As professional as an engineering firm's.", datePublished: "2024-09-30" },
     { authorName: "Simon T.", ratingValue: "5", reviewBody: "We cut the time spent on quotes drastically. It used to take two hours, now it's five minutes. The PDF has a structure clients respect.", datePublished: "2024-10-25" },
   ],
-  ristrutturazione: [
+  "renovation-contractor": [
     { authorName: "Helen C.", ratingValue: "5", reviewBody: "I run full renovations and need to coordinate demolition, mechanical, flooring, and finishes into one document. quoteai organizes it all into sections automatically. Incredible.", datePublished: "2024-10-14" },
     { authorName: "Frank N.", ratingValue: "5", reviewBody: "I mentioned an energy-efficiency upgrade in the text and quoteai automatically added a note flagging it in the quote. Didn't expect that. Huge time saver.", datePublished: "2024-11-10" },
   ],
-  carpentiere: [
+  "welder-fabricator": [
     { authorName: "Dave A.", ratingValue: "5", reviewBody: "For fabrication jobs I always struggled to explain the cost breakdown to customers. Now quoteai calculates steel weight, welding hours, and paint automatically. The customer immediately gets the pricing.", datePublished: "2024-10-03" },
     { authorName: "Mike G.", ratingValue: "5", reviewBody: "I do gates and fencing. I described a 10x6 ft sliding gate with a motor and the quote structure was already right, with materials and labour separated. Excellent.", datePublished: "2024-11-15" },
   ],
-  falegname: [
+  "carpenter-cabinetmaker": [
     { authorName: "George L.", ratingValue: "5", reviewBody: "I build custom furniture and closets. With quoteai I describe the wood species, finishes, and dimensions and the quote includes everything correctly. Customers get professional documents.", datePublished: "2024-09-25" },
     { authorName: "Carla M.", ratingValue: "5", reviewBody: "Finally software that knows carpentry terms: solid wood, veneer, matte lacquer. I don't have to explain every term to the AI. It just gets it.", datePublished: "2024-11-07" },
   ],
-  termoidraulico: [
+  "hvac-technician": [
     { authorName: "Peter R.", ratingValue: "5", reviewBody: "As an HVAC tech I handle both plumbing and heating systems. quoteai understands both without issue. In 30 seconds I have a full quote for a furnace, solar panels, and water lines.", datePublished: "2024-10-19" },
     { authorName: "Nick S.", ratingValue: "5", reviewBody: "I tried other software but it was complicated. quoteai is simple: I write what I'm doing in plain English and it generates the document. Works well even if you're not techy.", datePublished: "2024-11-01" },
   ],
@@ -1189,55 +1189,55 @@ export const SECTOR_REVIEWS: Record<string, SectorReview[]> = {
     { authorName: "Anna V.", ratingValue: "5", reviewBody: "As a freelancer I send quotes every week. With quoteai it takes 5 minutes instead of half an hour. The document is already professionally formatted and the client can't tell an AI made it.", datePublished: "2024-10-06" },
     { authorName: "Paul F.", ratingValue: "4", reviewBody: "Great for anyone working solo who doesn't want to lose time to admin. The PDF looks professional and clients take the quote more seriously than the ones I used to send in Word.", datePublished: "2024-11-20" },
   ],
-  geometra: [
+  "building-consultant": [
     { authorName: "Matt D.", ratingValue: "5", reviewBody: "As a building consultant I quote complex renovation oversight jobs. quoteai generates multi-section itemized quotes I can customize. Saves me two hours per quote.", datePublished: "2024-09-15" },
     { authorName: "Sarah L.", ratingValue: "5", reviewBody: "The format of quotes generated by quoteai is as professional as a technical firm's. Private clients are always impressed by the quality of the document.", datePublished: "2024-10-28" },
   ],
-  muratore: [
+  mason: [
     { authorName: "Claude B.", ratingValue: "5", reviewBody: "I do masonry and parging. I used to write quotes by hand on a pad. Now with quoteai I have a professional PDF in 30 seconds. Customers take me a lot more seriously.", datePublished: "2024-10-11" },
     { authorName: "Richard P.", ratingValue: "5", reviewBody: "I described a job with partition demolition, new block wall, and parging, and quoteai correctly separated the line items with per-square-foot pricing. Exactly what I wanted.", datePublished: "2024-11-13" },
   ],
-  giardiniere: [
+  landscaper: [
     { authorName: "Val C.", ratingValue: "5", reviewBody: "For landscaping jobs I always struggled to price things out. quoteai understands pruning hours, lawn square footage, and materials, and generates a clear quote. Customers understand what they're paying for right away.", datePublished: "2024-10-07" },
     { authorName: "Tony R.", ratingValue: "4", reviewBody: "Great for maintenance quotes and irrigation systems. I write the yard description and the system correctly estimates labour hours and materials needed.", datePublished: "2024-11-16" },
   ],
-  piastrellista: [
+  "tile-installer": [
     { authorName: "Emil G.", ratingValue: "5", reviewBody: "As a tile installer I need to calculate square footage, thinset, grout, and surrounds separately. quoteai does it all automatically from the description. I don't make pricing mistakes anymore.", datePublished: "2024-10-09" },
     { authorName: "Fiona A.", ratingValue: "5", reviewBody: "I described a 24x24 porcelain tile install over 270 sq ft plus a bathroom surround, and quoteai calculated everything with separate pricing for materials and labour. Perfect.", datePublished: "2024-11-08" },
   ],
-  serramentista: [
+  "window-door-installer": [
     { authorName: "Bruce N.", ratingValue: "5", reviewBody: "Window and door quotes always have a lot of line items: sizes, glass, hardware, installation. quoteai handles all that complexity automatically. Saves me an hour per quote.", datePublished: "2024-10-17" },
     { authorName: "Teresa M.", ratingValue: "5", reviewBody: "I can finally quote while I'm still taking measurements at the customer's home. I describe the windows and doors and the document is ready by the time I leave.", datePublished: "2024-11-05" },
   ],
-  tetto: [
+  roofer: [
     { authorName: "Frank L.", ratingValue: "5", reviewBody: "Roofing quotes are always complex: shingles, insulation, flashing. quoteai splits it all correctly into line items with per-square-foot pricing. Customers understand every line.", datePublished: "2024-10-22" },
     { authorName: "Gina C.", ratingValue: "4", reviewBody: "I described a full reshingle and the quote included tear-off, ice-and-water shield, shingles, flashing, and disposal. All correct and in 30 seconds.", datePublished: "2024-11-11" },
   ],
-  condizionatori: [
+  "air-conditioning-installer": [
     { authorName: "Mark P.", ratingValue: "5", reviewBody: "I've installed AC units for years. With quoteai I describe the capacity, the type (single or multi-zone), and the outdoor unit distance and the quote already includes labour, line sets, and testing. Great.", datePublished: "2024-10-05" },
     { authorName: "Rose F.", ratingValue: "5", reviewBody: "Customers always ask for written quotes. I used to make them in Word and it took too long. With quoteai it's instant and the PDF looks professional enough to close the deal.", datePublished: "2024-11-19" },
   ],
-  pittore: [
+  "decorative-painter": [
     { authorName: "Andrew L.", ratingValue: "5", reviewBody: "As a painter I do repaints, exterior coatings, and decorative finishes. quoteai knows decorative plaster, breathable coatings, priming. Generates the right line items without me having to explain every technique.", datePublished: "2024-10-16" },
     { authorName: "Monica B.", ratingValue: "5", reviewBody: "I was worried the AI wouldn't understand painting work, but it nails the difference between a primer coat and a finish coat. Per-square-foot pricing is right in line with the market.", datePublished: "2024-11-04" },
   ],
-  pavimentista: [
+  "flooring-installer": [
     { authorName: "Serge C.", ratingValue: "5", reviewBody: "I install hardwood, laminate, and tile. quoteai understands the install differences and generates separate line items for material, adhesive, baseboard, and old-floor removal. Finally, software that knows the trade.", datePublished: "2024-10-13" },
     { authorName: "Irene V.", ratingValue: "5", reviewBody: "I tried other software but it was too generic. quoteai uses the right terminology for flooring installers and the result is a professional document customers understand and sign without hesitation.", datePublished: "2024-11-14" },
   ],
-  "modello-excel": [
+  "excel-template": [
     { authorName: "Christine M.", ratingValue: "5", reviewBody: "I used a template I downloaded online. Formatting to fix every time, manual math, wrong tax. With quoteai I stopped using Excel for good. Everything's automatic now.", datePublished: "2024-10-21" },
     { authorName: "Ed R.", ratingValue: "5", reviewBody: "My Excel template used to break every time I sent it to a customer on a Mac. With quoteai I send a PDF that opens on any device. Finally, no more compatibility headaches.", datePublished: "2024-11-09" },
   ],
-  "modello-word": [
+  "word-template": [
     { authorName: "Beth F.", ratingValue: "5", reviewBody: "I spent months looking for the right Word template. They all had formatting issues. With quoteai I don't need a template anymore: the document is already perfect once it's generated.", datePublished: "2024-10-18" },
     { authorName: "Sam P.", ratingValue: "4", reviewBody: "quoteai's PDF opens on any phone with no need for Word or Office. My customers don't need to install anything to open it. Much more practical than a .docx file.", datePublished: "2024-11-02" },
   ],
-  "come-fare-preventivo": [
+  "how-to-quote": [
     { authorName: "Dan A.", ratingValue: "5", reviewBody: "I didn't know how to structure a professional quote. The guide explained what to include and quoteai generates it automatically with the whole correct structure: header, line items, tax, payment terms.", datePublished: "2024-10-02" },
     { authorName: "Nadia C.", ratingValue: "5", reviewBody: "I started from zero as a tradesperson. With quoteai my first quote already looked as professional as the big companies'. Customers have no idea it took 30 seconds.", datePublished: "2024-11-17" },
   ],
-  "preventivi-gratis": [
+  "free-quote": [
     { authorName: "Gino F.", ratingValue: "5", reviewBody: "I tried quoteai for free and after the first quote I signed up for the Starter plan. Worth every dollar. The time I save is worth way more than the monthly cost.", datePublished: "2024-10-24" },
     { authorName: "Carmen R.", ratingValue: "5", reviewBody: "No credit card to try it, no commitment. I created my first quote for free and the result already looked professional. Then I picked the monthly plan without hesitating.", datePublished: "2024-11-06" },
   ],
@@ -1248,28 +1248,28 @@ export const SECTOR_REVIEWS: Record<string, SectorReview[]> = {
 };
 
 export const SECTOR_RATINGS: Record<string, { ratingValue: number; reviewCount: number }> = {
-  imbianchino: { ratingValue: 4.8, reviewCount: 127 },
-  elettricista: { ratingValue: 4.9, reviewCount: 143 },
-  idraulico: { ratingValue: 4.8, reviewCount: 118 },
-  edilizia: { ratingValue: 4.7, reviewCount: 96 },
-  ristrutturazione: { ratingValue: 4.8, reviewCount: 134 },
-  carpentiere: { ratingValue: 4.8, reviewCount: 89 },
-  falegname: { ratingValue: 4.9, reviewCount: 76 },
-  termoidraulico: { ratingValue: 4.8, reviewCount: 104 },
+  painter: { ratingValue: 4.8, reviewCount: 127 },
+  electrician: { ratingValue: 4.9, reviewCount: 143 },
+  plumber: { ratingValue: 4.8, reviewCount: 118 },
+  "general-contractor": { ratingValue: 4.7, reviewCount: 96 },
+  "renovation-contractor": { ratingValue: 4.8, reviewCount: 134 },
+  "welder-fabricator": { ratingValue: 4.8, reviewCount: 89 },
+  "carpenter-cabinetmaker": { ratingValue: 4.9, reviewCount: 76 },
+  "hvac-technician": { ratingValue: 4.8, reviewCount: 104 },
   freelance: { ratingValue: 4.7, reviewCount: 81 },
-  geometra: { ratingValue: 4.8, reviewCount: 92 },
-  muratore: { ratingValue: 4.7, reviewCount: 88 },
-  giardiniere: { ratingValue: 4.8, reviewCount: 73 },
-  piastrellista: { ratingValue: 4.9, reviewCount: 71 },
-  serramentista: { ratingValue: 4.8, reviewCount: 79 },
-  tetto: { ratingValue: 4.7, reviewCount: 67 },
-  condizionatori: { ratingValue: 4.8, reviewCount: 84 },
-  pittore: { ratingValue: 4.8, reviewCount: 83 },
-  pavimentista: { ratingValue: 4.9, reviewCount: 68 },
-  "modello-excel": { ratingValue: 4.7, reviewCount: 156 },
-  "modello-word": { ratingValue: 4.7, reviewCount: 138 },
-  "come-fare-preventivo": { ratingValue: 4.8, reviewCount: 201 },
-  "preventivi-gratis": { ratingValue: 4.8, reviewCount: 178 },
+  "building-consultant": { ratingValue: 4.8, reviewCount: 92 },
+  mason: { ratingValue: 4.7, reviewCount: 88 },
+  landscaper: { ratingValue: 4.8, reviewCount: 73 },
+  "tile-installer": { ratingValue: 4.9, reviewCount: 71 },
+  "window-door-installer": { ratingValue: 4.8, reviewCount: 79 },
+  roofer: { ratingValue: 4.7, reviewCount: 67 },
+  "air-conditioning-installer": { ratingValue: 4.8, reviewCount: 84 },
+  "decorative-painter": { ratingValue: 4.8, reviewCount: 83 },
+  "flooring-installer": { ratingValue: 4.9, reviewCount: 68 },
+  "excel-template": { ratingValue: 4.7, reviewCount: 156 },
+  "word-template": { ratingValue: 4.7, reviewCount: 138 },
+  "how-to-quote": { ratingValue: 4.8, reviewCount: 201 },
+  "free-quote": { ratingValue: 4.8, reviewCount: 178 },
   professionista: { ratingValue: 4.8, reviewCount: 312 },
 };
 
@@ -1369,10 +1369,10 @@ export const CITIES_BY_SLUG: Record<string, CityData> = Object.fromEntries(
 // A few SECTORS entries are generic guides/tools, not geo-localizable trades —
 // "quote using an Excel template in Halifax" makes no sense as a distinct page.
 const NON_LOCAL_SECTOR_SLUGS = new Set([
-  "come-fare-preventivo",
-  "modello-excel",
-  "modello-word",
-  "preventivi-gratis",
+  "how-to-quote",
+  "excel-template",
+  "word-template",
+  "free-quote",
 ]);
 
 export const CITY_SECTORS: readonly string[] = Object.keys(SECTORS).filter(
@@ -1439,181 +1439,181 @@ export function getCityDesc(sector: SectorData, cityName: string, citySlug: stri
 }
 
 export const RELATED_SECTORS: Record<string, { slug: string; label: string }[]> = {
-  imbianchino: [
-    { slug: "pittore", label: "Painters & Finishers" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "pavimentista", label: "Flooring Installers" },
-    { slug: "modello-excel", label: "Excel Alternative" },
+  painter: [
+    { slug: "decorative-painter", label: "Painters & Finishers" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "mason", label: "Masons" },
+    { slug: "flooring-installer", label: "Flooring Installers" },
+    { slug: "excel-template", label: "Excel Alternative" },
   ],
-  pittore: [
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "serramentista", label: "Window & Door Installers" },
-    { slug: "modello-word", label: "Word Alternative" },
+  "decorative-painter": [
+    { slug: "painter", label: "Painters" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "mason", label: "Masons" },
+    { slug: "window-door-installer", label: "Window & Door Installers" },
+    { slug: "word-template", label: "Word Alternative" },
   ],
-  elettricista: [
-    { slug: "idraulico", label: "Plumbers" },
-    { slug: "termoidraulico", label: "HVAC & Heating" },
-    { slug: "condizionatori", label: "AC Installers" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  electrician: [
+    { slug: "plumber", label: "Plumbers" },
+    { slug: "hvac-technician", label: "HVAC & Heating" },
+    { slug: "air-conditioning-installer", label: "AC Installers" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
   ],
-  idraulico: [
-    { slug: "termoidraulico", label: "HVAC & Heating" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "condizionatori", label: "AC Installers" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
+  plumber: [
+    { slug: "hvac-technician", label: "HVAC & Heating" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "air-conditioning-installer", label: "AC Installers" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "mason", label: "Masons" },
+    { slug: "free-quote", label: "Free Quotes" },
   ],
-  edilizia: [
-    { slug: "muratore", label: "Masons" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "tetto", label: "Roofers" },
-    { slug: "geometra", label: "Building Consultants" },
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "modello-excel", label: "Excel Alternative" },
+  "general-contractor": [
+    { slug: "mason", label: "Masons" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "roofer", label: "Roofers" },
+    { slug: "building-consultant", label: "Building Consultants" },
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "excel-template", label: "Excel Alternative" },
   ],
-  ristrutturazione: [
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "idraulico", label: "Plumbers" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "serramentista", label: "Window & Door Installers" },
-    { slug: "piastrellista", label: "Tile Installers" },
+  "renovation-contractor": [
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "mason", label: "Masons" },
+    { slug: "plumber", label: "Plumbers" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "window-door-installer", label: "Window & Door Installers" },
+    { slug: "tile-installer", label: "Tile Installers" },
   ],
-  carpentiere: [
-    { slug: "falegname", label: "Carpenters" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "serramentista", label: "Window & Door Installers" },
-    { slug: "tetto", label: "Roofers" },
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  "welder-fabricator": [
+    { slug: "carpenter-cabinetmaker", label: "Carpenters" },
+    { slug: "mason", label: "Masons" },
+    { slug: "window-door-installer", label: "Window & Door Installers" },
+    { slug: "roofer", label: "Roofers" },
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
   ],
-  falegname: [
-    { slug: "carpentiere", label: "Welders & Fabricators" },
-    { slug: "serramentista", label: "Window & Door Installers" },
-    { slug: "pavimentista", label: "Flooring Installers" },
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "modello-word", label: "Word Alternative" },
+  "carpenter-cabinetmaker": [
+    { slug: "welder-fabricator", label: "Welders & Fabricators" },
+    { slug: "window-door-installer", label: "Window & Door Installers" },
+    { slug: "flooring-installer", label: "Flooring Installers" },
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "word-template", label: "Word Alternative" },
   ],
-  termoidraulico: [
-    { slug: "idraulico", label: "Plumbers" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "condizionatori", label: "AC Installers" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  "hvac-technician": [
+    { slug: "plumber", label: "Plumbers" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "air-conditioning-installer", label: "AC Installers" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
   ],
   freelance: [
-    { slug: "geometra", label: "Building Consultants" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
-    { slug: "modello-word", label: "Word Alternative" },
-    { slug: "modello-excel", label: "Excel Alternative" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "pittore", label: "Painters & Finishers" },
+    { slug: "building-consultant", label: "Building Consultants" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
+    { slug: "word-template", label: "Word Alternative" },
+    { slug: "excel-template", label: "Excel Alternative" },
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "decorative-painter", label: "Painters & Finishers" },
   ],
-  geometra: [
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "ristrutturazione", label: "Renovations" },
+  "building-consultant": [
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "renovation-contractor", label: "Renovations" },
     { slug: "freelance", label: "Freelancers" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "tetto", label: "Roofers" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
+    { slug: "mason", label: "Masons" },
+    { slug: "roofer", label: "Roofers" },
   ],
-  muratore: [
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "tetto", label: "Roofers" },
-    { slug: "geometra", label: "Building Consultants" },
+  mason: [
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "painter", label: "Painters" },
+    { slug: "roofer", label: "Roofers" },
+    { slug: "building-consultant", label: "Building Consultants" },
   ],
-  giardiniere: [
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
-    { slug: "modello-excel", label: "Excel Alternative" },
+  landscaper: [
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
+    { slug: "excel-template", label: "Excel Alternative" },
     { slug: "freelance", label: "Freelancers" },
-    { slug: "pavimentista", label: "Flooring Installers" },
-    { slug: "pittore", label: "Painters & Finishers" },
+    { slug: "flooring-installer", label: "Flooring Installers" },
+    { slug: "decorative-painter", label: "Painters & Finishers" },
   ],
-  piastrellista: [
-    { slug: "pavimentista", label: "Flooring Installers" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "falegname", label: "Carpenters" },
-    { slug: "modello-excel", label: "Excel Alternative" },
+  "tile-installer": [
+    { slug: "flooring-installer", label: "Flooring Installers" },
+    { slug: "mason", label: "Masons" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "painter", label: "Painters" },
+    { slug: "carpenter-cabinetmaker", label: "Carpenters" },
+    { slug: "excel-template", label: "Excel Alternative" },
   ],
-  serramentista: [
-    { slug: "falegname", label: "Carpenters" },
-    { slug: "carpentiere", label: "Welders & Fabricators" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "tetto", label: "Roofers" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  "window-door-installer": [
+    { slug: "carpenter-cabinetmaker", label: "Carpenters" },
+    { slug: "welder-fabricator", label: "Welders & Fabricators" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "roofer", label: "Roofers" },
+    { slug: "mason", label: "Masons" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
   ],
-  tetto: [
-    { slug: "edilizia", label: "General Contractors" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "serramentista", label: "Window & Door Installers" },
-    { slug: "carpentiere", label: "Welders & Fabricators" },
-    { slug: "geometra", label: "Building Consultants" },
-    { slug: "modello-excel", label: "Excel Alternative" },
+  roofer: [
+    { slug: "general-contractor", label: "General Contractors" },
+    { slug: "mason", label: "Masons" },
+    { slug: "window-door-installer", label: "Window & Door Installers" },
+    { slug: "welder-fabricator", label: "Welders & Fabricators" },
+    { slug: "building-consultant", label: "Building Consultants" },
+    { slug: "excel-template", label: "Excel Alternative" },
   ],
-  condizionatori: [
-    { slug: "termoidraulico", label: "HVAC & Heating" },
-    { slug: "idraulico", label: "Plumbers" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  "air-conditioning-installer": [
+    { slug: "hvac-technician", label: "HVAC & Heating" },
+    { slug: "plumber", label: "Plumbers" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
   ],
-  pavimentista: [
-    { slug: "piastrellista", label: "Tile Installers" },
-    { slug: "falegname", label: "Carpenters" },
-    { slug: "ristrutturazione", label: "Renovations" },
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "muratore", label: "Masons" },
-    { slug: "modello-word", label: "Word Alternative" },
+  "flooring-installer": [
+    { slug: "tile-installer", label: "Tile Installers" },
+    { slug: "carpenter-cabinetmaker", label: "Carpenters" },
+    { slug: "renovation-contractor", label: "Renovations" },
+    { slug: "painter", label: "Painters" },
+    { slug: "mason", label: "Masons" },
+    { slug: "word-template", label: "Word Alternative" },
   ],
-  "modello-excel": [
-    { slug: "modello-word", label: "Word Alternative" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "ristrutturazione", label: "Renovations" },
+  "excel-template": [
+    { slug: "word-template", label: "Word Alternative" },
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
+    { slug: "painter", label: "Painters" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "renovation-contractor", label: "Renovations" },
   ],
-  "modello-word": [
-    { slug: "modello-excel", label: "Excel Alternative" },
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
+  "word-template": [
+    { slug: "excel-template", label: "Excel Alternative" },
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "how-to-quote", label: "How to Write a Quote" },
     { slug: "freelance", label: "Freelancers" },
-    { slug: "geometra", label: "Building Consultants" },
-    { slug: "falegname", label: "Carpenters" },
+    { slug: "building-consultant", label: "Building Consultants" },
+    { slug: "carpenter-cabinetmaker", label: "Carpenters" },
   ],
-  "come-fare-preventivo": [
-    { slug: "preventivi-gratis", label: "Free Quotes" },
-    { slug: "modello-excel", label: "Excel Alternative" },
-    { slug: "modello-word", label: "Word Alternative" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "idraulico", label: "Plumbers" },
+  "how-to-quote": [
+    { slug: "free-quote", label: "Free Quotes" },
+    { slug: "excel-template", label: "Excel Alternative" },
+    { slug: "word-template", label: "Word Alternative" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "plumber", label: "Plumbers" },
     { slug: "freelance", label: "Freelancers" },
   ],
-  "preventivi-gratis": [
-    { slug: "come-fare-preventivo", label: "How to Write a Quote" },
-    { slug: "modello-excel", label: "Excel Alternative" },
-    { slug: "modello-word", label: "Word Alternative" },
-    { slug: "imbianchino", label: "Painters" },
-    { slug: "elettricista", label: "Electricians" },
-    { slug: "idraulico", label: "Plumbers" },
+  "free-quote": [
+    { slug: "how-to-quote", label: "How to Write a Quote" },
+    { slug: "excel-template", label: "Excel Alternative" },
+    { slug: "word-template", label: "Word Alternative" },
+    { slug: "painter", label: "Painters" },
+    { slug: "electrician", label: "Electricians" },
+    { slug: "plumber", label: "Plumbers" },
   ],
 };
 

@@ -7,9 +7,9 @@ const KEY_PATH = path.join(__dirname, "google-indexing-key.json");
 const SITE_URL = "https://quoteai.ca/";
 
 const urls = [
-  "https://quoteai.ca/preventivi/condizionatori/",
-  "https://quoteai.ca/preventivi/imbianchino/monza/",
-  "https://quoteai.ca/preventivi/edilizia/brescia/",
+  "https://quoteai.ca/quotes/air-conditioning-installer/",
+  "https://quoteai.ca/quotes/painter/monza/",
+  "https://quoteai.ca/quotes/general-contractor/brescia/",
   "https://quoteai.ca/blog/privacy/",
   "https://quoteai.ca/privacy/",
   "https://quoteai.ca/chi-siamo/",

@@ -135,7 +135,7 @@ export default function MappaSitoPage() {
               <ul className="space-y-2.5 text-sm">
                 {Object.entries(SECTORS).map(([slug, sector]) => (
                   <li key={slug}>
-                    <Link href={`/preventivi/${slug}/`} className="text-gray-600 hover:text-violet-600 transition-colors">
+                    <Link href={`/quotes/${slug}/`} className="text-gray-600 hover:text-violet-600 transition-colors">
                       {sector.label}
                     </Link>
                   </li>
@@ -172,7 +172,7 @@ export default function MappaSitoPage() {
                               return (
                                 <Link
                                   key={sectorSlug}
-                                  href={`/preventivi/${sectorSlug}/${city.slug}/`}
+                                  href={`/quotes/${sectorSlug}/${city.slug}/`}
                                   className="text-gray-500 hover:text-violet-600 transition-colors truncate"
                                   title={`${t("sitemap.quoteFor")} ${s.label} — ${city.name}`}
                                 >

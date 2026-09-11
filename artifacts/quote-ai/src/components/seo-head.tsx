@@ -23,7 +23,7 @@ interface SeoHeadProps {
    * NOTE: there is currently no locale-prefixed routing (no /fr/ path segment) —
    * every URL only ever serves English content today. This prop and the
    * hreflang/og:locale output below exist so the follow-up i18n pass can wire
-   * up real fr-CA routes (e.g. /fr/preventivi/...) without having to touch
+   * up real fr-CA routes (e.g. /fr/quotes/...) without having to touch
    * every call site again: once French routes exist, pass canonical +
    * frCanonical here and the alternate tags will be correct immediately.
    */

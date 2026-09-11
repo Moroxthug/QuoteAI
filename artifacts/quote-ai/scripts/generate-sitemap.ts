@@ -36,7 +36,7 @@ for (const route of PUBLIC_ROUTES) {
 
 // SEO sector landing pages
 for (const sectorSlug of Object.keys(SECTORS)) {
-  entries.push(url(`${BASE_URL}/preventivi/${sectorSlug}/`, "0.8", "monthly", "2026-05-01"));
+  entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/`, "0.8", "monthly", "2026-05-01"));
 }
 
 // SEO city×sector pages — restricted to ACTIVE_CITIES (see seo-data.ts) to
@@ -44,7 +44,7 @@ for (const sectorSlug of Object.keys(SECTORS)) {
 for (const sectorSlug of CITY_SECTORS) {
   for (const city of ACTIVE_CITIES) {
     const priority = TIER1_CITY_SLUGS.has(city.slug) ? "0.7" : "0.6";
-    entries.push(url(`${BASE_URL}/preventivi/${sectorSlug}/${city.slug}/`, priority, "monthly", "2026-05-01"));
+    entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/${city.slug}/`, priority, "monthly", "2026-05-01"));
   }
 }
 
@@ -87,7 +87,7 @@ Disallow: /admin
 Disallow: /api
 
 # City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)
-${inactiveCitySlugs.map((slug) => `Disallow: /preventivi/*/${slug}/`).join("\n")}
+${inactiveCitySlugs.map((slug) => `Disallow: /quotes/*/${slug}/`).join("\n")}
 
 Sitemap: https://quoteai.ca/sitemap.xml
 `;

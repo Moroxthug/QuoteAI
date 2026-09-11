@@ -13,16 +13,16 @@ if (!existsSync(outDir)) {
 
 // Deve restare in sincronia con SECTOR_OG_IMAGES in src/data/seo-render-engine.ts
 const SECTOR_SLUGS = [
-  "edilizia",
-  "ristrutturazione",
-  "elettricista",
-  "idraulico",
-  "imbianchino",
-  "carpentiere",
-  "falegname",
-  "termoidraulico",
+  "general-contractor",
+  "renovation-contractor",
+  "electrician",
+  "plumber",
+  "painter",
+  "welder-fabricator",
+  "carpenter-cabinetmaker",
+  "hvac-technician",
   "freelance",
-  "geometra",
+  "building-consultant",
 ];
 
 function escXml(s: string): string {

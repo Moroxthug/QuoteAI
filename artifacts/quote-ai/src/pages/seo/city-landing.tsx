@@ -35,7 +35,7 @@ export default function SeoCityLanding() {
 
   const titleTag = getCityTitle(s, cityName, citySlug);
   const metaDesc = getCityDesc(s, cityName, citySlug, regionName);
-  const canonical = `https://quoteai.ca/preventivi/${s.slug}/${citySlug}/`;
+  const canonical = `https://quoteai.ca/quotes/${s.slug}/${citySlug}/`;
 
   const intro = city ? getCityIntro(s, city) : "";
   const faqItems = city ? getCityFaqItems(s, city) : [];
@@ -167,7 +167,7 @@ export default function SeoCityLanding() {
           <ol className="flex items-center text-sm text-gray-500 flex-wrap">
             <li><Link href="/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
-            <li><Link href={`/preventivi/${s.slug}/`} className="hover:text-violet-600 transition-colors">{s.label}</Link></li>
+            <li><Link href={`/quotes/${s.slug}/`} className="hover:text-violet-600 transition-colors">{s.label}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
             <li className="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">{cityName}</li>
           </ol>
@@ -202,7 +202,7 @@ export default function SeoCityLanding() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </a>
             <a
-              href={`/preventivi/${s.slug}/`}
+              href={`/quotes/${s.slug}/`}
               className="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold"
             >
               {t("seo.city.heroCta2")}
@@ -300,7 +300,7 @@ export default function SeoCityLanding() {
               {nearbyAnchors.map(({ slug, anchorText }) => (
                 <a
                   key={slug}
-                  href={`/preventivi/${s.slug}/${slug}/`}
+                  href={`/quotes/${s.slug}/${slug}/`}
                   className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors"
                 >
                   {anchorText}
@@ -322,7 +322,7 @@ export default function SeoCityLanding() {
               {sameCityOtherSectors.map((r) => (
                 <a
                   key={r.slug}
-                  href={`/preventivi/${r.slug}/${citySlug}/`}
+                  href={`/quotes/${r.slug}/${citySlug}/`}
                   className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
                 >
                   <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
@@ -345,7 +345,7 @@ export default function SeoCityLanding() {
               {relatedSectors.map((r) => (
                 <a
                   key={r.slug}
-                  href={`/preventivi/${r.slug}/`}
+                  href={`/quotes/${r.slug}/`}
                   className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
                 >
                   <span className="text-violet-400 font-bold" aria-hidden="true">→</span>

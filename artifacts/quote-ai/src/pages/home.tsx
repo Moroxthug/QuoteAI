@@ -866,9 +866,9 @@ export default function Home() {
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
               {[
-                { href: "/preventivi/modello-excel", label: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", badge: "vs Excel" },
-                { href: "/preventivi/modello-word", label: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", badge: "vs Word" },
-                { href: "/preventivi/come-fare-preventivo", label: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", badge: "Guide" },
+                { href: "/quotes/excel-template", label: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", badge: "vs Excel" },
+                { href: "/quotes/word-template", label: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", badge: "vs Word" },
+                { href: "/quotes/how-to-quote", label: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", badge: "Guide" },
               ].map(({ href, label, desc, badge }) => (
                 <Link
                   key={href}
@@ -902,7 +902,7 @@ export default function Home() {
                 {Object.entries(TRADE_LABELS[lang]).map(([slug, label]) => (
                   <Link
                     key={slug}
-                    href={`/preventivi/${slug}/`}
+                    href={`/quotes/${slug}/`}
                     className="text-xs text-gray-500 hover:text-violet-600 py-1 px-2 rounded hover:bg-violet-50 transition-colors"
                   >
                     {label}
@@ -926,7 +926,7 @@ export default function Home() {
                   ].map(city => (
                     <Link
                       key={city.slug}
-                      href={`/preventivi/ristrutturazione/${city.slug}/`}
+                      href={`/quotes/renovation-contractor/${city.slug}/`}
                       className="text-xs text-gray-400 hover:text-violet-600 hover:bg-violet-50 px-2 py-0.5 rounded transition-colors"
                     >
                       {city.name}

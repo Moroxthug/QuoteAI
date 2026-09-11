@@ -40,16 +40,16 @@ export function strHash(s: string): number {
 // ─── OG image path ────────────────────────────────────────────────────────
 
 const SECTOR_OG_IMAGES: Record<string, string> = {
-  edilizia: "/og/sectors/edilizia.png",
-  ristrutturazione: "/og/sectors/ristrutturazione.png",
-  elettricista: "/og/sectors/elettricista.png",
-  idraulico: "/og/sectors/idraulico.png",
-  imbianchino: "/og/sectors/imbianchino.png",
-  carpentiere: "/og/sectors/carpentiere.png",
-  falegname: "/og/sectors/falegname.png",
-  termoidraulico: "/og/sectors/termoidraulico.png",
+  "general-contractor": "/og/sectors/general-contractor.png",
+  "renovation-contractor": "/og/sectors/renovation-contractor.png",
+  electrician: "/og/sectors/electrician.png",
+  plumber: "/og/sectors/plumber.png",
+  painter: "/og/sectors/painter.png",
+  "welder-fabricator": "/og/sectors/welder-fabricator.png",
+  "carpenter-cabinetmaker": "/og/sectors/carpenter-cabinetmaker.png",
+  "hvac-technician": "/og/sectors/hvac-technician.png",
   freelance: "/og/sectors/freelance.png",
-  geometra: "/og/sectors/geometra.png",
+  "building-consultant": "/og/sectors/building-consultant.png",
 };
 
 export function getOgImagePath(sectorSlug: string): string {
@@ -295,7 +295,7 @@ export function getCityRelatedSectors(sectorSlug: string): { slug: string; label
 }
 
 // ─── Same-city, other trades — cross-links every city page to sibling ────
-// trade pages for the same city (e.g. imbianchino/toronto → elettricista/toronto).
+// trade pages for the same city (e.g. painter/toronto → electrician/toronto).
 // Rotated deterministically per city+sector so the ~18 local trades get an
 // even spread of inbound links across a city's pages rather than always
 // linking the same subset from every page.
@@ -317,7 +317,7 @@ export function getSameCityOtherSectors(
 export type JsonLdSchema = { "@context": string; "@type": string; [key: string]: unknown };
 
 export function buildCityJsonLd(sector: SectorData, city: CityData): JsonLdSchema[] {
-  const canonical = `${BASE_URL}/preventivi/${sector.slug}/${city.slug}/`;
+  const canonical = `${BASE_URL}/quotes/${sector.slug}/${city.slug}/`;
   const faqItems = getCityFaqItems(sector, city);
   return [
     {
@@ -355,7 +355,7 @@ export function buildCityJsonLd(sector: SectorData, city: CityData): JsonLdSchem
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-        { "@type": "ListItem", position: 2, name: sector.label, item: `${BASE_URL}/preventivi/${sector.slug}/` },
+        { "@type": "ListItem", position: 2, name: sector.label, item: `${BASE_URL}/quotes/${sector.slug}/` },
         { "@type": "ListItem", position: 3, name: city.name, item: canonical },
       ],
     },
@@ -399,7 +399,7 @@ export function verifyCityContentInDev(
 
   if (mismatches.length > 0) {
     console.warn(
-      `[seo-render-engine] Content mismatch on /preventivi/${sector.slug}/${city.slug}: ` +
+      `[seo-render-engine] Content mismatch on /quotes/${sector.slug}/${city.slug}: ` +
         mismatches.join(", ") +
         ". SeoCityLanding must consume all data exclusively from seo-render-engine.ts."
     );

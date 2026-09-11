@@ -188,7 +188,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">{t("footer.trades")}</h4>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
                 {Object.entries(TRADE_LABELS[lang]).map(([slug, label]) => (
-                  <li key={slug}><Link href={`/preventivi/${slug}/`} className="hover:text-foreground transition-colors">{label}</Link></li>
+                  <li key={slug}><Link href={`/quotes/${slug}/`} className="hover:text-foreground transition-colors">{label}</Link></li>
                 ))}
               </ul>
             </div>
@@ -207,10 +207,10 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <h4 className="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">{t("footer.guides")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link href="/blog/" className="hover:text-foreground transition-colors font-medium text-foreground/80">{t("footer.blog")}</Link></li>
-                <li><Link href="/preventivi/modello-excel/" className="hover:text-foreground transition-colors">{t("footer.excelTemplate")}</Link></li>
-                <li><Link href="/preventivi/modello-word/" className="hover:text-foreground transition-colors">{t("footer.wordTemplate")}</Link></li>
-                <li><Link href="/preventivi/come-fare-preventivo/" className="hover:text-foreground transition-colors">{t("footer.howToQuote")}</Link></li>
-                <li><Link href="/preventivi/preventivi-gratis/" className="hover:text-foreground transition-colors">{t("footer.freeQuotes")}</Link></li>
+                <li><Link href="/quotes/excel-template/" className="hover:text-foreground transition-colors">{t("footer.excelTemplate")}</Link></li>
+                <li><Link href="/quotes/word-template/" className="hover:text-foreground transition-colors">{t("footer.wordTemplate")}</Link></li>
+                <li><Link href="/quotes/how-to-quote/" className="hover:text-foreground transition-colors">{t("footer.howToQuote")}</Link></li>
+                <li><Link href="/quotes/free-quote/" className="hover:text-foreground transition-colors">{t("footer.freeQuotes")}</Link></li>
               </ul>
               <h4 className="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">{t("footer.company")}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">

@@ -60,16 +60,16 @@ if (!existsSync(templatePath)) {
 const BASE_URL = "https://quoteai.ca";
 
 const SECTOR_OG_IMAGES: Record<string, string> = {
-  edilizia: "/og/edilizia.jpg",
-  ristrutturazione: "/og/ristrutturazione.jpg",
-  elettricista: "/og/elettricista.jpg",
-  idraulico: "/og/idraulico.jpg",
-  imbianchino: "/og/imbianchino.jpg",
-  carpentiere: "/og/carpentiere.jpg",
-  falegname: "/og/falegname.jpg",
-  termoidraulico: "/og/termoidraulico.jpg",
+  "general-contractor": "/og/general-contractor.jpg",
+  "renovation-contractor": "/og/renovation-contractor.jpg",
+  electrician: "/og/electrician.jpg",
+  plumber: "/og/plumber.jpg",
+  painter: "/og/painter.jpg",
+  "welder-fabricator": "/og/welder-fabricator.jpg",
+  "carpenter-cabinetmaker": "/og/carpenter-cabinetmaker.jpg",
+  "hvac-technician": "/og/hvac-technician.jpg",
   freelance: "/og/freelance.jpg",
-  geometra: "/og/geometra.jpg",
+  "building-consultant": "/og/building-consultant.jpg",
 };
 
 // ─── Core utilities ────────────────────────────────────────────────────────
@@ -185,34 +185,34 @@ const STATIC_FOOTER = `<footer class="border-t py-12 md:py-16 bg-white">
       <div class="md:col-span-2">
         <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Trades</h4>
         <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
-          <li><a href="/preventivi/imbianchino/" class="hover:text-foreground transition-colors">Painter</a></li>
-          <li><a href="/preventivi/muratore/" class="hover:text-foreground transition-colors">Mason</a></li>
-          <li><a href="/preventivi/elettricista/" class="hover:text-foreground transition-colors">Electrician</a></li>
-          <li><a href="/preventivi/pittore/" class="hover:text-foreground transition-colors">Decorative Painter</a></li>
-          <li><a href="/preventivi/idraulico/" class="hover:text-foreground transition-colors">Plumber</a></li>
-          <li><a href="/preventivi/piastrellista/" class="hover:text-foreground transition-colors">Tile Installer</a></li>
-          <li><a href="/preventivi/edilizia/" class="hover:text-foreground transition-colors">General Contractors</a></li>
-          <li><a href="/preventivi/giardiniere/" class="hover:text-foreground transition-colors">Landscaper</a></li>
-          <li><a href="/preventivi/ristrutturazione/" class="hover:text-foreground transition-colors">Renovation Contractors</a></li>
-          <li><a href="/preventivi/serramentista/" class="hover:text-foreground transition-colors">Window &amp; Door Installer</a></li>
-          <li><a href="/preventivi/carpentiere/" class="hover:text-foreground transition-colors">Welders &amp; Fabricators</a></li>
-          <li><a href="/preventivi/tetto/" class="hover:text-foreground transition-colors">Roofing</a></li>
-          <li><a href="/preventivi/falegname/" class="hover:text-foreground transition-colors">Carpenters</a></li>
-          <li><a href="/preventivi/condizionatori/" class="hover:text-foreground transition-colors">Air Conditioning</a></li>
-          <li><a href="/preventivi/freelance/" class="hover:text-foreground transition-colors">Freelancer</a></li>
-          <li><a href="/preventivi/pavimentista/" class="hover:text-foreground transition-colors">Flooring Installer</a></li>
-          <li><a href="/preventivi/geometra/" class="hover:text-foreground transition-colors">Building Consultants</a></li>
-          <li><a href="/preventivi/termoidraulico/" class="hover:text-foreground transition-colors">HVAC &amp; Heating</a></li>
+          <li><a href="/quotes/painter/" class="hover:text-foreground transition-colors">Painter</a></li>
+          <li><a href="/quotes/mason/" class="hover:text-foreground transition-colors">Mason</a></li>
+          <li><a href="/quotes/electrician/" class="hover:text-foreground transition-colors">Electrician</a></li>
+          <li><a href="/quotes/decorative-painter/" class="hover:text-foreground transition-colors">Decorative Painter</a></li>
+          <li><a href="/quotes/plumber/" class="hover:text-foreground transition-colors">Plumber</a></li>
+          <li><a href="/quotes/tile-installer/" class="hover:text-foreground transition-colors">Tile Installer</a></li>
+          <li><a href="/quotes/general-contractor/" class="hover:text-foreground transition-colors">General Contractors</a></li>
+          <li><a href="/quotes/landscaper/" class="hover:text-foreground transition-colors">Landscaper</a></li>
+          <li><a href="/quotes/renovation-contractor/" class="hover:text-foreground transition-colors">Renovation Contractors</a></li>
+          <li><a href="/quotes/window-door-installer/" class="hover:text-foreground transition-colors">Window &amp; Door Installer</a></li>
+          <li><a href="/quotes/welder-fabricator/" class="hover:text-foreground transition-colors">Welders &amp; Fabricators</a></li>
+          <li><a href="/quotes/roofer/" class="hover:text-foreground transition-colors">Roofing</a></li>
+          <li><a href="/quotes/carpenter-cabinetmaker/" class="hover:text-foreground transition-colors">Carpenters</a></li>
+          <li><a href="/quotes/air-conditioning-installer/" class="hover:text-foreground transition-colors">Air Conditioning</a></li>
+          <li><a href="/quotes/freelance/" class="hover:text-foreground transition-colors">Freelancer</a></li>
+          <li><a href="/quotes/flooring-installer/" class="hover:text-foreground transition-colors">Flooring Installer</a></li>
+          <li><a href="/quotes/building-consultant/" class="hover:text-foreground transition-colors">Building Consultants</a></li>
+          <li><a href="/quotes/hvac-technician/" class="hover:text-foreground transition-colors">HVAC &amp; Heating</a></li>
         </ul>
       </div>
       <div>
         <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Guides</h4>
         <ul class="space-y-2 text-sm text-muted-foreground">
           <li><a href="/blog/" class="hover:text-foreground transition-colors font-medium text-foreground/80">Blog &amp; Guides</a></li>
-          <li><a href="/preventivi/modello-excel/" class="hover:text-foreground transition-colors">Excel Quote Template</a></li>
-          <li><a href="/preventivi/modello-word/" class="hover:text-foreground transition-colors">Word Quote Template</a></li>
-          <li><a href="/preventivi/come-fare-preventivo/" class="hover:text-foreground transition-colors">How to Write a Quote</a></li>
-          <li><a href="/preventivi/preventivi-gratis/" class="hover:text-foreground transition-colors">Free Quote Software</a></li>
+          <li><a href="/quotes/excel-template/" class="hover:text-foreground transition-colors">Excel Quote Template</a></li>
+          <li><a href="/quotes/word-template/" class="hover:text-foreground transition-colors">Word Quote Template</a></li>
+          <li><a href="/quotes/how-to-quote/" class="hover:text-foreground transition-colors">How to Write a Quote</a></li>
+          <li><a href="/quotes/free-quote/" class="hover:text-foreground transition-colors">Free Quote Software</a></li>
         </ul>
         <h4 class="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">Company</h4>
         <ul class="space-y-2 text-sm text-muted-foreground">
@@ -278,7 +278,7 @@ function buildSectorCityGrid(s: SectorData): string {
       const cityLinks = cities
         .map(
           (c) =>
-            `<a href="/preventivi/${esc(s.slug)}/${esc(c.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(c.name)}</a>`
+            `<a href="/quotes/${esc(s.slug)}/${esc(c.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(c.name)}</a>`
         )
         .join("\n            ");
       return `<div>
@@ -311,7 +311,7 @@ function buildRelatedSectorsSection(s: SectorData, heading?: string): string {
   const links = related
     .map(
       (r) =>
-        `<a href="/preventivi/${esc(r.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
+        `<a href="/quotes/${esc(r.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
           <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(r.label)}
         </a>`
     )
@@ -387,7 +387,7 @@ function buildCityContextBlock(city: CityData, s: SectorData): string {
 // ─── JSON-LD schema builders ────────────────────────────────────────────────
 
 function buildSectorJsonLd(s: SectorData): object[] {
-  const canonical = `${BASE_URL}/preventivi/${s.slug}/`;
+  const canonical = `${BASE_URL}/quotes/${s.slug}/`;
   const schemas: object[] = [
     {
       "@context": "https://schema.org",
@@ -701,7 +701,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
 
   const breadcrumb = buildBreadcrumb([
     { name: "Home", href: "/" },
-    { name: s.label, href: `/preventivi/${s.slug}/` },
+    { name: s.label, href: `/quotes/${s.slug}/` },
     { name: cityName, href: null },
   ]);
 
@@ -720,7 +720,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
         <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
           Create your free quote
         </a>
-        <a href="/preventivi/${esc(s.slug)}/" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+        <a href="/quotes/${esc(s.slug)}/" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
           See how it works
         </a>
       </div>
@@ -793,7 +793,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
 
   const nearbyLinks = getNearbyAnchors(s, city)
     .map(({ slug, anchorText }) =>
-      `<a href="/preventivi/${esc(s.slug)}/${esc(slug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(anchorText)}</a>`
+      `<a href="/quotes/${esc(s.slug)}/${esc(slug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(anchorText)}</a>`
     )
     .join("\n          ");
 
@@ -821,7 +821,7 @@ function buildCityBodyHtml(s: SectorData, city: CityData): string {
         ${sameCityOtherSectors
           .map(
             (r) =>
-              `<a href="/preventivi/${esc(r.slug)}/${esc(city.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
+              `<a href="/quotes/${esc(r.slug)}/${esc(city.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
           <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(r.label)} in ${esc(cityName)}
         </a>`
           )
@@ -939,7 +939,7 @@ function buildHomepageBodyHtml(): string {
   const sectorLinks = Object.values(SECTORS)
     .map(
       (s) =>
-        `<a href="/preventivi/${esc(s.slug)}/" class="group flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-white p-5 text-center hover:border-violet-200 hover:shadow-sm transition-all">
+        `<a href="/quotes/${esc(s.slug)}/" class="group flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-white p-5 text-center hover:border-violet-200 hover:shadow-sm transition-all">
           <div class="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm text-violet-600 bg-violet-50" aria-hidden="true">${esc(s.label.charAt(0))}</div>
           <span class="text-sm font-medium text-gray-700 group-hover:text-violet-700 transition-colors">${esc(s.label)}</span>
         </a>`
@@ -952,7 +952,7 @@ function buildHomepageBodyHtml(): string {
   const cityLinks = ACTIVE_CITIES
     .map(
       (city) =>
-        `<a href="/preventivi/ristrutturazione/${esc(city.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(city.name)}</a>`
+        `<a href="/quotes/renovation-contractor/${esc(city.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(city.name)}</a>`
     )
     .join("\n      ");
 
@@ -1192,7 +1192,7 @@ const homepageWebSiteSchema = {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: `${BASE_URL}/preventivi/{search_term_string}`,
+      urlTemplate: `${BASE_URL}/quotes/{search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },
@@ -1249,20 +1249,20 @@ for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
       ? sector.descriptionVariants[descHash % sector.descriptionVariants.length]
       : sector.metaDescription;
 
-  const canonical = `${BASE_URL}/preventivi/${sectorSlug}/`;
+  const canonical = `${BASE_URL}/quotes/${sectorSlug}/`;
   const jsonLd = buildSectorJsonLd(sector);
   const ogImagePath = ogImage(sectorSlug);
 
   const headBlock = buildHeadBlock({ title, description, canonical, ogImagePath, jsonLd });
   const bodyHtml = buildSectorBodyHtml(sector);
   const html = injectBody(injectHead(template, headBlock), bodyHtml);
-  writeRoute(`preventivi/${sectorSlug}`, html);
+  writeRoute(`quotes/${sectorSlug}`, html);
   count++;
 
   if (!CITY_SECTORS.includes(sectorSlug)) continue;
 
   for (const city of ACTIVE_CITIES) {
-    const cityCanonical = `${BASE_URL}/preventivi/${sectorSlug}/${city.slug}/`;
+    const cityCanonical = `${BASE_URL}/quotes/${sectorSlug}/${city.slug}/`;
     const cityTitle = getCityTitle(sector, city.name, city.slug);
     const cityDesc = getCityDesc(sector, city.name, city.slug, city.region);
     const cityJsonLd = buildCityJsonLd(sector, city);
@@ -1276,7 +1276,7 @@ for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
     });
     const cityBodyHtml = buildCityBodyHtml(sector, city);
     const cityHtml = injectBody(injectHead(template, cityHeadBlock), cityBodyHtml);
-    writeRoute(`preventivi/${sectorSlug}/${city.slug}`, cityHtml);
+    writeRoute(`quotes/${sectorSlug}/${city.slug}`, cityHtml);
     count++;
   }
 }
@@ -1499,7 +1499,7 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
   const relatedSectorLinks = article.relatedSectors.map((sectorSlug) => {
     const sector = SECTORS[sectorSlug];
     if (!sector) return "";
-    return `<a href="/preventivi/${esc(sectorSlug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors">
+    return `<a href="/quotes/${esc(sectorSlug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors">
       <span class="text-violet-400 font-bold">→</span> ${esc(sector.label)} quotes
     </a>`;
   }).filter(Boolean).join("\n    ");
@@ -1522,7 +1522,7 @@ function buildBlogArticleBodyHtml(article: BlogArticle): string {
       ${ACTIVE_CITIES
         .map(
           (city) =>
-            `<a href="/preventivi/${esc(geoSector.slug)}/${esc(city.slug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors">
+            `<a href="/quotes/${esc(geoSector.slug)}/${esc(city.slug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors">
         <span class="text-violet-400 font-bold">→</span> ${esc(city.name)}
       </a>`
         )
@@ -1829,7 +1829,7 @@ function buildMappaSitoBodyHtml(): string {
   `;
 
   const sectorLinks = Object.entries(SECTORS).map(([slug, sector]) => `
-    <li><a href="/preventivi/${slug}/" class="text-gray-600 hover:text-violet-600 transition-colors">${esc(sector.label)}</a></li>
+    <li><a href="/quotes/${slug}/" class="text-gray-600 hover:text-violet-600 transition-colors">${esc(sector.label)}</a></li>
   `).join("");
 
   const professionsIndex = `
@@ -1858,7 +1858,7 @@ function buildMappaSitoBodyHtml(): string {
       const sectorLinksForCity = CITY_SECTORS.map((sectorSlug) => {
         const s = SECTORS[sectorSlug];
         if (!s) return "";
-        return `<a href="/preventivi/${sectorSlug}/${city.slug}/" class="text-gray-500 hover:text-violet-600 transition-colors truncate" title="${esc(s.label)} quote in ${esc(city.name)}">${esc(s.label)}</a>`;
+        return `<a href="/quotes/${sectorSlug}/${city.slug}/" class="text-gray-500 hover:text-violet-600 transition-colors truncate" title="${esc(s.label)} quote in ${esc(city.name)}">${esc(s.label)}</a>`;
       }).join("\n");
 
       return `

@@ -14,8 +14,8 @@ if (typeof window !== "undefined" && import.meta.env.VITE_POSTHOG_KEY) {
   });
 }
 
-const SEO_CITY_RE = /^\/preventivi\/[^/]+\/[^/]+\/?$/;
-const SEO_SECTOR_RE = /^\/preventivi\/[^/]+\/?$/;
+const SEO_CITY_RE = /^\/quotes\/[^/]+\/[^/]+\/?$/;
+const SEO_SECTOR_RE = /^\/quotes\/[^/]+\/?$/;
 const BLOG_RE = /^\/blog(\/.*)?$/;
 
 const rootEl = document.getElementById("root")!;

@@ -248,7 +248,7 @@ export default function SeoLanding() {
   const slug = (params as { type?: string }).type ?? "professionista";
   const s = SECTORS[slug] ?? DEFAULT_SECTOR;
 
-  const canonical = `https://quoteai.ca/preventivi/${s.slug}/`;
+  const canonical = `https://quoteai.ca/quotes/${s.slug}/`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -405,10 +405,10 @@ export default function SeoLanding() {
       </section>
 
       {/* ── Guide-specific blocks ────────────────────────── */}
-      {slug === "modello-excel" && <ExcelWordComparisonBlock tool="Excel" />}
-      {slug === "modello-word" && <ExcelWordComparisonBlock tool="Word" />}
-      {slug === "come-fare-preventivo" && <ComeFareGuideBlock />}
-      {slug === "preventivi-gratis" && <PreventiviGratisPlansBlock />}
+      {slug === "excel-template" && <ExcelWordComparisonBlock tool="Excel" />}
+      {slug === "word-template" && <ExcelWordComparisonBlock tool="Word" />}
+      {slug === "how-to-quote" && <ComeFareGuideBlock />}
+      {slug === "free-quote" && <PreventiviGratisPlansBlock />}
 
       {/* ── "Built for the Canadian market" ──────────────── */}
       <section className="py-20 bg-white">
@@ -481,7 +481,7 @@ export default function SeoLanding() {
               {TIER1_CITIES.map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/preventivi/${slug}/${city.slug}/`}
+                  href={`/quotes/${slug}/${city.slug}/`}
                   className="flex items-center gap-2.5 bg-white hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 transition-colors group"
                 >
                   <MapPin className="h-3.5 w-3.5 text-violet-400 group-hover:text-violet-600 shrink-0" />
@@ -517,7 +517,7 @@ export default function SeoLanding() {
                     {CITIES_BY_REGION[region].map((city) => (
                       <li key={city.slug}>
                         <Link
-                          href={`/preventivi/${slug}/${city.slug}/`}
+                          href={`/quotes/${slug}/${city.slug}/`}
                           className="text-sm text-gray-500 hover:text-violet-600 transition-colors"
                         >
                           {s.label} {city.name}
@@ -543,7 +543,7 @@ export default function SeoLanding() {
               {RELATED_SECTORS[slug].map((r) => (
                 <Link
                   key={r.slug}
-                  href={`/preventivi/${r.slug}/`}
+                  href={`/quotes/${r.slug}/`}
                   className="flex items-center gap-3 bg-gray-50 hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-5 py-3.5 transition-colors group"
                 >
                   <ArrowRight className="h-4 w-4 text-violet-400 group-hover:text-violet-600 shrink-0" />

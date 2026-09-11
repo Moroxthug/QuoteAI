@@ -21,7 +21,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-03-04",
     readingTimeMin: 5,
-    relatedSectors: ["imbianchino", "pittore"],
+    relatedSectors: ["painter", "decorative-painter"],
     contentHtml: `
 <p>Painting is one of the most common renovation jobs booked in Canada every year — and one of the easiest to get a wildly inaccurate quote for. Prices swing a lot depending on the city, the condition of the walls, and the finish you choose. Here's what painting an apartment actually costs across Canada in 2026.</p>
 
@@ -69,7 +69,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
   <li>Whether ceilings and trim are included</li>
   <li>Desired finish (flat, eggshell, satin) and colour changes (dark-to-light colour changes can require an extra coat)</li>
 </ul>
-<p>With this information, a professional painter using <a href="/preventivi/imbianchino/">AI-assisted quoting software</a> can turn around a detailed, itemized PDF estimate on-site — often before they've even left the apartment.</p>
+<p>With this information, a professional painter using <a href="/quotes/painter/">AI-assisted quoting software</a> can turn around a detailed, itemized PDF estimate on-site — often before they've even left the apartment.</p>
 `,
   },
   {
@@ -80,7 +80,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-03-18",
     readingTimeMin: 6,
-    relatedSectors: ["idraulico", "piastrellista", "ristrutturazione"],
+    relatedSectors: ["plumber", "tile-installer", "renovation-contractor"],
     contentHtml: `
 <p>Bathroom renovations are consistently one of the highest-value projects homeowners take on, and one of the widest-ranging in price. In Toronto specifically, labour costs and permit requirements push totals higher than the national average. Here's a realistic breakdown for 2026.</p>
 
@@ -114,7 +114,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Frameless glass enclosures look great but run $1,200–$3,500 installed, compared to $300–$700 for a standard sliding door or curtain setup.</p>
 
 <h2>How to compare quotes properly</h2>
-<p>A trustworthy bathroom renovation quote should break out plumbing, tiling, electrical, fixtures, and labour as separate line items — not one lump sum. It should also state whether permits are included and who is responsible for pulling them. Contractors using <a href="/preventivi/idraulico/">AI quoting tools built for tradespeople</a> can generate this level of detail directly from a site visit, which makes comparing multiple quotes far easier for homeowners.</p>
+<p>A trustworthy bathroom renovation quote should break out plumbing, tiling, electrical, fixtures, and labour as separate line items — not one lump sum. It should also state whether permits are included and who is responsible for pulling them. Contractors using <a href="/quotes/plumber/">AI quoting tools built for tradespeople</a> can generate this level of detail directly from a site visit, which makes comparing multiple quotes far easier for homeowners.</p>
 `,
   },
   {
@@ -125,7 +125,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-04-02",
     readingTimeMin: 5,
-    relatedSectors: ["elettricista", "termoidraulico"],
+    relatedSectors: ["electrician", "hvac-technician"],
     contentHtml: `
 <p>Rewiring a house is one of the more disruptive — and expensive — renovation jobs, but it's often non-negotiable for older homes with outdated or unsafe wiring. Here's what it realistically costs across Canada in 2026.</p>
 
@@ -156,7 +156,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Electrical work in Canada almost always requires a permit and inspection through the provincial electrical safety authority (e.g., ESA in Ontario, Technical Safety BC, or equivalent). Permit fees typically run $150–$600 depending on scope, and a licensed electrician should always include this in the quote — unpermitted electrical work can void home insurance and complicate a future sale.</p>
 
 <h2>Getting an accurate electrical quote</h2>
-<p>A proper rewiring quote should specify the number of circuits, panel size, wiring type being removed, and whether drywall patching is included after the work (most electricians do not include drywall repair — confirm this upfront). Electricians using <a href="/preventivi/elettricista/">quoting software built for the trade</a> can produce a detailed, circuit-by-circuit estimate on the spot rather than a vague lump-sum number.</p>
+<p>A proper rewiring quote should specify the number of circuits, panel size, wiring type being removed, and whether drywall patching is included after the work (most electricians do not include drywall repair — confirm this upfront). Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can produce a detailed, circuit-by-circuit estimate on the spot rather than a vague lump-sum number.</p>
 `,
   },
   {
@@ -167,7 +167,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-04-16",
     readingTimeMin: 5,
-    relatedSectors: ["tetto", "muratore"],
+    relatedSectors: ["roofer", "mason"],
     contentHtml: `
 <p>A roof is one of the biggest single expenses a homeowner faces, and Canada's climate — heavy snow loads, freeze-thaw cycles, and ice damming — makes roofing specs a bit different than in milder climates. Here's what re-roofing costs across Canada in 2026.</p>
 
@@ -195,7 +195,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Roofing labour in Toronto and Vancouver tends to run 15–25% above the national average. Calgary and Edmonton pricing is generally close to the national midpoint, while Atlantic Canada and Quebec can run somewhat lower — though harsher winter climates in Quebec and the Prairies often mean higher-spec materials are standard, which can offset lower labour costs.</p>
 
 <h2>What a proper roofing quote should include</h2>
-<p>A complete roofing estimate should specify shingle brand/line, ice and water shield coverage area, ventilation (ridge vents, soffit vents), flashing replacement, and disposal. Roofers using <a href="/preventivi/tetto/">AI-powered quoting tools</a> can generate this level of line-item detail immediately after a roof measurement, which makes it much easier for homeowners to compare bids apples-to-apples.</p>
+<p>A complete roofing estimate should specify shingle brand/line, ice and water shield coverage area, ventilation (ridge vents, soffit vents), flashing replacement, and disposal. Roofers using <a href="/quotes/roofer/">AI-powered quoting tools</a> can generate this level of line-item detail immediately after a roof measurement, which makes it much easier for homeowners to compare bids apples-to-apples.</p>
 `,
   },
   {
@@ -206,7 +206,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-05-05",
     readingTimeMin: 4,
-    relatedSectors: ["falegname", "carpentiere"],
+    relatedSectors: ["carpenter-cabinetmaker", "welder-fabricator"],
     contentHtml: `
 <p>Decks are one of the most requested outdoor projects across Canada, especially as homeowners look to extend their living space through the warmer months. Costs vary significantly based on material choice and deck complexity.</p>
 
@@ -234,7 +234,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Deck-building labour in Toronto, Vancouver, and Calgary tends to run above the national average, largely due to higher framing labour costs and, in BC and Ontario, higher lumber transport costs. Quebec and Atlantic Canada markets are often somewhat more affordable for comparable wood decks, though composite material pricing is fairly consistent nationwide since it's typically sourced from the same handful of manufacturers.</p>
 
 <h2>Getting a proper deck quote</h2>
-<p>A solid deck quote should specify footing depth and spacing, joist material and spacing, decking material and fastening method, and railing type — not just a total square footage price. Contractors using <a href="/preventivi/falegname/">quoting software for carpenters and builders</a> can put this together with accurate material takeoffs directly from a site visit.</p>
+<p>A solid deck quote should specify footing depth and spacing, joist material and spacing, decking material and fastening method, and railing type — not just a total square footage price. Contractors using <a href="/quotes/carpenter-cabinetmaker/">quoting software for carpenters and builders</a> can put this together with accurate material takeoffs directly from a site visit.</p>
 `,
   },
   {
@@ -245,7 +245,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Pricing",
     publishedAt: "2026-05-20",
     readingTimeMin: 5,
-    relatedSectors: ["ristrutturazione", "edilizia"],
+    relatedSectors: ["renovation-contractor", "general-contractor"],
     contentHtml: `
 <p>Because most Canadian homes have full basements, finishing one is among the most common ways to add livable square footage without an addition. Here's what a realistic basement finishing budget looks like in 2026.</p>
 
@@ -274,7 +274,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Basement finishing costs in Toronto and Vancouver typically run 15–25% above the national average due to higher trade labour rates. Prairie cities like Calgary, Edmonton, and Winnipeg tend to be closer to the national average, while Quebec markets are often somewhat lower — though colder regions across the country may require additional attention to insulation specs (higher R-value requirements) that can offset some of that savings.</p>
 
 <h2>Getting a complete basement quote</h2>
-<p>A thorough basement finishing quote should separate framing, electrical, plumbing (if applicable), drywall, flooring, and any egress window work as individual line items, along with a note on whether waterproofing was assessed. Contractors using <a href="/preventivi/ristrutturazione/">AI-assisted quoting tools</a> can build this structure quickly from a walkthrough, which gives homeowners a much clearer picture of where their money is going.</p>
+<p>A thorough basement finishing quote should separate framing, electrical, plumbing (if applicable), drywall, flooring, and any egress window work as individual line items, along with a note on whether waterproofing was assessed. Contractors using <a href="/quotes/renovation-contractor/">AI-assisted quoting tools</a> can build this structure quickly from a walkthrough, which gives homeowners a much clearer picture of where their money is going.</p>
 `,
   },
   {
@@ -285,7 +285,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Advice",
     publishedAt: "2026-03-10",
     readingTimeMin: 5,
-    relatedSectors: ["freelance", "come-fare-preventivo"],
+    relatedSectors: ["freelance", "how-to-quote"],
     contentHtml: `
 <p>A well-built quote is often the difference between a client who signs on the spot and one who quietly goes with a competitor. For tradespeople, the quote is usually the first real "document" a client sees from you — it needs to communicate professionalism and value, not just a number.</p>
 
@@ -312,7 +312,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Speed matters more than most tradespeople realize. Jobs are frequently awarded to whichever contractor sends a complete, professional quote first — sometimes within hours of the site visit. A quote that takes a week to arrive is competing against nothing; a quote sent the same day is often the only one the client seriously considers.</p>
 
 <h2>Format matters</h2>
-<p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/preventivi/come-fare-preventivo/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
+<p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/quotes/how-to-quote/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
 `,
   },
   {
@@ -323,7 +323,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Advice",
     publishedAt: "2026-04-08",
     readingTimeMin: 4,
-    relatedSectors: ["come-fare-preventivo", "freelance"],
+    relatedSectors: ["how-to-quote", "freelance"],
     contentHtml: `
 <p>Most contractors lose jobs not because their pricing is too high, but because of how the quote itself is put together and delivered. Here are the mistakes that show up most often — and what to do instead.</p>
 
@@ -349,7 +349,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Most jobs aren't booked from the first quote alone. A short follow-up message two or three days later ("just checking if you had any questions about the estimate") closes a meaningful share of jobs that would otherwise go quiet.</p>
 
 <h2>The fix: build a repeatable process</h2>
-<p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/preventivi/preventivi-gratis/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
+<p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/quotes/free-quote/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
 `,
   },
   {
@@ -360,7 +360,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Advice",
     publishedAt: "2026-05-12",
     readingTimeMin: 6,
-    relatedSectors: ["freelance", "edilizia"],
+    relatedSectors: ["freelance", "general-contractor"],
     contentHtml: `
 <p>A lot of tradespeople price jobs by gut feel, or by matching whatever a competitor seems to charge. That approach works fine until a busy season quietly turns into a break-even one. Here's a straightforward way to price a job so the number on the quote actually protects your margin.</p>
 
@@ -391,7 +391,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Verbal add-ons during a job ("while you're here, can you also...") are one of the fastest ways to erode margin. Any change to scope should generate a quick written change order with updated pricing — even a one-line text message confirmation is better than nothing.</p>
 
 <h2>Putting it into a quote</h2>
-<p>None of this needs to be visible to the client line-by-line — most quotes just show labour and materials totals per task. But pricing it this way internally, rather than guessing, is what keeps a full calendar profitable instead of just busy. Quoting software built for tradespeople can apply consistent markup and overhead rules automatically, so every job gets priced the same disciplined way — see how it works for <a href="/preventivi/edilizia/">general contractors and builders</a>.</p>
+<p>None of this needs to be visible to the client line-by-line — most quotes just show labour and materials totals per task. But pricing it this way internally, rather than guessing, is what keeps a full calendar profitable instead of just busy. Quoting software built for tradespeople can apply consistent markup and overhead rules automatically, so every job gets priced the same disciplined way — see how it works for <a href="/quotes/general-contractor/">general contractors and builders</a>.</p>
 `,
   },
   {
@@ -402,7 +402,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Tools",
     publishedAt: "2026-06-02",
     readingTimeMin: 4,
-    relatedSectors: ["preventivi-gratis", "come-fare-preventivo"],
+    relatedSectors: ["free-quote", "how-to-quote"],
     contentHtml: `
 <p>For a lot of trades, the biggest bottleneck isn't finding work — it's the hours spent every week turning site visits into finished quotes. Mobile quoting tools are changing that math, and contractors who adopt them tend to close more jobs simply by being first to respond.</p>
 
@@ -422,7 +422,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>The newer generation of quoting tools use AI to turn a plain-language job description — spoken or typed on-site — directly into a structured, priced quote. Instead of manually building a spreadsheet formula for every job type, a contractor can describe the scope in normal language and get a properly formatted estimate back in under a minute.</p>
 
 <h2>What this replaces</h2>
-<p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/preventivi/preventivi-gratis/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
+<p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/quotes/free-quote/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
 `,
   },
   {
@@ -433,7 +433,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Trades",
     publishedAt: "2026-09-02",
     readingTimeMin: 5,
-    relatedSectors: ["edilizia", "termoidraulico"],
+    relatedSectors: ["general-contractor", "hvac-technician"],
     contentHtml: `
 <p>Winterization work is a category almost unique to climates like Canada's — and it's a genuine seasonal revenue stream for contractors who offer it proactively rather than waiting for a burst pipe call in January. Here's what belongs on a proper winterization checklist, and roughly what each job costs.</p>
 
@@ -457,7 +457,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Freeze-thaw cycles are one of the leading causes of structural and plumbing damage across most of the country. A single frozen and burst pipe can cause $5,000–$25,000+ in water damage — far more than the cost of preventive winterization. This makes winterization one of the easier "add-on" services for contractors to pitch to existing clients each fall, since the value proposition (a few hundred dollars now vs. a potential five-figure repair) is easy to explain.</p>
 
 <h2>Building winterization into your service offering</h2>
-<p>Contractors who run winterization as a standalone seasonal package — rather than a one-off ad hoc request — tend to see strong repeat business, since it's a natural annual touchpoint with past clients. Bundling a few of the checklist items above into a fixed-price fall package (e.g., "Winter-Ready Home Check") gives clients a simple, low-commitment way to book, and gives contractors a predictable quoting template to reuse every season. Tools built for <a href="/preventivi/edilizia/">general contractors</a> make it easy to save a standard winterization package as a reusable quote template.</p>
+<p>Contractors who run winterization as a standalone seasonal package — rather than a one-off ad hoc request — tend to see strong repeat business, since it's a natural annual touchpoint with past clients. Bundling a few of the checklist items above into a fixed-price fall package (e.g., "Winter-Ready Home Check") gives clients a simple, low-commitment way to book, and gives contractors a predictable quoting template to reuse every season. Tools built for <a href="/quotes/general-contractor/">general contractors</a> make it easy to save a standard winterization package as a reusable quote template.</p>
 `,
   },
   {
@@ -468,7 +468,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Trades",
     publishedAt: "2026-09-08",
     readingTimeMin: 5,
-    relatedSectors: ["tetto", "muratore"],
+    relatedSectors: ["roofer", "mason"],
     contentHtml: `
 <p>Roofing in Canada isn't just about shingles and flashing — snow load and ice management are structural and design considerations that don't come up the same way in most other markets. Here's what matters.</p>
 
@@ -494,7 +494,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 </ul>
 
 <h2>What this means for a roofing quote</h2>
-<p>A roofing quote for a Canadian home should account for ice and water shield coverage, confirm whether ventilation upgrades are included, and flag if eavestrough capacity needs to be increased. Roofers using <a href="/preventivi/tetto/">quoting tools built for the trade</a> can include these Canada-specific line items automatically rather than relying on generic templates.</p>
+<p>A roofing quote for a Canadian home should account for ice and water shield coverage, confirm whether ventilation upgrades are included, and flag if eavestrough capacity needs to be increased. Roofers using <a href="/quotes/roofer/">quoting tools built for the trade</a> can include these Canada-specific line items automatically rather than relying on generic templates.</p>
 `,
   },
   {
@@ -505,7 +505,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Trades",
     publishedAt: "2026-06-20",
     readingTimeMin: 6,
-    relatedSectors: ["idraulico", "ristrutturazione"],
+    relatedSectors: ["plumber", "renovation-contractor"],
     contentHtml: `
 <p>Because the vast majority of Canadian homes have full basements, waterproofing is one of the most consistently requested services in the country — and one of the most misunderstood by homeowners comparing quotes.</p>
 
@@ -536,7 +536,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>This is worth repeating from a cost perspective: finishing a basement (drywall, flooring, framing) before addressing water issues is one of the most expensive mistakes homeowners make, because all of that finishing work often has to be torn out again if moisture problems surface later. A waterproofing assessment before finishing typically costs a few hundred dollars — a small fraction of the tens of thousands a redo can cost.</p>
 
 <h2>Getting a proper waterproofing quote</h2>
-<p>A trustworthy waterproofing quote should specify whether the approach is interior, exterior, or a hybrid, the linear footage being treated, sump pump specs, and warranty terms — waterproofing warranties vary widely between contractors and are worth comparing directly. Contractors using <a href="/preventivi/idraulico/">quoting software for tradespeople</a> can document this scope clearly so homeowners know exactly what they're paying for.</p>
+<p>A trustworthy waterproofing quote should specify whether the approach is interior, exterior, or a hybrid, the linear footage being treated, sump pump specs, and warranty terms — waterproofing warranties vary widely between contractors and are worth comparing directly. Contractors using <a href="/quotes/plumber/">quoting software for tradespeople</a> can document this scope clearly so homeowners know exactly what they're paying for.</p>
 `,
   },
   {
@@ -547,7 +547,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Business",
     publishedAt: "2026-07-14",
     readingTimeMin: 6,
-    relatedSectors: ["termoidraulico", "edilizia", "ristrutturazione"],
+    relatedSectors: ["hvac-technician", "general-contractor", "renovation-contractor"],
     contentHtml: `
 <p><strong>Editorial note:</strong> Rebate programs, amounts, and eligibility rules change frequently — sometimes year to year, and sometimes mid-year as program funding is renewed or exhausted. Always verify current amounts and eligibility directly with the relevant program before quoting a client, and treat the figures below as a general orientation rather than guaranteed numbers.</p>
 
@@ -569,7 +569,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Rather than quoting a specific rebate dollar amount directly on an invoice (which can create liability if the program has changed), it's safer to reference the program by name and direct the client to confirm current details and apply directly. A line like "this upgrade may qualify for [program name] — client to confirm current eligibility and amount" keeps the quote accurate without the contractor being on the hook for a rebate figure that changes.</p>
 
 <h2>Building this into your quoting process</h2>
-<p>For contractors who frequently quote insulation, heat pump, or high-efficiency HVAC work, it's worth keeping a running note of which programs are currently active in your service area and reviewing it seasonally, since these programs are one of the more effective ways to help a client justify a higher-efficiency (and higher-margin) upgrade. Tools built for <a href="/preventivi/termoidraulico/">HVAC and heating contractors</a> make it easy to add a standard rebate-reference note to any quote involving eligible upgrades.</p>
+<p>For contractors who frequently quote insulation, heat pump, or high-efficiency HVAC work, it's worth keeping a running note of which programs are currently active in your service area and reviewing it seasonally, since these programs are one of the more effective ways to help a client justify a higher-efficiency (and higher-margin) upgrade. Tools built for <a href="/quotes/hvac-technician/">HVAC and heating contractors</a> make it easy to add a standard rebate-reference note to any quote involving eligible upgrades.</p>
 `,
   },
   {
@@ -580,7 +580,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     category: "Business",
     publishedAt: "2026-08-05",
     readingTimeMin: 5,
-    relatedSectors: ["freelance", "edilizia"],
+    relatedSectors: ["freelance", "general-contractor"],
     contentHtml: `
 <p>For local trades — electricians, plumbers, painters, landscapers — a well-optimized Google Business Profile is often the single highest-return marketing asset available, and it's free. Here's how to set one up properly.</p>
 
@@ -603,7 +603,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Google Business Profile allows periodic posts (offers, updates, project highlights). Profiles that post at least a few times a month tend to see better visibility than dormant ones. This doesn't need to be elaborate — a photo from a recent job with a short caption is enough.</p>
 
 <h2>Why this connects to your quoting process</h2>
-<p>A strong Google Business Profile generates more inbound calls and requests — which means more quotes going out. If your quoting process is still slow or manual, an increase in leads from local search can quickly turn into a bottleneck rather than a win. Pairing a strong local presence with fast, professional quoting tools ensures the extra leads actually convert into booked jobs — see how this works for <a href="/preventivi/edilizia/">contractors and tradespeople</a>.</p>
+<p>A strong Google Business Profile generates more inbound calls and requests — which means more quotes going out. If your quoting process is still slow or manual, an increase in leads from local search can quickly turn into a bottleneck rather than a win. Pairing a strong local presence with fast, professional quoting tools ensures the extra leads actually convert into booked jobs — see how this works for <a href="/quotes/general-contractor/">contractors and tradespeople</a>.</p>
 `,
   },
   {
@@ -631,7 +631,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <p>Responding to reviews, positive or negative, signals to future clients that you're actively engaged with your business reputation. For a negative review, a calm, professional response addressing the specific concern (without getting defensive) often does more for your credibility with future clients than the negative review itself does damage.</p>
 
 <h2>Why review volume compounds</h2>
-<p>Beyond trust-building, review count and recency are factors in local search visibility — profiles with a steady stream of recent reviews tend to be favoured over ones with a handful of old reviews, even if the older reviews are excellent. Treating review collection as an ongoing part of your workflow (rather than a one-time push) pays off steadily over time, especially when paired with fast, professional quoting that gets clients to "yes" in the first place — see tools built for <a href="/preventivi/freelance/">independent tradespeople and freelancers</a>.</p>
+<p>Beyond trust-building, review count and recency are factors in local search visibility — profiles with a steady stream of recent reviews tend to be favoured over ones with a handful of old reviews, even if the older reviews are excellent. Treating review collection as an ongoing part of your workflow (rather than a one-time push) pays off steadily over time, especially when paired with fast, professional quoting that gets clients to "yes" in the first place — see tools built for <a href="/quotes/freelance/">independent tradespeople and freelancers</a>.</p>
 `,
   },
 ];
@@ -646,31 +646,31 @@ export interface GuideCard {
 
 export const GUIDE_CARDS: GuideCard[] = [
   {
-    slug: "come-fare-preventivo",
+    slug: "how-to-quote",
     title: "How to Write a Professional Quote",
     description: "A step-by-step guide: structure, line items, tax, and how to send a quote that clients actually sign. Everything you need to build a quote that converts.",
-    href: "/preventivi/come-fare-preventivo",
+    href: "/quotes/how-to-quote",
     icon: "📋",
   },
   {
-    slug: "preventivi-gratis",
+    slug: "free-quote",
     title: "Free Quoting: Get Started Risk-Free",
     description: "Free and low-cost ways to start generating professional quotes. See how to get going without investing anything upfront.",
-    href: "/preventivi/preventivi-gratis",
+    href: "/quotes/free-quote",
     icon: "🎁",
   },
   {
-    slug: "modello-excel",
+    slug: "excel-template",
     title: "A Better Alternative to Excel Templates",
     description: "Why the classic Excel quote template no longer cuts it — a direct comparison with modern AI-powered software for tradespeople.",
-    href: "/preventivi/modello-excel",
+    href: "/quotes/excel-template",
     icon: "📊",
   },
   {
-    slug: "modello-word",
+    slug: "word-template",
     title: "A Better Alternative to Word Templates",
     description: "From a Word document to an automatic, professional PDF — how to make the switch without the hassle.",
-    href: "/preventivi/modello-word",
+    href: "/quotes/word-template",
     icon: "📄",
   },
 ];
@@ -733,26 +733,26 @@ export function getArticlesByCategory(categoryName: string): BlogArticle[] {
 }
 
 export const SECTOR_ARTICLES: Record<string, string[]> = {
-  imbianchino: ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  pittore: ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-get-more-reviews-as-a-contractor"],
-  elettricista: ["cost-to-rewire-a-house-canada", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  idraulico: ["bathroom-renovation-cost-toronto-2026", "basement-waterproofing-guide-canadian-homes", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-get-more-reviews-as-a-contractor"],
-  termoidraulico: ["cost-to-rewire-a-house-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  muratore: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "basement-finishing-cost-canada", "how-to-price-a-job-labour-materials-markup"],
-  edilizia: ["basement-finishing-cost-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "google-business-profile-guide-for-tradespeople", "how-to-price-a-job-labour-materials-markup"],
-  ristrutturazione: ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "basement-waterproofing-guide-canadian-homes", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  falegname: ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs"],
-  carpentiere: ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make"],
-  piastrellista: ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  giardiniere: ["deck-installation-cost-canada-2026", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
+  painter: ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
+  "decorative-painter": ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-get-more-reviews-as-a-contractor"],
+  electrician: ["cost-to-rewire-a-house-canada", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
+  plumber: ["bathroom-renovation-cost-toronto-2026", "basement-waterproofing-guide-canadian-homes", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-get-more-reviews-as-a-contractor"],
+  "hvac-technician": ["cost-to-rewire-a-house-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
+  mason: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "basement-finishing-cost-canada", "how-to-price-a-job-labour-materials-markup"],
+  "general-contractor": ["basement-finishing-cost-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "google-business-profile-guide-for-tradespeople", "how-to-price-a-job-labour-materials-markup"],
+  "renovation-contractor": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "basement-waterproofing-guide-canadian-homes", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
+  "carpenter-cabinetmaker": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs"],
+  "welder-fabricator": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make"],
+  "tile-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
+  landscaper: ["deck-installation-cost-canada-2026", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
   freelance: ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-price-a-job-labour-materials-markup", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
-  geometra: ["basement-finishing-cost-canada", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  serramentista: ["cost-to-reroof-a-home-canada", "how-to-price-a-job-labour-materials-markup", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  tetto: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "winterizing-your-home-contractor-checklist"],
-  condizionatori: ["canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  pavimentista: ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  "modello-excel": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "modello-word": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "come-fare-preventivo": ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors"],
-  "preventivi-gratis": ["mobile-quoting-on-the-go-for-contractors", "how-to-write-a-professional-quote-that-wins-jobs"],
+  "building-consultant": ["basement-finishing-cost-canada", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
+  "window-door-installer": ["cost-to-reroof-a-home-canada", "how-to-price-a-job-labour-materials-markup", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
+  roofer: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "winterizing-your-home-contractor-checklist"],
+  "air-conditioning-installer": ["canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
+  "flooring-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
+  "excel-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
+  "word-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
+  "how-to-quote": ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors"],
+  "free-quote": ["mobile-quoting-on-the-go-for-contractors", "how-to-write-a-professional-quote-that-wins-jobs"],
 };

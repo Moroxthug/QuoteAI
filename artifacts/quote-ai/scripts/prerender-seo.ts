@@ -12,6 +12,8 @@ import {
   getCityDesc,
   RELATED_SECTORS,
   CITY_CONTEXT,
+  SECTOR_KEY_BY_FR_SLUG,
+  FRENCH_PRIMARY_CITY_SLUGS,
 } from "../src/data/seo-data.js";
 import type { SectorData, CityData } from "../src/data/seo-data.js";
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "../src/data/seo-intelligence.js";
@@ -26,6 +28,9 @@ import {
   getCityHowItWorksSteps,
   getNearbyAnchors,
   getSameCityOtherSectors,
+  getCityContextText,
+  getSectorFrContent,
+  DEMAND_TEXT_FR,
   buildCityJsonLd as buildCityJsonLdFromEngine,
 } from "../src/data/seo-render-engine.js";
 import {
@@ -92,17 +97,28 @@ function buildHeadBlock(opts: {
   canonical: string;
   ogImagePath: string;
   jsonLd: object[];
+  /** This page's own language. Defaults to English. */
+  lang?: "en" | "fr";
+  /** URL of the other language's version of this same page, if one exists. */
+  altUrl?: string;
 }): string {
-  const { title, description, canonical, ogImagePath, jsonLd } = opts;
+  const { title, description, canonical, ogImagePath, jsonLd, lang = "en", altUrl } = opts;
   const ogImageUrl = ogImagePath.startsWith("http")
     ? ogImagePath
     : `${BASE_URL}${ogImagePath}`;
+  const enUrl = lang === "en" ? canonical : altUrl;
+  const frUrl = lang === "fr" ? canonical : altUrl;
+  const hreflangLines = [
+    enUrl ? `  <link rel="alternate" hreflang="en-CA" href="${esc(enUrl)}" />` : null,
+    frUrl ? `  <link rel="alternate" hreflang="fr-CA" href="${esc(frUrl)}" />` : null,
+    // English is the site's default/fallback locale.
+    `  <link rel="alternate" hreflang="x-default" href="${esc(enUrl ?? canonical)}" />`,
+  ].filter((l): l is string => l !== null);
   const lines = [
     `  <title>${esc(title)}</title>`,
     `  <meta name="description" content="${esc(description)}" />`,
     `  <link rel="canonical" href="${esc(canonical)}" />`,
-    `  <link rel="alternate" hreflang="en-CA" href="${esc(canonical)}" />`,
-    `  <link rel="alternate" hreflang="x-default" href="${esc(canonical)}" />`,
+    ...hreflangLines,
     `  <meta property="og:title" content="${esc(title)}" />`,
     `  <meta property="og:description" content="${esc(description)}" />`,
     `  <meta property="og:url" content="${esc(canonical)}" />`,
@@ -110,7 +126,7 @@ function buildHeadBlock(opts: {
     `  <meta property="og:image:width" content="1200" />`,
     `  <meta property="og:image:height" content="630" />`,
     `  <meta property="og:type" content="website" />`,
-    `  <meta property="og:locale" content="en_CA" />`,
+    `  <meta property="og:locale" content="${lang === "fr" ? "fr_CA" : "en_CA"}" />`,
     `  <meta property="og:site_name" content="quoteai" />`,
     `  <meta name="twitter:card" content="summary_large_image" />`,
     `  <meta name="twitter:title" content="${esc(title)}" />`,
@@ -132,8 +148,9 @@ function pruneModulepreload(html: string): string {
   );
 }
 
-function injectHead(template: string, headBlock: string): string {
+function injectHead(template: string, headBlock: string, lang: "en" | "fr" = "en"): string {
   let html = template;
+  html = html.replace(/<html lang="[^"]*"/, `<html lang="${lang === "fr" ? "fr-CA" : "en-CA"}"`);
   html = html.replace(/<title>[^<]*<\/title>/, "");
   html = html.replace(/<meta\s+name="description"[^>]*\/?>/i, "");
   html = html.replace(/<link\b[^>]*\brel=["']canonical["'][^>]*\/?>/gi, "");
@@ -237,6 +254,71 @@ ${STATIC_HEADER}
 <main class="flex-1 flex flex-col">${contentHtml}</main>
 ${STATIC_FOOTER}
 ${STATIC_WHATSAPP}
+</div>`;
+}
+
+// ─── French shell (header/footer/WhatsApp button) ──────────────────────────
+
+const STATIC_HEADER_FR = `<header class="sticky top-0 z-50 w-full transition-all duration-300 bg-transparent border-b border-transparent">
+  <div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+    <a href="/fr" class="flex items-center">${STATIC_LOGO}</a>
+    <nav class="flex items-center gap-3">
+      <a href="/sign-in/" class="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full">Se connecter</a>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-9 items-center justify-center px-5 text-sm font-semibold">S'inscrire</a>
+    </nav>
+  </div>
+</header>`;
+
+const FR_TRADE_FOOTER_LINKS = Object.entries(SECTORS)
+  .filter(([slug]) => CITY_SECTORS.includes(slug))
+  .map(([, s]) => `<li><a href="/fr/soumissions/${esc(s.frSlug)}/" class="hover:text-foreground transition-colors">${esc(s.fr.label)}</a></li>`)
+  .join("\n          ");
+
+const STATIC_FOOTER_FR = `<footer class="border-t py-12 md:py-16 bg-white">
+  <div class="container mx-auto px-4 md:px-6">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+      <div class="md:col-span-2">
+        <a href="/fr" class="flex items-center mb-4">${STATIC_LOGO}</a>
+        <p class="text-sm text-muted-foreground max-w-xs leading-relaxed">Logiciel de soumission par IA pour les artisans et petites entreprises canadiennes. Rapide, professionnel, prêt en 30 secondes.</p>
+      </div>
+      <div class="md:col-span-2">
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Métiers</h4>
+        <ul class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground">
+          ${FR_TRADE_FOOTER_LINKS}
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4 text-sm uppercase tracking-wider text-foreground">Guides</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li><a href="/blog/" class="hover:text-foreground transition-colors font-medium text-foreground/80">Blogue et guides</a></li>
+          <li><a href="/fr/soumissions/${esc(SECTORS["excel-template"].frSlug)}/" class="hover:text-foreground transition-colors">Modèle Excel</a></li>
+          <li><a href="/fr/soumissions/${esc(SECTORS["word-template"].frSlug)}/" class="hover:text-foreground transition-colors">Modèle Word</a></li>
+          <li><a href="/fr/soumissions/${esc(SECTORS["how-to-quote"].frSlug)}/" class="hover:text-foreground transition-colors">Comment faire une soumission</a></li>
+          <li><a href="/fr/soumissions/${esc(SECTORS["free-quote"].frSlug)}/" class="hover:text-foreground transition-colors">Soumission gratuite</a></li>
+        </ul>
+        <h4 class="font-semibold mt-8 mb-4 text-sm uppercase tracking-wider text-foreground">Entreprise</h4>
+        <ul class="space-y-2 text-sm text-muted-foreground">
+          <li><a href="/chi-siamo/" class="hover:text-foreground transition-colors">À propos</a></li>
+          <li><a href="/contatti/" class="hover:text-foreground transition-colors">Contact</a></li>
+          <li><button class="hover:text-foreground transition-colors text-left">Soutien</button></li>
+          <li><a href="/privacy-policy/" class="hover:text-foreground transition-colors">Politique de confidentialité</a></li>
+          <li><a href="/terms/" class="hover:text-foreground transition-colors">Conditions d'utilisation</a></li>
+          <li><a href="/mappa-sito/" class="hover:text-foreground transition-colors">Plan du site</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">© ${CURRENT_YEAR} quoteai. Tous droits réservés.</div>
+  </div>
+</footer>`;
+
+const STATIC_WHATSAPP_FR = `<a href="/whatsapp/" aria-label="Clavarder avec nous sur WhatsApp" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full shadow-lg shadow-green-200/60 transition-all duration-200 hover:scale-105 active:scale-95" style="background:rgb(37,211,102)"><span class="flex h-14 w-14 items-center justify-center rounded-full" style="background:rgb(37,211,102)"><img src="/wa-icon.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="pr-5 text-white text-sm font-semibold whitespace-nowrap hidden sm:inline-block">Besoin d'aide?</span></a>`;
+
+function wrapInPublicLayoutFr(contentHtml: string): string {
+  return `<div class="min-h-[100dvh] flex flex-col bg-background text-foreground">
+${STATIC_HEADER_FR}
+<main class="flex-1 flex flex-col">${contentHtml}</main>
+${STATIC_FOOTER_FR}
+${STATIC_WHATSAPP_FR}
 </div>`;
 }
 
@@ -430,8 +512,8 @@ function buildSectorJsonLd(s: SectorData): object[] {
   return schemas;
 }
 
-function buildCityJsonLd(s: SectorData, city: CityData): object[] {
-  return buildCityJsonLdFromEngine(s, city);
+function buildCityJsonLd(s: SectorData, city: CityData, lang: "en-CA" | "fr-CA" = "en-CA"): object[] {
+  return buildCityJsonLdFromEngine(s, city, lang);
 }
 
 // ─── Phase 3: Sector body — 2 layout variants ──────────────────────────────
@@ -639,19 +721,60 @@ function buildSectorDeepDive(s: SectorData): string {
 
 // ─── Phase 9: Osservatorio Prezzi e Domanda ────────────────────────────────
 
-function buildOsservatorio(s: SectorData, city: CityData, intel: CityIntelligence): string {
+function buildOsservatorio(s: SectorData, city: CityData, intel: CityIntelligence, lang: "en-CA" | "fr-CA" = "en-CA"): string {
   const pct = Math.round(Math.abs(intel.priceIndex - 1.0) * 100);
   const priceLabel = intel.priceIndex > 1.0 ? `+${pct}%` : intel.priceIndex < 1.0 ? `\u2212${pct}%` : `\u00b10%`;
   const priceColor =
     intel.priceIndex > 1.05 ? "text-amber-600" : intel.priceIndex < 0.95 ? "text-green-600" : "text-gray-800";
-  const demandLabels: Record<CityIntelligence["demandLevel"], string> = {
-    LOW: "Moderate", MEDIUM: "Average", HIGH: "High", CRITICAL: "Very high",
-  };
+  const demandLabels: Record<CityIntelligence["demandLevel"], string> =
+    lang === "fr-CA"
+      ? { LOW: "Mod\u00e9r\u00e9e", MEDIUM: "Moyenne", HIGH: "\u00c9lev\u00e9e", CRITICAL: "Tr\u00e8s \u00e9lev\u00e9e" }
+      : { LOW: "Moderate", MEDIUM: "Average", HIGH: "High", CRITICAL: "Very high" };
   const demandColors: Record<CityIntelligence["demandLevel"], string> = {
     LOW: "text-green-600", MEDIUM: "text-blue-600", HIGH: "text-amber-600", CRITICAL: "text-red-600",
   };
   const [sv1, sv2, sv3] = intel.topServices;
   void s;
+  if (lang === "fr-CA") {
+    return `<section class="py-10 bg-white border-b border-gray-100" aria-label="Observatoire des prix et de la demande ${esc(city.name)}">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+    <div class="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-cyan-50/20 p-6 md:p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <h2 class="text-base font-bold text-gray-900">Observatoire des prix et de la demande : ${esc(city.name)}</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Indice des prix</div>
+          <div class="text-2xl font-bold ${priceColor}">${priceLabel}</div>
+          <div class="text-xs text-gray-400 mt-1">vs. moyenne nationale</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Demande</div>
+          <div class="text-base font-bold ${demandColors[intel.demandLevel]}">${demandLabels[intel.demandLevel]}</div>
+          <div class="text-xs text-gray-400 mt-1">${esc(city.region)}</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">D\u00e9lai</div>
+          <div class="text-base font-bold text-gray-800">${esc(intel.avgLeadTime)}</div>
+          <div class="text-xs text-gray-400 mt-1">r\u00e9ponse estim\u00e9e</div>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-gray-100">
+          <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Services les plus demand\u00e9s</div>
+          <ul class="space-y-1.5">
+            <li class="flex items-start gap-1 text-xs text-gray-600"><span class="text-violet-400 shrink-0 font-bold" aria-hidden="true">&rsaquo;</span>${esc(sv1)}</li>
+            <li class="flex items-start gap-1 text-xs text-gray-600"><span class="text-violet-400 shrink-0 font-bold" aria-hidden="true">&rsaquo;</span>${esc(sv2)}</li>
+            <li class="flex items-start gap-1 text-xs text-gray-600"><span class="text-violet-400 shrink-0 font-bold" aria-hidden="true">&rsaquo;</span>${esc(sv3)}</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-sm text-gray-500 leading-relaxed border-t border-violet-100 pt-4">${esc(intel.localInsight)}</p>
+    </div>
+  </div>
+</section>`;
+  }
   return `<section class="py-10 bg-white border-b border-gray-100" aria-label="Price and demand observatory ${esc(city.name)}">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
     <div class="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-cyan-50/20 p-6 md:p-8">
@@ -879,29 +1002,19 @@ function buildQuantoCostaBlock(
   s: SectorData,
   city: CityData,
   intel: CityIntelligence | undefined,
+  lang: "en-CA" | "fr-CA" = "en-CA",
 ): string {
   const cityName = city.name;
   const regionName = city.region;
-  const sectorLabel = s.label.toLowerCase();
   const pricePct = intel ? Math.round((intel.priceIndex - 1.0) * 100) : 0;
-  const priceNote = !intel
-    ? `in line with the national average`
-    : pricePct > 5
-      ? `on average <strong>${pricePct}% higher</strong> than the national average`
-      : pricePct < -5
-        ? `on average <strong>${Math.abs(pricePct)}% lower</strong> than the national average`
-        : `in line with the national average (a modest variation within ±5%)`;
 
-  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "steady";
-
-  const examples = s.useCases.slice(0, 4).map((uc, i) => {
+  const examples = (lang === "fr-CA" ? s.fr.useCases : s.useCases).slice(0, 4).map((uc, i) => {
     const base = 250 + i * 320 + (strHash(city.slug + s.slug + String(i)) % 180);
     const factor = intel ? intel.priceIndex : 1.0;
     const low = Math.round((base * factor) / 10) * 10;
     const high = Math.round((base * factor * 1.7) / 10) * 10;
-    return { label: uc, range: `$${low} to $${high}` };
+    return { label: uc, range: lang === "fr-CA" ? `${low} $ à ${high} $` : `$${low} to $${high}` };
   });
-
   const examplesList = examples
     .map(
       (e) =>
@@ -911,6 +1024,47 @@ function buildQuantoCostaBlock(
         </li>`,
     )
     .join("\n        ");
+
+  if (lang === "fr-CA") {
+    const sectorLabel = s.fr.label.toLowerCase();
+    const priceNote = !intel
+      ? `conforme à la moyenne nationale`
+      : pricePct > 5
+        ? `en moyenne <strong>${pricePct}% plus élevé</strong> que la moyenne nationale`
+        : pricePct < -5
+          ? `en moyenne <strong>${Math.abs(pricePct)}% plus bas</strong> que la moyenne nationale`
+          : `conforme à la moyenne nationale (variation limitée à ±5%)`;
+    const demandText = intel ? DEMAND_TEXT_FR[intel.demandLevel] : "stable";
+    const paragraph1 = `À ${esc(cityName)}, le coût moyen pour des travaux de ${esc(sectorLabel)} est ${priceNote}. La demande au ${esc(regionName)} est actuellement ${esc(demandText.toLowerCase())}, ce qui influence la rapidité de réponse des entrepreneurs et la marge de négociation sur le prix final. Les fourchettes ci-dessous sont des prix de marché moyens tirés de soumissions réelles générées avec quoteai pour des travaux à ${esc(cityName)} et les environs.`;
+    const paragraph2 = `Chaque soumission dépend de facteurs propres au travail : l'ampleur exacte des travaux, la qualité des matériaux demandés, l'accessibilité du site, l'urgence et les conditions particulières convenues avec le client. C'est pourquoi nous recommandons toujours une visite ou une description détaillée : avec quoteai, vous pouvez le faire en 30 secondes en décrivant le travail en langage naturel, et obtenir un document professionnel et modifiable, prêt à envoyer au client par WhatsApp ou courriel.`;
+    return `<section class="py-20 bg-white border-t border-gray-100" aria-label="Combien coûte ${esc(sectorLabel)} à ${esc(cityName)}">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+    <div class="text-center mb-10">
+      <h2 class="text-2xl font-bold text-gray-900">Combien coûte un ${esc(sectorLabel)} à ${esc(cityName)}</h2>
+      <p class="text-sm text-gray-400 mt-2">Fourchettes de prix typiques pour les travaux les plus demandés</p>
+    </div>
+    <div class="space-y-4 text-gray-600 leading-relaxed text-base mb-8">
+      <p>${paragraph1}</p>
+      <p>${paragraph2}</p>
+    </div>
+    <ul class="space-y-2.5">
+      ${examplesList}
+    </ul>
+    <p class="text-xs text-gray-400 mt-6 text-center">Prix de marché moyens à ${esc(cityName)}, mis à jour pour ${CURRENT_YEAR}. Taxes non incluses. Les prix réels varient selon les particularités du travail.</p>
+  </div>
+</section>`;
+  }
+
+  const sectorLabel = s.label.toLowerCase();
+  const priceNote = !intel
+    ? `in line with the national average`
+    : pricePct > 5
+      ? `on average <strong>${pricePct}% higher</strong> than the national average`
+      : pricePct < -5
+        ? `on average <strong>${Math.abs(pricePct)}% lower</strong> than the national average`
+        : `in line with the national average (a modest variation within ±5%)`;
+
+  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "steady";
 
   const paragraph1 = `In ${esc(cityName)}, the average cost for ${esc(sectorLabel)} work is ${priceNote}. Demand in ${esc(regionName)} is currently ${esc(demandText)}, which affects how quickly contractors respond and how much room there is to negotiate the final price. The ranges below are average market prices drawn from real quotes generated with quoteai for jobs in ${esc(cityName)} and the surrounding area.`;
   const paragraph2 = `Every quote depends on job-specific factors: the exact scope of work, the quality of materials requested, site accessibility, how urgent the job is, and any custom terms agreed with the client. That's why we always recommend a proper walkthrough or a detailed description: with quoteai you can do that in 30 seconds by describing the job in plain language, and get a professional, editable document ready to send to the client by WhatsApp or email.`;
@@ -1173,6 +1327,565 @@ function buildHomepageBodyHtml(): string {
 </div>`;
 }
 
+// ─── French homepage body ───────────────────────────────────────────────────
+
+function buildHomepageBodyHtmlFr(): string {
+  const sectorLinks = Object.values(SECTORS)
+    .map(
+      (s) =>
+        `<a href="/fr/soumissions/${esc(s.frSlug)}/" class="group flex flex-col items-center gap-3 rounded-2xl border border-gray-100 bg-white p-5 text-center hover:border-violet-200 hover:shadow-sm transition-all">
+          <div class="h-10 w-10 rounded-xl flex items-center justify-center font-bold text-sm text-violet-600 bg-violet-50" aria-hidden="true">${esc(s.fr.label.charAt(0))}</div>
+          <span class="text-sm font-medium text-gray-700 group-hover:text-violet-700 transition-colors">${esc(s.fr.label)}</span>
+        </a>`
+    )
+    .join("\n      ");
+
+  const cityLinks = ACTIVE_CITIES
+    .map(
+      (city) =>
+        `<a href="/fr/soumissions/${esc(SECTORS["renovation-contractor"].frSlug)}/${esc(city.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(city.name)}</a>`
+    )
+    .join("\n      ");
+
+  return `<div class="flex flex-col min-h-screen bg-white">
+  <section class="relative overflow-hidden bg-white pt-28 pb-36">
+    <div class="mesh-blob mesh-blob-1" aria-hidden="true"></div>
+    <div class="mesh-blob mesh-blob-2" aria-hidden="true"></div>
+    <div class="mesh-blob mesh-blob-3" aria-hidden="true"></div>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <h1 class="mx-auto max-w-4xl text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl lg:text-7xl leading-[1.1]">
+        Créez des soumissions professionnelles en <span class="gradient-text">30 secondes</span> avec l'IA
+      </h1>
+      <p class="mx-auto mt-8 max-w-2xl text-xl text-gray-500 leading-relaxed">
+        Oubliez Excel et les estimations écrites à la main. Décrivez le travail dans vos propres mots et quoteai génère un document soigné, prêt à envoyer au client.
+      </p>
+      <div class="mt-12 flex flex-col sm:flex-row justify-center gap-4">
+        <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Commencer gratuitement
+          <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="#comment-ca-marche" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Voir comment ça marche
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-gray-400">
+        ✓ Gratuit pour commencer &nbsp;&middot;&nbsp; ✓ Sans carte de crédit &nbsp;&middot;&nbsp; ✓ Soumission en 30 secondes
+      </p>
+    </div>
+  </section>
+
+  <section id="comment-ca-marche" class="fade-in-section py-28 bg-gray-50/60">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Fini Excel. Fini les feuilles écrites à la main.</h2>
+        <p class="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">quoteai transforme une description en langage naturel en une soumission professionnelle avec tous les calculs déjà faits.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div class="card-soft bg-white rounded-2xl p-8">
+          <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">Écrivez en langage naturel</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Aucun champ à remplir. Décrivez le travail comme vous le diriez à voix haute — l'IA comprend et structure tout automatiquement.</p>
+        </div>
+        <div class="card-soft bg-white rounded-2xl p-8">
+          <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">Un PDF professionnel, instantanément</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Postes de coûts, quantités, prix unitaires, taxes et total — tout est calculé et formaté. Prêt à envoyer par WhatsApp ou courriel.</p>
+        </div>
+        <div class="card-soft bg-white rounded-2xl p-8">
+          <div class="h-12 w-12 rounded-2xl flex items-center justify-center text-white mb-6" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <h3 class="text-lg font-bold text-gray-900 mb-3">Modifiez tout ce que vous voulez</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">Chaque poste est modifiable directement dans l'aperçu. Changez les prix, ajoutez des travaux, personnalisez les conditions de paiement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in-section py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Des soumissions pour tous les métiers</h2>
+        <p class="mt-3 text-base text-gray-500">Peintres, électriciens, plombiers, charpentiers, maçons et bien d'autres — quoteai fonctionne pour tous.</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
+        ${sectorLinks}
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in-section py-20 bg-gray-50/60">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold text-gray-900 sm:text-3xl">Soumissions dans les grandes villes canadiennes</h2>
+        <p class="mt-3 text-base text-gray-500">Utilisé par des entrepreneurs et artisans d'un océan à l'autre.</p>
+      </div>
+      <div class="flex flex-wrap gap-3 justify-center max-w-3xl mx-auto">
+        ${cityLinks}
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in-section py-14 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-8">
+        <span class="inline-block bg-amber-50 text-amber-600 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">Avis vérifiés</span>
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">Ce que les gens <span class="gradient-text">en disent</span></h2>
+        <div class="flex items-center justify-center gap-2 mt-3" aria-label="Note moyenne ${AGGREGATE_RATING.ratingValue} sur 5">
+          <div class="flex gap-0.5" aria-hidden="true">
+            ${Array.from({ length: 5 }).map(() => `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 fill-amber-400" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join("")}
+          </div>
+          <span class="text-sm font-bold text-gray-800">${AGGREGATE_RATING.ratingValue}</span>
+          <span class="text-sm text-gray-400">/5 &middot; ${AGGREGATE_RATING.reviewCount} avis</span>
+        </div>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
+        ${TESTIMONIALS.map((t) => {
+          const initials = t.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase();
+          const stars = Array.from({ length: 5 }).map((_, i) =>
+            `<svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 ${i < t.rating ? "text-amber-400 fill-amber-400" : "text-gray-100 fill-gray-100"}" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+          ).join("");
+          return `<div class="bg-white rounded-xl border border-gray-100 p-5 card-soft flex flex-col gap-3">
+            <div class="flex gap-0.5" aria-label="${t.rating} étoiles sur 5">${stars}</div>
+            <p class="text-sm text-gray-700 leading-relaxed flex-1">&ldquo;${esc(testimonialText(t.key))}&rdquo;</p>
+            <div class="flex items-center gap-3 pt-2 border-t border-gray-50">
+              <div class="h-9 w-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">${initials}</div>
+              <div>
+                <div class="text-sm font-semibold text-gray-900">${esc(t.name)}</div>
+                <div class="text-xs text-gray-400">${esc(t.website)}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join("\n        ")}
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in-section py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div class="rounded-2xl p-10 md:p-14 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(6,182,212,0.06))">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Ce qu'est quoteai, et pour qui</h2>
+        <p class="text-sm sm:text-[15px] text-gray-600 leading-relaxed">
+          <strong class="text-gray-900">quoteai</strong> est un logiciel propulsé par l'IA qui transforme une description en langage naturel en une soumission complète et professionnelle. Conçu pour les entrepreneurs, artisans et petites entreprises partout au Canada qui envoient des soumissions à leurs clients chaque semaine — peintres, électriciens, plombiers, maçons, soudeurs, charpentiers, entrepreneurs en rénovation, et tous les métiers de la construction. L'objectif est simple : réduire le temps nécessaire pour préparer une soumission de 30-60 minutes à 30 secondes, sans sacrifier la qualité du document final. Les taxes canadiennes (TPS/TVH, TVP/TVQ selon la province) sont calculées automatiquement, et vos informations d'entreprise sont enregistrées une fois pour être appliquées à chaque soumission.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fade-in-section py-28 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
+      <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
+        Prêt à créer votre première soumission <span class="gradient-text">en 30 secondes</span>?
+      </h2>
+      <p class="text-lg text-gray-500 mb-10">
+        Joignez-vous aux entrepreneurs partout au Canada qui utilisent quoteai chaque jour. Sans carte de crédit. Sans engagement.
+      </p>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
+        Commencer gratuitement
+        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+</div>`;
+}
+
+// ─── French sector page body ────────────────────────────────────────────────
+
+function buildFrBreadcrumb(items: { name: string; href: string | null }[]): string {
+  return buildBreadcrumb(items).replace('aria-label="Breadcrumb"', 'aria-label="Fil d\'Ariane"');
+}
+
+function buildSectorBodyHtmlFr(s: SectorData): string {
+  const c = getSectorFrContent(s);
+  const breadcrumb = buildFrBreadcrumb([
+    { name: "Accueil", href: "/fr" },
+    { name: c.h1Highlight, href: null },
+  ]);
+
+  const sHero = `<section class="relative overflow-hidden bg-white pt-24 pb-20">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl relative z-10">
+      <div class="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Conçu pour les artisans canadiens
+      </div>
+      <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
+        ${esc(c.h1)} <span class="gradient-text">${esc(c.h1Highlight)}</span>
+      </h1>
+      <p class="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">${esc(c.intro)}</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Créer ma soumission gratuite
+        </a>
+        <a href="#comment-ca-marche" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Comment ça marche
+        </a>
+      </div>
+      <p class="text-sm text-gray-400 mt-5">Sans carte de crédit &middot; Soumission prête en 30 secondes</p>
+    </div>
+  </section>`;
+
+  const sBenefits = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl font-bold text-gray-900">${esc(c.h2Benefits)}</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${c.benefits.map((b) => `<div class="card-soft bg-white p-7 rounded-2xl flex flex-col">
+          <div class="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm mb-5 shrink-0" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true"></div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(b.title)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(b.desc)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const sHowItWorks = `<section id="comment-ca-marche" class="py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl font-bold text-gray-900">${esc(c.h2HowItWorks)}</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        ${c.howItWorks.map((step, i) => `<div>
+          <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-5" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">${i + 1}</div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(step.step)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(step.desc)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const sUseCases = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">${esc(c.h2UseCases)}</h2>
+      </div>
+      <ul class="grid sm:grid-cols-2 gap-3">
+        ${s.fr.useCases.map((uc) => `<li class="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="text-sm text-gray-700">${esc(uc)}</span>
+        </li>`).join("")}
+      </ul>
+    </div>
+  </section>`;
+
+  const sMarket = `<section class="py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div class="rounded-2xl p-10 md:p-14 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(6,182,212,0.06))">
+        <div class="relative z-10">
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">Conçu pour le marché canadien des métiers</h2>
+          <div class="grid md:grid-cols-3 gap-6 text-sm text-gray-600 leading-relaxed">
+            <div><div class="font-semibold text-gray-900 mb-2">Taxes canadiennes intégrées</div><p>La TPS/TVH (et la TVP/TVQ le cas échéant) est calculée automatiquement selon la province où le travail est exécuté.</p></div>
+            <div><div class="font-semibold text-gray-900 mb-2">Vos informations d'entreprise, sauvegardées une fois</div><p>Nom de l'entreprise, numéro de licence ou d'enregistrement, adresse et logo — chaque champ nécessaire pour une soumission professionnelle.</p></div>
+            <div><div class="font-semibold text-gray-900 mb-2">Vocabulaire des métiers intégré</div><p>L'IA est entraînée sur les termes que les entrepreneurs et artisans canadiens utilisent réellement.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+
+  const sFaq = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">${esc(c.h2Faq)}</h2>
+      </div>
+      <div class="space-y-4">
+        ${c.faq.map((f) => `<div class="bg-white rounded-2xl p-6 card-soft">
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(f.q)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(f.a)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const sCityGrid = CITY_SECTORS.includes(s.slug) ? (() => {
+    const byRegion = new Map<string, CityData[]>();
+    for (const city of ACTIVE_CITIES) {
+      const arr = byRegion.get(city.region) ?? [];
+      arr.push(city);
+      byRegion.set(city.region, arr);
+    }
+    const regionBlocks = Array.from(byRegion.entries())
+      .map(([region, cities]) => `<div>
+          <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">${esc(region)}</h3>
+          <div class="flex flex-wrap gap-2">
+            ${cities.map((c2) => `<a href="/fr/soumissions/${esc(s.frSlug)}/${esc(c2.slug)}/" class="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(c2.name)}</a>`).join("\n            ")}
+          </div>
+        </div>`)
+      .join("\n        ");
+    return `<section class="py-20 bg-gray-50">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-2xl font-bold text-gray-900">Soumissions ${esc(c.h1Highlight.toLowerCase())} dans les principales villes</h2>
+      <p class="text-sm text-gray-500 mt-2">Sélectionnez votre ville pour des prix et informations locales</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      ${regionBlocks}
+    </div>
+  </div>
+</section>`;
+  })() : "";
+
+  const related = RELATED_SECTORS[s.slug];
+  const sRelated = related && related.length > 0 ? `<section class="py-14 bg-white border-t border-gray-100">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+    <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">Services connexes</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      ${related.map((r) => {
+        const rSector = SECTORS[r.slug];
+        const rLabel = rSector ? rSector.fr.label : r.label;
+        const rSlug = rSector ? rSector.frSlug : r.slug;
+        return `<a href="/fr/soumissions/${esc(rSlug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
+          <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(rLabel)}
+        </a>`;
+      }).join("\n      ")}
+    </div>
+  </div>
+</section>` : "";
+
+  const sCta = `<section class="py-24 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">Prêt à créer votre première soumission <span class="gradient-text">en 30 secondes</span>?</h2>
+      <p class="text-lg text-gray-500 mb-10">
+        Sans carte de crédit. Sans engagement. Votre première soumission est gratuite.
+      </p>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
+        Commencer gratuitement
+        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>`;
+
+  return wrapInPublicLayoutFr(`<div class="flex flex-col min-h-screen bg-white">
+  ${breadcrumb}
+  ${sHero}
+  ${sBenefits}
+  ${sHowItWorks}
+  ${sUseCases}
+  ${sMarket}
+  ${sFaq}
+  ${sCityGrid}
+  ${sRelated}
+  ${sCta}
+</div>`);
+}
+
+function buildSectorJsonLdFr(s: SectorData): object[] {
+  const c = getSectorFrContent(s);
+  const canonical = `${BASE_URL}/fr/soumissions/${s.frSlug}/`;
+  const schemas: object[] = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "quoteai",
+      description: s.fr.jsonLdDescription,
+      url: canonical,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      inLanguage: "fr",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", availability: "https://schema.org/InStock" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/fr/` },
+        { "@type": "ListItem", position: 2, name: s.fr.label, item: canonical },
+      ],
+    },
+  ];
+  if (c.faq.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: c.faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  return schemas;
+}
+
+// ─── French city page body ──────────────────────────────────────────────────
+
+function buildCityBodyHtmlFr(s: SectorData, city: CityData): string {
+  const cityName = city.name;
+  const regionName = city.region;
+  const intel = CITY_INTELLIGENCE[city.slug];
+  const c = getSectorFrContent(s);
+  const intro = getCityIntro(s, city, "fr-CA");
+
+  const breadcrumb = buildFrBreadcrumb([
+    { name: "Accueil", href: "/fr" },
+    { name: s.fr.label, href: `/fr/soumissions/${s.frSlug}/` },
+    { name: cityName, href: null },
+  ]);
+
+  const sHero = `<section class="relative overflow-hidden bg-white pt-24 pb-20">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl relative z-10">
+      <div class="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${esc(regionName)}
+      </div>
+      <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
+        ${esc(c.h1)} <span class="gradient-text">${esc(c.h1Highlight)}</span><br />
+        <span class="text-gray-500 text-3xl sm:text-4xl font-bold">à ${esc(cityName)}</span>
+      </h1>
+      <p class="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">${esc(intro)}</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Créer ma soumission gratuite
+        </a>
+        <a href="/fr/soumissions/${esc(s.frSlug)}/" class="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold">
+          Voir comment ça marche
+        </a>
+      </div>
+      <p class="text-sm text-gray-400 mt-5">Sans carte de crédit &middot; Soumission prête en 30 secondes</p>
+    </div>
+  </section>`;
+
+  const sOsservatorio = intel ? buildOsservatorio(s, city, intel, "fr-CA") : "";
+
+  const sBenefits = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl font-bold text-gray-900">Pourquoi les ${esc(s.fr.labelPlural)} de ${esc(cityName)} choisissent quoteai</h2>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        ${c.benefits.map((b) => `<div class="card-soft bg-white p-7 rounded-2xl flex flex-col">
+          <div class="h-10 w-10 rounded-xl flex items-center justify-center text-white font-bold text-sm mb-5 shrink-0" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true"></div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(b.title)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(b.desc)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const howItWorksSteps = getCityHowItWorksSteps(cityName, "fr-CA");
+  const sHowItWorks = `<section class="py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl font-bold text-gray-900">Soumission professionnelle à ${esc(cityName)} en 3 étapes</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-10">
+        ${howItWorksSteps.map((step) => `<div>
+          <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-5" style="background:linear-gradient(135deg,#7C3AED,#06B6D4)" aria-hidden="true">${esc(step.n)}</div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(step.title)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(step.desc)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const sUseCases = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">Soumissions pour ces travaux à ${esc(cityName)}</h2>
+      </div>
+      <ul class="grid sm:grid-cols-2 gap-3">
+        ${s.fr.useCases.map((uc) => `<li class="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="text-sm text-gray-700">${esc(uc)}</span>
+        </li>`).join("")}
+      </ul>
+    </div>
+  </section>`;
+
+  const cityFaqItems = getCityFaqItems(s, city, "fr-CA");
+  const sFaq = `<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">Questions fréquentes</h2>
+      </div>
+      <div class="space-y-4">
+        ${cityFaqItems.map((f) => `<div class="bg-white rounded-2xl p-6 card-soft">
+          <h3 class="text-base font-semibold text-gray-900 mb-2">${esc(f.q)}</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">${esc(f.a)}</p>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>`;
+
+  const nearbyLinks = getNearbyAnchors(s, city, "fr-CA")
+    .map(({ slug, anchorText }) => `<a href="/fr/soumissions/${esc(s.frSlug)}/${esc(slug)}/" class="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors">${esc(anchorText)}</a>`)
+    .join("\n          ");
+  const sNearby = nearbyLinks ? `<section class="py-16 bg-white border-t border-gray-100">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">
+        Soumissions ${esc(s.fr.labelPlural)} dans les villes voisines
+      </h2>
+      <div class="flex flex-wrap gap-2 justify-center">
+          ${nearbyLinks}
+      </div>
+    </div>
+  </section>` : "";
+
+  const sQuantoCosta = buildQuantoCostaBlock(s, city, intel, "fr-CA");
+  const contextTextFr = getCityContextText(city.slug, "fr-CA");
+  const sContext = contextTextFr ? `<section class="py-10 bg-violet-50/50 border-y border-violet-100/60">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+    <div class="flex gap-4 items-start">
+      <div class="shrink-0 mt-0.5 h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div>
+        <h2 class="text-sm font-semibold text-violet-700 mb-1.5">${esc(s.fr.label)} à ${esc(cityName)} — marché local</h2>
+        <p class="text-sm text-gray-600 leading-relaxed">${esc(contextTextFr)}</p>
+      </div>
+    </div>
+  </div>
+</section>` : "";
+
+  const sameCityOtherSectors = getSameCityOtherSectors(s.slug, city.slug, 6, "fr-CA");
+  const sSameCityOther = sameCityOtherSectors.length ? `<section class="py-14 bg-gray-50 border-t border-gray-100">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <h2 class="text-base font-semibold text-gray-500 mb-5 text-center">Autres services à ${esc(cityName)}</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        ${sameCityOtherSectors
+          .map((r) => `<a href="/fr/soumissions/${esc(SECTORS[r.slug]?.frSlug ?? r.slug)}/${esc(city.slug)}/" class="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors">
+          <span class="text-violet-400 font-bold" aria-hidden="true">→</span> ${esc(r.label)} à ${esc(cityName)}
+        </a>`)
+          .join("\n        ")}
+      </div>
+    </div>
+  </section>` : "";
+
+  const ctaTexts = getCityCtaTexts(getCityCtaVariant(s, city), cityName, "fr-CA");
+  const sCta = `<section class="py-24 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
+      <h2 class="text-3xl font-bold text-gray-900 mb-4">${esc(ctaTexts.headingPrefix)}<span class="gradient-text">${esc(ctaTexts.headingGradient)}</span></h2>
+      <p class="text-lg text-gray-500 mb-10">
+        Aucune carte de crédit requise. Votre première soumission professionnelle est gratuite.
+      </p>
+      <a href="/sign-up/" class="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold">
+        ${esc(ctaTexts.button)}
+        <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+      <p class="text-sm text-gray-400 mt-4">Soumission prête en 30 secondes &middot; Sans engagement</p>
+    </div>
+  </section>`;
+
+  return wrapInPublicLayoutFr(`<div class="flex flex-col min-h-screen bg-white">
+  ${breadcrumb}
+  ${sHero}
+  ${sOsservatorio}
+  ${sBenefits}
+  ${sHowItWorks}
+  ${sUseCases}
+  ${sFaq}
+  ${sQuantoCosta}
+  ${sContext}
+  ${sNearby}
+  ${sSameCityOther}
+  ${sCta}
+</div>`);
+}
+
 // ─── Main execution ─────────────────────────────────────────────────────────
 
 const template = pruneModulepreload(readFileSync(templatePath, "utf-8"));
@@ -1229,11 +1942,46 @@ const homepageHeadBlock = buildHeadBlock({
   canonical: `${BASE_URL}/`,
   ogImagePath: "/opengraph.jpg",
   jsonLd: [homepageWebSiteSchema, homepageSoftwareSchema],
+  lang: "en",
+  altUrl: `${BASE_URL}/fr/`,
 });
 const homepageHtml = injectBody(injectHead(template, homepageHeadBlock), buildHomepageBodyHtml());
 writeFileSync(templatePath, homepageHtml, "utf-8");
 count++;
 console.log("  ✓ Homepage prerendered");
+
+// French homepage
+const homepageWebSiteSchemaFr = {
+  ...homepageWebSiteSchema,
+  description: "Logiciel IA pour soumissions professionnelles en 30 secondes. Conçu pour les entrepreneurs, petites entreprises et travailleurs autonomes canadiens.",
+  inLanguage: "fr",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: { "@type": "EntryPoint", urlTemplate: `${BASE_URL}/fr/soumissions/{search_term_string}` },
+    "query-input": "required name=search_term_string",
+  },
+};
+const homepageSoftwareSchemaFr = {
+  ...homepageSoftwareSchema,
+  description: "Logiciel de soumission par IA pour les entrepreneurs, petites entreprises et artisans canadiens.",
+  url: `${BASE_URL}/fr/`,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", description: "Essai gratuit disponible" },
+  audience: { "@type": "BusinessAudience", audienceType: "Entrepreneurs, petites entreprises, artisans, travailleurs autonomes" },
+  inLanguage: "fr",
+};
+const homepageHeadBlockFr = buildHeadBlock({
+  title: "quoteai – Soumissions en ligne pour entrepreneurs | IA en 30s",
+  description: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les entrepreneurs, petites entreprises et artisans canadiens. Essayez gratuitement.",
+  canonical: `${BASE_URL}/fr/`,
+  ogImagePath: "/opengraph.jpg",
+  jsonLd: [homepageWebSiteSchemaFr, homepageSoftwareSchemaFr],
+  lang: "fr",
+  altUrl: `${BASE_URL}/`,
+});
+const homepageHtmlFr = injectBody(injectHead(template, homepageHeadBlockFr, "fr"), buildHomepageBodyHtmlFr());
+writeRoute("fr", homepageHtmlFr);
+count++;
+console.log("  ✓ French homepage prerendered");
 
 // Phase 2–8: Sector + city pages
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
@@ -1250,19 +1998,37 @@ for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
       : sector.metaDescription;
 
   const canonical = `${BASE_URL}/quotes/${sectorSlug}/`;
+  const frCanonical = `${BASE_URL}/fr/soumissions/${sector.frSlug}/`;
   const jsonLd = buildSectorJsonLd(sector);
   const ogImagePath = ogImage(sectorSlug);
 
-  const headBlock = buildHeadBlock({ title, description, canonical, ogImagePath, jsonLd });
+  const headBlock = buildHeadBlock({ title, description, canonical, ogImagePath, jsonLd, lang: "en", altUrl: frCanonical });
   const bodyHtml = buildSectorBodyHtml(sector);
   const html = injectBody(injectHead(template, headBlock), bodyHtml);
   writeRoute(`quotes/${sectorSlug}`, html);
   count++;
 
+  // French sector page (every sector gets one)
+  const frHeadBlock = buildHeadBlock({
+    title: sector.fr.titleTag,
+    description: sector.fr.metaDescription,
+    canonical: frCanonical,
+    ogImagePath,
+    jsonLd: buildSectorJsonLdFr(sector),
+    lang: "fr",
+    altUrl: canonical,
+  });
+  const frBodyHtml = buildSectorBodyHtmlFr(sector);
+  const frHtml = injectBody(injectHead(template, frHeadBlock, "fr"), frBodyHtml);
+  writeRoute(`fr/soumissions/${sector.frSlug}`, frHtml);
+  count++;
+
   if (!CITY_SECTORS.includes(sectorSlug)) continue;
 
   for (const city of ACTIVE_CITIES) {
+    const isFrenchPrimaryCity = FRENCH_PRIMARY_CITY_SLUGS.includes(city.slug);
     const cityCanonical = `${BASE_URL}/quotes/${sectorSlug}/${city.slug}/`;
+    const cityFrCanonical = `${BASE_URL}/fr/soumissions/${sector.frSlug}/${city.slug}/`;
     const cityTitle = getCityTitle(sector, city.name, city.slug);
     const cityDesc = getCityDesc(sector, city.name, city.slug, city.region);
     const cityJsonLd = buildCityJsonLd(sector, city);
@@ -1273,13 +2039,39 @@ for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
       canonical: cityCanonical,
       ogImagePath: ogImage(sectorSlug),
       jsonLd: cityJsonLd,
+      lang: "en",
+      altUrl: isFrenchPrimaryCity ? cityFrCanonical : undefined,
     });
     const cityBodyHtml = buildCityBodyHtml(sector, city);
     const cityHtml = injectBody(injectHead(template, cityHeadBlock), cityBodyHtml);
     writeRoute(`quotes/${sectorSlug}/${city.slug}`, cityHtml);
     count++;
+
+    // French city page — only for the French-primary Quebec cities (see
+    // FRENCH_PRIMARY_CITY_SLUGS in seo-data.ts). Other cities stay
+    // English-only for now; their hreflang tags above correctly omit fr-CA.
+    if (!isFrenchPrimaryCity) continue;
+
+    const cityTitleFr = getCityTitle(sector, city.name, city.slug, "fr-CA");
+    const cityDescFr = getCityDesc(sector, city.name, city.slug, city.region, "fr-CA");
+    const cityJsonLdFr = buildCityJsonLd(sector, city, "fr-CA");
+
+    const cityHeadBlockFr = buildHeadBlock({
+      title: cityTitleFr,
+      description: cityDescFr,
+      canonical: cityFrCanonical,
+      ogImagePath: ogImage(sectorSlug),
+      jsonLd: cityJsonLdFr,
+      lang: "fr",
+      altUrl: cityCanonical,
+    });
+    const cityBodyHtmlFr = buildCityBodyHtmlFr(sector, city);
+    const cityHtmlFr = injectBody(injectHead(template, cityHeadBlockFr, "fr"), cityBodyHtmlFr);
+    writeRoute(`fr/soumissions/${sector.frSlug}/${city.slug}`, cityHtmlFr);
+    count++;
   }
 }
+console.log("  ✓ French sector + city pages prerendered");
 
 // ─── Blog JSON-LD builders ───────────────────────────────────────────────────
 

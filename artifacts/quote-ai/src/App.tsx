@@ -88,6 +88,8 @@ function Router() {
     <Switch>
       {/* Public pages — paths from sitemap-routes.ts (shared with generate-sitemap.ts) */}
       <Route path={PATHS.HOME} component={() => <PublicLayout><Home /></PublicLayout>} />
+      {/* French homepage — same component, detects lang from the /fr prefix */}
+      <Route path="/fr" component={() => <PublicLayout><Home /></PublicLayout>} />
       <Route path={PATHS.WHATSAPP} component={() => <PublicLayout><WhatsappPage /></PublicLayout>} />
       <Route path={PATHS.CHI_SIAMO} component={ChiSiamoPage} />
       <Route path={PATHS.CONTATTI} component={ContattiPage} />
@@ -159,6 +161,9 @@ function Router() {
       {/* SEO landing pages — dynamic, driven by SECTORS / CITIES data */}
       <Route path="/quotes/:type/:city" component={() => <PublicLayout><Suspense fallback={null}><SeoCityLanding /></Suspense></PublicLayout>} />
       <Route path="/quotes/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
+      {/* French SEO landing pages — same components, detect lang from the /fr prefix */}
+      <Route path="/fr/soumissions/:type/:city" component={() => <PublicLayout><Suspense fallback={null}><SeoCityLanding /></Suspense></PublicLayout>} />
+      <Route path="/fr/soumissions/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
 
       {/* Blog — dynamic, driven by BLOG_ARTICLES / BLOG_CATEGORIES data */}
       <Route path="/blog/categoria/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogCategoryPage /></Suspense></PublicLayout>} />

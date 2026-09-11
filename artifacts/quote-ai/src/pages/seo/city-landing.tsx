@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { useParams, Link } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
-import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, getCityTitle, getCityDesc } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, getCityTitle, getCityDesc } from "@/data/seo-data";
 import { BLOG_ARTICLES, SECTOR_ARTICLES } from "@/data/blog-data";
 import {
   getCityIntro,
@@ -18,37 +18,64 @@ import {
   buildCityJsonLd,
   verifyCityContentInDev,
   getOgImagePath,
+  getSectorFrContent,
+  cityBasePath,
+  type Lang as EngineLang,
 } from "@/data/seo-render-engine";
 import { SeoHead } from "@/components/seo-head";
+import { isFrenchPath } from "@/i18n/LanguageContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function SeoCityLanding() {
   const { t } = useLanguage();
+  const [pathname] = useLocation();
+  const isFr = isFrenchPath(pathname);
+  const engineLang: EngineLang = isFr ? "fr-CA" : "en-CA";
+  const base = cityBasePath(engineLang);
   const params = useParams() as { type?: string; city?: string };
-  const sectorSlug = params.type ?? "";
+  const rawSlug = params.type ?? "";
+  const sectorSlug = isFr ? (SECTOR_KEY_BY_FR_SLUG[rawSlug] ?? rawSlug) : rawSlug;
   const citySlug = params.city ?? "";
 
   const s = SECTORS[sectorSlug] ?? DEFAULT_SECTOR;
+  const sSlugForLang = isFr ? s.frSlug : s.slug;
   const city = CITIES_BY_SLUG[citySlug];
   const cityName = city?.name ?? citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const regionName = city?.region ?? "Canada";
 
-  const titleTag = getCityTitle(s, cityName, citySlug);
-  const metaDesc = getCityDesc(s, cityName, citySlug, regionName);
-  const canonical = `https://quoteai.ca/quotes/${s.slug}/${citySlug}/`;
+  // City-page chrome (h1/benefits/useCases) reuses the sector's own
+  // fields for English, and the generic French sector-page templates
+  // for French (sector.fr only carries titleTag/metaDescription/useCases).
+  const frSectorContent = isFr ? getSectorFrContent(s) : null;
+  const h1 = frSectorContent?.h1 ?? s.h1;
+  const h1Highlight = frSectorContent?.h1Highlight ?? s.h1Highlight;
+  const benefits = frSectorContent?.benefits ?? s.benefits;
+  const useCases = isFr ? s.fr.useCases : s.useCases;
+  const sectorLabel = isFr ? s.fr.label : s.label;
+  const sectorLabelPlural = isFr ? s.fr.labelPlural : s.labelPlural;
 
-  const intro = city ? getCityIntro(s, city) : "";
-  const faqItems = city ? getCityFaqItems(s, city) : [];
-  const howItWorksSteps = getCityHowItWorksSteps(cityName);
+  const titleTag = getCityTitle(s, cityName, citySlug, engineLang);
+  const metaDesc = getCityDesc(s, cityName, citySlug, regionName, engineLang);
+  const canonical = `https://quoteai.ca${base}/${sSlugForLang}/${citySlug}/`;
+  const enCanonical = `https://quoteai.ca/quotes/${s.slug}/${citySlug}/`;
+  const frCanonical = `https://quoteai.ca/fr/soumissions/${s.frSlug}/${citySlug}/`;
+
+  const intro = city ? getCityIntro(s, city, engineLang) : "";
+  const faqItems = city ? getCityFaqItems(s, city, engineLang) : [];
+  const howItWorksSteps = getCityHowItWorksSteps(cityName, engineLang);
   const layout = city ? getCityLayout(s, city) : 0;
   const ctaVariant = city ? getCityCtaVariant(s, city) : 0;
-  const cta = getCityCtaTexts(ctaVariant, cityName);
-  const nearbyAnchors = city ? getNearbyAnchors(s, city) : [];
+  const cta = getCityCtaTexts(ctaVariant, cityName, engineLang);
+  const nearbyAnchors = city ? getNearbyAnchors(s, city, engineLang) : [];
   const osservatorio = city ? getOsservatorioData(city.slug) : null;
-  const contextText = city ? getCityContextText(city.slug) : null;
-  const relatedSectors = getCityRelatedSectors(s.slug);
-  const sameCityOtherSectors = city ? getSameCityOtherSectors(s.slug, city.slug) : [];
-  const jsonLd = city ? buildCityJsonLd(s, city) : [];
+  const contextText = city ? getCityContextText(city.slug, engineLang) : null;
+  const relatedSectorKeys = getCityRelatedSectors(s.slug);
+  const relatedSectors = relatedSectorKeys.map((r) => ({
+    slug: r.slug,
+    label: isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label,
+  }));
+  const sameCityOtherSectors = city ? getSameCityOtherSectors(s.slug, city.slug, 6, engineLang) : [];
+  const jsonLd = city ? buildCityJsonLd(s, city, engineLang) : [];
 
   useEffect(() => {
     if (city) {
@@ -65,11 +92,11 @@ export default function SeoCityLanding() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-3xl font-bold text-gray-900">
-            {t("seo.city.whyChooseHeading").replace("{trade}", s.labelPlural).replace("{city}", cityName)}
+            {t("seo.city.whyChooseHeading").replace("{trade}", sectorLabelPlural).replace("{city}", cityName)}
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {s.benefits.map((b) => (
+          {benefits.map((b) => (
             <div key={b.title} className="card-soft bg-white p-7 rounded-2xl flex flex-col">
               <div
                 className="h-10 w-10 rounded-xl flex items-center justify-center mb-5 text-white shrink-0"
@@ -121,7 +148,7 @@ export default function SeoCityLanding() {
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
-          {s.useCases.map((uc) => (
+          {useCases.map((uc) => (
             <div key={uc} className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
               <CheckCircle2 className="h-4 w-4 text-violet-500 shrink-0" />
               <span className="text-sm text-gray-700">{uc}</span>
@@ -159,15 +186,23 @@ export default function SeoCityLanding() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <SeoHead title={titleTag} description={metaDesc} canonical={canonical} jsonLd={jsonLd} ogImage={getOgImagePath(s.slug)} />
+      <SeoHead
+        title={titleTag}
+        description={metaDesc}
+        canonical={canonical}
+        jsonLd={jsonLd}
+        ogImage={getOgImagePath(s.slug)}
+        lang={engineLang}
+        frCanonical={frCanonical}
+      />
 
       {/* ── Breadcrumb ───────────────────────────────────────── */}
       <nav aria-label={t("seo.city.breadcrumbAria")} className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center text-sm text-gray-500 flex-wrap">
-            <li><Link href="/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
+            <li><Link href={isFr ? "/fr" : "/"} className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
-            <li><Link href={`/quotes/${s.slug}/`} className="hover:text-violet-600 transition-colors">{s.label}</Link></li>
+            <li><Link href={`${base}/${sSlugForLang}/`} className="hover:text-violet-600 transition-colors">{sectorLabel}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
             <li className="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">{cityName}</li>
           </ol>
@@ -187,8 +222,8 @@ export default function SeoCityLanding() {
             {regionName}
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
-            {s.h1}{" "}
-            <span className="gradient-text">{s.h1Highlight}</span>
+            {h1}{" "}
+            <span className="gradient-text">{h1Highlight}</span>
             <br />
             <span className="text-gray-500 text-3xl sm:text-4xl font-bold">{t("seo.city.inCityConnector")} {cityName}</span>
           </h1>
@@ -202,7 +237,7 @@ export default function SeoCityLanding() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </a>
             <a
-              href={`/quotes/${s.slug}/`}
+              href={`${base}/${sSlugForLang}/`}
               className="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold"
             >
               {t("seo.city.heroCta2")}
@@ -280,7 +315,7 @@ export default function SeoCityLanding() {
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-violet-700 mb-1.5">
-                  {t("seo.city.contextHeading").replace("{trade}", s.label).replace("{city}", cityName)}
+                  {t("seo.city.contextHeading").replace("{trade}", sectorLabel).replace("{city}", cityName)}
                 </h2>
                 <p className="text-sm text-gray-600 leading-relaxed">{contextText}</p>
               </div>
@@ -294,13 +329,13 @@ export default function SeoCityLanding() {
         <section className="py-16 bg-white border-t border-gray-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <h2 className="text-base font-semibold text-gray-500 mb-5 text-center">
-              {t("seo.city.nearbyHeading").replace("{trade}", s.labelPlural)}
+              {t("seo.city.nearbyHeading").replace("{trade}", sectorLabelPlural)}
             </h2>
             <div className="flex flex-wrap gap-2 justify-center">
               {nearbyAnchors.map(({ slug, anchorText }) => (
                 <a
                   key={slug}
-                  href={`/quotes/${s.slug}/${slug}/`}
+                  href={`${base}/${sSlugForLang}/${slug}/`}
                   className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors"
                 >
                   {anchorText}
@@ -322,7 +357,7 @@ export default function SeoCityLanding() {
               {sameCityOtherSectors.map((r) => (
                 <a
                   key={r.slug}
-                  href={`/quotes/${r.slug}/${citySlug}/`}
+                  href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/${citySlug}/`}
                   className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
                 >
                   <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
@@ -345,7 +380,7 @@ export default function SeoCityLanding() {
               {relatedSectors.map((r) => (
                 <a
                   key={r.slug}
-                  href={`/quotes/${r.slug}/`}
+                  href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/`}
                   className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
                 >
                   <span className="text-violet-400 font-bold" aria-hidden="true">→</span>

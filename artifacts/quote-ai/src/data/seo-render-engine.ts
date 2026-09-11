@@ -22,6 +22,7 @@ import {
   ACTIVE_CITY_SLUGS,
   CITY_SECTORS,
   SECTORS,
+  SECTOR_KEY_BY_FR_SLUG,
 } from "./seo-data.js";
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
 import type { CityIntelligence } from "./seo-intelligence.js";
@@ -30,6 +31,58 @@ export { getCityTitle, getCityDesc };
 export type { CityIntelligence, SectorData, CityData };
 
 const BASE_URL = "https://quoteai.ca";
+
+export type Lang = "en-CA" | "fr-CA";
+
+/** Sector label/labelPlural for the given lang — "fr-CA" reads sector.fr.*. */
+function sectorLabel(sector: SectorData, lang: Lang): { label: string; labelPlural: string } {
+  return lang === "fr-CA"
+    ? { label: sector.fr.label, labelPlural: sector.fr.labelPlural }
+    : { label: sector.label, labelPlural: sector.labelPlural };
+}
+
+/** City path segment for the given lang: /quotes/ (en) or /fr/soumissions/ (fr). */
+export function cityBasePath(lang: Lang): string {
+  return lang === "fr-CA" ? "/fr/soumissions" : "/quotes";
+}
+
+/** Sector slug for the given lang — frSlug under /fr/soumissions/. */
+function sectorPathSlug(sector: SectorData, lang: Lang): string {
+  return lang === "fr-CA" ? sector.frSlug : sector.slug;
+}
+
+/**
+ * Given the current pathname, returns the equivalent URL in the other
+ * language, or null if this path has no distinct counterpart (dashboard,
+ * auth, blog, etc. — the language toggle there just flips chrome text
+ * without navigating).
+ */
+export function getLanguageCounterpartPath(pathname: string): string | null {
+  if (pathname === "/") return "/fr";
+  if (pathname === "/fr" || pathname === "/fr/") return "/";
+
+  const enCity = pathname.match(/^\/quotes\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/);
+  if (enCity) {
+    const sector = SECTORS[enCity[1]];
+    if (sector) return `/fr/soumissions/${sector.frSlug}/${enCity[2]}/`;
+  }
+  const enSector = pathname.match(/^\/quotes\/([a-z0-9-]+)\/?$/);
+  if (enSector) {
+    const sector = SECTORS[enSector[1]];
+    if (sector) return `/fr/soumissions/${sector.frSlug}/`;
+  }
+  const frCity = pathname.match(/^\/fr\/soumissions\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/);
+  if (frCity) {
+    const key = SECTOR_KEY_BY_FR_SLUG[frCity[1]];
+    if (key) return `/quotes/${key}/${frCity[2]}/`;
+  }
+  const frSector = pathname.match(/^\/fr\/soumissions\/([a-z0-9-]+)\/?$/);
+  if (frSector) {
+    const key = SECTOR_KEY_BY_FR_SLUG[frSector[1]];
+    if (key) return `/quotes/${key}/`;
+  }
+  return null;
+}
 
 // ─── Deterministic hash ────────────────────────────────────────────────────
 
@@ -66,8 +119,26 @@ export function getOgImagePath(sectorSlug: string): string {
 // variant array alongside each English one — the CITY_CONTEXT data shape in
 // seo-data.ts already anticipates this (see CityContextEntry).
 
-export function getCityIntro(sector: SectorData, city: CityData): string {
+export function getCityIntro(sector: SectorData, city: CityData, lang: Lang = "en-CA"): string {
   const isService = sector.sectorType === "service";
+  if (lang === "fr-CA") {
+    const { label, labelPlural } = sectorLabel(sector, lang);
+    const labelL = label.toLowerCase();
+    const variantsFr = isService
+      ? [
+          `Vous dirigez une entreprise de ${labelL} à ${city.name}? quoteai est le logiciel de soumission par IA conçu pour les artisans partout au ${city.region}. Décrivez le travail en langage naturel et obtenez un document professionnel en 30 secondes.`,
+          `${city.name} voit passer des milliers de contrats de ${labelL} chaque année. Les professionnels qui utilisent quoteai répondent aux clients en minutes plutôt qu'en jours, et remportent plus de contrats. Fini Excel, fini le papier.`,
+          `Dans un marché comme ${city.name}, la concurrence dans le domaine de ${labelL} est féroce. Celui qui envoie sa soumission en premier a un réel avantage. Avec quoteai, vous le faites en 30 secondes, encore devant le client — directement depuis votre téléphone.`,
+          `Diriger une entreprise de ${labelL} à ${city.name} veut dire jongler avec des soumissions complexes. quoteai s'occupe de l'administratif : décrivez le travail, l'IA génère la soumission complète, et vous vous concentrez sur le chantier.`,
+        ]
+      : [
+          `Êtes-vous ${labelL} à ${city.name} et perdez-vous des heures avec des tableurs ou des soumissions papier? quoteai est le logiciel de soumission par IA conçu pour les artisans partout au ${city.region}. Décrivez le travail en langage naturel et obtenez un document professionnel en 30 secondes.`,
+          `${city.name} compte des milliers d'artisans et de petites entreprises actifs. Les ${labelPlural} qui utilisent quoteai répondent aux clients en minutes plutôt qu'en jours, et remportent plus de contrats. Fini Excel, fini le papier.`,
+          `Dans une ville comme ${city.name}, la concurrence entre ${labelPlural} est féroce. Celui qui envoie sa soumission en premier a un réel avantage. Avec quoteai, vous le faites en 30 secondes, encore devant le client — directement depuis votre téléphone.`,
+          `Travailler comme ${labelL} à ${city.name} veut dire jongler avec plusieurs clients aux besoins différents. quoteai s'occupe de l'administratif : décrivez le travail, l'IA génère la soumission complète, et vous vous concentrez sur votre métier.`,
+        ];
+    return variantsFr[strHash(city.slug) % variantsFr.length];
+  }
   const variants = isService
     ? [
         `Running a ${sector.label.toLowerCase()} business in ${city.name}? quoteai is the AI quoting software built for trades professionals across ${city.region}. Describe the job in plain English, get a professional document in 30 seconds.`,
@@ -91,9 +162,57 @@ export interface CityFaqItem {
   a: string;
 }
 
-export function getCityFaqItems(sector: SectorData, city: CityData): CityFaqItem[] {
+export const DEMAND_TEXT_FR: Record<CityIntelligence["demandLevel"], string> = {
+  LOW: "modérée",
+  MEDIUM: "moyenne",
+  HIGH: "élevée",
+  CRITICAL: "très élevée",
+};
+
+export function getCityFaqItems(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityFaqItem[] {
   const intel = CITY_INTELLIGENCE[city.slug];
   const pricePct = intel ? Math.round(Math.abs(intel.priceIndex - 1.0) * 100) : 0;
+
+  if (lang === "fr-CA") {
+    const { label, labelPlural } = sectorLabel(sector, lang);
+    const labelL = label.toLowerCase();
+    const priceAnswerFr = intel
+      ? intel.priceIndex > 1.05
+        ? `Les prix des services de ${labelL} à ${city.name} sont environ ${pricePct}% au-dessus de la moyenne canadienne. Présenter une soumission professionnelle et détaillée est essentiel pour justifier le prix et gagner la confiance du client.`
+        : intel.priceIndex < 0.95
+          ? `À ${city.name}, les prix pour les ${labelPlural} sont environ ${pricePct}% sous la moyenne canadienne. Dans un marché aussi compétitif, répondre rapidement avec une soumission professionnelle est le meilleur moyen de se démarquer.`
+          : `Les prix pour les ${labelPlural} à ${city.name} sont dans la moyenne canadienne. La rapidité de réponse et la qualité de la soumission font la différence pour remporter le contrat.`
+      : `Les prix varient selon la complexité du travail et l'emplacement. Avec quoteai, vous pouvez générer des soumissions professionnelles en 30 secondes et démontrer votre compétitivité immédiatement.`;
+
+    const leadTimeAnswerFr = intel
+      ? intel.demandLevel === "CRITICAL"
+        ? `La demande à ${city.name} est très élevée : les délais de réponse habituels sont d'environ ${intel.avgLeadTime}. Envoyer la soumission quelques minutes après la visite — comme le permet quoteai — améliore considérablement vos chances de remporter le contrat.`
+        : intel.demandLevel === "HIGH"
+          ? `Avec une demande ${DEMAND_TEXT_FR[intel.demandLevel]} à ${city.name}, les professionnels répondent habituellement en ${intel.avgLeadTime}. Envoyer une soumission professionnelle rapidement reste le meilleur moyen de décrocher le contrat.`
+          : intel.demandLevel === "MEDIUM"
+            ? `Les délais de réponse habituels pour les ${labelPlural} à ${city.name} sont d'environ ${intel.avgLeadTime}. Une soumission professionnelle envoyée le jour même peut faire la différence face à la concurrence.`
+            : `Le marché de ${city.name} affiche une demande ${DEMAND_TEXT_FR[intel.demandLevel]} pour ce type de service, avec des délais de réponse d'environ ${intel.avgLeadTime}. Le professionnalisme et la rapidité demeurent des atouts importants.`
+      : `Les délais de réponse dépendent de la disponibilité locale. Avec quoteai, vous pouvez répondre aux nouvelles demandes en 30 secondes et améliorer vos chances sur chaque contrat.`;
+
+    return [
+      {
+        q: `Comment obtenir une soumission professionnelle à ${city.name}?`,
+        a: `Avec quoteai, ça prend 30 secondes. Décrivez le travail en langage naturel dans le champ de texte, et le moteur d'IA génère automatiquement le document avec les postes de coûts, quantités, prix unitaires et taxes. Téléchargez le PDF et envoyez-le directement à votre client à ${city.name}.`,
+      },
+      {
+        q: `quoteai fonctionne-t-il pour les ${labelPlural} à ${city.name} et dans tout le ${city.region}?`,
+        a: `Oui. quoteai est une application web accessible depuis n'importe quel appareil avec une connexion internet. Il n'y a aucune restriction géographique : ça fonctionne à ${city.name} tout comme ailleurs au Canada.`,
+      },
+      {
+        q: `Combien coûtent les services de ${labelL} à ${city.name}?`,
+        a: priceAnswerFr,
+      },
+      {
+        q: `Quel est le délai de réponse moyen pour les ${labelPlural} à ${city.name}?`,
+        a: leadTimeAnswerFr,
+      },
+    ];
+  }
 
   const priceAnswer = intel
     ? intel.priceIndex > 1.05
@@ -141,7 +260,26 @@ export interface HowItWorksStep {
   desc: string;
 }
 
-export function getCityHowItWorksSteps(cityName: string): HowItWorksStep[] {
+export function getCityHowItWorksSteps(cityName: string, lang: Lang = "en-CA"): HowItWorksStep[] {
+  if (lang === "fr-CA") {
+    return [
+      {
+        n: "1",
+        title: "Décrivez le travail",
+        desc: `Depuis votre téléphone à ${cityName}, écrivez ce que vous devez faire dans vos propres mots. L'IA comprend le vocabulaire des métiers.`,
+      },
+      {
+        n: "2",
+        title: "L'IA génère la soumission",
+        desc: "quoteai identifie les postes de coûts, estime les quantités et calcule automatiquement les totaux et les taxes. Zéro erreur, zéro calcul manuel.",
+      },
+      {
+        n: "3",
+        title: "Envoyez-la au client",
+        desc: `Un PDF professionnel en 30 secondes. Envoyez-le par texto ou courriel à votre client à ${cityName} avant même d'avoir quitté le chantier.`,
+      },
+    ];
+  }
   return [
     {
       n: "1",
@@ -177,7 +315,29 @@ export interface CtaTexts {
   button: string;
 }
 
-export function getCityCtaTexts(ctaVariant: 0 | 1 | 2, cityName: string): CtaTexts {
+export function getCityCtaTexts(ctaVariant: 0 | 1 | 2, cityName: string, lang: Lang = "en-CA"): CtaTexts {
+  if (lang === "fr-CA") {
+    switch (ctaVariant) {
+      case 1:
+        return {
+          headingPrefix: `Votre premier PDF professionnel à ${cityName} est `,
+          headingGradient: "entièrement gratuit",
+          button: "Créer un compte gratuit",
+        };
+      case 2:
+        return {
+          headingPrefix: "Arrêtez de perdre du temps. Générez la soumission ",
+          headingGradient: "pendant que vous êtes encore avec le client",
+          button: "Essayer gratuitement — sans engagement",
+        };
+      default:
+        return {
+          headingPrefix: `Commencez à créer des soumissions à ${cityName} `,
+          headingGradient: "en 30 secondes",
+          button: "Commencer gratuitement",
+        };
+    }
+  }
   switch (ctaVariant) {
     case 1:
       return {
@@ -208,7 +368,8 @@ export interface NearbyAnchor {
   anchorText: string;
 }
 
-export function getNearbyAnchors(sector: SectorData, city: CityData): NearbyAnchor[] {
+export function getNearbyAnchors(sector: SectorData, city: CityData, lang: Lang = "en-CA"): NearbyAnchor[] {
+  const { label } = sectorLabel(sector, lang);
   return city.nearbySlug
     .map((slug): NearbyAnchor | null => {
       const nearbyCity = CITIES_BY_SLUG[slug];
@@ -217,13 +378,22 @@ export function getNearbyAnchors(sector: SectorData, city: CityData): NearbyAnch
       // aren't prerendered/indexable right now (see ACTIVE_CITY_SLUGS).
       if (!ACTIVE_CITY_SLUGS.has(nearbyCity.slug)) return null;
       const nearbyIntel = CITY_INTELLIGENCE[slug];
-      const anchorText = nearbyIntel
-        ? nearbyIntel.priceIndex > 1.05
-          ? `${sector.label} Quotes in ${nearbyCity.name}`
-          : nearbyIntel.priceIndex < 0.95
-            ? `${sector.label} Costs in ${nearbyCity.name}`
-            : `${sector.label} in ${nearbyCity.name}`
-        : nearbyCity.name;
+      const anchorText =
+        lang === "fr-CA"
+          ? nearbyIntel
+            ? nearbyIntel.priceIndex > 1.05
+              ? `Soumissions ${label} à ${nearbyCity.name}`
+              : nearbyIntel.priceIndex < 0.95
+                ? `Coûts ${label} à ${nearbyCity.name}`
+                : `${label} à ${nearbyCity.name}`
+            : nearbyCity.name
+          : nearbyIntel
+            ? nearbyIntel.priceIndex > 1.05
+              ? `${label} Quotes in ${nearbyCity.name}`
+              : nearbyIntel.priceIndex < 0.95
+                ? `${label} Costs in ${nearbyCity.name}`
+                : `${label} in ${nearbyCity.name}`
+            : nearbyCity.name;
       return { slug: nearbyCity.slug, name: nearbyCity.name, anchorText };
     })
     .filter((x): x is NearbyAnchor => x !== null);
@@ -303,22 +473,79 @@ export function getCityRelatedSectors(sectorSlug: string): { slug: string; label
 export function getSameCityOtherSectors(
   sectorSlug: string,
   citySlug: string,
-  limit = 6
+  limit = 6,
+  lang: Lang = "en-CA"
 ): { slug: string; label: string }[] {
   const others = CITY_SECTORS.filter((slug) => slug !== sectorSlug);
   if (others.length === 0) return [];
   const start = strHash(citySlug + sectorSlug) % others.length;
   const rotated = [...others.slice(start), ...others.slice(0, start)];
-  return rotated.slice(0, limit).map((slug) => ({ slug, label: SECTORS[slug].label }));
+  return rotated.slice(0, limit).map((slug) => ({
+    slug,
+    label: lang === "fr-CA" ? SECTORS[slug].fr.label : SECTORS[slug].label,
+  }));
 }
 
 // ─── JSON-LD schemas (unified — same FAQ text as visible body) ────────────
 
 export type JsonLdSchema = { "@context": string; "@type": string; [key: string]: unknown };
 
-export function buildCityJsonLd(sector: SectorData, city: CityData): JsonLdSchema[] {
-  const canonical = `${BASE_URL}/quotes/${sector.slug}/${city.slug}/`;
-  const faqItems = getCityFaqItems(sector, city);
+export function buildCityJsonLd(sector: SectorData, city: CityData, lang: Lang = "en-CA"): JsonLdSchema[] {
+  const base = cityBasePath(lang);
+  const sSlug = sectorPathSlug(sector, lang);
+  const canonical = `${BASE_URL}${base}/${sSlug}/${city.slug}/`;
+  const sectorPageUrl = `${BASE_URL}${base}/${sSlug}/`;
+  const faqItems = getCityFaqItems(sector, city, lang);
+  const { label, labelPlural } = sectorLabel(sector, lang);
+
+  if (lang === "fr-CA") {
+    return [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "quoteai",
+        description: `Logiciel de soumission par IA pour les ${labelPlural} à ${city.name} (${city.region}).`,
+        url: canonical,
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        inLanguage: "fr",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", availability: "https://schema.org/InStock" },
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        name: `Soumissions ${label} à ${city.name}`,
+        description: `Logiciel de soumission par IA pour les ${labelPlural} à ${city.name}`,
+        serviceType: `Soumission ${label}`,
+        provider: { "@type": "Organization", name: "quoteai", url: BASE_URL },
+        areaServed: [
+          { "@type": "City", name: city.name },
+          { "@type": "State", name: city.region },
+          { "@type": "Country", name: "Canada" },
+        ],
+        url: canonical,
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/fr/` },
+          { "@type": "ListItem", position: 2, name: label, item: sectorPageUrl },
+          { "@type": "ListItem", position: 3, name: city.name, item: canonical },
+        ],
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+    ];
+  }
+
   return [
     {
       "@context": "https://schema.org",
@@ -355,7 +582,7 @@ export function buildCityJsonLd(sector: SectorData, city: CityData): JsonLdSchem
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-        { "@type": "ListItem", position: 2, name: sector.label, item: `${BASE_URL}/quotes/${sector.slug}/` },
+        { "@type": "ListItem", position: 2, name: sector.label, item: sectorPageUrl },
         { "@type": "ListItem", position: 3, name: city.name, item: canonical },
       ],
     },
@@ -404,4 +631,78 @@ export function verifyCityContentInDev(
         ". SeoCityLanding must consume all data exclusively from seo-render-engine.ts."
     );
   }
+}
+
+// ─── French sector-page content (generic templates, not hand-authored per
+// sector — mirrors the pattern already used for city pages above). Covers
+// h1/intro/benefits/howItWorks/faq; titleTag/metaDescription/useCases are
+// hand-authored per sector on SectorData.fr (see seo-data.ts). ────────────
+
+export interface SectorFrContent {
+  h1: string;
+  h1Highlight: string;
+  intro: string;
+  h2Benefits: string;
+  benefits: { title: string; desc: string }[];
+  h2HowItWorks: string;
+  howItWorks: { step: string; desc: string }[];
+  h2UseCases: string;
+  h2Faq: string;
+  faq: { q: string; a: string }[];
+}
+
+function capitalize(s: string): string {
+  return s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+export function getSectorFrContent(sector: SectorData): SectorFrContent {
+  const { label, labelPlural } = sector.fr;
+  const labelL = label.toLowerCase();
+
+  return {
+    h1: "Soumissions pour",
+    h1Highlight: capitalize(labelPlural),
+    intro: `Vous perdez encore des soirées sur des tableurs ou des soumissions écrites à la main? Avec quoteai, décrivez le travail dans vos propres mots — et l'IA génère une soumission professionnelle avec descriptions techniques, quantités, prix unitaires et taxes calculées automatiquement. En 30 secondes, depuis votre téléphone.`,
+    h2Benefits: `Pourquoi les ${labelPlural} choisissent quoteai`,
+    h2HowItWorks: "Comment ça marche : 3 étapes",
+    h2UseCases: `Travaux courants pour ${labelPlural}`,
+    h2Faq: "Questions fréquentes",
+    benefits: [
+      {
+        title: "Soumissionnez depuis le chantier",
+        desc: `Ouvrez quoteai sur votre téléphone pendant que vous êtes encore chez le client. Décrivez le travail en langage naturel et obtenez un document prêt en une minute.`,
+      },
+      {
+        title: "Calculs automatiques",
+        desc: `L'IA estime les quantités, les matériaux et les heures de main-d'œuvre à partir de votre description. Fini les calculs manuels, fini les erreurs.`,
+      },
+      {
+        title: "Un document professionnel",
+        desc: `Chaque soumission inclut l'en-tête de votre entreprise, des postes détaillés avec unités et prix unitaires, des sous-totaux et les taxes. Ça inspire confiance au client.`,
+      },
+      {
+        title: "Une archive numérique",
+        desc: `Toutes vos soumissions envoyées, sauvegardées et consultables depuis n'importe quel appareil. Retrouvez le bon contrat pour le bon client en quelques secondes.`,
+      },
+    ],
+    howItWorks: [
+      { step: "1. Décrivez le travail", desc: `Écrivez-le simplement, comme vous le raconteriez : le type de ${labelL} à effectuer, les dimensions, les matériaux.` },
+      { step: "2. L'IA structure la soumission", desc: "quoteai lit la description, identifie les postes, estime les quantités et calcule les totaux avec les taxes appliquées." },
+      { step: "3. Téléchargez et envoyez", desc: "Ajoutez votre logo, ajustez au besoin, et téléchargez le PDF. Envoyez-le au client par texto ou courriel." },
+    ],
+    faq: [
+      {
+        q: "Combien coûte le logiciel de soumission pour ce métier?",
+        a: `quoteai offre un forfait Starter avec un nombre de soumissions mensuel, en plus de l'option d'acheter des soumissions à l'unité sans aucun abonnement.`,
+      },
+      {
+        q: "Puis-je l'utiliser sur mon téléphone directement au chantier?",
+        a: "Oui. quoteai est entièrement adapté aux appareils mobiles et fonctionne sur tout téléphone ou tablette avec une connexion internet — rien à installer.",
+      },
+      {
+        q: `La soumission inclut-elle des prix de marché pour les ${labelPlural}?`,
+        a: "L'IA suggère des prix typiques du marché canadien, que vous pouvez ajuster librement. Vous pouvez aussi enregistrer votre propre liste de prix dans les paramètres.",
+      },
+    ],
+  };
 }

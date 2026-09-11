@@ -1,5 +1,20 @@
+export interface SectorDataFr {
+  label: string;
+  labelPlural: string;
+  titleTag: string;
+  metaDescription: string;
+  jsonLdDescription: string;
+  useCases: string[];
+}
+
 export interface SectorData {
   slug: string;
+  /** French URL slug, used under the /fr/soumissions/ locale prefix. */
+  frSlug: string;
+  /** French sector-specific content. Chrome/headings/benefits/howItWorks/faq
+   * are supplied generically by the French template generators in
+   * seo-render-engine.ts (getSectorFr*), not hand-authored per sector. */
+  fr: SectorDataFr;
   sectorType: "professional" | "service";
   label: string;
   labelPlural: string;
@@ -24,6 +39,22 @@ export interface SectorData {
 export const SECTORS: Record<string, SectorData> = {
   painter: {
     slug: "painter",
+    frSlug: "peintre",
+    fr: {
+      label: "Peintre",
+      labelPlural: "peintres",
+      titleTag: "Soumissions peintre en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les peintres canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les peintres canadiens.",
+      useCases: [
+        "Peinture intérieure de condos et de maisons",
+        "Peinture de bureaux et d'espaces commerciaux",
+        "Réparation de cloisons sèches et de fissures",
+        "Peinture de portes extérieures, boiseries et fenêtres",
+        "Finitions décoratives et murs d'accent",
+        "Revêtement extérieur et stucco",
+      ],
+    },
     sectorType: "professional",
     label: "Painter",
     labelPlural: "painters",
@@ -75,6 +106,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   electrician: {
     slug: "electrician",
+    frSlug: "electricien",
+    fr: {
+      label: "Électricien",
+      labelPlural: "électriciens",
+      titleTag: "Soumissions électricien en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les électriciens canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les électriciens canadiens.",
+      useCases: [
+        "Rénovation de câblage résidentiel et mise à niveau de panneaux",
+        "Installation de panneaux et de disjoncteurs",
+        "Installation de bornes solaires et de recharge VE",
+        "Câblage de données et domotique",
+        "Travaux électriques commerciaux et industriels",
+        "Mise aux normes d'un câblage ancien",
+      ],
+    },
     sectorType: "professional",
     label: "Electrician",
     labelPlural: "electricians",
@@ -126,6 +173,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   plumber: {
     slug: "plumber",
+    frSlug: "plombier",
+    fr: {
+      label: "Plombier",
+      labelPlural: "plombiers",
+      titleTag: "Soumissions plombier en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les plombiers canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les plombiers canadiens.",
+      useCases: [
+        "Remplacement de fournaise et de chauffe-eau",
+        "Remplacement complet de la tuyauterie",
+        "Installation de chauffage radiant au sol",
+        "Travaux de drains et d'égouts",
+        "Entretien de fournaises et de chaudières",
+        "Installation de robinetterie et d'appareils sanitaires",
+      ],
+    },
     sectorType: "professional",
     label: "Plumber",
     labelPlural: "plumbers",
@@ -177,6 +240,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "general-contractor": {
     slug: "general-contractor",
+    frSlug: "entrepreneur-general",
+    fr: {
+      label: "Entrepreneur général",
+      labelPlural: "entrepreneurs généraux",
+      titleTag: "Soumissions entrepreneur général en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les entrepreneurs généraux canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les entrepreneurs généraux canadiens.",
+      useCases: [
+        "Construction de maisons neuves et sur mesure",
+        "Rénovation résidentielle et commerciale",
+        "Charpente et travaux structuraux en béton",
+        "Finition intérieure et extérieure",
+        "Réparation et renforcement structural",
+        "Démolition et enlèvement de débris",
+      ],
+    },
     sectorType: "service",
     label: "General Contractor",
     labelPlural: "general contractors",
@@ -228,6 +307,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "renovation-contractor": {
     slug: "renovation-contractor",
+    frSlug: "entrepreneur-renovation",
+    fr: {
+      label: "Entrepreneur en rénovation",
+      labelPlural: "entrepreneurs en rénovation",
+      titleTag: "Soumissions entrepreneur en rénovation en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les entrepreneurs en rénovation canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les entrepreneurs en rénovation canadiens.",
+      useCases: [
+        "Rénovations complètes de condos et de maisons",
+        "Rénovation de salles de bain avec céramique et accessoires",
+        "Remplacement de planchers et de finitions",
+        "Remplacement de fenêtres et de portes extérieures",
+        "Améliorations écoénergétiques admissibles à des subventions",
+        "Rénovation de bureaux et d'espaces commerciaux",
+      ],
+    },
     sectorType: "service",
     label: "Renovation Contractor",
     labelPlural: "renovation contractors",
@@ -279,6 +374,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "welder-fabricator": {
     slug: "welder-fabricator",
+    frSlug: "soudeur-metallier",
+    fr: {
+      label: "Soudeur-métallier",
+      labelPlural: "soudeurs-métalliers",
+      titleTag: "Soumissions soudeur-métallier en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les soudeurs-métalliers canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les soudeurs-métalliers canadiens.",
+      useCases: [
+        "Portails et clôtures en acier et en aluminium",
+        "Charpentes et fermes en acier structural",
+        "Auvents et marquises en acier",
+        "Escaliers en acier intérieurs et extérieurs",
+        "Rampes et balcons en acier inoxydable",
+        "Mezzanines et structures industrielles",
+      ],
+    },
     sectorType: "professional",
     label: "Welder & Metal Fabricator",
     labelPlural: "welders and metal fabricators",
@@ -330,6 +441,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "carpenter-cabinetmaker": {
     slug: "carpenter-cabinetmaker",
+    frSlug: "menuisier-ebeniste",
+    fr: {
+      label: "Menuisier-ébéniste",
+      labelPlural: "menuisiers-ébénistes",
+      titleTag: "Soumissions menuisier-ébéniste en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les menuisiers-ébénistes canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les menuisiers-ébénistes canadiens.",
+      useCases: [
+        "Garde-robes sur mesure et rangements intégrés",
+        "Cuisines en bois massif et en stratifié",
+        "Fenêtres sur mesure en bois et composite",
+        "Planchers en bois franc et en bois d'ingénierie",
+        "Portes intérieures sur mesure",
+        "Meubles-lavabos et bibliothèques sur mesure",
+      ],
+    },
     sectorType: "professional",
     label: "Carpenter & Cabinetmaker",
     labelPlural: "carpenters and cabinetmakers",
@@ -381,6 +508,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "hvac-technician": {
     slug: "hvac-technician",
+    frSlug: "technicien-cvc",
+    fr: {
+      label: "Technicien CVC",
+      labelPlural: "techniciens CVC",
+      titleTag: "Soumissions technicien cvc en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les techniciens CVC canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les techniciens CVC canadiens.",
+      useCases: [
+        "Installation de fournaises à condensation et de thermopompes",
+        "Systèmes de chauffage radiant au sol",
+        "Installation de climatisation",
+        "Remplacement de plinthes et de radiateurs",
+        "Systèmes thermiques solaires",
+        "Entretien de fournaises et de chaudières",
+      ],
+    },
     sectorType: "professional",
     label: "HVAC & Heating Technician",
     labelPlural: "HVAC and heating technicians",
@@ -432,6 +575,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   freelance: {
     slug: "freelance",
+    frSlug: "travailleur-autonome",
+    fr: {
+      label: "Travailleur autonome",
+      labelPlural: "travailleurs autonomes",
+      titleTag: "Soumissions travailleur autonome en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les travailleurs autonomes canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les travailleurs autonomes canadiens.",
+      useCases: [
+        "Développeurs web et logiciels",
+        "Designers graphiques et UX/UI",
+        "Consultants en marketing et en référencement",
+        "Rédacteurs et créateurs de contenu",
+        "Photographes et vidéastes",
+        "Consultants et coachs d'affaires",
+      ],
+    },
     sectorType: "professional",
     label: "Freelancer",
     labelPlural: "freelancers and consultants",
@@ -483,6 +642,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "building-consultant": {
     slug: "building-consultant",
+    frSlug: "expert-batiment",
+    fr: {
+      label: "Expert en bâtiment",
+      labelPlural: "experts en bâtiment",
+      titleTag: "Soumissions expert en bâtiment en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les experts en bâtiment canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les experts en bâtiment canadiens.",
+      useCases: [
+        "Inspections pré-achat et pré-vente",
+        "Dossiers de plans et demandes de permis",
+        "Surveillance de chantier et rapports d'avancement",
+        "Audits énergétiques et évaluations d'efficacité",
+        "Évaluations structurales et de l'état des propriétés",
+        "Arpentage et relevés de terrain",
+      ],
+    },
     sectorType: "professional",
     label: "Building Consultant",
     labelPlural: "building consultants and home inspectors",
@@ -534,6 +709,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   mason: {
     slug: "mason",
+    frSlug: "macon",
+    fr: {
+      label: "Maçon",
+      labelPlural: "maçons",
+      titleTag: "Soumissions maçon en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les maçons canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les maçons canadiens.",
+      useCases: [
+        "Murs porteurs et cloisons en blocs",
+        "Fondations et dalles en béton armé",
+        "Crépissage et finition de murs",
+        "Dalles de béton pour planchers et entrées",
+        "Démolition et enlèvement de cloisons",
+        "Réparation et renforcement de maçonnerie existante",
+      ],
+    },
     sectorType: "professional",
     label: "Mason & Concrete Contractor",
     labelPlural: "masons and concrete contractors",
@@ -585,6 +776,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   landscaper: {
     slug: "landscaper",
+    frSlug: "paysagiste",
+    fr: {
+      label: "Paysagiste",
+      labelPlural: "paysagistes",
+      titleTag: "Soumissions paysagiste en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les paysagistes canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les paysagistes canadiens.",
+      useCases: [
+        "Entretien régulier de pelouses et de jardins",
+        "Taille de haies, arbustes et arbres fruitiers",
+        "Conception et aménagement paysager",
+        "Installation de systèmes d'irrigation automatique",
+        "Traitements antiparasitaires et fertilisation",
+        "Plates-bandes, jardinières et jardins sur toit",
+      ],
+    },
     sectorType: "professional",
     label: "Landscaper",
     labelPlural: "landscapers",
@@ -636,6 +843,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "tile-installer": {
     slug: "tile-installer",
+    frSlug: "poseur-de-ceramique",
+    fr: {
+      label: "Poseur de céramique",
+      labelPlural: "poseurs de céramique",
+      titleTag: "Soumissions poseur de céramique en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les poseurs de céramique canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les poseurs de céramique canadiens.",
+      useCases: [
+        "Céramique grand format pour aires de vie",
+        "Céramique et mosaïque pour salles de bain et douches",
+        "Remplacement de planchers avec retrait de l'ancien matériau",
+        "Planchers en pierre naturelle",
+        "Imperméabilisation de douches et zones humides",
+        "Planchers en céramique imitation bois",
+      ],
+    },
     sectorType: "professional",
     label: "Tile Installer",
     labelPlural: "tile installers",
@@ -687,6 +910,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "window-door-installer": {
     slug: "window-door-installer",
+    frSlug: "poseur-portes-fenetres",
+    fr: {
+      label: "Poseur de portes et fenêtres",
+      labelPlural: "poseurs de portes et fenêtres",
+      titleTag: "Soumissions poseur de portes et fenêtres en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les poseurs de portes et fenêtres canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les poseurs de portes et fenêtres canadiens.",
+      useCases: [
+        "Remplacement de fenêtres en vinyle et aluminium à rupture thermique",
+        "Portes d'entrée en acier et installation de porte avant",
+        "Portes de garage sectionnelles et enroulables",
+        "Moustiquaires sur mesure, rétractables et plissées",
+        "Volets roulants motorisés et stores en aluminium",
+        "Portes-fenêtres coulissantes et murs vitrés",
+      ],
+    },
     sectorType: "professional",
     label: "Window & Door Installer",
     labelPlural: "window and door installers",
@@ -738,6 +977,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   roofer: {
     slug: "roofer",
+    frSlug: "couvreur",
+    fr: {
+      label: "Couvreur",
+      labelPlural: "couvreurs",
+      titleTag: "Soumissions couvreur en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les couvreurs canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les couvreurs canadiens.",
+      useCases: [
+        "Remplacement de toiture en bardeaux d'asphalte",
+        "Membranes d'étanchéité pour toits plats et terrasses",
+        "Amélioration de l'isolation et des combles",
+        "Gouttières, descentes pluviales et solins",
+        "Installation de puits de lumière et de lucarnes",
+        "Toitures métalliques et systèmes de panneaux industriels",
+      ],
+    },
     sectorType: "service",
     label: "Roofer",
     labelPlural: "roofing companies",
@@ -789,6 +1044,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "air-conditioning-installer": {
     slug: "air-conditioning-installer",
+    frSlug: "installateur-climatisation",
+    fr: {
+      label: "Installateur de climatisation",
+      labelPlural: "installateurs de climatisation",
+      titleTag: "Soumissions installateur de climatisation en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les installateurs de climatisation canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les installateurs de climatisation canadiens.",
+      useCases: [
+        "Installation de mini-split sans conduit à zone unique ou multiple",
+        "Thermopompes air-eau pour chauffage et climatisation",
+        "Systèmes VRF et à conduits pour bureaux et commerces",
+        "Ventilateurs récupérateurs de chaleur (VRC) et d'énergie (VRE)",
+        "Entretien et recharge de réfrigérant pour systèmes existants",
+        "Systèmes de refroidissement évaporatif industriel",
+      ],
+    },
     sectorType: "service",
     label: "Air Conditioning Installer",
     labelPlural: "air conditioning and HVAC installers",
@@ -840,6 +1111,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "decorative-painter": {
     slug: "decorative-painter",
+    frSlug: "peintre-decorateur",
+    fr: {
+      label: "Peintre-décorateur",
+      labelPlural: "peintres-décorateurs",
+      titleTag: "Soumissions peintre-décorateur en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les peintres-décorateurs canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les peintres-décorateurs canadiens.",
+      useCases: [
+        "Peinture intérieure de condos et de maisons",
+        "Revêtements extérieurs avec peinture élastomère ou pour maçonnerie",
+        "Enduits décoratifs haut de gamme et finitions d'accent",
+        "Peinture de portes et fenêtres en bois et en acier",
+        "Traitement de la moisissure et revêtements respirants",
+        "Repeinture d'extérieurs d'immeubles à condos et appartements",
+      ],
+    },
     sectorType: "professional",
     label: "Painter & Decorative Finisher",
     labelPlural: "painters and decorative finishers",
@@ -891,6 +1178,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "flooring-installer": {
     slug: "flooring-installer",
+    frSlug: "poseur-de-plancher",
+    fr: {
+      label: "Poseur de revêtements de sol",
+      labelPlural: "poseurs de revêtements de sol",
+      titleTag: "Soumissions poseur de revêtements de sol en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les poseurs de revêtements de sol canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les poseurs de revêtements de sol canadiens.",
+      useCases: [
+        "Installation de planchers en bois franc préfini et massif",
+        "Installation de planchers stratifiés et vinyle (LVT/SPC)",
+        "Revêtements de plancher en époxy et microciment",
+        "Tapis et revêtements textiles commerciaux",
+        "Préparation de sous-plancher et autonivelant",
+        "Ponçage, réfection et entretien de planchers en bois franc existants",
+      ],
+    },
     sectorType: "professional",
     label: "Flooring Installer",
     labelPlural: "flooring installers",
@@ -942,6 +1245,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "excel-template": {
     slug: "excel-template",
+    frSlug: "modele-soumission-excel",
+    fr: {
+      label: "Modèle Excel",
+      labelPlural: "modèles Excel",
+      titleTag: "Soumissions modèle excel en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les modèles Excel canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les modèles Excel canadiens.",
+      useCases: [
+        "Peintres et décorateurs fatigués de corriger des formules",
+        "Plombiers qui veulent soumissionner depuis le chantier",
+        "Entrepreneurs généraux avec des soumissions complexes à plusieurs sections",
+        "Charpentiers et fabricants qui suivent matériaux et main-d'œuvre",
+        "Électriciens qui doivent répondre rapidement aux clients",
+        "Travailleurs autonomes et consultants qui envoient des propositions",
+      ],
+    },
     sectorType: "service",
     label: "Excel Quote Template",
     labelPlural: "Excel users",
@@ -993,6 +1312,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "word-template": {
     slug: "word-template",
+    frSlug: "modele-soumission-word",
+    fr: {
+      label: "Modèle Word",
+      labelPlural: "modèles Word",
+      titleTag: "Soumissions modèle word en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les modèles Word canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les modèles Word canadiens.",
+      useCases: [
+        "Artisans qui cherchent un « modèle de soumission Word gratuit »",
+        "Plombiers et électriciens qui débutent en rédaction de soumissions",
+        "Entrepreneurs généraux qui veulent une norme professionnelle",
+        "Travailleurs autonomes qui envoient des propositions à des clients",
+        "Entrepreneurs en rénovation et consultants avec des soumissions à plusieurs lignes",
+        "Petites entreprises sans logiciel dédié",
+      ],
+    },
     sectorType: "service",
     label: "Word Quote Template",
     labelPlural: "Word users",
@@ -1044,6 +1379,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "how-to-quote": {
     slug: "how-to-quote",
+    frSlug: "comment-faire-une-soumission",
+    fr: {
+      label: "Comment faire une soumission",
+      labelPlural: "guides de soumission",
+      titleTag: "Soumissions comment faire une soumission en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les guides de soumission canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les guides de soumission canadiens.",
+      useCases: [
+        "Artisans qui veulent arrêter de soumissionner à la main",
+        "Entrepreneurs généraux à la recherche d'un logiciel de soumission rapide",
+        "Plombiers et électriciens qui soumissionnent depuis le chantier",
+        "Travailleurs autonomes qui envoient des propositions à des clients",
+        "Entrepreneurs en rénovation qui doivent justifier des prix plus élevés",
+        "Petites entreprises qui veulent une soumission d'apparence professionnelle",
+      ],
+    },
     sectorType: "service",
     label: "Professional Quote",
     labelPlural: "contractors",
@@ -1095,6 +1446,22 @@ export const SECTORS: Record<string, SectorData> = {
 
   "free-quote": {
     slug: "free-quote",
+    frSlug: "soumission-gratuite",
+    fr: {
+      label: "Soumission gratuite",
+      labelPlural: "soumissions gratuites",
+      titleTag: "Soumissions soumission gratuite en ligne | quoteai – IA en 30s",
+      metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les soumissions gratuites canadiens. Essayez gratuitement.",
+      jsonLdDescription: "Logiciel de soumission par IA pour les soumissions gratuites canadiens.",
+      useCases: [
+        "Artisans qui débutent dans la rédaction de soumissions professionnelles",
+        "Petites entreprises qui numérisent leur processus de soumission",
+        "Travailleurs autonomes à la recherche d'une alternative gratuite à Word et Excel",
+        "Électriciens et plombiers qui veulent essayer avant de payer",
+        "Experts en bâtiment et professionnels qui testent de nouveaux outils",
+        "Entrepreneurs généraux qui envisagent de changer de logiciel",
+      ],
+    },
     sectorType: "service",
     label: "Free Quotes",
     labelPlural: "contractors and small businesses",
@@ -1144,6 +1511,11 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "Free online quoting software for Canadian contractors and small businesses. Get started for free, no credit card.",
   },
 };
+
+/** frSlug -> canonical (English) sector key, for resolving /fr/soumissions/:frSlug routes. */
+export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(SECTORS).map(([key, s]) => [s.frSlug, key]),
+);
 
 export interface SectorReview {
   authorName: string;
@@ -1241,7 +1613,7 @@ export const SECTOR_REVIEWS: Record<string, SectorReview[]> = {
     { authorName: "Gino F.", ratingValue: "5", reviewBody: "I tried quoteai for free and after the first quote I signed up for the Starter plan. Worth every dollar. The time I save is worth way more than the monthly cost.", datePublished: "2024-10-24" },
     { authorName: "Carmen R.", ratingValue: "5", reviewBody: "No credit card to try it, no commitment. I created my first quote for free and the result already looked professional. Then I picked the monthly plan without hesitating.", datePublished: "2024-11-06" },
   ],
-  professionista: [
+  contractor: [
     { authorName: "Lawrence B.", ratingValue: "5", reviewBody: "I use quoteai every day for my small business's quotes. Cut prep time from an hour to under five minutes. Customers get professional documents and sign a lot more often.", datePublished: "2024-10-27" },
     { authorName: "Alicia D.", ratingValue: "5", reviewBody: "The AI understands my trade's technical language without me needing to use formal terms. I describe the job like I'd explain it to a friend and the quote comes out perfect.", datePublished: "2024-11-12" },
   ],
@@ -1270,11 +1642,20 @@ export const SECTOR_RATINGS: Record<string, { ratingValue: number; reviewCount: 
   "word-template": { ratingValue: 4.7, reviewCount: 138 },
   "how-to-quote": { ratingValue: 4.8, reviewCount: 201 },
   "free-quote": { ratingValue: 4.8, reviewCount: 178 },
-  professionista: { ratingValue: 4.8, reviewCount: 312 },
+  contractor: { ratingValue: 4.8, reviewCount: 312 },
 };
 
 export const DEFAULT_SECTOR: SectorData = {
-  slug: "professionista",
+  slug: "contractor",
+  frSlug: "entrepreneur",
+  fr: {
+    label: "Entrepreneur",
+    labelPlural: "entrepreneurs",
+    titleTag: "Soumissions en ligne pour entrepreneurs | quoteai – IA",
+    metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les entrepreneurs canadiens.",
+    jsonLdDescription: "Logiciel de soumission par IA pour les entrepreneurs canadiens.",
+    useCases: [],
+  },
   sectorType: "professional",
   label: "Contractor",
   labelPlural: "contractors",
@@ -1421,19 +1802,45 @@ const CITY_DESC_FORMULAS: Array<(label: string, labelPlural: string, city: strin
   (_l, labelPlural, city) => `Quotes for ${labelPlural} in ${city} in 30 seconds with AI. Nothing to install. Try it free.`,
 ];
 
+const CITY_TITLE_FORMULAS_FR: Array<(label: string, labelPlural: string, city: string) => string> = [
+  (label, _lp, city) => `Soumission ${label} à ${city} | quoteai – IA en 30s`,
+  (_l, labelPlural, city) => `Logiciel de soumission pour ${labelPlural} à ${city} | quoteai`,
+  (label, _lp, city) => `Soumissions ${label} professionnelles à ${city} – quoteai`,
+  (label, _lp, city) => `${label} à ${city} : soumission en ligne en 30 secondes | quoteai`,
+  (_l, labelPlural, city) => `Soumissions pour ${labelPlural} à ${city} | quoteai IA`,
+];
+
+const CITY_DESC_FORMULAS_FR: Array<(label: string, labelPlural: string, city: string, region: string) => string> = [
+  (_l, labelPlural, city, region) => `Logiciel de soumission par IA pour les ${labelPlural} à ${city}. Créez des soumissions professionnelles en 30 secondes. Sans carte de crédit. Utilisé partout au ${region}.`,
+  (_l, labelPlural, city) => `Les ${labelPlural} à ${city} génèrent des soumissions professionnelles avec quoteai en 30 secondes. Fini Excel, fini les erreurs. Essayez gratuitement.`,
+  (_l, labelPlural, city) => `Les ${labelPlural} à ${city} utilisent quoteai pour créer des soumissions en 30 secondes. Professionnel, rapide, sans erreur. Essayez gratuitement.`,
+  (label, _lp, city, region) => `Soumission ${label} à ${city} en 30 secondes avec l'IA. Logiciel professionnel pour les artisans du ${region}. Sans engagement.`,
+  (_l, labelPlural, city) => `Soumissions pour ${labelPlural} à ${city} en 30 secondes avec l'IA. Rien à installer. Essayez gratuitement.`,
+];
+
 // Google truncates titles at ~70 chars; Semrush flags anything longer.
 const MAX_TITLE_LENGTH = 70;
 
-export function getCityTitle(sector: SectorData, cityName: string, citySlug: string): string {
+export function getCityTitle(sector: SectorData, cityName: string, citySlug: string, lang: "en-CA" | "fr-CA" = "en-CA"): string {
   const hash = strHash(sector.slug + citySlug);
+  if (lang === "fr-CA") {
+    const formula = CITY_TITLE_FORMULAS_FR[hash % CITY_TITLE_FORMULAS_FR.length];
+    const title = formula(sector.fr.label, sector.fr.labelPlural, cityName);
+    if (title.length <= MAX_TITLE_LENGTH) return title;
+    return `Soumissions pour ${sector.fr.labelPlural} à ${cityName} | quoteai`;
+  }
   const formula = CITY_TITLE_FORMULAS[hash % CITY_TITLE_FORMULAS.length];
   const title = formula(sector.label, sector.labelPlural, cityName);
   if (title.length <= MAX_TITLE_LENGTH) return title;
   return `Quotes for ${sector.labelPlural} in ${cityName} | quoteai`;
 }
 
-export function getCityDesc(sector: SectorData, cityName: string, citySlug: string, region: string): string {
+export function getCityDesc(sector: SectorData, cityName: string, citySlug: string, region: string, lang: "en-CA" | "fr-CA" = "en-CA"): string {
   const hash = strHash(sector.slug + citySlug + "d");
+  if (lang === "fr-CA") {
+    const formula = CITY_DESC_FORMULAS_FR[hash % CITY_DESC_FORMULAS_FR.length];
+    return formula(sector.fr.label, sector.fr.labelPlural, cityName, region);
+  }
   const formula = CITY_DESC_FORMULAS[hash % CITY_DESC_FORMULAS.length];
   return formula(sector.label, sector.labelPlural, cityName, region);
 }
@@ -1618,12 +2025,12 @@ export const RELATED_SECTORS: Record<string, { slug: string; label: string }[]> 
 };
 
 /**
- * Hand-written "local market" copy per city. Shape is lang-aware ({ en, fr })
- * even though only `en` is populated today — there is no locale-prefixed
- * routing yet (see the note on CITIES above and the report from this pass),
- * so getCityContextText() in seo-render-engine.ts always resolves `en` for
- * now. Once fr-CA routes exist, fill in `fr` for the French-primary cities
- * (see FRENCH_PRIMARY_CITY_SLUGS) and thread a real lang argument through.
+ * Hand-written "local market" copy per city. Shape is lang-aware ({ en, fr }).
+ * `fr` is filled in for the French-primary cities (see
+ * FRENCH_PRIMARY_CITY_SLUGS) — getCityContextText() in seo-render-engine.ts
+ * resolves it when called with lang="fr-CA". Non-Quebec cities only have
+ * `en` populated; getCityContextText() falls back to `en` when `fr` is
+ * missing.
  */
 export interface CityContextEntry {
   en: string;
@@ -1663,15 +2070,19 @@ export const CITY_CONTEXT: Record<string, CityContextEntry> = {
   },
   montreal: {
     en: "Montreal's building stock is dominated by older triplexes and duplexes with exterior staircases, especially in the Plateau and Rosemont, which means renovation quotes often need to account for older wiring, plaster walls, and party-wall considerations specific to attached row housing. Demand is strong for kitchen and bathroom remodels, mechanical upgrades, and energy-efficiency retrofits, with French as the primary language of business for most residential clients.",
+    fr: "Le parc immobilier de Montréal est dominé par d'anciens triplex et duplex avec escaliers extérieurs, particulièrement dans le Plateau et Rosemont, ce qui signifie que les soumissions de rénovation doivent souvent tenir compte d'un câblage ancien, de murs en plâtre et de considérations de mur mitoyen propres aux maisons en rangée. La demande est forte pour la rénovation de cuisines et de salles de bain, les mises à niveau mécaniques et les rénovations écoénergétiques, le français étant la langue principale des affaires pour la plupart des clients résidentiels.",
   },
   "quebec-city": {
     en: "Quebec City combines a UNESCO-listed historic core with strict heritage-preservation rules around Vieux-Québec and a much larger stock of standard 20th-century housing in the surrounding boroughs. Cold winters and heavy snow loads make roofing, insulation, and exterior envelope work a major seasonal driver, and French is the default language for nearly all client communication.",
+    fr: "Québec combine un centre historique classé par l'UNESCO, avec des règles strictes de préservation patrimoniale autour du Vieux-Québec, et un parc immobilier beaucoup plus vaste datant du 20e siècle dans les arrondissements environnants. Les hivers froids et les fortes chutes de neige font de la toiture, de l'isolation et de l'enveloppe extérieure un moteur saisonnier majeur, et le français est la langue par défaut pour la quasi-totalité des communications avec la clientèle.",
   },
   gatineau: {
     en: "Gatineau sits just across the river from Ottawa and shares much of that region's public-sector-driven demand, while remaining a distinctly French-primary market. Newer suburban development in areas like Aylmer and Hull contrasts with older housing closer to the river, and bilingual quoting (French-first, English available) is a practical advantage given how many customers cross the interprovincial border for work.",
+    fr: "Gatineau, juste en face d'Ottawa, partage une bonne part de la demande liée au secteur public de cette région tout en demeurant un marché nettement à prédominance francophone. Le développement de banlieues plus récentes comme Aylmer et Hull contraste avec des quartiers plus anciens près de la rivière, et offrir des soumissions bilingues (français d'abord, anglais disponible) est un atout pratique étant donné le nombre de clients qui traversent la frontière interprovinciale pour leurs travaux.",
   },
   laval: {
     en: "Laval, just north of Montreal, has grown rapidly with a mix of 1970s-80s suburban housing now due for major mechanical and roofing updates, and newer subdivisions still under active construction. French-primary demand is strong for renovation and finishing trades, with steady overflow work from the tighter, more expensive Montreal core.",
+    fr: "Laval, juste au nord de Montréal, a connu une croissance rapide avec un mélange de maisons de banlieue des années 1970-1980 qui nécessitent maintenant d'importantes mises à niveau mécaniques et de toiture, et de nouveaux quartiers encore en construction active. La demande francophone est forte pour les métiers de rénovation et de finition, avec un débordement de travaux constant en provenance du centre montréalais, plus dense et plus coûteux.",
   },
   halifax: {
     en: "Halifax's housing stock includes a significant share of older wood-frame homes in the peninsula core that need structural, roofing, and moisture-control attention given the damp Atlantic climate, alongside newer suburban growth in Bedford and Dartmouth. Salt-air exposure accelerates wear on exterior finishes and metal fixtures, keeping steady demand for painting, siding, and roofing work throughout the region.",

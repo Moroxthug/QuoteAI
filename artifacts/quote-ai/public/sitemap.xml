@@ -49,7 +49,19 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/</loc>
+    <lastmod>2026-09-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/painter/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -61,7 +73,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/electricien/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/plumber/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/plombier/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -73,7 +97,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-general/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-renovation/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -85,7 +121,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/soudeur-metallier/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/menuisier-ebeniste/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -97,7 +145,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/technicien-cvc/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/freelance/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/travailleur-autonome/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -109,7 +169,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/expert-batiment/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/mason/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/macon/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -121,7 +193,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/paysagiste/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/tile-installer/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-ceramique/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -133,7 +217,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/roofer/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/couvreur/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -145,7 +241,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/installateur-climatisation/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre-decorateur/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -157,7 +265,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-plancher/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/excel-template/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/modele-soumission-excel/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -169,7 +289,19 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/modele-soumission-word/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/how-to-quote/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/comment-faire-une-soumission/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -181,16 +313,22 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/soumission-gratuite/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/painter/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/mississauga/</loc>
@@ -208,7 +346,7 @@
     <loc>https://quoteai.ca/quotes/painter/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/surrey/</loc>
@@ -226,13 +364,13 @@
     <loc>https://quoteai.ca/quotes/painter/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/winnipeg/</loc>
@@ -244,10 +382,22 @@
     <loc>https://quoteai.ca/quotes/painter/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/painter/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -259,7 +409,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/painter/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -274,13 +436,13 @@
     <loc>https://quoteai.ca/quotes/electrician/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/mississauga/</loc>
@@ -298,7 +460,7 @@
     <loc>https://quoteai.ca/quotes/electrician/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/surrey/</loc>
@@ -316,13 +478,13 @@
     <loc>https://quoteai.ca/quotes/electrician/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/winnipeg/</loc>
@@ -334,10 +496,22 @@
     <loc>https://quoteai.ca/quotes/electrician/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/electricien/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/electrician/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/electricien/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -349,7 +523,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/electricien/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/electrician/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/electricien/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -364,13 +550,13 @@
     <loc>https://quoteai.ca/quotes/plumber/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/mississauga/</loc>
@@ -388,7 +574,7 @@
     <loc>https://quoteai.ca/quotes/plumber/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/surrey/</loc>
@@ -406,13 +592,13 @@
     <loc>https://quoteai.ca/quotes/plumber/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/winnipeg/</loc>
@@ -424,10 +610,22 @@
     <loc>https://quoteai.ca/quotes/plumber/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/plombier/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/plumber/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/plombier/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -439,7 +637,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/plombier/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/plumber/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/plombier/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -454,13 +664,13 @@
     <loc>https://quoteai.ca/quotes/general-contractor/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/mississauga/</loc>
@@ -478,7 +688,7 @@
     <loc>https://quoteai.ca/quotes/general-contractor/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/surrey/</loc>
@@ -496,13 +706,13 @@
     <loc>https://quoteai.ca/quotes/general-contractor/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/winnipeg/</loc>
@@ -514,10 +724,22 @@
     <loc>https://quoteai.ca/quotes/general-contractor/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-general/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/general-contractor/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-general/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -529,7 +751,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-general/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/general-contractor/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-general/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -544,13 +778,13 @@
     <loc>https://quoteai.ca/quotes/renovation-contractor/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/mississauga/</loc>
@@ -568,7 +802,7 @@
     <loc>https://quoteai.ca/quotes/renovation-contractor/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/surrey/</loc>
@@ -586,13 +820,13 @@
     <loc>https://quoteai.ca/quotes/renovation-contractor/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/winnipeg/</loc>
@@ -604,10 +838,22 @@
     <loc>https://quoteai.ca/quotes/renovation-contractor/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-renovation/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-renovation/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -619,7 +865,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-renovation/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/renovation-contractor/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/entrepreneur-renovation/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -634,13 +892,13 @@
     <loc>https://quoteai.ca/quotes/welder-fabricator/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/mississauga/</loc>
@@ -658,7 +916,7 @@
     <loc>https://quoteai.ca/quotes/welder-fabricator/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/surrey/</loc>
@@ -676,13 +934,13 @@
     <loc>https://quoteai.ca/quotes/welder-fabricator/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/winnipeg/</loc>
@@ -694,10 +952,22 @@
     <loc>https://quoteai.ca/quotes/welder-fabricator/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/soudeur-metallier/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/soudeur-metallier/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -709,7 +979,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/soudeur-metallier/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/welder-fabricator/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/soudeur-metallier/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -724,13 +1006,13 @@
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/mississauga/</loc>
@@ -748,7 +1030,7 @@
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/surrey/</loc>
@@ -766,13 +1048,13 @@
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/winnipeg/</loc>
@@ -784,10 +1066,22 @@
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/menuisier-ebeniste/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/menuisier-ebeniste/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -799,7 +1093,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/menuisier-ebeniste/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/carpenter-cabinetmaker/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/menuisier-ebeniste/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -814,13 +1120,13 @@
     <loc>https://quoteai.ca/quotes/hvac-technician/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/mississauga/</loc>
@@ -838,7 +1144,7 @@
     <loc>https://quoteai.ca/quotes/hvac-technician/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/surrey/</loc>
@@ -856,13 +1162,13 @@
     <loc>https://quoteai.ca/quotes/hvac-technician/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/winnipeg/</loc>
@@ -874,10 +1180,22 @@
     <loc>https://quoteai.ca/quotes/hvac-technician/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/technicien-cvc/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/technicien-cvc/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -889,7 +1207,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/technicien-cvc/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/hvac-technician/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/technicien-cvc/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -904,13 +1234,13 @@
     <loc>https://quoteai.ca/quotes/freelance/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/mississauga/</loc>
@@ -928,7 +1258,7 @@
     <loc>https://quoteai.ca/quotes/freelance/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/surrey/</loc>
@@ -946,13 +1276,13 @@
     <loc>https://quoteai.ca/quotes/freelance/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/winnipeg/</loc>
@@ -964,10 +1294,22 @@
     <loc>https://quoteai.ca/quotes/freelance/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/travailleur-autonome/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/freelance/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/travailleur-autonome/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -979,7 +1321,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/travailleur-autonome/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/freelance/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/travailleur-autonome/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -994,13 +1348,13 @@
     <loc>https://quoteai.ca/quotes/building-consultant/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/mississauga/</loc>
@@ -1018,7 +1372,7 @@
     <loc>https://quoteai.ca/quotes/building-consultant/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/surrey/</loc>
@@ -1036,13 +1390,13 @@
     <loc>https://quoteai.ca/quotes/building-consultant/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/winnipeg/</loc>
@@ -1054,10 +1408,22 @@
     <loc>https://quoteai.ca/quotes/building-consultant/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/expert-batiment/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/building-consultant/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/expert-batiment/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1069,7 +1435,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/expert-batiment/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/building-consultant/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/expert-batiment/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1084,13 +1462,13 @@
     <loc>https://quoteai.ca/quotes/mason/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/mississauga/</loc>
@@ -1108,7 +1486,7 @@
     <loc>https://quoteai.ca/quotes/mason/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/surrey/</loc>
@@ -1126,13 +1504,13 @@
     <loc>https://quoteai.ca/quotes/mason/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/winnipeg/</loc>
@@ -1144,10 +1522,22 @@
     <loc>https://quoteai.ca/quotes/mason/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/macon/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/mason/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/macon/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1159,7 +1549,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/macon/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/mason/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/macon/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1174,13 +1576,13 @@
     <loc>https://quoteai.ca/quotes/landscaper/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/mississauga/</loc>
@@ -1198,7 +1600,7 @@
     <loc>https://quoteai.ca/quotes/landscaper/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/surrey/</loc>
@@ -1216,13 +1618,13 @@
     <loc>https://quoteai.ca/quotes/landscaper/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/winnipeg/</loc>
@@ -1234,10 +1636,22 @@
     <loc>https://quoteai.ca/quotes/landscaper/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/paysagiste/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/landscaper/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/paysagiste/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1249,7 +1663,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/paysagiste/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/landscaper/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/paysagiste/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1264,13 +1690,13 @@
     <loc>https://quoteai.ca/quotes/tile-installer/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/mississauga/</loc>
@@ -1288,7 +1714,7 @@
     <loc>https://quoteai.ca/quotes/tile-installer/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/surrey/</loc>
@@ -1306,13 +1732,13 @@
     <loc>https://quoteai.ca/quotes/tile-installer/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/winnipeg/</loc>
@@ -1324,10 +1750,22 @@
     <loc>https://quoteai.ca/quotes/tile-installer/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-ceramique/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/tile-installer/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-ceramique/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1339,7 +1777,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-ceramique/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/tile-installer/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-ceramique/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1354,13 +1804,13 @@
     <loc>https://quoteai.ca/quotes/window-door-installer/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/mississauga/</loc>
@@ -1378,7 +1828,7 @@
     <loc>https://quoteai.ca/quotes/window-door-installer/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/surrey/</loc>
@@ -1396,13 +1846,13 @@
     <loc>https://quoteai.ca/quotes/window-door-installer/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/winnipeg/</loc>
@@ -1414,10 +1864,22 @@
     <loc>https://quoteai.ca/quotes/window-door-installer/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1429,7 +1891,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/window-door-installer/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1444,13 +1918,13 @@
     <loc>https://quoteai.ca/quotes/roofer/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/mississauga/</loc>
@@ -1468,7 +1942,7 @@
     <loc>https://quoteai.ca/quotes/roofer/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/surrey/</loc>
@@ -1486,13 +1960,13 @@
     <loc>https://quoteai.ca/quotes/roofer/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/winnipeg/</loc>
@@ -1504,10 +1978,22 @@
     <loc>https://quoteai.ca/quotes/roofer/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/couvreur/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/roofer/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/couvreur/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1519,7 +2005,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/couvreur/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/roofer/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/couvreur/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1534,13 +2032,13 @@
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/mississauga/</loc>
@@ -1558,7 +2056,7 @@
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/surrey/</loc>
@@ -1576,13 +2074,13 @@
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/winnipeg/</loc>
@@ -1594,10 +2092,22 @@
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/installateur-climatisation/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/installateur-climatisation/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1609,7 +2119,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/installateur-climatisation/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/air-conditioning-installer/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/installateur-climatisation/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1624,13 +2146,13 @@
     <loc>https://quoteai.ca/quotes/decorative-painter/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/mississauga/</loc>
@@ -1648,7 +2170,7 @@
     <loc>https://quoteai.ca/quotes/decorative-painter/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/surrey/</loc>
@@ -1666,13 +2188,13 @@
     <loc>https://quoteai.ca/quotes/decorative-painter/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/winnipeg/</loc>
@@ -1684,10 +2206,22 @@
     <loc>https://quoteai.ca/quotes/decorative-painter/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre-decorateur/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre-decorateur/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1699,7 +2233,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre-decorateur/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/decorative-painter/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/peintre-decorateur/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1714,13 +2260,13 @@
     <loc>https://quoteai.ca/quotes/flooring-installer/toronto/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/ottawa/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/mississauga/</loc>
@@ -1738,7 +2284,7 @@
     <loc>https://quoteai.ca/quotes/flooring-installer/vancouver/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/surrey/</loc>
@@ -1756,13 +2302,13 @@
     <loc>https://quoteai.ca/quotes/flooring-installer/calgary/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/edmonton/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/winnipeg/</loc>
@@ -1774,10 +2320,22 @@
     <loc>https://quoteai.ca/quotes/flooring-installer/montreal/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-plancher/montreal/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/quebec-city/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-plancher/quebec-city/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -1789,7 +2347,19 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-plancher/gatineau/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/flooring-installer/laval/</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/poseur-de-plancher/laval/</loc>
     <lastmod>2026-05-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

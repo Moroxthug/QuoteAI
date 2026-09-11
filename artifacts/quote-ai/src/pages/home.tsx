@@ -9,6 +9,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { WhatsAppChatDemo } from "@/components/whatsapp-chat-demo";
 import { TRADE_LABELS } from "@/i18n/translations";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { SECTORS } from "@/data/seo-data";
+import { cityBasePath } from "@/data/seo-render-engine";
 const DemoPlayer = lazy(() => import("@/components/demo/DemoPlayer"));
 
 function ScrollSection({
@@ -36,6 +38,7 @@ export default function Home() {
   const { data: plans } = useGetPlans();
   const { isSignedIn } = useAuth();
   const { lang } = useLanguage();
+  const base = cityBasePath(lang === "fr" ? "fr-CA" : "en-CA");
   const [, navigate] = useLocation();
   const [homepageInput, setHomepageInput] = useState("");
   const homepageInputRef = useRef<HTMLInputElement>(null);
@@ -96,9 +99,19 @@ export default function Home() {
           the prerendered shell by scripts/prerender-seo.ts — don't duplicate
           it here via Helmet, or crawlers see two WebSite schemas. */}
       <SeoHead
-        title="quoteai – Instant Quotes for Canadian Contractors | AI in 30s"
-        description="Forget Excel and handwritten paperwork. Describe the job in your own words and quoteai generates a professional quote with tax, line items, and totals in 30 seconds."
-        canonical="https://quoteai.ca/"
+        title={
+          lang === "fr"
+            ? "quoteai – Soumissions instantanées pour entrepreneurs canadiens | IA en 30s"
+            : "quoteai – Instant Quotes for Canadian Contractors | AI in 30s"
+        }
+        description={
+          lang === "fr"
+            ? "Oubliez Excel et la paperasse écrite à la main. Décrivez le travail dans vos propres mots et quoteai génère une soumission professionnelle avec taxes, postes et totaux en 30 secondes."
+            : "Forget Excel and handwritten paperwork. Describe the job in your own words and quoteai generates a professional quote with tax, line items, and totals in 30 seconds."
+        }
+        canonical={lang === "fr" ? "https://quoteai.ca/fr/" : "https://quoteai.ca/"}
+        lang={lang === "fr" ? "fr-CA" : "en-CA"}
+        frCanonical="https://quoteai.ca/fr/"
       />
 
       {/* ── SEZIONE 1: Hero con scena 3D ──────────────────────── */}
@@ -866,13 +879,13 @@ export default function Home() {
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
               {[
-                { href: "/quotes/excel-template", label: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", badge: "vs Excel" },
-                { href: "/quotes/word-template", label: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", badge: "vs Word" },
-                { href: "/quotes/how-to-quote", label: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", badge: "Guide" },
-              ].map(({ href, label, desc, badge }) => (
+                { slug: "excel-template", label: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", badge: "vs Excel" },
+                { slug: "word-template", label: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", badge: "vs Word" },
+                { slug: "how-to-quote", label: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", badge: "Guide" },
+              ].map(({ slug: guideSlug, label, desc, badge }) => (
                 <Link
-                  key={href}
-                  href={href}
+                  key={guideSlug}
+                  href={`${base}/${lang === "fr" ? (SECTORS[guideSlug]?.frSlug ?? guideSlug) : guideSlug}/`}
                   className="bg-white rounded-xl border border-gray-100 p-4 hover:border-violet-200 hover:shadow-md transition-all group card-soft"
                 >
                   <span className="text-[10px] font-bold uppercase tracking-wider text-violet-500 bg-violet-50 px-2 py-0.5 rounded-full">{badge}</span>
@@ -902,7 +915,7 @@ export default function Home() {
                 {Object.entries(TRADE_LABELS[lang]).map(([slug, label]) => (
                   <Link
                     key={slug}
-                    href={`/quotes/${slug}/`}
+                    href={`${base}/${lang === "fr" ? (SECTORS[slug]?.frSlug ?? slug) : slug}/`}
                     className="text-xs text-gray-500 hover:text-violet-600 py-1 px-2 rounded hover:bg-violet-50 transition-colors"
                   >
                     {label}
@@ -926,7 +939,7 @@ export default function Home() {
                   ].map(city => (
                     <Link
                       key={city.slug}
-                      href={`/quotes/renovation-contractor/${city.slug}/`}
+                      href={`${base}/${lang === "fr" ? SECTORS["renovation-contractor"].frSlug : "renovation-contractor"}/${city.slug}/`}
                       className="text-xs text-gray-400 hover:text-violet-600 hover:bg-violet-50 px-2 py-0.5 rounded transition-colors"
                     >
                       {city.name}

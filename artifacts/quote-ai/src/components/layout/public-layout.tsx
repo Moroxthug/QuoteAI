@@ -8,12 +8,28 @@ import { useAuth } from "@/hooks/use-auth";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
+import { getLanguageCounterpartPath } from "@/data/seo-render-engine";
 
 function LanguageToggle({ className }: { className?: string }) {
   const { lang, toggleLang, t } = useLanguage();
+  const [pathname, navigate] = useLocation();
+
+  const handleClick = () => {
+    // Pages with a real French URL (home, sector/city SEO pages) navigate
+    // to the counterpart URL so hreflang/canonical/prerendered content stay
+    // correct. Everything else (dashboard, auth, blog, ...) just flips the
+    // client-side chrome language in place.
+    const counterpart = getLanguageCounterpartPath(pathname);
+    if (counterpart) {
+      navigate(counterpart);
+    } else {
+      toggleLang();
+    }
+  };
+
   return (
     <button
-      onClick={toggleLang}
+      onClick={handleClick}
       className={cn(
         "inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full",
         className

@@ -1,11 +1,11 @@
-import { useParams, Link } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Building2, BookOpen, X, MapPin } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
-import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
 import { BLOG_ARTICLES, SECTOR_ARTICLES } from "@/data/blog-data";
-import { getOgImagePath } from "@/data/seo-render-engine";
+import { getOgImagePath, getSectorFrContent, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
-import { useLanguage } from "@/i18n/LanguageContext";
+import { useLanguage, isFrenchPath } from "@/i18n/LanguageContext";
 
 // Highlighted cities on the sector hub page — must stay within ACTIVE_CITIES,
 // the only cities actually prerendered/sitemapped right now (see seo-data.ts).
@@ -244,37 +244,66 @@ function PreventiviGratisPlansBlock() {
 
 export default function SeoLanding() {
   const { t } = useLanguage();
+  const [pathname] = useLocation();
+  const isFr = isFrenchPath(pathname);
+  const engineLang: EngineLang = isFr ? "fr-CA" : "en-CA";
+  const base = cityBasePath(engineLang);
   const params = useParams();
-  const slug = (params as { type?: string }).type ?? "professionista";
+  const rawSlug = (params as { type?: string }).type ?? "contractor";
+  const slug = isFr ? (SECTOR_KEY_BY_FR_SLUG[rawSlug] ?? rawSlug) : rawSlug;
   const s = SECTORS[slug] ?? DEFAULT_SECTOR;
+  const sSlugForLang = isFr ? s.frSlug : s.slug;
 
-  const canonical = `https://quoteai.ca/quotes/${s.slug}/`;
+  // French sector-page copy: titleTag/metaDescription/jsonLdDescription/useCases
+  // are hand-authored per sector (SectorData.fr); h1/intro/benefits/howItWorks/faq
+  // come from the generic French templates in seo-render-engine.ts.
+  const frContent = isFr ? getSectorFrContent(s) : null;
+  const titleTag = isFr ? s.fr.titleTag : s.titleTag;
+  const metaDescription = isFr ? s.fr.metaDescription : s.metaDescription;
+  const jsonLdDescription = isFr ? s.fr.jsonLdDescription : s.jsonLdDescription;
+  const h1 = frContent?.h1 ?? s.h1;
+  const h1Highlight = frContent?.h1Highlight ?? s.h1Highlight;
+  const intro = frContent?.intro ?? s.intro;
+  const h2Benefits = frContent?.h2Benefits ?? s.h2Benefits;
+  const benefits = frContent?.benefits ?? s.benefits;
+  const h2HowItWorks = frContent?.h2HowItWorks ?? s.h2HowItWorks;
+  const howItWorks = frContent?.howItWorks ?? s.howItWorks;
+  const h2UseCases = frContent?.h2UseCases ?? s.h2UseCases;
+  const useCases = isFr ? s.fr.useCases : s.useCases;
+  const h2Faq = frContent?.h2Faq ?? s.h2Faq;
+  const faq = frContent?.faq ?? s.faq;
+  const labelPlural = isFr ? s.fr.labelPlural : s.labelPlural;
+  const label = isFr ? s.fr.label : s.label;
+
+  const canonical = `https://quoteai.ca${base}/${sSlugForLang}/`;
+  const enCanonical = `https://quoteai.ca/quotes/${s.slug}/`;
+  const frCanonical = `https://quoteai.ca/fr/soumissions/${s.frSlug}/`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication" as const,
       name: "quoteai",
-      description: s.jsonLdDescription,
+      description: jsonLdDescription,
       url: canonical,
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",
-      inLanguage: "en",
+      inLanguage: isFr ? "fr" : "en",
       offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", availability: "https://schema.org/InStock" },
     },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList" as const,
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://quoteai.ca/" },
-        { "@type": "ListItem", position: 2, name: s.h1Highlight, item: canonical },
+        { "@type": "ListItem", position: 1, name: isFr ? "Accueil" : "Home", item: isFr ? "https://quoteai.ca/fr/" : "https://quoteai.ca/" },
+        { "@type": "ListItem", position: 2, name: h1Highlight, item: canonical },
       ],
     },
-    ...(s.faq.length > 0
+    ...(faq.length > 0
       ? [
           {
             "@context": "https://schema.org",
             "@type": "FAQPage" as const,
-            mainEntity: s.faq.map((f) => ({
+            mainEntity: faq.map((f) => ({
               "@type": "Question",
               name: f.q,
               acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -287,11 +316,13 @@ export default function SeoLanding() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <SeoHead
-        title={s.titleTag}
-        description={s.metaDescription}
+        title={titleTag}
+        description={metaDescription}
         canonical={canonical}
         jsonLd={jsonLd}
         ogImage={getOgImagePath(s.slug)}
+        lang={engineLang}
+        frCanonical={frCanonical}
       />
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-white pt-24 pb-20" aria-label="Hero">
@@ -311,11 +342,11 @@ export default function SeoLanding() {
                 {t("seo.builtForMarket")}
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
-                {s.h1}{" "}
-                <span className="gradient-text">{s.h1Highlight}</span>
+                {h1}{" "}
+                <span className="gradient-text">{h1Highlight}</span>
               </h1>
               <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                {s.intro}
+                {intro}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
@@ -345,10 +376,10 @@ export default function SeoLanding() {
       <section className="py-20 bg-gray-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-gray-900">{s.h2Benefits}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{h2Benefits}</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {s.benefits.map((b) => (
+            {benefits.map((b) => (
               <div key={b.title} className="card-soft bg-white p-7 rounded-2xl flex flex-col">
                 <div
                   className="h-10 w-10 rounded-xl flex items-center justify-center mb-5 text-white shrink-0"
@@ -368,10 +399,10 @@ export default function SeoLanding() {
       <section id="come-funziona" className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-gray-900">{s.h2HowItWorks}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{h2HowItWorks}</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            {s.howItWorks.map((step, i) => (
+            {howItWorks.map((step, i) => (
               <div key={i} className="relative">
                 <div
                   className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-5"
@@ -391,10 +422,10 @@ export default function SeoLanding() {
       <section className="py-20 bg-gray-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">{s.h2UseCases}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{h2UseCases}</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
-            {s.useCases.map((uc) => (
+            {useCases.map((uc) => (
               <div key={uc} className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
                 <CheckCircle2 className="h-4 w-4 text-violet-500 shrink-0" />
                 <span className="text-sm text-gray-700">{uc}</span>
@@ -452,10 +483,10 @@ export default function SeoLanding() {
       <section className="py-20 bg-gray-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">{s.h2Faq}</h2>
+            <h2 className="text-3xl font-bold text-gray-900">{h2Faq}</h2>
           </div>
           <div className="space-y-4">
-            {s.faq.map((f) => (
+            {faq.map((f) => (
               <div key={f.q} className="bg-white rounded-2xl p-6 card-soft">
                 <h3 className="text-base font-semibold text-gray-900 mb-2">{f.q}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{f.a}</p>
@@ -471,7 +502,7 @@ export default function SeoLanding() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-10">
               <h2 className="text-2xl font-bold text-gray-900">
-                {t("seo.cityHub.heading").replace("{trade}", s.labelPlural)}
+                {t("seo.cityHub.heading").replace("{trade}", labelPlural)}
               </h2>
               <p className="text-sm text-gray-500 mt-2">
                 {t("seo.cityHub.subtitle")}
@@ -481,7 +512,7 @@ export default function SeoLanding() {
               {TIER1_CITIES.map((city) => (
                 <Link
                   key={city.slug}
-                  href={`/quotes/${slug}/${city.slug}/`}
+                  href={`${base}/${sSlugForLang}/${city.slug}/`}
                   className="flex items-center gap-2.5 bg-white hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 transition-colors group"
                 >
                   <MapPin className="h-3.5 w-3.5 text-violet-400 group-hover:text-violet-600 shrink-0" />
@@ -501,7 +532,7 @@ export default function SeoLanding() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
             <div className="text-center mb-8">
               <h2 className="text-xl font-bold text-gray-900">
-                {t("seo.allCities.heading").replace("{trade}", s.labelPlural)}
+                {t("seo.allCities.heading").replace("{trade}", labelPlural)}
               </h2>
               <p className="text-sm text-gray-500 mt-2">
                 {t("seo.allCities.subtitle")}
@@ -517,10 +548,10 @@ export default function SeoLanding() {
                     {CITIES_BY_REGION[region].map((city) => (
                       <li key={city.slug}>
                         <Link
-                          href={`/quotes/${slug}/${city.slug}/`}
+                          href={`${base}/${sSlugForLang}/${city.slug}/`}
                           className="text-sm text-gray-500 hover:text-violet-600 transition-colors"
                         >
-                          {s.label} {city.name}
+                          {label} {city.name}
                         </Link>
                       </li>
                     ))}
@@ -543,11 +574,11 @@ export default function SeoLanding() {
               {RELATED_SECTORS[slug].map((r) => (
                 <Link
                   key={r.slug}
-                  href={`/quotes/${r.slug}/`}
+                  href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/`}
                   className="flex items-center gap-3 bg-gray-50 hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-5 py-3.5 transition-colors group"
                 >
                   <ArrowRight className="h-4 w-4 text-violet-400 group-hover:text-violet-600 shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700">{t("seo.quotesForLink")} {r.label}</span>
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700">{t("seo.quotesForLink")} {isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label}</span>
                 </Link>
               ))}
             </div>
@@ -571,7 +602,7 @@ export default function SeoLanding() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{t("seo.insights.heading")}</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">{t("seo.insights.subtitlePrefix")} {s.h1Highlight.toLowerCase()}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">{t("seo.insights.subtitlePrefix")} {h1Highlight.toLowerCase()}</p>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -611,7 +642,7 @@ export default function SeoLanding() {
             <span className="gradient-text">{t("seo.finalCta.headingHighlight")}</span>?
           </h2>
           <p className="text-lg text-gray-500 mb-10">
-            {t("seo.finalCta.bodyPrefix")} {s.h1Highlight.toLowerCase()} {t("seo.finalCta.bodySuffix")}
+            {t("seo.finalCta.bodyPrefix")} {h1Highlight.toLowerCase()} {t("seo.finalCta.bodySuffix")}
           </p>
           <Link
             href="/sign-up/"

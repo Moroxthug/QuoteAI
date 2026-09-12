@@ -41,7 +41,7 @@ export function Scene3() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          L'AI genera il preventivo.
+          The AI generates the quote.
         </motion.h2>
 
         {/* Abstract Document Skeleton Assembly */}

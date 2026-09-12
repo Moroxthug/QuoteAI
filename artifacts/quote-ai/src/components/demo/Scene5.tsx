@@ -36,7 +36,7 @@ export function Scene5() {
         animate={phase >= 2 ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        Il preventivo professionale in 60 secondi.
+        The professional quote in 60 seconds.
       </motion.div>
 
       <motion.div 

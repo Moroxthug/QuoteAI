@@ -62,7 +62,7 @@ export function Scene1() {
             animate={phase >= 3 ? { y: 0, opacity: 1, filter: 'blur(0px)' } : { y: 50, opacity: 0, filter: 'blur(10px)' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            Fare preventivi.
+            Making quotes.
           </motion.p>
 
           <motion.p
@@ -71,7 +71,7 @@ export function Scene1() {
             animate={phase >= 4 ? { y: 0, opacity: 1, filter: 'blur(0px)' } : { y: 30, opacity: 0, filter: 'blur(10px)' }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            Il lavoro che nessuno vuole fare.
+            The job nobody wants to do.
           </motion.p>
         </div>
       </div>

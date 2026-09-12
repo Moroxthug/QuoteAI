@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-const FULL_TEXT = "Ristrutturazione bagno 8mq: rimozione rivestimenti, nuova piastrellatura, sostituzione sanitari e rubinetteria, box doccia nuovo.";
+const FULL_TEXT = "80 sq ft bathroom renovation: remove old tiling, new tile installation, replace toilet and fixtures, new shower stall.";
 
 export function Scene2() {
   const [phase, setPhase] = useState(0);
@@ -45,8 +45,8 @@ export function Scene2() {
         transition={{ duration: 0.7, delay: 0.5 }}
       >
         <h2 className="text-[3.6vw] font-black tracking-tighter text-slate-900">
-          Descrivi il lavoro.{' '}
-          <span className="gradient-text">In italiano.</span>
+          Describe the job.{' '}
+          <span className="gradient-text">In your own words.</span>
         </h2>
       </motion.div>
 
@@ -75,14 +75,14 @@ export function Scene2() {
               <line x1="8" y1="16" x2="8" y2="16"/>
               <line x1="16" y1="16" x2="16" y2="16"/>
             </svg>
-            <span className="text-sm font-semibold" style={{ color: '#7C3AED' }}>Genera con AI</span>
+            <span className="text-sm font-semibold" style={{ color: '#7C3AED' }}>Generate with AI</span>
           </div>
           {/* Manual tab */}
           <div className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
-            <span className="text-sm font-semibold" style={{ color: '#9ca3af' }}>Manuale</span>
+            <span className="text-sm font-semibold" style={{ color: '#9ca3af' }}>Manual</span>
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export function Scene2() {
                 )}
                 {!hasText && phase >= 1 && (
                   <span style={{ color: '#9ca3af' }}>
-                    Descrivi il lavoro e ottieni un preventivo in 30 secondi...
+                    Describe the job and get a quote in 30 seconds...
                     <motion.span
                       style={{ display: 'inline-block', width: 2, height: '1em', background: '#7C3AED', marginLeft: 1, verticalAlign: 'middle', borderRadius: 1 }}
                       animate={{ opacity: [1, 0, 1] }}
@@ -217,8 +217,8 @@ export function Scene2() {
           {/* Example chips */}
           <div className="px-3 pb-3" style={{ borderTop: '1px solid #f9fafb', paddingTop: 10 }}>
             <div className="flex flex-wrap gap-1.5 items-center">
-              <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: 4 }}>Es:</span>
-              {['Imbianchino', 'Elettricista', 'Idraulico', 'Ristrutturazione', 'Muratore'].map((label, i) => (
+              <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: 4 }}>E.g.:</span>
+              {['Painter', 'Electrician', 'Plumber', 'Renovation', 'Mason'].map((label, i) => (
                 <motion.div
                   key={label}
                   className="rounded-full"
@@ -254,9 +254,9 @@ export function Scene2() {
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
               </svg>
-              <span style={{ fontSize: 14, fontWeight: 500, color: '#374151' }}>Committente</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: '#374151' }}>Client</span>
             </div>
-            <span style={{ fontSize: 12, color: '#9ca3af' }}>opzionale</span>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>optional</span>
           </div>
           <div className="px-4 py-3">
             <div
@@ -268,7 +268,7 @@ export function Scene2() {
                 color: '#9ca3af',
               }}
             >
-              + Aggiungi dati committente
+              + Add client details
             </div>
           </div>
         </motion.div>

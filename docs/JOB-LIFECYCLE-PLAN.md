@@ -288,3 +288,14 @@ Reply with any changes to these and I'll start Phase 0.
 **Verified**: workspace typecheck, api-server build, template/render/PDF pipeline for ON/BC/AB/QC/NS × EN/FR (sample PDFs generated). Not verified against a live DB/email.
 
 **Deferred**: company-uploaded custom templates; AI "regenerate this section" button; contractor countersign-after-customer flow is supported by the API but the UI always signs first.
+
+### Deployment notes (2026-09-12)
+- Both migrations (0001, 0002) are applied to the production Supabase project `quoteai` (new tables created with RLS enabled; the API connects as the postgres role so RLS does not affect it).
+- Vercel deploys are made from the local machine with `npx vercel deploy --prod --yes` (project `quote-ai`, Hobby plan) — GitHub pushes do NOT auto-deploy.
+- Hobby plan allows one cron run per day → `vercel.json` cron is `0 12 * * *`. Reminders/retries are batched daily; the accept/sign automations run inline.
+- `CRON_SECRET` must be set in Vercel env vars for `/api/cron/tick` to accept the tick.
+- Live test on 2026-09-12: quote email → accept → notification worked end-to-end.
+
+### Phase 2 — next up (user requests captured)
+- Job deadlines/milestones must be **imported from the quote** (chapters + payment schedule) — the current `/crm` project modal starts empty ("No deadlines yet"); this is the core of Phase 2's `contract.signed` → job auto-setup.
+- Retire `/crm` (screenshot shows it still uses the mock Fatture in Cloud invoice "FAT-2026-328 Simulated document") into `/dashboard/jobs`.

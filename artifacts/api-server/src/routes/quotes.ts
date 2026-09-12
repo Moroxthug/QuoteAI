@@ -1412,7 +1412,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
     // Generate clean PDF (never watermark for email)
     const pdfBuffer = await generateQuotePdfBuffer(quote, profile ?? null, false);
 
-    const companyName = (quote.companySnapshot as QuoteCompanySnapshot | null)?.companyName || profile?.companyName || "La tua azienda";
+    const companyName = (quote.companySnapshot as QuoteCompanySnapshot | null)?.companyName || profile?.companyName || "Your company";
     const numeroData = quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()} - ${new Date().toLocaleDateString("en-CA")}`;
     const totale = Number(quote.totale);
     const totaleFormatted = new Intl.NumberFormat("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totale);
@@ -1421,7 +1421,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
     await sendQuotePdfEmail({
       toEmail,
       companyName,
-      clientName: clientName || (quote.clientData as QuoteClientData)?.nome || "Cliente",
+      clientName: clientName || (quote.clientData as QuoteClientData)?.nome || "there",
       quoteNumber: numeroData,
       totale: totaleFormatted,
       pdfBuffer,

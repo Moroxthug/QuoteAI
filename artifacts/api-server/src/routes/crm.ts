@@ -572,7 +572,7 @@ router.post("/crm/invoices/generate", requireAuth, async (req, res) => {
 
     const { quoteId, projectId } = parsed.data;
 
-    let customerName = "Cliente Generico";
+    let customerName = "Customer";
     let totalAmount = 0;
 
     if (quoteId) {

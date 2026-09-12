@@ -3,7 +3,7 @@ import { eq, count, sql } from "drizzle-orm";
 
 /**
  * Generates the next progressive quote number for a user.
- * Format: "N° {progressivo}.{anno} del {gg}/{mm}/{anno}"
+ * Format: "No. {progressive}.{year} - {yyyy}-{mm}-{dd}" (ISO date, unambiguous for EN/FR Canada)
  * The progressive is count(existing quotes) + 1.
  */
 export async function generateNumeroPreventivo(userId: string): Promise<string> {
@@ -21,5 +21,5 @@ export async function generateNumeroPreventivo(userId: string): Promise<string> 
   const dd = String(today.getDate()).padStart(2, "0");
   const mm = String(today.getMonth() + 1).padStart(2, "0");
 
-  return `N° ${nextNumber}.${year} del ${dd}/${mm}/${year}`;
+  return `No. ${nextNumber}.${year} - ${year}-${mm}-${dd}`;
 }

@@ -36,18 +36,20 @@ FUNDAMENTAL RULES:
 4. Each chapter contains detailed work LINE ITEMS with professional units of measure (sqm, linear m, cubic m, kg, hours, lump sum, pieces, each, kW, etc.)
 5. Calculate a subtotal for each chapter.
 6. Apply a discount ONLY if the user explicitly requests one; otherwise percentage: 0
-7. Typical construction payment terms: 30% deposit on signing, 30% at interim milestone, 30% at final milestone, 10% balance on completion
+7. Payment terms must follow Canadian norms, NOT a large upfront deposit: a small deposit of 10-15% on signing, one or two progress payments tied to milestones (e.g. on material delivery/start of work, and on substantial completion) making up the bulk of the total, and a final holdback of 10-15% released only after the client has inspected and approved the completed work. Never default to a deposit larger than 15% — many provinces (e.g. Ontario, Quebec) treat large upfront deposits as a red flag and some regulate maximum deposits for consumer home-renovation contracts.
 8. Always include applicable sales tax at 13% (Canadian HST) unless otherwise indicated
 9. titolo_riga2 must describe the project and the job-site location
 10. numero_preventivo_data: DO NOT GENERATE — the server assigns the number automatically. Return an empty string.
+11. descrizione_generale must be a real 2-4 sentence plain-English summary of the project scope (what is being done, where, and the general approach) — never a placeholder or a one-line restatement of the title.
+12. note must be a short client-facing closing paragraph that always covers: the quote's validity period (e.g. 30 days), a one-line statement of what is NOT included (permits, unforeseen conditions behind walls/floors, work not explicitly listed above, etc.), and a brief workmanship-warranty statement (e.g. "Workmanship is guaranteed for 1 year from completion; manufacturer warranties apply to materials and fixtures.").
 
 OUTPUT — VALID JSON ONLY, no extra text:
 {
-  "titolo_riga1": "Economic Analysis and Priced Bill of Quantities",
+  "titolo_riga1": "Project Quote & Itemized Estimate",
   "titolo_riga2": "Project: [brief description] – [City] ([Province])",
   "numero_preventivo_data": "",
   "cliente": { "nome": "", "indirizzo": "" },
-  "descrizione_generale": "Brief description of the project",
+  "descrizione_generale": "2-4 sentence plain-English summary of the project scope, approach, and location.",
   "capitoli": [
     {
       "lettera": "A",
@@ -67,16 +69,16 @@ OUTPUT — VALID JSON ONLY, no extra text:
   ],
   "sconto": { "percentuale": 0, "importo_scontato": 0 },
   "condizioni_pagamento": [
-    "30% deposit upon contract signing",
-    "30% upon completion of the first phase of work",
-    "30% upon completion of the second phase of work",
-    "10% balance upon completion of work"
+    "15% deposit upon contract signing",
+    "35% upon delivery of materials and start of work",
+    "35% upon substantial completion",
+    "15% final balance upon completion and client walkthrough"
   ],
   "subtotale": 0,
   "iva_percentuale": 13,
   "iva_valore": 0,
   "totale": 0,
-  "note": "Quote valid for 30 days from the issue date."
+  "note": "Quote valid for 30 days from the issue date. Excludes permits, unforeseen conditions behind existing walls/floors, and any work not explicitly listed above. Workmanship is guaranteed for 1 year from completion; manufacturer warranties apply to materials and fixtures."
 }
 
 CALCULATIONS:
@@ -200,7 +202,7 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
 
   return {
     rawInput,
-    titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Economic Analysis and Priced Bill of Quantities",
+    titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
     titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
     numeroPreventivoData: aiData.numero_preventivo_data ?? "",
     clientData: { nome: aiData.cliente?.nome ?? "", indirizzo: aiData.cliente?.indirizzo ?? "" },
@@ -209,16 +211,16 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
     capitoli,
     sconto,
     condizioniPagamento: aiData.condizioni_pagamento ?? [
-      "30% deposit upon contract signing",
-      "30% upon completion of the first phase of work",
-      "30% upon completion of the second phase of work",
-      "10% balance upon completion of work",
+      "15% deposit upon contract signing",
+      "35% upon delivery of materials and start of work",
+      "35% upon substantial completion",
+      "15% final balance upon completion and client walkthrough",
     ],
     subtotale: calculatedSubtotale.toFixed(2),
     ivaPercentuale: ivaPercentualeVal.toFixed(2),
     ivaValore: ivaValoreVal.toFixed(2),
     totale: totaleVal.toFixed(2),
-    note: aiData.note ?? "Quote valid for 30 days",
+    note: aiData.note ?? "Quote valid for 30 days from the issue date. Excludes permits, unforeseen conditions behind existing walls/floors, and any work not explicitly listed above.",
     capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite")),
     templateId,
   };

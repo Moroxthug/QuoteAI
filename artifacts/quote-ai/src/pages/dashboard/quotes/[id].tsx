@@ -793,7 +793,7 @@ export default function QuoteDetail() {
                   {quote.numeroPreventivoData && (
                     <div className="text-sm font-bold text-slate-700 mt-1">{quote.numeroPreventivoData}</div>
                   )}
-                  <div className="text-xs text-slate-500 mt-1">{t("dashboard.quoteDetail.dateLabel")} {format(new Date(quote.createdAt), "dd/MM/yyyy")}</div>
+                  <div className="text-xs text-slate-500 mt-1">{t("dashboard.quoteDetail.dateLabel")} {format(new Date(quote.createdAt), "yyyy-MM-dd")}</div>
                 </div>
               </div>
 

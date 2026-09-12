@@ -111,20 +111,22 @@ CORE RULES:
 4. Each chapter contains detailed line ITEMS with professional units of measure (sqft, linear ft, cubic ft, kg, hours, lump sum, each, kW, etc.)
 5. Calculate a subtotal for each chapter. The SUMMARY is derived automatically from the chapters array (letter + title + subtotal + note); no separate field is needed.
 6. Apply a discount ONLY if the user explicitly requests one in their description; otherwise always set percentage: 0
-7. Typical construction payment terms: 30% deposit on signing, 30% at mid-project milestone, 30% at final-phase milestone, 10% balance on completion
+7. Payment terms must follow Canadian norms, NOT a large upfront deposit: a small deposit of 10-15% on signing, one or two progress payments tied to milestones (e.g. on material delivery/start of work, and on substantial completion) making up the bulk of the total, and a final holdback of 10-15% released only after the client has inspected and approved the completed work. Never default to a deposit larger than 15%.
 8. Do not assume a fixed sales-tax rate — Canadian GST/HST varies by province (roughly 5–15%); leave the tax percentage at 0 unless the user specifies a rate or province
 9. The second title line must describe the project and job-site location
 10. numero_preventivo_data: DO NOT GENERATE — the server assigns the quote number automatically. Return an empty string.
 11. CRITICAL RULE — ZERO OMISSIONS: if the user provides a detailed description with many NUMBERED or BULLETED items, every single item must become its own distinct line in the quote. Do NOT summarize, do NOT merge multiple items into one, do NOT skip or omit items. Create MULTIPLE CHAPTERS if needed to fit everything. Every item the user lists must have its own description, unit of measure, quantity, unit price, and total.
 12. IF the user attaches a document with a bill of quantities or item list: transform the document 1:1. Every line of the document becomes one item. Do NOT invent new items, do NOT merge similar items. Keep the quantities and unit prices from the document.
+13. descrizione_generale must be a real 2-4 sentence plain-English summary of the project scope (what is being done, where, and the general approach) — never a placeholder or a one-line restatement of the title.
+14. note must be a short client-facing closing paragraph that always covers: the quote's validity period (e.g. 30 days), a one-line statement of what is NOT included (permits, unforeseen conditions behind walls/floors, work not explicitly listed above, etc.), and a brief workmanship-warranty statement (e.g. "Workmanship is guaranteed for 1 year from completion; manufacturer warranties apply to materials and fixtures.").
 
 OUTPUT — VALID JSON ONLY, no extra text:
 {
-  "titolo_riga1": "Cost Analysis and Itemized Estimate",
+  "titolo_riga1": "Project Quote & Itemized Estimate",
   "titolo_riga2": "[Brief description] project – [City] ([Province])",
   "numero_preventivo_data": "",
   "cliente": { "nome": "", "indirizzo": "" },
-  "descrizione_generale": "Brief summary of the project",
+  "descrizione_generale": "2-4 sentence plain-English summary of the project scope, approach, and location.",
   "capitoli": [
     {
       "lettera": "A",
@@ -144,16 +146,16 @@ OUTPUT — VALID JSON ONLY, no extra text:
   ],
   "sconto": { "percentuale": 0, "importo_scontato": 0 },
   "condizioni_pagamento": [
-    "30% deposit on contract signing",
-    "30% on completion of first work phase",
-    "30% on completion of second work phase",
-    "10% balance on completion"
+    "15% deposit on contract signing",
+    "35% on delivery of materials and start of work",
+    "35% on substantial completion",
+    "15% final balance on completion and client walkthrough"
   ],
   "subtotale": 0,
   "iva_percentuale": 0,
   "iva_valore": 0,
   "totale": 0,
-  "note": "Quote valid for 30 days from the date of issue. Any additional work not covered by this quote will be estimated separately."
+  "note": "Quote valid for 30 days from the date of issue. Excludes permits, unforeseen conditions behind existing walls/floors, and any work not explicitly listed above. Workmanship is guaranteed for 1 year from completion; manufacturer warranties apply to materials and fixtures."
 }
 
 CALCULATIONS:
@@ -788,7 +790,7 @@ Write all output text in English.`
       let subTot = chaptersRaw.reduce((sum, c) => sum + c.subtotale, 0);
 
       if (targetTotalEur && subTot > 0) {
-        const ivaRate = 0.22;
+        const ivaRate = 0.13;
         const targetSubtotale = targetTotalEur / (1 + ivaRate);
         const scaleFactor = targetSubtotale / subTot;
         req.log.info({ scaleFactor, rawSubtotale: subTot, targetSubtotale }, "Numbered computo: applying price scaling to hit target total");
@@ -806,25 +808,25 @@ Write all output text in English.`
 
       chapters = await enrichVociDescrizioni(chapters);
 
-      const iva = Math.round(subTot * 22) / 100;
+      const iva = Math.round(subTot * 13) / 100;
       const totale = Math.round((subTot + iva) * 100) / 100;
 
       aiData = {
         capitoli: chapters,
         subtotale: subTot,
-        iva_percentuale: 22,
+        iva_percentuale: 13,
         iva_valore: iva,
         totale,
-        descrizione_generale: "Priced bill of quantities using prices from the document",
+        descrizione_generale: "Itemized quote generated from the uploaded price list document.",
         note: "Quote valid for 30 days",
         sconto: { percentuale: 0, importo_scontato: 0 },
         condizioni_pagamento: [
-          "30% deposit upon contract signing",
-          "30% upon completion of the first phase of work",
-          "30% upon completion of the second phase of work",
-          "10% balance upon completion of work",
+          "15% deposit upon contract signing",
+          "35% upon delivery of materials and start of work",
+          "35% upon substantial completion",
+          "15% final balance upon completion and client walkthrough",
         ],
-        titolo_riga1: "Computo Metrico Prezzato",
+        titolo_riga1: "Project Quote & Itemized Estimate",
         titolo_riga2: "",
         numero_preventivo_data: "",
         cliente: { nome: "", indirizzo: "" },
@@ -861,7 +863,7 @@ Write all output text in English.`
       let subTot = chaptersRaw.reduce((sum, c) => sum + c.subtotale, 0);
 
       if (targetTotalEur && subTot > 0) {
-        const ivaRate = 0.22;
+        const ivaRate = 0.13;
         const targetSubtotale = targetTotalEur / (1 + ivaRate);
         const scaleFactor = targetSubtotale / subTot;
         req.log.info({ scaleFactor, rawSubtotale: subTot, targetSubtotale }, "Tabular computo: applying price scaling to hit target total");
@@ -879,25 +881,25 @@ Write all output text in English.`
 
       chapters = await enrichVociDescrizioni(chapters);
 
-      const iva = Math.round(subTot * 22) / 100;
+      const iva = Math.round(subTot * 13) / 100;
       const totale = Math.round((subTot + iva) * 100) / 100;
 
       aiData = {
         capitoli: chapters,
         subtotale: subTot,
-        iva_percentuale: 22,
+        iva_percentuale: 13,
         iva_valore: iva,
         totale,
         descrizione_generale: "Economic analysis and priced bill of quantities",
         note: "Quote valid for 30 days",
         sconto: { percentuale: 0, importo_scontato: 0 },
         condizioni_pagamento: [
-          "30% deposit upon contract signing",
-          "30% upon completion of the first phase of work",
-          "30% upon completion of the second phase of work",
-          "10% balance upon completion of work",
+          "15% deposit upon contract signing",
+          "35% upon delivery of materials and start of work",
+          "35% upon substantial completion",
+          "15% final balance upon completion and client walkthrough",
         ],
-        titolo_riga1: "Economic Analysis and Priced Bill of Quantities",
+        titolo_riga1: "Project Quote & Itemized Estimate",
         titolo_riga2: "",
         numero_preventivo_data: "",
         cliente: { nome: "", indirizzo: "" },
@@ -905,7 +907,7 @@ Write all output text in English.`
     } else {
       const parsedCapitoli = parseComputoMetrico(fullText);
       const subTot = parsedCapitoli?.reduce((sum, c) => sum + c.subtotale, 0) ?? 0;
-      const iva = Math.round(subTot * 22) / 100;
+      const iva = Math.round(subTot * 13) / 100;
       aiData = {
         capitoli: parsedCapitoli?.map(c => ({
           lettera: c.lettera,
@@ -921,7 +923,7 @@ Write all output text in English.`
           subtotale: c.subtotale,
         })) ?? [],
         subtotale: subTot,
-        iva_percentuale: 22,
+        iva_percentuale: 13,
         iva_valore: iva,
         totale: subTot + iva,
         descrizione_generale: "Economic analysis and priced bill of quantities",
@@ -957,10 +959,10 @@ Write all output text in English.`
         : null;
 
     const condizioniPagamento = aiData.condizioni_pagamento ?? [
-      "30% deposit upon contract signing",
-      "30% upon completion of the first phase of work",
-      "30% upon completion of the second phase of work",
-      "10% balance upon completion of work",
+      "15% deposit upon contract signing",
+      "35% upon delivery of materials and start of work",
+      "35% upon substantial completion",
+      "15% final balance upon completion and client walkthrough",
     ];
 
     const subtotale = Number(aiData.subtotale ?? 0);
@@ -1016,7 +1018,7 @@ Write all output text in English.`
           sconto,
           condizioniPagamento,
           capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite")),
-          titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Economic Analysis and Priced Bill of Quantities",
+          titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
           titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
           numeroPreventivoData,
           subtotale: subtotale.toFixed(2),
@@ -1849,7 +1851,7 @@ function generateHtmlStandard(
     ? quote.condizioniPagamento
     : [];
 
-  const titolo1 = quote.titoloPreventivoRiga1 || "Economic Analysis and Priced Bill of Quantities";
+  const titolo1 = quote.titoloPreventivoRiga1 || "Project Quote & Itemized Estimate";
   const titolo2 = quote.titoloPreventivoRiga2 || "";
   const numeroData = quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()} - ${new Date().toLocaleDateString("en-CA")}`;
   const subtotale = Number(quote.subtotale);
@@ -1880,7 +1882,7 @@ function generateHtmlStandard(
     <div class="company-block">
       ${logoHtml}
       <div class="company-name">${companyName}</div>
-      ${companyVat ? `<div class="company-detail">P.IVA / C.F.: ${companyVat}</div>` : ""}
+      ${companyVat ? `<div class="company-detail">Tax ID: ${companyVat}</div>` : ""}
       ${companyAddress ? `<div class="company-detail">${companyAddress}</div>` : ""}
       ${companyPhone ? `<div class="company-detail">Tel: ${companyPhone}</div>` : ""}
       ${companyEmail ? `<div class="company-detail">${companyEmail}</div>` : ""}
@@ -2048,7 +2050,7 @@ function generateHtmlStandard(
     : "";
 
   return `<!DOCTYPE html>
-<html lang="it">
+<html lang="en-CA">
 <head>
   <meta charset="UTF-8">
   <title>${titolo1}</title>
@@ -2277,12 +2279,12 @@ function generateHtmlStandard(
   </div>
 
   ${hasCapitoli ? `<div class="section">
-    <div class="section-heading">1. Quadro Sintetico</div>
+    <div class="section-heading">1. Summary</div>
     ${quadroSinteticoHtml}
   </div>` : ""}
 
   <div class="section">
-    ${hasCapitoli ? `<div class="section-heading">2. Computo Metrico Dettagliato</div>` : ""}
+    ${hasCapitoli ? `<div class="section-heading">2. Detailed Breakdown</div>` : ""}
     ${chaptersHtml}
   </div>
 
@@ -2392,25 +2394,13 @@ function generateHtmlProfessionale(
       </div>`
     : "";
 
-  const incentivesData = (clientData as any)?.incentivesData;
-  const incentivesHtml = incentivesData && (incentivesData.bonusStataleApplicato || incentivesData.bandoRegionaleApplicato)
-    ? `<div class="condizioni" style="border-color: #0d9488; background: #f0fdfa;">
-        <div class="condizioni-title" style="color: #0f766e;">🎁 PIANO AGEVOLAZIONI FISCALI E CONTRIBUTI VERIFICATI AI</div>
-        <ul style="list-style: none; padding-left: 0; margin-top: 4px;">
-          ${incentivesData.bonusStataleApplicato ? `<li style="margin-bottom:3px;"><strong>Detrazione Statale:</strong> ${incentivesData.bonusStataleApplicato} (−$&nbsp;${formatCad(Number(incentivesData.detrazioneAnnuaStimata || 0) * 10)} in 10 anni)</li>` : ""}
-          ${incentivesData.bandoRegionaleApplicato ? `<li style="margin-bottom:3px;color:#047857;"><strong>Contributo Locale:</strong> ${incentivesData.bandoRegionaleApplicato} (−$&nbsp;${formatCad(Number(incentivesData.contributoRegionaleStimato || 0))})</li>` : ""}
-          <li style="margin-top: 8px; font-weight: bold; font-size: 10pt; color: #047857; border-top: 1px dashed #99f6e4; padding-top: 6px;">INVESTIMENTO NETTO REALE STIMATO: $&nbsp;${formatCad(Number(incentivesData.costoNettoStimato || totale))}</li>
-        </ul>
-      </div>`
-    : "";
-
   const footerHtml = companyName
     ? `<div class="doc-footer">${companyName}${companyAddress ? ` — ${companyAddress}` : ""}</div>` : "";
 
   const committente = [clientData.nome, clientData.indirizzo, clientData.city, clientData.province, clientData.postalCode].filter(Boolean).join(" — ");
 
   return `<!DOCTYPE html>
-<html lang="it">
+<html lang="en-CA">
 <head>
   <meta charset="UTF-8">
   <title>Quote ${numeroData}</title>
@@ -2466,7 +2456,7 @@ function generateHtmlProfessionale(
     <div class="company-block">
       ${logoHtml}
       <div class="company-name">${companyName}</div>
-      ${companyVat ? `<div class="company-detail">P.IVA / C.F.: ${companyVat}</div>` : ""}
+      ${companyVat ? `<div class="company-detail">Tax ID: ${companyVat}</div>` : ""}
       ${companyAddress ? `<div class="company-detail">${companyAddress}</div>` : ""}
       ${companyPhone ? `<div class="company-detail">Tel: ${companyPhone}</div>` : ""}
       ${companyEmail ? `<div class="company-detail">${companyEmail}</div>` : ""}
@@ -2511,7 +2501,6 @@ function generateHtmlProfessionale(
     </table>
   </div>
 
-  ${incentivesHtml}
   ${condizioniHtml}
   ${footerHtml}
 </body>
@@ -2569,8 +2558,8 @@ function generateHtmlElegante(
     </tr>`).join("");
 
   const scontoHtml = sconto && sconto.percentuale > 0
-    ? `<div class="total-row"><span>Sconto (${sconto.percentuale}%)</span><span>−&nbsp;$&nbsp;${formatCad(Number(quote.subtotale) - sconto.importoScontato)}</span></div>
-       <div class="total-row"><span>Imponibile scontato</span><span>$&nbsp;${formatCad(sconto.importoScontato)}</span></div>` : "";
+    ? `<div class="total-row"><span>Discount (${sconto.percentuale}%)</span><span>−&nbsp;$&nbsp;${formatCad(Number(quote.subtotale) - sconto.importoScontato)}</span></div>
+       <div class="total-row"><span>Discounted subtotal</span><span>$&nbsp;${formatCad(sconto.importoScontato)}</span></div>` : "";
 
   const condizioniHtml = condizioniPagamento.length > 0
     ? `<div class="condizioni">
@@ -2578,28 +2567,16 @@ function generateHtmlElegante(
         <ul>${condizioniPagamento.map(c => `<li>${c}</li>`).join("")}</ul>
       </div>` : "";
 
-  const incentivesData = (clientData as any)?.incentivesData;
-  const incentivesHtml = incentivesData && (incentivesData.bonusStataleApplicato || incentivesData.bandoRegionaleApplicato)
-    ? `<div class="condizioni" style="border-color: #0d9488; background: #f0fdfa;">
-        <div class="condizioni-title" style="color: #0f766e;">🎁 PIANO AGEVOLAZIONI FISCALI E CONTRIBUTI VERIFICATI AI</div>
-        <ul style="list-style: none; padding-left: 0; margin-top: 4px;">
-          ${incentivesData.bonusStataleApplicato ? `<li style="margin-bottom:3px;"><strong>Detrazione Statale:</strong> ${incentivesData.bonusStataleApplicato} (−$&nbsp;${formatCad(Number(incentivesData.detrazioneAnnuaStimata || 0) * 10)} in 10 anni)</li>` : ""}
-          ${incentivesData.bandoRegionaleApplicato ? `<li style="margin-bottom:3px;color:#047857;"><strong>Contributo Locale:</strong> ${incentivesData.bandoRegionaleApplicato} (−$&nbsp;${formatCad(Number(incentivesData.contributoRegionaleStimato || 0))})</li>` : ""}
-          <li style="margin-top: 8px; font-weight: bold; font-size: 10pt; color: #047857; border-top: 1px dashed #99f6e4; padding-top: 6px;">INVESTIMENTO NETTO REALE STIMATO: $&nbsp;${formatCad(Number(incentivesData.costoNettoStimato || totale))}</li>
-        </ul>
-      </div>`
-    : "";
-
   const footerHtml = companyName
     ? `<div class="doc-footer">${companyName}${companyAddress ? ` — ${companyAddress}` : ""}</div>` : "";
 
   const clientLines = [clientData.nome, clientData.indirizzo, [clientData.city, clientData.province, clientData.postalCode].filter(Boolean).join(" ")].filter(Boolean);
 
   return `<!DOCTYPE html>
-<html lang="it">
+<html lang="en-CA">
 <head>
   <meta charset="UTF-8">
-  <title>Offerta ${numeroData}</title>
+  <title>Quote ${numeroData}</title>
   <style>
     @page { size: A4 portrait; margin: 12mm 16mm 14mm 16mm; }
     * { box-sizing: border-box; }
@@ -2680,9 +2657,9 @@ function generateHtmlElegante(
         <th class="col-num">#</th>
         <th class="col-desc">Description</th>
         <th class="col-um">Unit</th>
-        <th class="col-qty">Q.</th>
-        <th class="col-pu">P. unitario</th>
-        <th class="col-tot">Importo</th>
+        <th class="col-qty">Qty</th>
+        <th class="col-pu">Unit Price</th>
+        <th class="col-tot">Amount</th>
       </tr>
     </thead>
     <tbody>
@@ -2699,7 +2676,6 @@ function generateHtmlElegante(
     </div>
   </div>
 
-  ${incentivesHtml}
   ${condizioniHtml}
   ${footerHtml}
 </body>
@@ -2754,7 +2730,7 @@ async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: ProfileRow)
   const companyAddress = snap?.address || profile?.address || "";
   const companyPhone = snap?.phone || profile?.phone || "";
   const companyEmail = snap?.email || profile?.email || "";
-  const titolo1 = quote.titoloPreventivoRiga1 || "Economic Analysis and Priced Bill of Quantities";
+  const titolo1 = quote.titoloPreventivoRiga1 || "Project Quote & Itemized Estimate";
   const titolo2 = quote.titoloPreventivoRiga2 || "";
   const numeroData = quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()} - ${new Date().toLocaleDateString("en-CA")}`;
   const subtotale = Number(quote.subtotale);
@@ -2775,7 +2751,7 @@ async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: ProfileRow)
   const companyInfoStack: Content[] = [
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
-  if (companyVat) companyInfoStack.push({ text: `P.IVA / C.F.: ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyVat) companyInfoStack.push({ text: `Tax ID: ${companyVat}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
   if (companyPhone) companyInfoStack.push({ text: `Tel: ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });
@@ -3132,7 +3108,7 @@ async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRow, with
   const companyAddress = snap?.address || profile?.address || "";
   const companyPhone = snap?.phone || profile?.phone || "";
   const companyEmail = snap?.email || profile?.email || "";
-  const titolo1 = quote.titoloPreventivoRiga1 || "Economic Analysis and Priced Bill of Quantities";
+  const titolo1 = quote.titoloPreventivoRiga1 || "Project Quote & Itemized Estimate";
   const titolo2 = quote.titoloPreventivoRiga2 || "";
   const numeroData = quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()} - ${new Date().toLocaleDateString("en-CA")}`;
   const subtotale = Number(quote.subtotale);
@@ -3151,7 +3127,7 @@ async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRow, with
   const companyInfoStack: Content[] = [
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
-  if (companyVat) companyInfoStack.push({ text: `P.IVA / C.F.: ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyVat) companyInfoStack.push({ text: `Tax ID: ${companyVat}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
   if (companyPhone) companyInfoStack.push({ text: `Tel: ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });
@@ -3597,7 +3573,7 @@ router.post("/quotes/manual", requireAuth, async (req, res) => {
           clientData: clientDataInput ?? { nome: "", indirizzo: "" },
           companySnapshot: resolvedSnapshot,
           templateId: (["standard", "arosio", "mariagrazia"].includes(templateId ?? "") ? templateId : "standard") as "standard" | "arosio" | "mariagrazia",
-          titoloPreventivoRiga1: titoloPreventivoRiga1 ?? "Economic Analysis and Priced Bill of Quantities",
+          titoloPreventivoRiga1: titoloPreventivoRiga1 ?? "Project Quote & Itemized Estimate",
           titoloPreventivoRiga2: titoloPreventivoRiga2 ?? "",
           descrizioneGenerale: descrizioneGenerale ?? "",
           numeroPreventivoData,

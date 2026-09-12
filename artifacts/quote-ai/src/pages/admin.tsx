@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import {
-  Users, TrendingUp, FileText, Euro, ToggleLeft, ToggleRight,
+  Users, TrendingUp, FileText, DollarSign, ToggleLeft, ToggleRight,
   RefreshCw, ArrowLeft, Crown, Zap, Calendar, BarChart3,
   ChevronUp, ChevronDown, Minus, Search, Settings, ShieldAlert,
   Sparkles, CheckCircle2, AlertTriangle, PlayCircle, Activity,
@@ -43,7 +43,7 @@ type AdminUser = {
 };
 
 type Settings = Record<string, string>;
-type Tab = "overview" | "users" | "widget" | "incentives" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events";
+type Tab = "overview" | "users" | "widget" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events";
 
 type EmailEvent = {
   id: string;
@@ -238,126 +238,7 @@ export default function AdminPage() {
     }
   }
 
-  // Stato e funzioni per la gestione del catalogo incentivi & cron AI quotidiano
-  const [incentivesList, setIncentivesList] = useState<any[]>([]);
-  const [loadingIncentives, setLoadingIncentives] = useState(false);
-  const [syncingAi, setSyncingAi] = useState(false);
-  const [newIncCodice, setNewIncCodice] = useState("");
-  const [newIncTitolo, setNewIncTitolo] = useState("");
-  const [newIncDesc, setNewIncDesc] = useState("");
-  const [newIncProvince, setNewIncProvince] = useState("ON");
-  const [newIncLevel, setNewIncLevel] = useState("regionale");
-  const [newIncMassimale, setNewIncMassimale] = useState("5000");
-  const [editingIncentive, setEditingIncentive] = useState<any | null>(null);
-  const [editForm, setEditForm] = useState({
-    titolo: "",
-    descrizione: "",
-    percentualeMassima: "",
-    massimaleContributo: "",
-    stato: "active",
-    fonteUfficialeUrl: "",
-    humanVerified: false,
-  });
-
-  async function loadIncentives() {
-    setLoadingIncentives(true);
-    try {
-      const res = await authFetch("/api/admin/incentives");
-      if (res.success) setIncentivesList(res.incentives || []);
-    } catch (e: any) {
-      toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadIncentivesCatalog") });
-    } finally {
-      setLoadingIncentives(false);
-    }
-  }
-
-  async function runAiSync() {
-    setSyncingAi(true);
-    try {
-      const res = await authFetch("/api/admin/incentives/cron-sync", { method: "POST" });
-      if (res.success) {
-        toast({
-          title: t("admin.aiHeuristicCheckComplete"),
-          description: `${res.summary}${res.disclaimer ? ` — ${res.disclaimer}` : ""}`,
-        });
-        loadIncentives();
-      }
-    } catch (e: any) {
-      toast({ variant: "destructive", title: t("admin.error"), description: e.message || t("admin.errorAiScan") });
-    } finally {
-      setSyncingAi(false);
-    }
-  }
-
-  async function handleCreateIncentive(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newIncCodice || !newIncTitolo) return;
-    try {
-      const res = await authFetch("/api/admin/incentives", {
-        method: "POST",
-        body: JSON.stringify({
-          level: newIncLevel,
-          codice: newIncCodice,
-          titolo: newIncTitolo,
-          descrizione: newIncDesc || newIncTitolo,
-          province: newIncLevel === "regionale" || newIncLevel === "comunale" ? newIncProvince : null,
-          massimaleContributo: newIncMassimale,
-          stato: "active"
-        })
-      });
-      if (res.success) {
-        toast({ title: t("admin.incentiveAdded"), description: t("admin.incentiveAddedDesc").replace("{title}", newIncTitolo) });
-        setNewIncCodice(""); setNewIncTitolo(""); setNewIncDesc("");
-        loadIncentives();
-      }
-    } catch (e: any) {
-      toast({ variant: "destructive", title: t("admin.error"), description: e.message });
-    }
-  }
-
-  async function handleDeleteIncentive(id: string) {
-    if (!confirm(t("admin.confirmDeleteIncentive"))) return;
-    try {
-      await authFetch(`/api/admin/incentives/${id}`, { method: "DELETE" });
-      loadIncentives();
-    } catch (e: any) {
-      toast({ variant: "destructive", title: t("admin.error"), description: e.message });
-    }
-  }
-
-  function openEditIncentive(inc: any) {
-    setEditingIncentive(inc);
-    setEditForm({
-      titolo: inc.titolo || "",
-      descrizione: inc.descrizione || "",
-      percentualeMassima: inc.percentualeMassima || "",
-      massimaleContributo: inc.massimaleContributo || "",
-      stato: inc.stato || "active",
-      fonteUfficialeUrl: inc.fonteUfficialeUrl || "",
-      humanVerified: !!inc.humanVerified,
-    });
-  }
-
-  async function handleUpdateIncentive(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editingIncentive) return;
-    try {
-      const res = await authFetch(`/api/admin/incentives/${editingIncentive.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(editForm),
-      });
-      if (res.success) {
-        toast({ title: t("admin.incentiveUpdated"), description: editForm.titolo });
-        setEditingIncentive(null);
-        loadIncentives();
-      }
-    } catch (e: any) {
-      toast({ variant: "destructive", title: t("admin.error"), description: e.message });
-    }
-  }
-
   useEffect(() => {
-    if (tab === "incentives") loadIncentives();
     if (tab === "email-events") loadEmailEvents();
   }, [tab]);
 
@@ -756,8 +637,7 @@ export default function AdminPage() {
               { id: "overview", label: t("admin.tabOverview"), icon: BarChart3 },
               { id: "users", label: t("admin.tabUsers"), icon: Users },
               { id: "widget", label: t("admin.tabWidget"), icon: Zap },
-              { id: "incentives", label: t("admin.tabIncentives"), icon: Award },
-              { id: "stripe", label: t("admin.tabStripe"), icon: Euro },
+              { id: "stripe", label: t("admin.tabStripe"), icon: DollarSign },
               { id: "gsc", label: "Search Console", icon: Globe },
               { id: "seo", label: "SEO Checker", icon: Sparkles },
               { id: "support", label: t("admin.tabSupport"), icon: MessageSquare },
@@ -790,7 +670,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                   { label: t("admin.totalUsers"), value: String(metrics.totalUsers), sub: `+${metrics.usersThisMonth} ${t("admin.thisMonth")}`, icon: Users, color: "text-violet-500", bg: "bg-violet-50" },
-                  { label: t("admin.estimatedMrr"), value: fmt(metrics.mrr), sub: `${metrics.starterCount} Starter · ${metrics.proCount} Pro`, icon: Euro, color: "text-emerald-500", bg: "bg-emerald-50" },
+                  { label: t("admin.estimatedMrr"), value: fmt(metrics.mrr), sub: `${metrics.starterCount} Starter · ${metrics.proCount} Pro`, icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-50" },
                   { label: t("admin.totalQuotes"), value: String(metrics.totalQuotes), sub: `${metrics.quotesThisMonth} ${t("admin.thisMonth")}`, trend: true, icon: FileText, color: "text-blue-500", bg: "bg-blue-50" },
                   { label: t("admin.revenueGenerated"), value: fmt(metrics.totalQuoteRevenue), sub: t("admin.totalUnlockedQuoteValue"), icon: TrendingUp, color: "text-amber-500", bg: "bg-amber-50" },
                 ].map(({ label, value, sub, trend, icon: Icon, color, bg }) => (
@@ -1335,7 +1215,7 @@ export default function AdminPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
                           { label: t("admin.widgetQuotesGenerated"), value: String(widgetStats.global.totalQuotes), desc: t("admin.totalWidgetRequests"), icon: FileText, color: "text-violet-500", bg: "bg-violet-50" },
-                          { label: t("admin.totalAiCost"), value: `$${Number(widgetStats.global.totalCost).toFixed(4)}`, desc: t("admin.estimatedTokenCost"), icon: Euro, color: "text-emerald-500", bg: "bg-emerald-50" },
+                          { label: t("admin.totalAiCost"), value: `$${Number(widgetStats.global.totalCost).toFixed(4)}`, desc: t("admin.estimatedTokenCost"), icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-50" },
                           { label: t("admin.totalTokens"), value: widgetStats.global.totalTokens.toLocaleString("en-CA"), desc: `${t("admin.promptPlusCompletion")}: ${widgetStats.global.totalQuotes > 0 ? Math.round(widgetStats.global.totalTokens / widgetStats.global.totalQuotes) : 0} / ${t("admin.call")}`, icon: Bot, color: "text-blue-500", bg: "bg-blue-50" },
                         ].map(({ label, value, desc, icon: Icon, color, bg }) => (
                           <div key={label} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
@@ -1417,291 +1297,6 @@ export default function AdminPage() {
                       </div>
                     </>
                   )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* INCENTIVES CATALOG (AI DAILY UPDATED) */}
-          {tab === "incentives" && (
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
-                <div>
-                  <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <Award className="h-5 w-5 text-emerald-500" /> {t("admin.incentivesEngineTitle")}
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-1">
-                    {t("admin.incentivesEngineDesc")}
-                  </p>
-                </div>
-                <button
-                  onClick={runAiSync}
-                  disabled={syncingAi}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold rounded-xl shadow-sm text-xs transition-all disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-4 w-4 ${syncingAi ? "animate-spin" : ""}`} />
-                  {syncingAi ? t("admin.aiScanInProgress") : t("admin.runDailyAiScan")}
-                </button>
-              </div>
-
-              {/* Manual/custom addition form */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
-                <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-violet-500" /> {t("admin.addNewCustomIncentive")}
-                </h3>
-                <form onSubmit={handleCreateIncentive} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.level")}</label>
-                    <select
-                      value={newIncLevel}
-                      onChange={(e) => setNewIncLevel(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-violet-500 bg-white"
-                    >
-                      <option value="statale">{t("admin.levelFederal")}</option>
-                      <option value="regionale">{t("admin.levelProvincial")}</option>
-                      <option value="comunale">{t("admin.levelMunicipal")}</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.identifierCode")}</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. ONTARIO_ECO_2026"
-                      value={newIncCodice}
-                      onChange={(e) => setNewIncCodice(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-violet-500 bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">Province / City</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. ON or Toronto"
-                      value={newIncProvince}
-                      onChange={(e) => setNewIncProvince(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-violet-500 bg-white"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.incentiveTitle")}</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Home Efficiency & Heating Rebate — Ontario"
-                      value={newIncTitolo}
-                      onChange={(e) => setNewIncTitolo(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-violet-500 bg-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.maxContribution")}</label>
-                    <input
-                      type="number"
-                      required
-                      placeholder="5000"
-                      value={newIncMassimale}
-                      onChange={(e) => setNewIncMassimale(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-100 rounded-xl text-sm focus:outline-none focus:border-violet-500 bg-white"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3 flex justify-end">
-                    <button type="submit" className="px-5 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs transition-all">
-                      {t("admin.addIncentiveToCatalog")}
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Incentives catalog table */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-800">{t("admin.activeVerifiedIncentives")} ({incentivesList.length})</h3>
-                  {loadingIncentives && <span className="text-xs text-slate-400 animate-pulse">{t("admin.loading")}</span>}
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/50">
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">{t("admin.level")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">{t("admin.codeTitle")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">{t("admin.zone")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase text-right">{t("admin.maxContributionShort")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase text-center">{t("admin.status")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase text-center">{t("admin.aiVerification")}</th>
-                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase text-right">{t("admin.actions")}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                      {incentivesList.map((inc) => (
-                        <tr key={inc.id} className="hover:bg-slate-50/20 text-xs">
-                          <td className="px-4 py-3.5">
-                            <span className={`px-2 py-0.5 rounded-full font-bold uppercase ${
-                              inc.level === "statale" ? "bg-violet-50 text-violet-700 border border-violet-100" :
-                              inc.level === "regionale" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" :
-                              "bg-blue-50 text-blue-700 border border-blue-100"
-                            }`}>
-                              {inc.level}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3.5">
-                            <div className="font-bold text-slate-800">{inc.titolo}</div>
-                            <div className="font-mono text-[10px] text-slate-400">{inc.codice}</div>
-                          </td>
-                          <td className="px-4 py-3.5 font-medium text-slate-600">
-                            {inc.province || inc.city || t("admin.national")}
-                          </td>
-                          <td className="px-4 py-3.5 text-right font-bold text-emerald-600">
-                            ${Number(inc.massimaleContributo || 0).toLocaleString("en-CA")}
-                          </td>
-                          <td className="px-4 py-3.5 text-center">
-                            <span className={`px-2 py-0.5 rounded-full font-semibold ${
-                              inc.stato === "active" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                            }`}>
-                              {inc.stato === "active" ? t("admin.activeCheck") : t("admin.expiringSoon")}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3.5 text-center">
-                            <span className={`px-2 py-0.5 rounded-full ${
-                              inc.isVerifiedByAi ? "bg-cyan-50 text-cyan-700 border border-cyan-200 font-semibold" : "bg-slate-100 text-slate-500"
-                            }`}>
-                              {inc.isVerifiedByAi ? t("admin.aiVerifiedCheck") : t("admin.pending")}
-                            </span>
-                            {inc.lastCheckedAt && (
-                              <div className="text-[9px] text-slate-400 mt-0.5">
-                                {new Date(inc.lastCheckedAt).toLocaleDateString("en-CA")}
-                              </div>
-                            )}
-                            <div className={`mt-1 px-2 py-0.5 rounded-full inline-block ${
-                              inc.humanVerified ? "bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold" : "bg-slate-50 text-slate-400 border border-slate-200"
-                            }`}>
-                              {inc.humanVerified ? t("admin.manuallyCheckedYes") : t("admin.manuallyCheckedNo")}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                            <button
-                              onClick={() => openEditIncentive(inc)}
-                              className="text-violet-600 hover:text-violet-800 font-medium px-2 py-1 rounded hover:bg-violet-50 transition-colors mr-1"
-                            >
-                              {t("admin.editAction")}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteIncentive(inc.id)}
-                              className="text-red-500 hover:text-red-700 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors"
-                            >
-                              {t("admin.deleteAction")}
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {editingIncentive && (
-                <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-                  <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 relative">
-                    <button
-                      onClick={() => setEditingIncentive(null)}
-                      className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                    <h3 className="text-sm font-bold text-slate-800 mb-1">{t("admin.editIncentive")}</h3>
-                    <p className="text-xs text-slate-400 mb-4 font-mono">{editingIncentive.codice}</p>
-                    <form onSubmit={handleUpdateIncentive} className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.incentiveTitle")}</label>
-                        <input
-                          type="text"
-                          value={editForm.titolo}
-                          onChange={(e) => setEditForm((f) => ({ ...f, titolo: e.target.value }))}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.description")}</label>
-                        <textarea
-                          value={editForm.descrizione}
-                          onChange={(e) => setEditForm((f) => ({ ...f, descrizione: e.target.value }))}
-                          rows={3}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.maxPercent")}</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={editForm.percentualeMassima}
-                            onChange={(e) => setEditForm((f) => ({ ...f, percentualeMassima: e.target.value }))}
-                            className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.maxContribution")}</label>
-                          <input
-                            type="number"
-                            value={editForm.massimaleContributo}
-                            onChange={(e) => setEditForm((f) => ({ ...f, massimaleContributo: e.target.value }))}
-                            className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.status")}</label>
-                        <select
-                          value={editForm.stato}
-                          onChange={(e) => setEditForm((f) => ({ ...f, stato: e.target.value }))}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                        >
-                          <option value="active">{t("admin.statusActive")}</option>
-                          <option value="expiring_soon">{t("admin.statusExpiringSoon")}</option>
-                          <option value="closed">{t("admin.statusClosed")}</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">{t("admin.officialSourceUrl")}</label>
-                        <input
-                          type="text"
-                          value={editForm.fonteUfficialeUrl}
-                          onChange={(e) => setEditForm((f) => ({ ...f, fonteUfficialeUrl: e.target.value }))}
-                          className="w-full border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-1 focus:ring-violet-500"
-                        />
-                      </div>
-                      <label className="flex items-center gap-2 text-xs font-semibold text-slate-600 pt-1">
-                        <input
-                          type="checkbox"
-                          checked={editForm.humanVerified}
-                          onChange={(e) => setEditForm((f) => ({ ...f, humanVerified: e.target.checked }))}
-                        />
-                        {t("admin.iPersonallyVerified")}
-                      </label>
-                      <div className="flex justify-end gap-2 pt-2">
-                        <button
-                          type="button"
-                          onClick={() => setEditingIncentive(null)}
-                          className="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-50 rounded-lg transition"
-                        >
-                          {t("admin.cancel")}
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-4 py-2 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition"
-                        >
-                          {t("admin.saveChanges")}
-                        </button>
-                      </div>
-                    </form>
-                  </div>
                 </div>
               )}
             </div>
@@ -1794,7 +1389,7 @@ export default function AdminPage() {
                 {/* Force-link Stripe Customer Form */}
                 <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-4">
                   <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                    <Euro className="h-4 w-4 text-emerald-500" /> {t("admin.linkStripeCustomerId")}
+                    <DollarSign className="h-4 w-4 text-emerald-500" /> {t("admin.linkStripeCustomerId")}
                   </h3>
                   <form onSubmit={handleLinkCustomer} className="space-y-4">
                     <div>

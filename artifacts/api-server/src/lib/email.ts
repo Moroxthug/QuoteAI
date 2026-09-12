@@ -376,15 +376,11 @@ function buildWidgetClientConfirmationEmail(params: {
   companyEmail: string | null;
   prezzoMinimo: string;
   prezzoMassimo: string;
-  incentivesSummary?: string;
 }): string {
-  const { clientName, companyName, companyPhone, companyEmail, prezzoMinimo, prezzoMassimo, incentivesSummary } = params;
+  const { clientName, companyName, companyPhone, companyEmail, prezzoMinimo, prezzoMassimo } = params;
   const contactLine = [companyPhone, companyEmail].filter(Boolean).join(" · ");
-  const incentivesBlock = incentivesSummary
-    ? `<div class="incentives-box"><strong>🎁 Rebates that may apply</strong><br/>${incentivesSummary.replace(/\n/g, "<br/>")}</div>`
-    : "";
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -420,9 +416,7 @@ function buildWidgetClientConfirmationEmail(params: {
       <div class="range">${prezzoMinimo} – ${prezzoMassimo} CAD</div>
     </div>
 
-    ${incentivesBlock}
-
-    <p style="font-size:13px;color:#6b7280;text-align:center;">This is an automatic AI-generated estimate and may change after an on-site visit.${incentivesSummary ? " The rebates listed are also a preliminary estimate, to be confirmed during the technical and eligibility review." : ""}${contactLine ? ` For any questions you can contact ${companyName} directly: ${contactLine}.` : ""}</p>
+    <p style="font-size:13px;color:#6b7280;text-align:center;">This is an automatic AI-generated estimate and may change after an on-site visit.${contactLine ? ` For any questions you can contact ${companyName} directly: ${contactLine}.` : ""}</p>
   </div>
   <div class="footer">
     Estimate calculated with <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a> technology<br/>
@@ -441,7 +435,6 @@ export async function sendWidgetClientConfirmationEmail(params: {
   companyEmail: string | null;
   prezzoMinimo: string;
   prezzoMassimo: string;
-  incentivesSummary?: string;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -461,7 +454,6 @@ export async function sendWidgetClientConfirmationEmail(params: {
         companyEmail: params.companyEmail,
         prezzoMinimo: params.prezzoMinimo,
         prezzoMassimo: params.prezzoMassimo,
-        incentivesSummary: params.incentivesSummary ? escapeHtml(params.incentivesSummary) : undefined,
       }),
     });
     logger.info({ to: params.toEmail }, "Widget client confirmation email sent");
@@ -520,19 +512,17 @@ export async function sendWidgetLeadNotification(params: {
   totale: string;
   prezzoMinimo: string;
   prezzoMassimo: string;
-  incentivesSummary?: string;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     logger.warn("RESEND_API_KEY not set — skipping widget lead notification email");
     return;
   }
-  const { toEmail, companyName, clientName, clientEmail, clientPhone, rawInput, totale, prezzoMinimo, prezzoMassimo, incentivesSummary } = params;
+  const { toEmail, companyName, clientName, clientEmail, clientPhone, rawInput, totale, prezzoMinimo, prezzoMassimo } = params;
   const safeClientName = escapeHtml(clientName);
   const safeClientEmail = escapeHtml(clientEmail);
   const safeClientPhone = escapeHtml(clientPhone);
   const safeRawInput = escapeHtml(rawInput);
-  const safeIncentivesSummary = incentivesSummary ? escapeHtml(incentivesSummary) : incentivesSummary;
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
@@ -540,7 +530,7 @@ export async function sendWidgetLeadNotification(params: {
       to: [toEmail],
       subject: `⚡ New Lead Converted from Widget — ${clientName}`,
       html: `<!DOCTYPE html>
-<html lang="en">
+<html lang="en-CA">
 <head>
 <meta charset="UTF-8" />
 <title>New Widget Lead</title>
@@ -595,8 +585,6 @@ export async function sendWidgetLeadNotification(params: {
       </div>
       <div style="font-size:11px; color:#71717a; font-weight:normal; margin-top:4px; text-align:right;">Calculated quote total: ${totale} CAD</div>
     </div>
-
-    ${safeIncentivesSummary ? `<div class="incentives-box"><strong>🎁 REBATE & PROGRAM CHECK RESULTS:</strong>\n${safeIncentivesSummary}</div>` : ""}
 
     <p style="font-size:13px; color:#71717a; line-height:1.5; text-align:center; margin-top:24px;">
       We recommend following up with the client within 24 hours to schedule a site visit and improve your conversion rate.

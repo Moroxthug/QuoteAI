@@ -497,7 +497,7 @@ export default function CrmPage() {
     printWindow.document.write(`
       <html>
         <head>
-          <title>SAL No. ${salNumber} - ${proj.name}</title>
+          <title>Progress Billing No. ${salNumber} - ${proj.name}</title>
           <style>
             body { font-family: sans-serif; color: #333; padding: 40px; line-height: 1.4; }
             .header { display: flex; justify-content: space-between; border-bottom: 2px solid #7c3aed; padding-bottom: 20px; margin-bottom: 30px; }
@@ -531,7 +531,7 @@ export default function CrmPage() {
             </div>
           </div>
 
-          <div class="doc-title">Progress Report (S.A.L.) No. ${salNumber}</div>
+          <div class="doc-title">Progress Billing Statement No. ${salNumber}</div>
 
           <div class="info-grid">
             <div class="info-box">
@@ -586,7 +586,7 @@ export default function CrmPage() {
               <span>$${retentionVal.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
             <div class="totals-row final">
-              <span>Net SAL Amount:</span>
+              <span>Net Amount Due:</span>
               <span>$${nettoDaPagare.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           </div>
@@ -832,7 +832,7 @@ export default function CrmPage() {
               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2.5 pb-2">ADMINISTRATION</p>
             )}
             {[
-              { id: "sal", label: "Progress Billing (SAL)", icon: FileText },
+              { id: "sal", label: "Progress Billing", icon: FileText },
               { id: "fatturazione", label: "Electronic Invoicing", icon: Receipt },
               { id: "pratiche", label: "Permit Management", icon: FolderOpen },
               { id: "analytics", label: "KPI & Analytics", icon: BarChart3 },
@@ -1723,12 +1723,12 @@ export default function CrmPage() {
             </div>
           )}
 
-          {/* 12. SECTION: STATO AVANZAMENTO LAVORI (SAL) */}
+          {/* 12. SECTION: PROGRESS BILLING */}
           {activeSection === "sal" && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="bg-white border border-gray-150 p-6 rounded-xl shadow-xs space-y-4">
-                <h3 className="font-black text-gray-800 text-base">Generatore Stato Avanzamento Lavori (SAL)</h3>
-                <p className="text-xs text-gray-500">Seleziona un cantiere attivo e configura le ritenute per calcolare l'avanzamento dei lavori in formato PDF.</p>
+                <h3 className="font-black text-gray-800 text-base">Progress Billing Generator</h3>
+                <p className="text-xs text-gray-500">Select an active job site and configure the holdback retention to generate a progress billing PDF.</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                   <div className="space-y-1.5">
@@ -1738,14 +1738,14 @@ export default function CrmPage() {
                       onChange={(e) => setSelectedSalProjId(e.target.value)}
                       className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-violet-500"
                     >
-                      <option value="">Scegli un cantiere...</option>
+                      <option value="">Choose a job site...</option>
                       {projects.map((p) => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Numero SAL</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Progress Draw No.</label>
                     <input
                       type="text"
                       value={salNumber}
@@ -1754,7 +1754,7 @@ export default function CrmPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ritenuta di Garanzia (%)</label>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Holdback Retention (%)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -1798,7 +1798,7 @@ export default function CrmPage() {
                         </div>
 
                         <div className="text-center font-bold text-base text-gray-900 uppercase tracking-wider py-2">
-                          Progress Report (S.A.L.) No. {salNumber}
+                          Progress Billing Statement No. {salNumber}
                         </div>
 
                         {/* Info details */}
@@ -1863,7 +1863,7 @@ export default function CrmPage() {
                             <span className="font-mono text-rose-600">- ${retentionVal.toLocaleString("en-CA", { minimumFractionDigits: 2 })}</span>
                           </div>
                           <div className="flex justify-between border-t border-violet-200 pt-2 font-bold text-sm text-violet-750 gap-4">
-                            <span>Net SAL Amount:</span>
+                            <span>Net Amount Due:</span>
                             <span className="font-mono">${nettoDaPagare.toLocaleString("en-CA", { minimumFractionDigits: 2 })}</span>
                           </div>
                         </div>

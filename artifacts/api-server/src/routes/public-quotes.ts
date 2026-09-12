@@ -329,25 +329,39 @@ Use these exact measurements to mathematically calculate the quantities.`;
       return;
     }
 
-    // Struttura i capitoli
-    const capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap: any) => ({
-      lettera: cap.lettera ?? "A",
-      titolo: cap.titolo ?? "",
-      osservazione: cap.osservazione ?? "Voce ordinaria",
-      voci: (cap.voci ?? []).map((v: any) => ({
-        descrizione: v.descrizione ?? "",
-        um: v.um ?? "a.c.",
-        quantita: Number(v.quantita ?? 0),
-        prezzoUnitario: Number(v.prezzo_unitario ?? 0),
-        totale: Number(v.totale ?? 0),
-      })),
-      subtotale: Number(cap.subtotale ?? 0),
-    }));
+    // Chapters/totals are recomputed from quantita * prezzoUnitario rather than
+    // trusted from the AI's own top-level fields, which can echo the prompt's
+    // placeholder "0" values even when the per-item numbers are correct.
+    let calculatedSubtotale = 0;
+    const capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap: any) => {
+      let capSubtotale = 0;
+      const voci = (cap.voci ?? []).map((v: any) => {
+        const quantita = Number(v.quantita ?? 0);
+        const prezzoUnitario = Number(v.prezzo_unitario ?? 0);
+        const totale = Number((quantita * prezzoUnitario).toFixed(2));
+        capSubtotale += totale;
+        return {
+          descrizione: v.descrizione ?? "",
+          um: v.um ?? "a.c.",
+          quantita,
+          prezzoUnitario,
+          totale,
+        };
+      });
+      calculatedSubtotale += capSubtotale;
+      return {
+        lettera: cap.lettera ?? "A",
+        titolo: cap.titolo ?? "",
+        osservazione: cap.osservazione ?? "Voce ordinaria",
+        voci,
+        subtotale: Number(capSubtotale.toFixed(2)),
+      };
+    });
 
-    const subtotale = Number(aiData.subtotale ?? 0);
+    const subtotale = Number(calculatedSubtotale.toFixed(2));
     const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
-    const ivaValore = Number(aiData.iva_valore ?? 0);
-    const totale = Number(aiData.totale ?? 0);
+    const ivaValore = Number((subtotale * ivaPercentuale / 100).toFixed(2));
+    const totale = Number((subtotale + ivaValore).toFixed(2));
 
     const resolvedClientData: QuoteClientData = {
       nome: clientData?.nome || aiData.cliente?.nome || "Lead Widget",

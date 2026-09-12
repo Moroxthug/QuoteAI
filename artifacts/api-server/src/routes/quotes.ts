@@ -931,32 +931,48 @@ Write all output text in English.`
       };
     }
 
-    let capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap) => ({
-      lettera: cap.lettera ?? "A",
-      titolo: cap.titolo ?? "",
-      osservazione: cap.osservazione ?? "Standard item",
-      voci: (cap.voci ?? []).map((v) => ({
-        descrizione: v.descrizione ?? "",
-        um: v.um ?? "a.c.",
-        quantita: Number(v.quantita ?? 0),
-        prezzoUnitario: Number(v.prezzo_unitario ?? 0),
-        totale: Number(v.totale ?? 0),
-      })),
-      subtotale: Number(cap.subtotale ?? 0),
-    }));
+    // NOTE: totale/subtotale for each line item and chapter are always
+    // RECOMPUTED here from quantita * prezzoUnitario rather than trusted from
+    // the AI's own aiData.totale/subtotale/iva_valore fields. The model
+    // sometimes echoes the literal "0" placeholders from the prompt's example
+    // JSON for the top-level totals even while correctly computing every
+    // per-item and per-chapter number, which used to make the request fail
+    // the "AI returned empty or invalid quote structure" check below.
+    let capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap) => {
+      let capSubtotale = 0;
+      const voci = (cap.voci ?? []).map((v) => {
+        const quantita = Number(v.quantita ?? 0);
+        const prezzoUnitario = Number(v.prezzo_unitario ?? 0);
+        const totale = Number((quantita * prezzoUnitario).toFixed(2));
+        capSubtotale += totale;
+        return {
+          descrizione: v.descrizione ?? "",
+          um: v.um ?? "a.c.",
+          quantita,
+          prezzoUnitario,
+          totale,
+        };
+      });
+      return {
+        lettera: cap.lettera ?? "A",
+        titolo: cap.titolo ?? "",
+        osservazione: cap.osservazione ?? "Standard item",
+        voci,
+        subtotale: Number(capSubtotale.toFixed(2)),
+      };
+    });
 
     if (templateId === "arosio" || templateId === "mariagrazia") {
       capitoli = await enrichVociDescrizioni(capitoli);
     }
 
+    const calculatedSubtotale = Number(capitoli.reduce((sum, c) => sum + c.subtotale, 0).toFixed(2));
+
     const scontoRaw = aiData.sconto;
+    const scontoPercentuale = scontoRaw ? Number(scontoRaw.percentuale ?? 0) : 0;
+    const importoScontato = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
     const sconto: QuoteDiscount | null =
-      scontoRaw && Number(scontoRaw.percentuale ?? 0) > 0
-        ? {
-            percentuale: Number(scontoRaw.percentuale ?? 0),
-            importoScontato: Number(scontoRaw.importo_scontato ?? 0),
-          }
-        : null;
+      scontoPercentuale > 0 ? { percentuale: scontoPercentuale, importoScontato } : null;
 
     const condizioniPagamento = aiData.condizioni_pagamento ?? [
       "15% deposit upon contract signing",
@@ -965,10 +981,11 @@ Write all output text in English.`
       "15% final balance upon completion and client walkthrough",
     ];
 
-    const subtotale = Number(aiData.subtotale ?? 0);
+    const subtotale = calculatedSubtotale;
     const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
-    const ivaValore = Number(aiData.iva_valore ?? 0);
-    const totale = Number(aiData.totale ?? 0);
+    const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
+    const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
+    const totale = Number((imponibile + ivaValore).toFixed(2));
 
     // Sanity check: reject empty/zero-value AI output before persisting a junk quote
     const hasAnyVoci = capitoli.some(c => Array.isArray(c.voci) && c.voci.length > 0);
@@ -1554,35 +1571,51 @@ When you use a price-list item, apply the exact unit price or a very close one. 
       return;
     }
 
-    let capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap) => ({
-      lettera: cap.lettera ?? "A",
-      titolo: cap.titolo ?? "",
-      osservazione: cap.osservazione ?? "Standard item",
-      voci: (cap.voci ?? []).map((v) => ({
-        descrizione: v.descrizione ?? "",
-        um: v.um ?? "a.c.",
-        quantita: Number(v.quantita ?? 0),
-        prezzoUnitario: Number(v.prezzo_unitario ?? 0),
-        totale: Number(v.totale ?? 0),
-      })),
-      subtotale: Number(cap.subtotale ?? 0),
-    }));
+    // NOTE: totals are recomputed from quantita * prezzoUnitario, not trusted from
+    // the AI's own top-level fields — see the identical comment on the POST /api/quotes
+    // handler above for why (the model can echo the prompt's placeholder "0" values).
+    let capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap) => {
+      let capSubtotale = 0;
+      const voci = (cap.voci ?? []).map((v) => {
+        const quantita = Number(v.quantita ?? 0);
+        const prezzoUnitario = Number(v.prezzo_unitario ?? 0);
+        const totale = Number((quantita * prezzoUnitario).toFixed(2));
+        capSubtotale += totale;
+        return {
+          descrizione: v.descrizione ?? "",
+          um: v.um ?? "a.c.",
+          quantita,
+          prezzoUnitario,
+          totale,
+        };
+      });
+      return {
+        lettera: cap.lettera ?? "A",
+        titolo: cap.titolo ?? "",
+        osservazione: cap.osservazione ?? "Standard item",
+        voci,
+        subtotale: Number(capSubtotale.toFixed(2)),
+      };
+    });
 
     if (quote.templateId === "arosio" || quote.templateId === "mariagrazia") {
       capitoli = await enrichVociDescrizioni(capitoli);
     }
 
+    const calculatedSubtotale = Number(capitoli.reduce((sum, c) => sum + c.subtotale, 0).toFixed(2));
+
     const scontoRaw = aiData.sconto;
+    const scontoPercentuale = scontoRaw ? Number(scontoRaw.percentuale ?? 0) : 0;
+    const importoScontato = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
     const sconto: QuoteDiscount | null =
-      scontoRaw && Number(scontoRaw.percentuale ?? 0) > 0
-        ? { percentuale: Number(scontoRaw.percentuale), importoScontato: Number(scontoRaw.importo_scontato ?? 0) }
-        : null;
+      scontoPercentuale > 0 ? { percentuale: scontoPercentuale, importoScontato } : null;
 
     const condizioniPagamento = aiData.condizioni_pagamento ?? quote.condizioniPagamento ?? [];
-    const subtotale = Number(aiData.subtotale ?? 0);
+    const subtotale = calculatedSubtotale;
     const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
-    const ivaValore = Number(aiData.iva_valore ?? 0);
-    const totale = Number(aiData.totale ?? 0);
+    const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
+    const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
+    const totale = Number((imponibile + ivaValore).toFixed(2));
 
     const resolvedClientData: QuoteClientData = keepClientData && currentClientData?.nome
       ? currentClientData

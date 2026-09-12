@@ -45,9 +45,9 @@ const router = Router();
 export const PLANS = [
   {
     id: "monthly_starter",
-    stripePriceId: "price_1TUdJjCaDBaDETvnCGbjTgIq",
+    stripePriceId: "price_1UEgdQEI5cvpdr6NMQIPKpao",
     name: "Starter",
-    price: 29,
+    price: 19,
     currency: "cad",
     interval: "month",
     features: [
@@ -64,9 +64,9 @@ export const PLANS = [
   },
   {
     id: "monthly_pro",
-    stripePriceId: "price_1TUdJjCaDBaDETvnfBv37ryF",
+    stripePriceId: "price_1UEgdSEI5cvpdr6Nx6dNesfl",
     name: "Pro",
-    price: 69,
+    price: 49,
     currency: "cad",
     interval: "month",
     features: [
@@ -84,9 +84,9 @@ export const PLANS = [
   },
   {
     id: "monthly_elite",
-    stripePriceId: "price_1TUdJjCaDBaDETvnCo3JKGJ7",
+    stripePriceId: "price_1UEgdVEI5cvpdr6NHbrrdO88",
     name: "Elite",
-    price: 79,
+    price: 59,
     currency: "cad",
     interval: "month",
     features: [
@@ -105,7 +105,7 @@ export const PLANS = [
   },
   {
     id: "oneshot_watermark",
-    stripePriceId: "price_1TUdJjCaDBaDETvnRnYfWJWh",
+    stripePriceId: "price_1UEgdiEI5cvpdr6NTlQf5eJK",
     name: "Single with Watermark",
     price: 5,
     currency: "cad",
@@ -117,7 +117,7 @@ export const PLANS = [
   },
   {
     id: "oneshot_clean",
-    stripePriceId: "price_1TUdJkCaDBaDETvnVsY6ZWec",
+    stripePriceId: "price_1UEgdkEI5cvpdr6NbbRfMtsd",
     name: "Single Clean",
     price: 13,
     currency: "cad",

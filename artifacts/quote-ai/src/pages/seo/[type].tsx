@@ -140,7 +140,7 @@ function PreventiviGratisPlansBlock() {
   const plans = [
     {
       name: t("seo.plans.starterName"),
-      price: "$29",
+      price: "$19",
       period: t("seo.plans.perMonth"),
       highlight: false,
       badge: null,
@@ -156,7 +156,7 @@ function PreventiviGratisPlansBlock() {
     },
     {
       name: t("seo.plans.proName"),
-      price: "$79",
+      price: "$49",
       period: t("seo.plans.perMonth"),
       highlight: true,
       badge: t("seo.plans.mostChosen"),
@@ -172,7 +172,7 @@ function PreventiviGratisPlansBlock() {
     },
     {
       name: t("seo.plans.singleName"),
-      price: "$29",
+      price: "$13",
       period: ` ${t("seo.plans.oneTime")}`,
       highlight: false,
       badge: null,

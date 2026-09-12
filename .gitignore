@@ -68,3 +68,6 @@ gen-lang-client-*.json
 **/.env
 **/.env.*
 !**/.env.example
+
+.vercel
+.env*

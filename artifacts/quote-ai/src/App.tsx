@@ -38,6 +38,9 @@ const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));
+const ContractsListPage = lazy(() => import("@/pages/dashboard/contracts/index"));
+const ContractDetailPage = lazy(() => import("@/pages/dashboard/contracts/[id]"));
+const SignPage = lazy(() => import("@/pages/sign/[token]"));
 const BlogArticlePage = lazy(() => import("@/pages/blog/[slug]"));
 const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
 
@@ -145,6 +148,12 @@ function Router() {
       <Route path="/dashboard/clients" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><ClientsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      <Route path="/dashboard/contracts/:id" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><ContractDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/contracts" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><ContractsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
       <Route path="/dashboard/invoices" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><InvoicesPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
@@ -154,6 +163,9 @@ function Router() {
       <Route path="/dashboard/documents" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><DocumentsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+
+      {/* Public e-signature page: the customer signs the contract from the emailed link */}
+      <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />
 
       {/* Pagina pubblica: il cliente finale visualizza e accetta il preventivo (link condiviso via WhatsApp/email) */}
       <Route path="/p/:id" component={() => <PublicLayout><Suspense fallback={null}><PublicQuotePage /></Suspense></PublicLayout>} />

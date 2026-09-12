@@ -18,6 +18,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleCard } from "@/components/payment-schedule-card";
+import { QuoteContractCard } from "@/components/quote-contract-card";
+import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
@@ -1932,6 +1934,9 @@ export default function QuoteDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Contract (Phase 1) */}
+          <QuoteContractCard quoteId={quote.id} quoteStatus={quote.status} hasContractsFeature={hasFeature(profile as never, "contracts")} />
 
           {/* Payment schedule (Phase 0: drives contract terms + invoicing) */}
           <PaymentScheduleCard

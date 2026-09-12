@@ -19,6 +19,7 @@ import {
 export const AUTOMATION_EVENTS = [
   "quote.accepted",
   "contract.signed",
+  "contract.declined",
   "milestone.completed",
   "job.completed",
   "invoice.overdue",

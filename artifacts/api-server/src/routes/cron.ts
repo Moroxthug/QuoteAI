@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { retryDueAutomations } from "../lib/automation";
+import { runContractMaintenance } from "../contracts/maintenance.js";
 
 const router = Router();
 
@@ -21,8 +22,8 @@ router.get("/cron/tick", async (req, res) => {
   const startedAt = Date.now();
   try {
     const automations = await retryDueAutomations();
-    // Phase 1+: contract reminders, invoice overdue detection, etc. are added here.
-    res.json({ ok: true, automations, tookMs: Date.now() - startedAt });
+    const contracts = await runContractMaintenance();
+    res.json({ ok: true, automations, contracts, tookMs: Date.now() - startedAt });
   } catch (err) {
     req.log.error({ err }, "Cron tick failed");
     res.status(500).json({ ok: false });

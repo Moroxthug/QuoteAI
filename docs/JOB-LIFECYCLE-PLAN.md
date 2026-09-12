@@ -272,3 +272,19 @@ Reply with any changes to these and I'll start Phase 0.
 **Verified**: workspace typecheck, api-server build, unit checks on parser/tax/plans. Not yet verified against a live DB (no `DATABASE_URL` locally).
 
 **Deferred to Phase 2**: switching `/api/clients` and the Clients pages from the derived view to the `clients` table (the table is populated and linked; the read path is unchanged so nothing breaks).
+
+### Phase 1 — Contracts & e-signature ✅ (built 2026-09-12, not yet deployed)
+
+**Schema**: `lib/db/src/schema/contracts.ts` — `contracts` (structured document + variables, status machine draft→sent→viewed→signed / declined / voided / expired, PDF hashes), `contract_signers` (contractor + customer; hashed signing token, OTP, signature, consent, IP/UA), `contract_events` (audit trail), `contract_sequences`. Migration `lib/db/drizzle/0002_phase1_contracts.sql`.
+
+**Templates** (`artifacts/api-server/src/contracts/templates.ts`): one 16-section construction services agreement, EN + FR, with province-specific clauses for ON (CPA 2002 cooling-off, Construction Act holdback), BC (BPCPA, Builders Lien Act), AB (CPA, PPCLA prompt payment), QC (LPC itinerant merchant, RBQ licence, Civil Code hypothec, French-language clause when English is requested) and a generic Canada variant. Legal sections are locked; scope + schedule are AI-drafted from the quote (gpt-4o-mini, deterministic fallback); price, payment schedule and parties are rendered from variables. `TEMPLATE_VERSION` is stamped on every contract. **Lawyer review still required before marketing as compliant.**
+
+**Rendering**: `render.ts` (markdown-lite → HTML for preview/signing page), `pdf.ts` (pdfmake — Vercel-safe; signature page + electronic-signature certificate with event log, IPs, and SHA-256 fingerprints of the sent and signed documents).
+
+**Flow** (`contracts/service.ts`, `routes/contracts.ts`, `routes/sign.ts`): draft from quote (manual or auto on `quote.accepted`) → company edits editable sections/variables → company signs (draw/type) → send: unsigned PDF frozen + hashed, 30-day single-purpose token emailed → customer opens `/sign/:token` (viewed event) → email OTP (6 digits, 10 min, 5 attempts) → consent + signature → `finalizeContract`: signed PDF with audit page stored in private bucket, both parties emailed the PDF, quote marked accepted, `contract.signed` automation raised. Decline with reason notifies the company. Cron: expiry + reminders at 3/7/14 days (re-issues token). Rate-limited by IP on all public endpoints.
+
+**Frontend**: `/dashboard/contracts` (list + stats + filters), `/dashboard/contracts/:id` (progress steps, rendered document, edit mode, sign/send/void dialogs, signers, activity), `/sign/:token` (mobile-first public signing page in the contract's language), Contract card on the quote page, nav item (Pro), `signature-pad.tsx`, EN + FR strings.
+
+**Verified**: workspace typecheck, api-server build, template/render/PDF pipeline for ON/BC/AB/QC/NS × EN/FR (sample PDFs generated). Not verified against a live DB/email.
+
+**Deferred**: company-uploaded custom templates; AI "regenerate this section" button; contractor countersign-after-customer flow is supported by the API but the UI always signs first.

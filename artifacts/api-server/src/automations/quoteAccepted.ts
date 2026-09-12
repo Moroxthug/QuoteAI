@@ -1,4 +1,6 @@
-import { db, quotesTable, businessProfilesTable, authUsersTable, DEFAULT_AUTOMATION_SETTINGS, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, authUsersTable, DEFAULT_AUTOMATION_SETTINGS, hasFeature, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { createContractFromQuote } from "../contracts/service.js";
+import { logger } from "../lib/logger.js";
 import { eq } from "drizzle-orm";
 import { registerAutomation } from "../lib/automation";
 import { createNotification, writeAudit } from "../lib/notifications";
@@ -34,16 +36,29 @@ registerAutomation("quote.accepted", async (run) => {
 
   // Idempotency: a retry after a partial failure must not create a second
   // notification, so the payload records what already happened.
-  const done = (run.result ?? {}) as { notified?: boolean; emailed?: boolean };
+  const done = (run.result ?? {}) as { notified?: boolean; emailed?: boolean; contractId?: string };
   const result: Record<string, unknown> = { ...done };
+
+  // Phase 1: draft the contract right away so the company only has to
+  // review, sign and send. createContractFromQuote is idempotent per quote.
+  if (!done.contractId && settings.autoDraftContract && hasFeature(profile, "contracts")) {
+    try {
+      const { contract } = await createContractFromQuote({ userId: quote.userId, quoteId: quote.id, actor: "system" });
+      result.contractId = contract.id;
+    } catch (err) {
+      // Not fatal for the notification path; the company can draft manually.
+      logger.warn({ err, quoteId: quote.id }, "Auto-draft contract failed");
+      result.contractError = err instanceof Error ? err.message : String(err);
+    }
+  }
 
   if (!done.notified) {
     await createNotification({
       userId: quote.userId,
       type: "quote_accepted",
       title: `${clientName} accepted quote ${quoteNumber}`,
-      body: `Total $${totale}. Next: turn it into a signed contract.`,
-      link: `/dashboard/quotes/${quote.id}`,
+      body: result.contractId ? `Total ${totale}. We drafted the contract — review, sign and send it.` : `Total ${totale}. Next: turn it into a signed contract.`,
+      link: result.contractId ? `/dashboard/contracts/${result.contractId}` : `/dashboard/quotes/${quote.id}`,
       entityType: "quote",
       entityId: quote.id,
     });

@@ -15,6 +15,8 @@ import publicQuotesRouter from "./public-quotes";
 import speechRouter from "./speech";
 import cronRouter from "./cron";
 import notificationsRouter from "./notifications";
+import contractsRouter from "./contracts";
+import signRouter from "./sign";
 
 const router: IRouter = Router();
 
@@ -34,5 +36,7 @@ router.use(publicQuotesRouter);
 router.use(speechRouter);
 router.use(cronRouter);
 router.use(notificationsRouter);
+router.use(contractsRouter);
+router.use(signRouter);
 
 export default router;

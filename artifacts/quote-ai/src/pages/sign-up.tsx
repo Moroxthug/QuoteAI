@@ -94,9 +94,7 @@ export default function SignUpPage() {
             </Link>
           </p>
           <a
-            href="https://wa.me/393791059492"
-            target="_blank"
-            rel="noopener noreferrer nofollow"
+            href="mailto:support@quoteai.ca?subject=Beta%20access%20request"
             className="inline-flex items-center gap-2 w-full justify-center h-10 rounded-xl font-semibold text-sm text-white transition-all hover:opacity-90"
             style={{ background: "#25D366" }}
           >

@@ -130,11 +130,18 @@ export default function Home() {
             {/* Copy */}
             <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
-                Create professional quotes<br />
-                in <span className="gradient-text">30 seconds</span> with AI
+                {lang === "fr" ? (
+                  <>Créez des soumissions professionnelles<br />en <span className="gradient-text">30 secondes</span> avec l'IA</>
+                ) : (
+                  <>Create professional quotes<br />in <span className="gradient-text">30 seconds</span> with AI</>
+                )}
               </h1>
               <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
-                Describe the job in your own words — <span className="quoteai-word font-semibold">quoteai</span> generates a professional quote with line items, quantities, and tax. Ready to send to your client.
+                {lang === "fr" ? (
+                  <>Décrivez le travail dans vos propres mots — <span className="quoteai-word font-semibold">quoteai</span> génère une soumission professionnelle avec postes, quantités et taxes. Prête à envoyer à votre client.</>
+                ) : (
+                  <>Describe the job in your own words — <span className="quoteai-word font-semibold">quoteai</span> generates a professional quote with line items, quantities, and tax. Ready to send to your client.</>
+                )}
               </p>
 
               {/* AI bar */}
@@ -157,7 +164,7 @@ export default function Home() {
                   value={homepageInput}
                   onChange={(e) => setHomepageInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && homepageInput.trim()) handleHomepageSubmit(); }}
-                  placeholder="Describe the job and get a quote in 30 seconds..."
+                  placeholder={lang === "fr" ? "Décrivez le travail et obtenez une soumission en 30 secondes..." : "Describe the job and get a quote in 30 seconds..."}
                   className="flex-1 text-sm outline-none placeholder:text-gray-400 text-gray-800 bg-transparent min-w-0"
                 />
                 <div className="group relative shrink-0">
@@ -180,21 +187,21 @@ export default function Home() {
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mb-6">7-day free trial · No credit card required</p>
+              <p className="text-xs text-gray-400 mb-6">{lang === "fr" ? "Essai gratuit de 7 jours · Sans carte de crédit" : "7-day free trial · No credit card required"}</p>
 
               <div className="flex justify-center lg:justify-start gap-3">
                 <button
                   onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")}
                   className="btn-gradient inline-flex h-9 items-center px-5 text-sm font-semibold rounded-lg"
                 >
-                  Start for free
+                  {lang === "fr" ? "Commencer gratuitement" : "Start for free"}
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </button>
                 <Link
                   href="#prezzi"
                   className="btn-gradient-outline inline-flex h-9 items-center px-5 text-sm font-semibold rounded-lg"
                 >
-                  See plans
+                  {lang === "fr" ? "Voir les forfaits" : "See plans"}
                 </Link>
               </div>
             </div>
@@ -283,7 +290,7 @@ export default function Home() {
               </Suspense>
             </div>
           </div>
-          <p className="text-xs text-gray-400 text-center mt-3">Live demo — no effects, no editing</p>
+          <p className="text-xs text-gray-400 text-center mt-3">{lang === "fr" ? "Démo en direct — aucun effet, aucun montage" : "Live demo — no effects, no editing"}</p>
         </div>
       </section>
 
@@ -305,24 +312,24 @@ export default function Home() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-green-400 uppercase tracking-wider">New</span>
+                      <span className="text-xs font-bold text-green-400 uppercase tracking-wider">{lang === "fr" ? "Nouveau" : "New"}</span>
                       <span className="text-xs text-gray-600">·</span>
-                      <span className="text-xs text-gray-500">Straight from your phone</span>
+                      <span className="text-xs text-gray-500">{lang === "fr" ? "Directement depuis votre téléphone" : "Straight from your phone"}</span>
                     </div>
                     <p className="text-white font-bold text-base sm:text-lg leading-snug">
-                      Create quotes directly from{" "}
+                      {lang === "fr" ? "Créez des soumissions directement depuis" : "Create quotes directly from"}{" "}
                       <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #25D366, #a78bfa)" }}>
                         WhatsApp
                       </span>
                     </p>
                     <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
-                      Voice note, text, or photo → professional PDF in 60 seconds. No app to open.
+                      {lang === "fr" ? "Note vocale, texte ou photo → PDF professionnel en 60 secondes. Aucune application à ouvrir." : "Voice note, text, or photo → professional PDF in 60 seconds. No app to open."}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-semibold text-violet-300 group-hover:text-white transition-colors">See how it works</span>
+                  <span className="text-sm font-semibold text-violet-300 group-hover:text-white transition-colors">{lang === "fr" ? "Voir comment ça marche" : "See how it works"}</span>
                   <ArrowRight className="h-4 w-4 text-violet-400 group-hover:text-white transition-colors" />
                 </div>
               </div>
@@ -343,16 +350,23 @@ export default function Home() {
 
               <div>
                 <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
-                  From voice note to PDF<br />
-                  <span className="text-violet-600">without touching a computer</span>
+                  {lang === "fr" ? (
+                    <>D'une note vocale au PDF<br /><span className="text-violet-600">sans toucher un ordinateur</span></>
+                  ) : (
+                    <>From voice note to PDF<br /><span className="text-violet-600">without touching a computer</span></>
+                  )}
                 </h2>
 
                 <div className="space-y-5 mb-8">
-                  {[
+                  {(lang === "fr" ? [
+                    { num: "1", title: "Envoyez une note vocale, un texte ou une photo", desc: "Directement sur WhatsApp. Décrivez le travail comme vous le feriez avec un client." },
+                    { num: "2", title: "L'IA génère un aperçu", desc: "Sections, prix et taxes en 60 secondes. Corrigez ou approuvez immédiatement." },
+                    { num: "3", title: "Recevez le PDF dans le clavardage", desc: "Envoyez-le à votre client d'un geste. La soumission est aussi sauvegardée sur quoteai.ca." },
+                  ] : [
                     { num: "1", title: "Send a voice note, text, or photo", desc: "Right on WhatsApp. Describe the job just like you'd talk to a client." },
                     { num: "2", title: "The AI generates a preview", desc: "Sections, prices, and tax in 60 seconds. Correct or approve it right away." },
                     { num: "3", title: "Get the PDF in chat", desc: "Send it to your client with a tap. The quote is also saved on quoteai.ca." },
-                  ].map((s) => (
+                  ]).map((s) => (
                     <div key={s.num} className="flex gap-4">
                       <div
                         className="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white"
@@ -372,7 +386,7 @@ export default function Home() {
                   href="/whatsapp/"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group"
                 >
-                  See the full feature
+                  {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -388,19 +402,22 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
             <div>
               <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-4 leading-snug">
-                From a simple text to a{" "}
-                <span className="gradient-text">professional document</span>.
+                {lang === "fr" ? (
+                  <>D'un simple texte à un{" "}<span className="gradient-text">document professionnel</span>.</>
+                ) : (
+                  <>From a simple text to a{" "}<span className="gradient-text">professional document</span>.</>
+                )}
               </h2>
               <div className="bg-gray-50 p-5 rounded-xl mb-4 font-mono text-sm border border-gray-100 text-gray-700">
-                "I need to paint an 800 sq ft apartment with two coats of
-                white washable paint. Also include skim-coating a damaged
-                wall in the living room."
+                {lang === "fr"
+                  ? "« Je dois peindre un appartement de 800 pi² avec deux couches de peinture lavable blanche. Il faut aussi refaire l'enduit d'un mur endommagé au salon. »"
+                  : "\"I need to paint an 800 sq ft apartment with two coats of white washable paint. Also include skim-coating a damaged wall in the living room.\""}
               </div>
               <ArrowRight className="h-6 w-6 text-violet-500 mx-auto lg:mx-0 mb-4 rotate-90 lg:rotate-0" />
               <p className="text-sm text-gray-500 leading-relaxed">
-                Our AI engine understands natural language, identifies each
-                individual cost item, estimates quantities, and lays it all
-                out in a standard format.
+                {lang === "fr"
+                  ? "Notre moteur d'IA comprend le langage naturel, identifie chaque poste de coût, estime les quantités et présente le tout dans un format standard."
+                  : "Our AI engine understands natural language, identifies each individual cost item, estimates quantities, and lays it all out in a standard format."}
               </p>
             </div>
 
@@ -536,20 +553,28 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-600 uppercase tracking-wider mb-3">
                   <Hammer className="h-3.5 w-3.5" />
-                  Included in every plan
+                  {lang === "fr" ? "Inclus dans tous les forfaits" : "Included in every plan"}
                 </div>
                 <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
-                  An accepted quote<br />
-                  <span className="text-violet-600">becomes a job site</span>
+                  {lang === "fr" ? (
+                    <>Une soumission acceptée<br /><span className="text-violet-600">devient un chantier</span></>
+                  ) : (
+                    <>An accepted quote<br /><span className="text-violet-600">becomes a job site</span></>
+                  )}
                 </h2>
 
                 <div className="space-y-5 mb-8">
-                  {[
+                  {(lang === "fr" ? [
+                    { icon: Hammer, title: "Un clic, aucune ressaisie", desc: "Ouvrez le chantier directement depuis la soumission acceptée : client, montant et postes sont déjà liés." },
+                    { icon: ListChecks, title: "Suivi des tâches et de l'avancement", desc: "Organisez le travail en tâches avec des échéances, sans quitter quoteai." },
+                    { icon: Users, title: "Membres d'équipe et fournisseurs", desc: "Assignez le chantier à votre équipe et suivez les fournisseurs impliqués." },
+                    { icon: Building2, title: "Budget et coûts extra maîtrisés", desc: "Chaque dépense hors soumission initiale reste liée au chantier et à son budget de départ." },
+                  ] : [
                     { icon: Hammer, title: "One click, zero re-typing", desc: "Open the job site straight from the accepted quote: client, amount, and line items are already linked." },
                     { icon: ListChecks, title: "Tasks and progress tracking", desc: "Organize the work into tasks with deadlines, without leaving quoteai." },
                     { icon: Users, title: "Team members and suppliers", desc: "Assign the job site to your team and keep track of the suppliers involved." },
                     { icon: Building2, title: "Budget and extra costs under control", desc: "Every expense outside the original quote stays linked to the job site and its starting budget." },
-                  ].map((s) => (
+                  ]).map((s) => (
                     <div key={s.title} className="flex gap-4">
                       <div
                         className="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white"
@@ -569,7 +594,7 @@ export default function Home() {
                   href="/crm"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group"
                 >
-                  See the job site CRM
+                  {lang === "fr" ? "Voir le CRM de chantier" : "See the job site CRM"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -633,10 +658,10 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-xl font-semibold text-gray-900">
-              Simple, Transparent Plans
+              {lang === "fr" ? "Des forfaits simples et transparents" : "Simple, Transparent Plans"}
             </h2>
             <p className="mt-2 text-sm text-gray-500 max-w-xl mx-auto leading-relaxed">
-              7-day free trial included — no credit card required.
+              {lang === "fr" ? "Essai gratuit de 7 jours inclus — sans carte de crédit." : "7-day free trial included — no credit card required."}
             </p>
           </div>
 
@@ -660,14 +685,14 @@ export default function Home() {
                   {isPro && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="text-[10px] font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full whitespace-nowrap border border-violet-100">
-                        ⭐ Most Popular
+                        ⭐ {lang === "fr" ? "Le plus populaire" : "Most Popular"}
                       </span>
                     </div>
                   )}
                   {isElite && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                       <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full whitespace-nowrap border border-amber-100">
-                        👑 Unlimited
+                        👑 {lang === "fr" ? "Illimité" : "Unlimited"}
                       </span>
                     </div>
                   )}
@@ -707,7 +732,9 @@ export default function Home() {
                     }`}
                   >
                     {loadingPlanId === plan.id ? (
-                      <><Loader2 className="h-3.5 w-3.5 animate-spin" />Please wait...</>
+                      <><Loader2 className="h-3.5 w-3.5 animate-spin" />{lang === "fr" ? "Veuillez patienter..." : "Please wait..."}</>
+                    ) : lang === "fr" ? (
+                      isStarter ? "Commencer avec Starter" : isPro ? "Commencer avec Pro" : "Commencer avec Elite"
                     ) : (
                       isStarter ? "Start with Starter" : isPro ? "Start with Pro" : "Start with Elite"
                     )}
@@ -720,7 +747,7 @@ export default function Home() {
           {/* Divider */}
           <div className="flex items-center gap-4 max-w-xl mx-auto mb-6">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">or a one-time purchase</span>
+            <span className="text-xs text-gray-400 font-medium">{lang === "fr" ? "ou un achat unique" : "or a one-time purchase"}</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -738,7 +765,7 @@ export default function Home() {
                   <h3 className="text-xs font-semibold text-gray-900 mb-0.5">{plan.name}</h3>
                   <div className="mb-2">
                     <span className="text-lg font-bold text-gray-900">${plan.price}</span>
-                    <span className="text-gray-400 text-[10px]"> one-time</span>
+                    <span className="text-gray-400 text-[10px]"> {lang === "fr" ? "paiement unique" : "one-time"}</span>
                   </div>
                   <ul className="space-y-1 mb-4 flex-1">
                     {plan.features.map((feature, i) => (
@@ -755,7 +782,7 @@ export default function Home() {
                       isClean ? "btn-gradient" : "btn-gradient-outline"
                     }`}
                   >
-                    Buy
+                    {lang === "fr" ? "Acheter" : "Buy"}
                   </button>
                 </div>
               );
@@ -770,14 +797,14 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-xl font-semibold tracking-tight text-gray-900">
-                <span className="quoteai-word">quoteai</span> vs{" "}
-                <span className="gradient-text">Word and Excel</span>
+                <span className="quoteai-word">quoteai</span> {lang === "fr" ? "vs" : "vs"}{" "}
+                <span className="gradient-text">Word {lang === "fr" ? "et" : "and"} Excel</span>
               </h2>
             </div>
 
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
               <div className="grid grid-cols-4 border-b border-gray-100">
-                <div className="px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Feature</div>
+                <div className="px-5 py-3.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">{lang === "fr" ? "Fonctionnalité" : "Feature"}</div>
                 {[
                   { label: "quoteai", gradient: true },
                   { label: "Word", gradient: false },
@@ -853,7 +880,7 @@ export default function Home() {
                 onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")}
                 className="btn-gradient inline-flex h-10 items-center justify-center px-6 text-sm font-semibold"
               >
-                Try quoteai for free
+                {lang === "fr" ? "Essayez quoteai gratuitement" : "Try quoteai for free"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </button>
             </div>
@@ -869,20 +896,26 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-6">
-              <span className="inline-block bg-violet-100 text-violet-700 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">No more spreadsheets</span>
+              <span className="inline-block bg-violet-100 text-violet-700 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">{lang === "fr" ? "Fini les tableurs" : "No more spreadsheets"}</span>
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl mb-3">
-                Forget <span className="gradient-text">Excel and Word</span>
+                {lang === "fr" ? <>Oubliez <span className="gradient-text">Excel et Word</span></> : <>Forget <span className="gradient-text">Excel and Word</span></>}
               </h2>
               <p className="text-sm text-gray-500 max-w-xl mx-auto leading-relaxed">
-                Excel templates break. Word documents don't calculate. With <span className="quoteai-word font-semibold">quoteai</span> you describe the job in your own words and in 30 seconds you have a professional document ready to send.
+                {lang === "fr"
+                  ? <>Les modèles Excel se brisent. Les documents Word ne calculent rien. Avec <span className="quoteai-word font-semibold">quoteai</span> vous décrivez le travail dans vos propres mots et en 30 secondes vous avez un document professionnel prêt à envoyer.</>
+                  : <>Excel templates break. Word documents don't calculate. With <span className="quoteai-word font-semibold">quoteai</span> you describe the job in your own words and in 30 seconds you have a professional document ready to send.</>}
               </p>
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
-              {[
+              {(lang === "fr" ? [
+                { slug: "excel-template", label: "Alternative à une soumission Excel", desc: "Pas de formules. Pas d'erreurs. Juste des résultats.", badge: "vs Excel" },
+                { slug: "word-template", label: "Alternative à un modèle Word", desc: "PDF professionnel en un clic, sans mise en page manuelle.", badge: "vs Word" },
+                { slug: "how-to-quote", label: "Comment rédiger une soumission", desc: "Un guide pratique pour les entrepreneurs et petites entreprises canadiennes.", badge: "Guide" },
+              ] : [
                 { slug: "excel-template", label: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", badge: "vs Excel" },
                 { slug: "word-template", label: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", badge: "vs Word" },
                 { slug: "how-to-quote", label: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", badge: "Guide" },
-              ].map(({ slug: guideSlug, label, desc, badge }) => (
+              ]).map(({ slug: guideSlug, label, desc, badge }) => (
                 <Link
                   key={guideSlug}
                   href={`${base}/${lang === "fr" ? (SECTORS[guideSlug]?.frSlug ?? guideSlug) : guideSlug}/`}
@@ -891,7 +924,7 @@ export default function Home() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-violet-500 bg-violet-50 px-2 py-0.5 rounded-full">{badge}</span>
                   <h3 className="font-semibold text-gray-900 mt-2.5 mb-1 text-sm leading-snug group-hover:text-violet-700 transition-colors">{label}</h3>
                   <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
-                  <span className="inline-flex items-center gap-1 text-xs text-violet-500 font-semibold mt-2">Learn more <ArrowRight className="h-3 w-3" /></span>
+                  <span className="inline-flex items-center gap-1 text-xs text-violet-500 font-semibold mt-2">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-3 w-3" /></span>
                 </Link>
               ))}
             </div>
@@ -906,7 +939,7 @@ export default function Home() {
             onClick={() => setSectorsOpen(v => !v)}
             className="w-full flex items-center justify-between py-3 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
           >
-            <span>Quotes for every trade and city</span>
+            <span>{lang === "fr" ? "Soumissions pour chaque métier et ville" : "Quotes for every trade and city"}</span>
             <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${sectorsOpen ? "rotate-180" : ""}`} />
           </button>
           {sectorsOpen && (
@@ -923,7 +956,7 @@ export default function Home() {
                 ))}
               </div>
               <div className="pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-400 mb-2">Major cities</p>
+                <p className="text-xs text-gray-400 mb-2">{lang === "fr" ? "Principales villes" : "Major cities"}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {[
                     { name: "Toronto", slug: "toronto" },
@@ -958,78 +991,137 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-10">
               <span className="inline-flex items-center gap-1.5 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                <Sparkles className="h-3 w-3" /> Deep dive
+                <Sparkles className="h-3 w-3" /> {lang === "fr" ? "Analyse approfondie" : "Deep dive"}
               </span>
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                What is <span className="quoteai-word text-2xl sm:text-3xl">quoteai</span> and who it's for
+                {lang === "fr"
+                  ? <>Qu'est-ce que <span className="quoteai-word text-2xl sm:text-3xl">quoteai</span> et à qui ça s'adresse</>
+                  : <>What is <span className="quoteai-word text-2xl sm:text-3xl">quoteai</span> and who it's for</>}
               </h2>
             </div>
 
             <div className="space-y-5 text-sm sm:text-[15px] text-gray-600 leading-relaxed">
-              <p>
-                <strong className="text-gray-900">quoteai</strong> is a Canadian software that uses artificial
-                intelligence to turn a plain-language description into a complete, professional quote. It's built for
-                contractors, skilled tradespeople, and small businesses that send client quotes every week — painters,
-                electricians, plumbers, masons, metalworkers, carpenters, renovation companies, and every trade in
-                construction and mechanical/electrical work. The goal is simple: cut the time it takes to put together
-                a quote from 30-60 minutes down to 30 seconds, without giving up the quality of the final document.
-              </p>
+              {lang === "fr" ? (
+                <p>
+                  <strong className="text-gray-900">quoteai</strong> est un logiciel canadien qui utilise l'intelligence
+                  artificielle pour transformer une description en langage courant en une soumission complète et
+                  professionnelle. Il est conçu pour les entrepreneurs, artisans qualifiés et petites entreprises qui
+                  envoient des soumissions à leurs clients chaque semaine — peintres, électriciens, plombiers, maçons,
+                  métalliers, menuisiers, entreprises de rénovation, et tous les métiers de la construction et du
+                  mécanique/électrique. L'objectif est simple : réduire le temps nécessaire pour préparer une soumission
+                  de 30-60 minutes à 30 secondes, sans sacrifier la qualité du document final.
+                </p>
+              ) : (
+                <p>
+                  <strong className="text-gray-900">quoteai</strong> is a Canadian software that uses artificial
+                  intelligence to turn a plain-language description into a complete, professional quote. It's built for
+                  contractors, skilled tradespeople, and small businesses that send client quotes every week — painters,
+                  electricians, plumbers, masons, metalworkers, carpenters, renovation companies, and every trade in
+                  construction and mechanical/electrical work. The goal is simple: cut the time it takes to put together
+                  a quote from 30-60 minutes down to 30 seconds, without giving up the quality of the final document.
+                </p>
+              )}
 
               <div className="grid sm:grid-cols-3 gap-3 my-8">
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
                   <DollarSign className="h-5 w-5 text-violet-600 mb-2" />
-                  <div className="font-semibold text-gray-900 text-sm mb-1">Built-in Canadian tax</div>
-                  <p className="text-xs text-gray-500 leading-relaxed">Automatic GST/HST calculation by province.</p>
+                  <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "Taxes canadiennes intégrées" : "Built-in Canadian tax"}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Calcul automatique de la TPS/TVH selon la province." : "Automatic GST/HST calculation by province."}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
                   <Shield className="h-5 w-5 text-violet-600 mb-2" />
-                  <div className="font-semibold text-gray-900 text-sm mb-1">Securely stored data</div>
-                  <p className="text-xs text-gray-500 leading-relaxed">Stripe handles payments, sessions are protected with encrypted cookies.</p>
+                  <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "Données stockées en sécurité" : "Securely stored data"}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Stripe gère les paiements, les sessions sont protégées par des cookies chiffrés." : "Stripe handles payments, sessions are protected with encrypted cookies."}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
                   <Cpu className="h-5 w-5 text-violet-600 mb-2" />
-                  <div className="font-semibold text-gray-900 text-sm mb-1">AI trained for the trades</div>
-                  <p className="text-xs text-gray-500 leading-relaxed">Technical vocabulary for construction and mechanical trades.</p>
+                  <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "IA formée pour les métiers" : "AI trained for the trades"}</div>
+                  <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Vocabulaire technique pour la construction et les métiers mécaniques." : "Technical vocabulary for construction and mechanical trades."}</p>
                 </div>
               </div>
 
-              <h3 className="text-lg font-semibold text-gray-900 pt-3">How it actually works</h3>
-              <p>
-                Open quoteai on your phone right on the job site, or from home in the evening. Describe the job the way
-                you'd explain it to a coworker: <em>"Paint an 800 sq ft apartment, two coats of white washable paint,
-                skim-coat the bathroom wall."</em> In thirty seconds the AI engine builds a quote organized into
-                sections, with cost items, units of measure (square feet, hours, per unit), market-rate unit prices,
-                and automatic tax calculation. You can edit every line item, swap in your own price list, and add or
-                remove sections. When you're ready, download the PDF, send it over WhatsApp or email, and the document
-                is saved to your account for future edits.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 pt-3">{lang === "fr" ? "Comment ça fonctionne concrètement" : "How it actually works"}</h3>
+              {lang === "fr" ? (
+                <p>
+                  Ouvrez quoteai sur votre téléphone directement sur le chantier, ou de la maison le soir. Décrivez le
+                  travail comme vous l'expliqueriez à un collègue : <em>« Peindre un appartement de 800 pi², deux
+                  couches de peinture lavable blanche, enduire le mur de la salle de bain. »</em> En trente secondes, le
+                  moteur d'IA construit une soumission organisée en sections, avec les postes de coûts, unités de mesure
+                  (pieds carrés, heures, à l'unité), prix unitaires au taux du marché, et calcul automatique des taxes.
+                  Vous pouvez modifier chaque ligne, utiliser votre propre liste de prix, et ajouter ou retirer des
+                  sections. Une fois prêt, téléchargez le PDF, envoyez-le par WhatsApp ou courriel, et le document est
+                  sauvegardé dans votre compte pour modification future.
+                </p>
+              ) : (
+                <p>
+                  Open quoteai on your phone right on the job site, or from home in the evening. Describe the job the way
+                  you'd explain it to a coworker: <em>"Paint an 800 sq ft apartment, two coats of white washable paint,
+                  skim-coat the bathroom wall."</em> In thirty seconds the AI engine builds a quote organized into
+                  sections, with cost items, units of measure (square feet, hours, per unit), market-rate unit prices,
+                  and automatic tax calculation. You can edit every line item, swap in your own price list, and add or
+                  remove sections. When you're ready, download the PDF, send it over WhatsApp or email, and the document
+                  is saved to your account for future edits.
+                </p>
+              )}
 
-              <h3 className="text-lg font-semibold text-gray-900 pt-3">Why it works better than Excel or traditional software</h3>
-              <p>
-                Traditional quoting software is built for the office: it requires installation, an upfront setup of
-                price lists and codes, and hours of training. Excel is free but forces you to start from a blank
-                sheet or a template built years ago every single time. quoteai removes both problems: there's nothing
-                to install (just a browser), nothing to configure up front (the AI already knows average market
-                prices), and every quote is structured from the start. On average, our users report saving 4-6 hours
-                a week — time that goes back into the job site or their family.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 pt-3">{lang === "fr" ? "Pourquoi c'est mieux qu'Excel ou les logiciels traditionnels" : "Why it works better than Excel or traditional software"}</h3>
+              {lang === "fr" ? (
+                <p>
+                  Les logiciels de soumission traditionnels sont conçus pour le bureau : ils demandent une installation,
+                  une configuration initiale des listes de prix et codes, et des heures de formation. Excel est gratuit
+                  mais vous force à repartir d'une feuille vide ou d'un modèle créé il y a des années, chaque fois.
+                  quoteai élimine ces deux problèmes : rien à installer (juste un navigateur), rien à configurer au
+                  départ (l'IA connaît déjà les prix moyens du marché), et chaque soumission est structurée dès le
+                  départ. En moyenne, nos utilisateurs rapportent économiser 4 à 6 heures par semaine — du temps qui
+                  retourne au chantier ou à la famille.
+                </p>
+              ) : (
+                <p>
+                  Traditional quoting software is built for the office: it requires installation, an upfront setup of
+                  price lists and codes, and hours of training. Excel is free but forces you to start from a blank
+                  sheet or a template built years ago every single time. quoteai removes both problems: there's nothing
+                  to install (just a browser), nothing to configure up front (the AI already knows average market
+                  prices), and every quote is structured from the start. On average, our users report saving 4-6 hours
+                  a week — time that goes back into the job site or their family.
+                </p>
+              )}
 
-              <h3 className="text-lg font-semibold text-gray-900 pt-3">Security and Canadian tax compliance</h3>
-              <p>
-                All data is stored on secure, encrypted infrastructure, sessions are protected with encrypted cookies,
-                and payments are processed through Stripe. Tax handling follows Canadian rules: GST/HST is calculated
-                automatically based on your province, at the rate that applies to your work. Your business details
-                (business number, GST/HST number) are saved once and applied to every quote automatically.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 pt-3">{lang === "fr" ? "Sécurité et conformité fiscale canadienne" : "Security and Canadian tax compliance"}</h3>
+              {lang === "fr" ? (
+                <p>
+                  Toutes les données sont stockées sur une infrastructure sécurisée et chiffrée, les sessions sont
+                  protégées par des cookies chiffrés, et les paiements sont traités via Stripe. La gestion fiscale suit
+                  les règles canadiennes : la TPS/TVH est calculée automatiquement selon votre province, au taux
+                  applicable à votre travail. Vos informations d'entreprise (numéro d'entreprise, numéro de TPS/TVH)
+                  sont enregistrées une seule fois et appliquées automatiquement à chaque soumission.
+                </p>
+              ) : (
+                <p>
+                  All data is stored on secure, encrypted infrastructure, sessions are protected with encrypted cookies,
+                  and payments are processed through Stripe. Tax handling follows Canadian rules: GST/HST is calculated
+                  automatically based on your province, at the rate that applies to your work. Your business details
+                  (business number, GST/HST number) are saved once and applied to every quote automatically.
+                </p>
+              )}
 
-              <h3 className="text-lg font-semibold text-gray-900 pt-3">What it costs to get started</h3>
-              <p>
-                Signing up is free, and your first quote is generated without entering a credit card. From there you
-                can choose: pay for a single quote ($29) when you need one, or start a monthly subscription
-                (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited). You can change or cancel
-                your plan at any time from your account. Thousands of Canadian contractors already use quoteai every
-                week.
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 pt-3">{lang === "fr" ? "Combien ça coûte pour commencer" : "What it costs to get started"}</h3>
+              {lang === "fr" ? (
+                <p>
+                  L'inscription est gratuite, et votre première soumission est générée sans entrer de carte de crédit.
+                  Ensuite, vous pouvez choisir : payer pour une seule soumission (5 $ à 13 $) selon vos besoins, ou
+                  démarrer un abonnement mensuel (Starter 19 $ avec 10 soumissions, Pro 49 $ avec 60 soumissions, Elite
+                  59 $ illimité). Vous pouvez modifier ou annuler votre forfait à tout moment depuis votre compte. Des
+                  milliers d'entrepreneurs canadiens utilisent déjà quoteai chaque semaine.
+                </p>
+              ) : (
+                <p>
+                  Signing up is free, and your first quote is generated without entering a credit card. From there you
+                  can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription
+                  (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited). You can change or cancel
+                  your plan at any time from your account. Thousands of Canadian contractors already use quoteai every
+                  week.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -1042,17 +1134,18 @@ export default function Home() {
           <div className="mesh-blob mesh-blob-2" style={{ opacity: 0.6 }} />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
             <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white mb-3">
-              Ready to transform your business?
+              {lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}
             </h2>
             <p className="text-sm text-gray-400 mb-7 max-w-md mx-auto leading-relaxed">
-              Join hundreds of Canadian contractors and tradespeople who
-              save hours every week.
+              {lang === "fr"
+                ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine."
+                : "Join hundreds of Canadian contractors and tradespeople who save hours every week."}
             </p>
             <button
               onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")}
               className="btn-gradient inline-flex h-11 items-center justify-center px-8 text-sm font-semibold"
             >
-              Create Your Free Account
+              {lang === "fr" ? "Créez votre compte gratuit" : "Create Your Free Account"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </button>
           </div>

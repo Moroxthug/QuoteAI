@@ -250,8 +250,10 @@
     z-index: -1;
   }
   .btn-gradient-outline:hover {
+    background: linear-gradient(135deg, var(--grad-from), var(--grad-mid), var(--grad-to)) !important;
+    color: white !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.15) !important;
+    box-shadow: 0 8px 28px rgba(124, 58, 237, 0.35) !important;
   }
 
   /* Soft card shadow — Design System */

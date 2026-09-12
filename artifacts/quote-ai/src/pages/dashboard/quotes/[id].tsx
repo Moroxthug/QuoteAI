@@ -631,42 +631,44 @@ export default function QuoteDetail() {
             </span>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {!isEditLocked && (
-            <Button
-              variant={isEditMode ? "default" : "outline"}
-              className="gap-2"
+            <button
+              className={cn(
+                "inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold",
+                isEditMode ? "btn-gradient" : "btn-gradient-outline"
+              )}
               onClick={isEditMode ? () => setIsEditMode(false) : enterEditMode}
             >
               {isEditMode ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
               {isEditMode ? t("dashboard.quoteDetail.closeEditor") : t("dashboard.quoteDetail.edit")}
-            </Button>
+            </button>
           )}
           {!isEditLocked && (
-            <Button
-              variant="outline"
-              className="gap-2"
+            <button
+              className="btn-gradient-outline inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold"
               onClick={() => setIsRegenOpen(true)}
             >
               <Sparkles className="h-4 w-4" />
               {t("dashboard.quoteDetail.regenerate")}
-            </Button>
+            </button>
           )}
-          <Button
+          <button
             onClick={isLocked ? handleUnlock : handleDownload}
             disabled={generatePdf.isPending}
-            className="gap-2"
-            variant={isLocked ? "default" : "outline"}
+            className={cn(
+              "inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none",
+              isLocked ? "btn-gradient" : "btn-gradient-outline"
+            )}
           >
             {generatePdf.isPending
               ? <Loader2 className="h-4 w-4 animate-spin" />
               : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
             {t("dashboard.quoteDetail.downloadPdf")}
-          </Button>
+          </button>
           {!isLocked && quote?.status === "unlocked" && (
-            <Button
-              variant="outline"
-              className="gap-2"
+            <button
+              className="btn-gradient-outline inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none"
               onClick={() => setIsEmailDialogOpen(true)}
               disabled={sendPdfEmail.isPending}
             >
@@ -674,21 +676,20 @@ export default function QuoteDetail() {
                 ? <Loader2 className="h-4 w-4 animate-spin" />
                 : <Mail className="h-4 w-4" />}
               {t("dashboard.quoteDetail.sendByEmail")}
-            </Button>
+            </button>
           )}
           {!isLocked && (quote?.status === "unlocked" || quote?.status === "accepted") && (
-            <Button
-              variant="outline"
-              className="gap-2"
+            <button
+              className="btn-gradient-outline inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold"
               onClick={handleCopyPublicLink}
             >
               <Copy className="h-4 w-4" />
               {t("dashboard.quoteDetail.copyClientLink")}
-            </Button>
+            </button>
           )}
           {!isLocked && quote?.status === "unlocked" && (
-            <Button
-              className="gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold"
+            <button
+              className="btn-gradient inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none"
               onClick={handleAvviaCantiere}
               disabled={avviandoCantiere}
             >
@@ -696,12 +697,11 @@ export default function QuoteDetail() {
                 ? <Loader2 className="h-4 w-4 animate-spin" />
                 : <Hammer className="h-4 w-4" />}
               {t("dashboard.quoteDetail.startCrmProject")}
-            </Button>
+            </button>
           )}
           {!quote.capitolatoPro && (
-            <Button
-              variant="outline"
-              className="gap-2 border-violet-300 text-violet-700 hover:bg-violet-50"
+            <button
+              className="btn-gradient-outline inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none"
               onClick={handleUpgradeToCapitolato}
               disabled={upgradeToCapitolato.isPending}
             >
@@ -709,13 +709,12 @@ export default function QuoteDetail() {
                 ? <Loader2 className="h-4 w-4 animate-spin" />
                 : <Star className="h-4 w-4" />}
               {isPro ? t("dashboard.quoteDetail.upgradeToProSpec") : t("dashboard.quoteDetail.proSpec")}
-              {!isPro && <Lock className="h-3 w-3 ml-1 opacity-60" />}
-            </Button>
+              {!isPro && <Lock className="h-3 w-3 -ml-1 opacity-60" />}
+            </button>
           )}
           {quote.capitolatoPro && isPro && quote.status === "unlocked" && (
-            <Button
-              variant="outline"
-              className="gap-2 border-violet-400 text-violet-800 hover:bg-violet-50"
+            <button
+              className="btn-gradient-outline inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold disabled:opacity-50 disabled:pointer-events-none"
               onClick={handleDownloadProPdf}
               disabled={generatePdfPro.isPending}
             >
@@ -723,7 +722,7 @@ export default function QuoteDetail() {
                 ? <Loader2 className="h-4 w-4 animate-spin" />
                 : <FileDown className="h-4 w-4" />}
               {t("dashboard.quoteDetail.downloadProPdf")}
-            </Button>
+            </button>
           )}
         </div>
       </div>

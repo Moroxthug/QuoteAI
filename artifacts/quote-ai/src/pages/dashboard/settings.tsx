@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { BusinessTab } from "./settings-business-tab";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1130,11 +1131,12 @@ export default function SettingsPage() {
   const tabFromParam = params.get("tab");
   const { data: subscription } = useGetSubscription();
   const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
-  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : "billing";
-  const [activeTab, setActiveTab] = useState<"account" | "billing" | "whatsapp" | "widget">(defaultTab as any);
+  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : "billing";
+  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget">(defaultTab as any);
 
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
+    { id: "business" as const, label: t("dashboard.settings.tabs.business") },
     { id: "billing" as const, label: t("dashboard.settings.tabs.billing") },
     ...(isProOrElite ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
@@ -1167,6 +1169,8 @@ export default function SettingsPage() {
 
       {activeTab === "account" ? (
         <AccountTab />
+      ) : activeTab === "business" ? (
+        <BusinessTab />
       ) : activeTab === "whatsapp" ? (
         <WhatsappTab />
       ) : activeTab === "widget" ? (

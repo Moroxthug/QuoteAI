@@ -11,3 +11,8 @@ export * from "./messages";
 export * from "./incentives";
 export * from "./email-events";
 
+export * from "./clients";
+export * from "./payment-schedule";
+export * from "./tax";
+export * from "./automation";
+export * from "./plans";

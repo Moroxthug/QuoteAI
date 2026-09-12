@@ -13,6 +13,8 @@ import crmRouter from "./crm";
 import supportRouter from "./support";
 import publicQuotesRouter from "./public-quotes";
 import speechRouter from "./speech";
+import cronRouter from "./cron";
+import notificationsRouter from "./notifications";
 
 const router: IRouter = Router();
 
@@ -30,5 +32,7 @@ router.use(crmRouter);
 router.use(supportRouter);
 router.use(publicQuotesRouter);
 router.use(speechRouter);
+router.use(cronRouter);
+router.use(notificationsRouter);
 
 export default router;

@@ -309,10 +309,15 @@ function buildQuoteEmailHtml(params: {
   clientName: string;
   quoteNumber: string;
   totale: string;
+  publicUrl?: string | null;
 }): string {
   const companyName = escapeHtml(params.companyName);
   const clientName = escapeHtml(params.clientName);
-  const { quoteNumber, totale } = params;
+  const { quoteNumber, totale, publicUrl } = params;
+  const ctaHtml = publicUrl
+    ? `<div class="cta"><a class="btn" href="${publicUrl}">View &amp; accept online</a></div>
+    <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:-12px;">You can review the full quote in your browser and accept it in one click.</p>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en-CA">
 <head>
@@ -357,6 +362,7 @@ function buildQuoteEmailHtml(params: {
         <span>$ ${totale}</span>
       </div>
     </div>
+    ${ctaHtml}
 
     <p style="font-size:13px;color:#6b7280;text-align:center;">Document generated with <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a></p>
   </div>
@@ -470,6 +476,7 @@ export async function sendQuotePdfEmail(params: {
   totale: string;
   pdfBuffer: Buffer;
   filename: string;
+  publicUrl?: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -487,6 +494,7 @@ export async function sendQuotePdfEmail(params: {
         clientName: params.clientName,
         quoteNumber: params.quoteNumber,
         totale: params.totale,
+        publicUrl: params.publicUrl ?? null,
       }),
       attachments: [
         {
@@ -601,4 +609,85 @@ export async function sendWidgetLeadNotification(params: {
   } catch (err) {
     logger.error({ err }, "Failed to send widget lead notification email");
   }
+}
+
+function buildQuoteAcceptedEmail(params: {
+  companyName: string;
+  clientName: string;
+  quoteNumber: string;
+  totale: string;
+  acceptedAt: string;
+  quoteUrl: string;
+}): string {
+  const companyName = escapeHtml(params.companyName);
+  const clientName = escapeHtml(params.clientName);
+  const { quoteNumber, totale, acceptedAt, quoteUrl } = params;
+  return `<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quote accepted</title>
+<style>
+  body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
+  .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }
+  .header { background:linear-gradient(135deg,#059669,#06b6d4); padding:32px 40px; text-align:center; }
+  .header img { height:36px; }
+  .header h1 { color:white; font-size:22px; font-weight:700; margin:16px 0 4px; }
+  .header p { color:rgba(255,255,255,0.9); font-size:14px; margin:0; }
+  .body { padding:32px 40px; }
+  .greeting { font-size:16px; color:#1a1a2e; margin-bottom:20px; line-height:1.6; }
+  .quote-box { background:#ecfdf5; border:1px solid #d1fae5; border-radius:12px; padding:20px 24px; margin:24px 0; }
+  .quote-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #d1fae5; font-size:14px; }
+  .quote-row:last-child { border-bottom:none; font-weight:700; color:#047857; font-size:16px; }
+  .quote-label { color:#6b7280; }
+  .cta { text-align:center; margin:28px 0; }
+  .btn { display:inline-block; background:linear-gradient(135deg,#7c3aed,#06b6d4); color:white; font-size:15px; font-weight:600; padding:13px 32px; border-radius:10px; text-decoration:none; }
+  .footer { background:#f9fafb; padding:20px 40px; text-align:center; font-size:12px; color:#9ca3af; border-top:1px solid #f3f4f6; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <img src="${LOGO_URL}" alt="QuoteAI" />
+    <h1>🎉 ${clientName} accepted your quote</h1>
+    <p>Quote ${quoteNumber} is now accepted</p>
+  </div>
+  <div class="body">
+    <p class="greeting">Good news, ${companyName}!<br/><br/><strong>${clientName}</strong> confirmed the quote online on ${acceptedAt}. The next step is turning it into a signed contract and getting the deposit in.</p>
+    <div class="quote-box">
+      <div class="quote-row"><span class="quote-label">Quote</span><span><strong>${quoteNumber}</strong></span></div>
+      <div class="quote-row"><span class="quote-label">Accepted by</span><span>${clientName}</span></div>
+      <div class="quote-row"><span class="quote-label">Total</span><span>$ ${totale}</span></div>
+    </div>
+    <div class="cta"><a class="btn" href="${quoteUrl}">Open the quote</a></div>
+  </div>
+  <div class="footer">You receive this because acceptance notifications are enabled in your QuoteAI settings.</div>
+</div>
+</body>
+</html>`;
+}
+
+export async function sendQuoteAcceptedEmail(params: {
+  toEmail: string;
+  companyName: string;
+  clientName: string;
+  quoteNumber: string;
+  totale: string;
+  acceptedAt: string;
+  quoteUrl: string;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    logger.warn("RESEND_API_KEY not set — skipping quote-accepted email");
+    return;
+  }
+  const resend = new Resend(apiKey);
+  await resend.emails.send({
+    from: "QuoteAI <no-reply@quoteai.ca>",
+    to: [params.toEmail],
+    subject: `${params.clientName} accepted quote ${params.quoteNumber}`,
+    html: buildQuoteAcceptedEmail(params),
+  });
+  logger.info({ to: params.toEmail, quoteNumber: params.quoteNumber }, "Quote accepted email sent");
 }

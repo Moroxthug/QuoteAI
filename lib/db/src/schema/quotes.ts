@@ -10,6 +10,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { clientsTable } from "./clients";
+import type { PaymentSchedule } from "./payment-schedule";
 
 export const quoteItemSchema = z.object({
   descrizione: z.string(),
@@ -71,6 +73,12 @@ export type QuoteCompanySnapshot = z.infer<typeof quoteCompanySnapshotSchema>;
 export const quotesTable = pgTable("quotes", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").notNull(),
+  /** Linked client record (Phase 0). Null only for legacy rows that could not be matched. */
+  clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
+  /** Province the work is performed in (drives tax + contract template). */
+  province: text("province"),
+  /** Structured payment schedule; null means "derive from condizioniPagamento". */
+  paymentSchedule: jsonb("payment_schedule").$type<PaymentSchedule | null>(),
   clientData: jsonb("client_data").$type<QuoteClientData>().notNull().default({ nome: "", indirizzo: "" }),
   descrizioneGenerale: text("descrizione_generale").notNull().default(""),
   items: jsonb("items").$type<QuoteItem[]>().notNull().default([]),

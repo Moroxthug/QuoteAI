@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import multer from "multer";
-import { db, quotesTable, quoteAttachmentsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema } from "@workspace/db";
+import { db, quotesTable, quoteAttachmentsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
+import { getBaseUrl } from "../lib/baseUrl.js";
+import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { eq, desc, count, sum, sql, and, avg } from "drizzle-orm";
 import { getTrialStatus, PLANS } from "./payments.js";
 import {
@@ -63,6 +65,7 @@ function getPdfmake(): PdfMakeInstance {
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";
+import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 
@@ -172,9 +175,15 @@ type AttachmentRow = typeof quoteAttachmentsTable.$inferSelect;
 
 function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[]) {
   const tot = Number(q.totale);
+  const province = normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null;
+  const paymentSchedule = q.paymentSchedule ?? derivePaymentScheduleFromText(q.condizioniPagamento, tot);
   return {
     id: q.id,
     userId: q.userId,
+    clientId: q.clientId ?? null,
+    province,
+    taxProfile: province ? getTaxProfile(province) : null,
+    paymentSchedule,
     clientData: q.clientData,
     descrizioneGenerale: q.descrizioneGenerale,
     items: Array.isArray(q.items) ? q.items : [],
@@ -366,6 +375,7 @@ router.post("/quotes", requireAuth, aiCallLimiter, imageUpload.array("images", 3
         subscriptionPlan: businessProfilesTable.subscriptionPlan,
         subscriptionStatus: businessProfilesTable.subscriptionStatus,
         trialStartedAt: businessProfilesTable.trialStartedAt,
+        province: businessProfilesTable.province,
       })
       .from(businessProfilesTable)
       .where(eq(businessProfilesTable.userId, userId));
@@ -982,7 +992,7 @@ Write all output text in English.`
     ];
 
     const subtotale = calculatedSubtotale;
-    const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
+    const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, profile?.province);
     const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
     const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
     const totale = Number((imponibile + ivaValore).toFixed(2));
@@ -1051,6 +1061,8 @@ Write all output text in English.`
         })
         .returning();
     });
+
+    await linkQuoteToClient(quote!, profile?.province);
 
     // Save attachments to object storage + quote_attachments table
     const savedAttachments: typeof quoteAttachmentsTable.$inferInsert[] = [];
@@ -1181,7 +1193,49 @@ router.put("/quotes/:id", requireAuth, async (req, res) => {
       }
     }
 
-    if (body.clientData !== undefined) updates.clientData = body.clientData;
+    if (body.clientData !== undefined) {
+      updates.clientData = body.clientData;
+      updates.clientId = await ensureClientForQuote(userId, body.clientData);
+      const fromClient = normalizeProvince(body.clientData.province);
+      if (fromClient) updates.province = fromClient;
+    }
+
+    // Phase 0 fields are not in the generated UpdateQuoteBody (which strips
+    // unknown keys), so they are validated here.
+    const rawBody = req.body as Record<string, unknown>;
+    if (rawBody.province !== undefined) {
+      const p = rawBody.province === null ? null : normalizeProvince(String(rawBody.province));
+      if (rawBody.province !== null && !p) {
+        res.status(400).json({ error: "Invalid province code" });
+        return;
+      }
+      updates.province = p;
+    }
+    if (rawBody.paymentSchedule !== undefined) {
+      if (rawBody.paymentSchedule === null) {
+        updates.paymentSchedule = null;
+      } else {
+        const ps = paymentScheduleSchema.safeParse(rawBody.paymentSchedule);
+        if (!ps.success) {
+          res.status(400).json({ error: "Invalid payment schedule", details: ps.error });
+          return;
+        }
+        const totalForCheck = body.totale !== undefined ? Number(body.totale) : Number(existing.totale);
+        const problem = validatePaymentSchedule(ps.data, totalForCheck);
+        if (problem) {
+          res.status(400).json({ error: problem });
+          return;
+        }
+        updates.paymentSchedule = { ...ps.data, derived: false };
+        // Keep the human-readable terms (used by PDFs/emails) in sync unless
+        // the caller is explicitly editing the text in the same request.
+        if (body.condizioniPagamento === undefined) updates.condizioniPagamento = paymentScheduleToText(ps.data);
+      }
+    } else if (body.condizioniPagamento !== undefined && existing.paymentSchedule?.derived !== false) {
+      // Free-text edit with no hand-edited schedule: drop the cached one so
+      // it is re-derived from the new text on read.
+      updates.paymentSchedule = null;
+    }
     if (body.descrizioneGenerale !== undefined) updates.descrizioneGenerale = body.descrizioneGenerale;
     if (body.items !== undefined) updates.items = body.items;
     if (body.capitoli !== undefined) updates.capitoli = body.capitoli as QuoteChapter[];
@@ -1372,6 +1426,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
       totale: totaleFormatted,
       pdfBuffer,
       filename,
+      publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
 
     res.json({ success: true });
@@ -1434,6 +1489,8 @@ router.post("/quotes/:id/duplicate", requireAuth, async (req, res) => {
         })
         .returning();
     });
+
+    await linkQuoteToClient(newQuote!, null, { applyDefaultTerms: false });
 
     res.status(201).json(serializeQuote(newQuote));
   } catch (err) {
@@ -1612,7 +1669,7 @@ When you use a price-list item, apply the exact unit price or a very close one. 
 
     const condizioniPagamento = aiData.condizioni_pagamento ?? quote.condizioniPagamento ?? [];
     const subtotale = calculatedSubtotale;
-    const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
+    const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, quote.province ?? (quote.clientData as QuoteClientData | null)?.province);
     const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
     const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
     const totale = Number((imponibile + ivaValore).toFixed(2));
@@ -3492,6 +3549,7 @@ router.post("/quotes/manual", requireAuth, async (req, res) => {
         subscriptionPlan: businessProfilesTable.subscriptionPlan,
         subscriptionStatus: businessProfilesTable.subscriptionStatus,
         trialStartedAt: businessProfilesTable.trialStartedAt,
+        province: businessProfilesTable.province,
       })
       .from(businessProfilesTable)
       .where(eq(businessProfilesTable.userId, userId));
@@ -3625,6 +3683,8 @@ router.post("/quotes/manual", requireAuth, async (req, res) => {
         })
         .returning();
     });
+
+    await linkQuoteToClient(quote!, profile?.province);
 
     // Start trial on first quote creation
     if (!profile?.trialStartedAt) {

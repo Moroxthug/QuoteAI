@@ -1,0 +1,274 @@
+# Quote → Contract → Job → Invoice: Product & Implementation Plan
+
+Status: **approved 2026-09-12, all §9 recommendations accepted. Phase 0 built (see §10).**
+
+---
+
+## 1. Verdict on the idea
+
+The idea is right. It's the Jobber / Buildertrend / Houzz Pro playbook (quote → contract → job management → invoicing) but AI-first, cheaper, and built for small Canadian contractors who today do this with PDFs, e-transfers and a notebook. The differentiator isn't any single module — it's that **nothing has to be typed twice**: the quote seeds the contract, the contract seeds the job, the job's payment schedule seeds the invoices, and receipts/timesheets become costs with one tap.
+
+Four things need refining before it's buildable and safe to sell:
+
+| Your framing | Refined | Why |
+|---|---|---|
+| "AI writes a contract legal in Canada / province" | **Lawyer-reviewed provincial templates; AI fills variables and drafts the scope/schedule/price sections from the quote.** | A fully LLM-generated contract can hallucinate clauses and we can't claim "legal". Templates make the legal part deterministic; AI does the merge and the narrative. The legal-review gate is a pre-launch task, not a code task. |
+| "Digital signature if legal here, sent by email, we somehow get the signed doc back" | **Native in-app e-signature via a secure link in the email.** Customer signs on our page; we produce a signed PDF + audit certificate and email it to both parties. | E-signatures are valid across Canada (PIPEDA Part 2; ON *Electronic Commerce Act*; BC/AB *Electronic Transactions Acts*; QC *Act to establish a legal framework for IT*). Construction/renovation contracts are not in the excluded categories (wills, some land transfers, POAs). No email interception needed — the email just carries the link. $0/document vs DocuSign per-envelope pricing. |
+| "Manage employees' timesheets and salary" | **Track labour cost (hours × rate × burden), not payroll.** Export a payroll summary; don't compute CPP/EI/withholding. | Payroll is its own regulated product (Wagepoint, QBO Payroll). Building it would sink the project. Labour *cost* is what the job P&L needs. |
+| "Machinery, machine loans" | **Equipment register at company level (owned/rented, financing payments) → jobs are charged a usage rate per day/hour.** | A loan payment is overhead, not a job cost. Allocating by usage keeps job margins honest and still shows the loan in company-level cash flow. |
+
+Two things you didn't mention that construction needs and the plan adds:
+
+- **Change orders.** Scope changes mid-job are the #1 cause of margin loss and disputes. A change order = mini-quote → customer e-signs → contract value and invoice schedule update. Without this, "how much we're about to make" is wrong after week 2.
+- **Statutory holdback.** ON/BC/AB require a 10% lien holdback on progress payments for construction contracts. Optional per-contract toggle; when on, invoices show the holdback and a final "holdback release" invoice is generated.
+
+Things to explicitly **not** build in v1: payroll, accounting ledger (sync to QuickBooks later), card payments via Stripe Connect (contractors get paid by Interac e-Transfer; 2.9% on a $20k invoice is a non-starter — offer it later as opt-in), worker mobile app (start with a magic-link time-entry page).
+
+---
+
+## 2. What already exists (and what we reuse)
+
+| Area | Exists today | Reuse / gap |
+|---|---|---|
+| Quote generation, PDF, public link `/p/:id`, accept with name + IP + timestamp | ✅ `routes/quotes.ts`, `routes/public-quotes.ts` | Reuse. Gap: no notification to the company on acceptance; acceptance doesn't create anything downstream. |
+| Payment terms on quote | `condizioniPagamento: text[]` (free text) | **Blocker for automation.** Must become a structured payment schedule (§4.1). |
+| Tax | `ivaPercentuale` default 22, AI prompt says "13% HST" | Replace with per-province tax config (GST/HST/PST/QST). |
+| Clients | Derived on the fly from quotes (`routes/clients.ts`, md5 of name+email+phone) | Need a real `clients` table (contract party, invoice recipient). Backfill from quotes. |
+| CRM | `projects`, `project_tasks`, `collaborators` (hourly rate, cents), `project_assignments`, `extra_costs`, `suppliers`; one 1,900-line page at `/crm` | Keep tables, extend. Rebuild UI as `/dashboard/jobs` with tabs (§6). |
+| Invoicing | `/dashboard/invoices` "Coming soon"; `/crm/invoices/generate` is a Fatture in Cloud mock | Replace entirely with native invoicing. |
+| Document upload + AI extraction | `uploaded_documents` → OpenAI extraction → `price_intelligence` | Reuse the pipeline for receipts/supplier invoices → cost entries. |
+| Email | Resend + webhook → `email_events` | Reuse; add contract/invoice/notification templates. |
+| Auth / billing | better-auth, Stripe subscriptions ($19/$49/$59) | Gate features by plan. |
+| AI | OpenAI gpt-4o / gpt-4o-mini via `lib/integrations-openai-ai-server` | Reuse for contract merge, milestone planning, receipt extraction, assistant (function calling). |
+| Infra | Vercel: single serverless function, 60 s max, **no cron, no queue** | Add Vercel Cron (`vercel.json` `crons`) + an `automation_runs` table for retries. Keep every automation idempotent and < 60 s. |
+| i18n | EN / FR contexts in `src/i18n` | All new UI needs both. Quebec contracts must be offered in French. |
+
+---
+
+## 3. The end-to-end flow (target)
+
+```
+Company                     Customer                       System
+───────                     ────────                       ──────
+Create quote ──────────────────────────────────────────────▶ payment schedule structured
+Send (email link / PDF)  ─▶ opens /p/:id
+                            Accepts (name, IP, ts) ───────▶ ▸ notify company
+                                                             ▸ draft contract from quote + province template
+Review contract, sign ──────────────────────────────────▶   ▸ email customer secure signing link
+                            Signs (draw/type, OTP) ───────▶ ▸ signed PDF + audit cert → object storage (hash)
+                                                             ▸ email final PDF to both
+                                                             ▸ create Job: milestones, schedule, cost budget (AI proposal)
+                                                             ▸ deposit invoice (draft or auto-send per settings)
+"Review job setup" (1 click) ────────────────────────────▶   ▸ job active
+Work: receipts → AI → costs; time entries; tasks
+Mark milestone complete ────────────────────────────────▶   ▸ progress invoice generated (+ holdback if on) → send
+                            Pays by e-transfer / card
+Mark paid ──────────────────────────────────────────────▶   ▸ AR updated; reminders stop
+Change order → customer signs ──────────────────────────▶   ▸ contract value + schedule updated
+Job complete ───────────────────────────────────────────▶   ▸ final invoice (+ holdback release after lien period)
+Dashboard: margin, cash, timeline, AR — and an assistant that can answer/act on any of it
+```
+
+"Fluent, not mechanical": the company never fills a form to create the job. They receive **one** message — *"Maria Rossi signed. We set up 'Kitchen reno – 12 Main St' with 4 milestones, a schedule ending Nov 14 and a $3,000 deposit invoice ready to send. Review →"* — and land on a review screen where everything is editable and confirmed with one click.
+
+---
+
+## 4. Data model (new / changed)
+
+All new money columns are **integer cents** (matches CRM tables; quotes stay `numeric` and are converted at the boundary).
+
+### 4.1 Structured payment schedule (on quotes, copied to contracts)
+```ts
+paymentSchedule: {
+  currency: "CAD",
+  terms: [
+    { id, type: "deposit" | "milestone" | "completion" | "holdback_release",
+      label, trigger: "on_signing" | "milestone:<milestoneKey>" | "on_completion" | "days_after:<n>",
+      amountType: "percent" | "fixed", value, dueDays: 15 }
+  ],
+  holdback: { enabled: boolean, percent: 10 }
+}
+```
+AI extracts this from the quote's free-text terms at generation time; the quote editor gets a proper "Payment schedule" section. Existing `condizioniPagamento[]` is kept as the human-readable rendering.
+
+### 4.2 Province tax config (business profile + client)
+`business_profiles.province`, `gstHstNumber`, `qstNumber`, `defaultTaxProfile`. Tax profiles table seeded: ON HST 13%; BC GST 5% + PST 7%; AB GST 5%; QC GST 5% + QST 9.975%; others. Quotes/invoices store line-level tax breakdown.
+
+### 4.3 Clients
+`clients` (id, userId, name, email, phone, address, city, province, postalCode, type: individual|business, businessNumber, notes). Quotes get `clientId` (nullable, backfilled by the same md5 grouping used today).
+
+### 4.4 Contracts & signatures
+- `contract_templates` (id, userId nullable = system, province, language, version, bodyMarkdown with `{{variables}}` and `{{#sections}}`, status).
+- `contracts` (id, userId, quoteId, clientId, projectId, templateId, province, language, status: draft|sent|viewed|partially_signed|signed|declined|voided|expired, variables jsonb, renderedHtml, contractValueCents, paymentSchedule jsonb, holdback, unsignedPdfUrl, signedPdfUrl, documentHash, sentAt, expiresAt, signedAt).
+- `contract_signers` (id, contractId, role: company|customer, name, email, token (hashed), status, otpVerifiedAt, signedAt, signatureImageUrl, signatureType: drawn|typed, ip, userAgent, consentText).
+- `contract_events` (audit trail: created, sent, viewed, otp_sent, otp_verified, signed, completed, reminder_sent…). Rendered into the audit certificate page of the signed PDF.
+- `change_orders` (id, projectId, contractId, number, description, items jsonb, amountCents, taxCents, status, scheduleDelta, signed via the same signer/event tables).
+
+### 4.5 Jobs (extend `projects`)
+Add: `clientId`, `contractId`, `address`, `province`, `contractValueCents`, `changeOrdersCents` (derived), `setupStatus: pending_review|confirmed`, `plannedStart/End`, `progressPercent`, `taxProfile`.
+- `milestones` (id, projectId, key, title, description, sortOrder, plannedStart, plannedEnd, actualStart, actualEnd, status, paymentTermId nullable, sourceChapter).
+- `project_tasks` gets `milestoneId`.
+- `cost_budget_lines` (projectId, category, chapterRef, plannedCents) — AI-proposed split of the quote into expected costs; drives *projected* margin.
+
+### 4.6 Costs, time, equipment
+- `cost_entries` (id, userId, projectId, milestoneId?, category: materials|labour|subcontractor|permits_fees|equipment|misc|tax_nonrecoverable, vendor/supplierId, description, date, subtotalCents, taxCents (GST/HST/PST/QST split), totalCents, sourceDocumentId?, timeEntryId?, status: pending_review|confirmed, createdBy: user|ai|system). Replaces `extra_costs` (migrate rows as `misc`).
+- `workers` (evolve `collaborators`): type employee|subcontractor, hourlyRateCents, burdenPercent (employer CPP/EI/WSIB — company sets, default 15%), overtimeRule, magicLinkToken, active.
+- `time_entries` (id, workerId, projectId, milestoneId?, date, hours, rateCentsSnapshot, burdenSnapshot, note, approvedAt). Approved entries materialise a labour `cost_entry`.
+- `equipment` (id, userId, name, ownership: owned|rented|financed, purchaseCents, financing: {lender, monthlyPaymentCents, remainingMonths}, usageRateCents per hour|day). `equipment_usage` (equipmentId, projectId, date, quantity) → equipment `cost_entry`.
+
+### 4.7 Invoices
+- `invoices` (id, userId, projectId, clientId, contractId?, number (per-company sequence, e.g. `INV-2026-0042`), type: deposit|progress|final|holdback_release|change_order|manual, status: draft|sent|viewed|partially_paid|paid|overdue|void, issueDate, dueDate, lines jsonb, subtotalCents, taxBreakdown, holdbackCents, totalCents, paidCents, pdfUrl, publicToken, sentAt, paymentInstructions (e-transfer email, etc.), milestoneId?, paymentTermId?).
+- `invoice_payments` (invoiceId, date, amountCents, method: etransfer|cheque|cash|card|other, reference).
+- `invoice_sequences` (userId, year, next).
+
+### 4.8 Automation plumbing
+- `automation_runs` (id, userId, event: quote.accepted|contract.signed|milestone.completed|invoice.overdue…, entityId, idempotencyKey unique, status, attempts, lastError, payload). Handlers run inline in the triggering request; failures are retried by cron.
+- `notifications` (userId, type, title, body, link, readAt) → in-app bell + email digest.
+- `audit_log` (userId, actor, entityType, entityId, action, diff).
+
+---
+
+## 5. Legal & compliance notes baked into the design
+
+These are product requirements, not legal advice; the templates must be reviewed by a Canadian lawyer before you market them as compliant (**launch gate**).
+
+- **Ontario** — *Consumer Protection Act* (written contract requirements; **10-day cooling-off** for direct agreements signed at the consumer's home — very common for renovators, so the template includes the statutory cancellation notice); *Construction Act* (10% holdback, prompt payment 28 days, proper invoice requirements).
+- **British Columbia** — *Business Practices and Consumer Protection Act* (direct sales 10-day cancellation); *Builders Lien Act* (10% holdback, 55-day lien period).
+- **Alberta** — *Consumer Protection Act* + Prepaid Contracting Business licence disclosure; *Prompt Payment and Construction Lien Act* (10% holdback).
+- **Quebec** — Civil Code (contract of enterprise, arts. 2098–2129); *Consumer Protection Act* (itinerant merchant 10-day cancellation); **RBQ licence number must appear**; **French version required** (Charter of the French Language) — English only if the customer expressly requests it in writing (we capture that choice).
+- **Everywhere** — GST/HST registration number on invoices ≥ $30; buyer name ≥ $150; tax shown separately (CRA invoice requirements). Sequential, non-reusable invoice numbers.
+- **E-signature evidence** — identity (email OTP), intent (explicit consent checkbox with text), integrity (SHA-256 of the unsigned and signed PDF stored; signed PDF immutable), attribution (IP, UA, timestamp per signer), retention (object storage, never deleted on project delete — void instead).
+- **Data** — signed contracts and invoices are financial records; keep 7 years (CRA). Project deletion becomes archival.
+
+Templates shipped: ON, BC, AB, QC (EN+FR), Generic-Canada. Companies can also upload their own template with `{{variables}}`.
+
+---
+
+## 6. UI (in line with the existing dashboard style)
+
+New navigation: **Dashboard · Quotes · Clients · Jobs · Invoices · Team · Documents · Analytics · Settings**. `/crm` is retired (redirect to `/dashboard/jobs`).
+
+- **Quote detail** — new "Payment schedule" card; after acceptance a "Contract" card (draft → send → status timeline).
+- **Contract editor** `/dashboard/contracts/:id` — left: rendered contract with editable AI sections (scope, schedule, price) and locked legal sections (with "why is this locked?" tooltips); right: signers, status, send. Preview PDF.
+- **Public signing page** `/sign/:token` — no login: contract view → OTP to email → consent checkbox → draw/type signature → done screen with download. Mobile-first (customers sign on phones).
+- **Job page** `/dashboard/jobs/:id` — tabs: **Overview** (contract value, invoiced, collected, costs, projected vs actual margin, timeline strip), **Schedule** (milestones Gantt + tasks), **Costs** (entries by category, budget vs actual, receipt upload dropzone → AI review queue), **Team & time** (assignments, time entries, approve), **Invoices**, **Documents** (contract, change orders, receipts, photos), **Assistant** (chat scoped to this job).
+- **Job setup review** — first screen after signing: AI-proposed milestones/dates/budget as editable cards, one "Looks good, start the job" button.
+- **Invoices** `/dashboard/invoices` — list with AR aging; invoice detail with send / mark paid / remind; public `/i/:token` view for the customer with payment instructions.
+- **Team** `/dashboard/team` — workers, rates, burden, equipment register; magic-link time entry page `/t/:token` for workers.
+- **Analytics** — add: margin by job, AR aging, cash in vs out by month, labour hours by worker, quote→contract conversion.
+- **Assistant** — reachable from every job and from the dashboard; can read everything, and *propose* writes (add cost, create milestone, draft invoice, log time) that the user confirms inline.
+
+Charts: recharts (already installed); follow the `dataviz` skill palette rules for consistency.
+
+---
+
+## 7. Implementation phases
+
+Each phase is shippable on its own and behind a feature flag (`business_profiles.featureFlags`). Estimates are focused build time with the whole pipeline (schema → API → UI → tests → FR strings).
+
+### Phase 0 — Foundations (≈1 week)
+- `clients` table + backfill; `clientId` on quotes.
+- Structured `paymentSchedule` on quotes; AI extraction of it; quote editor UI; PDF rendering.
+- Province tax profiles; replace `ivaPercentuale` semantics (keep column, fix defaults/prompt).
+- `automation_runs`, `notifications`, `audit_log`; Vercel Cron endpoint `/api/cron/tick` (secret header) running every 15 min.
+- Company notification email on quote acceptance (immediate win).
+- Feature-flag helper + plan gating map.
+
+### Phase 1 — Contracts & e-signature (≈2–3 weeks)
+- Template engine (markdown + variables + conditional sections), 5 templates × EN/FR.
+- `POST /contracts/from-quote/:quoteId` → AI merge (scope, schedule narrative, price table) → draft.
+- Editor UI; company sign; `POST /contracts/:id/send` → Resend email with signing link (hashed token, 30-day expiry).
+- Public signing flow: view → OTP → consent → signature (canvas/typed) → `POST /sign/:token/complete`.
+- Signed PDF generation (existing puppeteer path) with signature page + audit certificate; hashes; storage; emails to both parties.
+- Reminders (cron: unsigned after 3 and 7 days); void/expire; decline with reason.
+- Automation: `quote.accepted` → auto-draft contract + notify.
+
+### Phase 2 — Job setup automation, milestones, change orders (≈2 weeks)
+- `contract.signed` → create/attach project, client, milestones (AI from chapters + payment schedule), schedule (AI, editable), cost budget lines (AI split), tasks; `setupStatus = pending_review`; single notification.
+- Job page shell with Overview + Schedule tabs; setup-review screen; Gantt.
+- Change orders (create → customer e-sign via Phase 1 machinery → contract value + schedule update).
+- Retire `/crm` (redirect); migrate its working parts into Jobs.
+
+### Phase 3 — Costs, team & time, receipt AI (≈2–3 weeks)
+- `cost_entries`, categories, Costs tab with budget-vs-actual.
+- Receipt / supplier-invoice upload → AI extraction (vendor, date, lines, GST/HST/PST/QST, total, suggested category + job) → review queue → confirm.
+- Workers (evolve collaborators), burden, equipment register + usage.
+- Time entries + approval → labour cost; worker magic-link time page; payroll summary export (CSV).
+- Team tab, Documents tab.
+
+### Phase 4 — Invoicing (≈2 weeks)
+- Invoice model, per-company numbering, CRA-compliant PDF (bilingual), public view, send, mark paid / partial, void, credit note.
+- Automations: `contract.signed` → deposit invoice; `milestone.completed` → progress invoice (holdback applied); `job.completed` → final; holdback release after lien period. Company setting: auto-send vs review (default review, with "auto-send after 24 h if not touched").
+- Cron: overdue detection + reminder emails (3/7/14 days), AR aging.
+- Replace mock `/crm/invoices/generate`.
+
+### Phase 5 — Dashboards & assistant (≈2 weeks)
+- Job Overview charts; company Analytics additions; cash-flow view.
+- Assistant: OpenAI function-calling over a tool set (`get_job_summary`, `list_costs`, `list_invoices`, `propose_cost_entry`, `propose_milestone`, `propose_invoice`, `get_schedule_risks`…). Every write is a proposal card the user confirms. Conversation stored per job.
+
+### Phase 6 — Launch readiness (≈1–2 weeks)
+- **Legal review gate**: templates + signing consent text + invoice format reviewed by a Canadian lawyer/accountant; incorporate edits.
+- End-to-end test suite: quote → accept → contract → sign (both) → job → costs → milestone → invoice → paid, in EN and FR, ON and QC.
+- Mobile pass on signing, invoice and time-entry pages.
+- Rate limits on all public token endpoints; token hashing; storage ACLs.
+- Onboarding: province + tax numbers + RBQ/licence + e-transfer email + default payment schedule + signature.
+- Pricing gating (`DECIDE`), migration rehearsal on a prod snapshot, monitoring (PostHog events per automation, alerts on `automation_runs` failures), help articles.
+
+**Total: roughly 11–14 weeks** of focused work, delivered phase by phase. Phase 0 + 1 alone already give a sellable "quote → signed contract" product.
+
+---
+
+## 8. Production-readiness principles (applied in every phase)
+
+1. **Idempotent automations** with unique idempotency keys; every automation logs a run; cron retries failures (max 5) and alerts.
+2. **Nothing auto-sends money-related email without an explicit company setting**; defaults are "draft + notify".
+3. **Immutable financial documents**: signed contracts and sent invoices are never edited — void and reissue.
+4. **Every public URL is a hashed, expiring, single-purpose token** with rate limiting (existing pattern in `public-quotes.ts`).
+5. **Integer cents, explicit tax breakdown, province on every money document.**
+6. **Bilingual from day one** — no new string without an EN and FR key; QC defaults to FR.
+7. **Plan gating in one map**, not scattered `if`s.
+8. **Serverless-safe**: no work > 60 s in a request; PDFs generated once and cached in storage; AI calls with timeouts and fallbacks (if milestone planning fails, the job is still created with one milestone per payment term).
+9. **Migrations are additive** in each phase; old columns removed one phase later.
+10. **Tests for every automation handler** and for tax/holdback/invoice math.
+
+---
+
+## 9. Decisions needed (`DECIDE`)
+
+| # | Question | Recommendation |
+|---|---|---|
+| 1 | E-signature: native vs DocuSign/Dropbox Sign integration | **Native.** Legally sufficient in Canada, seamless, free. Add DocuSign as an opt-in later if a customer demands it. |
+| 2 | Contract generation: template + AI merge vs fully AI-generated | **Template + AI merge.** Only way to make a defensible compliance claim. |
+| 3 | Provinces at launch | **ON, BC, AB, QC + Generic.** ~85% of the market. |
+| 4 | Payments: manual tracking + e-transfer instructions vs Stripe Connect card payments | **Manual + e-transfer first.** Stripe Connect opt-in in a later phase. |
+| 5 | Payroll | **Out of scope.** Labour cost + payroll summary export only. |
+| 6 | Retire `/crm` in favour of `/dashboard/jobs` | **Yes**, in Phase 2. |
+| 7 | Plan gating | Suggest: Starter = quotes + acceptance notifications; Pro = contracts/e-sign + jobs + costs + invoicing; Elite = assistant + team/time + equipment + analytics. |
+| 8 | Team accounts (multi-user per company) | **Defer.** Workers use magic links; full roles later. |
+| 9 | Legal review | Budget for a Canadian construction/consumer-law lawyer to review the 5 templates before launch. Non-negotiable if you market "compliant". |
+
+Reply with any changes to these and I'll start Phase 0.
+
+---
+
+## 10. Build log
+
+### Phase 0 — Foundations ✅ (built 2026-09-12, not yet deployed)
+
+**Schema** (`lib/db/src/schema/`): `clients.ts`, `payment-schedule.ts` (zod + parser + validation), `tax.ts` (all 13 provinces/territories, GST/HST/PST/QST split), `automation.ts` (`automation_runs`, `notifications`, `audit_log`), `plans.ts` (feature ↔ tier map with per-profile overrides). `quotes` gained `client_id`, `province`, `payment_schedule`; `business_profiles` gained province, GST/HST/QST/PST numbers, licence, e-transfer email, default payment schedule, automation settings, feature flags.
+
+**Migration**: `lib/db/drizzle/0001_phase0_foundations.sql` — additive, idempotent, backfills `clients` from existing quotes and links them. Apply with `pnpm --filter @workspace/db push` (needs `DATABASE_URL`) or paste the SQL into the Supabase SQL editor. Then set `CRON_SECRET` in Vercel (the `crons` entry in `vercel.json` calls `/api/cron/tick` every 15 min).
+
+**Server** (`artifacts/api-server/src/`):
+- `lib/automation.ts` — idempotent event runner with backoff retry; `automations/quoteAccepted.ts` — first handler (in-app notification + email to the company, audit entry).
+- `routes/cron.ts`, `routes/notifications.ts`.
+- `lib/clients.ts` — `ensureClientForQuote` + post-insert hook on all 5 quote-creation paths (web, manual, duplicate, widget, WhatsApp) that links the client, stamps the province and applies the company's default payment schedule.
+- `lib/tax.ts` — replaced the Italian `?? 22` VAT fallback with the company's provincial rate.
+- `routes/quotes.ts` — serializer returns `clientId`, `province`, `taxProfile`, `paymentSchedule` (derived from the free-text terms when not stored); `PUT` accepts `paymentSchedule` (validated: sums to total, one on-signing term) and `province`; the quote email now carries a **View & accept online** button.
+- `routes/business-profile.ts` — new fields + returns `plan` and a `features` map.
+
+**Frontend** (`artifacts/quote-ai/src/`): `components/payment-schedule-editor.tsx`, `components/payment-schedule-card.tsx` (quote detail sidebar), `pages/dashboard/settings-business-tab.tsx` (Settings → Business), `components/notifications-bell.tsx` (sidebar, 60 s polling), `lib/plans.ts`, `lib/payment-schedule.ts`; EN + FR strings.
+
+**Verified**: workspace typecheck, api-server build, unit checks on parser/tax/plans. Not yet verified against a live DB (no `DATABASE_URL` locally).
+
+**Deferred to Phase 2**: switching `/api/clients` and the Clients pages from the derived view to the `clients` table (the table is populated and linked; the read path is unchanged so nothing breaks).

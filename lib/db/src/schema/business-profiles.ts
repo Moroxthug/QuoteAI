@@ -3,9 +3,29 @@ import {
   text,
   timestamp,
   integer,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import type { PaymentSchedule } from "./payment-schedule";
+
+export type FeatureFlags = Record<string, boolean>;
+
+/** Automation preferences a company can tune. All default to the conservative option. */
+export type AutomationSettings = {
+  /** Email the company when a customer accepts a quote. */
+  notifyOnQuoteAccepted: boolean;
+  /** Phase 1: auto-draft a contract when a quote is accepted. */
+  autoDraftContract: boolean;
+  /** Phase 4: send milestone invoices without manual review. */
+  autoSendInvoices: boolean;
+};
+
+export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
+  notifyOnQuoteAccepted: true,
+  autoDraftContract: true,
+  autoSendInvoices: false,
+};
 
 export const businessProfilesTable = pgTable("business_profiles", {
   userId: text("user_id").primaryKey(),
@@ -22,6 +42,16 @@ export const businessProfilesTable = pgTable("business_profiles", {
   trialStartedAt: timestamp("trial_started_at", { withTimezone: true }),
   trialDownloadsUsed: integer("trial_downloads_used").notNull().default(0),
   apiKey: text("api_key"),
+  // ── Canadian business identity (Phase 0) ─────────────────────────────────
+  province: text("province"), // home province, drives default tax profile + contract template
+  gstHstNumber: text("gst_hst_number"), // e.g. 123456789RT0001 — printed on invoices
+  qstNumber: text("qst_number"), // Quebec only
+  pstNumber: text("pst_number"), // BC / SK / MB
+  licenceNumber: text("licence_number"), // RBQ (QC), HCRA (ON builders), municipal licence, etc.
+  etransferEmail: text("etransfer_email"), // where customers send Interac e-Transfers
+  defaultPaymentSchedule: jsonb("default_payment_schedule").$type<PaymentSchedule | null>(),
+  automationSettings: jsonb("automation_settings").$type<Partial<AutomationSettings>>().notNull().default({}),
+  featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

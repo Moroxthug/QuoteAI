@@ -12,6 +12,7 @@ import { useGetSubscription } from "@workspace/api-client-react";
 import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 function useNavItems() {
   const { t } = useLanguage();
@@ -304,6 +305,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           )}
 
           <NavLinks collapsed={isCollapsed} />
+        </div>
+
+        {/* Notifications */}
+        <div className={cn("border-t border-gray-100 py-2", isCollapsed ? "px-2" : "px-2")}>
+          <NotificationsBell collapsed={isCollapsed} />
         </div>
 
         {/* Account section */}

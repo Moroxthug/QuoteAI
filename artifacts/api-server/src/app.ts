@@ -9,6 +9,7 @@ import { auth, getTrustedOrigins } from "./lib/auth";
 import { PRICE_TO_PLAN } from "./routes/payments.js";
 import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
+import "./automations";
 import { logger } from "./lib/logger";
 
 const app: Express = express();

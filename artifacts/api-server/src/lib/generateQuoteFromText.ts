@@ -5,6 +5,8 @@ import { generateNumeroPreventivo } from "./quoteNumber.js";
 import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData } from "@workspace/db";
 import type { Logger } from "pino";
 import { trackEvent } from "./telemetry.js";
+import { linkQuoteToClient } from "./clients.js";
+import { resolveQuoteTaxRate } from "./tax.js";
 
 export const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
 
@@ -185,7 +187,7 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
   }
 
   const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
-  const ivaPercentualeVal = Number(aiData.iva_percentuale ?? 22);
+  const ivaPercentualeVal = resolveQuoteTaxRate(aiData.iva_percentuale, profile?.province);
   const ivaValoreVal = Number((imponibile * ivaPercentualeVal / 100).toFixed(2));
   const totaleVal = Number((imponibile + ivaValoreVal).toFixed(2));
 
@@ -576,6 +578,8 @@ export async function saveQuoteToDb({
 
     return q;
   });
+
+  await linkQuoteToClient(quote);
 
   return quote;
 }

@@ -19,11 +19,23 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
   ],
   "env": {
     "NODE_ENV": "production",
     "VERCEL_SKIP_TYPECHECK": "1"
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/tick",
+      "schedule": "*/15 * * * *"
+    }
+  ]
 }

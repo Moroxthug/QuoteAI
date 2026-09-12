@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { PaymentScheduleCard } from "@/components/payment-schedule-card";
+import type { PaymentSchedule } from "@/lib/payment-schedule";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -1930,6 +1932,14 @@ export default function QuoteDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Payment schedule (Phase 0: drives contract terms + invoicing) */}
+          <PaymentScheduleCard
+            quoteId={quote.id}
+            schedule={(quote as unknown as { paymentSchedule?: PaymentSchedule | null }).paymentSchedule ?? null}
+            total={quote.totale}
+            locked={isEditMode}
+          />
 
           {/* Summary card */}
           {hasCapitoli && (

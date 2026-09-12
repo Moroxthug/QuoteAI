@@ -8,6 +8,9 @@ import { logger } from "../lib/logger.js";
 import type { QuoteChapter, QuoteDiscount, QuoteClientData } from "@workspace/db";
 import { sendWidgetLeadNotification, sendWidgetClientConfirmationEmail } from "../lib/email.js";
 import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
+import { raiseAutomation } from "../lib/automation.js";
+import { linkQuoteToClient } from "../lib/clients.js";
+import { resolveQuoteTaxRate } from "../lib/tax.js";
 
 const router = Router();
 
@@ -359,7 +362,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
     });
 
     const subtotale = Number(calculatedSubtotale.toFixed(2));
-    const ivaPercentuale = Number(aiData.iva_percentuale ?? 22);
+    const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, profile.province);
     const ivaValore = Number((subtotale * ivaPercentuale / 100).toFixed(2));
     const totale = Number((subtotale + ivaValore).toFixed(2));
 
@@ -413,6 +416,8 @@ Use these exact measurements to mathematically calculate the quantities.`;
         apiCost,
       })
       .returning();
+
+    await linkQuoteToClient(quote!, profile.province);
 
     // Return the range estimate for the widget
     res.status(201).json({
@@ -536,6 +541,16 @@ router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) =>
       })
       .where(eq(quotesTable.id, id))
       .returning();
+
+    // Side effects (notify the company, later: draft the contract) run through
+    // the automation runner so a failure never breaks the customer's flow.
+    await raiseAutomation({
+      event: "quote.accepted",
+      userId: updated.userId,
+      entityType: "quote",
+      entityId: updated.id,
+      payload: { acceptedByName: trimmedName },
+    });
 
     res.json({ success: true, quote: toPublicQuote(updated) });
   } catch (err) {

@@ -198,7 +198,7 @@ export default function Home() {
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </button>
                 <Link
-                  href="#prezzi"
+                  href="#pricing"
                   className="btn-gradient-outline inline-flex h-9 items-center px-5 text-sm font-semibold rounded-lg"
                 >
                   {lang === "fr" ? "Voir les forfaits" : "See plans"}
@@ -654,7 +654,7 @@ export default function Home() {
       </ScrollSection>
 
       {/* ── SECTION 6: Pricing ─────────────────────────────────── */}
-      <ScrollSection className="py-16 bg-white" id="prezzi">
+      <ScrollSection className="py-16 bg-white" id="pricing">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-xl font-semibold text-gray-900">

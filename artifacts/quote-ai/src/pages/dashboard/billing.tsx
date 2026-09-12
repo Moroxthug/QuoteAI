@@ -102,7 +102,7 @@ export default function BillingPage() {
   const handleChoosePlan = () => {
     createPortal.mutate(undefined, {
       onSuccess: (r) => { window.open(r.url, "_blank"); },
-      onError: () => { window.location.href = "/#prezzi"; },
+      onError: () => { window.location.href = "/#pricing"; },
     });
   };
 

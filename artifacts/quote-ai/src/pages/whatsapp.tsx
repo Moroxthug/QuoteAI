@@ -235,7 +235,7 @@ export default function WhatsappPage() {
               <ArrowRight className="h-4 w-4" />
             </button>
             <Link
-              href="/#prezzi"
+              href="/#pricing"
               className="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:border-violet-300 transition-all"
             >
               {t("whatsapp.comparePlans")}

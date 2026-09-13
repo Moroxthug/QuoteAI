@@ -17,14 +17,24 @@ export type AutomationSettings = {
   notifyOnQuoteAccepted: boolean;
   /** Phase 1: auto-draft a contract when a quote is accepted. */
   autoDraftContract: boolean;
-  /** Phase 4: send milestone invoices without manual review. */
+  /** Phase 4: send automation-drafted invoices (deposit / progress / final) to the customer immediately, without review. */
   autoSendInvoices: boolean;
+  /**
+   * Phase 4, review mode only: send an automation-drafted invoice on its own
+   * if nobody has touched it after this many hours (0 = never). The daily
+   * cron performs the send, so the effective delay is "the next tick after".
+   */
+  invoiceAutoSendAfterHours: number;
+  /** Phase 4: email overdue reminders to the customer (3 / 7 / 14 days past due). */
+  invoiceReminders: boolean;
 };
 
 export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
   notifyOnQuoteAccepted: true,
   autoDraftContract: true,
   autoSendInvoices: false,
+  invoiceAutoSendAfterHours: 0,
+  invoiceReminders: true,
 };
 
 export const businessProfilesTable = pgTable("business_profiles", {

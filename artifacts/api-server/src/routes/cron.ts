@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { retryDueAutomations } from "../lib/automation";
 import { runContractMaintenance } from "../contracts/maintenance.js";
+import { runInvoiceMaintenance } from "../invoices/maintenance.js";
 
 const router = Router();
 
@@ -23,7 +24,8 @@ router.get("/cron/tick", async (req, res) => {
   try {
     const automations = await retryDueAutomations();
     const contracts = await runContractMaintenance();
-    res.json({ ok: true, automations, contracts, tookMs: Date.now() - startedAt });
+    const invoices = await runInvoiceMaintenance();
+    res.json({ ok: true, automations, contracts, invoices, tookMs: Date.now() - startedAt });
   } catch (err) {
     req.log.error({ err }, "Cron tick failed");
     res.status(500).json({ ok: false });

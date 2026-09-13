@@ -56,6 +56,8 @@ const ProfileExtrasBody = z.object({
       notifyOnQuoteAccepted: z.boolean().optional(),
       autoDraftContract: z.boolean().optional(),
       autoSendInvoices: z.boolean().optional(),
+      invoiceAutoSendAfterHours: z.number().int().min(0).max(168).optional(),
+      invoiceReminders: z.boolean().optional(),
     })
     .optional(),
 });

@@ -33,6 +33,8 @@ import { recomputeProgress, setupJobFromContract } from "../jobs/setup.js";
 import { createChangeOrder, updateChangeOrder, changeOrderStatusFromDocument } from "../jobs/changeOrders.js";
 import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
 import { costSummary, serializeCostEntry, serializeTimeEntry, serializeUsage } from "../costs/service.js";
+import { invoicesForProject, projectInvoiceTotals } from "../invoices/service.js";
+import { serializeInvoice } from "./invoices.js";
 
 const router = Router();
 
@@ -224,7 +226,7 @@ router.post("/jobs", requireAuth, async (req, res) => {
 async function loadJobDetail(userId: string, id: string) {
   const project = await ownedProject(userId, id);
   if (!project) return null;
-  const [milestones, tasks, budget, changeOrders, costs, assignments, client, contract, quote, timeEntries, usage] = await Promise.all([
+  const [milestones, tasks, budget, changeOrders, costs, assignments, client, contract, quote, timeEntries, usage, invoices] = await Promise.all([
     db.select().from(milestonesTable).where(eq(milestonesTable.projectId, id)).orderBy(asc(milestonesTable.sortOrder)),
     db.select().from(projectTasksTable).where(eq(projectTasksTable.projectId, id)).orderBy(asc(projectTasksTable.sortOrder), asc(projectTasksTable.createdAt)),
     db.select().from(costBudgetLinesTable).where(eq(costBudgetLinesTable.projectId, id)).orderBy(asc(costBudgetLinesTable.sortOrder)),
@@ -266,6 +268,7 @@ async function loadJobDetail(userId: string, id: string) {
       .where(eq(equipmentUsageTable.projectId, id))
       .orderBy(desc(equipmentUsageTable.date), desc(equipmentUsageTable.createdAt))
       .limit(200),
+    invoicesForProject(id),
   ]);
   const milestoneTitle = new Map(milestones.map((m) => [m.id, m.title]));
 
@@ -304,6 +307,8 @@ async function loadJobDetail(userId: string, id: string) {
     timeEntries: timeEntries.map((r) => serializeTimeEntry(r.e, { workerName: r.workerName, projectName: project.name, milestoneTitle: r.e.milestoneId ? (milestoneTitle.get(r.e.milestoneId) ?? null) : null })),
     equipmentUsage: usage.map((r) => serializeUsage(r.u, { equipmentName: r.equipmentName, projectName: project.name })),
     assignments,
+    invoices: invoices.map((i) => serializeInvoice(i, { projectName: project.name })),
+    invoiceTotals: projectInvoiceTotals(invoices),
   };
 }
 

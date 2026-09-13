@@ -187,6 +187,9 @@ export type JobDetailDto = {
   timeEntries: TimeEntryDto[];
   equipmentUsage: EquipmentUsageDto[];
   assignments: { id: string; collaboratorId: string; roleInProject: string; collaboratorName: string; collaboratorRole: string; collaboratorHourlyRate: number; workerType: "employee" | "subcontractor"; active: boolean }[];
+  // Phase 4
+  invoices: import("./invoices-api").InvoiceDto[];
+  invoiceTotals: import("./invoices-api").InvoiceTotalsDto;
 };
 
 export type MilestoneEdit = {

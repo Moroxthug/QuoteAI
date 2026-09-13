@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X,
+  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,17 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type JobDetailDto, type JobStatus, type MilestoneDto, type MilestoneStatus, type TaskDto } from "@/lib/jobs-api";
 import { contractsApi } from "@/lib/contracts-api";
+import { invoicesApi } from "@/lib/invoices-api";
 import { Gantt } from "@/components/jobs/gantt";
 import { JobStatusBadge, MilestoneStatusBadge, ChangeOrderStatusBadge } from "@/components/jobs/badges";
 import { ChangeOrderDialog } from "@/components/jobs/change-order-dialog";
 import { CostsTab } from "@/components/jobs/costs-tab";
 import { TeamTab } from "@/components/jobs/team-tab";
+import { InvoicesTab } from "@/components/jobs/invoices-tab";
 
-const TABS = ["overview", "schedule", "changes", "costs", "team", "documents"] as const;
+const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "documents"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Receipt, team: Users, documents: FolderOpen };
+const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, documents: FolderOpen };
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 
@@ -55,12 +57,8 @@ export default function JobDetailPage() {
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-violet-600 underline">{t("jobs.backToList")}</Link></div>;
 
-  const { job, milestones, changeOrders, budgetTotalCents, costs } = data;
+  const { job, milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
   const done = milestones.filter((m) => m.status === "completed").length;
-  const invoicedHint = milestones.filter((m) => m.status === "completed" && m.paymentAmountCents).reduce((s, m) => s + (m.paymentAmountCents ?? 0), 0);
-  const deposit = job.contract?.paymentSchedule.terms.find((x) => x.trigger === "on_signing");
-  const depositCents = deposit && job.contract ? Math.round((deposit.amountType === "percent" ? (job.contract.total * deposit.value) / 100 : deposit.value) * 100) : 0;
-  const releasedCents = invoicedHint + depositCents;
   const subtotalCents = job.contract ? Math.round(job.contract.subtotal * 100) : job.contractValueCents;
   const projectedMargin = subtotalCents > 0 && budgetTotalCents > 0 ? Math.round(((subtotalCents - budgetTotalCents) / subtotalCents) * 100) : null;
   const actualCosts = costs.totalCents;
@@ -97,7 +95,7 @@ export default function JobDetailPage() {
       {/* KPI strip */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Kpi label={t("jobs.kpi.value")} value={formatCents(job.totalValueCents)} sub={job.changeOrdersCents ? `${formatCents(job.contractValueCents)} + ${formatCents(job.changeOrdersCents)} ${t("jobs.kpi.co")}` : undefined} />
-        <Kpi label={t("jobs.kpi.released")} value={formatCents(releasedCents)} sub={t("jobs.kpi.releasedSub")} accent="text-blue-600" />
+        <Kpi label={t("jobs.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={`${formatCents(invoiceTotals.collectedCents)} ${t("jobs.kpi.collected")}${invoiceTotals.outstandingCents ? ` · ${formatCents(invoiceTotals.outstandingCents)} ${t("jobs.kpi.outstanding")}` : ""}`} accent={invoiceTotals.overdueCents ? "text-rose-600" : "text-blue-600"} />
         <Kpi label={t("jobs.kpi.budget")} value={budgetTotalCents ? formatCents(budgetTotalCents) : "—"} sub={projectedMargin !== null ? `${t("jobs.kpi.projectedMargin")} ${projectedMargin}%` : undefined} />
         <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} accent={budgetTotalCents && actualCosts > budgetTotalCents ? "text-rose-600" : undefined} />
         <Kpi label={t("jobs.kpi.progress")} value={`${job.progressPercent}%`} sub={`${done}/${milestones.length} ${t("jobs.milestonesShort")}`} accent="text-emerald-600" progress={job.progressPercent} />
@@ -107,7 +105,7 @@ export default function JobDetailPage() {
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit overflow-x-auto max-w-full">
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
-          const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
+          const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "invoices" ? invoiceTotals.draftCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
           return (
             <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
               <Icon className="h-3.5 w-3.5" /> {t(`jobs.tab.${k}`)}{count ? <span className={cn("text-[10px] rounded-full px-1.5", k === "changes" ? "bg-slate-200 text-slate-700" : "bg-amber-200 text-amber-900")}>{count}</span> : null}
@@ -122,6 +120,7 @@ export default function JobDetailPage() {
         <ChangesTab data={data} locale={locale} onNew={() => setCoOpen(true)} />
       )}
       {tab === "costs" && <CostsTab data={data} locale={locale} />}
+      {tab === "invoices" && <InvoicesTab data={data} locale={locale} />}
       {tab === "team" && <TeamTab data={data} locale={locale} />}
       {tab === "documents" && <DocumentsTab data={data} locale={locale} />}
 
@@ -197,19 +196,20 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
 
       <div className="space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.overview.payments")}</h3>
+          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-slate-900">{t("jobs.overview.payments")}</h3><button className="text-xs text-violet-600 hover:underline" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button></div>
           {terms.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noSchedule")}</p> : (
             <ul className="space-y-1.5">
               {terms.map((x) => {
                 const amount = x.amountType === "percent" ? (total * x.value) / 100 : x.value;
                 const ms = milestones.find((m) => m.paymentTermId === x.id);
-                const released = x.trigger === "on_signing" || ms?.status === "completed";
+                const inv = data.invoices.find((i) => i.paymentTermId === x.id && i.status !== "void");
+                const released = !!inv || x.trigger === "on_signing" || ms?.status === "completed";
                 return (
                   <li key={x.id} className="flex items-start gap-2 text-sm">
-                    {released ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" /> : <Circle className="h-4 w-4 text-slate-300 mt-0.5 shrink-0" />}
+                    {inv?.status === "paid" ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" /> : released ? <CheckCircle2 className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" /> : <Circle className="h-4 w-4 text-slate-300 mt-0.5 shrink-0" />}
                     <div className="min-w-0 flex-1">
                       <div className="text-slate-800 truncate">{x.label}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{ms ? `${t("jobs.overview.onMilestone")} ${ms.title}` : x.trigger === "on_signing" ? t("jobs.setup.dueNow") : x.trigger === "on_completion" ? t("jobs.overview.onCompletion") : t("jobs.overview.unlinked")}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{inv ? `${inv.number} · ${t(`invoices.status.${inv.status}`)}` : ms ? `${t("jobs.overview.onMilestone")} ${ms.title}` : x.trigger === "on_signing" ? t("jobs.setup.dueNow") : x.trigger === "on_completion" ? t("jobs.overview.onCompletion") : t("jobs.overview.unlinked")}</div>
                     </div>
                     <div className="font-medium text-slate-900 whitespace-nowrap">{formatCents(Math.round(amount * 100))}</div>
                   </li>
@@ -402,8 +402,9 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
     if (job.contract) list.push({ id: job.contract.id, title: `${t("jobs.docs.contract")} ${job.contract.contractNumber}`, sub: job.contract.signedAt ? `${t("jobs.co.signedOn")} ${format(new Date(job.contract.signedAt), "PP", { locale })}` : job.contract.status, href: `/dashboard/contracts/${job.contract.id}`, pdf: contractsApi.pdfUrl(job.contract.id, true) });
     for (const co of changeOrders) if (co.documentContractId) list.push({ id: co.id, title: `${co.number} · ${co.title}`, sub: t(`jobs.co.status.${co.status}`), href: `/dashboard/contracts/${co.documentContractId}`, pdf: contractsApi.pdfUrl(co.documentContractId, true) });
     if (job.quote) list.push({ id: job.quote.id, title: `${t("jobs.docs.quote")} ${job.quote.number ?? ""}`.trim(), sub: job.quote.status, href: `/dashboard/quotes/${job.quote.id}` });
+    for (const inv of data.invoices) if (inv.status !== "draft") list.push({ id: inv.id, title: `${t(`invoices.type.${inv.type}`)} ${inv.number}`, sub: `${t(`invoices.status.${inv.status}`)} · ${formatCents(inv.totalCents)}`, href: `/dashboard/invoices/${inv.id}`, pdf: invoicesApi.pdfUrl(inv.id, true) });
     return list;
-  }, [job, changeOrders, t, locale]);
+  }, [job, changeOrders, data.invoices, t, locale]);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
       {docs.length === 0 && receipts.length === 0 && <div className="p-8 text-center text-sm text-slate-400">{t("jobs.docs.empty")}</div>}

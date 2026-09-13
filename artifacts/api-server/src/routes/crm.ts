@@ -8,7 +8,6 @@ import {
   collaboratorsTable,
   projectAssignmentsTable,
   suppliersTable,
-  quotesTable,
 } from "@workspace/db";
 import { z } from "zod";
 
@@ -485,69 +484,6 @@ router.post("/crm/suppliers", requireAuth, async (req, res) => {
 // ── EXTRA COSTS (COSTI EXTRA) ───────────────────────────────────────────────
 // Extra costs moved to cost_entries in Phase 3 (routes/costs.ts).
 
-router.post("/crm/invoices/generate", requireAuth, async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const schema = z.object({
-      quoteId: z.string().uuid().optional(),
-      projectId: z.string().uuid().optional(),
-    });
-
-    const parsed = schema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ error: "Invalid parameters", details: parsed.error });
-      return;
-    }
-
-    const { quoteId, projectId } = parsed.data;
-
-    let customerName = "Customer";
-    let totalAmount = 0;
-
-    if (quoteId) {
-      const [quote] = await db
-        .select()
-        .from(quotesTable)
-        .where(and(eq(quotesTable.id, quoteId), eq(quotesTable.userId, userId)));
-
-      if (quote) {
-        customerName = quote.clientData.nome || customerName;
-        totalAmount = parseFloat(quote.totale || "0");
-      }
-    } else if (projectId) {
-      const [project] = await db
-        .select()
-        .from(projectsTable)
-        .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
-      if (project) {
-        customerName = project.name;
-        totalAmount = project.budget / 100;
-      }
-    }
-
-    // Simuliamo l'integrazione di Fatture in Cloud
-    // In produzione verrebbe effettuata una chiamata POST a https://api-v2.fattureincloud.it/c/{dirigente}/issued_documents
-    const mockInvoiceId = Math.floor(Math.random() * 1000000);
-    const mockInvoiceNumber = `FAT-${new Date().getFullYear()}-${mockInvoiceId.toString().substring(0, 3)}`;
-
-    req.log.info({ userId, mockInvoiceId, customerName, totalAmount }, "Mocking invoice creation in Fatture in Cloud");
-
-    res.json({
-      success: true,
-      message: "Fattura creata con successo in bozza (Simulazione)",
-      invoice: {
-        id: mockInvoiceId,
-        number: mockInvoiceNumber,
-        customer: customerName,
-        total: totalAmount,
-        status: "draft",
-        url: `https://mock.fattureincloud.it/documenti/fatture/${mockInvoiceId}`,
-      },
-    });
-  } catch (err) {
-    req.log.error({ err }, "Error generating invoice mockup");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+// Invoicing is native since Phase 4 (routes/invoices.ts); the Fatture in Cloud mock is gone.
 
 export default router;

@@ -21,6 +21,8 @@ import jobsRouter from "./jobs";
 import costsRouter from "./costs";
 import teamRouter from "./team";
 import workerTimeRouter from "./worker-time";
+import invoicesRouter from "./invoices";
+import publicInvoicesRouter from "./public-invoices";
 
 const router: IRouter = Router();
 
@@ -46,5 +48,7 @@ router.use(jobsRouter);
 router.use(costsRouter);
 router.use(teamRouter);
 router.use(workerTimeRouter);
+router.use(invoicesRouter);
+router.use(publicInvoicesRouter);
 
 export default router;

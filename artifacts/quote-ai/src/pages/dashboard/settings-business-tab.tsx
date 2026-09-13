@@ -24,7 +24,7 @@ type ProfileExtras = {
   licenceNumber: string | null;
   etransferEmail: string | null;
   defaultPaymentSchedule: PaymentSchedule | null;
-  automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean };
+  automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean; invoiceAutoSendAfterHours: number; invoiceReminders: boolean };
 };
 
 const DEFAULT_SCHEDULE: PaymentSchedule = {
@@ -58,6 +58,9 @@ export function BusinessTab() {
   const [licenceNumber, setLicenceNumber] = useState("");
   const [etransferEmail, setEtransferEmail] = useState("");
   const [notifyOnQuoteAccepted, setNotifyOnQuoteAccepted] = useState(true);
+  const [autoSendInvoices, setAutoSendInvoices] = useState(false);
+  const [invoiceAutoSendAfterHours, setInvoiceAutoSendAfterHours] = useState(0);
+  const [invoiceReminders, setInvoiceReminders] = useState(true);
   const [schedule, setSchedule] = useState<PaymentSchedule>(DEFAULT_SCHEDULE);
   const [saving, setSaving] = useState(false);
 
@@ -70,6 +73,9 @@ export function BusinessTab() {
     setLicenceNumber(profile.licenceNumber ?? "");
     setEtransferEmail(profile.etransferEmail ?? "");
     setNotifyOnQuoteAccepted(profile.automationSettings?.notifyOnQuoteAccepted ?? true);
+    setAutoSendInvoices(profile.automationSettings?.autoSendInvoices ?? false);
+    setInvoiceAutoSendAfterHours(profile.automationSettings?.invoiceAutoSendAfterHours ?? 0);
+    setInvoiceReminders(profile.automationSettings?.invoiceReminders ?? true);
     setSchedule(profile.defaultPaymentSchedule ?? DEFAULT_SCHEDULE);
   }, [profile]);
 
@@ -97,7 +103,7 @@ export function BusinessTab() {
           pstNumber: pstNumber || null,
           licenceNumber: licenceNumber || null,
           etransferEmail: etransferEmail || null,
-          automationSettings: { notifyOnQuoteAccepted },
+          automationSettings: { notifyOnQuoteAccepted, autoSendInvoices, invoiceAutoSendAfterHours, invoiceReminders },
           defaultPaymentSchedule: schedule,
         }),
       });
@@ -220,6 +226,36 @@ export function BusinessTab() {
               <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.notifyAcceptedHint")}</div>
             </div>
             <Switch checked={notifyOnQuoteAccepted} onCheckedChange={setNotifyOnQuoteAccepted} />
+          </div>
+
+          {/* Phase 4: invoice automation */}
+          <div className="mt-3 flex items-center justify-between rounded-lg border px-4 py-3">
+            <div>
+              <div className="text-sm font-medium">{t("dashboard.settings.business.autoSendInvoices")}</div>
+              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.autoSendInvoicesHint")}</div>
+            </div>
+            <Switch checked={autoSendInvoices} onCheckedChange={setAutoSendInvoices} />
+          </div>
+          {!autoSendInvoices && (
+            <div className="mt-3 flex items-center justify-between gap-4 rounded-lg border px-4 py-3">
+              <div>
+                <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReviewWindow")}</div>
+                <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceReviewWindowHint")}</div>
+              </div>
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={invoiceAutoSendAfterHours} onChange={(e) => setInvoiceAutoSendAfterHours(Number(e.target.value))}>
+                <option value={0}>{t("dashboard.settings.business.reviewNever")}</option>
+                <option value={24}>24 h</option>
+                <option value={48}>48 h</option>
+                <option value={72}>72 h</option>
+              </select>
+            </div>
+          )}
+          <div className="mt-3 flex items-center justify-between rounded-lg border px-4 py-3">
+            <div>
+              <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReminders")}</div>
+              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceRemindersHint")}</div>
+            </div>
+            <Switch checked={invoiceReminders} onCheckedChange={setInvoiceReminders} />
           </div>
         </CardContent>
       </Card>

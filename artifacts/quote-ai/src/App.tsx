@@ -31,6 +31,8 @@ const AdminPage = lazy(() => import("@/pages/admin"));
 const ClientsPage = lazy(() => import("@/pages/dashboard/clients/index"));
 const ClientDetailPage = lazy(() => import("@/pages/dashboard/clients/[name]"));
 const InvoicesPage = lazy(() => import("@/pages/dashboard/invoices"));
+const InvoiceDetailPage = lazy(() => import("@/pages/dashboard/invoices/[id]"));
+const PublicInvoicePage = lazy(() => import("@/pages/i/[token]"));
 const JobsListPage = lazy(() => import("@/pages/dashboard/jobs/index"));
 const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
 const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
@@ -158,6 +160,9 @@ function Router() {
       <Route path="/dashboard/contracts" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><ContractsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      <Route path="/dashboard/invoices/:id" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><InvoiceDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
       <Route path="/dashboard/invoices" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><InvoicesPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
@@ -182,6 +187,8 @@ function Router() {
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}
       <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />
+      {/* Public invoice page: the customer sees the balance + payment instructions from the emailed link */}
+      <Route path="/i/:token" component={() => <Suspense fallback={null}><PublicInvoicePage /></Suspense>} />
       {/* Public worker time-entry page (magic link from the Team page) */}
       <Route path="/t/:token" component={() => <Suspense fallback={null}><WorkerTimePage /></Suspense>} />
 

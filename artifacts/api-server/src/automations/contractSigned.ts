@@ -1,4 +1,4 @@
-import { db, projectsTable, milestonesTable, paymentTermAmount } from "@workspace/db";
+import { db, projectsTable, milestonesTable, businessProfilesTable, paymentTermAmount } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { registerAutomation } from "../lib/automation.js";
 import { createNotification } from "../lib/notifications.js";
@@ -6,6 +6,7 @@ import { logger } from "../lib/logger.js";
 import { loadContract } from "../contracts/service.js";
 import { setupJobFromContract } from "../jobs/setup.js";
 import { applySignedChangeOrder } from "../jobs/changeOrders.js";
+import { draftDepositInvoice, applyAutoSendPolicy } from "../invoices/service.js";
 
 const cad = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
 const longDate = (d: Date | null) => (d ? d.toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }) : null);
@@ -32,8 +33,31 @@ registerAutomation("contract.signed", async (run) => {
     const [project] = await db.select().from(projectsTable).where(eq(projectsTable.id, setup.projectId));
     const milestones = await db.select().from(milestonesTable).where(eq(milestonesTable.projectId, setup.projectId));
     const deposit = contract.variables.paymentSchedule.terms.find((t) => t.trigger === "on_signing");
-    const depositText = deposit ? ` and a ${cad(paymentTermAmount(deposit, contract.variables.total))} deposit due now` : "";
     const endText = setup.plannedEnd ? ` and a schedule ending ${longDate(setup.plannedEnd)}` : "";
+
+    // Phase 4: the deposit invoice is drafted (or sent, per the company's
+    // setting) right away and folded into the same single notification.
+    let depositText = deposit ? ` and a ${cad(paymentTermAmount(deposit, contract.variables.total))} deposit due now` : "";
+    let depositInvoiceId: string | null = null;
+    let depositAction: string | null = null;
+    if (deposit) {
+      try {
+        const drafted = await draftDepositInvoice({ contract, projectId: setup.projectId });
+        if (drafted) {
+          depositInvoiceId = drafted.invoice.id;
+          const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, contract.userId));
+          const outcome = await applyAutoSendPolicy(drafted.invoice, profile, { notify: false });
+          depositAction = outcome.action;
+          depositText =
+            outcome.action === "sent" ? ` and deposit invoice ${drafted.invoice.number} (${cad(drafted.invoice.totalCents / 100)}) was sent to ${customer}`
+            : outcome.action === "scheduled_auto_send" ? ` and deposit invoice ${drafted.invoice.number} (${cad(drafted.invoice.totalCents / 100)}) will go out automatically unless you edit it first`
+            : ` and deposit invoice ${drafted.invoice.number} (${cad(drafted.invoice.totalCents / 100)}) is ready to send`;
+        }
+      } catch (err) {
+        // The job setup is what matters here; the deposit can be created from the Invoices tab.
+        logger.error({ err, contractId: contract.id }, "Deposit invoice drafting failed");
+      }
+    }
 
     await createNotification({
       userId: contract.userId,
@@ -44,7 +68,7 @@ registerAutomation("contract.signed", async (run) => {
       entityType: "project",
       entityId: setup.projectId,
     });
-    return { ok: true, kind: "agreement", projectId: setup.projectId, milestones: milestones.length, created: setup.created };
+    return { ok: true, kind: "agreement", projectId: setup.projectId, milestones: milestones.length, created: setup.created, depositInvoiceId, depositAction };
   } catch (err) {
     // The signature itself is already final; tell the company now and let
     // the cron retry the job setup (the handler is idempotent).

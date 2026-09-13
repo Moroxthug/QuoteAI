@@ -8,6 +8,9 @@ export type ContractDto = {
   quoteId: string | null;
   clientId: string | null;
   projectId: string | null;
+  kind: "agreement" | "change_order";
+  parentContractId: string | null;
+  changeOrderId: string | null;
   contractNumber: string;
   status: "draft" | "sent" | "viewed" | "signed" | "declined" | "voided" | "expired";
   province: string;

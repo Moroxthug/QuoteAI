@@ -28,7 +28,7 @@ import { logger } from "../lib/logger.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { raiseAutomation } from "../lib/automation.js";
-import { createNotification, writeAudit } from "../lib/notifications.js";
+import { writeAudit } from "../lib/notifications.js";
 import { sendContractSigningEmail, sendContractSignedEmail } from "../lib/emailContracts.js";
 import { buildContractDocument, fallbackScope, fallbackSchedule, templateKeyForProvince, refreshLockedSections, type Lang, type TemplateKey } from "./templates.js";
 import { buildContractPdf } from "./pdf.js";
@@ -300,7 +300,8 @@ export function applyVariableEdits(contract: Contract, edits: Partial<Pick<Contr
   if (edits.holdbackPercent !== undefined) v.paymentSchedule.holdback.percent = edits.holdbackPercent;
   if (edits.customerEmail !== undefined) v.customer.email = edits.customerEmail;
   if (edits.customerName !== undefined) v.customer.name = edits.customerName;
-  const document = refreshLockedSections(contract.document, v);
+  // Change-order documents have their own layout (jobs/changeOrders.ts); only the variables change.
+  const document = contract.kind === "change_order" ? contract.document : refreshLockedSections(contract.document, v);
   return { variables: v, document };
 }
 
@@ -443,22 +444,14 @@ export async function finalizeContract(contractId: string): Promise<void> {
         total: contract.variables.total,
         pdfBuffer: stored.buffer,
         language: contract.language as Lang,
-        dashboardUrl: `${getBaseUrl()}/dashboard/contracts/${contract.id}`,
+        dashboardUrl: contract.kind === "change_order" && contract.projectId ? `${getBaseUrl()}/dashboard/jobs/${contract.projectId}?tab=changes` : `${getBaseUrl()}/dashboard/contracts/${contract.id}`,
       });
     } catch (err) {
       logger.error({ err, contractId, to: r.email }, "Failed to email signed contract");
     }
   }
 
-  await createNotification({
-    userId: contract.userId,
-    type: "contract_signed",
-    title: `${contract.variables.customer.name} signed contract ${contract.contractNumber}`,
-    body: `Contract value ${new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(contract.variables.total)}. Signed copy sent to both parties.`,
-    link: `/dashboard/contracts/${contract.id}`,
-    entityType: "contract",
-    entityId: contract.id,
-  });
-
+  // The contract.signed handler (Phase 2) sets up the job / applies the
+  // change order and sends the single "signed — job set up" notification.
   await raiseAutomation({ event: "contract.signed", userId: contract.userId, entityType: "contract", entityId: contract.id });
 }

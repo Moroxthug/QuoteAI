@@ -2,3 +2,4 @@
 // it once at startup so `raiseAutomation` and the cron tick can dispatch.
 import "./quoteAccepted";
 import "./contractSigned";
+import "./milestoneCompleted";

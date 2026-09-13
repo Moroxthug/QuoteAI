@@ -187,17 +187,19 @@ export default function ContractDetailPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Link href="/dashboard/contracts" className="text-sm text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 mb-2">
-            <ArrowLeft className="h-3.5 w-3.5" /> {t("contracts.backToList")}
+          <Link href={contract.kind === "change_order" && contract.projectId ? `/dashboard/jobs/${contract.projectId}?tab=changes` : "/dashboard/contracts"} className="text-sm text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 mb-2">
+            <ArrowLeft className="h-3.5 w-3.5" /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}
           </Link>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
             <FileSignature className="h-7 w-7 text-violet-600" />
             {contract.contractNumber}
             <ContractStatusBadge status={contract.status} />
+            {contract.kind === "change_order" && <Badge className="font-medium border-0 bg-amber-100 text-amber-800">{t("contracts.changeOrder")}</Badge>}
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
             {contract.variables.customer.name} · {contract.variables.projectTitle} · <strong className="text-slate-700">{formatCad(contract.variables.total)}</strong>
             {contract.quoteId && <> · <Link href={`/dashboard/quotes/${contract.quoteId}`} className="text-violet-600 hover:underline">{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link></>}
+            {contract.projectId && <> · <Link href={`/dashboard/jobs/${contract.projectId}`} className="text-violet-600 hover:underline">{t("contracts.openJob")}</Link></>}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

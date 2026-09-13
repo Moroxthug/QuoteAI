@@ -59,7 +59,7 @@ router.post("/crm/projects", requireAuth, async (req, res) => {
         name,
         description: description ?? "",
         quoteId: quoteId ?? null,
-        status: status ?? "planning",
+        status: (status ?? "planning") as "planning" | "active" | "suspended" | "completed",
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
         budget: budget ?? 0,

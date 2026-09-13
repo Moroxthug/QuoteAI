@@ -31,7 +31,9 @@ const AdminPage = lazy(() => import("@/pages/admin"));
 const ClientsPage = lazy(() => import("@/pages/dashboard/clients/index"));
 const ClientDetailPage = lazy(() => import("@/pages/dashboard/clients/[name]"));
 const InvoicesPage = lazy(() => import("@/pages/dashboard/invoices"));
-const CrmPage = lazy(() => import("@/pages/dashboard/crm"));
+const JobsListPage = lazy(() => import("@/pages/dashboard/jobs/index"));
+const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
+const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
 const DocumentsPage = lazy(() => import("@/pages/dashboard/documents"));
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
@@ -157,9 +159,18 @@ function Router() {
       <Route path="/dashboard/invoices" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><InvoicesPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
-      <Route path="/crm" component={() => (
-        <OnboardingGuard><DashSuspense><CrmPage /></DashSuspense></OnboardingGuard>
+      <Route path="/dashboard/jobs/:id/setup" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><JobSetupPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      <Route path="/dashboard/jobs/:id" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><JobDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/jobs" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><JobsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      {/* The old CRM is retired (Phase 2): its working parts live in Jobs */}
+      <Route path="/crm" component={() => <Redirect to="/dashboard/jobs" />} />
+      <Route path="/crm/:rest*" component={() => <Redirect to="/dashboard/jobs" />} />
       <Route path="/dashboard/documents" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><DocumentsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />

@@ -17,3 +17,4 @@ export * from "./tax";
 export * from "./automation";
 export * from "./plans";
 export * from "./contracts";
+export * from "./jobs";

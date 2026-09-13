@@ -90,6 +90,9 @@ export const CONTRACT_STATUSES = [
 ] as const;
 export type ContractStatus = (typeof CONTRACT_STATUSES)[number];
 
+export const CONTRACT_KINDS = ["agreement", "change_order"] as const;
+export type ContractKind = (typeof CONTRACT_KINDS)[number];
+
 export const contractsTable = pgTable(
   "contracts",
   {
@@ -99,6 +102,12 @@ export const contractsTable = pgTable(
     clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
     /** Set in Phase 2 once the job is created. Plain uuid (no FK) to avoid a schema cycle with crm.ts. */
     projectId: uuid("project_id"),
+    /** "agreement" = the main services contract; "change_order" = a signable amendment (Phase 2). */
+    kind: text("kind", { enum: CONTRACT_KINDS }).notNull().default("agreement"),
+    /** For change orders: the signed agreement being amended. */
+    parentContractId: uuid("parent_contract_id"),
+    /** For change orders: the change_orders row this document belongs to (plain uuid, FK in SQL). */
+    changeOrderId: uuid("change_order_id"),
     contractNumber: text("contract_number").notNull(),
     status: text("status", { enum: CONTRACT_STATUSES }).notNull().default("draft"),
     province: text("province").notNull(),

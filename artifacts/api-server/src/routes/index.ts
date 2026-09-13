@@ -17,6 +17,7 @@ import cronRouter from "./cron";
 import notificationsRouter from "./notifications";
 import contractsRouter from "./contracts";
 import signRouter from "./sign";
+import jobsRouter from "./jobs";
 
 const router: IRouter = Router();
 
@@ -38,5 +39,6 @@ router.use(cronRouter);
 router.use(notificationsRouter);
 router.use(contractsRouter);
 router.use(signRouter);
+router.use(jobsRouter);
 
 export default router;

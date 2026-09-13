@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleCard } from "@/components/payment-schedule-card";
 import { QuoteContractCard } from "@/components/quote-contract-card";
+import { jobsApi } from "@/lib/jobs-api";
 import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
 
@@ -319,42 +320,21 @@ export default function QuoteDetail() {
   const handleAvviaCantiere = async () => {
     if (!quote || !id || avviandoCantiere) return;
     const clientName = (quote.clientData as { nome?: string })?.nome || t("dashboard.quoteDetail.genericClient");
-    const budget = Number(quote.totale || 0);
-
     setAvviandoCantiere(true);
     try {
-      // The CRM (artifacts/quote-ai/src/pages/dashboard/crm.tsx) reads
-      // projects from /api/crm/projects on the real backend, no longer from
-      // localStorage: we create the project there, linked to the quote via
-      // quoteId so duplicate detection is reliable (not name-based).
-      const existingRes = await fetch("/api/crm/projects", { credentials: "include" });
-      if (!existingRes.ok) throw new Error("Couldn't check existing projects");
-      const existingProjects: Array<{ quoteId: string | null }> = await existingRes.json();
-
-      if (existingProjects.some((p) => p.quoteId === id)) {
-        toast({ title: t("dashboard.quoteDetail.projectAlreadyStarted"), description: t("dashboard.quoteDetail.projectAlreadyStartedDesc") });
-        window.open("/crm", "_blank");
-        return;
-      }
-
-      const createRes = await fetch("/api/crm/projects", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: `${t("dashboard.quoteDetail.projectNamePrefix")} ${clientName}`,
-          quoteId: id,
-          status: "active",
-          budget: Math.round(budget * 100), // the backend stores the budget in cents
-          startDate: new Date().toISOString().split("T")[0],
-        }),
+      // Phase 2: jobs live at /dashboard/jobs. Creating from a quote is
+      // idempotent server-side (one job per quote); signed contracts create
+      // the job automatically with milestones imported from the quote.
+      const res = await jobsApi.create({
+        name: `${quote.titoloPreventivoRiga2 || t("dashboard.quoteDetail.projectNamePrefix")} – ${clientName}`.slice(0, 200),
+        quoteId: id,
+        plannedStart: new Date().toISOString().split("T")[0],
       });
-      if (!createRes.ok) throw new Error("Error creating project");
-
-      toast({ title: t("dashboard.quoteDetail.projectStarted"), description: t("dashboard.quoteDetail.projectStartedDesc") });
-      window.open("/crm", "_blank");
+      toast({ title: res.created ? t("dashboard.quoteDetail.projectStarted") : t("dashboard.quoteDetail.projectAlreadyStarted"), description: res.created ? t("dashboard.quoteDetail.projectStartedDesc") : t("dashboard.quoteDetail.projectAlreadyStartedDesc") });
+      navigate(`/dashboard/jobs/${res.job.id}`);
     } catch (err) {
-      toast({ title: t("dashboard.quoteDetail.error"), description: t("dashboard.quoteDetail.errorStartProject"), variant: "destructive" });
+      const e = err as Error & { code?: string };
+      toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("dashboard.quoteDetail.error"), description: e.code === "PLAN_REQUIRED" ? e.message : t("dashboard.quoteDetail.errorStartProject"), variant: "destructive" });
     } finally {
       setAvviandoCantiere(false);
     }

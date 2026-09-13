@@ -4,12 +4,30 @@ import {
   uuid,
   timestamp,
   integer,
-  boolean,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { businessProfilesTable } from "./business-profiles";
 import { quotesTable } from "./quotes";
+import { clientsTable } from "./clients";
+
+export const PROJECT_STATUSES = ["planning", "active", "suspended", "completed"] as const;
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
+
+export const PROJECT_SETUP_STATUSES = ["pending_review", "confirmed"] as const;
+export type ProjectSetupStatus = (typeof PROJECT_SETUP_STATUSES)[number];
+
+/** How the job setup was proposed; shown on the "review job setup" screen. */
+export type ProjectSetupProposal = {
+  source: "ai" | "fallback";
+  model?: string;
+  rationale?: string;
+  generatedAt: string;
+  /** Working days assumed for the whole job. */
+  durationWorkingDays: number;
+  /** Expected cost ÷ pre-tax price used to size the cost budget. */
+  costRatio: number;
+};
 
 export const projectsTable = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -17,10 +35,27 @@ export const projectsTable = pgTable("projects", {
   quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
-  status: text("status").notNull().default("planning"), // planning, active, suspended, completed
+  status: text("status", { enum: PROJECT_STATUSES }).notNull().default("planning"),
   startDate: timestamp("start_date", { withTimezone: true }),
   endDate: timestamp("end_date", { withTimezone: true }),
-  budget: integer("budget").notNull().default(0), // in cents
+  budget: integer("budget").notNull().default(0), // in cents — legacy; mirrors contractValueCents for jobs created from a contract
+  // ── Phase 2: jobs created from a signed contract ─────────────────────────
+  clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
+  /** Plain uuid (no drizzle FK) to avoid a schema cycle with contracts.ts; the SQL migration adds the FK. */
+  contractId: uuid("contract_id"),
+  address: text("address").notNull().default(""),
+  province: text("province"),
+  /** Signed contract value incl. tax (cents), before change orders. */
+  contractValueCents: integer("contract_value_cents").notNull().default(0),
+  /** Sum of signed change orders incl. tax (cents); can be negative. */
+  changeOrdersCents: integer("change_orders_cents").notNull().default(0),
+  setupStatus: text("setup_status", { enum: PROJECT_SETUP_STATUSES }).notNull().default("confirmed"),
+  setupProposal: jsonb("setup_proposal").$type<ProjectSetupProposal | null>(),
+  setupConfirmedAt: timestamp("setup_confirmed_at", { withTimezone: true }),
+  plannedStart: timestamp("planned_start", { withTimezone: true }),
+  plannedEnd: timestamp("planned_end", { withTimezone: true }),
+  progressPercent: integer("progress_percent").notNull().default(0),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
@@ -32,6 +67,9 @@ export const projectTasksTable = pgTable("project_tasks", {
   description: text("description").notNull().default(""),
   status: text("status").notNull().default("todo"), // todo, in_progress, done
   dueDate: timestamp("due_date", { withTimezone: true }),
+  /** Phase 2: tasks hang off a milestone (plain uuid; jobs.ts imports this file, so the FK lives in SQL). */
+  milestoneId: uuid("milestone_id"),
+  sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

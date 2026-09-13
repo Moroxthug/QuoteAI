@@ -21,10 +21,10 @@ function useNavItems() {
     { href: "/dashboard/quotes", labelKey: "dashboard.nav.quotes", icon: FileText, exact: false, proOnly: false, comingSoon: false },
     { href: "/dashboard/clients", labelKey: "dashboard.nav.clients", icon: Users, exact: false, proOnly: false, comingSoon: false },
     { href: "/dashboard/contracts", labelKey: "dashboard.nav.contracts", icon: FileSignature, exact: false, proOnly: true, comingSoon: false },
+    { href: "/dashboard/jobs", labelKey: "dashboard.nav.jobs", icon: Briefcase, exact: false, proOnly: true, comingSoon: false },
     { href: "/dashboard/analytics", labelKey: "dashboard.nav.analytics", icon: BarChart3, exact: false, proOnly: false, comingSoon: false },
     { href: "/dashboard/catalog", labelKey: "dashboard.nav.catalog", icon: BookOpen, exact: false, proOnly: true, comingSoon: false },
     { href: "/dashboard/invoices", labelKey: "dashboard.nav.invoices", icon: Receipt, exact: false, proOnly: false, comingSoon: true },
-    { href: "/crm", labelKey: "dashboard.nav.crm", icon: Briefcase, exact: false, proOnly: false, comingSoon: false, external: true },
     { href: "/dashboard/documents", labelKey: "dashboard.nav.documents", icon: FolderOpen, exact: false, proOnly: false, comingSoon: false },
     { href: "/dashboard/settings", labelKey: "dashboard.nav.settings", icon: Settings, exact: false, proOnly: false, comingSoon: false },
   ].map(item => ({ ...item, label: t(item.labelKey) }));
@@ -195,28 +195,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <nav className="flex flex-col gap-0.5">
       {NAV_ITEMS.map((item) => {
         const active = isActive(item.href, location, item.exact);
-        const link = item.external ? (
-          <a
-            key={item.href}
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onClick}
-            className={cn(
-              "flex items-center rounded-lg transition-all",
-              collapsed ? "justify-center h-9 w-9 mx-auto" : "gap-2.5 px-2.5 py-2",
-              "text-sm font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-            )}
-          >
-            <item.icon className="h-4 w-4 shrink-0 text-gray-400" />
-            {!collapsed && (
-              <span className="flex-1 text-sm">{item.label}</span>
-            )}
-            {!collapsed && (
-              <ArrowUpRight className="h-3.5 w-3.5 text-gray-400 shrink-0 ml-1 opacity-70" />
-            )}
-          </a>
-        ) : (
+        const link = (
           <Link
             key={item.href}
             href={item.href}

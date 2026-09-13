@@ -591,10 +591,10 @@ export default function Home() {
                 </div>
 
                 <Link
-                  href="/crm"
+                  href="/dashboard/jobs"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group"
                 >
-                  {lang === "fr" ? "Voir le CRM de chantier" : "See the job site CRM"}
+                  {lang === "fr" ? "Voir la gestion de chantier" : "See job management"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>

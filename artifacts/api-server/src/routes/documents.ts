@@ -241,7 +241,7 @@ router.get("/documents", requireAuth, async (req, res) => {
     const docs = await db
       .select()
       .from(uploadedDocumentsTable)
-      .where(eq(uploadedDocumentsTable.userId, userId))
+      .where(and(eq(uploadedDocumentsTable.userId, userId), eq(uploadedDocumentsTable.purpose, "price_intelligence")))
       .orderBy(desc(uploadedDocumentsTable.createdAt));
     res.json(docs.map(serializeDoc));
   } catch (err) {

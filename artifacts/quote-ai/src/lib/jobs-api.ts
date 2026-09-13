@@ -74,6 +74,89 @@ export type ChangeOrderDto = {
   createdAt: string;
 };
 
+export type CostEntryStatus = "pending_review" | "confirmed";
+export type CostEntrySource = "manual" | "receipt" | "time_entry" | "equipment" | "legacy";
+export type TaxBreakdownDto = { GST?: number; HST?: number; PST?: number; QST?: number };
+export type ReceiptExtractionDto = {
+  vendor: string | null;
+  date: string | null;
+  currency: string | null;
+  lines: { description: string; quantity: number | null; unitPrice: number | null; total: number | null }[];
+  subtotal: number | null;
+  taxes: { GST?: number | null; HST?: number | null; PST?: number | null; QST?: number | null };
+  total: number | null;
+  suggestedCategory: CostCategory | null;
+  suggestedProjectId: string | null;
+  confidence: "high" | "medium" | "low";
+  note: string | null;
+  model: string;
+};
+export type CostEntryDto = {
+  id: string;
+  projectId: string | null;
+  projectName: string | null;
+  milestoneId: string | null;
+  milestoneTitle: string | null;
+  category: CostCategory;
+  vendor: string;
+  description: string;
+  date: string | null;
+  subtotalCents: number;
+  taxCents: number;
+  taxBreakdown: TaxBreakdownDto;
+  totalCents: number;
+  status: CostEntryStatus;
+  source: CostEntrySource;
+  createdBy: "user" | "ai" | "system";
+  sourceDocumentId: string | null;
+  timeEntryId: string | null;
+  equipmentUsageId: string | null;
+  aiExtraction: ReceiptExtractionDto | null;
+  confirmedAt: string | null;
+  createdAt: string;
+};
+export type CostEntryEdit = { category?: CostCategory; vendor?: string; description?: string; date?: string; milestoneId?: string | null; subtotalCents?: number; taxCents?: number; taxBreakdown?: TaxBreakdownDto; totalCents?: number; status?: CostEntryStatus; projectId?: string };
+
+export type TimeEntryStatus = "submitted" | "approved" | "rejected";
+export type TimeEntryDto = {
+  id: string;
+  workerId: string;
+  workerName: string | null;
+  projectId: string;
+  projectName: string | null;
+  milestoneId: string | null;
+  milestoneTitle: string | null;
+  date: string | null;
+  hours: number;
+  rateCents: number;
+  burdenPercent: number;
+  costCents: number;
+  note: string;
+  status: TimeEntryStatus;
+  enteredBy: "worker" | "company";
+  approvedAt: string | null;
+  rejectedReason: string | null;
+  costEntryId: string | null;
+  createdAt: string;
+};
+export type UsageUnit = "hour" | "day";
+export type EquipmentUsageDto = {
+  id: string;
+  equipmentId: string;
+  equipmentName: string | null;
+  projectId: string;
+  projectName: string | null;
+  milestoneId: string | null;
+  date: string | null;
+  quantity: number;
+  unit: UsageUnit;
+  rateCents: number;
+  costCents: number;
+  note: string;
+  costEntryId: string | null;
+  createdAt: string;
+};
+
 export type PaymentTermDto = { id: string; type: string; label: string; trigger: string; amountType: "percent" | "fixed"; value: number; dueDays: number; milestoneKey?: string };
 
 export type JobDetailDto = {
@@ -100,8 +183,10 @@ export type JobDetailDto = {
   budget: BudgetLineDto[];
   budgetTotalCents: number;
   changeOrders: ChangeOrderDto[];
-  costs: { totalCents: number; entries: { id: string; description: string; amountCents: number; date: string }[] };
-  assignments: { id: string; collaboratorId: string; roleInProject: string; collaboratorName: string; collaboratorRole: string; collaboratorHourlyRate: number }[];
+  costs: { totalCents: number; pendingCents: number; pendingCount: number; byCategory: Record<CostCategory, number>; entries: CostEntryDto[] };
+  timeEntries: TimeEntryDto[];
+  equipmentUsage: EquipmentUsageDto[];
+  assignments: { id: string; collaboratorId: string; roleInProject: string; collaboratorName: string; collaboratorRole: string; collaboratorHourlyRate: number; workerType: "employee" | "subcontractor"; active: boolean }[];
 };
 
 export type MilestoneEdit = {
@@ -161,15 +246,36 @@ export const jobsApi = {
     req<{ changeOrder: ChangeOrderDto; documentContractId: string }>(`/api/jobs/${id}/change-orders`, { method: "POST", body: json(body) }),
   deleteChangeOrder: (id: string, coId: string) => req<{ success: true }>(`/api/jobs/${id}/change-orders/${coId}`, { method: "DELETE" }),
 
-  addCost: (id: string, body: { description: string; amountCents: number; date?: string }) => req<{ entry: { id: string } }>(`/api/jobs/${id}/costs`, { method: "POST", body: json(body) }),
+  // Costs (Phase 3)
+  addCost: (id: string, body: CostEntryEdit & { category: CostCategory; totalCents: number }) => req<{ entry: CostEntryDto }>(`/api/jobs/${id}/costs`, { method: "POST", body: json(body) }),
+  updateCost: (id: string, cid: string, body: CostEntryEdit) => req<{ entry: CostEntryDto }>(`/api/jobs/${id}/costs/${cid}`, { method: "PUT", body: json(body) }),
   deleteCost: (id: string, cid: string) => req<{ success: true }>(`/api/jobs/${id}/costs/${cid}`, { method: "DELETE" }),
+  reviewQueue: () => req<{ entries: CostEntryDto[] }>("/api/costs/review"),
+  scanReceipt: async (file: File, projectId?: string) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    if (projectId) fd.append("projectId", projectId);
+    const res = await fetch("/api/costs/receipts", { method: "POST", credentials: "include", body: fd });
+    const body = (await res.json().catch(() => ({}))) as { entry: CostEntryDto; error?: string; message?: string; requiredPlan?: string };
+    if (!res.ok) {
+      const err = new Error(body.message || body.error || `Request failed (${res.status})`) as Error & { code?: string; requiredPlan?: string };
+      err.code = body.error;
+      err.requiredPlan = body.requiredPlan;
+      throw err;
+    }
+    return body;
+  },
+  receiptFileUrl: (docId: string) => `/api/costs/receipts/${docId}/file`,
 
-  // Team (legacy CRM endpoints until Phase 3 introduces workers)
-  collaborators: () => req<{ id: string; name: string; role: string; hourlyRate: number }[]>("/api/crm/collaborators"),
-  addCollaborator: (body: { name: string; role?: string; hourlyRate?: number }) => req<{ id: string; name: string }>("/api/crm/collaborators", { method: "POST", body: json(body) }),
-  assign: (id: string, body: { collaboratorId: string; roleInProject?: string }) => req<{ id: string }>(`/api/crm/projects/${id}/assignments`, { method: "POST", body: json(body) }),
-  unassign: (id: string, assignmentId: string) => req<{ success: true }>(`/api/crm/projects/${id}/assignments/${assignmentId}`, { method: "DELETE" }),
+  // Team & time on a job (Phase 3)
+  assign: (id: string, body: { workerId: string; roleInProject?: string }) => req<{ assignment: { id: string } }>(`/api/jobs/${id}/assignments`, { method: "POST", body: json(body) }),
+  unassign: (id: string, assignmentId: string) => req<{ success: true }>(`/api/jobs/${id}/assignments/${assignmentId}`, { method: "DELETE" }),
+  addTimeEntry: (id: string, body: { workerId: string; date: string; hours: number; milestoneId?: string | null; note?: string; approve?: boolean }) => req<{ entry: TimeEntryDto }>(`/api/jobs/${id}/time-entries`, { method: "POST", body: json(body) }),
+  addEquipmentUsage: (id: string, body: { equipmentId: string; date: string; quantity: number; unit?: UsageUnit; milestoneId?: string | null; note?: string }) => req<{ usage: EquipmentUsageDto }>(`/api/jobs/${id}/equipment-usage`, { method: "POST", body: json(body) }),
+  deleteEquipmentUsage: (id: string, uid: string) => req<{ success: true }>(`/api/jobs/${id}/equipment-usage/${uid}`, { method: "DELETE" }),
 };
+
+export { req as apiRequest, json as apiJson };
 
 export const formatCad = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
 export const formatCents = (c: number) => formatCad(c / 100);

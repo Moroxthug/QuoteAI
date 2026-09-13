@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type JobSummaryDto } from "@/lib/jobs-api";
 import { JobStatusBadge } from "@/components/jobs/badges";
+import { ReceiptQueue } from "@/components/jobs/receipt-queue";
 
 const FILTERS = ["all", "pending_review", "active", "planning", "completed"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -73,6 +74,8 @@ export default function JobsListPage() {
         <Stat label={t("jobs.stat.openValue")} value={formatCents(stats.openValue)} accent="text-emerald-600" />
         <Stat label={t("jobs.stat.completed")} value={String(stats.completed)} />
       </div>
+
+      <ReceiptQueue jobs={data?.items ?? []} />
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">

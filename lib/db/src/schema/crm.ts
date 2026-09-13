@@ -5,6 +5,8 @@ import {
   timestamp,
   integer,
   jsonb,
+  numeric,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -74,14 +76,30 @@ export const projectTasksTable = pgTable("project_tasks", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
+export const WORKER_TYPES = ["employee", "subcontractor"] as const;
+export type WorkerType = (typeof WORKER_TYPES)[number];
+
+/**
+ * Workers. The table keeps its legacy name (`collaborators`); Phase 3 added
+ * the type, employer burden, active flag and the magic-link token used by
+ * the worker time-entry page (/t/:token).
+ */
 export const collaboratorsTable = pgTable("collaborators", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
-  role: text("role").notNull().default("collaboratore"), // dipendente, collaboratore
+  role: text("role").notNull().default("worker"), // free text shown on the team page ("Carpenter", "Apprentice"…)
   email: text("email"),
   phone: text("phone"),
   hourlyRate: integer("hourly_rate").notNull().default(0), // in cents
+  workerType: text("worker_type", { enum: WORKER_TYPES }).notNull().default("employee"),
+  /** Employer burden on top of the hourly rate (CPP/EI/WSIB/vacation…), percent. Subcontractors: 0. */
+  burdenPercent: numeric("burden_percent", { precision: 5, scale: 2 }).notNull().default("15"),
+  active: boolean("active").notNull().default(true),
+  /** SHA-256 of the raw magic-link token; null until an invite link is issued. */
+  timeTokenHash: text("time_token_hash"),
+  timeTokenExpiresAt: timestamp("time_token_expires_at", { withTimezone: true }),
+  lastTimeEntryAt: timestamp("last_time_entry_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
@@ -94,6 +112,7 @@ export const projectAssignmentsTable = pgTable("project_assignments", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** @deprecated Phase 3 migrated these rows into `cost_entries`; kept one phase for rollback. */
 export const extraCostsTable = pgTable("extra_costs", {
   id: uuid("id").defaultRandom().primaryKey(),
   projectId: uuid("project_id").notNull().references(() => projectsTable.id, { onDelete: "cascade" }),

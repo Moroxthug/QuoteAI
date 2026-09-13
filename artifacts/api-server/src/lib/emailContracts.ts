@@ -6,15 +6,15 @@ import { getBaseUrl } from "./baseUrl.js";
 // Kept in their own module so email.ts (quotes/subscriptions) stays readable.
 
 const LOGO_URL = `${getBaseUrl()}/quoteai-logo.png`;
-const FROM = "QuoteAI <no-reply@quoteai.ca>";
+export const FROM = "QuoteAI <no-reply@quoteai.ca>";
 
 export type EmailLang = "en" | "fr";
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-function shell(params: { lang: EmailLang; headerTitle: string; headerSub: string; bodyHtml: string; footer: string; accent?: string }): string {
+export function shell(params: { lang: EmailLang; headerTitle: string; headerSub: string; bodyHtml: string; footer: string; accent?: string }): string {
   const accent = params.accent ?? "linear-gradient(135deg,#7c3aed,#06b6d4)";
   return `<!DOCTYPE html>
 <html lang="${params.lang === "fr" ? "fr-CA" : "en-CA"}">
@@ -55,7 +55,7 @@ function cad(n: number, lang: EmailLang): string {
   return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(n);
 }
 
-function resendOrThrow(): Resend {
+export function resendOrThrow(): Resend {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     logger.warn("RESEND_API_KEY not set — cannot send email");

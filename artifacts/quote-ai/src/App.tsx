@@ -34,6 +34,8 @@ const InvoicesPage = lazy(() => import("@/pages/dashboard/invoices"));
 const JobsListPage = lazy(() => import("@/pages/dashboard/jobs/index"));
 const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
 const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
+const TeamPage = lazy(() => import("@/pages/dashboard/team"));
+const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const DocumentsPage = lazy(() => import("@/pages/dashboard/documents"));
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
@@ -168,6 +170,9 @@ function Router() {
       <Route path="/dashboard/jobs" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><JobsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      <Route path="/dashboard/team" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><TeamPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
       {/* The old CRM is retired (Phase 2): its working parts live in Jobs */}
       <Route path="/crm" component={() => <Redirect to="/dashboard/jobs" />} />
       <Route path="/crm/:rest*" component={() => <Redirect to="/dashboard/jobs" />} />
@@ -177,6 +182,8 @@ function Router() {
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}
       <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />
+      {/* Public worker time-entry page (magic link from the Team page) */}
+      <Route path="/t/:token" component={() => <Suspense fallback={null}><WorkerTimePage /></Suspense>} />
 
       {/* Pagina pubblica: il cliente finale visualizza e accetta il preventivo (link condiviso via WhatsApp/email) */}
       <Route path="/p/:id" component={() => <PublicLayout><Suspense fallback={null}><PublicQuotePage /></Suspense></PublicLayout>} />

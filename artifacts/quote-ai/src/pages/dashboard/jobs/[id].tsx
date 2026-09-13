@@ -4,11 +4,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Loader2, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X,
+  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -18,6 +17,8 @@ import { contractsApi } from "@/lib/contracts-api";
 import { Gantt } from "@/components/jobs/gantt";
 import { JobStatusBadge, MilestoneStatusBadge, ChangeOrderStatusBadge } from "@/components/jobs/badges";
 import { ChangeOrderDialog } from "@/components/jobs/change-order-dialog";
+import { CostsTab } from "@/components/jobs/costs-tab";
+import { TeamTab } from "@/components/jobs/team-tab";
 
 const TABS = ["overview", "schedule", "changes", "costs", "team", "documents"] as const;
 type Tab = (typeof TABS)[number];
@@ -98,7 +99,7 @@ export default function JobDetailPage() {
         <Kpi label={t("jobs.kpi.value")} value={formatCents(job.totalValueCents)} sub={job.changeOrdersCents ? `${formatCents(job.contractValueCents)} + ${formatCents(job.changeOrdersCents)} ${t("jobs.kpi.co")}` : undefined} />
         <Kpi label={t("jobs.kpi.released")} value={formatCents(releasedCents)} sub={t("jobs.kpi.releasedSub")} accent="text-blue-600" />
         <Kpi label={t("jobs.kpi.budget")} value={budgetTotalCents ? formatCents(budgetTotalCents) : "—"} sub={projectedMargin !== null ? `${t("jobs.kpi.projectedMargin")} ${projectedMargin}%` : undefined} />
-        <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} accent={budgetTotalCents && actualCosts > budgetTotalCents ? "text-rose-600" : undefined} />
+        <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} accent={budgetTotalCents && actualCosts > budgetTotalCents ? "text-rose-600" : undefined} />
         <Kpi label={t("jobs.kpi.progress")} value={`${job.progressPercent}%`} sub={`${done}/${milestones.length} ${t("jobs.milestonesShort")}`} accent="text-emerald-600" progress={job.progressPercent} />
       </div>
 
@@ -106,10 +107,10 @@ export default function JobDetailPage() {
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit overflow-x-auto max-w-full">
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
-          const count = k === "changes" ? changeOrders.length : undefined;
+          const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
           return (
             <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
-              <Icon className="h-3.5 w-3.5" /> {t(`jobs.tab.${k}`)}{count ? <span className="text-[10px] bg-slate-200 text-slate-700 rounded-full px-1.5">{count}</span> : null}
+              <Icon className="h-3.5 w-3.5" /> {t(`jobs.tab.${k}`)}{count ? <span className={cn("text-[10px] rounded-full px-1.5", k === "changes" ? "bg-slate-200 text-slate-700" : "bg-amber-200 text-amber-900")}>{count}</span> : null}
             </button>
           );
         })}
@@ -121,7 +122,7 @@ export default function JobDetailPage() {
         <ChangesTab data={data} locale={locale} onNew={() => setCoOpen(true)} />
       )}
       {tab === "costs" && <CostsTab data={data} locale={locale} />}
-      {tab === "team" && <TeamTab data={data} />}
+      {tab === "team" && <TeamTab data={data} locale={locale} />}
       {tab === "documents" && <DocumentsTab data={data} locale={locale} />}
 
       <ChangeOrderDialog jobId={job.id} open={coOpen} onOpenChange={setCoOpen} />
@@ -392,119 +393,10 @@ function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeo
   );
 }
 
-function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
-  const { t } = useLanguage();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { job, budget, budgetTotalCents, costs } = data;
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ["job", job.id] });
-  const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
-  const add = useMutation({ mutationFn: (v: { description: string; amountCents: number; date?: string }) => jobsApi.addCost(job.id, v), onSuccess: () => { refresh(); setDesc(""); setAmount(""); }, onError });
-  const del = useMutation({ mutationFn: (cid: string) => jobsApi.deleteCost(job.id, cid), onSuccess: refresh, onError });
-  const [desc, setDesc] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const pct = budgetTotalCents ? Math.min(100, Math.round((costs.totalCents / budgetTotalCents) * 100)) : 0;
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <section className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
-        <h2 className="text-base font-bold text-slate-900">{t("jobs.costs.entries")}</h2>
-        <form className="grid grid-cols-1 md:grid-cols-[1fr_120px_140px_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (desc.trim() && amount) add.mutate({ description: desc.trim(), amountCents: Math.round(Number(amount) * 100), date: date || undefined }); }}>
-          <Input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t("jobs.costs.descPlaceholder")} />
-          <Input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="$" />
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-          <Button type="submit" size="sm" className="h-10 gap-1" disabled={add.isPending}><Plus className="h-4 w-4" /> {t("jobs.costs.add")}</Button>
-        </form>
-        <p className="text-[11px] text-slate-400">{t("jobs.costs.phase3Hint")}</p>
-        {costs.entries.length === 0 ? <p className="text-sm text-slate-400 py-4 text-center">{t("jobs.costs.empty")}</p> : (
-          <ul className="divide-y">
-            {costs.entries.map((c) => (
-              <li key={c.id} className="flex items-center gap-3 py-2 text-sm group">
-                <span className="text-xs text-slate-400 w-24 shrink-0">{format(new Date(c.date), "PP", { locale })}</span>
-                <span className="flex-1 truncate text-slate-800">{c.description}</span>
-                <span className="font-medium">{formatCents(c.amountCents)}</span>
-                <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => del.mutate(c.id)}><Trash2 className="h-4 w-4" /></button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
-        <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">{t("jobs.costs.budgetVsActual")}</h3><Link href={`/dashboard/jobs/${job.id}/setup`} className="text-xs text-violet-600 hover:underline">{t("jobs.costs.editBudget")}</Link></div>
-        <div>
-          <div className="flex justify-between text-sm"><span className="text-slate-500">{t("jobs.kpi.costs")}</span><span className="font-semibold">{formatCents(costs.totalCents)}</span></div>
-          <div className="h-2 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", costs.totalCents > budgetTotalCents && budgetTotalCents ? "bg-rose-500" : "bg-emerald-500")} style={{ width: `${pct}%` }} /></div>
-          <div className="flex justify-between text-xs text-slate-400 mt-1"><span>{t("jobs.kpi.budget")}</span><span>{formatCents(budgetTotalCents)}</span></div>
-        </div>
-        {budget.length > 0 && (
-          <ul className="space-y-1 pt-2 border-t">
-            {budget.map((b) => <li key={b.id} className="flex justify-between text-sm"><span className="text-slate-600">{t(`jobs.cost.${b.category}`)}</span><span>{formatCents(b.plannedCents)}</span></li>)}
-          </ul>
-        )}
-      </section>
-    </div>
-  );
-}
-
-function TeamTab({ data }: { data: JobDetailDto }) {
-  const { t } = useLanguage();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { job, assignments } = data;
-  const { data: collaborators } = useQuery({ queryKey: ["collaborators"], queryFn: jobsApi.collaborators });
-  const refresh = () => { queryClient.invalidateQueries({ queryKey: ["job", job.id] }); queryClient.invalidateQueries({ queryKey: ["collaborators"] }); };
-  const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
-  const assign = useMutation({ mutationFn: (collaboratorId: string) => jobsApi.assign(job.id, { collaboratorId }), onSuccess: refresh, onError });
-  const unassign = useMutation({ mutationFn: (aid: string) => jobsApi.unassign(job.id, aid), onSuccess: refresh, onError });
-  const addCollab = useMutation({ mutationFn: (v: { name: string; hourlyRate?: number }) => jobsApi.addCollaborator(v), onSuccess: async (c) => { await assign.mutateAsync(c.id); setName(""); setRate(""); }, onError });
-  const [name, setName] = useState("");
-  const [rate, setRate] = useState("");
-  const [pick, setPick] = useState("");
-  const available = (collaborators ?? []).filter((c) => !assignments.some((a) => a.collaboratorId === c.id));
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <section className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
-        <h2 className="text-base font-bold text-slate-900">{t("jobs.team.assigned")}</h2>
-        {assignments.length === 0 ? <p className="text-sm text-slate-400 py-4 text-center">{t("jobs.team.empty")}</p> : (
-          <ul className="divide-y">
-            {assignments.map((a) => (
-              <li key={a.id} className="flex items-center gap-3 py-2 text-sm group">
-                <div className="h-8 w-8 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-xs font-bold">{a.collaboratorName.slice(0, 2).toUpperCase()}</div>
-                <div className="flex-1 min-w-0"><div className="font-medium text-slate-800 truncate">{a.collaboratorName}</div><div className="text-xs text-slate-400">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</div></div>
-                <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => unassign.mutate(a.id)}><Trash2 className="h-4 w-4" /></button>
-              </li>
-            ))}
-          </ul>
-        )}
-        <p className="text-[11px] text-slate-400">{t("jobs.team.phase3Hint")}</p>
-      </section>
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
-        <h3 className="text-sm font-bold text-slate-900">{t("jobs.team.add")}</h3>
-        {available.length > 0 && (
-          <div className="flex gap-2">
-            <select value={pick} onChange={(e) => setPick(e.target.value)} className="h-9 flex-1 rounded-md border border-slate-200 bg-white px-2 text-sm">
-              <option value="">{t("jobs.team.pick")}</option>
-              {available.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-            <Button size="sm" className="h-9" disabled={!pick || assign.isPending} onClick={() => { assign.mutate(pick); setPick(""); }}>{t("jobs.team.assign")}</Button>
-          </div>
-        )}
-        <form className="space-y-2 pt-2 border-t" onSubmit={(e) => { e.preventDefault(); if (name.trim()) addCollab.mutate({ name: name.trim(), hourlyRate: rate ? Math.round(Number(rate) * 100) : undefined }); }}>
-          <Label className="text-xs text-slate-500">{t("jobs.team.newWorker")}</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.team.namePlaceholder")} className="h-9" />
-          <Input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} className="h-9" />
-          <Button type="submit" size="sm" variant="outline" className="w-full h-9" disabled={!name.trim() || addCollab.isPending}>{t("jobs.team.addAndAssign")}</Button>
-        </form>
-      </section>
-    </div>
-  );
-}
-
 function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
   const { t } = useLanguage();
-  const { job, changeOrders } = data;
+  const { job, changeOrders, costs } = data;
+  const receipts = costs.entries.filter((e) => e.source === "receipt" && e.sourceDocumentId);
   const docs = useMemo(() => {
     const list: { id: string; title: string; sub: string; href: string; pdf?: string }[] = [];
     if (job.contract) list.push({ id: job.contract.id, title: `${t("jobs.docs.contract")} ${job.contract.contractNumber}`, sub: job.contract.signedAt ? `${t("jobs.co.signedOn")} ${format(new Date(job.contract.signedAt), "PP", { locale })}` : job.contract.status, href: `/dashboard/contracts/${job.contract.id}`, pdf: contractsApi.pdfUrl(job.contract.id, true) });
@@ -514,7 +406,7 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
   }, [job, changeOrders, t, locale]);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
-      {docs.length === 0 && <div className="p-8 text-center text-sm text-slate-400">{t("jobs.docs.empty")}</div>}
+      {docs.length === 0 && receipts.length === 0 && <div className="p-8 text-center text-sm text-slate-400">{t("jobs.docs.empty")}</div>}
       {docs.map((d) => (
         <div key={d.id} className="flex items-center gap-3 px-4 py-3">
           <div className="h-9 w-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center"><FileSignature className="h-4 w-4" /></div>
@@ -522,7 +414,13 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
           {d.pdf && <a href={d.pdf} className="text-sm text-violet-600 hover:underline inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" /> PDF</a>}
         </div>
       ))}
-      <div className="px-4 py-3 text-[11px] text-slate-400">{t("jobs.docs.phase3Hint")}</div>
+      {receipts.map((r) => (
+        <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+          <div className="h-9 w-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center"><Receipt className="h-4 w-4" /></div>
+          <div className="min-w-0 flex-1"><div className="font-medium text-slate-900 truncate">{r.vendor || t("jobs.costs.unknownVendor")} · {formatCents(r.totalCents)}</div><div className="text-xs text-slate-400">{t("jobs.docs.receipt")} · {r.date ? format(day(r.date)!, "PP", { locale }) : ""}{r.status === "pending_review" ? ` · ${t("jobs.costs.toReview")}` : ""}</div></div>
+          <a href={jobsApi.receiptFileUrl(r.sourceDocumentId!)} target="_blank" rel="noreferrer" className="text-sm text-violet-600 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3.5 w-3.5" /> {t("jobs.costs.openReceipt")}</a>
+        </div>
+      ))}
     </div>
   );
 }

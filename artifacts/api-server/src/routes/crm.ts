@@ -7,7 +7,6 @@ import {
   projectTasksTable,
   collaboratorsTable,
   projectAssignmentsTable,
-  extraCostsTable,
   suppliersTable,
   quotesTable,
 } from "@workspace/db";
@@ -418,7 +417,7 @@ router.post("/crm/collaborators", requireAuth, async (req, res) => {
       .values({
         userId,
         name: parsed.data.name,
-        role: parsed.data.role ?? "collaboratore",
+        role: parsed.data.role ?? "worker",
         email: parsed.data.email ?? null,
         phone: parsed.data.phone ?? null,
         hourlyRate: parsed.data.hourlyRate ?? 0,
@@ -484,78 +483,8 @@ router.post("/crm/suppliers", requireAuth, async (req, res) => {
 });
 
 // ── EXTRA COSTS (COSTI EXTRA) ───────────────────────────────────────────────
-router.get("/crm/projects/:projectId/extra-costs", requireAuth, async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const { projectId } = req.params;
+// Extra costs moved to cost_entries in Phase 3 (routes/costs.ts).
 
-    const [project] = await db
-      .select()
-      .from(projectsTable)
-      .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
-
-    if (!project) {
-      res.status(404).json({ error: "Project not found" });
-      return;
-    }
-
-    const costs = await db
-      .select()
-      .from(extraCostsTable)
-      .where(eq(extraCostsTable.projectId, projectId));
-
-    res.json(costs);
-  } catch (err) {
-    req.log.error({ err }, "Error fetching extra costs");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-router.post("/crm/projects/:projectId/extra-costs", requireAuth, async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const { projectId } = req.params;
-
-    const [project] = await db
-      .select()
-      .from(projectsTable)
-      .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
-
-    if (!project) {
-      res.status(404).json({ error: "Project not found" });
-      return;
-    }
-
-    const schema = z.object({
-      description: z.string().min(1),
-      amount: z.number().int(), // in cents
-      date: z.string().optional(),
-    });
-
-    const parsed = schema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ error: "Invalid parameters", details: parsed.error });
-      return;
-    }
-
-    const [cost] = await db
-      .insert(extraCostsTable)
-      .values({
-        projectId,
-        description: parsed.data.description,
-        amount: parsed.data.amount,
-        date: parsed.data.date ? new Date(parsed.data.date) : new Date(),
-      })
-      .returning();
-
-    res.status(201).json(cost);
-  } catch (err) {
-    req.log.error({ err }, "Error creating extra cost");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// ── FATTURE IN CLOUD INTEGRATION (MOCK & DRAFT) ──────────────────────────────
 router.post("/crm/invoices/generate", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);

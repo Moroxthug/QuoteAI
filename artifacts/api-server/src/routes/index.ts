@@ -18,6 +18,9 @@ import notificationsRouter from "./notifications";
 import contractsRouter from "./contracts";
 import signRouter from "./sign";
 import jobsRouter from "./jobs";
+import costsRouter from "./costs";
+import teamRouter from "./team";
+import workerTimeRouter from "./worker-time";
 
 const router: IRouter = Router();
 
@@ -40,5 +43,8 @@ router.use(notificationsRouter);
 router.use(contractsRouter);
 router.use(signRouter);
 router.use(jobsRouter);
+router.use(costsRouter);
+router.use(teamRouter);
+router.use(workerTimeRouter);
 
 export default router;

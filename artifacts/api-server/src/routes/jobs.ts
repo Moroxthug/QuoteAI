@@ -10,9 +10,11 @@ import {
   contractsTable,
   clientsTable,
   quotesTable,
-  extraCostsTable,
   projectAssignmentsTable,
   collaboratorsTable,
+  timeEntriesTable,
+  equipmentUsageTable,
+  equipmentTable,
   businessProfilesTable,
   hasFeature,
   minimumPlanFor,
@@ -30,6 +32,7 @@ import { writeAudit } from "../lib/notifications.js";
 import { recomputeProgress, setupJobFromContract } from "../jobs/setup.js";
 import { createChangeOrder, updateChangeOrder, changeOrderStatusFromDocument } from "../jobs/changeOrders.js";
 import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
+import { costSummary, serializeCostEntry, serializeTimeEntry, serializeUsage } from "../costs/service.js";
 
 const router = Router();
 
@@ -221,7 +224,7 @@ router.post("/jobs", requireAuth, async (req, res) => {
 async function loadJobDetail(userId: string, id: string) {
   const project = await ownedProject(userId, id);
   if (!project) return null;
-  const [milestones, tasks, budget, changeOrders, costs, assignments, client, contract, quote] = await Promise.all([
+  const [milestones, tasks, budget, changeOrders, costs, assignments, client, contract, quote, timeEntries, usage] = await Promise.all([
     db.select().from(milestonesTable).where(eq(milestonesTable.projectId, id)).orderBy(asc(milestonesTable.sortOrder)),
     db.select().from(projectTasksTable).where(eq(projectTasksTable.projectId, id)).orderBy(asc(projectTasksTable.sortOrder), asc(projectTasksTable.createdAt)),
     db.select().from(costBudgetLinesTable).where(eq(costBudgetLinesTable.projectId, id)).orderBy(asc(costBudgetLinesTable.sortOrder)),
@@ -231,7 +234,7 @@ async function loadJobDetail(userId: string, id: string) {
       .leftJoin(contractsTable, eq(contractsTable.id, changeOrdersTable.documentContractId))
       .where(eq(changeOrdersTable.projectId, id))
       .orderBy(asc(changeOrdersTable.createdAt)),
-    db.select().from(extraCostsTable).where(eq(extraCostsTable.projectId, id)).orderBy(desc(extraCostsTable.date)),
+    costSummary(id),
     db
       .select({
         id: projectAssignmentsTable.id,
@@ -240,6 +243,8 @@ async function loadJobDetail(userId: string, id: string) {
         collaboratorName: collaboratorsTable.name,
         collaboratorRole: collaboratorsTable.role,
         collaboratorHourlyRate: collaboratorsTable.hourlyRate,
+        workerType: collaboratorsTable.workerType,
+        active: collaboratorsTable.active,
       })
       .from(projectAssignmentsTable)
       .innerJoin(collaboratorsTable, eq(projectAssignmentsTable.collaboratorId, collaboratorsTable.id))
@@ -247,7 +252,22 @@ async function loadJobDetail(userId: string, id: string) {
     project.clientId ? db.select().from(clientsTable).where(eq(clientsTable.id, project.clientId)).then((r) => r[0] ?? null) : Promise.resolve(null),
     project.contractId ? db.select().from(contractsTable).where(eq(contractsTable.id, project.contractId)).then((r) => r[0] ?? null) : Promise.resolve(null),
     project.quoteId ? db.select({ id: quotesTable.id, number: quotesTable.numeroPreventivoData, status: quotesTable.status }).from(quotesTable).where(eq(quotesTable.id, project.quoteId)).then((r) => r[0] ?? null) : Promise.resolve(null),
+    db
+      .select({ e: timeEntriesTable, workerName: collaboratorsTable.name })
+      .from(timeEntriesTable)
+      .innerJoin(collaboratorsTable, eq(collaboratorsTable.id, timeEntriesTable.workerId))
+      .where(eq(timeEntriesTable.projectId, id))
+      .orderBy(desc(timeEntriesTable.date), desc(timeEntriesTable.createdAt))
+      .limit(200),
+    db
+      .select({ u: equipmentUsageTable, equipmentName: equipmentTable.name })
+      .from(equipmentUsageTable)
+      .innerJoin(equipmentTable, eq(equipmentTable.id, equipmentUsageTable.equipmentId))
+      .where(eq(equipmentUsageTable.projectId, id))
+      .orderBy(desc(equipmentUsageTable.date), desc(equipmentUsageTable.createdAt))
+      .limit(200),
   ]);
+  const milestoneTitle = new Map(milestones.map((m) => [m.id, m.title]));
 
   return {
     job: {
@@ -275,9 +295,14 @@ async function loadJobDetail(userId: string, id: string) {
     budgetTotalCents: budget.reduce((s, b) => s + b.plannedCents, 0),
     changeOrders: changeOrders.map((r) => serializeChangeOrder(r.co, r.docStatus)),
     costs: {
-      totalCents: costs.reduce((s, c) => s + c.amount, 0),
-      entries: costs.map((c) => ({ id: c.id, description: c.description, amountCents: c.amount, date: c.date.toISOString() })),
+      totalCents: costs.confirmedCents,
+      pendingCents: costs.pendingCents,
+      pendingCount: costs.pendingCount,
+      byCategory: costs.byCategory,
+      entries: costs.entries.map((c) => serializeCostEntry(c, { milestoneTitle: c.milestoneId ? (milestoneTitle.get(c.milestoneId) ?? null) : null })),
     },
+    timeEntries: timeEntries.map((r) => serializeTimeEntry(r.e, { workerName: r.workerName, projectName: project.name, milestoneTitle: r.e.milestoneId ? (milestoneTitle.get(r.e.milestoneId) ?? null) : null })),
+    equipmentUsage: usage.map((r) => serializeUsage(r.u, { equipmentName: r.equipmentName, projectName: project.name })),
     assignments,
   };
 }
@@ -831,43 +856,6 @@ router.delete("/jobs/:id/change-orders/:coId", requireAuth, async (req, res) => 
   }
 });
 
-// ── Costs (legacy extra_costs until Phase 3) & team ──────────────────────────
-
-router.post("/jobs/:id/costs", requireAuth, async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const project = await ownedProject(userId, req.params.id as string);
-    if (!project) {
-      res.status(404).json({ error: "Not found" });
-      return;
-    }
-    const body = z.object({ description: z.string().min(1).max(300), amountCents: z.number().int(), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }).safeParse(req.body);
-    if (!body.success) {
-      res.status(400).json({ error: "Invalid parameters", details: body.error });
-      return;
-    }
-    const [c] = await db.insert(extraCostsTable).values({ projectId: project.id, description: body.data.description, amount: body.data.amountCents, date: parseIsoDate(body.data.date) ?? new Date() }).returning();
-    res.status(201).json({ entry: { id: c!.id, description: c!.description, amountCents: c!.amount, date: c!.date.toISOString() } });
-  } catch (err) {
-    req.log.error({ err }, "Error adding cost");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-router.delete("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const project = await ownedProject(userId, req.params.id as string);
-    if (!project) {
-      res.status(404).json({ error: "Not found" });
-      return;
-    }
-    await db.delete(extraCostsTable).where(and(eq(extraCostsTable.id, req.params.cid as string), eq(extraCostsTable.projectId, project.id)));
-    res.json({ success: true });
-  } catch (err) {
-    req.log.error({ err }, "Error deleting cost");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+// Costs, time entries and equipment usage live in routes/costs.ts and routes/team.ts (Phase 3).
 
 export default router;

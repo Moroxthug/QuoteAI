@@ -20,3 +20,4 @@ export * from "./contracts";
 export * from "./jobs";
 export * from "./costs";
 export * from "./invoices";
+export * from "./assistant";

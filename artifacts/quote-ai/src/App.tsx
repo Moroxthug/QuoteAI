@@ -37,6 +37,7 @@ const JobsListPage = lazy(() => import("@/pages/dashboard/jobs/index"));
 const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
 const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
 const TeamPage = lazy(() => import("@/pages/dashboard/team"));
+const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const DocumentsPage = lazy(() => import("@/pages/dashboard/documents"));
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
@@ -174,6 +175,9 @@ function Router() {
       )} />
       <Route path="/dashboard/jobs" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><JobsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/assistant" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><AssistantPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
       <Route path="/dashboard/team" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><TeamPage /></DashSuspense></DashboardLayout></OnboardingGuard>

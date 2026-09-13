@@ -21,10 +21,12 @@ import { ChangeOrderDialog } from "@/components/jobs/change-order-dialog";
 import { CostsTab } from "@/components/jobs/costs-tab";
 import { TeamTab } from "@/components/jobs/team-tab";
 import { InvoicesTab } from "@/components/jobs/invoices-tab";
+import { OverviewCharts } from "@/components/jobs/overview-charts";
+import { AssistantPanel } from "@/components/assistant/assistant-panel";
 
-const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "documents"] as const;
+const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "documents", "assistant"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, documents: FolderOpen };
+const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, documents: FolderOpen, assistant: Sparkles };
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 
@@ -123,6 +125,7 @@ export default function JobDetailPage() {
       {tab === "invoices" && <InvoicesTab data={data} locale={locale} />}
       {tab === "team" && <TeamTab data={data} locale={locale} />}
       {tab === "documents" && <DocumentsTab data={data} locale={locale} />}
+      {tab === "assistant" && <AssistantPanel projectId={job.id} />}
 
       <ChangeOrderDialog jobId={job.id} open={coOpen} onOpenChange={setCoOpen} />
     </div>
@@ -167,6 +170,8 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
   const terms = job.contract?.paymentSchedule.terms ?? [];
   const total = job.contract?.total ?? job.contractValueCents / 100;
   return (
+    <div className="space-y-4">
+    <OverviewCharts jobId={job.id} locale={locale} jobStatus={job.status} />
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5">
@@ -242,6 +247,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
           </section>
         )}
       </div>
+    </div>
     </div>
   );
 }

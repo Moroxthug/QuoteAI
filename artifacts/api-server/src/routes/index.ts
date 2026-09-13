@@ -23,6 +23,8 @@ import teamRouter from "./team";
 import workerTimeRouter from "./worker-time";
 import invoicesRouter from "./invoices";
 import publicInvoicesRouter from "./public-invoices";
+import analyticsRouter from "./analytics";
+import assistantRouter from "./assistant";
 
 const router: IRouter = Router();
 
@@ -50,5 +52,7 @@ router.use(teamRouter);
 router.use(workerTimeRouter);
 router.use(invoicesRouter);
 router.use(publicInvoicesRouter);
+router.use(analyticsRouter);
+router.use(assistantRouter);
 
 export default router;

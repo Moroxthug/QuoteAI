@@ -71,3 +71,6 @@ gen-lang-client-*.json
 
 .vercel
 .env*
+
+# Supabase CLI link state
+supabase/.temp/

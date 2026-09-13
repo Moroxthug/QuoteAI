@@ -170,6 +170,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const { data: subscription } = useGetSubscription();
   const isPro = subscription?.isActive && subscription?.plan === "monthly_pro";
+  // Hooks must run on every render — keep this above the early returns below.
+  const allNavItems = useNavItems();
 
   useEffect(() => {
     try { localStorage.setItem("sidebar-collapsed", String(isCollapsed)); } catch {}
@@ -188,7 +190,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  const allNavItems = useNavItems();
   const NAV_ITEMS = allNavItems.filter(item => !item.proOnly || isPro);
 
   const NavLinks = ({ collapsed = false, onClick }: { collapsed?: boolean; onClick?: () => void }) => (

@@ -71,6 +71,16 @@ router.get("/storage/objects/*objectPath", requireAuth, async (req: Request, res
   try {
     const raw = req.params.objectPath;
     const objectPath = Array.isArray(raw) ? raw.join("/") : raw;
+
+    // Every private object is stored under `<type>/<ownerUserId>/...` — enforce
+    // that the caller is the owner rather than relying on the path being hard
+    // to guess (this route is otherwise reachable by any authenticated user).
+    const ownerId = objectPath.split("/")[1];
+    if (!ownerId || ownerId !== res.locals.userId) {
+      res.status(404).json({ error: "Object not found" });
+      return;
+    }
+
     const objectData = await objectStorageService.downloadPrivateObject(objectPath);
 
     res.status(objectData.status);

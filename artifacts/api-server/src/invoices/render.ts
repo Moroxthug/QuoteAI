@@ -172,6 +172,12 @@ export const INVOICE_CSS = `
 .inv .box h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:#5b21b6; }
 .inv .note { font-size:12px; color:#6b7280; margin-top:8px; }
 .inv .thanks { margin-top:18px; color:#374151; font-size:13px; }
+.inv .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+@media (max-width: 480px) {
+  .inv .meta { grid-template-columns:1fr; gap:12px; }
+  .inv table.grid th, .inv table.grid td { padding:6px 4px; font-size:12px; }
+  .inv table.totals { max-width:none; }
+}
 `;
 
 export function renderInvoiceHtml(inv: Invoice, payments: InvoicePayment[] = []): string {
@@ -195,7 +201,7 @@ export function renderInvoiceHtml(inv: Invoice, payments: InvoicePayment[] = [])
   const rows = inv.lines
     .map((l) => `<tr><td>${esc(l.description)}</td><td class="num">${fmtQty(l.quantity, lang)}</td><td class="num">${fmtCents(l.unitCents, lang)}</td><td class="num">${fmtCents(l.amountCents, lang)}</td></tr>`)
     .join("");
-  parts.push(`<table class="grid"><thead><tr><th>${ti("description", lang)}</th><th class="num">${ti("qty", lang)}</th><th class="num">${ti("unit", lang)}</th><th class="num">${ti("amount", lang)}</th></tr></thead><tbody>${rows}</tbody></table>`);
+  parts.push(`<div class="table-wrap"><table class="grid"><thead><tr><th>${ti("description", lang)}</th><th class="num">${ti("qty", lang)}</th><th class="num">${ti("unit", lang)}</th><th class="num">${ti("amount", lang)}</th></tr></thead><tbody>${rows}</tbody></table></div>`);
 
   const totals: string[] = [];
   totals.push(`<tr><td>${ti("subtotal", lang)}</td><td class="num">${fmtCents(inv.subtotalCents, lang)}</td></tr>`);

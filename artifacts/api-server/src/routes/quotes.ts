@@ -1885,7 +1885,7 @@ router.post("/quotes/:id/generate-pdf-pro", requireAuth, async (req, res) => {
     const pdfBuffer = await generateCapitolatoPdfBuffer(quote, profile ?? null);
 
     // Upload to Object Storage
-    const subPath = `capitolato-pdfs/${randomUUID()}.pdf`;
+    const subPath = `capitolato-pdfs/${userId}/${randomUUID()}.pdf`;
     const pdfPath = await objectStorage.uploadObjectBuffer({
       subPath,
       buffer: pdfBuffer,

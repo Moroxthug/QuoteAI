@@ -116,8 +116,7 @@ router.get("/quickbooks/connect", requireAuth, requirePermission("integrations",
 // GET /api/quickbooks/callback — Intuit redirects the browser here after the company approves
 // access; this exchanges the code server-side (never exposing it to frontend JS) and redirects
 // back into Settings with a status flag.
-const settingsUrl = (status: "connected" | "error", reason?: string) =>
-  `${getBaseUrl()}/dashboard/settings?tab=integrations&qb=${status}${reason ? `&qbReason=${encodeURIComponent(reason)}` : ""}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&qb=${status}`;
 
 router.get("/quickbooks/callback", requireAuth, async (req, res) => {
   try {
@@ -127,7 +126,7 @@ router.get("/quickbooks/callback", requireAuth, async (req, res) => {
     const state = typeof req.query.state === "string" ? req.query.state : null;
 
     if (!state || !verifyState(state, userId) || !code || !realmId) {
-      res.redirect(settingsUrl("error", "state_or_params_invalid"));
+      res.redirect(settingsUrl("error"));
       return;
     }
 
@@ -135,11 +134,7 @@ router.get("/quickbooks/callback", requireAuth, async (req, res) => {
     res.redirect(settingsUrl("connected"));
   } catch (err) {
     req.log.error({ err }, "QuickBooks OAuth callback failed");
-    // TEMPORARY (remove once the connect flow is confirmed working end-to-end):
-    // surface the real error message in the redirect so it's visible in the
-    // browser URL without needing Vercel log access mid-debugging session.
-    const message = err instanceof Error ? err.message : String(err);
-    res.redirect(settingsUrl("error", message.slice(0, 300)));
+    res.redirect(settingsUrl("error"));
   }
 });
 

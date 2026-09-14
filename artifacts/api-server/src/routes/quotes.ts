@@ -65,6 +65,7 @@ function getPdfmake(): PdfMakeInstance {
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";
+import { QUOTE_FOLLOWUP_CADENCE_DAYS } from "../lib/quoteMessaging.js";
 import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
 import { createManualQuote, type ManualQuoteInput } from "../quotes/manualCreate.js";
 import { randomUUID } from "crypto";
@@ -1432,6 +1433,19 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
       replyTo: profile?.email ?? null,
       publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
+
+    // Phase 21: start the follow-up reminder sequence, unless the quote is
+    // already accepted or the client has unsubscribed from reminders.
+    if (quote.status !== "accepted" && !quote.unsubscribedAt) {
+      await db
+        .update(quotesTable)
+        .set({
+          sentAt: quote.sentAt ?? new Date(),
+          followUpStage: 0,
+          nextFollowUpAt: new Date(Date.now() + QUOTE_FOLLOWUP_CADENCE_DAYS[0] * 86_400_000),
+        })
+        .where(eq(quotesTable.id, quote.id));
+    }
 
     res.json({ success: true });
   } catch (err) {

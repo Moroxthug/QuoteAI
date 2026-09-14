@@ -27,6 +27,7 @@ export const AUTOMATION_EVENTS = [
   "job.review_request_due",
   "invoice.paid",
   "cost.confirmed",
+  "quote.followup_due",
 ] as const;
 export type AutomationEvent = (typeof AUTOMATION_EVENTS)[number];
 

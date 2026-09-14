@@ -7,9 +7,12 @@ import {
   jsonb,
   boolean,
   integer,
+  index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { randomUUID } from "crypto";
 import { clientsTable } from "./clients";
 import type { PaymentSchedule } from "./payment-schedule";
 
@@ -72,6 +75,14 @@ export type QuoteCompanySnapshot = z.infer<typeof quoteCompanySnapshotSchema>;
 
 export const quotesTable = pgTable("quotes", {
   id: uuid("id").defaultRandom().primaryKey(),
+  /** Set when the quote PDF is first emailed to the client — drives Phase 21's follow-up reminder sequence. */
+  sentAt: timestamp("sent_at", { withTimezone: true }),
+  /** How many follow-up sequence steps have fired; 0 = none sent yet. Mirrors leadsTable's pattern. */
+  followUpStage: integer("follow_up_stage").notNull().default(0),
+  nextFollowUpAt: timestamp("next_follow_up_at", { withTimezone: true }),
+  /** Opaque token for the follow-up unsubscribe link — never the quote id, so the link can't enumerate quotes. */
+  unsubscribeToken: text("unsubscribe_token").notNull().$defaultFn(() => randomUUID()),
+  unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
   userId: text("user_id").notNull(),
   /** Linked client record (Phase 0). Null only for legacy rows that could not be matched. */
   clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
@@ -114,7 +125,10 @@ export const quotesTable = pgTable("quotes", {
   apiCost: numeric("api_cost", { precision: 10, scale: 6 }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-});
+}, (t) => [
+  index("quotes_followup_due_idx").on(t.status, t.nextFollowUpAt),
+  uniqueIndex("quotes_unsubscribe_token_idx").on(t.unsubscribeToken),
+]);
 
 export const quoteAttachmentsTable = pgTable("quote_attachments", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -129,6 +143,7 @@ export const quoteAttachmentsTable = pgTable("quote_attachments", {
 
 export const insertQuoteSchema = createInsertSchema(quotesTable).omit({
   id: true,
+  unsubscribeToken: true,
   createdAt: true,
   updatedAt: true,
 });

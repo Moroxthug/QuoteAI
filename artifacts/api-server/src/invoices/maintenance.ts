@@ -60,6 +60,7 @@ export async function runInvoiceMaintenance(now = new Date()): Promise<{ overdue
       const { buffer } = await invoicePdfBuffer(inv.id);
       await sendInvoiceReminderEmail({
         toEmail,
+        userId: inv.userId,
         customerName: inv.customer.name,
         companyName: inv.contractor.name,
         number: inv.number,
@@ -71,6 +72,7 @@ export async function runInvoiceMaintenance(now = new Date()): Promise<{ overdue
         etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
         daysOverdue,
         pdfBuffer: buffer,
+        replyTo: profiles.get(inv.userId)?.email ?? null,
       });
       await db.update(invoicesTable).set({ reminderCount: sql`${invoicesTable.reminderCount} + 1`, lastReminderAt: now }).where(eq(invoicesTable.id, inv.id));
       await logInvoiceEvent({ invoiceId: inv.id, type: "reminder_sent", actor: "system", detail: { number: inv.reminderCount + 1, daysOverdue } });

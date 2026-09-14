@@ -528,6 +528,34 @@ export interface CalendarSyncLog {
   entries: CalendarSyncLogEntry[];
 }
 
+export type EmailProvider = typeof EmailProvider[keyof typeof EmailProvider];
+
+
+export const EmailProvider = {
+  google: 'google',
+} as const;
+
+export interface EmailConnectionStatus {
+  provider: EmailProvider;
+  accountEmail: string;
+  isEnabled: boolean;
+  connectedAt: string;
+  lastSendAt?: string | null;
+  lastSendError?: string | null;
+}
+
+export interface EmailConnectionsStatus {
+  connections: EmailConnectionStatus[];
+}
+
+export interface EmailConnectionUrl {
+  url: string;
+}
+
+export interface EmailConnectionToggleBody {
+  isEnabled: boolean;
+}
+
 export interface TrialStatus {
   isTrialActive: boolean;
   trialStartedAt?: string | null;

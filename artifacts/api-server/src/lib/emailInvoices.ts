@@ -1,5 +1,6 @@
 import { logger } from "./logger.js";
-import { shell, escapeHtml, resendOrThrow, FROM, type EmailLang } from "./emailContracts.js";
+import { shell, escapeHtml, type EmailLang } from "./emailContracts.js";
+import { sendCustomerEmail } from "./connectedEmailSend.js";
 
 // ── Invoice emails (Phase 4) ─────────────────────────────────────────────────
 // Same visual shell as the contract emails. Every email carries the PDF and
@@ -11,6 +12,7 @@ const day = (d: Date, lang: EmailLang) => d.toLocaleDateString(lang === "fr" ? "
 
 type Common = {
   toEmail: string;
+  userId: string;
   customerName: string;
   companyName: string;
   number: string;
@@ -20,6 +22,7 @@ type Common = {
   publicUrl: string;
   language: EmailLang;
   etransferEmail?: string | null;
+  replyTo?: string | null;
 };
 
 function summaryBox(p: Common, t: { invoice: string; due: string; total: string; balance: string; etransfer: string }): string {
@@ -68,9 +71,11 @@ export async function sendInvoiceEmail(params: Common & { pdfBuffer: Buffer; mes
     bodyHtml: `<p>${t.body}</p>${params.message ? `<div class="msg">${escapeHtml(params.message)}</div>` : ""}${summaryBox(params, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`,
     footer: t.footer,
   });
-  await resendOrThrow().emails.send({
-    from: FROM,
-    to: [params.toEmail],
+  await sendCustomerEmail({
+    userId: params.userId,
+    toEmail: params.toEmail,
+    fromDisplayName: params.companyName,
+    replyTo: params.replyTo,
     subject: t.subject,
     html,
     attachments: [{ filename: `${params.number}.pdf`, content: params.pdfBuffer.toString("base64") }],
@@ -96,9 +101,11 @@ export async function sendInvoiceReminderEmail(params: Common & { daysOverdue: n
         invoice: "Invoice", due: "Was due", total: "Total", balance: "Balance due", etransfer: "Interac e-Transfer to",
       };
   const html = shell({ lang, accent: "linear-gradient(135deg,#d97706,#f97316)", headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox(params, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
-  await resendOrThrow().emails.send({
-    from: FROM,
-    to: [params.toEmail],
+  await sendCustomerEmail({
+    userId: params.userId,
+    toEmail: params.toEmail,
+    fromDisplayName: params.companyName,
+    replyTo: params.replyTo,
     subject: t.subject,
     html,
     ...(params.pdfBuffer ? { attachments: [{ filename: `${params.number}.pdf`, content: params.pdfBuffer.toString("base64") }] } : {}),
@@ -124,5 +131,5 @@ export async function sendPaymentReceiptEmail(params: Common & { paidCents: numb
         invoice: "Invoice", due: "Due", total: "Total", balance: "Balance", etransfer: "Interac e-Transfer to",
       };
   const html = shell({ lang, accent: "linear-gradient(135deg,#059669,#06b6d4)", headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox({ ...params, etransferEmail: settled ? null : params.etransferEmail }, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
-  await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
+  await sendCustomerEmail({ userId: params.userId, toEmail: params.toEmail, fromDisplayName: params.companyName, replyTo: params.replyTo, subject: t.subject, html });
 }

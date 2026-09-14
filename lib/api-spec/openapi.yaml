@@ -866,6 +866,82 @@ paths:
               schema:
                 $ref: "#/components/schemas/CalendarSyncLog"
 
+  /email-connections/status:
+    get:
+      operationId: getEmailConnectionsStatus
+      tags: [emailConnections]
+      summary: Get the connected-email-sending status for every provider the company has connected
+      responses:
+        "200":
+          description: Connection status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailConnectionsStatus"
+
+  /email-connections/{provider}/connect:
+    get:
+      operationId: getEmailConnectionConnectUrl
+      tags: [emailConnections]
+      summary: Get the OAuth authorization URL to redirect the browser to for connected email sending
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/EmailProvider"
+      responses:
+        "200":
+          description: Authorization URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmailConnectionUrl"
+
+  /email-connections/{provider}/disconnect:
+    delete:
+      operationId: disconnectEmailConnection
+      tags: [emailConnections]
+      summary: Unlink a connected email account from the company account
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/EmailProvider"
+      responses:
+        "200":
+          description: Disconnected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+
+  /email-connections/{provider}/toggle:
+    patch:
+      operationId: toggleEmailConnection
+      tags: [emailConnections]
+      summary: Enable or disable connected email sending for a connected provider
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/EmailProvider"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailConnectionToggleBody"
+      responses:
+        "200":
+          description: Toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResult"
+
   /documents:
     get:
       operationId: listDocuments
@@ -2090,6 +2166,59 @@ components:
             $ref: "#/components/schemas/CalendarSyncLogEntry"
       required:
         - entries
+
+    EmailProvider:
+      type: string
+      enum: [google]
+
+    EmailConnectionStatus:
+      type: object
+      properties:
+        provider:
+          $ref: "#/components/schemas/EmailProvider"
+        accountEmail:
+          type: string
+        isEnabled:
+          type: boolean
+        connectedAt:
+          type: string
+        lastSendAt:
+          type: string
+          nullable: true
+        lastSendError:
+          type: string
+          nullable: true
+      required:
+        - provider
+        - accountEmail
+        - isEnabled
+        - connectedAt
+
+    EmailConnectionsStatus:
+      type: object
+      properties:
+        connections:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmailConnectionStatus"
+      required:
+        - connections
+
+    EmailConnectionUrl:
+      type: object
+      properties:
+        url:
+          type: string
+      required:
+        - url
+
+    EmailConnectionToggleBody:
+      type: object
+      properties:
+        isEnabled:
+          type: boolean
+      required:
+        - isEnabled
 
     TrialStatus:
       type: object

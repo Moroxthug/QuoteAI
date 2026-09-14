@@ -27,6 +27,7 @@ export * from "./leads";
 export * from "./job-photos";
 export * from "./quickbooks";
 export * from "./calendar";
+export * from "./email-connections";
 export * from "./imports";
 export * from "./stripe-connect";
 export * from "./financeit";

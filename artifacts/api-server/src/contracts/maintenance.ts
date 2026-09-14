@@ -44,9 +44,10 @@ export async function runContractMaintenance(): Promise<{ expired: number; remin
     try {
       const raw = newRawToken();
       await db.update(contractSignersTable).set({ tokenHash: hashToken(raw), tokenExpiresAt: c.expiresAt }).where(eq(contractSignersTable.id, signer.id));
-      const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, c.userId));
+      const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl, email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, c.userId));
       await sendContractReminderEmail({
         toEmail: signer.email,
+        userId: c.userId,
         customerName: signer.name,
         companyName: c.variables.contractor.name,
         contractNumber: c.contractNumber,
@@ -54,6 +55,7 @@ export async function runContractMaintenance(): Promise<{ expired: number; remin
         expiresAt: c.expiresAt ?? new Date(now.getTime() + 7 * 86_400_000),
         language: c.language as "en" | "fr",
         companyLogoUrl: senderProfile?.logoUrl ?? null,
+        replyTo: senderProfile?.email ?? null,
       });
       await db.update(contractsTable).set({ lastReminderAt: now, reminderCount: sql`${contractsTable.reminderCount} + 1` }).where(eq(contractsTable.id, c.id));
       await logContractEvent({ contractId: c.id, type: "reminder_sent", actor: "system", signerId: signer.id, detail: { number: c.reminderCount + 1 } });

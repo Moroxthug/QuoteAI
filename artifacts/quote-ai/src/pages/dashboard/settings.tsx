@@ -15,6 +15,8 @@ import {
   useGetCalendarStatus, getGetCalendarStatusQueryKey, useGetCalendarConnectUrl,
   getGetCalendarConnectUrlQueryKey, useDisconnectCalendar, useToggleCalendar,
   type CalendarProvider,
+  useGetEmailConnectionsStatus, getGetEmailConnectionsStatusQueryKey, useGetEmailConnectionConnectUrl,
+  getGetEmailConnectionConnectUrlQueryKey, useDisconnectEmailConnection, useToggleEmailConnection,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2 } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -1706,6 +1708,123 @@ function CalendarSyncTab() {
   );
 }
 
+function EmailConnectionCard() {
+  const provider = "google" as const;
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status, isLoading } = useGetEmailConnectionsStatus();
+  const getConnectUrl = useGetEmailConnectionConnectUrl(provider, { query: { queryKey: getGetEmailConnectionConnectUrlQueryKey(provider), enabled: false } });
+  const disconnectEmail = useDisconnectEmailConnection();
+  const toggleEmail = useToggleEmailConnection();
+
+  const conn = status?.connections.find((c) => c.provider === provider);
+  const isConnected = !!conn;
+  const isEnabled = conn?.isEnabled ?? true;
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getGetEmailConnectionsStatusQueryKey() });
+
+  const handleConnect = async () => {
+    const result = await getConnectUrl.refetch();
+    if (result.data?.url) window.location.href = result.data.url;
+    else toast({ title: t("dashboard.settings.emailSend.error"), variant: "destructive" });
+  };
+
+  const handleDisconnect = () => {
+    disconnectEmail.mutate(
+      { provider },
+      { onSuccess: () => { invalidate(); toast({ title: t("dashboard.settings.emailSend.disconnected") }); }, onError: () => toast({ title: t("dashboard.settings.emailSend.error"), variant: "destructive" }) }
+    );
+  };
+
+  const handleToggle = () => {
+    toggleEmail.mutate(
+      { provider, data: { isEnabled: !isEnabled } },
+      { onSuccess: invalidate, onError: () => toast({ title: t("dashboard.settings.emailSend.error"), variant: "destructive" }) }
+    );
+  };
+
+  if (isLoading) return <Skeleton className="h-32 w-full rounded-2xl" />;
+
+  if (!isConnected) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center">
+              <Mail className="h-5 w-5 text-rose-600" />
+            </div>
+            <CardTitle className="text-base">Gmail</CardTitle>
+          </div>
+        </CardHeader>
+        <CardFooter>
+          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} variant="outline" size="sm" className="gap-2">
+            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {t("dashboard.settings.emailSend.connectCta")}
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="border-rose-200 bg-gradient-to-br from-rose-50 to-orange-50">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center">
+              <Mail className="h-5 w-5 text-rose-600" />
+            </div>
+            <div>
+              <CardTitle className="text-base">Gmail</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
+            </div>
+          </div>
+          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+            {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {conn?.lastSendError ? (
+          <p className="text-xs text-red-600">{t("dashboard.settings.emailSend.lastSendFailed")}</p>
+        ) : conn?.lastSendAt ? (
+          <p className="text-xs text-muted-foreground">{t("dashboard.settings.emailSend.lastSend")} {new Date(conn.lastSendAt).toLocaleString()}</p>
+        ) : null}
+        <div className="flex flex-wrap gap-3">
+          <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleEmail.isPending} className="gap-2">
+            {toggleEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectEmail.isPending} className="gap-2 text-red-600 hover:text-red-700">
+            {disconnectEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+            {t("dashboard.settings.emailSend.disconnect")}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function EmailSendTab() {
+  const { t } = useLanguage();
+  const { data: subscription } = useGetSubscription();
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null;
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="text-sm font-semibold">{t("dashboard.settings.emailSend.title")}</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.emailSend.desc")}</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <EmailConnectionCard />
+      </div>
+    </div>
+  );
+}
+
 function WidgetTab() {
   const { t } = useLanguage();
   const { data: profile, isLoading } = useGetBusinessProfile();
@@ -1957,6 +2076,7 @@ export default function SettingsPage() {
           <FinanceitTab />
           <QuickbooksTab />
           <CalendarSyncTab />
+          <EmailSendTab />
           <DeveloperApiTab />
         </div>
       ) : activeTab === "security" ? (

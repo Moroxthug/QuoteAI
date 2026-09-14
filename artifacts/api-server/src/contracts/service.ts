@@ -389,9 +389,10 @@ export async function sendContractToCustomer(params: { contractId: string; userI
     .returning();
 
   const signUrl = `${getBaseUrl()}/sign/${rawToken}`;
-  const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, params.userId));
+  const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl, email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, params.userId));
   await sendContractSigningEmail({
     toEmail,
+    userId: params.userId,
     customerName: contract.variables.customer.name,
     companyName: contract.variables.contractor.name,
     contractNumber: contract.contractNumber,
@@ -401,6 +402,7 @@ export async function sendContractToCustomer(params: { contractId: string; userI
     language: contract.language as Lang,
     message: params.message,
     companyLogoUrl: senderProfile?.logoUrl ?? null,
+    replyTo: senderProfile?.email ?? null,
   });
 
   await logContractEvent({ contractId: contract.id, type: isResend ? "reminder_sent" : "sent", actor: "contractor", signerId: customerSigner.id, detail: { to: toEmail }, ip: params.ip, userAgent: params.userAgent });
@@ -439,6 +441,7 @@ export async function finalizeContract(contractId: string): Promise<void> {
     try {
       await sendContractSignedEmail({
         toEmail: r.email,
+        userId: contract.userId,
         role: r.role,
         customerName: contract.variables.customer.name,
         companyName: contract.variables.contractor.name,
@@ -447,6 +450,7 @@ export async function finalizeContract(contractId: string): Promise<void> {
         pdfBuffer: stored.buffer,
         language: contract.language as Lang,
         dashboardUrl: contract.kind === "change_order" && contract.projectId ? `${getBaseUrl()}/dashboard/jobs/${contract.projectId}?tab=changes` : `${getBaseUrl()}/dashboard/contracts/${contract.id}`,
+        replyTo: contract.variables.contractor.email || owner?.email || null,
       });
     } catch (err) {
       logger.error({ err, contractId, to: r.email }, "Failed to email signed contract");

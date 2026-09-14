@@ -1421,6 +1421,61 @@ export const GetCalendarSyncLogResponse = zod.object({
 
 
 /**
+ * @summary Get the connected-email-sending status for every provider the company has connected
+ */
+export const GetEmailConnectionsStatusResponse = zod.object({
+  "connections": zod.array(zod.object({
+  "provider": zod.enum(['google']),
+  "accountEmail": zod.string(),
+  "isEnabled": zod.boolean(),
+  "connectedAt": zod.string(),
+  "lastSendAt": zod.string().nullish(),
+  "lastSendError": zod.string().nullish()
+}))
+})
+
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for connected email sending
+ */
+export const GetEmailConnectionConnectUrlParams = zod.object({
+  "provider": zod.enum(['google'])
+})
+
+export const GetEmailConnectionConnectUrlResponse = zod.object({
+  "url": zod.string()
+})
+
+
+/**
+ * @summary Unlink a connected email account from the company account
+ */
+export const DisconnectEmailConnectionParams = zod.object({
+  "provider": zod.enum(['google'])
+})
+
+export const DisconnectEmailConnectionResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Enable or disable connected email sending for a connected provider
+ */
+export const ToggleEmailConnectionParams = zod.object({
+  "provider": zod.enum(['google'])
+})
+
+export const ToggleEmailConnectionBody = zod.object({
+  "isEnabled": zod.boolean()
+})
+
+export const ToggleEmailConnectionResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary List uploaded documents for the authenticated user
  */
 export const ListDocumentsResponseItem = zod.object({

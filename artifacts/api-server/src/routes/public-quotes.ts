@@ -499,6 +499,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
     if (clientEmail && clientEmail.includes("@")) {
       sendWidgetClientConfirmationEmail({
         toEmail: clientEmail,
+        userId,
         clientName: resolvedClientData.nome,
         companyName: profile.companyName,
         companyPhone: profile.phone ?? null,

@@ -34,6 +34,10 @@ import type {
   CreateCheckoutBody,
   CreateManualQuoteBody,
   CreateQuoteBody,
+  EmailConnectionToggleBody,
+  EmailConnectionUrl,
+  EmailConnectionsStatus,
+  EmailProvider,
   HealthStatus,
   ImportCatalogResult,
   LogoUploadResult,
@@ -4064,6 +4068,323 @@ export function useGetCalendarSyncLog<TData = Awaited<ReturnType<typeof getCalen
 
 
 
+
+export const getGetEmailConnectionsStatusUrl = () => {
+
+
+
+
+  return `/api/email-connections/status`
+}
+
+/**
+ * @summary Get the connected-email-sending status for every provider the company has connected
+ */
+export const getEmailConnectionsStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<EmailConnectionsStatus> => {
+
+  return customFetch<EmailConnectionsStatus>(getGetEmailConnectionsStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEmailConnectionsStatusQueryKey = () => {
+    return [
+    `/api/email-connections/status`
+    ] as const;
+    }
+
+
+export const getGetEmailConnectionsStatusQueryOptions = <TData = Awaited<ReturnType<typeof getEmailConnectionsStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionsStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEmailConnectionsStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEmailConnectionsStatus>>> = ({ signal }) => getEmailConnectionsStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionsStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEmailConnectionsStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getEmailConnectionsStatus>>>
+export type GetEmailConnectionsStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the connected-email-sending status for every provider the company has connected
+ */
+
+export function useGetEmailConnectionsStatus<TData = Awaited<ReturnType<typeof getEmailConnectionsStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionsStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEmailConnectionsStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetEmailConnectionConnectUrlUrl = (provider: EmailProvider,) => {
+
+
+
+
+  return `/api/email-connections/${provider}/connect`
+}
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for connected email sending
+ */
+export const getEmailConnectionConnectUrl = async (provider: EmailProvider, options?: Parameters<typeof customFetch>[1]): Promise<EmailConnectionUrl> => {
+
+  return customFetch<EmailConnectionUrl>(getGetEmailConnectionConnectUrlUrl(provider),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEmailConnectionConnectUrlQueryKey = (provider: EmailProvider,) => {
+    return [
+    `/api/email-connections/${provider}/connect`
+    ] as const;
+    }
+
+
+export const getGetEmailConnectionConnectUrlQueryOptions = <TData = Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>, TError = ErrorType<unknown>>(provider: EmailProvider, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEmailConnectionConnectUrlQueryKey(provider);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>> = ({ signal }) => getEmailConnectionConnectUrl(provider, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: provider !== null && provider !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEmailConnectionConnectUrlQueryResult = NonNullable<Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>>
+export type GetEmailConnectionConnectUrlQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for connected email sending
+ */
+
+export function useGetEmailConnectionConnectUrl<TData = Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>, TError = ErrorType<unknown>>(
+ provider: EmailProvider, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEmailConnectionConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEmailConnectionConnectUrlQueryOptions(provider,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDisconnectEmailConnectionUrl = (provider: EmailProvider,) => {
+
+
+
+
+  return `/api/email-connections/${provider}/disconnect`
+}
+
+/**
+ * @summary Unlink a connected email account from the company account
+ */
+export const disconnectEmailConnection = async (provider: EmailProvider, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+  return customFetch<SuccessResult>(getDisconnectEmailConnectionUrl(provider),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectEmailConnectionMutationKey = () => ['disconnectEmailConnection'] as const;
+
+export const getDisconnectEmailConnectionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectEmailConnection>>, TError,DisconnectEmailConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectEmailConnection>>, TError,DisconnectEmailConnectionMutationVariables, TContext> => {
+
+const mutationKey = getDisconnectEmailConnectionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectEmailConnection>>, DisconnectEmailConnectionMutationVariables> = (props) => {
+          const {provider} = props ?? {};
+
+          return  disconnectEmailConnection(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectEmailConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectEmailConnection>>>
+
+    export type DisconnectEmailConnectionMutationError = ErrorType<unknown>
+    export type DisconnectEmailConnectionMutationVariables = {provider: EmailProvider}
+
+    /**
+ * @summary Unlink a connected email account from the company account
+ */
+export const useDisconnectEmailConnection = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectEmailConnection>>, TError,DisconnectEmailConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectEmailConnection>>,
+        TError,
+        DisconnectEmailConnectionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDisconnectEmailConnectionMutationOptions(options));
+    }
+
+export const getToggleEmailConnectionUrl = (provider: EmailProvider,) => {
+
+
+
+
+  return `/api/email-connections/${provider}/toggle`
+}
+
+/**
+ * @summary Enable or disable connected email sending for a connected provider
+ */
+export const toggleEmailConnection = async (provider: EmailProvider,
+    emailConnectionToggleBody: EmailConnectionToggleBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getToggleEmailConnectionUrl(provider),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(emailConnectionToggleBody)
+  }
+);}
+
+
+
+
+
+export const getToggleEmailConnectionMutationKey = () => ['toggleEmailConnection'] as const;
+
+export const getToggleEmailConnectionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleEmailConnection>>, TError,ToggleEmailConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleEmailConnection>>, TError,ToggleEmailConnectionMutationVariables, TContext> => {
+
+const mutationKey = getToggleEmailConnectionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleEmailConnection>>, ToggleEmailConnectionMutationVariables> = (props) => {
+          const {provider,data} = props ?? {};
+
+          return  toggleEmailConnection(provider,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ToggleEmailConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof toggleEmailConnection>>>
+    export type ToggleEmailConnectionMutationBody = BodyType<EmailConnectionToggleBody>
+    export type ToggleEmailConnectionMutationError = ErrorType<unknown>
+    export type ToggleEmailConnectionMutationVariables = {provider: EmailProvider;data: BodyType<EmailConnectionToggleBody>}
+
+    /**
+ * @summary Enable or disable connected email sending for a connected provider
+ */
+export const useToggleEmailConnection = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleEmailConnection>>, TError,ToggleEmailConnectionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof toggleEmailConnection>>,
+        TError,
+        ToggleEmailConnectionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getToggleEmailConnectionMutationOptions(options));
+    }
 
 export const getListDocumentsUrl = () => {
 

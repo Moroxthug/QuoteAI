@@ -501,8 +501,10 @@ export async function sendInvoice(params: { invoiceId: string; userId?: string; 
   const [updated] = await db.update(invoicesTable).set({ pdfUrl: stored.url, pdfHash: stored.sha256 }).where(eq(invoicesTable.id, inv.id)).returning();
 
   const lang = inv.language as Lang;
+  const [senderProfile] = await db.select({ email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, inv.userId));
   await sendInvoiceEmail({
     toEmail,
+    userId: inv.userId,
     customerName: inv.customer.name,
     companyName: inv.contractor.name,
     number: inv.number,
@@ -516,6 +518,7 @@ export async function sendInvoice(params: { invoiceId: string; userId?: string; 
     message: params.message,
     isCreditNote: inv.type === "credit_note",
     typeLabel: invoiceTitle(inv, lang),
+    replyTo: senderProfile?.email ?? null,
   });
 
   await logInvoiceEvent({ invoiceId: inv.id, type: params.actor === "system" ? "auto_sent" : resend ? "resent" : "sent", actor: params.actor, detail: { to: toEmail }, ip: params.ip, userAgent: params.userAgent });
@@ -562,8 +565,10 @@ export async function recordPayment(params: { invoiceId: string; userId: string;
   const toEmail = (inv.customer.email ?? "").trim();
   if (params.sendReceipt !== false && toEmail.includes("@") && inv.publicTokenHash) {
     try {
+      const [senderProfile] = await db.select({ email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, inv.userId));
       await sendPaymentReceiptEmail({
         toEmail,
+        userId: inv.userId,
         customerName: inv.customer.name,
         companyName: inv.contractor.name,
         number: inv.number,
@@ -575,6 +580,7 @@ export async function recordPayment(params: { invoiceId: string; userId: string;
         etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
         paidCents: params.amountCents,
         paidOn: date,
+        replyTo: senderProfile?.email ?? null,
       });
       await logInvoiceEvent({ invoiceId: inv.id, type: "receipt_sent", actor: "system", detail: { to: toEmail } });
     } catch (err) {

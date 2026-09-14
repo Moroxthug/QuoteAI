@@ -2212,6 +2212,15 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.calendar.lastSynced": "Last synced:",
     "dashboard.settings.calendar.error": "Something went wrong — try again.",
 
+    "dashboard.settings.emailSend.title": "Send emails as yourself",
+    "dashboard.settings.emailSend.desc": "Connect your Gmail so quotes, contracts, and invoices go out from your own inbox instead of no-reply@quoteai.ca — replies land in your inbox, not ours.",
+    "dashboard.settings.emailSend.connectCta": "Connect Gmail",
+    "dashboard.settings.emailSend.disconnect": "Disconnect",
+    "dashboard.settings.emailSend.disconnected": "Disconnected",
+    "dashboard.settings.emailSend.lastSend": "Last send:",
+    "dashboard.settings.emailSend.lastSendFailed": "Last send failed — reconnect your account.",
+    "dashboard.settings.emailSend.error": "Something went wrong — try again.",
+
     "dashboard.settings.tabs.account": "Business Account",
     "dashboard.settings.tabs.billing": "Plan & Billing",
     "dashboard.settings.tabs.whatsapp": "WhatsApp Bot",
@@ -5041,6 +5050,15 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.calendar.disconnected": "Déconnecté",
     "dashboard.settings.calendar.lastSynced": "Dernière synchronisation :",
     "dashboard.settings.calendar.error": "Une erreur est survenue — réessayez.",
+
+    "dashboard.settings.emailSend.title": "Envoyer les courriels en votre nom",
+    "dashboard.settings.emailSend.desc": "Connectez votre Gmail pour que les soumissions, contrats et factures partent de votre propre boîte de réception au lieu de no-reply@quoteai.ca — les réponses arrivent chez vous, pas chez nous.",
+    "dashboard.settings.emailSend.connectCta": "Connecter Gmail",
+    "dashboard.settings.emailSend.disconnect": "Déconnecter",
+    "dashboard.settings.emailSend.disconnected": "Déconnecté",
+    "dashboard.settings.emailSend.lastSend": "Dernier envoi :",
+    "dashboard.settings.emailSend.lastSendFailed": "Le dernier envoi a échoué — reconnectez votre compte.",
+    "dashboard.settings.emailSend.error": "Une erreur est survenue — réessayez.",
 
     "dashboard.settings.tabs.account": "Compte d'entreprise",
     "dashboard.settings.tabs.billing": "Forfait et facturation",

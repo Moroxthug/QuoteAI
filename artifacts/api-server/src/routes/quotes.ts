@@ -1421,6 +1421,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
 
     await sendQuotePdfEmail({
       toEmail,
+      userId,
       companyName,
       clientName: clientName || (quote.clientData as QuoteClientData)?.nome || "there",
       quoteNumber: numeroData,
@@ -1428,6 +1429,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
       pdfBuffer,
       filename,
       companyLogoUrl: profile?.logoUrl ?? null,
+      replyTo: profile?.email ?? null,
       publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
 

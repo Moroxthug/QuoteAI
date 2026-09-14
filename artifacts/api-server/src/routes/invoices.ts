@@ -409,8 +409,10 @@ router.post("/invoices/:id/remind", requireAuth, requirePermission("invoicing", 
     const toEmail = (inv.customer.email ?? "").trim();
     if (!toEmail.includes("@")) { res.status(400).json({ error: "CUSTOMER_EMAIL_MISSING", message: "The customer has no email address." }); return; }
     const { buffer } = await invoicePdfBuffer(inv.id);
+    const [senderProfile] = await db.select({ email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, inv.userId));
     await sendInvoiceReminderEmail({
       toEmail,
+      userId: inv.userId,
       customerName: inv.customer.name,
       companyName: inv.contractor.name,
       number: inv.number,
@@ -422,6 +424,7 @@ router.post("/invoices/:id/remind", requireAuth, requirePermission("invoicing", 
       etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
       daysOverdue: Math.max(0, Math.floor((Date.now() - inv.dueDate.getTime()) / 86_400_000)),
       pdfBuffer: buffer,
+      replyTo: senderProfile?.email ?? null,
     });
     await db.update(invoicesTable).set({ lastReminderAt: new Date() }).where(eq(invoicesTable.id, inv.id));
     await logInvoiceEvent({ invoiceId: inv.id, type: "reminder_sent", actor: "contractor", detail: { manual: true }, ip: req.ip });

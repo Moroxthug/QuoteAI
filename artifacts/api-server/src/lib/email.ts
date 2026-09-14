@@ -1,15 +1,12 @@
 import { Resend } from "resend";
 import { logger } from "./logger";
 import { getBaseUrl } from "./baseUrl";
+import { sendCustomerEmail } from "./connectedEmailSend.js";
 
 // Gmail and most webmail clients strip data: URI images from HTML emails,
 // so the logo must be a real hosted URL rather than an inline base64 SVG.
 const LOGO_URL = `${getBaseUrl()}/quoteai-logo.png`;
 
-/** Strips characters that would break a `"Name" <email>` From header (CRLF injection, quotes, angle brackets). */
-function sanitizeForFromHeader(value: string): string {
-  return value.replace(/[\r\n"<>]/g, "").trim().slice(0, 60);
-}
 
 function escapeHtml(value: string): string {
   return value
@@ -444,6 +441,7 @@ function buildWidgetClientConfirmationEmail(params: {
 
 export async function sendWidgetClientConfirmationEmail(params: {
   toEmail: string;
+  userId: string;
   clientName: string;
   companyName: string;
   companyPhone: string | null;
@@ -458,10 +456,11 @@ export async function sendWidgetClientConfirmationEmail(params: {
     return;
   }
   try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`,
-      to: [params.toEmail],
+    await sendCustomerEmail({
+      userId: params.userId,
+      toEmail: params.toEmail,
+      fromDisplayName: params.companyName,
+      replyTo: params.companyEmail,
       subject: `Your request to ${params.companyName} has been received`,
       html: buildWidgetClientConfirmationEmail({
         clientName: escapeHtml(params.clientName),
@@ -481,6 +480,7 @@ export async function sendWidgetClientConfirmationEmail(params: {
 
 export async function sendQuotePdfEmail(params: {
   toEmail: string;
+  userId: string;
   companyName: string;
   clientName: string;
   quoteNumber: string;
@@ -489,6 +489,7 @@ export async function sendQuotePdfEmail(params: {
   filename: string;
   publicUrl?: string | null;
   companyLogoUrl?: string | null;
+  replyTo?: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -496,10 +497,11 @@ export async function sendQuotePdfEmail(params: {
     throw new Error("Email service not configured");
   }
   try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`,
-      to: [params.toEmail],
+    await sendCustomerEmail({
+      userId: params.userId,
+      toEmail: params.toEmail,
+      fromDisplayName: params.companyName,
+      replyTo: params.replyTo,
       subject: `Quote ${params.quoteNumber} – ${params.companyName}`,
       html: buildQuoteEmailHtml({
         companyName: params.companyName,

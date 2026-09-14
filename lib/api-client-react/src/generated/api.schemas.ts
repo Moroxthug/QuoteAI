@@ -487,6 +487,47 @@ export interface QuickbooksRetryBody {
   entityId: string;
 }
 
+export type CalendarProvider = typeof CalendarProvider[keyof typeof CalendarProvider];
+
+
+export const CalendarProvider = {
+  google: 'google',
+  outlook: 'outlook',
+} as const;
+
+export interface CalendarConnectionStatus {
+  provider: CalendarProvider;
+  accountEmail: string;
+  isEnabled: boolean;
+  connectedAt: string;
+  lastSyncedAt?: string | null;
+}
+
+export interface CalendarStatus {
+  connections: CalendarConnectionStatus[];
+}
+
+export interface CalendarConnectUrl {
+  url: string;
+}
+
+export interface CalendarToggleBody {
+  isEnabled: boolean;
+}
+
+export interface CalendarSyncLogEntry {
+  id: string;
+  provider: CalendarProvider;
+  milestoneId: string;
+  status: string;
+  error?: string | null;
+  updatedAt: string;
+}
+
+export interface CalendarSyncLog {
+  entries: CalendarSyncLogEntry[];
+}
+
 export interface TrialStatus {
   isTrialActive: boolean;
   trialStartedAt?: string | null;

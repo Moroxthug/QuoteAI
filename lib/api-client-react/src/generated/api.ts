@@ -21,6 +21,11 @@ import type {
 
 import type {
   BusinessProfile,
+  CalendarConnectUrl,
+  CalendarProvider,
+  CalendarStatus,
+  CalendarSyncLog,
+  CalendarToggleBody,
   CapitolatoPdfResult,
   CatalogItem,
   CheckoutResult,
@@ -3663,6 +3668,400 @@ export const useRetryQuickbooksSync = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getRetryQuickbooksSyncMutationOptions(options));
     }
+
+export const getGetCalendarStatusUrl = () => {
+
+
+
+
+  return `/api/calendar/status`
+}
+
+/**
+ * @summary Get the calendar sync connection status for every provider the company has connected
+ */
+export const getCalendarStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<CalendarStatus> => {
+
+  return customFetch<CalendarStatus>(getGetCalendarStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCalendarStatusQueryKey = () => {
+    return [
+    `/api/calendar/status`
+    ] as const;
+    }
+
+
+export const getGetCalendarStatusQueryOptions = <TData = Awaited<ReturnType<typeof getCalendarStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCalendarStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendarStatus>>> = ({ signal }) => getCalendarStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCalendarStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCalendarStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getCalendarStatus>>>
+export type GetCalendarStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the calendar sync connection status for every provider the company has connected
+ */
+
+export function useGetCalendarStatus<TData = Awaited<ReturnType<typeof getCalendarStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCalendarStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetCalendarConnectUrlUrl = (provider: CalendarProvider,) => {
+
+
+
+
+  return `/api/calendar/${provider}/connect`
+}
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for a calendar provider
+ */
+export const getCalendarConnectUrl = async (provider: CalendarProvider, options?: Parameters<typeof customFetch>[1]): Promise<CalendarConnectUrl> => {
+
+  return customFetch<CalendarConnectUrl>(getGetCalendarConnectUrlUrl(provider),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCalendarConnectUrlQueryKey = (provider: CalendarProvider,) => {
+    return [
+    `/api/calendar/${provider}/connect`
+    ] as const;
+    }
+
+
+export const getGetCalendarConnectUrlQueryOptions = <TData = Awaited<ReturnType<typeof getCalendarConnectUrl>>, TError = ErrorType<unknown>>(provider: CalendarProvider, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCalendarConnectUrlQueryKey(provider);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendarConnectUrl>>> = ({ signal }) => getCalendarConnectUrl(provider, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: provider !== null && provider !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCalendarConnectUrl>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCalendarConnectUrlQueryResult = NonNullable<Awaited<ReturnType<typeof getCalendarConnectUrl>>>
+export type GetCalendarConnectUrlQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for a calendar provider
+ */
+
+export function useGetCalendarConnectUrl<TData = Awaited<ReturnType<typeof getCalendarConnectUrl>>, TError = ErrorType<unknown>>(
+ provider: CalendarProvider, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCalendarConnectUrlQueryOptions(provider,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDisconnectCalendarUrl = (provider: CalendarProvider,) => {
+
+
+
+
+  return `/api/calendar/${provider}/disconnect`
+}
+
+/**
+ * @summary Unlink a calendar provider from the company account
+ */
+export const disconnectCalendar = async (provider: CalendarProvider, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+  return customFetch<SuccessResult>(getDisconnectCalendarUrl(provider),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectCalendarMutationKey = () => ['disconnectCalendar'] as const;
+
+export const getDisconnectCalendarMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectCalendar>>, TError,DisconnectCalendarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectCalendar>>, TError,DisconnectCalendarMutationVariables, TContext> => {
+
+const mutationKey = getDisconnectCalendarMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectCalendar>>, DisconnectCalendarMutationVariables> = (props) => {
+          const {provider} = props ?? {};
+
+          return  disconnectCalendar(provider,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectCalendarMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectCalendar>>>
+
+    export type DisconnectCalendarMutationError = ErrorType<unknown>
+    export type DisconnectCalendarMutationVariables = {provider: CalendarProvider}
+
+    /**
+ * @summary Unlink a calendar provider from the company account
+ */
+export const useDisconnectCalendar = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectCalendar>>, TError,DisconnectCalendarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectCalendar>>,
+        TError,
+        DisconnectCalendarMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDisconnectCalendarMutationOptions(options));
+    }
+
+export const getToggleCalendarUrl = (provider: CalendarProvider,) => {
+
+
+
+
+  return `/api/calendar/${provider}/toggle`
+}
+
+/**
+ * @summary Enable or disable calendar sync for a connected provider
+ */
+export const toggleCalendar = async (provider: CalendarProvider,
+    calendarToggleBody: CalendarToggleBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getToggleCalendarUrl(provider),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(calendarToggleBody)
+  }
+);}
+
+
+
+
+
+export const getToggleCalendarMutationKey = () => ['toggleCalendar'] as const;
+
+export const getToggleCalendarMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleCalendar>>, TError,ToggleCalendarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleCalendar>>, TError,ToggleCalendarMutationVariables, TContext> => {
+
+const mutationKey = getToggleCalendarMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleCalendar>>, ToggleCalendarMutationVariables> = (props) => {
+          const {provider,data} = props ?? {};
+
+          return  toggleCalendar(provider,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ToggleCalendarMutationResult = NonNullable<Awaited<ReturnType<typeof toggleCalendar>>>
+    export type ToggleCalendarMutationBody = BodyType<CalendarToggleBody>
+    export type ToggleCalendarMutationError = ErrorType<unknown>
+    export type ToggleCalendarMutationVariables = {provider: CalendarProvider;data: BodyType<CalendarToggleBody>}
+
+    /**
+ * @summary Enable or disable calendar sync for a connected provider
+ */
+export const useToggleCalendar = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleCalendar>>, TError,ToggleCalendarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof toggleCalendar>>,
+        TError,
+        ToggleCalendarMutationVariables,
+        TContext
+      > => {
+      return useMutation(getToggleCalendarMutationOptions(options));
+    }
+
+export const getGetCalendarSyncLogUrl = () => {
+
+
+
+
+  return `/api/calendar/sync-log`
+}
+
+/**
+ * @summary Recent milestone calendar sync attempts (success and failure)
+ */
+export const getCalendarSyncLog = async ( options?: Parameters<typeof customFetch>[1]): Promise<CalendarSyncLog> => {
+
+  return customFetch<CalendarSyncLog>(getGetCalendarSyncLogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCalendarSyncLogQueryKey = () => {
+    return [
+    `/api/calendar/sync-log`
+    ] as const;
+    }
+
+
+export const getGetCalendarSyncLogQueryOptions = <TData = Awaited<ReturnType<typeof getCalendarSyncLog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCalendarSyncLogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendarSyncLog>>> = ({ signal }) => getCalendarSyncLog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCalendarSyncLog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCalendarSyncLogQueryResult = NonNullable<Awaited<ReturnType<typeof getCalendarSyncLog>>>
+export type GetCalendarSyncLogQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Recent milestone calendar sync attempts (success and failure)
+ */
+
+export function useGetCalendarSyncLog<TData = Awaited<ReturnType<typeof getCalendarSyncLog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCalendarSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCalendarSyncLogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getListDocumentsUrl = () => {
 

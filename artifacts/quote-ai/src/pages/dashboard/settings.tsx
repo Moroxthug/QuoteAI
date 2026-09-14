@@ -12,6 +12,9 @@ import {
   getGetQuickbooksConnectUrlQueryKey, useDisconnectQuickbooks, useToggleQuickbooks,
   useGetQuickbooksAccounts, getGetQuickbooksAccountsQueryKey, useUpdateQuickbooksMapping,
   useGetQuickbooksSyncLog, getGetQuickbooksSyncLogQueryKey, useRetryQuickbooksSync,
+  useGetCalendarStatus, getGetCalendarStatusQueryKey, useGetCalendarConnectUrl,
+  getGetCalendarConnectUrlQueryKey, useDisconnectCalendar, useToggleCalendar,
+  type CalendarProvider,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1277,6 +1280,123 @@ function QuickbooksTab() {
   );
 }
 
+const CALENDAR_PROVIDER_LABEL: Record<CalendarProvider, string> = { google: "Google Calendar", outlook: "Outlook" };
+
+function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status, isLoading } = useGetCalendarStatus();
+  const getConnectUrl = useGetCalendarConnectUrl(provider, { query: { queryKey: getGetCalendarConnectUrlQueryKey(provider), enabled: false } });
+  const disconnectCal = useDisconnectCalendar();
+  const toggleCal = useToggleCalendar();
+
+  const conn = status?.connections.find((c) => c.provider === provider);
+  const isConnected = !!conn;
+  const isEnabled = conn?.isEnabled ?? true;
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: getGetCalendarStatusQueryKey() });
+
+  const handleConnect = async () => {
+    const result = await getConnectUrl.refetch();
+    if (result.data?.url) window.location.href = result.data.url;
+    else toast({ title: t("dashboard.settings.calendar.error"), variant: "destructive" });
+  };
+
+  const handleDisconnect = () => {
+    disconnectCal.mutate(
+      { provider },
+      { onSuccess: () => { invalidate(); toast({ title: t("dashboard.settings.calendar.disconnected") }); }, onError: () => toast({ title: t("dashboard.settings.calendar.error"), variant: "destructive" }) }
+    );
+  };
+
+  const handleToggle = () => {
+    toggleCal.mutate(
+      { provider, data: { isEnabled: !isEnabled } },
+      { onSuccess: invalidate, onError: () => toast({ title: t("dashboard.settings.calendar.error"), variant: "destructive" }) }
+    );
+  };
+
+  if (isLoading) return <Skeleton className="h-32 w-full rounded-2xl" />;
+
+  if (!isConnected) {
+    return (
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center">
+              <CalendarDays className="h-5 w-5 text-sky-600" />
+            </div>
+            <CardTitle className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardFooter>
+          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} variant="outline" size="sm" className="gap-2">
+            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {t("dashboard.settings.calendar.connectCta")}
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="border-sky-200 bg-gradient-to-br from-sky-50 to-cyan-50">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center">
+              <CalendarDays className="h-5 w-5 text-sky-600" />
+            </div>
+            <div>
+              <CardTitle className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</CardTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
+            </div>
+          </div>
+          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+            {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {conn?.lastSyncedAt && (
+          <p className="text-xs text-muted-foreground">{t("dashboard.settings.calendar.lastSynced")} {new Date(conn.lastSyncedAt).toLocaleString()}</p>
+        )}
+        <div className="flex flex-wrap gap-3">
+          <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleCal.isPending} className="gap-2">
+            {toggleCal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectCal.isPending} className="gap-2 text-red-600 hover:text-red-700">
+            {disconnectCal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+            {t("dashboard.settings.calendar.disconnect")}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CalendarSyncTab() {
+  const { t } = useLanguage();
+  const { data: subscription } = useGetSubscription();
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null;
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="text-sm font-semibold">{t("dashboard.settings.calendar.title")}</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.calendar.desc")}</p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <CalendarProviderCard provider="google" />
+        <CalendarProviderCard provider="outlook" />
+      </div>
+    </div>
+  );
+}
+
 function WidgetTab() {
   const { t } = useLanguage();
   const { data: profile, isLoading } = useGetBusinessProfile();
@@ -1522,7 +1642,10 @@ export default function SettingsPage() {
       ) : activeTab === "usage" ? (
         <UsageTab />
       ) : activeTab === "integrations" ? (
-        <QuickbooksTab />
+        <div className="space-y-6">
+          <QuickbooksTab />
+          <CalendarSyncTab />
+        </div>
       ) : (
         <BillingTab />
       )}

@@ -2082,6 +2082,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.quickbooks.retry": "Retry",
     "dashboard.settings.quickbooks.retried": "Sync retried",
 
+    "dashboard.settings.calendar.title": "Calendar sync",
+    "dashboard.settings.calendar.desc": "Push job milestones to your calendar so schedules show up where you already look.",
+    "dashboard.settings.calendar.connectCta": "Connect",
+    "dashboard.settings.calendar.disconnect": "Disconnect",
+    "dashboard.settings.calendar.disconnected": "Disconnected",
+    "dashboard.settings.calendar.lastSynced": "Last synced:",
+    "dashboard.settings.calendar.error": "Something went wrong — try again.",
+
     "dashboard.settings.tabs.account": "Business Account",
     "dashboard.settings.tabs.billing": "Plan & Billing",
     "dashboard.settings.tabs.whatsapp": "WhatsApp Bot",
@@ -4756,6 +4764,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.quickbooks.costEntry": "Entrée de coût",
     "dashboard.settings.quickbooks.retry": "Réessayer",
     "dashboard.settings.quickbooks.retried": "Synchronisation relancée",
+
+    "dashboard.settings.calendar.title": "Synchronisation du calendrier",
+    "dashboard.settings.calendar.desc": "Envoyez les jalons de chantier dans votre calendrier pour voir les échéances là où vous regardez déjà.",
+    "dashboard.settings.calendar.connectCta": "Connecter",
+    "dashboard.settings.calendar.disconnect": "Déconnecter",
+    "dashboard.settings.calendar.disconnected": "Déconnecté",
+    "dashboard.settings.calendar.lastSynced": "Dernière synchronisation :",
+    "dashboard.settings.calendar.error": "Une erreur est survenue — réessayez.",
 
     "dashboard.settings.tabs.account": "Compte d'entreprise",
     "dashboard.settings.tabs.billing": "Forfait et facturation",

@@ -42,6 +42,8 @@ import { serializeInvoice } from "./invoices.js";
 import { Readable } from "node:stream";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
 import { sendJobPhotoShare } from "../lib/jobMessaging.js";
+import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 const objectStorage = new ObjectStorageService();
@@ -408,6 +410,8 @@ router.delete("/jobs/:id", requireAuth, async (req, res) => {
       res.status(409).json({ error: "LOCKED", message: "Jobs created from a signed contract cannot be deleted. Mark the job as completed or suspended instead." });
       return;
     }
+    const projectMilestoneIds = (await db.select({ id: milestonesTable.id }).from(milestonesTable).where(eq(milestonesTable.projectId, project.id))).map((m) => m.id);
+    await removeMilestonesFromCalendar(userId, projectMilestoneIds).catch((err) => req.log.error({ err }, "Calendar cleanup failed for deleted job"));
     await db.delete(projectsTable).where(eq(projectsTable.id, project.id));
     res.json({ success: true });
   } catch (err) {
@@ -443,6 +447,17 @@ async function applySetupEdits(userId: string, project: typeof projectsTable.$in
   const contract = project.contractId ? (await db.select().from(contractsTable).where(eq(contractsTable.id, project.contractId)))[0] : undefined;
   const terms = contract?.variables.paymentSchedule.terms ?? [];
   const total = contract?.variables.total ?? project.contractValueCents / 100;
+
+  // Calendar cleanup for milestones about to be dropped has to happen before the delete below,
+  // since `calendar_synced_events` rows cascade-delete with their milestone.
+  if (edits.milestones) {
+    const existingBefore = await db.select().from(milestonesTable).where(eq(milestonesTable.projectId, project.id));
+    const keepIdsBefore = new Set(edits.milestones.map((m) => m.id).filter((x): x is string => !!x));
+    const toDeleteBefore = existingBefore.filter((m) => !keepIdsBefore.has(m.id)).map((m) => m.id);
+    if (toDeleteBefore.length) {
+      await removeMilestonesFromCalendar(userId, toDeleteBefore).catch((err) => logger.error({ err }, "Calendar cleanup failed for dropped milestones"));
+    }
+  }
 
   await db.transaction(async (tx) => {
     if (edits.milestones) {
@@ -497,6 +512,14 @@ async function applySetupEdits(userId: string, project: typeof projectsTable.$in
     }
     if (Object.keys(projectUpdates).length) await tx.update(projectsTable).set(projectUpdates).where(eq(projectsTable.id, project.id));
   });
+
+  if (edits.milestones) {
+    const jobName = edits.name ?? project.name;
+    const current = await db.select().from(milestonesTable).where(eq(milestonesTable.projectId, project.id));
+    for (const m of current) {
+      syncMilestoneToCalendar(userId, m, jobName).catch((err) => logger.error({ err }, "Calendar sync failed for milestone setup edit"));
+    }
+  }
 }
 
 const SetupBody = z.object({
@@ -576,8 +599,14 @@ router.post("/jobs/:id/setup/regenerate", requireAuth, async (req, res) => {
       return;
     }
     // Force a rebuild: wiping the milestones makes setupJobFromContract regenerate.
+    const staleMilestoneIds = (await db.select({ id: milestonesTable.id }).from(milestonesTable).where(eq(milestonesTable.projectId, project.id))).map((m) => m.id);
+    await removeMilestonesFromCalendar(userId, staleMilestoneIds).catch((err) => req.log.error({ err }, "Calendar cleanup failed for regenerated setup"));
     await db.delete(milestonesTable).where(eq(milestonesTable.projectId, project.id));
     await setupJobFromContract(contract);
+    const rebuilt = await db.select().from(milestonesTable).where(eq(milestonesTable.projectId, project.id));
+    for (const m of rebuilt) {
+      syncMilestoneToCalendar(userId, m, project.name).catch((err) => req.log.error({ err }, "Calendar sync failed for regenerated milestone"));
+    }
     res.json(await loadJobDetail(userId, project.id));
   } catch (err) {
     req.log.error({ err }, "Error regenerating job setup");
@@ -623,6 +652,7 @@ router.post("/jobs/:id/milestones", requireAuth, async (req, res) => {
         valueCents: body.data.valueCents ?? 0,
       })
       .returning();
+    syncMilestoneToCalendar(userId, m!, project.name).catch((err) => req.log.error({ err }, "Calendar sync failed for new milestone"));
     res.status(201).json({ milestone: serializeMilestone(m!) });
   } catch (err) {
     req.log.error({ err }, "Error creating milestone");
@@ -663,6 +693,7 @@ router.put("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
     if (d.status === "completed" && owned.milestone.status !== "completed") {
       await raiseAutomation({ event: "milestone.completed", userId, entityType: "milestone", entityId: m!.id, payload: { projectId: owned.project.id } });
     }
+    syncMilestoneToCalendar(userId, m!, owned.project.name).catch((err) => req.log.error({ err }, "Calendar sync failed for updated milestone"));
     const tasks = await db.select().from(projectTasksTable).where(eq(projectTasksTable.milestoneId, m!.id));
     res.json({ milestone: serializeMilestone(m!, tasks), progressPercent: progress });
   } catch (err) {
@@ -680,6 +711,7 @@ router.delete("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
       res.status(404).json({ error: "Not found" });
       return;
     }
+    await removeMilestoneFromCalendar(userId, owned.milestone.id).catch((err) => req.log.error({ err }, "Calendar cleanup failed for deleted milestone"));
     await db.update(projectTasksTable).set({ milestoneId: null }).where(eq(projectTasksTable.milestoneId, owned.milestone.id));
     await db.delete(milestonesTable).where(eq(milestonesTable.id, owned.milestone.id));
     await recomputeProgress(owned.project.id);

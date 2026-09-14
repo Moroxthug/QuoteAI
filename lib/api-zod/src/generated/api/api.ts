@@ -1352,6 +1352,75 @@ export const RetryQuickbooksSyncResponse = zod.object({
 
 
 /**
+ * @summary Get the calendar sync connection status for every provider the company has connected
+ */
+export const GetCalendarStatusResponse = zod.object({
+  "connections": zod.array(zod.object({
+  "provider": zod.enum(['google', 'outlook']),
+  "accountEmail": zod.string(),
+  "isEnabled": zod.boolean(),
+  "connectedAt": zod.string(),
+  "lastSyncedAt": zod.string().nullish()
+}))
+})
+
+
+/**
+ * @summary Get the OAuth authorization URL to redirect the browser to for a calendar provider
+ */
+export const GetCalendarConnectUrlParams = zod.object({
+  "provider": zod.enum(['google', 'outlook'])
+})
+
+export const GetCalendarConnectUrlResponse = zod.object({
+  "url": zod.string()
+})
+
+
+/**
+ * @summary Unlink a calendar provider from the company account
+ */
+export const DisconnectCalendarParams = zod.object({
+  "provider": zod.enum(['google', 'outlook'])
+})
+
+export const DisconnectCalendarResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Enable or disable calendar sync for a connected provider
+ */
+export const ToggleCalendarParams = zod.object({
+  "provider": zod.enum(['google', 'outlook'])
+})
+
+export const ToggleCalendarBody = zod.object({
+  "isEnabled": zod.boolean()
+})
+
+export const ToggleCalendarResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Recent milestone calendar sync attempts (success and failure)
+ */
+export const GetCalendarSyncLogResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "provider": zod.enum(['google', 'outlook']),
+  "milestoneId": zod.string(),
+  "status": zod.string(),
+  "error": zod.string().nullish(),
+  "updatedAt": zod.string()
+}))
+})
+
+
+/**
  * @summary List uploaded documents for the authenticated user
  */
 export const ListDocumentsResponseItem = zod.object({

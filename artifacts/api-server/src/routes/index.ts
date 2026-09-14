@@ -31,6 +31,7 @@ import leadsRouter from "./leads";
 import publicLeadsRouter from "./public-leads";
 import publicReviewsRouter from "./public-reviews";
 import quickbooksRouter from "./quickbooks";
+import calendarRouter from "./calendar";
 
 const router: IRouter = Router();
 
@@ -66,5 +67,6 @@ router.use(leadsRouter);
 router.use(publicLeadsRouter);
 router.use(publicReviewsRouter);
 router.use(quickbooksRouter);
+router.use(calendarRouter);
 
 export default router;

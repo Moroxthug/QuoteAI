@@ -224,8 +224,8 @@ importers:
         specifier: ^24.43.0
         version: 24.43.1(typescript@5.9.3)
       resend:
-        specifier: ^6.12.2
-        version: 6.26.0
+        specifier: ^6.27.0
+        version: 6.27.0
       stripe:
         specifier: ^22.1.0
         version: 22.6.1(@types/node@25.3.5)
@@ -3969,8 +3969,8 @@ packages:
   requires-port@1.0.0:
     resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
-  resend@6.26.0:
-    resolution: {integrity: sha512-vkrULozV5nGF8o7tyun/t0+qFgtPpn+cyRhVqeorhOsPUNDiSc/9p/pn8AprdHqJpYaTvftpnQgWurW++FkCdw==}
+  resend@6.27.0:
+    resolution: {integrity: sha512-5Auh9GWkmKteeEM7rG45j7JRQVsKaQG0Okk4Ev0Pekh+1qfclRsmd4alZ3Kx0AqEosnZjEe/kCXf9jxfGaPZtg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -7976,7 +7976,7 @@ snapshots:
 
   requires-port@1.0.0: {}
 
-  resend@6.26.0:
+  resend@6.27.0:
     dependencies:
       postal-mime: 2.7.5
       standardwebhooks: 1.0.0

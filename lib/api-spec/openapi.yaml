@@ -919,6 +919,53 @@ paths:
               schema:
                 $ref: "#/components/schemas/PriceSummary"
 
+  /documents/price-alerts:
+    get:
+      operationId: getPriceAlerts
+      tags: [documents]
+      summary: List active (undismissed) price-trend alerts for the authenticated user
+      responses:
+        "200":
+          description: Active price-trend alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PriceAlert"
+
+  /documents/price-alerts/{id}/dismiss:
+    post:
+      operationId: dismissPriceAlert
+      tags: [documents]
+      summary: Dismiss a price-trend alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Alert dismissed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceAlert"
+
+  /documents/price-comparison:
+    get:
+      operationId: getPriceComparison
+      tags: [documents]
+      summary: Cross-supplier price comparison for work types seen from 2+ vendors
+      responses:
+        "200":
+          description: Cross-supplier comparison groups
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceComparisonResult"
+
   /documents/{id}/extract:
     post:
       operationId: extractDocument
@@ -2183,6 +2230,80 @@ components:
         - minPrice
         - maxPrice
         - count
+
+    PriceAlert:
+      type: object
+      properties:
+        id:
+          type: string
+        workType:
+          type: string
+        zone:
+          type: string
+          nullable: true
+        previousAvgPrice:
+          type: number
+        currentAvgPrice:
+          type: number
+        percentChange:
+          type: number
+        direction:
+          type: string
+          enum: [up, down]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - workType
+        - previousAvgPrice
+        - currentAvgPrice
+        - percentChange
+        - direction
+        - createdAt
+
+    PriceComparisonVendor:
+      type: object
+      properties:
+        vendor:
+          type: string
+        avgPrice:
+          type: number
+        count:
+          type: number
+      required:
+        - vendor
+        - avgPrice
+        - count
+
+    PriceComparisonGroup:
+      type: object
+      properties:
+        workType:
+          type: string
+        zone:
+          type: string
+          nullable: true
+        unit:
+          type: string
+          nullable: true
+        vendors:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceComparisonVendor"
+      required:
+        - workType
+        - vendors
+
+    PriceComparisonResult:
+      type: object
+      properties:
+        comparisons:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceComparisonGroup"
+      required:
+        - comparisons
 
     Client:
       type: object

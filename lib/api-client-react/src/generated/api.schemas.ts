@@ -591,6 +591,42 @@ export interface PriceSummary {
   items: PriceSummaryItem[];
 }
 
+export type PriceAlertDirection = typeof PriceAlertDirection[keyof typeof PriceAlertDirection];
+
+
+export const PriceAlertDirection = {
+  up: 'up',
+  down: 'down',
+} as const;
+
+export interface PriceAlert {
+  id: string;
+  workType: string;
+  zone?: string | null;
+  previousAvgPrice: number;
+  currentAvgPrice: number;
+  percentChange: number;
+  direction: PriceAlertDirection;
+  createdAt: string;
+}
+
+export interface PriceComparisonVendor {
+  vendor: string;
+  avgPrice: number;
+  count: number;
+}
+
+export interface PriceComparisonGroup {
+  workType: string;
+  zone?: string | null;
+  unit?: string | null;
+  vendors: PriceComparisonVendor[];
+}
+
+export interface PriceComparisonResult {
+  comparisons: PriceComparisonGroup[];
+}
+
 export interface Client {
   id: string;
   clientName: string;

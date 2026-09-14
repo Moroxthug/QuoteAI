@@ -41,6 +41,8 @@ import type {
   PdfResult,
   Plan,
   PortalSessionResult,
+  PriceAlert,
+  PriceComparisonResult,
   PriceSummary,
   QuickbooksAccounts,
   QuickbooksConnectUrl,
@@ -4281,6 +4283,234 @@ export function useGetPriceSummary<TData = Awaited<ReturnType<typeof getPriceSum
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetPriceSummaryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPriceAlertsUrl = () => {
+
+
+
+
+  return `/api/documents/price-alerts`
+}
+
+/**
+ * @summary List active (undismissed) price-trend alerts for the authenticated user
+ */
+export const getPriceAlerts = async ( options?: Parameters<typeof customFetch>[1]): Promise<PriceAlert[]> => {
+
+  return customFetch<PriceAlert[]>(getGetPriceAlertsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPriceAlertsQueryKey = () => {
+    return [
+    `/api/documents/price-alerts`
+    ] as const;
+    }
+
+
+export const getGetPriceAlertsQueryOptions = <TData = Awaited<ReturnType<typeof getPriceAlerts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPriceAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPriceAlertsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPriceAlerts>>> = ({ signal }) => getPriceAlerts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPriceAlerts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPriceAlertsQueryResult = NonNullable<Awaited<ReturnType<typeof getPriceAlerts>>>
+export type GetPriceAlertsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List active (undismissed) price-trend alerts for the authenticated user
+ */
+
+export function useGetPriceAlerts<TData = Awaited<ReturnType<typeof getPriceAlerts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPriceAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPriceAlertsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDismissPriceAlertUrl = (id: string,) => {
+
+
+
+
+  return `/api/documents/price-alerts/${id}/dismiss`
+}
+
+/**
+ * @summary Dismiss a price-trend alert
+ */
+export const dismissPriceAlert = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PriceAlert> => {
+
+  return customFetch<PriceAlert>(getDismissPriceAlertUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getDismissPriceAlertMutationKey = () => ['dismissPriceAlert'] as const;
+
+export const getDismissPriceAlertMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissPriceAlert>>, TError,DismissPriceAlertMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof dismissPriceAlert>>, TError,DismissPriceAlertMutationVariables, TContext> => {
+
+const mutationKey = getDismissPriceAlertMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof dismissPriceAlert>>, DismissPriceAlertMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  dismissPriceAlert(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DismissPriceAlertMutationResult = NonNullable<Awaited<ReturnType<typeof dismissPriceAlert>>>
+
+    export type DismissPriceAlertMutationError = ErrorType<unknown>
+    export type DismissPriceAlertMutationVariables = {id: string}
+
+    /**
+ * @summary Dismiss a price-trend alert
+ */
+export const useDismissPriceAlert = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof dismissPriceAlert>>, TError,DismissPriceAlertMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof dismissPriceAlert>>,
+        TError,
+        DismissPriceAlertMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDismissPriceAlertMutationOptions(options));
+    }
+
+export const getGetPriceComparisonUrl = () => {
+
+
+
+
+  return `/api/documents/price-comparison`
+}
+
+/**
+ * @summary Cross-supplier price comparison for work types seen from 2+ vendors
+ */
+export const getPriceComparison = async ( options?: Parameters<typeof customFetch>[1]): Promise<PriceComparisonResult> => {
+
+  return customFetch<PriceComparisonResult>(getGetPriceComparisonUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPriceComparisonQueryKey = () => {
+    return [
+    `/api/documents/price-comparison`
+    ] as const;
+    }
+
+
+export const getGetPriceComparisonQueryOptions = <TData = Awaited<ReturnType<typeof getPriceComparison>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPriceComparison>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPriceComparisonQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPriceComparison>>> = ({ signal }) => getPriceComparison({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPriceComparison>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPriceComparisonQueryResult = NonNullable<Awaited<ReturnType<typeof getPriceComparison>>>
+export type GetPriceComparisonQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Cross-supplier price comparison for work types seen from 2+ vendors
+ */
+
+export function useGetPriceComparison<TData = Awaited<ReturnType<typeof getPriceComparison>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPriceComparison>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPriceComparisonQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

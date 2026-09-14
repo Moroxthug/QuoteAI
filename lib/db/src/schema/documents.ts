@@ -41,10 +41,28 @@ export const priceIntelligenceTable = pgTable("price_intelligence", {
   unitPrice: text("unit_price").notNull(),
   unit: text("unit"),
   zone: text("zone"),
+  /** Supplier/vendor name extracted from the source document, if any — enables cross-supplier comparison (Phase 18). */
+  vendor: text("vendor"),
   sourceDocumentId: uuid("source_document_id").references(
     () => uploadedDocumentsTable.id,
     { onDelete: "cascade" }
   ),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const priceTrendDirectionEnum = pgEnum("price_trend_direction", ["up", "down"]);
+
+/** Phase 18: weekly-cadence price-trend alerts, one row per (userId, workType, zone) trend crossing the threshold. */
+export const priceIntelligenceAlertsTable = pgTable("price_intelligence_alerts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id").notNull(),
+  workType: text("work_type").notNull(),
+  zone: text("zone"),
+  previousAvgPrice: text("previous_avg_price").notNull(),
+  currentAvgPrice: text("current_avg_price").notNull(),
+  percentChange: text("percent_change").notNull(),
+  direction: priceTrendDirectionEnum("direction").notNull(),
+  dismissedAt: timestamp("dismissed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -62,9 +80,12 @@ export const extractedDocumentDataSchema = z.object({
     .optional(),
   totale: z.number().nullable().optional(),
   zona: z.string().nullable().optional(),
+  /** Supplier/vendor/contractor company name issuing the document, if identifiable. */
+  fornitore: z.string().nullable().optional(),
   note: z.string().nullable().optional(),
 });
 
 export type UploadedDocument = typeof uploadedDocumentsTable.$inferSelect;
 export type PriceIntelligenceItem = typeof priceIntelligenceTable.$inferSelect;
+export type PriceIntelligenceAlert = typeof priceIntelligenceAlertsTable.$inferSelect;
 export type ExtractedDocumentData = z.infer<typeof extractedDocumentDataSchema>;

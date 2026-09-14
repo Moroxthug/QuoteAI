@@ -5,9 +5,10 @@ import {
   db,
   uploadedDocumentsTable,
   priceIntelligenceTable,
+  priceIntelligenceAlertsTable,
   extractedDocumentDataSchema,
 } from "@workspace/db";
-import { eq, and, desc, avg, min, max, count, sql } from "drizzle-orm";
+import { eq, and, desc, avg, min, max, count, sql, isNull, isNotNull } from "drizzle-orm";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { randomUUID } from "crypto";
@@ -82,6 +83,7 @@ RULES:
 3. If the document mentions a geographic area (city, province), include it in the "zona" field
 4. The "totale" field is the total for the entire document (if present)
 5. Include a maximum of 30 items — choose the most significant ones by price
+6. If the document's letterhead, header, or signature identifies the supplier/vendor/contractor company that issued it, put its name in "fornitore" (just the company name, not an address). If it's not clearly identifiable, use null.
 
 OUTPUT VALID JSON ONLY, no extra text:
 {
@@ -90,10 +92,11 @@ OUTPUT VALID JSON ONLY, no extra text:
   ],
   "totale": 15000,
   "zona": "Toronto (ON)",
+  "fornitore": "Acme Renovations Inc.",
   "note": "Quote for apartment renovation"
 }
 
-If you can't find clear unit prices, return: { "lavorazioni": [], "totale": null, "zona": null, "note": "No unit prices found" }`;
+If you can't find clear unit prices, return: { "lavorazioni": [], "totale": null, "zona": null, "fornitore": null, "note": "No unit prices found" }`;
 
 async function extractFromImage(buffer: Buffer, mimeType: string) {
   const base64 = buffer.toString("base64");
@@ -364,6 +367,117 @@ router.get("/documents/price-summary", requireAuth, async (req, res) => {
   }
 });
 
+function serializeAlert(a: typeof priceIntelligenceAlertsTable.$inferSelect) {
+  return {
+    id: a.id,
+    workType: a.workType,
+    zone: a.zone ?? null,
+    previousAvgPrice: Number(a.previousAvgPrice),
+    currentAvgPrice: Number(a.currentAvgPrice),
+    percentChange: Number(a.percentChange),
+    direction: a.direction,
+    createdAt: a.createdAt.toISOString(),
+  };
+}
+
+// GET /api/documents/price-alerts
+router.get("/documents/price-alerts", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const alerts = await db
+      .select()
+      .from(priceIntelligenceAlertsTable)
+      .where(
+        and(
+          eq(priceIntelligenceAlertsTable.userId, userId),
+          isNull(priceIntelligenceAlertsTable.dismissedAt)
+        )
+      )
+      .orderBy(desc(priceIntelligenceAlertsTable.createdAt));
+    res.json(alerts.map(serializeAlert));
+  } catch (err) {
+    logger.error({ err }, "Error fetching price alerts");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/documents/price-alerts/:id/dismiss
+router.post("/documents/price-alerts/:id/dismiss", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const alertId = String(req.params.id);
+    const [updated] = await db
+      .update(priceIntelligenceAlertsTable)
+      .set({ dismissedAt: new Date() })
+      .where(
+        and(
+          eq(priceIntelligenceAlertsTable.id, alertId),
+          eq(priceIntelligenceAlertsTable.userId, userId)
+        )
+      )
+      .returning();
+
+    if (!updated) {
+      res.status(404).json({ error: "Alert not found" });
+      return;
+    }
+    res.json(serializeAlert(updated));
+  } catch (err) {
+    logger.error({ err }, "Error dismissing price alert");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/documents/price-comparison — cross-supplier comparison for work types
+// seen from 2+ distinct vendors in the same zone.
+router.get("/documents/price-comparison", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+
+    const rows = await db
+      .select({
+        workType: priceIntelligenceTable.workType,
+        zone: priceIntelligenceTable.zone,
+        vendor: priceIntelligenceTable.vendor,
+        avgPrice: avg(sql`${priceIntelligenceTable.unitPrice}::numeric`),
+        cnt: count(),
+        unit: sql<string | null>`max(${priceIntelligenceTable.unit})`,
+      })
+      .from(priceIntelligenceTable)
+      .where(
+        and(
+          eq(priceIntelligenceTable.userId, userId),
+          isNotNull(priceIntelligenceTable.vendor)
+        )
+      )
+      .groupBy(priceIntelligenceTable.workType, priceIntelligenceTable.zone, priceIntelligenceTable.vendor);
+
+    type VendorPrice = { vendor: string; avgPrice: number; count: number };
+    type ComparisonGroup = { workType: string; zone: string | null; unit: string | null; vendors: VendorPrice[] };
+    const groups = new Map<string, ComparisonGroup>();
+
+    for (const r of rows) {
+      if (!r.vendor) continue;
+      const key = `${r.workType}::${r.zone ?? ""}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = { workType: r.workType, zone: r.zone ?? null, unit: r.unit || null, vendors: [] };
+        groups.set(key, group);
+      }
+      group.vendors.push({ vendor: r.vendor, avgPrice: Number(r.avgPrice ?? 0), count: Number(r.cnt) });
+    }
+
+    const comparisons = Array.from(groups.values())
+      .filter((g) => g.vendors.length >= 2)
+      .map((g) => ({ ...g, vendors: g.vendors.sort((a, b) => a.avgPrice - b.avgPrice) }));
+
+    res.json({ comparisons });
+  } catch (err) {
+    logger.error({ err }, "Error fetching price comparison");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // POST /api/documents/:id/extract
 router.post("/documents/:id/extract", requireAuth, documentAiLimiter, async (req, res) => {
   try {
@@ -425,7 +539,7 @@ router.post("/documents/:id/extract", requireAuth, documentAiLimiter, async (req
       }
 
       const result = extractedDocumentDataSchema.safeParse(parsed);
-      const extractedData = result.success ? result.data : { lavorazioni: [], totale: null, zona: null, note: "Parsing fallito" };
+      const extractedData = result.success ? result.data : { lavorazioni: [], totale: null, zona: null, fornitore: null, note: "Parsing fallito" };
 
       await db
         .update(uploadedDocumentsTable)
@@ -446,6 +560,7 @@ router.post("/documents/:id/extract", requireAuth, documentAiLimiter, async (req
           unitPrice: String(l.prezzoUnitario),
           unit: l.um ?? null,
           zone: l.zona ?? extractedData.zona ?? null,
+          vendor: extractedData.fornitore ?? null,
           sourceDocumentId: docId,
         }));
 

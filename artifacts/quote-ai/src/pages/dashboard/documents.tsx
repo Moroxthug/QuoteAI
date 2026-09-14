@@ -2,15 +2,19 @@ import { useRef, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FolderOpen, Upload, Loader2, CheckCircle2, AlertCircle, Clock, Trash2, Zap, FileText, ImageIcon, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { FolderOpen, Upload, Loader2, CheckCircle2, AlertCircle, Clock, Trash2, Zap, FileText, ImageIcon, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Scale } from "lucide-react";
 import {
   useListDocuments,
   useUploadDocument,
   useExtractDocument,
   useDeleteDocument,
   useGetPriceSummary,
+  useGetPriceAlerts,
+  useDismissPriceAlert,
+  useGetPriceComparison,
   getListDocumentsQueryKey,
   getGetPriceSummaryQueryKey,
+  getGetPriceAlertsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -183,6 +187,110 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
   );
 }
 
+function PriceAlerts() {
+  const qc = useQueryClient();
+  const { data: alerts = [] } = useGetPriceAlerts();
+
+  const dismissMut = useDismissPriceAlert({
+    mutation: {
+      onSuccess: () => qc.invalidateQueries({ queryKey: getGetPriceAlertsQueryKey() }),
+    },
+  });
+
+  if (alerts.length === 0) return null;
+
+  return (
+    <Card className="border-amber-200 bg-amber-50/40">
+      <CardHeader className="pb-2 pt-4 px-5">
+        <CardTitle className="text-base font-semibold flex items-center gap-2 text-amber-800">
+          <TrendingUp className="h-4 w-4 text-amber-600" />
+          Price trend alerts
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-5 pb-4 space-y-2">
+        {alerts.map((alert) => (
+          <div key={alert.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-white p-3">
+            <div className="flex items-center gap-2 min-w-0">
+              {alert.direction === "up" ? (
+                <TrendingUp className="h-4 w-4 text-red-500 shrink-0" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-green-600 shrink-0" />
+              )}
+              <p className="text-sm text-gray-700 truncate">
+                <span className="font-semibold">{alert.workType}</span>
+                {alert.zone && <span className="text-gray-400"> in {alert.zone}</span>} is{" "}
+                <span className={cn("font-semibold", alert.direction === "up" ? "text-red-600" : "text-green-600")}>
+                  {alert.direction === "up" ? "up" : "down"} {Math.abs(alert.percentChange).toFixed(0)}%
+                </span>{" "}
+                ({formatCurrency(alert.previousAvgPrice)} → {formatCurrency(alert.currentAvgPrice)})
+              </p>
+            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-6 w-6 text-gray-400 hover:text-gray-600 shrink-0"
+              onClick={() => dismissMut.mutate({ id: alert.id })}
+              disabled={dismissMut.isPending}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function PriceComparison() {
+  const { data } = useGetPriceComparison();
+  const comparisons = data?.comparisons ?? [];
+
+  if (comparisons.length === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader className="pb-2 pt-4 px-5">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
+          <Scale className="h-4 w-4 text-violet-500" />
+          Cross-supplier comparison
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-5 pb-4 space-y-3">
+        {comparisons.map((group) => {
+          const cheapest = group.vendors[0];
+          return (
+            <div key={`${group.workType}::${group.zone ?? ""}`} className="rounded-lg border border-gray-100 p-3">
+              <p className="text-xs font-semibold text-gray-700">
+                {group.workType}
+                {group.zone && <span className="text-gray-400 font-normal"> — {group.zone}</span>}
+              </p>
+              <div className="mt-2 space-y-1">
+                {group.vendors.map((v) => (
+                  <div key={v.vendor} className="flex items-center justify-between text-xs">
+                    <span className={cn("text-gray-600", v.vendor === cheapest.vendor && "font-semibold text-green-700")}>
+                      {v.vendor}
+                    </span>
+                    <span className="text-gray-500">
+                      {formatCurrency(v.avgPrice)}
+                      {group.unit && `/${group.unit}`}
+                      <span className="text-gray-300 ml-1">({v.count})</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {group.vendors.length >= 2 && group.vendors[group.vendors.length - 1].avgPrice > cheapest.avgPrice && (
+                <p className="text-[10px] text-violet-600 mt-1.5">
+                  You're paying more at {group.vendors[group.vendors.length - 1].vendor} than at {cheapest.vendor} for the same work.
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function DocumentsPage() {
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -302,6 +410,10 @@ export default function DocumentsPage() {
           </CardContent>
         </Card>
       )}
+
+      <PriceAlerts />
+
+      <PriceComparison />
 
       {/* Price summary */}
       {priceSummary && priceSummary.items.length > 0 && (

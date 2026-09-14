@@ -1500,6 +1500,58 @@ export const GetPriceSummaryResponse = zod.object({
 
 
 /**
+ * @summary List active (undismissed) price-trend alerts for the authenticated user
+ */
+export const GetPriceAlertsResponseItem = zod.object({
+  "id": zod.string(),
+  "workType": zod.string(),
+  "zone": zod.string().nullish(),
+  "previousAvgPrice": zod.number(),
+  "currentAvgPrice": zod.number(),
+  "percentChange": zod.number(),
+  "direction": zod.enum(['up', 'down']),
+  "createdAt": zod.coerce.date()
+})
+export const GetPriceAlertsResponse = zod.array(GetPriceAlertsResponseItem)
+
+
+/**
+ * @summary Dismiss a price-trend alert
+ */
+export const DismissPriceAlertParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DismissPriceAlertResponse = zod.object({
+  "id": zod.string(),
+  "workType": zod.string(),
+  "zone": zod.string().nullish(),
+  "previousAvgPrice": zod.number(),
+  "currentAvgPrice": zod.number(),
+  "percentChange": zod.number(),
+  "direction": zod.enum(['up', 'down']),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Cross-supplier price comparison for work types seen from 2+ vendors
+ */
+export const GetPriceComparisonResponse = zod.object({
+  "comparisons": zod.array(zod.object({
+  "workType": zod.string(),
+  "zone": zod.string().nullish(),
+  "unit": zod.string().nullish(),
+  "vendors": zod.array(zod.object({
+  "vendor": zod.string(),
+  "avgPrice": zod.number(),
+  "count": zod.number()
+}))
+}))
+})
+
+
+/**
  * @summary Trigger AI extraction on an uploaded document
  */
 export const ExtractDocumentParams = zod.object({

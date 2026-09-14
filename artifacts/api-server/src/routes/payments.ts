@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission";
 import { getBaseUrl } from "../lib/baseUrl";
 import { db, quotesTable, businessProfilesTable, authUsersTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
@@ -154,7 +155,7 @@ router.get("/payments/trial-status", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/payments/checkout", requireAuth, async (req, res) => {
+router.post("/payments/checkout", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const parsed = CreateCheckoutSessionBody.safeParse(req.body);
@@ -327,7 +328,7 @@ router.post("/payments/unlock-quote", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/payments/portal", requireAuth, async (req, res) => {
+router.post("/payments/portal", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [profile] = await db

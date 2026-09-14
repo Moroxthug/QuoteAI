@@ -3,7 +3,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, Mail, UserX, UserCheck, Filter } from "lucide-react";
+import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, Mail, UserX, UserCheck, Filter, UserPlus, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,11 +14,12 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { formatCents, type TimeEntryDto, type TimeEntryStatus, type UsageUnit } from "@/lib/jobs-api";
 import { teamApi, type EquipmentDto, type EquipmentEdit, type EquipmentOwnership, type WorkerDto, type WorkerEdit, type WorkerType } from "@/lib/team-api";
+import { teamMembersApi, type TeamMemberDto, type TeamMemberRole } from "@/lib/team-members-api";
 import { TimeStatusBadge } from "@/components/jobs/team-tab";
 
-const TABS = ["workers", "time", "equipment"] as const;
+const TABS = ["workers", "time", "equipment", "members"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_ICONS: Record<Tab, typeof Users> = { workers: Users, time: Clock, equipment: Wrench };
+const TAB_ICONS: Record<Tab, typeof Users> = { workers: Users, time: Clock, equipment: Wrench, members: UserPlus };
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const isoDay = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -61,7 +62,137 @@ export default function TeamPage() {
       {tab === "workers" && workers && <WorkersTab workers={workers.items} locale={locale} />}
       {tab === "time" && <TimeTab workers={workers?.items ?? []} locale={locale} />}
       {tab === "equipment" && <EquipmentTab />}
+      {tab === "members" && <MembersTab />}
     </div>
+  );
+}
+
+// ── Team members (Phase 7: logins, not workers logging hours) ──────────────
+
+const ROLE_OPTIONS: TeamMemberRole[] = ["admin", "office", "foreman", "viewer"];
+
+function MembersTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const refresh = () => queryClient.invalidateQueries({ queryKey: ["team-members"] });
+  const onError = (e: Error & { code?: string; requiredPlan?: string }) => toast({ title: e.code === "PLAN_REQUIRED" ? t("team.members.planRequired") : e.code === "SEAT_LIMIT" ? t("team.members.seatLimitTitle") : t("jobs.error"), description: e.message, variant: "destructive" });
+  const { data, isLoading } = useQuery({ queryKey: ["team-members"], queryFn: teamMembersApi.list });
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [invite, setInvite] = useState<{ url: string; emailed: boolean } | null>(null);
+
+  const resend = useMutation({ mutationFn: (id: string) => teamMembersApi.resend(id), onSuccess: (r) => { refresh(); setInvite(r); }, onError });
+  const setStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: "active" | "suspended" }) => teamMembersApi.update(id, { status }), onSuccess: refresh, onError });
+  const remove = useMutation({ mutationFn: (id: string) => teamMembersApi.remove(id), onSuccess: refresh, onError });
+
+  const members = data?.items ?? [];
+  const seats = data?.seats;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-slate-500">{t("team.members.intro")}</p>
+        <div className="flex items-center gap-2">
+          {seats && <span className="text-xs text-slate-400">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
+          <Button size="sm" className="gap-2" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</Button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3"><Skeleton className="h-16 w-full rounded-2xl" /></div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
+          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50/60">
+            <div className="h-10 w-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-sm font-bold shrink-0">YOU</div>
+            <div className="min-w-0 flex-1"><span className="font-semibold text-slate-900">{t("team.members.you")}</span></div>
+          </div>
+          {members.length === 0 && (
+            <div className="p-10 text-center text-sm text-slate-500">{t("team.members.empty")}</div>
+          )}
+          {members.map((m) => (
+            <MemberRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
+          ))}
+        </div>
+      )}
+
+      <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} onInvited={(r) => { refresh(); setInvite(r); }} onError={onError} />
+      <MemberInviteLinkDialog invite={invite} onClose={() => setInvite(null)} />
+    </div>
+  );
+}
+
+function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemberDto; onResend: () => void; onSuspend: () => void; onRemove: () => void }) {
+  const { t } = useLanguage();
+  const statusLabel = member.status === "active" ? t("team.members.statusActive") : member.status === "suspended" ? t("team.members.statusSuspended") : t("team.members.statusInvited");
+  const statusClass = member.status === "active" ? "bg-emerald-100 text-emerald-700" : member.status === "suspended" ? "bg-slate-200 text-slate-600" : "bg-amber-100 text-amber-700";
+  return (
+    <div className="flex flex-wrap items-center gap-3 px-4 py-3">
+      <div className="h-10 w-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold shrink-0">{member.email.slice(0, 2).toUpperCase()}</div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold text-slate-900 truncate">{member.email}</span>
+          <span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-100 text-slate-600">{t(`team.members.role.${member.role}`)}</span>
+          <span className={cn("text-[10px] rounded px-1.5 py-0.5", statusClass)}>{statusLabel}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 shrink-0">
+        {member.status !== "active" && <Button size="sm" variant="outline" className="h-8 gap-1" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</Button>}
+        {member.status !== "invited" && (
+          <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
+            {member.status === "suspended" ? <UserCheck className="h-4 w-4" /> : <UserX className="h-4 w-4" />}
+          </button>
+        )}
+        <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.members.remove")} onClick={onRemove}><Trash2 className="h-4 w-4" /></button>
+      </div>
+    </div>
+  );
+}
+
+function InviteMemberDialog({ open, onOpenChange, onInvited, onError }: { open: boolean; onOpenChange: (v: boolean) => void; onInvited: (r: { url: string; emailed: boolean }) => void; onError: (e: Error & { code?: string; requiredPlan?: string }) => void }) {
+  const { t } = useLanguage();
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<TeamMemberRole>("office");
+  useEffect(() => { if (open) { setEmail(""); setRole("office"); } }, [open]);
+  const invite = useMutation({
+    mutationFn: () => teamMembersApi.invite(email.trim(), role),
+    onSuccess: (r) => { onOpenChange(false); onInvited(r); },
+    onError,
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle>{t("team.members.dialogTitle")}</DialogTitle><DialogDescription>{t("team.members.dialogDesc")}</DialogDescription></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1"><Label>{t("team.members.email")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></div>
+          <div className="space-y-1">
+            <Label>{t("team.members.role")}</Label>
+            <select value={role} onChange={(e) => setRole(e.target.value as TeamMemberRole)} className="h-10 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+              {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{t(`team.members.role.${r}`)}</option>)}
+            </select>
+          </div>
+          <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button><Button disabled={!email.trim() || invite.isPending} onClick={() => invite.mutate()} className="gap-2">{invite.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("team.members.send")}</Button></div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function MemberInviteLinkDialog({ invite, onClose }: { invite: { url: string; emailed: boolean } | null; onClose: () => void }) {
+  const { t } = useLanguage();
+  const [copied, setCopied] = useState(false);
+  const copy = () => { navigator.clipboard.writeText(invite!.url); setCopied(true); setTimeout(() => setCopied(false), 1500); };
+  return (
+    <Dialog open={!!invite} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle>{invite?.emailed ? t("team.members.inviteSent") : t("team.members.inviteNotSent")}</DialogTitle></DialogHeader>
+        {invite && (
+          <div className="flex items-center gap-2">
+            <Input readOnly value={invite.url} className="text-xs" />
+            <Button size="sm" variant="outline" onClick={copy} className="gap-1 shrink-0">{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? t("team.invite.copied") : t("team.invite.copy")}</Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

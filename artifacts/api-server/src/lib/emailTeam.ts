@@ -35,3 +35,38 @@ export async function sendWorkerInviteEmail(params: { toEmail: string; workerNam
   await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
   logger.info({ to: params.toEmail }, "Worker invite email sent");
 }
+
+/** Phase 7: invite for a person to get their own login on a company's QuoteAI account. */
+export async function sendTeamMemberInviteEmail(params: { toEmail: string; companyName: string; inviterName: string; role: string; url: string; language: EmailLang }): Promise<void> {
+  const { language: lang } = params;
+  const company = escapeHtml(params.companyName);
+  const inviter = escapeHtml(params.inviterName);
+  const t = lang === "fr"
+    ? {
+        title: "Vous êtes invité à rejoindre une équipe",
+        sub: `${params.companyName} sur QuoteAI`,
+        body: `Bonjour,<br/><br/><strong>${inviter}</strong> vous invite à rejoindre le compte QuoteAI de <strong>${company}</strong> avec le rôle « ${escapeHtml(params.role)} ». Créez votre accès en cliquant ci-dessous.`,
+        btn: "Rejoindre l'équipe",
+        hint: "Ce lien vous est personnel et expire dans 7 jours.",
+        footer: `Envoyé via QuoteAI au nom de ${company}.`,
+        subject: `${params.companyName} vous invite sur QuoteAI`,
+      }
+    : {
+        title: "You're invited to join a team",
+        sub: `${params.companyName} on QuoteAI`,
+        body: `Hi,<br/><br/><strong>${inviter}</strong> is inviting you to join <strong>${company}</strong>'s QuoteAI account as a ${escapeHtml(params.role)}. Set up your access below.`,
+        btn: "Join the team",
+        hint: "This link is personal to you and expires in 7 days.",
+        footer: `Sent through QuoteAI on behalf of ${company}.`,
+        subject: `${params.companyName} invited you to QuoteAI`,
+      };
+  const html = shell({
+    lang,
+    headerTitle: t.title,
+    headerSub: t.sub,
+    bodyHtml: `<p>${t.body}</p><div class="cta"><a class="btn" href="${params.url}">${t.btn}</a></div><p class="muted">${t.hint}</p>`,
+    footer: t.footer,
+  });
+  await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
+  logger.info({ to: params.toEmail }, "Team member invite email sent");
+}

@@ -19,12 +19,25 @@ export const PRODUCT_FEATURES = [
   "team_time", // Phase 3: workers, time entries, equipment
   "assistant", // Phase 5: job AI assistant
   "analytics_pro", // Phase 5: margin / AR / cash flow
+  "team_accounts", // Phase 7: multi-user team accounts (invite logins, roles)
 ] as const;
 export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
-const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing"];
+const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
 const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro"];
+
+/** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
+export const SEATS_INCLUDED: Record<PlanId, number> = {
+  free: 1,
+  monthly_starter: 1,
+  monthly_pro: 2,
+  monthly_elite: 5,
+};
+
+export function seatsIncluded(plan: PlanId): number {
+  return SEATS_INCLUDED[plan];
+}
 
 export const PLAN_FEATURES: Record<PlanId, ReadonlySet<ProductFeature>> = {
   free: new Set<ProductFeature>(["quotes"]),

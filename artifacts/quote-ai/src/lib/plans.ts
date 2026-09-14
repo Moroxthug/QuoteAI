@@ -16,11 +16,19 @@ export type ProductFeature =
   | "invoicing"
   | "team_time"
   | "assistant"
-  | "analytics_pro";
+  | "analytics_pro"
+  | "team_accounts";
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
-const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing"];
+const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
 const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro"];
+
+export const SEATS_INCLUDED: Record<PlanId, number> = {
+  free: 1,
+  monthly_starter: 1,
+  monthly_pro: 2,
+  monthly_elite: 5,
+};
 
 export const PLAN_FEATURES: Record<PlanId, ReadonlySet<ProductFeature>> = {
   free: new Set<ProductFeature>(["quotes"]),

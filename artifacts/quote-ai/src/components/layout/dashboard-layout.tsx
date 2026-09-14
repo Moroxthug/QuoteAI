@@ -1,5 +1,7 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, ArrowUpRight, FileSignature, HardHat, Sparkles } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, ArrowUpRight, FileSignature, HardHat, Sparkles, Check } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { teamMembersApi } from "@/lib/team-members-api";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -87,6 +89,30 @@ function isActive(navHref: string, location: string, exact: boolean) {
   return location === navHref || location.startsWith(navHref + "/") || location.startsWith(navHref + "?");
 }
 
+function OrgSwitcherItems() {
+  const { t } = useLanguage();
+  const queryClient = useQueryClient();
+  const { data } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
+  const switchOrg = useMutation({
+    mutationFn: (orgId: string) => teamMembersApi.switchOrg(orgId),
+    onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard"; },
+  });
+  const orgs = data?.items ?? [];
+  if (orgs.length < 2) return null;
+  return (
+    <>
+      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">{t("team.switcher.switch")}</div>
+      {orgs.map((o) => (
+        <DropdownMenuItem key={o.orgId} className="cursor-pointer flex items-center gap-2" onClick={() => o.orgId !== data?.activeOrgId && switchOrg.mutate(o.orgId)}>
+          {o.orgId === data?.activeOrgId ? <Check className="h-3.5 w-3.5 text-violet-600 shrink-0" /> : <span className="w-3.5 shrink-0" />}
+          <span className="truncate flex-1">{o.isOwn ? (o.companyName || t("team.switcher.myCompany")) : o.companyName}</span>
+        </DropdownMenuItem>
+      ))}
+      <DropdownMenuSeparator />
+    </>
+  );
+}
+
 function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -132,6 +158,7 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           {email && <div className="text-[10px] text-gray-400 truncate">{email}</div>}
         </div>
         <DropdownMenuSeparator />
+        <OrgSwitcherItems />
         <DropdownMenuItem asChild>
           <Link href="/dashboard/settings?tab=account" className="cursor-pointer flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-gray-400" /> {t("dashboard.account.companyProfile")}

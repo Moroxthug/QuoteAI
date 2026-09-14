@@ -21,3 +21,4 @@ export * from "./jobs";
 export * from "./costs";
 export * from "./invoices";
 export * from "./assistant";
+export * from "./organization-members";

@@ -32,7 +32,7 @@
     "pdfmake": "^0.3.7",
     "pino": "^9",
     "pino-http": "^10",
-    "posthog-node": "^5.40.0",
+    "posthog-node": "^5.52.1",
     "puppeteer": "^24.43.0",
     "resend": "^6.12.2",
     "stripe": "^22.1.0",

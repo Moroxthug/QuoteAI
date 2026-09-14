@@ -99,12 +99,39 @@ The schema (`incentives_catalog`) exists and is now Canadianized (federal/provin
 
 ---
 
-## 7. Suggested build order
+## 7. Phase 20 — Send customer emails from the contractor's own connected inbox (≈2 weeks)
+
+**The gap**: every customer-facing email (quote PDF, contract signing/reminder, invoice, lead follow-up) sends from `no-reply@quoteai.ca`. Phase 8 already swapped the *display name* and logo ("{company} via QuoteAI"), but the actual From address — and therefore where a customer's reply lands — is still QuoteAI's, not the contractor's. A reply today has nowhere good to go.
+
+**Design**: extend the exact OAuth pattern already built for Phase 12's Calendar connections to email — a per-company "Connect your email" integration, Gmail and Outlook both (Microsoft 365 is as common as Gmail with Canadian trades, and doesn't carry Google's extra scrutiny — see below), **send-only**. When connected, the existing customer-facing send call sites (`email.ts`/`emailContracts.ts`, already parameterized per Phase 8) send through the contractor's own account instead of QuoteAI's; when not connected, behavior is unchanged (Phase 8's branded `no-reply@quoteai.ca` stays the default/free-tier fallback, not replaced).
+
+**Scope reality-check (researched this session)**:
+- **Gmail**: `gmail.send` is a Google **"sensitive" scope, not "restricted"** — standard OAuth app verification only, no CASA security assessment. That assessment (~$500/year, third-party audit) only applies if the app also *reads* the inbox (`gmail.readonly`/`gmail.modify`) — which this phase deliberately does not do. Send-only keeps this cheap and fast to ship.
+- **Outlook**: Microsoft Graph's delegated `Mail.Send` permission has no equivalent CASA-style audit requirement — standard app registration + consent, same tier of effort as the Outlook Calendar app registration already started in Phase 12 (and per [[growth-platform-plan]], not yet finished — this phase should piggyback on finishing that registration rather than duplicating the app-registration work).
+- **Explicitly out of scope for v1**: reading replies back into QuoteAI (a shared inbox/thread view). That's the expensive, restricted-scope version and isn't needed to solve the actual problem (replies currently vanishing) — a reply landing in the contractor's own real inbox, read on their own phone/laptop like normal, already fixes it.
+
+**Cheap independent win, ships regardless of this phase**: set a `Reply-To` header to the contractor's real email (already stored in `business_profiles`) on every customer-facing send today. Zero OAuth, same-day fix, solves most of the "replies disappear" problem immediately — should ship on its own before or alongside this phase, not wait for it.
+
+**Build**:
+- New `email_connections` table (userId, provider `google`|`microsoft`, encrypted OAuth tokens via the existing `lib/crypto.ts` helper, connected mailbox address) — migration `0017_phase20_email_connections.sql` (numbering depends on which phases land first).
+- `artifacts/api-server/src/routes/email-connections.ts`: OAuth connect/callback (reusing Phase 11/12's signed-`state` HMAC pattern), disconnect, status.
+- Thin send clients: `lib/gmailSendClient.ts` (Gmail API `users.messages.send`, raw MIME) and `lib/outlookSendClient.ts` (Graph `/me/sendMail`), mirroring `googleCalendarClient.ts`/`outlookCalendarClient.ts`'s style.
+- `email.ts`/`emailContracts.ts` gain a "send via connected account if present, else via Resend as today" branch at each existing customer-facing call site — no change to transactional/internal emails (welcome, subscription, admin notifications), same boundary Phase 8 already drew.
+- Settings → Integrations: "Send emails as yourself" card (connect/disconnect Gmail or Outlook, shows the connected address).
+- Token refresh handling (both providers issue short-lived access tokens); a failed send falls back to the Resend/QuoteAI-branded path rather than silently dropping the email, logged for the contractor to notice and reconnect.
+- Tests: fallback-on-failure behavior, that internal/QuoteAI-facing emails never route through a connected personal account (scope boundary), token-encryption round-trip (same helper already tested in Phase 13).
+
+**Feasibility**: fully self-serve for the send-only scope described — no partner/business-approval gate like Phase 16's Financeit dependency. The one shared dependency is finishing the Outlook OAuth app registration (already started, blocked on flipping `signInAudience`, tracked in [[growth-platform-plan]]) — worth doing that first since both Phase 12's calendar sync and this phase need it.
+
+---
+
+## 8. Suggested build order
 
 1. **Phase 15 (invoice payments)** — closes an actual functional gap, fully self-serve, no external dependency. Start here.
 2. **Phase 17 (incentives engine)** — fully self-serve, reuses existing i18n/schema investment, meaningful differentiation.
 3. **Phase 18 (price intelligence)** — cheap, self-serve, sharpens the core product.
-4. **Phase 19 (public API)** — self-serve, but lower urgency until there's third-party demand.
-5. **Phase 16 (Financeit financing)** — highest potential close-rate impact, but blocked on you pursuing partner access first; build the engineering piece in parallel once you've started that conversation, not before.
+4. **Phase 20 (connected-email sending)** — mostly self-serve (send-only scopes, no CASA-style audit); ship the independent `Reply-To` quick win first regardless of when the full phase starts. The Gmail half has no dependency; the Outlook half needs the Outlook OAuth app registration finished first (currently deferred — see below), so start with Gmail if that registration is still pending.
+5. **Phase 19 (public API)** — self-serve, but lower urgency until there's third-party demand.
+6. **Phase 16 (Financeit financing)** — highest potential close-rate impact, but blocked on you pursuing partner access first; build the engineering piece in parallel once you've started that conversation, not before.
 
-Deferred, tracked elsewhere: SMS channel, Outlook/Entra ID calendar OAuth completion, WhatsApp template approval (see [[growth-platform-plan]] memory for status).
+Deferred, tracked elsewhere (per the user, handled personally rather than delegated): SMS channel, finishing the Outlook/Entra ID OAuth app registration (needed by both Phase 12's calendar sync and Phase 20's Outlook email — the `signInAudience` fix is the blocker, see [[growth-platform-plan]]), WhatsApp template approval.

@@ -43,7 +43,41 @@ type AdminUser = {
 };
 
 type Settings = Record<string, string>;
-type Tab = "overview" | "users" | "widget" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events" | "margin";
+type Tab = "overview" | "users" | "widget" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events" | "margin" | "incentives";
+
+type IncentiveCatalogRow = {
+  id: string;
+  level: "federal" | "provincial" | "municipal" | "utility";
+  codice: string;
+  titolo: string;
+  descrizione: string;
+  province: string | null;
+  city: string | null;
+  categoriaIntervento: string;
+  tipoAgevolazione: string;
+  massimaleContributo: string | null;
+  incomeTested: boolean;
+  scadenza: string | null;
+  stato: "active" | "expiring_soon" | "closed";
+  fonteUfficialeUrl: string | null;
+  isVerifiedByAi: boolean;
+  humanVerified: boolean;
+  lastCheckedAt: string | null;
+};
+
+const EMPTY_INCENTIVE_FORM = {
+  level: "federal" as const,
+  codice: "",
+  titolo: "",
+  descrizione: "",
+  province: "",
+  city: "",
+  categoriaIntervento: "all",
+  tipoAgevolazione: "rebate",
+  massimaleContributo: "",
+  incomeTested: false,
+  fonteUfficialeUrl: "",
+};
 
 type MarginRow = {
   userId: string;
@@ -266,6 +300,101 @@ export default function AdminPage() {
   useEffect(() => {
     if (tab === "email-events") loadEmailEvents();
   }, [tab]);
+
+  // Incentives catalog (Phase 17)
+  const [incentives, setIncentives] = useState<IncentiveCatalogRow[]>([]);
+  const [loadingIncentives, setLoadingIncentives] = useState(false);
+  const [incentiveForm, setIncentiveForm] = useState<Omit<typeof EMPTY_INCENTIVE_FORM, "level"> & { level: IncentiveCatalogRow["level"] }>(EMPTY_INCENTIVE_FORM);
+  const [editingIncentiveId, setEditingIncentiveId] = useState<string | null>(null);
+  const [showIncentiveForm, setShowIncentiveForm] = useState(false);
+  const [savingIncentive, setSavingIncentive] = useState(false);
+
+  async function loadIncentives() {
+    setLoadingIncentives(true);
+    try {
+      const res = await authFetch("/api/admin/incentives");
+      if (res.success) setIncentives(res.incentives || []);
+    } catch {
+      toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadIncentivesCatalog") });
+    } finally {
+      setLoadingIncentives(false);
+    }
+  }
+
+  useEffect(() => {
+    if (tab === "incentives") loadIncentives();
+  }, [tab]);
+
+  function startEditIncentive(row: IncentiveCatalogRow) {
+    setEditingIncentiveId(row.id);
+    setIncentiveForm({
+      level: row.level,
+      codice: row.codice,
+      titolo: row.titolo,
+      descrizione: row.descrizione,
+      province: row.province || "",
+      city: row.city || "",
+      categoriaIntervento: row.categoriaIntervento,
+      tipoAgevolazione: row.tipoAgevolazione,
+      massimaleContributo: row.massimaleContributo || "",
+      incomeTested: row.incomeTested,
+      fonteUfficialeUrl: row.fonteUfficialeUrl || "",
+    });
+    setShowIncentiveForm(true);
+  }
+
+  function resetIncentiveForm() {
+    setEditingIncentiveId(null);
+    setIncentiveForm(EMPTY_INCENTIVE_FORM);
+    setShowIncentiveForm(false);
+  }
+
+  async function saveIncentive(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingIncentive(true);
+    try {
+      const payload = {
+        ...incentiveForm,
+        province: incentiveForm.province.trim() || null,
+        city: incentiveForm.city.trim() || null,
+        fonteUfficialeUrl: incentiveForm.fonteUfficialeUrl.trim() || null,
+        massimaleContributo: incentiveForm.massimaleContributo.trim() || null,
+      };
+      const res = editingIncentiveId
+        ? await authFetch(`/api/admin/incentives/${editingIncentiveId}`, { method: "PUT", body: JSON.stringify(payload) })
+        : await authFetch("/api/admin/incentives", { method: "POST", body: JSON.stringify(payload) });
+      if (res.success) {
+        resetIncentiveForm();
+        loadIncentives();
+      }
+    } catch (err: any) {
+      toast({ variant: "destructive", title: t("admin.error"), description: err.message || t("admin.errorLoadIncentivesCatalog") });
+    } finally {
+      setSavingIncentive(false);
+    }
+  }
+
+  async function toggleHumanVerified(row: IncentiveCatalogRow) {
+    try {
+      await authFetch(`/api/admin/incentives/${row.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ humanVerified: !row.humanVerified }),
+      });
+      loadIncentives();
+    } catch {
+      toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadIncentivesCatalog") });
+    }
+  }
+
+  async function deleteIncentive(id: string) {
+    if (!window.confirm("Delete this incentive program?")) return;
+    try {
+      await authFetch(`/api/admin/incentives/${id}`, { method: "DELETE" });
+      loadIncentives();
+    } catch {
+      toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadIncentivesCatalog") });
+    }
+  }
 
   async function handleCreateUnregisteredClient(e: React.FormEvent) {
     e.preventDefault();
@@ -666,6 +795,7 @@ export default function AdminPage() {
               { id: "users", label: t("admin.tabUsers"), icon: Users },
               { id: "widget", label: t("admin.tabWidget"), icon: Zap },
               { id: "margin", label: "Cost & Margin", icon: TrendingUp },
+              { id: "incentives", label: t("admin.tabIncentives"), icon: Award },
               { id: "stripe", label: t("admin.tabStripe"), icon: DollarSign },
               { id: "gsc", label: "Search Console", icon: Globe },
               { id: "seo", label: "SEO Checker", icon: Sparkles },
@@ -1698,6 +1828,134 @@ export default function AdminPage() {
           )}
 
           {/* RESEND WEBHOOK EVENTS (delivery/bounce/complaint) */}
+          {tab === "incentives" && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+                <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                  <Award className="h-5 w-5 text-emerald-500" /> {t("admin.incentivesEngineTitle")}
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">{t("admin.incentivesEngineDesc")}</p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <h3 className="text-sm font-bold text-slate-800">
+                    {t("admin.activeVerifiedIncentives")} ({incentives.filter(i => i.stato !== "closed" && i.humanVerified).length} / {incentives.length})
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => { resetIncentiveForm(); setShowIncentiveForm(true); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700"
+                    >
+                      + Add program
+                    </button>
+                    <button
+                      onClick={loadIncentives}
+                      disabled={loadingIncentives}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-100 bg-white shadow-sm text-xs text-slate-500 hover:text-slate-800 transition-all font-medium disabled:opacity-50"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${loadingIncentives ? "animate-spin" : ""}`} />
+                      {t("admin.refresh")}
+                    </button>
+                  </div>
+                </div>
+
+                {showIncentiveForm && (
+                  <form onSubmit={saveIncentive} className="border border-slate-100 rounded-xl p-4 space-y-3 bg-slate-50/50">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <select value={incentiveForm.level} onChange={e => setIncentiveForm(f => ({ ...f, level: e.target.value as any }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5">
+                        <option value="federal">Federal</option>
+                        <option value="provincial">Provincial</option>
+                        <option value="municipal">Municipal</option>
+                        <option value="utility">Utility</option>
+                      </select>
+                      <input required placeholder="Code (e.g. CGHAP)" value={incentiveForm.codice} onChange={e => setIncentiveForm(f => ({ ...f, codice: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5" />
+                      <input placeholder="Province (ON, QC...)" value={incentiveForm.province} onChange={e => setIncentiveForm(f => ({ ...f, province: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5" />
+                      <input placeholder="City (optional)" value={incentiveForm.city} onChange={e => setIncentiveForm(f => ({ ...f, city: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5" />
+                    </div>
+                    <input required placeholder="Program title" value={incentiveForm.titolo} onChange={e => setIncentiveForm(f => ({ ...f, titolo: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 w-full" />
+                    <textarea required placeholder="Description" value={incentiveForm.descrizione} onChange={e => setIncentiveForm(f => ({ ...f, descrizione: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 w-full" rows={2} />
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <select value={incentiveForm.categoriaIntervento} onChange={e => setIncentiveForm(f => ({ ...f, categoriaIntervento: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5">
+                        {["all", "energy_efficiency", "heat_pump", "insulation", "windows_doors", "accessibility", "general_renovation"].map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                      <select value={incentiveForm.tipoAgevolazione} onChange={e => setIncentiveForm(f => ({ ...f, tipoAgevolazione: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5">
+                        {["rebate", "direct_grant", "tax_credit", "no_cost_direct_install", "low_interest_loan"].map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                      <input placeholder="Max amount ($)" value={incentiveForm.massimaleContributo} onChange={e => setIncentiveForm(f => ({ ...f, massimaleContributo: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5" />
+                      <label className="flex items-center gap-1.5 text-xs text-slate-500">
+                        <input type="checkbox" checked={incentiveForm.incomeTested} onChange={e => setIncentiveForm(f => ({ ...f, incomeTested: e.target.checked }))} />
+                        Income-tested
+                      </label>
+                    </div>
+                    <input placeholder="Official source URL" value={incentiveForm.fonteUfficialeUrl} onChange={e => setIncentiveForm(f => ({ ...f, fonteUfficialeUrl: e.target.value }))} className="text-xs border border-slate-200 rounded-lg px-2 py-1.5 w-full" />
+                    <div className="flex items-center gap-2">
+                      <button type="submit" disabled={savingIncentive} className="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 disabled:opacity-50">
+                        {editingIncentiveId ? "Save changes" : "Create program"}
+                      </button>
+                      <button type="button" onClick={resetIncentiveForm} className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-500">
+                        {t("admin.cancel")}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {incentives.length === 0 && !loadingIncentives && (
+                  <p className="text-xs text-slate-400">No incentive programs yet.</p>
+                )}
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">Program</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">Level / Region</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">Category</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">Status</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase">Verification</th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-400 uppercase text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {incentives.map((row) => (
+                        <tr key={row.id} className="hover:bg-slate-50/20 text-xs align-top">
+                          <td className="px-4 py-3.5">
+                            <p className="font-semibold text-slate-700">{row.titolo}</p>
+                            <p className="text-slate-400">{row.codice}</p>
+                          </td>
+                          <td className="px-4 py-3.5 text-slate-600">
+                            {row.level}{row.province ? ` · ${row.province}` : ""}{row.city ? ` · ${row.city}` : ""}
+                          </td>
+                          <td className="px-4 py-3.5 text-slate-600">{row.categoriaIntervento}</td>
+                          <td className="px-4 py-3.5">
+                            <span className={`px-2 py-0.5 rounded-full font-bold ${row.stato === "active" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : row.stato === "expiring_soon" ? "bg-amber-50 text-amber-700 border border-amber-100" : "bg-slate-100 text-slate-500"}`}>
+                              {row.stato}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3.5">
+                            <button
+                              onClick={() => toggleHumanVerified(row)}
+                              className={`px-2 py-0.5 rounded-full font-bold ${row.humanVerified ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
+                            >
+                              {row.humanVerified ? "Human-verified" : "Mark verified"}
+                            </button>
+                            {!row.isVerifiedByAi && (
+                              <span className="ml-1.5 px-2 py-0.5 rounded-full font-bold bg-red-50 text-red-600 border border-red-100">AI check failed</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3.5 text-right space-x-2">
+                            <button onClick={() => startEditIncentive(row)} className="text-violet-600 hover:underline font-semibold">Edit</button>
+                            <button onClick={() => deleteIncentive(row.id)} className="text-red-500 hover:underline font-semibold">Delete</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
           {tab === "email-events" && (
             <div className="space-y-6">
               <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">

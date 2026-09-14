@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable } from "@workspace/db";
-import { eq, sql } from "drizzle-orm";
+import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable } from "@workspace/db";
+import { eq, sql, or, isNull } from "drizzle-orm";
+import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
@@ -689,6 +690,51 @@ router.post("/public/quotes/:id/financeit/apply", financeitApplyLimiter, async (
   } catch (err) {
     logger.error({ err }, "Error starting Financeit application");
     res.status(502).json({ error: "FINANCEIT_API_ERROR", message: "Couldn't reach Financeit — try again in a moment." });
+  }
+});
+
+// GET /api/public/quotes/:id/incentives — rebate/grant programs that could
+// apply to this quote's work and location. Never a guarantee of eligibility;
+// the frontend always renders the accompanying disclaimer.
+router.get("/public/quotes/:id/incentives", quoteViewLimiter, async (req, res) => {
+  try {
+    const id = req.params.id as string;
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote || (quote.status !== "unlocked" && quote.status !== "accepted")) {
+      res.status(404).json({ error: "Quote not found." });
+      return;
+    }
+
+    const catalog = await db
+      .select()
+      .from(incentivesCatalogTable)
+      .where(or(isNull(incentivesCatalogTable.userId), eq(incentivesCatalogTable.userId, quote.userId)));
+
+    const chapterText = (quote.capitoli ?? [])
+      .map((c) => [c.titolo, ...(c.voci ?? []).map((v) => v.descrizione)].join(" "))
+      .join(" ");
+    const categories = inferInterventionCategories(`${quote.descrizioneGenerale ?? ""} ${chapterText}`);
+
+    const matches = matchIncentivesForQuote(catalog, { province: quote.province, categories })
+      .slice(0, 6)
+      .map((item) => ({
+        id: item.id,
+        level: item.level,
+        titolo: item.titolo,
+        descrizione: item.descrizione,
+        tipoAgevolazione: item.tipoAgevolazione,
+        percentualeMassima: item.percentualeMassima,
+        massimaleContributo: item.massimaleContributo,
+        massimaleSpesa: item.massimaleSpesa,
+        incomeTested: item.incomeTested,
+        fonteUfficialeUrl: item.fonteUfficialeUrl,
+        humanVerified: item.humanVerified,
+      }));
+
+    res.json({ incentives: matches });
+  } catch (err) {
+    logger.error({ err }, "Error matching public quote incentives");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

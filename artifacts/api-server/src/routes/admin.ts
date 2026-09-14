@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth";
-import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable, incentivesCatalogTable, insertIncentivesCatalogSchema } from "@workspace/db";
 import { eq, sql, desc, count, inArray } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { getUncachableStripeClient } from "../stripeClient";
@@ -1043,6 +1043,77 @@ router.get("/admin/email-events", requireAdmin, async (req, res) => {
     res.json({ success: true, count: events.length, events });
   } catch (err) {
     logger.error({ err }, "Error fetching email events");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Incentives catalog CRUD (Phase 17) ──────────────────────────────────────
+// System-wide catalog only (userId null) — a contractor's own custom program
+// isn't manageable from here yet, so this always filters to platform entries.
+router.get("/admin/incentives", async (_req, res) => {
+  try {
+    const rows = await db
+      .select()
+      .from(incentivesCatalogTable)
+      .orderBy(desc(incentivesCatalogTable.updatedAt));
+    res.json({ success: true, incentives: rows });
+  } catch (err) {
+    logger.error({ err }, "Error fetching incentives catalog");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/admin/incentives", async (req, res) => {
+  try {
+    const parsed = insertIncentivesCatalogSchema.safeParse({ ...req.body, userId: null });
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid incentive data", details: parsed.error.issues });
+      return;
+    }
+    const [row] = await db.insert(incentivesCatalogTable).values(parsed.data).returning();
+    res.json({ success: true, incentive: row });
+  } catch (err) {
+    logger.error({ err }, "Error creating incentive");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/admin/incentives/:id", async (req, res) => {
+  try {
+    const parsed = insertIncentivesCatalogSchema.partial().safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid incentive data", details: parsed.error.issues });
+      return;
+    }
+    const [row] = await db
+      .update(incentivesCatalogTable)
+      .set({ ...parsed.data, updatedAt: new Date() })
+      .where(eq(incentivesCatalogTable.id, req.params.id as string))
+      .returning();
+    if (!row) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    res.json({ success: true, incentive: row });
+  } catch (err) {
+    logger.error({ err }, "Error updating incentive");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/admin/incentives/:id", async (req, res) => {
+  try {
+    const [row] = await db
+      .delete(incentivesCatalogTable)
+      .where(eq(incentivesCatalogTable.id, req.params.id as string))
+      .returning();
+    if (!row) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    res.json({ success: true });
+  } catch (err) {
+    logger.error({ err }, "Error deleting incentive");
     res.status(500).json({ error: "Internal server error" });
   }
 });

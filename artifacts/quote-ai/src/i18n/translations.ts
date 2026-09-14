@@ -1604,6 +1604,13 @@ export const translations: Record<Lang, Record<string, string>> = {
     "publicQuote.financing.continueApplication": "Continue application",
     "publicQuote.financing.error": "Couldn't reach the financing provider. Please try again shortly.",
 
+    "publicQuote.rebates.title": "You may qualify for rebates",
+    "publicQuote.rebates.subtitle": "Programs that could apply to this job, based on its location and type of work.",
+    "publicQuote.rebates.upTo": "Up to",
+    "publicQuote.rebates.incomeTested": "Income-tested",
+    "publicQuote.rebates.learnMore": "Learn more",
+    "publicQuote.rebates.disclaimer": "Estimated matches only, not a guarantee of eligibility. Confirm details with the program before relying on it.",
+
     "dashboard.quotesList.statusAll": "All",
     "dashboard.quotesList.statusDraft": "Draft",
     "dashboard.quotesList.statusUnlocked": "Unlocked",
@@ -4410,6 +4417,13 @@ export const translations: Record<Lang, Record<string, string>> = {
     "publicQuote.financing.statusFunded": "Votre financement a été versé.",
     "publicQuote.financing.continueApplication": "Continuer la demande",
     "publicQuote.financing.error": "Impossible de joindre le fournisseur de financement. Réessayez sous peu.",
+
+    "publicQuote.rebates.title": "Vous pourriez être admissible à des subventions",
+    "publicQuote.rebates.subtitle": "Programmes qui pourraient s'appliquer à ce chantier, selon son emplacement et le type de travaux.",
+    "publicQuote.rebates.upTo": "Jusqu'à",
+    "publicQuote.rebates.incomeTested": "Sous condition de revenu",
+    "publicQuote.rebates.learnMore": "En savoir plus",
+    "publicQuote.rebates.disclaimer": "Correspondances estimées seulement, pas une garantie d'admissibilité. Confirmez les détails auprès du programme avant de vous y fier.",
 
     "dashboard.quotesList.statusAll": "Toutes",
     "dashboard.quotesList.statusDraft": "Brouillon",

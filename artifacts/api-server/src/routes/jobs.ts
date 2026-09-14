@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
+import multer from "multer";
+import { randomUUID } from "node:crypto";
 import {
   db,
   projectsTable,
@@ -16,6 +18,8 @@ import {
   equipmentUsageTable,
   equipmentTable,
   businessProfilesTable,
+  whatsappConnectionsTable,
+  jobPhotosTable,
   hasFeature,
   minimumPlanFor,
   PROJECT_STATUSES,
@@ -35,8 +39,22 @@ import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
 import { costSummary, serializeCostEntry, serializeTimeEntry, serializeUsage } from "../costs/service.js";
 import { invoicesForProject, projectInvoiceTotals } from "../invoices/service.js";
 import { serializeInvoice } from "./invoices.js";
+import { Readable } from "node:stream";
+import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
+import { sendJobPhotoShare } from "../lib/jobMessaging.js";
 
 const router = Router();
+const objectStorage = new ObjectStorageService();
+
+const PHOTO_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"];
+const photoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (PHOTO_MIME_TYPES.includes(file.mimetype)) cb(null, true);
+    else cb(new Error(`Unsupported file type: ${file.mimetype}. Use a JPG, PNG, WEBP or HEIC photo.`));
+  },
+});
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -862,5 +880,244 @@ router.delete("/jobs/:id/change-orders/:coId", requireAuth, async (req, res) => 
 });
 
 // Costs, time entries and equipment usage live in routes/costs.ts and routes/team.ts (Phase 3).
+
+// ── Photos (Phase 10) ─────────────────────────────────────────────────────────
+// Job photo gallery: upload tied to a job and optionally a milestone, stored
+// privately in Supabase Storage exactly like receipts (routes/costs.ts). A
+// "share" send emails/WhatsApps time-limited signed links to the customer —
+// it doesn't change where the file lives or make it public.
+
+function serializePhoto(p: typeof jobPhotosTable.$inferSelect) {
+  return {
+    id: p.id,
+    projectId: p.projectId,
+    milestoneId: p.milestoneId,
+    fileName: p.fileName,
+    fileSize: p.fileSize,
+    mimeType: p.mimeType,
+    caption: p.caption,
+    sortOrder: p.sortOrder,
+    sharedAt: p.sharedAt ? p.sharedAt.toISOString() : null,
+    createdAt: p.createdAt.toISOString(),
+  };
+}
+
+router.get("/jobs/:id/photos", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const photos = await db.select().from(jobPhotosTable).where(eq(jobPhotosTable.projectId, project.id)).orderBy(asc(jobPhotosTable.sortOrder), asc(jobPhotosTable.createdAt));
+    res.json({ photos: photos.map(serializePhoto) });
+  } catch (err) {
+    req.log.error({ err }, "Error listing job photos");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post(
+  "/jobs/:id/photos",
+  requireAuth,
+  (req, res, next) => {
+    photoUpload.single("file")(req, res, (err) => {
+      if (err instanceof multer.MulterError || err instanceof Error) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      next(err);
+    });
+  },
+  async (req, res) => {
+    try {
+      const userId = getUserId(res);
+      const project = await ownedProject(userId, req.params.id as string);
+      if (!project) {
+        res.status(404).json({ error: "Not found" });
+        return;
+      }
+      const file = req.file;
+      if (!file) {
+        res.status(400).json({ error: "No file provided" });
+        return;
+      }
+      const milestoneIdRaw = typeof req.body?.milestoneId === "string" && req.body.milestoneId ? req.body.milestoneId : null;
+      if (milestoneIdRaw) {
+        const [m] = await db.select().from(milestonesTable).where(and(eq(milestonesTable.id, milestoneIdRaw), eq(milestonesTable.projectId, project.id)));
+        if (!m) {
+          res.status(404).json({ error: "Milestone not found" });
+          return;
+        }
+      }
+      const caption = typeof req.body?.caption === "string" ? req.body.caption.slice(0, 500) : "";
+      const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic" }[file.mimetype] ?? "bin";
+      const subPath = `job-photos/${userId}/${project.id}/${randomUUID()}.${ext}`;
+      const fileUrl = await objectStorage.uploadObjectBuffer({ subPath, buffer: file.buffer, contentType: file.mimetype });
+      const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(jobPhotosTable).where(eq(jobPhotosTable.projectId, project.id));
+      const [photo] = await db
+        .insert(jobPhotosTable)
+        .values({
+          userId,
+          projectId: project.id,
+          milestoneId: milestoneIdRaw,
+          fileName: file.originalname,
+          fileSize: file.size,
+          mimeType: file.mimetype,
+          fileUrl,
+          caption,
+          sortOrder: Number(count ?? 0),
+        })
+        .returning();
+      res.status(201).json({ photo: serializePhoto(photo!) });
+    } catch (err) {
+      req.log.error({ err }, "Error uploading job photo");
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+router.get("/jobs/:id/photos/:photoId/file", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const [photo] = await db.select().from(jobPhotosTable).where(and(eq(jobPhotosTable.id, req.params.photoId as string), eq(jobPhotosTable.projectId, project.id)));
+    if (!photo) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const file = await objectStorage.downloadPrivateObject(photo.fileUrl.replace(/^\/objects\//, ""));
+    res.status(file.status);
+    file.headers.forEach((v, k) => res.setHeader(k, v));
+    if (file.body) Readable.fromWeb(file.body as unknown as import("node:stream/web").ReadableStream<Uint8Array>).pipe(res);
+    else res.end();
+  } catch (err) {
+    if (err instanceof ObjectNotFoundError) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    req.log.error({ err }, "Error fetching job photo");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const body = z.object({ caption: z.string().max(500).optional(), milestoneId: z.string().uuid().nullable().optional(), sortOrder: z.number().int().min(0).optional() }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const [existing] = await db.select().from(jobPhotosTable).where(and(eq(jobPhotosTable.id, req.params.photoId as string), eq(jobPhotosTable.projectId, project.id)));
+    if (!existing) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const [photo] = await db
+      .update(jobPhotosTable)
+      .set({
+        ...(body.data.caption !== undefined && { caption: body.data.caption }),
+        ...(body.data.milestoneId !== undefined && { milestoneId: body.data.milestoneId }),
+        ...(body.data.sortOrder !== undefined && { sortOrder: body.data.sortOrder }),
+      })
+      .where(eq(jobPhotosTable.id, existing.id))
+      .returning();
+    res.json({ photo: serializePhoto(photo!) });
+  } catch (err) {
+    req.log.error({ err }, "Error updating job photo");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const [photo] = await db.select().from(jobPhotosTable).where(and(eq(jobPhotosTable.id, req.params.photoId as string), eq(jobPhotosTable.projectId, project.id)));
+    if (!photo) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    await objectStorage.deleteObjectBuffer(photo.fileUrl.replace(/^\/objects\//, ""));
+    await db.delete(jobPhotosTable).where(eq(jobPhotosTable.id, photo.id));
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error deleting job photo");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/jobs/:id/photos/share — email/WhatsApp signed links to a set of
+// photos to the job's client. Doesn't publish the photos; links expire.
+router.post("/jobs/:id/photos/share", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (!project.clientId) {
+      res.status(409).json({ error: "NO_CLIENT", message: "This job has no client to share photos with." });
+      return;
+    }
+    const body = z.object({ photoIds: z.array(z.string().uuid()).min(1).max(20) }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const photos = await db.select().from(jobPhotosTable).where(and(inArray(jobPhotosTable.id, body.data.photoIds), eq(jobPhotosTable.projectId, project.id)));
+    if (photos.length === 0) {
+      res.status(404).json({ error: "No matching photos" });
+      return;
+    }
+    const [client] = await db.select().from(clientsTable).where(eq(clientsTable.id, project.clientId));
+    if (!client) {
+      res.status(404).json({ error: "Client not found" });
+      return;
+    }
+    if (client.marketingUnsubscribedAt) {
+      res.status(409).json({ error: "UNSUBSCRIBED", message: "This client has unsubscribed from these messages." });
+      return;
+    }
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    if (!profile) {
+      res.status(500).json({ error: "Business profile not found" });
+      return;
+    }
+    const photoUrls = await Promise.all(
+      photos.map((p) => objectStorage.getPresignedGetURL(p.fileUrl.replace(/^\/objects\//, ""), 30 * 24 * 60 * 60)),
+    );
+    const [wa] = await db.select().from(whatsappConnectionsTable).where(eq(whatsappConnectionsTable.userId, userId));
+    const whatsappTemplateName = wa?.isEnabled ? (process.env.WHATSAPP_PHOTO_SHARE_TEMPLATE ?? null) : null;
+
+    const result = await sendJobPhotoShare({ client, profile, photoUrls, whatsappTemplateName });
+    if (!result.ok) {
+      res.status(502).json({ error: "SEND_FAILED", reason: result.reason });
+      return;
+    }
+    await db.update(jobPhotosTable).set({ sharedAt: new Date() }).where(inArray(jobPhotosTable.id, photos.map((p) => p.id)));
+    await writeAudit({ userId, actorType: "user", entityType: "project", entityId: project.id, action: "photos_shared", diff: { channel: result.channel, photoIds: photos.map((p) => p.id) } });
+    res.json({ success: true, channel: result.channel, count: photos.length });
+  } catch (err) {
+    req.log.error({ err }, "Error sharing job photos");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 export default router;

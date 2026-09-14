@@ -29,6 +29,7 @@ import assistantRouter from "./assistant";
 import usageRouter from "./usage";
 import leadsRouter from "./leads";
 import publicLeadsRouter from "./public-leads";
+import publicReviewsRouter from "./public-reviews";
 
 const router: IRouter = Router();
 
@@ -62,5 +63,6 @@ router.use(assistantRouter);
 router.use(usageRouter);
 router.use(leadsRouter);
 router.use(publicLeadsRouter);
+router.use(publicReviewsRouter);
 
 export default router;

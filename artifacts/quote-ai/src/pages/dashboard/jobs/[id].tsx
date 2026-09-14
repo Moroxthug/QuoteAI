@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X,
+  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,11 @@ import { TeamTab } from "@/components/jobs/team-tab";
 import { InvoicesTab } from "@/components/jobs/invoices-tab";
 import { OverviewCharts } from "@/components/jobs/overview-charts";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
+import { PhotosTab } from "@/components/jobs/photos-tab";
 
-const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "documents", "assistant"] as const;
+const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "photos", "documents", "assistant"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, documents: FolderOpen, assistant: Sparkles };
+const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, photos: Camera, documents: FolderOpen, assistant: Sparkles };
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 
@@ -124,6 +125,7 @@ export default function JobDetailPage() {
       {tab === "costs" && <CostsTab data={data} locale={locale} />}
       {tab === "invoices" && <InvoicesTab data={data} locale={locale} />}
       {tab === "team" && <TeamTab data={data} locale={locale} />}
+      {tab === "photos" && <PhotosTab data={data} />}
       {tab === "documents" && <DocumentsTab data={data} locale={locale} />}
       {tab === "assistant" && <AssistantPanel projectId={job.id} />}
 

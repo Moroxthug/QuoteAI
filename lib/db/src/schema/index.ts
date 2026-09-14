@@ -24,3 +24,4 @@ export * from "./assistant";
 export * from "./organization-members";
 export * from "./usage";
 export * from "./leads";
+export * from "./job-photos";

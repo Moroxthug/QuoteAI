@@ -37,6 +37,8 @@ function serializeProfileExtras(profile: BusinessProfile | undefined) {
     licenceNumber: profile?.licenceNumber ?? null,
     etransferEmail: profile?.etransferEmail ?? null,
     defaultPaymentSchedule: profile?.defaultPaymentSchedule ?? null,
+    googleReviewUrl: profile?.googleReviewUrl ?? null,
+    sendReviewRequests: profile?.sendReviewRequests ?? true,
     automationSettings: { ...DEFAULT_AUTOMATION_SETTINGS, ...(profile?.automationSettings ?? {}) },
     plan: effectivePlan(profile),
     features,
@@ -50,6 +52,8 @@ const ProfileExtrasBody = z.object({
   pstNumber: z.string().max(40).nullable().optional(),
   licenceNumber: z.string().max(80).nullable().optional(),
   etransferEmail: z.string().email().max(200).nullable().optional(),
+  googleReviewUrl: z.string().url().max(500).nullable().optional(),
+  sendReviewRequests: z.boolean().optional(),
   defaultPaymentSchedule: z.unknown().nullable().optional(),
   automationSettings: z
     .object({
@@ -158,6 +162,8 @@ router.put("/business-profile", requireAuth, async (req, res) => {
       ...(extras.pstNumber !== undefined && { pstNumber: extras.pstNumber?.trim() || null }),
       ...(extras.licenceNumber !== undefined && { licenceNumber: extras.licenceNumber?.trim() || null }),
       ...(extras.etransferEmail !== undefined && { etransferEmail: extras.etransferEmail?.trim() || null }),
+      ...(extras.googleReviewUrl !== undefined && { googleReviewUrl: extras.googleReviewUrl?.trim() || null }),
+      ...(extras.sendReviewRequests !== undefined && { sendReviewRequests: extras.sendReviewRequests }),
       ...(defaultPaymentSchedule !== undefined && { defaultPaymentSchedule }),
       ...(extras.automationSettings !== undefined && {
         automationSettings: { ...(existing?.automationSettings ?? {}), ...extras.automationSettings },

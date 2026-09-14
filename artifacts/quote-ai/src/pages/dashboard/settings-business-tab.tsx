@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Loader2, Save, MapPin, Landmark, Zap, CalendarClock } from "lucide-react";
+import { Loader2, Save, MapPin, Landmark, Zap, CalendarClock, Star } from "lucide-react";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
 import { CANADIAN_PROVINCES, type PaymentSchedule } from "@/lib/payment-schedule";
 
@@ -23,6 +23,8 @@ type ProfileExtras = {
   pstNumber: string | null;
   licenceNumber: string | null;
   etransferEmail: string | null;
+  googleReviewUrl: string | null;
+  sendReviewRequests: boolean;
   defaultPaymentSchedule: PaymentSchedule | null;
   automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean; invoiceAutoSendAfterHours: number; invoiceReminders: boolean };
 };
@@ -57,6 +59,8 @@ export function BusinessTab() {
   const [pstNumber, setPstNumber] = useState("");
   const [licenceNumber, setLicenceNumber] = useState("");
   const [etransferEmail, setEtransferEmail] = useState("");
+  const [googleReviewUrl, setGoogleReviewUrl] = useState("");
+  const [sendReviewRequests, setSendReviewRequests] = useState(true);
   const [notifyOnQuoteAccepted, setNotifyOnQuoteAccepted] = useState(true);
   const [autoSendInvoices, setAutoSendInvoices] = useState(false);
   const [invoiceAutoSendAfterHours, setInvoiceAutoSendAfterHours] = useState(0);
@@ -72,6 +76,8 @@ export function BusinessTab() {
     setPstNumber(profile.pstNumber ?? "");
     setLicenceNumber(profile.licenceNumber ?? "");
     setEtransferEmail(profile.etransferEmail ?? "");
+    setGoogleReviewUrl(profile.googleReviewUrl ?? "");
+    setSendReviewRequests(profile.sendReviewRequests ?? true);
     setNotifyOnQuoteAccepted(profile.automationSettings?.notifyOnQuoteAccepted ?? true);
     setAutoSendInvoices(profile.automationSettings?.autoSendInvoices ?? false);
     setInvoiceAutoSendAfterHours(profile.automationSettings?.invoiceAutoSendAfterHours ?? 0);
@@ -103,6 +109,8 @@ export function BusinessTab() {
           pstNumber: pstNumber || null,
           licenceNumber: licenceNumber || null,
           etransferEmail: etransferEmail || null,
+          googleReviewUrl: googleReviewUrl || null,
+          sendReviewRequests,
           automationSettings: { notifyOnQuoteAccepted, autoSendInvoices, invoiceAutoSendAfterHours, invoiceReminders },
           defaultPaymentSchedule: schedule,
         }),
@@ -195,6 +203,30 @@ export function BusinessTab() {
           <Label htmlFor="etransfer">{t("dashboard.settings.business.etransferEmail")}</Label>
           <Input id="etransfer" type="email" value={etransferEmail} onChange={(e) => setEtransferEmail(e.target.value)} placeholder="payments@yourcompany.ca" />
           <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.etransferHint")}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Star className="h-5 w-5 text-violet-600" />
+            {t("dashboard.settings.business.reviewsTitle")}
+          </CardTitle>
+          <CardDescription>{t("dashboard.settings.business.reviewsDesc")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="googleReviewUrl">{t("dashboard.settings.business.googleReviewUrl")}</Label>
+            <Input id="googleReviewUrl" type="url" value={googleReviewUrl} onChange={(e) => setGoogleReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" />
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.googleReviewUrlHint")}</p>
+          </div>
+          <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+            <div>
+              <div className="text-sm font-medium">{t("dashboard.settings.business.sendReviewRequests")}</div>
+              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.sendReviewRequestsHint")}</div>
+            </div>
+            <Switch checked={sendReviewRequests} onCheckedChange={setSendReviewRequests} disabled={!googleReviewUrl} />
+          </div>
         </CardContent>
       </Card>
 

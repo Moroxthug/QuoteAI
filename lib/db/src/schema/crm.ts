@@ -58,6 +58,8 @@ export const projectsTable = pgTable("projects", {
   plannedEnd: timestamp("planned_end", { withTimezone: true }),
   progressPercent: integer("progress_percent").notNull().default(0),
   completedAt: timestamp("completed_at", { withTimezone: true }),
+  /** Phase 10: set once the review-request message has gone out, so the daily scan never re-sends it. */
+  reviewRequestSentAt: timestamp("review_request_sent_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

@@ -4,6 +4,7 @@ import {
   timestamp,
   integer,
   jsonb,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -60,6 +61,9 @@ export const businessProfilesTable = pgTable("business_profiles", {
   licenceNumber: text("licence_number"), // RBQ (QC), HCRA (ON builders), municipal licence, etc.
   etransferEmail: text("etransfer_email"), // where customers send Interac e-Transfers
   defaultPaymentSchedule: jsonb("default_payment_schedule").$type<PaymentSchedule | null>(),
+  // ── Phase 10: review requests ────────────────────────────────────────────
+  googleReviewUrl: text("google_review_url"), // Google Business Profile "write a review" link, set once in Settings
+  sendReviewRequests: boolean("send_review_requests").notNull().default(true),
   automationSettings: jsonb("automation_settings").$type<Partial<AutomationSettings>>().notNull().default({}),
   featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

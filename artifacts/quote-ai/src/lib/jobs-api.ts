@@ -192,6 +192,19 @@ export type JobDetailDto = {
   invoiceTotals: import("./invoices-api").InvoiceTotalsDto;
 };
 
+export type JobPhotoDto = {
+  id: string;
+  projectId: string;
+  milestoneId: string | null;
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  caption: string;
+  sortOrder: number;
+  sharedAt: string | null;
+  createdAt: string;
+};
+
 export type MilestoneEdit = {
   id?: string;
   key?: string;
@@ -276,6 +289,24 @@ export const jobsApi = {
   addTimeEntry: (id: string, body: { workerId: string; date: string; hours: number; milestoneId?: string | null; note?: string; approve?: boolean }) => req<{ entry: TimeEntryDto }>(`/api/jobs/${id}/time-entries`, { method: "POST", body: json(body) }),
   addEquipmentUsage: (id: string, body: { equipmentId: string; date: string; quantity: number; unit?: UsageUnit; milestoneId?: string | null; note?: string }) => req<{ usage: EquipmentUsageDto }>(`/api/jobs/${id}/equipment-usage`, { method: "POST", body: json(body) }),
   deleteEquipmentUsage: (id: string, uid: string) => req<{ success: true }>(`/api/jobs/${id}/equipment-usage/${uid}`, { method: "DELETE" }),
+
+  // Photos (Phase 10)
+  listPhotos: (id: string) => req<{ photos: JobPhotoDto[] }>(`/api/jobs/${id}/photos`),
+  uploadPhoto: async (id: string, file: File, opts?: { milestoneId?: string | null; caption?: string }) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    if (opts?.milestoneId) fd.append("milestoneId", opts.milestoneId);
+    if (opts?.caption) fd.append("caption", opts.caption);
+    const res = await fetch(`/api/jobs/${id}/photos`, { method: "POST", credentials: "include", body: fd });
+    const body = (await res.json().catch(() => ({}))) as { photo: JobPhotoDto; error?: string; message?: string };
+    if (!res.ok) throw new Error(body.message || body.error || `Request failed (${res.status})`);
+    return body;
+  },
+  updatePhoto: (id: string, photoId: string, body: { caption?: string; milestoneId?: string | null; sortOrder?: number }) =>
+    req<{ photo: JobPhotoDto }>(`/api/jobs/${id}/photos/${photoId}`, { method: "PUT", body: json(body) }),
+  deletePhoto: (id: string, photoId: string) => req<{ success: true }>(`/api/jobs/${id}/photos/${photoId}`, { method: "DELETE" }),
+  sharePhotos: (id: string, photoIds: string[]) => req<{ success: true; channel: "email" | "whatsapp"; count: number }>(`/api/jobs/${id}/photos/share`, { method: "POST", body: json({ photoIds }) }),
+  photoFileUrl: (id: string, photoId: string) => `/api/jobs/${id}/photos/${photoId}/file`,
 };
 
 export { req as apiRequest, json as apiJson };

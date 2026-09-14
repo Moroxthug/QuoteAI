@@ -34,12 +34,14 @@ import type {
   CreateCheckoutBody,
   CreateManualQuoteBody,
   CreateQuoteBody,
+  CreateQuoteVariantBody,
   EmailConnectionToggleBody,
   EmailConnectionUrl,
   EmailConnectionsStatus,
   EmailProvider,
   HealthStatus,
   ImportCatalogResult,
+  ListQuoteVariants200,
   LogoUploadResult,
   PaymentVerifyResult,
   PdfResult,
@@ -57,6 +59,7 @@ import type {
   QuickbooksToggleBody,
   Quote,
   QuoteStats,
+  QuoteVariant,
   RegenerateQuoteBody,
   SendQuotePdfEmail200,
   SendQuotePdfEmailBody,
@@ -69,6 +72,7 @@ import type {
   UpdateBusinessProfileBody,
   UpdateCatalogItemBody,
   UpdateQuoteBody,
+  UpdateQuoteVariantBody,
   UploadBusinessProfileLogoBody,
   UploadDocumentBody,
   UploadUrlRequest,
@@ -1082,6 +1086,339 @@ export const useDuplicateQuote = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDuplicateQuoteMutationOptions(options));
+    }
+
+export const getListQuoteVariantsUrl = (id: string,) => {
+
+
+
+
+  return `/api/quotes/${id}/variants`
+}
+
+/**
+ * @summary List a quote's Good/Better/Best variants
+ */
+export const listQuoteVariants = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<ListQuoteVariants200> => {
+
+  return customFetch<ListQuoteVariants200>(getListQuoteVariantsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListQuoteVariantsQueryKey = (id: string,) => {
+    return [
+    `/api/quotes/${id}/variants`
+    ] as const;
+    }
+
+
+export const getListQuoteVariantsQueryOptions = <TData = Awaited<ReturnType<typeof listQuoteVariants>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listQuoteVariants>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListQuoteVariantsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listQuoteVariants>>> = ({ signal }) => listQuoteVariants(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listQuoteVariants>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListQuoteVariantsQueryResult = NonNullable<Awaited<ReturnType<typeof listQuoteVariants>>>
+export type ListQuoteVariantsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List a quote's Good/Better/Best variants
+ */
+
+export function useListQuoteVariants<TData = Awaited<ReturnType<typeof listQuoteVariants>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listQuoteVariants>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListQuoteVariantsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateQuoteVariantUrl = (id: string,) => {
+
+
+
+
+  return `/api/quotes/${id}/variants`
+}
+
+/**
+ * @summary Add a variant to a quote (clones current pricing, or another variant, by default). A quote can have at most 3.
+ */
+export const createQuoteVariant = async (id: string,
+    createQuoteVariantBody?: CreateQuoteVariantBody, options?: Parameters<typeof customFetch>[1]): Promise<QuoteVariant> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuoteVariant>(getCreateQuoteVariantUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createQuoteVariantBody)
+  }
+);}
+
+
+
+
+
+export const getCreateQuoteVariantMutationKey = () => ['createQuoteVariant'] as const;
+
+export const getCreateQuoteVariantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createQuoteVariant>>, TError,CreateQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createQuoteVariant>>, TError,CreateQuoteVariantMutationVariables, TContext> => {
+
+const mutationKey = getCreateQuoteVariantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createQuoteVariant>>, CreateQuoteVariantMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createQuoteVariant(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateQuoteVariantMutationResult = NonNullable<Awaited<ReturnType<typeof createQuoteVariant>>>
+    export type CreateQuoteVariantMutationBody = BodyType<CreateQuoteVariantBody> | undefined
+    export type CreateQuoteVariantMutationError = ErrorType<unknown>
+    export type CreateQuoteVariantMutationVariables = {id: string;data?: BodyType<CreateQuoteVariantBody>}
+
+    /**
+ * @summary Add a variant to a quote (clones current pricing, or another variant, by default). A quote can have at most 3.
+ */
+export const useCreateQuoteVariant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createQuoteVariant>>, TError,CreateQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createQuoteVariant>>,
+        TError,
+        CreateQuoteVariantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateQuoteVariantMutationOptions(options));
+    }
+
+export const getUpdateQuoteVariantUrl = (id: string,
+    variantId: string,) => {
+
+
+
+
+  return `/api/quotes/${id}/variants/${variantId}`
+}
+
+/**
+ * @summary Update a quote variant's pricing/content
+ */
+export const updateQuoteVariant = async (id: string,
+    variantId: string,
+    updateQuoteVariantBody?: UpdateQuoteVariantBody, options?: Parameters<typeof customFetch>[1]): Promise<QuoteVariant> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<QuoteVariant>(getUpdateQuoteVariantUrl(id,variantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateQuoteVariantBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateQuoteVariantMutationKey = () => ['updateQuoteVariant'] as const;
+
+export const getUpdateQuoteVariantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateQuoteVariant>>, TError,UpdateQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateQuoteVariant>>, TError,UpdateQuoteVariantMutationVariables, TContext> => {
+
+const mutationKey = getUpdateQuoteVariantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateQuoteVariant>>, UpdateQuoteVariantMutationVariables> = (props) => {
+          const {id,variantId,data} = props ?? {};
+
+          return  updateQuoteVariant(id,variantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateQuoteVariantMutationResult = NonNullable<Awaited<ReturnType<typeof updateQuoteVariant>>>
+    export type UpdateQuoteVariantMutationBody = BodyType<UpdateQuoteVariantBody> | undefined
+    export type UpdateQuoteVariantMutationError = ErrorType<unknown>
+    export type UpdateQuoteVariantMutationVariables = {id: string;variantId: string;data?: BodyType<UpdateQuoteVariantBody>}
+
+    /**
+ * @summary Update a quote variant's pricing/content
+ */
+export const useUpdateQuoteVariant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateQuoteVariant>>, TError,UpdateQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateQuoteVariant>>,
+        TError,
+        UpdateQuoteVariantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateQuoteVariantMutationOptions(options));
+    }
+
+export const getDeleteQuoteVariantUrl = (id: string,
+    variantId: string,) => {
+
+
+
+
+  return `/api/quotes/${id}/variants/${variantId}`
+}
+
+/**
+ * @summary Remove a quote variant
+ */
+export const deleteQuoteVariant = async (id: string,
+    variantId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getDeleteQuoteVariantUrl(id,variantId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteQuoteVariantMutationKey = () => ['deleteQuoteVariant'] as const;
+
+export const getDeleteQuoteVariantMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteQuoteVariant>>, TError,DeleteQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteQuoteVariant>>, TError,DeleteQuoteVariantMutationVariables, TContext> => {
+
+const mutationKey = getDeleteQuoteVariantMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteQuoteVariant>>, DeleteQuoteVariantMutationVariables> = (props) => {
+          const {id,variantId} = props ?? {};
+
+          return  deleteQuoteVariant(id,variantId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteQuoteVariantMutationResult = NonNullable<Awaited<ReturnType<typeof deleteQuoteVariant>>>
+
+    export type DeleteQuoteVariantMutationError = ErrorType<unknown>
+    export type DeleteQuoteVariantMutationVariables = {id: string;variantId: string}
+
+    /**
+ * @summary Remove a quote variant
+ */
+export const useDeleteQuoteVariant = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteQuoteVariant>>, TError,DeleteQuoteVariantMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteQuoteVariant>>,
+        TError,
+        DeleteQuoteVariantMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteQuoteVariantMutationOptions(options));
     }
 
 export const getRegenerateQuoteUrl = (id: string,) => {

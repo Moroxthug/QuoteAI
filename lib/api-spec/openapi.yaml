@@ -243,6 +243,99 @@ paths:
               schema:
                 $ref: "#/components/schemas/Quote"
 
+  /quotes/{id}/variants:
+    get:
+      operationId: listQuoteVariants
+      tags: [quotes]
+      summary: List a quote's Good/Better/Best variants
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Variants for the quote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  variants:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/QuoteVariant"
+    post:
+      operationId: createQuoteVariant
+      tags: [quotes]
+      summary: Add a variant to a quote (clones current pricing, or another variant, by default). A quote can have at most 3.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuoteVariantBody"
+      responses:
+        "201":
+          description: Newly created variant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteVariant"
+
+  /quotes/{id}/variants/{variantId}:
+    put:
+      operationId: updateQuoteVariant
+      tags: [quotes]
+      summary: Update a quote variant's pricing/content
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateQuoteVariantBody"
+      responses:
+        "200":
+          description: Updated variant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteVariant"
+    delete:
+      operationId: deleteQuoteVariant
+      tags: [quotes]
+      summary: Remove a quote variant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: variantId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
   /quotes/{id}/regenerate:
     post:
       operationId: regenerateQuote
@@ -1311,6 +1404,102 @@ components:
         - fileUrl
         - createdAt
 
+    QuoteVariant:
+      type: object
+      properties:
+        id:
+          type: string
+        quoteId:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+        position:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItem"
+        capitoli:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapter"
+        sconto:
+          $ref: "#/components/schemas/QuoteDiscount"
+          nullable: true
+        condizioniPagamento:
+          type: array
+          items:
+            type: string
+        subtotale:
+          type: number
+        ivaPercentuale:
+          type: number
+        ivaValore:
+          type: number
+        totale:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - quoteId
+        - label
+        - items
+        - capitoli
+        - condizioniPagamento
+        - subtotale
+        - ivaPercentuale
+        - ivaValore
+        - totale
+        - createdAt
+        - updatedAt
+
+    CreateQuoteVariantBody:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        cloneFromVariantId:
+          type: string
+          description: Clone an existing variant's pricing instead of the parent quote's current pricing.
+
+    UpdateQuoteVariantBody:
+      type: object
+      properties:
+        label:
+          type: string
+        description:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItem"
+        capitoli:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteChapter"
+        sconto:
+          $ref: "#/components/schemas/QuoteDiscount"
+          nullable: true
+        condizioniPagamento:
+          type: array
+          items:
+            type: string
+        subtotale:
+          type: number
+        ivaPercentuale:
+          type: number
+        ivaValore:
+          type: number
+        totale:
+          type: number
+
     Quote:
       type: object
       properties:
@@ -1385,6 +1574,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/QuoteAttachment'
+        acceptedVariantId:
+          type: string
+          nullable: true
+        variants:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteVariant"
         createdAt:
           type: string
         updatedAt:

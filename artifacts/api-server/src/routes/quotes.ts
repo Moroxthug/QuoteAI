@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import multer from "multer";
-import { db, quotesTable, quoteAttachmentsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
+import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { eq, desc, count, sum, sql, and, avg } from "drizzle-orm";
@@ -175,7 +175,29 @@ type QuoteRow = typeof quotesTable.$inferSelect;
 
 type AttachmentRow = typeof quoteAttachmentsTable.$inferSelect;
 
-export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[]) {
+type VariantRow = typeof quoteVariantsTable.$inferSelect;
+
+export function serializeQuoteVariant(v: VariantRow) {
+  return {
+    id: v.id,
+    quoteId: v.quoteId,
+    label: v.label,
+    description: v.description,
+    position: v.position,
+    items: Array.isArray(v.items) ? v.items : [],
+    capitoli: Array.isArray(v.capitoli) ? v.capitoli : [],
+    sconto: (v.sconto as QuoteDiscount | null) ?? null,
+    condizioniPagamento: Array.isArray(v.condizioniPagamento) ? v.condizioniPagamento : [],
+    subtotale: Number(v.subtotale),
+    ivaPercentuale: Number(v.ivaPercentuale),
+    ivaValore: Number(v.ivaValore),
+    totale: Number(v.totale),
+    createdAt: v.createdAt.toISOString(),
+    updatedAt: v.updatedAt.toISOString(),
+  };
+}
+
+export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], variants?: VariantRow[]) {
   const tot = Number(q.totale);
   const province = normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null;
   const paymentSchedule = q.paymentSchedule ?? derivePaymentScheduleFromText(q.condizioniPagamento, tot);
@@ -212,6 +234,8 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[]) {
     templateId: q.templateId ?? "standard",
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
+    acceptedVariantId: q.acceptedVariantId ?? null,
+    variants: variants?.map(serializeQuoteVariant) ?? [],
     attachments: attachments?.map(a => ({
       id: a.id,
       fileName: a.fileName,
@@ -1136,14 +1160,200 @@ router.get("/quotes/:id", requireAuth, async (req, res) => {
       return;
     }
 
-    const attachments = await db
-      .select()
-      .from(quoteAttachmentsTable)
-      .where(eq(quoteAttachmentsTable.quoteId, id));
+    const [attachments, variants] = await Promise.all([
+      db.select().from(quoteAttachmentsTable).where(eq(quoteAttachmentsTable.quoteId, id)),
+      db.select().from(quoteVariantsTable).where(eq(quoteVariantsTable.quoteId, id)).orderBy(quoteVariantsTable.position),
+    ]);
 
-    res.json(serializeQuote(quote, attachments));
+    res.json(serializeQuote(quote, attachments, variants));
   } catch (err) {
     req.log.error({ err }, "Error fetching quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/quotes/:id/variants
+router.get("/quotes/:id/variants", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const id = req.params.id as string;
+
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (quote.userId !== userId) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const variants = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(eq(quoteVariantsTable.quoteId, id))
+      .orderBy(quoteVariantsTable.position);
+
+    res.json({ variants: variants.map(serializeQuoteVariant) });
+  } catch (err) {
+    req.log.error({ err }, "Error fetching quote variants");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/quotes/:id/variants — clone the quote's current pricing into a new variant
+router.post("/quotes/:id/variants", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const id = req.params.id as string;
+
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (quote.userId !== userId) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const existingVariants = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(eq(quoteVariantsTable.quoteId, id));
+
+    if (existingVariants.length >= 3) {
+      res.status(400).json({ error: "A quote can have at most 3 variants" });
+      return;
+    }
+
+    const body = req.body as Record<string, unknown>;
+    const cloneFrom = typeof body.cloneFromVariantId === "string"
+      ? existingVariants.find(v => v.id === body.cloneFromVariantId)
+      : undefined;
+
+    const source = cloneFrom ?? quote;
+    const defaultLabels = ["Good", "Better", "Best"];
+
+    const [variant] = await db
+      .insert(quoteVariantsTable)
+      .values({
+        quoteId: id,
+        userId,
+        label: typeof body.label === "string" ? body.label : (defaultLabels[existingVariants.length] ?? ""),
+        description: typeof body.description === "string" ? body.description : "",
+        position: existingVariants.length,
+        items: (Array.isArray(source.items) ? source.items : []) as QuoteItem[],
+        capitoli: (Array.isArray(source.capitoli) ? source.capitoli : []) as QuoteChapter[],
+        sconto: (source.sconto as QuoteDiscount | null) ?? null,
+        condizioniPagamento: Array.isArray(source.condizioniPagamento) ? source.condizioniPagamento : [],
+        subtotale: source.subtotale,
+        ivaPercentuale: source.ivaPercentuale,
+        ivaValore: source.ivaValore,
+        totale: source.totale,
+      })
+      .returning();
+
+    res.status(201).json(serializeQuoteVariant(variant!));
+  } catch (err) {
+    req.log.error({ err }, "Error creating quote variant");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// PUT /api/quotes/:id/variants/:variantId
+router.put("/quotes/:id/variants/:variantId", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id, variantId } = req.params as { id: string; variantId: string };
+
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (quote.userId !== userId) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const [existing] = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(and(eq(quoteVariantsTable.id, variantId), eq(quoteVariantsTable.quoteId, id)));
+    if (!existing) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+
+    const body = req.body as Record<string, unknown>;
+    const updates: Partial<typeof existing> = {};
+    if (typeof body.label === "string") updates.label = body.label;
+    if (typeof body.description === "string") updates.description = body.description;
+    if (Array.isArray(body.items)) updates.items = body.items as QuoteItem[];
+    if (Array.isArray(body.capitoli)) updates.capitoli = body.capitoli as QuoteChapter[];
+    if (body.sconto !== undefined) updates.sconto = body.sconto as QuoteDiscount | null;
+    if (Array.isArray(body.condizioniPagamento)) updates.condizioniPagamento = body.condizioniPagamento as string[];
+    if (body.subtotale !== undefined) updates.subtotale = String(body.subtotale);
+    if (body.ivaPercentuale !== undefined) updates.ivaPercentuale = String(body.ivaPercentuale);
+    if (body.ivaValore !== undefined) updates.ivaValore = String(body.ivaValore);
+    if (body.totale !== undefined) updates.totale = String(body.totale);
+
+    const [updated] = await db
+      .update(quoteVariantsTable)
+      .set(updates)
+      .where(eq(quoteVariantsTable.id, variantId))
+      .returning();
+
+    res.json(serializeQuoteVariant(updated!));
+  } catch (err) {
+    req.log.error({ err }, "Error updating quote variant");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// DELETE /api/quotes/:id/variants/:variantId
+router.delete("/quotes/:id/variants/:variantId", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id, variantId } = req.params as { id: string; variantId: string };
+
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (quote.userId !== userId) {
+      res.status(403).json({ error: "Forbidden" });
+      return;
+    }
+
+    const [existing] = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(and(eq(quoteVariantsTable.id, variantId), eq(quoteVariantsTable.quoteId, id)));
+    if (!existing) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+
+    await db.delete(quoteVariantsTable).where(eq(quoteVariantsTable.id, variantId));
+
+    // Renumber remaining variants so `position` stays contiguous.
+    const remaining = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(eq(quoteVariantsTable.quoteId, id))
+      .orderBy(quoteVariantsTable.position);
+    for (let i = 0; i < remaining.length; i++) {
+      if (remaining[i]!.position !== i) {
+        await db.update(quoteVariantsTable).set({ position: i }).where(eq(quoteVariantsTable.id, remaining[i]!.id));
+      }
+    }
+
+    res.status(204).end();
+  } catch (err) {
+    req.log.error({ err }, "Error deleting quote variant");
     res.status(500).json({ error: "Internal server error" });
   }
 });

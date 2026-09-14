@@ -68,6 +68,44 @@ export interface QuoteAttachment {
   createdAt: string;
 }
 
+export interface QuoteVariant {
+  id: string;
+  quoteId: string;
+  label: string;
+  description?: string;
+  position?: number;
+  items: QuoteItem[];
+  capitoli: QuoteChapter[];
+  sconto?: QuoteDiscount | null;
+  condizioniPagamento: string[];
+  subtotale: number;
+  ivaPercentuale: number;
+  ivaValore: number;
+  totale: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateQuoteVariantBody {
+  label?: string;
+  description?: string;
+  /** Clone an existing variant's pricing instead of the parent quote's current pricing. */
+  cloneFromVariantId?: string;
+}
+
+export interface UpdateQuoteVariantBody {
+  label?: string;
+  description?: string;
+  items?: QuoteItem[];
+  capitoli?: QuoteChapter[];
+  sconto?: QuoteDiscount | null;
+  condizioniPagamento?: string[];
+  subtotale?: number;
+  ivaPercentuale?: number;
+  ivaValore?: number;
+  totale?: number;
+}
+
 export type QuoteStatus = typeof QuoteStatus[keyof typeof QuoteStatus];
 
 
@@ -115,6 +153,8 @@ export interface Quote {
   capitolatoPdfUrl?: string | null;
   templateId?: QuoteTemplateId;
   attachments?: QuoteAttachment[];
+  acceptedVariantId?: string | null;
+  variants?: QuoteVariant[];
   createdAt: string;
   updatedAt: string;
 }
@@ -675,6 +715,10 @@ export interface Client {
 
 export type SendQuotePdfEmail200 = {
   success?: boolean;
+};
+
+export type ListQuoteVariants200 = {
+  variants?: QuoteVariant[];
 };
 
 export type UploadBusinessProfileLogoBody = {

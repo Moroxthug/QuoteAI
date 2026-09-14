@@ -25,6 +25,18 @@ interface PublicQuoteChapter {
   osservazione?: string;
 }
 
+interface PublicQuoteVariant {
+  id: string;
+  label: string;
+  description: string;
+  position: number;
+  capitoli: PublicQuoteChapter[] | null;
+  subtotale: string;
+  ivaPercentuale: string;
+  ivaValore: string;
+  totale: string;
+}
+
 interface PublicQuote {
   id: string;
   numeroPreventivoData: string | null;
@@ -43,6 +55,8 @@ interface PublicQuote {
   status: "unlocked" | "accepted";
   acceptedAt: string | null;
   acceptedByName: string | null;
+  acceptedVariantId: string | null;
+  variants: PublicQuoteVariant[];
 }
 
 function euro(value: string | number) {
@@ -275,6 +289,7 @@ export default function PublicQuotePage() {
   const [nomeConferma, setNomeConferma] = useState("");
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -287,7 +302,13 @@ export default function PublicQuotePage() {
           return;
         }
         const data = await res.json();
-        if (!cancelled) setQuote(data.quote);
+        if (!cancelled) {
+          setQuote(data.quote);
+          const variants: PublicQuoteVariant[] = data.quote?.variants ?? [];
+          if (variants.length > 1) {
+            setSelectedVariantId(data.quote.acceptedVariantId || variants[0]?.id || null);
+          }
+        }
       } catch {
         if (!cancelled) setNotFound(true);
       } finally {
@@ -299,13 +320,18 @@ export default function PublicQuotePage() {
 
   async function handleAccept() {
     if (!id || !nomeConferma.trim() || accepting) return;
+    const hasTiers = (quote?.variants?.length ?? 0) > 1;
+    if (hasTiers && !selectedVariantId) {
+      setError(t("publicQuote.tiers.selectOneError"));
+      return;
+    }
     setAccepting(true);
     setError(null);
     try {
       const res = await fetch(`/api/public/quotes/${id}/accept`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomeConferma: nomeConferma.trim() }),
+        body: JSON.stringify({ nomeConferma: nomeConferma.trim(), variantId: hasTiers ? selectedVariantId : undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -341,6 +367,14 @@ export default function PublicQuotePage() {
   }
 
   const isAccepted = quote.status === "accepted";
+  const tiers = quote.variants || [];
+  const hasTiers = tiers.length > 1;
+  const activeVariant = hasTiers ? (tiers.find((v) => v.id === selectedVariantId) ?? tiers[0]) : null;
+  const displayCapitoli = activeVariant ? activeVariant.capitoli : quote.capitoli;
+  const displaySubtotale = activeVariant ? activeVariant.subtotale : quote.subtotale;
+  const displayIvaPercentuale = activeVariant ? activeVariant.ivaPercentuale : quote.ivaPercentuale;
+  const displayIvaValore = activeVariant ? activeVariant.ivaValore : quote.ivaValore;
+  const displayTotale = activeVariant ? activeVariant.totale : quote.totale;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-2xl">
@@ -355,6 +389,35 @@ export default function PublicQuotePage() {
           <p className="text-sm text-gray-400 mt-1">{quote.numeroPreventivoData}</p>
         )}
       </div>
+
+      {hasTiers && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+          {tiers.map((tier) => {
+            const isSelected = tier.id === activeVariant?.id;
+            const isWinner = isAccepted && quote.acceptedVariantId === tier.id;
+            return (
+              <button
+                key={tier.id}
+                type="button"
+                onClick={() => !isAccepted && setSelectedVariantId(tier.id)}
+                disabled={isAccepted}
+                className={`text-left rounded-xl border p-4 transition ${
+                  isSelected
+                    ? "border-violet-400 bg-violet-50 ring-2 ring-violet-200"
+                    : "border-gray-200 bg-white hover:border-violet-200"
+                } ${isAccepted && !isWinner ? "opacity-50" : ""}`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-gray-900">{tier.label}</span>
+                  {isWinner && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+                </div>
+                {tier.description && <p className="text-xs text-gray-500 mt-0.5">{tier.description}</p>}
+                <p className="text-lg font-extrabold text-gray-900 mt-2">{euro(tier.totale)}</p>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <Card className="border-gray-100 shadow-md mb-6">
         <CardContent className="p-5 sm:p-6">
@@ -371,7 +434,7 @@ export default function PublicQuotePage() {
           )}
 
           <div className="space-y-4">
-            {(quote.capitoli || []).map((cap) => (
+            {(displayCapitoli || []).map((cap) => (
               <div key={cap.lettera}>
                 <div className="flex items-center justify-between text-sm font-semibold text-gray-800 mb-1.5">
                   <span>{cap.lettera}. {cap.titolo}</span>
@@ -392,15 +455,15 @@ export default function PublicQuotePage() {
           <div className="mt-5 pt-4 border-t border-gray-100 space-y-1">
             <div className="flex justify-between text-sm text-gray-500">
               <span>{t("publicQuote.subtotal")}</span>
-              <span>{euro(quote.subtotale)}</span>
+              <span>{euro(displaySubtotale)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
-              <span>{t("publicQuote.tax")} ({quote.ivaPercentuale}%)</span>
-              <span>{euro(quote.ivaValore)}</span>
+              <span>{t("publicQuote.tax")} ({displayIvaPercentuale}%)</span>
+              <span>{euro(displayIvaValore)}</span>
             </div>
             <div className="flex justify-between text-base font-bold text-gray-900 pt-1">
               <span>{t("publicQuote.total")}</span>
-              <span>{euro(quote.totale)}</span>
+              <span>{euro(displayTotale)}</span>
             </div>
           </div>
 
@@ -453,7 +516,7 @@ export default function PublicQuotePage() {
               {error && <p className="text-xs text-red-500">{error}</p>}
               <Button
                 onClick={handleAccept}
-                disabled={!nomeConferma.trim() || accepting}
+                disabled={!nomeConferma.trim() || accepting || (hasTiers && !selectedVariantId)}
                 className="w-full gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold"
               >
                 {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Hammer className="h-4 w-4" />}

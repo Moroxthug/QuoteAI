@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable } from "@workspace/db";
+import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable } from "@workspace/db";
 import { eq, sql, or, isNull } from "drizzle-orm";
 import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -75,7 +75,23 @@ const financeitApplyLimiter = ipRateLimiter({
 // Public projection of the quote: always excludes userId, Stripe billing
 // data, and internal AI metadata (costs/tokens) — this endpoint is not
 // authenticated, the only "secret" is the quote's UUID itself.
-function toPublicQuote(quote: typeof quotesTable.$inferSelect) {
+function toPublicVariant(v: typeof quoteVariantsTable.$inferSelect) {
+  return {
+    id: v.id,
+    label: v.label,
+    description: v.description,
+    position: v.position,
+    capitoli: v.capitoli,
+    sconto: v.sconto,
+    condizioniPagamento: v.condizioniPagamento,
+    subtotale: v.subtotale,
+    ivaPercentuale: v.ivaPercentuale,
+    ivaValore: v.ivaValore,
+    totale: v.totale,
+  };
+}
+
+function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeof quoteVariantsTable.$inferSelect)[]) {
   return {
     id: quote.id,
     numeroPreventivoData: quote.numeroPreventivoData,
@@ -96,6 +112,8 @@ function toPublicQuote(quote: typeof quotesTable.$inferSelect) {
     status: quote.status,
     acceptedAt: quote.acceptedAt,
     acceptedByName: quote.acceptedByName,
+    acceptedVariantId: quote.acceptedVariantId ?? null,
+    variants: variants?.map(toPublicVariant) ?? [],
   };
 }
 
@@ -537,7 +555,13 @@ router.get("/public/quotes/:id", quoteViewLimiter, async (req, res) => {
       return;
     }
 
-    res.json({ success: true, quote: toPublicQuote(quote) });
+    const variants = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(eq(quoteVariantsTable.quoteId, id))
+      .orderBy(quoteVariantsTable.position);
+
+    res.json({ success: true, quote: toPublicQuote(quote, variants) });
   } catch (err) {
     logger.error({ err }, "Error fetching public quote view");
     res.status(500).json({ error: "Internal server error" });
@@ -551,7 +575,7 @@ router.get("/public/quotes/:id", quoteViewLimiter, async (req, res) => {
 router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) => {
   try {
     const id = req.params.id as string;
-    const { nomeConferma } = req.body as { nomeConferma?: string };
+    const { nomeConferma, variantId } = req.body as { nomeConferma?: string; variantId?: string };
 
     const trimmedName = (nomeConferma || "").trim();
     if (!trimmedName) {
@@ -573,20 +597,54 @@ router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) =>
       return;
     }
 
+    const variants = await db
+      .select()
+      .from(quoteVariantsTable)
+      .where(eq(quoteVariantsTable.quoteId, id))
+      .orderBy(quoteVariantsTable.position);
+
     if (quote.status === "accepted") {
       // Idempotent: if already accepted, simply return the current state
       // instead of overwriting who/when accepted it.
-      res.json({ success: true, quote: toPublicQuote(quote) });
+      res.json({ success: true, quote: toPublicQuote(quote, variants) });
       return;
+    }
+
+    // When the quote has Good/Better/Best variants, the client must pick one
+    // and its pricing is copied onto the parent quote row before status flips
+    // to "accepted" — so every downstream consumer (PDF, contract auto-draft,
+    // invoicing) keeps reading quotesTable.items/capitoli/totale unchanged,
+    // with zero awareness that variants exist.
+    let variantUpdates: Partial<typeof quote> = {};
+    let acceptedVariantId: string | null = null;
+    if (variants.length > 0) {
+      const chosen = variants.find(v => v.id === variantId) ?? (variants.length === 1 ? variants[0] : undefined);
+      if (!chosen) {
+        res.status(400).json({ error: "Select one of the options before accepting." });
+        return;
+      }
+      acceptedVariantId = chosen.id;
+      variantUpdates = {
+        items: chosen.items,
+        capitoli: chosen.capitoli,
+        sconto: chosen.sconto,
+        condizioniPagamento: chosen.condizioniPagamento,
+        subtotale: chosen.subtotale,
+        ivaPercentuale: chosen.ivaPercentuale,
+        ivaValore: chosen.ivaValore,
+        totale: chosen.totale,
+      };
     }
 
     const [updated] = await db
       .update(quotesTable)
       .set({
+        ...variantUpdates,
         status: "accepted",
         acceptedAt: new Date(),
         acceptedByName: trimmedName,
         acceptedIp: req.ip || null,
+        acceptedVariantId,
       })
       .where(eq(quotesTable.id, id))
       .returning();
@@ -601,7 +659,7 @@ router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) =>
       payload: { acceptedByName: trimmedName },
     });
 
-    res.json({ success: true, quote: toPublicQuote(updated) });
+    res.json({ success: true, quote: toPublicQuote(updated, variants) });
   } catch (err) {
     logger.error({ err }, "Error accepting public quote");
     res.status(500).json({ error: "Internal server error" });

@@ -110,6 +110,8 @@ export const quotesTable = pgTable("quotes", {
   acceptedAt: timestamp("accepted_at", { withTimezone: true }),
   acceptedByName: text("accepted_by_name"),
   acceptedIp: text("accepted_ip"),
+  /** Which variant the client accepted, when the quote has Good/Better/Best variants (Phase 22). Null for single-price quotes or before acceptance. */
+  acceptedVariantId: uuid("accepted_variant_id"),
   rawInput: text("raw_input").notNull().default(""),
   stripeSessionId: text("stripe_session_id"),
   unlockedWithPlan: text("unlocked_with_plan"),
@@ -141,6 +143,36 @@ export const quoteAttachmentsTable = pgTable("quote_attachments", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * Phase 22 — Good/Better/Best tiered quotes. A quote gets 0-3 variant rows; when
+ * exactly one (or zero) exist, every downstream code path (PDF, contracts, invoices)
+ * keeps reading quotesTable.items/capitoli/totale unchanged. When a customer accepts
+ * a specific variant, its pricing fields are copied onto the parent quotesTable row
+ * before the accept flow fires, so no downstream consumer needs to know variants exist.
+ */
+export const quoteVariantsTable = pgTable("quote_variants", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  quoteId: uuid("quote_id").notNull().references(() => quotesTable.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  /** Freeform label, typically "Good" / "Better" / "Best" but not constrained to those three. */
+  label: text("label").notNull().default(""),
+  description: text("description").notNull().default(""),
+  /** Display order, 0-based. */
+  position: integer("position").notNull().default(0),
+  items: jsonb("items").$type<QuoteItem[]>().notNull().default([]),
+  capitoli: jsonb("capitoli").$type<QuoteChapter[]>().default([]),
+  sconto: jsonb("sconto").$type<QuoteDiscount | null>(),
+  condizioniPagamento: text("condizioni_pagamento").array().default([]),
+  subtotale: numeric("subtotale", { precision: 10, scale: 2 }).notNull().default("0"),
+  ivaPercentuale: numeric("iva_percentuale", { precision: 5, scale: 2 }).notNull().default("22"),
+  ivaValore: numeric("iva_valore", { precision: 10, scale: 2 }).notNull().default("0"),
+  totale: numeric("totale", { precision: 10, scale: 2 }).notNull().default("0"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+}, (t) => [
+  index("quote_variants_quote_id_idx").on(t.quoteId),
+]);
+
 export const insertQuoteSchema = createInsertSchema(quotesTable).omit({
   id: true,
   unsubscribeToken: true,
@@ -148,6 +180,14 @@ export const insertQuoteSchema = createInsertSchema(quotesTable).omit({
   updatedAt: true,
 });
 
+export const insertQuoteVariantSchema = createInsertSchema(quoteVariantsTable).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type Quote = typeof quotesTable.$inferSelect;
 export type QuoteAttachment = typeof quoteAttachmentsTable.$inferSelect;
+export type InsertQuoteVariant = z.infer<typeof insertQuoteVariantSchema>;
+export type QuoteVariant = typeof quoteVariantsTable.$inferSelect;

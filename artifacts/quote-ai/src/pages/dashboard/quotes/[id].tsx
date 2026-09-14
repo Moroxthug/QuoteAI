@@ -1,5 +1,5 @@
 import { useParams, useSearch } from "wouter";
-import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey } from "@workspace/api-client-react";
+import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -69,6 +69,13 @@ export default function QuoteDetail() {
   const regenerateQuote = useRegenerateQuote();
   const duplicateQuote = useDuplicateQuote();
   const [, navigate] = useLocation();
+
+  // Phase 22: Good/Better/Best tiered quotes
+  const { data: variantsData } = useListQuoteVariants(id || "");
+  const variants = variantsData?.variants ?? [];
+  const createVariant = useCreateQuoteVariant();
+  const updateVariant = useUpdateQuoteVariant();
+  const deleteVariant = useDeleteQuoteVariant();
 
   // Regen panel state
   const [isRegenOpen, setIsRegenOpen] = useState(false);
@@ -1837,6 +1844,100 @@ export default function QuoteDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Phase 22: Good/Better/Best tiered quotes */}
+          {!isEditLocked && quote?.status !== "accepted" && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Star className="h-4 w-4 text-muted-foreground" />
+                  {t("dashboard.quoteDetail.variants.title")}
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  {t("dashboard.quoteDetail.variants.subtitle")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0">
+                {variants.map((v) => (
+                  <div key={v.id} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        defaultValue={v.label}
+                        placeholder={t("dashboard.quoteDetail.variants.labelPlaceholder")}
+                        className="h-8 text-sm font-medium"
+                        onBlur={(e) => {
+                          if (e.target.value === v.label) return;
+                          updateVariant.mutate({ id: id!, variantId: v.id, data: { label: e.target.value } }, {
+                            onSuccess: () => queryClient.invalidateQueries({ queryKey: getListQuoteVariantsQueryKey(id!) }),
+                          });
+                        }}
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0 text-red-500 hover:text-red-600"
+                        disabled={deleteVariant.isPending}
+                        onClick={() => {
+                          deleteVariant.mutate({ id: id!, variantId: v.id }, {
+                            onSuccess: () => queryClient.invalidateQueries({ queryKey: getListQuoteVariantsQueryKey(id!) }),
+                            onError: () => toast({ title: t("dashboard.quoteDetail.variants.errorDelete"), variant: "destructive" }),
+                          });
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Textarea
+                      defaultValue={v.description}
+                      placeholder={t("dashboard.quoteDetail.variants.descriptionPlaceholder")}
+                      rows={2}
+                      className="text-xs resize-none"
+                      onBlur={(e) => {
+                        if (e.target.value === v.description) return;
+                        updateVariant.mutate({ id: id!, variantId: v.id, data: { description: e.target.value } }, {
+                          onSuccess: () => queryClient.invalidateQueries({ queryKey: getListQuoteVariantsQueryKey(id!) }),
+                        });
+                      }}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs text-muted-foreground shrink-0">{t("dashboard.quoteDetail.variants.totalLabel")}</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        defaultValue={v.totale}
+                        className="h-8 text-sm"
+                        onBlur={(e) => {
+                          const totale = Number(e.target.value);
+                          if (!Number.isFinite(totale) || totale === Number(v.totale)) return;
+                          const ivaPct = Number(v.ivaPercentuale);
+                          const subtotale = Math.round((totale / (1 + ivaPct / 100)) * 100) / 100;
+                          const ivaValore = Math.round((totale - subtotale) * 100) / 100;
+                          updateVariant.mutate({ id: id!, variantId: v.id, data: { totale, subtotale, ivaValore } }, {
+                            onSuccess: () => queryClient.invalidateQueries({ queryKey: getListQuoteVariantsQueryKey(id!) }),
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2"
+                  disabled={createVariant.isPending || variants.length >= 3}
+                  onClick={() => {
+                    if (!id) return;
+                    createVariant.mutate({ id, data: {} }, {
+                      onSuccess: () => queryClient.invalidateQueries({ queryKey: getListQuoteVariantsQueryKey(id) }),
+                      onError: () => toast({ title: t("dashboard.quoteDetail.variants.errorCreate"), variant: "destructive" }),
+                    });
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  {variants.length >= 3 ? t("dashboard.quoteDetail.variants.maxReached") : t("dashboard.quoteDetail.variants.addOption")}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Template picker */}
           <Card>

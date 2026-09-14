@@ -90,6 +90,45 @@ export const ListQuotesResponseItem = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -184,6 +223,45 @@ export const CreateQuoteResponse = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -272,6 +350,45 @@ export const GetQuoteStatsResponse = zod.object({
   "fileUrl": zod.string(),
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -396,6 +513,45 @@ export const CreateManualQuoteResponse = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -492,6 +648,45 @@ export const GetQuoteResponse = zod.object({
   "fileUrl": zod.string(),
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -626,6 +821,45 @@ export const UpdateQuoteResponse = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -750,9 +984,243 @@ export const DuplicateQuoteResponse = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
+
+
+/**
+ * @summary List a quote's Good/Better/Best variants
+ */
+export const ListQuoteVariantsParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ListQuoteVariantsResponse = zod.object({
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional()
+})
+
+
+/**
+ * @summary Add a variant to a quote (clones current pricing, or another variant, by default). A quote can have at most 3.
+ */
+export const CreateQuoteVariantParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const CreateQuoteVariantBody = zod.object({
+  "label": zod.string().optional(),
+  "description": zod.string().optional(),
+  "cloneFromVariantId": zod.string().optional().describe('Clone an existing variant\'s pricing instead of the parent quote\'s current pricing.')
+})
+
+export const CreateQuoteVariantResponse = zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a quote variant's pricing/content
+ */
+export const UpdateQuoteVariantParams = zod.object({
+  "id": zod.coerce.string(),
+  "variantId": zod.coerce.string()
+})
+
+export const UpdateQuoteVariantBody = zod.object({
+  "label": zod.string().optional(),
+  "description": zod.string().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})).optional(),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})).optional(),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()).optional(),
+  "subtotale": zod.number().optional(),
+  "ivaPercentuale": zod.number().optional(),
+  "ivaValore": zod.number().optional(),
+  "totale": zod.number().optional()
+})
+
+export const UpdateQuoteVariantResponse = zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Remove a quote variant
+ */
+export const DeleteQuoteVariantParams = zod.object({
+  "id": zod.coerce.string(),
+  "variantId": zod.coerce.string()
+})
+
+export const DeleteQuoteVariantResponse = zod.void()
 
 
 /**
@@ -839,6 +1307,45 @@ export const RegenerateQuoteResponse = zod.object({
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
 })).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })
@@ -922,6 +1429,45 @@ export const UpgradeToCapitolatoProResponse = zod.object({
   "fileUrl": zod.string(),
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1749,6 +2295,45 @@ export const ListClientQuotesResponseItem = zod.object({
   "fileUrl": zod.string(),
   "fileSize": zod.number().nullish(),
   "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()

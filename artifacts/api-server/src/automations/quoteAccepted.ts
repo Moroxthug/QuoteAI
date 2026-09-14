@@ -1,4 +1,4 @@
-import { db, quotesTable, businessProfilesTable, authUsersTable, DEFAULT_AUTOMATION_SETTINGS, hasFeature, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, authUsersTable, leadsTable, DEFAULT_AUTOMATION_SETTINGS, hasFeature, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
 import { createContractFromQuote } from "../contracts/service.js";
 import { logger } from "../lib/logger.js";
 import { eq } from "drizzle-orm";
@@ -33,6 +33,9 @@ registerAutomation("quote.accepted", async (run) => {
     diff: { acceptedAt: quote.acceptedAt, acceptedByName: quote.acceptedByName },
     ip: quote.acceptedIp,
   });
+
+  // A won lead has nothing left to follow up on — stop the sequence.
+  await db.update(leadsTable).set({ status: "won", nextFollowUpAt: null }).where(eq(leadsTable.quoteId, quote.id));
 
   // Idempotency: a retry after a partial failure must not create a second
   // notification, so the payload records what already happened.

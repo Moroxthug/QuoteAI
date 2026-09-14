@@ -27,6 +27,8 @@ import publicInvoicesRouter from "./public-invoices";
 import analyticsRouter from "./analytics";
 import assistantRouter from "./assistant";
 import usageRouter from "./usage";
+import leadsRouter from "./leads";
+import publicLeadsRouter from "./public-leads";
 
 const router: IRouter = Router();
 
@@ -58,5 +60,7 @@ router.use(publicInvoicesRouter);
 router.use(analyticsRouter);
 router.use(assistantRouter);
 router.use(usageRouter);
+router.use(leadsRouter);
+router.use(publicLeadsRouter);
 
 export default router;

@@ -23,3 +23,4 @@ export * from "./invoices";
 export * from "./assistant";
 export * from "./organization-members";
 export * from "./usage";
+export * from "./leads";

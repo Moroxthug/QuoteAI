@@ -29,6 +29,7 @@ const CatalogPage = lazy(() => import("@/pages/dashboard/catalog"));
 const AnalyticsPage = lazy(() => import("@/pages/dashboard/analytics"));
 const AdminPage = lazy(() => import("@/pages/admin"));
 const ClientsPage = lazy(() => import("@/pages/dashboard/clients/index"));
+const LeadsListPage = lazy(() => import("@/pages/dashboard/leads/index"));
 const ClientDetailPage = lazy(() => import("@/pages/dashboard/clients/[name]"));
 const InvoicesPage = lazy(() => import("@/pages/dashboard/invoices"));
 const InvoiceDetailPage = lazy(() => import("@/pages/dashboard/invoices/[id]"));
@@ -155,6 +156,9 @@ function Router() {
       )} />
       <Route path="/dashboard/clients" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><ClientsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/leads" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><LeadsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
       <Route path="/dashboard/contracts/:id" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><ContractDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>

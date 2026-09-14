@@ -81,6 +81,47 @@ async function sendWhatsappText(to: string, text: string): Promise<void> {
   else recordWhatsappUsageFromContext();
 }
 
+/**
+ * Sends a pre-approved Meta template message ("HSM"). Business-initiated
+ * outbound (e.g. lead follow-ups) must use a template outside Meta's 24h
+ * customer-service window — free-form text (sendWhatsappText) is only legal
+ * within that window. Template names/languages must already be approved in
+ * the Meta Business Manager; this call does not submit or verify approval.
+ */
+async function sendWhatsappTemplate(
+  to: string,
+  templateName: string,
+  languageCode: string,
+  bodyParams: string[] = [],
+): Promise<boolean> {
+  if (!WA_TOKEN || !WA_PHONE_ID) {
+    logger.warn("WhatsApp env vars not configured — skipping template send");
+    return false;
+  }
+  const res = await fetch(`https://graph.facebook.com/v20.0/${WA_PHONE_ID}/messages`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to,
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: languageCode },
+        components: bodyParams.length
+          ? [{ type: "body", parameters: bodyParams.map(text => ({ type: "text", text })) }]
+          : [],
+      },
+    }),
+  });
+  if (!res.ok) {
+    logger.error({ err: await res.text(), to, templateName }, "WhatsApp template send failed");
+    return false;
+  }
+  recordWhatsappUsageFromContext();
+  return true;
+}
+
 async function uploadMetaMedia(buffer: Buffer, mimeType: string, filename: string): Promise<string | null> {
   if (!WA_TOKEN || !WA_PHONE_ID) return null;
   try {
@@ -1509,6 +1550,7 @@ function normalizePhone(input: string): string | null {
 
 // Kept for backwards-compatibility with the web (non-WhatsApp) quote generation
 export { generateQuoteFromText };
+export { sendWhatsappText, sendWhatsappTemplate };
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

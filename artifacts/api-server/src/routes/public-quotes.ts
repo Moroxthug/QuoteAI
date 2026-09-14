@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
@@ -11,6 +11,7 @@ import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { linkQuoteToClient } from "../lib/clients.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
+import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
 
 const router = Router();
 
@@ -418,6 +419,32 @@ Use these exact measurements to mathematically calculate the quantities.`;
       .returning();
 
     await linkQuoteToClient(quote!, profile.province);
+
+    // Phase 9: the widget submission is a lead first — record consent and
+    // schedule the first follow-up here so a quote that's never accepted
+    // still gets a nurture sequence instead of going cold silently.
+    try {
+      const [lead] = await db
+        .insert(leadsTable)
+        .values({
+          userId,
+          clientId: quote!.clientId,
+          quoteId: quote!.id,
+          name: resolvedClientData.nome,
+          email: resolvedClientData.email || null,
+          phone: resolvedClientData.phone || null,
+          preferredChannel: "email",
+          source: "widget",
+          status: "new",
+          consentSource: "widget_form",
+          nextFollowUpAt: new Date(Date.now() + FOLLOWUP_CADENCE_DAYS[0]! * 86_400_000),
+        })
+        .returning();
+      await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "widget", quoteId: quote!.id } });
+      await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "consent_recorded", payload: { consentSource: "widget_form" } });
+    } catch (leadErr) {
+      logger.error({ err: leadErr, quoteId: quote!.id }, "Failed to record widget lead (non-fatal)");
+    }
 
     // Return the range estimate for the widget
     res.status(201).json({

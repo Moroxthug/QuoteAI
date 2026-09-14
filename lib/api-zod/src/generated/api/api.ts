@@ -662,7 +662,7 @@ export const SendQuotePdfEmailParams = zod.object({
 })
 
 export const SendQuotePdfEmailBody = zod.object({
-  "toEmail": zod.email(),
+  "toEmail": zod.string().email(),
   "clientName": zod.string().optional()
 })
 
@@ -999,7 +999,7 @@ export const UploadBusinessProfileLogoResponse = zod.object({
  */
 export const RequestUploadUrlBody = zod.object({
   "name": zod.string(),
-  "size": zod.int(),
+  "size": zod.number().int(),
   "contentType": zod.string()
 })
 
@@ -1008,7 +1008,7 @@ export const RequestUploadUrlResponse = zod.object({
   "objectPath": zod.string(),
   "metadata": zod.object({
   "name": zod.string(),
-  "size": zod.int(),
+  "size": zod.number().int(),
   "contentType": zod.string()
 }).optional()
 })
@@ -1427,7 +1427,7 @@ export const ListDocumentsResponseItem = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1460,7 +1460,7 @@ export const UploadDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1510,7 +1510,7 @@ export const ExtractDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.int().nullish(),
+  "fileSize": zod.number().int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),

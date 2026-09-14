@@ -24,12 +24,13 @@ export const PRODUCT_FEATURES = [
   "calendar_sync", // Phase 12: one-way push of job milestones to Google Calendar / Outlook
   "invoice_card_payments", // Phase 15: online card/ACH payment on invoices via the company's own Stripe Connect account
   "financeit", // Phase 16: point-of-sale financing on quotes via Financeit's hosted application flow
+  "public_api", // Phase 19: versioned public API (API keys + webhooks) for Zapier/Make and direct integrations
 ] as const;
 export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit"];
+const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
 export const SEATS_INCLUDED: Record<PlanId, number> = {

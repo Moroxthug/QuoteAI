@@ -11,10 +11,16 @@ import { logger } from "./logger";
 
 export type AutomationHandler = (run: AutomationRun) => Promise<Record<string, unknown> | void>;
 
-const handlers = new Map<AutomationEvent, AutomationHandler>();
+// Multiple handlers can share one event (e.g. Phase 19's webhook dispatcher
+// runs alongside each event's existing domain handler) — all run in
+// registration order on every attempt, so each MUST be idempotent, same as
+// the single-handler case already was.
+const handlers = new Map<AutomationEvent, AutomationHandler[]>();
 
 export function registerAutomation(event: AutomationEvent, handler: AutomationHandler): void {
-  handlers.set(event, handler);
+  const list = handlers.get(event) ?? [];
+  list.push(handler);
+  handlers.set(event, list);
 }
 
 const BACKOFF_MINUTES = [5, 15, 60, 240, 1440];
@@ -64,8 +70,8 @@ export async function raiseAutomation(params: {
 }
 
 async function executeRun(run: AutomationRun): Promise<void> {
-  const handler = handlers.get(run.event as AutomationEvent);
-  if (!handler) {
+  const eventHandlers = handlers.get(run.event as AutomationEvent);
+  if (!eventHandlers || eventHandlers.length === 0) {
     logger.warn({ event: run.event, runId: run.id }, "No automation handler registered");
     await db
       .update(automationRunsTable)
@@ -83,10 +89,14 @@ async function executeRun(run: AutomationRun): Promise<void> {
   if (!claimed) return;
 
   try {
-    const result = await handler(claimed);
+    const combinedResult: Record<string, unknown> = {};
+    for (const handler of eventHandlers) {
+      const result = await handler(claimed);
+      if (result) Object.assign(combinedResult, result);
+    }
     await db
       .update(automationRunsTable)
-      .set({ status: "succeeded", result: (result as Record<string, unknown> | undefined) ?? null, lastError: null, finishedAt: new Date() })
+      .set({ status: "succeeded", result: Object.keys(combinedResult).length ? combinedResult : null, lastError: null, finishedAt: new Date() })
       .where(eq(automationRunsTable.id, run.id));
     logger.info({ event: run.event, runId: run.id }, "Automation succeeded");
   } catch (err) {

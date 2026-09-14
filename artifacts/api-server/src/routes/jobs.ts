@@ -122,7 +122,7 @@ function serializeChangeOrder(co: ChangeOrder, docStatus: string | null | undefi
   };
 }
 
-function serializeProject(p: typeof projectsTable.$inferSelect) {
+export function serializeProject(p: typeof projectsTable.$inferSelect) {
   return {
     id: p.id,
     name: p.name,

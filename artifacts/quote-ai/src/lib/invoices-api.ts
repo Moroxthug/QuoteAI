@@ -128,6 +128,24 @@ export const financeitApi = {
   disconnect: () => req<{ success: true }>("/api/financeit/disconnect", { method: "DELETE" }),
 };
 
+// Phase 19: public API keys + webhooks (Settings → Integrations → Developer API)
+export type AutomationEventName =
+  | "quote.accepted" | "contract.signed" | "contract.declined" | "milestone.completed" | "job.completed"
+  | "invoice.overdue" | "lead.followup_due" | "job.review_request_due" | "invoice.paid" | "cost.confirmed";
+
+export type ApiKeyDto = { id: string; name: string; keyPrefix: string; role: string; lastUsedAt: string | null; revokedAt: string | null; createdAt: string };
+export type WebhookDto = { id: string; url: string; events: AutomationEventName[]; isEnabled: boolean; createdAt: string };
+
+export const developerApi = {
+  listKeys: () => req<{ items: ApiKeyDto[]; events: AutomationEventName[] }>("/api/developer/api-keys"),
+  createKey: (name: string) => req<{ key: ApiKeyDto; rawKey: string }>("/api/developer/api-keys", { method: "POST", body: json({ name }) }),
+  revokeKey: (id: string) => req<{ success: true }>(`/api/developer/api-keys/${id}`, { method: "DELETE" }),
+  listWebhooks: () => req<{ items: WebhookDto[]; events: AutomationEventName[] }>("/api/developer/webhooks"),
+  createWebhook: (url: string, events: AutomationEventName[]) => req<{ webhook: WebhookDto; secret: string }>("/api/developer/webhooks", { method: "POST", body: json({ url, events }) }),
+  toggleWebhook: (id: string, isEnabled: boolean) => req<{ success: true }>(`/api/developer/webhooks/${id}`, { method: "PATCH", body: json({ isEnabled }) }),
+  deleteWebhook: (id: string) => req<{ success: true }>(`/api/developer/webhooks/${id}`, { method: "DELETE" }),
+};
+
 export type PublicInvoiceDto = {
   invoice: {
     id: string;

@@ -66,6 +66,7 @@ import { ObjectStorageService } from "../lib/objectStorage.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";
 import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
+import { createManualQuote, type ManualQuoteInput } from "../quotes/manualCreate.js";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 
@@ -173,7 +174,7 @@ type QuoteRow = typeof quotesTable.$inferSelect;
 
 type AttachmentRow = typeof quoteAttachmentsTable.$inferSelect;
 
-function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[]) {
+export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[]) {
   const tot = Number(q.totale);
   const province = normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null;
   const paymentSchedule = q.paymentSchedule ?? derivePaymentScheduleFromText(q.condizioniPagamento, tot);
@@ -3543,159 +3544,12 @@ async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRow, with
 router.post("/quotes/manual", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
-
-    // Quota enforcement (same as AI route)
-    const [profile] = await db
-      .select({
-        subscriptionPlan: businessProfilesTable.subscriptionPlan,
-        subscriptionStatus: businessProfilesTable.subscriptionStatus,
-        trialStartedAt: businessProfilesTable.trialStartedAt,
-        province: businessProfilesTable.province,
-      })
-      .from(businessProfilesTable)
-      .where(eq(businessProfilesTable.userId, userId));
-
-    if (profile?.subscriptionStatus === "active" && profile.subscriptionPlan) {
-      const plan = PLANS.find(p => p.id === profile.subscriptionPlan);
-      if (plan?.quotaPerMonth != null) {
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const [{ cnt }] = await db
-          .select({ cnt: sql<number>`count(*)::int` })
-          .from(quotesTable)
-          .where(sql`${quotesTable.userId} = ${userId} AND ${quotesTable.createdAt} >= ${monthStart.toISOString()} AND ${quotesTable.createdAt} < ${nextMonth.toISOString()}`);
-        if (cnt >= plan.quotaPerMonth) {
-          res.status(429).json({ error: `Monthly quota reached. You've used all ${plan.quotaPerMonth} quotes included in the ${plan.name} plan this month.`, code: "QUOTA_EXCEEDED" });
-          return;
-        }
-      }
-    }
-
-    const {
-      capitoli: rawCapitoli,
-      clientData: rawClientData,
-      companySnapshot: rawSnapshot,
-      templateId,
-      titoloPreventivoRiga1,
-      titoloPreventivoRiga2,
-      descrizioneGenerale,
-      ivaPercentuale: rawIva,
-      condizioniPagamento,
-      note,
-    } = req.body as {
-      capitoli?: unknown;
-      clientData?: unknown;
-      companySnapshot?: unknown;
-      templateId?: string;
-      titoloPreventivoRiga1?: string;
-      titoloPreventivoRiga2?: string;
-      descrizioneGenerale?: string;
-      ivaPercentuale?: number;
-      condizioniPagamento?: string[];
-      note?: string;
-    };
-
-    // Validate capitoli
-    const capitoliResult = quoteChapterSchema.array().safeParse(rawCapitoli);
-    if (!capitoliResult.success) {
-      res.status(400).json({ error: "Invalid capitoli", details: capitoliResult.error });
+    const result = await createManualQuote(userId, req.body as ManualQuoteInput);
+    if (!result.ok) {
+      res.status(result.status).json({ error: result.error, details: result.details, code: result.status === 429 ? "QUOTA_EXCEEDED" : undefined });
       return;
     }
-    const capitoli = capitoliResult.data as QuoteChapter[];
-
-    // Validate optional clientData
-    let clientDataInput: QuoteClientData | undefined;
-    if (rawClientData) {
-      const r = quoteClientDataSchema.safeParse(rawClientData);
-      if (!r.success) {
-        res.status(400).json({ error: "Invalid clientData", details: r.error });
-        return;
-      }
-      clientDataInput = r.data;
-    }
-
-    // Resolve company snapshot
-    let resolvedSnapshot: QuoteCompanySnapshot | null = null;
-    if (rawSnapshot) {
-      const r = quoteCompanySnapshotSchema.safeParse(rawSnapshot);
-      if (r.success) resolvedSnapshot = r.data;
-    }
-    if (!resolvedSnapshot) {
-      const [bp] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
-      if (bp) {
-        resolvedSnapshot = {
-          companyName: bp.companyName,
-          vatNumber: bp.vatNumber ?? undefined,
-          address: bp.address ?? undefined,
-          phone: bp.phone ?? undefined,
-          email: bp.email ?? undefined,
-          logoUrl: bp.logoUrl ?? undefined,
-        };
-      }
-    }
-
-    // Recalculate totals server-side (never trust client)
-    const recalcCapitoli = capitoli.map(cap => {
-      const voci = cap.voci.map(v => ({
-        ...v,
-        totale: Math.round(v.quantita * v.prezzoUnitario * 100) / 100,
-      }));
-      const subtotale = voci.reduce((s, v) => s + v.totale, 0);
-      return { ...cap, voci, subtotale: Math.round(subtotale * 100) / 100 };
-    });
-
-    const subtotale = recalcCapitoli.reduce((s, c) => s + c.subtotale, 0);
-    const ivaPercentuale = typeof rawIva === "number" && rawIva >= 0 ? rawIva : 22;
-    const ivaValore = Math.round(subtotale * (ivaPercentuale / 100) * 100) / 100;
-    const totale = Math.round((subtotale + ivaValore) * 100) / 100;
-
-    const [quote] = await db.transaction(async (tx) => {
-      // Row lock the user's business profile record to prevent concurrent quote creation
-      await tx.execute(sql`SELECT user_id FROM ${businessProfilesTable} WHERE user_id = ${userId} FOR UPDATE`);
-
-      const numeroPreventivoData = await generateNumeroPreventivo(userId);
-
-      return await tx
-        .insert(quotesTable)
-        .values({
-          userId,
-          rawInput: `[Manual quote] ${titoloPreventivoRiga2 ?? descrizioneGenerale ?? ""}`.trim(),
-          capitoli: recalcCapitoli,
-          clientData: clientDataInput ?? { nome: "", indirizzo: "" },
-          companySnapshot: resolvedSnapshot,
-          templateId: (["standard", "arosio", "mariagrazia"].includes(templateId ?? "") ? templateId : "standard") as "standard" | "arosio" | "mariagrazia",
-          titoloPreventivoRiga1: titoloPreventivoRiga1 ?? "Project Quote & Itemized Estimate",
-          titoloPreventivoRiga2: titoloPreventivoRiga2 ?? "",
-          descrizioneGenerale: descrizioneGenerale ?? "",
-          numeroPreventivoData,
-          subtotale: subtotale.toFixed(2),
-          ivaPercentuale: ivaPercentuale.toFixed(2),
-          ivaValore: ivaValore.toFixed(2),
-          totale: totale.toFixed(2),
-          condizioniPagamento: Array.isArray(condizioniPagamento) ? condizioniPagamento : [
-            "30% acconto alla firma",
-            "30% a SAL intermedio",
-            "30% a SAL finale",
-            "10% saldo fine lavori",
-          ],
-          note: note ?? "Quote valid for 30 days",
-          status: "draft",
-        })
-        .returning();
-    });
-
-    await linkQuoteToClient(quote!, profile?.province);
-
-    // Start trial on first quote creation
-    if (!profile?.trialStartedAt) {
-      await db
-        .update(businessProfilesTable)
-        .set({ trialStartedAt: new Date() })
-        .where(eq(businessProfilesTable.userId, userId));
-    }
-
-    res.status(201).json(serializeQuote(quote!));
+    res.status(201).json(serializeQuote(result.quote));
   } catch (err) {
     req.log.error({ err }, "Error creating manual quote");
     res.status(500).json({ error: "Internal server error" });

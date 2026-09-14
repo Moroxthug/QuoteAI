@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
-import { stripeConnectApi, financeitApi } from "@/lib/invoices-api";
+import { stripeConnectApi, financeitApi, developerApi, type AutomationEventName } from "@/lib/invoices-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1420,6 +1420,175 @@ function FinanceitTab() {
   );
 }
 
+function DeveloperApiTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: subscription } = useGetSubscription();
+  const { data: keysData, isLoading: keysLoading } = useQuery({ queryKey: ["developer-api-keys"], queryFn: developerApi.listKeys });
+  const { data: webhooksData, isLoading: webhooksLoading } = useQuery({ queryKey: ["developer-webhooks"], queryFn: developerApi.listWebhooks });
+  const [keyName, setKeyName] = useState("");
+  const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookEvents, setWebhookEvents] = useState<AutomationEventName[]>([]);
+  const [revealedSecret, setRevealedSecret] = useState<string | null>(null);
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+
+  const createKey = useMutation({
+    mutationFn: () => developerApi.createKey(keyName.trim()),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["developer-api-keys"] });
+      setKeyName("");
+      setRevealedKey(res.rawKey);
+    },
+    onError: () => toast({ title: t("dashboard.settings.developerApi.error"), variant: "destructive" }),
+  });
+  const revokeKey = useMutation({
+    mutationFn: (id: string) => developerApi.revokeKey(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["developer-api-keys"] }),
+    onError: () => toast({ title: t("dashboard.settings.developerApi.error"), variant: "destructive" }),
+  });
+  const createWebhook = useMutation({
+    mutationFn: () => developerApi.createWebhook(webhookUrl.trim(), webhookEvents),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["developer-webhooks"] });
+      setWebhookUrl("");
+      setWebhookEvents([]);
+      setRevealedSecret(res.secret);
+    },
+    onError: () => toast({ title: t("dashboard.settings.developerApi.error"), variant: "destructive" }),
+  });
+  const toggleWebhook = useMutation({
+    mutationFn: ({ id, isEnabled }: { id: string; isEnabled: boolean }) => developerApi.toggleWebhook(id, isEnabled),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["developer-webhooks"] }),
+    onError: () => toast({ title: t("dashboard.settings.developerApi.error"), variant: "destructive" }),
+  });
+  const deleteWebhook = useMutation({
+    mutationFn: (id: string) => developerApi.deleteWebhook(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["developer-webhooks"] }),
+    onError: () => toast({ title: t("dashboard.settings.developerApi.error"), variant: "destructive" }),
+  });
+
+  if (!isElite) return null;
+
+  const keys = keysData?.items ?? [];
+  const events = keysData?.events ?? webhooksData?.events ?? [];
+  const webhooks = webhooksData?.items ?? [];
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl flex items-center justify-center bg-slate-100">
+            <KeyRound className="h-6 w-6 text-slate-600" />
+          </div>
+          <div>
+            <CardTitle>{t("dashboard.settings.developerApi.title")}</CardTitle>
+            <CardDescription className="mt-0.5">{t("dashboard.settings.developerApi.desc")}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* API keys */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-gray-700">{t("dashboard.settings.developerApi.apiKeys")}</h4>
+          {revealedKey && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+              <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.keyRevealWarning")}</p>
+              <div className="flex items-center gap-2">
+                <code className="text-xs bg-white border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedKey}</code>
+                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedKey); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setRevealedKey(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
+            </div>
+          )}
+          {keysLoading ? <Skeleton className="h-16 w-full rounded-lg" /> : (
+            <div className="space-y-2">
+              {keys.filter(k => !k.revokedAt).map((k) => (
+                <div key={k.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
+                  <div>
+                    <p className="text-sm font-medium">{k.name}</p>
+                    <p className="text-xs text-gray-500">{k.keyPrefix}••••••••• · {k.role}</p>
+                  </div>
+                  <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => revokeKey.mutate(k.id)} disabled={revokeKey.isPending}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <Input value={keyName} onChange={(e) => setKeyName(e.target.value)} placeholder={t("dashboard.settings.developerApi.keyNamePlaceholder")} className="max-w-xs" />
+            <Button size="sm" onClick={() => createKey.mutate()} disabled={!keyName.trim() || createKey.isPending} className="gap-2">
+              {createKey.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+              {t("dashboard.settings.developerApi.createKey")}
+            </Button>
+          </div>
+        </div>
+
+        {/* Webhooks */}
+        <div className="space-y-3 border-t pt-4">
+          <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h4>
+          {revealedSecret && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+              <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.secretRevealWarning")}</p>
+              <div className="flex items-center gap-2">
+                <code className="text-xs bg-white border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedSecret}</code>
+                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedSecret); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setRevealedSecret(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
+            </div>
+          )}
+          {webhooksLoading ? <Skeleton className="h-16 w-full rounded-lg" /> : (
+            <div className="space-y-2">
+              {webhooks.map((w) => (
+                <div key={w.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
+                  <div>
+                    <p className="text-sm font-medium break-all">{w.url}</p>
+                    <p className="text-xs text-gray-500">{w.events.join(", ")}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button size="sm" variant="outline" onClick={() => toggleWebhook.mutate({ id: w.id, isEnabled: !w.isEnabled })} disabled={toggleWebhook.isPending}>
+                      {w.isEnabled ? t("dashboard.settings.developerApi.pause") : t("dashboard.settings.developerApi.resume")}
+                    </Button>
+                    <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => deleteWebhook.mutate(w.id)} disabled={deleteWebhook.isPending}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Input value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} placeholder={t("dashboard.settings.developerApi.webhookUrlPlaceholder")} />
+            <div className="flex flex-wrap gap-1.5">
+              {events.map((ev) => (
+                <button
+                  key={ev}
+                  type="button"
+                  onClick={() => setWebhookEvents((prev) => prev.includes(ev) ? prev.filter(e => e !== ev) : [...prev, ev])}
+                  className={cn("text-xs px-2 py-1 rounded-full border", webhookEvents.includes(ev) ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200")}
+                >
+                  {ev}
+                </button>
+              ))}
+            </div>
+            <Button size="sm" onClick={() => createWebhook.mutate()} disabled={!webhookUrl.trim() || webhookEvents.length === 0 || createWebhook.isPending} className="gap-2">
+              {createWebhook.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Webhook className="h-4 w-4" />}
+              {t("dashboard.settings.developerApi.addWebhook")}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 const CALENDAR_PROVIDER_LABEL: Record<CalendarProvider, string> = { google: "Google Calendar", outlook: "Outlook" };
 
 function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
@@ -1788,6 +1957,7 @@ export default function SettingsPage() {
           <FinanceitTab />
           <QuickbooksTab />
           <CalendarSyncTab />
+          <DeveloperApiTab />
         </div>
       ) : activeTab === "security" ? (
         <SecurityTab />

@@ -36,6 +36,8 @@ import calendarRouter from "./calendar";
 import securityRouter from "./security";
 import importsRouter from "./imports";
 import financeitRouter from "./financeit";
+import developerApiRouter from "./developer-api";
+import publicV1Router from "./public-v1";
 
 const router: IRouter = Router();
 
@@ -76,5 +78,7 @@ router.use(calendarRouter);
 router.use(securityRouter);
 router.use(importsRouter);
 router.use(financeitRouter);
+router.use(developerApiRouter);
+router.use("/v1/public", publicV1Router);
 
 export default router;

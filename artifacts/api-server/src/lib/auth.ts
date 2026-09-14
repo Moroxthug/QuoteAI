@@ -79,33 +79,42 @@ export const auth = betterAuth({
   }),
   plugins: [bearer(), twoFactor({ issuer: "QuoteAI" })],
   hooks: {
+    // IMPORTANT: better-auth re-throws any non-APIError raised in an `after`
+    // hook, which replaces the endpoint's real response with a 500 — so a bug
+    // or transient DB error in this best-effort audit logging would turn a
+    // correct login into "invalid credentials" for the user. Never let
+    // anything in here escape; log and swallow instead.
     after: createAuthMiddleware(async (ctx) => {
-      const newSession = ctx.context.newSession;
-      if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
-        const orgId = await resolveOrgForAudit(newSession.user.id);
-        await recordSecurityAuditEvent({
-          orgId,
-          actorUserId: newSession.user.id,
-          action: "login",
-          ipAddress: newSession.session.ipAddress ?? null,
-          userAgent: newSession.session.userAgent ?? null,
-        });
-        return;
-      }
-      const session = ctx.context.session;
-      if (!session) return;
-      if (ctx.path === "/two-factor/enable") {
-        const orgId = await resolveOrgForAudit(session.user.id);
-        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.enabled" });
-      } else if (ctx.path === "/two-factor/disable") {
-        const orgId = await resolveOrgForAudit(session.user.id);
-        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.disabled" });
-      } else if (ctx.path === "/revoke-session") {
-        const orgId = await resolveOrgForAudit(session.user.id);
-        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked" });
-      } else if (ctx.path === "/revoke-sessions" || ctx.path === "/revoke-other-sessions") {
-        const orgId = await resolveOrgForAudit(session.user.id);
-        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked_all" });
+      try {
+        const newSession = ctx.context.newSession;
+        if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
+          const orgId = await resolveOrgForAudit(newSession.user.id);
+          await recordSecurityAuditEvent({
+            orgId,
+            actorUserId: newSession.user.id,
+            action: "login",
+            ipAddress: newSession.session.ipAddress ?? null,
+            userAgent: newSession.session.userAgent ?? null,
+          });
+          return;
+        }
+        const session = ctx.context.session;
+        if (!session) return;
+        if (ctx.path === "/two-factor/enable") {
+          const orgId = await resolveOrgForAudit(session.user.id);
+          await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.enabled" });
+        } else if (ctx.path === "/two-factor/disable") {
+          const orgId = await resolveOrgForAudit(session.user.id);
+          await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.disabled" });
+        } else if (ctx.path === "/revoke-session") {
+          const orgId = await resolveOrgForAudit(session.user.id);
+          await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked" });
+        } else if (ctx.path === "/revoke-sessions" || ctx.path === "/revoke-other-sessions") {
+          const orgId = await resolveOrgForAudit(session.user.id);
+          await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked_all" });
+        }
+      } catch (err) {
+        logger.error({ err, path: ctx.path }, "Security audit hook failed (non-fatal, auth response unaffected)");
       }
     }),
   },

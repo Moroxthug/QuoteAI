@@ -10,7 +10,11 @@ export function ipRateLimiter(opts: { windowMs: number; max: number; message: st
     limit: opts.max,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: opts.message },
+    // Both keys populated: better-auth's client reads `message` off the
+    // error body, our own hand-written fetch helpers (usage-api.ts etc.)
+    // read `error`/`message` too — a rate-limit block should never come
+    // through the UI looking like "invalid credentials".
+    message: { error: opts.message, message: opts.message, code: "RATE_LIMITED" },
   });
 }
 

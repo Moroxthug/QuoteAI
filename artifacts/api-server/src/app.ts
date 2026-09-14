@@ -14,14 +14,34 @@ import { logger } from "./lib/logger";
 import { ipRateLimiter } from "./lib/rateLimit";
 
 // Brute-force protection on credential-guessing endpoints. Keyed by IP (pre-auth,
-// there's no user identity yet); a generous ceiling since it also covers normal
-// typo-retries, not just attacks.
-const authRateLimiter = ipRateLimiter({
+// there's no user identity yet). Each action gets its OWN budget — sharing one
+// bucket across sign-in/2FA/password-reset meant a handful of legitimate retries
+// on one could silently starve the others, and the failure looked exactly like
+// "invalid credentials" or "error sending" on the frontend instead of a clear
+// rate-limit message.
+const signInRateLimiter = ipRateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 20,
-  message: "Too many attempts. Please wait a few minutes and try again.",
+  max: 30,
+  message: "Too many sign-in attempts. Please wait a few minutes and try again.",
 });
-const AUTH_RATE_LIMITED_PATHS = ["/api/auth/sign-in/email", "/api/auth/two-factor/verify-totp", "/api/auth/two-factor/verify-backup-code", "/api/auth/two-factor/verify-otp", "/api/auth/forget-password", "/api/auth/reset-password"];
+const twoFactorRateLimiter = ipRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: "Too many verification attempts. Please wait a few minutes and try again.",
+});
+const passwordResetRateLimiter = ipRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many password reset requests. Please wait a few minutes and try again.",
+});
+const AUTH_RATE_LIMITERS: Record<string, ReturnType<typeof ipRateLimiter>> = {
+  "/api/auth/sign-in/email": signInRateLimiter,
+  "/api/auth/two-factor/verify-totp": twoFactorRateLimiter,
+  "/api/auth/two-factor/verify-backup-code": twoFactorRateLimiter,
+  "/api/auth/two-factor/verify-otp": twoFactorRateLimiter,
+  "/api/auth/forget-password": passwordResetRateLimiter,
+  "/api/auth/reset-password": passwordResetRateLimiter,
+};
 
 const app: Express = express();
 
@@ -55,8 +75,9 @@ app.use(
 app.use((req, res, next): void => {
   if (req.url?.startsWith("/api/auth/") || req.url === "/api/auth") {
     const pathOnly = req.url.split("?")[0];
-    if (AUTH_RATE_LIMITED_PATHS.includes(pathOnly)) {
-      authRateLimiter(req, res, (err?: unknown) => {
+    const limiter = AUTH_RATE_LIMITERS[pathOnly];
+    if (limiter) {
+      limiter(req, res, (err?: unknown) => {
         if (err) { next(err); return; }
         void toNodeHandler(auth)(req, res);
       });

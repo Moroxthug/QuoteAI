@@ -3,7 +3,7 @@
 import { apiRequest as req, apiJson as json } from "@/lib/jobs-api";
 
 export type InvoiceType = "deposit" | "progress" | "final" | "holdback_release" | "change_order" | "manual" | "credit_note";
-export type InvoiceStatus = "draft" | "sent" | "viewed" | "partially_paid" | "paid" | "overdue" | "void";
+export type InvoiceStatus = "draft" | "sent" | "viewed" | "pending_confirmation" | "partially_paid" | "paid" | "overdue" | "void";
 export type PaymentMethod = "etransfer" | "cheque" | "cash" | "card" | "bank_transfer" | "credit_note" | "other";
 export const PAYMENT_METHODS: Exclude<PaymentMethod, "credit_note">[] = ["etransfer", "cheque", "cash", "card", "bank_transfer", "other"];
 
@@ -107,7 +107,16 @@ export const invoicesApi = {
   void: (id: string, reason?: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/void`, { method: "POST", body: json({ reason }) }),
   creditNote: (id: string, body: { amountCents: number; description: string; reason?: string; send?: boolean }) =>
     req<{ creditNote: InvoiceDto; invoice: InvoiceDto }>(`/api/invoices/${id}/credit-note`, { method: "POST", body: json(body) }),
+  confirmEtransfer: (id: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/confirm-etransfer`, { method: "POST", body: "{}" }),
+  rejectEtransfer: (id: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/reject-etransfer`, { method: "POST", body: "{}" }),
   pdfUrl: (id: string, download = false) => `/api/invoices/${id}/pdf${download ? "?download=1" : ""}`,
+};
+
+export type StripeConnectStatusDto = { connected: boolean; chargesEnabled?: boolean; payoutsEnabled?: boolean; detailsSubmitted?: boolean; connectedAt?: string };
+
+export const stripeConnectApi = {
+  status: () => req<StripeConnectStatusDto>("/api/invoice-payments/connect/status"),
+  onboard: () => req<{ url: string }>("/api/invoice-payments/connect/onboard", { method: "POST", body: "{}" }),
 };
 
 export type PublicInvoiceDto = {
@@ -130,6 +139,7 @@ export type PublicInvoiceDto = {
     customerName: string;
     paymentInstructions: { etransferEmail?: string | null; chequePayableTo?: string | null; note?: string | null };
     paidAt: string | null;
+    canPayByCard: boolean;
   };
   html: string;
   css: string;
@@ -138,7 +148,9 @@ export type PublicInvoiceDto = {
 export const publicInvoiceApi = {
   get: (token: string) => req<PublicInvoiceDto>(`/api/i/${token}`),
   pdfUrl: (token: string, download = false) => `/api/i/${token}/pdf${download ? "?download=1" : ""}`,
+  markSent: (token: string) => req<{ status: InvoiceStatus }>(`/api/i/${token}/mark-sent`, { method: "POST", body: "{}" }),
+  payLink: (token: string) => req<{ url: string }>(`/api/i/${token}/pay-link`, { method: "POST", body: "{}" }),
 };
 
 /** Open statuses = counts towards accounts receivable. */
-export const isOpenInvoice = (s: InvoiceStatus) => s === "sent" || s === "viewed" || s === "partially_paid" || s === "overdue";
+export const isOpenInvoice = (s: InvoiceStatus) => s === "sent" || s === "viewed" || s === "pending_confirmation" || s === "partially_paid" || s === "overdue";

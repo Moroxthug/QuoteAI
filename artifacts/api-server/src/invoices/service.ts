@@ -584,6 +584,50 @@ export async function recordPayment(params: { invoiceId: string; userId: string;
   return { invoice: updated, payment: payment! };
 }
 
+// ── e-Transfer self-report / confirm / reject (Phase 15) ────────────────────
+// Interac e-Transfer needs no payment-processor integration — it's a
+// confirmation workflow: the customer tells us they sent it, the contractor
+// confirms receipt (one click) before the invoice becomes paid.
+
+export async function reportEtransferSent(params: { invoiceId: string; ip?: string | null; userAgent?: string | null }): Promise<Invoice> {
+  const loaded = await loadInvoice(params.invoiceId);
+  if (!loaded) throw new Error("Invoice not found");
+  const inv = loaded.invoice;
+  if (!["sent", "viewed", "overdue"].includes(inv.status)) throw new Error("NOT_OPEN");
+  const [updated] = await db.update(invoicesTable).set({ status: "pending_confirmation", etransferSelfReportedAt: new Date() }).where(eq(invoicesTable.id, inv.id)).returning();
+  await logInvoiceEvent({ invoiceId: inv.id, type: "etransfer_reported", actor: "customer", ip: params.ip, userAgent: params.userAgent });
+  await createNotification({
+    userId: inv.userId,
+    type: "invoice_payment_reported",
+    title: `${inv.number}: customer says they paid`,
+    body: `${inv.customer.name || "The customer"} marked ${inv.number} (${(inv.totalCents / 100).toLocaleString("en-CA", { style: "currency", currency: "CAD" })}) as sent by e-Transfer. Confirm receipt to mark it paid.`,
+    link: `/dashboard/invoices/${inv.id}`,
+    entityType: "invoice",
+    entityId: inv.id,
+  });
+  return updated!;
+}
+
+export async function confirmEtransferReceived(params: { invoiceId: string; userId: string; ip?: string | null }): Promise<Invoice> {
+  const loaded = await loadInvoice(params.invoiceId);
+  if (!loaded || loaded.invoice.userId !== params.userId) throw new Error("Invoice not found");
+  const inv = loaded.invoice;
+  const amountCents = balanceCents(inv);
+  if (amountCents <= 0) throw new Error("Nothing owing on this invoice");
+  const { invoice } = await recordPayment({ invoiceId: inv.id, userId: params.userId, amountCents, method: "etransfer", note: "Confirmed from the customer's e-Transfer self-report", sendReceipt: true, ip: params.ip });
+  return invoice;
+}
+
+export async function rejectEtransferReport(params: { invoiceId: string; userId: string; ip?: string | null }): Promise<Invoice> {
+  const loaded = await loadInvoice(params.invoiceId);
+  if (!loaded || loaded.invoice.userId !== params.userId) throw new Error("Invoice not found");
+  const inv = loaded.invoice;
+  if (inv.status !== "pending_confirmation") throw new Error("Invoice is not awaiting confirmation");
+  const [updated] = await db.update(invoicesTable).set({ status: statusAfterPayment({ status: "sent", totalCents: inv.totalCents, paidCents: inv.paidCents, dueDate: inv.dueDate }), etransferSelfReportedAt: null }).where(eq(invoicesTable.id, inv.id)).returning();
+  await logInvoiceEvent({ invoiceId: inv.id, type: "etransfer_rejected", actor: "contractor", ip: params.ip });
+  return updated!;
+}
+
 export async function removePayment(params: { invoiceId: string; paymentId: string; userId: string }): Promise<Invoice> {
   const [payment] = await db.select().from(invoicePaymentsTable).where(and(eq(invoicePaymentsTable.id, params.paymentId), eq(invoicePaymentsTable.invoiceId, params.invoiceId), eq(invoicePaymentsTable.userId, params.userId)));
   if (!payment) throw new Error("Payment not found");

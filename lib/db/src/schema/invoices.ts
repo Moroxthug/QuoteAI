@@ -24,11 +24,15 @@ import { clientsTable } from "./clients";
 export const INVOICE_TYPES = ["deposit", "progress", "final", "holdback_release", "change_order", "manual", "credit_note"] as const;
 export type InvoiceType = (typeof INVOICE_TYPES)[number];
 
-export const INVOICE_STATUSES = ["draft", "sent", "viewed", "partially_paid", "paid", "overdue", "void"] as const;
+// "pending_confirmation": the customer self-reported an e-Transfer as sent
+// (public invoice page) but the contractor hasn't confirmed receipt yet —
+// see Phase 15. Never set by the payment math itself, only by the explicit
+// self-report / confirm / reject actions.
+export const INVOICE_STATUSES = ["draft", "sent", "viewed", "pending_confirmation", "partially_paid", "paid", "overdue", "void"] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 
 /** Statuses that count towards accounts receivable. */
-export const OPEN_INVOICE_STATUSES: readonly InvoiceStatus[] = ["sent", "viewed", "partially_paid", "overdue"];
+export const OPEN_INVOICE_STATUSES: readonly InvoiceStatus[] = ["sent", "viewed", "pending_confirmation", "partially_paid", "overdue"];
 
 export const PAYMENT_METHODS = ["etransfer", "cheque", "cash", "card", "bank_transfer", "credit_note", "other"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
@@ -119,6 +123,10 @@ export const invoicesTable = pgTable(
     publicTokenHash: text("public_token_hash"),
     pdfUrl: text("pdf_url"),
     pdfHash: text("pdf_hash"),
+    /** Set when the customer clicks "I've sent the e-Transfer" on the public invoice page. */
+    etransferSelfReportedAt: timestamp("etransfer_self_reported_at", { withTimezone: true }),
+    /** Latest Stripe Checkout Session created for online card payment (idempotency for the webhook). */
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
     sentAt: timestamp("sent_at", { withTimezone: true }),
     viewedAt: timestamp("viewed_at", { withTimezone: true }),
     paidAt: timestamp("paid_at", { withTimezone: true }),

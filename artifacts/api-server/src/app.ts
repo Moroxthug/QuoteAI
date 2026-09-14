@@ -295,6 +295,76 @@ app.post(
 );
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Stripe Connect webhook (Phase 15: invoice card payments) ─────────────────
+// Separate endpoint/secret from the platform webhook above: Connect events
+// (checkout sessions and account updates on a connected account) are a
+// distinct event stream in the Stripe Dashboard, not forwarded to the
+// platform endpoint.
+app.post(
+  "/api/payments/connect-webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const signature = req.headers["stripe-signature"];
+    if (!signature) { res.status(400).json({ error: "Missing stripe-signature header" }); return; }
+    const sig = Array.isArray(signature) ? signature[0] : signature;
+
+    const webhookSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      logger.error("STRIPE_CONNECT_WEBHOOK_SECRET not set — cannot verify Connect webhook signature");
+      res.status(500).json({ error: "Webhook secret not configured" });
+      return;
+    }
+
+    let event: {
+      type: string;
+      account?: string;
+      data: { object: { id?: string; metadata?: Record<string, string>; amount_total?: number; payment_status?: string; charges_enabled?: boolean; payouts_enabled?: boolean; details_submitted?: boolean } };
+    };
+
+    try {
+      const { getUncachableStripeClient } = await import("./stripeClient");
+      const stripe = await getUncachableStripeClient();
+      event = stripe.webhooks.constructEvent(req.body as Buffer, sig, webhookSecret) as typeof event;
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      logger.error({ err }, "Stripe Connect webhook signature verification failed");
+      res.status(400).json({ error: `Webhook signature error: ${message}` });
+      return;
+    }
+
+    try {
+      if (event.type === "checkout.session.completed") {
+        const session = event.data.object;
+        const invoiceId = session.metadata?.invoiceId;
+        if (invoiceId && session.payment_status === "paid" && typeof session.amount_total === "number") {
+          const { db: database, invoicesTable: invTable, invoicePaymentsTable: payTable } = await import("@workspace/db");
+          const { eq: eqOp } = await import("drizzle-orm");
+          const [inv] = await database.select().from(invTable).where(eqOp(invTable.id, invoiceId));
+          if (inv) {
+            // Idempotent: a webhook retry must not double-record the same Checkout Session.
+            const [already] = await database.select().from(payTable).where(eqOp(payTable.reference, session.id ?? ""));
+            if (!already) {
+              const { recordPayment } = await import("./invoices/service");
+              await recordPayment({ invoiceId: inv.id, userId: inv.userId, amountCents: session.amount_total, method: "card", reference: session.id ?? "", sendReceipt: true });
+              logger.info({ invoiceId, sessionId: session.id }, "Invoice paid by card via Stripe Connect");
+            }
+          }
+        }
+      }
+
+      if (event.type === "account.updated" && event.account) {
+        const { syncConnectAccountStatus } = await import("./invoices/stripeConnect");
+        await syncConnectAccountStatus(event.account);
+      }
+    } catch (bizErr) {
+      logger.error({ err: bizErr }, "Stripe Connect webhook business logic error (non-fatal)");
+    }
+
+    res.status(200).json({ received: true });
+  }
+);
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── WhatsApp webhook — verify Meta HMAC signature before express.json() ───────
 app.post(
   "/api/whatsapp/webhook",

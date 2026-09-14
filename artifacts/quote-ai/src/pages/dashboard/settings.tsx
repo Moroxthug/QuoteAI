@@ -22,9 +22,9 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2 } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
@@ -33,6 +33,7 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
+import { stripeConnectApi } from "@/lib/invoices-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1281,6 +1282,54 @@ function QuickbooksTab() {
   );
 }
 
+function StripeConnectTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const { data: subscription } = useGetSubscription();
+  const { data: status, isLoading } = useQuery({ queryKey: ["stripe-connect-status"], queryFn: stripeConnectApi.status });
+  const onboard = useMutation({
+    mutationFn: stripeConnectApi.onboard,
+    onSuccess: (r) => { window.location.href = r.url; },
+    onError: () => toast({ title: t("dashboard.settings.stripeConnect.error"), variant: "destructive" }),
+  });
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  const connected = status?.connected ?? false;
+  const chargesEnabled = status?.chargesEnabled ?? false;
+
+  return (
+    <Card className={connected && chargesEnabled ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50" : undefined}>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-violet-100")}>
+            <CreditCard className={cn("h-6 w-6", connected && chargesEnabled ? "text-emerald-600" : "text-violet-500")} />
+          </div>
+          <div>
+            <CardTitle>{t("dashboard.settings.stripeConnect.title")}</CardTitle>
+            <CardDescription className="mt-0.5">{t("dashboard.settings.stripeConnect.desc")}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {connected && (
+          <Badge className={cn("text-xs", chargesEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-800 border-amber-200")} variant="outline">
+            {chargesEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.active")}</> : <><AlertCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.onboardingIncomplete")}</>}
+          </Badge>
+        )}
+      </CardContent>
+      <CardFooter>
+        <Button onClick={() => onboard.mutate()} disabled={onboard.isPending} className="gap-2">
+          {onboard.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+          {connected ? (chargesEnabled ? t("dashboard.settings.stripeConnect.manage") : t("dashboard.settings.stripeConnect.finishOnboarding")) : t("dashboard.settings.stripeConnect.connectCta")}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
 const CALENDAR_PROVIDER_LABEL: Record<CalendarProvider, string> = { google: "Google Calendar", outlook: "Outlook" };
 
 function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
@@ -1645,6 +1694,7 @@ export default function SettingsPage() {
         <UsageTab />
       ) : activeTab === "integrations" ? (
         <div className="space-y-6">
+          <StripeConnectTab />
           <QuickbooksTab />
           <CalendarSyncTab />
         </div>

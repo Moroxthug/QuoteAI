@@ -118,6 +118,10 @@ export function statusAfterPayment(params: { status: InvoiceStatus; totalCents: 
   const now = params.now ?? new Date();
   if (paidCents > 0) return "partially_paid";
   if (now > params.dueDate) return "overdue";
+  // A customer's e-Transfer self-report holds until the contractor confirms
+  // or rejects it — it isn't a byproduct of the payment math, only of those
+  // two explicit actions (see invoices/service.ts).
+  if (status === "pending_confirmation") return "pending_confirmation";
   return status === "viewed" ? "viewed" : "sent";
 }
 

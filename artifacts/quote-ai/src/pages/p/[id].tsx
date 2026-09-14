@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, Loader2, FileX, Hammer } from "lucide-react";
+import { CheckCircle2, Loader2, FileX, Hammer, Landmark } from "lucide-react";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -47,6 +47,129 @@ interface PublicQuote {
 
 function euro(value: string | number) {
   return Number(value).toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+}
+
+type FinanceitEstimate = { monthlyPayment: number; termMonths: number; apr: number };
+type FinanceitApplicationStatusDto = { status: string; applicationLink: string };
+
+const FINANCEIT_STATUS_KEYS: Record<string, string> = {
+  sent: "publicQuote.financing.statusSent",
+  in_progress: "publicQuote.financing.statusInProgress",
+  approved: "publicQuote.financing.statusApproved",
+  declined: "publicQuote.financing.statusDeclined",
+  funded: "publicQuote.financing.statusFunded",
+};
+
+// Only rendered once we've confirmed the contractor behind this quote has
+// financing enabled — most quotes never call the Financeit APIs at all.
+function FinancingWidget({ quoteId }: { quoteId: string }) {
+  const { t } = useLanguage();
+  const [checked, setChecked] = useState(false);
+  const [available, setAvailable] = useState(false);
+  const [application, setApplication] = useState<FinanceitApplicationStatusDto | null>(null);
+  const [estimate, setEstimate] = useState<FinanceitEstimate | null>(null);
+  const [loadingEstimate, setLoadingEstimate] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/public/quotes/${quoteId}/financeit/status`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        setAvailable(!!data.available);
+        setApplication(data.application ?? null);
+      } catch {
+        // Financing is a bonus, not core to the accept flow — fail silently.
+      } finally {
+        if (!cancelled) setChecked(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [quoteId]);
+
+  async function handleEstimate() {
+    setLoadingEstimate(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/public/quotes/${quoteId}/financeit/estimate`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) { setError(t("publicQuote.financing.error")); return; }
+      setEstimate(data.estimate);
+    } catch {
+      setError(t("publicQuote.financing.error"));
+    } finally {
+      setLoadingEstimate(false);
+    }
+  }
+
+  async function handleApply() {
+    setApplying(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/public/quotes/${quoteId}/financeit/apply`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) { setError(t("publicQuote.financing.error")); return; }
+      window.location.href = data.applicationLink;
+    } catch {
+      setError(t("publicQuote.financing.error"));
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  if (!checked || !available) return null;
+
+  return (
+    <Card className="border-amber-100 bg-amber-50/50 mb-6">
+      <CardContent className="p-5 sm:p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Landmark className="h-4 w-4 text-amber-600" />
+          <p className="text-sm font-semibold text-gray-900">{t("publicQuote.financing.title")}</p>
+        </div>
+        <p className="text-xs text-gray-500 mb-4">{t("publicQuote.financing.subtitle")}</p>
+
+        {application ? (
+          <div className="space-y-2">
+            {FINANCEIT_STATUS_KEYS[application.status] && (
+              <p className="text-xs text-gray-700">{t(FINANCEIT_STATUS_KEYS[application.status])}</p>
+            )}
+            {application.status === "sent" && (
+              <Button variant="outline" size="sm" onClick={() => { window.location.href = application.applicationLink; }} className="gap-2">
+                {t("publicQuote.financing.continueApplication")}
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {estimate ? (
+              <div className="text-sm text-gray-800">
+                <span className="text-lg font-bold">{euro(estimate.monthlyPayment)}</span>
+                <span className="text-gray-500">{t("publicQuote.financing.perMonth")}</span>
+                <span className="text-xs text-gray-400 ml-2">({estimate.termMonths} {t("publicQuote.financing.termMonths")})</span>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleEstimate} disabled={loadingEstimate} className="gap-2">
+                {loadingEstimate ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {t("publicQuote.financing.getEstimate")}
+              </Button>
+            )}
+            {error && <p className="text-xs text-red-500">{error}</p>}
+            <div>
+              <Button onClick={handleApply} disabled={applying} className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+                {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Landmark className="h-4 w-4" />}
+                {t("publicQuote.financing.applyButton")}
+              </Button>
+            </div>
+            <p className="text-[11px] text-gray-400">{t("publicQuote.financing.disclaimer")}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function PublicQuotePage() {
@@ -192,6 +315,8 @@ export default function PublicQuotePage() {
           )}
         </CardContent>
       </Card>
+
+      <FinancingWidget quoteId={quote.id} />
 
       {isAccepted ? (
         <Card className="border-emerald-200 bg-emerald-50">

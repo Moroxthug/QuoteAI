@@ -35,6 +35,7 @@ import quickbooksRouter from "./quickbooks";
 import calendarRouter from "./calendar";
 import securityRouter from "./security";
 import importsRouter from "./imports";
+import financeitRouter from "./financeit";
 
 const router: IRouter = Router();
 
@@ -74,5 +75,6 @@ router.use(quickbooksRouter);
 router.use(calendarRouter);
 router.use(securityRouter);
 router.use(importsRouter);
+router.use(financeitRouter);
 
 export default router;

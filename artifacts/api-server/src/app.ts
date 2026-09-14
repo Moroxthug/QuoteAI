@@ -365,6 +365,62 @@ app.post(
 );
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Financeit webhook (Phase 16: point-of-sale financing) ────────────────────
+// Best-effort delivery, no auto-retry per Financeit's docs. Verified against a
+// shared secret (FINANCEIT_WEBHOOK_SECRET, provisioned alongside partner API
+// access) rather than a signature scheme — revisit once the exact webhook
+// authentication Financeit issues is in hand.
+app.post(
+  "/api/webhooks/financeit",
+  express.json(),
+  async (req: Request, res: Response): Promise<void> => {
+    const webhookSecret = process.env.FINANCEIT_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      logger.error("FINANCEIT_WEBHOOK_SECRET not set — rejecting Financeit webhook POST to prevent spoofing");
+      res.status(500).json({ error: "Webhook secret not configured" });
+      return;
+    }
+    const tokenHeader = req.headers["x-financeit-webhook-token"];
+    const tokenStr = Array.isArray(tokenHeader) ? tokenHeader[0] : tokenHeader;
+    if (!tokenStr) {
+      res.status(400).json({ error: "Missing x-financeit-webhook-token header" });
+      return;
+    }
+    const { timingSafeEqual } = await import("node:crypto");
+    const provided = Buffer.from(tokenStr);
+    const expected = Buffer.from(webhookSecret);
+    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+      res.status(401).json({ error: "Invalid webhook token" });
+      return;
+    }
+
+    const body = req.body as { event_type?: string; application_id?: string; loan_state?: string; [k: string]: unknown };
+    const eventType = body.event_type === "funds_released" ? "funds_released" : "loan_state_event";
+
+    try {
+      if (body.application_id) {
+        const { getFinanceitApplicationByFinanceitId, recordFinanceitLoanEvent } = await import("./financeit/service");
+        const application = await getFinanceitApplicationByFinanceitId(body.application_id);
+        if (application) {
+          await recordFinanceitLoanEvent({
+            applicationId: application.id,
+            eventType,
+            loanState: typeof body.loan_state === "string" ? body.loan_state : null,
+            raw: body,
+          });
+        } else {
+          logger.warn({ applicationId: body.application_id }, "Financeit webhook: no matching application found");
+        }
+      }
+    } catch (bizErr) {
+      logger.error({ err: bizErr }, "Financeit webhook business logic error (non-fatal)");
+    }
+
+    res.status(200).json({ received: true });
+  }
+);
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── WhatsApp webhook — verify Meta HMAC signature before express.json() ───────
 app.post(
   "/api/whatsapp/webhook",

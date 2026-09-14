@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
-import { stripeConnectApi } from "@/lib/invoices-api";
+import { stripeConnectApi, financeitApi } from "@/lib/invoices-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1330,6 +1330,96 @@ function StripeConnectTab() {
   );
 }
 
+function FinanceitTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: subscription } = useGetSubscription();
+  const { data: status, isLoading } = useQuery({ queryKey: ["financeit-status"], queryFn: financeitApi.status });
+  const [dealerId, setDealerId] = useState("");
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["financeit-status"] });
+
+  const saveDealer = useMutation({
+    mutationFn: () => financeitApi.saveDealer(dealerId.trim()),
+    onSuccess: () => { invalidate(); setDealerId(""); toast({ title: t("dashboard.settings.financeit.connected") }); },
+    onError: () => toast({ title: t("dashboard.settings.financeit.error"), variant: "destructive" }),
+  });
+  const toggle = useMutation({
+    mutationFn: (isEnabled: boolean) => financeitApi.toggle(isEnabled),
+    onSuccess: invalidate,
+    onError: () => toast({ title: t("dashboard.settings.financeit.error"), variant: "destructive" }),
+  });
+  const disconnect = useMutation({
+    mutationFn: financeitApi.disconnect,
+    onSuccess: () => { invalidate(); toast({ title: t("dashboard.settings.financeit.disconnected") }); },
+    onError: () => toast({ title: t("dashboard.settings.financeit.error"), variant: "destructive" }),
+  });
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  const connected = status?.connected ?? false;
+  const isEnabled = status?.isEnabled ?? true;
+
+  return (
+    <Card className={connected && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-violet-100")}>
+            <Landmark className={cn("h-6 w-6", connected && isEnabled ? "text-amber-600" : "text-violet-500")} />
+          </div>
+          <div>
+            <CardTitle>{t("dashboard.settings.financeit.title")}</CardTitle>
+            <CardDescription className="mt-0.5">{t("dashboard.settings.financeit.desc")}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {connected ? (
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-600 border-gray-200")} variant="outline">
+                {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.financeit.active")}</> : t("dashboard.settings.financeit.paused")}
+              </Badge>
+              <p className="text-xs text-gray-500 mt-1.5">{t("dashboard.settings.financeit.dealerIdLabel")}: {status?.dealerId}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs text-gray-500">{t("dashboard.settings.financeit.dealerIdHelp")}</p>
+            <Input
+              value={dealerId}
+              onChange={(e) => setDealerId(e.target.value)}
+              placeholder={t("dashboard.settings.financeit.dealerIdPlaceholder")}
+            />
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="gap-2">
+        {connected ? (
+          <>
+            <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+              {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isEnabled ? t("dashboard.settings.financeit.pause") : t("dashboard.settings.financeit.resume")}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+              {t("dashboard.settings.financeit.disconnect")}
+            </Button>
+          </>
+        ) : (
+          <Button onClick={() => saveDealer.mutate()} disabled={!dealerId.trim() || saveDealer.isPending} className="gap-2">
+            {saveDealer.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {t("dashboard.settings.financeit.connectCta")}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
+  );
+}
+
 const CALENDAR_PROVIDER_LABEL: Record<CalendarProvider, string> = { google: "Google Calendar", outlook: "Outlook" };
 
 function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
@@ -1695,6 +1785,7 @@ export default function SettingsPage() {
       ) : activeTab === "integrations" ? (
         <div className="space-y-6">
           <StripeConnectTab />
+          <FinanceitTab />
           <QuickbooksTab />
           <CalendarSyncTab />
         </div>

@@ -12,6 +12,13 @@ import { raiseAutomation } from "../lib/automation.js";
 import { linkQuoteToClient } from "../lib/clients.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { calculateEstimate, sendDirectInvite } from "../lib/financeitClient.js";
+import {
+  getFinanceitConnection,
+  getLatestFinanceitApplicationForQuote,
+  recordFinanceitApplication,
+  markFinanceitApplied,
+} from "../financeit/service.js";
 
 const router = Router();
 
@@ -51,6 +58,18 @@ const quoteAcceptLimiter = ipRateLimiter({
 });
 
 const MAX_ACCEPTED_NAME_LENGTH = 120;
+
+const financeitEstimateLimiter = ipRateLimiter({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: "Too many requests. Try again shortly.",
+});
+
+const financeitApplyLimiter = ipRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: "Too many financing applications from this IP address. Try again later.",
+});
 
 // Public projection of the quote: always excludes userId, Stripe billing
 // data, and internal AI metadata (costs/tokens) — this endpoint is not
@@ -584,6 +603,92 @@ router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) =>
   } catch (err) {
     logger.error({ err }, "Error accepting public quote");
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/public/quotes/:id/financeit/status — does the contractor behind
+// this quote offer financing? Never exposes the userId or dealerId.
+router.get("/public/quotes/:id/financeit/status", quoteViewLimiter, async (req, res) => {
+  try {
+    const id = req.params.id as string;
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote || (quote.status !== "unlocked" && quote.status !== "accepted")) {
+      res.status(404).json({ error: "Quote not found." });
+      return;
+    }
+    const conn = await getFinanceitConnection(quote.userId);
+    const application = await getLatestFinanceitApplicationForQuote(id);
+    res.json({
+      available: !!conn?.isEnabled,
+      application: application ? { status: application.status, applicationLink: application.applicationLink } : null,
+    });
+  } catch (err) {
+    logger.error({ err }, "Error fetching public quote financing status");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/public/quotes/:id/financeit/estimate — indicative monthly-payment
+// estimate only, no application and no credit check.
+router.post("/public/quotes/:id/financeit/estimate", financeitEstimateLimiter, async (req, res) => {
+  try {
+    const id = req.params.id as string;
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote || (quote.status !== "unlocked" && quote.status !== "accepted")) {
+      res.status(404).json({ error: "Quote not found." });
+      return;
+    }
+    const conn = await getFinanceitConnection(quote.userId);
+    if (!conn?.isEnabled) {
+      res.status(409).json({ error: "FINANCING_NOT_AVAILABLE" });
+      return;
+    }
+    const amountCents = Math.round(Number(quote.totale) * 100);
+    const estimate = await calculateEstimate(conn.dealerId, amountCents);
+    res.json({ estimate });
+  } catch (err) {
+    logger.error({ err }, "Error calculating Financeit estimate");
+    res.status(502).json({ error: "FINANCEIT_API_ERROR", message: "Couldn't reach Financeit — try again in a moment." });
+  }
+});
+
+// POST /api/public/quotes/:id/financeit/apply — sends the customer Financeit's
+// hosted application link (direct_invites/send); QuoteAI never sees loan data.
+router.post("/public/quotes/:id/financeit/apply", financeitApplyLimiter, async (req, res) => {
+  try {
+    const id = req.params.id as string;
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote || (quote.status !== "unlocked" && quote.status !== "accepted")) {
+      res.status(404).json({ error: "Quote not found." });
+      return;
+    }
+    const conn = await getFinanceitConnection(quote.userId);
+    if (!conn?.isEnabled) {
+      res.status(409).json({ error: "FINANCING_NOT_AVAILABLE" });
+      return;
+    }
+    const amountCents = Math.round(Number(quote.totale) * 100);
+    const customerName = quote.clientData?.nome?.trim() || "Customer";
+    const invite = await sendDirectInvite({
+      dealerId: conn.dealerId,
+      amountCents,
+      referenceId: id,
+      customerName,
+      customerEmail: quote.clientData?.email ?? null,
+      customerPhone: quote.clientData?.phone ?? null,
+    });
+    const application = await recordFinanceitApplication({
+      userId: quote.userId,
+      quoteId: id,
+      dealerId: conn.dealerId,
+      financeitApplicationId: invite.applicationId,
+      applicationLink: invite.applicationLink,
+    });
+    await markFinanceitApplied(quote.userId);
+    res.json({ applicationLink: application.applicationLink });
+  } catch (err) {
+    logger.error({ err }, "Error starting Financeit application");
+    res.status(502).json({ error: "FINANCEIT_API_ERROR", message: "Couldn't reach Financeit — try again in a moment." });
   }
 });
 

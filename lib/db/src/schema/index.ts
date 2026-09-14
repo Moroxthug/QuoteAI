@@ -29,3 +29,4 @@ export * from "./quickbooks";
 export * from "./calendar";
 export * from "./imports";
 export * from "./stripe-connect";
+export * from "./financeit";

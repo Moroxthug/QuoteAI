@@ -23,12 +23,13 @@ export const PRODUCT_FEATURES = [
   "quickbooks_sync", // Phase 11: one-way sync of paid invoices/confirmed costs to QuickBooks Online
   "calendar_sync", // Phase 12: one-way push of job milestones to Google Calendar / Outlook
   "invoice_card_payments", // Phase 15: online card/ACH payment on invoices via the company's own Stripe Connect account
+  "financeit", // Phase 16: point-of-sale financing on quotes via Financeit's hosted application flow
 ] as const;
 export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments"];
+const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
 export const SEATS_INCLUDED: Record<PlanId, number> = {

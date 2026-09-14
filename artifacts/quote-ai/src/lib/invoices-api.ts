@@ -119,6 +119,15 @@ export const stripeConnectApi = {
   onboard: () => req<{ url: string }>("/api/invoice-payments/connect/onboard", { method: "POST", body: "{}" }),
 };
 
+export type FinanceitStatusDto = { connected: boolean; dealerId?: string; isEnabled?: boolean; connectedAt?: string; lastAppliedAt?: string | null };
+
+export const financeitApi = {
+  status: () => req<FinanceitStatusDto>("/api/financeit/status"),
+  saveDealer: (dealerId: string) => req<{ connected: boolean; dealerId: string; isEnabled: boolean }>("/api/financeit/dealer", { method: "PUT", body: json({ dealerId }) }),
+  toggle: (isEnabled: boolean) => req<{ success: true }>("/api/financeit/toggle", { method: "PATCH", body: json({ isEnabled }) }),
+  disconnect: () => req<{ success: true }>("/api/financeit/disconnect", { method: "DELETE" }),
+};
+
 export type PublicInvoiceDto = {
   invoice: {
     id: string;

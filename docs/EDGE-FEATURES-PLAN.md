@@ -125,13 +125,107 @@ The schema (`incentives_catalog`) exists and is now Canadianized (federal/provin
 
 ---
 
-## 8. Suggested build order
+## 8. Phase 21 — Quote-sent follow-up reminders (≈3-5 days)
 
-1. **Phase 15 (invoice payments)** — closes an actual functional gap, fully self-serve, no external dependency. Start here.
-2. **Phase 17 (incentives engine)** — fully self-serve, reuses existing i18n/schema investment, meaningful differentiation.
-3. **Phase 18 (price intelligence)** — cheap, self-serve, sharpens the core product.
-4. **Phase 20 (connected-email sending)** — mostly self-serve (send-only scopes, no CASA-style audit); ship the independent `Reply-To` quick win first regardless of when the full phase starts. The Gmail half has no dependency; the Outlook half needs the Outlook OAuth app registration finished first (currently deferred — see below), so start with Gmail if that registration is still pending.
-5. **Phase 19 (public API)** — self-serve, but lower urgency until there's third-party demand.
-6. **Phase 16 (Financeit financing)** — highest potential close-rate impact, but blocked on you pursuing partner access first; build the engineering piece in parallel once you've started that conversation, not before.
+**The gap, confirmed in code**: `lib/db/src/schema/automation.ts`'s `AUTOMATION_EVENTS` covers `quote.accepted`, `contract.signed/declined`, `milestone.completed`, `job.completed`, `invoice.overdue`, `lead.followup_due`, `job.review_request_due`, `invoice.paid`, `cost.confirmed` — every stage of the funnel has an automated nudge except the one that arguably matters most: a quote gets sent and, if the customer never responds, nothing ever follows up. Leads get a follow-up sequence (Phase 9) but only *before* a quote exists.
+
+**Build**: add a `quote.followup_due` event, same `automation_runs`/`raiseAutomation` pattern used everywhere else, cadence configurable per company (default something like 2/5/10 days after `sentAt`, mirroring Phase 9/10's fixed-then-later-configurable approach), auto-stop on accept/decline/unsubscribe. Reuses the exact CASA-identification-block/unsubscribe messaging machinery already built for leads and review requests — no new compliance surface.
+
+**Feasibility**: fully self-serve, smallest phase in this plan, plausibly the highest ROI-per-hour item here since it directly recovers quotes that are already 90% closed.
+
+---
+
+## 9. Phase 22 — Good/Better/Best tiered quotes (≈2-3 weeks)
+
+**The gap, confirmed in code**: `quotesTable` (`lib/db/src/schema/quotes.ts:73-117`) models one fixed price per quote row — no concept of presenting a customer with multiple options in a single send. Tiered pricing ("basic/standard/premium") is a well-known contractor sales technique for lifting average deal size, and no schema hook exists for it today.
+
+**Design**: rather than cramming tiers into the existing `quotesTable` row, add a lightweight `quote_variants` table — a quote gets 1-3 variant rows (each with its own `items`/`capitoli`/`totale`), and the customer-facing accept page shows them side by side; accepting one variant does today's normal `quotesTable.status = "accepted"` flow, just tagged with which variant won. This keeps every existing single-price code path (PDF generation, contract creation, invoicing) working unchanged for a quote with exactly one variant — a non-breaking additive model, not a rewrite of the quote pipeline.
+
+**Build**: `quote_variants` table + migration; quote builder UI gains an "add option" affordance (clone-and-edit an existing variant); customer accept page (`/q/:token` or equivalent) renders a comparison layout when >1 variant exists; AI quote generation could optionally propose 2-3 tiers directly from one prompt as a stretch goal.
+
+**Feasibility**: fully self-serve — this is a product/schema design task, no external dependency. Larger lift than most items here because it touches the quote pipeline's core data shape; sequence it after the smaller wins.
+
+---
+
+## 10. Phase 23 — Worker GPS clock-in/out (≈1-2 weeks)
+
+**The gap, confirmed in code**: `worker-time.ts` already has a mobile-friendly, tokenized magic-link page (`/t/:token`, no login) built for field workers — but it only captures a self-reported `hours` number, `date`, optional `milestoneId`/`note`. No location, no actual clock-in/clock-out timestamp.
+
+**Build**: extend the existing magic-link page with a "Clock in" / "Clock out" button pair (browser geolocation API, no native app needed) instead of a manual hours field — hours get derived from the timestamp delta, with the raw clock-in/out times and lat/long stored alongside for dispute resolution. Add a per-job "geofence radius" setting (optional, off by default) that just flags — never blocks — a clock-in that's far from the job address, since connectivity/GPS accuracy issues on real job sites make hard blocking a support-ticket generator.
+
+**Feasibility**: fully self-serve, incremental on infrastructure that already exists (the magic-link page, the worker-time table) rather than a new subsystem.
+
+---
+
+## 11. Phase 24 — UI polish: dark mode & mobile quote builder (≈1-2 weeks)
+
+Two unrelated fixes bundled because they're both frontend-only, no backend/schema change:
+
+- **Dark mode is currently a half-built ghost feature.** `index.css` defines the full `.dark` CSS-variable block and a `@custom-variant dark` — but there's no `ThemeProvider`, no toggle, and only 5 files (all shadcn primitives) use any `dark:` class. Two options: (a) finish it — wire a theme toggle + `localStorage` preference, since it's genuinely useful for someone checking job status from a truck at night, and most of the token groundwork already exists; or (b) if not prioritized, strip the dead CSS so it stops looking like a broken feature. Recommend (a) — the hard part (token definitions) is already done.
+- **The quote builder is the weakest responsive screen** in the app, despite being the most business-critical one — fixed-width truncation (`max-w-[400px]` table cells, `max-w-[160px]` logo) and few breakpoints compared to the properly responsive dashboard shell/jobs list/invoices pages. A targeted pass (reflow the line-items table to a stacked card layout under `sm:`, same pattern already used elsewhere in the app) rather than a full redesign.
+
+**Feasibility**: fully self-serve, frontend-only.
+
+---
+
+## 12. Phase 25 — Wave accounting integration (≈2 weeks)
+
+**Researched this session**: Wave has a genuinely public, self-serve **GraphQL API** (`developer.waveapps.com`, OAuth 2.0, a real developer portal with self-serve app registration — no partner-approval gate, unlike Financeit or Flinks below). Wave is free accounting software popular with solo/small Canadian contractors who aren't QuickBooks customers — this integration reaches a segment Phase 11's QuickBooks sync doesn't.
+
+**Build**: mirrors Phase 11's shape almost exactly — OAuth connect (`wave_connections` table, encrypted tokens via the existing `lib/crypto.ts` helper), `invoice.paid`/`cost.confirmed` push sales/expenses via GraphQL mutations instead of QuickBooks's REST calls, same one-line-per-transaction v1 simplification, same Settings → Integrations card pattern, same Elite-tier gate. Genuinely one of the more mechanical phases in this plan since Phase 11 already proved the pattern end to end.
+
+**Feasibility**: fully self-serve, no external approval needed.
+
+---
+
+## 13. Phase 26 — HomeStars (reality check: not a real integration opportunity today)
+
+**Researched this session, and the honest answer is different from Google Reviews (Phase 10)**: HomeStars has **no public partner API** for review sync or lead import. The only "HomeStars API" results that exist are third-party scrapers (Apify) that scrape public profile pages — fragile, likely against HomeStars's terms of service, and not something to build a paying customer's workflow on top of.
+
+**Recommendation**: don't build a deep integration. Instead, extend Phase 10's existing "Reviews & reachout" Settings card with a second manual link field — `homeStarsProfileUrl` alongside the existing `googleReviewUrl` — so the same post-job review-request message can offer *either* platform (or both) as a one-click link, exactly like the Google flow already does. This gets 90% of the customer value (more reviews on the platform Canadian homeowners actually check) with an hour of work instead of a fragile scraper. Revisit a real sync only if HomeStars ever opens a partner API.
+
+---
+
+## 14. Phase 27 — Bank feed reconciliation (Flinks) — lower priority, partner-gated like Financeit
+
+**Researched this session**: Flinks (owned by National Bank of Canada) is the leading Canadian open-banking data platform, but access is **not self-serve** — their own materials describe "managed services for onboarding, accreditation, consent management, governance" rather than an instant developer signup, the same partner-onboarding shape as Phase 16's Financeit. On top of that, Canada's actual open-banking regulatory framework is *itself* only entering "Phase 1 — read access" in 2026 per federal draft regulations — this is an early, still-forming market, not a mature self-serve API space yet.
+
+**Recommendation**: don't prioritize this now. It would meaningfully reduce receipt-scanning friction (auto-reconcile a bank feed instead of photographing every receipt) if built, but between the partner-gate and the immature regulatory environment, it's a multi-month business-development effort before any code gets written — similar profile to Financeit, and arguably premature given Canada's open banking rules are still being finalized. Worth revisiting in 12-18 months as the regulatory framework matures.
+
+---
+
+## 15. Phase 28 — Ad-platform lead capture (≈1-2 weeks for Meta; Google LSA is harder and narrower)
+
+**Researched this session — two different platforms, two different feasibility profiles**:
+- **Meta (Facebook/Instagram) Lead Ads**: well-documented public Graph API with lead-retrieval webhooks, standard Meta App Review process — QuoteAI already has a working relationship with Meta's developer platform via the existing WhatsApp Cloud API integration (Phase 9), so the app-review process is a known quantity, not a new relationship to build. **Recommended starting point.**
+- **Google Local Services Ads**: technically has API access via the Google Ads API, but requires a developer token (approval process), a manager-account structure, and — critically — only benefits contractors who are already running active Google LSA campaigns, a narrower and more specialized subset than Meta's broader ad reach. Lower priority; revisit if customer demand specifically asks for it.
+
+**Build (Meta half)**: a company connects their Facebook Page/Lead Ads via OAuth (Settings → Integrations), a webhook receives new leads in real time and writes them into the existing `leads` table with `source: "meta_ads"` and the ad/campaign name preserved for attribution — reuses Phase 9's lead pipeline and CASL consent-logging entirely; a Lead Ads submission already carries the customer's consent to be contacted, which needs to be captured as the `consentSource` on the resulting lead record.
+
+**Feasibility**: Meta half is fully self-serve, standard app-review timeline (days, not the enterprise-partner timeline of Financeit/Flinks). Google LSA half is self-serve but slower to approve and narrower in applicability — sequence it after, if at all.
+
+---
+
+## 16. Suggested build order
+
+**Tier 1 — cheapest, highest-ROI, fully self-serve. Do these first, roughly in this order:**
+1. **Phase 21 (quote-sent reminders)** — smallest phase in the whole plan, closes a real gap in the funnel's most valuable stage. Start here, even before Phase 15.
+2. **Phase 15 (invoice payments)** — closes an actual functional gap, fully self-serve, no external dependency.
+3. **Phase 24 (dark mode + mobile quote builder)** — frontend-only, no schema change, quick to ship independently of everything else.
+4. **Phase 17 (incentives engine)** — fully self-serve, reuses existing i18n/schema investment, meaningful differentiation.
+5. **Phase 18 (price intelligence)** — cheap, self-serve, sharpens the core product.
+
+**Tier 2 — self-serve but bigger builds:**
+6. **Phase 20 (connected-email sending)** — send-only scopes, no CASA-style audit; ship the independent `Reply-To` quick win first regardless of when the full phase starts. Gmail half has no dependency; Outlook half needs that OAuth app registration finished first (see deferred list below).
+7. **Phase 25 (Wave accounting)** — mechanical repeat of Phase 11's QuickBooks pattern, fully self-serve public API.
+8. **Phase 28 (Meta/Facebook Lead Ads)** — self-serve, standard app-review timeline; skip the Google LSA half unless a customer specifically asks.
+9. **Phase 23 (worker GPS clock-in/out)** — incremental on existing infrastructure.
+10. **Phase 22 (tiered quotes)** — biggest schema lift in Tier 2, sequence after the smaller wins.
+11. **Phase 19 (public API)** — self-serve, but lower urgency until there's third-party demand.
+
+**Tier 3 — real value, but gated on something outside pure engineering. Don't lead with these:**
+- **Phase 16 (Financeit financing)** — blocked on you pursuing partner access first.
+- **Phase 27 (Flinks bank feed)** — blocked on Flinks's own accreditation process *and* Canada's open-banking framework still being finalized; revisit in 12-18 months.
+- **Phase 26 (HomeStars)** — no real API exists; the recommended version (a manual profile-link field, piggybacking on Phase 10) is actually Tier 1-cheap — do that small version now, not the (nonexistent) deep integration.
 
 Deferred, tracked elsewhere (per the user, handled personally rather than delegated): SMS channel, finishing the Outlook/Entra ID OAuth app registration (needed by both Phase 12's calendar sync and Phase 20's Outlook email — the `signInAudience` fix is the blocker, see [[growth-platform-plan]]), WhatsApp template approval.

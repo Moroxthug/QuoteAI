@@ -5,3 +5,5 @@ import "./contractSigned";
 import "./milestoneCompleted";
 import "./leadFollowup";
 import "./jobReviewRequest";
+import "./invoicePaidQuickbooks";
+import "./costConfirmedQuickbooks";

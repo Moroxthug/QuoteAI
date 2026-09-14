@@ -8,13 +8,18 @@ import {
   useGetWhatsappStatus, useConnectWhatsapp, useVerifyWhatsapp, useDisconnectWhatsapp,
   useToggleWhatsapp, getGetWhatsappStatusQueryKey, useGetWhatsappUsage,
   useCreateCheckoutSession, useGetPlans, getGetSubscriptionQueryKey,
+  useGetQuickbooksStatus, getGetQuickbooksStatusQueryKey, useGetQuickbooksConnectUrl,
+  getGetQuickbooksConnectUrlQueryKey, useDisconnectQuickbooks, useToggleQuickbooks,
+  useGetQuickbooksAccounts, getGetQuickbooksAccountsQueryKey, useUpdateQuickbooksMapping,
+  useGetQuickbooksSyncLog, getGetQuickbooksSyncLogQueryKey, useRetryQuickbooksSync,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +28,7 @@ import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BusinessTab } from "./settings-business-tab";
 import { usageApi } from "@/lib/usage-api";
+import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -981,6 +987,296 @@ function WhatsappTab() {
   );
 }
 
+function QuickbooksUpsellCard() {
+  const { t } = useLanguage();
+  const createCheckout = useCreateCheckoutSession();
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleCheckout = () => {
+    setLoading(true);
+    createCheckout.mutate(
+      { data: { planType: "monthly_elite" } },
+      {
+        onSuccess: (r) => { window.location.href = r.url; },
+        onError: () => {
+          setLoading(false);
+          toast({ title: t("dashboard.settings.billing.errorStartPayment"), variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  return (
+    <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
+            <Plug className="h-6 w-6 text-violet-500" />
+          </div>
+          <div>
+            <CardTitle>{t("dashboard.settings.quickbooksUpsell.title")}</CardTitle>
+            <CardDescription className="mt-0.5">{t("dashboard.settings.quickbooksUpsell.desc")}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardFooter>
+        <Button onClick={handleCheckout} disabled={loading} className="gap-2">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+          {t("dashboard.settings.quickbooksUpsell.cta")}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function QuickbooksMappingCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status } = useGetQuickbooksStatus();
+  const { data: accounts, isLoading: loadingAccounts } = useGetQuickbooksAccounts({ query: { queryKey: getGetQuickbooksAccountsQueryKey(), enabled: !!status?.connected } });
+  const updateMapping = useUpdateQuickbooksMapping();
+
+  const [paymentAccountId, setPaymentAccountId] = useState<string>("");
+  const [categoryAccountIds, setCategoryAccountIds] = useState<Record<string, string>>({});
+
+  const paymentAccount = accounts?.paymentAccounts.find(a => a.id === paymentAccountId);
+
+  const handleSave = () => {
+    const categoryMap: Record<string, { id: string; name: string } | null> = {};
+    for (const c of COST_CATEGORY_KEYS) {
+      const id = categoryAccountIds[c];
+      const account = accounts?.expenseAccounts.find(a => a.id === id);
+      categoryMap[c] = account ? { id: account.id, name: account.name } : null;
+    }
+    updateMapping.mutate(
+      { data: { paymentAccount: paymentAccount ? { id: paymentAccount.id, name: paymentAccount.name } : undefined, categoryMap } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetQuickbooksStatusQueryKey() });
+          toast({ title: t("dashboard.settings.quickbooks.mappingSaved") });
+        },
+        onError: () => toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("dashboard.settings.quickbooks.mappingTitle")}</CardTitle>
+        <CardDescription>{t("dashboard.settings.quickbooks.mappingDesc")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.paymentAccount")}</label>
+          <Select value={paymentAccountId} onValueChange={setPaymentAccountId}>
+            <SelectTrigger>
+              <SelectValue placeholder={status?.paymentAccountName ?? t("dashboard.settings.quickbooks.selectAccount")} />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts?.paymentAccounts.map(a => (
+                <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-3">
+          <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.categoryMapping")}</label>
+          {COST_CATEGORY_KEYS.map((c) => (
+            <div key={c} className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground w-32 shrink-0">{t(`jobs.cost.${c}`)}</span>
+              <Select
+                value={categoryAccountIds[c] ?? ""}
+                onValueChange={(v) => setCategoryAccountIds(prev => ({ ...prev, [c]: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={status?.categoryMap?.[c] ?? t("dashboard.settings.quickbooks.selectAccount")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts?.expenseAccounts.map(a => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleSave} disabled={updateMapping.isPending} className="gap-2">
+          {updateMapping.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {t("dashboard.settings.quickbooks.saveMapping")}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function QuickbooksSyncLogCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: log } = useGetQuickbooksSyncLog();
+  const retry = useRetryQuickbooksSync();
+
+  if (!log || log.entries.length === 0) return null;
+
+  const handleRetry = (entityType: string, entityId: string) => {
+    retry.mutate(
+      { data: { entityType: entityType as "invoice" | "cost_entry", entityId } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetQuickbooksSyncLogQueryKey() });
+          toast({ title: t("dashboard.settings.quickbooks.retried") });
+        },
+        onError: () => toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("dashboard.settings.quickbooks.syncLogTitle")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {log.entries.map((e) => (
+          <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
+            <div className="flex items-center gap-2 min-w-0">
+              {e.status === "synced" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              ) : (
+                <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="font-medium truncate">{e.entityType === "invoice" ? t("dashboard.settings.quickbooks.invoice") : t("dashboard.settings.quickbooks.costEntry")}</p>
+                {e.error && <p className="text-xs text-red-600 truncate">{e.error}</p>}
+              </div>
+            </div>
+            {e.status === "failed" && (
+              <Button size="sm" variant="outline" className="gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
+                <RefreshCw className="h-3.5 w-3.5" /> {t("dashboard.settings.quickbooks.retry")}
+              </Button>
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function QuickbooksTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status, isLoading } = useGetQuickbooksStatus();
+  const { data: subscription } = useGetSubscription();
+  const getConnectUrl = useGetQuickbooksConnectUrl({ query: { queryKey: getGetQuickbooksConnectUrlQueryKey(), enabled: false } });
+  const disconnectQb = useDisconnectQuickbooks();
+  const toggleQb = useToggleQuickbooks();
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isConnected = status?.connected ?? false;
+  const isEnabled = status?.isEnabled ?? true;
+
+  const handleConnect = async () => {
+    const result = await getConnectUrl.refetch();
+    if (result.data?.url) window.location.href = result.data.url;
+    else toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" });
+  };
+
+  const handleDisconnect = () => {
+    disconnectQb.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetQuickbooksStatusQueryKey() });
+        toast({ title: t("dashboard.settings.quickbooks.disconnected") });
+      },
+      onError: () => toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" }),
+    });
+  };
+
+  const handleToggle = () => {
+    toggleQb.mutate(
+      { data: { isEnabled: !isEnabled } },
+      {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: getGetQuickbooksStatusQueryKey() }),
+        onError: () => toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (!isElite) return <QuickbooksUpsellCard />;
+
+  if (!isConnected) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-emerald-600" />
+            </div>
+            <div>
+              <CardTitle>{t("dashboard.settings.quickbooks.connectTitle")}</CardTitle>
+              <CardDescription className="mt-0.5">{t("dashboard.settings.quickbooks.connectDesc")}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardFooter>
+          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="gap-2">
+            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {t("dashboard.settings.quickbooks.connectCta")}
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-emerald-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">{status?.companyName || t("dashboard.settings.quickbooks.connectedTitle")}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">{t("dashboard.settings.quickbooks.connectedSince")} {status?.connectedAt ? new Date(status.connectedAt).toLocaleDateString() : ""}</p>
+              </div>
+            </div>
+            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+              {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {status?.lastSyncedAt && (
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.quickbooks.lastSynced")} {new Date(status.lastSyncedAt).toLocaleString()}</p>
+          )}
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleQb.isPending} className="gap-2">
+              {toggleQb.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectQb.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              {disconnectQb.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+              {t("dashboard.settings.quickbooks.disconnect")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <QuickbooksMappingCard />
+      <QuickbooksSyncLogCard />
+    </div>
+  );
+}
+
 function WidgetTab() {
   const { t } = useLanguage();
   const { data: profile, isLoading } = useGetBusinessProfile();
@@ -1176,8 +1472,9 @@ export default function SettingsPage() {
   const tabFromParam = params.get("tab");
   const { data: subscription } = useGetSubscription();
   const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
-  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : "billing";
-  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage">(defaultTab as any);
+  const isElite = subscription?.isActive && subscription?.plan === "monthly_elite";
+  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : "billing";
+  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage" | "integrations">(defaultTab as any);
 
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
@@ -1186,6 +1483,7 @@ export default function SettingsPage() {
     ...(isProOrElite ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
     { id: "usage" as const, label: t("dashboard.settings.tabs.usage") },
+    ...(isElite ? [{ id: "integrations" as const, label: t("dashboard.settings.tabs.integrations") }] : []),
   ];
 
   return (
@@ -1223,6 +1521,8 @@ export default function SettingsPage() {
         <WidgetTab />
       ) : activeTab === "usage" ? (
         <UsageTab />
+      ) : activeTab === "integrations" ? (
+        <QuickbooksTab />
       ) : (
         <BillingTab />
       )}

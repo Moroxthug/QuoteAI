@@ -662,7 +662,7 @@ export const SendQuotePdfEmailParams = zod.object({
 })
 
 export const SendQuotePdfEmailBody = zod.object({
-  "toEmail": zod.string().email(),
+  "toEmail": zod.email(),
   "clientName": zod.string().optional()
 })
 
@@ -999,7 +999,7 @@ export const UploadBusinessProfileLogoResponse = zod.object({
  */
 export const RequestUploadUrlBody = zod.object({
   "name": zod.string(),
-  "size": zod.number().int(),
+  "size": zod.int(),
   "contentType": zod.string()
 })
 
@@ -1008,7 +1008,7 @@ export const RequestUploadUrlResponse = zod.object({
   "objectPath": zod.string(),
   "metadata": zod.object({
   "name": zod.string(),
-  "size": zod.number().int(),
+  "size": zod.int(),
   "contentType": zod.string()
 }).optional()
 })
@@ -1245,13 +1245,120 @@ export const ToggleWhatsappResponse = zod.object({
 
 
 /**
+ * @summary Get the QuickBooks Online connection status for the authenticated company
+ */
+export const GetQuickbooksStatusResponse = zod.object({
+  "connected": zod.boolean(),
+  "companyName": zod.string().nullish(),
+  "environment": zod.string().nullish(),
+  "isEnabled": zod.boolean().nullish(),
+  "connectedAt": zod.string().nullish(),
+  "lastSyncedAt": zod.string().nullish(),
+  "hasPaymentAccount": zod.boolean().nullish(),
+  "paymentAccountName": zod.string().nullish(),
+  "categoryMap": zod.record(zod.string(), zod.string().nullable()).nullish()
+})
+
+
+/**
+ * @summary Get the QuickBooks OAuth authorization URL to redirect the browser to
+ */
+export const GetQuickbooksConnectUrlResponse = zod.object({
+  "url": zod.string()
+})
+
+
+/**
+ * @summary Unlink QuickBooks Online from the company account
+ */
+export const DisconnectQuickbooksResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Enable or disable QuickBooks sync
+ */
+export const ToggleQuickbooksBody = zod.object({
+  "isEnabled": zod.boolean()
+})
+
+export const ToggleQuickbooksResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary List the company's QuickBooks expense and bank/credit-card accounts, for the mapping UI
+ */
+export const GetQuickbooksAccountsResponse = zod.object({
+  "expenseAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "paymentAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}))
+})
+
+
+/**
+ * @summary Set the payment (funding) account and cost-category → expense-account mapping
+ */
+export const UpdateQuickbooksMappingBody = zod.object({
+  "paymentAccount": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()]).optional(),
+  "categoryMap": zod.record(zod.string(), zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()])).optional()
+})
+
+export const UpdateQuickbooksMappingResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Recent QuickBooks sync attempts (success and failure)
+ */
+export const GetQuickbooksSyncLogResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "qboId": zod.string().nullish(),
+  "status": zod.string(),
+  "error": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const RetryQuickbooksSyncBody = zod.object({
+  "entityType": zod.enum(['invoice', 'cost_entry']),
+  "entityId": zod.string()
+})
+
+export const RetryQuickbooksSyncResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary List uploaded documents for the authenticated user
  */
 export const ListDocumentsResponseItem = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.number().int().nullish(),
+  "fileSize": zod.int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1284,7 +1391,7 @@ export const UploadDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.number().int().nullish(),
+  "fileSize": zod.int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),
@@ -1334,7 +1441,7 @@ export const ExtractDocumentResponse = zod.object({
   "id": zod.string(),
   "userId": zod.string(),
   "fileName": zod.string(),
-  "fileSize": zod.number().int().nullish(),
+  "fileSize": zod.int().nullish(),
   "mimeType": zod.string(),
   "fileUrl": zod.string(),
   "status": zod.enum(['pending', 'processing', 'done', 'error']),

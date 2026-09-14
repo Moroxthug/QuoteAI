@@ -21,6 +21,7 @@ import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
 import { writeAudit } from "../lib/notifications.js";
+import { raiseAutomation } from "../lib/automation.js";
 import { logger } from "../lib/logger.js";
 import { parseIsoDate } from "../jobs/dates.js";
 import { readReceipt, normalizeReceipt, receiptDescription, RECEIPT_MIME_TYPES, type JobCandidate } from "../costs/receiptAi.js";
@@ -140,6 +141,7 @@ router.post("/jobs/:id/costs", requireAuth, async (req, res) => {
         confirmedAt: new Date(),
       })
       .returning();
+    await raiseAutomation({ event: "cost.confirmed", userId, entityType: "cost_entry", entityId: entry!.id });
     res.status(201).json({ entry: serializeCostEntry(entry!) });
   } catch (err) {
     req.log.error({ err }, "Error adding cost");
@@ -203,6 +205,7 @@ router.put("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
     const [updated] = await db.update(costEntriesTable).set(updates).where(eq(costEntriesTable.id, entry.id)).returning();
     if (d.status === "confirmed" && entry.status !== "confirmed") {
       await writeAudit({ userId, actorType: "user", actorId: userId, entityType: "cost_entry", entityId: entry.id, action: "confirmed", diff: { totalCents: updated!.totalCents, category: updated!.category } });
+      await raiseAutomation({ event: "cost.confirmed", userId, entityType: "cost_entry", entityId: entry.id });
     }
     res.json({ entry: serializeCostEntry(updated!) });
   } catch (err) {

@@ -37,6 +37,13 @@ import type {
   Plan,
   PortalSessionResult,
   PriceSummary,
+  QuickbooksAccounts,
+  QuickbooksConnectUrl,
+  QuickbooksMappingBody,
+  QuickbooksRetryBody,
+  QuickbooksStatus,
+  QuickbooksSyncLog,
+  QuickbooksToggleBody,
   Quote,
   QuoteStats,
   RegenerateQuoteBody,
@@ -428,7 +435,7 @@ export const createManualQuote = async (createManualQuoteBody: CreateManualQuote
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -516,7 +523,7 @@ export const suggestItemDescription = async (suggestItemDescriptionBody: Suggest
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -682,7 +689,7 @@ export const updateQuote = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -919,7 +926,7 @@ export const sendQuotePdfEmail = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1082,7 +1089,7 @@ export const regenerateQuote = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1395,7 +1402,7 @@ export const updateBusinessProfile = async (updateBusinessProfileBody: UpdateBus
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1561,7 +1568,7 @@ export const requestUploadUrl = async (uploadUrlRequest: UploadUrlRequest, optio
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -1649,7 +1656,7 @@ export const createCheckoutSession = async (createCheckoutBody: CreateCheckoutBo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2042,7 +2049,7 @@ export const unlockQuoteWithSubscription = async (unlockQuoteBody: UnlockQuoteBo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2358,7 +2365,7 @@ export const createCatalogItem = async (createCatalogItemBody: CreateCatalogItem
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2446,7 +2453,7 @@ export const bulkCreateCatalogItems = async (createCatalogItemBody: CreateCatalo
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2611,7 +2618,7 @@ export const connectWhatsapp = async (whatsappConnectBody: WhatsappConnectBody, 
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2699,7 +2706,7 @@ export const verifyWhatsapp = async (whatsappVerifyBody: WhatsappVerifyBody, opt
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -2938,7 +2945,7 @@ export const toggleWhatsapp = async (whatsappToggleBody: WhatsappToggleBody, opt
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
@@ -3009,6 +3016,652 @@ export const useToggleWhatsapp = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getToggleWhatsappMutationOptions(options));
+    }
+
+export const getGetQuickbooksStatusUrl = () => {
+
+
+
+
+  return `/api/quickbooks/status`
+}
+
+/**
+ * @summary Get the QuickBooks Online connection status for the authenticated company
+ */
+export const getQuickbooksStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksStatus> => {
+
+  return customFetch<QuickbooksStatus>(getGetQuickbooksStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetQuickbooksStatusQueryKey = () => {
+    return [
+    `/api/quickbooks/status`
+    ] as const;
+    }
+
+
+export const getGetQuickbooksStatusQueryOptions = <TData = Awaited<ReturnType<typeof getQuickbooksStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQuickbooksStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuickbooksStatus>>> = ({ signal }) => getQuickbooksStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetQuickbooksStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getQuickbooksStatus>>>
+export type GetQuickbooksStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the QuickBooks Online connection status for the authenticated company
+ */
+
+export function useGetQuickbooksStatus<TData = Awaited<ReturnType<typeof getQuickbooksStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetQuickbooksStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetQuickbooksConnectUrlUrl = () => {
+
+
+
+
+  return `/api/quickbooks/connect`
+}
+
+/**
+ * @summary Get the QuickBooks OAuth authorization URL to redirect the browser to
+ */
+export const getQuickbooksConnectUrl = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksConnectUrl> => {
+
+  return customFetch<QuickbooksConnectUrl>(getGetQuickbooksConnectUrlUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetQuickbooksConnectUrlQueryKey = () => {
+    return [
+    `/api/quickbooks/connect`
+    ] as const;
+    }
+
+
+export const getGetQuickbooksConnectUrlQueryOptions = <TData = Awaited<ReturnType<typeof getQuickbooksConnectUrl>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQuickbooksConnectUrlQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuickbooksConnectUrl>>> = ({ signal }) => getQuickbooksConnectUrl({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksConnectUrl>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetQuickbooksConnectUrlQueryResult = NonNullable<Awaited<ReturnType<typeof getQuickbooksConnectUrl>>>
+export type GetQuickbooksConnectUrlQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the QuickBooks OAuth authorization URL to redirect the browser to
+ */
+
+export function useGetQuickbooksConnectUrl<TData = Awaited<ReturnType<typeof getQuickbooksConnectUrl>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetQuickbooksConnectUrlQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDisconnectQuickbooksUrl = () => {
+
+
+
+
+  return `/api/quickbooks/disconnect`
+}
+
+/**
+ * @summary Unlink QuickBooks Online from the company account
+ */
+export const disconnectQuickbooks = async ( options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+  return customFetch<SuccessResult>(getDisconnectQuickbooksUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectQuickbooksMutationKey = () => ['disconnectQuickbooks'] as const;
+
+export const getDisconnectQuickbooksMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectQuickbooks>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectQuickbooks>>, TError,void, TContext> => {
+
+const mutationKey = getDisconnectQuickbooksMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectQuickbooks>>, void> = () => {
+
+
+          return  disconnectQuickbooks(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectQuickbooksMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectQuickbooks>>>
+
+    export type DisconnectQuickbooksMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Unlink QuickBooks Online from the company account
+ */
+export const useDisconnectQuickbooks = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectQuickbooks>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectQuickbooks>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDisconnectQuickbooksMutationOptions(options));
+    }
+
+export const getToggleQuickbooksUrl = () => {
+
+
+
+
+  return `/api/quickbooks/toggle`
+}
+
+/**
+ * @summary Enable or disable QuickBooks sync
+ */
+export const toggleQuickbooks = async (quickbooksToggleBody: QuickbooksToggleBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getToggleQuickbooksUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quickbooksToggleBody)
+  }
+);}
+
+
+
+
+
+export const getToggleQuickbooksMutationKey = () => ['toggleQuickbooks'] as const;
+
+export const getToggleQuickbooksMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleQuickbooks>>, TError,ToggleQuickbooksMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleQuickbooks>>, TError,ToggleQuickbooksMutationVariables, TContext> => {
+
+const mutationKey = getToggleQuickbooksMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleQuickbooks>>, ToggleQuickbooksMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  toggleQuickbooks(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ToggleQuickbooksMutationResult = NonNullable<Awaited<ReturnType<typeof toggleQuickbooks>>>
+    export type ToggleQuickbooksMutationBody = BodyType<QuickbooksToggleBody>
+    export type ToggleQuickbooksMutationError = ErrorType<unknown>
+    export type ToggleQuickbooksMutationVariables = {data: BodyType<QuickbooksToggleBody>}
+
+    /**
+ * @summary Enable or disable QuickBooks sync
+ */
+export const useToggleQuickbooks = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleQuickbooks>>, TError,ToggleQuickbooksMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof toggleQuickbooks>>,
+        TError,
+        ToggleQuickbooksMutationVariables,
+        TContext
+      > => {
+      return useMutation(getToggleQuickbooksMutationOptions(options));
+    }
+
+export const getGetQuickbooksAccountsUrl = () => {
+
+
+
+
+  return `/api/quickbooks/accounts`
+}
+
+/**
+ * @summary List the company's QuickBooks expense and bank/credit-card accounts, for the mapping UI
+ */
+export const getQuickbooksAccounts = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksAccounts> => {
+
+  return customFetch<QuickbooksAccounts>(getGetQuickbooksAccountsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetQuickbooksAccountsQueryKey = () => {
+    return [
+    `/api/quickbooks/accounts`
+    ] as const;
+    }
+
+
+export const getGetQuickbooksAccountsQueryOptions = <TData = Awaited<ReturnType<typeof getQuickbooksAccounts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksAccounts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQuickbooksAccountsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuickbooksAccounts>>> = ({ signal }) => getQuickbooksAccounts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksAccounts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetQuickbooksAccountsQueryResult = NonNullable<Awaited<ReturnType<typeof getQuickbooksAccounts>>>
+export type GetQuickbooksAccountsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the company's QuickBooks expense and bank/credit-card accounts, for the mapping UI
+ */
+
+export function useGetQuickbooksAccounts<TData = Awaited<ReturnType<typeof getQuickbooksAccounts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksAccounts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetQuickbooksAccountsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateQuickbooksMappingUrl = () => {
+
+
+
+
+  return `/api/quickbooks/mapping`
+}
+
+/**
+ * @summary Set the payment (funding) account and cost-category → expense-account mapping
+ */
+export const updateQuickbooksMapping = async (quickbooksMappingBody: QuickbooksMappingBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getUpdateQuickbooksMappingUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quickbooksMappingBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateQuickbooksMappingMutationKey = () => ['updateQuickbooksMapping'] as const;
+
+export const getUpdateQuickbooksMappingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateQuickbooksMapping>>, TError,UpdateQuickbooksMappingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateQuickbooksMapping>>, TError,UpdateQuickbooksMappingMutationVariables, TContext> => {
+
+const mutationKey = getUpdateQuickbooksMappingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateQuickbooksMapping>>, UpdateQuickbooksMappingMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateQuickbooksMapping(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateQuickbooksMappingMutationResult = NonNullable<Awaited<ReturnType<typeof updateQuickbooksMapping>>>
+    export type UpdateQuickbooksMappingMutationBody = BodyType<QuickbooksMappingBody>
+    export type UpdateQuickbooksMappingMutationError = ErrorType<unknown>
+    export type UpdateQuickbooksMappingMutationVariables = {data: BodyType<QuickbooksMappingBody>}
+
+    /**
+ * @summary Set the payment (funding) account and cost-category → expense-account mapping
+ */
+export const useUpdateQuickbooksMapping = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateQuickbooksMapping>>, TError,UpdateQuickbooksMappingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateQuickbooksMapping>>,
+        TError,
+        UpdateQuickbooksMappingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateQuickbooksMappingMutationOptions(options));
+    }
+
+export const getGetQuickbooksSyncLogUrl = () => {
+
+
+
+
+  return `/api/quickbooks/sync-log`
+}
+
+/**
+ * @summary Recent QuickBooks sync attempts (success and failure)
+ */
+export const getQuickbooksSyncLog = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksSyncLog> => {
+
+  return customFetch<QuickbooksSyncLog>(getGetQuickbooksSyncLogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetQuickbooksSyncLogQueryKey = () => {
+    return [
+    `/api/quickbooks/sync-log`
+    ] as const;
+    }
+
+
+export const getGetQuickbooksSyncLogQueryOptions = <TData = Awaited<ReturnType<typeof getQuickbooksSyncLog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQuickbooksSyncLogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getQuickbooksSyncLog>>> = ({ signal }) => getQuickbooksSyncLog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksSyncLog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetQuickbooksSyncLogQueryResult = NonNullable<Awaited<ReturnType<typeof getQuickbooksSyncLog>>>
+export type GetQuickbooksSyncLogQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Recent QuickBooks sync attempts (success and failure)
+ */
+
+export function useGetQuickbooksSyncLog<TData = Awaited<ReturnType<typeof getQuickbooksSyncLog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getQuickbooksSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetQuickbooksSyncLogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRetryQuickbooksSyncUrl = () => {
+
+
+
+
+  return `/api/quickbooks/sync-log/retry`
+}
+
+/**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const retryQuickbooksSync = async (quickbooksRetryBody: QuickbooksRetryBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getRetryQuickbooksSyncUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(quickbooksRetryBody)
+  }
+);}
+
+
+
+
+
+export const getRetryQuickbooksSyncMutationKey = () => ['retryQuickbooksSync'] as const;
+
+export const getRetryQuickbooksSyncMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryQuickbooksSync>>, TError,RetryQuickbooksSyncMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryQuickbooksSync>>, TError,RetryQuickbooksSyncMutationVariables, TContext> => {
+
+const mutationKey = getRetryQuickbooksSyncMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryQuickbooksSync>>, RetryQuickbooksSyncMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  retryQuickbooksSync(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryQuickbooksSyncMutationResult = NonNullable<Awaited<ReturnType<typeof retryQuickbooksSync>>>
+    export type RetryQuickbooksSyncMutationBody = BodyType<QuickbooksRetryBody>
+    export type RetryQuickbooksSyncMutationError = ErrorType<unknown>
+    export type RetryQuickbooksSyncMutationVariables = {data: BodyType<QuickbooksRetryBody>}
+
+    /**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const useRetryQuickbooksSync = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryQuickbooksSync>>, TError,RetryQuickbooksSyncMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryQuickbooksSync>>,
+        TError,
+        RetryQuickbooksSyncMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryQuickbooksSyncMutationOptions(options));
     }
 
 export const getListDocumentsUrl = () => {
@@ -3633,7 +4286,7 @@ export const updateCatalogItem = async (id: string,
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(Array.from(h as unknown as Iterable<[string, string]>));
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
     if (Symbol.iterator in h) {
       return Object.fromEntries(
         Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),

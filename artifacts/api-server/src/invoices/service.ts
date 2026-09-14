@@ -34,6 +34,7 @@ import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { writeAudit, createNotification } from "../lib/notifications.js";
 import { sendInvoiceEmail, sendPaymentReceiptEmail } from "../lib/emailInvoices.js";
+import { raiseAutomation } from "../lib/automation.js";
 import { computeInvoiceAmounts, termSubtotalCents, finalInvoiceSubtotalCents, lienPeriodDays, addDays, statusAfterPayment, balanceCents, lineFrom } from "./math.js";
 import { buildInvoicePdf } from "./pdf.js";
 import { ti, invoiceTitle, type Lang, type IKey } from "./render.js";
@@ -533,7 +534,10 @@ export async function refreshInvoiceStatus(invoiceId: string, now = new Date()):
   const status = statusAfterPayment({ status: inv.status, totalCents: inv.totalCents, paidCents, dueDate: inv.dueDate, now });
   const paidAt = status === "paid" ? (inv.paidAt ?? loaded.payments.at(-1)?.date ?? now) : null;
   const [updated] = await db.update(invoicesTable).set({ paidCents, status, paidAt }).where(eq(invoicesTable.id, invoiceId)).returning();
-  if (status === "paid" && inv.status !== "paid") await logInvoiceEvent({ invoiceId, type: "paid", actor: "system", detail: { paidCents } });
+  if (status === "paid" && inv.status !== "paid") {
+    await logInvoiceEvent({ invoiceId, type: "paid", actor: "system", detail: { paidCents } });
+    await raiseAutomation({ event: "invoice.paid", userId: inv.userId, entityType: "invoice", entityId: invoiceId });
+  }
   return updated!;
 }
 

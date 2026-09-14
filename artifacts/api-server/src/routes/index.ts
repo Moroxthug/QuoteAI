@@ -30,6 +30,7 @@ import usageRouter from "./usage";
 import leadsRouter from "./leads";
 import publicLeadsRouter from "./public-leads";
 import publicReviewsRouter from "./public-reviews";
+import quickbooksRouter from "./quickbooks";
 
 const router: IRouter = Router();
 
@@ -64,5 +65,6 @@ router.use(usageRouter);
 router.use(leadsRouter);
 router.use(publicLeadsRouter);
 router.use(publicReviewsRouter);
+router.use(quickbooksRouter);
 
 export default router;

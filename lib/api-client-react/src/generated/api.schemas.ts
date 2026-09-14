@@ -421,6 +421,72 @@ export interface SuccessResult {
   success: boolean;
 }
 
+export type QuickbooksStatusCategoryMap = {[key: string]: string | null} | null;
+
+export interface QuickbooksStatus {
+  connected: boolean;
+  companyName?: string | null;
+  environment?: string | null;
+  isEnabled?: boolean | null;
+  connectedAt?: string | null;
+  lastSyncedAt?: string | null;
+  hasPaymentAccount?: boolean | null;
+  paymentAccountName?: string | null;
+  categoryMap?: QuickbooksStatusCategoryMap;
+}
+
+export interface QuickbooksConnectUrl {
+  url: string;
+}
+
+export interface QuickbooksToggleBody {
+  isEnabled: boolean;
+}
+
+export interface QuickbooksAccount {
+  id: string;
+  name: string;
+}
+
+export interface QuickbooksAccounts {
+  expenseAccounts: QuickbooksAccount[];
+  paymentAccounts: QuickbooksAccount[];
+}
+
+export type QuickbooksMappingBodyCategoryMap = {[key: string]: QuickbooksAccount | null};
+
+export interface QuickbooksMappingBody {
+  paymentAccount?: QuickbooksAccount | null;
+  categoryMap?: QuickbooksMappingBodyCategoryMap;
+}
+
+export interface QuickbooksSyncLogEntry {
+  id: string;
+  entityType: string;
+  entityId: string;
+  qboId?: string | null;
+  status: string;
+  error?: string | null;
+  createdAt: string;
+}
+
+export interface QuickbooksSyncLog {
+  entries: QuickbooksSyncLogEntry[];
+}
+
+export type QuickbooksRetryBodyEntityType = typeof QuickbooksRetryBodyEntityType[keyof typeof QuickbooksRetryBodyEntityType];
+
+
+export const QuickbooksRetryBodyEntityType = {
+  invoice: 'invoice',
+  cost_entry: 'cost_entry',
+} as const;
+
+export interface QuickbooksRetryBody {
+  entityType: QuickbooksRetryBodyEntityType;
+  entityId: string;
+}
+
 export interface TrialStatus {
   isTrialActive: boolean;
   trialStartedAt?: string | null;

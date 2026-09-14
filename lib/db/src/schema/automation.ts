@@ -25,6 +25,8 @@ export const AUTOMATION_EVENTS = [
   "invoice.overdue",
   "lead.followup_due",
   "job.review_request_due",
+  "invoice.paid",
+  "cost.confirmed",
 ] as const;
 export type AutomationEvent = (typeof AUTOMATION_EVENTS)[number];
 

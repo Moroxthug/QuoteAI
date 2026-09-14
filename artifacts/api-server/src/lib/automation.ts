@@ -105,6 +105,19 @@ async function executeRun(run: AutomationRun): Promise<void> {
   }
 }
 
+/** Manual retry (e.g. from a "retry sync" button): re-runs a specific run right away, bypassing backoff. */
+export async function retryAutomationNow(idempotencyKey: string): Promise<{ ok: boolean }> {
+  const [run] = await db.select().from(automationRunsTable).where(eq(automationRunsTable.idempotencyKey, idempotencyKey));
+  if (!run) return { ok: false };
+  await db
+    .update(automationRunsTable)
+    .set({ status: "failed", nextAttemptAt: new Date() })
+    .where(eq(automationRunsTable.id, run.id));
+  const [reloaded] = await db.select().from(automationRunsTable).where(eq(automationRunsTable.id, run.id));
+  await executeRun(reloaded!);
+  return { ok: true };
+}
+
 /** Called by the cron tick: retries failed runs whose backoff has elapsed. */
 export async function retryDueAutomations(limit = 25): Promise<{ retried: number }> {
   const due = await db

@@ -24,8 +24,8 @@ export const uploadedDocumentsTable = pgTable("uploaded_documents", {
   mimeType: text("mime_type").notNull(),
   fileUrl: text("file_url").notNull(),
   status: documentStatusEnum("status").notNull().default("pending"),
-  /** price_intelligence (catalog learning) or receipt (Phase 3 cost entry). */
-  purpose: text("purpose", { enum: ["price_intelligence", "receipt"] }).notNull().default("price_intelligence"),
+  /** price_intelligence (catalog learning), receipt (Phase 3 cost entry), or import_pdf (Phase 14 old-quote import). */
+  purpose: text("purpose", { enum: ["price_intelligence", "receipt", "import_pdf"] }).notNull().default("price_intelligence"),
   /** Job the receipt was uploaded from (plain uuid; crm.ts is not imported here to avoid a cycle). */
   projectId: uuid("project_id"),
   extractedData: jsonb("extracted_data"),

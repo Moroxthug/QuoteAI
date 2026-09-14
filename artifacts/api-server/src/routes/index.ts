@@ -33,6 +33,7 @@ import publicReviewsRouter from "./public-reviews";
 import quickbooksRouter from "./quickbooks";
 import calendarRouter from "./calendar";
 import securityRouter from "./security";
+import importsRouter from "./imports";
 
 const router: IRouter = Router();
 
@@ -70,5 +71,6 @@ router.use(publicReviewsRouter);
 router.use(quickbooksRouter);
 router.use(calendarRouter);
 router.use(securityRouter);
+router.use(importsRouter);
 
 export default router;

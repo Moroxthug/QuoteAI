@@ -7,6 +7,7 @@ import type { Logger } from "pino";
 import { trackEvent } from "./telemetry.js";
 import { linkQuoteToClient } from "./clients.js";
 import { resolveQuoteTaxRate } from "./tax.js";
+import { recordAiUsage } from "./usage.js";
 
 export const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
 
@@ -331,6 +332,8 @@ export async function buildQuoteFromAI({
       const cCostRate = isMini ? 0.00000060 : isGpt4 ? 0.000015 : 0.00000079;
       result.apiCost = (result.promptTokens * pCostRate) + (result.completionTokens * cCostRate);
 
+      recordAiUsage({ userId, model: result.modelUsed, kind: hasImages ? "ai_vision" : "ai_text", usage, relatedEntityType: "quote_generation" });
+
       flagIfAnomalousTotal(userId, result, log, "generation");
 
       trackEvent(userId, "quote_generation_completed", {
@@ -464,6 +467,8 @@ Return the COMPLETE updated quote in valid JSON with the same structure. Recalcu
       const pCostRate = isMini ? 0.00000015 : isGpt4 ? 0.000005 : 0.00000059;
       const cCostRate = isMini ? 0.00000060 : isGpt4 ? 0.000015 : 0.00000079;
       result.apiCost = (result.promptTokens * pCostRate) + (result.completionTokens * cCostRate);
+
+      recordAiUsage({ userId, model: result.modelUsed, kind: "ai_text", usage, relatedEntityType: "quote_regeneration" });
 
       flagIfAnomalousTotal(userId, result, log, "regeneration");
 

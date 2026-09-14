@@ -316,7 +316,7 @@ router.post(
       // AI read — a failure still leaves an empty pending entry the user can fill by hand.
       let read: ReturnType<typeof normalizeReceipt>;
       try {
-        const { raw, model } = await readReceipt({ buffer: file.buffer, mimeType: file.mimetype, candidates, province: (project?.province ?? profile?.province) ?? null });
+        const { raw, model } = await readReceipt({ buffer: file.buffer, mimeType: file.mimetype, candidates, province: (project?.province ?? profile?.province) ?? null, userId });
         read = normalizeReceipt(raw, { model, candidateIds: candidates.map((c) => c.id), province: (project?.province ?? profile?.province) ?? null });
         await db.update(uploadedDocumentsTable).set({ status: "done", extractedData: read.extraction }).where(eq(uploadedDocumentsTable.id, doc!.id));
       } catch (err) {

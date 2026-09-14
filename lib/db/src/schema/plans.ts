@@ -39,6 +39,21 @@ export function seatsIncluded(plan: PlanId): number {
   return SEATS_INCLUDED[plan];
 }
 
+/**
+ * Monthly allowance for the two metered, cost-bearing features (Phase 8 §3.5/§4a)
+ * — receipt AI (gpt-4o vision) scans and WhatsApp outbound sends. Everything
+ * else (quotes, contracts, invoicing, PDFs) has no real marginal cost and
+ * stays unmetered. `null` = unlimited. Usage past the allowance is currently
+ * observability-only (surfaced in the Settings usage panel) — hard overage
+ * billing is not wired up yet.
+ */
+export const MONTHLY_USAGE_ALLOWANCE: Record<PlanId, { receiptScans: number | null; whatsappMessages: number | null }> = {
+  free: { receiptScans: 0, whatsappMessages: 0 },
+  monthly_starter: { receiptScans: 20, whatsappMessages: 0 },
+  monthly_pro: { receiptScans: 100, whatsappMessages: 200 },
+  monthly_elite: { receiptScans: 300, whatsappMessages: 1000 },
+};
+
 export const PLAN_FEATURES: Record<PlanId, ReadonlySet<ProductFeature>> = {
   free: new Set<ProductFeature>(["quotes"]),
   monthly_starter: new Set(STARTER),

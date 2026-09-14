@@ -2011,8 +2011,13 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.tabs.billing": "Plan & Billing",
     "dashboard.settings.tabs.whatsapp": "WhatsApp Bot",
     "dashboard.settings.tabs.widget": "Website Integration (Funnel)",
+    "dashboard.settings.tabs.usage": "Usage",
     "dashboard.settings.title": "Settings",
     "dashboard.settings.subtitle": "Manage your business details and your subscription.",
+    "dashboard.settings.usage.subtitle": "Your AI receipt scans and WhatsApp messages this month.",
+    "dashboard.settings.usage.receiptScans": "Receipt AI scans",
+    "dashboard.settings.usage.whatsappMessages": "WhatsApp messages sent",
+    "dashboard.settings.usage.resetNote": "Usage resets on the 1st of each month. Going over your plan's allowance doesn't block you — it's shown here so you know when it's time to upgrade.",
 
 
 
@@ -4605,8 +4610,13 @@ export const translations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.tabs.billing": "Forfait et facturation",
     "dashboard.settings.tabs.whatsapp": "Robot WhatsApp",
     "dashboard.settings.tabs.widget": "Intégration au site (conversion)",
+    "dashboard.settings.tabs.usage": "Utilisation",
     "dashboard.settings.title": "Paramètres",
     "dashboard.settings.subtitle": "Gérez les renseignements de votre entreprise et votre abonnement.",
+    "dashboard.settings.usage.subtitle": "Vos analyses de reçus par IA et vos messages WhatsApp ce mois-ci.",
+    "dashboard.settings.usage.receiptScans": "Analyses de reçus par IA",
+    "dashboard.settings.usage.whatsappMessages": "Messages WhatsApp envoyés",
+    "dashboard.settings.usage.resetNote": "L'utilisation est réinitialisée le 1er de chaque mois. Dépasser l'allocation de votre forfait ne vous bloque pas — c'est affiché ici pour savoir quand passer à un forfait supérieur.",
 
 
 

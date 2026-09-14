@@ -389,6 +389,7 @@ export async function sendContractToCustomer(params: { contractId: string; userI
     .returning();
 
   const signUrl = `${getBaseUrl()}/sign/${rawToken}`;
+  const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, params.userId));
   await sendContractSigningEmail({
     toEmail,
     customerName: contract.variables.customer.name,
@@ -399,6 +400,7 @@ export async function sendContractToCustomer(params: { contractId: string; userI
     expiresAt,
     language: contract.language as Lang,
     message: params.message,
+    companyLogoUrl: senderProfile?.logoUrl ?? null,
   });
 
   await logContractEvent({ contractId: contract.id, type: isResend ? "reminder_sent" : "sent", actor: "contractor", signerId: customerSigner.id, detail: { to: toEmail }, ip: params.ip, userAgent: params.userAgent });

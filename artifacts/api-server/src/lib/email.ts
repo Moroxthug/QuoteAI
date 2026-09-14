@@ -6,6 +6,11 @@ import { getBaseUrl } from "./baseUrl";
 // so the logo must be a real hosted URL rather than an inline base64 SVG.
 const LOGO_URL = `${getBaseUrl()}/quoteai-logo.png`;
 
+/** Strips characters that would break a `"Name" <email>` From header (CRLF injection, quotes, angle brackets). */
+function sanitizeForFromHeader(value: string): string {
+  return value.replace(/[\r\n"<>]/g, "").trim().slice(0, 60);
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -310,10 +315,12 @@ function buildQuoteEmailHtml(params: {
   quoteNumber: string;
   totale: string;
   publicUrl?: string | null;
+  logoUrl?: string | null;
 }): string {
   const companyName = escapeHtml(params.companyName);
   const clientName = escapeHtml(params.clientName);
   const { quoteNumber, totale, publicUrl } = params;
+  const logoUrl = params.logoUrl || LOGO_URL;
   const ctaHtml = publicUrl
     ? `<div class="cta"><a class="btn" href="${publicUrl}">View &amp; accept online</a></div>
     <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:-12px;">You can review the full quote in your browser and accept it in one click.</p>`
@@ -345,7 +352,7 @@ function buildQuoteEmailHtml(params: {
 <body>
 <div class="wrapper">
   <div class="header">
-    <img src="${LOGO_URL}" alt="QuoteAI" />
+    <img src="${logoUrl}" alt="${companyName}" />
     <h1>Your quote is ready</h1>
     <p>${companyName} has sent you a professional quote</p>
   </div>
@@ -382,8 +389,10 @@ function buildWidgetClientConfirmationEmail(params: {
   companyEmail: string | null;
   prezzoMinimo: string;
   prezzoMassimo: string;
+  logoUrl?: string | null;
 }): string {
   const { clientName, companyName, companyPhone, companyEmail, prezzoMinimo, prezzoMassimo } = params;
+  const logoUrl = params.logoUrl || LOGO_URL;
   const contactLine = [companyPhone, companyEmail].filter(Boolean).join(" · ");
   return `<!DOCTYPE html>
 <html lang="en-CA">
@@ -410,7 +419,7 @@ function buildWidgetClientConfirmationEmail(params: {
 <body>
 <div class="wrapper">
   <div class="header">
-    <img src="${LOGO_URL}" alt="QuoteAI" />
+    <img src="${logoUrl}" alt="${escapeHtml(companyName)}" />
     <h1>Request received ✓</h1>
     <p>${companyName} has received your quote request</p>
   </div>
@@ -441,6 +450,7 @@ export async function sendWidgetClientConfirmationEmail(params: {
   companyEmail: string | null;
   prezzoMinimo: string;
   prezzoMassimo: string;
+  companyLogoUrl?: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -450,7 +460,7 @@ export async function sendWidgetClientConfirmationEmail(params: {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: "QuoteAI <no-reply@quoteai.ca>",
+      from: `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`,
       to: [params.toEmail],
       subject: `Your request to ${params.companyName} has been received`,
       html: buildWidgetClientConfirmationEmail({
@@ -460,6 +470,7 @@ export async function sendWidgetClientConfirmationEmail(params: {
         companyEmail: params.companyEmail,
         prezzoMinimo: params.prezzoMinimo,
         prezzoMassimo: params.prezzoMassimo,
+        logoUrl: params.companyLogoUrl ?? null,
       }),
     });
     logger.info({ to: params.toEmail }, "Widget client confirmation email sent");
@@ -477,6 +488,7 @@ export async function sendQuotePdfEmail(params: {
   pdfBuffer: Buffer;
   filename: string;
   publicUrl?: string | null;
+  companyLogoUrl?: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -486,7 +498,7 @@ export async function sendQuotePdfEmail(params: {
   try {
     const resend = new Resend(apiKey);
     await resend.emails.send({
-      from: "QuoteAI <no-reply@quoteai.ca>",
+      from: `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`,
       to: [params.toEmail],
       subject: `Quote ${params.quoteNumber} – ${params.companyName}`,
       html: buildQuoteEmailHtml({
@@ -495,6 +507,7 @@ export async function sendQuotePdfEmail(params: {
         quoteNumber: params.quoteNumber,
         totale: params.totale,
         publicUrl: params.publicUrl ?? null,
+        logoUrl: params.companyLogoUrl ?? null,
       }),
       attachments: [
         {

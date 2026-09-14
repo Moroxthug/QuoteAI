@@ -16,12 +16,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BusinessTab } from "./settings-business-tab";
+import { usageApi } from "@/lib/usage-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1123,6 +1124,50 @@ function WidgetTab() {
   );
 }
 
+function UsageMeter({ label, used, allowance }: { label: string; used: number; allowance: number | null }) {
+  const pct = allowance ? Math.min(100, Math.round((used / allowance) * 100)) : 0;
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-baseline justify-between text-sm">
+        <span className="text-gray-700">{label}</span>
+        <span className="text-gray-500">
+          {used} {allowance !== null ? `/ ${allowance}` : "(unlimited)"}
+        </span>
+      </div>
+      {allowance !== null && (
+        <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+          <div
+            className={cn("h-full rounded-full", pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-emerald-500")}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function UsageTab() {
+  const { t } = useLanguage();
+  const { data, isLoading } = useQuery({ queryKey: ["usage-summary"], queryFn: usageApi.summary });
+
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (!data) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("dashboard.settings.tabs.usage")}</CardTitle>
+        <CardDescription>{t("dashboard.settings.usage.subtitle")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <UsageMeter label={t("dashboard.settings.usage.receiptScans")} used={data.receiptScans.used} allowance={data.receiptScans.allowance} />
+        <UsageMeter label={t("dashboard.settings.usage.whatsappMessages")} used={data.whatsappMessages.used} allowance={data.whatsappMessages.allowance} />
+        <p className="text-xs text-gray-400 pt-2 border-t">{t("dashboard.settings.usage.resetNote")}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function SettingsPage() {
   const { t } = useLanguage();
   const search = useSearch();
@@ -1131,8 +1176,8 @@ export default function SettingsPage() {
   const tabFromParam = params.get("tab");
   const { data: subscription } = useGetSubscription();
   const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
-  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : "billing";
-  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget">(defaultTab as any);
+  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : "billing";
+  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage">(defaultTab as any);
 
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
@@ -1140,6 +1185,7 @@ export default function SettingsPage() {
     { id: "billing" as const, label: t("dashboard.settings.tabs.billing") },
     ...(isProOrElite ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
+    { id: "usage" as const, label: t("dashboard.settings.tabs.usage") },
   ];
 
   return (
@@ -1175,6 +1221,8 @@ export default function SettingsPage() {
         <WhatsappTab />
       ) : activeTab === "widget" ? (
         <WidgetTab />
+      ) : activeTab === "usage" ? (
+        <UsageTab />
       ) : (
         <BillingTab />
       )}

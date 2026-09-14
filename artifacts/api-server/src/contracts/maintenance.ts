@@ -1,4 +1,4 @@
-import { db, contractsTable, contractSignersTable } from "@workspace/db";
+import { db, contractsTable, contractSignersTable, businessProfilesTable } from "@workspace/db";
 import { and, eq, inArray, isNotNull, lt, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
@@ -44,6 +44,7 @@ export async function runContractMaintenance(): Promise<{ expired: number; remin
     try {
       const raw = newRawToken();
       await db.update(contractSignersTable).set({ tokenHash: hashToken(raw), tokenExpiresAt: c.expiresAt }).where(eq(contractSignersTable.id, signer.id));
+      const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, c.userId));
       await sendContractReminderEmail({
         toEmail: signer.email,
         customerName: signer.name,
@@ -52,6 +53,7 @@ export async function runContractMaintenance(): Promise<{ expired: number; remin
         signUrl: `${getBaseUrl()}/sign/${raw}`,
         expiresAt: c.expiresAt ?? new Date(now.getTime() + 7 * 86_400_000),
         language: c.language as "en" | "fr",
+        companyLogoUrl: senderProfile?.logoUrl ?? null,
       });
       await db.update(contractsTable).set({ lastReminderAt: now, reminderCount: sql`${contractsTable.reminderCount} + 1` }).where(eq(contractsTable.id, c.id));
       await logContractEvent({ contractId: c.id, type: "reminder_sent", actor: "system", signerId: signer.id, detail: { number: c.reminderCount + 1 } });

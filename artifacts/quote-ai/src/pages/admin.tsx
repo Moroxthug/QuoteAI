@@ -43,7 +43,17 @@ type AdminUser = {
 };
 
 type Settings = Record<string, string>;
-type Tab = "overview" | "users" | "widget" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events";
+type Tab = "overview" | "users" | "widget" | "stripe" | "gsc" | "seo" | "settings" | "support" | "email-events" | "margin";
+
+type MarginRow = {
+  userId: string;
+  companyName: string | null;
+  plan: string | null;
+  costCents: number;
+  revenueCents: number;
+  marginCents: number;
+  byKind: Record<string, { costCents: number; quantity: number }>;
+};
 
 type EmailEvent = {
   id: string;
@@ -206,6 +216,21 @@ export default function AdminPage() {
   const [newClientVat, setNewClientVat] = useState("");
   const [creatingClient, setCreatingClient] = useState(false);
 
+  const [marginRows, setMarginRows] = useState<MarginRow[]>([]);
+  const [marginLoading, setMarginLoading] = useState(false);
+
+  async function loadMargin() {
+    setMarginLoading(true);
+    try {
+      const data = await authFetch("/api/admin/margin?days=30");
+      setMarginRows((data as { rows: MarginRow[] }).rows ?? []);
+    } catch (e) {
+      toast({ variant: "destructive", title: t("admin.error"), description: "Failed to load margin data" });
+    } finally {
+      setMarginLoading(false);
+    }
+  }
+
   async function loadWidgetStats() {
     setWidgetStatsLoading(true);
     try {
@@ -280,6 +305,9 @@ export default function AdminPage() {
   useEffect(() => {
     if (tab === "widget" && widgetSubTab === "analytics") {
       loadWidgetStats();
+    }
+    if (tab === "margin") {
+      loadMargin();
     }
     // Avoid a row expanded in "Users" staying open (with the wrong
     // content) when switching to "Clients & Widget", since they share
@@ -637,6 +665,7 @@ export default function AdminPage() {
               { id: "overview", label: t("admin.tabOverview"), icon: BarChart3 },
               { id: "users", label: t("admin.tabUsers"), icon: Users },
               { id: "widget", label: t("admin.tabWidget"), icon: Zap },
+              { id: "margin", label: "Cost & Margin", icon: TrendingUp },
               { id: "stripe", label: t("admin.tabStripe"), icon: DollarSign },
               { id: "gsc", label: "Search Console", icon: Globe },
               { id: "seo", label: "SEO Checker", icon: Sparkles },
@@ -1297,6 +1326,50 @@ export default function AdminPage() {
                       </div>
                     </>
                   )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* COST & MARGIN TAB (Phase 8 §4a) — cost vs. subscription revenue per org,
+              rolled up nightly from usage_events into usage_daily_summary, so
+              accounts running at a loss surface before it's a pattern. */}
+          {tab === "margin" && (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Cost & Margin (last 30 days)</h2>
+                <p className="text-xs text-slate-400">AI (receipt vision + quote text) and WhatsApp cost vs. estimated subscription revenue, per account. Sorted by lowest margin first.</p>
+              </div>
+              {marginLoading ? (
+                <div className="text-sm text-slate-400 py-8 text-center">Loading…</div>
+              ) : marginRows.length === 0 ? (
+                <div className="text-sm text-slate-400 py-8 text-center">No metered usage recorded in this window yet.</div>
+              ) : (
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
+                      <tr>
+                        <th className="px-4 py-3 text-left">Company</th>
+                        <th className="px-4 py-3 text-left">Plan</th>
+                        <th className="px-4 py-3 text-right">Cost</th>
+                        <th className="px-4 py-3 text-right">Revenue (est.)</th>
+                        <th className="px-4 py-3 text-right">Margin</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {marginRows.map((row) => (
+                        <tr key={row.userId} className={row.marginCents < 0 ? "bg-red-50/50" : ""}>
+                          <td className="px-4 py-3 font-medium text-slate-700">{row.companyName || row.userId.slice(0, 8)}</td>
+                          <td className="px-4 py-3 text-slate-500">{row.plan ?? "—"}</td>
+                          <td className="px-4 py-3 text-right font-mono">${(row.costCents / 100).toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-mono">${(row.revenueCents / 100).toFixed(2)}</td>
+                          <td className={`px-4 py-3 text-right font-mono font-semibold ${row.marginCents < 0 ? "text-red-600" : "text-emerald-600"}`}>
+                            ${(row.marginCents / 100).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>

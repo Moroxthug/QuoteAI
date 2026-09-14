@@ -458,6 +458,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
         companyEmail: profile.email ?? null,
         prezzoMinimo: (totale * 0.9).toFixed(2),
         prezzoMassimo: (totale * 1.25).toFixed(2),
+        companyLogoUrl: profile.logoUrl ?? null,
       }).catch(emailErr => {
         logger.error({ err: emailErr }, "Failed to send client confirmation email asynchronously");
       });

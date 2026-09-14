@@ -14,8 +14,14 @@ export function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-export function shell(params: { lang: EmailLang; headerTitle: string; headerSub: string; bodyHtml: string; footer: string; accent?: string }): string {
+/** Strips characters that would break a `"Name" <email>` From header (CRLF injection, quotes, angle brackets). */
+export function sanitizeForFromHeader(value: string): string {
+  return value.replace(/[\r\n"<>]/g, "").trim().slice(0, 60);
+}
+
+export function shell(params: { lang: EmailLang; headerTitle: string; headerSub: string; bodyHtml: string; footer: string; accent?: string; logoUrl?: string | null; logoAlt?: string }): string {
   const accent = params.accent ?? "linear-gradient(135deg,#7c3aed,#06b6d4)";
+  const logoUrl = params.logoUrl || LOGO_URL;
   return `<!DOCTYPE html>
 <html lang="${params.lang === "fr" ? "fr-CA" : "en-CA"}">
 <head>
@@ -43,7 +49,7 @@ export function shell(params: { lang: EmailLang; headerTitle: string; headerSub:
 </head>
 <body>
 <div class="wrapper">
-  <div class="header"><img src="${LOGO_URL}" alt="QuoteAI" /><h1>${escapeHtml(params.headerTitle)}</h1><p>${escapeHtml(params.headerSub)}</p></div>
+  <div class="header"><img src="${logoUrl}" alt="${escapeHtml(params.logoAlt ?? "QuoteAI")}" /><h1>${escapeHtml(params.headerTitle)}</h1><p>${escapeHtml(params.headerSub)}</p></div>
   <div class="body">${params.bodyHtml}</div>
   <div class="footer">${params.footer}</div>
 </div>
@@ -74,6 +80,7 @@ export async function sendContractSigningEmail(params: {
   expiresAt: Date;
   language: EmailLang;
   message?: string;
+  companyLogoUrl?: string | null;
 }): Promise<void> {
   const { language: lang } = params;
   const company = escapeHtml(params.companyName);
@@ -111,8 +118,11 @@ export async function sendContractSigningEmail(params: {
       <div class="row"><span class="label">${t.price}</span><span>${cad(params.total, lang)}</span></div></div>
       <div class="cta"><a class="btn" href="${params.signUrl}">${t.btn}</a></div><p class="muted">${t.hint}</p>`,
     footer: t.footer,
+    logoUrl: params.companyLogoUrl,
+    logoAlt: params.companyName,
   });
-  await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
+  const from = `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`;
+  await resendOrThrow().emails.send({ from, to: [params.toEmail], subject: t.subject, html });
   logger.info({ to: params.toEmail, contractNumber: params.contractNumber }, "Contract signing email sent");
 }
 
@@ -208,12 +218,14 @@ export async function sendContractReminderEmail(params: {
   signUrl: string;
   expiresAt: Date;
   language: EmailLang;
+  companyLogoUrl?: string | null;
 }): Promise<void> {
   const { language: lang } = params;
   const expires = params.expiresAt.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { dateStyle: "long" });
   const t = lang === "fr"
     ? { title: "Rappel : contrat en attente de signature", sub: `${params.companyName}`, body: `Bonjour ${escapeHtml(params.customerName)},<br/><br/>le contrat ${escapeHtml(params.contractNumber)} de <strong>${escapeHtml(params.companyName)}</strong> attend toujours votre signature. Le lien expire le ${expires}.`, btn: "Signer le contrat", subject: `Rappel — contrat ${params.contractNumber} à signer`, footer: "Envoyé via QuoteAI." }
     : { title: "Reminder: contract awaiting your signature", sub: `${params.companyName}`, body: `Hi ${escapeHtml(params.customerName)},<br/><br/>contract ${escapeHtml(params.contractNumber)} from <strong>${escapeHtml(params.companyName)}</strong> is still waiting for your signature. The link expires on ${expires}.`, btn: "Sign the contract", subject: `Reminder — contract ${params.contractNumber} awaiting signature`, footer: "Sent through QuoteAI." };
-  const html = shell({ lang, headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p><div class="cta"><a class="btn" href="${params.signUrl}">${t.btn}</a></div>`, footer: t.footer });
-  await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
+  const html = shell({ lang, headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p><div class="cta"><a class="btn" href="${params.signUrl}">${t.btn}</a></div>`, footer: t.footer, logoUrl: params.companyLogoUrl, logoAlt: params.companyName });
+  const from = `${sanitizeForFromHeader(params.companyName)} via QuoteAI <no-reply@quoteai.ca>`;
+  await resendOrThrow().emails.send({ from, to: [params.toEmail], subject: t.subject, html });
 }

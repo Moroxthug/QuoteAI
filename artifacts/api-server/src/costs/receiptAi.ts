@@ -2,6 +2,7 @@ import { COST_CATEGORIES, getTaxProfile, normalizeProvince, type CostCategory, t
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { createRequire } from "node:module";
 import { logger } from "../lib/logger.js";
+import { recordAiUsage } from "../lib/usage.js";
 
 const _require = createRequire(import.meta.url);
 
@@ -63,7 +64,7 @@ async function pdfText(buffer: Buffer): Promise<string> {
 }
 
 /** Calls the model. Images use gpt-4o vision; PDFs are parsed to text and sent to gpt-4o-mini. */
-export async function readReceipt(params: { buffer: Buffer; mimeType: string; candidates: JobCandidate[]; province: string | null }): Promise<{ raw: unknown; model: string }> {
+export async function readReceipt(params: { buffer: Buffer; mimeType: string; candidates: JobCandidate[]; province: string | null; userId: string }): Promise<{ raw: unknown; model: string }> {
   const system = systemPrompt(params.candidates, params.province);
   if (params.mimeType === "application/pdf") {
     const text = await pdfText(params.buffer);
@@ -73,6 +74,7 @@ export async function readReceipt(params: { buffer: Buffer; mimeType: string; ca
       { model, temperature: 0, max_completion_tokens: 1500, response_format: { type: "json_object" }, messages: [{ role: "system", content: system }, { role: "user", content: `Text of the document:\n\n${text}` }] },
       { timeout: 30_000 },
     );
+    recordAiUsage({ userId: params.userId, model, kind: "ai_text", usage: completion.usage, relatedEntityType: "receipt" });
     return { raw: safeJson(completion.choices[0]?.message?.content), model };
   }
   const model = "gpt-4o";
@@ -90,6 +92,7 @@ export async function readReceipt(params: { buffer: Buffer; mimeType: string; ca
     },
     { timeout: 40_000 },
   );
+  recordAiUsage({ userId: params.userId, model, kind: "ai_vision", usage: completion.usage, relatedEntityType: "receipt" });
   return { raw: safeJson(completion.choices[0]?.message?.content), model };
 }
 

@@ -23,6 +23,7 @@ import { generateQuotePreviewImage } from "../lib/generateQuotePreviewImage.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { randomUUID } from "crypto";
+import { withWhatsappUsageContext, recordWhatsappUsageFromContext } from "../lib/usage.js";
 
 const objectStorage = new ObjectStorageService();
 const router = Router();
@@ -77,6 +78,7 @@ async function sendWhatsappText(to: string, text: string): Promise<void> {
     body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: text } }),
   });
   if (!res.ok) logger.error({ err: await res.text(), to }, "WhatsApp text send failed");
+  else recordWhatsappUsageFromContext();
 }
 
 async function uploadMetaMedia(buffer: Buffer, mimeType: string, filename: string): Promise<string | null> {
@@ -117,7 +119,7 @@ async function sendWhatsappImage(to: string, imageBuffer: Buffer, caption: strin
         image: { id: mediaId, caption },
       }),
     });
-    if (res.ok) return;
+    if (res.ok) { recordWhatsappUsageFromContext(); return; }
     logger.error({ err: await res.text(), to }, "WhatsApp image send (media-id) failed — trying link fallback");
   }
 
@@ -140,6 +142,7 @@ async function sendWhatsappImage(to: string, imageBuffer: Buffer, caption: strin
     if (!res.ok) {
       logger.error({ err: await res.text(), to }, "WhatsApp image send (link fallback) failed");
     } else {
+      recordWhatsappUsageFromContext();
       void objectStorage.deleteObjectBuffer(subPath).catch(e => logger.warn({ e, subPath }, "Image cleanup failed"));
     }
   } catch (err) {
@@ -163,7 +166,7 @@ async function sendWhatsappDocument(to: string, pdfBuffer: Buffer, filename: str
         document: { id: mediaId, filename, caption },
       }),
     });
-    if (res.ok) return;
+    if (res.ok) { recordWhatsappUsageFromContext(); return; }
     logger.error({ err: await res.text(), to }, "WhatsApp document send (media-id) failed — trying link fallback");
   }
 
@@ -185,6 +188,7 @@ async function sendWhatsappDocument(to: string, pdfBuffer: Buffer, filename: str
     if (!res.ok) {
       logger.error({ err: await res.text(), to }, "WhatsApp document send (link fallback) failed");
     } else {
+      recordWhatsappUsageFromContext();
       void objectStorage.deleteObjectBuffer(subPath).catch(e => logger.warn({ e, subPath }, "PDF cleanup failed"));
     }
   } catch (err) {
@@ -1260,66 +1264,68 @@ router.post("/whatsapp/webhook", async (req, res) => {
         return;
       }
 
-      // ── Load session ────────────────────────────────────────────────────────────
-      const session = await loadValidSession(from);
+      await withWhatsappUsageContext(connection.userId, async () => {
+        // ── Load session ────────────────────────────────────────────────────────────
+        const session = await loadValidSession(from);
 
-      // ── Menu trigger — intercepts any state (except OTP, handled above) ─────────
-      if (isMenuTrigger(rawInput)) {
-        const prefs = await getPreferences(connection.userId);
-        await sendMainMenu(from, connection.userId, prefs);
-        return;
-      }
+        // ── Menu trigger — intercepts any state (except OTP, handled above) ─────────
+        if (isMenuTrigger(rawInput)) {
+          const prefs = await getPreferences(connection.userId);
+          await sendMainMenu(from, connection.userId, prefs);
+          return;
+        }
 
-      // ── Menu state routing ───────────────────────────────────────────────────────
-      if (session?.state === "menu_main") {
-        await handleMenuMainReply(from, connection.userId, rawInput, profile);
-        return;
-      }
+        // ── Menu state routing ───────────────────────────────────────────────────────
+        if (session?.state === "menu_main") {
+          await handleMenuMainReply(from, connection.userId, rawInput, profile);
+          return;
+        }
 
-      if (session?.state === "menu_clients") {
-        await handleClientsMenuReply(from, connection.userId, rawInput, session);
-        return;
-      }
+        if (session?.state === "menu_clients") {
+          await handleClientsMenuReply(from, connection.userId, rawInput, session);
+          return;
+        }
 
-      if (session?.state === "menu_template") {
-        await handleTemplateMenuReply(from, connection.userId, rawInput, profile);
-        return;
-      }
+        if (session?.state === "menu_template") {
+          await handleTemplateMenuReply(from, connection.userId, rawInput, profile);
+          return;
+        }
 
-      if (session?.state === "menu_iva") {
-        await handleIvaMenuReply(from, connection.userId, rawInput);
-        return;
-      }
+        if (session?.state === "menu_iva") {
+          await handleIvaMenuReply(from, connection.userId, rawInput);
+          return;
+        }
 
-      // ── Quote flow state routing ─────────────────────────────────────────────────
-      if (session?.state === "awaiting_template_selection") {
-        await handleTemplateSelectionReply(from, connection.userId, rawInput, profile);
-        return;
-      }
+        // ── Quote flow state routing ─────────────────────────────────────────────────
+        if (session?.state === "awaiting_template_selection") {
+          await handleTemplateSelectionReply(from, connection.userId, rawInput, profile);
+          return;
+        }
 
-      if (session?.state === "awaiting_client_choice") {
-        await handleClientChoiceReply(from, connection.userId, rawInput, session);
-        return;
-      }
+        if (session?.state === "awaiting_client_choice") {
+          await handleClientChoiceReply(from, connection.userId, rawInput, session);
+          return;
+        }
 
-      if (session?.state === "awaiting_job_input") {
-        await handleJobInputReply(from, connection.userId, rawInput, session, profile, imageDataUrls);
-        return;
-      }
+        if (session?.state === "awaiting_job_input") {
+          await handleJobInputReply(from, connection.userId, rawInput, session, profile, imageDataUrls);
+          return;
+        }
 
-      if (session?.state === "awaiting_confirmation") {
-        await handleConfirmationReply(from, connection.userId, rawInput, session, profile);
-        return;
-      }
+        if (session?.state === "awaiting_confirmation") {
+          await handleConfirmationReply(from, connection.userId, rawInput, session, profile);
+          return;
+        }
 
-      if (session?.state === "awaiting_client_data") {
-        // Legacy backward-compat handler
-        await handleClientDataReply(from, connection.userId, rawInput, session, profile);
-        return;
-      }
+        if (session?.state === "awaiting_client_data") {
+          // Legacy backward-compat handler
+          await handleClientDataReply(from, connection.userId, rawInput, session, profile);
+          return;
+        }
 
-      // ── No session: start greeting flow ─────────────────────────────────────────
-      await handleGreeting(from, connection.userId, profile);
+        // ── No session: start greeting flow ─────────────────────────────────────────
+        await handleGreeting(from, connection.userId, profile);
+      });
     } finally {
       releaseProcessingLock(from);
     }

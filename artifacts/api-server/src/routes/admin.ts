@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth";
-import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable } from "@workspace/db";
 import { eq, sql, desc, count, inArray } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { getUncachableStripeClient } from "../stripeClient";
@@ -954,6 +954,77 @@ router.post("/admin/widget/create-client", async (req, res) => {
     res.status(201).json({ success: true, profile });
   } catch (err) {
     logger.error({ err }, "Error creating unregistered widget client");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/admin/margin — per-org AI/WhatsApp cost vs. subscription revenue
+// (Phase 8 §4a). Cost comes from usage_daily_summary (rolled up nightly by
+// the cron tick); revenue is the plan's flat monthly price as a proxy for
+// what the account pays — flags accounts running at a loss before it's a
+// pattern, so pricing/allowances (plans.ts MONTHLY_USAGE_ALLOWANCE) can be
+// corrected.
+const PLAN_MONTHLY_PRICE_CAD: Record<string, number> = {
+  monthly_starter: 19,
+  monthly_pro: 49,
+  monthly_elite: 59,
+};
+
+router.get("/admin/margin", async (req, res) => {
+  try {
+    const days = Math.min(Number(req.query.days) || 30, 90);
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const costRows = await db
+      .select({
+        userId: usageDailySummaryTable.userId,
+        kind: usageDailySummaryTable.kind,
+        costCents: sql<string>`SUM(${usageDailySummaryTable.costCents})`,
+        quantity: sql<string>`SUM(${usageDailySummaryTable.quantity})`,
+      })
+      .from(usageDailySummaryTable)
+      .where(sql`${usageDailySummaryTable.date} >= ${since}`)
+      .groupBy(usageDailySummaryTable.userId, usageDailySummaryTable.kind);
+
+    const byUser = new Map<string, { costCentsTotal: number; byKind: Record<string, { costCents: number; quantity: number }> }>();
+    for (const row of costRows) {
+      const entry = byUser.get(row.userId) ?? { costCentsTotal: 0, byKind: {} };
+      const costCents = Number(row.costCents);
+      entry.byKind[row.kind] = { costCents, quantity: Number(row.quantity) };
+      entry.costCentsTotal += costCents;
+      byUser.set(row.userId, entry);
+    }
+
+    const userIds = [...byUser.keys()];
+    const profiles = userIds.length
+      ? await db
+          .select({ userId: businessProfilesTable.userId, companyName: businessProfilesTable.companyName, subscriptionPlan: businessProfilesTable.subscriptionPlan, subscriptionStatus: businessProfilesTable.subscriptionStatus })
+          .from(businessProfilesTable)
+          .where(inArray(businessProfilesTable.userId, userIds))
+      : [];
+    const profileByUser = new Map(profiles.map((p) => [p.userId, p]));
+
+    const rows = userIds
+      .map((userId) => {
+        const entry = byUser.get(userId)!;
+        const profile = profileByUser.get(userId);
+        const plan = profile?.subscriptionStatus === "active" ? (profile?.subscriptionPlan ?? null) : null;
+        const revenueCents = (plan ? PLAN_MONTHLY_PRICE_CAD[plan] ?? 0 : 0) * 100;
+        return {
+          userId,
+          companyName: profile?.companyName ?? null,
+          plan,
+          costCents: entry.costCentsTotal,
+          revenueCents,
+          marginCents: revenueCents - entry.costCentsTotal,
+          byKind: entry.byKind,
+        };
+      })
+      .sort((a, b) => a.marginCents - b.marginCents);
+
+    res.json({ days, rows });
+  } catch (err) {
+    logger.error({ err }, "Admin margin error");
     res.status(500).json({ error: "Internal server error" });
   }
 });

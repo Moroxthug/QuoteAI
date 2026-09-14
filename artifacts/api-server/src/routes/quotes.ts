@@ -1426,6 +1426,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
       totale: totaleFormatted,
       pdfBuffer,
       filename,
+      companyLogoUrl: profile?.logoUrl ?? null,
       publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
 

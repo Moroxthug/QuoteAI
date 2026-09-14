@@ -17,6 +17,7 @@ import {
 } from "@workspace/db";
 import { and, eq, inArray } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import {
@@ -148,7 +149,7 @@ function fail(res: import("express").Response, err: unknown, fallback: string) {
 // ── List & aging ─────────────────────────────────────────────────────────────
 
 // GET /api/invoices
-router.get("/invoices", requireAuth, async (req, res) => {
+router.get("/invoices", requireAuth, requirePermission("invoicing", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireInvoicing(userId);
@@ -176,7 +177,7 @@ router.get("/invoices", requireAuth, async (req, res) => {
 });
 
 // GET /api/invoices/clients — real client records (the legacy /api/clients list is derived from quotes)
-router.get("/invoices/clients", requireAuth, async (req, res) => {
+router.get("/invoices/clients", requireAuth, requirePermission("invoicing", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const rows = await db.select({ id: clientsTable.id, name: clientsTable.name, email: clientsTable.email, province: clientsTable.province }).from(clientsTable).where(eq(clientsTable.userId, userId)).orderBy(clientsTable.name).limit(500);
@@ -188,7 +189,7 @@ router.get("/invoices/clients", requireAuth, async (req, res) => {
 });
 
 // GET /api/invoices/:id
-router.get("/invoices/:id", requireAuth, async (req, res) => {
+router.get("/invoices/:id", requireAuth, requirePermission("invoicing", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await loadInvoice(req.params.id as string);
@@ -229,7 +230,7 @@ const createSchema = z.object({
 });
 
 // POST /api/invoices — manual invoice for a job or a client
-router.post("/invoices", requireAuth, async (req, res) => {
+router.post("/invoices", requireAuth, requirePermission("invoicing", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireInvoicing(userId);
@@ -261,7 +262,7 @@ router.post("/invoices", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/invoices — create the invoice for a schedule term / the final / the holdback release
-router.post("/jobs/:id/invoices", requireAuth, async (req, res) => {
+router.post("/jobs/:id/invoices", requireAuth, requirePermission("invoicing", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireInvoicing(userId);
@@ -298,7 +299,7 @@ router.post("/jobs/:id/invoices", requireAuth, async (req, res) => {
 });
 
 // GET /api/jobs/:id/invoices
-router.get("/jobs/:id/invoices", requireAuth, async (req, res) => {
+router.get("/jobs/:id/invoices", requireAuth, requirePermission("invoicing", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [project] = await db.select({ id: projectsTable.id }).from(projectsTable).where(and(eq(projectsTable.id, req.params.id as string), eq(projectsTable.userId, userId)));
@@ -326,7 +327,7 @@ const editSchema = z.object({
 });
 
 // PUT /api/invoices/:id — drafts only; sent invoices are immutable
-router.put("/invoices/:id", requireAuth, async (req, res) => {
+router.put("/invoices/:id", requireAuth, requirePermission("invoicing", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await loadInvoice(req.params.id as string);
@@ -359,7 +360,7 @@ router.put("/invoices/:id", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/invoices/:id — drafts only (numbers are never reused; the gap is the audit trail)
-router.delete("/invoices/:id", requireAuth, async (req, res) => {
+router.delete("/invoices/:id", requireAuth, requirePermission("invoicing", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await loadInvoice(req.params.id as string);
@@ -376,7 +377,7 @@ router.delete("/invoices/:id", requireAuth, async (req, res) => {
 // ── Send / remind / PDF ──────────────────────────────────────────────────────
 
 // POST /api/invoices/:id/send
-router.post("/invoices/:id/send", requireAuth, sendLimiter, async (req, res) => {
+router.post("/invoices/:id/send", requireAuth, requirePermission("invoicing", "edit"), sendLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireInvoicing(userId);
@@ -398,7 +399,7 @@ router.post("/invoices/:id/send", requireAuth, sendLimiter, async (req, res) => 
 });
 
 // POST /api/invoices/:id/remind — manual reminder (does not count against the automatic 3/7/14 schedule)
-router.post("/invoices/:id/remind", requireAuth, sendLimiter, async (req, res) => {
+router.post("/invoices/:id/remind", requireAuth, requirePermission("invoicing", "edit"), sendLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await loadInvoice(req.params.id as string);
@@ -432,7 +433,7 @@ router.post("/invoices/:id/remind", requireAuth, sendLimiter, async (req, res) =
 });
 
 // GET /api/invoices/:id/pdf
-router.get("/invoices/:id/pdf", requireAuth, async (req, res) => {
+router.get("/invoices/:id/pdf", requireAuth, requirePermission("invoicing", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await loadInvoice(req.params.id as string);
@@ -450,7 +451,7 @@ router.get("/invoices/:id/pdf", requireAuth, async (req, res) => {
 // ── Payments ─────────────────────────────────────────────────────────────────
 
 // POST /api/invoices/:id/payments
-router.post("/invoices/:id/payments", requireAuth, async (req, res) => {
+router.post("/invoices/:id/payments", requireAuth, requirePermission("invoicing", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const body = z
@@ -484,7 +485,7 @@ router.post("/invoices/:id/payments", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/invoices/:id/payments/:pid
-router.delete("/invoices/:id/payments/:pid", requireAuth, async (req, res) => {
+router.delete("/invoices/:id/payments/:pid", requireAuth, requirePermission("invoicing", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const invoice = await removePayment({ invoiceId: req.params.id as string, paymentId: req.params.pid as string, userId });
@@ -498,7 +499,7 @@ router.delete("/invoices/:id/payments/:pid", requireAuth, async (req, res) => {
 // ── Void & credit note ───────────────────────────────────────────────────────
 
 // POST /api/invoices/:id/void
-router.post("/invoices/:id/void", requireAuth, async (req, res) => {
+router.post("/invoices/:id/void", requireAuth, requirePermission("invoicing", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const body = z.object({ reason: z.string().max(500).optional() }).safeParse(req.body ?? {});
@@ -512,7 +513,7 @@ router.post("/invoices/:id/void", requireAuth, async (req, res) => {
 });
 
 // POST /api/invoices/:id/credit-note
-router.post("/invoices/:id/credit-note", requireAuth, sendLimiter, async (req, res) => {
+router.post("/invoices/:id/credit-note", requireAuth, requirePermission("invoicing", "full"), sendLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const body = z.object({ amountCents: z.number().int().min(1), description: z.string().min(1).max(500), reason: z.string().max(1000).optional(), send: z.boolean().optional() }).safeParse(req.body);

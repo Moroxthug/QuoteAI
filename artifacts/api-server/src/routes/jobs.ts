@@ -31,6 +31,7 @@ import {
 } from "@workspace/db";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { writeAudit } from "../lib/notifications.js";
 import { recomputeProgress, setupJobFromContract } from "../jobs/setup.js";
@@ -150,7 +151,7 @@ function serializeProject(p: typeof projectsTable.$inferSelect) {
 // ── List ─────────────────────────────────────────────────────────────────────
 
 // GET /api/jobs
-router.get("/jobs", requireAuth, async (req, res) => {
+router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const projects = await db.select().from(projectsTable).where(eq(projectsTable.userId, userId)).orderBy(desc(projectsTable.createdAt)).limit(300);
@@ -178,7 +179,7 @@ router.get("/jobs", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs — manual job (no contract). Used by the quote page "Start job" button.
-router.post("/jobs", requireAuth, async (req, res) => {
+router.post("/jobs", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireJobsFeature(userId);
@@ -333,7 +334,7 @@ async function loadJobDetail(userId: string, id: string) {
 }
 
 // GET /api/jobs/:id
-router.get("/jobs/:id", requireAuth, async (req, res) => {
+router.get("/jobs/:id", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const detail = await loadJobDetail(getUserId(res), req.params.id as string);
     if (!detail) {
@@ -348,7 +349,7 @@ router.get("/jobs/:id", requireAuth, async (req, res) => {
 });
 
 // PUT /api/jobs/:id
-router.put("/jobs/:id", requireAuth, async (req, res) => {
+router.put("/jobs/:id", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -398,7 +399,7 @@ router.put("/jobs/:id", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/jobs/:id — only jobs without a signed contract behind them
-router.delete("/jobs/:id", requireAuth, async (req, res) => {
+router.delete("/jobs/:id", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -530,7 +531,7 @@ const SetupBody = z.object({
 });
 
 // PUT /api/jobs/:id/setup — save edits on the review screen without confirming
-router.put("/jobs/:id/setup", requireAuth, async (req, res) => {
+router.put("/jobs/:id/setup", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -552,7 +553,7 @@ router.put("/jobs/:id/setup", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/setup/confirm — "Looks good, start the job"
-router.post("/jobs/:id/setup/confirm", requireAuth, async (req, res) => {
+router.post("/jobs/:id/setup/confirm", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -577,7 +578,7 @@ router.post("/jobs/:id/setup/confirm", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/setup/regenerate — rebuild the proposal from the contract (discards edits)
-router.post("/jobs/:id/setup/regenerate", requireAuth, async (req, res) => {
+router.post("/jobs/:id/setup/regenerate", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -624,7 +625,7 @@ async function ownedMilestone(userId: string, projectId: string, milestoneId: st
 }
 
 // POST /api/jobs/:id/milestones
-router.post("/jobs/:id/milestones", requireAuth, async (req, res) => {
+router.post("/jobs/:id/milestones", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -661,7 +662,7 @@ router.post("/jobs/:id/milestones", requireAuth, async (req, res) => {
 });
 
 // PUT /api/jobs/:id/milestones/:mid
-router.put("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
+router.put("/jobs/:id/milestones/:mid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const owned = await ownedMilestone(userId, req.params.id as string, req.params.mid as string);
@@ -703,7 +704,7 @@ router.put("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/jobs/:id/milestones/:mid
-router.delete("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/milestones/:mid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const owned = await ownedMilestone(userId, req.params.id as string, req.params.mid as string);
@@ -724,7 +725,7 @@ router.delete("/jobs/:id/milestones/:mid", requireAuth, async (req, res) => {
 
 // ── Tasks ────────────────────────────────────────────────────────────────────
 
-router.post("/jobs/:id/tasks", requireAuth, async (req, res) => {
+router.post("/jobs/:id/tasks", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -745,7 +746,7 @@ router.post("/jobs/:id/tasks", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/jobs/:id/tasks/:tid", requireAuth, async (req, res) => {
+router.patch("/jobs/:id/tasks/:tid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -775,7 +776,7 @@ router.patch("/jobs/:id/tasks/:tid", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/jobs/:id/tasks/:tid", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/tasks/:tid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -793,7 +794,7 @@ router.delete("/jobs/:id/tasks/:tid", requireAuth, async (req, res) => {
 
 // ── Budget ───────────────────────────────────────────────────────────────────
 
-router.put("/jobs/:id/budget", requireAuth, async (req, res) => {
+router.put("/jobs/:id/budget", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -833,7 +834,7 @@ const ChangeOrderBody = z.object({
   scheduleDeltaDays: z.number().int().min(-365).max(365).default(0),
 });
 
-router.post("/jobs/:id/change-orders", requireAuth, async (req, res) => {
+router.post("/jobs/:id/change-orders", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireJobsFeature(userId);
@@ -857,7 +858,7 @@ router.post("/jobs/:id/change-orders", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/jobs/:id/change-orders/:coId", requireAuth, async (req, res) => {
+router.put("/jobs/:id/change-orders/:coId", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -882,7 +883,7 @@ router.put("/jobs/:id/change-orders/:coId", requireAuth, async (req, res) => {
 });
 
 // DELETE — drafts only (sent/signed ones are voided through the contract)
-router.delete("/jobs/:id/change-orders/:coId", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/change-orders/:coId", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -934,7 +935,7 @@ function serializePhoto(p: typeof jobPhotosTable.$inferSelect) {
   };
 }
 
-router.get("/jobs/:id/photos", requireAuth, async (req, res) => {
+router.get("/jobs/:id/photos", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -953,6 +954,7 @@ router.get("/jobs/:id/photos", requireAuth, async (req, res) => {
 router.post(
   "/jobs/:id/photos",
   requireAuth,
+  requirePermission("jobs", "edit"),
   (req, res, next) => {
     photoUpload.single("file")(req, res, (err) => {
       if (err instanceof multer.MulterError || err instanceof Error) {
@@ -1010,7 +1012,7 @@ router.post(
   },
 );
 
-router.get("/jobs/:id/photos/:photoId/file", requireAuth, async (req, res) => {
+router.get("/jobs/:id/photos/:photoId/file", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -1038,7 +1040,7 @@ router.get("/jobs/:id/photos/:photoId/file", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
+router.put("/jobs/:id/photos/:photoId", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -1072,7 +1074,7 @@ router.put("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/photos/:photoId", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -1096,7 +1098,7 @@ router.delete("/jobs/:id/photos/:photoId", requireAuth, async (req, res) => {
 
 // POST /api/jobs/:id/photos/share — email/WhatsApp signed links to a set of
 // photos to the job's client. Doesn't publish the photos; links expire.
-router.post("/jobs/:id/photos/share", requireAuth, async (req, res) => {
+router.post("/jobs/:id/photos/share", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);

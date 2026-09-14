@@ -1,0 +1,26 @@
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test
+      # `pnpm run typecheck` at the repo root is intentionally not run here yet:
+      # lib/api-zod's generated client fails `tsc --build` on a pre-existing
+      # zod v3-vs-v4 mismatch (orval emits v4-only APIs against the v3.25 the
+      # repo pins) unrelated to any app code, so it would fail every PR. Once
+      # that's resolved, add `pnpm run typecheck` as a second step here.
+      - run: pnpm --filter @workspace/api-server run typecheck
+      - run: pnpm --filter @workspace/quote-ai run typecheck

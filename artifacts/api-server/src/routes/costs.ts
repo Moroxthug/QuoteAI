@@ -18,6 +18,7 @@ import {
 } from "@workspace/db";
 import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
 import { writeAudit } from "../lib/notifications.js";
@@ -88,7 +89,7 @@ async function milestoneBelongs(projectId: string, milestoneId: string | null | 
 // ── Per-job entries ──────────────────────────────────────────────────────────
 
 // GET /api/jobs/:id/costs
-router.get("/jobs/:id/costs", requireAuth, async (req, res) => {
+router.get("/jobs/:id/costs", requireAuth, requirePermission("costs", "view"), async (req, res) => {
   try {
     const project = await ownedProject(getUserId(res), req.params.id as string);
     if (!project) {
@@ -105,7 +106,7 @@ router.get("/jobs/:id/costs", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/costs — manual entry, confirmed right away
-router.post("/jobs/:id/costs", requireAuth, async (req, res) => {
+router.post("/jobs/:id/costs", requireAuth, requirePermission("costs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireCostsFeature(userId);
@@ -150,7 +151,7 @@ router.post("/jobs/:id/costs", requireAuth, async (req, res) => {
 });
 
 // PUT /api/jobs/:id/costs/:cid — edit and/or confirm. Labour/equipment entries are derived: edit the time entry or usage instead.
-router.put("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
+router.put("/jobs/:id/costs/:cid", requireAuth, requirePermission("costs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -215,7 +216,7 @@ router.put("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/jobs/:id/costs/:cid
-router.delete("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/costs/:cid", requireAuth, requirePermission("costs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -250,7 +251,7 @@ router.delete("/jobs/:id/costs/:cid", requireAuth, async (req, res) => {
 // ── Receipts ─────────────────────────────────────────────────────────────────
 
 // GET /api/costs/review — every pending entry (receipts still to confirm), incl. unmatched ones
-router.get("/costs/review", requireAuth, async (req, res) => {
+router.get("/costs/review", requireAuth, requirePermission("costs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const entries = await db.select().from(costEntriesTable).where(and(eq(costEntriesTable.userId, userId), eq(costEntriesTable.status, "pending_review"))).orderBy(desc(costEntriesTable.createdAt)).limit(100);
@@ -266,6 +267,7 @@ router.get("/costs/review", requireAuth, async (req, res) => {
 router.post(
   "/costs/receipts",
   requireAuth,
+  requirePermission("costs", "edit"),
   receiptLimiter,
   (req, res, next) => {
     receiptUpload.single("file")(req, res, (err) => {
@@ -362,7 +364,7 @@ router.post(
 );
 
 // GET /api/costs/receipts/:docId/file — the receipt image/PDF (owner only)
-router.get("/costs/receipts/:docId/file", requireAuth, async (req, res) => {
+router.get("/costs/receipts/:docId/file", requireAuth, requirePermission("costs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [doc] = await db.select().from(uploadedDocumentsTable).where(and(eq(uploadedDocumentsTable.id, req.params.docId as string), eq(uploadedDocumentsTable.userId, userId)));

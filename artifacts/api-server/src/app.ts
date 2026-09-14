@@ -11,6 +11,17 @@ import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
 import "./automations";
 import { logger } from "./lib/logger";
+import { ipRateLimiter } from "./lib/rateLimit";
+
+// Brute-force protection on credential-guessing endpoints. Keyed by IP (pre-auth,
+// there's no user identity yet); a generous ceiling since it also covers normal
+// typo-retries, not just attacks.
+const authRateLimiter = ipRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: "Too many attempts. Please wait a few minutes and try again.",
+});
+const AUTH_RATE_LIMITED_PATHS = ["/api/auth/sign-in/email", "/api/auth/two-factor/verify-totp", "/api/auth/two-factor/verify-backup-code", "/api/auth/two-factor/verify-otp", "/api/auth/forget-password", "/api/auth/reset-password"];
 
 const app: Express = express();
 
@@ -43,6 +54,14 @@ app.use(
 // Use raw middleware to avoid Express 5 wildcard syntax issues
 app.use((req, res, next): void => {
   if (req.url?.startsWith("/api/auth/") || req.url === "/api/auth") {
+    const pathOnly = req.url.split("?")[0];
+    if (AUTH_RATE_LIMITED_PATHS.includes(pathOnly)) {
+      authRateLimiter(req, res, (err?: unknown) => {
+        if (err) { next(err); return; }
+        void toNodeHandler(auth)(req, res);
+      });
+      return;
+    }
     void toNodeHandler(auth)(req, res);
     return;
   }

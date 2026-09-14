@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BusinessTab } from "./settings-business-tab";
+import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
 
@@ -1593,8 +1594,8 @@ export default function SettingsPage() {
   const { data: subscription } = useGetSubscription();
   const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
   const isElite = subscription?.isActive && subscription?.plan === "monthly_elite";
-  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : "billing";
-  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage" | "integrations">(defaultTab as any);
+  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : tabFromParam === "security" ? "security" : "billing";
+  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage" | "integrations" | "security">(defaultTab as any);
 
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
@@ -1604,6 +1605,7 @@ export default function SettingsPage() {
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
     { id: "usage" as const, label: t("dashboard.settings.tabs.usage") },
     ...(isElite ? [{ id: "integrations" as const, label: t("dashboard.settings.tabs.integrations") }] : []),
+    { id: "security" as const, label: t("dashboard.settings.tabs.security") },
   ];
 
   return (
@@ -1646,6 +1648,8 @@ export default function SettingsPage() {
           <QuickbooksTab />
           <CalendarSyncTab />
         </div>
+      ) : activeTab === "security" ? (
+        <SecurityTab />
       ) : (
         <BillingTab />
       )}

@@ -28,6 +28,11 @@ export default function SignInPage() {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState<string | null>(null);
 
+  const [twoFactorMode, setTwoFactorMode] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false);
+  const [useBackupCode, setUseBackupCode] = useState(false);
+
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -45,6 +50,8 @@ export default function SignInPage() {
         } else {
           setError(msg || t("signIn.errorInvalidCredentials"));
         }
+      } else if (result.data && "twoFactorRedirect" in result.data && result.data.twoFactorRedirect) {
+        setTwoFactorMode(true);
       } else {
         navigate(nextPath);
       }
@@ -52,6 +59,26 @@ export default function SignInPage() {
       setError(t("signIn.errorConnection"));
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleVerifyTwoFactor(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setTwoFactorLoading(true);
+    try {
+      const result = useBackupCode
+        ? await authClient.twoFactor.verifyBackupCode({ code: twoFactorCode.trim() })
+        : await authClient.twoFactor.verifyTotp({ code: twoFactorCode.trim() });
+      if (result.error) {
+        setError(result.error.message ?? t("signIn.errorInvalidCredentials"));
+      } else {
+        navigate(nextPath);
+      }
+    } catch {
+      setError(t("signIn.errorConnection"));
+    } finally {
+      setTwoFactorLoading(false);
     }
   }
 
@@ -85,7 +112,51 @@ export default function SignInPage() {
               <Logo />
             </div>
 
-            {!resetMode ? (
+            {twoFactorMode ? (
+              <>
+                <h1 className="text-xl font-bold text-gray-900 text-center mb-1">{t("signIn.twoFactorTitle")}</h1>
+                <p className="text-sm text-gray-400 text-center mb-6">
+                  {useBackupCode ? t("signIn.twoFactorBackupSubtitle") : t("signIn.twoFactorSubtitle")}
+                </p>
+
+                {error && (
+                  <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-3 py-2.5 mb-4">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleVerifyTwoFactor} className="space-y-4">
+                  <div>
+                    <input
+                      type="text"
+                      inputMode={useBackupCode ? "text" : "numeric"}
+                      autoFocus
+                      required
+                      value={twoFactorCode}
+                      onChange={e => setTwoFactorCode(e.target.value)}
+                      placeholder={useBackupCode ? t("signIn.twoFactorBackupPlaceholder") : "123456"}
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={twoFactorLoading}
+                    className="btn-gradient w-full h-11 flex items-center justify-center gap-2 text-sm font-semibold disabled:opacity-60"
+                  >
+                    {twoFactorLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                    {t("signIn.twoFactorVerify")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setUseBackupCode(v => !v); setTwoFactorCode(""); setError(null); }}
+                    className="w-full text-center text-sm text-violet-600 hover:underline font-medium"
+                  >
+                    {useBackupCode ? t("signIn.twoFactorUseTotp") : t("signIn.twoFactorUseBackup")}
+                  </button>
+                </form>
+              </>
+            ) : !resetMode ? (
               <>
                 <h1 className="text-xl font-bold text-gray-900 text-center mb-1">{t("signIn.title")}</h1>
                 <p className="text-sm text-gray-400 text-center mb-6">{t("signIn.subtitle")}</p>
@@ -210,7 +281,7 @@ export default function SignInPage() {
             )}
           </div>
 
-          {!resetMode && (
+          {!resetMode && !twoFactorMode && (
             <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
               <span className="text-sm text-gray-500">{t("signIn.noAccount")} </span>
               <Link href={nextPath !== "/dashboard" ? `/sign-up?next=${encodeURIComponent(nextPath)}` : "/sign-up"} className="text-sm text-violet-600 font-semibold hover:underline">

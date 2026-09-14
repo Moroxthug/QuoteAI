@@ -1,0 +1,24 @@
+name: Dependency audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1" # weekly, Monday 06:00 UTC
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      # Non-blocking for now: this is a first pass at CI for the repo (which
+      # has no other workflows or test runner yet) — fails loud in the log
+      # without breaking every PR on a transitive advisory no one triaged yet.
+      - run: pnpm audit --audit-level=high || echo "::warning::pnpm audit found issues — review before the next release."

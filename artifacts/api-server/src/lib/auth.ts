@@ -1,11 +1,30 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { bearer } from "better-auth/plugins";
-import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable } from "@workspace/db";
+import { bearer, twoFactor } from "better-auth/plugins";
+import { createAuthMiddleware } from "better-auth/api";
+import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable } from "@workspace/db";
+import { and, asc, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { logger } from "./logger";
 import { sendWelcomeEmail } from "./email";
 import { getBaseUrl } from "./baseUrl";
+import { recordSecurityAuditEvent } from "./auditLog";
+
+// Minimal, duplicate-of-`resolveActingOrg` org lookup — kept local rather than
+// imported from ../middlewares/authMiddleware to avoid that module's circular
+// import back onto `auth` here. Only used to scope audit rows written from
+// better-auth's own request lifecycle (login, 2FA, session revoke).
+async function resolveOrgForAudit(actorId: string): Promise<string> {
+  const [profile] = await db.select({ userId: businessProfilesTable.userId }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, actorId));
+  if (profile) return actorId;
+  const [membership] = await db
+    .select()
+    .from(organizationMembersTable)
+    .where(and(eq(organizationMembersTable.userId, actorId), eq(organizationMembersTable.status, "active")))
+    .orderBy(asc(organizationMembersTable.joinedAt))
+    .limit(1);
+  return membership?.ownerId ?? actorId;
+}
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -55,9 +74,41 @@ export const auth = betterAuth({
       session: authSessionsTable,
       account: authAccountsTable,
       verification: authVerificationsTable,
+      twoFactor: authTwoFactorTable,
     },
   }),
-  plugins: [bearer()],
+  plugins: [bearer(), twoFactor({ issuer: "QuoteAI" })],
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      const newSession = ctx.context.newSession;
+      if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
+        const orgId = await resolveOrgForAudit(newSession.user.id);
+        await recordSecurityAuditEvent({
+          orgId,
+          actorUserId: newSession.user.id,
+          action: "login",
+          ipAddress: newSession.session.ipAddress ?? null,
+          userAgent: newSession.session.userAgent ?? null,
+        });
+        return;
+      }
+      const session = ctx.context.session;
+      if (!session) return;
+      if (ctx.path === "/two-factor/enable") {
+        const orgId = await resolveOrgForAudit(session.user.id);
+        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.enabled" });
+      } else if (ctx.path === "/two-factor/disable") {
+        const orgId = await resolveOrgForAudit(session.user.id);
+        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.disabled" });
+      } else if (ctx.path === "/revoke-session") {
+        const orgId = await resolveOrgForAudit(session.user.id);
+        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked" });
+      } else if (ctx.path === "/revoke-sessions" || ctx.path === "/revoke-other-sessions") {
+        const orgId = await resolveOrgForAudit(session.user.id);
+        await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "session.revoked_all" });
+      }
+    }),
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

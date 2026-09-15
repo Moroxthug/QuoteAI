@@ -39,6 +39,7 @@ import emailConnectionsRouter from "./email-connections";
 import securityRouter from "./security";
 import importsRouter from "./imports";
 import financeitRouter from "./financeit";
+import flinksRouter from "./flinks";
 import developerApiRouter from "./developer-api";
 import publicV1Router from "./public-v1";
 
@@ -84,6 +85,7 @@ router.use(emailConnectionsRouter);
 router.use(securityRouter);
 router.use(importsRouter);
 router.use(financeitRouter);
+router.use(flinksRouter);
 router.use(developerApiRouter);
 router.use("/v1/public", publicV1Router);
 

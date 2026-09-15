@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,7 +28,8 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,7 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
-import { stripeConnectApi, financeitApi, developerApi, type AutomationEventName } from "@/lib/invoices-api";
+import { stripeConnectApi, financeitApi, developerApi, flinksApi, type AutomationEventName, type FlinksAccountDto } from "@/lib/invoices-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -1737,6 +1738,301 @@ function FinanceitTab() {
   );
 }
 
+function FlinksConnectDialog({ open, onOpenChange, onConnected }: { open: boolean; onOpenChange: (open: boolean) => void; onConnected: (accounts: FlinksAccountDto[]) => void }) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const { data: connectUrlData, isLoading } = useQuery({ queryKey: ["flinks-connect-url"], queryFn: flinksApi.connectUrl, enabled: open, retry: false });
+  const connectMutation = useMutation({
+    mutationFn: ({ loginId, institutionName }: { loginId: string; institutionName: string }) => flinksApi.connect(loginId, institutionName),
+    onSuccess: (r) => { onConnected(r.accounts); onOpenChange(false); },
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    function handleMessage(event: MessageEvent) {
+      const data = event.data as { step?: string; loginId?: string; institution?: string } | undefined;
+      if (data?.step === "REDIRECT" && data.loginId) {
+        connectMutation.mutate({ loginId: data.loginId, institutionName: data.institution ?? "Bank account" });
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl h-[640px] flex flex-col">
+        <DialogHeader>
+          <DialogTitle>{t("dashboard.settings.flinks.connectTitle")}</DialogTitle>
+          <DialogDescription>{t("dashboard.settings.flinks.connectDialogDesc")}</DialogDescription>
+        </DialogHeader>
+        <div className="flex-1 rounded-lg overflow-hidden border border-border bg-muted/30">
+          {isLoading || !connectUrlData?.url ? (
+            <div className="h-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <iframe src={connectUrlData.url} title="Flinks Connect" className="w-full h-full border-0" />
+          )}
+        </div>
+        {connectMutation.isPending && (
+          <p className="text-xs text-muted-foreground flex items-center gap-2"><Loader2 className="h-3 w-3 animate-spin" /> {t("dashboard.settings.flinks.connecting")}</p>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function FlinksAccountPicker({ accounts, onPick, isPending }: { accounts: FlinksAccountDto[]; onPick: (a: FlinksAccountDto) => void; isPending: boolean }) {
+  const { t } = useLanguage();
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.pickAccountHelp")}</p>
+      {accounts.map((a) => (
+        <button
+          key={a.id}
+          type="button"
+          disabled={isPending}
+          onClick={() => onPick(a)}
+          className="w-full text-left px-3 py-2 rounded-lg border border-border hover:border-amber-300 hover:bg-amber-50 transition-colors text-sm flex items-center justify-between disabled:opacity-50"
+        >
+          <span>{a.name}{a.last4 ? ` ••••${a.last4}` : ""}</span>
+          <span className="text-xs text-muted-foreground">{a.institution}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function FlinksTransactionsCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({ queryKey: ["flinks-transactions"], queryFn: flinksApi.transactions });
+  const [candidatesFor, setCandidatesFor] = useState<string | null>(null);
+  const { data: candidatesData } = useQuery({
+    queryKey: ["flinks-candidates", candidatesFor],
+    queryFn: () => flinksApi.candidates(candidatesFor!),
+    enabled: !!candidatesFor,
+  });
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["flinks-transactions"] });
+  const matchMutation = useMutation({
+    mutationFn: ({ id, costEntryId }: { id: string; costEntryId: string }) => flinksApi.match(id, costEntryId),
+    onSuccess: () => { invalidate(); setCandidatesFor(null); },
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+  const ignoreMutation = useMutation({
+    mutationFn: (id: string) => flinksApi.ignore(id),
+    onSuccess: invalidate,
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+  const unmatchMutation = useMutation({
+    mutationFn: (id: string) => flinksApi.unmatch(id),
+    onSuccess: invalidate,
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  const transactions = data?.transactions ?? [];
+  if (transactions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-6 text-sm text-muted-foreground text-center">{t("dashboard.settings.flinks.noTransactions")}</CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">{t("dashboard.settings.flinks.transactionsTitle")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {transactions.map((tx) => (
+          <div key={tx.id} className="border border-border rounded-lg p-3 space-y-2">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm font-medium">{tx.description || t("dashboard.settings.flinks.unlabeledTransaction")}</p>
+                <p className="text-xs text-muted-foreground">{new Date(tx.date).toLocaleDateString()}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={cn("text-sm font-semibold", tx.amountCents < 0 ? "text-red-600" : "text-emerald-600")}>
+                  {(tx.amountCents / 100).toLocaleString(undefined, { style: "currency", currency: "CAD" })}
+                </span>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs",
+                    tx.matchStatus === "matched" && "bg-emerald-100 text-emerald-700 border-emerald-200",
+                    tx.matchStatus === "ignored" && "bg-muted text-muted-foreground border-border",
+                    tx.matchStatus === "unmatched" && "bg-amber-100 text-amber-800 border-amber-200"
+                  )}
+                >
+                  {t(`dashboard.settings.flinks.status.${tx.matchStatus}`)}
+                </Badge>
+              </div>
+            </div>
+            {tx.matchStatus === "unmatched" && (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setCandidatesFor(candidatesFor === tx.id ? null : tx.id)} className="gap-1.5">
+                    {t("dashboard.settings.flinks.findMatch")}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => ignoreMutation.mutate(tx.id)} disabled={ignoreMutation.isPending} className="text-muted-foreground">
+                    {t("dashboard.settings.flinks.ignore")}
+                  </Button>
+                </div>
+                {candidatesFor === tx.id && (
+                  <div className="pl-2 border-l-2 border-amber-200 space-y-1.5">
+                    {(candidatesData?.candidates.length ?? 0) === 0 ? (
+                      <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.noCandidates")}</p>
+                    ) : (
+                      candidatesData!.candidates.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          disabled={matchMutation.isPending}
+                          onClick={() => matchMutation.mutate({ id: tx.id, costEntryId: c.id })}
+                          className="w-full text-left px-2.5 py-1.5 rounded-md border border-border hover:border-amber-300 hover:bg-amber-50 text-xs flex items-center justify-between disabled:opacity-50"
+                        >
+                          <span>{c.vendor || c.description || t("dashboard.settings.flinks.unlabeledTransaction")}</span>
+                          <span className="text-muted-foreground">{new Date(c.date).toLocaleDateString()}</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+            {tx.matchStatus === "matched" && (
+              <Button size="sm" variant="ghost" onClick={() => unmatchMutation.mutate(tx.id)} disabled={unmatchMutation.isPending} className="text-muted-foreground h-7 px-2 text-xs">
+                {t("dashboard.settings.flinks.undoMatch")}
+              </Button>
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function FlinksTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: subscription } = useGetSubscription();
+  const { data: status, isLoading } = useQuery({ queryKey: ["flinks-status"], queryFn: flinksApi.status });
+  const [showConnect, setShowConnect] = useState(false);
+  const [pendingAccounts, setPendingAccounts] = useState<FlinksAccountDto[] | null>(null);
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["flinks-status"] });
+  const selectAccountMutation = useMutation({
+    mutationFn: (a: FlinksAccountDto) => flinksApi.selectAccount(a),
+    onSuccess: () => { invalidate(); setPendingAccounts(null); toast({ title: t("dashboard.settings.flinks.connected") }); },
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+  const toggle = useMutation({
+    mutationFn: (isEnabled: boolean) => flinksApi.toggle(isEnabled),
+    onSuccess: invalidate,
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+  const disconnect = useMutation({
+    mutationFn: flinksApi.disconnect,
+    onSuccess: () => { invalidate(); toast({ title: t("dashboard.settings.flinks.disconnected") }); },
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+  const sync = useMutation({
+    mutationFn: flinksApi.sync,
+    onSuccess: () => { invalidate(); queryClient.invalidateQueries({ queryKey: ["flinks-transactions"] }); },
+    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
+  });
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  const connected = status?.connected ?? false;
+  const isEnabled = status?.isEnabled ?? true;
+  const hasAccount = !!status?.selectedAccount;
+
+  return (
+    <div className="space-y-4">
+      <Card className={connected && hasAccount && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-violet-100")}>
+              <Banknote className={cn("h-6 w-6", connected && hasAccount ? "text-amber-600" : "text-violet-500")} />
+            </div>
+            <div>
+              <CardTitle>{t("dashboard.settings.flinks.title")}</CardTitle>
+              <CardDescription className="mt-0.5">{t("dashboard.settings.flinks.desc")}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {!connected && (
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.connectHelp")}</p>
+          )}
+          {connected && !hasAccount && (
+            pendingAccounts ? (
+              <FlinksAccountPicker accounts={pendingAccounts} onPick={(a) => selectAccountMutation.mutate(a)} isPending={selectAccountMutation.isPending} />
+            ) : (
+              <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.noAccountSelected")}</p>
+            )
+          )}
+          {connected && hasAccount && (
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+                  {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.financeit.active")}</> : t("dashboard.settings.financeit.paused")}
+                </Badge>
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  {status?.institutionName} — {status?.selectedAccount?.name}{status?.selectedAccount?.last4 ? ` ••••${status.selectedAccount.last4}` : ""}
+                </p>
+                {status?.lastSyncedAt && (
+                  <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.flinks.lastSynced")} {new Date(status.lastSyncedAt).toLocaleString()}</p>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="gap-2 flex-wrap">
+          {!connected ? (
+            <Button onClick={() => setShowConnect(true)} className="gap-2">
+              <Plug className="h-4 w-4" />
+              {t("dashboard.settings.flinks.connectCta")}
+            </Button>
+          ) : (
+            <>
+              {hasAccount && (
+                <Button variant="outline" size="sm" onClick={() => sync.mutate()} disabled={sync.isPending} className="gap-2">
+                  {sync.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                  {t("dashboard.settings.flinks.syncNow")}
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+                {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isEnabled ? t("dashboard.settings.financeit.pause") : t("dashboard.settings.financeit.resume")}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+                {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+                {t("dashboard.settings.flinks.disconnect")}
+              </Button>
+            </>
+          )}
+        </CardFooter>
+      </Card>
+      {connected && hasAccount && <FlinksTransactionsCard />}
+      <FlinksConnectDialog
+        open={showConnect}
+        onOpenChange={setShowConnect}
+        onConnected={(accounts) => { setPendingAccounts(accounts); invalidate(); }}
+      />
+    </div>
+  );
+}
+
 function DeveloperApiTab() {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -2391,6 +2687,7 @@ export default function SettingsPage() {
           <FinanceitTab />
           <QuickbooksTab />
           <WaveTab />
+          <FlinksTab />
           <CalendarSyncTab />
           <EmailSendTab />
           <DeveloperApiTab />

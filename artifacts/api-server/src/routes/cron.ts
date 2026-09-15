@@ -8,6 +8,7 @@ import { runQuoteFollowupMaintenance } from "../quotes/maintenance.js";
 import { rollUpUsageForDate } from "../lib/usage.js";
 import { runIncentivesFreshnessCheck } from "../incentives/maintenance.js";
 import { runPriceIntelligenceTrendCheck } from "../priceIntelligence/maintenance.js";
+import { runFlinksSyncCheck } from "../flinks/maintenance.js";
 
 const router = Router();
 
@@ -36,10 +37,11 @@ router.get("/cron/tick", async (req, res) => {
     const incentives = await runIncentivesFreshnessCheck();
     const priceTrends = await runPriceIntelligenceTrendCheck();
     const quoteFollowups = await runQuoteFollowupMaintenance();
+    const flinksSync = await runFlinksSyncCheck();
     // Roll up yesterday's (and today's, in case cron shifted) usage_events into the daily summary.
     const usage = await rollUpUsageForDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
     await rollUpUsageForDate(new Date());
-    res.json({ ok: true, automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, usage, tookMs: Date.now() - startedAt });
+    res.json({ ok: true, automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, usage, tookMs: Date.now() - startedAt });
   } catch (err) {
     req.log.error({ err }, "Cron tick failed");
     res.status(500).json({ ok: false });

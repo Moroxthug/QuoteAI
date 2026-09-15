@@ -22,7 +22,7 @@ import { uploadedDocumentsTable } from "./documents";
 export const COST_ENTRY_STATUSES = ["pending_review", "confirmed"] as const;
 export type CostEntryStatus = (typeof COST_ENTRY_STATUSES)[number];
 
-export const COST_ENTRY_SOURCES = ["manual", "receipt", "time_entry", "equipment", "legacy"] as const;
+export const COST_ENTRY_SOURCES = ["manual", "receipt", "time_entry", "equipment", "legacy", "bank_feed"] as const;
 export type CostEntrySource = (typeof COST_ENTRY_SOURCES)[number];
 
 /** GST/HST/PST/QST split in cents, as read from the receipt (or computed). */

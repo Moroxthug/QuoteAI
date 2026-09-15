@@ -191,6 +191,33 @@ export const metaLeadAdsApi = {
   importLog: () => req<{ entries: MetaLeadAdsImportLogEntryDto[] }>("/api/meta-lead-ads/import-log"),
 };
 
+// Phase 29: Google Local Services Ads (LSA) lead capture — engineering track, gated on Google
+// developer-token approval + manager account setup (see docs/EDGE-FEATURES-PLAN.md §15).
+export type GoogleLsaStatusDto = {
+  connected: boolean;
+  lsaCustomerId?: string;
+  isEnabled?: boolean;
+  connectedAt?: string;
+  lastPolledAt?: string | null;
+  lastLeadAt?: string | null;
+};
+export type GoogleLsaImportLogEntryDto = {
+  id: string;
+  googleLsaLeadId: string;
+  leadType: string | null;
+  status: "imported" | "duplicate" | "failed";
+  error: string | null;
+  createdAt: string;
+};
+
+export const googleLsaApi = {
+  status: () => req<GoogleLsaStatusDto>("/api/google-lsa/status"),
+  connectUrl: (lsaCustomerId: string) => req<{ url: string }>(`/api/google-lsa/connect?lsaCustomerId=${encodeURIComponent(lsaCustomerId)}`),
+  toggle: (isEnabled: boolean) => req<{ success: true }>("/api/google-lsa/toggle", { method: "PATCH", body: json({ isEnabled }) }),
+  disconnect: () => req<{ success: true }>("/api/google-lsa/disconnect", { method: "DELETE" }),
+  importLog: () => req<{ entries: GoogleLsaImportLogEntryDto[] }>("/api/google-lsa/import-log"),
+};
+
 // Phase 19: public API keys + webhooks (Settings → Integrations → Developer API)
 export type AutomationEventName =
   | "quote.accepted" | "contract.signed" | "contract.declined" | "milestone.completed" | "job.completed"

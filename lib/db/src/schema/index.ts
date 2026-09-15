@@ -35,3 +35,4 @@ export * from "./publicApi";
 export * from "./wave";
 export * from "./flinks";
 export * from "./meta-lead-ads";
+export * from "./google-lsa";

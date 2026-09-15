@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
-import { stripeConnectApi, financeitApi, developerApi, flinksApi, metaLeadAdsApi, type AutomationEventName, type FlinksAccountDto } from "@/lib/invoices-api";
+import { stripeConnectApi, financeitApi, developerApi, flinksApi, metaLeadAdsApi, googleLsaApi, type AutomationEventName, type FlinksAccountDto } from "@/lib/invoices-api";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -2153,6 +2153,133 @@ function MetaLeadAdsTab() {
   );
 }
 
+function GoogleLsaImportLogCard() {
+  const { t } = useLanguage();
+  const { data: log } = useQuery({ queryKey: ["google-lsa-import-log"], queryFn: googleLsaApi.importLog });
+
+  if (!log || log.entries.length === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("dashboard.settings.googleLsa.importLogTitle")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {log.entries.map((e) => (
+          <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
+            <div className="flex items-center gap-2 min-w-0">
+              {e.status === "imported" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              ) : (
+                <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="font-medium truncate">{new Date(e.createdAt).toLocaleString()}</p>
+                {e.error && <p className="text-xs text-red-600 truncate">{e.error}</p>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function GoogleLsaTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: subscription } = useGetSubscription();
+  const { data: status, isLoading } = useQuery({ queryKey: ["google-lsa-status"], queryFn: googleLsaApi.status });
+  const [lsaCustomerId, setLsaCustomerId] = useState("");
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["google-lsa-status"] });
+  const toggle = useMutation({
+    mutationFn: (isEnabled: boolean) => googleLsaApi.toggle(isEnabled),
+    onSuccess: invalidate,
+    onError: () => toast({ title: t("dashboard.settings.googleLsa.error"), variant: "destructive" }),
+  });
+  const disconnect = useMutation({
+    mutationFn: googleLsaApi.disconnect,
+    onSuccess: () => { invalidate(); toast({ title: t("dashboard.settings.googleLsa.disconnected") }); },
+    onError: () => toast({ title: t("dashboard.settings.googleLsa.error"), variant: "destructive" }),
+  });
+  const connect = useMutation({
+    mutationFn: (id: string) => googleLsaApi.connectUrl(id),
+    onSuccess: (result) => { if (result.url) window.location.href = result.url; else toast({ title: t("dashboard.settings.googleLsa.error"), variant: "destructive" }); },
+    onError: () => toast({ title: t("dashboard.settings.googleLsa.error"), variant: "destructive" }),
+  });
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  const connected = status?.connected ?? false;
+  const isEnabled = status?.isEnabled ?? true;
+
+  return (
+    <div className="space-y-4">
+      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50" : undefined}>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-violet-100")}>
+              <Search className={cn("h-6 w-6", connected ? "text-blue-600" : "text-violet-500")} />
+            </div>
+            <div>
+              <CardTitle>{t("dashboard.settings.googleLsa.title")}</CardTitle>
+              <CardDescription className="mt-0.5">{t("dashboard.settings.googleLsa.desc")}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {!connected && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">{t("dashboard.settings.googleLsa.connectHelp")}</p>
+              <Input
+                value={lsaCustomerId}
+                onChange={(e) => setLsaCustomerId(e.target.value)}
+                placeholder={t("dashboard.settings.googleLsa.customerIdPlaceholder")}
+                className="max-w-xs"
+              />
+            </div>
+          )}
+          {connected && (
+            <div>
+              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+                {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
+              </Badge>
+              <p className="text-xs text-muted-foreground mt-1.5">{status?.lsaCustomerId}</p>
+              {status?.lastLeadAt && (
+                <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.googleLsa.lastLead")} {new Date(status.lastLeadAt).toLocaleString()}</p>
+              )}
+            </div>
+          )}
+        </CardContent>
+        <CardFooter className="gap-2 flex-wrap">
+          {!connected ? (
+            <Button onClick={() => connect.mutate(lsaCustomerId)} disabled={connect.isPending || !lsaCustomerId.trim()} className="gap-2">
+              {connect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+              {t("dashboard.settings.googleLsa.connectCta")}
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+                {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+                {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+                {t("dashboard.settings.googleLsa.disconnect")}
+              </Button>
+            </>
+          )}
+        </CardFooter>
+      </Card>
+      {connected && <GoogleLsaImportLogCard />}
+    </div>
+  );
+}
+
 function DeveloperApiTab() {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -2809,6 +2936,7 @@ export default function SettingsPage() {
           <WaveTab />
           <FlinksTab />
           <MetaLeadAdsTab />
+          <GoogleLsaTab />
           <CalendarSyncTab />
           <EmailSendTab />
           <DeveloperApiTab />

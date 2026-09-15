@@ -41,6 +41,7 @@ import importsRouter from "./imports";
 import financeitRouter from "./financeit";
 import flinksRouter from "./flinks";
 import metaLeadAdsRouter from "./meta-lead-ads";
+import googleLsaRouter from "./google-lsa";
 import developerApiRouter from "./developer-api";
 import publicV1Router from "./public-v1";
 
@@ -88,6 +89,7 @@ router.use(importsRouter);
 router.use(financeitRouter);
 router.use(flinksRouter);
 router.use(metaLeadAdsRouter);
+router.use(googleLsaRouter);
 router.use(developerApiRouter);
 router.use("/v1/public", publicV1Router);
 

@@ -24,6 +24,7 @@ type ProfileExtras = {
   licenceNumber: string | null;
   etransferEmail: string | null;
   googleReviewUrl: string | null;
+  homeStarsProfileUrl: string | null;
   sendReviewRequests: boolean;
   defaultPaymentSchedule: PaymentSchedule | null;
   automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean; invoiceAutoSendAfterHours: number; invoiceReminders: boolean };
@@ -60,6 +61,7 @@ export function BusinessTab() {
   const [licenceNumber, setLicenceNumber] = useState("");
   const [etransferEmail, setEtransferEmail] = useState("");
   const [googleReviewUrl, setGoogleReviewUrl] = useState("");
+  const [homeStarsProfileUrl, setHomeStarsProfileUrl] = useState("");
   const [sendReviewRequests, setSendReviewRequests] = useState(true);
   const [notifyOnQuoteAccepted, setNotifyOnQuoteAccepted] = useState(true);
   const [autoSendInvoices, setAutoSendInvoices] = useState(false);
@@ -77,6 +79,7 @@ export function BusinessTab() {
     setLicenceNumber(profile.licenceNumber ?? "");
     setEtransferEmail(profile.etransferEmail ?? "");
     setGoogleReviewUrl(profile.googleReviewUrl ?? "");
+    setHomeStarsProfileUrl(profile.homeStarsProfileUrl ?? "");
     setSendReviewRequests(profile.sendReviewRequests ?? true);
     setNotifyOnQuoteAccepted(profile.automationSettings?.notifyOnQuoteAccepted ?? true);
     setAutoSendInvoices(profile.automationSettings?.autoSendInvoices ?? false);
@@ -110,6 +113,7 @@ export function BusinessTab() {
           licenceNumber: licenceNumber || null,
           etransferEmail: etransferEmail || null,
           googleReviewUrl: googleReviewUrl || null,
+          homeStarsProfileUrl: homeStarsProfileUrl || null,
           sendReviewRequests,
           automationSettings: { notifyOnQuoteAccepted, autoSendInvoices, invoiceAutoSendAfterHours, invoiceReminders },
           defaultPaymentSchedule: schedule,
@@ -219,6 +223,11 @@ export function BusinessTab() {
             <Label htmlFor="googleReviewUrl">{t("dashboard.settings.business.googleReviewUrl")}</Label>
             <Input id="googleReviewUrl" type="url" value={googleReviewUrl} onChange={(e) => setGoogleReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" />
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.googleReviewUrlHint")}</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="homeStarsProfileUrl">{t("dashboard.settings.business.homeStarsProfileUrl")}</Label>
+            <Input id="homeStarsProfileUrl" type="url" value={homeStarsProfileUrl} onChange={(e) => setHomeStarsProfileUrl(e.target.value)} placeholder="https://homestars.com/companies/..." />
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.homeStarsProfileUrlHint")}</p>
           </div>
           <div className="flex items-center justify-between rounded-lg border px-4 py-3">
             <div>

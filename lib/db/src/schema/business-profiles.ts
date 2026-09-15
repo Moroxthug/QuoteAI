@@ -63,6 +63,8 @@ export const businessProfilesTable = pgTable("business_profiles", {
   defaultPaymentSchedule: jsonb("default_payment_schedule").$type<PaymentSchedule | null>(),
   // ── Phase 10: review requests ────────────────────────────────────────────
   googleReviewUrl: text("google_review_url"), // Google Business Profile "write a review" link, set once in Settings
+  // ── Phase 26: HomeStars link (no public partner API exists, so this is just a second manual review link) ──
+  homeStarsProfileUrl: text("homestars_profile_url"),
   sendReviewRequests: boolean("send_review_requests").notNull().default(true),
   automationSettings: jsonb("automation_settings").$type<Partial<AutomationSettings>>().notNull().default({}),
   featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),

@@ -111,20 +111,25 @@ export async function sendJobReviewRequest(params: {
   client: Client;
   profile: BusinessProfile;
   reviewUrl: string;
+  homeStarsUrl?: string | null;
   whatsappTemplateName?: string | null;
 }): Promise<JobMessageResult> {
-  const { client, profile, reviewUrl } = params;
+  const { client, profile, reviewUrl, homeStarsUrl } = params;
   const lang = client.preferredLanguage === "fr" ? "fr" : "en";
   const { subject, body } = reviewRequestCopy(lang, reviewUrl);
 
   if (client.phone && params.whatsappTemplateName) {
+    // WhatsApp template params are fixed at approval time, so a second (HomeStars) link can't be added here — email-only for now.
     const sent = await sendWhatsappTemplate(client.phone, params.whatsappTemplateName, lang === "fr" ? "fr" : "en_US", [client.name, reviewUrl]);
     if (sent) return { ok: true, channel: "whatsapp" };
     logger.warn({ clientId: client.id }, "WhatsApp review request failed, falling back to email");
   }
 
   if (!client.email) return { ok: false, reason: "no_email" };
-  const bodyHtml = `<p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body.split(reviewUrl)[0] ?? "")}<a href="${reviewUrl}" style="color:#2563eb;">${escapeHtml(reviewUrl)}</a></p>`;
+  const homeStarsLine = homeStarsUrl
+    ? `<p style="font-size:14px;color:#374151;line-height:1.6;">${lang === "fr" ? "Vous préférez HomeStars ?" : "Prefer HomeStars?"} <a href="${homeStarsUrl}" style="color:#2563eb;">${escapeHtml(homeStarsUrl)}</a></p>`
+    : "";
+  const bodyHtml = `<p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body.split(reviewUrl)[0] ?? "")}<a href="${reviewUrl}" style="color:#2563eb;">${escapeHtml(reviewUrl)}</a></p>${homeStarsLine}`;
   const html = wrapEmailHtml({ clientName: client.name, profile, lang, unsubscribeToken: client.marketingUnsubscribeToken, subject, bodyHtml });
   const result = await sendEmail({ to: client.email, profile, subject, html, unsubscribeToken: client.marketingUnsubscribeToken });
   return result.ok ? { ok: true, channel: "email" } : result;

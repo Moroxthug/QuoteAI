@@ -27,7 +27,7 @@ registerAutomation("job.review_request_due", async (run) => {
   const [wa] = await db.select().from(whatsappConnectionsTable).where(eq(whatsappConnectionsTable.userId, run.userId));
   const whatsappTemplateName = wa?.isEnabled ? (process.env.WHATSAPP_REVIEW_REQUEST_TEMPLATE ?? null) : null;
 
-  const result = await sendJobReviewRequest({ client, profile, reviewUrl: profile.googleReviewUrl, whatsappTemplateName });
+  const result = await sendJobReviewRequest({ client, profile, reviewUrl: profile.googleReviewUrl, homeStarsUrl: profile.homeStarsProfileUrl, whatsappTemplateName });
   if (!result.ok) {
     await writeAudit({ userId: run.userId, actorType: "system", entityType: "project", entityId: project.id, action: "review_request_failed", diff: { reason: result.reason } });
     throw new Error(`Review request send failed: ${result.reason}`);

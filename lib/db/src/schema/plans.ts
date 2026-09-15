@@ -28,12 +28,13 @@ export const PRODUCT_FEATURES = [
   "gmail_send", // Phase 20: send customer-facing emails from the company's own connected Gmail account
   "wave_sync", // Phase 25: one-way sync of paid invoices/confirmed costs to Wave accounting
   "flinks_bank_feed", // Phase 27: bank-feed reconciliation via Flinks (auto-match bank transactions to cost entries)
+  "meta_lead_ads", // Phase 28: import Facebook/Instagram Lead Ads submissions straight into the leads pipeline
 ] as const;
 export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api", "gmail_send", "wave_sync", "flinks_bank_feed"];
+const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api", "gmail_send", "wave_sync", "flinks_bank_feed", "meta_lead_ads"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
 export const SEATS_INCLUDED: Record<PlanId, number> = {

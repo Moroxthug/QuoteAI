@@ -15,14 +15,18 @@ import { quotesTable } from "./quotes";
 export const LEAD_STATUSES = ["new", "contacted", "quoted", "won", "lost", "unsubscribed"] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 
-export const LEAD_SOURCES = ["widget", "manual", "import"] as const;
+export const LEAD_SOURCES = ["widget", "manual", "import", "meta_lead_ads"] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 export const LEAD_CHANNELS = ["email", "sms", "whatsapp"] as const;
 export type LeadChannel = (typeof LEAD_CHANNELS)[number];
 
-/** CASL requires every automated message to have a recorded, honest consent basis. */
-export const LEAD_CONSENT_SOURCES = ["widget_form", "manual_entry", "import", "existing_client"] as const;
+/**
+ * CASL requires every automated message to have a recorded, honest consent basis.
+ * "meta_lead_ads" (Phase 28): consent basis is the customer's own opt-in on Meta's
+ * instant-form submission, captured at the moment they submitted the ad.
+ */
+export const LEAD_CONSENT_SOURCES = ["widget_form", "manual_entry", "import", "existing_client", "meta_lead_ads"] as const;
 export type LeadConsentSource = (typeof LEAD_CONSENT_SOURCES)[number];
 
 export const leadsTable = pgTable(
@@ -49,6 +53,13 @@ export const leadsTable = pgTable(
     nextFollowUpAt: timestamp("next_follow_up_at", { withTimezone: true }),
     lastContactedAt: timestamp("last_contacted_at", { withTimezone: true }),
     notes: text("notes").notNull().default(""),
+    // ── Phase 28: Meta Lead Ads attribution (all null for every other source) ──
+    metaLeadId: text("meta_lead_id"),
+    metaFormId: text("meta_form_id"),
+    metaFormName: text("meta_form_name"),
+    metaCampaignId: text("meta_campaign_id"),
+    metaCampaignName: text("meta_campaign_name"),
+    metaAdId: text("meta_ad_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },

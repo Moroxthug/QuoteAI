@@ -460,6 +460,48 @@ app.post(
 );
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Meta Lead Ads webhook — verify HMAC signature before express.json() ──────
+// Same handshake as the WhatsApp webhook above (both are Meta Graph API
+// webhooks): a `leadgen` field-change notification on a Page, signed with the
+// app secret rather than a per-connection secret.
+app.post(
+  "/api/meta-lead-ads/webhook",
+  express.raw({ type: "application/json" }),
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const appSecret = process.env.META_APP_SECRET;
+    if (!appSecret) {
+      logger.error("META_APP_SECRET not set — rejecting Meta Lead Ads webhook POST to prevent spoofing");
+      res.status(500).json({ error: "Webhook secret not configured" });
+      return;
+    }
+    {
+      const sigHeader = req.headers["x-hub-signature-256"];
+      const sigStr = Array.isArray(sigHeader) ? sigHeader[0] : sigHeader;
+      if (!sigStr) {
+        res.status(400).json({ error: "Missing x-hub-signature-256 header" });
+        return;
+      }
+      const { createHmac, timingSafeEqual } = await import("node:crypto");
+      const hmac = createHmac("sha256", appSecret).update(req.body as Buffer).digest("hex");
+      const expected = Buffer.from(`sha256=${hmac}`);
+      const actual = Buffer.from(sigStr);
+      if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) {
+        logger.error("Meta Lead Ads webhook signature mismatch — request rejected");
+        res.status(403).json({ error: "Forbidden" });
+        return;
+      }
+    }
+    try {
+      req.body = JSON.parse((req.body as Buffer).toString("utf-8")) as unknown;
+    } catch {
+      res.status(400).json({ error: "Invalid JSON" });
+      return;
+    }
+    next();
+  }
+);
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ── Resend webhook — email delivery/bounce/complaint events ─────────────────
 // Verifies the signature per the Svix standard used by Resend:
 // signed content = "{svix-id}.{svix-timestamp}.{raw body}", HMAC-SHA256 with

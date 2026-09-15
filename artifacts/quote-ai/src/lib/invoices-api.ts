@@ -166,6 +166,31 @@ export const flinksApi = {
   ignore: (transactionId: string) => req<{ success: true }>(`/api/flinks/transactions/${transactionId}/ignore`, { method: "POST" }),
 };
 
+// Phase 28: Meta (Facebook/Instagram) Lead Ads capture
+export type MetaLeadAdsStatusDto = {
+  connected: boolean;
+  pageName?: string;
+  isEnabled?: boolean;
+  connectedAt?: string;
+  lastLeadAt?: string | null;
+};
+export type MetaLeadAdsImportLogEntryDto = {
+  id: string;
+  metaLeadId: string;
+  formId: string | null;
+  status: "imported" | "duplicate" | "failed";
+  error: string | null;
+  createdAt: string;
+};
+
+export const metaLeadAdsApi = {
+  status: () => req<MetaLeadAdsStatusDto>("/api/meta-lead-ads/status"),
+  connectUrl: () => req<{ url: string }>("/api/meta-lead-ads/connect"),
+  toggle: (isEnabled: boolean) => req<{ success: true }>("/api/meta-lead-ads/toggle", { method: "PATCH", body: json({ isEnabled }) }),
+  disconnect: () => req<{ success: true }>("/api/meta-lead-ads/disconnect", { method: "DELETE" }),
+  importLog: () => req<{ entries: MetaLeadAdsImportLogEntryDto[] }>("/api/meta-lead-ads/import-log"),
+};
+
 // Phase 19: public API keys + webhooks (Settings → Integrations → Developer API)
 export type AutomationEventName =
   | "quote.accepted" | "contract.signed" | "contract.declined" | "milestone.completed" | "job.completed"

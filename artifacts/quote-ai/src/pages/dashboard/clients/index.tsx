@@ -39,7 +39,7 @@ export default function ClientsPage() {
               <Users className="h-6 w-6 text-violet-400" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">No clients yet</p>
+              <p className="font-semibold text-foreground">No clients yet</p>
               <p className="text-sm text-muted-foreground mt-1">
                 Clients will show up here as soon as you create quotes with a client name.
               </p>
@@ -66,7 +66,7 @@ export default function ClientsPage() {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 truncate">{client.clientName}</div>
+                      <div className="font-semibold text-foreground truncate">{client.clientName}</div>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
                         {client.email && (
                           <span className="flex items-center gap-1 text-xs text-muted-foreground truncate">
@@ -113,7 +113,7 @@ export default function ClientsPage() {
                         </span>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-gray-300 shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </div>
                 </CardContent>
               </Card>

@@ -47,7 +47,7 @@ function CandidateCard({ candidate }: { candidate: ImportCandidateDto }) {
   const matchLabel = candidate.matchedClientId ? t("imports.matchedClient") : draft.clientName ? t("imports.newClient") : t("imports.missingClient");
 
   return (
-    <div className="rounded-lg border bg-white p-4 space-y-3">
+    <div className="rounded-lg border bg-card p-4 space-y-3">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <div>
           <label className="text-xs text-slate-500">{t("imports.field.client")}</label>
@@ -180,7 +180,7 @@ export default function ImportsPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-white p-5 space-y-3">
+        <div className="rounded-lg border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="h-5 w-5 text-violet-600" />
             <h3 className="font-bold text-slate-900">{t("imports.uploadSpreadsheet")}</h3>
@@ -190,7 +190,7 @@ export default function ImportsPage() {
             <Download className="h-3.5 w-3.5" /> {t("imports.downloadTemplate")}
           </a>
           <div
-            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-violet-400 bg-violet-50" : "border-slate-200 hover:border-violet-300")}
+            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 hover:border-violet-300")}
             onDragOver={(e) => { e.preventDefault(); setDragCsv(true); }}
             onDragLeave={() => setDragCsv(false)}
             onDrop={(e) => { e.preventDefault(); setDragCsv(false); onCsvFiles(e.dataTransfer.files); }}
@@ -204,14 +204,14 @@ export default function ImportsPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-white p-5 space-y-3">
+        <div className="rounded-lg border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-violet-600" />
             <h3 className="font-bold text-slate-900">{t("imports.uploadPdfs")}</h3>
           </div>
           <p className="text-xs text-slate-500">{t("imports.uploadPdfsDesc")}</p>
           <div
-            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-violet-400 bg-violet-50" : "border-slate-200 hover:border-violet-300")}
+            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 hover:border-violet-300")}
             onDragOver={(e) => { e.preventDefault(); setDragPdf(true); }}
             onDragLeave={() => setDragPdf(false)}
             onDrop={(e) => { e.preventDefault(); setDragPdf(false); onPdfFiles(e.dataTransfer.files); }}
@@ -227,7 +227,7 @@ export default function ImportsPage() {
       </div>
 
       {batches.length > 0 && (
-        <div className="rounded-lg border bg-white p-4">
+        <div className="rounded-lg border bg-card p-4">
           <h3 className="text-sm font-bold text-slate-900 mb-2">{t("imports.batches")}</h3>
           <div className="divide-y">
             {batches.map((b) => (

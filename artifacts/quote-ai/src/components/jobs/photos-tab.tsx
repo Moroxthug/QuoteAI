@@ -60,7 +60,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       <div
-        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50" : "border-slate-200 bg-white hover:border-violet-300")}
+        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 bg-card hover:border-violet-300")}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
@@ -74,8 +74,8 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-violet-200 bg-violet-50 px-4 py-2.5">
-          <span className="text-sm text-violet-900">{selected.size} {t("jobs.photos.selected")}</span>
+        <div className="flex items-center justify-between rounded-lg border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-2.5">
+          <span className="text-sm text-violet-900 dark:text-violet-300">{selected.size} {t("jobs.photos.selected")}</span>
           <Button size="sm" className="gap-2" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
             {share.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
             {share.isPending ? t("jobs.photos.sharing") : t("jobs.photos.share")}
@@ -95,11 +95,11 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
           {photos.map((p: JobPhotoDto) => {
             const isSelected = selected.has(p.id);
             return (
-              <div key={p.id} className={cn("group relative rounded-xl overflow-hidden border bg-white", isSelected ? "border-violet-500 ring-2 ring-violet-200" : "border-slate-200")}>
+              <div key={p.id} className={cn("group relative rounded-xl overflow-hidden border bg-card", isSelected ? "border-violet-500 ring-2 ring-violet-200" : "border-slate-200")}>
                 <button className="block w-full aspect-square bg-slate-100" onClick={() => toggle(p.id)}>
                   <img src={jobsApi.photoFileUrl(job.id, p.id)} alt={p.caption || p.fileName} className="w-full h-full object-cover" />
                 </button>
-                <div className={cn("absolute top-2 left-2 h-5 w-5 rounded-full border-2 flex items-center justify-center", isSelected ? "bg-violet-600 border-violet-600" : "bg-white/80 border-white")} onClick={() => toggle(p.id)}>
+                <div className={cn("absolute top-2 left-2 h-5 w-5 rounded-full border-2 flex items-center justify-center", isSelected ? "bg-violet-600 border-violet-600" : "bg-card/80 border-white")} onClick={() => toggle(p.id)}>
                   {isSelected && <Check className="h-3 w-3 text-white" />}
                 </div>
                 <button

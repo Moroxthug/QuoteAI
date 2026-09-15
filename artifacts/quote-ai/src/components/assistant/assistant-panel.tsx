@@ -82,7 +82,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
 
   if (gated) {
     return (
-      <div className={cn("rounded-2xl border border-violet-200 bg-violet-50 p-8 text-center", className)}>
+      <div className={cn("rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center", className)}>
         <Sparkles className="h-10 w-10 text-violet-300 mx-auto mb-3" />
         <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
         <p className="text-sm text-slate-600 mt-1 max-w-md mx-auto">{t("assistant.gatedDesc")}</p>
@@ -92,7 +92,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
   }
 
   return (
-    <div className={cn("flex flex-col rounded-2xl border border-slate-200 bg-white overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
+    <div className={cn("flex flex-col rounded-2xl border border-slate-200 bg-card overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Sparkles className="h-4 w-4 text-violet-600" /> {t("assistant.title")}</div>
         {data && data.messages.length > 0 && (
@@ -190,7 +190,7 @@ function ProposalCard({ proposal, onConfirm, onDismiss, busy }: { proposal: Prop
   return (
     <div className={cn("mb-2 max-w-[85%] rounded-xl border p-3 text-sm", status === "pending" ? "border-violet-200 bg-violet-50/60" : status === "confirmed" ? "border-emerald-200 bg-emerald-50/50" : status === "failed" ? "border-rose-200 bg-rose-50/50" : "border-slate-200 bg-slate-50 opacity-70")}>
       <div className="flex items-start gap-2">
-        <span className="h-7 w-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0"><Icon className="h-3.5 w-3.5 text-violet-600" /></span>
+        <span className="h-7 w-7 rounded-lg bg-card border border-slate-200 flex items-center justify-center shrink-0"><Icon className="h-3.5 w-3.5 text-violet-600" /></span>
         <div className="min-w-0 flex-1">
           <div className="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">{t(`assistant.kind.${proposal.kind}`)}</div>
           <div className="font-medium text-slate-900">{proposal.summary}</div>

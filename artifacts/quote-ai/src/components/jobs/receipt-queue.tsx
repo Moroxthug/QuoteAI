@@ -28,7 +28,7 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const openJobs = jobs.filter((j) => j.status === "planning" || j.status === "active").map((j) => ({ id: j.id, name: j.name }));
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-3 md:p-4 flex flex-wrap items-center gap-3">
+    <div className="rounded-2xl border border-slate-200 bg-card p-3 md:p-4 flex flex-wrap items-center gap-3">
       <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) scan.mutate(f); e.target.value = ""; }} />
       <div className="h-9 w-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0"><Receipt className="h-4 w-4" /></div>
       <div className="min-w-0 flex-1">

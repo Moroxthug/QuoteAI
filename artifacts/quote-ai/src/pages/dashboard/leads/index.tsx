@@ -102,7 +102,7 @@ export default function LeadsListPage() {
               onClick={() => setFilter(f)}
               className={cn(
                 "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
-                filter === f ? "bg-violet-600 text-white border-violet-600" : "bg-white text-slate-600 border-slate-200 hover:border-violet-300",
+                filter === f ? "bg-violet-600 text-white border-violet-600" : "bg-card text-slate-600 border-slate-200 hover:border-violet-300",
               )}
             >
               {f === "all" ? t("leads.filter.all") : t(`leads.status.${f}`)}
@@ -118,7 +118,7 @@ export default function LeadsListPage() {
       ) : items.length === 0 ? (
         <div className="text-center py-16 text-slate-500 border border-dashed rounded-lg">{t("leads.empty")}</div>
       ) : (
-        <div className="divide-y rounded-lg border bg-white">
+        <div className="divide-y rounded-lg border bg-card">
           {items.map((lead) => {
             const ChannelIcon = CHANNEL_ICON[lead.preferredChannel];
             const canSend = !["won", "lost", "unsubscribed"].includes(lead.status) && !!(lead.email || lead.phone);

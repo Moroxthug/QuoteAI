@@ -36,9 +36,9 @@ export default function AnalyticsPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"><BarChart3 className="h-8 w-8 text-violet-600" />{t("analytics.title")}</h1>
           <p className="text-slate-500 mt-1">{t("analytics.subtitle")}</p>
         </div>
-        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl">
           {PERIODS.map((p) => (
-            <button key={p} onClick={() => setMonths(p)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all", months === p ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>{p} {t("analytics.monthsShort")}</button>
+            <button key={p} onClick={() => setMonths(p)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all", months === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>{p} {t("analytics.monthsShort")}</button>
           ))}
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
 function GateCard() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl border border-violet-200 bg-violet-50 p-8 text-center">
+    <div className="rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center">
       <Sparkles className="h-10 w-10 text-violet-300 mx-auto mb-3" />
       <h3 className="font-bold text-slate-900">{t("analytics.gatedTitle")}</h3>
       <p className="text-sm text-slate-600 mt-1 max-w-lg mx-auto">{t("analytics.gatedDesc")}</p>
@@ -209,7 +209,7 @@ function RiskChip({ flag, risk }: { flag: RiskFlag; risk: CompanyAnalyticsDto["j
 
 function Tile({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-2xl border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-lg font-bold text-slate-900 mt-0.5 truncate", tone)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}

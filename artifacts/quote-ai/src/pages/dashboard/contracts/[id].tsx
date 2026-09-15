@@ -174,7 +174,7 @@ export default function ContractDetailPage() {
   }
   if (error || !contract || !vars) {
     return (
-      <div className="rounded-2xl border bg-white p-12 text-center">
+      <div className="rounded-2xl border bg-card p-12 text-center">
         <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
         <p className="text-slate-700 font-medium">{t("contracts.notFound")}</p>
         <Link href="/dashboard/contracts" className="text-violet-600 text-sm mt-2 inline-block">{t("contracts.backToList")}</Link>
@@ -216,7 +216,7 @@ export default function ContractDetailPage() {
       {isOpen && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {steps.map((s, i) => (
-            <div key={s.key} className={cn("rounded-xl border px-3 py-2.5 flex items-center gap-2 text-sm", s.done ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-white border-slate-200 text-slate-500")}>
+            <div key={s.key} className={cn("rounded-xl border px-3 py-2.5 flex items-center gap-2 text-sm", s.done ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-card border-slate-200 text-slate-500")}>
               {s.done ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center shrink-0">{i + 1}</span>}
               {s.label}
             </div>
@@ -234,8 +234,8 @@ export default function ContractDetailPage() {
         {/* Document */}
         <div className="lg:col-span-2 space-y-4">
           {isDraft && (
-            <div className="flex items-center justify-between rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-violet-900">
+            <div className="flex items-center justify-between rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-violet-900 dark:text-violet-300">
                 <Sparkles className="h-4 w-4 text-violet-600" />
                 {t("contracts.draftHint")}
               </div>

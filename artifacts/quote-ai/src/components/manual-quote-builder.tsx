@@ -155,7 +155,7 @@ function AISuggestButton({
         "shrink-0 h-7 w-7 flex items-center justify-center rounded-lg transition-colors",
         suggest.isPending
           ? "bg-violet-100 text-violet-400 cursor-wait"
-          : "text-gray-300 hover:text-violet-500 hover:bg-violet-50"
+          : "text-muted-foreground hover:text-violet-500 hover:bg-violet-50"
       )}
     >
       {suggest.isPending
@@ -307,8 +307,8 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
     <div className="space-y-4">
 
       {/* ── Template ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("manualQuote.pdfTemplate")}</p>
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.pdfTemplate")}</p>
         <div className="grid grid-cols-3 gap-2">
           {TEMPLATES.map(tpl => (
             <button
@@ -318,22 +318,22 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
               className={cn(
                 "text-left p-3 rounded-xl border-2 transition-all",
                 templateId === tpl.id
-                  ? "border-violet-400 bg-violet-50"
-                  : "border-gray-200 hover:border-violet-200"
+                  ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15"
+                  : "border-border hover:border-violet-200"
               )}
             >
-              <p className={cn("text-xs font-semibold", templateId === tpl.id ? "text-violet-700" : "text-gray-700")}>{tpl.label}</p>
-              <p className="text-[10px] text-gray-400 mt-0.5">{tpl.desc}</p>
+              <p className={cn("text-xs font-semibold", templateId === tpl.id ? "text-violet-700" : "text-foreground")}>{tpl.label}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{tpl.desc}</p>
             </button>
           ))}
         </div>
       </div>
 
       {/* ── Title & Description ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("manualQuote.quoteHeader")}</p>
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.quoteHeader")}</p>
         <div className="space-y-1">
-          <Label className="text-xs font-medium text-gray-600">{t("manualQuote.jobSubject")}</Label>
+          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.jobSubject")}</Label>
           <Input
             placeholder={t("manualQuote.jobSubjectPlaceholder")}
             value={titoloRiga2}
@@ -343,22 +343,22 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-medium text-gray-600">{t("manualQuote.documentTitle")}</Label>
+          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.documentTitle")}</Label>
           <Input
             value={titoloRiga1}
             onChange={e => setTitoloRiga1(e.target.value)}
-            className="h-9 text-sm text-gray-600"
+            className="h-9 text-sm text-muted-foreground"
             disabled={isSubmitting}
           />
         </div>
         <div className="space-y-1">
-          <Label className="text-xs font-medium text-gray-600">{t("manualQuote.generalDescription")}</Label>
+          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.generalDescription")}</Label>
           <textarea
             value={descrizione}
             onChange={e => setDescrizione(e.target.value)}
             placeholder={t("manualQuote.generalDescriptionPlaceholder")}
             rows={2}
-            className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
+            className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
             disabled={isSubmitting}
           />
         </div>
@@ -372,23 +372,23 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
           const capSubtotale = computeCapSubtotale(ch);
 
           return (
-            <div key={ch.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div key={ch.id} className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
               {/* Chapter header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50/50">
-                <GripVertical className="h-4 w-4 text-gray-300 shrink-0" />
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
+                <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
                 <span className="font-bold text-sm text-violet-600 shrink-0 w-5">{lettera}</span>
                 <input
                   value={ch.titolo}
                   onChange={e => updateChapter(ch.id, { titolo: e.target.value })}
                   placeholder={`${t("manualQuote.chapterWord")} ${lettera}`}
-                  className="flex-1 text-sm font-semibold text-gray-800 bg-transparent outline-none placeholder:text-gray-400 min-w-0"
+                  className="flex-1 text-sm font-semibold text-foreground bg-transparent outline-none placeholder:text-muted-foreground min-w-0"
                   disabled={isSubmitting}
                 />
-                <span className="text-xs text-gray-500 font-mono shrink-0">$ {fmt(capSubtotale)}</span>
+                <span className="text-xs text-muted-foreground font-mono shrink-0">$ {fmt(capSubtotale)}</span>
                 <button
                   type="button"
                   onClick={() => updateChapter(ch.id, { collapsed: !ch.collapsed })}
-                  className="h-6 w-6 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors shrink-0"
+                  className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-accent transition-colors shrink-0"
                 >
                   {ch.collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
                 </button>
@@ -396,7 +396,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                   <button
                     type="button"
                     onClick={() => removeChapter(ch.id)}
-                    className="h-6 w-6 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                    className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
                     disabled={isSubmitting}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -408,11 +408,11 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                 <div className="p-4 space-y-2">
                   {/* Column headers */}
                   <div className="grid grid-cols-[1fr_64px_80px_88px_72px_28px] gap-2 px-1">
-                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">{t("manualQuote.colDescription")}</p>
-                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">{t("manualQuote.colUnit")}</p>
-                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">{t("manualQuote.colQty")}</p>
-                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide">{t("manualQuote.colUnitPrice")}</p>
-                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wide text-right">{t("manualQuote.colTotal")}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colDescription")}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colUnit")}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colQty")}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colUnitPrice")}</p>
+                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide text-right">{t("manualQuote.colTotal")}</p>
                     <span />
                   </div>
 
@@ -429,7 +429,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                             onFocus={() => setActiveVoceId(v.id)}
                             onBlur={() => setTimeout(() => setActiveVoceId(null), 250)}
                             placeholder={t("manualQuote.itemDescriptionPlaceholder")}
-                            className="flex-1 h-8 px-2.5 rounded-lg border border-gray-200 text-xs text-gray-800 placeholder:text-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition min-w-0"
+                            className="flex-1 h-8 px-2.5 rounded-lg border border-border text-xs text-foreground placeholder:text-muted-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition min-w-0"
                             disabled={isSubmitting}
                           />
                           <AISuggestButton
@@ -447,7 +447,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                             if (suggestions.length === 0) return null;
 
                             return (
-                              <div className="absolute left-0 right-0 top-9 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto divide-y">
+                              <div className="absolute left-0 right-0 top-9 bg-card border border-border rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto divide-y">
                                 {suggestions.map(item => (
                                   <button
                                     key={item.id}
@@ -462,8 +462,8 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                                     }}
                                     className="w-full text-left px-3 py-2 hover:bg-violet-50 text-[11px] flex justify-between gap-2"
                                   >
-                                    <span className="font-semibold text-gray-800 truncate">{item.nome}</span>
-                                    <span className="text-gray-500 shrink-0 font-mono">({item.um}) ${item.prezzoUnitario}</span>
+                                    <span className="font-semibold text-foreground truncate">{item.nome}</span>
+                                    <span className="text-muted-foreground shrink-0 font-mono">({item.um}) ${item.prezzoUnitario}</span>
                                   </button>
                                 ))}
                               </div>
@@ -475,7 +475,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                         <select
                           value={v.um}
                           onChange={e => updateVoce(ch.id, v.id, { um: e.target.value })}
-                          className="h-8 rounded-lg border border-gray-200 text-xs text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent px-1.5 transition w-full"
+                          className="h-8 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent px-1.5 transition w-full"
                           disabled={isSubmitting}
                         >
                           {UM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -488,7 +488,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                           step="any"
                           value={v.quantita}
                           onChange={e => updateVoce(ch.id, v.id, { quantita: e.target.value })}
-                          className="h-8 px-2 rounded-lg border border-gray-200 text-xs text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
+                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
                           disabled={isSubmitting}
                         />
 
@@ -500,12 +500,12 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                           value={v.prezzoUnitario}
                           onChange={e => updateVoce(ch.id, v.id, { prezzoUnitario: e.target.value })}
                           placeholder="0,00"
-                          className="h-8 px-2 rounded-lg border border-gray-200 text-xs text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
+                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
                           disabled={isSubmitting}
                         />
 
                         {/* Line item total */}
-                        <p className={cn("text-xs text-right font-mono shrink-0", voceTot > 0 ? "text-gray-700" : "text-gray-300")}>
+                        <p className={cn("text-xs text-right font-mono shrink-0", voceTot > 0 ? "text-foreground" : "text-muted-foreground")}>
                           {voceTot > 0 ? `$ ${fmt(voceTot)}` : "—"}
                         </p>
 
@@ -514,7 +514,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                           <button
                             type="button"
                             onClick={() => removeVoce(ch.id, v.id)}
-                            className="h-7 w-7 flex items-center justify-center rounded-lg text-gray-200 hover:text-red-400 hover:bg-red-50 transition-colors"
+                            className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-50 transition-colors"
                             disabled={isSubmitting}
                           >
                             <X className="h-3.5 w-3.5" />
@@ -528,7 +528,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                   <button
                     type="button"
                     onClick={() => addVoce(ch.id)}
-                    className="mt-1 flex items-center gap-1.5 text-xs text-gray-400 hover:text-violet-600 hover:bg-violet-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                    className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-violet-600 hover:bg-violet-50 px-2.5 py-1.5 rounded-lg transition-colors"
                     disabled={isSubmitting}
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -536,20 +536,20 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                   </button>
 
                   {/* Chapter note */}
-                  <div className="pt-1 border-t border-gray-50">
+                  <div className="pt-1 border-t border-border">
                     <input
                       value={ch.osservazione}
                       onChange={e => updateChapter(ch.id, { osservazione: e.target.value })}
                       placeholder={t("manualQuote.chapterNotePlaceholder")}
-                      className="w-full h-7 px-2.5 rounded-lg border border-dashed border-gray-200 text-xs text-gray-600 placeholder:text-gray-300 bg-transparent focus:outline-none focus:border-violet-300 transition"
+                      className="w-full h-7 px-2.5 rounded-lg border border-dashed border-border text-xs text-muted-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none focus:border-violet-300 transition"
                       disabled={isSubmitting}
                     />
                   </div>
 
                   {/* Chapter subtotal */}
                   <div className="flex justify-end pt-1">
-                    <span className="text-xs text-gray-500 font-medium">
-                      {t("manualQuote.subtotalPrefix")} {lettera}: <span className="font-mono font-semibold text-gray-800">$ {fmt(capSubtotale)}</span>
+                    <span className="text-xs text-muted-foreground font-medium">
+                      {t("manualQuote.subtotalPrefix")} {lettera}: <span className="font-mono font-semibold text-foreground">$ {fmt(capSubtotale)}</span>
                     </span>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         <button
           type="button"
           onClick={addChapter}
-          className="w-full py-3 rounded-2xl border-2 border-dashed border-gray-200 text-sm text-gray-400 hover:border-violet-300 hover:text-violet-500 hover:bg-violet-50/30 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-2xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-violet-300 hover:text-violet-500 hover:bg-violet-50/30 transition-all flex items-center justify-center gap-2"
           disabled={isSubmitting || chapters.length >= 26}
         >
           <Plus className="h-4 w-4" />
@@ -571,12 +571,12 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Totals & Tax ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("manualQuote.financialSummary")}</p>
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.financialSummary")}</p>
 
         {/* Tax rate selector */}
         <div className="flex items-center gap-3">
-          <Label className="text-xs font-medium text-gray-600 shrink-0">{t("manualQuote.taxRate")}</Label>
+          <Label className="text-xs font-medium text-muted-foreground shrink-0">{t("manualQuote.taxRate")}</Label>
           <div className="flex gap-2 flex-wrap">
             {IVA_OPTIONS.map(iva => (
               <button
@@ -587,7 +587,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                   "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                   ivaPercentuale === iva
                     ? "border-violet-400 bg-violet-50 text-violet-700"
-                    : "border-gray-200 text-gray-600 hover:border-violet-200"
+                    : "border-border text-muted-foreground hover:border-violet-200"
                 )}
                 disabled={isSubmitting}
               >
@@ -598,16 +598,16 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         </div>
 
         {/* Totals breakdown */}
-        <div className="space-y-1 pt-1 border-t border-gray-100">
-          <div className="flex justify-between text-sm text-gray-600">
+        <div className="space-y-1 pt-1 border-t border-border">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>{t("manualQuote.taxableAmount")}</span>
             <span className="font-mono">$ {fmt(subtotale)}</span>
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>{t("manualQuote.taxLabel")} {ivaPercentuale === 0 ? t("manualQuote.taxExempt") : `${ivaPercentuale}%`}</span>
             <span className="font-mono">$ {fmt(ivaValore)}</span>
           </div>
-          <div className="flex justify-between text-base font-bold text-gray-900 pt-1 border-t border-gray-200">
+          <div className="flex justify-between text-base font-bold text-foreground pt-1 border-t border-border">
             <span>{t("manualQuote.total")}</span>
             <span className="font-mono text-violet-700">$ {fmt(totale)}</span>
           </div>
@@ -615,17 +615,17 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Payment terms ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("manualQuote.paymentTerms")}</p>
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.paymentTerms")}</p>
         <div className="space-y-1.5">
           {condizioni.map((c, idx) => (
             <div key={idx} className="flex items-center gap-2">
-              <span className="text-xs text-gray-400 shrink-0 w-4">{idx + 1}.</span>
-              <span className="flex-1 text-sm text-gray-700">{c}</span>
+              <span className="text-xs text-muted-foreground shrink-0 w-4">{idx + 1}.</span>
+              <span className="flex-1 text-sm text-foreground">{c}</span>
               <button
                 type="button"
                 onClick={() => removeCondizione(idx)}
-                className="h-6 w-6 flex items-center justify-center rounded-lg text-gray-200 hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
+                className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
                 disabled={isSubmitting}
               >
                 <X className="h-3.5 w-3.5" />
@@ -656,13 +656,13 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Notes ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 space-y-2">
-        <Label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t("manualQuote.finalNotes")}</Label>
+      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-2">
+        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.finalNotes")}</Label>
         <textarea
           value={note}
           onChange={e => setNote(e.target.value)}
           rows={2}
-          className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
+          className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
           disabled={isSubmitting}
         />
       </div>
@@ -675,7 +675,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         className={cn(
           "w-full h-12 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2",
           isSubmitting
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            ? "bg-muted text-muted-foreground cursor-not-allowed"
             : "btn-gradient text-white shadow-sm hover:shadow-md"
         )}
       >

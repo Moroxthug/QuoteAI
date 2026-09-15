@@ -112,7 +112,7 @@ function StatusBadge({ status }: { status: string }) {
     case "pending_payment":
       return <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full">{t("dashboard.index.status.pending")}</span>;
     default:
-      return <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded-full"><Lock className="h-2.5 w-2.5" /> {t("dashboard.index.status.draft")}</span>;
+      return <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-muted text-muted-foreground border border-border px-1.5 py-0.5 rounded-full"><Lock className="h-2.5 w-2.5" /> {t("dashboard.index.status.draft")}</span>;
   }
 }
 
@@ -127,8 +127,8 @@ function StarterUpgradeCard() {
           <Crown className="h-4 w-4 text-amber-600" />
         </div>
         <div>
-          <div className="font-semibold text-gray-900 text-sm">{t("dashboard.index.starterUpgrade.title")}</div>
-          <div className="text-xs text-gray-500 mt-0.5">{t("dashboard.index.starterUpgrade.desc")}</div>
+          <div className="font-semibold text-foreground text-sm">{t("dashboard.index.starterUpgrade.title")}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">{t("dashboard.index.starterUpgrade.desc")}</div>
         </div>
       </div>
       <button
@@ -152,24 +152,24 @@ function OnboardingView() {
   ];
   return (
     <div className="space-y-3">
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <div className="px-5 pt-6 pb-5 text-center">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.12))" }}>
             <Sparkles className="h-6 w-6 text-violet-500" />
           </div>
-          <h2 className="text-lg font-bold text-gray-900 mb-1">{t("dashboard.index.onboarding.welcomePrefix")} <span className="quoteai-word text-lg">QuoteAI</span>!</h2>
-          <p className="text-xs text-gray-500 max-w-md mx-auto mb-5">
+          <h2 className="text-lg font-bold text-foreground mb-1">{t("dashboard.index.onboarding.welcomePrefix")} <span className="quoteai-word text-lg">QuoteAI</span>!</h2>
+          <p className="text-xs text-muted-foreground max-w-md mx-auto mb-5">
             {t("dashboard.index.onboarding.subtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5 text-left">
             {steps.map(({ icon: Icon, num, title, desc, href, cta }) => (
-              <div key={num} className="rounded-lg bg-gray-50 border border-gray-100 p-3.5">
+              <div key={num} className="rounded-lg bg-muted border border-border p-3.5">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="h-5 w-5 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{num}</span>
                   <Icon className="h-3.5 w-3.5 text-violet-500" />
-                  <span className="text-sm font-semibold text-gray-900">{title}</span>
+                  <span className="text-sm font-semibold text-foreground">{title}</span>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed mb-1.5">{desc}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-1.5">{desc}</p>
                 {href && cta && <Link href={href} className="text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">{cta}</Link>}
               </div>
             ))}
@@ -181,17 +181,17 @@ function OnboardingView() {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <Link href="/dashboard/profile" className="bg-white border border-gray-100 rounded-xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/profile" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-violet-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-violet-500" /></div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700">{t("dashboard.index.onboarding.companyProfile")}</span>
+          <span className="text-sm font-medium text-foreground group-hover:text-violet-700">{t("dashboard.index.onboarding.companyProfile")}</span>
         </Link>
-        <Link href="/dashboard/billing" className="bg-white border border-gray-100 rounded-xl p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/billing" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-amber-100 flex items-center justify-center"><Crown className="h-3.5 w-3.5 text-amber-500" /></div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-amber-700">{t("dashboard.index.onboarding.plansPricing")}</span>
+          <span className="text-sm font-medium text-foreground group-hover:text-amber-700">{t("dashboard.index.onboarding.plansPricing")}</span>
         </Link>
-        <Link href="/dashboard/new" className="bg-white border border-gray-100 rounded-xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/new" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-emerald-700">{t("dashboard.index.onboarding.createQuote")}</span>
+          <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.onboarding.createQuote")}</span>
         </Link>
       </div>
     </div>
@@ -209,7 +209,7 @@ function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUse
           <Gift className="h-4 w-4 text-violet-600" />
         </div>
         <div className="min-w-0">
-          <div className="font-semibold text-gray-900 text-sm">
+          <div className="font-semibold text-foreground text-sm">
             {t("dashboard.index.trial.active")}
             {typeof daysLeft === "number" && (
               <span className="ml-2 inline-flex items-center gap-1 text-[11px] font-medium text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded-full">
@@ -220,7 +220,7 @@ function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUse
               </span>
             )}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5">
+          <div className="text-xs text-muted-foreground mt-0.5">
             {remaining > 0
               ? t("dashboard.index.trial.remainingDesc").replace("{remaining}", String(remaining)).replace("{limit}", String(downloadsLimit))
               : t("dashboard.index.trial.exhaustedDesc")}
@@ -394,12 +394,12 @@ function DashboardQuickBar() {
   return (
     <div className="space-y-2">
       {/* ── AI Bar ── */}
-      <div className="ai-bar-glow bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="ai-bar-glow bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         {/* Photo strip */}
         {photos.length > 0 && (
-          <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-gray-100 pb-3">
+          <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
             {photoPreviews.map((src, idx) => (
-              <div key={idx} className="relative group w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0">
+              <div key={idx} className="relative group w-12 h-12 rounded-lg overflow-hidden border border-border bg-muted shrink-0">
                 <img src={src} alt="" className="w-full h-full object-cover" />
                 <button type="button" onClick={() => removePhoto(idx)} disabled={isSubmitting}
                   className="absolute top-0.5 right-0.5 bg-black/70 rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -409,7 +409,7 @@ function DashboardQuickBar() {
             ))}
             {photos.length < maxPhotos && (
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isSubmitting}
-                className="w-12 h-12 rounded-lg border-2 border-dashed border-gray-200 hover:border-violet-300 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-violet-500 transition-colors text-[9px]">
+                className="w-12 h-12 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[9px]">
                 <ImagePlus className="h-3 w-3" />
                 <span>{t("dashboard.new.add")}</span>
               </button>
@@ -419,9 +419,9 @@ function DashboardQuickBar() {
 
         {/* Document strip */}
         {docs.length > 0 && (
-          <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-gray-100 pb-3">
+          <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
             {docs.map((file, idx) => (
-              <div key={idx} className="relative group flex items-center gap-1.5 px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-700 shrink-0">
+              <div key={idx} className="relative group flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border bg-muted text-xs text-foreground shrink-0">
                 {file.type === "application/pdf" ? (
                   <FileText className="h-3.5 w-3.5 text-red-500" />
                 ) : file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? (
@@ -434,7 +434,7 @@ function DashboardQuickBar() {
                   type="button"
                   onClick={() => removeDoc(idx)}
                   disabled={isSubmitting}
-                  className="ml-0.5 text-gray-400 hover:text-red-500 transition-colors"
+                  className="ml-0.5 text-muted-foreground hover:text-red-500 transition-colors"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -445,7 +445,7 @@ function DashboardQuickBar() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSubmitting}
-                className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-gray-200 hover:border-violet-300 flex items-center gap-0.5 text-gray-400 hover:text-violet-500 transition-colors text-[10px]"
+                className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex items-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[10px]"
               >
                 <ImagePlus className="h-3 w-3" />
                 <span>{t("dashboard.new.add")}</span>
@@ -463,13 +463,13 @@ function DashboardQuickBar() {
                 disabled={isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS}
                 className={cn(
                   "h-8 w-8 flex items-center justify-center rounded-xl transition-colors",
-                  (photos.length > 0 || docs.length > 0) ? "bg-violet-100 text-violet-600 hover:bg-violet-200" : "text-gray-400 hover:bg-gray-100",
+                  (photos.length > 0 || docs.length > 0) ? "bg-violet-100 text-violet-600 hover:bg-violet-200" : "text-muted-foreground hover:bg-accent",
                   (isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS) && "opacity-40 cursor-not-allowed"
                 )}>
                 <ImagePlus className="h-4 w-4" />
               </button>
             ) : (
-              <button type="button" disabled className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-300 cursor-not-allowed">
+              <button type="button" disabled className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground cursor-not-allowed">
                 <Lock className="h-4 w-4" />
               </button>
             )}
@@ -487,7 +487,7 @@ function DashboardQuickBar() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey && canSubmit) { e.preventDefault(); handleSubmit(); } }}
             placeholder={t("dashboard.new.inputPlaceholder")}
-            className="flex-1 text-sm outline-none placeholder:text-gray-400 text-gray-800 bg-transparent min-w-0"
+            className="flex-1 text-sm outline-none placeholder:text-muted-foreground text-foreground bg-transparent min-w-0"
             disabled={isSubmitting}
           />
 
@@ -501,11 +501,11 @@ function DashboardQuickBar() {
           <button onClick={handleSubmit} disabled={!canSubmit}
             className={cn(
               "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-all",
-              canSubmit ? "btn-gradient shadow-sm" : "bg-gray-100 cursor-not-allowed"
+              canSubmit ? "btn-gradient shadow-sm" : "bg-muted cursor-not-allowed"
             )}>
             {isSubmitting
               ? <Loader2 className="h-4 w-4 animate-spin text-white" />
-              : <ArrowRight className={cn("h-4 w-4", canSubmit ? "text-white" : "text-gray-300")} />
+              : <ArrowRight className={cn("h-4 w-4", canSubmit ? "text-white" : "text-muted-foreground")} />
             }
           </button>
         </div>
@@ -526,16 +526,16 @@ function DashboardQuickBar() {
       />
 
       {/* ── Client Section ── */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         {/* Header — always clickable to toggle */}
         <button
           type="button"
           onClick={() => setClientOpen(v => !v)}
-          className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-gray-50/60 transition-colors"
+          className="w-full px-4 py-2.5 flex items-center justify-between hover:bg-accent transition-colors"
         >
           <div className="flex items-center gap-2">
-            <User className="h-3.5 w-3.5 text-gray-400" />
-            <span className="text-xs font-medium text-gray-600">{t("dashboard.new.client.label")}</span>
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.label")}</span>
             {clientForm.nome && !clientOpen && (
               <span className="text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full">
                 {clientForm.nome}
@@ -544,18 +544,18 @@ function DashboardQuickBar() {
           </div>
           <div className="flex items-center gap-1.5">
             {!clientOpen && !clientForm.nome && (
-              <span className="text-[11px] text-gray-400">{t("dashboard.new.client.optional")}</span>
+              <span className="text-[11px] text-muted-foreground">{t("dashboard.new.client.optional")}</span>
             )}
             {clientOpen
-              ? <ChevronUp className="h-3.5 w-3.5 text-gray-400" />
-              : <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+              ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+              : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
             }
           </div>
         </button>
 
         {/* Collapsed: compact chips for saved clients */}
         {!clientOpen && savedClients.length > 0 && (
-          <div className="px-4 pb-2.5 flex flex-wrap gap-1.5 border-t border-gray-50 pt-2">
+          <div className="px-4 pb-2.5 flex flex-wrap gap-1.5 border-t border-border pt-2">
             {savedClients.slice(0, 5).map(c => (
               <button
                 key={c.id}
@@ -565,7 +565,7 @@ function DashboardQuickBar() {
                   "inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border transition-all",
                   selectedClientId === c.id
                     ? "border-violet-300 bg-violet-50 text-violet-700 font-semibold"
-                    : "border-gray-200 text-gray-600 hover:border-violet-200 hover:bg-violet-50/50"
+                    : "border-border text-muted-foreground hover:border-violet-200 hover:bg-violet-50/50"
                 )}
               >
                 <User className="h-2.5 w-2.5" />
@@ -575,7 +575,7 @@ function DashboardQuickBar() {
             <button
               type="button"
               onClick={() => { setClientOpen(true); setClientMode("new"); setSelectedClientId(null); setClientForm(emptyClient); }}
-              className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-all"
+              className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-dashed border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 transition-all"
             >
               {t("dashboard.new.client.addNew")}
             </button>
@@ -589,7 +589,7 @@ function DashboardQuickBar() {
 
         {/* Expanded panel */}
         {clientOpen && (
-          <div className="border-t border-gray-100 px-4 pt-3 pb-4 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="border-t border-border px-4 pt-3 pb-4 animate-in fade-in slide-in-from-top-1 duration-200">
             {/* Saved clients chips in expanded view */}
             {savedClients.length > 0 && clientMode !== "new" && (
               <div className="flex flex-wrap gap-1.5 mb-3">
@@ -599,14 +599,14 @@ function DashboardQuickBar() {
                       "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-xl border transition-all",
                       selectedClientId === c.id
                         ? "border-violet-300 bg-violet-50 text-violet-700 font-semibold shadow-sm"
-                        : "border-gray-200 text-gray-600 hover:border-violet-200 hover:bg-violet-50/50"
+                        : "border-border text-muted-foreground hover:border-violet-200 hover:bg-violet-50/50"
                     )}>
                     <User className="h-3 w-3" />
                     {c.nome}
                   </button>
                 ))}
                 <button type="button" onClick={() => { setClientMode("new"); setSelectedClientId(null); setClientForm(emptyClient); }}
-                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-all">
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 transition-all">
                   {t("dashboard.index.client.addNewClient")}
                 </button>
               </div>
@@ -617,7 +617,7 @@ function DashboardQuickBar() {
               <button
                 type="button"
                 onClick={() => setClientMode("new")}
-                className="w-full mb-3 py-2 rounded-xl border border-dashed border-gray-200 text-xs text-gray-500 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all"
+                className="w-full mb-3 py-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all"
               >
                 {t("dashboard.new.client.addClientData")}
               </button>
@@ -627,32 +627,32 @@ function DashboardQuickBar() {
             {(clientMode === "new") && (
               <div className="space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-150">
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-gray-600">{t("dashboard.index.client.nameLabel")}</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.index.client.nameLabel")}</Label>
                   <Input placeholder={t("dashboard.new.client.namePlaceholder")} value={clientForm.nome}
                     onChange={e => setClientForm(f => ({ ...f, nome: e.target.value }))}
                     disabled={isSubmitting} className="h-8 text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.addressLabel")}</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.addressLabel")}</Label>
                   <Input placeholder={t("dashboard.new.client.addressPlaceholder")} value={clientForm.indirizzo}
                     onChange={e => setClientForm(f => ({ ...f, indirizzo: e.target.value }))}
                     disabled={isSubmitting} className="h-8 text-sm" />
                 </div>
                 <div className="grid grid-cols-5 gap-2">
                   <div className="col-span-3 space-y-1">
-                    <Label className="text-xs font-medium text-gray-600">City</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">City</Label>
                     <Input placeholder="Toronto" value={clientForm.city}
                       onChange={e => setClientForm(f => ({ ...f, city: e.target.value }))}
                       disabled={isSubmitting} className="h-8 text-sm" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.province")}</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.province")}</Label>
                     <Input placeholder="ON" value={clientForm.province}
                       onChange={e => setClientForm(f => ({ ...f, province: e.target.value.toUpperCase() }))}
                       disabled={isSubmitting} className="h-8 text-sm" maxLength={2} />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs font-medium text-gray-600">Postal Code</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">Postal Code</Label>
                     <Input placeholder="M5H 2N2" value={clientForm.postalCode}
                       onChange={e => setClientForm(f => ({ ...f, postalCode: e.target.value.toUpperCase() }))}
                       disabled={isSubmitting} className="h-8 text-sm" maxLength={7} />
@@ -660,25 +660,25 @@ function DashboardQuickBar() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.businessNumber")}</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.businessNumber")}</Label>
                     <Input placeholder="123456789RT0001" value={clientForm.businessNumber}
                       onChange={e => setClientForm(f => ({ ...f, businessNumber: e.target.value.toUpperCase() }))}
                       disabled={isSubmitting} className="h-8 text-sm" maxLength={16} />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.gstHst")}</Label>
+                    <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.gstHst")}</Label>
                     <Input placeholder="123456789RT0001" value={clientForm.partitaIva}
                       onChange={e => setClientForm(f => ({ ...f, partitaIva: e.target.value }))}
                       disabled={isSubmitting} className="h-8 text-sm" maxLength={15} />
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-0.5">
-                  <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none">
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
                     <input type="checkbox" checked={rememberClient} onChange={e => setRememberClient(e.target.checked)}
-                      className="rounded border-gray-300 text-violet-600 focus:ring-violet-500" />
+                      className="rounded border-border text-violet-600 focus:ring-violet-500" />
                     {t("dashboard.new.client.remember")}
                   </label>
-                  <button type="button" onClick={clearClient} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                  <button type="button" onClick={clearClient} className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors">
                     {t("dashboard.new.client.cancel")}
                   </button>
                 </div>
@@ -741,7 +741,7 @@ export default function DashboardHome() {
                   : t("dashboard.index.subtitleTotalQuotes").replace("{count}", String(stats?.total ?? 0))}
             </p>
           </div>
-          <Link href="/dashboard/new" className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-white/20 hover:bg-white/30 text-white text-xs font-semibold transition-colors backdrop-blur-sm border border-white/20">
+          <Link href="/dashboard/new" className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-card/20 hover:bg-card/30 text-white text-xs font-semibold transition-colors backdrop-blur-sm border border-white/20">
             <Plus className="h-3.5 w-3.5" />
             {t("nav.new")}
           </Link>
@@ -771,14 +771,14 @@ export default function DashboardHome() {
               const raw = stats?.[key] ?? 0;
               const value = isCurrency ? formatCurrency(raw as number) : String(raw);
               return (
-                <div key={key} className={`bg-white rounded-2xl border ${border} p-3 card-soft transition-all`}>
+                <div key={key} className={`bg-card rounded-2xl border ${border} p-3 card-soft transition-all`}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-gray-500">{label}</span>
+                    <span className="text-xs font-medium text-muted-foreground">{label}</span>
                     <div className={`h-7 w-7 rounded-lg ${accent} flex items-center justify-center`}>
                       <Icon className={`h-3.5 w-3.5 ${color}`} />
                     </div>
                   </div>
-                  <div className="text-xl font-extrabold text-gray-900 truncate">{value}</div>
+                  <div className="text-xl font-extrabold text-foreground truncate">{value}</div>
                 </div>
               );
             })}
@@ -792,8 +792,8 @@ export default function DashboardHome() {
                   <Crown className="h-4 w-4 text-violet-500" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 text-sm">{t("dashboard.index.unlockAll.title")}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{t("dashboard.index.unlockAll.desc")}</div>
+                  <div className="font-semibold text-foreground text-sm">{t("dashboard.index.unlockAll.title")}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{t("dashboard.index.unlockAll.desc")}</div>
                 </div>
               </div>
               <Link href="/dashboard/billing" className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold">
@@ -806,11 +806,11 @@ export default function DashboardHome() {
           {subscription?.isActive && subscription?.plan === "monthly_starter" && <StarterUpgradeCard />}
 
           {/* Recent quotes */}
-          <div className="bg-white rounded-2xl border border-gray-100 card-soft overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+          <div className="bg-card rounded-2xl border border-border card-soft overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <div>
-                <h2 className="text-sm font-semibold text-gray-900">{t("dashboard.index.recentQuotes.title")}</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{t("dashboard.index.recentQuotes.subtitle").replace("{count}", String(recentQuotes.length))}</p>
+                <h2 className="text-sm font-semibold text-foreground">{t("dashboard.index.recentQuotes.title")}</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.index.recentQuotes.subtitle").replace("{count}", String(recentQuotes.length))}</p>
               </div>
               <Link href="/dashboard/quotes" className="inline-flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">
                 {t("dashboard.index.recentQuotes.viewAll")} <ArrowRight className="h-3 w-3" />
@@ -821,25 +821,25 @@ export default function DashboardHome() {
                 <Link
                   key={quote.id}
                   href={`/dashboard/quotes/${quote.id}`}
-                  className={`flex items-center justify-between px-4 py-2.5 hover:bg-gray-50/80 transition-colors cursor-pointer ${idx !== recentQuotes.length - 1 ? "border-b border-gray-50" : ""}`}
+                  className={`flex items-center justify-between px-4 py-2.5 hover:bg-accent transition-colors cursor-pointer ${idx !== recentQuotes.length - 1 ? "border-b border-border" : ""}`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.10), rgba(6,182,212,0.10))" }}>
                       <FileText className="h-3 w-3 text-violet-500" />
                     </div>
                     <div className="min-w-0">
-                      <div className="font-medium text-gray-900 text-sm truncate">{quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}</div>
+                      <div className="font-medium text-foreground text-sm truncate">{quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}</div>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <StatusBadge status={quote.status} />
-                        <span className="text-[10px] text-gray-400">{new Date(quote.createdAt).toLocaleDateString("en-CA")}</span>
+                        <span className="text-[10px] text-muted-foreground">{new Date(quote.createdAt).toLocaleDateString("en-CA")}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 ml-3">
-                    <span className="font-bold text-sm text-gray-900">
+                    <span className="font-bold text-sm text-foreground">
                       {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(quote.totale)}
                     </span>
-                    <ArrowRight className="h-3 w-3 text-gray-300" />
+                    <ArrowRight className="h-3 w-3 text-muted-foreground" />
                   </div>
                 </Link>
               ))}
@@ -848,17 +848,17 @@ export default function DashboardHome() {
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <Link href="/dashboard/new" className="bg-white border border-gray-100 rounded-2xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group card-soft">
+            <Link href="/dashboard/new" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-violet-100 flex items-center justify-center"><Plus className="h-3.5 w-3.5 text-violet-500" /></div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700">{t("dashboard.index.quickActions.newQuote")}</span>
+              <span className="text-sm font-medium text-foreground group-hover:text-violet-700">{t("dashboard.index.quickActions.newQuote")}</span>
             </Link>
-            <Link href="/dashboard/quotes" className="bg-white border border-gray-100 rounded-2xl p-3 flex items-center gap-2.5 hover:border-blue-200 hover:bg-blue-50/30 transition-all group card-soft">
+            <Link href="/dashboard/quotes" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-blue-200 hover:bg-blue-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-blue-100 flex items-center justify-center"><FileText className="h-3.5 w-3.5 text-blue-500" /></div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">{t("dashboard.index.quickActions.allQuotes")}</span>
+              <span className="text-sm font-medium text-foreground group-hover:text-blue-700">{t("dashboard.index.quickActions.allQuotes")}</span>
             </Link>
-            <Link href="/dashboard/profile" className="bg-white border border-gray-100 rounded-2xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group card-soft">
+            <Link href="/dashboard/profile" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-emerald-700">{t("dashboard.index.quickActions.companyProfile")}</span>
+              <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.quickActions.companyProfile")}</span>
             </Link>
           </div>
         </div>

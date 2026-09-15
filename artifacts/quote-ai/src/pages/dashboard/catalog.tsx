@@ -461,9 +461,9 @@ export default function CatalogPage() {
   if (!isPro) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-        <BookOpen className="h-12 w-12 text-gray-300" />
-        <h2 className="text-xl font-semibold text-gray-700">{t("dashboard.catalog.proOnly.title")}</h2>
-        <p className="text-gray-500 max-w-md">
+        <BookOpen className="h-12 w-12 text-muted-foreground" />
+        <h2 className="text-xl font-semibold text-foreground">{t("dashboard.catalog.proOnly.title")}</h2>
+        <p className="text-muted-foreground max-w-md">
           {t("dashboard.catalog.proOnly.desc")}
         </p>
         <Button onClick={() => window.location.href = "/dashboard/settings?tab=billing"} className="gap-2 mt-2">
@@ -514,10 +514,10 @@ export default function CatalogPage() {
       ) : items.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <BookOpen className="h-10 w-10 text-gray-300" />
+            <BookOpen className="h-10 w-10 text-muted-foreground" />
             <div>
-              <p className="font-medium text-gray-700">{t("dashboard.catalog.empty.title")}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="font-medium text-foreground">{t("dashboard.catalog.empty.title")}</p>
+              <p className="text-sm text-muted-foreground mt-1">
                 {t("dashboard.catalog.empty.desc")}
               </p>
             </div>
@@ -570,7 +570,7 @@ export default function CatalogPage() {
               <CardContent className="p-0">
                 <div className="divide-y">
                   {groupedByCategory[cat].map(item => (
-                    <div key={item.id} className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors group">
+                    <div key={item.id} className="flex items-center gap-3 px-6 py-3 hover:bg-accent transition-colors group">
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm truncate">{item.nome}</div>
                         {item.note && <div className="text-xs text-muted-foreground truncate">{item.note}</div>}

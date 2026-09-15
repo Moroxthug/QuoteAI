@@ -142,16 +142,16 @@ export default function JobSetupPage() {
 
       {/* Summary strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 md:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3 md:col-span-2">
           <Label className="text-xs text-slate-500">{t("jobs.field.name")}</Label>
           <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 font-semibold" />
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.contractValue")}</div>
           <div className="text-xl font-bold text-slate-900 mt-0.5">{formatCents(job.contractValueCents)}</div>
           {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-[11px] text-violet-600 hover:underline inline-flex items-center gap-1"><FileSignature className="h-3 w-3" /> {job.contract.contractNumber}</Link>}
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.setup.window")}</div>
           <div className="text-sm font-semibold text-slate-900 mt-1">
             {plannedStart && plannedEnd ? `${format(parseDay(plannedStart), "d MMM", { locale })} → ${format(parseDay(plannedEnd), "PP", { locale })}` : "—"}
@@ -161,7 +161,7 @@ export default function JobSetupPage() {
       </div>
 
       {job.setupProposal && (
-        <div className="rounded-xl border border-violet-100 bg-violet-50/60 px-4 py-3 text-sm text-violet-900 flex gap-3">
+        <div className="rounded-xl border border-violet-100 dark:border-violet-800/40 bg-violet-50/60 dark:bg-violet-500/15 px-4 py-3 text-sm text-violet-900 dark:text-violet-300 flex gap-3">
           <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-violet-600" />
           <div>
             <span className="font-semibold">{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</span>{" "}
@@ -172,7 +172,7 @@ export default function JobSetupPage() {
       )}
 
       {/* Schedule */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-4">
+      <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.milestones")}</h2>
           <div className="flex items-center gap-2 text-sm">
@@ -202,7 +202,7 @@ export default function JobSetupPage() {
               <select
                 value={m.paymentTermId ?? ""}
                 onChange={(e) => updateMs(i, { paymentTermId: e.target.value || null })}
-                className={cn("h-9 rounded-md border border-slate-200 bg-white px-2 text-sm", m.paymentTermId ? "text-emerald-700 font-medium" : "text-slate-500")}
+                className={cn("h-9 rounded-md border border-slate-200 bg-card px-2 text-sm", m.paymentTermId ? "text-emerald-700 font-medium" : "text-slate-500")}
               >
                 <option value="">{t("jobs.milestone.noPayment")}</option>
                 {linkableTerms.map((x) => (
@@ -235,7 +235,7 @@ export default function JobSetupPage() {
       </section>
 
       {/* Budget */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
+      <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.budget")}</h2>
           <div className="text-sm text-slate-600">
@@ -265,7 +265,7 @@ export default function JobSetupPage() {
         </div>
       </section>
 
-      <div className="sticky bottom-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur px-4 py-3 shadow-lg">
+      <div className="sticky bottom-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200 bg-card/95 backdrop-blur px-4 py-3 shadow-lg">
         <span className="text-xs text-slate-500 mr-auto">{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</span>
         <Button variant="outline" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</Button>
         <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>

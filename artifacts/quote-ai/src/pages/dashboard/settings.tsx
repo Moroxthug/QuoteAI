@@ -464,7 +464,7 @@ function BillingTab() {
           </CardHeader>
           <CardContent className="space-y-5">
             {isStarter && sub.quotaUsed != null && sub.quotaLimit != null && (
-              <div className="bg-white/70 rounded-xl p-4 border border-violet-100">
+              <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
                 <div className="flex items-center gap-2 mb-3"><BarChart3 className="h-4 w-4 text-violet-500" /><span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span></div>
                 <QuotaBar used={sub.quotaUsed} limit={sub.quotaLimit} />
                 {resetDate && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><RefreshCw className="h-3 w-3" />{t("dashboard.billing.quotaResetsOn").replace("{date}", resetDate)}</p>}
@@ -475,7 +475,7 @@ function BillingTab() {
                 )}
               </div>
             )}
-            <div className="bg-white/70 rounded-xl p-4 border border-violet-100">
+            <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isElite ? (
@@ -539,7 +539,7 @@ function BillingTab() {
                       <ul className="space-y-1.5 mb-4">
                         {plan.features.map((f: string, i: number) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                            <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isPlanPro ? "text-violet-500" : isPlanElite ? "text-amber-500" : "text-gray-400"}`} />
+                            <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isPlanPro ? "text-violet-500" : isPlanElite ? "text-amber-500" : "text-muted-foreground"}`} />
                             {f}
                           </li>
                         ))}
@@ -627,7 +627,7 @@ function WhatsappUpsellCard() {
               { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsappUpsell.voice.desc") },
               { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
-              <div key={item.label} className="bg-white/70 rounded-xl p-3 text-center border border-violet-100">
+              <div key={item.label} className="bg-card/70 rounded-xl p-3 text-center border border-violet-100">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
@@ -767,7 +767,7 @@ function WhatsappTab() {
                   "text-xs",
                   isEnabled
                     ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                    : "bg-gray-100 text-gray-500 border-gray-200"
+                    : "bg-muted text-muted-foreground border-border"
                 )}
                 variant="outline"
               >
@@ -777,7 +777,7 @@ function WhatsappTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             {usage != null && usage.limit != null && (
-              <div className="bg-white/70 rounded-xl p-4 border border-emerald-100">
+              <div className="bg-card/70 rounded-xl p-4 border border-emerald-100">
                 <div className="flex items-center gap-2 mb-3">
                   <BarChart3 className="h-4 w-4 text-emerald-600" />
                   <span className="text-sm font-semibold">{t("dashboard.settings.whatsapp.usageThisMonth")}</span>
@@ -814,7 +814,7 @@ function WhatsappTab() {
                 )}
               </div>
             )}
-            <div className="bg-white/70 rounded-xl p-4 border border-emerald-100 text-sm text-muted-foreground space-y-1.5">
+            <div className="bg-card/70 rounded-xl p-4 border border-emerald-100 text-sm text-muted-foreground space-y-1.5">
               <p className="font-semibold text-foreground mb-2">{t("dashboard.settings.whatsapp.howToUseTitle")}</p>
               <p>{t("dashboard.settings.whatsapp.howToUse1")}</p>
               <p>{t("dashboard.settings.whatsapp.howToUse2")}</p>
@@ -866,7 +866,7 @@ function WhatsappTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 text-sm text-violet-700 space-y-1">
+          <div className="bg-violet-50 dark:bg-violet-500/15 border border-violet-200 dark:border-violet-800/40 rounded-xl p-4 text-sm text-violet-700 dark:text-violet-300 space-y-1">
             <p className="font-semibold">{t("dashboard.settings.whatsapp.checkPhone")}</p>
             <p className="text-violet-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
           </div>
@@ -920,8 +920,8 @@ function WhatsappTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-gray-100 flex items-center justify-center">
-              <MessageCircle className="h-6 w-6 text-gray-500" />
+            <div className="h-11 w-11 rounded-xl bg-muted flex items-center justify-center">
+              <MessageCircle className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.whatsapp.connectTitle")}</CardTitle>
@@ -936,7 +936,7 @@ function WhatsappTab() {
               { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsapp.connect.voice.desc") },
               { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
-              <div key={item.label} className="bg-gray-50 rounded-xl p-3 text-center">
+              <div key={item.label} className="bg-muted rounded-xl p-3 text-center">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
@@ -1257,7 +1257,7 @@ function QuickbooksTab() {
                 <p className="text-sm text-muted-foreground mt-0.5">{t("dashboard.settings.quickbooks.connectedSince")} {status?.connectedAt ? new Date(status.connectedAt).toLocaleDateString() : ""}</p>
               </div>
             </div>
-            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
               {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
             </Badge>
           </div>
@@ -1382,15 +1382,15 @@ function FinanceitTab() {
         {connected ? (
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-600 border-gray-200")} variant="outline">
+              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
                 {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.financeit.active")}</> : t("dashboard.settings.financeit.paused")}
               </Badge>
-              <p className="text-xs text-gray-500 mt-1.5">{t("dashboard.settings.financeit.dealerIdLabel")}: {status?.dealerId}</p>
+              <p className="text-xs text-muted-foreground mt-1.5">{t("dashboard.settings.financeit.dealerIdLabel")}: {status?.dealerId}</p>
             </div>
           </div>
         ) : (
           <div className="space-y-2">
-            <p className="text-xs text-gray-500">{t("dashboard.settings.financeit.dealerIdHelp")}</p>
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.financeit.dealerIdHelp")}</p>
             <Input
               value={dealerId}
               onChange={(e) => setDealerId(e.target.value)}
@@ -1494,12 +1494,12 @@ function DeveloperApiTab() {
       <CardContent className="space-y-6">
         {/* API keys */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">{t("dashboard.settings.developerApi.apiKeys")}</h4>
+          <h4 className="text-sm font-semibold text-foreground">{t("dashboard.settings.developerApi.apiKeys")}</h4>
           {revealedKey && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.keyRevealWarning")}</p>
               <div className="flex items-center gap-2">
-                <code className="text-xs bg-white border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedKey}</code>
+                <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedKey}</code>
                 <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedKey); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
@@ -1513,7 +1513,7 @@ function DeveloperApiTab() {
                 <div key={k.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
                   <div>
                     <p className="text-sm font-medium">{k.name}</p>
-                    <p className="text-xs text-gray-500">{k.keyPrefix}••••••••• · {k.role}</p>
+                    <p className="text-xs text-muted-foreground">{k.keyPrefix}••••••••• · {k.role}</p>
                   </div>
                   <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => revokeKey.mutate(k.id)} disabled={revokeKey.isPending}>
                     <Trash2 className="h-3.5 w-3.5" />
@@ -1533,12 +1533,12 @@ function DeveloperApiTab() {
 
         {/* Webhooks */}
         <div className="space-y-3 border-t pt-4">
-          <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h4>
+          <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h4>
           {revealedSecret && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.secretRevealWarning")}</p>
               <div className="flex items-center gap-2">
-                <code className="text-xs bg-white border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedSecret}</code>
+                <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedSecret}</code>
                 <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedSecret); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
                   <Copy className="h-3.5 w-3.5" />
                 </Button>
@@ -1552,7 +1552,7 @@ function DeveloperApiTab() {
                 <div key={w.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
                   <div>
                     <p className="text-sm font-medium break-all">{w.url}</p>
-                    <p className="text-xs text-gray-500">{w.events.join(", ")}</p>
+                    <p className="text-xs text-muted-foreground">{w.events.join(", ")}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button size="sm" variant="outline" onClick={() => toggleWebhook.mutate({ id: w.id, isEnabled: !w.isEnabled })} disabled={toggleWebhook.isPending}>
@@ -1574,7 +1574,7 @@ function DeveloperApiTab() {
                   key={ev}
                   type="button"
                   onClick={() => setWebhookEvents((prev) => prev.includes(ev) ? prev.filter(e => e !== ev) : [...prev, ev])}
-                  className={cn("text-xs px-2 py-1 rounded-full border", webhookEvents.includes(ev) ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200")}
+                  className={cn("text-xs px-2 py-1 rounded-full border", webhookEvents.includes(ev) ? "bg-gray-900 text-white border-gray-900" : "bg-card text-muted-foreground border-border")}
                 >
                   {ev}
                 </button>
@@ -1664,7 +1664,7 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
               <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
             </div>
           </div>
-          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
             {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
           </Badge>
         </div>
@@ -1780,7 +1780,7 @@ function EmailConnectionCard() {
               <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
             </div>
           </div>
-          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-gray-100 text-gray-500 border-gray-200")} variant="outline">
+          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
             {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
           </Badge>
         </div>
@@ -1908,7 +1908,7 @@ function WidgetTab() {
                 <Input
                   readOnly
                   value={apiKey}
-                  className="font-mono text-sm bg-gray-50 flex-1"
+                  className="font-mono text-sm bg-muted flex-1"
                 />
                 <Button
                   variant="outline"
@@ -1927,8 +1927,8 @@ function WidgetTab() {
                 </Button>
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-xl p-4 text-center border border-dashed border-gray-200">
-                <p className="text-sm text-gray-500 mb-3">{t("dashboard.settings.widget.noKeyDesc")}</p>
+              <div className="bg-muted rounded-xl p-4 text-center border border-dashed border-border">
+                <p className="text-sm text-muted-foreground mb-3">{t("dashboard.settings.widget.noKeyDesc")}</p>
                 <Button
                   onClick={handleGenerateKey}
                   disabled={generating}
@@ -1942,7 +1942,7 @@ function WidgetTab() {
           </div>
 
           {apiKey && (
-            <div className="space-y-4 pt-4 border-t border-gray-100">
+            <div className="space-y-4 pt-4 border-t border-border">
               <h3 className="text-sm font-semibold">{t("dashboard.settings.widget.step2Title")}</h3>
               <p className="text-xs text-muted-foreground">
                 {t("dashboard.settings.widget.step2Desc")}
@@ -1973,13 +1973,13 @@ function UsageMeter({ label, used, allowance }: { label: string; used: number; a
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between text-sm">
-        <span className="text-gray-700">{label}</span>
-        <span className="text-gray-500">
+        <span className="text-foreground">{label}</span>
+        <span className="text-muted-foreground">
           {used} {allowance !== null ? `/ ${allowance}` : "(unlimited)"}
         </span>
       </div>
       {allowance !== null && (
-        <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+        <div className="h-2 rounded-full bg-muted overflow-hidden">
           <div
             className={cn("h-full rounded-full", pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-emerald-500")}
             style={{ width: `${pct}%` }}
@@ -2006,7 +2006,7 @@ function UsageTab() {
       <CardContent className="space-y-5">
         <UsageMeter label={t("dashboard.settings.usage.receiptScans")} used={data.receiptScans.used} allowance={data.receiptScans.allowance} />
         <UsageMeter label={t("dashboard.settings.usage.whatsappMessages")} used={data.whatsappMessages.used} allowance={data.whatsappMessages.allowance} />
-        <p className="text-xs text-gray-400 pt-2 border-t">{t("dashboard.settings.usage.resetNote")}</p>
+        <p className="text-xs text-muted-foreground pt-2 border-t">{t("dashboard.settings.usage.resetNote")}</p>
       </CardContent>
     </Card>
   );
@@ -2043,7 +2043,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
         {TABS.map(tab => (
           <button
             key={tab.id}
@@ -2051,8 +2051,8 @@ export default function SettingsPage() {
             className={cn(
               "px-4 py-2 text-sm font-medium rounded-lg transition-all",
               activeTab === tab.id
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {tab.label}

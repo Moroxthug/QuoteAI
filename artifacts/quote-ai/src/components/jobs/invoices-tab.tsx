@@ -50,7 +50,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
       </div>
 
       {job.contract && terms.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
           <h2 className="text-base font-bold text-slate-900 mb-3">{t("invoices.plan.title")}</h2>
           <ul className="divide-y">
             {terms.map((term) => {
@@ -105,12 +105,12 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
           <Button size="sm" variant="outline" className="gap-2" onClick={() => setManualOpen(true)}><Plus className="h-4 w-4" /> {t("invoices.manual")}</Button>
         </div>
         {invoices.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-500">
+          <div className="rounded-2xl border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
             <Receipt className="h-8 w-8 text-slate-300 mx-auto mb-2" />
             {job.contract ? t("invoices.jobEmptyContract") : t("invoices.jobEmpty")}
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
+          <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
             {[...invoices].reverse().map((inv) => <InvoiceRow key={inv.id} inv={inv} locale={locale} compact />)}
           </div>
         )}
@@ -123,7 +123,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
 
 function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}

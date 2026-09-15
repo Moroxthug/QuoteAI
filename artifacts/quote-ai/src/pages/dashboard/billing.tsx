@@ -154,7 +154,7 @@ export default function BillingPage() {
             {isStarter &&
               sub.quotaUsed != null &&
               sub.quotaLimit != null && (
-                <div className="bg-white/70 rounded-xl p-4 border border-violet-100">
+                <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
                   <div className="flex items-center gap-2 mb-3">
                     <BarChart3 className="h-4 w-4 text-violet-500" />
                     <span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span>
@@ -185,7 +185,7 @@ export default function BillingPage() {
               )}
 
             {/* Plan features */}
-            <div className="bg-white/70 rounded-xl p-4 border border-violet-100">
+            <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isPro ? (

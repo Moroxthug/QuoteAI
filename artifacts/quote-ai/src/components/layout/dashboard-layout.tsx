@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function useNavItems() {
   const { t } = useLanguage();
@@ -103,7 +104,7 @@ function OrgSwitcherItems() {
   if (orgs.length < 2) return null;
   return (
     <>
-      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-400">{t("team.switcher.switch")}</div>
+      <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t("team.switcher.switch")}</div>
       {orgs.map((o) => (
         <DropdownMenuItem key={o.orgId} className="cursor-pointer flex items-center gap-2" onClick={() => o.orgId !== data?.activeOrgId && switchOrg.mutate(o.orgId)}>
           {o.orgId === data?.activeOrgId ? <Check className="h-3.5 w-3.5 text-violet-600 shrink-0" /> : <span className="w-3.5 shrink-0" />}
@@ -133,8 +134,8 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
         {collapsed ? (
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <button className="h-9 w-9 mx-auto flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors shrink-0">
-                <div className="h-7 w-7 rounded-full bg-violet-100 text-violet-700 text-xs font-bold flex items-center justify-center uppercase">
+              <button className="h-9 w-9 mx-auto flex items-center justify-center rounded-lg hover:bg-accent transition-colors shrink-0">
+                <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center justify-center uppercase">
                   {initials || <User className="h-3.5 w-3.5" />}
                 </div>
               </button>
@@ -142,38 +143,38 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
             <TooltipContent side="right" className="text-xs">{name}</TooltipContent>
           </Tooltip>
         ) : (
-          <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group text-left">
-            <div className="h-7 w-7 rounded-full bg-violet-100 text-violet-700 text-xs font-bold flex items-center justify-center uppercase shrink-0">
+          <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors group text-left">
+            <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center justify-center uppercase shrink-0">
               {initials || <User className="h-3.5 w-3.5" />}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium text-gray-700 truncate leading-tight">{name}</div>
-              {email && <div className="text-[10px] text-gray-400 truncate leading-tight">{email}</div>}
+              <div className="text-xs font-medium text-foreground truncate leading-tight">{name}</div>
+              {email && <div className="text-[10px] text-muted-foreground truncate leading-tight">{email}</div>}
             </div>
-            <ChevronDown className="h-3 w-3 text-gray-400 group-hover:text-gray-600 shrink-0" />
+            <ChevronDown className="h-3 w-3 text-muted-foreground group-hover:text-foreground shrink-0" />
           </button>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="w-48 mb-1">
         <div className="px-2 py-1">
-          <div className="text-xs font-semibold text-gray-800 truncate">{name}</div>
-          {email && <div className="text-[10px] text-gray-400 truncate">{email}</div>}
+          <div className="text-xs font-semibold text-foreground truncate">{name}</div>
+          {email && <div className="text-[10px] text-muted-foreground truncate">{email}</div>}
         </div>
         <DropdownMenuSeparator />
         <OrgSwitcherItems />
         <DropdownMenuItem asChild>
           <Link href="/dashboard/settings?tab=account" className="cursor-pointer flex items-center gap-2">
-            <Building2 className="h-3.5 w-3.5 text-gray-400" /> {t("dashboard.account.companyProfile")}
+            <Building2 className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.companyProfile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard/settings?tab=billing" className="cursor-pointer flex items-center gap-2">
-            <CreditCard className="h-3.5 w-3.5 text-gray-400" /> {t("dashboard.account.planBilling")}
+            <CreditCard className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.planBilling")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard/settings" className="cursor-pointer flex items-center gap-2">
-            <Settings className="h-3.5 w-3.5 text-gray-400" /> {t("dashboard.account.settings")}
+            <Settings className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.settings")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -210,7 +211,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-white">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
         <div className="w-7 h-7 rounded-full border-[3px] border-violet-400 border-t-transparent animate-spin" />
       </div>
     );
@@ -237,11 +238,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               collapsed ? "justify-center h-9 w-9 mx-auto" : "gap-2.5 px-2.5 py-2",
               "text-sm font-medium",
               active
-                ? "text-violet-700 bg-violet-50 font-semibold"
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/15 font-semibold"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-violet-600" : "text-gray-400")} />
+            <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-violet-600 dark:text-violet-300" : "text-muted-foreground")} />
             {!collapsed && (
               <span className="flex-1 text-sm">{item.label}</span>
             )}
@@ -268,16 +269,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-[100dvh] flex bg-white">
+    <div className="min-h-[100dvh] flex bg-background">
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-gray-100 bg-white shadow-sm transition-all duration-200 shrink-0",
+          "hidden md:flex flex-col border-r border-border bg-card shadow-sm transition-all duration-200 shrink-0",
           isCollapsed ? "w-14" : "w-56"
         )}
       >
         {/* Logo + toggle */}
-        <div className={cn("h-14 flex items-center border-b border-gray-100", isCollapsed ? "justify-center px-2" : "px-4 justify-between")}>
+        <div className={cn("h-14 flex items-center border-b border-border", isCollapsed ? "justify-center px-2" : "px-4 justify-between")}>
           {!isCollapsed && (
             <Link href="/dashboard" className="flex items-center">
               <Logo />
@@ -285,7 +286,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           )}
           <button
             onClick={() => setIsCollapsed(v => !v)}
-            className="h-6 w-6 rounded-md flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors shrink-0"
+            className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shrink-0"
             title={isCollapsed ? t("dashboard.nav.expandSidebar") : t("dashboard.nav.collapseSidebar")}
           >
             {isCollapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
@@ -320,19 +321,24 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Notifications */}
-        <div className={cn("border-t border-gray-100 py-2", isCollapsed ? "px-2" : "px-2")}>
+        <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
           <NotificationsBell collapsed={isCollapsed} />
         </div>
 
+        {/* Theme toggle */}
+        <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
+          <ThemeToggle collapsed={isCollapsed} />
+        </div>
+
         {/* Account section */}
-        <div className={cn("border-t border-gray-100 py-2", isCollapsed ? "px-2" : "px-2")}>
+        <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
           <AccountMenu collapsed={isCollapsed} />
         </div>
       </aside>
 
       {/* Mobile Layout */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-gray-100 bg-white">
+        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card">
           <div className="flex items-center gap-2">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -341,9 +347,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   <span className="sr-only">{t("dashboard.nav.toggleMenu")}</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent ref={swipeRef} side="left" className="w-64 p-0 bg-white flex flex-col">
+              <SheetContent ref={swipeRef} side="left" className="w-64 p-0 bg-card flex flex-col">
                 <SheetTitle className="sr-only">{t("dashboard.nav.navMenu")}</SheetTitle>
-                <div className="h-14 flex items-center px-5 border-b border-gray-100">
+                <div className="h-14 flex items-center px-5 border-b border-border">
                   <Link href="/dashboard" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
                     <Logo />
                   </Link>
@@ -359,7 +365,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                   <NavLinks onClick={() => setIsMobileMenuOpen(false)} />
                 </div>
-                <div className="border-t border-gray-100 p-2">
+                <div className="border-t border-border p-2">
+                  <ThemeToggle />
+                </div>
+                <div className="border-t border-border p-2">
                   <AccountMenu />
                 </div>
               </SheetContent>

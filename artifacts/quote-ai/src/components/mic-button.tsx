@@ -28,7 +28,7 @@ export function MicButton({ onTranscribed, disabled }: MicButtonProps) {
           "h-8 w-8 flex items-center justify-center rounded-xl transition-colors",
           isRecording
             ? "bg-red-100 text-red-600 hover:bg-red-200"
-            : "text-gray-400 hover:bg-gray-100 hover:text-violet-600",
+            : "text-muted-foreground hover:bg-accent hover:text-violet-600",
           (disabled || isTranscribing) && !isRecording && "opacity-40 cursor-not-allowed"
         )}
       >

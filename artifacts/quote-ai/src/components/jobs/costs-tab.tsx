@@ -59,7 +59,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
       <div className="lg:col-span-2 space-y-4">
         {/* Dropzone */}
         <div
-          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50" : "border-slate-200 bg-white hover:border-violet-300")}
+          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 bg-card hover:border-violet-300")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
@@ -94,12 +94,12 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
         )}
 
         {/* Entries */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-slate-900">{t("jobs.costs.entries")}</h2>
             <div className="flex items-center gap-2">
               <div className="inline-flex items-center gap-1 text-xs text-slate-500"><Filter className="h-3.5 w-3.5" />
-                <select value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} className="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs">
+                <select value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} className="h-8 rounded-md border border-slate-200 bg-card px-2 text-xs">
                   <option value="all">{t("jobs.costs.allCategories")}</option>
                   {COST_CATEGORY_KEYS.map((c) => <option key={c} value={c}>{t(`jobs.cost.${c}`)}</option>)}
                 </select>
@@ -131,7 +131,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
         </section>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3 h-fit">
+      <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3 h-fit">
         <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">{t("jobs.costs.budgetVsActual")}</h3><Link href={`/dashboard/jobs/${job.id}/setup`} className="text-xs text-violet-600 hover:underline">{t("jobs.costs.editBudget")}</Link></div>
         <div>
           <div className="flex justify-between text-sm"><span className="text-slate-500">{t("jobs.kpi.costs")}</span><span className="font-semibold">{formatCents(costs.totalCents)}</span></div>

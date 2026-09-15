@@ -310,9 +310,9 @@ export function PriceCatalogSection() {
   if (!isPro) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-        <BookOpen className="h-12 w-12 text-gray-300 animate-pulse" />
-        <h2 className="text-xl font-semibold text-gray-700">{t("dashboard.catalog.proOnly.title")}</h2>
-        <p className="text-gray-500 max-w-md text-sm leading-relaxed">
+        <BookOpen className="h-12 w-12 text-muted-foreground animate-pulse" />
+        <h2 className="text-xl font-semibold text-foreground">{t("dashboard.catalog.proOnly.title")}</h2>
+        <p className="text-muted-foreground max-w-md text-sm leading-relaxed">
           {t("dashboard.catalog.proOnly.desc")}
         </p>
         <Button onClick={() => window.location.href = "/dashboard/settings?tab=billing"} className="gap-2 mt-2 font-semibold">
@@ -354,7 +354,7 @@ export function PriceCatalogSection() {
               {t("catalog.csv.chooseFile")}
             </Button>
             {csvFileName && (
-              <span className="text-xs font-medium text-gray-600 truncate max-w-xs bg-gray-100 px-2.5 py-1 rounded-md border">
+              <span className="text-xs font-medium text-muted-foreground truncate max-w-xs bg-muted px-2.5 py-1 rounded-md border">
                 {csvFileName}
               </span>
             )}
@@ -380,9 +380,9 @@ export function PriceCatalogSection() {
 
           {/* CSV Preview */}
           {csvPreview && (
-            <div className="border rounded-lg bg-white overflow-hidden max-h-48 overflow-y-auto">
+            <div className="border rounded-lg bg-card overflow-hidden max-h-48 overflow-y-auto">
               <table className="w-full text-xs text-left border-collapse">
-                <thead className="bg-gray-50 border-b font-semibold text-gray-700 sticky top-0">
+                <thead className="bg-muted border-b font-semibold text-foreground sticky top-0">
                   <tr>
                     <th className="p-2 border-r">{t("catalog.csv.colItem")}</th>
                     <th className="p-2 border-r w-32">{t("catalog.csv.colCategory")}</th>
@@ -390,9 +390,9 @@ export function PriceCatalogSection() {
                     <th className="p-2 w-28 text-right">{t("catalog.csv.colPrice")}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y text-gray-600">
+                <tbody className="divide-y text-muted-foreground">
                   {csvPreview.slice(0, 10).map((row, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
+                    <tr key={idx} className="hover:bg-accent">
                       <td className="p-2 border-r truncate max-w-xs">{row.nome}</td>
                       <td className="p-2 border-r truncate">{row.categoria || "-"}</td>
                       <td className="p-2 border-r text-center font-mono">{row.um}</td>
@@ -400,8 +400,8 @@ export function PriceCatalogSection() {
                     </tr>
                   ))}
                   {csvPreview.length > 10 && (
-                    <tr className="bg-gray-50/50">
-                      <td colSpan={4} className="p-2 text-center text-gray-400 italic">
+                    <tr className="bg-muted/50">
+                      <td colSpan={4} className="p-2 text-center text-muted-foreground italic">
                         {t("catalog.csv.andMoreItems").replace("{count}", String(csvPreview.length - 10))}
                       </td>
                     </tr>
@@ -417,7 +417,7 @@ export function PriceCatalogSection() {
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t("catalog.searchPlaceholder")}
               value={searchQuery}
@@ -438,17 +438,17 @@ export function PriceCatalogSection() {
         ) : filteredItems.length === 0 ? (
           <Card className="border-dashed py-12 text-center">
             <CardContent className="flex flex-col items-center justify-center gap-3">
-              <BookOpen className="h-8 w-8 text-gray-300" />
-              <div className="text-sm font-semibold text-gray-600">{t("catalog.noItemsFound")}</div>
-              <div className="text-xs text-gray-400">{t("catalog.noItemsFoundDesc")}</div>
+              <BookOpen className="h-8 w-8 text-muted-foreground" />
+              <div className="text-sm font-semibold text-muted-foreground">{t("catalog.noItemsFound")}</div>
+              <div className="text-xs text-muted-foreground">{t("catalog.noItemsFoundDesc")}</div>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-4">
             {categories.map(cat => (
-              <Card key={cat} className="shadow-sm border border-gray-150 overflow-hidden">
-                <CardHeader className="py-2.5 px-4 bg-gray-50/50 border-b">
-                  <CardTitle className="text-xs font-bold text-gray-700 flex items-center gap-1.5 uppercase tracking-wide">
+              <Card key={cat} className="shadow-sm border border-border overflow-hidden">
+                <CardHeader className="py-2.5 px-4 bg-muted/50 border-b">
+                  <CardTitle className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
                     <Tag className="h-3.5 w-3.5 text-violet-500" />
                     {cat}
                     <Badge variant="secondary" className="ml-auto font-mono text-[10px] py-0 px-1.5">{groupedByCategory[cat].length}</Badge>
@@ -456,10 +456,10 @@ export function PriceCatalogSection() {
                 </CardHeader>
                 <CardContent className="p-0 divide-y">
                   {groupedByCategory[cat].map(item => (
-                    <div key={item.id} className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50/50 transition-colors group">
+                    <div key={item.id} className="flex items-center gap-3 px-4 py-2 hover:bg-accent transition-colors group">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-xs text-gray-800 truncate">{item.nome}</div>
-                        {item.note && <div className="text-[10px] text-gray-400 truncate mt-0.5">{item.note}</div>}
+                        <div className="font-semibold text-xs text-foreground truncate">{item.nome}</div>
+                        {item.note && <div className="text-[10px] text-muted-foreground truncate mt-0.5">{item.note}</div>}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         <Badge variant="outline" className="text-[10px] font-mono h-5 px-1.5">

@@ -82,6 +82,18 @@
 
     <!-- Theme -->
     <meta name="theme-color" content="#7C3AED" />
+    <script>
+      (function () {
+        try {
+          if (
+            window.localStorage.getItem("quoteai-theme") === "dark" &&
+            window.location.pathname.indexOf("/dashboard") === 0
+          ) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
 
     <!-- Resource hints -->
     <link rel="dns-prefetch" href="https://wa.me" />

@@ -66,9 +66,9 @@ export default function ContractsListPage() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
           {FILTERS.map((f) => (
-            <button key={f} onClick={() => setFilter(f)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all", filter === f ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+            <button key={f} onClick={() => setFilter(f)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all", filter === f ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
               {t(`contracts.filter.${f}`)}
             </button>
           ))}
@@ -82,14 +82,14 @@ export default function ContractsListPage() {
       {isLoading ? (
         <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+        <div className="rounded-2xl border border-slate-200 bg-card p-12 text-center">
           <FileSignature className="h-10 w-10 text-slate-300 mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-slate-800">{t("contracts.emptyTitle")}</h2>
           <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">{t("contracts.emptyDesc")}</p>
           <Link href="/dashboard/quotes" className="inline-block mt-4 text-sm font-medium text-violet-600 hover:underline">{t("contracts.goToQuotes")}</Link>
         </div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
+        <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
           {items.map((c) => (
             <ContractRow key={c.id} c={c} locale={locale} />
           ))}
@@ -101,7 +101,7 @@ export default function ContractsListPage() {
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
     </div>

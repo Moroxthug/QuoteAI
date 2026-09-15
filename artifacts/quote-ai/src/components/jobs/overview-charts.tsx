@@ -64,7 +64,7 @@ function HealthStrip({ data, locale, jobStatus }: { data: JobAnalyticsDto; local
 
 function Tile({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub?: string; tone?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-2xl border border-slate-200 bg-card px-4 py-3">
       <div className="flex items-center gap-1.5 text-xs text-slate-500">{icon}{label}</div>
       <div className={cn("text-lg font-bold text-slate-900 mt-0.5", tone)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">{sub}</div>}

@@ -88,18 +88,18 @@ function ClientSelector({
 }: ClientSelectorProps) {
   const { t } = useLanguage();
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-50">
+    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="px-4 py-3 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
-          <User className="h-4 w-4 text-gray-400" />
-          <span className="text-sm font-medium text-gray-700">{t("dashboard.new.client.label")}</span>
+          <User className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">{t("dashboard.new.client.label")}</span>
           {clientForm.nome && (
             <span className="text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full">
               {clientForm.nome}
             </span>
           )}
         </div>
-        <span className="text-xs text-gray-400">{t("dashboard.new.client.optional")}</span>
+        <span className="text-xs text-muted-foreground">{t("dashboard.new.client.optional")}</span>
       </div>
 
       {savedClients.length > 0 && clientMode !== "new" && (
@@ -113,7 +113,7 @@ function ClientSelector({
                 "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-xl border transition-all",
                 selectedClientId === c.id
                   ? "border-violet-300 bg-violet-50 text-violet-700 font-semibold shadow-sm"
-                  : "border-gray-200 text-gray-600 hover:border-violet-200 hover:bg-violet-50/50"
+                  : "border-border text-muted-foreground hover:border-violet-200 hover:bg-violet-50/50"
               )}
             >
               <User className="h-3 w-3" />
@@ -123,7 +123,7 @@ function ClientSelector({
           <button
             type="button"
             onClick={() => { setClientMode("new"); }}
-            className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-all"
+            className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 transition-all"
           >
             {t("dashboard.new.client.addNew")}
           </button>
@@ -132,10 +132,10 @@ function ClientSelector({
 
       {clientMode === "saved" && selectedClientId && (
         <div className="px-4 pb-3 flex items-center justify-between">
-          <span className="text-[11px] text-gray-400">
+          <span className="text-[11px] text-muted-foreground">
             {[clientForm.indirizzo, clientForm.city, clientForm.province].filter(Boolean).join(", ") || t("dashboard.new.client.noAddress")}
           </span>
-          <button type="button" onClick={clearClient} className="text-[11px] text-gray-400 hover:text-red-500 transition-colors">
+          <button type="button" onClick={clearClient} className="text-[11px] text-muted-foreground hover:text-red-500 transition-colors">
             {t("dashboard.new.client.remove")}
           </button>
         </div>
@@ -146,7 +146,7 @@ function ClientSelector({
           <button
             type="button"
             onClick={() => setClientMode("new")}
-            className="w-full py-2.5 rounded-xl border border-dashed border-gray-200 text-xs text-gray-500 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all"
+            className="w-full py-2.5 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all"
           >
             {t("dashboard.new.client.addClientData")}
           </button>
@@ -154,9 +154,9 @@ function ClientSelector({
       )}
 
       {clientMode === "new" && (
-        <div className="px-4 pb-4 pt-3 space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-200 border-t border-gray-50">
+        <div className="px-4 pb-4 pt-3 space-y-2.5 animate-in fade-in slide-in-from-top-1 duration-200 border-t border-border">
           <div className="space-y-1">
-            <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.nameLabel")}</Label>
+            <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.nameLabel")}</Label>
             <Input
               placeholder={t("dashboard.new.client.namePlaceholder")}
               value={clientForm.nome}
@@ -166,7 +166,7 @@ function ClientSelector({
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.addressLabel")}</Label>
+            <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.addressLabel")}</Label>
             <Input
               placeholder={t("dashboard.new.client.addressPlaceholder")}
               value={clientForm.indirizzo}
@@ -177,42 +177,42 @@ function ClientSelector({
           </div>
           <div className="grid grid-cols-5 gap-2">
             <div className="col-span-3 space-y-1">
-              <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.city")}</Label>
+              <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.city")}</Label>
               <Input placeholder="Toronto" value={clientForm.city} onChange={e => setClientForm(f => ({ ...f, city: e.target.value }))} disabled={disabled} className="h-9 text-sm" />
             </div>
             <div className="col-span-1 space-y-1">
-              <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.province")}</Label>
+              <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.province")}</Label>
               <Input placeholder="ON" value={clientForm.province} onChange={e => setClientForm(f => ({ ...f, province: e.target.value.toUpperCase() }))} disabled={disabled} className="h-9 text-sm" maxLength={2} />
             </div>
             <div className="col-span-1 space-y-1">
-              <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.postalCode")}</Label>
+              <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.postalCode")}</Label>
               <Input placeholder="M5H 2N2" value={clientForm.postalCode} onChange={e => setClientForm(f => ({ ...f, postalCode: e.target.value.toUpperCase() }))} disabled={disabled} className="h-9 text-sm" maxLength={7} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.businessNumber")}</Label>
+              <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.businessNumber")}</Label>
               <Input placeholder="123456789RT0001" value={clientForm.businessNumber} onChange={e => setClientForm(f => ({ ...f, businessNumber: e.target.value.toUpperCase() }))} disabled={disabled} className="h-9 text-sm" maxLength={16} />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs font-medium text-gray-600">{t("dashboard.new.client.gstHst")}</Label>
+              <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.gstHst")}</Label>
               <Input placeholder="123456789RT0001" value={clientForm.partitaIva} onChange={e => setClientForm(f => ({ ...f, partitaIva: e.target.value }))} disabled={disabled} className="h-9 text-sm" maxLength={15} />
             </div>
           </div>
           <div className="flex items-center justify-between pt-1">
-            <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={rememberClient}
                 onChange={e => setRememberClient(e.target.checked)}
-                className="rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                className="rounded border-border text-violet-600 focus:ring-violet-500"
               />
               {t("dashboard.new.client.remember")}
             </label>
             <button
               type="button"
               onClick={clearClient}
-              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors"
             >
               {t("dashboard.new.client.cancel")}
             </button>
@@ -416,22 +416,22 @@ export default function NewQuote() {
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500 py-6 space-y-4">
       {/* Header */}
       <div className="mb-1">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">{t("dashboard.new.title")}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("dashboard.new.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
           {t("dashboard.new.subtitle")}
         </p>
       </div>
 
       {/* ── Tab switcher ── */}
-      <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 bg-muted rounded-xl p-1">
         <button
           type="button"
           onClick={() => setActiveTab("ai")}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all",
             activeTab === "ai"
-              ? "bg-white text-violet-700 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-card text-violet-700 shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           <Bot className="h-4 w-4" />
@@ -443,8 +443,8 @@ export default function NewQuote() {
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all",
             activeTab === "manual"
-              ? "bg-white text-violet-700 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-card text-violet-700 shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           <PencilLine className="h-4 w-4" />
@@ -456,8 +456,8 @@ export default function NewQuote() {
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold transition-all",
             activeTab === "listino"
-              ? "bg-white text-violet-700 shadow-sm"
-              : "text-gray-500 hover:text-gray-700"
+              ? "bg-card text-violet-700 shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
           )}
         >
           <BookOpen className="h-4 w-4" />
@@ -471,8 +471,8 @@ export default function NewQuote() {
           {/* Template selector */}
           <div className="space-y-1">
             <div className="flex items-center gap-2 px-1">
-              <LayoutTemplate className="h-3.5 w-3.5 text-gray-400" />
-              <span className="text-xs font-medium text-gray-500">{t("dashboard.new.layoutLabel")}</span>
+              <LayoutTemplate className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">{t("dashboard.new.layoutLabel")}</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {([
@@ -497,8 +497,8 @@ export default function NewQuote() {
                     className={cn(
                       "text-left px-3 py-2 rounded-xl border text-xs transition-all",
                       isActive
-                        ? "border-violet-400 bg-violet-50 text-violet-900 ring-1 ring-violet-300"
-                        : "border-gray-200 hover:border-violet-300 hover:bg-gray-50 text-gray-700"
+                        ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15 text-violet-900 dark:text-violet-300 ring-1 ring-violet-300"
+                        : "border-border hover:border-violet-300 hover:bg-accent text-foreground"
                     )}
                   >
                     <div className="font-semibold flex items-center gap-1">
@@ -508,7 +508,7 @@ export default function NewQuote() {
                         <span className="ml-auto text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded px-1.5 py-0.5">{t("dashboard.new.template.pro")}</span>
                       )}
                     </div>
-                    <div className="text-gray-500 mt-0.5 leading-snug">{tmpl.desc}</div>
+                    <div className="text-muted-foreground mt-0.5 leading-snug">{tmpl.desc}</div>
                   </button>
                 );
               })}
@@ -516,8 +516,8 @@ export default function NewQuote() {
           </div>
 
           {/* Target total input */}
-          <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-sm">
-            <span className="text-xs font-medium text-gray-500 shrink-0">{t("dashboard.new.targetAmount")}</span>
+          <div className="flex items-center gap-2 bg-card rounded-xl border border-border px-3 py-2.5 shadow-sm">
+            <span className="text-xs font-medium text-muted-foreground shrink-0">{t("dashboard.new.targetAmount")}</span>
             <input
               type="text"
               inputMode="numeric"
@@ -527,19 +527,19 @@ export default function NewQuote() {
                 setTargetTotalEur(v);
               }}
               placeholder={t("dashboard.new.targetPlaceholder")}
-              className="flex-1 text-sm outline-none placeholder:text-gray-300 text-gray-800 bg-transparent min-w-0 text-right font-mono"
+              className="flex-1 text-sm outline-none placeholder:text-muted-foreground text-foreground bg-transparent min-w-0 text-right font-mono"
               disabled={isAiSubmitting}
             />
-            <span className="text-xs text-gray-400 shrink-0">{t("dashboard.new.taxIncl")}</span>
+            <span className="text-xs text-muted-foreground shrink-0">{t("dashboard.new.taxIncl")}</span>
           </div>
 
           {/* AI bar card */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
             {/* Photo strip */}
             {photos.length > 0 && (
-              <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-gray-100 pb-3">
+              <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
                 {photoPreviews.map((src, idx) => (
-                  <div key={idx} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 shrink-0">
+                  <div key={idx} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-border bg-muted shrink-0">
                     <img src={src} alt={`${t("dashboard.new.photoAlt")} ${idx + 1}`} className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -556,7 +556,7 @@ export default function NewQuote() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isAiSubmitting}
-                    className="w-14 h-14 rounded-lg border-2 border-dashed border-gray-200 hover:border-violet-300 flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-violet-500 transition-colors text-[10px]"
+                    className="w-14 h-14 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[10px]"
                   >
                     <ImagePlus className="h-3.5 w-3.5" />
                     <span>{t("dashboard.new.add")}</span>
@@ -567,9 +567,9 @@ export default function NewQuote() {
 
             {/* Document strip */}
             {docs.length > 0 && (
-              <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-gray-100 pb-3">
+              <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
                 {docs.map((file, idx) => (
-                  <div key={idx} className="relative group flex items-center gap-1.5 px-2 py-1 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-700 shrink-0">
+                  <div key={idx} className="relative group flex items-center gap-1.5 px-2 py-1 rounded-lg border border-border bg-muted text-xs text-foreground shrink-0">
                     {file.type === "application/pdf" ? (
                       <FileText className="h-3.5 w-3.5 text-red-500" />
                     ) : file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? (
@@ -582,7 +582,7 @@ export default function NewQuote() {
                       type="button"
                       onClick={() => removeDoc(idx)}
                       disabled={isAiSubmitting}
-                      className="ml-0.5 text-gray-400 hover:text-red-500 transition-colors"
+                      className="ml-0.5 text-muted-foreground hover:text-red-500 transition-colors"
                     >
                       <X className="h-3 w-3" />
                     </button>
@@ -593,7 +593,7 @@ export default function NewQuote() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isAiSubmitting}
-                    className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-gray-200 hover:border-violet-300 flex items-center gap-0.5 text-gray-400 hover:text-violet-500 transition-colors text-[10px]"
+                    className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex items-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[10px]"
                   >
                     <ImagePlus className="h-3 w-3" />
                     <span>{t("dashboard.new.add")}</span>
@@ -615,7 +615,7 @@ export default function NewQuote() {
                       "h-8 w-8 flex items-center justify-center rounded-xl transition-colors",
                       photos.length > 0
                         ? "bg-violet-100 text-violet-600 hover:bg-violet-200"
-                        : "text-gray-400 hover:bg-gray-100",
+                        : "text-muted-foreground hover:bg-accent",
                       (isAiSubmitting || photos.length >= maxPhotos) && "opacity-40 cursor-not-allowed"
                     )}
                   >
@@ -625,7 +625,7 @@ export default function NewQuote() {
                   <button
                     type="button"
                     disabled
-                    className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-300 cursor-not-allowed"
+                    className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground cursor-not-allowed"
                   >
                     <Lock className="h-4 w-4" />
                   </button>
@@ -649,7 +649,7 @@ export default function NewQuote() {
                   }
                 }}
                 placeholder={t("dashboard.new.inputPlaceholder")}
-                className="flex-1 text-sm outline-none placeholder:text-gray-400 text-gray-800 bg-transparent min-w-0"
+                className="flex-1 text-sm outline-none placeholder:text-muted-foreground text-foreground bg-transparent min-w-0"
                 disabled={isAiSubmitting}
               />
 
@@ -663,12 +663,12 @@ export default function NewQuote() {
                 disabled={!canAiSubmit}
                 className={cn(
                   "h-9 w-9 rounded-full flex items-center justify-center shrink-0 transition-all",
-                  canAiSubmit ? "btn-gradient shadow-sm" : "bg-gray-100 cursor-not-allowed"
+                  canAiSubmit ? "btn-gradient shadow-sm" : "bg-muted cursor-not-allowed"
                 )}
               >
                 {isAiSubmitting
                   ? <Loader2 className="h-4 w-4 animate-spin text-white" />
-                  : <ArrowRight className={cn("h-4 w-4", canAiSubmit ? "text-white" : "text-gray-300")} />
+                  : <ArrowRight className={cn("h-4 w-4", canAiSubmit ? "text-white" : "text-muted-foreground")} />
                 }
               </button>
             </div>
@@ -679,16 +679,16 @@ export default function NewQuote() {
               </div>
             )}
 
-            <div className="px-3 pb-3 border-t border-gray-50 pt-2.5">
+            <div className="px-3 pb-3 border-t border-border pt-2.5">
               <div className="flex flex-wrap gap-1.5 items-center">
-                <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mr-1">{t("dashboard.new.examplesLabel")}</span>
+                <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide mr-1">{t("dashboard.new.examplesLabel")}</span>
                 {EXAMPLES.map(ex => (
                   <button
                     key={ex.label}
                     type="button"
                     onClick={() => setInput(ex.text)}
                     disabled={isAiSubmitting}
-                    className="text-xs px-2.5 py-1 rounded-full border border-gray-200 text-gray-600 hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-colors disabled:opacity-40"
+                    className="text-xs px-2.5 py-1 rounded-full border border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-colors disabled:opacity-40"
                   >
                     {ex.label}
                   </button>
@@ -753,7 +753,7 @@ export default function NewQuote() {
       {/* ══ LISTINO TAB ═════════════════════════════════════════════════════ */}
       {activeTab === "listino" && (
         <div className="space-y-4 animate-in fade-in duration-200">
-          <Card className="p-4 border border-violet-105 bg-white shadow-xs">
+          <Card className="p-4 border border-violet-105 bg-card shadow-xs">
             <PriceCatalogSection />
           </Card>
         </div>

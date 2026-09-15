@@ -56,7 +56,7 @@ export default function InvoicesPage() {
       </div>
 
       {gated || (error as Error & { code?: string } | null)?.code === "PLAN_REQUIRED" ? (
-        <div className="rounded-2xl border border-violet-200 bg-violet-50 p-8 text-center">
+        <div className="rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center">
           <Receipt className="h-10 w-10 text-violet-300 mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-slate-800">{t("invoices.gatedTitle")}</h2>
           <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">{t("invoices.gatedDesc")}</p>
@@ -74,9 +74,9 @@ export default function InvoicesPage() {
           {data && data.aging.totalCents > 0 && <Aging aging={data.aging} />}
 
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit overflow-x-auto max-w-full">
+            <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit overflow-x-auto max-w-full">
               {FILTERS.map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap", filter === f ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700")}>
+                <button key={f} onClick={() => setFilter(f)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap", filter === f ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
                   {t(`invoices.filter.${f}`)}
                 </button>
               ))}
@@ -90,13 +90,13 @@ export default function InvoicesPage() {
           {isLoading ? (
             <div className="space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}</div>
           ) : items.length === 0 ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+            <div className="rounded-2xl border border-slate-200 bg-card p-12 text-center">
               <Receipt className="h-10 w-10 text-slate-300 mx-auto mb-4" />
               <h2 className="text-lg font-semibold text-slate-800">{t("invoices.emptyTitle")}</h2>
               <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">{t("invoices.emptyDesc")}</p>
             </div>
           ) : (
-            <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden divide-y">
+            <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
               {items.map((inv) => <InvoiceRow key={inv.id} inv={inv} locale={locale} />)}
             </div>
           )}
@@ -110,7 +110,7 @@ export default function InvoicesPage() {
 
 function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5">{sub}</div>}
@@ -129,7 +129,7 @@ const BUCKETS: { key: keyof Omit<AgingDto, "totalCents" | "overdueCents">; color
 function Aging({ aging }: { aging: AgingDto }) {
   const { t } = useLanguage();
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4">
+    <section className="rounded-2xl border border-slate-200 bg-card p-4">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-slate-400" /> {t("invoices.aging.title")}</h2>
         <span className="text-sm text-slate-600">{t("invoices.aging.total")} <span className="font-semibold text-slate-900">{formatCents(aging.totalCents)}</span></span>

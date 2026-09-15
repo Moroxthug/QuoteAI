@@ -99,7 +99,7 @@ export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id
         {/* Today marker spans header + rows; the timeline starts after the 14rem label column */}
         {todayPct >= 0 && todayPct <= 100 && (
           <div className="absolute top-7 bottom-0 border-l-2 border-rose-400 pointer-events-none" style={{ left: `calc(14rem + (100% - 14rem) * ${todayPct / 100})` }}>
-            <span className="absolute bottom-0 -translate-x-1/2 text-[10px] font-semibold text-rose-500 bg-white px-1 whitespace-nowrap">{lang === "fr" ? "Aujourd'hui" : "Today"}</span>
+            <span className="absolute bottom-0 -translate-x-1/2 text-[10px] font-semibold text-rose-500 bg-card px-1 whitespace-nowrap">{lang === "fr" ? "Aujourd'hui" : "Today"}</span>
           </div>
         )}
       </div>

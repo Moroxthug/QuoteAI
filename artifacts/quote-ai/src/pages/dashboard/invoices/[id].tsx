@@ -91,7 +91,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       {scheduled && (
-        <div className="rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-900 flex items-start gap-2">
+        <div className="rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-3 text-sm text-violet-900 dark:text-violet-300 flex items-start gap-2">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
         </div>
@@ -110,7 +110,7 @@ export default function InvoiceDetailPage() {
           {editing ? (
             <DraftEditor data={data} onDone={() => { setEditing(false); refresh(); }} onCancel={() => setEditing(false)} />
           ) : (
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-8">
+            <section className="rounded-2xl border border-slate-200 bg-card p-5 md:p-8">
               <style dangerouslySetInnerHTML={{ __html: data.css }} />
               <div dangerouslySetInnerHTML={{ __html: data.html }} />
             </section>
@@ -119,7 +119,7 @@ export default function InvoiceDetailPage() {
 
         <div className="space-y-4">
           {data.publicUrl && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <section className="rounded-2xl border border-slate-200 bg-card p-4">
               <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.publicLink")}</h3>
               <div className="flex gap-2">
                 <Input readOnly value={data.publicUrl} className="text-xs" />
@@ -131,7 +131,7 @@ export default function InvoiceDetailPage() {
           )}
 
           {!isCredit && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <section className="rounded-2xl border border-slate-200 bg-card p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-bold text-slate-900">{t("invoices.payments")}</h3>
                 {open && <button className="text-xs text-violet-600 hover:underline" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
@@ -155,7 +155,7 @@ export default function InvoiceDetailPage() {
             </section>
           )}
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="rounded-2xl border border-slate-200 bg-card p-4">
             <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.activity")}</h3>
             <ul className="space-y-2">
               {[...data.events].reverse().map((e) => <EventRow key={e.id} e={e} locale={locale} />)}
@@ -177,7 +177,7 @@ export default function InvoiceDetailPage() {
 
 function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}
@@ -242,7 +242,7 @@ function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDon
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   return (
-    <section className="rounded-2xl border border-violet-200 bg-white p-5 space-y-4">
+    <section className="rounded-2xl border border-violet-200 bg-card p-5 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1"><Label>{t("invoices.field.title")}</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
         <div className="space-y-1"><Label>{t("invoices.field.customerEmail")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>

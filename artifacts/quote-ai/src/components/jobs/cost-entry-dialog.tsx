@@ -136,7 +136,7 @@ export function CostEntryDialog({
             {jobs && (isReceipt || !jobId) && (
               <div className="space-y-1">
                 <Label>{t("jobs.costs.job")}</Label>
-                <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+                <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="h-9 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
                   <option value="">{t("jobs.costs.pickJob")}</option>
                   {jobs.map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
                 </select>
@@ -145,7 +145,7 @@ export function CostEntryDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label>{t("jobs.costs.category")}</Label>
-                <select value={category} onChange={(e) => setCategory(e.target.value as CostCategory)} className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+                <select value={category} onChange={(e) => setCategory(e.target.value as CostCategory)} className="h-9 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
                   {COST_CATEGORY_KEYS.map((c) => <option key={c} value={c}>{t(`jobs.cost.${c}`)}</option>)}
                 </select>
               </div>
@@ -165,7 +165,7 @@ export function CostEntryDialog({
             {milestones.length > 0 && (
               <div className="space-y-1">
                 <Label>{t("jobs.costs.milestone")}</Label>
-                <select value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)} className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+                <select value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)} className="h-9 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
                   <option value="">{t("jobs.costs.wholeJob")}</option>
                   {milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
                 </select>
@@ -218,7 +218,7 @@ function ReceiptPreview({ docId }: { docId: string }) {
   }
   return (
     <a href={url} target="_blank" rel="noreferrer" title={t("jobs.costs.openReceipt")}>
-      <img src={url} alt="" className="w-full max-h-[420px] object-contain bg-white" onError={() => setFailed(true)} />
+      <img src={url} alt="" className="w-full max-h-[420px] object-contain bg-card" onError={() => setFailed(true)} />
     </a>
   );
 }

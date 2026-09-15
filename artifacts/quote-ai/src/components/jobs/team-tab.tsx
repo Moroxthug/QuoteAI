@@ -82,20 +82,20 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
         {/* Hours */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-violet-600" /> {t("jobs.team.hours")}</h2>
             <div className="text-xs text-slate-500">{approvedHours.toFixed(1)} h {t("jobs.team.approved")} · <span className="font-medium text-slate-800">{formatCents(approvedCents)}</span>{pendingHours.length ? <span className="ml-2 text-amber-700">{pendingHours.length} {t("jobs.team.pending")}</span> : null}</div>
           </div>
           <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_80px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
-            <select value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-white px-2 text-sm col-span-2 xl:col-span-1">
+            <select value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm col-span-2 xl:col-span-1">
               <option value="">{t("jobs.team.pickWorker")}</option>
               {timeWorkers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
             </select>
             <Input type="date" value={time.date} onChange={(e) => setTime({ ...time, date: e.target.value })} className="h-9" />
             <Input type="number" step="0.25" min="0.25" max="24" value={time.hours} onChange={(e) => setTime({ ...time, hours: e.target.value })} placeholder="h" className="h-9" />
             {milestones.length > 0 ? (
-              <select value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-white px-2 text-sm">
+              <select value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm">
                 <option value="">{t("jobs.costs.wholeJob")}</option>
                 {milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
               </select>
@@ -130,7 +130,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
         </section>
 
         {/* Equipment */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 md:p-5 space-y-3">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Wrench className="h-4 w-4 text-violet-600" /> {t("jobs.team.equipment")}</h2>
             <div className="text-xs text-slate-500">{t("jobs.team.equipmentCharged")} <span className="font-medium text-slate-800">{formatCents(usageCents)}</span></div>
@@ -139,7 +139,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
             <p className="text-xs text-slate-400">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-violet-600 underline">{t("jobs.team.openTeam")}</Link></p>
           ) : (
             <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_90px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
-              <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-white px-2 text-sm col-span-2 xl:col-span-1">
+              <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm col-span-2 xl:col-span-1">
                 <option value="">{t("jobs.team.pickEquipment")}</option>
                 {activeEquipment.map((eq) => <option key={eq.id} value={eq.id}>{eq.name} · {formatCents(eq.usageRateCents)}/{t(`team.unit.${eq.usageUnit}`)}</option>)}
               </select>
@@ -166,7 +166,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
 
       {/* Assigned */}
       <div className="space-y-4">
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Users className="h-4 w-4 text-violet-600" /> {t("jobs.team.assigned")}</h3>
             <Link href="/dashboard/team" className="text-xs text-violet-600 hover:underline inline-flex items-center gap-1">{t("jobs.team.openTeam")} <ExternalLink className="h-3 w-3" /></Link>
@@ -184,7 +184,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           )}
           {available.length > 0 && (
             <div className="flex gap-2 pt-2 border-t">
-              <select value={pick} onChange={(e) => setPick(e.target.value)} className="h-9 flex-1 rounded-md border border-slate-200 bg-white px-2 text-sm">
+              <select value={pick} onChange={(e) => setPick(e.target.value)} className="h-9 flex-1 rounded-md border border-slate-200 bg-card px-2 text-sm">
                 <option value="">{t("jobs.team.pick")}</option>
                 {available.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
@@ -201,7 +201,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
         </section>
 
         {/* Geofence */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+        <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
           <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-violet-600" /> {t("jobs.team.geofenceTitle")}</h3>
           <p className="text-xs text-slate-500">{t("jobs.team.geofenceHint")}</p>
           <Button type="button" variant="outline" size="sm" className="h-9 gap-1.5 w-full" disabled={locating} onClick={useMyLocation}>
@@ -210,7 +210,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           {job.latitude && job.longitude && (
             <div className="space-y-1">
               <Label className="text-xs text-slate-500">{t("jobs.team.radiusLabel")}</Label>
-              <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+              <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} className="h-9 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
                 <option value="">{t("jobs.team.radiusOff")}</option>
                 {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
               </select>

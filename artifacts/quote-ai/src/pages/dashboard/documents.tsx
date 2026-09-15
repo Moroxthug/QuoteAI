@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: UploadedDocument["status"] }) {
     </Badge>
   );
   return (
-    <Badge className="gap-1 bg-gray-100 text-gray-500 border-0">
+    <Badge className="gap-1 bg-muted text-muted-foreground border-0">
       <Clock className="h-3 w-3" /> Queued
     </Badge>
   );
@@ -89,9 +89,9 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
   const lavorazioni = (doc.extractedData as { lavorazioni?: Array<{ tipo: string; prezzoUnitario: number; um?: string | null; zona?: string | null }> } | null)?.lavorazioni ?? [];
 
   return (
-    <div className="border border-gray-100 rounded-xl p-4 bg-white hover:shadow-sm transition-shadow">
+    <div className="border border-border rounded-xl p-4 bg-card hover:shadow-sm transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="h-9 w-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+        <div className="h-9 w-9 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0">
           {isPdf ? (
             <FileText className="h-4 w-4 text-red-500" />
           ) : isDocx ? (
@@ -105,13 +105,13 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-medium text-gray-800 truncate max-w-xs">{doc.fileName}</p>
+            <p className="text-sm font-medium text-foreground truncate max-w-xs">{doc.fileName}</p>
             <StatusBadge status={doc.status} />
           </div>
           <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-xs text-gray-400">{formatDate(doc.createdAt)}</span>
+            <span className="text-xs text-muted-foreground">{formatDate(doc.createdAt)}</span>
             {doc.fileSize && (
-              <span className="text-xs text-gray-400">{formatFileSize(doc.fileSize)}</span>
+              <span className="text-xs text-muted-foreground">{formatFileSize(doc.fileSize)}</span>
             )}
             {doc.status === "done" && lavorazioni.length > 0 && (
               <span className="text-xs text-green-600 font-medium">{lavorazioni.length} items extracted</span>
@@ -132,21 +132,21 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
           )}
 
           {expanded && lavorazioni.length > 0 && (
-            <div className="mt-2 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden">
+            <div className="mt-2 rounded-lg bg-muted border border-border overflow-hidden">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="border-b border-gray-100 bg-gray-100/60">
-                    <th className="text-left px-3 py-1.5 font-semibold text-gray-600">Work item</th>
-                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">Price</th>
-                    <th className="text-right px-3 py-1.5 font-semibold text-gray-600">Unit</th>
+                  <tr className="border-b border-border bg-muted/60">
+                    <th className="text-left px-3 py-1.5 font-semibold text-muted-foreground">Work item</th>
+                    <th className="text-right px-3 py-1.5 font-semibold text-muted-foreground">Price</th>
+                    <th className="text-right px-3 py-1.5 font-semibold text-muted-foreground">Unit</th>
                   </tr>
                 </thead>
                 <tbody>
                   {lavorazioni.map((l, i) => (
-                    <tr key={i} className="border-b border-gray-50 last:border-0">
-                      <td className="px-3 py-1.5 text-gray-700">{l.tipo}</td>
-                      <td className="px-3 py-1.5 text-right text-gray-700 font-medium">{formatCurrency(l.prezzoUnitario)}</td>
-                      <td className="px-3 py-1.5 text-right text-gray-400">{l.um || "—"}</td>
+                    <tr key={i} className="border-b border-border last:border-0">
+                      <td className="px-3 py-1.5 text-foreground">{l.tipo}</td>
+                      <td className="px-3 py-1.5 text-right text-foreground font-medium">{formatCurrency(l.prezzoUnitario)}</td>
+                      <td className="px-3 py-1.5 text-right text-muted-foreground">{l.um || "—"}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -175,7 +175,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-7 w-7 text-gray-400 hover:text-red-500"
+            className="h-7 w-7 text-muted-foreground hover:text-red-500"
             onClick={() => deleteMut.mutate({ id: doc.id })}
             disabled={deleteMut.isPending}
           >
@@ -209,16 +209,16 @@ function PriceAlerts() {
       </CardHeader>
       <CardContent className="px-5 pb-4 space-y-2">
         {alerts.map((alert) => (
-          <div key={alert.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-white p-3">
+          <div key={alert.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-card p-3">
             <div className="flex items-center gap-2 min-w-0">
               {alert.direction === "up" ? (
                 <TrendingUp className="h-4 w-4 text-red-500 shrink-0" />
               ) : (
                 <TrendingDown className="h-4 w-4 text-green-600 shrink-0" />
               )}
-              <p className="text-sm text-gray-700 truncate">
+              <p className="text-sm text-foreground truncate">
                 <span className="font-semibold">{alert.workType}</span>
-                {alert.zone && <span className="text-gray-400"> in {alert.zone}</span>} is{" "}
+                {alert.zone && <span className="text-muted-foreground"> in {alert.zone}</span>} is{" "}
                 <span className={cn("font-semibold", alert.direction === "up" ? "text-red-600" : "text-green-600")}>
                   {alert.direction === "up" ? "up" : "down"} {Math.abs(alert.percentChange).toFixed(0)}%
                 </span>{" "}
@@ -228,7 +228,7 @@ function PriceAlerts() {
             <Button
               size="icon"
               variant="ghost"
-              className="h-6 w-6 text-gray-400 hover:text-gray-600 shrink-0"
+              className="h-6 w-6 text-muted-foreground hover:text-muted-foreground shrink-0"
               onClick={() => dismissMut.mutate({ id: alert.id })}
               disabled={dismissMut.isPending}
             >
@@ -259,21 +259,21 @@ function PriceComparison() {
         {comparisons.map((group) => {
           const cheapest = group.vendors[0];
           return (
-            <div key={`${group.workType}::${group.zone ?? ""}`} className="rounded-lg border border-gray-100 p-3">
-              <p className="text-xs font-semibold text-gray-700">
+            <div key={`${group.workType}::${group.zone ?? ""}`} className="rounded-lg border border-border p-3">
+              <p className="text-xs font-semibold text-foreground">
                 {group.workType}
-                {group.zone && <span className="text-gray-400 font-normal"> — {group.zone}</span>}
+                {group.zone && <span className="text-muted-foreground font-normal"> — {group.zone}</span>}
               </p>
               <div className="mt-2 space-y-1">
                 {group.vendors.map((v) => (
                   <div key={v.vendor} className="flex items-center justify-between text-xs">
-                    <span className={cn("text-gray-600", v.vendor === cheapest.vendor && "font-semibold text-green-700")}>
+                    <span className={cn("text-muted-foreground", v.vendor === cheapest.vendor && "font-semibold text-green-700")}>
                       {v.vendor}
                     </span>
-                    <span className="text-gray-500">
+                    <span className="text-muted-foreground">
                       {formatCurrency(v.avgPrice)}
                       {group.unit && `/${group.unit}`}
-                      <span className="text-gray-300 ml-1">({v.count})</span>
+                      <span className="text-muted-foreground ml-1">({v.count})</span>
                     </span>
                   </div>
                 ))}
@@ -346,7 +346,7 @@ export default function DocumentsPage() {
         onDrop={onDrop}
         className={cn(
           "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
-          isDragging ? "border-violet-400 bg-violet-50" : "border-gray-200 bg-gray-50/50 hover:border-violet-300 hover:bg-violet-50/30"
+          isDragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-border bg-muted/50 hover:border-violet-300 hover:bg-violet-50/30 dark:hover:bg-violet-500/10"
         )}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -367,7 +367,7 @@ export default function DocumentsPage() {
             </div>
           )}
           <div>
-            <p className="font-semibold text-gray-800 text-sm">
+            <p className="font-semibold text-foreground text-sm">
               {uploadMut.isPending ? "Uploading..." : "Drag files here or click to select"}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -381,7 +381,7 @@ export default function DocumentsPage() {
       {doneCount > 0 && (
         <Card className={cn(
           "border",
-          hasEnoughForIntelligence ? "border-violet-200 bg-violet-50/40" : "border-amber-200 bg-amber-50/40"
+          hasEnoughForIntelligence ? "border-violet-200 dark:border-violet-800/40 bg-violet-50/40 dark:bg-violet-500/10" : "border-amber-200 bg-amber-50/40"
         )}>
           <CardContent className="py-4 px-5 flex items-center gap-3">
             <div className={cn(
@@ -427,20 +427,20 @@ export default function DocumentsPage() {
           <CardContent className="px-5 pb-4">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {priceSummary.items.slice(0, 12).map((item) => (
-                <div key={item.workType} className="rounded-lg border border-gray-100 bg-gray-50/50 p-3">
-                  <p className="text-xs font-semibold text-gray-700 leading-tight line-clamp-2">{item.workType}</p>
+                <div key={item.workType} className="rounded-lg border border-border bg-muted/50 p-3">
+                  <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{item.workType}</p>
                   <p className="text-lg font-bold text-violet-700 mt-1">
                     {formatCurrency(item.avgUnitPrice)}
-                    {item.unit && <span className="text-xs font-normal text-gray-400 ml-1">/{item.unit}</span>}
+                    {item.unit && <span className="text-xs font-normal text-muted-foreground ml-1">/{item.unit}</span>}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[10px] text-gray-400">
+                    <span className="text-[10px] text-muted-foreground">
                       {formatCurrency(item.minPrice)} – {formatCurrency(item.maxPrice)}
                     </span>
-                    <span className="text-[10px] text-gray-400">({item.count} docs)</span>
+                    <span className="text-[10px] text-muted-foreground">({item.count} docs)</span>
                   </div>
                   {item.zones && item.zones.length > 0 && (
-                    <p className="text-[10px] text-gray-400 mt-0.5 truncate">{item.zones.join(", ")}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{item.zones.join(", ")}</p>
                   )}
                 </div>
               ))}
@@ -453,10 +453,10 @@ export default function DocumentsPage() {
       <Card>
         <CardHeader className="pb-2 pt-4 px-5 flex flex-row items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <FolderOpen className="h-4 w-4 text-gray-400" />
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
             Uploaded documents
             {docs.length > 0 && (
-              <Badge className="bg-gray-100 text-gray-500 border-0 text-xs">{docs.length}</Badge>
+              <Badge className="bg-muted text-muted-foreground border-0 text-xs">{docs.length}</Badge>
             )}
           </CardTitle>
           {pendingCount > 0 && (
@@ -466,11 +466,11 @@ export default function DocumentsPage() {
         <CardContent className="px-5 pb-5">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-300" />
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
           ) : docs.length === 0 ? (
             <div className="py-12 text-center">
-              <FolderOpen className="h-10 w-10 text-gray-200 mx-auto mb-3" />
+              <FolderOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">No documents uploaded</p>
               <p className="text-xs text-muted-foreground mt-1">
                 Upload your past quotes to extract market prices

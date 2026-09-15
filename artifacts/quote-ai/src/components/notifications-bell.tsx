@@ -56,7 +56,7 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
     <button
       type="button"
       className={cn(
-        "relative flex items-center gap-2.5 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors",
+        "relative flex items-center gap-2.5 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-colors",
         collapsed ? "h-9 w-9 mx-auto justify-center" : "w-full px-2.5 py-2",
       )}
       aria-label={t("notifications.title")}
@@ -103,17 +103,17 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
         </div>
         <div className="max-h-96 overflow-y-auto">
           {items.length === 0 ? (
-            <div className="px-3 py-8 text-center text-sm text-gray-400">{t("notifications.empty")}</div>
+            <div className="px-3 py-8 text-center text-sm text-muted-foreground">{t("notifications.empty")}</div>
           ) : (
             items.map((n) => {
               const inner = (
-                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-gray-50 transition-colors", !n.readAt && "bg-violet-50/60")}>
+                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-accent transition-colors", !n.readAt && "bg-violet-50/60 dark:bg-violet-500/15")}>
                   <div className="flex items-start gap-2">
                     {!n.readAt && <span className="h-2 w-2 rounded-full bg-violet-600 mt-1.5 shrink-0" />}
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium text-gray-800 leading-snug">{n.title}</div>
-                      {n.body && <div className="text-xs text-gray-500 mt-0.5 leading-snug">{n.body}</div>}
-                      <div className="text-[10px] text-gray-400 mt-1">
+                      <div className="text-sm font-medium text-foreground leading-snug">{n.title}</div>
+                      {n.body && <div className="text-xs text-muted-foreground mt-0.5 leading-snug">{n.body}</div>}
+                      <div className="text-[10px] text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale })}
                       </div>
                     </div>

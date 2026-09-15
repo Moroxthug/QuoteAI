@@ -60,7 +60,7 @@ export function PaymentScheduleEditor({
     <div className="space-y-3">
       <div className="space-y-2">
         {value.terms.map((term, i) => (
-          <div key={term.id} className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+          <div key={term.id} className="rounded-lg border border-slate-200 bg-card p-3 space-y-2">
             <div className="flex items-center gap-2">
               <GripVertical className="h-4 w-4 text-slate-300 shrink-0" />
               <span className="text-xs font-semibold text-slate-400 w-5 shrink-0">{i + 1}.</span>
@@ -88,7 +88,7 @@ export function PaymentScheduleEditor({
                     const type = e.target.value as PaymentTermType;
                     updateTerm(term.id, { type, trigger: triggerForType(type), dueDays: type === "deposit" ? 0 : term.dueDays || 15 });
                   }}
-                  className="w-full h-8 text-xs rounded-md border border-slate-200 bg-white px-2 focus:outline-none focus:border-violet-400"
+                  className="w-full h-8 text-xs rounded-md border border-slate-200 bg-card px-2 focus:outline-none focus:border-violet-400"
                 >
                   {TERM_TYPES.map((tt) => (
                     <option key={tt} value={tt}>{t(`paymentSchedule.type.${tt}`)}</option>

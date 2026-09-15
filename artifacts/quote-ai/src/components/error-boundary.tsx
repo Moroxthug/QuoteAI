@@ -44,9 +44,9 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center bg-white">
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">{t("errorBoundary.title")}</h1>
-          <p className="text-gray-500 max-w-md mb-6">
+        <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center bg-background">
+          <h1 className="text-2xl font-bold text-foreground mb-3">{t("errorBoundary.title")}</h1>
+          <p className="text-muted-foreground max-w-md mb-6">
             {t("errorBoundary.bodyPrefix")}{" "}
             <a href="mailto:info@quoteai.ca" className="text-violet-600 font-medium">
               info@quoteai.ca

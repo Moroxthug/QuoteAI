@@ -35,7 +35,7 @@ export default function ClientDetailPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard/clients" className="text-muted-foreground hover:text-gray-900 transition-colors">
+        <Link href="/dashboard/clients" className="text-muted-foreground hover:text-foreground transition-colors">
           <ChevronLeft className="h-5 w-5" />
         </Link>
         <div className="flex items-center gap-3 min-w-0">
@@ -201,7 +201,7 @@ export default function ClientDetailPage() {
                     <div className="text-xs text-muted-foreground mt-0.5">
                       {format(new Date(q.createdAt), "dd MMM yyyy", { locale: enCA })}
                       {q.numeroPreventivoData && (
-                        <span className="ml-2 text-gray-400">— {q.numeroPreventivoData}</span>
+                        <span className="ml-2 text-muted-foreground">— {q.numeroPreventivoData}</span>
                       )}
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export default function ClientDetailPage() {
                       {q.status === "unlocked" ? "Unlocked" : q.status === "pending_payment" ? "Pending" : "Draft"}
                     </span>
                     <span className="font-semibold text-sm">{formatCurrency(q.totale)}</span>
-                    <ChevronRight className="h-4 w-4 text-gray-300" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </Link>
               ))}

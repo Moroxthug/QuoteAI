@@ -1898,6 +1898,122 @@ export const RetryQuickbooksSyncResponse = zod.object({
 
 
 /**
+ * @summary Get the Wave accounting connection status for the authenticated company
+ */
+export const GetWaveStatusResponse = zod.object({
+  "connected": zod.boolean(),
+  "businessName": zod.string().nullish(),
+  "isEnabled": zod.boolean().nullish(),
+  "connectedAt": zod.string().nullish(),
+  "lastSyncedAt": zod.string().nullish(),
+  "hasPaymentAccount": zod.boolean().nullish(),
+  "paymentAccountName": zod.string().nullish(),
+  "hasIncomeAccount": zod.boolean().nullish(),
+  "incomeAccountName": zod.string().nullish(),
+  "categoryMap": zod.record(zod.string(), zod.string().nullable()).nullish()
+})
+
+
+/**
+ * @summary Get the Wave OAuth authorization URL to redirect the browser to
+ */
+export const GetWaveConnectUrlResponse = zod.object({
+  "url": zod.string()
+})
+
+
+/**
+ * @summary Unlink Wave from the company account
+ */
+export const DisconnectWaveResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Enable or disable Wave sync
+ */
+export const ToggleWaveBody = zod.object({
+  "isEnabled": zod.boolean()
+})
+
+export const ToggleWaveResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary List the company's Wave expense, income, and payment accounts, for the mapping UI
+ */
+export const GetWaveAccountsResponse = zod.object({
+  "expenseAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "incomeAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "paymentAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}))
+})
+
+
+/**
+ * @summary Set the payment (deposit) account, income account, and cost-category → expense-account mapping
+ */
+export const UpdateWaveMappingBody = zod.object({
+  "paymentAccount": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()]).optional(),
+  "incomeAccount": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()]).optional(),
+  "categoryMap": zod.record(zod.string(), zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()])).optional()
+})
+
+export const UpdateWaveMappingResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Recent Wave sync attempts (success and failure)
+ */
+export const GetWaveSyncLogResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "entityType": zod.string(),
+  "entityId": zod.string(),
+  "waveId": zod.string().nullish(),
+  "status": zod.string(),
+  "error": zod.string().nullish(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const RetryWaveSyncBody = zod.object({
+  "entityType": zod.enum(['invoice', 'cost_entry']),
+  "entityId": zod.string()
+})
+
+export const RetryWaveSyncResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary Get the calendar sync connection status for every provider the company has connected
  */
 export const GetCalendarStatusResponse = zod.object({

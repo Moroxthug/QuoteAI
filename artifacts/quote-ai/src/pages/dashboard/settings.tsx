@@ -12,6 +12,10 @@ import {
   getGetQuickbooksConnectUrlQueryKey, useDisconnectQuickbooks, useToggleQuickbooks,
   useGetQuickbooksAccounts, getGetQuickbooksAccountsQueryKey, useUpdateQuickbooksMapping,
   useGetQuickbooksSyncLog, getGetQuickbooksSyncLogQueryKey, useRetryQuickbooksSync,
+  useGetWaveStatus, getGetWaveStatusQueryKey, useGetWaveConnectUrl,
+  getGetWaveConnectUrlQueryKey, useDisconnectWave, useToggleWave,
+  useGetWaveAccounts, getGetWaveAccountsQueryKey, useUpdateWaveMapping,
+  useGetWaveSyncLog, getGetWaveSyncLogQueryKey, useRetryWaveSync,
   useGetCalendarStatus, getGetCalendarStatusQueryKey, useGetCalendarConnectUrl,
   getGetCalendarConnectUrlQueryKey, useDisconnectCalendar, useToggleCalendar,
   type CalendarProvider,
@@ -1284,6 +1288,317 @@ function QuickbooksTab() {
   );
 }
 
+function WaveUpsellCard() {
+  const { t } = useLanguage();
+  const createCheckout = useCreateCheckoutSession();
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleCheckout = () => {
+    setLoading(true);
+    createCheckout.mutate(
+      { data: { planType: "monthly_elite" } },
+      {
+        onSuccess: (r) => { window.location.href = r.url; },
+        onError: () => {
+          setLoading(false);
+          toast({ title: t("dashboard.settings.billing.errorStartPayment"), variant: "destructive" });
+        },
+      }
+    );
+  };
+
+  return (
+    <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
+            <Plug className="h-6 w-6 text-violet-500" />
+          </div>
+          <div>
+            <CardTitle>{t("dashboard.settings.waveUpsell.title")}</CardTitle>
+            <CardDescription className="mt-0.5">{t("dashboard.settings.waveUpsell.desc")}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardFooter>
+        <Button onClick={handleCheckout} disabled={loading} className="gap-2">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+          {t("dashboard.settings.waveUpsell.cta")}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function WaveMappingCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status } = useGetWaveStatus();
+  const { data: accounts, isLoading: loadingAccounts } = useGetWaveAccounts({ query: { queryKey: getGetWaveAccountsQueryKey(), enabled: !!status?.connected } });
+  const updateMapping = useUpdateWaveMapping();
+
+  const [paymentAccountId, setPaymentAccountId] = useState<string>("");
+  const [incomeAccountId, setIncomeAccountId] = useState<string>("");
+  const [categoryAccountIds, setCategoryAccountIds] = useState<Record<string, string>>({});
+
+  const paymentAccount = accounts?.paymentAccounts.find(a => a.id === paymentAccountId);
+  const incomeAccount = accounts?.incomeAccounts.find(a => a.id === incomeAccountId);
+
+  const handleSave = () => {
+    const categoryMap: Record<string, { id: string; name: string } | null> = {};
+    for (const c of COST_CATEGORY_KEYS) {
+      const id = categoryAccountIds[c];
+      const account = accounts?.expenseAccounts.find(a => a.id === id);
+      categoryMap[c] = account ? { id: account.id, name: account.name } : null;
+    }
+    updateMapping.mutate(
+      {
+        data: {
+          paymentAccount: paymentAccount ? { id: paymentAccount.id, name: paymentAccount.name } : undefined,
+          incomeAccount: incomeAccount ? { id: incomeAccount.id, name: incomeAccount.name } : undefined,
+          categoryMap,
+        },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetWaveStatusQueryKey() });
+          toast({ title: t("dashboard.settings.wave.mappingSaved") });
+        },
+        onError: () => toast({ title: t("dashboard.settings.wave.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-2xl" />;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("dashboard.settings.wave.mappingTitle")}</CardTitle>
+        <CardDescription>{t("dashboard.settings.wave.mappingDesc")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">{t("dashboard.settings.wave.paymentAccount")}</label>
+          <Select value={paymentAccountId} onValueChange={setPaymentAccountId}>
+            <SelectTrigger>
+              <SelectValue placeholder={status?.paymentAccountName ?? t("dashboard.settings.wave.selectAccount")} />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts?.paymentAccounts.map(a => (
+                <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">{t("dashboard.settings.wave.incomeAccount")}</label>
+          <Select value={incomeAccountId} onValueChange={setIncomeAccountId}>
+            <SelectTrigger>
+              <SelectValue placeholder={status?.incomeAccountName ?? t("dashboard.settings.wave.selectAccount")} />
+            </SelectTrigger>
+            <SelectContent>
+              {accounts?.incomeAccounts.map(a => (
+                <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-3">
+          <label className="text-sm font-medium">{t("dashboard.settings.wave.categoryMapping")}</label>
+          {COST_CATEGORY_KEYS.map((c) => (
+            <div key={c} className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground w-32 shrink-0">{t(`jobs.cost.${c}`)}</span>
+              <Select
+                value={categoryAccountIds[c] ?? ""}
+                onValueChange={(v) => setCategoryAccountIds(prev => ({ ...prev, [c]: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={status?.categoryMap?.[c] ?? t("dashboard.settings.wave.selectAccount")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts?.expenseAccounts.map(a => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleSave} disabled={updateMapping.isPending} className="gap-2">
+          {updateMapping.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {t("dashboard.settings.wave.saveMapping")}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function WaveSyncLogCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: log } = useGetWaveSyncLog();
+  const retry = useRetryWaveSync();
+
+  if (!log || log.entries.length === 0) return null;
+
+  const handleRetry = (entityType: string, entityId: string) => {
+    retry.mutate(
+      { data: { entityType: entityType as "invoice" | "cost_entry", entityId } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetWaveSyncLogQueryKey() });
+          toast({ title: t("dashboard.settings.wave.retried") });
+        },
+        onError: () => toast({ title: t("dashboard.settings.wave.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">{t("dashboard.settings.wave.syncLogTitle")}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {log.entries.map((e) => (
+          <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
+            <div className="flex items-center gap-2 min-w-0">
+              {e.status === "synced" ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              ) : (
+                <XCircle className="h-4 w-4 text-red-500 shrink-0" />
+              )}
+              <div className="min-w-0">
+                <p className="font-medium truncate">{e.entityType === "invoice" ? t("dashboard.settings.wave.invoice") : t("dashboard.settings.wave.costEntry")}</p>
+                {e.error && <p className="text-xs text-red-600 truncate">{e.error}</p>}
+              </div>
+            </div>
+            {e.status === "failed" && (
+              <Button size="sm" variant="outline" className="gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
+                <RefreshCw className="h-3.5 w-3.5" /> {t("dashboard.settings.wave.retry")}
+              </Button>
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function WaveTab() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status, isLoading } = useGetWaveStatus();
+  const { data: subscription } = useGetSubscription();
+  const getConnectUrl = useGetWaveConnectUrl({ query: { queryKey: getGetWaveConnectUrlQueryKey(), enabled: false } });
+  const disconnectWaveMutation = useDisconnectWave();
+  const toggleWaveMutation = useToggleWave();
+
+  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isConnected = status?.connected ?? false;
+  const isEnabled = status?.isEnabled ?? true;
+
+  const handleConnect = async () => {
+    const result = await getConnectUrl.refetch();
+    if (result.data?.url) window.location.href = result.data.url;
+    else toast({ title: t("dashboard.settings.wave.error"), variant: "destructive" });
+  };
+
+  const handleDisconnect = () => {
+    disconnectWaveMutation.mutate(undefined, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetWaveStatusQueryKey() });
+        toast({ title: t("dashboard.settings.wave.disconnected") });
+      },
+      onError: () => toast({ title: t("dashboard.settings.wave.error"), variant: "destructive" }),
+    });
+  };
+
+  const handleToggle = () => {
+    toggleWaveMutation.mutate(
+      { data: { isEnabled: !isEnabled } },
+      {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: getGetWaveStatusQueryKey() }),
+        onError: () => toast({ title: t("dashboard.settings.wave.error"), variant: "destructive" }),
+      }
+    );
+  };
+
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (!isElite) return <WaveUpsellCard />;
+
+  if (!isConnected) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-emerald-600" />
+            </div>
+            <div>
+              <CardTitle>{t("dashboard.settings.wave.connectTitle")}</CardTitle>
+              <CardDescription className="mt-0.5">{t("dashboard.settings.wave.connectDesc")}</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardFooter>
+          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="gap-2">
+            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {t("dashboard.settings.wave.connectCta")}
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <Building2 className="h-6 w-6 text-emerald-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">{status?.businessName || t("dashboard.settings.wave.connectedTitle")}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-0.5">{t("dashboard.settings.wave.connectedSince")} {status?.connectedAt ? new Date(status.connectedAt).toLocaleDateString() : ""}</p>
+              </div>
+            </div>
+            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+              {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {status?.lastSyncedAt && (
+            <p className="text-xs text-muted-foreground">{t("dashboard.settings.wave.lastSynced")} {new Date(status.lastSyncedAt).toLocaleString()}</p>
+          )}
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleWaveMutation.isPending} className="gap-2">
+              {toggleWaveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectWaveMutation.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              {disconnectWaveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
+              {t("dashboard.settings.wave.disconnect")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <WaveMappingCard />
+      <WaveSyncLogCard />
+    </div>
+  );
+}
+
 function StripeConnectTab() {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -2075,6 +2390,7 @@ export default function SettingsPage() {
           <StripeConnectTab />
           <FinanceitTab />
           <QuickbooksTab />
+          <WaveTab />
           <CalendarSyncTab />
           <EmailSendTab />
           <DeveloperApiTab />

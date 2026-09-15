@@ -78,6 +78,13 @@ import type {
   UploadUrlRequest,
   UploadUrlResponse,
   UploadedDocument,
+  WaveAccounts,
+  WaveConnectUrl,
+  WaveMappingBody,
+  WaveRetryBody,
+  WaveStatus,
+  WaveSyncLog,
+  WaveToggleBody,
   WhatsappConnectBody,
   WhatsappConnectResult,
   WhatsappStatus,
@@ -4010,6 +4017,652 @@ export const useRetryQuickbooksSync = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getRetryQuickbooksSyncMutationOptions(options));
+    }
+
+export const getGetWaveStatusUrl = () => {
+
+
+
+
+  return `/api/wave/status`
+}
+
+/**
+ * @summary Get the Wave accounting connection status for the authenticated company
+ */
+export const getWaveStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<WaveStatus> => {
+
+  return customFetch<WaveStatus>(getGetWaveStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWaveStatusQueryKey = () => {
+    return [
+    `/api/wave/status`
+    ] as const;
+    }
+
+
+export const getGetWaveStatusQueryOptions = <TData = Awaited<ReturnType<typeof getWaveStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWaveStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWaveStatus>>> = ({ signal }) => getWaveStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWaveStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWaveStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getWaveStatus>>>
+export type GetWaveStatusQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the Wave accounting connection status for the authenticated company
+ */
+
+export function useGetWaveStatus<TData = Awaited<ReturnType<typeof getWaveStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWaveStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetWaveConnectUrlUrl = () => {
+
+
+
+
+  return `/api/wave/connect`
+}
+
+/**
+ * @summary Get the Wave OAuth authorization URL to redirect the browser to
+ */
+export const getWaveConnectUrl = async ( options?: Parameters<typeof customFetch>[1]): Promise<WaveConnectUrl> => {
+
+  return customFetch<WaveConnectUrl>(getGetWaveConnectUrlUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWaveConnectUrlQueryKey = () => {
+    return [
+    `/api/wave/connect`
+    ] as const;
+    }
+
+
+export const getGetWaveConnectUrlQueryOptions = <TData = Awaited<ReturnType<typeof getWaveConnectUrl>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWaveConnectUrlQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWaveConnectUrl>>> = ({ signal }) => getWaveConnectUrl({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWaveConnectUrl>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWaveConnectUrlQueryResult = NonNullable<Awaited<ReturnType<typeof getWaveConnectUrl>>>
+export type GetWaveConnectUrlQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get the Wave OAuth authorization URL to redirect the browser to
+ */
+
+export function useGetWaveConnectUrl<TData = Awaited<ReturnType<typeof getWaveConnectUrl>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveConnectUrl>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWaveConnectUrlQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDisconnectWaveUrl = () => {
+
+
+
+
+  return `/api/wave/disconnect`
+}
+
+/**
+ * @summary Unlink Wave from the company account
+ */
+export const disconnectWave = async ( options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+  return customFetch<SuccessResult>(getDisconnectWaveUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDisconnectWaveMutationKey = () => ['disconnectWave'] as const;
+
+export const getDisconnectWaveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectWave>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof disconnectWave>>, TError,void, TContext> => {
+
+const mutationKey = getDisconnectWaveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof disconnectWave>>, void> = () => {
+
+
+          return  disconnectWave(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DisconnectWaveMutationResult = NonNullable<Awaited<ReturnType<typeof disconnectWave>>>
+
+    export type DisconnectWaveMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Unlink Wave from the company account
+ */
+export const useDisconnectWave = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof disconnectWave>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof disconnectWave>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDisconnectWaveMutationOptions(options));
+    }
+
+export const getToggleWaveUrl = () => {
+
+
+
+
+  return `/api/wave/toggle`
+}
+
+/**
+ * @summary Enable or disable Wave sync
+ */
+export const toggleWave = async (waveToggleBody: WaveToggleBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getToggleWaveUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(waveToggleBody)
+  }
+);}
+
+
+
+
+
+export const getToggleWaveMutationKey = () => ['toggleWave'] as const;
+
+export const getToggleWaveMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleWave>>, TError,ToggleWaveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleWave>>, TError,ToggleWaveMutationVariables, TContext> => {
+
+const mutationKey = getToggleWaveMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleWave>>, ToggleWaveMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  toggleWave(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ToggleWaveMutationResult = NonNullable<Awaited<ReturnType<typeof toggleWave>>>
+    export type ToggleWaveMutationBody = BodyType<WaveToggleBody>
+    export type ToggleWaveMutationError = ErrorType<unknown>
+    export type ToggleWaveMutationVariables = {data: BodyType<WaveToggleBody>}
+
+    /**
+ * @summary Enable or disable Wave sync
+ */
+export const useToggleWave = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleWave>>, TError,ToggleWaveMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof toggleWave>>,
+        TError,
+        ToggleWaveMutationVariables,
+        TContext
+      > => {
+      return useMutation(getToggleWaveMutationOptions(options));
+    }
+
+export const getGetWaveAccountsUrl = () => {
+
+
+
+
+  return `/api/wave/accounts`
+}
+
+/**
+ * @summary List the company's Wave expense, income, and payment accounts, for the mapping UI
+ */
+export const getWaveAccounts = async ( options?: Parameters<typeof customFetch>[1]): Promise<WaveAccounts> => {
+
+  return customFetch<WaveAccounts>(getGetWaveAccountsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWaveAccountsQueryKey = () => {
+    return [
+    `/api/wave/accounts`
+    ] as const;
+    }
+
+
+export const getGetWaveAccountsQueryOptions = <TData = Awaited<ReturnType<typeof getWaveAccounts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveAccounts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWaveAccountsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWaveAccounts>>> = ({ signal }) => getWaveAccounts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWaveAccounts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWaveAccountsQueryResult = NonNullable<Awaited<ReturnType<typeof getWaveAccounts>>>
+export type GetWaveAccountsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List the company's Wave expense, income, and payment accounts, for the mapping UI
+ */
+
+export function useGetWaveAccounts<TData = Awaited<ReturnType<typeof getWaveAccounts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveAccounts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWaveAccountsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateWaveMappingUrl = () => {
+
+
+
+
+  return `/api/wave/mapping`
+}
+
+/**
+ * @summary Set the payment (deposit) account, income account, and cost-category → expense-account mapping
+ */
+export const updateWaveMapping = async (waveMappingBody: WaveMappingBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getUpdateWaveMappingUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(waveMappingBody)
+  }
+);}
+
+
+
+
+
+export const getUpdateWaveMappingMutationKey = () => ['updateWaveMapping'] as const;
+
+export const getUpdateWaveMappingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWaveMapping>>, TError,UpdateWaveMappingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWaveMapping>>, TError,UpdateWaveMappingMutationVariables, TContext> => {
+
+const mutationKey = getUpdateWaveMappingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWaveMapping>>, UpdateWaveMappingMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateWaveMapping(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWaveMappingMutationResult = NonNullable<Awaited<ReturnType<typeof updateWaveMapping>>>
+    export type UpdateWaveMappingMutationBody = BodyType<WaveMappingBody>
+    export type UpdateWaveMappingMutationError = ErrorType<unknown>
+    export type UpdateWaveMappingMutationVariables = {data: BodyType<WaveMappingBody>}
+
+    /**
+ * @summary Set the payment (deposit) account, income account, and cost-category → expense-account mapping
+ */
+export const useUpdateWaveMapping = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWaveMapping>>, TError,UpdateWaveMappingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateWaveMapping>>,
+        TError,
+        UpdateWaveMappingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateWaveMappingMutationOptions(options));
+    }
+
+export const getGetWaveSyncLogUrl = () => {
+
+
+
+
+  return `/api/wave/sync-log`
+}
+
+/**
+ * @summary Recent Wave sync attempts (success and failure)
+ */
+export const getWaveSyncLog = async ( options?: Parameters<typeof customFetch>[1]): Promise<WaveSyncLog> => {
+
+  return customFetch<WaveSyncLog>(getGetWaveSyncLogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWaveSyncLogQueryKey = () => {
+    return [
+    `/api/wave/sync-log`
+    ] as const;
+    }
+
+
+export const getGetWaveSyncLogQueryOptions = <TData = Awaited<ReturnType<typeof getWaveSyncLog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWaveSyncLogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWaveSyncLog>>> = ({ signal }) => getWaveSyncLog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWaveSyncLog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWaveSyncLogQueryResult = NonNullable<Awaited<ReturnType<typeof getWaveSyncLog>>>
+export type GetWaveSyncLogQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Recent Wave sync attempts (success and failure)
+ */
+
+export function useGetWaveSyncLog<TData = Awaited<ReturnType<typeof getWaveSyncLog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWaveSyncLog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWaveSyncLogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRetryWaveSyncUrl = () => {
+
+
+
+
+  return `/api/wave/sync-log/retry`
+}
+
+/**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const retryWaveSync = async (waveRetryBody: WaveRetryBody, options?: Parameters<typeof customFetch>[1]): Promise<SuccessResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SuccessResult>(getRetryWaveSyncUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(waveRetryBody)
+  }
+);}
+
+
+
+
+
+export const getRetryWaveSyncMutationKey = () => ['retryWaveSync'] as const;
+
+export const getRetryWaveSyncMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryWaveSync>>, TError,RetryWaveSyncMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryWaveSync>>, TError,RetryWaveSyncMutationVariables, TContext> => {
+
+const mutationKey = getRetryWaveSyncMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryWaveSync>>, RetryWaveSyncMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  retryWaveSync(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryWaveSyncMutationResult = NonNullable<Awaited<ReturnType<typeof retryWaveSync>>>
+    export type RetryWaveSyncMutationBody = BodyType<WaveRetryBody>
+    export type RetryWaveSyncMutationError = ErrorType<unknown>
+    export type RetryWaveSyncMutationVariables = {data: BodyType<WaveRetryBody>}
+
+    /**
+ * @summary Manually re-run a failed sync for one invoice or cost entry
+ */
+export const useRetryWaveSync = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryWaveSync>>, TError,RetryWaveSyncMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryWaveSync>>,
+        TError,
+        RetryWaveSyncMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryWaveSyncMutationOptions(options));
     }
 
 export const getGetCalendarStatusUrl = () => {

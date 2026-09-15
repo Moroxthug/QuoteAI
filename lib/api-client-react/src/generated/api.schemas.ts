@@ -527,6 +527,75 @@ export interface QuickbooksRetryBody {
   entityId: string;
 }
 
+export type WaveStatusCategoryMap = {[key: string]: string | null} | null;
+
+export interface WaveStatus {
+  connected: boolean;
+  businessName?: string | null;
+  isEnabled?: boolean | null;
+  connectedAt?: string | null;
+  lastSyncedAt?: string | null;
+  hasPaymentAccount?: boolean | null;
+  paymentAccountName?: string | null;
+  hasIncomeAccount?: boolean | null;
+  incomeAccountName?: string | null;
+  categoryMap?: WaveStatusCategoryMap;
+}
+
+export interface WaveConnectUrl {
+  url: string;
+}
+
+export interface WaveToggleBody {
+  isEnabled: boolean;
+}
+
+export interface WaveAccount {
+  id: string;
+  name: string;
+}
+
+export interface WaveAccounts {
+  expenseAccounts: WaveAccount[];
+  incomeAccounts: WaveAccount[];
+  paymentAccounts: WaveAccount[];
+}
+
+export type WaveMappingBodyCategoryMap = {[key: string]: WaveAccount | null};
+
+export interface WaveMappingBody {
+  paymentAccount?: WaveAccount | null;
+  incomeAccount?: WaveAccount | null;
+  categoryMap?: WaveMappingBodyCategoryMap;
+}
+
+export interface WaveSyncLogEntry {
+  id: string;
+  entityType: string;
+  entityId: string;
+  waveId?: string | null;
+  status: string;
+  error?: string | null;
+  createdAt: string;
+}
+
+export interface WaveSyncLog {
+  entries: WaveSyncLogEntry[];
+}
+
+export type WaveRetryBodyEntityType = typeof WaveRetryBodyEntityType[keyof typeof WaveRetryBodyEntityType];
+
+
+export const WaveRetryBodyEntityType = {
+  invoice: 'invoice',
+  cost_entry: 'cost_entry',
+} as const;
+
+export interface WaveRetryBody {
+  entityType: WaveRetryBodyEntityType;
+  entityId: string;
+}
+
 export type CalendarProvider = typeof CalendarProvider[keyof typeof CalendarProvider];
 
 

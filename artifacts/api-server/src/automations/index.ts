@@ -8,4 +8,6 @@ import "./jobReviewRequest";
 import "./quoteFollowup";
 import "./invoicePaidQuickbooks";
 import "./costConfirmedQuickbooks";
+import "./invoicePaidWave";
+import "./costConfirmedWave";
 import "./webhookDispatch";

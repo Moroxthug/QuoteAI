@@ -3,7 +3,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, Mail, UserX, UserCheck, Filter, UserPlus, RotateCw } from "lucide-react";
+import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, Mail, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -404,6 +404,7 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
                       <div className="truncate"><Link href={`/dashboard/jobs/${e.projectId}?tab=team`} className="font-medium text-slate-800 hover:text-violet-700">{e.projectName}</Link> <span className="text-slate-500">· {e.hours} h</span>{e.milestoneTitle ? <span className="text-slate-400"> · {e.milestoneTitle}</span> : null}{e.enteredBy === "worker" ? <span className="text-[10px] text-slate-400 ml-1">({t("team.time.byWorker")})</span> : null}</div>
                       {e.note && <div className="text-[11px] text-slate-400 truncate">{e.note}</div>}
                     </div>
+                    {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" /></span>}
                     <TimeStatusBadge status={e.status} />
                     <span className="font-medium whitespace-nowrap w-20 text-right">{formatCents(e.costCents)}</span>
                     <div className="flex gap-1 shrink-0">

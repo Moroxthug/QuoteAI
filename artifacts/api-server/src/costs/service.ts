@@ -75,6 +75,9 @@ export function serializeTimeEntry(e: TimeEntry, extra?: { workerName?: string; 
     approvedAt: iso(e.approvedAt),
     rejectedReason: e.rejectedReason,
     costEntryId: e.costEntryId,
+    clockInAt: iso(e.clockInAt),
+    clockOutAt: iso(e.clockOutAt),
+    geofenceFlagged: e.geofenceFlagged,
     createdAt: e.createdAt.toISOString(),
   };
 }

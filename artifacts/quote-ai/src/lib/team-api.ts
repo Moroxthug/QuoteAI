@@ -69,12 +69,15 @@ export type WorkerPageDto = {
   language: "en" | "fr";
   jobs: { id: string; name: string; address: string; milestones: { id: string; title: string; status: string }[] }[];
   entries: WorkerEntryDto[];
+  activeEntry: WorkerEntryDto | null;
   today: string;
 };
-export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; createdAt: string };
+export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; clockInAt: string | null; clockOutAt: string | null; geofenceFlagged: boolean; createdAt: string };
 
 export const workerApi = {
   get: (token: string) => req<WorkerPageDto>(`/api/t/${token}`),
   add: (token: string, body: { projectId: string; date: string; hours: number; milestoneId?: string | null; note?: string }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/entries`, { method: "POST", body: json(body) }),
   remove: (token: string, id: string) => req<{ success: true }>(`/api/t/${token}/entries/${id}`, { method: "DELETE" }),
+  clockIn: (token: string, body: { projectId: string; milestoneId?: string | null; lat?: number; lng?: number }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/clock-in`, { method: "POST", body: json(body) }),
+  clockOut: (token: string, entryId: string, body: { lat?: number; lng?: number }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/entries/${entryId}/clock-out`, { method: "POST", body: json(body) }),
 };

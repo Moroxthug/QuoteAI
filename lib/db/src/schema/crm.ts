@@ -60,6 +60,11 @@ export const projectsTable = pgTable("projects", {
   completedAt: timestamp("completed_at", { withTimezone: true }),
   /** Phase 10: set once the review-request message has gone out, so the daily scan never re-sends it. */
   reviewRequestSentAt: timestamp("review_request_sent_at", { withTimezone: true }),
+  /** Phase 23: job-site coordinates, set manually (e.g. "use my location" while on site) — no geocoding integration exists. Both null unless set. */
+  latitude: numeric("latitude", { precision: 9, scale: 6 }),
+  longitude: numeric("longitude", { precision: 9, scale: 6 }),
+  /** Phase 23: optional, off by default. When set, a worker clock-in/out beyond this radius just flags the entry — never blocks it. */
+  geofenceRadiusMeters: integer("geofence_radius_meters"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

@@ -108,6 +108,15 @@ export const timeEntriesTable = pgTable(
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     rejectedReason: text("rejected_reason"),
     costEntryId: uuid("cost_entry_id").references(() => costEntriesTable.id, { onDelete: "set null" }),
+    /** Phase 23: GPS clock-in/out. Null on manually-logged (self-reported) entries. */
+    clockInAt: timestamp("clock_in_at", { withTimezone: true }),
+    clockOutAt: timestamp("clock_out_at", { withTimezone: true }),
+    clockInLat: numeric("clock_in_lat", { precision: 9, scale: 6 }),
+    clockInLng: numeric("clock_in_lng", { precision: 9, scale: 6 }),
+    clockOutLat: numeric("clock_out_lat", { precision: 9, scale: 6 }),
+    clockOutLng: numeric("clock_out_lng", { precision: 9, scale: 6 }),
+    /** Set when a clock-in/out location falls outside the job's geofence radius. Never blocks — flags for review only. */
+    geofenceFlagged: boolean("geofence_flagged").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },

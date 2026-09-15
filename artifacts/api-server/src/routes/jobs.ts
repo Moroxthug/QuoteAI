@@ -136,6 +136,9 @@ export function serializeProject(p: typeof projectsTable.$inferSelect) {
     contractId: p.contractId,
     address: p.address,
     province: p.province,
+    latitude: p.latitude ? Number(p.latitude) : null,
+    longitude: p.longitude ? Number(p.longitude) : null,
+    geofenceRadiusMeters: p.geofenceRadiusMeters,
     contractValueCents: p.contractValueCents,
     changeOrdersCents: p.changeOrdersCents,
     totalValueCents: p.contractValueCents + p.changeOrdersCents,
@@ -366,6 +369,9 @@ router.put("/jobs/:id", requireAuth, requirePermission("jobs", "edit"), async (r
         plannedStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
         plannedEnd: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
         contractValueCents: z.number().int().min(0).optional(),
+        latitude: z.number().min(-90).max(90).nullable().optional(),
+        longitude: z.number().min(-180).max(180).nullable().optional(),
+        geofenceRadiusMeters: z.number().int().min(50).max(5000).nullable().optional(),
       })
       .safeParse(req.body);
     if (!body.success) {
@@ -377,6 +383,9 @@ router.put("/jobs/:id", requireAuth, requirePermission("jobs", "edit"), async (r
     if (d.name !== undefined) updates.name = d.name;
     if (d.description !== undefined) updates.description = d.description;
     if (d.address !== undefined) updates.address = d.address;
+    if (d.latitude !== undefined) updates.latitude = d.latitude === null ? null : d.latitude.toFixed(6);
+    if (d.longitude !== undefined) updates.longitude = d.longitude === null ? null : d.longitude.toFixed(6);
+    if (d.geofenceRadiusMeters !== undefined) updates.geofenceRadiusMeters = d.geofenceRadiusMeters;
     if (d.status !== undefined) {
       updates.status = d.status;
       updates.completedAt = d.status === "completed" ? (project.completedAt ?? new Date()) : null;

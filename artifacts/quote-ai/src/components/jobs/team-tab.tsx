@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
-import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,6 +45,22 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
   const addTime = useMutation({ mutationFn: (v: { workerId: string; date: string; hours: number; milestoneId: string | null; note: string }) => jobsApi.addTimeEntry(job.id, v), onSuccess: () => { refresh(); setTime({ ...time, hours: "", note: "" }); }, onError });
   const addUsage = useMutation({ mutationFn: (v: { equipmentId: string; date: string; quantity: number; unit: UsageUnit; note: string }) => jobsApi.addEquipmentUsage(job.id, v), onSuccess: () => { refresh(); setUsage({ ...usage, quantity: "", note: "" }); }, onError });
   const delUsage = useMutation({ mutationFn: (uid: string) => jobsApi.deleteEquipmentUsage(job.id, uid), onSuccess: refresh, onError });
+  const [locating, setLocating] = useState(false);
+  const setLocation = useMutation({
+    mutationFn: (v: { latitude: number | null; longitude: number | null }) => jobsApi.update(job.id, v),
+    onSuccess: refresh,
+    onError,
+  });
+  const setRadius = useMutation({ mutationFn: (v: number | null) => jobsApi.update(job.id, { geofenceRadiusMeters: v }), onSuccess: refresh, onError });
+  const useMyLocation = () => {
+    if (!("geolocation" in navigator)) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { setLocating(false); setLocation.mutate({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }); },
+      () => setLocating(false),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   const [name, setName] = useState("");
   const [rate, setRate] = useState("");
@@ -98,6 +114,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
                     <div className="truncate"><span className="font-medium text-slate-800">{e.workerName}</span> <span className="text-slate-500">· {e.hours} h</span>{e.milestoneTitle ? <span className="text-slate-400"> · {e.milestoneTitle}</span> : null}</div>
                     {e.note && <div className="text-[11px] text-slate-400 truncate">{e.note}</div>}
                   </div>
+                  {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" /></span>}
                   <TimeStatusBadge status={e.status} />
                   <span className="font-medium whitespace-nowrap w-20 text-right">{e.status === "approved" ? formatCents(e.costCents) : <span className="text-slate-400">{formatCents(e.costCents)}</span>}</span>
                   <div className="flex gap-1 shrink-0">
@@ -181,6 +198,24 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
             <Button type="submit" size="sm" variant="outline" className="w-full h-9" disabled={!name.trim() || addWorker.isPending}>{t("jobs.team.addAndAssign")}</Button>
           </form>
           <p className="text-[11px] text-slate-400">{t("jobs.team.assignHint")}</p>
+        </section>
+
+        {/* Geofence */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
+          <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-violet-600" /> {t("jobs.team.geofenceTitle")}</h3>
+          <p className="text-xs text-slate-500">{t("jobs.team.geofenceHint")}</p>
+          <Button type="button" variant="outline" size="sm" className="h-9 gap-1.5 w-full" disabled={locating} onClick={useMyLocation}>
+            {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} {job.latitude ? t("jobs.team.updateLocation") : t("jobs.team.useMyLocation")}
+          </Button>
+          {job.latitude && job.longitude && (
+            <div className="space-y-1">
+              <Label className="text-xs text-slate-500">{t("jobs.team.radiusLabel")}</Label>
+              <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm">
+                <option value="">{t("jobs.team.radiusOff")}</option>
+                {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
+              </select>
+            </div>
+          )}
         </section>
       </div>
     </div>

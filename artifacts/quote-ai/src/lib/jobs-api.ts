@@ -17,6 +17,9 @@ export type JobSummaryDto = {
   contractId: string | null;
   address: string;
   province: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  geofenceRadiusMeters: number | null;
   contractValueCents: number;
   changeOrdersCents: number;
   totalValueCents: number;
@@ -137,6 +140,9 @@ export type TimeEntryDto = {
   approvedAt: string | null;
   rejectedReason: string | null;
   costEntryId: string | null;
+  clockInAt: string | null;
+  clockOutAt: string | null;
+  geofenceFlagged: boolean;
   createdAt: string;
 };
 export type UsageUnit = "hour" | "day";
@@ -238,7 +244,7 @@ export const jobsApi = {
   get: (id: string) => req<JobDetailDto>(`/api/jobs/${id}`),
   create: (body: { name: string; description?: string; quoteId?: string; clientId?: string; address?: string; province?: string; plannedStart?: string; plannedEnd?: string; contractValueCents?: number }) =>
     req<{ job: JobSummaryDto; created: boolean }>("/api/jobs", { method: "POST", body: json(body) }),
-  update: (id: string, body: { name?: string; description?: string; status?: JobStatus; address?: string; plannedStart?: string | null; plannedEnd?: string | null; contractValueCents?: number }) =>
+  update: (id: string, body: { name?: string; description?: string; status?: JobStatus; address?: string; plannedStart?: string | null; plannedEnd?: string | null; contractValueCents?: number; latitude?: number | null; longitude?: number | null; geofenceRadiusMeters?: number | null }) =>
     req<{ job: JobSummaryDto }>(`/api/jobs/${id}`, { method: "PUT", body: json(body) }),
   remove: (id: string) => req<{ success: true }>(`/api/jobs/${id}`, { method: "DELETE" }),
 

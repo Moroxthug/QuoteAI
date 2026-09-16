@@ -10,21 +10,29 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { leadsApi, type LeadDto, type LeadStatus } from "@/lib/leads-api";
 
-const FILTERS: (LeadStatus | "all")[] = ["all", "new", "contacted", "quoted", "won", "lost", "unsubscribed"];
+const COLUMNS: LeadStatus[] = ["new", "contacted", "quoted", "won", "lost", "unsubscribed"];
 
-const STATUS_COLORS: Record<LeadStatus, string> = {
+const COLUMN_STYLES: Record<LeadStatus, { dot: string; header: string }> = {
+  new: { dot: "bg-blue-500", header: "text-blue-700" },
+  contacted: { dot: "bg-amber-500", header: "text-amber-700" },
+  quoted: { dot: "bg-[var(--qa-purple)]", header: "text-[var(--qa-purple)]" },
+  won: { dot: "bg-[var(--qa-green)]", header: "text-[var(--qa-green-dark)]" },
+  lost: { dot: "bg-slate-400", header: "text-slate-600" },
+  unsubscribed: { dot: "bg-[var(--qa-red)]", header: "text-[var(--qa-red)]" },
+};
+
+const CARD_BADGE: Record<LeadStatus, string> = {
   new: "bg-blue-100 text-blue-700",
   contacted: "bg-amber-100 text-amber-700",
   quoted: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
-  won: "bg-emerald-100 text-emerald-700",
+  won: "bg-[var(--qa-green-t)] text-[var(--qa-green-dark)]",
   lost: "bg-slate-200 text-slate-600",
-  unsubscribed: "bg-red-100 text-red-700",
+  unsubscribed: "bg-[var(--qa-red-t)] text-[var(--qa-red)]",
 };
 
 const CHANNEL_ICON = { email: Mail, sms: Phone, whatsapp: MessageCircle };
@@ -35,20 +43,25 @@ export default function LeadsListPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["leads"], queryFn: () => leadsApi.list() });
-  const [filter, setFilter] = useState<LeadStatus | "all">("all");
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
+  const [dragOverCol, setDragOverCol] = useState<LeadStatus | null>(null);
 
   const items = useMemo(() => {
     const all = data?.items ?? [];
     const q = search.trim().toLowerCase();
-    return all.filter((l) => {
-      const inFilter = filter === "all" || l.status === filter;
-      const inSearch = !q || l.name.toLowerCase().includes(q) || (l.email ?? "").toLowerCase().includes(q) || (l.phone ?? "").includes(q);
-      return inFilter && inSearch;
-    });
-  }, [data, filter, search]);
+    if (!q) return all;
+    return all.filter(
+      (l) => l.name.toLowerCase().includes(q) || (l.email ?? "").toLowerCase().includes(q) || (l.phone ?? "").includes(q),
+    );
+  }, [data, search]);
+
+  const byColumn = useMemo(() => {
+    const map = new Map<LeadStatus, LeadDto[]>(COLUMNS.map((c) => [c, []]));
+    for (const lead of items) map.get(lead.status)?.push(lead);
+    return map;
+  }, [items]);
 
   const createMutation = useMutation({
     mutationFn: () => leadsApi.create({ name: form.name, email: form.email || undefined, phone: form.phone || undefined, notes: form.notes || undefined }),
@@ -75,6 +88,16 @@ export default function LeadsListPage() {
     onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
   });
 
+  const handleDrop = (status: LeadStatus, e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOverCol(null);
+    const id = e.dataTransfer.getData("text/lead-id");
+    if (!id) return;
+    const lead = items.find((l) => l.id === id);
+    if (!lead || lead.status === status) return;
+    statusMutation.mutate({ id, status });
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -90,73 +113,94 @@ export default function LeadsListPage() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input className="pl-9" placeholder={t("leads.search")} value={search} onChange={(e) => setSearch(e.target.value)} />
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
-                filter === f ? "bg-navy-600 text-white border-navy-600" : "bg-card text-slate-600 border-slate-200 hover:border-navy-300",
-              )}
-            >
-              {f === "all" ? t("leads.filter.all") : t(`leads.status.${f}`)}
-            </button>
-          ))}
-        </div>
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <Input className="pl-9" placeholder={t("leads.search")} value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[var(--radius)]" />)}
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-16 text-slate-500 border border-dashed rounded-lg">{t("leads.empty")}</div>
+        <div className="text-center py-16 text-slate-500 border border-dashed rounded-[var(--radius)]">{t("leads.empty")}</div>
       ) : (
-        <div className="divide-y rounded-lg border bg-card">
-          {items.map((lead) => {
-            const ChannelIcon = CHANNEL_ICON[lead.preferredChannel];
-            const canSend = !["won", "lost", "unsubscribed"].includes(lead.status) && !!(lead.email || lead.phone);
+        <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+          {COLUMNS.map((status) => {
+            const leads = byColumn.get(status) ?? [];
+            const style = COLUMN_STYLES[status];
             return (
-              <div key={lead.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-                <div className="flex-1 min-w-[160px]">
-                  <div className="font-medium text-slate-900">{lead.name}</div>
-                  <div className="text-sm text-slate-500 flex items-center gap-1">
-                    <ChannelIcon className="h-3.5 w-3.5" />
-                    {lead.email || lead.phone || "—"}
-                  </div>
-                </div>
-                <Badge variant="secondary" className="font-normal">{t(`leads.source.${lead.source}`)}</Badge>
-                <Select value={lead.status} onValueChange={(status) => statusMutation.mutate({ id: lead.id, status: status as LeadStatus })}>
-                  <SelectTrigger className={cn("w-[140px] h-8 text-xs font-medium border-0", STATUS_COLORS[lead.status])}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(["new", "contacted", "quoted", "won", "lost", "unsubscribed"] as LeadStatus[]).map((s) => (
-                      <SelectItem key={s} value={s}>{t(`leads.status.${s}`)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {lead.nextFollowUpAt && (
-                  <div className="text-xs text-slate-400 min-w-[120px]">
-                    {t("leads.nextFollowUp")}: {formatDistanceToNow(new Date(lead.nextFollowUpAt), { addSuffix: true, locale })}
-                  </div>
+              <div
+                key={status}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOverCol(status);
+                }}
+                onDragLeave={() => setDragOverCol((c) => (c === status ? null : c))}
+                onDrop={(e) => handleDrop(status, e)}
+                className={cn(
+                  "flex-1 min-w-[260px] max-w-[300px] rounded-[var(--radius)] bg-slate-50/70 border border-slate-200/80 flex flex-col transition-colors",
+                  dragOverCol === status && "bg-navy-50 border-navy-300",
                 )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="gap-1.5"
-                  disabled={!canSend || sendMutation.isPending}
-                  onClick={() => sendMutation.mutate(lead.id)}
-                >
-                  {sendMutation.isPending && sendMutation.variables === lead.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                  {t("leads.sendNow")}
-                </Button>
+              >
+                <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-200/80">
+                  <div className={cn("flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide", style.header)}>
+                    <span className={cn("h-1.5 w-1.5 rounded-full", style.dot)} />
+                    {t(`leads.status.${status}`)}
+                  </div>
+                  <Badge variant="secondary" className="font-normal text-xs">{leads.length}</Badge>
+                </div>
+                <div className="flex-1 space-y-2 p-2 min-h-[80px]">
+                  {leads.length === 0 ? (
+                    <div className="text-xs text-slate-400 text-center py-6">{t("leads.column.empty")}</div>
+                  ) : (
+                    leads.map((lead) => {
+                      const ChannelIcon = CHANNEL_ICON[lead.preferredChannel];
+                      const canSend = !["won", "lost", "unsubscribed"].includes(lead.status) && !!(lead.email || lead.phone);
+                      return (
+                        <div
+                          key={lead.id}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/lead-id", lead.id);
+                            e.dataTransfer.effectAllowed = "move";
+                          }}
+                          className="rounded-[var(--radius-sm)] border border-slate-200 bg-card p-3 shadow-[0_1px_3px_rgba(16,16,49,0.06)] cursor-grab active:cursor-grabbing hover:shadow-[0_4px_12px_rgba(16,16,49,0.10)] transition-shadow space-y-2"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="font-medium text-sm text-slate-900 leading-tight">{lead.name}</div>
+                            <Badge className={cn("text-[10px] font-normal shrink-0", CARD_BADGE[lead.status])} variant="secondary">
+                              {t(`leads.source.${lead.source}`)}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-slate-500 flex items-center gap-1 truncate">
+                            <ChannelIcon className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{lead.email || lead.phone || "—"}</span>
+                          </div>
+                          {lead.nextFollowUpAt && (
+                            <div className="text-[11px] text-slate-400">
+                              {t("leads.nextFollowUp")}: {formatDistanceToNow(new Date(lead.nextFollowUpAt), { addSuffix: true, locale })}
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full gap-1.5 h-7 text-xs"
+                            disabled={!canSend || sendMutation.isPending}
+                            onClick={() => sendMutation.mutate(lead.id)}
+                          >
+                            {sendMutation.isPending && sendMutation.variables === lead.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Send className="h-3 w-3" />
+                            )}
+                            {t("leads.sendNow")}
+                          </Button>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             );
           })}

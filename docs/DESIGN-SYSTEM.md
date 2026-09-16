@@ -1,6 +1,6 @@
 # QuoteAI visual redesign — design system reference
 
-**Status**: Phase 1 (design-system foundation) built. Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file.
+**Status**: Phase 30 (design-system foundation) built & pushed (2026-09-16). Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
 
 ## Source
 
@@ -27,7 +27,7 @@ Both use: navy `#101031` as the single primary/brand color, Figtree as the displ
 | `--qa-red` / `--qa-red-t` | `#d9480f` / `#fdeee5` | "Overdue"/error chip. |
 | `--qa-grey-t` | `#eceef2` | Neutral/inactive chip, pairs with `text-muted-foreground`. |
 
-Every hardcoded `rgba(124,58,237,...)` / `#7C3AED` / `#4F46E5` / `#06B6D4` reference inside `index.css`'s animation/utility layer (`.quoteai-word` shimmer, `.logo-glow`, `.crm-nav-active`, `pro-glow`, `soft-pulse-glow`, `.hero-grid-bg`, `.mesh-blob-1/2/3`) was repointed to navy (and, for variety in the wordmark shimmer and the two smaller mesh blobs, teal/green from the same accent set) — this file-scoped sweep is done; the same `violet-*`/`indigo-*`/`cyan-*` Tailwind utility classes used directly in ~68 page/component files (not just `index.css`) are Phase 2, not yet done.
+Every hardcoded `rgba(124,58,237,...)` / `#7C3AED` / `#4F46E5` / `#06B6D4` reference inside `index.css`'s animation/utility layer (`.quoteai-word` shimmer, `.logo-glow`, `.crm-nav-active`, `pro-glow`, `soft-pulse-glow`, `.hero-grid-bg`, `.mesh-blob-1/2/3`) was repointed to navy (and, for variety in the wordmark shimmer and the two smaller mesh blobs, teal/green from the same accent set) — this file-scoped sweep is done; the same `violet-*`/`indigo-*`/`cyan-*` Tailwind utility classes used directly in ~68 page/component files (not just `index.css`) are Phase 31, not yet done.
 
 ## Primitives touched (`src/components/ui/*.tsx`)
 
@@ -39,11 +39,13 @@ Every hardcoded `rgba(124,58,237,...)` / `#7C3AED` / `#4F46E5` / `#06B6D4` refer
 - `switch.tsx` — checked state now `bg-[var(--qa-green)]` (was `bg-primary`/navy) — the mockup uses green for "on," reserving navy for brand/primary actions only.
 - `logo.tsx` — dropped the `.logo-glow` violet drop-shadow pulse (kept the existing `/quoteai-logo.png` asset; no new brand asset was generated).
 
-## What's NOT done yet (later phases, per `docs/EDGE-FEATURES-PLAN.md`-style phased rollout)
+## What's NOT done yet
 
-- **Phase 2**: the ~68-file sweep replacing hardcoded `violet-*`/`indigo-*`/`cyan-*` Tailwind utility classes across dashboard pages, marketing pages, and shared components (`assistant-panel.tsx`, `notifications-bell.tsx`, etc.) with the new token/chip classes.
-- **Phase 3**: dashboard shell (`dashboard-layout.tsx`) — sidebar rail-collapse animation, grouped nav labels, topbar search/notifications restyle.
-- **Phase 4**: marketing homepage + `public-layout.tsx` — mega-menu, hero word-reveal, animated count-up stats, story-split restyle.
-- **Phase 5**: per-page dashboard visual pass, including rebuilding Leads (`leads/index.tsx`) as a kanban board.
+Each of these is meant to be its own conversation/phase, per the user's request:
 
-See the plan file this session worked from for the full phase breakdown and file-level notes.
+- **Phase 31**: the ~68-file sweep replacing hardcoded `violet-*`/`indigo-*`/`cyan-*` Tailwind utility classes across dashboard pages, marketing pages, and shared components (`assistant-panel.tsx`, `notifications-bell.tsx`, etc.) with the new token/chip classes.
+- **Phase 32**: dashboard shell (`dashboard-layout.tsx`) — sidebar rail-collapse animation, grouped nav labels, topbar search/notifications restyle.
+- **Phase 33**: marketing homepage + `public-layout.tsx` — mega-menu, hero word-reveal, animated count-up stats, story-split restyle.
+- **Phase 34**: per-page dashboard visual pass, including rebuilding Leads (`leads/index.tsx`) as a kanban board.
+
+Starting a new phase: read this file plus `[[deploy-workflow]]`'s conventions (typecheck, `preview_start` + Browser-pane visual check, auto-push) — no migrations are involved in any of these, this is frontend-only.

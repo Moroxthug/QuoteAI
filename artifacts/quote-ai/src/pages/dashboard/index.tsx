@@ -121,7 +121,7 @@ function StarterUpgradeCard() {
   const { t } = useLanguage();
   const createPortal = useCreateCustomerPortalSession();
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-navy-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+    <div className="bg-gradient-to-r from-amber-50 to-navy-50 border border-amber-200 rounded-[var(--radius)] p-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <div className="h-9 w-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
           <Crown className="h-4 w-4 text-amber-600" />
@@ -152,9 +152,9 @@ function OnboardingView() {
   ];
   return (
     <div className="space-y-3">
-      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-[var(--radius)] border border-border shadow-sm overflow-hidden">
         <div className="px-5 pt-6 pb-5 text-center">
-          <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.12))" }}>
+          <div className="mx-auto h-12 w-12 rounded-[var(--radius-sm)] flex items-center justify-center mb-3" style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.12), rgba(15,151,162,0.12))" }}>
             <Sparkles className="h-6 w-6 text-navy-500" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-1">{t("dashboard.index.onboarding.welcomePrefix")} <span className="quoteai-word text-lg">QuoteAI</span>!</h2>
@@ -181,15 +181,15 @@ function OnboardingView() {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <Link href="/dashboard/profile" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/profile" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-navy-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.onboarding.companyProfile")}</span>
         </Link>
-        <Link href="/dashboard/billing" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/billing" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-amber-100 flex items-center justify-center"><Crown className="h-3.5 w-3.5 text-amber-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-amber-700">{t("dashboard.index.onboarding.plansPricing")}</span>
         </Link>
-        <Link href="/dashboard/new" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group shadow-sm">
+        <Link href="/dashboard/new" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.onboarding.createQuote")}</span>
         </Link>
@@ -203,7 +203,7 @@ function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUse
   const { t } = useLanguage();
   const remaining = downloadsLimit - downloadsUsed;
   return (
-    <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-200 rounded-xl p-3.5 flex items-center justify-between gap-3">
+    <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-200 rounded-[var(--radius)] p-3.5 flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
         <div className="h-8 w-8 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
           <Gift className="h-4 w-4 text-navy-600" />
@@ -394,7 +394,7 @@ function DashboardQuickBar() {
   return (
     <div className="space-y-2">
       {/* ── AI Bar ── */}
-      <div className="ai-bar-glow bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="ai-bar-glow bg-card rounded-[var(--radius)] border border-border shadow-sm overflow-hidden">
         {/* Photo strip */}
         {photos.length > 0 && (
           <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
@@ -462,14 +462,14 @@ function DashboardQuickBar() {
               <button type="button" onClick={() => fileInputRef.current?.click()}
                 disabled={isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS}
                 className={cn(
-                  "h-8 w-8 flex items-center justify-center rounded-xl transition-colors",
+                  "h-8 w-8 flex items-center justify-center rounded-[var(--radius-sm)] transition-colors",
                   (photos.length > 0 || docs.length > 0) ? "bg-navy-100 text-navy-600 hover:bg-navy-200" : "text-muted-foreground hover:bg-accent",
                   (isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS) && "opacity-40 cursor-not-allowed"
                 )}>
                 <ImagePlus className="h-4 w-4" />
               </button>
             ) : (
-              <button type="button" disabled className="h-8 w-8 flex items-center justify-center rounded-xl text-muted-foreground cursor-not-allowed">
+              <button type="button" disabled className="h-8 w-8 flex items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground cursor-not-allowed">
                 <Lock className="h-4 w-4" />
               </button>
             )}
@@ -526,7 +526,7 @@ function DashboardQuickBar() {
       />
 
       {/* ── Client Section ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-[var(--radius)] border border-border shadow-sm overflow-hidden">
         {/* Header — always clickable to toggle */}
         <button
           type="button"
@@ -596,7 +596,7 @@ function DashboardQuickBar() {
                 {savedClients.slice(0, 6).map(c => (
                   <button key={c.id} type="button" onClick={() => selectSavedClient(c)}
                     className={cn(
-                      "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-xl border transition-all",
+                      "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-[var(--radius-sm)] border transition-all",
                       selectedClientId === c.id
                         ? "border-navy-300 bg-navy-50 text-navy-700 font-semibold shadow-sm"
                         : "border-border text-muted-foreground hover:border-navy-200 hover:bg-navy-50/50"
@@ -606,7 +606,7 @@ function DashboardQuickBar() {
                   </button>
                 ))}
                 <button type="button" onClick={() => { setClientMode("new"); setSelectedClientId(null); setClientForm(emptyClient); }}
-                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-navy-300 hover:text-navy-600 transition-all">
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-[var(--radius-sm)] border border-dashed border-border text-muted-foreground hover:border-navy-300 hover:text-navy-600 transition-all">
                   {t("dashboard.index.client.addNewClient")}
                 </button>
               </div>
@@ -617,7 +617,7 @@ function DashboardQuickBar() {
               <button
                 type="button"
                 onClick={() => setClientMode("new")}
-                className="w-full mb-3 py-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:border-navy-300 hover:text-navy-600 hover:bg-navy-50/30 transition-all"
+                className="w-full mb-3 py-2 rounded-[var(--radius-sm)] border border-dashed border-border text-xs text-muted-foreground hover:border-navy-300 hover:text-navy-600 hover:bg-navy-50/30 transition-all"
               >
                 {t("dashboard.new.client.addClientData")}
               </button>
@@ -710,12 +710,12 @@ export default function DashboardHome() {
   if (isLoadingStats) {
     return (
       <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Skeleton className="h-20 w-full rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-xl" />
+        <Skeleton className="h-20 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
+          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}
         </div>
-        <Skeleton className="h-52 rounded-xl" />
+        <Skeleton className="h-52 rounded-[var(--radius)]" />
       </div>
     );
   }
@@ -723,7 +723,7 @@ export default function DashboardHome() {
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
       {/* ── div 1: Hero greeting ── */}
-      <div className="hero-sheen relative overflow-hidden rounded-xl bg-gradient-to-br from-navy-600 via-navy-500 to-teal-500 px-5 py-4 text-white shadow-lg shadow-navy-300/40">
+      <div className="hero-sheen relative overflow-hidden rounded-[var(--radius)] bg-gradient-to-br from-navy-600 via-navy-500 to-teal-500 px-5 py-4 text-white shadow-lg shadow-navy-300/40">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, white 0%, transparent 60%)" }} />
         <div className="relative flex items-center justify-between gap-4">
           <div>
@@ -771,7 +771,7 @@ export default function DashboardHome() {
               const raw = stats?.[key] ?? 0;
               const value = isCurrency ? formatCurrency(raw as number) : String(raw);
               return (
-                <div key={key} className={`bg-card rounded-2xl border ${border} p-3 card-soft transition-all`}>
+                <div key={key} className={`bg-card rounded-[var(--radius)] border ${border} p-3 card-soft transition-all`}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-muted-foreground">{label}</span>
                     <div className={`h-7 w-7 rounded-lg ${accent} flex items-center justify-center`}>
@@ -786,7 +786,7 @@ export default function DashboardHome() {
 
           {/* Subscription upsell */}
           {!subscription?.isActive && (
-            <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-xl p-4 flex items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-[var(--radius)] p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
                   <Crown className="h-4 w-4 text-navy-500" />
@@ -806,7 +806,7 @@ export default function DashboardHome() {
           {subscription?.isActive && subscription?.plan === "monthly_starter" && <StarterUpgradeCard />}
 
           {/* Recent quotes */}
-          <div className="bg-card rounded-2xl border border-border card-soft overflow-hidden">
+          <div className="bg-card rounded-[var(--radius)] border border-border card-soft overflow-hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <div>
                 <h2 className="text-sm font-semibold text-foreground">{t("dashboard.index.recentQuotes.title")}</h2>
@@ -824,7 +824,7 @@ export default function DashboardHome() {
                   className={`flex items-center justify-between px-4 py-2.5 hover:bg-accent transition-colors cursor-pointer ${idx !== recentQuotes.length - 1 ? "border-b border-border" : ""}`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.10), rgba(6,182,212,0.10))" }}>
+                    <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.10), rgba(15,151,162,0.10))" }}>
                       <FileText className="h-3 w-3 text-navy-500" />
                     </div>
                     <div className="min-w-0">
@@ -848,15 +848,15 @@ export default function DashboardHome() {
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <Link href="/dashboard/new" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group card-soft">
+            <Link href="/dashboard/new" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Plus className="h-3.5 w-3.5 text-navy-500" /></div>
               <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.quickActions.newQuote")}</span>
             </Link>
-            <Link href="/dashboard/quotes" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-blue-200 hover:bg-blue-50/30 transition-all group card-soft">
+            <Link href="/dashboard/quotes" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-blue-200 hover:bg-blue-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-blue-100 flex items-center justify-center"><FileText className="h-3.5 w-3.5 text-blue-500" /></div>
               <span className="text-sm font-medium text-foreground group-hover:text-blue-700">{t("dashboard.index.quickActions.allQuotes")}</span>
             </Link>
-            <Link href="/dashboard/profile" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group card-soft">
+            <Link href="/dashboard/profile" className="bg-card border border-border rounded-[var(--radius)] p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
               <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.quickActions.companyProfile")}</span>
             </Link>

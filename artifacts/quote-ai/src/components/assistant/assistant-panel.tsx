@@ -82,7 +82,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
 
   if (gated) {
     return (
-      <div className={cn("rounded-2xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center", className)}>
+      <div className={cn("rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center", className)}>
         <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
         <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
         <p className="text-sm text-slate-600 mt-1 max-w-md mx-auto">{t("assistant.gatedDesc")}</p>
@@ -92,7 +92,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
   }
 
   return (
-    <div className={cn("flex flex-col rounded-2xl border border-slate-200 bg-card overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
+    <div className={cn("flex flex-col rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
         <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Sparkles className="h-4 w-4 text-navy-600" /> {t("assistant.title")}</div>
         {data && data.messages.length > 0 && (

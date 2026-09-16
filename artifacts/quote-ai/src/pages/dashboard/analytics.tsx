@@ -36,9 +36,9 @@ export default function AnalyticsPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"><BarChart3 className="h-8 w-8 text-navy-600" />{t("analytics.title")}</h1>
           <p className="text-slate-500 mt-1">{t("analytics.subtitle")}</p>
         </div>
-        <div className="flex gap-1 p-1 bg-muted rounded-xl">
+        <div className="flex gap-1 p-1 bg-muted rounded-full">
           {PERIODS.map((p) => (
-            <button key={p} onClick={() => setMonths(p)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all", months === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>{p} {t("analytics.monthsShort")}</button>
+            <button key={p} onClick={() => setMonths(p)} className={cn("px-3 py-1.5 text-sm font-medium rounded-full transition-all", months === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>{p} {t("analytics.monthsShort")}</button>
           ))}
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
 function GateCard() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
+    <div className="rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
       <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
       <h3 className="font-bold text-slate-900">{t("analytics.gatedTitle")}</h3>
       <p className="text-sm text-slate-600 mt-1 max-w-lg mx-auto">{t("analytics.gatedDesc")}</p>
@@ -66,7 +66,7 @@ function GateCard() {
 
 function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDto | undefined; isLoading: boolean; locale: typeof enCA }) {
   const { t } = useLanguage();
-  if (isLoading || !data) return <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}</div>;
+  if (isLoading || !data) return <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}</div>;
   const tot = data.totals;
   const monthLabel = (m: string) => format(new Date(`${m}-01T00:00:00`), "MMM", { locale });
   const monthRows = data.months.map((m) => ({ ...m, label: monthLabel(m.month) }));
@@ -209,7 +209,7 @@ function RiskChip({ flag, risk }: { flag: RiskFlag; risk: CompanyAnalyticsDto["j
 
 function Tile({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-card px-4 py-3">
+    <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-lg font-bold text-slate-900 mt-0.5 truncate", tone)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}

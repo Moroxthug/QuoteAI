@@ -30,7 +30,7 @@ export const moneyShort = (v: number) => {
 
 export function ChartCard({ title, subtitle, children, right, className }: { title: string; subtitle?: string; children: ReactNode; right?: ReactNode; className?: string }) {
   return (
-    <section className={`rounded-2xl border border-slate-200 bg-card p-4 md:p-5 ${className ?? ""}`}>
+    <section className={`rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5 ${className ?? ""}`}>
       <div className="flex items-start justify-between gap-3 mb-3">
         <div>
           <h3 className="text-sm font-bold text-slate-900">{title}</h3>

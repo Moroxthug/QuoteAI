@@ -1,6 +1,6 @@
 # QuoteAI visual redesign — design system reference
 
-**Status**: Phases 30-31 built & pushed (2026-09-16). Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
+**Status**: Phases 30-33 built & pushed. Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
 
 ## Source
 
@@ -49,11 +49,17 @@ Added a `navy-50…950` and `teal-50…950` Tailwind color scale to `@theme inli
 
 `dashboard-layout.tsx`'s sidebar nav now renders in 5 presentational groups (`Overview`/`Sales`/`Delivery`/`Insights`/`Workspace`, defined by `NAV_GROUPS` + each item's `group` key) with uppercase group headers when expanded and thin dividers between groups when collapsed to the rail. The rail-collapse itself now animates each item's label (`max-w-0 opacity-0` ↔ `max-w-[140px] opacity-100`, `transition-[max-width,opacity] duration-200`) instead of hard-unmounting it, so text fades/shrinks in place alongside the `w-14`↔`w-56` sidebar width transition. Added a desktop topbar (new `<header>` row above `<main>`, `hidden md:flex`) holding a Cmd/Ctrl+K quick-search pill (`QuickSearch`, built on the existing `ui/command.tsx` cmdk wrapper — jumps to any nav page or "New Quote", no new backend search endpoint needed) and the notifications bell, which moved out of the sidebar's bottom stack into this topbar (`NotificationsBell` gained `side`/`align` props so its popover opens downward there instead of to the right); also added it to the mobile header, which never had it before. Translation keys added: `dashboard.nav.group.*`, `dashboard.search.*` (en + fr).
 
+## Phase 33 (marketing homepage) — built & pushed
+
+No copy of the two original mockups was saved to disk (they were pasted directly into the Phase 30 conversation), so this phase worked from this doc's written description rather than pixel-matching image references.
+
+- **Mega-menu**: `TradesMegaMenu` in `public-layout.tsx`'s desktop nav — click-to-open (not hover; hover+click together fought each other and closed instantly on click), closes on outside click, shows a fixed `MEGA_MENU_TRADE_SLUGS` subset of `TRADE_LABELS` plus footer-style resource links and a WhatsApp callout card. `MobileTradesAccordion` mirrors it in the mobile drawer.
+- **Hero word-reveal**: `components/reveal-heading.tsx`'s `RevealHeading` splits a heading into lines/words and staggers a slide-up+fade-in per word on mount (`.reveal-word-wrap`/`.reveal-word` in `index.css`, `@keyframes word-reveal-up`, reduced-motion-safe). Used for the homepage H1; gradient words (e.g. "30 seconds") keep the existing static `.gradient-text` class layered on top.
+- **Animated count-up stats**: `components/stats-bar.tsx` + `hooks/use-count-up.ts` (IntersectionObserver-triggered count from 0, reduced-motion-safe). Shows 4 numbers, all real and derived from existing data rather than invented: "30 sec" to generate a quote, `Object.keys(TRADE_LABELS.en).length` trades supported, `CITIES.length` Canadian cities covered, and `AGGREGATE_RATING` (from `testimonials-section.tsx`).
+- **Story-split restyle**: turned out to mean fixing 4 leftover hardcoded violet hex colors in `home.tsx` that Phase 31's Tailwind-*class* sweep couldn't catch because they were inline `style={{ background: "..." }}` strings, not Tailwind classes — the WhatsApp-teaser blob glow, one gradient-text accent, and two numbered-step-circle gradients. Repointed to `var(--qa-navy)` / `var(--qa-teal)` / `var(--grad-from)`/`var(--grad-to))`. The existing icon+text/visual split sections already matched the design system's spacing/color language after Phases 30-31, so no structural rebuild was needed there.
+
 ## What's NOT done yet
 
-Each of these is meant to be its own conversation/phase, per the user's request:
-
-- **Phase 33**: marketing homepage + `public-layout.tsx` — mega-menu, hero word-reveal, animated count-up stats, story-split restyle.
 - **Phase 34**: per-page dashboard visual pass, including rebuilding Leads (`leads/index.tsx`) as a kanban board.
 
 Starting a new phase: read this file plus `[[deploy-workflow]]`'s conventions (typecheck, `preview_start` + Browser-pane visual check, auto-push) — no migrations are involved in any of these, this is frontend-only.

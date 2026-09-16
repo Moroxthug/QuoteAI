@@ -57,7 +57,7 @@ export default function JobDetailPage() {
 
   const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-64 w-full rounded-[var(--radius)]" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
 
   const { job, milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
@@ -105,12 +105,12 @@ export default function JobDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit overflow-x-auto max-w-full">
+      <div className="flex gap-1 p-1 bg-muted rounded-full w-fit overflow-x-auto max-w-full">
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
           const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "invoices" ? invoiceTotals.draftCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
           return (
-            <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-lg transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+            <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-full transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
               <Icon className="h-3.5 w-3.5" /> {t(`jobs.tab.${k}`)}{count ? <span className={cn("text-[10px] rounded-full px-1.5", k === "changes" ? "bg-slate-200 text-slate-700" : "bg-amber-200 text-amber-900")}>{count}</span> : null}
             </button>
           );
@@ -138,7 +138,7 @@ export default function JobDetailPage() {
 
 function Kpi({ label, value, sub, accent, progress }: { label: string; value: string; sub?: string; accent?: string; progress?: number }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
+    <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
       {progress !== undefined && <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1.5"><div className="h-full bg-emerald-500" style={{ width: `${progress}%` }} /></div>}
@@ -176,7 +176,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
     <OverviewCharts jobId={job.id} locale={locale} jobStatus={job.status} />
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
+        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-slate-900">{t("jobs.overview.timeline")}</h2>
             <button className="text-sm text-navy-600 hover:underline" onClick={() => onGoTo("schedule")}>{t("jobs.overview.openSchedule")}</button>
@@ -185,7 +185,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
         </section>
 
         {next && (
-          <section className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 md:p-5">
+          <section className="rounded-[var(--radius)] border border-blue-100 bg-blue-50/50 p-4 md:p-5">
             <div className="text-xs uppercase tracking-wide text-blue-600 font-semibold">{t("jobs.overview.upNext")}</div>
             <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -202,7 +202,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
       </div>
 
       <div className="space-y-4">
-        <section className="rounded-2xl border border-slate-200 bg-card p-4">
+        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
           <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-slate-900">{t("jobs.overview.payments")}</h3><button className="text-xs text-navy-600 hover:underline" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button></div>
           {terms.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noSchedule")}</p> : (
             <ul className="space-y-1.5">
@@ -226,7 +226,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
           )}
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-card p-4">
+        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
           <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.overview.budget")}</h3>
           {budget.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noBudget")}</p> : (
             <ul className="space-y-1">
@@ -239,7 +239,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
         </section>
 
         {changeOrders.length > 0 && (
-          <section className="rounded-2xl border border-slate-200 bg-card p-4">
+          <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
             <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.tab.changes")}</h3>
             <ul className="space-y-1.5">
               {changeOrders.map((co) => (
@@ -271,7 +271,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
+      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.schedule.gantt")}</h2>
           <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-sm text-navy-600 hover:underline">{t("jobs.schedule.editDates")}</Link>
@@ -284,7 +284,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
           const expanded = open === m.id;
           const doneTasks = m.tasks.filter((x) => x.status === "done").length;
           return (
-            <div key={m.id} className={cn("rounded-2xl border bg-card transition-colors", m.status === "in_progress" ? "border-blue-200" : m.status === "completed" ? "border-emerald-100" : "border-slate-200")}>
+            <div key={m.id} className={cn("rounded-[var(--radius)] border bg-card transition-colors", m.status === "in_progress" ? "border-blue-200" : m.status === "completed" ? "border-emerald-100" : "border-slate-200")}>
               <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(expanded ? null : m.id)}>
                 <div className={cn("h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0", m.status === "completed" ? "bg-emerald-500 text-white" : m.status === "in_progress" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600")}>
                   {m.status === "completed" ? <Check className="h-4 w-4" /> : idx + 1}
@@ -326,14 +326,14 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
           );
         })}
         {milestones.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
+          <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
             {t("jobs.schedule.empty")} <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-navy-600 underline">{t("jobs.schedule.addMilestones")}</Link>
           </div>
         )}
       </div>
 
       {unassignedTasks.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-card p-4">
+        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
           <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.schedule.otherTasks")}</h3>
           <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
         </section>
@@ -372,9 +372,9 @@ function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeo
       </div>
       {!job.contract && <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">{t("jobs.co.noContract")}</p>}
       {changeOrders.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">{t("jobs.co.empty")}</div>
+        <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">{t("jobs.co.empty")}</div>
       ) : (
-        <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
+        <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
           {changeOrders.map((co) => (
             <div key={co.id} className="flex items-center gap-4 px-4 py-3">
               <div className="min-w-0 flex-1">
@@ -414,7 +414,7 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
     return list;
   }, [job, changeOrders, data.invoices, t, locale]);
   return (
-    <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
+    <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
       {docs.length === 0 && receipts.length === 0 && <div className="p-8 text-center text-sm text-slate-400">{t("jobs.docs.empty")}</div>}
       {docs.map((d) => (
         <div key={d.id} className="flex items-center gap-3 px-4 py-3">

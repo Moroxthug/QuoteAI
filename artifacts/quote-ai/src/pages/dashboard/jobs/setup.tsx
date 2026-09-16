@@ -108,7 +108,7 @@ export default function JobSetupPage() {
   const move = (i: number, dir: -1 | 1) => setMilestones((ms) => { const j = i + dir; if (j < 0 || j >= ms.length) return ms; const copy = [...ms]; [copy[i], copy[j]] = [copy[j]!, copy[i]!]; return copy; });
   const addMs = () => setMilestones((ms) => { const last = ms.at(-1); const s = last?.plannedEnd ? dayStr(addDays(parseDay(last.plannedEnd), 1)) : ""; return [...ms, { title: "", description: "", plannedStart: s, plannedEnd: s, paymentTermId: null, valueCents: 0, taskCount: 0, status: "planned" }]; });
 
-  if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
+  if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-[var(--radius)]" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
 
   const { job } = data;
@@ -142,16 +142,16 @@ export default function JobSetupPage() {
 
       {/* Summary strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3 md:col-span-2">
+        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3 md:col-span-2">
           <Label className="text-xs text-slate-500">{t("jobs.field.name")}</Label>
           <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 font-semibold" />
         </div>
-        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
+        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.contractValue")}</div>
           <div className="text-xl font-bold text-slate-900 mt-0.5">{formatCents(job.contractValueCents)}</div>
           {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-[11px] text-navy-600 hover:underline inline-flex items-center gap-1"><FileSignature className="h-3 w-3" /> {job.contract.contractNumber}</Link>}
         </div>
-        <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
+        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.setup.window")}</div>
           <div className="text-sm font-semibold text-slate-900 mt-1">
             {plannedStart && plannedEnd ? `${format(parseDay(plannedStart), "d MMM", { locale })} → ${format(parseDay(plannedEnd), "PP", { locale })}` : "—"}
@@ -161,7 +161,7 @@ export default function JobSetupPage() {
       </div>
 
       {job.setupProposal && (
-        <div className="rounded-xl border border-navy-100 dark:border-navy-800/40 bg-navy-50/60 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex gap-3">
+        <div className="rounded-[var(--radius)] border border-navy-100 dark:border-navy-800/40 bg-navy-50/60 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex gap-3">
           <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-navy-600" />
           <div>
             <span className="font-semibold">{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</span>{" "}
@@ -172,7 +172,7 @@ export default function JobSetupPage() {
       )}
 
       {/* Schedule */}
-      <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-4">
+      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.milestones")}</h2>
           <div className="flex items-center gap-2 text-sm">
@@ -185,7 +185,7 @@ export default function JobSetupPage() {
 
         <div className="space-y-2">
           {milestones.map((m, i) => (
-            <div key={m.id ?? `new-${i}`} className="rounded-xl border border-slate-200 p-3 grid grid-cols-1 md:grid-cols-[auto_minmax(0,1.3fr)_auto_auto_minmax(0,1fr)_auto] gap-2 items-center">
+            <div key={m.id ?? `new-${i}`} className="rounded-[var(--radius-sm)] border border-slate-200 p-3 grid grid-cols-1 md:grid-cols-[auto_minmax(0,1.3fr)_auto_auto_minmax(0,1fr)_auto] gap-2 items-center">
               <div className="flex md:flex-col gap-1">
                 <button type="button" onClick={() => move(i, -1)} className="text-slate-400 hover:text-slate-700 disabled:opacity-30" disabled={i === 0}><ChevronUp className="h-4 w-4" /></button>
                 <button type="button" onClick={() => move(i, 1)} className="text-slate-400 hover:text-slate-700 disabled:opacity-30" disabled={i === milestones.length - 1}><ChevronDown className="h-4 w-4" /></button>
@@ -235,7 +235,7 @@ export default function JobSetupPage() {
       </section>
 
       {/* Budget */}
-      <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
+      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.budget")}</h2>
           <div className="text-sm text-slate-600">
@@ -265,7 +265,7 @@ export default function JobSetupPage() {
         </div>
       </section>
 
-      <div className="sticky bottom-4 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-slate-200 bg-card/95 backdrop-blur px-4 py-3 shadow-lg">
+      <div className="sticky bottom-4 flex flex-wrap items-center justify-end gap-2 rounded-[var(--radius)] border border-slate-200 bg-card/95 backdrop-blur px-4 py-3 shadow-lg">
         <span className="text-xs text-slate-500 mr-auto">{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</span>
         <Button variant="outline" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</Button>
         <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>

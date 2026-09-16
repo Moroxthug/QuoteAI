@@ -42,7 +42,7 @@ export default function InvoiceDetailPage() {
   const remind = useMutation({ mutationFn: () => invoicesApi.remind(id!), onSuccess: () => { refresh(); toast({ title: t("invoices.reminderSent") }); }, onError });
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-96 w-full rounded-2xl" /></div>;
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-96 w-full rounded-[var(--radius)]" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-navy-600 underline">{t("invoices.backToList")}</Link></div>;
 
   const inv = data.invoice;
@@ -91,18 +91,18 @@ export default function InvoiceDetailPage() {
       </div>
 
       {scheduled && (
-        <div className="rounded-xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex items-start gap-2">
+        <div className="rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex items-start gap-2">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
         </div>
       )}
       {inv.autoSendAt && isDraft && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-2">
+        <div className="rounded-[var(--radius)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-2">
           <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
           <span>{t("invoices.autoSendHint")} <strong>{format(new Date(inv.autoSendAt), "PPp", { locale })}</strong>. {t("invoices.autoSendHint2")}</span>
         </div>
       )}
-      {inv.status === "void" && <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{t("invoices.voidedOn")} {inv.voidedAt ? format(new Date(inv.voidedAt), "PPp", { locale }) : ""}{inv.voidReason ? ` — ${inv.voidReason}` : ""}</div>}
+      {inv.status === "void" && <div className="rounded-[var(--radius)] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{t("invoices.voidedOn")} {inv.voidedAt ? format(new Date(inv.voidedAt), "PPp", { locale }) : ""}{inv.voidReason ? ` — ${inv.voidReason}` : ""}</div>}
       {inv.status === "pending_confirmation" && <PendingConfirmationBanner invoice={inv} onDone={refresh} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -110,7 +110,7 @@ export default function InvoiceDetailPage() {
           {editing ? (
             <DraftEditor data={data} onDone={() => { setEditing(false); refresh(); }} onCancel={() => setEditing(false)} />
           ) : (
-            <section className="rounded-2xl border border-slate-200 bg-card p-5 md:p-8">
+            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-5 md:p-8">
               <style dangerouslySetInnerHTML={{ __html: data.css }} />
               <div dangerouslySetInnerHTML={{ __html: data.html }} />
             </section>
@@ -119,7 +119,7 @@ export default function InvoiceDetailPage() {
 
         <div className="space-y-4">
           {data.publicUrl && (
-            <section className="rounded-2xl border border-slate-200 bg-card p-4">
+            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
               <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.publicLink")}</h3>
               <div className="flex gap-2">
                 <Input readOnly value={data.publicUrl} className="text-xs" />
@@ -131,7 +131,7 @@ export default function InvoiceDetailPage() {
           )}
 
           {!isCredit && (
-            <section className="rounded-2xl border border-slate-200 bg-card p-4">
+            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-bold text-slate-900">{t("invoices.payments")}</h3>
                 {open && <button className="text-xs text-navy-600 hover:underline" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
@@ -155,7 +155,7 @@ export default function InvoiceDetailPage() {
             </section>
           )}
 
-          <section className="rounded-2xl border border-slate-200 bg-card p-4">
+          <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
             <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.activity")}</h3>
             <ul className="space-y-2">
               {[...data.events].reverse().map((e) => <EventRow key={e.id} e={e} locale={locale} />)}
@@ -177,7 +177,7 @@ export default function InvoiceDetailPage() {
 
 function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
+    <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
       <div className="text-xs text-slate-500">{label}</div>
       <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
       {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}
@@ -192,7 +192,7 @@ function PendingConfirmationBanner({ invoice, onDone }: { invoice: InvoiceDto; o
   const confirm = useMutation({ mutationFn: () => invoicesApi.confirmEtransfer(invoice.id), onSuccess: () => { onDone(); toast({ title: t("invoices.etransferConfirmed") }); }, onError });
   const reject = useMutation({ mutationFn: () => invoicesApi.rejectEtransfer(invoice.id), onSuccess: () => { onDone(); toast({ title: t("invoices.etransferRejected") }); }, onError });
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex flex-wrap items-start justify-between gap-3">
+    <div className="rounded-[var(--radius)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex flex-wrap items-start justify-between gap-3">
       <div className="flex items-start gap-2">
         <MailQuestion className="h-4 w-4 mt-0.5 shrink-0" />
         <span>{t("invoices.pendingConfirmationHint")} <strong>{formatCents(invoice.balanceCents)}</strong>.</span>
@@ -242,7 +242,7 @@ function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDon
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   return (
-    <section className="rounded-2xl border border-navy-200 bg-card p-5 space-y-4">
+    <section className="rounded-[var(--radius)] border border-navy-200 bg-card p-5 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1"><Label>{t("invoices.field.title")}</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
         <div className="space-y-1"><Label>{t("invoices.field.customerEmail")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>

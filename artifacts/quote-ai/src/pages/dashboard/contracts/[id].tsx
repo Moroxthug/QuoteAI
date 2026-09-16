@@ -168,13 +168,13 @@ export default function ContractDetailPage() {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-[600px] w-full rounded-xl" />
+        <Skeleton className="h-[600px] w-full rounded-[var(--radius)]" />
       </div>
     );
   }
   if (error || !contract || !vars) {
     return (
-      <div className="rounded-2xl border bg-card p-12 text-center">
+      <div className="rounded-[var(--radius)] border bg-card p-12 text-center">
         <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
         <p className="text-slate-700 font-medium">{t("contracts.notFound")}</p>
         <Link href="/dashboard/contracts" className="text-navy-600 text-sm mt-2 inline-block">{t("contracts.backToList")}</Link>
@@ -216,7 +216,7 @@ export default function ContractDetailPage() {
       {isOpen && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           {steps.map((s, i) => (
-            <div key={s.key} className={cn("rounded-xl border px-3 py-2.5 flex items-center gap-2 text-sm", s.done ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-card border-slate-200 text-slate-500")}>
+            <div key={s.key} className={cn("rounded-[var(--radius-sm)] border px-3 py-2.5 flex items-center gap-2 text-sm", s.done ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-card border-slate-200 text-slate-500")}>
               {s.done ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center shrink-0">{i + 1}</span>}
               {s.label}
             </div>
@@ -225,7 +225,7 @@ export default function ContractDetailPage() {
       )}
 
       {contract.status === "declined" && customerSigner?.declineReason && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           <strong>{t("contracts.declinedReason")}:</strong> {customerSigner.declineReason}
         </div>
       )}
@@ -234,7 +234,7 @@ export default function ContractDetailPage() {
         {/* Document */}
         <div className="lg:col-span-2 space-y-4">
           {isDraft && (
-            <div className="flex items-center justify-between rounded-xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3">
+            <div className="flex items-center justify-between rounded-[var(--radius-sm)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3">
               <div className="flex items-center gap-2 text-sm text-navy-900 dark:text-navy-300">
                 <Sparkles className="h-4 w-4 text-navy-600" />
                 {t("contracts.draftHint")}

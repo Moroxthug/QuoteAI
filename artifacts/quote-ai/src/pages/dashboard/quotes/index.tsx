@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, MoreVertical, FileText, Trash2, Eye, Copy, ChevronDown, Loader2 } from "lucide-react";
+import { Search, MoreVertical, FileText, Trash2, Eye, Copy, ChevronDown, Loader2, Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
@@ -90,10 +90,13 @@ export default function QuotesList() {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">{t("dashboard.quotesList.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("dashboard.quotesList.subtitle")}</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+            <FileText className="h-8 w-8 text-navy-600" />
+            {t("dashboard.quotesList.title")}
+          </h1>
+          <p className="text-slate-500 mt-1">{t("dashboard.quotesList.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative w-full sm:w-[220px]">
@@ -134,6 +137,9 @@ export default function QuotesList() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button asChild size="sm" className="gap-2 shrink-0">
+            <Link href="/dashboard/new"><Plus className="h-4 w-4" /> {t("dashboard.quotesList.createFirstQuote")}</Link>
+          </Button>
         </div>
       </div>
 
@@ -154,7 +160,7 @@ export default function QuotesList() {
           ))}
         </div>
       ) : filteredQuotes.length === 0 ? (
-        <div className="text-center py-10 border-2 border-dashed rounded-lg bg-muted/20">
+        <div className="text-center py-10 border-2 border-dashed rounded-[var(--radius)] bg-muted/20">
           <FileText className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
           <h3 className="text-base font-medium text-foreground mb-1">{t("dashboard.quotesList.noQuotesFound")}</h3>
           {searchTerm || statusFilter !== "all" ? (

@@ -53,7 +53,7 @@ export default function ClientDetailPage() {
               <Skeleton className="h-7 w-48" />
             ) : (
               <>
-                <h1 className="text-2xl font-bold tracking-tight leading-tight truncate">
+                <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 leading-tight truncate">
                   {clientName || "Client"}
                 </h1>
                 {(email || phone || city || indirizzo) && (
@@ -207,7 +207,7 @@ export default function ClientDetailPage() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      q.status === "unlocked" ? "bg-navy-100 text-navy-700" :
+                      q.status === "unlocked" ? "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]" :
                       q.status === "pending_payment" ? "bg-amber-100 text-amber-700" :
                       "bg-slate-100 text-slate-600"
                     }`}>

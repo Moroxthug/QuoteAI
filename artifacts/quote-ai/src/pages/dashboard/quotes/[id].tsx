@@ -594,7 +594,10 @@ export default function QuoteDetail() {
       {/* Top bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.quoteDetail.title")}</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+            <FileText className="h-7 w-7 text-navy-600 shrink-0" />
+            {t("dashboard.quoteDetail.title")}
+          </h1>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
             {isLocked ? (
               <Badge variant="outline" className="text-muted-foreground"><Lock className="h-3 w-3 mr-1" /> {t("dashboard.quoteDetail.statusDraftLocked")}</Badge>

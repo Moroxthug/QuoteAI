@@ -58,7 +58,6 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LanguageProvider } from "@/i18n/LanguageContext";
-import { ThemeProvider } from "@/hooks/use-theme";
 import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isOnboardingSkipped } from "@/lib/onboarding-state";
@@ -252,19 +251,17 @@ function PostHogIdentify() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <TooltipProvider>
-            <PostHogIdentify />
-            <ErrorBoundary>
-              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-                <Router />
-              </WouterRouter>
-            </ErrorBoundary>
-            <Toaster />
-          </TooltipProvider>
-        </LanguageProvider>
-      </ThemeProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <PostHogIdentify />
+          <ErrorBoundary>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </ErrorBoundary>
+          <Toaster />
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

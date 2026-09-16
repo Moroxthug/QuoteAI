@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -91,7 +91,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       {scheduled && (
-        <div className="rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex items-start gap-2">
+        <div className="rounded-[var(--radius)] border border-navy-200 bg-navy-50 px-4 py-3 text-sm text-navy-900 flex items-start gap-2">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
         </div>

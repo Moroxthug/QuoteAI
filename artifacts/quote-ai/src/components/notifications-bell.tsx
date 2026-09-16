@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+﻿import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Bell, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -107,7 +107,7 @@ export function NotificationsBell({ collapsed, side = "right", align = "start" }
           ) : (
             items.map((n) => {
               const inner = (
-                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-accent transition-colors", !n.readAt && "bg-navy-50/60 dark:bg-navy-500/15")}>
+                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-accent transition-colors", !n.readAt && "bg-navy-50/60")}>
                   <div className="flex items-start gap-2">
                     {!n.readAt && <span className="h-2 w-2 rounded-full bg-navy-600 mt-1.5 shrink-0" />}
                     <div className="min-w-0 flex-1">

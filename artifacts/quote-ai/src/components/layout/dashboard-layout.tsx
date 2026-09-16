@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+﻿import { Link, useLocation } from "wouter";
 import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, ArrowUpRight, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
@@ -16,7 +16,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { NotificationsBell } from "@/components/notifications-bell";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -139,7 +138,7 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button className="h-9 w-9 mx-auto flex items-center justify-center rounded-lg hover:bg-accent transition-colors shrink-0">
-                <div className="h-7 w-7 rounded-full bg-navy-100 dark:bg-navy-500/20 text-navy-700 dark:text-navy-300 text-xs font-bold flex items-center justify-center uppercase">
+                <div className="h-7 w-7 rounded-full bg-navy-100 text-navy-700 text-xs font-bold flex items-center justify-center uppercase">
                   {initials || <User className="h-3.5 w-3.5" />}
                 </div>
               </button>
@@ -148,7 +147,7 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           </Tooltip>
         ) : (
           <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors group text-left">
-            <div className="h-7 w-7 rounded-full bg-navy-100 dark:bg-navy-500/20 text-navy-700 dark:text-navy-300 text-xs font-bold flex items-center justify-center uppercase shrink-0">
+            <div className="h-7 w-7 rounded-full bg-navy-100 text-navy-700 text-xs font-bold flex items-center justify-center uppercase shrink-0">
               {initials || <User className="h-3.5 w-3.5" />}
             </div>
             <div className="flex-1 min-w-0">
@@ -317,11 +316,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 collapsed ? "gap-0 justify-center w-9 mx-auto" : "gap-2.5 px-2.5",
                 "text-sm font-medium",
                 active
-                  ? "text-navy-700 dark:text-navy-300 bg-navy-50 dark:bg-navy-500/15 font-semibold"
+                  ? "text-navy-700 bg-navy-50 font-semibold"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
             >
-              <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-navy-600 dark:text-navy-300" : "text-muted-foreground")} />
+              <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-navy-600" : "text-muted-foreground")} />
               <span
                 className={cn(
                   "overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-200 ease-in-out",
@@ -407,11 +406,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <NavLinks collapsed={isCollapsed} />
         </div>
 
-        {/* Theme toggle */}
-        <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
-          <ThemeToggle collapsed={isCollapsed} />
-        </div>
-
         {/* Account section */}
         <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
           <AccountMenu collapsed={isCollapsed} />
@@ -453,9 +447,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     {t("dashboard.nav.newQuote")}
                   </Link>
                   <NavLinks onClick={() => setIsMobileMenuOpen(false)} />
-                </div>
-                <div className="border-t border-border p-2">
-                  <ThemeToggle />
                 </div>
                 <div className="border-t border-border p-2">
                   <AccountMenu />

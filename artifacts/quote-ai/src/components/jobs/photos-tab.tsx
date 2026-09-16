@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, Loader2, Trash2, Share2, Check, ImageOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       <div
-        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 bg-card hover:border-navy-300")}
+        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50" : "border-slate-200 bg-card hover:border-navy-300")}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
@@ -74,8 +74,8 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-2.5">
-          <span className="text-sm text-navy-900 dark:text-navy-300">{selected.size} {t("jobs.photos.selected")}</span>
+        <div className="flex items-center justify-between rounded-lg border border-navy-200 bg-navy-50 px-4 py-2.5">
+          <span className="text-sm text-navy-900">{selected.size} {t("jobs.photos.selected")}</span>
           <Button size="sm" className="gap-2" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
             {share.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
             {share.isPending ? t("jobs.photos.sharing") : t("jobs.photos.share")}

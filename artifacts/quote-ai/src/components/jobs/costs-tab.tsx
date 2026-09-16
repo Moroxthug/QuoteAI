@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+﻿import { useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -59,7 +59,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
       <div className="lg:col-span-2 space-y-4">
         {/* Dropzone */}
         <div
-          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 bg-card hover:border-navy-300")}
+          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50" : "border-slate-200 bg-card hover:border-navy-300")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}

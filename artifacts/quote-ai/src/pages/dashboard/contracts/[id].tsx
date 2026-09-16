@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -234,8 +234,8 @@ export default function ContractDetailPage() {
         {/* Document */}
         <div className="lg:col-span-2 space-y-4">
           {isDraft && (
-            <div className="flex items-center justify-between rounded-[var(--radius-sm)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-navy-900 dark:text-navy-300">
+            <div className="flex items-center justify-between rounded-[var(--radius-sm)] border border-navy-200 bg-navy-50 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-navy-900">
                 <Sparkles className="h-4 w-4 text-navy-600" />
                 {t("contracts.draftHint")}
               </div>

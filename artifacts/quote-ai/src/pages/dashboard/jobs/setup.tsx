@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, differenceInCalendarDays, format } from "date-fns";
@@ -161,7 +161,7 @@ export default function JobSetupPage() {
       </div>
 
       {job.setupProposal && (
-        <div className="rounded-[var(--radius)] border border-navy-100 dark:border-navy-800/40 bg-navy-50/60 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex gap-3">
+        <div className="rounded-[var(--radius)] border border-navy-100 bg-navy-50/60 px-4 py-3 text-sm text-navy-900 flex gap-3">
           <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-navy-600" />
           <div>
             <span className="font-semibold">{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</span>{" "}

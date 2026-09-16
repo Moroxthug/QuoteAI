@@ -1,4 +1,4 @@
-import { useParams, useSearch } from "wouter";
+﻿import { useParams, useSearch } from "wouter";
 import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -2053,7 +2053,7 @@ export default function QuoteDetail() {
                     className={cn(
                       "w-full text-left px-3 py-2.5 rounded-lg border text-xs transition-all",
                       isActive
-                        ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15 text-navy-900 dark:text-navy-300 ring-1 ring-navy-300"
+                        ? "border-navy-400 bg-navy-50 text-navy-900 ring-1 ring-navy-300"
                         : isClickable || isProClickable
                           ? "border-slate-200 hover:border-navy-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
                           : requiresPro
@@ -2139,9 +2139,9 @@ export default function QuoteDetail() {
               {t("dashboard.quoteDetail.upgradeProSpecDesc")}
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-lg bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 px-4 py-3 text-sm text-navy-800 dark:text-navy-300 space-y-1">
+          <div className="rounded-lg bg-navy-50 border border-navy-200 px-4 py-3 text-sm text-navy-800 space-y-1">
             <p className="font-semibold">{t("dashboard.quoteDetail.whatWillUpdate")}</p>
-            <ul className="list-disc list-inside space-y-0.5 text-navy-700 dark:text-navy-300">
+            <ul className="list-disc list-inside space-y-0.5 text-navy-700">
               <li>{t("dashboard.quoteDetail.updateItem1")}</li>
               <li>{t("dashboard.quoteDetail.updateItem2")}</li>
               <li>{t("dashboard.quoteDetail.updateItem3")}</li>

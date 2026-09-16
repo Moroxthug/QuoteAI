@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+﻿import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, Send, Trash2, Check, X, ExternalLink, Receipt, Wallet, Flag, ListTodo, Mail, Banknote, Loader2, AlertTriangle } from "lucide-react";
@@ -82,7 +82,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
 
   if (gated) {
     return (
-      <div className={cn("rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center", className)}>
+      <div className={cn("rounded-[var(--radius)] border border-navy-200 bg-navy-50 p-8 text-center", className)}>
         <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
         <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
         <p className="text-sm text-slate-600 mt-1 max-w-md mx-auto">{t("assistant.gatedDesc")}</p>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -56,7 +56,7 @@ export default function InvoicesPage() {
       </div>
 
       {gated || (error as Error & { code?: string } | null)?.code === "PLAN_REQUIRED" ? (
-        <div className="rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
+        <div className="rounded-[var(--radius)] border border-navy-200 bg-navy-50 p-8 text-center">
           <Receipt className="h-10 w-10 text-navy-300 mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-slate-800">{t("invoices.gatedTitle")}</h2>
           <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">{t("invoices.gatedDesc")}</p>

@@ -22,9 +22,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./mockup-system.css";
 @plugin "@tailwindcss/typography";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: hsl(var(--background));
@@ -169,47 +168,6 @@
   --qa-yellow: #ffe01b;     --qa-yellow-t: #fdf6c9;  --qa-yellow-dark: #7a5c00;
   --qa-red: #d9480f;        --qa-red-t: #fdeee5;
   --qa-grey-t: #eceef2;
-}
-
-.dark {
-  --background: 222 47% 7%;
-  --foreground: 210 40% 98%;
-
-  --card: 222 47% 9%;
-  --card-foreground: 210 40% 98%;
-  --card-border: 217 33% 17%;
-
-  --popover: 222 47% 9%;
-  --popover-foreground: 210 40% 98%;
-  --popover-border: 217 33% 17%;
-
-  --primary: 210 40% 98%;
-  --primary-foreground: 222 47% 7%;
-
-  --secondary: 41 96% 40%;
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 217 33% 17%;
-  --muted-foreground: 215 20% 65%;
-
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
-
-  --destructive: 0 62% 30%;
-  --destructive-foreground: 210 40% 98%;
-
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 265 89% 70%;
-
-  --sidebar: 222 47% 7%;
-  --sidebar-foreground: 210 40% 98%;
-  --sidebar-border: 217 33% 17%;
-  --sidebar-primary: 210 40% 98%;
-  --sidebar-primary-foreground: 222 47% 7%;
-  --sidebar-accent: 217 33% 17%;
-  --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-ring: 265 89% 70%;
 }
 
 @layer base {

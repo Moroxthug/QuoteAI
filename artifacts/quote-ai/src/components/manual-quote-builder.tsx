@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+﻿import { useState, useCallback } from "react";
 import {
   Plus, Trash2, ChevronDown, ChevronUp, Sparkles, Loader2,
   GripVertical, X,
@@ -318,7 +318,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
               className={cn(
                 "text-left p-3 rounded-xl border-2 transition-all",
                 templateId === tpl.id
-                  ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15"
+                  ? "border-navy-400 bg-navy-50"
                   : "border-border hover:border-navy-200"
               )}
             >

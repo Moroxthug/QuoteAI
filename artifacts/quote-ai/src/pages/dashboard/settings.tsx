@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -871,7 +871,7 @@ function WhatsappTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 rounded-[var(--radius)] p-4 text-sm text-navy-700 dark:text-navy-300 space-y-1">
+          <div className="bg-navy-50 border border-navy-200 rounded-[var(--radius)] p-4 text-sm text-navy-700 space-y-1">
             <p className="font-semibold">{t("dashboard.settings.whatsapp.checkPhone")}</p>
             <p className="text-navy-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
           </div>

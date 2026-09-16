@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+﻿import { useRef, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -346,7 +346,7 @@ export default function DocumentsPage() {
         onDrop={onDrop}
         className={cn(
           "border-2 border-dashed rounded-[var(--radius)] p-8 text-center transition-colors cursor-pointer",
-          isDragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-border bg-muted/50 hover:border-navy-300 hover:bg-navy-50/30 dark:hover:bg-navy-500/10"
+          isDragging ? "border-navy-400 bg-navy-50" : "border-border bg-muted/50 hover:border-navy-300 hover:bg-navy-50/30"
         )}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -381,7 +381,7 @@ export default function DocumentsPage() {
       {doneCount > 0 && (
         <Card className={cn(
           "border",
-          hasEnoughForIntelligence ? "border-navy-200 dark:border-navy-800/40 bg-navy-50/40 dark:bg-navy-500/10" : "border-amber-200 bg-amber-50/40"
+          hasEnoughForIntelligence ? "border-navy-200 bg-navy-50/40" : "border-amber-200 bg-amber-50/40"
         )}>
           <CardContent className="py-4 px-5 flex items-center gap-3">
             <div className={cn(

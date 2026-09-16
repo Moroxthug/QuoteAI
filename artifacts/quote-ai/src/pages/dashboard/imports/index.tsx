@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UploadCloud, FileSpreadsheet, FileText, Loader2, Download, Check, X, Trash2, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -190,7 +190,7 @@ export default function ImportsPage() {
             <Download className="h-3.5 w-3.5" /> {t("imports.downloadTemplate")}
           </a>
           <div
-            className={cn("rounded-[var(--radius)] border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 hover:border-navy-300")}
+            className={cn("rounded-[var(--radius)] border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-navy-400 bg-navy-50" : "border-slate-200 hover:border-navy-300")}
             onDragOver={(e) => { e.preventDefault(); setDragCsv(true); }}
             onDragLeave={() => setDragCsv(false)}
             onDrop={(e) => { e.preventDefault(); setDragCsv(false); onCsvFiles(e.dataTransfer.files); }}
@@ -211,7 +211,7 @@ export default function ImportsPage() {
           </div>
           <p className="text-xs text-slate-500">{t("imports.uploadPdfsDesc")}</p>
           <div
-            className={cn("rounded-[var(--radius)] border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 hover:border-navy-300")}
+            className={cn("rounded-[var(--radius)] border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-navy-400 bg-navy-50" : "border-slate-200 hover:border-navy-300")}
             onDragOver={(e) => { e.preventDefault(); setDragPdf(true); }}
             onDragLeave={() => setDragPdf(false)}
             onDrop={(e) => { e.preventDefault(); setDragPdf(false); onPdfFiles(e.dataTransfer.files); }}

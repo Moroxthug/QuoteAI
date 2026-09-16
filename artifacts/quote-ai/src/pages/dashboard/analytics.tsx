@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetQuoteStats, useListQuotes, useGetBusinessProfile } from "@workspace/api-client-react";
@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
 function GateCard() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-[var(--radius)] border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
+    <div className="rounded-[var(--radius)] border border-navy-200 bg-navy-50 p-8 text-center">
       <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
       <h3 className="font-bold text-slate-900">{t("analytics.gatedTitle")}</h3>
       <p className="text-sm text-slate-600 mt-1 max-w-lg mx-auto">{t("analytics.gatedDesc")}</p>

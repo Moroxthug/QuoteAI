@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+﻿import { useState, useRef, useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useCreateQuote, useGetBusinessProfile, useGetSubscription } from "@workspace/api-client-react";
 import {
@@ -497,7 +497,7 @@ export default function NewQuote() {
                     className={cn(
                       "text-left px-3 py-2 rounded-xl border text-xs transition-all",
                       isActive
-                        ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15 text-navy-900 dark:text-navy-300 ring-1 ring-navy-300"
+                        ? "border-navy-400 bg-navy-50 text-navy-900 ring-1 ring-navy-300"
                         : "border-border hover:border-navy-300 hover:bg-accent text-foreground"
                     )}
                   >

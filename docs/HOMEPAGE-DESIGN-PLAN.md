@@ -1,6 +1,8 @@
 # Homepage & Design System Overhaul — Implementation Plan
 
-**Status**: planning, not started. Nothing in this doc has been built yet — it's for review/approval before any code changes.
+**Status: superseded (2026-09-16).** The user supplied two concrete reference mockups (navy `#101031` + Figtree, pill buttons, tinted chips, mega-menu, animated hero/stats) and asked for a direct visual replication instead — the opposite direction from this doc's "Intuit-style restraint, muted bronze accent, small radii" recommendation. That work is tracked in `docs/DESIGN-SYSTEM.md`. This doc is kept for its diagnosis in §1 (wrong-product homepage copy, fake Italian testimonial logos) and its integration-logo sourcing notes in §5, which are still valid and unaddressed — but its palette/typography/radius recommendations in §4 are no longer the direction and should not be implemented.
+
+**Status** (original): planning, not started. Nothing in this doc has been built yet — it's for review/approval before any code changes.
 
 ## 1. The actual problem (diagnosis, not vibes)
 

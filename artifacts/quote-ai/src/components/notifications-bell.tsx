@@ -32,7 +32,7 @@ async function fetchNotifications(): Promise<{ items: NotificationItem[]; unread
  * signed, invoice paid…). Polls every minute — cheap, and enough for a
  * contractor checking the dashboard between site visits.
  */
-export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
+export function NotificationsBell({ collapsed, side = "right", align = "start" }: { collapsed: boolean; side?: "right" | "bottom"; align?: "start" | "end" }) {
   const { t, lang } = useLanguage();
   const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchNotifications, refetchInterval: 60_000, staleTime: 30_000 });
@@ -83,12 +83,12 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>{trigger}</PopoverTrigger>
           </TooltipTrigger>
-          <TooltipContent side="right" className="text-xs">{t("notifications.title")}</TooltipContent>
+          <TooltipContent side={side} className="text-xs">{t("notifications.title")}</TooltipContent>
         </Tooltip>
       ) : (
         <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       )}
-      <PopoverContent side="right" align="start" className="w-80 p-0">
+      <PopoverContent side={side} align={align} className="w-80 p-0">
         <div className="flex items-center justify-between px-3 py-2 border-b">
           <span className="text-sm font-semibold">{t("notifications.title")}</span>
           {unread > 0 && (

@@ -1,11 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, ArrowUpRight, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, ArrowUpRight, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -17,24 +18,27 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+/** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
+const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
+
 function useNavItems() {
   const { t } = useLanguage();
   return [
-    { href: "/dashboard", labelKey: "dashboard.nav.dashboard", icon: LayoutDashboard, exact: true, proOnly: false, comingSoon: false },
-    { href: "/dashboard/quotes", labelKey: "dashboard.nav.quotes", icon: FileText, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/clients", labelKey: "dashboard.nav.clients", icon: Users, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/leads", labelKey: "dashboard.nav.leads", icon: Target, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/contracts", labelKey: "dashboard.nav.contracts", icon: FileSignature, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/jobs", labelKey: "dashboard.nav.jobs", icon: Briefcase, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/team", labelKey: "dashboard.nav.team", icon: HardHat, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/assistant", labelKey: "dashboard.nav.assistant", icon: Sparkles, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/analytics", labelKey: "dashboard.nav.analytics", icon: BarChart3, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/catalog", labelKey: "dashboard.nav.catalog", icon: BookOpen, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/invoices", labelKey: "dashboard.nav.invoices", icon: Receipt, exact: false, proOnly: true, comingSoon: false },
-    { href: "/dashboard/documents", labelKey: "dashboard.nav.documents", icon: FolderOpen, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/imports", labelKey: "dashboard.nav.imports", icon: UploadCloud, exact: false, proOnly: false, comingSoon: false },
-    { href: "/dashboard/settings", labelKey: "dashboard.nav.settings", icon: Settings, exact: false, proOnly: false, comingSoon: false },
-  ].map(item => ({ ...item, label: t(item.labelKey) }));
+    { href: "/dashboard", labelKey: "dashboard.nav.dashboard", icon: LayoutDashboard, exact: true, proOnly: false, comingSoon: false, group: "overview" },
+    { href: "/dashboard/quotes", labelKey: "dashboard.nav.quotes", icon: FileText, exact: false, proOnly: false, comingSoon: false, group: "sales" },
+    { href: "/dashboard/clients", labelKey: "dashboard.nav.clients", icon: Users, exact: false, proOnly: false, comingSoon: false, group: "sales" },
+    { href: "/dashboard/leads", labelKey: "dashboard.nav.leads", icon: Target, exact: false, proOnly: false, comingSoon: false, group: "sales" },
+    { href: "/dashboard/contracts", labelKey: "dashboard.nav.contracts", icon: FileSignature, exact: false, proOnly: true, comingSoon: false, group: "sales" },
+    { href: "/dashboard/jobs", labelKey: "dashboard.nav.jobs", icon: Briefcase, exact: false, proOnly: true, comingSoon: false, group: "delivery" },
+    { href: "/dashboard/team", labelKey: "dashboard.nav.team", icon: HardHat, exact: false, proOnly: true, comingSoon: false, group: "delivery" },
+    { href: "/dashboard/catalog", labelKey: "dashboard.nav.catalog", icon: BookOpen, exact: false, proOnly: true, comingSoon: false, group: "delivery" },
+    { href: "/dashboard/invoices", labelKey: "dashboard.nav.invoices", icon: Receipt, exact: false, proOnly: true, comingSoon: false, group: "delivery" },
+    { href: "/dashboard/analytics", labelKey: "dashboard.nav.analytics", icon: BarChart3, exact: false, proOnly: false, comingSoon: false, group: "insights" },
+    { href: "/dashboard/assistant", labelKey: "dashboard.nav.assistant", icon: Sparkles, exact: false, proOnly: true, comingSoon: false, group: "insights" },
+    { href: "/dashboard/documents", labelKey: "dashboard.nav.documents", icon: FolderOpen, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
+    { href: "/dashboard/imports", labelKey: "dashboard.nav.imports", icon: UploadCloud, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
+    { href: "/dashboard/settings", labelKey: "dashboard.nav.settings", icon: Settings, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
+  ].map(item => ({ ...item, label: t(item.labelKey), groupLabel: t(`dashboard.nav.group.${item.group}`) }));
 }
 
 /**
@@ -189,6 +193,69 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
   );
 }
 
+type NavItem = ReturnType<typeof useNavItems>[number];
+
+/** Cmd/Ctrl+K palette for jumping to a nav page or firing a quick action. */
+function QuickSearch({ navItems }: { navItems: NavItem[] }) {
+  const { t } = useLanguage();
+  const [, navigate] = useLocation();
+  const [open, setOpen] = useState(false);
+  const isMac = typeof navigator !== "undefined" && /mac/i.test(navigator.platform);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((v) => !v);
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  function go(href: string) {
+    setOpen(false);
+    navigate(href);
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="hidden md:flex items-center gap-2 h-9 w-full max-w-sm rounded-full border border-border bg-background px-3.5 text-sm text-muted-foreground hover:border-navy-300 hover:text-foreground transition-colors"
+      >
+        <Search className="h-3.5 w-3.5 shrink-0" />
+        <span className="flex-1 text-left truncate">{t("dashboard.search.placeholder")}</span>
+        <kbd className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0">
+          {isMac ? "⌘K" : "Ctrl K"}
+        </kbd>
+      </button>
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder={t("dashboard.search.placeholder")} />
+        <CommandList>
+          <CommandEmpty>{t("dashboard.search.empty")}</CommandEmpty>
+          <CommandGroup heading={t("dashboard.search.groupActions")}>
+            <CommandItem value={t("dashboard.nav.newQuote")} onSelect={() => go("/dashboard/new")}>
+              <Plus className="text-navy-600" />
+              {t("dashboard.nav.newQuote")}
+            </CommandItem>
+          </CommandGroup>
+          <CommandGroup heading={t("dashboard.search.groupPages")}>
+            {navItems.map((item) => (
+              <CommandItem key={item.href} value={`${item.label} ${item.groupLabel}`} onSelect={() => go(item.href)}>
+                <item.icon className="text-muted-foreground" />
+                {item.label}
+                <CommandShortcut>{item.groupLabel}</CommandShortcut>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
+  );
+}
+
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
   const { isLoaded, isSignedIn } = useAuth();
@@ -226,44 +293,64 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const NavLinks = ({ collapsed = false, onClick }: { collapsed?: boolean; onClick?: () => void }) => (
     <nav className="flex flex-col gap-0.5">
-      {NAV_ITEMS.map((item) => {
-        const active = isActive(item.href, location, item.exact);
-        const link = (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onClick}
-            className={cn(
-              "flex items-center rounded-lg transition-all",
-              collapsed ? "justify-center h-9 w-9 mx-auto" : "gap-2.5 px-2.5 py-2",
-              "text-sm font-medium",
-              active
-                ? "text-navy-700 dark:text-navy-300 bg-navy-50 dark:bg-navy-500/15 font-semibold"
-                : "text-muted-foreground hover:bg-accent hover:text-foreground"
-            )}
-          >
-            <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-navy-600 dark:text-navy-300" : "text-muted-foreground")} />
-            {!collapsed && (
-              <span className="flex-1 text-sm">{item.label}</span>
-            )}
-            {!collapsed && item.proOnly && (
-              <Badge className="text-[10px] px-1 py-0 h-4 bg-navy-100 text-navy-700 border-0 font-semibold">{t("dashboard.nav.pro")}</Badge>
-            )}
-            {!collapsed && item.comingSoon && (
-              <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-100 text-amber-600 border-0 font-semibold">{t("dashboard.nav.comingSoon")}</Badge>
-            )}
-          </Link>
+      {NAV_GROUPS.flatMap((group, groupIndex) => {
+        const items = NAV_ITEMS.filter((item) => item.group === group);
+        if (items.length === 0) return [];
+
+        const header = collapsed ? (
+          groupIndex > 0 && <div key={`${group}-sep`} className="my-1.5 mx-2 border-t border-border" />
+        ) : (
+          <div key={`${group}-heading`} className={cn("px-2.5 mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70", groupIndex > 0 && "mt-3")}>
+            {items[0]!.groupLabel}
+          </div>
         );
 
-        if (collapsed) {
-          return (
-            <Tooltip key={item.href} delayDuration={0}>
-              <TooltipTrigger asChild>{link}</TooltipTrigger>
-              <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
-            </Tooltip>
+        const links = items.map((item) => {
+          const active = isActive(item.href, location, item.exact);
+          const link = (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClick}
+              className={cn(
+                "flex items-center h-9 rounded-lg transition-all duration-200",
+                collapsed ? "gap-0 justify-center w-9 mx-auto" : "gap-2.5 px-2.5",
+                "text-sm font-medium",
+                active
+                  ? "text-navy-700 dark:text-navy-300 bg-navy-50 dark:bg-navy-500/15 font-semibold"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              )}
+            >
+              <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-navy-600 dark:text-navy-300" : "text-muted-foreground")} />
+              <span
+                className={cn(
+                  "overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-200 ease-in-out",
+                  collapsed ? "max-w-0 opacity-0" : "max-w-[140px] opacity-100 flex-1"
+                )}
+              >
+                {item.label}
+              </span>
+              {!collapsed && item.proOnly && (
+                <Badge className="text-[10px] px-1 py-0 h-4 bg-navy-100 text-navy-700 border-0 font-semibold shrink-0">{t("dashboard.nav.pro")}</Badge>
+              )}
+              {!collapsed && item.comingSoon && (
+                <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-100 text-amber-600 border-0 font-semibold shrink-0">{t("dashboard.nav.comingSoon")}</Badge>
+              )}
+            </Link>
           );
-        }
-        return link;
+
+          if (collapsed) {
+            return (
+              <Tooltip key={item.href} delayDuration={0}>
+                <TooltipTrigger asChild>{link}</TooltipTrigger>
+                <TooltipContent side="right" className="text-xs">{item.label}</TooltipContent>
+              </Tooltip>
+            );
+          }
+          return link;
+        });
+
+        return header ? [header, ...links] : links;
       })}
     </nav>
   );
@@ -320,11 +407,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <NavLinks collapsed={isCollapsed} />
         </div>
 
-        {/* Notifications */}
-        <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
-          <NotificationsBell collapsed={isCollapsed} />
-        </div>
-
         {/* Theme toggle */}
         <div className={cn("border-t border-border py-2", isCollapsed ? "px-2" : "px-2")}>
           <ThemeToggle collapsed={isCollapsed} />
@@ -336,9 +418,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {/* Mobile Layout */}
+      {/* Main column */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card">
+        {/* Desktop topbar */}
+        <header className="hidden md:flex h-14 items-center justify-between gap-4 px-6 border-b border-border bg-card shrink-0">
+          <QuickSearch navItems={NAV_ITEMS} />
+          <NotificationsBell collapsed side="bottom" align="end" />
+        </header>
+
+        {/* Mobile header */}
+        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
           <div className="flex items-center gap-2">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -377,7 +466,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <Logo style={{ height: 26 }} />
             </Link>
           </div>
-          <AccountMenu />
+          <div className="flex items-center gap-1">
+            <NotificationsBell collapsed side="bottom" align="end" />
+            <AccountMenu />
+          </div>
         </header>
 
         <main className="flex-1 overflow-auto p-4 md:p-6">

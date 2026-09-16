@@ -45,11 +45,14 @@ Added a `navy-50…950` and `teal-50…950` Tailwind color scale to `@theme inli
 
 **Exception, done by hand**: a handful of spots used violet/indigo as a genuinely distinct *status* color sitting alongside blue in the same badge/chip set (`jobs/badges.tsx` MILESTONE.planned + INVOICE.viewed + the invoice "scheduled" chip, `contracts/[id].tsx` STATUS_STYLES.viewed, `jobs/gantt.tsx` BAR.planned, `leads/index.tsx` STATUS_COLORS.quoted, `quotes/index.tsx`'s "unlocked" badge). Recoloring those to navy would have made them visually collide with the "active/sent" blue status right next to them, so those specific keys were mapped to the existing `--qa-purple`/`--qa-purple-t` chip tokens instead (`bg-[var(--qa-purple-t)] text-[var(--qa-purple)]`), keeping them a distinct hue. Everything else in those same files (plain brand accents) still went to navy.
 
+## Phase 32 (dashboard shell) — built & pushed 2026-09-16
+
+`dashboard-layout.tsx`'s sidebar nav now renders in 5 presentational groups (`Overview`/`Sales`/`Delivery`/`Insights`/`Workspace`, defined by `NAV_GROUPS` + each item's `group` key) with uppercase group headers when expanded and thin dividers between groups when collapsed to the rail. The rail-collapse itself now animates each item's label (`max-w-0 opacity-0` ↔ `max-w-[140px] opacity-100`, `transition-[max-width,opacity] duration-200`) instead of hard-unmounting it, so text fades/shrinks in place alongside the `w-14`↔`w-56` sidebar width transition. Added a desktop topbar (new `<header>` row above `<main>`, `hidden md:flex`) holding a Cmd/Ctrl+K quick-search pill (`QuickSearch`, built on the existing `ui/command.tsx` cmdk wrapper — jumps to any nav page or "New Quote", no new backend search endpoint needed) and the notifications bell, which moved out of the sidebar's bottom stack into this topbar (`NotificationsBell` gained `side`/`align` props so its popover opens downward there instead of to the right); also added it to the mobile header, which never had it before. Translation keys added: `dashboard.nav.group.*`, `dashboard.search.*` (en + fr).
+
 ## What's NOT done yet
 
 Each of these is meant to be its own conversation/phase, per the user's request:
 
-- **Phase 32**: dashboard shell (`dashboard-layout.tsx`) — sidebar rail-collapse animation, grouped nav labels, topbar search/notifications restyle.
 - **Phase 33**: marketing homepage + `public-layout.tsx` — mega-menu, hero word-reveal, animated count-up stats, story-split restyle.
 - **Phase 34**: per-page dashboard visual pass, including rebuilding Leads (`leads/index.tsx`) as a kanban board.
 

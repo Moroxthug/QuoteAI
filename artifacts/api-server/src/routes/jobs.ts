@@ -162,6 +162,7 @@ router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, 
     const clientIds = [...new Set(projects.map((p) => p.clientId).filter((x): x is string => !!x))];
     const clients: { id: string; name: string }[] = clientIds.length ? await db.select({ id: clientsTable.id, name: clientsTable.name }).from(clientsTable).where(inArray(clientsTable.id, clientIds)) : [];
     const milestones: Milestone[] = ids.length ? await db.select().from(milestonesTable).where(inArray(milestonesTable.projectId, ids)).orderBy(asc(milestonesTable.sortOrder)) : [];
+    const assignments: { projectId: string }[] = ids.length ? await db.select({ projectId: projectAssignmentsTable.projectId }).from(projectAssignmentsTable).where(inArray(projectAssignmentsTable.projectId, ids)) : [];
     const clientName = new Map(clients.map((c) => [c.id, c.name]));
     const items = projects.map((p) => {
       const ms = milestones.filter((m) => m.projectId === p.id);
@@ -172,6 +173,7 @@ router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, 
         milestoneCount: ms.length,
         milestonesDone: ms.filter((m) => m.status === "completed").length,
         nextMilestone: next ? { id: next.id, title: next.title, plannedEnd: toIsoDate(next.plannedEnd) } : null,
+        crewCount: assignments.filter((a) => a.projectId === p.id).length,
       };
     });
     res.json({ items });

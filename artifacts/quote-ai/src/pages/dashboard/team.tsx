@@ -3,7 +3,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, Mail, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin } from "lucide-react";
+import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,20 +38,20 @@ export default function TeamPage() {
   const { data: pending } = useQuery({ queryKey: ["time-entries", "submitted"], queryFn: () => teamApi.timeEntries({ status: "submitted" }) });
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="animate-in fade-in duration-500">
+      <div className="page-head">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"><Users className="h-7 w-7 text-navy-600" /> {t("team.title")}</h1>
-          <p className="text-slate-500 mt-1 text-sm">{t("team.subtitle")}</p>
+          <h1>{t("team.title")}</h1>
+          <p className="sub">{t("team.subtitle")}</p>
         </div>
       </div>
 
-      <div className="flex gap-1 p-1 bg-muted rounded-full w-fit overflow-x-auto max-w-full">
+      <div className="pills mb-4">
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
           const count = k === "time" ? (pending?.items.length ?? 0) : 0;
           return (
-            <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-full transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+            <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill inline-flex items-center gap-1.5", tab === k && "on")}>
               <Icon className="h-3.5 w-3.5" /> {t(`team.tab.${k}`)}{count ? <span className="text-[10px] bg-amber-200 text-amber-900 rounded-full px-1.5">{count}</span> : null}
             </button>
           );
@@ -89,29 +89,40 @@ function MembersTab() {
   const seats = data?.seats;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-500">{t("team.members.intro")}</p>
-        <div className="flex items-center gap-2">
-          {seats && <span className="text-xs text-slate-400">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
-          <Button size="sm" className="gap-2" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</Button>
+    <div className="card">
+      <div className="toolbar">
+        <p className="text-sm text-slate-500 m-0">{t("team.members.intro")}</p>
+        <div className="grow flex items-center gap-2">
+          {seats && <span className="foot-note">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
+          <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius)]" /></div>
+        <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius)]" /></div>
       ) : (
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
-          <div className="flex items-center gap-3 px-4 py-3 bg-slate-50/60">
-            <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center text-sm font-bold shrink-0">YOU</div>
-            <div className="min-w-0 flex-1"><span className="font-semibold text-slate-900">{t("team.members.you")}</span></div>
-          </div>
-          {members.length === 0 && (
-            <div className="p-10 text-center text-sm text-slate-500">{t("team.members.empty")}</div>
-          )}
-          {members.map((m) => (
-            <MemberRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
-          ))}
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>{t("team.col.member")}</th>
+                <th>{t("team.col.role")}</th>
+                <th>{t("team.col.status")}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span className="cell-flex"><span className="avat" style={{ background: "var(--navy)", color: "#fff" }}>YOU</span><span className="t-strong">{t("team.members.you")}</span></span></td>
+                <td><span className="chip chip-purple">{t("team.members.role.admin")}</span></td>
+                <td><span className="chip chip-green">{t("team.members.statusActive")}</span></td>
+                <td></td>
+              </tr>
+              {members.map((m) => (
+                <MemberRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -124,27 +135,29 @@ function MembersTab() {
 function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemberDto; onResend: () => void; onSuspend: () => void; onRemove: () => void }) {
   const { t } = useLanguage();
   const statusLabel = member.status === "active" ? t("team.members.statusActive") : member.status === "suspended" ? t("team.members.statusSuspended") : t("team.members.statusInvited");
-  const statusClass = member.status === "active" ? "bg-emerald-100 text-emerald-700" : member.status === "suspended" ? "bg-slate-200 text-slate-600" : "bg-amber-100 text-amber-700";
+  const statusChip = member.status === "active" ? "chip-green" : member.status === "suspended" ? "chip-grey" : "chip-yellow";
   return (
-    <div className="flex flex-wrap items-center gap-3 px-4 py-3">
-      <div className="h-10 w-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold shrink-0">{member.email.slice(0, 2).toUpperCase()}</div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-slate-900 truncate">{member.email}</span>
-          <span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-100 text-slate-600">{t(`team.members.role.${member.role}`)}</span>
-          <span className={cn("text-[10px] rounded px-1.5 py-0.5", statusClass)}>{statusLabel}</span>
+    <tr>
+      <td>
+        <span className="cell-flex">
+          <span className="avat">{member.email.slice(0, 2).toUpperCase()}</span>
+          <span className="t-strong">{member.email}</span>
+        </span>
+      </td>
+      <td><span className="chip chip-purple">{t(`team.members.role.${member.role}`)}</span></td>
+      <td><span className={cn("chip", statusChip)}>{statusLabel}</span></td>
+      <td onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1.5 justify-end">
+          {member.status !== "active" && <Button size="sm" variant="outline" className="h-8 gap-1" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</Button>}
+          {member.status !== "invited" && (
+            <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
+              {member.status === "suspended" ? <UserCheck className="h-4 w-4" /> : <UserX className="h-4 w-4" />}
+            </button>
+          )}
+          <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.members.remove")} onClick={onRemove}><Trash2 className="h-4 w-4" /></button>
         </div>
-      </div>
-      <div className="flex items-center gap-1.5 shrink-0">
-        {member.status !== "active" && <Button size="sm" variant="outline" className="h-8 gap-1" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</Button>}
-        {member.status !== "invited" && (
-          <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
-            {member.status === "suspended" ? <UserCheck className="h-4 w-4" /> : <UserX className="h-4 w-4" />}
-          </button>
-        )}
-        <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.members.remove")} onClick={onRemove}><Trash2 className="h-4 w-4" /></button>
-      </div>
-    </div>
+      </td>
+    </tr>
   );
 }
 
@@ -217,48 +230,70 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
   const inactiveCount = workers.filter((w) => !w.active).length;
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-500">{t("team.workers.intro")}</p>
-        <div className="flex items-center gap-2">
+    <div className="card">
+      <div className="toolbar">
+        <p className="text-sm text-slate-500 m-0">{t("team.workers.intro")}</p>
+        <div className="grow flex items-center gap-2">
           {inactiveCount > 0 && <button className="text-xs text-slate-500 hover:text-slate-800" onClick={() => setShowInactive((v) => !v)}>{showInactive ? t("team.workers.hideInactive") : `${t("team.workers.showInactive")} (${inactiveCount})`}</button>}
-          <Button size="sm" className="gap-2" onClick={() => setEditing({ open: true, worker: null })}><Plus className="h-4 w-4" /> {t("team.workers.add")}</Button>
+          <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, worker: null })}><Plus className="h-4 w-4" /> {t("team.workers.add")}</button>
         </div>
       </div>
       {list.length === 0 ? (
-        <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-10 text-center text-sm text-slate-500">{t("team.workers.empty")}</div>
+        <div className="p-10 text-center text-sm text-slate-500">{t("team.workers.empty")}</div>
       ) : (
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
-          {list.map((w) => (
-            <div key={w.id} className={cn("flex flex-wrap items-center gap-3 px-4 py-3", !w.active && "opacity-60")}>
-              <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center text-sm font-bold shrink-0">{w.name.slice(0, 2).toUpperCase()}</div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold text-slate-900">{w.name}</span><span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-100 text-slate-600">{t(`team.type.${w.workerType}`)}</span>{w.role && w.role !== "worker" && <span className="text-xs text-slate-500">{w.role}</span>}{!w.active && <span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-200 text-slate-600">{t("team.workers.inactive")}</span>}</div>
-                <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap gap-x-3">
-                  <span>{formatCents(w.hourlyRateCents)}/h{w.burdenPercent ? ` + ${w.burdenPercent}% ${t("team.workers.burden")}` : ""} = <span className="font-medium text-slate-700">{formatCents(Math.round(w.hourlyRateCents * (1 + w.burdenPercent / 100)))}/h</span></span>
-                  {w.email && <span className="inline-flex items-center gap-1"><Mail className="h-3 w-3" />{w.email}</span>}
-                  <span>{w.hoursThisMonth.toFixed(1)} h {t("team.workers.thisMonth")}</span>
-                  {w.pendingCount > 0 && <span className="text-amber-700">{w.pendingCount} {t("team.workers.toApprove")}</span>}
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                {w.active && (
-                  w.hasInvite ? (
-                    <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending} title={`${t("team.workers.linkActiveUntil")} ${w.inviteExpiresAt ? format(new Date(w.inviteExpiresAt), "PP", { locale }) : ""}`}><Link2 className="h-3.5 w-3.5 text-emerald-600" /> {t("team.workers.newLink")}</Button>
-                  ) : (
-                    <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending}><Link2 className="h-3.5 w-3.5" /> {t("team.workers.timeLink")}</Button>
-                  )
-                )}
-                {w.hasInvite && <button className="text-xs text-slate-400 hover:text-rose-600 px-1" onClick={() => revoke.mutate(w.id)}>{t("team.workers.revoke")}</button>}
-                <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={t("team.workers.edit")} onClick={() => setEditing({ open: true, worker: w })}><Pencil className="h-4 w-4" /></button>
-                <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={w.active ? t("team.workers.deactivate") : t("team.workers.reactivate")} onClick={() => toggleActive.mutate(w)}>{w.active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}</button>
-                <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.workers.delete")} onClick={() => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); }}><Trash2 className="h-4 w-4" /></button>
-              </div>
-            </div>
-          ))}
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>{t("team.col.member")}</th>
+                <th>{t("team.col.rate")}</th>
+                <th>{t("team.workers.thisMonth")}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((w) => (
+                <tr key={w.id} className={cn(!w.active && "opacity-60")}>
+                  <td>
+                    <span className="cell-flex">
+                      <span className="avat">{w.name.slice(0, 2).toUpperCase()}</span>
+                      <span>
+                        <span className="t-strong">{w.name}</span>
+                        <span className="t-sub">
+                          {t(`team.type.${w.workerType}`)}{w.role && w.role !== "worker" ? ` · ${w.role}` : ""}{w.email ? ` · ${w.email}` : ""}{!w.active ? ` · ${t("team.workers.inactive")}` : ""}
+                        </span>
+                      </span>
+                    </span>
+                  </td>
+                  <td className="t-amt">
+                    {formatCents(Math.round(w.hourlyRateCents * (1 + w.burdenPercent / 100)))}/h
+                  </td>
+                  <td>
+                    {w.hoursThisMonth.toFixed(1)} h
+                    {w.pendingCount > 0 && <span className="chip chip-yellow" style={{ marginLeft: 8 }}>{w.pendingCount} {t("team.workers.toApprove")}</span>}
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      {w.active && (
+                        w.hasInvite ? (
+                          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending} title={`${t("team.workers.linkActiveUntil")} ${w.inviteExpiresAt ? format(new Date(w.inviteExpiresAt), "PP", { locale }) : ""}`}><Link2 className="h-3.5 w-3.5 text-emerald-600" /> {t("team.workers.newLink")}</Button>
+                        ) : (
+                          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending}><Link2 className="h-3.5 w-3.5" /> {t("team.workers.timeLink")}</Button>
+                        )
+                      )}
+                      {w.hasInvite && <button className="text-xs text-slate-400 hover:text-rose-600 px-1" onClick={() => revoke.mutate(w.id)}>{t("team.workers.revoke")}</button>}
+                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={t("team.workers.edit")} onClick={() => setEditing({ open: true, worker: w })}><Pencil className="h-4 w-4" /></button>
+                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={w.active ? t("team.workers.deactivate") : t("team.workers.reactivate")} onClick={() => toggleActive.mutate(w)}>{w.active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}</button>
+                      <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.workers.delete")} onClick={() => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); }}><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-      <p className="text-[11px] text-slate-400">{t("team.workers.burdenHint")}</p>
+      <div className="card-foot"><span className="foot-note">{t("team.workers.burdenHint")}</span></div>
 
       <WorkerDialog worker={editing.worker} open={editing.open} onOpenChange={(v) => setEditing((s) => ({ ...s, open: v }))} />
       <InviteDialog invite={invite} onClose={() => setInvite(null)} />
@@ -357,7 +392,8 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[var(--radius)] border border-slate-200 bg-card p-3 flex flex-wrap items-center gap-2">
+      <div className="card">
+      <div className="toolbar" style={{ borderBottom: "none" }}>
         <Filter className="h-4 w-4 text-slate-400" />
         <select value={status} onChange={(e) => setStatus(e.target.value as TimeEntryStatus | "all")} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm">
           <option value="submitted">{t("team.time.filter.submitted")}</option>
@@ -378,6 +414,7 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
         )}
         <div className="flex-1" />
         <a href={teamApi.payrollCsvUrl(from, to)} className="inline-flex items-center gap-1 text-sm text-navy-700 hover:underline" title={t("team.time.exportHint")}><Download className="h-4 w-4" /> {t("team.time.export")} ({from} → {to})</a>
+      </div>
       </div>
 
       {status === "submitted" && submittedIds.length > 0 && (
@@ -442,38 +479,64 @@ function EquipmentTab() {
   const monthlyOverhead = items.filter((e) => e.active && e.ownership === "financed").reduce((s, e) => s + (e.financing.monthlyPaymentCents ?? 0), 0);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-500">{t("team.equipment.intro")}</p>
-        <Button size="sm" className="gap-2" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</Button>
+    <div className="card">
+      <div className="toolbar">
+        <p className="text-sm text-slate-500 m-0">{t("team.equipment.intro")}</p>
+        <div className="grow">
+          <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</button>
+        </div>
       </div>
-      {isLoading ? <Skeleton className="h-24 w-full rounded-[var(--radius)]" /> : items.length === 0 ? (
-        <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-10 text-center text-sm text-slate-500">{t("team.equipment.empty")}</div>
+      {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius)]" /></div> : items.length === 0 ? (
+        <div className="p-10 text-center text-sm text-slate-500">{t("team.equipment.empty")}</div>
       ) : (
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
-          {items.map((e) => (
-            <div key={e.id} className={cn("flex flex-wrap items-center gap-3 px-4 py-3", !e.active && "opacity-60")}>
-              <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><Wrench className="h-5 w-5" /></div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold text-slate-900">{e.name}</span><span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-100 text-slate-600">{t(`team.ownership.${e.ownership}`)}</span>{!e.active && <span className="text-[10px] rounded px-1.5 py-0.5 bg-slate-200 text-slate-600">{t("team.workers.inactive")}</span>}</div>
-                <div className="text-xs text-slate-500 mt-0.5 flex flex-wrap gap-x-3">
-                  <span className="font-medium text-slate-700">{formatCents(e.usageRateCents)}/{t(`team.unit.${e.usageUnit}`)}</span>
-                  {e.ownership === "financed" && e.financing.monthlyPaymentCents ? <span>{formatCents(e.financing.monthlyPaymentCents)}/{t("team.equipment.month")}{e.financing.remainingMonths ? ` · ${e.financing.remainingMonths} ${t("team.equipment.monthsLeft")}` : ""}{e.financing.lender ? ` · ${e.financing.lender}` : ""}</span> : null}
-                  {e.purchaseCents ? <span>{t("team.equipment.purchase")} {formatCents(e.purchaseCents)}</span> : null}
-                  <span>{t("team.equipment.chargedThisMonth")} {formatCents(e.usageCentsThisMonth)}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" onClick={() => setEditing({ open: true, item: e })}><Pencil className="h-4 w-4" /></button>
-                <button className="text-xs text-slate-400 hover:text-slate-800 px-1" onClick={() => toggle.mutate(e)}>{e.active ? t("team.workers.deactivate") : t("team.workers.reactivate")}</button>
-                <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" onClick={() => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); }}><Trash2 className="h-4 w-4" /></button>
-              </div>
-            </div>
-          ))}
-          {monthlyOverhead > 0 && <div className="px-4 py-2 text-sm text-right text-slate-600 bg-slate-50">{t("team.equipment.overhead")} <span className="font-semibold text-slate-900">{formatCents(monthlyOverhead)}/{t("team.equipment.month")}</span></div>}
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>{t("team.equipment.name")}</th>
+                <th>{t("team.equipment.ownership")}</th>
+                <th>{t("team.equipment.rate")}</th>
+                <th>{t("team.equipment.chargedThisMonth")}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((e) => (
+                <tr key={e.id} className={cn(!e.active && "opacity-60")}>
+                  <td>
+                    <span className="cell-flex">
+                      <span className="cell-ic"><Wrench className="h-4 w-4" /></span>
+                      <span>
+                        <span className="t-strong">{e.name}</span>
+                        {!e.active && <span className="t-sub">{t("team.workers.inactive")}</span>}
+                      </span>
+                    </span>
+                  </td>
+                  <td>
+                    <span className="chip chip-grey">{t(`team.ownership.${e.ownership}`)}</span>
+                    {e.ownership === "financed" && e.financing.monthlyPaymentCents ? (
+                      <div className="t-sub">{formatCents(e.financing.monthlyPaymentCents)}/{t("team.equipment.month")}{e.financing.remainingMonths ? ` · ${e.financing.remainingMonths} ${t("team.equipment.monthsLeft")}` : ""}</div>
+                    ) : null}
+                  </td>
+                  <td className="t-amt">{formatCents(e.usageRateCents)}/{t(`team.unit.${e.usageUnit}`)}</td>
+                  <td>{formatCents(e.usageCentsThisMonth)}</td>
+                  <td onClick={(ev) => ev.stopPropagation()}>
+                    <div className="flex items-center gap-1.5 justify-end">
+                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" onClick={() => setEditing({ open: true, item: e })}><Pencil className="h-4 w-4" /></button>
+                      <button className="text-xs text-slate-400 hover:text-slate-800 px-1" onClick={() => toggle.mutate(e)}>{e.active ? t("team.workers.deactivate") : t("team.workers.reactivate")}</button>
+                      <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" onClick={() => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); }}><Trash2 className="h-4 w-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-      <p className="text-[11px] text-slate-400">{t("team.equipment.hint")}</p>
+      <div className="card-foot">
+        <span className="foot-note">{t("team.equipment.hint")}</span>
+        {monthlyOverhead > 0 && <span className="foot-note">{t("team.equipment.overhead")} {formatCents(monthlyOverhead)}/{t("team.equipment.month")}</span>}
+      </div>
       <EquipmentDialog item={editing.item} open={editing.open} onOpenChange={(v) => setEditing((s) => ({ ...s, open: v }))} />
     </div>
   );

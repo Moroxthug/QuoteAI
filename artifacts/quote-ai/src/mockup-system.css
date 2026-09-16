@@ -325,3 +325,9 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
   .kanban { grid-template-columns: 1fr; }
   .head-actions .btn { width: 100%; justify-content: center; }
 }
+
+/* ==========================================================
+   CONTRACTS / JOBS / TEAM (Phase 42) — progress bars.
+   ========================================================== */
+.pbar { height: 6px; width: 110px; background: var(--soft-2); border-radius: 99px; overflow: hidden; flex: none; }
+.pbar i { display: block; height: 100%; border-radius: 99px; background: var(--green); }

@@ -33,6 +33,7 @@ export type JobSummaryDto = {
   milestoneCount: number;
   milestonesDone: number;
   nextMilestone: { id: string; title: string; plannedEnd: string | null } | null;
+  crewCount: number;
 };
 
 export type TaskDto = { id: string; milestoneId: string | null; title: string; description: string; status: "todo" | "in_progress" | "done"; dueDate: string | null; sortOrder: number };
@@ -166,7 +167,7 @@ export type EquipmentUsageDto = {
 export type PaymentTermDto = { id: string; type: string; label: string; trigger: string; amountType: "percent" | "fixed"; value: number; dueDays: number; milestoneKey?: string };
 
 export type JobDetailDto = {
-  job: Omit<JobSummaryDto, "clientName" | "milestoneCount" | "milestonesDone" | "nextMilestone"> & {
+  job: Omit<JobSummaryDto, "clientName" | "milestoneCount" | "milestonesDone" | "nextMilestone" | "crewCount"> & {
     setupProposal: { source: "ai" | "fallback"; model?: string; rationale?: string; generatedAt: string; durationWorkingDays: number; costRatio: number } | null;
     setupConfirmedAt: string | null;
     client: { id: string; name: string; email: string | null; phone: string | null } | null;

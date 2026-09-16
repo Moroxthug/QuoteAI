@@ -46,7 +46,7 @@ export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }:
       </CardHeader>
       <CardContent className="pt-0 space-y-2">
         {!hasContractsFeature ? (
-          <Link href="/dashboard/settings?tab=billing" className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 px-3 py-2.5 text-xs text-slate-500 hover:border-violet-300 hover:text-violet-700">
+          <Link href="/dashboard/settings?tab=billing" className="flex items-center gap-2 rounded-lg border border-dashed border-slate-300 px-3 py-2.5 text-xs text-slate-500 hover:border-navy-300 hover:text-navy-700">
             <Lock className="h-3.5 w-3.5" /> {t("contracts.cardUpgrade")}
           </Link>
         ) : isLoading ? (

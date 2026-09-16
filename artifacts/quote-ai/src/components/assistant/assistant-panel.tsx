@@ -82,11 +82,11 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
 
   if (gated) {
     return (
-      <div className={cn("rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center", className)}>
-        <Sparkles className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+      <div className={cn("rounded-2xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center", className)}>
+        <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
         <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
         <p className="text-sm text-slate-600 mt-1 max-w-md mx-auto">{t("assistant.gatedDesc")}</p>
-        <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-semibold text-violet-700 hover:underline">{t("assistant.upgrade")}</Link>
+        <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-semibold text-navy-700 hover:underline">{t("assistant.upgrade")}</Link>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
   return (
     <div className={cn("flex flex-col rounded-2xl border border-slate-200 bg-card overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Sparkles className="h-4 w-4 text-violet-600" /> {t("assistant.title")}</div>
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Sparkles className="h-4 w-4 text-navy-600" /> {t("assistant.title")}</div>
         {data && data.messages.length > 0 && (
           <button className="text-xs text-slate-400 hover:text-slate-700 inline-flex items-center gap-1" onClick={() => clear.mutate()} disabled={clear.isPending}><Trash2 className="h-3.5 w-3.5" /> {t("assistant.clear")}</button>
         )}
@@ -104,10 +104,10 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
         {isLoading && <div className="space-y-3"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-10 w-1/2 ml-auto" /></div>}
         {data && visible.length === 0 && !pending && (
           <div className="text-center py-6">
-            <Sparkles className="h-8 w-8 text-violet-200 mx-auto mb-2" />
+            <Sparkles className="h-8 w-8 text-navy-200 mx-auto mb-2" />
             <p className="text-sm text-slate-600 max-w-sm mx-auto">{projectId ? t("assistant.emptyJob") : t("assistant.emptyCompany")}</p>
             <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {suggestions.map((s) => <button key={s} onClick={() => send.mutate(s)} className="text-xs rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 hover:border-violet-300 hover:bg-violet-50">{s}</button>)}
+              {suggestions.map((s) => <button key={s} onClick={() => send.mutate(s)} className="text-xs rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 hover:border-navy-300 hover:bg-navy-50">{s}</button>)}
             </div>
           </div>
         )}
@@ -146,7 +146,7 @@ function Bubble({ message }: { message: AssistantMessageDto }) {
   const mine = message.role === "user";
   return (
     <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
-      <div className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed", mine ? "bg-violet-600 text-white rounded-br-md" : "bg-slate-100 text-slate-800 rounded-bl-md")}>
+      <div className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed", mine ? "bg-navy-600 text-white rounded-br-md" : "bg-slate-100 text-slate-800 rounded-bl-md")}>
         {mine ? <span className="whitespace-pre-wrap">{message.content}</span> : <Markdownish text={message.content} />}
       </div>
     </div>
@@ -188,9 +188,9 @@ function ProposalCard({ proposal, onConfirm, onDismiss, busy }: { proposal: Prop
   const link = proposal.resultEntityType === "invoice" && proposal.resultEntityId ? `/dashboard/invoices/${proposal.resultEntityId}` : proposal.projectId ? `/dashboard/jobs/${proposal.projectId}?tab=${tab}` : null;
   const status = proposal.status;
   return (
-    <div className={cn("mb-2 max-w-[85%] rounded-xl border p-3 text-sm", status === "pending" ? "border-violet-200 bg-violet-50/60" : status === "confirmed" ? "border-emerald-200 bg-emerald-50/50" : status === "failed" ? "border-rose-200 bg-rose-50/50" : "border-slate-200 bg-slate-50 opacity-70")}>
+    <div className={cn("mb-2 max-w-[85%] rounded-xl border p-3 text-sm", status === "pending" ? "border-navy-200 bg-navy-50/60" : status === "confirmed" ? "border-emerald-200 bg-emerald-50/50" : status === "failed" ? "border-rose-200 bg-rose-50/50" : "border-slate-200 bg-slate-50 opacity-70")}>
       <div className="flex items-start gap-2">
-        <span className="h-7 w-7 rounded-lg bg-card border border-slate-200 flex items-center justify-center shrink-0"><Icon className="h-3.5 w-3.5 text-violet-600" /></span>
+        <span className="h-7 w-7 rounded-lg bg-card border border-slate-200 flex items-center justify-center shrink-0"><Icon className="h-3.5 w-3.5 text-navy-600" /></span>
         <div className="min-w-0 flex-1">
           <div className="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">{t(`assistant.kind.${proposal.kind}`)}</div>
           <div className="font-medium text-slate-900">{proposal.summary}</div>
@@ -208,7 +208,7 @@ function ProposalCard({ proposal, onConfirm, onDismiss, busy }: { proposal: Prop
         {status === "confirmed" && (
           <>
             <span className="text-xs font-medium text-emerald-700 inline-flex items-center gap-1"><Check className="h-3.5 w-3.5" /> {t("assistant.confirmed")}</span>
-            {link && <Link href={link} className="text-xs text-violet-700 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3 w-3" /> {t("assistant.open")}</Link>}
+            {link && <Link href={link} className="text-xs text-navy-700 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3 w-3" /> {t("assistant.open")}</Link>}
           </>
         )}
         {status === "dismissed" && <span className="text-xs text-slate-500">{t("assistant.dismissed")}</span>}

@@ -283,7 +283,7 @@ export default function SupportBot() {
     return (
       <button
         onClick={() => setIsDismissed(false)}
-        className="fixed bottom-2 right-2 w-4 h-4 bg-gray-400/50 hover:bg-violet-600 rounded-full cursor-pointer transition-all duration-300 z-[9999] opacity-40 hover:opacity-100"
+        className="fixed bottom-2 right-2 w-4 h-4 bg-gray-400/50 hover:bg-navy-600 rounded-full cursor-pointer transition-all duration-300 z-[9999] opacity-40 hover:opacity-100"
         title={t("supportBot.restoreChat")}
       />
     );
@@ -341,7 +341,7 @@ export default function SupportBot() {
           transform: `translate(${dragPos.x}px, ${dragPos.y}px)`,
           touchAction: "none",
         }}
-        className={`fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-xl hover:shadow-violet-500/30 transition-all duration-300 z-[9999] hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 ${
+        className={`fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-tr from-navy-600 to-navy-600 text-white shadow-xl hover:shadow-navy-500/30 transition-all duration-300 z-[9999] hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 ${
           isOpen ? "rotate-90 bg-slate-800" : ""
         }`}
       >
@@ -392,14 +392,14 @@ export default function SupportBot() {
           className="fixed bottom-24 right-6 w-96 h-[500px] rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-[9999] transition-all duration-300 animate-in slide-in-from-bottom-5"
         >
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white flex items-center justify-between">
+          <div className="p-4 bg-gradient-to-r from-navy-600 to-navy-600 text-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-sm">{t("supportBot.headerTitle")}</h3>
-                <span className="text-[10px] text-violet-100 flex items-center gap-1">
+                <span className="text-[10px] text-navy-100 flex items-center gap-1">
                   <span className={`w-1.5 h-1.5 rounded-full ${isAdminOnline ? "bg-emerald-400" : "bg-amber-400"}`}></span>
                   {isAdminOnline ? t("supportBot.operatorOnline") : t("supportBot.aiOnly")}
                 </span>
@@ -438,7 +438,7 @@ export default function SupportBot() {
             {showOnboarding ? (
               <form onSubmit={handleStartConversation} className="space-y-3 p-2 bg-white rounded-xl border border-slate-100 shadow-sm animate-in fade-in">
                 <div className="text-center pb-2">
-                  <Sparkles className="h-8 w-8 text-violet-500 mx-auto mb-1 animate-pulse" />
+                  <Sparkles className="h-8 w-8 text-navy-500 mx-auto mb-1 animate-pulse" />
                   <h4 className="font-semibold text-slate-800 text-sm">{t("supportBot.startSessionTitle")}</h4>
                   <p className="text-xs text-slate-500">{t("supportBot.startSessionBody")}</p>
                 </div>
@@ -450,7 +450,7 @@ export default function SupportBot() {
                     placeholder={t("supportBot.namePlaceholder")}
                     value={visitorName}
                     onChange={e => setVisitorName(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-navy-500"
                   />
                 </div>
                 <div>
@@ -461,7 +461,7 @@ export default function SupportBot() {
                     placeholder="jane@example.com"
                     value={visitorEmail}
                     onChange={e => setVisitorEmail(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-navy-500"
                   />
                 </div>
                 <div>
@@ -471,13 +471,13 @@ export default function SupportBot() {
                     placeholder="416 555 0123"
                     value={visitorPhone}
                     onChange={e => setVisitorPhone(e.target.value)}
-                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-violet-500"
+                    className="w-full mt-0.5 px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-navy-500"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-sm font-semibold transition"
+                  className="w-full py-2 bg-navy-600 hover:bg-navy-700 text-white rounded-lg text-sm font-semibold transition"
                 >
                   {loading ? t("supportBot.starting") : t("supportBot.startChat")}
                 </button>
@@ -493,8 +493,8 @@ export default function SupportBot() {
               <>
                 {/* Greeting msg */}
                 <div className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                    <Bot className="h-3.5 w-3.5 text-violet-600" />
+                  <div className="w-6 h-6 rounded-full bg-navy-100 flex items-center justify-center shrink-0">
+                    <Bot className="h-3.5 w-3.5 text-navy-600" />
                   </div>
                   <div className="p-2.5 rounded-2xl rounded-tl-none bg-white border border-slate-100 shadow-sm max-w-[80%] text-xs text-slate-700">
                     {t("supportBot.greeting")}
@@ -526,14 +526,14 @@ export default function SupportBot() {
                   return (
                     <div key={msg.id} className={`flex gap-2 ${isUser ? "justify-end" : ""}`}>
                       {!isUser && (
-                        <div className="w-6 h-6 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                          <Bot className="h-3.5 w-3.5 text-violet-600" />
+                        <div className="w-6 h-6 rounded-full bg-navy-100 flex items-center justify-center shrink-0">
+                          <Bot className="h-3.5 w-3.5 text-navy-600" />
                         </div>
                       )}
                       <div
                         className={`p-2.5 rounded-2xl text-xs max-w-[80%] shadow-sm ${
                           isUser
-                            ? "bg-violet-600 text-white rounded-tr-none"
+                            ? "bg-navy-600 text-white rounded-tr-none"
                             : "bg-white border border-slate-100 text-slate-700 rounded-tl-none"
                         }`}
                       >
@@ -560,12 +560,12 @@ export default function SupportBot() {
                 placeholder={t("supportBot.typeMessage")}
                 value={inputText}
                 onChange={e => setInputText(e.target.value)}
-                className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500"
+                className="flex-1 px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-navy-500"
               />
               <button
                 type="submit"
                 disabled={loading || !inputText.trim()}
-                className="p-2 bg-violet-600 hover:bg-violet-700 disabled:bg-slate-200 text-white rounded-xl transition flex items-center justify-center shrink-0"
+                className="p-2 bg-navy-600 hover:bg-navy-700 disabled:bg-slate-200 text-white rounded-xl transition flex items-center justify-center shrink-0"
               >
                 <Send className="h-4 w-4" />
               </button>

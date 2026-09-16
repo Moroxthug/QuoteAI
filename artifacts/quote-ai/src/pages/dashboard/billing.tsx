@@ -23,7 +23,7 @@ function QuotaBar({ used, limit }: { used: number; limit: number }) {
   const { t } = useLanguage();
   const pct = Math.min(100, Math.round((used / limit) * 100));
   const color =
-    pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-violet-500";
+    pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-navy-500";
 
   return (
     <div className="space-y-1.5">
@@ -119,18 +119,18 @@ export default function BillingPage() {
       {/* Current plan card */}
       {isActive ? (
         <Card
-          className={`border-2 ${isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-violet-50" : "border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50"}`}
+          className={`border-2 ${isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-navy-50" : "border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50"}`}
         >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-11 w-11 rounded-xl flex items-center justify-center ${isPro ? "bg-amber-100" : "bg-violet-100"}`}
+                  className={`h-11 w-11 rounded-xl flex items-center justify-center ${isPro ? "bg-amber-100" : "bg-navy-100"}`}
                 >
                   {isPro ? (
                     <Crown className="h-6 w-6 text-amber-600" />
                   ) : (
-                    <Zap className="h-6 w-6 text-violet-500" />
+                    <Zap className="h-6 w-6 text-navy-500" />
                   )}
                 </div>
                 <div>
@@ -141,7 +141,7 @@ export default function BillingPage() {
                 </div>
               </div>
               <Badge
-                className={`text-xs ${isPro ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-violet-100 text-violet-700 border-violet-200"}`}
+                className={`text-xs ${isPro ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-navy-100 text-navy-700 border-navy-200"}`}
                 variant="outline"
               >
                 <CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.billing.active")}
@@ -154,9 +154,9 @@ export default function BillingPage() {
             {isStarter &&
               sub.quotaUsed != null &&
               sub.quotaLimit != null && (
-                <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
+                <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
                   <div className="flex items-center gap-2 mb-3">
-                    <BarChart3 className="h-4 w-4 text-violet-500" />
+                    <BarChart3 className="h-4 w-4 text-navy-500" />
                     <span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span>
                   </div>
                   <QuotaBar
@@ -185,7 +185,7 @@ export default function BillingPage() {
               )}
 
             {/* Plan features */}
-            <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
+            <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isPro ? (
@@ -284,16 +284,16 @@ export default function BillingPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-sm">
-                  <Zap className="h-4 w-4 text-violet-500" />
+                  <Zap className="h-4 w-4 text-navy-500" />
                   {t("dashboard.billing.starterPlanLabel")}
                 </div>
                 <ul className="space-y-1.5 text-sm">
                   <li className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-navy-400 shrink-0" />
                     {t("dashboard.billing.compare.starterQuotes")}
                   </li>
                   <li className="flex items-center gap-2 text-muted-foreground">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-navy-400 shrink-0" />
                     {t("dashboard.billing.compare.professionalPdf")}
                   </li>
                   <li className="flex items-center gap-2 text-muted-foreground line-through opacity-50">

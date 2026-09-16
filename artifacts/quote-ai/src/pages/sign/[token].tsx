@@ -127,7 +127,7 @@ export default function SignPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+        <Loader2 className="h-6 w-6 animate-spin text-navy-600" />
       </div>
     );
   }
@@ -184,11 +184,11 @@ export default function SignPage() {
         )}
 
         {step === "review" && (
-          <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 flex items-start gap-3">
-            <ShieldCheck className="h-5 w-5 text-violet-600 mt-0.5 shrink-0" />
-            <div className="text-sm text-violet-900">
+          <div className="rounded-2xl border border-navy-200 bg-navy-50 p-4 flex items-start gap-3">
+            <ShieldCheck className="h-5 w-5 text-navy-600 mt-0.5 shrink-0" />
+            <div className="text-sm text-navy-900">
               <div className="font-semibold">{t("sign.introTitle").replace("{name}", contract.customerName)}</div>
-              <div className="text-violet-800/80 mt-0.5">{t("sign.introDesc")}</div>
+              <div className="text-navy-800/80 mt-0.5">{t("sign.introDesc")}</div>
             </div>
           </div>
         )}
@@ -205,7 +205,7 @@ export default function SignPage() {
             {step === "otp" ? (
               <>
                 <div className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-violet-600 mt-0.5" />
+                  <Mail className="h-5 w-5 text-navy-600 mt-0.5" />
                   <div>
                     <h2 className="font-semibold text-slate-900">{t("sign.otpTitle")}</h2>
                     <p className="text-sm text-slate-500">{t("sign.otpDesc").replace("{email}", signer.emailMasked)}</p>
@@ -231,7 +231,7 @@ export default function SignPage() {
             ) : (
               <>
                 <div className="flex items-start gap-3">
-                  <FileSignature className="h-5 w-5 text-violet-600 mt-0.5" />
+                  <FileSignature className="h-5 w-5 text-navy-600 mt-0.5" />
                   <div>
                     <h2 className="font-semibold text-slate-900">{t("sign.signTitle")}</h2>
                     <p className="text-sm text-slate-500">{t("sign.signDesc")}</p>

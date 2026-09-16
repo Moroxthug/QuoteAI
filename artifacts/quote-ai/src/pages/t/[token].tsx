@@ -96,7 +96,7 @@ export default function WorkerTimePage() {
   // The currently-open clock-in (if any) already renders in its own card above.
   const closedEntries = useMemo(() => (data ? data.entries.filter((e) => !(e.clockInAt && !e.clockOutAt)) : []), [data]);
 
-  if (isLoading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-violet-600" /></div>;
+  if (isLoading) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-navy-600" /></div>;
   if (error || !data) {
     const code = (error as Error & { code?: string })?.code;
     return (
@@ -124,12 +124,12 @@ export default function WorkerTimePage() {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-4 space-y-4">
-          <h1 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-violet-600" /> {t("worker.clockInOut")}</h1>
+          <h1 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-navy-600" /> {t("worker.clockInOut")}</h1>
 
           {data.activeEntry ? (
-            <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 space-y-3 text-center">
+            <div className="rounded-xl border border-navy-200 bg-navy-50 p-4 space-y-3 text-center">
               <div className="text-sm text-slate-600">{data.activeEntry.projectName}{data.activeEntry.milestoneTitle ? ` · ${data.activeEntry.milestoneTitle}` : ""}</div>
-              <div className="text-3xl font-bold tabular-nums text-violet-700">{elapsedLabel(data.activeEntry.clockInAt!, now)}</div>
+              <div className="text-3xl font-bold tabular-nums text-navy-700">{elapsedLabel(data.activeEntry.clockInAt!, now)}</div>
               <div className="text-xs text-slate-500">{t("worker.clockedInSince")} {format(new Date(data.activeEntry.clockInAt!), "HH:mm")}</div>
               {clockOut.error && <p className="text-xs text-rose-600">{(clockOut.error as Error).message}</p>}
               <Button className="w-full h-12 rounded-xl text-base gap-2 bg-slate-900 hover:bg-slate-800" disabled={clockOut.isPending} onClick={() => clockOut.mutate(data.activeEntry!.id)}>
@@ -143,7 +143,7 @@ export default function WorkerTimePage() {
                 {data.jobs.length === 0 ? <p className="text-sm text-slate-500">{t("worker.noJobs")}</p> : (
                   <div className="grid gap-2">
                     {data.jobs.map((j) => (
-                      <button key={j.id} onClick={() => { setProjectId(j.id); setMilestoneId(""); }} className={cn("text-left rounded-xl border px-3 py-2.5 transition-colors", projectId === j.id ? "border-violet-500 bg-violet-50 ring-1 ring-violet-500" : "border-slate-200 bg-white active:bg-slate-50")}>
+                      <button key={j.id} onClick={() => { setProjectId(j.id); setMilestoneId(""); }} className={cn("text-left rounded-xl border px-3 py-2.5 transition-colors", projectId === j.id ? "border-navy-500 bg-navy-50 ring-1 ring-navy-500" : "border-slate-200 bg-white active:bg-slate-50")}>
                         <div className="font-medium text-slate-900 text-sm">{j.name}</div>
                         {j.address && <div className="text-xs text-slate-500 truncate">{j.address}</div>}
                       </button>
@@ -189,7 +189,7 @@ export default function WorkerTimePage() {
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
-            {[4, 6, 8, 10].map((h) => <button key={h} onClick={() => setHours(h)} className={cn("rounded-full px-3 py-1 text-xs font-medium border", hours === h ? "bg-violet-600 text-white border-violet-600" : "bg-white border-slate-200 text-slate-600")}>{h} h</button>)}
+            {[4, 6, 8, 10].map((h) => <button key={h} onClick={() => setHours(h)} className={cn("rounded-full px-3 py-1 text-xs font-medium border", hours === h ? "bg-navy-600 text-white border-navy-600" : "bg-white border-slate-200 text-slate-600")}>{h} h</button>)}
           </div>
           <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("worker.notePlaceholder")} className="h-11 rounded-xl" />
 

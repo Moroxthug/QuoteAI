@@ -66,7 +66,7 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
       {unread > 0 && (
         <span
           className={cn(
-            "min-w-[18px] h-[18px] px-1 rounded-full bg-violet-600 text-white text-[10px] font-bold flex items-center justify-center",
+            "min-w-[18px] h-[18px] px-1 rounded-full bg-navy-600 text-white text-[10px] font-bold flex items-center justify-center",
             collapsed && "absolute -top-1 -right-1",
           )}
         >
@@ -95,7 +95,7 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
             <button
               type="button"
               onClick={() => markRead.mutate(undefined)}
-              className="text-xs text-violet-600 hover:text-violet-800 flex items-center gap-1"
+              className="text-xs text-navy-600 hover:text-navy-800 flex items-center gap-1"
             >
               <CheckCheck className="h-3.5 w-3.5" /> {t("notifications.markAllRead")}
             </button>
@@ -107,9 +107,9 @@ export function NotificationsBell({ collapsed }: { collapsed: boolean }) {
           ) : (
             items.map((n) => {
               const inner = (
-                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-accent transition-colors", !n.readAt && "bg-violet-50/60 dark:bg-violet-500/15")}>
+                <div className={cn("px-3 py-2.5 border-b last:border-b-0 hover:bg-accent transition-colors", !n.readAt && "bg-navy-50/60 dark:bg-navy-500/15")}>
                   <div className="flex items-start gap-2">
-                    {!n.readAt && <span className="h-2 w-2 rounded-full bg-violet-600 mt-1.5 shrink-0" />}
+                    {!n.readAt && <span className="h-2 w-2 rounded-full bg-navy-600 mt-1.5 shrink-0" />}
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium text-foreground leading-snug">{n.title}</div>
                       {n.body && <div className="text-xs text-muted-foreground mt-0.5 leading-snug">{n.body}</div>}

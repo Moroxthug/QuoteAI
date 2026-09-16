@@ -52,7 +52,7 @@ export default function ContractsListPage() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-          <FileSignature className="h-8 w-8 text-violet-600" />
+          <FileSignature className="h-8 w-8 text-navy-600" />
           {t("contracts.title")}
         </h1>
         <p className="text-slate-500 mt-1">{t("contracts.subtitle")}</p>
@@ -86,7 +86,7 @@ export default function ContractsListPage() {
           <FileSignature className="h-10 w-10 text-slate-300 mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-slate-800">{t("contracts.emptyTitle")}</h2>
           <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">{t("contracts.emptyDesc")}</p>
-          <Link href="/dashboard/quotes" className="inline-block mt-4 text-sm font-medium text-violet-600 hover:underline">{t("contracts.goToQuotes")}</Link>
+          <Link href="/dashboard/quotes" className="inline-block mt-4 text-sm font-medium text-navy-600 hover:underline">{t("contracts.goToQuotes")}</Link>
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
@@ -113,7 +113,7 @@ function ContractRow({ c, locale }: { c: ContractDto; locale: Locale }) {
   const when = c.signedAt ?? c.sentAt ?? c.createdAt;
   return (
     <Link href={`/dashboard/contracts/${c.id}`} className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-      <div className="h-10 w-10 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+      <div className="h-10 w-10 rounded-lg bg-navy-50 text-navy-600 flex items-center justify-center shrink-0">
         <FileSignature className="h-5 w-5" />
       </div>
       <div className="min-w-0 flex-1">

@@ -136,7 +136,7 @@ export default function SignInPage() {
                       value={twoFactorCode}
                       onChange={e => setTwoFactorCode(e.target.value)}
                       placeholder={useBackupCode ? t("signIn.twoFactorBackupPlaceholder") : "123456"}
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                     />
                   </div>
                   <button
@@ -150,7 +150,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={() => { setUseBackupCode(v => !v); setTwoFactorCode(""); setError(null); }}
-                    className="w-full text-center text-sm text-violet-600 hover:underline font-medium"
+                    className="w-full text-center text-sm text-navy-600 hover:underline font-medium"
                   >
                     {useBackupCode ? t("signIn.twoFactorUseTotp") : t("signIn.twoFactorUseBackup")}
                   </button>
@@ -178,7 +178,7 @@ export default function SignInPage() {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="jane@example.com"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
@@ -191,7 +191,7 @@ export default function SignInPage() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                       />
                       <button
                         type="button"
@@ -207,7 +207,7 @@ export default function SignInPage() {
                     <button
                       type="button"
                       onClick={() => { setResetMode(true); setResetEmail(email); setError(null); }}
-                      className="text-xs text-violet-600 hover:text-violet-700 font-medium transition-colors"
+                      className="text-xs text-navy-600 hover:text-navy-700 font-medium transition-colors"
                     >
                       {t("signIn.forgotPassword")}
                     </button>
@@ -232,7 +232,7 @@ export default function SignInPage() {
                 </p>
                 <button
                   onClick={() => { setResetMode(false); setResetSent(false); }}
-                  className="text-sm text-violet-600 hover:underline font-medium"
+                  className="text-sm text-navy-600 hover:underline font-medium"
                 >
                   {t("signIn.backToLogin")}
                 </button>
@@ -258,7 +258,7 @@ export default function SignInPage() {
                       value={resetEmail}
                       onChange={e => setResetEmail(e.target.value)}
                       placeholder="jane@example.com"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                     />
                   </div>
                   <button
@@ -284,7 +284,7 @@ export default function SignInPage() {
           {!resetMode && !twoFactorMode && (
             <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
               <span className="text-sm text-gray-500">{t("signIn.noAccount")} </span>
-              <Link href={nextPath !== "/dashboard" ? `/sign-up?next=${encodeURIComponent(nextPath)}` : "/sign-up"} className="text-sm text-violet-600 font-semibold hover:underline">
+              <Link href={nextPath !== "/dashboard" ? `/sign-up?next=${encodeURIComponent(nextPath)}` : "/sign-up"} className="text-sm text-navy-600 font-semibold hover:underline">
                 {t("signIn.signUpLink")}
               </Link>
             </div>

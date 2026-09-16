@@ -349,7 +349,7 @@ export default function PublicQuotePage() {
   if (loading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-navy-500" />
       </div>
     );
   }
@@ -379,7 +379,7 @@ export default function PublicQuotePage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-2xl">
       <div className="text-center mb-8">
-        <div className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-2">
+        <div className="text-xs font-bold text-navy-600 uppercase tracking-wider mb-2">
           {quote.companySnapshot?.companyName || t("publicQuote.quoteFallback")}
         </div>
         <h1 className="text-xl font-semibold text-gray-900">
@@ -403,8 +403,8 @@ export default function PublicQuotePage() {
                 disabled={isAccepted}
                 className={`text-left rounded-xl border p-4 transition ${
                   isSelected
-                    ? "border-violet-400 bg-violet-50 ring-2 ring-violet-200"
-                    : "border-gray-200 bg-white hover:border-violet-200"
+                    ? "border-navy-400 bg-navy-50 ring-2 ring-navy-200"
+                    : "border-gray-200 bg-white hover:border-navy-200"
                 } ${isAccepted && !isWinner ? "opacity-50" : ""}`}
               >
                 <div className="flex items-center justify-between">
@@ -517,7 +517,7 @@ export default function PublicQuotePage() {
               <Button
                 onClick={handleAccept}
                 disabled={!nomeConferma.trim() || accepting || (hasTiers && !selectedVariantId)}
-                className="w-full gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold"
+                className="w-full gap-2 bg-gradient-to-r from-navy-600 to-navy-600 text-white font-bold"
               >
                 {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Hammer className="h-4 w-4" />}
                 {t("publicQuote.acceptButton")}

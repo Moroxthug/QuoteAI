@@ -150,7 +150,7 @@ export default function SeoCityLanding() {
         <div className="grid sm:grid-cols-2 gap-3">
           {useCases.map((uc) => (
             <div key={uc} className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
-              <CheckCircle2 className="h-4 w-4 text-violet-500 shrink-0" />
+              <CheckCircle2 className="h-4 w-4 text-navy-500 shrink-0" />
               <span className="text-sm text-gray-700">{uc}</span>
             </div>
           ))}
@@ -200,9 +200,9 @@ export default function SeoCityLanding() {
       <nav aria-label={t("seo.city.breadcrumbAria")} className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center text-sm text-gray-500 flex-wrap">
-            <li><Link href={isFr ? "/fr" : "/"} className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
+            <li><Link href={isFr ? "/fr" : "/"} className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
-            <li><Link href={`${base}/${sSlugForLang}/`} className="hover:text-violet-600 transition-colors">{sectorLabel}</Link></li>
+            <li><Link href={`${base}/${sSlugForLang}/`} className="hover:text-navy-600 transition-colors">{sectorLabel}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300 select-none">/</li>
             <li className="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">{cityName}</li>
           </ol>
@@ -217,7 +217,7 @@ export default function SeoCityLanding() {
           style={{ background: "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.12) 0%, transparent 70%)" }}
         />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full bg-navy-50 border border-navy-100 px-4 py-1.5 text-sm font-medium text-navy-700 mb-8">
             <MapPin className="h-3.5 w-3.5" />
             {regionName}
           </div>
@@ -254,10 +254,10 @@ export default function SeoCityLanding() {
           aria-label={`${t("seo.city.observatoryAria")} ${cityName}`}
         >
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-50/40 to-cyan-50/20 p-6 md:p-8">
+            <div className="rounded-2xl border border-navy-100 bg-gradient-to-br from-navy-50/40 to-teal-50/20 p-6 md:p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0" aria-hidden="true">
-                  <BarChart2 className="h-4 w-4 text-violet-600" />
+                <div className="h-8 w-8 rounded-lg bg-navy-100 flex items-center justify-center shrink-0" aria-hidden="true">
+                  <BarChart2 className="h-4 w-4 text-navy-600" />
                 </div>
                 <h2 className="text-base font-bold text-gray-900">
                   {t("seo.city.observatoryHeading")} {cityName}
@@ -284,14 +284,14 @@ export default function SeoCityLanding() {
                   <ul className="space-y-1.5">
                     {osservatorio.topServices.map((sv) => (
                       <li key={sv} className="flex items-start gap-1 text-xs text-gray-600">
-                        <span className="text-violet-400 shrink-0 font-bold" aria-hidden="true">›</span>
+                        <span className="text-navy-400 shrink-0 font-bold" aria-hidden="true">›</span>
                         {sv}
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 leading-relaxed border-t border-violet-100 pt-4">
+              <p className="text-sm text-gray-500 leading-relaxed border-t border-navy-100 pt-4">
                 {osservatorio.localInsight}
               </p>
             </div>
@@ -304,17 +304,17 @@ export default function SeoCityLanding() {
 
       {/* ── City context ─────────────────────────────────────── */}
       {contextText && (
-        <section className="py-10 bg-violet-50/50 border-y border-violet-100/60">
+        <section className="py-10 bg-navy-50/50 border-y border-navy-100/60">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
             <div className="flex gap-4 items-start">
               <div
-                className="shrink-0 mt-0.5 h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center"
+                className="shrink-0 mt-0.5 h-8 w-8 rounded-lg bg-navy-100 flex items-center justify-center"
                 aria-hidden="true"
               >
-                <MapPin className="h-4 w-4 text-violet-600" />
+                <MapPin className="h-4 w-4 text-navy-600" />
               </div>
               <div>
-                <h2 className="text-sm font-semibold text-violet-700 mb-1.5">
+                <h2 className="text-sm font-semibold text-navy-700 mb-1.5">
                   {t("seo.city.contextHeading").replace("{trade}", sectorLabel).replace("{city}", cityName)}
                 </h2>
                 <p className="text-sm text-gray-600 leading-relaxed">{contextText}</p>
@@ -336,7 +336,7 @@ export default function SeoCityLanding() {
                 <a
                   key={slug}
                   href={`${base}/${sSlugForLang}/${slug}/`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-violet-300 hover:text-violet-600 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 text-sm text-gray-500 hover:border-navy-300 hover:text-navy-600 transition-colors"
                 >
                   {anchorText}
                 </a>
@@ -358,9 +358,9 @@ export default function SeoCityLanding() {
                 <a
                   key={r.slug}
                   href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/${citySlug}/`}
-                  className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
+                  className="flex items-center gap-2 bg-white border border-gray-100 hover:border-navy-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-navy-700 transition-colors"
                 >
-                  <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
+                  <span className="text-navy-400 font-bold" aria-hidden="true">→</span>
                   {r.label} {t("seo.city.inCityConnector")} {cityName}
                 </a>
               ))}
@@ -381,9 +381,9 @@ export default function SeoCityLanding() {
                 <a
                   key={r.slug}
                   href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/`}
-                  className="flex items-center gap-2 bg-white border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors"
+                  className="flex items-center gap-2 bg-white border border-gray-100 hover:border-navy-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:text-navy-700 transition-colors"
                 >
-                  <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
+                  <span className="text-navy-400 font-bold" aria-hidden="true">→</span>
                   {r.label}
                 </a>
               ))}
@@ -414,7 +414,7 @@ export default function SeoCityLanding() {
                   </div>
                   <h2 className="text-base font-semibold text-gray-900">{t("seo.insights.heading")}</h2>
                 </div>
-                <Link href="/blog/" className="text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">
+                <Link href="/blog/" className="text-xs font-semibold text-navy-600 hover:text-navy-700 transition-colors">
                   {t("seo.city.viewAllArticles")}
                 </Link>
               </div>
@@ -423,10 +423,10 @@ export default function SeoCityLanding() {
                   <a
                     key={a.slug}
                     href={`/blog/${a.slug}/`}
-                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all duration-200 p-5"
+                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-navy-200 hover:shadow-sm transition-all duration-200 p-5"
                   >
-                    <span className="text-xs font-semibold text-violet-700 mb-2">{a.category}</span>
-                    <span className="text-sm font-semibold text-gray-900 group-hover:text-violet-700 transition-colors leading-snug mb-3">
+                    <span className="text-xs font-semibold text-navy-700 mb-2">{a.category}</span>
+                    <span className="text-sm font-semibold text-gray-900 group-hover:text-navy-700 transition-colors leading-snug mb-3">
                       {a.title}
                     </span>
                     <span className="text-xs text-gray-400 mt-auto">{a.readingTimeMin} {t("blog.readingTimeSuffix")}</span>

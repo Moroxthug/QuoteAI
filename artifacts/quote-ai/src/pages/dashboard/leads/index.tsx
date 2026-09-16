@@ -21,7 +21,7 @@ const FILTERS: (LeadStatus | "all")[] = ["all", "new", "contacted", "quoted", "w
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: "bg-blue-100 text-blue-700",
   contacted: "bg-amber-100 text-amber-700",
-  quoted: "bg-violet-100 text-violet-700",
+  quoted: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
   won: "bg-emerald-100 text-emerald-700",
   lost: "bg-slate-200 text-slate-600",
   unsubscribed: "bg-red-100 text-red-700",
@@ -80,7 +80,7 @@ export default function LeadsListPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-            <Users className="h-8 w-8 text-violet-600" />
+            <Users className="h-8 w-8 text-navy-600" />
             {t("leads.title")}
           </h1>
           <p className="text-slate-500 mt-1">{t("leads.subtitle")}</p>
@@ -102,7 +102,7 @@ export default function LeadsListPage() {
               onClick={() => setFilter(f)}
               className={cn(
                 "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
-                filter === f ? "bg-violet-600 text-white border-violet-600" : "bg-card text-slate-600 border-slate-200 hover:border-violet-300",
+                filter === f ? "bg-navy-600 text-white border-navy-600" : "bg-card text-slate-600 border-slate-200 hover:border-navy-300",
               )}
             >
               {f === "all" ? t("leads.filter.all") : t(`leads.status.${f}`)}

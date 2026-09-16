@@ -73,7 +73,7 @@ function ExcelWordComparisonBlock({ tool }: { tool: "Excel" | "Word" }) {
               </div>
               <div className="py-3.5 px-5 flex items-center justify-center border-l border-gray-100">
                 {r.new
-                  ? <CheckCircle2 className="h-5 w-5 text-violet-500" />
+                  ? <CheckCircle2 className="h-5 w-5 text-navy-500" />
                   : <X className="h-5 w-5 text-red-300" />}
               </div>
             </div>
@@ -201,7 +201,7 @@ function PreventiviGratisPlansBlock() {
           {plans.map((p) => (
             <div
               key={p.name}
-              className={`relative rounded-2xl p-6 flex flex-col ${p.highlight ? "shadow-lg border-2 border-violet-400 bg-white" : "border border-gray-100 bg-white card-soft"}`}
+              className={`relative rounded-2xl p-6 flex flex-col ${p.highlight ? "shadow-lg border-2 border-navy-400 bg-white" : "border border-gray-100 bg-white card-soft"}`}
             >
               {p.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -221,7 +221,7 @@ function PreventiviGratisPlansBlock() {
               <ul className="space-y-2.5 mb-6 flex-1">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-violet-500 shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-navy-500 shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -337,7 +337,7 @@ export default function SeoLanding() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
           <div className="grid lg:grid-cols-2 gap-14 items-center">
             <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-navy-50 border border-navy-100 px-4 py-1.5 text-sm font-medium text-navy-700 mb-8">
                 <Star className="h-3.5 w-3.5 fill-current" />
                 {t("seo.builtForMarket")}
               </div>
@@ -427,7 +427,7 @@ export default function SeoLanding() {
           <div className="grid sm:grid-cols-2 gap-3">
             {useCases.map((uc) => (
               <div key={uc} className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
-                <CheckCircle2 className="h-4 w-4 text-violet-500 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-navy-500 shrink-0" />
                 <span className="text-sm text-gray-700">{uc}</span>
               </div>
             ))}
@@ -457,19 +457,19 @@ export default function SeoLanding() {
               <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-600 leading-relaxed">
                 <div>
                   <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-violet-500" /> {t("seo.marketSection.taxTitle")}
+                    <TrendingUp className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.taxTitle")}
                   </div>
                   <p>{t("seo.marketSection.taxBody")}</p>
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-violet-500" /> {t("seo.marketSection.businessTitle")}
+                    <Shield className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.businessTitle")}
                   </div>
                   <p>{t("seo.marketSection.businessBody")}</p>
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-violet-500" /> {t("seo.marketSection.lexiconTitle")}
+                    <FileText className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.lexiconTitle")}
                   </div>
                   <p>{t("seo.marketSection.lexiconBody")}</p>
                 </div>
@@ -513,10 +513,10 @@ export default function SeoLanding() {
                 <Link
                   key={city.slug}
                   href={`${base}/${sSlugForLang}/${city.slug}/`}
-                  className="flex items-center gap-2.5 bg-white hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-4 py-3 transition-colors group"
+                  className="flex items-center gap-2.5 bg-white hover:bg-navy-50 border border-gray-100 hover:border-navy-200 rounded-xl px-4 py-3 transition-colors group"
                 >
-                  <MapPin className="h-3.5 w-3.5 text-violet-400 group-hover:text-violet-600 shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700 truncate">
+                  <MapPin className="h-3.5 w-3.5 text-navy-400 group-hover:text-navy-600 shrink-0" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-navy-700 truncate">
                     {city.name}
                   </span>
                 </Link>
@@ -541,7 +541,7 @@ export default function SeoLanding() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {REGION_NAMES_SORTED.map((region) => (
                 <div key={region}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-violet-600 mb-2.5">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-600 mb-2.5">
                     {region}
                   </h3>
                   <ul className="space-y-1.5">
@@ -549,7 +549,7 @@ export default function SeoLanding() {
                       <li key={city.slug}>
                         <Link
                           href={`${base}/${sSlugForLang}/${city.slug}/`}
-                          className="text-sm text-gray-500 hover:text-violet-600 transition-colors"
+                          className="text-sm text-gray-500 hover:text-navy-600 transition-colors"
                         >
                           {label} {city.name}
                         </Link>
@@ -575,10 +575,10 @@ export default function SeoLanding() {
                 <Link
                   key={r.slug}
                   href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/`}
-                  className="flex items-center gap-3 bg-gray-50 hover:bg-violet-50 border border-gray-100 hover:border-violet-200 rounded-xl px-5 py-3.5 transition-colors group"
+                  className="flex items-center gap-3 bg-gray-50 hover:bg-navy-50 border border-gray-100 hover:border-navy-200 rounded-xl px-5 py-3.5 transition-colors group"
                 >
-                  <ArrowRight className="h-4 w-4 text-violet-400 group-hover:text-violet-600 shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-violet-700">{t("seo.quotesForLink")} {isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label}</span>
+                  <ArrowRight className="h-4 w-4 text-navy-400 group-hover:text-navy-600 shrink-0" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-navy-700">{t("seo.quotesForLink")} {isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label}</span>
                 </Link>
               ))}
             </div>
@@ -610,10 +610,10 @@ export default function SeoLanding() {
                   <Link
                     key={a.slug}
                     href={`/blog/${a.slug}/`}
-                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all p-5"
+                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-navy-200 hover:shadow-sm transition-all p-5"
                   >
-                    <span className="text-xs font-semibold text-violet-600 mb-2">{a.category}</span>
-                    <span className="text-sm font-semibold text-gray-800 group-hover:text-violet-700 transition-colors leading-snug mb-2">
+                    <span className="text-xs font-semibold text-navy-600 mb-2">{a.category}</span>
+                    <span className="text-sm font-semibold text-gray-800 group-hover:text-navy-700 transition-colors leading-snug mb-2">
                       {a.title}
                     </span>
                     <span className="text-xs text-gray-400 mt-auto">{a.readingTimeMin} {t("blog.readingTimeSuffix")}</span>
@@ -621,7 +621,7 @@ export default function SeoLanding() {
                 ))}
               </div>
               <div className="mt-6 text-center">
-                <Link href="/blog/" className="text-sm font-medium text-violet-600 hover:text-violet-800 transition-colors">
+                <Link href="/blog/" className="text-sm font-medium text-navy-600 hover:text-navy-800 transition-colors">
                   {t("seo.insights.viewAll")}
                 </Link>
               </div>
@@ -634,8 +634,8 @@ export default function SeoLanding() {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
           <div className="flex items-center justify-center gap-2 mb-6">
-            <Clock className="h-5 w-5 text-violet-500" />
-            <span className="text-sm font-semibold text-violet-600">{t("seo.finalCta.badge")}</span>
+            <Clock className="h-5 w-5 text-navy-500" />
+            <span className="text-sm font-semibold text-navy-600">{t("seo.finalCta.badge")}</span>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
             {t("seo.finalCta.headingPrefix")}{" "}

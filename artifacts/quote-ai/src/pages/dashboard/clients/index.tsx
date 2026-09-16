@@ -35,8 +35,8 @@ export default function ClientsPage() {
       ) : !clients || clients.length === 0 ? (
         <Card>
           <CardContent className="py-16 flex flex-col items-center justify-center gap-3 text-center">
-            <div className="h-14 w-14 rounded-full bg-violet-50 flex items-center justify-center">
-              <Users className="h-6 w-6 text-violet-400" />
+            <div className="h-14 w-14 rounded-full bg-navy-50 flex items-center justify-center">
+              <Users className="h-6 w-6 text-navy-400" />
             </div>
             <div>
               <p className="font-semibold text-foreground">No clients yet</p>
@@ -57,11 +57,11 @@ export default function ClientsPage() {
               href={`/dashboard/clients/${client.id}`}
               className="block"
             >
-              <Card className="hover:shadow-sm hover:border-violet-200 transition-all cursor-pointer">
+              <Card className="hover:shadow-sm hover:border-navy-200 transition-all cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-                      <span className="text-sm font-bold text-violet-700 uppercase">
+                    <div className="h-10 w-10 rounded-full bg-navy-100 flex items-center justify-center shrink-0">
+                      <span className="text-sm font-bold text-navy-700 uppercase">
                         {client.clientName.slice(0, 2)}
                       </span>
                     </div>
@@ -98,7 +98,7 @@ export default function ClientsPage() {
                           {client.quoteCount} {client.quoteCount === 1 ? "quote" : "quotes"}
                         </span>
                         {client.unlockedCount > 0 && (
-                          <span className="flex items-center gap-1 text-xs text-violet-600">
+                          <span className="flex items-center gap-1 text-xs text-navy-600">
                             <CheckCircle2 className="h-3 w-3" />
                             {client.unlockedCount} accepted
                           </span>

@@ -57,7 +57,7 @@ export default function OnboardingPage() {
   if (!isLoaded) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-white">
-        <div className="w-8 h-8 rounded-full border-[3px] border-violet-400 border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-[3px] border-navy-400 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-br from-violet-50 via-white to-cyan-50 flex flex-col">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-navy-50 via-white to-teal-50 flex flex-col">
       {/* Header */}
       <header className="h-16 flex items-center px-6 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
         <Logo />
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
               <div className="text-center mb-8">
                 <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15))" }}>
-                  <Building2 className="h-8 w-8 text-violet-500" />
+                  <Building2 className="h-8 w-8 text-navy-500" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("onboarding.title")}</h1>
                 <p className="text-gray-500 text-sm max-w-sm mx-auto">
@@ -260,7 +260,7 @@ export default function OnboardingPage() {
               <div className="text-center mb-8">
                 <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15))" }}>
-                  <MapPin className="h-8 w-8 text-violet-500" />
+                  <MapPin className="h-8 w-8 text-navy-500" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("onboarding.step2Title")}</h1>
                 <p className="text-gray-500 text-sm max-w-sm mx-auto">

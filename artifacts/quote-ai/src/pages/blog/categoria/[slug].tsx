@@ -13,8 +13,8 @@ function formatDate(iso: string, lang: "en" | "fr"): string {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Professioni: "bg-violet-50 text-violet-700",
-  Prezzi: "bg-cyan-50 text-cyan-700",
+  Professioni: "bg-navy-50 text-navy-700",
+  Prezzi: "bg-teal-50 text-teal-700",
   Consigli: "bg-amber-50 text-amber-700",
   Tool: "bg-green-50 text-green-700",
   Innovazione: "bg-blue-50 text-blue-700",
@@ -78,16 +78,16 @@ export default function BlogCategoryPage() {
       <nav aria-label={t("seo.city.breadcrumbAria")} className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center text-sm text-gray-500 flex-wrap gap-1">
-            <li><Link href="/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
+            <li><Link href="/" className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300">/</li>
-            <li><Link href="/blog/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbBlog")}</Link></li>
+            <li><Link href="/blog/" className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbBlog")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300">/</li>
             <li className="text-gray-900 font-medium" aria-current="page">{category.name}</li>
           </ol>
         </div>
       </nav>
 
-      <section className="bg-gradient-to-br from-violet-50/60 to-cyan-50/30 pt-14 pb-10">
+      <section className="bg-gradient-to-br from-navy-50/60 to-teal-50/30 pt-14 pb-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl text-center">
           <div className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold mb-5 ${CATEGORY_COLORS[category.name] ?? "bg-gray-100 text-gray-600"}`}>
             {category.name}
@@ -109,7 +109,7 @@ export default function BlogCategoryPage() {
           {articles.length === 0 ? (
             <div className="text-center py-20 text-gray-400">
               <p className="text-lg font-medium">{t("blog.noArticlesInCategory")}</p>
-              <Link href="/blog/" className="mt-6 inline-block text-violet-600 hover:underline text-sm font-semibold">
+              <Link href="/blog/" className="mt-6 inline-block text-navy-600 hover:underline text-sm font-semibold">
                 {t("blog.backToBlogArrow")}
               </Link>
             </div>
@@ -119,7 +119,7 @@ export default function BlogCategoryPage() {
                 <Link
                   key={article.slug}
                   href={`/blog/${article.slug}/`}
-                  className="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                  className="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-navy-200 hover:shadow-md transition-all duration-200 overflow-hidden"
                 >
                   <div className="p-6 flex flex-col flex-1">
                     <div className="flex items-center justify-between mb-4">
@@ -128,7 +128,7 @@ export default function BlogCategoryPage() {
                       </span>
                       <span className="text-xs text-gray-400">{article.readingTimeMin} min</span>
                     </div>
-                    <h2 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-violet-700 transition-colors flex-1">
+                    <h2 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-navy-700 transition-colors flex-1">
                       {article.title}
                     </h2>
                     <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-3">
@@ -138,7 +138,7 @@ export default function BlogCategoryPage() {
                       <time className="text-xs text-gray-400" dateTime={article.publishedAt}>
                         {formatDate(article.publishedAt, lang)}
                       </time>
-                      <span className="text-xs font-semibold text-violet-600 group-hover:translate-x-0.5 transition-transform">
+                      <span className="text-xs font-semibold text-navy-600 group-hover:translate-x-0.5 transition-transform">
                         {t("blog.readArticle")}
                       </span>
                     </div>

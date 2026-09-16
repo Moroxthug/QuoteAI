@@ -84,7 +84,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
         {/* Hours */}
         <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-violet-600" /> {t("jobs.team.hours")}</h2>
+            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-navy-600" /> {t("jobs.team.hours")}</h2>
             <div className="text-xs text-slate-500">{approvedHours.toFixed(1)} h {t("jobs.team.approved")} · <span className="font-medium text-slate-800">{formatCents(approvedCents)}</span>{pendingHours.length ? <span className="ml-2 text-amber-700">{pendingHours.length} {t("jobs.team.pending")}</span> : null}</div>
           </div>
           <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_80px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
@@ -104,7 +104,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
             )}
             <Button type="submit" size="sm" className="h-9 gap-1 col-span-2 xl:col-span-1" disabled={!time.workerId || !time.hours || addTime.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logHours")}</Button>
           </form>
-          {activeWorkers.length === 0 && <p className="text-xs text-slate-400">{t("jobs.team.noWorkersHint")} <Link href="/dashboard/team" className="text-violet-600 underline">{t("jobs.team.openTeam")}</Link></p>}
+          {activeWorkers.length === 0 && <p className="text-xs text-slate-400">{t("jobs.team.noWorkersHint")} <Link href="/dashboard/team" className="text-navy-600 underline">{t("jobs.team.openTeam")}</Link></p>}
           {timeEntries.length === 0 ? <p className="text-sm text-slate-400 py-4 text-center">{t("jobs.team.noHours")}</p> : (
             <ul className="divide-y">
               {timeEntries.map((e) => (
@@ -132,11 +132,11 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
         {/* Equipment */}
         <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Wrench className="h-4 w-4 text-violet-600" /> {t("jobs.team.equipment")}</h2>
+            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Wrench className="h-4 w-4 text-navy-600" /> {t("jobs.team.equipment")}</h2>
             <div className="text-xs text-slate-500">{t("jobs.team.equipmentCharged")} <span className="font-medium text-slate-800">{formatCents(usageCents)}</span></div>
           </div>
           {activeEquipment.length === 0 ? (
-            <p className="text-xs text-slate-400">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-violet-600 underline">{t("jobs.team.openTeam")}</Link></p>
+            <p className="text-xs text-slate-400">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-navy-600 underline">{t("jobs.team.openTeam")}</Link></p>
           ) : (
             <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_90px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
               <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm col-span-2 xl:col-span-1">
@@ -168,14 +168,14 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
       <div className="space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Users className="h-4 w-4 text-violet-600" /> {t("jobs.team.assigned")}</h3>
-            <Link href="/dashboard/team" className="text-xs text-violet-600 hover:underline inline-flex items-center gap-1">{t("jobs.team.openTeam")} <ExternalLink className="h-3 w-3" /></Link>
+            <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Users className="h-4 w-4 text-navy-600" /> {t("jobs.team.assigned")}</h3>
+            <Link href="/dashboard/team" className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1">{t("jobs.team.openTeam")} <ExternalLink className="h-3 w-3" /></Link>
           </div>
           {assignments.length === 0 ? <p className="text-sm text-slate-400 py-2 text-center">{t("jobs.team.empty")}</p> : (
             <ul className="divide-y">
               {assignments.map((a) => (
                 <li key={a.id} className="flex items-center gap-3 py-2 text-sm group">
-                  <div className="h-8 w-8 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-xs font-bold">{a.collaboratorName.slice(0, 2).toUpperCase()}</div>
+                  <div className="h-8 w-8 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center text-xs font-bold">{a.collaboratorName.slice(0, 2).toUpperCase()}</div>
                   <div className="flex-1 min-w-0"><div className="font-medium text-slate-800 truncate">{a.collaboratorName}</div><div className="text-xs text-slate-400">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</div></div>
                   <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => unassign.mutate(a.id)}><Trash2 className="h-4 w-4" /></button>
                 </li>
@@ -202,7 +202,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
 
         {/* Geofence */}
         <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
-          <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-violet-600" /> {t("jobs.team.geofenceTitle")}</h3>
+          <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-navy-600" /> {t("jobs.team.geofenceTitle")}</h3>
           <p className="text-xs text-slate-500">{t("jobs.team.geofenceHint")}</p>
           <Button type="button" variant="outline" size="sm" className="h-9 gap-1.5 w-full" disabled={locating} onClick={useMyLocation}>
             {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} {job.latitude ? t("jobs.team.updateLocation") : t("jobs.team.useMyLocation")}

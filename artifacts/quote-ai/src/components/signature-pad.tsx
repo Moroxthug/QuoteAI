@@ -119,7 +119,7 @@ export function SignaturePad({ value, onChange, defaultName }: { value: Signatur
               onChange(e.target.value.trim() ? { type: "typed", data: e.target.value.trim() } : null);
             }}
             placeholder={t("signature.typePlaceholder")}
-            className="w-full h-11 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
+            className="w-full h-11 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-navy-400"
           />
           <div className="h-24 rounded-xl border border-slate-200 bg-card flex items-center justify-center overflow-hidden">
             <span className="text-3xl text-slate-900" style={{ fontFamily: '"Brush Script MT", "Segoe Script", "Snell Roundhand", cursive' }}>{typed || " "}</span>

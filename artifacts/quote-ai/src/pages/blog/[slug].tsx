@@ -11,8 +11,8 @@ function formatDate(iso: string, lang: "en" | "fr"): string {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Professioni: "bg-violet-50 text-violet-700",
-  Prezzi: "bg-cyan-50 text-cyan-700",
+  Professioni: "bg-navy-50 text-navy-700",
+  Prezzi: "bg-teal-50 text-teal-700",
   Consigli: "bg-amber-50 text-amber-700",
   Tool: "bg-green-50 text-green-700",
   Innovazione: "bg-blue-50 text-blue-700",
@@ -98,9 +98,9 @@ export default function BlogArticlePage() {
       <nav aria-label={t("seo.city.breadcrumbAria")} className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center text-sm text-gray-500 flex-wrap gap-1">
-            <li><Link href="/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
+            <li><Link href="/" className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300">/</li>
-            <li><Link href="/blog/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbBlog")}</Link></li>
+            <li><Link href="/blog/" className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbBlog")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300">/</li>
             <li className="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">{article.title}</li>
           </ol>
@@ -108,7 +108,7 @@ export default function BlogArticlePage() {
       </nav>
 
       <article className="flex-1">
-        <header className="bg-gradient-to-br from-violet-50/40 to-cyan-50/20 pt-14 pb-10 border-b border-gray-100">
+        <header className="bg-gradient-to-br from-navy-50/40 to-teal-50/20 pt-14 pb-10 border-b border-gray-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
             <div className="flex items-center gap-3 mb-5">
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${CATEGORY_COLORS[article.category] ?? "bg-gray-100 text-gray-600"}`}>
@@ -132,15 +132,15 @@ export default function BlogArticlePage() {
           {toc.length >= 2 && (
             <nav
               aria-label={t("blog.toc")}
-              className="mb-10 rounded-xl border border-violet-100 bg-violet-50/40 px-6 py-5"
+              className="mb-10 rounded-xl border border-navy-100 bg-navy-50/40 px-6 py-5"
             >
-              <p className="text-xs font-bold text-violet-700 uppercase tracking-wider mb-3">{t("blog.toc")}</p>
+              <p className="text-xs font-bold text-navy-700 uppercase tracking-wider mb-3">{t("blog.toc")}</p>
               <ol className="space-y-1.5">
                 {toc.map((item) => (
                   <li key={item.id} className={item.level === 3 ? "pl-4" : ""}>
                     <a
                       href={`#${item.id}`}
-                      className="text-sm text-gray-700 hover:text-violet-700 transition-colors leading-snug"
+                      className="text-sm text-gray-700 hover:text-navy-700 transition-colors leading-snug"
                     >
                       {item.level === 3 && <span className="mr-1 text-gray-400">–</span>}
                       {item.text}
@@ -152,7 +152,7 @@ export default function BlogArticlePage() {
           )}
 
           <div
-            className="prose prose-gray prose-headings:font-bold prose-h2:text-xl prose-h3:text-base prose-p:leading-relaxed prose-li:leading-relaxed prose-a:text-violet-600 max-w-none"
+            className="prose prose-gray prose-headings:font-bold prose-h2:text-xl prose-h3:text-base prose-p:leading-relaxed prose-li:leading-relaxed prose-a:text-navy-600 max-w-none"
             dangerouslySetInnerHTML={{ __html: bodyHtml }}
           />
         </div>
@@ -166,9 +166,9 @@ export default function BlogArticlePage() {
                   <Link
                     key={sector.slug}
                     href={`/quotes/${sector.slug}/`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-navy-300 hover:text-navy-700 transition-colors"
                   >
-                    <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
+                    <span className="text-navy-400 font-bold" aria-hidden="true">→</span>
                     {t("blog.quotesForPrefix")} {sector.label}
                   </Link>
                 ))}
@@ -188,9 +188,9 @@ export default function BlogArticlePage() {
                   <Link
                     key={city.slug}
                     href={`/quotes/${geoSector.slug}/${city.slug}/`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-violet-300 hover:text-violet-700 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:border-navy-300 hover:text-navy-700 transition-colors"
                   >
-                    <span className="text-violet-400 font-bold" aria-hidden="true">→</span>
+                    <span className="text-navy-400 font-bold" aria-hidden="true">→</span>
                     {city.name}
                   </Link>
                 ))}
@@ -208,12 +208,12 @@ export default function BlogArticlePage() {
                   <Link
                     key={a.slug}
                     href={`/blog/${a.slug}/`}
-                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all p-4"
+                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-navy-200 hover:shadow-sm transition-all p-4"
                   >
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full self-start mb-2 ${CATEGORY_COLORS[a.category] ?? "bg-gray-100 text-gray-600"}`}>
                       {a.category}
                     </span>
-                    <span className="text-xs font-semibold text-gray-800 group-hover:text-violet-700 transition-colors leading-snug">
+                    <span className="text-xs font-semibold text-gray-800 group-hover:text-navy-700 transition-colors leading-snug">
                       {a.title}
                     </span>
                   </Link>
@@ -224,7 +224,7 @@ export default function BlogArticlePage() {
         )}
       </article>
 
-      <section className="py-16 bg-gradient-to-br from-violet-50/60 to-cyan-50/20 border-t border-violet-100/60">
+      <section className="py-16 bg-gradient-to-br from-navy-50/60 to-teal-50/20 border-t border-navy-100/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
             {t("blog.ctaTitlePrefix")} <span className="gradient-text">{t("blog.ctaTitleHighlight")}</span>

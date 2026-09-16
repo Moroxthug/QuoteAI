@@ -123,7 +123,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
 
           {doc.status === "done" && lavorazioni.length > 0 && (
             <button
-              className="mt-2 flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800 font-medium"
+              className="mt-2 flex items-center gap-1 text-xs text-navy-600 hover:text-navy-800 font-medium"
               onClick={() => setExpanded(v => !v)}
             >
               {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -167,7 +167,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
               {extractMut.isPending ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
               ) : (
-                <Zap className="h-3 w-3 text-violet-500" />
+                <Zap className="h-3 w-3 text-navy-500" />
               )}
               Process
             </Button>
@@ -251,7 +251,7 @@ function PriceComparison() {
     <Card>
       <CardHeader className="pb-2 pt-4 px-5">
         <CardTitle className="text-base font-semibold flex items-center gap-2">
-          <Scale className="h-4 w-4 text-violet-500" />
+          <Scale className="h-4 w-4 text-navy-500" />
           Cross-supplier comparison
         </CardTitle>
       </CardHeader>
@@ -279,7 +279,7 @@ function PriceComparison() {
                 ))}
               </div>
               {group.vendors.length >= 2 && group.vendors[group.vendors.length - 1].avgPrice > cheapest.avgPrice && (
-                <p className="text-[10px] text-violet-600 mt-1.5">
+                <p className="text-[10px] text-navy-600 mt-1.5">
                   You're paying more at {group.vendors[group.vendors.length - 1].vendor} than at {cheapest.vendor} for the same work.
                 </p>
               )}
@@ -346,7 +346,7 @@ export default function DocumentsPage() {
         onDrop={onDrop}
         className={cn(
           "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
-          isDragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-border bg-muted/50 hover:border-violet-300 hover:bg-violet-50/30 dark:hover:bg-violet-500/10"
+          isDragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-border bg-muted/50 hover:border-navy-300 hover:bg-navy-50/30 dark:hover:bg-navy-500/10"
         )}
         onClick={() => fileInputRef.current?.click()}
       >
@@ -360,10 +360,10 @@ export default function DocumentsPage() {
         />
         <div className="flex flex-col items-center gap-3">
           {uploadMut.isPending ? (
-            <Loader2 className="h-8 w-8 text-violet-400 animate-spin" />
+            <Loader2 className="h-8 w-8 text-navy-400 animate-spin" />
           ) : (
-            <div className="h-12 w-12 rounded-xl bg-violet-100 flex items-center justify-center">
-              <Upload className="h-5 w-5 text-violet-600" />
+            <div className="h-12 w-12 rounded-xl bg-navy-100 flex items-center justify-center">
+              <Upload className="h-5 w-5 text-navy-600" />
             </div>
           )}
           <div>
@@ -381,20 +381,20 @@ export default function DocumentsPage() {
       {doneCount > 0 && (
         <Card className={cn(
           "border",
-          hasEnoughForIntelligence ? "border-violet-200 dark:border-violet-800/40 bg-violet-50/40 dark:bg-violet-500/10" : "border-amber-200 bg-amber-50/40"
+          hasEnoughForIntelligence ? "border-navy-200 dark:border-navy-800/40 bg-navy-50/40 dark:bg-navy-500/10" : "border-amber-200 bg-amber-50/40"
         )}>
           <CardContent className="py-4 px-5 flex items-center gap-3">
             <div className={cn(
               "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
-              hasEnoughForIntelligence ? "bg-violet-100" : "bg-amber-100"
+              hasEnoughForIntelligence ? "bg-navy-100" : "bg-amber-100"
             )}>
-              <TrendingUp className={cn("h-4 w-4", hasEnoughForIntelligence ? "text-violet-600" : "text-amber-600")} />
+              <TrendingUp className={cn("h-4 w-4", hasEnoughForIntelligence ? "text-navy-600" : "text-amber-600")} />
             </div>
             <div>
               {hasEnoughForIntelligence ? (
                 <>
-                  <p className="text-sm font-semibold text-violet-800">Price intelligence active</p>
-                  <p className="text-xs text-violet-600 mt-0.5">
+                  <p className="text-sm font-semibold text-navy-800">Price intelligence active</p>
+                  <p className="text-xs text-navy-600 mt-0.5">
                     {doneCount} documents processed — your average prices are now used in new AI quotes.
                   </p>
                 </>
@@ -420,7 +420,7 @@ export default function DocumentsPage() {
         <Card>
           <CardHeader className="pb-2 pt-4 px-5">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-violet-500" />
+              <TrendingUp className="h-4 w-4 text-navy-500" />
               Average extracted prices
             </CardTitle>
           </CardHeader>
@@ -429,7 +429,7 @@ export default function DocumentsPage() {
               {priceSummary.items.slice(0, 12).map((item) => (
                 <div key={item.workType} className="rounded-lg border border-border bg-muted/50 p-3">
                   <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{item.workType}</p>
-                  <p className="text-lg font-bold text-violet-700 mt-1">
+                  <p className="text-lg font-bold text-navy-700 mt-1">
                     {formatCurrency(item.avgUnitPrice)}
                     {item.unit && <span className="text-xs font-normal text-muted-foreground ml-1">/{item.unit}</span>}
                   </p>

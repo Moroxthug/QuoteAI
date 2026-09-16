@@ -45,7 +45,7 @@ export function LineEditor({ rows, onChange }: { rows: Row[]; onChange: (rows: R
         </div>
       ))}
       <div className="flex items-center justify-between">
-        <button type="button" className="text-xs text-violet-600 hover:underline inline-flex items-center gap-1" onClick={() => onChange([...rows, emptyRow()])}><Plus className="h-3 w-3" /> {t("invoices.line.add")}</button>
+        <button type="button" className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1" onClick={() => onChange([...rows, emptyRow()])}><Plus className="h-3 w-3" /> {t("invoices.line.add")}</button>
         <div className="text-sm text-slate-600">{t("invoices.subtotal")} <span className="font-semibold text-slate-900">{formatCents(subtotal)}</span></div>
       </div>
     </div>

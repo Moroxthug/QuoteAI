@@ -33,7 +33,7 @@ export default function AnalyticsPage() {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"><BarChart3 className="h-8 w-8 text-violet-600" />{t("analytics.title")}</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"><BarChart3 className="h-8 w-8 text-navy-600" />{t("analytics.title")}</h1>
           <p className="text-slate-500 mt-1">{t("analytics.subtitle")}</p>
         </div>
         <div className="flex gap-1 p-1 bg-muted rounded-xl">
@@ -55,11 +55,11 @@ export default function AnalyticsPage() {
 function GateCard() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center">
-      <Sparkles className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+    <div className="rounded-2xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
+      <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
       <h3 className="font-bold text-slate-900">{t("analytics.gatedTitle")}</h3>
       <p className="text-sm text-slate-600 mt-1 max-w-lg mx-auto">{t("analytics.gatedDesc")}</p>
-      <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-semibold text-violet-700 hover:underline">{t("analytics.upgrade")}</Link>
+      <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-semibold text-navy-700 hover:underline">{t("analytics.upgrade")}</Link>
     </div>
   );
 }
@@ -165,7 +165,7 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
             <ul className="divide-y divide-slate-100">
               {data.jobs.risks.slice(0, 6).map((r) => (
                 <li key={r.id} className="py-2">
-                  <Link href={`/dashboard/jobs/${r.id}`} className="text-sm font-medium text-slate-900 hover:text-violet-700 inline-flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 text-amber-500" />{r.name}</Link>
+                  <Link href={`/dashboard/jobs/${r.id}`} className="text-sm font-medium text-slate-900 hover:text-navy-700 inline-flex items-center gap-1.5"><AlertTriangle className="h-3.5 w-3.5 text-amber-500" />{r.name}</Link>
                   <div className="flex flex-wrap gap-1 mt-1">{r.flags.map((f) => <RiskChip key={f} flag={f} risk={r} />)}</div>
                 </li>
               ))}
@@ -182,7 +182,7 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
               <tbody>
                 {data.jobs.margins.map((j) => (
                   <tr key={j.id} className="border-t border-slate-100">
-                    <td className="py-2"><Link href={`/dashboard/jobs/${j.id}`} className="font-medium text-slate-900 hover:text-violet-700 inline-flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5 text-slate-400" />{j.name}</Link>{j.clientName && <div className="text-xs text-slate-400">{j.clientName}</div>}</td>
+                    <td className="py-2"><Link href={`/dashboard/jobs/${j.id}`} className="font-medium text-slate-900 hover:text-navy-700 inline-flex items-center gap-1.5"><Briefcase className="h-3.5 w-3.5 text-slate-400" />{j.name}</Link>{j.clientName && <div className="text-xs text-slate-400">{j.clientName}</div>}</td>
                     <td><JobStatusBadge status={j.status as never} /></td>
                     <td className="text-right text-slate-800">{formatCents(j.subtotalCents)}</td>
                     <td className="text-right text-slate-800">{formatCents(j.costCents)}</td>
@@ -249,7 +249,7 @@ function QuotesSection({ months, locale }: { months: number; locale: typeof enCA
     : [];
 
   const statCards = [
-    { label: t("analytics.totalQuotes"), value: stats?.total ?? 0, sub: `${stats?.thisMonth ?? 0} ${t("analytics.thisMonth")}`, icon: <FileText className="h-5 w-5 text-violet-500" />, format: (v: number) => String(v) },
+    { label: t("analytics.totalQuotes"), value: stats?.total ?? 0, sub: `${stats?.thisMonth ?? 0} ${t("analytics.thisMonth")}`, icon: <FileText className="h-5 w-5 text-navy-500" />, format: (v: number) => String(v) },
     { label: t("analytics.quotedRevenue"), value: stats?.totalRevenue ?? 0, sub: `${formatCurrency(stats?.unlockedRevenue ?? 0)} ${t("analytics.unlockedLower")}`, icon: <DollarSign className="h-5 w-5 text-emerald-500" />, format: formatCurrency },
     { label: t("analytics.averageValue"), value: stats?.avgValue ?? 0, sub: t("analytics.perQuote"), icon: <TrendingUp className="h-5 w-5 text-blue-500" />, format: formatCurrency },
     { label: t("analytics.unlocked"), value: stats?.unlocked ?? 0, sub: stats?.total ? `${Math.round((stats.unlocked / stats.total) * 100)}% ${t("analytics.ofTotal")}` : "—", icon: <CheckCircle2 className="h-5 w-5 text-amber-500" />, format: (v: number) => String(v) },
@@ -319,7 +319,7 @@ function QuotesSection({ months, locale }: { months: number; locale: typeof enCA
                   <div className="text-xs text-muted-foreground mt-0.5">{format(new Date(q.createdAt), "PP", { locale })}</div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 ml-4">
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${q.status === "unlocked" ? "bg-violet-100 text-violet-700" : q.status === "pending_payment" ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${q.status === "unlocked" ? "bg-navy-100 text-navy-700" : q.status === "pending_payment" ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-600"}`}>
                     {q.status === "unlocked" ? t("analytics.quoteStatus.unlocked") : q.status === "pending_payment" ? t("analytics.quoteStatus.pending") : t("analytics.quoteStatus.draft")}
                   </span>
                   <span className="font-semibold text-sm">{formatCurrency(q.totale)}</span>

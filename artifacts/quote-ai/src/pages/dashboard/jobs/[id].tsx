@@ -58,7 +58,7 @@ export default function JobDetailPage() {
   const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-violet-600 underline">{t("jobs.backToList")}</Link></div>;
+  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
 
   const { job, milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
   const done = milestones.filter((m) => m.status === "completed").length;
@@ -73,14 +73,14 @@ export default function JobDetailPage() {
         <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 flex-wrap">
-              <Briefcase className="h-7 w-7 text-violet-600 shrink-0" />
+              <Briefcase className="h-7 w-7 text-navy-600 shrink-0" />
               <EditableName id={job.id} name={job.name} />
               <JobStatusBadge status={job.status} />
             </h1>
             <div className="text-slate-500 mt-1 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
               {job.client && <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5" />{job.client.name}</span>}
               {job.address && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.address}</span>}
-              {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="inline-flex items-center gap-1 hover:text-violet-700"><FileSignature className="h-3.5 w-3.5" />{job.contract.contractNumber}</Link>}
+              {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="inline-flex items-center gap-1 hover:text-navy-700"><FileSignature className="h-3.5 w-3.5" />{job.contract.contractNumber}</Link>}
               {job.plannedStart && job.plannedEnd && <span>{format(day(job.plannedStart)!, "d MMM", { locale })} → {format(day(job.plannedEnd)!, "PP", { locale })}</span>}
             </div>
           </div>
@@ -179,7 +179,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
         <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-bold text-slate-900">{t("jobs.overview.timeline")}</h2>
-            <button className="text-sm text-violet-600 hover:underline" onClick={() => onGoTo("schedule")}>{t("jobs.overview.openSchedule")}</button>
+            <button className="text-sm text-navy-600 hover:underline" onClick={() => onGoTo("schedule")}>{t("jobs.overview.openSchedule")}</button>
           </div>
           <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={() => onGoTo("schedule")} />
         </section>
@@ -203,7 +203,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
 
       <div className="space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-card p-4">
-          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-slate-900">{t("jobs.overview.payments")}</h3><button className="text-xs text-violet-600 hover:underline" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button></div>
+          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-slate-900">{t("jobs.overview.payments")}</h3><button className="text-xs text-navy-600 hover:underline" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button></div>
           {terms.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noSchedule")}</p> : (
             <ul className="space-y-1.5">
               {terms.map((x) => {
@@ -235,7 +235,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
               ))}
             </ul>
           )}
-          <button className="text-xs text-violet-600 hover:underline mt-2" onClick={() => onGoTo("costs")}>{t("jobs.overview.openCosts")}</button>
+          <button className="text-xs text-navy-600 hover:underline mt-2" onClick={() => onGoTo("costs")}>{t("jobs.overview.openCosts")}</button>
         </section>
 
         {changeOrders.length > 0 && (
@@ -274,7 +274,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
       <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-slate-900">{t("jobs.schedule.gantt")}</h2>
-          <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-sm text-violet-600 hover:underline">{t("jobs.schedule.editDates")}</Link>
+          <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-sm text-navy-600 hover:underline">{t("jobs.schedule.editDates")}</Link>
         </div>
         <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={(mid) => setOpen(mid)} />
       </section>
@@ -318,7 +318,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
                       <Button type="button" size="sm" variant="ghost" className="h-8" onClick={() => setNewTask(null)}>{t("jobs.cancel")}</Button>
                     </form>
                   ) : (
-                    <button className="text-xs text-violet-600 hover:underline inline-flex items-center gap-1" onClick={() => setNewTask({ milestoneId: m.id, title: "" })}><Plus className="h-3 w-3" /> {t("jobs.task.add")}</button>
+                    <button className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1" onClick={() => setNewTask({ milestoneId: m.id, title: "" })}><Plus className="h-3 w-3" /> {t("jobs.task.add")}</button>
                   )}
                 </div>
               )}
@@ -327,7 +327,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
         })}
         {milestones.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
-            {t("jobs.schedule.empty")} <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-violet-600 underline">{t("jobs.schedule.addMilestones")}</Link>
+            {t("jobs.schedule.empty")} <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-navy-600 underline">{t("jobs.schedule.addMilestones")}</Link>
           </div>
         )}
       </div>
@@ -348,7 +348,7 @@ function TaskList({ tasks, onToggle, onDelete }: { tasks: TaskDto[]; onToggle: (
     <ul className="space-y-1">
       {tasks.map((x) => (
         <li key={x.id} className="flex items-center gap-2 text-sm group">
-          <button onClick={() => onToggle(x)} className={cn("h-4 w-4 rounded border flex items-center justify-center shrink-0", x.status === "done" ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 hover:border-violet-400")}>{x.status === "done" && <Check className="h-3 w-3" />}</button>
+          <button onClick={() => onToggle(x)} className={cn("h-4 w-4 rounded border flex items-center justify-center shrink-0", x.status === "done" ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 hover:border-navy-400")}>{x.status === "done" && <Check className="h-3 w-3" />}</button>
           <span className={cn("flex-1 truncate", x.status === "done" && "line-through text-slate-400")}>{x.title}</span>
           <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => onDelete(x.id)}><Trash2 className="h-3.5 w-3.5" /></button>
         </li>
@@ -387,7 +387,7 @@ function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeo
               </div>
               <div className={cn("font-semibold whitespace-nowrap", co.totalCents < 0 ? "text-rose-600" : "text-slate-900")}>{formatCents(co.totalCents)}</div>
               {co.documentContractId && (
-                <Link href={`/dashboard/contracts/${co.documentContractId}`} className="text-sm text-violet-600 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
+                <Link href={`/dashboard/contracts/${co.documentContractId}`} className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
                   {co.status === "draft" ? t("jobs.co.signAndSend") : t("jobs.co.open")} <ExternalLink className="h-3.5 w-3.5" />
                 </Link>
               )}
@@ -419,15 +419,15 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
       {docs.map((d) => (
         <div key={d.id} className="flex items-center gap-3 px-4 py-3">
           <div className="h-9 w-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center"><FileSignature className="h-4 w-4" /></div>
-          <div className="min-w-0 flex-1"><Link href={d.href} className="font-medium text-slate-900 hover:text-violet-700 truncate block">{d.title}</Link><div className="text-xs text-slate-400">{d.sub}</div></div>
-          {d.pdf && <a href={d.pdf} className="text-sm text-violet-600 hover:underline inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" /> PDF</a>}
+          <div className="min-w-0 flex-1"><Link href={d.href} className="font-medium text-slate-900 hover:text-navy-700 truncate block">{d.title}</Link><div className="text-xs text-slate-400">{d.sub}</div></div>
+          {d.pdf && <a href={d.pdf} className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" /> PDF</a>}
         </div>
       ))}
       {receipts.map((r) => (
         <div key={r.id} className="flex items-center gap-3 px-4 py-3">
           <div className="h-9 w-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center"><Receipt className="h-4 w-4" /></div>
           <div className="min-w-0 flex-1"><div className="font-medium text-slate-900 truncate">{r.vendor || t("jobs.costs.unknownVendor")} · {formatCents(r.totalCents)}</div><div className="text-xs text-slate-400">{t("jobs.docs.receipt")} · {r.date ? format(day(r.date)!, "PP", { locale }) : ""}{r.status === "pending_review" ? ` · ${t("jobs.costs.toReview")}` : ""}</div></div>
-          <a href={jobsApi.receiptFileUrl(r.sourceDocumentId!)} target="_blank" rel="noreferrer" className="text-sm text-violet-600 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3.5 w-3.5" /> {t("jobs.costs.openReceipt")}</a>
+          <a href={jobsApi.receiptFileUrl(r.sourceDocumentId!)} target="_blank" rel="noreferrer" className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3.5 w-3.5" /> {t("jobs.costs.openReceipt")}</a>
         </div>
       ))}
     </div>

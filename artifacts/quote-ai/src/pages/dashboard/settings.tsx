@@ -162,10 +162,10 @@ function AccountTab() {
     <div className="space-y-6">
       {/* Logo */}
       {isStarter ? (
-        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+        <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-violet-500" />
+              <Crown className="h-5 w-5 text-navy-500" />
               <CardTitle>{t("dashboard.profile.logoProOnly.title")}</CardTitle>
             </div>
             <CardDescription>
@@ -177,7 +177,7 @@ function AccountTab() {
             <div className="flex items-center gap-4">
               <div className="flex-1 space-y-1.5">
                 {[t("dashboard.profile.logoProOnly.feature1"), t("dashboard.profile.logoProOnly.feature2"), t("dashboard.profile.logoProOnly.feature3")].map(f => (
-                  <div key={f} className="flex items-center gap-2 text-sm"><span className="text-violet-500 font-bold">✓</span> {f}</div>
+                  <div key={f} className="flex items-center gap-2 text-sm"><span className="text-navy-500 font-bold">✓</span> {f}</div>
                 ))}
               </div>
               <Button onClick={() => createPortal.mutate(undefined, { onSuccess: (r) => { window.open(r.url, "_blank"); } })} disabled={createPortal.isPending}>
@@ -283,7 +283,7 @@ function AccountTab() {
       <Card className="mt-6">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-violet-500" />
+            <Zap className="h-5 w-5 text-navy-500" />
             <CardTitle>{t("dashboard.settings.account.widgetCard.title")}</CardTitle>
           </div>
           <CardDescription>
@@ -360,7 +360,7 @@ function AccountTab() {
 function QuotaBar({ used, limit }: { used: number; limit: number }) {
   const { t } = useLanguage();
   const pct = Math.min(100, Math.round((used / limit) * 100));
-  const color = pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-violet-500";
+  const color = pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-navy-500";
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("dashboard.billing.quotesUsed")}</span><span className="font-semibold">{used} / {limit}</span></div>
@@ -450,27 +450,27 @@ function BillingTab() {
   return (
     <div className="space-y-6">
       {isActive ? (
-        <Card className={`border-2 ${isElite ? "border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50" : isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-violet-50" : "border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50"}`}>
+        <Card className={`border-2 ${isElite ? "border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50" : isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-navy-50" : "border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50"}`}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${isElite ? "bg-amber-200" : isPro ? "bg-amber-100" : "bg-violet-100"}`}>
-                  {isElite ? <Crown className="h-6 w-6 text-amber-700" /> : isPro ? <Crown className="h-6 w-6 text-amber-600" /> : <Zap className="h-6 w-6 text-violet-500" />}
+                <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${isElite ? "bg-amber-200" : isPro ? "bg-amber-100" : "bg-navy-100"}`}>
+                  {isElite ? <Crown className="h-6 w-6 text-amber-700" /> : isPro ? <Crown className="h-6 w-6 text-amber-600" /> : <Zap className="h-6 w-6 text-navy-500" />}
                 </div>
                 <div>
                   <CardTitle className="text-xl">QuoteAI {planLabel}</CardTitle>
                   <p className="text-sm text-muted-foreground mt-0.5">{planPrice}</p>
                 </div>
               </div>
-              <Badge className={`text-xs ${isElite ? "bg-amber-100 text-amber-800 border-amber-300" : isPro ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-violet-100 text-violet-700 border-violet-200"}`} variant="outline">
+              <Badge className={`text-xs ${isElite ? "bg-amber-100 text-amber-800 border-amber-300" : isPro ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-navy-100 text-navy-700 border-navy-200"}`} variant="outline">
                 <CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.billing.active")}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-5">
             {isStarter && sub.quotaUsed != null && sub.quotaLimit != null && (
-              <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
-                <div className="flex items-center gap-2 mb-3"><BarChart3 className="h-4 w-4 text-violet-500" /><span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span></div>
+              <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
+                <div className="flex items-center gap-2 mb-3"><BarChart3 className="h-4 w-4 text-navy-500" /><span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span></div>
                 <QuotaBar used={sub.quotaUsed} limit={sub.quotaLimit} />
                 {resetDate && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><RefreshCw className="h-3 w-3" />{t("dashboard.billing.quotaResetsOn").replace("{date}", resetDate)}</p>}
                 {(sub.quotaRemaining ?? 0) <= 3 && (sub.quotaRemaining ?? 0) > 0 && (
@@ -480,7 +480,7 @@ function BillingTab() {
                 )}
               </div>
             )}
-            <div className="bg-card/70 rounded-xl p-4 border border-violet-100">
+            <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isElite ? (
@@ -533,9 +533,9 @@ function BillingTab() {
                 const isPlanPro = plan.id === "monthly_pro";
                 const isPlanElite = plan.id === "monthly_elite";
                 return (
-                  <Card key={plan.id} className={`flex flex-col ${isPlanPro ? "border-2 border-violet-300 shadow-lg" : isPlanElite ? "border-2 border-amber-300" : ""}`}>
+                  <Card key={plan.id} className={`flex flex-col ${isPlanPro ? "border-2 border-navy-300 shadow-lg" : isPlanElite ? "border-2 border-amber-300" : ""}`}>
                     <CardHeader className="pb-2">
-                      {isPlanPro && <span className="text-[10px] font-bold text-violet-600 uppercase tracking-wider">{t("dashboard.settings.billing.mostPopular")}</span>}
+                      {isPlanPro && <span className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">{t("dashboard.settings.billing.mostPopular")}</span>}
                       {isPlanElite && <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">{t("dashboard.settings.billing.unlimited")}</span>}
                       <CardTitle className="text-lg">{plan.name}</CardTitle>
                       <p className="text-2xl font-extrabold">${plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
@@ -544,7 +544,7 @@ function BillingTab() {
                       <ul className="space-y-1.5 mb-4">
                         {plan.features.map((f: string, i: number) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                            <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isPlanPro ? "text-violet-500" : isPlanElite ? "text-amber-500" : "text-muted-foreground"}`} />
+                            <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isPlanPro ? "text-navy-500" : isPlanElite ? "text-amber-500" : "text-muted-foreground"}`} />
                             {f}
                           </li>
                         ))}
@@ -611,11 +611,11 @@ function WhatsappUpsellCard() {
 
   return (
     <div className="space-y-4">
-      <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+      <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
-              <MessageCircle className="h-6 w-6 text-violet-500" />
+            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+              <MessageCircle className="h-6 w-6 text-navy-500" />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.whatsappUpsell.title")}</CardTitle>
@@ -632,7 +632,7 @@ function WhatsappUpsellCard() {
               { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsappUpsell.voice.desc") },
               { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
-              <div key={item.label} className="bg-card/70 rounded-xl p-3 text-center border border-violet-100">
+              <div key={item.label} className="bg-card/70 rounded-xl p-3 text-center border border-navy-100">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
@@ -856,11 +856,11 @@ function WhatsappTab() {
 
   if (otpState) {
     return (
-      <Card className="border-violet-200">
+      <Card className="border-navy-200">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
-              <MessageCircle className="h-6 w-6 text-violet-600" />
+            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+              <MessageCircle className="h-6 w-6 text-navy-600" />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.whatsapp.enterCodeTitle")}</CardTitle>
@@ -871,9 +871,9 @@ function WhatsappTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="bg-violet-50 dark:bg-violet-500/15 border border-violet-200 dark:border-violet-800/40 rounded-xl p-4 text-sm text-violet-700 dark:text-violet-300 space-y-1">
+          <div className="bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 rounded-xl p-4 text-sm text-navy-700 dark:text-navy-300 space-y-1">
             <p className="font-semibold">{t("dashboard.settings.whatsapp.checkPhone")}</p>
-            <p className="text-violet-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
+            <p className="text-navy-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
           </div>
 
           <div className="space-y-2">
@@ -1020,11 +1020,11 @@ function QuickbooksUpsellCard() {
   };
 
   return (
-    <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+    <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
-            <Plug className="h-6 w-6 text-violet-500" />
+          <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+            <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
             <CardTitle>{t("dashboard.settings.quickbooksUpsell.title")}</CardTitle>
@@ -1310,11 +1310,11 @@ function WaveUpsellCard() {
   };
 
   return (
-    <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+    <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
-            <Plug className="h-6 w-6 text-violet-500" />
+          <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+            <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
             <CardTitle>{t("dashboard.settings.waveUpsell.title")}</CardTitle>
@@ -1622,8 +1622,8 @@ function StripeConnectTab() {
     <Card className={connected && chargesEnabled ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50" : undefined}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-violet-100")}>
-            <CreditCard className={cn("h-6 w-6", connected && chargesEnabled ? "text-emerald-600" : "text-violet-500")} />
+          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-navy-100")}>
+            <CreditCard className={cn("h-6 w-6", connected && chargesEnabled ? "text-emerald-600" : "text-navy-500")} />
           </div>
           <div>
             <CardTitle>{t("dashboard.settings.stripeConnect.title")}</CardTitle>
@@ -1685,8 +1685,8 @@ function FinanceitTab() {
     <Card className={connected && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-violet-100")}>
-            <Landmark className={cn("h-6 w-6", connected && isEnabled ? "text-amber-600" : "text-violet-500")} />
+          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-navy-100")}>
+            <Landmark className={cn("h-6 w-6", connected && isEnabled ? "text-amber-600" : "text-navy-500")} />
           </div>
           <div>
             <CardTitle>{t("dashboard.settings.financeit.title")}</CardTitle>
@@ -1961,8 +1961,8 @@ function FlinksTab() {
       <Card className={connected && hasAccount && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-violet-100")}>
-              <Banknote className={cn("h-6 w-6", connected && hasAccount ? "text-amber-600" : "text-violet-500")} />
+            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-navy-100")}>
+              <Banknote className={cn("h-6 w-6", connected && hasAccount ? "text-amber-600" : "text-navy-500")} />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.flinks.title")}</CardTitle>
@@ -2100,11 +2100,11 @@ function MetaLeadAdsTab() {
 
   return (
     <div className="space-y-4">
-      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50" : undefined}>
+      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-violet-100")}>
-              <Megaphone className={cn("h-6 w-6", connected ? "text-blue-600" : "text-violet-500")} />
+            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
+              <Megaphone className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.metaLeadAds.title")}</CardTitle>
@@ -2219,11 +2219,11 @@ function GoogleLsaTab() {
 
   return (
     <div className="space-y-4">
-      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50" : undefined}>
+      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-violet-100")}>
-              <Search className={cn("h-6 w-6", connected ? "text-blue-600" : "text-violet-500")} />
+            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
+              <Search className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.googleLsa.title")}</CardTitle>
@@ -2510,7 +2510,7 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
   }
 
   return (
-    <Card className="border-sky-200 bg-gradient-to-br from-sky-50 to-cyan-50">
+    <Card className="border-sky-200 bg-gradient-to-br from-sky-50 to-teal-50">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
@@ -2744,8 +2744,8 @@ function WidgetTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center">
-              <Zap className="h-6 w-6 text-violet-600" />
+            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+              <Zap className="h-6 w-6 text-navy-600" />
             </div>
             <div>
               <CardTitle>{t("dashboard.settings.widget.title")}</CardTitle>

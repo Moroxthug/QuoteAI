@@ -42,8 +42,8 @@ export default function ClientDetailPage() {
           {isLoading ? (
             <Skeleton className="h-9 w-9 rounded-full" />
           ) : (
-            <div className="h-9 w-9 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-              <span className="text-sm font-bold text-violet-700 uppercase">
+            <div className="h-9 w-9 rounded-full bg-navy-100 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-navy-700 uppercase">
                 {clientName.slice(0, 2) || "??"}
               </span>
             </div>
@@ -92,7 +92,7 @@ export default function ClientDetailPage() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quotes</span>
               <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center">
-                <FileText className="h-4 w-4 text-violet-500" />
+                <FileText className="h-4 w-4 text-navy-500" />
               </div>
             </div>
             {isLoading ? <Skeleton className="h-8 w-16" /> : (
@@ -207,7 +207,7 @@ export default function ClientDetailPage() {
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      q.status === "unlocked" ? "bg-violet-100 text-violet-700" :
+                      q.status === "unlocked" ? "bg-navy-100 text-navy-700" :
                       q.status === "pending_payment" ? "bg-amber-100 text-amber-700" :
                       "bg-slate-100 text-slate-600"
                     }`}>

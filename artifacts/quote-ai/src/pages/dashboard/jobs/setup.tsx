@@ -109,7 +109,7 @@ export default function JobSetupPage() {
   const addMs = () => setMilestones((ms) => { const last = ms.at(-1); const s = last?.plannedEnd ? dayStr(addDays(parseDay(last.plannedEnd), 1)) : ""; return [...ms, { title: "", description: "", plannedStart: s, plannedEnd: s, paymentTermId: null, valueCents: 0, taskCount: 0, status: "planned" }]; });
 
   if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-2xl" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-violet-600 underline">{t("jobs.backToList")}</Link></div>;
+  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
 
   const { job } = data;
   const confirmed = job.setupStatus === "confirmed";
@@ -149,7 +149,7 @@ export default function JobSetupPage() {
         <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.contractValue")}</div>
           <div className="text-xl font-bold text-slate-900 mt-0.5">{formatCents(job.contractValueCents)}</div>
-          {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-[11px] text-violet-600 hover:underline inline-flex items-center gap-1"><FileSignature className="h-3 w-3" /> {job.contract.contractNumber}</Link>}
+          {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-[11px] text-navy-600 hover:underline inline-flex items-center gap-1"><FileSignature className="h-3 w-3" /> {job.contract.contractNumber}</Link>}
         </div>
         <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
           <div className="text-xs text-slate-500">{t("jobs.setup.window")}</div>
@@ -161,12 +161,12 @@ export default function JobSetupPage() {
       </div>
 
       {job.setupProposal && (
-        <div className="rounded-xl border border-violet-100 dark:border-violet-800/40 bg-violet-50/60 dark:bg-violet-500/15 px-4 py-3 text-sm text-violet-900 dark:text-violet-300 flex gap-3">
-          <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-violet-600" />
+        <div className="rounded-xl border border-navy-100 dark:border-navy-800/40 bg-navy-50/60 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex gap-3">
+          <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-navy-600" />
           <div>
             <span className="font-semibold">{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</span>{" "}
-            {job.setupProposal.rationale && <span className="text-violet-800">{job.setupProposal.rationale}</span>}
-            <span className="text-violet-700/80"> {t("jobs.setup.editHint")}</span>
+            {job.setupProposal.rationale && <span className="text-navy-800">{job.setupProposal.rationale}</span>}
+            <span className="text-navy-700/80"> {t("jobs.setup.editHint")}</span>
           </div>
         </div>
       )}

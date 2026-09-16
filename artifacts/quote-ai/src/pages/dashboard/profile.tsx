@@ -161,10 +161,10 @@ export default function ProfileSettings() {
 
       {/* Logo Upload Card — hidden for Starter, replaced with upgrade prompt */}
       {isStarter ? (
-        <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-cyan-50">
+        <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-violet-500" />
+              <Crown className="h-5 w-5 text-navy-500" />
               <CardTitle>{t("dashboard.profile.logoProOnly.title")}</CardTitle>
             </div>
             <CardDescription>
@@ -177,7 +177,7 @@ export default function ProfileSettings() {
               <div className="flex-1 space-y-1.5">
                 {[t("dashboard.profile.logoProOnly.feature1"), t("dashboard.profile.logoProOnly.feature2"), t("dashboard.profile.logoProOnly.feature3")].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm text-foreground">
-                    <span className="text-violet-500 font-bold">✓</span> {f}
+                    <span className="text-navy-500 font-bold">✓</span> {f}
                   </div>
                 ))}
               </div>

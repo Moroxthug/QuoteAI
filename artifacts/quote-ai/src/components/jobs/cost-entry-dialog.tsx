@@ -117,10 +117,10 @@ export function CostEntryDialog({
                 <ReceiptPreview docId={entry.sourceDocumentId} />
               </div>
               {ai && (
-                <div className="rounded-xl border border-violet-100 bg-violet-50/60 p-3 text-xs text-slate-700 space-y-1">
-                  <div className="flex items-center gap-1.5 font-semibold text-violet-800"><Sparkles className="h-3.5 w-3.5" /> {t("jobs.costs.aiRead")} · <span className={cn("font-medium", ai.confidence === "high" ? "text-emerald-700" : ai.confidence === "medium" ? "text-amber-700" : "text-rose-700")}>{t(`jobs.costs.confidence.${ai.confidence}`)}</span></div>
+                <div className="rounded-xl border border-navy-100 bg-navy-50/60 p-3 text-xs text-slate-700 space-y-1">
+                  <div className="flex items-center gap-1.5 font-semibold text-navy-800"><Sparkles className="h-3.5 w-3.5" /> {t("jobs.costs.aiRead")} · <span className={cn("font-medium", ai.confidence === "high" ? "text-emerald-700" : ai.confidence === "medium" ? "text-amber-700" : "text-rose-700")}>{t(`jobs.costs.confidence.${ai.confidence}`)}</span></div>
                   {ai.lines.length > 0 && (
-                    <ul className="max-h-32 overflow-y-auto divide-y divide-violet-100">
+                    <ul className="max-h-32 overflow-y-auto divide-y divide-navy-100">
                       {ai.lines.map((l, i) => (
                         <li key={i} className="flex justify-between gap-2 py-0.5"><span className="truncate">{l.quantity && l.quantity !== 1 ? `${l.quantity} × ` : ""}{l.description}</span>{l.total !== null && <span className="whitespace-nowrap">{l.total.toFixed(2)}</span>}</li>
                       ))}
@@ -213,7 +213,7 @@ function ReceiptPreview({ docId }: { docId: string }) {
   const [failed, setFailed] = useState(false);
   if (failed) {
     return (
-      <a href={url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 p-8 text-sm text-violet-700 hover:underline"><ExternalLink className="h-4 w-4" /> {t("jobs.costs.openReceipt")}</a>
+      <a href={url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 p-8 text-sm text-navy-700 hover:underline"><ExternalLink className="h-4 w-4" /> {t("jobs.costs.openReceipt")}</a>
     );
   }
   return (

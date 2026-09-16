@@ -115,7 +115,7 @@ export function PaymentScheduleCard({
               {schedule.terms.map((term, i) => (
                 <li key={term.id} className="flex items-start justify-between gap-3 text-sm">
                   <div className="flex items-start gap-2 min-w-0">
-                    <span className="h-5 w-5 rounded-full bg-violet-100 text-violet-700 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                    <span className="h-5 w-5 rounded-full bg-navy-100 text-navy-700 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                     <div className="min-w-0">
                       <div className="text-slate-800 font-medium leading-tight truncate">{term.label || t(`paymentSchedule.type.${term.type}`)}</div>
                       <div className="text-[11px] text-slate-400">

@@ -43,7 +43,7 @@ export default function InvoiceDetailPage() {
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-96 w-full rounded-2xl" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-violet-600 underline">{t("invoices.backToList")}</Link></div>;
+  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-navy-600 underline">{t("invoices.backToList")}</Link></div>;
 
   const inv = data.invoice;
   const isDraft = inv.status === "draft";
@@ -58,15 +58,15 @@ export default function InvoiceDetailPage() {
         <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 flex-wrap">
-              <Receipt className="h-7 w-7 text-violet-600 shrink-0" />
+              <Receipt className="h-7 w-7 text-navy-600 shrink-0" />
               {inv.number}
               <InvoiceStatusBadge status={inv.status} scheduled={scheduled} />
               <InvoiceTypeBadge type={inv.type} />
             </h1>
             <div className="text-slate-500 mt-1 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
               <span>{inv.customer.name}{inv.customer.email ? ` · ${inv.customer.email}` : ""}</span>
-              {inv.projectId && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`} className="inline-flex items-center gap-1 hover:text-violet-700"><Briefcase className="h-3.5 w-3.5" />{inv.projectName ?? t("invoices.job")}</Link>}
-              {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`} className="hover:text-violet-700">{t("invoices.creditFor")}</Link>}
+              {inv.projectId && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`} className="inline-flex items-center gap-1 hover:text-navy-700"><Briefcase className="h-3.5 w-3.5" />{inv.projectName ?? t("invoices.job")}</Link>}
+              {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`} className="hover:text-navy-700">{t("invoices.creditFor")}</Link>}
             </div>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -91,7 +91,7 @@ export default function InvoiceDetailPage() {
       </div>
 
       {scheduled && (
-        <div className="rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-3 text-sm text-violet-900 dark:text-violet-300 flex items-start gap-2">
+        <div className="rounded-xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3 text-sm text-navy-900 dark:text-navy-300 flex items-start gap-2">
           <Clock className="h-4 w-4 mt-0.5 shrink-0" />
           <span>{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
         </div>
@@ -134,7 +134,7 @@ export default function InvoiceDetailPage() {
             <section className="rounded-2xl border border-slate-200 bg-card p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-bold text-slate-900">{t("invoices.payments")}</h3>
-                {open && <button className="text-xs text-violet-600 hover:underline" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
+                {open && <button className="text-xs text-navy-600 hover:underline" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
               </div>
               {data.payments.length === 0 ? <p className="text-sm text-slate-400">{t("invoices.noPayments")}</p> : (
                 <ul className="space-y-2">
@@ -242,7 +242,7 @@ function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDon
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   return (
-    <section className="rounded-2xl border border-violet-200 bg-card p-5 space-y-4">
+    <section className="rounded-2xl border border-navy-200 bg-card p-5 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1"><Label>{t("invoices.field.title")}</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
         <div className="space-y-1"><Label>{t("invoices.field.customerEmail")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>

@@ -58,7 +58,7 @@ export default function JobsListPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-            <Briefcase className="h-8 w-8 text-violet-600" />
+            <Briefcase className="h-8 w-8 text-navy-600" />
             {t("jobs.title")}
           </h1>
           <p className="text-slate-500 mt-1">{t("jobs.subtitle")}</p>
@@ -98,7 +98,7 @@ export default function JobsListPage() {
           <Sparkles className="h-10 w-10 text-slate-300 mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-slate-800">{t("jobs.emptyTitle")}</h2>
           <p className="text-slate-500 text-sm mt-1 max-w-md mx-auto">{t("jobs.emptyDesc")}</p>
-          <Link href="/dashboard/contracts" className="inline-block mt-4 text-sm font-medium text-violet-600 hover:underline">{t("jobs.goToContracts")}</Link>
+          <Link href="/dashboard/contracts" className="inline-block mt-4 text-sm font-medium text-navy-600 hover:underline">{t("jobs.goToContracts")}</Link>
         </div>
       ) : (
         <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
@@ -128,7 +128,7 @@ function JobRow({ j, locale }: { j: JobSummaryDto; locale: typeof enCA }) {
   const href = pending ? `/dashboard/jobs/${j.id}/setup` : `/dashboard/jobs/${j.id}`;
   return (
     <Link href={href} className={cn("flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 transition-colors", pending && "bg-amber-50/40")}>
-      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shrink-0", pending ? "bg-amber-100 text-amber-700" : "bg-violet-50 text-violet-600")}>
+      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shrink-0", pending ? "bg-amber-100 text-amber-700" : "bg-navy-50 text-navy-600")}>
         {pending ? <Sparkles className="h-5 w-5" /> : <Briefcase className="h-5 w-5" />}
       </div>
       <div className="min-w-0 flex-1">

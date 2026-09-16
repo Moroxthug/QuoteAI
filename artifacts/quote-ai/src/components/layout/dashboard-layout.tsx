@@ -107,7 +107,7 @@ function OrgSwitcherItems() {
       <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t("team.switcher.switch")}</div>
       {orgs.map((o) => (
         <DropdownMenuItem key={o.orgId} className="cursor-pointer flex items-center gap-2" onClick={() => o.orgId !== data?.activeOrgId && switchOrg.mutate(o.orgId)}>
-          {o.orgId === data?.activeOrgId ? <Check className="h-3.5 w-3.5 text-violet-600 shrink-0" /> : <span className="w-3.5 shrink-0" />}
+          {o.orgId === data?.activeOrgId ? <Check className="h-3.5 w-3.5 text-navy-600 shrink-0" /> : <span className="w-3.5 shrink-0" />}
           <span className="truncate flex-1">{o.isOwn ? (o.companyName || t("team.switcher.myCompany")) : o.companyName}</span>
         </DropdownMenuItem>
       ))}
@@ -135,7 +135,7 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
               <button className="h-9 w-9 mx-auto flex items-center justify-center rounded-lg hover:bg-accent transition-colors shrink-0">
-                <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center justify-center uppercase">
+                <div className="h-7 w-7 rounded-full bg-navy-100 dark:bg-navy-500/20 text-navy-700 dark:text-navy-300 text-xs font-bold flex items-center justify-center uppercase">
                   {initials || <User className="h-3.5 w-3.5" />}
                 </div>
               </button>
@@ -144,7 +144,7 @@ function AccountMenu({ collapsed = false }: { collapsed?: boolean }) {
           </Tooltip>
         ) : (
           <button className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-accent transition-colors group text-left">
-            <div className="h-7 w-7 rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300 text-xs font-bold flex items-center justify-center uppercase shrink-0">
+            <div className="h-7 w-7 rounded-full bg-navy-100 dark:bg-navy-500/20 text-navy-700 dark:text-navy-300 text-xs font-bold flex items-center justify-center uppercase shrink-0">
               {initials || <User className="h-3.5 w-3.5" />}
             </div>
             <div className="flex-1 min-w-0">
@@ -212,7 +212,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (!isLoaded) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-background">
-        <div className="w-7 h-7 rounded-full border-[3px] border-violet-400 border-t-transparent animate-spin" />
+        <div className="w-7 h-7 rounded-full border-[3px] border-navy-400 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -238,16 +238,16 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               collapsed ? "justify-center h-9 w-9 mx-auto" : "gap-2.5 px-2.5 py-2",
               "text-sm font-medium",
               active
-                ? "text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/15 font-semibold"
+                ? "text-navy-700 dark:text-navy-300 bg-navy-50 dark:bg-navy-500/15 font-semibold"
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
             )}
           >
-            <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-violet-600 dark:text-violet-300" : "text-muted-foreground")} />
+            <item.icon className={cn("h-4 w-4 shrink-0", active ? "text-navy-600 dark:text-navy-300" : "text-muted-foreground")} />
             {!collapsed && (
               <span className="flex-1 text-sm">{item.label}</span>
             )}
             {!collapsed && item.proOnly && (
-              <Badge className="text-[10px] px-1 py-0 h-4 bg-violet-100 text-violet-700 border-0 font-semibold">{t("dashboard.nav.pro")}</Badge>
+              <Badge className="text-[10px] px-1 py-0 h-4 bg-navy-100 text-navy-700 border-0 font-semibold">{t("dashboard.nav.pro")}</Badge>
             )}
             {!collapsed && item.comingSoon && (
               <Badge className="text-[10px] px-1 py-0 h-4 bg-amber-100 text-amber-600 border-0 font-semibold">{t("dashboard.nav.comingSoon")}</Badge>

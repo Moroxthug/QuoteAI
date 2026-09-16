@@ -26,7 +26,7 @@ export function QuotePreviewMockup({ sector }: { sector: SectorData }) {
 
   return (
     <div className="relative mx-auto w-full max-w-sm lg:rotate-2 hover:lg:rotate-0 transition-transform duration-300">
-      <div className="absolute -top-3 -right-3 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-violet-700 shadow-lg border border-violet-100">
+      <div className="absolute -top-3 -right-3 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-navy-700 shadow-lg border border-navy-100">
         <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
         Generato con AI in 30s
       </div>

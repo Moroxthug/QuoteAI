@@ -146,7 +146,7 @@ export function BusinessTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <MapPin className="h-5 w-5 text-violet-600" />
+            <MapPin className="h-5 w-5 text-navy-600" />
             {t("dashboard.settings.business.identityTitle")}
           </CardTitle>
           <CardDescription>{t("dashboard.settings.business.identityDesc")}</CardDescription>
@@ -198,7 +198,7 @@ export function BusinessTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Landmark className="h-5 w-5 text-violet-600" />
+            <Landmark className="h-5 w-5 text-navy-600" />
             {t("dashboard.settings.business.paymentsTitle")}
           </CardTitle>
           <CardDescription>{t("dashboard.settings.business.paymentsDesc")}</CardDescription>
@@ -213,7 +213,7 @@ export function BusinessTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Star className="h-5 w-5 text-violet-600" />
+            <Star className="h-5 w-5 text-navy-600" />
             {t("dashboard.settings.business.reviewsTitle")}
           </CardTitle>
           <CardDescription>{t("dashboard.settings.business.reviewsDesc")}</CardDescription>
@@ -242,7 +242,7 @@ export function BusinessTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <CalendarClock className="h-5 w-5 text-violet-600" />
+            <CalendarClock className="h-5 w-5 text-navy-600" />
             {t("dashboard.settings.business.scheduleTitle")}
           </CardTitle>
           <CardDescription>{t("dashboard.settings.business.scheduleDesc")}</CardDescription>
@@ -255,7 +255,7 @@ export function BusinessTab() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Zap className="h-5 w-5 text-violet-600" />
+            <Zap className="h-5 w-5 text-navy-600" />
             {t("dashboard.settings.business.automationTitle")}
           </CardTitle>
           <CardDescription>{t("dashboard.settings.business.automationDesc")}</CardDescription>

@@ -59,7 +59,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
       <div className="lg:col-span-2 space-y-4">
         {/* Dropzone */}
         <div
-          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 bg-card hover:border-violet-300")}
+          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 bg-card hover:border-navy-300")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
@@ -67,7 +67,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
         >
           <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
           <div className="flex flex-col items-center gap-1.5">
-            <div className="h-10 w-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center">{scan.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
+            <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center">{scan.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
             <div className="font-semibold text-slate-900 text-sm">{scan.isPending ? t("jobs.costs.scanning") : t("jobs.costs.dropTitle")}</div>
             <div className="text-xs text-slate-500 max-w-md">{t("jobs.costs.dropDesc")}</div>
           </div>
@@ -132,7 +132,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3 h-fit">
-        <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">{t("jobs.costs.budgetVsActual")}</h3><Link href={`/dashboard/jobs/${job.id}/setup`} className="text-xs text-violet-600 hover:underline">{t("jobs.costs.editBudget")}</Link></div>
+        <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">{t("jobs.costs.budgetVsActual")}</h3><Link href={`/dashboard/jobs/${job.id}/setup`} className="text-xs text-navy-600 hover:underline">{t("jobs.costs.editBudget")}</Link></div>
         <div>
           <div className="flex justify-between text-sm"><span className="text-slate-500">{t("jobs.kpi.costs")}</span><span className="font-semibold">{formatCents(costs.totalCents)}</span></div>
           <div className="h-2 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", costs.totalCents > budgetTotalCents && budgetTotalCents ? "bg-rose-500" : "bg-emerald-500")} style={{ width: `${pct}%` }} /></div>
@@ -149,7 +149,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
             return (
               <li key={c}>
                 <div className="flex justify-between text-xs"><span className="text-slate-600">{t(`jobs.cost.${c}`)}</span><span className={cn("font-medium", over ? "text-rose-600" : "text-slate-800")}>{formatCents(actual)} <span className="text-slate-400 font-normal">/ {formatCents(planned)}</span></span></div>
-                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", over ? "bg-rose-500" : "bg-violet-500")} style={{ width: `${p}%` }} /></div>
+                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", over ? "bg-rose-500" : "bg-navy-500")} style={{ width: `${p}%` }} /></div>
               </li>
             );
           })}

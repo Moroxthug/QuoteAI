@@ -145,7 +145,7 @@ export default function Home() {
               </p>
 
               {/* AI bar */}
-              <div className="ai-bar-glow flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-100 transition-all mb-3 max-w-lg mx-auto lg:mx-0">
+              <div className="ai-bar-glow flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-navy-400 focus-within:ring-2 focus-within:ring-navy-100 transition-all mb-3 max-w-lg mx-auto lg:mx-0">
                 <div className="group relative shrink-0">
                   <button
                     disabled
@@ -158,7 +158,7 @@ export default function Home() {
                     <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
                   </div>
                 </div>
-                <Sparkles className="h-4 w-4 text-violet-400 shrink-0" />
+                <Sparkles className="h-4 w-4 text-navy-400 shrink-0" />
                 <input
                   ref={homepageInputRef}
                   value={homepageInput}
@@ -209,8 +209,8 @@ export default function Home() {
             {/* 3D scene: floating quote document */}
             <div className="hero-3d-stage hidden lg:flex justify-center items-center relative h-[420px]">
               <div ref={heroDocRef} className="hero-doc relative w-[320px]">
-                <div className="absolute -bottom-12 left-8 right-8 h-8 rounded-[50%] bg-violet-900/15 blur-xl" style={{ transform: "translateZ(-60px)" }} />
-                <div className="hero-doc-layer rounded-2xl overflow-hidden border border-gray-100 shadow-2xl shadow-violet-200/60 bg-white">
+                <div className="absolute -bottom-12 left-8 right-8 h-8 rounded-[50%] bg-navy-900/15 blur-xl" style={{ transform: "translateZ(-60px)" }} />
+                <div className="hero-doc-layer rounded-2xl overflow-hidden border border-gray-100 shadow-2xl shadow-navy-200/60 bg-white">
                   <div className="bg-gray-900 px-3 py-2 flex items-center gap-2">
                     <div className="flex gap-1.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
@@ -257,11 +257,11 @@ export default function Home() {
                   <div className="text-[11px] font-semibold text-gray-700">Tax calculated</div>
                 </div>
                 <div className="hero-float-chip absolute -right-14 top-40 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-2s" }}>
-                  <div className="h-6 w-6 rounded-lg bg-violet-50 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-violet-500" /></div>
+                  <div className="h-6 w-6 rounded-lg bg-navy-50 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-navy-500" /></div>
                   <div className="text-[11px] font-semibold text-gray-700">Generated in 30 sec</div>
                 </div>
                 <div className="hero-float-chip absolute -left-10 bottom-2 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-3.2s" }}>
-                  <div className="h-6 w-6 rounded-lg bg-cyan-50 flex items-center justify-center"><DollarSign className="h-3.5 w-3.5 text-cyan-500" /></div>
+                  <div className="h-6 w-6 rounded-lg bg-teal-50 flex items-center justify-center"><DollarSign className="h-3.5 w-3.5 text-teal-500" /></div>
                   <div className="text-[11px] font-semibold text-gray-700">$1,769.00 total</div>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function Home() {
               <div className="text-[11px] font-medium text-gray-400 ml-2">quoteai.ca — demo</div>
             </div>
             <div style={{ aspectRatio: "16/9", position: "relative", overflow: "hidden" }}>
-              <Suspense fallback={<div className="w-full h-full bg-gray-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" /></div>}>
+              <Suspense fallback={<div className="w-full h-full bg-gray-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-navy-500 border-t-transparent rounded-full animate-spin" /></div>}>
                 <div className="absolute inset-0" style={{ transform: "scale(1)", transformOrigin: "top left", width: "100%", height: "100%" }}>
                   <DemoPlayer loop={true} />
                 </div>
@@ -329,8 +329,8 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-semibold text-violet-300 group-hover:text-white transition-colors">{lang === "fr" ? "Voir comment ça marche" : "See how it works"}</span>
-                  <ArrowRight className="h-4 w-4 text-violet-400 group-hover:text-white transition-colors" />
+                  <span className="text-sm font-semibold text-navy-300 group-hover:text-white transition-colors">{lang === "fr" ? "Voir comment ça marche" : "See how it works"}</span>
+                  <ArrowRight className="h-4 w-4 text-navy-400 group-hover:text-white transition-colors" />
                 </div>
               </div>
             </div>
@@ -351,9 +351,9 @@ export default function Home() {
               <div>
                 <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
                   {lang === "fr" ? (
-                    <>D'une note vocale au PDF<br /><span className="text-violet-600">sans toucher un ordinateur</span></>
+                    <>D'une note vocale au PDF<br /><span className="text-navy-600">sans toucher un ordinateur</span></>
                   ) : (
-                    <>From voice note to PDF<br /><span className="text-violet-600">without touching a computer</span></>
+                    <>From voice note to PDF<br /><span className="text-navy-600">without touching a computer</span></>
                   )}
                 </h2>
 
@@ -384,7 +384,7 @@ export default function Home() {
 
                 <Link
                   href="/whatsapp/"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-navy-600 hover:text-navy-700 transition-colors group"
                 >
                   {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
@@ -413,7 +413,7 @@ export default function Home() {
                   ? "« Je dois peindre un appartement de 800 pi² avec deux couches de peinture lavable blanche. Il faut aussi refaire l'enduit d'un mur endommagé au salon. »"
                   : "\"I need to paint an 800 sq ft apartment with two coats of white washable paint. Also include skim-coating a damaged wall in the living room.\""}
               </div>
-              <ArrowRight className="h-6 w-6 text-violet-500 mx-auto lg:mx-0 mb-4 rotate-90 lg:rotate-0" />
+              <ArrowRight className="h-6 w-6 text-navy-500 mx-auto lg:mx-0 mb-4 rotate-90 lg:rotate-0" />
               <p className="text-sm text-gray-500 leading-relaxed">
                 {lang === "fr"
                   ? "Notre moteur d'IA comprend le langage naturel, identifie chaque poste de coût, estime les quantités et présente le tout dans un format standard."
@@ -551,15 +551,15 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-14 items-center">
 
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-600 uppercase tracking-wider mb-3">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-navy-600 uppercase tracking-wider mb-3">
                   <Hammer className="h-3.5 w-3.5" />
                   {lang === "fr" ? "Inclus dans tous les forfaits" : "Included in every plan"}
                 </div>
                 <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
                   {lang === "fr" ? (
-                    <>Une soumission acceptée<br /><span className="text-violet-600">devient un chantier</span></>
+                    <>Une soumission acceptée<br /><span className="text-navy-600">devient un chantier</span></>
                   ) : (
-                    <>An accepted quote<br /><span className="text-violet-600">becomes a job site</span></>
+                    <>An accepted quote<br /><span className="text-navy-600">becomes a job site</span></>
                   )}
                 </h2>
 
@@ -592,7 +592,7 @@ export default function Home() {
 
                 <Link
                   href="/dashboard/jobs"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:text-violet-700 transition-colors group"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-navy-600 hover:text-navy-700 transition-colors group"
                 >
                   {lang === "fr" ? "Voir la gestion de chantier" : "See job management"}
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
@@ -629,7 +629,7 @@ export default function Home() {
                         { done: false, label: "Living room skim coating" },
                       ].map((t) => (
                         <div key={t.label} className="flex items-center gap-2.5 text-sm">
-                          <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${t.done ? "bg-violet-600" : "border border-gray-300"}`}>
+                          <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${t.done ? "bg-navy-600" : "border border-gray-300"}`}>
                             {t.done && <Check className="h-3 w-3 text-white" />}
                           </div>
                           <span className={t.done ? "text-gray-400 line-through" : "text-gray-700"}>{t.label}</span>
@@ -642,7 +642,7 @@ export default function Home() {
                         <Users className="h-3.5 w-3.5" />
                         2 team members assigned
                       </div>
-                      <span className="text-xs font-semibold text-violet-600">Linked to the quote</span>
+                      <span className="text-xs font-semibold text-navy-600">Linked to the quote</span>
                     </div>
                   </div>
                 </div>
@@ -676,7 +676,7 @@ export default function Home() {
                   key={plan.id}
                   className={`plan-card-enter card-soft bg-white rounded-xl p-6 flex flex-col relative transition-all duration-300 ${
                     isPro
-                      ? "border-2 border-violet-300 shadow-lg shadow-violet-200/40"
+                      ? "border-2 border-navy-300 shadow-lg shadow-navy-200/40"
                       : isElite
                         ? "border-2 border-amber-300"
                         : "border border-gray-200"
@@ -684,7 +684,7 @@ export default function Home() {
                 >
                   {isPro && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="text-[10px] font-semibold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full whitespace-nowrap border border-violet-100">
+                      <span className="text-[10px] font-semibold text-navy-600 bg-navy-50 px-2 py-0.5 rounded-full whitespace-nowrap border border-navy-100">
                         ⭐ {lang === "fr" ? "Le plus populaire" : "Most Popular"}
                       </span>
                     </div>
@@ -699,7 +699,7 @@ export default function Home() {
 
                   <div className="mb-3">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mb-1.5 inline-block ${
-                      isPro ? "bg-violet-100 text-violet-700" : isElite ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"
+                      isPro ? "bg-navy-100 text-navy-700" : isElite ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-500"
                     }`}>
                       {plan.name}
                     </span>
@@ -713,7 +713,7 @@ export default function Home() {
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-1.5">
                         <CheckCircle2 className={`h-3 w-3 shrink-0 mt-0.5 ${
-                          isPro ? "text-violet-500" : isElite ? "text-amber-500" : "text-gray-400"
+                          isPro ? "text-navy-500" : isElite ? "text-amber-500" : "text-gray-400"
                         }`} />
                         <span className="text-xs text-gray-600 leading-snug">{feature}</span>
                       </li>
@@ -759,7 +759,7 @@ export default function Home() {
                 <div
                   key={plan.id}
                   className={`bg-white rounded-xl p-4 flex flex-col border ${
-                    isClean ? "border-violet-100" : "border-gray-200"
+                    isClean ? "border-navy-100" : "border-gray-200"
                   }`}
                 >
                   <h3 className="text-xs font-semibold text-gray-900 mb-0.5">{plan.name}</h3>
@@ -770,7 +770,7 @@ export default function Home() {
                   <ul className="space-y-1 mb-4 flex-1">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-1.5">
-                        <CheckCircle2 className="h-3 w-3 text-violet-400 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="h-3 w-3 text-navy-400 shrink-0 mt-0.5" />
                         <span className="text-[11px] text-gray-500">{feature}</span>
                       </li>
                     ))}
@@ -810,7 +810,7 @@ export default function Home() {
                   { label: "Word", gradient: false },
                   { label: "Excel", gradient: false },
                 ].map(({ label, gradient }) => (
-                  <div key={label} className={`px-4 py-3.5 text-center text-sm font-bold ${gradient ? "bg-gradient-to-b from-violet-50 to-cyan-50/40" : ""}`}>
+                  <div key={label} className={`px-4 py-3.5 text-center text-sm font-bold ${gradient ? "bg-gradient-to-b from-navy-50 to-teal-50/40" : ""}`}>
                     {gradient ? <span className="quoteai-word">{label}</span> : <span className="text-gray-400">{label}</span>}
                   </div>
                 ))}
@@ -861,12 +861,12 @@ export default function Home() {
                     { cell: word,   highlight: false },
                     { cell: excel,  highlight: false },
                   ].map(({ cell, highlight }, i) => (
-                    <div key={i} className={`px-4 py-3.5 flex flex-col items-center justify-center gap-0.5 ${highlight ? "bg-gradient-to-b from-violet-50/60 to-cyan-50/30" : ""}`}>
+                    <div key={i} className={`px-4 py-3.5 flex flex-col items-center justify-center gap-0.5 ${highlight ? "bg-gradient-to-b from-navy-50/60 to-teal-50/30" : ""}`}>
                       {cell.ok
-                        ? <Check className={`h-4 w-4 ${highlight ? "text-violet-600" : "text-emerald-500"}`} />
+                        ? <Check className={`h-4 w-4 ${highlight ? "text-navy-600" : "text-emerald-500"}`} />
                         : <X className="h-4 w-4 text-gray-300" />
                       }
-                      <span className={`text-[11px] font-medium text-center leading-tight ${cell.ok ? (highlight ? "text-violet-700" : "text-gray-600") : "text-gray-300"}`}>
+                      <span className={`text-[11px] font-medium text-center leading-tight ${cell.ok ? (highlight ? "text-navy-700" : "text-gray-600") : "text-gray-300"}`}>
                         {cell.label}
                       </span>
                     </div>
@@ -896,7 +896,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-6">
-              <span className="inline-block bg-violet-100 text-violet-700 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">{lang === "fr" ? "Fini les tableurs" : "No more spreadsheets"}</span>
+              <span className="inline-block bg-navy-100 text-navy-700 text-xs font-bold px-3 py-0.5 rounded-full uppercase tracking-wider mb-3">{lang === "fr" ? "Fini les tableurs" : "No more spreadsheets"}</span>
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl mb-3">
                 {lang === "fr" ? <>Oubliez <span className="gradient-text">Excel et Word</span></> : <>Forget <span className="gradient-text">Excel and Word</span></>}
               </h2>
@@ -919,12 +919,12 @@ export default function Home() {
                 <Link
                   key={guideSlug}
                   href={`${base}/${lang === "fr" ? (SECTORS[guideSlug]?.frSlug ?? guideSlug) : guideSlug}/`}
-                  className="bg-white rounded-xl border border-gray-100 p-4 hover:border-violet-200 hover:shadow-md transition-all group card-soft"
+                  className="bg-white rounded-xl border border-gray-100 p-4 hover:border-navy-200 hover:shadow-md transition-all group card-soft"
                 >
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-violet-500 bg-violet-50 px-2 py-0.5 rounded-full">{badge}</span>
-                  <h3 className="font-semibold text-gray-900 mt-2.5 mb-1 text-sm leading-snug group-hover:text-violet-700 transition-colors">{label}</h3>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-navy-500 bg-navy-50 px-2 py-0.5 rounded-full">{badge}</span>
+                  <h3 className="font-semibold text-gray-900 mt-2.5 mb-1 text-sm leading-snug group-hover:text-navy-700 transition-colors">{label}</h3>
                   <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
-                  <span className="inline-flex items-center gap-1 text-xs text-violet-500 font-semibold mt-2">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-3 w-3" /></span>
+                  <span className="inline-flex items-center gap-1 text-xs text-navy-500 font-semibold mt-2">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-3 w-3" /></span>
                 </Link>
               ))}
             </div>
@@ -949,7 +949,7 @@ export default function Home() {
                   <Link
                     key={slug}
                     href={`${base}/${lang === "fr" ? (SECTORS[slug]?.frSlug ?? slug) : slug}/`}
-                    className="text-xs text-gray-500 hover:text-violet-600 py-1 px-2 rounded hover:bg-violet-50 transition-colors"
+                    className="text-xs text-gray-500 hover:text-navy-600 py-1 px-2 rounded hover:bg-navy-50 transition-colors"
                   >
                     {label}
                   </Link>
@@ -973,7 +973,7 @@ export default function Home() {
                     <Link
                       key={city.slug}
                       href={`${base}/${lang === "fr" ? SECTORS["renovation-contractor"].frSlug : "renovation-contractor"}/${city.slug}/`}
-                      className="text-xs text-gray-400 hover:text-violet-600 hover:bg-violet-50 px-2 py-0.5 rounded transition-colors"
+                      className="text-xs text-gray-400 hover:text-navy-600 hover:bg-navy-50 px-2 py-0.5 rounded transition-colors"
                     >
                       {city.name}
                     </Link>
@@ -990,7 +990,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-10">
-              <span className="inline-flex items-center gap-1.5 bg-violet-50 border border-violet-100 text-violet-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-navy-50 border border-navy-100 text-navy-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
                 <Sparkles className="h-3 w-3" /> {lang === "fr" ? "Analyse approfondie" : "Deep dive"}
               </span>
               <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
@@ -1024,17 +1024,17 @@ export default function Home() {
 
               <div className="grid sm:grid-cols-3 gap-3 my-8">
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
-                  <DollarSign className="h-5 w-5 text-violet-600 mb-2" />
+                  <DollarSign className="h-5 w-5 text-navy-600 mb-2" />
                   <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "Taxes canadiennes intégrées" : "Built-in Canadian tax"}</div>
                   <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Calcul automatique de la TPS/TVH selon la province." : "Automatic GST/HST calculation by province."}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
-                  <Shield className="h-5 w-5 text-violet-600 mb-2" />
+                  <Shield className="h-5 w-5 text-navy-600 mb-2" />
                   <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "Données stockées en sécurité" : "Securely stored data"}</div>
                   <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Stripe gère les paiements, les sessions sont protégées par des cookies chiffrés." : "Stripe handles payments, sessions are protected with encrypted cookies."}</p>
                 </div>
                 <div className="rounded-xl bg-gray-50 border border-gray-100 p-4">
-                  <Cpu className="h-5 w-5 text-violet-600 mb-2" />
+                  <Cpu className="h-5 w-5 text-navy-600 mb-2" />
                   <div className="font-semibold text-gray-900 text-sm mb-1">{lang === "fr" ? "IA formée pour les métiers" : "AI trained for the trades"}</div>
                   <p className="text-xs text-gray-500 leading-relaxed">{lang === "fr" ? "Vocabulaire technique pour la construction et les métiers mécaniques." : "Technical vocabulary for construction and mechanical trades."}</p>
                 </div>

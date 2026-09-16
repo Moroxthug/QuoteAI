@@ -11,7 +11,7 @@ const JOB: Record<JobStatus, string> = {
   completed: "bg-emerald-100 text-emerald-700",
 };
 const MILESTONE: Record<MilestoneStatus, string> = {
-  planned: "bg-violet-100 text-violet-700",
+  planned: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
   in_progress: "bg-blue-100 text-blue-700",
   completed: "bg-emerald-100 text-emerald-700",
   skipped: "bg-slate-100 text-slate-500",
@@ -43,7 +43,7 @@ export function ChangeOrderStatusBadge({ status }: { status: ChangeOrderStatus }
 const INVOICE: Record<InvoiceStatus, string> = {
   draft: "bg-slate-100 text-slate-700",
   sent: "bg-blue-100 text-blue-700",
-  viewed: "bg-indigo-100 text-indigo-700",
+  viewed: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
   pending_confirmation: "bg-amber-100 text-amber-800",
   partially_paid: "bg-amber-100 text-amber-800",
   paid: "bg-emerald-100 text-emerald-700",
@@ -53,7 +53,7 @@ const INVOICE: Record<InvoiceStatus, string> = {
 
 export function InvoiceStatusBadge({ status, scheduled }: { status: InvoiceStatus; scheduled?: boolean }) {
   const { t } = useLanguage();
-  if (status === "draft" && scheduled) return <Badge className="font-medium border-0 bg-violet-100 text-violet-700">{t("invoices.status.scheduled")}</Badge>;
+  if (status === "draft" && scheduled) return <Badge className="font-medium border-0 bg-[var(--qa-purple-t)] text-[var(--qa-purple)]">{t("invoices.status.scheduled")}</Badge>;
   return <Badge className={cn("font-medium border-0", INVOICE[status])}>{t(`invoices.status.${status}`)}</Badge>;
 }
 

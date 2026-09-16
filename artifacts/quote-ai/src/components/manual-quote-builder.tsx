@@ -154,8 +154,8 @@ function AISuggestButton({
       className={cn(
         "shrink-0 h-7 w-7 flex items-center justify-center rounded-lg transition-colors",
         suggest.isPending
-          ? "bg-violet-100 text-violet-400 cursor-wait"
-          : "text-muted-foreground hover:text-violet-500 hover:bg-violet-50"
+          ? "bg-navy-100 text-navy-400 cursor-wait"
+          : "text-muted-foreground hover:text-navy-500 hover:bg-navy-50"
       )}
     >
       {suggest.isPending
@@ -318,11 +318,11 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
               className={cn(
                 "text-left p-3 rounded-xl border-2 transition-all",
                 templateId === tpl.id
-                  ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15"
-                  : "border-border hover:border-violet-200"
+                  ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15"
+                  : "border-border hover:border-navy-200"
               )}
             >
-              <p className={cn("text-xs font-semibold", templateId === tpl.id ? "text-violet-700" : "text-foreground")}>{tpl.label}</p>
+              <p className={cn("text-xs font-semibold", templateId === tpl.id ? "text-navy-700" : "text-foreground")}>{tpl.label}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{tpl.desc}</p>
             </button>
           ))}
@@ -358,7 +358,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
             onChange={e => setDescrizione(e.target.value)}
             placeholder={t("manualQuote.generalDescriptionPlaceholder")}
             rows={2}
-            className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
+            className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition-shadow"
             disabled={isSubmitting}
           />
         </div>
@@ -376,7 +376,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
               {/* Chapter header */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
                 <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="font-bold text-sm text-violet-600 shrink-0 w-5">{lettera}</span>
+                <span className="font-bold text-sm text-navy-600 shrink-0 w-5">{lettera}</span>
                 <input
                   value={ch.titolo}
                   onChange={e => updateChapter(ch.id, { titolo: e.target.value })}
@@ -429,7 +429,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                             onFocus={() => setActiveVoceId(v.id)}
                             onBlur={() => setTimeout(() => setActiveVoceId(null), 250)}
                             placeholder={t("manualQuote.itemDescriptionPlaceholder")}
-                            className="flex-1 h-8 px-2.5 rounded-lg border border-border text-xs text-foreground placeholder:text-muted-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition min-w-0"
+                            className="flex-1 h-8 px-2.5 rounded-lg border border-border text-xs text-foreground placeholder:text-muted-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition min-w-0"
                             disabled={isSubmitting}
                           />
                           <AISuggestButton
@@ -460,7 +460,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                                       });
                                       setActiveVoceId(null);
                                     }}
-                                    className="w-full text-left px-3 py-2 hover:bg-violet-50 text-[11px] flex justify-between gap-2"
+                                    className="w-full text-left px-3 py-2 hover:bg-navy-50 text-[11px] flex justify-between gap-2"
                                   >
                                     <span className="font-semibold text-foreground truncate">{item.nome}</span>
                                     <span className="text-muted-foreground shrink-0 font-mono">({item.um}) ${item.prezzoUnitario}</span>
@@ -475,7 +475,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                         <select
                           value={v.um}
                           onChange={e => updateVoce(ch.id, v.id, { um: e.target.value })}
-                          className="h-8 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent px-1.5 transition w-full"
+                          className="h-8 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent px-1.5 transition w-full"
                           disabled={isSubmitting}
                         >
                           {UM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
@@ -488,7 +488,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                           step="any"
                           value={v.quantita}
                           onChange={e => updateVoce(ch.id, v.id, { quantita: e.target.value })}
-                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
+                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition text-right w-full"
                           disabled={isSubmitting}
                         />
 
@@ -500,7 +500,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                           value={v.prezzoUnitario}
                           onChange={e => updateVoce(ch.id, v.id, { prezzoUnitario: e.target.value })}
                           placeholder="0,00"
-                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition text-right w-full"
+                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition text-right w-full"
                           disabled={isSubmitting}
                         />
 
@@ -528,7 +528,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                   <button
                     type="button"
                     onClick={() => addVoce(ch.id)}
-                    className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-violet-600 hover:bg-violet-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                    className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-navy-600 hover:bg-navy-50 px-2.5 py-1.5 rounded-lg transition-colors"
                     disabled={isSubmitting}
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -541,7 +541,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                       value={ch.osservazione}
                       onChange={e => updateChapter(ch.id, { osservazione: e.target.value })}
                       placeholder={t("manualQuote.chapterNotePlaceholder")}
-                      className="w-full h-7 px-2.5 rounded-lg border border-dashed border-border text-xs text-muted-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none focus:border-violet-300 transition"
+                      className="w-full h-7 px-2.5 rounded-lg border border-dashed border-border text-xs text-muted-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none focus:border-navy-300 transition"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -562,7 +562,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         <button
           type="button"
           onClick={addChapter}
-          className="w-full py-3 rounded-2xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-violet-300 hover:text-violet-500 hover:bg-violet-50/30 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 rounded-2xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-navy-300 hover:text-navy-500 hover:bg-navy-50/30 transition-all flex items-center justify-center gap-2"
           disabled={isSubmitting || chapters.length >= 26}
         >
           <Plus className="h-4 w-4" />
@@ -586,8 +586,8 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
                 className={cn(
                   "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                   ivaPercentuale === iva
-                    ? "border-violet-400 bg-violet-50 text-violet-700"
-                    : "border-border text-muted-foreground hover:border-violet-200"
+                    ? "border-navy-400 bg-navy-50 text-navy-700"
+                    : "border-border text-muted-foreground hover:border-navy-200"
                 )}
                 disabled={isSubmitting}
               >
@@ -609,7 +609,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
           </div>
           <div className="flex justify-between text-base font-bold text-foreground pt-1 border-t border-border">
             <span>{t("manualQuote.total")}</span>
-            <span className="font-mono text-violet-700">$ {fmt(totale)}</span>
+            <span className="font-mono text-navy-700">$ {fmt(totale)}</span>
           </div>
         </div>
       </div>
@@ -662,7 +662,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
           value={note}
           onChange={e => setNote(e.target.value)}
           rows={2}
-          className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-transparent transition-shadow"
+          className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition-shadow"
           disabled={isSubmitting}
         />
       </div>

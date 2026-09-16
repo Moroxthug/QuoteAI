@@ -1,6 +1,6 @@
 # QuoteAI visual redesign — design system reference
 
-**Status**: Phase 30 (design-system foundation) built & pushed (2026-09-16). Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
+**Status**: Phases 30-31 built & pushed (2026-09-16). Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
 
 ## Source
 
@@ -39,11 +39,16 @@ Every hardcoded `rgba(124,58,237,...)` / `#7C3AED` / `#4F46E5` / `#06B6D4` refer
 - `switch.tsx` — checked state now `bg-[var(--qa-green)]` (was `bg-primary`/navy) — the mockup uses green for "on," reserving navy for brand/primary actions only.
 - `logo.tsx` — dropped the `.logo-glow` violet drop-shadow pulse (kept the existing `/quoteai-logo.png` asset; no new brand asset was generated).
 
+## Phase 31 (Tailwind color sweep) — built & pushed 2026-09-16
+
+Added a `navy-50…950` and `teal-50…950` Tailwind color scale to `@theme inline` in `index.css` (hue 240 to match `--primary`/`--ring`, hue 187 to match `--qa-teal`; fixed, not theme-tokens, same as the `--qa-*` chips). Then swept all ~68 files: mechanical `violet-*`/`indigo-*` → `navy-*` and `cyan-*` → `teal-*` for brand-accent usage (icons, links, hover states, gradients, progress bars) — this covered the overwhelming majority of the ~1030 occurrences.
+
+**Exception, done by hand**: a handful of spots used violet/indigo as a genuinely distinct *status* color sitting alongside blue in the same badge/chip set (`jobs/badges.tsx` MILESTONE.planned + INVOICE.viewed + the invoice "scheduled" chip, `contracts/[id].tsx` STATUS_STYLES.viewed, `jobs/gantt.tsx` BAR.planned, `leads/index.tsx` STATUS_COLORS.quoted, `quotes/index.tsx`'s "unlocked" badge). Recoloring those to navy would have made them visually collide with the "active/sent" blue status right next to them, so those specific keys were mapped to the existing `--qa-purple`/`--qa-purple-t` chip tokens instead (`bg-[var(--qa-purple-t)] text-[var(--qa-purple)]`), keeping them a distinct hue. Everything else in those same files (plain brand accents) still went to navy.
+
 ## What's NOT done yet
 
 Each of these is meant to be its own conversation/phase, per the user's request:
 
-- **Phase 31**: the ~68-file sweep replacing hardcoded `violet-*`/`indigo-*`/`cyan-*` Tailwind utility classes across dashboard pages, marketing pages, and shared components (`assistant-panel.tsx`, `notifications-bell.tsx`, etc.) with the new token/chip classes.
 - **Phase 32**: dashboard shell (`dashboard-layout.tsx`) — sidebar rail-collapse animation, grouped nav labels, topbar search/notifications restyle.
 - **Phase 33**: marketing homepage + `public-layout.tsx` — mega-menu, hero word-reveal, animated count-up stats, story-split restyle.
 - **Phase 34**: per-page dashboard visual pass, including rebuilding Leads (`leads/index.tsx`) as a kanban board.

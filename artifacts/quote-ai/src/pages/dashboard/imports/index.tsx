@@ -173,7 +173,7 @@ export default function ImportsPage() {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-          <UploadCloud className="h-8 w-8 text-violet-600" />
+          <UploadCloud className="h-8 w-8 text-navy-600" />
           {t("imports.title")}
         </h1>
         <p className="text-slate-500 mt-1">{t("imports.subtitle")}</p>
@@ -182,15 +182,15 @@ export default function ImportsPage() {
       <div className="grid md:grid-cols-2 gap-4">
         <div className="rounded-lg border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <FileSpreadsheet className="h-5 w-5 text-violet-600" />
+            <FileSpreadsheet className="h-5 w-5 text-navy-600" />
             <h3 className="font-bold text-slate-900">{t("imports.uploadSpreadsheet")}</h3>
           </div>
           <p className="text-xs text-slate-500">{t("imports.uploadSpreadsheetDesc")}</p>
-          <a href={importsApi.templateUrl} className="inline-flex items-center gap-1.5 text-xs font-medium text-violet-700 hover:underline">
+          <a href={importsApi.templateUrl} className="inline-flex items-center gap-1.5 text-xs font-medium text-navy-700 hover:underline">
             <Download className="h-3.5 w-3.5" /> {t("imports.downloadTemplate")}
           </a>
           <div
-            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 hover:border-violet-300")}
+            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragCsv ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 hover:border-navy-300")}
             onDragOver={(e) => { e.preventDefault(); setDragCsv(true); }}
             onDragLeave={() => setDragCsv(false)}
             onDrop={(e) => { e.preventDefault(); setDragCsv(false); onCsvFiles(e.dataTransfer.files); }}
@@ -206,12 +206,12 @@ export default function ImportsPage() {
 
         <div className="rounded-lg border bg-card p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-violet-600" />
+            <FileText className="h-5 w-5 text-navy-600" />
             <h3 className="font-bold text-slate-900">{t("imports.uploadPdfs")}</h3>
           </div>
           <p className="text-xs text-slate-500">{t("imports.uploadPdfsDesc")}</p>
           <div
-            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 hover:border-violet-300")}
+            className={cn("rounded-xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer mt-6", dragPdf ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 hover:border-navy-300")}
             onDragOver={(e) => { e.preventDefault(); setDragPdf(true); }}
             onDragLeave={() => setDragPdf(false)}
             onDrop={(e) => { e.preventDefault(); setDragPdf(false); onPdfFiles(e.dataTransfer.files); }}

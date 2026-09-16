@@ -608,7 +608,7 @@ export default function QuoteDetail() {
               </Badge>
             )}
             {quote.capitolatoPro && (
-              <Badge className="bg-violet-600 text-white gap-1">
+              <Badge className="bg-navy-600 text-white gap-1">
                 <Star className="h-3 w-3" />
                 {t("dashboard.quoteDetail.proSpecBadge")}
               </Badge>
@@ -725,8 +725,8 @@ export default function QuoteDetail() {
   
             {/* Edit mode top banner */}
             {isEditMode && !isEditLocked && (
-              <div className="bg-violet-50 border-b-2 border-violet-200 px-5 py-3 flex items-center justify-between gap-4 sticky top-0 z-20">
-                <span className="text-xs font-semibold text-violet-700 flex items-center gap-1.5">
+              <div className="bg-navy-50 border-b-2 border-navy-200 px-5 py-3 flex items-center justify-between gap-4 sticky top-0 z-20">
+                <span className="text-xs font-semibold text-navy-700 flex items-center gap-1.5">
                   <Pencil className="h-3.5 w-3.5" />
                   {t("dashboard.quoteDetail.editModeBanner")}
                 </span>
@@ -793,13 +793,13 @@ export default function QuoteDetail() {
                   <input
                     value={editTitolo1}
                     onChange={e => setEditTitolo1(e.target.value)}
-                    className="w-full text-sm font-bold uppercase tracking-wide text-slate-800 text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-300 focus:border-violet-400 focus:outline-none"
+                    className="w-full text-sm font-bold uppercase tracking-wide text-slate-800 text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-300 focus:border-navy-400 focus:outline-none"
                     placeholder={t("dashboard.quoteDetail.titlePlaceholder")}
                   />
                   <input
                     value={editTitolo2}
                     onChange={e => setEditTitolo2(e.target.value)}
-                    className="w-full text-xs text-slate-500 italic text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-300 focus:border-violet-400 focus:outline-none"
+                    className="w-full text-xs text-slate-500 italic text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-300 focus:border-navy-400 focus:outline-none"
                     placeholder={t("dashboard.quoteDetail.subtitlePlaceholder")}
                   />
                 </div>
@@ -818,11 +818,11 @@ export default function QuoteDetail() {
               <div className="mt-5 mb-6">
                 <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">{t("dashboard.quoteDetail.billTo")}</div>
                 {isEditMode ? (
-                  <div className="space-y-2 bg-violet-50/60 border border-violet-200 rounded-lg p-3">
+                  <div className="space-y-2 bg-navy-50/60 border border-navy-200 rounded-lg p-3">
                     {/* Saved client selector */}
                     {savedClients && savedClients.length > 0 && (
                       <div className="flex items-center gap-2 mb-1">
-                        <Users className="h-3.5 w-3.5 text-violet-500 shrink-0" />
+                        <Users className="h-3.5 w-3.5 text-navy-500 shrink-0" />
                         <select
                           value=""
                           onChange={e => {
@@ -837,7 +837,7 @@ export default function QuoteDetail() {
                               setEditClientPIVA(client.partitaIva || "");
                             }
                           }}
-                          className="flex-1 text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                          className="flex-1 text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                         >
                           <option value="" disabled>{t("dashboard.quoteDetail.selectSavedClient")}</option>
                           {savedClients.map(c => (
@@ -851,19 +851,19 @@ export default function QuoteDetail() {
                         value={editClientNome}
                         onChange={e => setEditClientNome(e.target.value)}
                         placeholder={t("dashboard.quoteDetail.nameBusinessNamePlaceholder")}
-                        className="col-span-2 text-sm text-slate-800 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                        className="col-span-2 text-sm text-slate-800 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                       />
                       <input
                         value={editClientIndirizzo}
                         onChange={e => setEditClientIndirizzo(e.target.value)}
                         placeholder={t("dashboard.quoteDetail.streetPlaceholder")}
-                        className="col-span-2 text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                        className="col-span-2 text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                       />
                       <input
                         value={editClientCity}
                         onChange={e => setEditClientCity(e.target.value)}
                         placeholder="City"
-                        className="text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                        className="text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                       />
                       <div className="flex gap-1">
                         <input
@@ -871,14 +871,14 @@ export default function QuoteDetail() {
                           onChange={e => setEditClientProvince(e.target.value.toUpperCase())}
                           placeholder="Prov"
                           maxLength={2}
-                          className="w-14 text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                          className="w-14 text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                         />
                         <input
                           value={editClientPostalCode}
                           onChange={e => setEditClientPostalCode(e.target.value.toUpperCase())}
                           placeholder="Postal Code"
                           maxLength={7}
-                          className="w-24 text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                          className="w-24 text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                         />
                       </div>
                       <input
@@ -886,14 +886,14 @@ export default function QuoteDetail() {
                         onChange={e => setEditClientBusinessNumber(e.target.value.toUpperCase())}
                         placeholder="Business Number"
                         maxLength={16}
-                        className="text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                        className="text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                       />
                       <input
                         value={editClientPIVA}
                         onChange={e => setEditClientPIVA(e.target.value)}
                         placeholder="GST/HST Number"
                         maxLength={15}
-                        className="text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                        className="text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                       />
                     </div>
                   </div>
@@ -959,7 +959,7 @@ export default function QuoteDetail() {
                           href={`/api/storage/objects/${att.fileUrl.replace(/^\/objects\//, "")}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-muted text-xs text-foreground hover:border-violet-300 hover:text-violet-600 transition-colors shrink-0"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-muted text-xs text-foreground hover:border-navy-300 hover:text-navy-600 transition-colors shrink-0"
                           title={att.fileName}
                         >
                           {icon}
@@ -1056,7 +1056,7 @@ export default function QuoteDetail() {
                                       <input
                                         value={voce.descrizione}
                                         onChange={e => updateVoce(ci, vi, "descrizione", e.target.value)}
-                                        className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-700"
+                                        className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-700"
                                         placeholder={t("dashboard.quoteDetail.descriptionPlaceholder")}
                                       />
                                     </td>
@@ -1064,7 +1064,7 @@ export default function QuoteDetail() {
                                       <input
                                         value={voce.um}
                                         onChange={e => updateVoce(ci, vi, "um", e.target.value)}
-                                        className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                        className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                       />
                                     </td>
                                     <td className="py-1 px-1">
@@ -1072,7 +1072,7 @@ export default function QuoteDetail() {
                                         type="number"
                                         value={voce.quantita}
                                         onChange={e => updateVoce(ci, vi, "quantita", e.target.value === "" ? 0 : Number(e.target.value))}
-                                        className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                        className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                         min={0} step={0.01}
                                       />
                                     </td>
@@ -1081,7 +1081,7 @@ export default function QuoteDetail() {
                                         type="number"
                                         value={voce.prezzoUnitario}
                                         onChange={e => updateVoce(ci, vi, "prezzoUnitario", e.target.value === "" ? 0 : Number(e.target.value))}
-                                        className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                        className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                         min={0} step={0.01}
                                       />
                                     </td>
@@ -1102,7 +1102,7 @@ export default function QuoteDetail() {
                                 <td colSpan={5} className="py-1.5 px-3">
                                   <button
                                     onClick={() => addVoce(ci)}
-                                    className="text-xs text-violet-600 hover:text-violet-800 font-medium flex items-center gap-1"
+                                    className="text-xs text-navy-600 hover:text-navy-800 font-medium flex items-center gap-1"
                                   >
                                     <Plus className="h-3 w-3" /> {t("dashboard.quoteDetail.addItem")}
                                   </button>
@@ -1118,7 +1118,7 @@ export default function QuoteDetail() {
                   </div>
                   <button
                     onClick={addCapitolo}
-                    className="mt-3 w-full py-2.5 text-xs text-violet-600 hover:text-violet-800 font-medium border-2 border-dashed border-violet-200 hover:border-violet-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="mt-3 w-full py-2.5 text-xs text-navy-600 hover:text-navy-800 font-medium border-2 border-dashed border-navy-200 hover:border-navy-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Plus className="h-3.5 w-3.5" /> {t("dashboard.quoteDetail.addChapter")}
                   </button>
@@ -1176,7 +1176,7 @@ export default function QuoteDetail() {
                                         <input
                                           value={voce.descrizione}
                                           onChange={e => updateVoce(ci, vi, "descrizione", e.target.value)}
-                                          className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-700"
+                                          className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-700"
                                           placeholder={t("dashboard.quoteDetail.descriptionPlaceholder")}
                                         />
                                       </td>
@@ -1184,7 +1184,7 @@ export default function QuoteDetail() {
                                         <input
                                           value={voce.um}
                                           onChange={e => updateVoce(ci, vi, "um", e.target.value)}
-                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                         />
                                       </td>
                                       <td className="py-1 px-1">
@@ -1192,7 +1192,7 @@ export default function QuoteDetail() {
                                           type="number"
                                           value={voce.quantita}
                                           onChange={e => updateVoce(ci, vi, "quantita", e.target.value === "" ? 0 : Number(e.target.value))}
-                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                           min={0} step={0.01}
                                         />
                                       </td>
@@ -1201,7 +1201,7 @@ export default function QuoteDetail() {
                                           type="number"
                                           value={voce.prezzoUnitario}
                                           onChange={e => updateVoce(ci, vi, "prezzoUnitario", e.target.value === "" ? 0 : Number(e.target.value))}
-                                          className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                           min={0} step={0.01}
                                         />
                                       </td>
@@ -1222,7 +1222,7 @@ export default function QuoteDetail() {
                                   <td colSpan={6} className="py-1.5 px-3">
                                     <button
                                       onClick={() => addVoce(ci)}
-                                      className="text-xs text-violet-600 hover:text-violet-800 font-medium flex items-center gap-1"
+                                      className="text-xs text-navy-600 hover:text-navy-800 font-medium flex items-center gap-1"
                                     >
                                       <Plus className="h-3 w-3" /> {t("dashboard.quoteDetail.addItem")}
                                     </button>
@@ -1238,7 +1238,7 @@ export default function QuoteDetail() {
                   </div>
                   <button
                     onClick={addCapitolo}
-                    className="mt-3 w-full py-2.5 text-xs text-violet-600 hover:text-violet-800 font-medium border-2 border-dashed border-violet-200 hover:border-violet-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    className="mt-3 w-full py-2.5 text-xs text-navy-600 hover:text-navy-800 font-medium border-2 border-dashed border-navy-200 hover:border-navy-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Plus className="h-3.5 w-3.5" /> {t("dashboard.quoteDetail.addChapter")}
                   </button>
@@ -1251,20 +1251,20 @@ export default function QuoteDetail() {
                     {editCapitoli.map((cap, capIdx) => {
                       const capSub = cap.voci.reduce((s, v) => s + Number(v.quantita) * Number(v.prezzoUnitario), 0);
                       return (
-                        <div key={capIdx} className="border-2 border-violet-200 rounded-lg overflow-hidden">
+                        <div key={capIdx} className="border-2 border-navy-200 rounded-lg overflow-hidden">
                           {/* Chapter header — editable */}
-                          <div className="bg-violet-50 px-3 py-2 flex items-center gap-2 border-b border-violet-100">
+                          <div className="bg-navy-50 px-3 py-2 flex items-center gap-2 border-b border-navy-100">
                             <span className="text-sm font-bold text-slate-400 shrink-0">{cap.lettera}.</span>
                             <input
                               value={cap.titolo}
                               onChange={e => updateCapitolo(capIdx, "titolo", e.target.value)}
-                              className="flex-1 text-sm font-semibold text-slate-800 bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-300 focus:border-violet-400 focus:outline-none min-w-0"
+                              className="flex-1 text-sm font-semibold text-slate-800 bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-300 focus:border-navy-400 focus:outline-none min-w-0"
                               placeholder={t("dashboard.quoteDetail.chapterTitlePlaceholderLower")}
                             />
                             <input
                               value={cap.osservazione ?? ""}
                               onChange={e => updateCapitolo(capIdx, "osservazione", e.target.value)}
-                              className="w-28 text-xs text-slate-500 bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-300 focus:border-violet-400 focus:outline-none hidden sm:block"
+                              className="w-28 text-xs text-slate-500 bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-300 focus:border-navy-400 focus:outline-none hidden sm:block"
                               placeholder={t("dashboard.quoteDetail.notePlaceholder")}
                             />
                             <span className="text-xs font-semibold text-slate-600 whitespace-nowrap shrink-0">{formatCurrency(capSub)}</span>
@@ -1286,7 +1286,7 @@ export default function QuoteDetail() {
                                     <input
                                       value={voce.descrizione}
                                       onChange={e => updateVoce(capIdx, vi, "descrizione", e.target.value)}
-                                      className="flex-1 min-w-0 bg-transparent border border-slate-200 rounded px-2 py-1.5 text-sm focus:border-violet-400 focus:outline-none text-slate-700"
+                                      className="flex-1 min-w-0 bg-transparent border border-slate-200 rounded px-2 py-1.5 text-sm focus:border-navy-400 focus:outline-none text-slate-700"
                                       placeholder={t("dashboard.quoteDetail.itemDescriptionPlaceholder")}
                                     />
                                     <button
@@ -1303,7 +1303,7 @@ export default function QuoteDetail() {
                                       <input
                                         value={voce.um}
                                         onChange={e => updateVoce(capIdx, vi, "um", e.target.value)}
-                                        className="mt-0.5 w-full text-center bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-violet-400 focus:outline-none text-slate-600 normal-case"
+                                        className="mt-0.5 w-full text-center bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-navy-400 focus:outline-none text-slate-600 normal-case"
                                       />
                                     </label>
                                     <label className="text-[10px] text-slate-400 uppercase tracking-wide">
@@ -1312,7 +1312,7 @@ export default function QuoteDetail() {
                                         type="number"
                                         value={voce.quantita}
                                         onChange={e => updateVoce(capIdx, vi, "quantita", e.target.value === "" ? 0 : Number(e.target.value))}
-                                        className="mt-0.5 w-full text-center bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-violet-400 focus:outline-none text-slate-600 normal-case"
+                                        className="mt-0.5 w-full text-center bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-navy-400 focus:outline-none text-slate-600 normal-case"
                                         min={0} step={0.01}
                                       />
                                     </label>
@@ -1322,7 +1322,7 @@ export default function QuoteDetail() {
                                         type="number"
                                         value={voce.prezzoUnitario}
                                         onChange={e => updateVoce(capIdx, vi, "prezzoUnitario", e.target.value === "" ? 0 : Number(e.target.value))}
-                                        className="mt-0.5 w-full text-right bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-violet-400 focus:outline-none text-slate-600 normal-case"
+                                        className="mt-0.5 w-full text-right bg-transparent border border-slate-200 rounded px-1 py-1.5 text-sm focus:border-navy-400 focus:outline-none text-slate-600 normal-case"
                                         min={0} step={0.01}
                                       />
                                     </label>
@@ -1356,7 +1356,7 @@ export default function QuoteDetail() {
                                         <input
                                           value={voce.descrizione}
                                           onChange={e => updateVoce(capIdx, vi, "descrizione", e.target.value)}
-                                          className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-700"
+                                          className="w-full bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-700"
                                           placeholder={t("dashboard.quoteDetail.itemDescriptionPlaceholder")}
                                         />
                                       </td>
@@ -1364,7 +1364,7 @@ export default function QuoteDetail() {
                                         <input
                                           value={voce.um}
                                           onChange={e => updateVoce(capIdx, vi, "um", e.target.value)}
-                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                         />
                                       </td>
                                       <td className="py-1 px-1">
@@ -1372,7 +1372,7 @@ export default function QuoteDetail() {
                                           type="number"
                                           value={voce.quantita}
                                           onChange={e => updateVoce(capIdx, vi, "quantita", e.target.value === "" ? 0 : Number(e.target.value))}
-                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-center bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                           min={0} step={0.01}
                                         />
                                       </td>
@@ -1381,7 +1381,7 @@ export default function QuoteDetail() {
                                           type="number"
                                           value={voce.prezzoUnitario}
                                           onChange={e => updateVoce(capIdx, vi, "prezzoUnitario", e.target.value === "" ? 0 : Number(e.target.value))}
-                                          className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-violet-200 focus:border-violet-400 focus:outline-none text-slate-600"
+                                          className="w-full text-right bg-transparent border border-transparent rounded px-1 py-0.5 hover:border-navy-200 focus:border-navy-400 focus:outline-none text-slate-600"
                                           min={0} step={0.01}
                                         />
                                       </td>
@@ -1407,7 +1407,7 @@ export default function QuoteDetail() {
                           <div className="bg-slate-50 border-t border-slate-100 px-3 py-2 flex items-center justify-between">
                             <button
                               onClick={() => addVoce(capIdx)}
-                              className="text-xs text-violet-600 hover:text-violet-800 font-medium flex items-center gap-1 hover:bg-violet-50 rounded px-2 py-1 transition-colors"
+                              className="text-xs text-navy-600 hover:text-navy-800 font-medium flex items-center gap-1 hover:bg-navy-50 rounded px-2 py-1 transition-colors"
                             >
                               <Plus className="h-3 w-3" /> {t("dashboard.quoteDetail.addItem")}
                             </button>
@@ -1421,7 +1421,7 @@ export default function QuoteDetail() {
                     {/* Add chapter */}
                     <button
                       onClick={addCapitolo}
-                      className="w-full py-2.5 text-xs text-violet-600 hover:text-violet-800 font-medium border-2 border-dashed border-violet-200 hover:border-violet-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                      className="w-full py-2.5 text-xs text-navy-600 hover:text-navy-800 font-medium border-2 border-dashed border-navy-200 hover:border-navy-400 rounded-lg transition-colors flex items-center justify-center gap-1.5"
                     >
                       <Plus className="h-3.5 w-3.5" /> {t("dashboard.quoteDetail.addChapter")}
                     </button>
@@ -1465,11 +1465,11 @@ export default function QuoteDetail() {
                                         <button
                                           onClick={() => handleRegenerateSingleVoce(ci, vi, title)}
                                           disabled={isRegenerating}
-                                          className="p-1 rounded bg-slate-100 hover:bg-violet-50 text-slate-400 hover:text-violet-650 transition opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                                          className="p-1 rounded bg-slate-100 hover:bg-navy-50 text-slate-400 hover:text-navy-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
                                           title={t("dashboard.quoteDetail.regenerateProDescTitle")}
                                         >
                                           {isRegenerating ? (
-                                            <Loader2 className="h-3 w-3 animate-spin text-violet-600" />
+                                            <Loader2 className="h-3 w-3 animate-spin text-navy-600" />
                                           ) : (
                                             <RefreshCw className="h-3 w-3" />
                                           )}
@@ -1483,7 +1483,7 @@ export default function QuoteDetail() {
                                         <button
                                           onClick={() => handleRegenerateSingleVoce(ci, vi, title)}
                                           disabled={isRegenerating}
-                                          className="text-[9px] text-violet-600 hover:text-violet-850 font-semibold flex items-center gap-1 mt-0.5 hover:underline"
+                                          className="text-[9px] text-navy-600 hover:text-navy-800 font-semibold flex items-center gap-1 mt-0.5 hover:underline"
                                         >
                                           <Sparkles className="h-2.5 w-2.5" /> {t("dashboard.quoteDetail.addAiProDescription")}
                                         </button>
@@ -1540,11 +1540,11 @@ export default function QuoteDetail() {
                                     <button
                                       onClick={() => handleRegenerateSingleVoce(row.ci, row.vi, title)}
                                       disabled={isRegenerating}
-                                      className="p-1 rounded bg-slate-100 hover:bg-violet-50 text-slate-400 hover:text-violet-650 transition opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
+                                      className="p-1 rounded bg-slate-100 hover:bg-navy-50 text-slate-400 hover:text-navy-600 transition opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0"
                                       title={t("dashboard.quoteDetail.regenerateProDescTitle")}
                                     >
                                       {isRegenerating ? (
-                                        <Loader2 className="h-3 w-3 animate-spin text-violet-600" />
+                                        <Loader2 className="h-3 w-3 animate-spin text-navy-600" />
                                       ) : (
                                         <RefreshCw className="h-3 w-3" />
                                       )}
@@ -1558,7 +1558,7 @@ export default function QuoteDetail() {
                                     <button
                                       onClick={() => handleRegenerateSingleVoce(row.ci, row.vi, title)}
                                       disabled={isRegenerating}
-                                      className="text-[9px] text-violet-600 hover:text-violet-850 font-semibold flex items-center gap-1 mt-0.5 hover:underline"
+                                      className="text-[9px] text-navy-600 hover:text-navy-800 font-semibold flex items-center gap-1 mt-0.5 hover:underline"
                                     >
                                       <Sparkles className="h-2.5 w-2.5" /> {t("dashboard.quoteDetail.addAiProDescription")}
                                     </button>
@@ -1678,7 +1678,7 @@ export default function QuoteDetail() {
                             type="number"
                             value={editScontoPerc}
                             onChange={e => setEditScontoPerc(Math.max(0, Math.min(100, Number(e.target.value))))}
-                            className="w-16 text-right bg-violet-50 border border-violet-200 rounded px-2 py-0.5 text-sm focus:outline-none focus:border-violet-400"
+                            className="w-16 text-right bg-navy-50 border border-navy-200 rounded px-2 py-0.5 text-sm focus:outline-none focus:border-navy-400"
                             min={0} max={100} step={1}
                           />
                         </div>
@@ -1694,7 +1694,7 @@ export default function QuoteDetail() {
                             type="number"
                             value={editIvaPerc}
                             onChange={e => setEditIvaPerc(Math.max(0, Number(e.target.value)))}
-                            className="w-16 text-right bg-violet-50 border border-violet-200 rounded px-2 py-0.5 text-sm focus:outline-none focus:border-violet-400"
+                            className="w-16 text-right bg-navy-50 border border-navy-200 rounded px-2 py-0.5 text-sm focus:outline-none focus:border-navy-400"
                             min={0} step={1}
                           />
                         </div>
@@ -1741,12 +1741,12 @@ export default function QuoteDetail() {
 
               {/* Condizioni di pagamento */}
               {isEditMode ? (
-                <div className="mb-6 border-2 border-violet-200 rounded-lg p-4 bg-violet-50/40">
+                <div className="mb-6 border-2 border-navy-200 rounded-lg p-4 bg-navy-50/40">
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center justify-between">
                     <span>{t("dashboard.quoteDetail.paymentTerms")}</span>
                     <button
                       onClick={() => setEditCondizioniPagamento(prev => [...prev, ""])}
-                      className="text-xs text-violet-600 hover:text-violet-800 font-medium flex items-center gap-1 hover:bg-violet-100 rounded px-2 py-1 transition-colors"
+                      className="text-xs text-navy-600 hover:text-navy-800 font-medium flex items-center gap-1 hover:bg-navy-100 rounded px-2 py-1 transition-colors"
                     >
                       <Plus className="h-3 w-3" /> {t("dashboard.quoteDetail.add")}
                     </button>
@@ -1758,7 +1758,7 @@ export default function QuoteDetail() {
                           value={cond}
                           onChange={e => setEditCondizioniPagamento(prev => prev.map((c, ci) => ci === i ? e.target.value : c))}
                           placeholder={t("dashboard.quoteDetail.paymentTermPlaceholder")}
-                          className="flex-1 text-xs text-slate-700 bg-white border border-violet-200 rounded px-2 py-1.5 focus:outline-none focus:border-violet-400"
+                          className="flex-1 text-xs text-slate-700 bg-white border border-navy-200 rounded px-2 py-1.5 focus:outline-none focus:border-navy-400"
                         />
                         <button
                           onClick={() => setEditCondizioniPagamento(prev => prev.filter((_, ci) => ci !== i))}
@@ -1789,12 +1789,12 @@ export default function QuoteDetail() {
 
               {/* Descrizione Generale / Oggetto */}
               {isEditMode ? (
-                <div className="pt-4 border-t border-violet-100">
+                <div className="pt-4 border-t border-navy-100">
                   <div className="text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{t("dashboard.quoteDetail.generalDescriptionLabel")}</div>
                   <textarea
                     value={editDescrizioneGenerale}
                     onChange={e => setEditDescrizioneGenerale(e.target.value)}
-                    className="w-full text-xs text-slate-500 bg-violet-50/50 border border-violet-200 rounded p-2 focus:outline-none focus:border-violet-400 resize-none min-h-[60px]"
+                    className="w-full text-xs text-slate-500 bg-navy-50/50 border border-navy-200 rounded p-2 focus:outline-none focus:border-navy-400 resize-none min-h-[60px]"
                     placeholder={t("dashboard.quoteDetail.generalDescriptionPlaceholder")}
                   />
                 </div>
@@ -1808,12 +1808,12 @@ export default function QuoteDetail() {
 
               {/* Notes */}
               {isEditMode ? (
-                <div className="pt-4 border-t border-violet-100">
+                <div className="pt-4 border-t border-navy-100">
                   <div className="text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">{t("dashboard.quoteDetail.finalNotesLabel")}</div>
                   <textarea
                     value={editNote}
                     onChange={e => setEditNote(e.target.value)}
-                    className="w-full text-xs text-slate-500 bg-violet-50/50 border border-violet-200 rounded p-2 focus:outline-none focus:border-violet-400 resize-none min-h-[60px]"
+                    className="w-full text-xs text-slate-500 bg-navy-50/50 border border-navy-200 rounded p-2 focus:outline-none focus:border-navy-400 resize-none min-h-[60px]"
                     placeholder={t("dashboard.quoteDetail.finalNotesPlaceholder")}
                   />
                 </div>
@@ -1871,7 +1871,7 @@ export default function QuoteDetail() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full justify-start gap-2 text-violet-600 border-violet-200 hover:bg-violet-50"
+                    className="w-full justify-start gap-2 text-navy-600 border-navy-200 hover:bg-navy-50"
                     onClick={() => setIsRegenOpen(true)}
                   >
                     <Sparkles className="h-4 w-4" />
@@ -2050,16 +2050,16 @@ export default function QuoteDetail() {
                     className={cn(
                       "w-full text-left px-3 py-2.5 rounded-lg border text-xs transition-all",
                       isActive
-                        ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15 text-violet-900 dark:text-violet-300 ring-1 ring-violet-300"
+                        ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15 text-navy-900 dark:text-navy-300 ring-1 ring-navy-300"
                         : isClickable || isProClickable
-                          ? "border-slate-200 hover:border-violet-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
+                          ? "border-slate-200 hover:border-navy-300 hover:bg-slate-50 text-slate-700 cursor-pointer"
                           : requiresPro
                             ? "border-slate-200 hover:border-amber-300 hover:bg-amber-50 text-slate-600 cursor-pointer"
                             : "border-slate-200 opacity-50 text-slate-400 cursor-not-allowed"
                     )}
                   >
                     <div className="font-semibold flex items-center gap-1.5">
-                      {isActive && <CheckCircle2 className="h-3 w-3 text-violet-600 shrink-0" />}
+                      {isActive && <CheckCircle2 className="h-3 w-3 text-navy-600 shrink-0" />}
                       {tmpl.label}
                       {tmpl.proOnly && !isPro && (
                         <span className="ml-auto text-[10px] font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded px-1.5 py-0.5 leading-none">PRO</span>
@@ -2129,16 +2129,16 @@ export default function QuoteDetail() {
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-violet-600" />
+              <Star className="h-5 w-5 text-navy-600" />
               {t("dashboard.quoteDetail.upgradeProSpecTitle")}
             </DialogTitle>
             <DialogDescription>
               {t("dashboard.quoteDetail.upgradeProSpecDesc")}
             </DialogDescription>
           </DialogHeader>
-          <div className="rounded-lg bg-violet-50 dark:bg-violet-500/15 border border-violet-200 dark:border-violet-800/40 px-4 py-3 text-sm text-violet-800 dark:text-violet-300 space-y-1">
+          <div className="rounded-lg bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 px-4 py-3 text-sm text-navy-800 dark:text-navy-300 space-y-1">
             <p className="font-semibold">{t("dashboard.quoteDetail.whatWillUpdate")}</p>
-            <ul className="list-disc list-inside space-y-0.5 text-violet-700 dark:text-violet-300">
+            <ul className="list-disc list-inside space-y-0.5 text-navy-700 dark:text-navy-300">
               <li>{t("dashboard.quoteDetail.updateItem1")}</li>
               <li>{t("dashboard.quoteDetail.updateItem2")}</li>
               <li>{t("dashboard.quoteDetail.updateItem3")}</li>
@@ -2151,7 +2151,7 @@ export default function QuoteDetail() {
             <Button
               onClick={handleConfirmCapitolatoUpgrade}
               disabled={upgradeToCapitolato.isPending}
-              className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+              className="gap-2 bg-navy-600 hover:bg-navy-700 text-white"
             >
               {upgradeToCapitolato.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
               {upgradeToCapitolato.isPending ? t("dashboard.quoteDetail.upgradingInProgress") : t("dashboard.quoteDetail.upgradeNow")}
@@ -2165,7 +2165,7 @@ export default function QuoteDetail() {
         <DialogContent className="sm:max-w-[520px]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-500" />
+              <Sparkles className="h-5 w-5 text-navy-500" />
               {t("dashboard.quoteDetail.regenerateWithAiTitle")}
             </DialogTitle>
             <DialogDescription>
@@ -2239,7 +2239,7 @@ export default function QuoteDetail() {
                     { id: "monthly_pro", label: "Pro", price: `$49${t("dashboard.quoteDetail.perMonth")}`, badge: t("dashboard.quoteDetail.mostPopular"), features: [t("dashboard.quoteDetail.feature60Quotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featurePhotoUpload")], highlight: true },
                     { id: "monthly_elite", label: "Elite", price: `$59${t("dashboard.quoteDetail.perMonth")}`, badge: t("dashboard.quoteDetail.unlimited"), features: [t("dashboard.quoteDetail.featureUnlimitedQuotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featureDedicatedSupport")], highlight: false },
                   ].map((opt) => (
-                    <div key={opt.id} className={`relative rounded-xl border p-4 flex flex-col ${opt.highlight ? "border-primary ring-1 ring-primary shadow-sm bg-gradient-to-br from-violet-50 to-cyan-50" : "border-amber-300 bg-amber-50/30"}`}>
+                    <div key={opt.id} className={`relative rounded-xl border p-4 flex flex-col ${opt.highlight ? "border-primary ring-1 ring-primary shadow-sm bg-gradient-to-br from-navy-50 to-teal-50" : "border-amber-300 bg-amber-50/30"}`}>
                       <div className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white whitespace-nowrap ${opt.highlight ? "bg-primary" : "bg-amber-500"}`}>
                         {opt.badge}
                       </div>

@@ -72,6 +72,33 @@
   --color-sidebar-accent-border: var(--sidebar-accent-border);
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
+  /* Navy/teal accent scales (Phase 31 — replaces the old violet/indigo/cyan Tailwind
+     defaults used across ~68 files). Fixed hues, not theme-able light/dark, same as
+     the --qa-* chip tokens: hue 240 matches --primary/--ring, hue 187 matches --qa-teal. */
+  --color-navy-50: hsl(240 60% 97%);
+  --color-navy-100: hsl(240 55% 94%);
+  --color-navy-200: hsl(240 55% 88%);
+  --color-navy-300: hsl(240 50% 78%);
+  --color-navy-400: hsl(240 48% 65%);
+  --color-navy-500: hsl(240 50% 52%);
+  --color-navy-600: hsl(240 51% 40%);
+  --color-navy-700: hsl(240 51% 30%);
+  --color-navy-800: hsl(240 51% 22%);
+  --color-navy-900: hsl(240 51% 16%);
+  --color-navy-950: hsl(240 51% 10%);
+
+  --color-teal-50: hsl(187 70% 96%);
+  --color-teal-100: hsl(187 65% 90%);
+  --color-teal-200: hsl(187 60% 80%);
+  --color-teal-300: hsl(187 60% 68%);
+  --color-teal-400: hsl(187 62% 55%);
+  --color-teal-500: hsl(187 70% 42%);
+  --color-teal-600: hsl(187 75% 34%);
+  --color-teal-700: hsl(187 78% 27%);
+  --color-teal-800: hsl(187 78% 21%);
+  --color-teal-900: hsl(187 75% 16%);
+  --color-teal-950: hsl(187 75% 10%);
+
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);

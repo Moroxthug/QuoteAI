@@ -73,7 +73,7 @@ export default function WhatsappPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <button
               onClick={() => navigate(isSignedIn ? "/dashboard/settings" : "/sign-up?plan=monthly_pro")}
-              className="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-violet-900/40"
+              className="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white transition-all shadow-lg shadow-navy-900/40"
               style={{ background: "linear-gradient(135deg, #7c3aed, #2563eb)" }}
             >
               {t("whatsapp.activateBot")}
@@ -112,10 +112,10 @@ export default function WhatsappPage() {
           <div className="max-w-5xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-14 items-center">
               <div className="order-2 lg:order-1">
-                <span className="inline-block text-violet-600 text-xs font-bold uppercase tracking-wider mb-3">{t("whatsapp.howItWorksLabel")}</span>
+                <span className="inline-block text-navy-600 text-xs font-bold uppercase tracking-wider mb-3">{t("whatsapp.howItWorksLabel")}</span>
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900 mb-6 leading-snug">
                   {t("whatsapp.howItWorksTitleLine1")}<br />
-                  <span className="text-violet-600">{t("whatsapp.howItWorksTitleLine2")}</span>
+                  <span className="text-navy-600">{t("whatsapp.howItWorksTitleLine2")}</span>
                 </h2>
 
                 <div className="space-y-5">
@@ -161,7 +161,7 @@ export default function WhatsappPage() {
             <div className="grid sm:grid-cols-3 gap-6">
               {FEATURES.map((f) => (
                 <div key={f.title} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 text-violet-600 bg-violet-50">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 text-navy-600 bg-navy-50">
                     <f.icon className="w-5 h-5" />
                   </div>
                   <h3 className="font-semibold text-gray-900 text-sm mb-1.5">{f.title}</h3>
@@ -196,7 +196,7 @@ export default function WhatsappPage() {
               { emoji: "😓", label: t("whatsapp.withoutQuoteAi"), items: [t("whatsapp.without1"), t("whatsapp.without2"), t("whatsapp.without3"), t("whatsapp.without4"), t("whatsapp.without5")] },
               { emoji: "⚡", label: t("whatsapp.withQuoteAiWhatsapp"), items: [t("whatsapp.with1"), t("whatsapp.with2"), t("whatsapp.with3"), t("whatsapp.with4"), t("whatsapp.with5")], highlight: true },
             ].map((col) => (
-              <div key={col.label} className={`rounded-xl p-4 ${col.highlight ? "border border-violet-500/40 bg-violet-950/40" : "bg-gray-900"}`}>
+              <div key={col.label} className={`rounded-xl p-4 ${col.highlight ? "border border-navy-500/40 bg-navy-950/40" : "bg-gray-900"}`}>
                 <p className="text-sm font-bold text-white mb-3">{col.emoji} {col.label}</p>
                 <ul className="space-y-1.5">
                   {col.items.map((item) => (
@@ -215,7 +215,7 @@ export default function WhatsappPage() {
       {/* ── CTA ─────────────────────────────────────────────────────── */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-xl">
-          <div className="inline-flex items-center gap-1.5 bg-violet-50 text-violet-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
+          <div className="inline-flex items-center gap-1.5 bg-navy-50 text-navy-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
             <MessageCircle className="w-3 h-3" />
             {t("whatsapp.botProElite")}
           </div>
@@ -228,7 +228,7 @@ export default function WhatsappPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-3">
             <button
               onClick={() => navigate(isSignedIn ? "/dashboard/settings" : "/sign-up?plan=monthly_pro")}
-              className="inline-flex h-11 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white transition-all shadow-md shadow-violet-300"
+              className="inline-flex h-11 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white transition-all shadow-md shadow-navy-300"
               style={{ background: "linear-gradient(135deg, #7c3aed, #2563eb)" }}
             >
               {isSignedIn ? t("whatsapp.connectWhatsapp") : t("whatsapp.tryFree7Days")}
@@ -236,7 +236,7 @@ export default function WhatsappPage() {
             </button>
             <Link
               href="/#pricing"
-              className="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:border-violet-300 transition-all"
+              className="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:border-navy-300 transition-all"
             >
               {t("whatsapp.comparePlans")}
             </Link>

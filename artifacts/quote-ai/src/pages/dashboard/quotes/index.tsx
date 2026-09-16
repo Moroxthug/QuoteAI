@@ -22,7 +22,7 @@ const formatCurrency = (amount: number) =>
 function StatusBadge({ status }: { status: string }) {
   const { t } = useLanguage();
   if (status === "unlocked")
-    return <Badge className="bg-violet-100 text-violet-700 hover:bg-violet-100 border-0 text-[11px] px-1.5 py-0">{t("dashboard.quotesList.statusUnlocked")}</Badge>;
+    return <Badge className="bg-[var(--qa-purple-t)] text-[var(--qa-purple)] hover:bg-[var(--qa-purple-t)] border-0 text-[11px] px-1.5 py-0">{t("dashboard.quotesList.statusUnlocked")}</Badge>;
   if (status === "pending_payment")
     return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0 text-[11px] px-1.5 py-0">{t("dashboard.quotesList.statusPending")}</Badge>;
   return <Badge variant="outline" className="text-slate-500 text-[11px] px-1.5 py-0">{t("dashboard.quotesList.statusDraft")}</Badge>;
@@ -112,7 +112,7 @@ export default function QuotesList() {
               <Button variant="outline" size="sm" className="gap-1.5 shrink-0 h-8 text-xs">
                 <span>{STATUS_LABELS[statusFilter]}</span>
                 {counts && statusFilter !== "all" && (
-                  <Badge className="h-4 min-w-4 px-1 text-[10px] bg-violet-100 text-violet-700 border-0 ml-0.5">
+                  <Badge className="h-4 min-w-4 px-1 text-[10px] bg-[var(--qa-purple-t)] text-[var(--qa-purple)] border-0 ml-0.5">
                     {counts[statusFilter]}
                   </Badge>
                 )}

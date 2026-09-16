@@ -70,7 +70,7 @@ export default function SignUpPage() {
   if (registrationOpen === null) {
     return (
       <div className="flex-1 flex items-center justify-center py-12 px-4">
-        <div className="h-8 w-8 rounded-full border-2 border-violet-400 border-t-transparent animate-spin" />
+        <div className="h-8 w-8 rounded-full border-2 border-navy-400 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -89,7 +89,7 @@ export default function SignUpPage() {
           </p>
           <p className="text-sm text-gray-500 mb-6">
             {t("signUp.alreadyInvited")}{" "}
-            <Link href="/sign-in/" className="text-violet-600 font-semibold hover:underline">
+            <Link href="/sign-in/" className="text-navy-600 font-semibold hover:underline">
               {t("signUp.loginHere")}
             </Link>
           </p>
@@ -121,7 +121,7 @@ export default function SignUpPage() {
                 <p className="text-sm text-gray-500 mb-6">
                   {t("signUp.checkEmailBodyPrefix")} <strong>{email}</strong>. {t("signUp.checkEmailBodySuffix")}
                 </p>
-                <Link href="/sign-in" className="text-sm text-violet-600 hover:underline font-medium">
+                <Link href="/sign-in" className="text-sm text-navy-600 hover:underline font-medium">
                   {t("signUp.backToLogin")}
                 </Link>
               </div>
@@ -147,7 +147,7 @@ export default function SignUpPage() {
                       value={name}
                       onChange={e => setName(e.target.value)}
                       placeholder="Jane Smith"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
@@ -159,7 +159,7 @@ export default function SignUpPage() {
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="jane@example.com"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                     />
                   </div>
                   <div>
@@ -173,7 +173,7 @@ export default function SignUpPage() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder={t("signUp.passwordPlaceholder")}
-                        className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                        className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 pr-10 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
                       />
                       <button
                         type="button"
@@ -208,7 +208,7 @@ export default function SignUpPage() {
           {!verificationSent && (
             <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
               <span className="text-sm text-gray-500">{t("signUp.alreadyHaveAccount")} </span>
-              <Link href={nextPath !== "/onboarding" ? `/sign-in?next=${encodeURIComponent(nextPath)}` : "/sign-in"} className="text-sm text-violet-600 font-semibold hover:underline">
+              <Link href={nextPath !== "/onboarding" ? `/sign-in?next=${encodeURIComponent(nextPath)}` : "/sign-in"} className="text-sm text-navy-600 font-semibold hover:underline">
                 {t("signUp.signInLink")}
               </Link>
             </div>

@@ -51,7 +51,7 @@ export default function TermsPage() {
               To access the Service you must create an account and provide accurate, up-to-date information.
               You are responsible for keeping your credentials confidential and for all activity that occurs
               under your account. If you become aware of any unauthorized access, notify us immediately at{" "}
-              <a href="mailto:support@quoteai.ca" className="text-violet-600 hover:underline">support@quoteai.ca</a>.
+              <a href="mailto:support@quoteai.ca" className="text-navy-600 hover:underline">support@quoteai.ca</a>.
             </p>
           </section>
 
@@ -129,7 +129,7 @@ export default function TermsPage() {
               QuoteAI reserves the right to suspend or terminate access to the Service in the event of a breach
               of these Terms, with notice by email except in cases of serious violations. You may cancel your
               account at any time from the Settings page or by contacting{" "}
-              <a href="mailto:support@quoteai.ca" className="text-violet-600 hover:underline">support@quoteai.ca</a>.
+              <a href="mailto:support@quoteai.ca" className="text-navy-600 hover:underline">support@quoteai.ca</a>.
             </p>
           </section>
 
@@ -154,7 +154,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">11. Contact us</h2>
             <p>
-              For any questions about these Terms: <a href="mailto:support@quoteai.ca" className="text-violet-600 hover:underline">support@quoteai.ca</a>
+              For any questions about these Terms: <a href="mailto:support@quoteai.ca" className="text-navy-600 hover:underline">support@quoteai.ca</a>
             </p>
           </section>
 

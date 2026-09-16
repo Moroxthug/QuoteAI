@@ -107,7 +107,7 @@ function TypingIndicator() {
 function PreviewCard({ data, t }: { data: ReturnType<typeof buildPreviewData>; t: (key: string) => string }) {
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden w-[200px] text-[8px]">
-      <div className="bg-violet-700 px-2 py-1.5 text-white font-bold text-[9px] flex items-center gap-1">
+      <div className="bg-navy-700 px-2 py-1.5 text-white font-bold text-[9px] flex items-center gap-1">
         <FileText className="w-2.5 h-2.5 shrink-0" />
         {t("waDemo.preview.quoteLabel")}
       </div>
@@ -152,8 +152,8 @@ function PdfBubble({ filename }: { filename: string }) {
         <p className="text-[8px] font-semibold text-gray-800 truncate">{filename}</p>
         <p className="text-[7px] text-gray-400">48 KB · PDF</p>
       </div>
-      <div className="w-5 h-5 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
-        <ArrowRight className="w-2.5 h-2.5 text-violet-600" />
+      <div className="w-5 h-5 rounded-full bg-navy-100 flex items-center justify-center shrink-0">
+        <ArrowRight className="w-2.5 h-2.5 text-navy-600" />
       </div>
     </div>
   );
@@ -206,7 +206,7 @@ function ChatBubble({ msg, previewData, t }: { msg: ChatMsg; previewData: Return
     return (
       <div className="flex flex-col items-end mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="bg-[#d9fdd3] rounded-2xl rounded-br-sm px-2.5 py-1.5 shadow-sm flex items-center gap-2 max-w-[160px]">
-          <div className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-full bg-navy-600 flex items-center justify-center shrink-0">
             <Mic className="w-3 h-3 text-white" />
           </div>
           <div className="text-[#075e54]">

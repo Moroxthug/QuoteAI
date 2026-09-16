@@ -80,10 +80,10 @@ function PlanBadge({ plan }: { plan: string | null | undefined }) {
     <span
       className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
         isElite
-          ? "bg-cyan-100 text-cyan-700 border border-cyan-200"
+          ? "bg-teal-100 text-teal-700 border border-teal-200"
           : isPro
             ? "bg-amber-100 text-amber-700 border border-amber-200"
-            : "bg-violet-100 text-violet-700 border border-violet-200"
+            : "bg-navy-100 text-navy-700 border border-navy-200"
       }`}
     >
       {isPro || isElite ? <Crown className="h-2.5 w-2.5" /> : <Zap className="h-2.5 w-2.5" />}
@@ -96,7 +96,7 @@ function PlanBadge({ plan }: { plan: string | null | undefined }) {
 function useStatCards() {
   const { t } = useLanguage();
   return [
-    { key: "thisMonth" as const, label: t("dashboard.index.stat.thisMonth"), icon: CalendarDays, color: "text-violet-500", accent: "bg-violet-50", border: "border-violet-200" },
+    { key: "thisMonth" as const, label: t("dashboard.index.stat.thisMonth"), icon: CalendarDays, color: "text-navy-500", accent: "bg-navy-50", border: "border-navy-200" },
     { key: "unlocked" as const, label: t("dashboard.index.stat.unlocked"), icon: CheckCircle2, color: "text-emerald-500", accent: "bg-emerald-50", border: "border-emerald-200" },
     { key: "unlockedRevenue" as const, label: t("dashboard.index.stat.unlockedRevenue"), icon: TrendingUp, color: "text-blue-500", accent: "bg-blue-50", border: "border-blue-200", isCurrency: true },
     { key: "avgValue" as const, label: t("dashboard.index.stat.avgValue"), icon: Sparkles, color: "text-amber-500", accent: "bg-amber-50", border: "border-amber-200", isCurrency: true },
@@ -121,7 +121,7 @@ function StarterUpgradeCard() {
   const { t } = useLanguage();
   const createPortal = useCreateCustomerPortalSession();
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-violet-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+    <div className="bg-gradient-to-r from-amber-50 to-navy-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
         <div className="h-9 w-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
           <Crown className="h-4 w-4 text-amber-600" />
@@ -155,7 +155,7 @@ function OnboardingView() {
       <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <div className="px-5 pt-6 pb-5 text-center">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center mb-3" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.12))" }}>
-            <Sparkles className="h-6 w-6 text-violet-500" />
+            <Sparkles className="h-6 w-6 text-navy-500" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-1">{t("dashboard.index.onboarding.welcomePrefix")} <span className="quoteai-word text-lg">QuoteAI</span>!</h2>
           <p className="text-xs text-muted-foreground max-w-md mx-auto mb-5">
@@ -165,12 +165,12 @@ function OnboardingView() {
             {steps.map(({ icon: Icon, num, title, desc, href, cta }) => (
               <div key={num} className="rounded-lg bg-muted border border-border p-3.5">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="h-5 w-5 rounded-full bg-violet-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{num}</span>
-                  <Icon className="h-3.5 w-3.5 text-violet-500" />
+                  <span className="h-5 w-5 rounded-full bg-navy-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{num}</span>
+                  <Icon className="h-3.5 w-3.5 text-navy-500" />
                   <span className="text-sm font-semibold text-foreground">{title}</span>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed mb-1.5">{desc}</p>
-                {href && cta && <Link href={href} className="text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">{cta}</Link>}
+                {href && cta && <Link href={href} className="text-xs font-semibold text-navy-600 hover:text-navy-700 transition-colors">{cta}</Link>}
               </div>
             ))}
           </div>
@@ -181,9 +181,9 @@ function OnboardingView() {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <Link href="/dashboard/profile" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group shadow-sm">
-          <div className="h-7 w-7 rounded-lg bg-violet-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-violet-500" /></div>
-          <span className="text-sm font-medium text-foreground group-hover:text-violet-700">{t("dashboard.index.onboarding.companyProfile")}</span>
+        <Link href="/dashboard/profile" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group shadow-sm">
+          <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-navy-500" /></div>
+          <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.onboarding.companyProfile")}</span>
         </Link>
         <Link href="/dashboard/billing" className="bg-card border border-border rounded-xl p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group shadow-sm">
           <div className="h-7 w-7 rounded-lg bg-amber-100 flex items-center justify-center"><Crown className="h-3.5 w-3.5 text-amber-500" /></div>
@@ -203,16 +203,16 @@ function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUse
   const { t } = useLanguage();
   const remaining = downloadsLimit - downloadsUsed;
   return (
-    <div className="bg-gradient-to-r from-violet-50 to-cyan-50 border border-violet-200 rounded-xl p-3.5 flex items-center justify-between gap-3">
+    <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-200 rounded-xl p-3.5 flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
-        <div className="h-8 w-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-          <Gift className="h-4 w-4 text-violet-600" />
+        <div className="h-8 w-8 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
+          <Gift className="h-4 w-4 text-navy-600" />
         </div>
         <div className="min-w-0">
           <div className="font-semibold text-foreground text-sm">
             {t("dashboard.index.trial.active")}
             {typeof daysLeft === "number" && (
-              <span className="ml-2 inline-flex items-center gap-1 text-[11px] font-medium text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded-full">
+              <span className="ml-2 inline-flex items-center gap-1 text-[11px] font-medium text-navy-600 bg-navy-100 px-1.5 py-0.5 rounded-full">
                 <Clock className="h-2.5 w-2.5" />
                 {daysLeft === 0
                   ? t("dashboard.index.trial.expiresToday")
@@ -409,7 +409,7 @@ function DashboardQuickBar() {
             ))}
             {photos.length < maxPhotos && (
               <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isSubmitting}
-                className="w-12 h-12 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[9px]">
+                className="w-12 h-12 rounded-lg border-2 border-dashed border-border hover:border-navy-300 flex flex-col items-center justify-center gap-0.5 text-muted-foreground hover:text-navy-500 transition-colors text-[9px]">
                 <ImagePlus className="h-3 w-3" />
                 <span>{t("dashboard.new.add")}</span>
               </button>
@@ -445,7 +445,7 @@ function DashboardQuickBar() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSubmitting}
-                className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-border hover:border-violet-300 flex items-center gap-0.5 text-muted-foreground hover:text-violet-500 transition-colors text-[10px]"
+                className="w-auto px-2 h-7 rounded-lg border-2 border-dashed border-border hover:border-navy-300 flex items-center gap-0.5 text-muted-foreground hover:text-navy-500 transition-colors text-[10px]"
               >
                 <ImagePlus className="h-3 w-3" />
                 <span>{t("dashboard.new.add")}</span>
@@ -463,7 +463,7 @@ function DashboardQuickBar() {
                 disabled={isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS}
                 className={cn(
                   "h-8 w-8 flex items-center justify-center rounded-xl transition-colors",
-                  (photos.length > 0 || docs.length > 0) ? "bg-violet-100 text-violet-600 hover:bg-violet-200" : "text-muted-foreground hover:bg-accent",
+                  (photos.length > 0 || docs.length > 0) ? "bg-navy-100 text-navy-600 hover:bg-navy-200" : "text-muted-foreground hover:bg-accent",
                   (isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS) && "opacity-40 cursor-not-allowed"
                 )}>
                 <ImagePlus className="h-4 w-4" />
@@ -481,7 +481,7 @@ function DashboardQuickBar() {
             )}
           </div>
 
-          <Sparkles className="h-4 w-4 text-violet-400 shrink-0" />
+          <Sparkles className="h-4 w-4 text-navy-400 shrink-0" />
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -511,7 +511,7 @@ function DashboardQuickBar() {
         </div>
 
         {isSubmitting && (
-          <div className="px-3 pb-3 text-xs text-violet-600 font-medium flex items-center gap-1.5">
+          <div className="px-3 pb-3 text-xs text-navy-600 font-medium flex items-center gap-1.5">
             <Loader2 className="h-3 w-3 animate-spin" />
             {(photos.length > 0 || docs.length > 0) ? t("dashboard.index.quickBar.analyzingAttachments") : t("dashboard.index.quickBar.generatingQuote")}
           </div>
@@ -537,7 +537,7 @@ function DashboardQuickBar() {
             <User className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.label")}</span>
             {clientForm.nome && !clientOpen && (
-              <span className="text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-semibold text-navy-700 bg-navy-50 border border-navy-100 px-2 py-0.5 rounded-full">
                 {clientForm.nome}
               </span>
             )}
@@ -564,8 +564,8 @@ function DashboardQuickBar() {
                 className={cn(
                   "inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border transition-all",
                   selectedClientId === c.id
-                    ? "border-violet-300 bg-violet-50 text-violet-700 font-semibold"
-                    : "border-border text-muted-foreground hover:border-violet-200 hover:bg-violet-50/50"
+                    ? "border-navy-300 bg-navy-50 text-navy-700 font-semibold"
+                    : "border-border text-muted-foreground hover:border-navy-200 hover:bg-navy-50/50"
                 )}
               >
                 <User className="h-2.5 w-2.5" />
@@ -575,7 +575,7 @@ function DashboardQuickBar() {
             <button
               type="button"
               onClick={() => { setClientOpen(true); setClientMode("new"); setSelectedClientId(null); setClientForm(emptyClient); }}
-              className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-dashed border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 transition-all"
+              className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg border border-dashed border-border text-muted-foreground hover:border-navy-300 hover:text-navy-600 transition-all"
             >
               {t("dashboard.new.client.addNew")}
             </button>
@@ -598,15 +598,15 @@ function DashboardQuickBar() {
                     className={cn(
                       "inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-xl border transition-all",
                       selectedClientId === c.id
-                        ? "border-violet-300 bg-violet-50 text-violet-700 font-semibold shadow-sm"
-                        : "border-border text-muted-foreground hover:border-violet-200 hover:bg-violet-50/50"
+                        ? "border-navy-300 bg-navy-50 text-navy-700 font-semibold shadow-sm"
+                        : "border-border text-muted-foreground hover:border-navy-200 hover:bg-navy-50/50"
                     )}>
                     <User className="h-3 w-3" />
                     {c.nome}
                   </button>
                 ))}
                 <button type="button" onClick={() => { setClientMode("new"); setSelectedClientId(null); setClientForm(emptyClient); }}
-                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-violet-300 hover:text-violet-600 transition-all">
+                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-xl border border-dashed border-border text-muted-foreground hover:border-navy-300 hover:text-navy-600 transition-all">
                   {t("dashboard.index.client.addNewClient")}
                 </button>
               </div>
@@ -617,7 +617,7 @@ function DashboardQuickBar() {
               <button
                 type="button"
                 onClick={() => setClientMode("new")}
-                className="w-full mb-3 py-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50/30 transition-all"
+                className="w-full mb-3 py-2 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:border-navy-300 hover:text-navy-600 hover:bg-navy-50/30 transition-all"
               >
                 {t("dashboard.new.client.addClientData")}
               </button>
@@ -675,7 +675,7 @@ function DashboardQuickBar() {
                 <div className="flex items-center justify-between pt-0.5">
                   <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none">
                     <input type="checkbox" checked={rememberClient} onChange={e => setRememberClient(e.target.checked)}
-                      className="rounded border-border text-violet-600 focus:ring-violet-500" />
+                      className="rounded border-border text-navy-600 focus:ring-navy-500" />
                     {t("dashboard.new.client.remember")}
                   </label>
                   <button type="button" onClick={clearClient} className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors">
@@ -723,7 +723,7 @@ export default function DashboardHome() {
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
       {/* ── div 1: Hero greeting ── */}
-      <div className="hero-sheen relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-600 via-violet-500 to-cyan-500 px-5 py-4 text-white shadow-lg shadow-violet-300/40">
+      <div className="hero-sheen relative overflow-hidden rounded-xl bg-gradient-to-br from-navy-600 via-navy-500 to-teal-500 px-5 py-4 text-white shadow-lg shadow-navy-300/40">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, white 0%, transparent 60%)" }} />
         <div className="relative flex items-center justify-between gap-4">
           <div>
@@ -786,10 +786,10 @@ export default function DashboardHome() {
 
           {/* Subscription upsell */}
           {!subscription?.isActive && (
-            <div className="bg-gradient-to-r from-violet-50 to-cyan-50 border border-violet-100 rounded-xl p-4 flex items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-xl p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-violet-100 flex items-center justify-center shrink-0">
-                  <Crown className="h-4 w-4 text-violet-500" />
+                <div className="h-9 w-9 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
+                  <Crown className="h-4 w-4 text-navy-500" />
                 </div>
                 <div>
                   <div className="font-semibold text-foreground text-sm">{t("dashboard.index.unlockAll.title")}</div>
@@ -812,7 +812,7 @@ export default function DashboardHome() {
                 <h2 className="text-sm font-semibold text-foreground">{t("dashboard.index.recentQuotes.title")}</h2>
                 <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.index.recentQuotes.subtitle").replace("{count}", String(recentQuotes.length))}</p>
               </div>
-              <Link href="/dashboard/quotes" className="inline-flex items-center gap-1 text-xs font-semibold text-violet-600 hover:text-violet-700 transition-colors">
+              <Link href="/dashboard/quotes" className="inline-flex items-center gap-1 text-xs font-semibold text-navy-600 hover:text-navy-700 transition-colors">
                 {t("dashboard.index.recentQuotes.viewAll")} <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
@@ -825,7 +825,7 @@ export default function DashboardHome() {
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="h-7 w-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.10), rgba(6,182,212,0.10))" }}>
-                      <FileText className="h-3 w-3 text-violet-500" />
+                      <FileText className="h-3 w-3 text-navy-500" />
                     </div>
                     <div className="min-w-0">
                       <div className="font-medium text-foreground text-sm truncate">{quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}</div>
@@ -848,9 +848,9 @@ export default function DashboardHome() {
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            <Link href="/dashboard/new" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-violet-200 hover:bg-violet-50/30 transition-all group card-soft">
-              <div className="h-7 w-7 rounded-lg bg-violet-100 flex items-center justify-center"><Plus className="h-3.5 w-3.5 text-violet-500" /></div>
-              <span className="text-sm font-medium text-foreground group-hover:text-violet-700">{t("dashboard.index.quickActions.newQuote")}</span>
+            <Link href="/dashboard/new" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group card-soft">
+              <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Plus className="h-3.5 w-3.5 text-navy-500" /></div>
+              <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.quickActions.newQuote")}</span>
             </Link>
             <Link href="/dashboard/quotes" className="bg-card border border-border rounded-2xl p-3 flex items-center gap-2.5 hover:border-blue-200 hover:bg-blue-50/30 transition-all group card-soft">
               <div className="h-7 w-7 rounded-lg bg-blue-100 flex items-center justify-center"><FileText className="h-3.5 w-3.5 text-blue-500" /></div>

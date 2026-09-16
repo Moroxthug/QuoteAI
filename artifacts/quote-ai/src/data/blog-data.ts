@@ -690,13 +690,13 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     slug: "trades",
     name: "Trades",
     description: "Practical guides for painters, electricians, plumbers, roofers, and other trades — including Canada-specific work like winterization and snow load roofing.",
-    color: "bg-violet-50 text-violet-700 border-violet-200 hover:border-violet-400",
+    color: "bg-navy-50 text-navy-700 border-navy-200 hover:border-navy-400",
   },
   {
     slug: "pricing",
     name: "Pricing",
     description: "Up-to-date Canadian pricing for the most common jobs: cost per square foot, per room, and per project, with regional differences called out.",
-    color: "bg-cyan-50 text-cyan-700 border-cyan-200 hover:border-cyan-400",
+    color: "bg-teal-50 text-teal-700 border-teal-200 hover:border-teal-400",
   },
   {
     slug: "advice",

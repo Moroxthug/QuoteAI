@@ -37,7 +37,7 @@ export default function PublicInvoicePage() {
   }, [data?.invoice.language, setLang]);
 
   if (isLoading) {
-    return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-violet-600" /></div>;
+    return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-navy-600" /></div>;
   }
   if (error || !data) {
     return (
@@ -97,10 +97,10 @@ export default function PublicInvoicePage() {
           </div>
         )}
         {!paid && !voided && !pendingConfirmation && !credit && (
-          <div className={`rounded-2xl border p-5 ${invoice.status === "overdue" ? "border-rose-200 bg-rose-50" : "border-violet-200 bg-violet-50"}`}>
+          <div className={`rounded-2xl border p-5 ${invoice.status === "overdue" ? "border-rose-200 bg-rose-50" : "border-navy-200 bg-navy-50"}`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <div className={`text-xs font-semibold uppercase tracking-wide ${invoice.status === "overdue" ? "text-rose-700" : "text-violet-700"}`}>{invoice.status === "overdue" ? t("publicInvoice.overdue") : t("publicInvoice.balanceDue")}</div>
+                <div className={`text-xs font-semibold uppercase tracking-wide ${invoice.status === "overdue" ? "text-rose-700" : "text-navy-700"}`}>{invoice.status === "overdue" ? t("publicInvoice.overdue") : t("publicInvoice.balanceDue")}</div>
                 <div className="text-3xl font-extrabold text-slate-900 mt-1">{fmt(invoice.balanceCents)}</div>
                 <div className="text-sm text-slate-600 mt-1">{t("publicInvoice.dueBy")} <strong>{day(invoice.dueDate)}</strong>{invoice.paidCents > 0 ? ` · ${t("publicInvoice.alreadyPaid")} ${fmt(invoice.paidCents)}` : ""}</div>
               </div>
@@ -117,20 +117,20 @@ export default function PublicInvoicePage() {
 
             {(pi.etransferEmail || pi.chequePayableTo || pi.note) && (
               <div className="mt-4 rounded-xl bg-white/80 border border-white p-4 space-y-2 text-sm">
-                <div className="font-semibold text-slate-900 inline-flex items-center gap-2"><Banknote className="h-4 w-4 text-violet-600" /> {t("publicInvoice.howToPay")}</div>
+                <div className="font-semibold text-slate-900 inline-flex items-center gap-2"><Banknote className="h-4 w-4 text-navy-600" /> {t("publicInvoice.howToPay")}</div>
                 {pi.etransferEmail && (
                   <div className="flex flex-wrap items-center gap-2">
                     <Mail className="h-4 w-4 text-slate-400" />
                     <span className="text-slate-700">{t("publicInvoice.etransferTo")}</span>
                     <code className="rounded bg-slate-100 px-2 py-0.5 text-slate-900 font-semibold">{pi.etransferEmail}</code>
-                    <button className="text-violet-600 hover:text-violet-800" onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
+                    <button className="text-navy-600 hover:text-navy-800" onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
                   </div>
                 )}
                 {pi.chequePayableTo && <div className="text-slate-700">{t("publicInvoice.chequeTo")} <strong>{pi.chequePayableTo}</strong></div>}
                 {pi.note && <div className="text-slate-700">{pi.note}</div>}
                 <div className="text-xs text-slate-500">{t("publicInvoice.reference")} <strong>{invoice.number}</strong>.</div>
                 {pi.etransferEmail && !confirming && (
-                  <button className="mt-1 inline-flex items-center gap-1.5 text-violet-700 hover:text-violet-900 font-medium" onClick={() => setConfirming(true)}>
+                  <button className="mt-1 inline-flex items-center gap-1.5 text-navy-700 hover:text-navy-900 font-medium" onClick={() => setConfirming(true)}>
                     <Clock className="h-4 w-4" /> {t("publicInvoice.iSentIt")}
                   </button>
                 )}
@@ -154,7 +154,7 @@ export default function PublicInvoicePage() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
-          <a href={publicInvoiceApi.pdfUrl(token!, true)} className="inline-flex items-center gap-2 font-medium text-violet-700 hover:underline"><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
+          <a href={publicInvoiceApi.pdfUrl(token!, true)} className="inline-flex items-center gap-2 font-medium text-navy-700 hover:underline"><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
           <span>{t("publicInvoice.questions")} {invoice.companyEmail ? <a href={`mailto:${invoice.companyEmail}`} className="underline">{invoice.companyEmail}</a> : invoice.companyName}{invoice.companyPhone ? ` · ${invoice.companyPhone}` : ""}</span>
         </div>
       </main>

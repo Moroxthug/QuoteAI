@@ -46,7 +46,7 @@ export default function ChiSiamoPage() {
           }}
         />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full bg-navy-50 border border-navy-100 px-4 py-1.5 text-sm font-medium text-navy-700 mb-8">
             <Heart className="h-3.5 w-3.5 fill-current" />
             {t("about.madeIn")}
           </div>
@@ -91,8 +91,8 @@ export default function ChiSiamoPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-gray-50 rounded-2xl p-8 text-center">
-              <div className="h-14 w-14 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-5">
-                <Zap className="h-7 w-7 text-violet-600" />
+              <div className="h-14 w-14 rounded-2xl bg-navy-100 flex items-center justify-center mx-auto mb-5">
+                <Zap className="h-7 w-7 text-navy-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">{t("about.value1Title")}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">
@@ -100,8 +100,8 @@ export default function ChiSiamoPage() {
               </p>
             </div>
             <div className="bg-gray-50 rounded-2xl p-8 text-center">
-              <div className="h-14 w-14 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-5">
-                <Target className="h-7 w-7 text-violet-600" />
+              <div className="h-14 w-14 rounded-2xl bg-navy-100 flex items-center justify-center mx-auto mb-5">
+                <Target className="h-7 w-7 text-navy-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">{t("about.value2Title")}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">
@@ -109,8 +109,8 @@ export default function ChiSiamoPage() {
               </p>
             </div>
             <div className="bg-gray-50 rounded-2xl p-8 text-center">
-              <div className="h-14 w-14 rounded-2xl bg-violet-100 flex items-center justify-center mx-auto mb-5">
-                <Users className="h-7 w-7 text-violet-600" />
+              <div className="h-14 w-14 rounded-2xl bg-navy-100 flex items-center justify-center mx-auto mb-5">
+                <Users className="h-7 w-7 text-navy-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">{t("about.value3Title")}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">
@@ -154,7 +154,7 @@ export default function ChiSiamoPage() {
             </Link>
             <Link
               href="/contatti/"
-              className="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-gray-700 border border-gray-200 hover:border-violet-300 hover:text-violet-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-gray-700 border border-gray-200 hover:border-navy-300 hover:text-navy-700 transition-colors"
             >
               {t("about.ctaContactUs")}
             </Link>

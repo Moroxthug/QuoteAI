@@ -308,7 +308,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
             <div className="flex items-center justify-center mb-4">
               <div className="h-14 w-14 rounded-full flex items-center justify-center"
                 style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.12))" }}>
-                <CheckCircle2 className="h-7 w-7 text-violet-500" />
+                <CheckCircle2 className="h-7 w-7 text-navy-500" />
               </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("support.sentTitle")}</h3>
@@ -330,7 +330,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 required
                 value={problema}
                 onChange={e => setProblema(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
               >
                 <option value="">{t("support.selectType")}</option>
                 <option value={t("support.technical")}>{t("support.technical")}</option>
@@ -350,7 +350,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 value={descrizione}
                 onChange={e => setDescrizione(e.target.value)}
                 placeholder={t("support.descriptionPlaceholder")}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all resize-none"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all resize-none"
               />
             </div>
             <div>
@@ -363,7 +363,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="jane@example.com"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
               />
             </div>
             <button

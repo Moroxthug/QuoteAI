@@ -21,11 +21,11 @@ export default function TeamInvitePage() {
   const returnTo = encodeURIComponent(`/team-invite/${token}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-navy-50 to-white flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center space-y-5">
         <Logo style={{ height: 28, margin: "0 auto" }} />
 
-        {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto text-violet-500" />}
+        {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto text-navy-500" />}
 
         {!isLoading && err && (
           <div className="space-y-2">
@@ -40,7 +40,7 @@ export default function TeamInvitePage() {
             <p className="text-sm text-slate-500">You've been invited as <strong>{preview.role}</strong>, using <strong>{preview.email}</strong>.</p>
 
             {!isLoaded ? (
-              <Loader2 className="h-5 w-5 animate-spin mx-auto text-violet-500" />
+              <Loader2 className="h-5 w-5 animate-spin mx-auto text-navy-500" />
             ) : !isSignedIn ? (
               <div className="space-y-2">
                 <p className="text-xs text-slate-400">Sign in or create an account with that email to accept.</p>

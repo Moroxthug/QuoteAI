@@ -325,10 +325,10 @@ export function PriceCatalogSection() {
   return (
     <div className="space-y-6">
       {/* Upload & CSV Action Card */}
-      <Card className="border border-violet-100 bg-gradient-to-br from-white to-violet-50/20 shadow-sm overflow-hidden">
+      <Card className="border border-navy-100 bg-gradient-to-br from-white to-navy-50/20 shadow-sm overflow-hidden">
         <CardHeader className="pb-4">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Upload className="h-4 w-4 text-violet-500" />
+            <Upload className="h-4 w-4 text-navy-500" />
             {t("catalog.csv.importTitle")}
           </CardTitle>
           <CardDescription className="text-xs">
@@ -347,7 +347,7 @@ export function PriceCatalogSection() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 border-violet-200 hover:bg-violet-55 text-violet-750"
+              className="gap-2 border-navy-200 hover:bg-navy-50 text-navy-700"
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-4 w-4" />
@@ -449,7 +449,7 @@ export function PriceCatalogSection() {
               <Card key={cat} className="shadow-sm border border-border overflow-hidden">
                 <CardHeader className="py-2.5 px-4 bg-muted/50 border-b">
                   <CardTitle className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
-                    <Tag className="h-3.5 w-3.5 text-violet-500" />
+                    <Tag className="h-3.5 w-3.5 text-navy-500" />
                     {cat}
                     <Badge variant="secondary" className="ml-auto font-mono text-[10px] py-0 px-1.5">{groupedByCategory[cat].length}</Badge>
                   </CardTitle>

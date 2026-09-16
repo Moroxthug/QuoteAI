@@ -26,7 +26,7 @@ const formatCad = (n: number) => new Intl.NumberFormat("en-CA", { style: "curren
 export const STATUS_STYLES: Record<ContractDto["status"], string> = {
   draft: "bg-slate-100 text-slate-700",
   sent: "bg-blue-100 text-blue-700",
-  viewed: "bg-indigo-100 text-indigo-700",
+  viewed: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
   signed: "bg-emerald-100 text-emerald-700",
   declined: "bg-red-100 text-red-700",
   voided: "bg-slate-200 text-slate-500",
@@ -177,7 +177,7 @@ export default function ContractDetailPage() {
       <div className="rounded-2xl border bg-card p-12 text-center">
         <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
         <p className="text-slate-700 font-medium">{t("contracts.notFound")}</p>
-        <Link href="/dashboard/contracts" className="text-violet-600 text-sm mt-2 inline-block">{t("contracts.backToList")}</Link>
+        <Link href="/dashboard/contracts" className="text-navy-600 text-sm mt-2 inline-block">{t("contracts.backToList")}</Link>
       </div>
     );
   }
@@ -191,15 +191,15 @@ export default function ContractDetailPage() {
             <ArrowLeft className="h-3.5 w-3.5" /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}
           </Link>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-            <FileSignature className="h-7 w-7 text-violet-600" />
+            <FileSignature className="h-7 w-7 text-navy-600" />
             {contract.contractNumber}
             <ContractStatusBadge status={contract.status} />
             {contract.kind === "change_order" && <Badge className="font-medium border-0 bg-amber-100 text-amber-800">{t("contracts.changeOrder")}</Badge>}
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
             {contract.variables.customer.name} · {contract.variables.projectTitle} · <strong className="text-slate-700">{formatCad(contract.variables.total)}</strong>
-            {contract.quoteId && <> · <Link href={`/dashboard/quotes/${contract.quoteId}`} className="text-violet-600 hover:underline">{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link></>}
-            {contract.projectId && <> · <Link href={`/dashboard/jobs/${contract.projectId}`} className="text-violet-600 hover:underline">{t("contracts.openJob")}</Link></>}
+            {contract.quoteId && <> · <Link href={`/dashboard/quotes/${contract.quoteId}`} className="text-navy-600 hover:underline">{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link></>}
+            {contract.projectId && <> · <Link href={`/dashboard/jobs/${contract.projectId}`} className="text-navy-600 hover:underline">{t("contracts.openJob")}</Link></>}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -234,9 +234,9 @@ export default function ContractDetailPage() {
         {/* Document */}
         <div className="lg:col-span-2 space-y-4">
           {isDraft && (
-            <div className="flex items-center justify-between rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-violet-900 dark:text-violet-300">
-                <Sparkles className="h-4 w-4 text-violet-600" />
+            <div className="flex items-center justify-between rounded-xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-navy-900 dark:text-navy-300">
+                <Sparkles className="h-4 w-4 text-navy-600" />
                 {t("contracts.draftHint")}
               </div>
               {editing ? (

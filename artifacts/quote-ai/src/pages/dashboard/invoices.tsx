@@ -47,7 +47,7 @@ export default function InvoicesPage() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-            <Receipt className="h-8 w-8 text-violet-600" />
+            <Receipt className="h-8 w-8 text-navy-600" />
             {t("invoices.title")}
           </h1>
           <p className="text-slate-500 mt-1">{t("invoices.subtitle")}</p>
@@ -56,11 +56,11 @@ export default function InvoicesPage() {
       </div>
 
       {gated || (error as Error & { code?: string } | null)?.code === "PLAN_REQUIRED" ? (
-        <div className="rounded-2xl border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 p-8 text-center">
-          <Receipt className="h-10 w-10 text-violet-300 mx-auto mb-3" />
+        <div className="rounded-2xl border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 p-8 text-center">
+          <Receipt className="h-10 w-10 text-navy-300 mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-slate-800">{t("invoices.gatedTitle")}</h2>
           <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">{t("invoices.gatedDesc")}</p>
-          <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-medium text-violet-600 hover:underline">{t("invoices.upgrade")}</Link>
+          <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-medium text-navy-600 hover:underline">{t("invoices.upgrade")}</Link>
         </div>
       ) : (
         <>
@@ -155,7 +155,7 @@ export function InvoiceRow({ inv, locale, compact }: { inv: InvoiceDto; locale: 
   const scheduled = inv.status === "draft" && !!inv.scheduledFor && new Date(inv.scheduledFor) > new Date();
   return (
     <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shrink-0", overdue ? "bg-rose-50 text-rose-600" : inv.status === "paid" ? "bg-emerald-50 text-emerald-600" : "bg-violet-50 text-violet-600")}>
+      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shrink-0", overdue ? "bg-rose-50 text-rose-600" : inv.status === "paid" ? "bg-emerald-50 text-emerald-600" : "bg-navy-50 text-navy-600")}>
         {overdue ? <AlertTriangle className="h-5 w-5" /> : <Receipt className="h-5 w-5" />}
       </div>
       <div className="min-w-0 flex-1">

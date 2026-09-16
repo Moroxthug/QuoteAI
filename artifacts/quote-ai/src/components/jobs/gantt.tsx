@@ -8,7 +8,7 @@ import type { MilestoneStatus } from "@/lib/jobs-api";
 export type GanttRow = { id: string; title: string; start: string | null; end: string | null; status: MilestoneStatus; paymentAmountCents?: number | null };
 
 const BAR: Record<MilestoneStatus, string> = {
-  planned: "bg-violet-200 border-violet-300 text-violet-900",
+  planned: "bg-[var(--qa-purple-t)] border-[var(--qa-purple)]/30 text-[var(--qa-purple)]",
   in_progress: "bg-blue-500 border-blue-600 text-white",
   completed: "bg-emerald-500 border-emerald-600 text-white",
   skipped: "bg-slate-200 border-slate-300 text-slate-500 line-through",
@@ -70,7 +70,7 @@ export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id
           return (
             <div key={r.id} className={cn("flex items-center group", onRowClick && "cursor-pointer")} onClick={() => onRowClick?.(r.id)}>
               <div className="w-56 shrink-0 pr-3 py-2">
-                <div className="text-sm font-medium text-slate-800 truncate group-hover:text-violet-700">{r.title}</div>
+                <div className="text-sm font-medium text-slate-800 truncate group-hover:text-navy-700">{r.title}</div>
                 <div className="text-[11px] text-slate-400 truncate">
                   {s && e ? `${format(s, "d MMM", { locale })} → ${format(e, "d MMM", { locale })}` : "—"}
                   {r.paymentAmountCents ? ` · $${(r.paymentAmountCents / 100).toLocaleString("en-CA", { maximumFractionDigits: 0 })}` : ""}

@@ -60,7 +60,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       <div
-        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-violet-400 bg-violet-50 dark:bg-violet-500/15" : "border-slate-200 bg-card hover:border-violet-300")}
+        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-slate-200 bg-card hover:border-navy-300")}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
@@ -68,14 +68,14 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       >
         <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
         <div className="flex flex-col items-center gap-1.5">
-          <div className="h-10 w-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center">{upload.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
+          <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center">{upload.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
           <div className="font-semibold text-slate-900 text-sm">{upload.isPending ? t("jobs.photos.uploading") : t("jobs.photos.upload")}</div>
         </div>
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-violet-200 dark:border-violet-800/40 bg-violet-50 dark:bg-violet-500/15 px-4 py-2.5">
-          <span className="text-sm text-violet-900 dark:text-violet-300">{selected.size} {t("jobs.photos.selected")}</span>
+        <div className="flex items-center justify-between rounded-lg border border-navy-200 dark:border-navy-800/40 bg-navy-50 dark:bg-navy-500/15 px-4 py-2.5">
+          <span className="text-sm text-navy-900 dark:text-navy-300">{selected.size} {t("jobs.photos.selected")}</span>
           <Button size="sm" className="gap-2" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
             {share.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
             {share.isPending ? t("jobs.photos.sharing") : t("jobs.photos.share")}
@@ -95,11 +95,11 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
           {photos.map((p: JobPhotoDto) => {
             const isSelected = selected.has(p.id);
             return (
-              <div key={p.id} className={cn("group relative rounded-xl overflow-hidden border bg-card", isSelected ? "border-violet-500 ring-2 ring-violet-200" : "border-slate-200")}>
+              <div key={p.id} className={cn("group relative rounded-xl overflow-hidden border bg-card", isSelected ? "border-navy-500 ring-2 ring-navy-200" : "border-slate-200")}>
                 <button className="block w-full aspect-square bg-slate-100" onClick={() => toggle(p.id)}>
                   <img src={jobsApi.photoFileUrl(job.id, p.id)} alt={p.caption || p.fileName} className="w-full h-full object-cover" />
                 </button>
-                <div className={cn("absolute top-2 left-2 h-5 w-5 rounded-full border-2 flex items-center justify-center", isSelected ? "bg-violet-600 border-violet-600" : "bg-card/80 border-white")} onClick={() => toggle(p.id)}>
+                <div className={cn("absolute top-2 left-2 h-5 w-5 rounded-full border-2 flex items-center justify-center", isSelected ? "bg-navy-600 border-navy-600" : "bg-card/80 border-white")} onClick={() => toggle(p.id)}>
                   {isSelected && <Check className="h-3 w-3 text-white" />}
                 </div>
                 <button
@@ -110,7 +110,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
                   <Trash2 className="h-3 w-3" />
                 </button>
                 <div className="p-2 space-y-0.5">
-                  {milestoneTitle(p.milestoneId) && <div className="text-[10px] text-violet-600 truncate">{milestoneTitle(p.milestoneId)}</div>}
+                  {milestoneTitle(p.milestoneId) && <div className="text-[10px] text-navy-600 truncate">{milestoneTitle(p.milestoneId)}</div>}
                   {p.caption && <div className="text-[11px] text-slate-600 truncate">{p.caption}</div>}
                   {p.sharedAt && <div className="text-[10px] text-emerald-600">{t("jobs.photos.shared")}</div>}
                 </div>

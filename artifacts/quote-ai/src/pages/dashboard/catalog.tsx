@@ -323,7 +323,7 @@ function OcrImportDialog({
                     type="checkbox"
                     checked={it.selected}
                     onChange={() => toggleItem(i)}
-                    className="h-4 w-4 shrink-0 accent-violet-600"
+                    className="h-4 w-4 shrink-0 accent-navy-600"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate">{it.nome}</div>
@@ -562,7 +562,7 @@ export default function CatalogPage() {
             <Card key={cat}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-violet-500" />
+                  <Tag className="h-4 w-4 text-navy-500" />
                   {cat}
                   <Badge variant="secondary" className="ml-auto">{groupedByCategory[cat].length}</Badge>
                 </CardTitle>

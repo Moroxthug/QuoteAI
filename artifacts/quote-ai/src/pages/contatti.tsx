@@ -87,8 +87,8 @@ export default function ContattiPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {/* Email supporto */}
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-xl bg-violet-50 flex items-center justify-center mb-5">
-                <Mail className="h-6 w-6 text-violet-600" />
+              <div className="h-12 w-12 rounded-xl bg-navy-50 flex items-center justify-center mb-5">
+                <Mail className="h-6 w-6 text-navy-600" />
               </div>
               <h2 className="text-lg font-bold text-gray-900 mb-2">{t("contact.productSupportTitle")}</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">
@@ -96,7 +96,7 @@ export default function ContattiPage() {
               </p>
               <a
                 href="mailto:info@quoteai.ca"
-                className="text-violet-600 font-semibold text-sm hover:text-violet-800 transition-colors"
+                className="text-navy-600 font-semibold text-sm hover:text-navy-800 transition-colors"
               >
                 info@quoteai.ca →
               </a>
@@ -142,8 +142,8 @@ export default function ContattiPage() {
       {/* Tempi di risposta */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <div className="flex items-start gap-4 bg-violet-50 border border-violet-100 rounded-2xl p-6">
-            <Clock className="h-6 w-6 text-violet-600 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-4 bg-navy-50 border border-navy-100 rounded-2xl p-6">
+            <Clock className="h-6 w-6 text-navy-600 flex-shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-gray-900 mb-1">{t("contact.responseTimeTitle")}</h3>
               <p className="text-gray-600 text-sm leading-relaxed">

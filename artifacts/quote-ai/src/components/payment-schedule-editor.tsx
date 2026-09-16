@@ -88,7 +88,7 @@ export function PaymentScheduleEditor({
                     const type = e.target.value as PaymentTermType;
                     updateTerm(term.id, { type, trigger: triggerForType(type), dueDays: type === "deposit" ? 0 : term.dueDays || 15 });
                   }}
-                  className="w-full h-8 text-xs rounded-md border border-slate-200 bg-card px-2 focus:outline-none focus:border-violet-400"
+                  className="w-full h-8 text-xs rounded-md border border-slate-200 bg-card px-2 focus:outline-none focus:border-navy-400"
                 >
                   {TERM_TYPES.map((tt) => (
                     <option key={tt} value={tt}>{t(`paymentSchedule.type.${tt}`)}</option>

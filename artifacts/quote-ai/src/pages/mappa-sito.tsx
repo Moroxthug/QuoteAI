@@ -59,37 +59,37 @@ export default function MappaSitoPage() {
             {/* Section 1: Main Pages */}
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <Globe className="h-5 w-5 text-violet-600" />
+                <Globe className="h-5 w-5 text-navy-600" />
                 <h2 className="text-lg font-bold text-gray-900">{t("sitemap.mainPagesTitle")}</h2>
               </div>
               <ul className="space-y-2.5 text-sm">
                 <li>
-                  <Link href="/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.homePage")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/whatsapp/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/whatsapp/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.whatsappQuotes")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/chi-siamo/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/chi-siamo/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.aboutUs")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contatti/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/contatti/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.contactSupport")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/privacy/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.privacyPolicy")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/termini/" className="text-gray-600 hover:text-violet-600 transition-colors">
+                  <Link href="/termini/" className="text-gray-600 hover:text-navy-600 transition-colors">
                     {t("sitemap.termsOfService")}
                   </Link>
                 </li>
@@ -99,18 +99,18 @@ export default function MappaSitoPage() {
             {/* Section 2: Blog & Guides */}
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <BookOpen className="h-5 w-5 text-violet-600" />
+                <BookOpen className="h-5 w-5 text-navy-600" />
                 <h2 className="text-lg font-bold text-gray-900">{t("sitemap.blogGuidesTitle")}</h2>
               </div>
               <ul className="space-y-2.5 text-sm">
                 <li>
-                  <Link href="/blog/" className="font-semibold text-gray-800 hover:text-violet-600 transition-colors">
+                  <Link href="/blog/" className="font-semibold text-gray-800 hover:text-navy-600 transition-colors">
                     {t("sitemap.blogIndex")}
                   </Link>
                 </li>
                 {BLOG_CATEGORIES.map((cat) => (
                   <li key={cat.slug}>
-                    <Link href={`/blog/categoria/${cat.slug}/`} className="text-gray-600 hover:text-violet-600 transition-colors pl-2">
+                    <Link href={`/blog/categoria/${cat.slug}/`} className="text-gray-600 hover:text-navy-600 transition-colors pl-2">
                       {t("sitemap.category")}: {cat.name}
                     </Link>
                   </li>
@@ -118,7 +118,7 @@ export default function MappaSitoPage() {
                 <li className="pt-2 font-semibold text-gray-800 border-t border-gray-50 mt-2">{t("sitemap.latestArticles")}</li>
                 {BLOG_ARTICLES.slice(0, 5).map((art) => (
                   <li key={art.slug} className="truncate max-w-full">
-                    <Link href={`/blog/${art.slug}/`} className="text-gray-500 hover:text-violet-600 text-xs transition-colors pl-2">
+                    <Link href={`/blog/${art.slug}/`} className="text-gray-500 hover:text-navy-600 text-xs transition-colors pl-2">
                       {art.title}
                     </Link>
                   </li>
@@ -129,13 +129,13 @@ export default function MappaSitoPage() {
             {/* Section 3: Professions Index */}
             <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <Layers className="h-5 w-5 text-violet-600" />
+                <Layers className="h-5 w-5 text-navy-600" />
                 <h2 className="text-lg font-bold text-gray-900">{t("sitemap.professionsTitle")}</h2>
               </div>
               <ul className="space-y-2.5 text-sm">
                 {Object.entries(SECTORS).map(([slug, sector]) => (
                   <li key={slug}>
-                    <Link href={`/quotes/${slug}/`} className="text-gray-600 hover:text-violet-600 transition-colors">
+                    <Link href={`/quotes/${slug}/`} className="text-gray-600 hover:text-navy-600 transition-colors">
                       {sector.label}
                     </Link>
                   </li>
@@ -148,7 +148,7 @@ export default function MappaSitoPage() {
           {/* Programmatic Cities Directory */}
           <div className="mt-12 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
-              <MapPin className="h-6 w-6 text-violet-600" />
+              <MapPin className="h-6 w-6 text-navy-600" />
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{t("sitemap.localQuotesTitle")}</h2>
                 <p className="text-sm text-gray-500 mt-1">{t("sitemap.localQuotesSubtitle")}</p>
@@ -160,7 +160,7 @@ export default function MappaSitoPage() {
                 const regionCities = citiesByRegion.get(region) || [];
                 return (
                   <div key={region} className="border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-violet-700 mb-4">{region}</h3>
+                    <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-700 mb-4">{region}</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-4 gap-x-2 text-xs">
                       {regionCities.map((city) => (
                         <div key={city.slug} className="flex flex-col gap-1">
@@ -173,7 +173,7 @@ export default function MappaSitoPage() {
                                 <Link
                                   key={sectorSlug}
                                   href={`/quotes/${sectorSlug}/${city.slug}/`}
-                                  className="text-gray-500 hover:text-violet-600 transition-colors truncate"
+                                  className="text-gray-500 hover:text-navy-600 transition-colors truncate"
                                   title={`${t("sitemap.quoteFor")} ${s.label} — ${city.name}`}
                                 >
                                   {s.label}

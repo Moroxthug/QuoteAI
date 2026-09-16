@@ -9,8 +9,8 @@ function formatDate(iso: string, lang: "en" | "fr"): string {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Professioni: "bg-violet-50 text-violet-700",
-  Prezzi: "bg-cyan-50 text-cyan-700",
+  Professioni: "bg-navy-50 text-navy-700",
+  Prezzi: "bg-teal-50 text-teal-700",
   Consigli: "bg-amber-50 text-amber-700",
   Tool: "bg-green-50 text-green-700",
   Innovazione: "bg-blue-50 text-blue-700",
@@ -32,16 +32,16 @@ export default function BlogPage() {
       <nav aria-label={t("seo.city.breadcrumbAria")} className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center text-sm text-gray-500 flex-wrap gap-1">
-            <li><Link href="/" className="hover:text-violet-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
+            <li><Link href="/" className="hover:text-navy-600 transition-colors">{t("blog.breadcrumbHome")}</Link></li>
             <li aria-hidden="true" className="mx-1.5 text-gray-300">/</li>
             <li className="text-gray-900 font-medium" aria-current="page">{t("blog.breadcrumbBlog")}</li>
           </ol>
         </div>
       </nav>
 
-      <section className="bg-gradient-to-br from-violet-50/60 to-cyan-50/30 pt-16 pb-12">
+      <section className="bg-gradient-to-br from-navy-50/60 to-teal-50/30 pt-16 pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-violet-100 border border-violet-200 px-4 py-1.5 text-sm font-medium text-violet-700 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-navy-100 border border-navy-200 px-4 py-1.5 text-sm font-medium text-navy-700 mb-6">
             {t("blog.heroBadge")}
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl mb-4 leading-tight">
@@ -70,7 +70,7 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-violet-50/40 border-b border-violet-100">
+      <section className="py-12 bg-navy-50/40 border-b border-navy-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900">{t("blog.practicalGuidesTitle")}</h2>
@@ -81,16 +81,16 @@ export default function BlogPage() {
               <Link
                 key={guide.slug}
                 href={guide.href}
-                className="group flex flex-col bg-white rounded-2xl border border-violet-100 hover:border-violet-300 hover:shadow-md transition-all duration-200 p-5"
+                className="group flex flex-col bg-white rounded-2xl border border-navy-100 hover:border-navy-300 hover:shadow-md transition-all duration-200 p-5"
               >
                 <span className="text-2xl mb-3">{guide.icon}</span>
-                <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-violet-700 transition-colors">
+                <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-navy-700 transition-colors">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-gray-500 leading-relaxed flex-1">
                   {guide.description}
                 </p>
-                <span className="mt-3 text-xs font-semibold text-violet-600 group-hover:translate-x-0.5 transition-transform inline-block">
+                <span className="mt-3 text-xs font-semibold text-navy-600 group-hover:translate-x-0.5 transition-transform inline-block">
                   {t("blog.readGuide")}
                 </span>
               </Link>
@@ -106,7 +106,7 @@ export default function BlogPage() {
               <Link
                 key={article.slug}
                 href={`/blog/${article.slug}/`}
-                className="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+                className="group flex flex-col bg-white rounded-2xl border border-gray-100 hover:border-navy-200 hover:shadow-md transition-all duration-200 overflow-hidden"
               >
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center justify-between mb-4">
@@ -115,7 +115,7 @@ export default function BlogPage() {
                     </span>
                     <span className="text-xs text-gray-400">{article.readingTimeMin} min</span>
                   </div>
-                  <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-violet-700 transition-colors flex-1">
+                  <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 group-hover:text-navy-700 transition-colors flex-1">
                     {article.title}
                   </h3>
                   <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-3">
@@ -125,7 +125,7 @@ export default function BlogPage() {
                     <time className="text-xs text-gray-400" dateTime={article.publishedAt}>
                       {formatDate(article.publishedAt, lang)}
                     </time>
-                    <span className="text-xs font-semibold text-violet-600 group-hover:translate-x-0.5 transition-transform">
+                    <span className="text-xs font-semibold text-navy-600 group-hover:translate-x-0.5 transition-transform">
                       {t("blog.readArticle")}
                     </span>
                   </div>

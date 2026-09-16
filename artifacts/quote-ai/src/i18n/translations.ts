@@ -140,6 +140,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     "assistant.open": "Open",
     "assistant.dismissed": "Dismissed",
     "assistant.failed": "Failed",
+    "assistant.includedInElite": "Included in Elite",
+    "assistant.online": "Online · works from your quotes, clients and price list",
+    "assistant.threadsTitle": "Threads",
+    "assistant.threadCompany": "Company assistant",
+    "assistant.threadJob": "This job",
+    "assistant.threadNew": "New conversation",
 
     // ── Phase 4: invoicing ──
     "jobs.tab.invoices": "Invoices",
@@ -3155,6 +3161,12 @@ export const translations: Record<Lang, Record<string, string>> = {
     "assistant.open": "Ouvrir",
     "assistant.dismissed": "Ignoré",
     "assistant.failed": "Échec",
+    "assistant.includedInElite": "Inclus dans Elite",
+    "assistant.online": "En ligne · s'appuie sur vos soumissions, clients et prix",
+    "assistant.threadsTitle": "Fils",
+    "assistant.threadCompany": "Assistant de l'entreprise",
+    "assistant.threadJob": "Ce chantier",
+    "assistant.threadNew": "Nouvelle conversation",
 
     // ── Phase 4: invoicing ──
     "jobs.tab.invoices": "Factures",

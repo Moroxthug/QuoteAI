@@ -1,10 +1,7 @@
-﻿import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, Send, Trash2, Check, X, ExternalLink, Receipt, Wallet, Flag, ListTodo, Mail, Banknote, Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -18,7 +15,7 @@ const KIND_ICON: Record<ProposalKind, typeof Receipt> = { cost_entry: Wallet, mi
  * null = the company-wide conversation. Writes only happen through proposal
  * cards the user confirms here.
  */
-export function AssistantPanel({ projectId, className, compact }: { projectId: string | null; className?: string; compact?: boolean }) {
+export function AssistantPanel({ projectId, className }: { projectId: string | null; className?: string }) {
   const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -80,6 +77,10 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
   const submit = () => { const c = draft.trim(); if (c && data && !send.isPending) send.mutate(c); };
   const suggestions = (projectId ? ["s1", "s2", "s3", "s4"] : ["c1", "c2", "c3", "c4"]).map((k) => t(`assistant.suggest.${k}`));
 
+  const lastAt = data?.messages.length ? data.messages[data.messages.length - 1]!.createdAt : null;
+  const threadLabel = projectId ? t("assistant.threadJob") : t("assistant.threadCompany");
+  const threadTime = lastAt ? new Date(lastAt).toLocaleDateString() : t("assistant.threadNew");
+
   if (gated) {
     return (
       <div className={cn("rounded-[var(--radius)] border border-navy-200 bg-navy-50 p-8 text-center", className)}>
@@ -92,51 +93,64 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
   }
 
   return (
-    <div className={cn("flex flex-col rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden", compact ? "h-[560px]" : "h-[calc(100dvh-220px)] min-h-[520px]", className)}>
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 bg-slate-50/60">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Sparkles className="h-4 w-4 text-navy-600" /> {t("assistant.title")}</div>
-        {data && data.messages.length > 0 && (
-          <button className="text-xs text-slate-400 hover:text-slate-700 inline-flex items-center gap-1" onClick={() => clear.mutate()} disabled={clear.isPending}><Trash2 className="h-3.5 w-3.5" /> {t("assistant.clear")}</button>
-        )}
+    <div className={cn("chat-grid", className)}>
+      <div className="card th-list">
+        <div className="card-head"><div><h2>{t("assistant.threadsTitle")}</h2></div></div>
+        <button type="button" className="th-row on">
+          <b>{threadLabel}</b>
+          <span>{threadTime}</span>
+        </button>
       </div>
 
-      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {isLoading && <div className="space-y-3"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-10 w-1/2 ml-auto" /></div>}
-        {data && visible.length === 0 && !pending && (
-          <div className="text-center py-6">
-            <Sparkles className="h-8 w-8 text-navy-200 mx-auto mb-2" />
-            <p className="text-sm text-slate-600 max-w-sm mx-auto">{projectId ? t("assistant.emptyJob") : t("assistant.emptyCompany")}</p>
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-              {suggestions.map((s) => <button key={s} onClick={() => send.mutate(s)} className="text-xs rounded-full border border-slate-200 px-3 py-1.5 text-slate-700 hover:border-navy-300 hover:bg-navy-50">{s}</button>)}
+      <div className="card">
+        <div className="chat-head">
+          <div className="chat-head-main">
+            <span className="chat-av"><Sparkles className="h-4 w-4" /></span>
+            <div><b>{t("assistant.title")}</b><small>{t("assistant.online")}</small></div>
+          </div>
+          {data && data.messages.length > 0 && (
+            <button type="button" className="chat-clear" onClick={() => clear.mutate()} disabled={clear.isPending}><Trash2 className="h-3.5 w-3.5" /> {t("assistant.clear")}</button>
+          )}
+        </div>
+
+        <div ref={listRef} className="chat-body">
+          {isLoading && (
+            <>
+              <div className="bubble ai typing"><i /><i /><i /></div>
+            </>
+          )}
+          {data && visible.length === 0 && !pending && (
+            <div className="bubble ai">{projectId ? t("assistant.emptyJob") : t("assistant.emptyCompany")}</div>
+          )}
+          {visible.map((m, idx) => (
+            <div key={m.id} className="contents">
+              {m.role === "assistant" && cardsFor(idx).map((p) => <ProposalCard key={p.id} proposal={p} onConfirm={() => confirm.mutate(p.id)} onDismiss={() => dismiss.mutate(p.id)} busy={confirm.isPending && confirm.variables === p.id} />)}
+              <Bubble message={m} />
             </div>
-          </div>
-        )}
-        {visible.map((m, idx) => (
-          <div key={m.id}>
-            {m.role === "assistant" && cardsFor(idx).map((p) => <ProposalCard key={p.id} proposal={p} onConfirm={() => confirm.mutate(p.id)} onDismiss={() => dismiss.mutate(p.id)} busy={confirm.isPending && confirm.variables === p.id} />)}
-            <Bubble message={m} />
-          </div>
-        ))}
-        {pending && <Bubble message={{ id: "pending", role: "user", content: pending, toolCalls: null, toolCallId: null, toolName: null, createdAt: "" }} />}
-        {send.isPending && (
-          <div className="flex items-center gap-2 text-xs text-slate-400"><Loader2 className="h-3.5 w-3.5 animate-spin" /> {t("assistant.thinking")}</div>
-        )}
-      </div>
+          ))}
+          {pending && <Bubble message={{ id: "pending", role: "user", content: pending, toolCalls: null, toolCallId: null, toolName: null, createdAt: "" }} />}
+          {send.isPending && <div className="bubble ai typing"><i /><i /><i /></div>}
+        </div>
 
-      <div className="border-t border-slate-100 p-3">
-        <div className="flex items-end gap-2">
-          <Textarea
+        {data && visible.length === 0 && !pending && (
+          <div className="chat-sug">
+            {suggestions.map((s) => <button key={s} type="button" className="pill" onClick={() => send.mutate(s)}>{s}</button>)}
+          </div>
+        )}
+
+        <div className="chat-in">
+          <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit(); } }}
             placeholder={t("assistant.placeholder")}
-            rows={1}
-            className="min-h-[40px] max-h-32 resize-none text-sm"
+            aria-label={t("assistant.placeholder")}
             disabled={!data || send.isPending}
           />
-          <Button size="icon" onClick={submit} disabled={!draft.trim() || !data || send.isPending} aria-label={t("assistant.send")}><Send className="h-4 w-4" /></Button>
+          <button type="button" className="comp-send" onClick={submit} disabled={!draft.trim() || !data || send.isPending} aria-label={t("assistant.send")}>
+            <Send className="chev" />
+          </button>
         </div>
-        <p className="text-[10px] text-slate-400 mt-1.5">{t("assistant.disclaimer")}</p>
       </div>
     </div>
   );
@@ -145,10 +159,8 @@ export function AssistantPanel({ projectId, className, compact }: { projectId: s
 function Bubble({ message }: { message: AssistantMessageDto }) {
   const mine = message.role === "user";
   return (
-    <div className={cn("flex", mine ? "justify-end" : "justify-start")}>
-      <div className={cn("max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed", mine ? "bg-navy-600 text-white rounded-br-md" : "bg-slate-100 text-slate-800 rounded-bl-md")}>
-        {mine ? <span className="whitespace-pre-wrap">{message.content}</span> : <Markdownish text={message.content} />}
-      </div>
+    <div className={cn("bubble", mine ? "user" : "ai")}>
+      {mine ? message.content : <Markdownish text={message.content} />}
     </div>
   );
 }
@@ -158,7 +170,7 @@ function Markdownish({ text }: { text: string }) {
   const blocks: ReactNode[] = [];
   const lines = text.replace(/\r/g, "").split("\n");
   let list: string[] = [];
-  const flush = () => { if (list.length) { blocks.push(<ul key={blocks.length} className="list-disc pl-4 space-y-0.5">{list.map((l, i) => <li key={i}>{inline(l)}</li>)}</ul>); list = []; } };
+  const flush = () => { if (list.length) { blocks.push(<ul key={blocks.length}>{list.map((l, i) => <li key={i}>{inline(l)}</li>)}</ul>); list = []; } };
   for (const raw of lines) {
     const line = raw.trim();
     const m = /^(?:[-*•]|\d+[.)])\s+(.*)$/.exec(line);
@@ -167,7 +179,7 @@ function Markdownish({ text }: { text: string }) {
     if (line) blocks.push(<p key={blocks.length}>{inline(line.replace(/^#+\s*/, ""))}</p>);
   }
   flush();
-  return <div className="space-y-1.5">{blocks}</div>;
+  return <>{blocks}</>;
 }
 
 function inline(s: string): ReactNode {
@@ -188,31 +200,33 @@ function ProposalCard({ proposal, onConfirm, onDismiss, busy }: { proposal: Prop
   const link = proposal.resultEntityType === "invoice" && proposal.resultEntityId ? `/dashboard/invoices/${proposal.resultEntityId}` : proposal.projectId ? `/dashboard/jobs/${proposal.projectId}?tab=${tab}` : null;
   const status = proposal.status;
   return (
-    <div className={cn("mb-2 max-w-[85%] rounded-xl border p-3 text-sm", status === "pending" ? "border-navy-200 bg-navy-50/60" : status === "confirmed" ? "border-emerald-200 bg-emerald-50/50" : status === "failed" ? "border-rose-200 bg-rose-50/50" : "border-slate-200 bg-slate-50 opacity-70")}>
-      <div className="flex items-start gap-2">
-        <span className="h-7 w-7 rounded-lg bg-card border border-slate-200 flex items-center justify-center shrink-0"><Icon className="h-3.5 w-3.5 text-navy-600" /></span>
+    <div className={cn("prop-card", status)}>
+      <div className="prop-head">
+        <span className="prop-ic"><Icon className="h-3.5 w-3.5" /></span>
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] uppercase tracking-wide text-slate-500 font-semibold">{t(`assistant.kind.${proposal.kind}`)}</div>
-          <div className="font-medium text-slate-900">{proposal.summary}</div>
-          {details.filter(Boolean).map((d, i) => <div key={i} className="text-xs text-slate-500 mt-0.5">{d}</div>)}
-          {status === "failed" && proposal.error && <div className="text-xs text-rose-700 mt-1 inline-flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {proposal.error}</div>}
+          <div className="prop-kind">{t(`assistant.kind.${proposal.kind}`)}</div>
+          <div className="prop-summary">{proposal.summary}</div>
+          {details.filter(Boolean).map((d, i) => <div key={i} className="prop-detail">{d}</div>)}
+          {status === "failed" && proposal.error && <div className="prop-detail" style={{ color: "var(--red)" }}><AlertTriangle className="h-3 w-3" style={{ display: "inline", marginRight: 4 }} />{proposal.error}</div>}
         </div>
       </div>
-      <div className="flex items-center gap-2 mt-2.5">
+      <div className="prop-actions">
         {status === "pending" && (
           <>
-            <Button size="sm" className="h-8 gap-1.5" onClick={onConfirm} disabled={busy}>{busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("assistant.confirm")}</Button>
-            <Button size="sm" variant="ghost" className="h-8 gap-1.5 text-slate-500" onClick={onDismiss} disabled={busy}><X className="h-3.5 w-3.5" /> {t("assistant.dismiss")}</Button>
+            <button type="button" className="btn btn-navy btn-sm" onClick={onConfirm} disabled={busy}>
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("assistant.confirm")}
+            </button>
+            <button type="button" className="prop-dismiss" onClick={onDismiss} disabled={busy}><X className="h-3.5 w-3.5" /> {t("assistant.dismiss")}</button>
           </>
         )}
         {status === "confirmed" && (
           <>
-            <span className="text-xs font-medium text-emerald-700 inline-flex items-center gap-1"><Check className="h-3.5 w-3.5" /> {t("assistant.confirmed")}</span>
-            {link && <Link href={link} className="text-xs text-navy-700 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3 w-3" /> {t("assistant.open")}</Link>}
+            <span className="prop-status ok"><Check className="h-3.5 w-3.5" /> {t("assistant.confirmed")}</span>
+            {link && <Link href={link} className="prop-dismiss"><ExternalLink className="h-3 w-3" /> {t("assistant.open")}</Link>}
           </>
         )}
-        {status === "dismissed" && <span className="text-xs text-slate-500">{t("assistant.dismissed")}</span>}
-        {status === "failed" && <span className="text-xs text-rose-600">{t("assistant.failed")}</span>}
+        {status === "dismissed" && <span className="prop-status muted">{t("assistant.dismissed")}</span>}
+        {status === "failed" && <span className="prop-status err">{t("assistant.failed")}</span>}
       </div>
     </div>
   );

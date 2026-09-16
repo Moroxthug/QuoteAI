@@ -3,6 +3,8 @@ import { Link, useLocation } from "wouter";
 import { ArrowRight, CheckCircle2, FileText, Zap, Lock, Star, Sparkles, Mic, ImagePlus, Check, X, Loader2, ChevronDown, Shield, Cpu, DollarSign, Hammer, Users, ListChecks, Building2 } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { TestimonialsSection } from "@/components/testimonials-section";
+import { RevealHeading } from "@/components/reveal-heading";
+import { StatsBar } from "@/components/stats-bar";
 import { useGetPlans, useCreateCheckoutSession } from "@workspace/api-client-react";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
@@ -131,9 +133,19 @@ export default function Home() {
             <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
                 {lang === "fr" ? (
-                  <>Créez des soumissions professionnelles<br />en <span className="gradient-text">30 secondes</span> avec l'IA</>
+                  <RevealHeading
+                    lines={[
+                      [{ text: "Créez" }, { text: "des" }, { text: "soumissions" }, { text: "professionnelles" }],
+                      [{ text: "en" }, { text: "30", gradient: true }, { text: "secondes", gradient: true }, { text: "avec" }, { text: "l'IA" }],
+                    ]}
+                  />
                 ) : (
-                  <>Create professional quotes<br />in <span className="gradient-text">30 seconds</span> with AI</>
+                  <RevealHeading
+                    lines={[
+                      [{ text: "Create" }, { text: "professional" }, { text: "quotes" }],
+                      [{ text: "in" }, { text: "30", gradient: true }, { text: "seconds", gradient: true }, { text: "with" }, { text: "AI" }],
+                    ]}
+                  />
                 )}
               </h1>
               <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
@@ -270,6 +282,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── SECTION 1BIS: Animated stats bar ──────────────────── */}
+      <StatsBar />
+
       {/* ── SECTION 2: Demo Video ─────────────────────────────── */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4 max-w-3xl">
@@ -298,7 +313,7 @@ export default function Home() {
       <ScrollSection className="py-0">
         <Link href="/whatsapp/">
           <div className="relative overflow-hidden cursor-pointer group" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 50%, #0a1628 100%)" }}>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "radial-gradient(ellipse, #7c3aed, transparent)" }} />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "radial-gradient(ellipse, var(--qa-navy), transparent)" }} />
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
               <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
@@ -318,7 +333,7 @@ export default function Home() {
                     </div>
                     <p className="text-white font-bold text-base sm:text-lg leading-snug">
                       {lang === "fr" ? "Créez des soumissions directement depuis" : "Create quotes directly from"}{" "}
-                      <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #25D366, #a78bfa)" }}>
+                      <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #25D366, var(--qa-teal))" }}>
                         WhatsApp
                       </span>
                     </p>
@@ -370,7 +385,7 @@ export default function Home() {
                     <div key={s.num} className="flex gap-4">
                       <div
                         className="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white"
-                        style={{ background: "linear-gradient(135deg, #7c3aed, #2563eb)" }}
+                        style={{ background: "linear-gradient(135deg, var(--grad-from), var(--grad-to))" }}
                       >
                         {s.num}
                       </div>
@@ -578,7 +593,7 @@ export default function Home() {
                     <div key={s.title} className="flex gap-4">
                       <div
                         className="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white"
-                        style={{ background: "linear-gradient(135deg, #7c3aed, #2563eb)" }}
+                        style={{ background: "linear-gradient(135deg, var(--grad-from), var(--grad-to))" }}
                       >
                         <s.icon className="h-4 w-4" />
                       </div>

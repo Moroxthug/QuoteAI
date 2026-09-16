@@ -1,14 +1,115 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Logo } from "@/components/logo";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
-import { X, Send, CheckCircle2, Menu, Globe } from "lucide-react";
+import { X, Send, CheckCircle2, Menu, Globe, ChevronDown, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath } from "@/data/seo-render-engine";
+import { getLanguageCounterpartPath, cityBasePath } from "@/data/seo-render-engine";
+import { SECTORS } from "@/data/seo-data";
+
+const MEGA_MENU_TRADE_SLUGS = [
+  "painter",
+  "electrician",
+  "plumber",
+  "general-contractor",
+  "renovation-contractor",
+  "roofer",
+  "landscaper",
+  "flooring-installer",
+];
+
+function TradesMegaMenu() {
+  const { t, lang } = useLanguage();
+  const base = cityBasePath(lang === "fr" ? "fr-CA" : "en-CA");
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDocClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+
+  const tradeLabels = TRADE_LABELS[lang];
+
+  return (
+    <div ref={containerRef} className="relative hidden lg:block">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full"
+        aria-expanded={open}
+      >
+        {t("nav.trades")}
+        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <div className="mega-menu-panel absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[560px] bg-white rounded-2xl border border-gray-100 shadow-2xl shadow-navy-200/30 overflow-hidden">
+          <div className="grid grid-cols-3 p-6 gap-6">
+            <div className="col-span-2">
+              <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                {t("nav.megamenu.popularTrades")}
+              </div>
+              <div className="grid grid-cols-2 gap-1">
+                {MEGA_MENU_TRADE_SLUGS.map((slug) => (
+                  <Link
+                    key={slug}
+                    href={`${base}/${lang === "fr" ? (SECTORS[slug]?.frSlug ?? slug) : slug}/`}
+                    onClick={() => setOpen(false)}
+                    className="text-sm text-gray-600 hover:text-navy-700 hover:bg-navy-50 rounded-lg px-2.5 py-1.5 transition-colors"
+                  >
+                    {tradeLabels[slug]}
+                  </Link>
+                ))}
+              </div>
+              <Link
+                href="/#pricing"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-navy-600 hover:text-navy-700 mt-3 px-2.5"
+              >
+                {t("nav.megamenu.viewAllTrades")}
+              </Link>
+            </div>
+
+            <div className="border-l border-gray-100 pl-6">
+              <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                {t("nav.megamenu.resources")}
+              </div>
+              <ul className="space-y-1.5 mb-4">
+                <li><Link href="/blog/" onClick={() => setOpen(false)} className="text-sm text-gray-600 hover:text-navy-700 transition-colors">{t("footer.blog")}</Link></li>
+                <li><Link href="/quotes/excel-template/" onClick={() => setOpen(false)} className="text-sm text-gray-600 hover:text-navy-700 transition-colors">{t("footer.excelTemplate")}</Link></li>
+                <li><Link href="/quotes/word-template/" onClick={() => setOpen(false)} className="text-sm text-gray-600 hover:text-navy-700 transition-colors">{t("footer.wordTemplate")}</Link></li>
+                <li><Link href="/quotes/how-to-quote/" onClick={() => setOpen(false)} className="text-sm text-gray-600 hover:text-navy-700 transition-colors">{t("footer.howToQuote")}</Link></li>
+              </ul>
+              <Link
+                href="/whatsapp/"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl bg-gray-50 hover:bg-navy-50 border border-gray-100 p-3 transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="h-6 w-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}>
+                    <MessageCircle className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="text-xs font-semibold text-gray-900">{t("nav.megamenu.whatsappTitle")}</span>
+                </div>
+                <p className="text-xs text-gray-500 leading-snug">{t("nav.megamenu.whatsappDesc")}</p>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function LanguageToggle({ className }: { className?: string }) {
   const { lang, toggleLang, t } = useLanguage();
@@ -42,6 +143,39 @@ function LanguageToggle({ className }: { className?: string }) {
   );
 }
 
+function MobileTradesAccordion({ onNavigate }: { onNavigate: (href: string) => void }) {
+  const { t, lang } = useLanguage();
+  const base = cityBasePath(lang === "fr" ? "fr-CA" : "en-CA");
+  const [open, setOpen] = useState(false);
+  const tradeLabels = TRADE_LABELS[lang];
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center justify-between w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        aria-expanded={open}
+      >
+        {t("nav.trades")}
+        <ChevronDown className={cn("h-4 w-4 text-gray-400 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div className="grid grid-cols-2 gap-1 px-4 pb-2">
+          {MEGA_MENU_TRADE_SLUGS.map((slug) => (
+            <button
+              key={slug}
+              onClick={() => onNavigate(`${base}/${lang === "fr" ? (SECTORS[slug]?.frSlug ?? slug) : slug}/`)}
+              className="text-left text-xs text-gray-500 hover:text-navy-700 py-1.5 px-2 rounded-lg hover:bg-navy-50 transition-colors"
+            >
+              {tradeLabels[slug]}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useAuth();
   const { t, lang } = useLanguage();
@@ -70,6 +204,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <Logo />
           </Link>
           <nav className="flex items-center gap-3">
+            <TradesMegaMenu />
             <Link
               href="/whatsapp/"
               className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full"
@@ -141,6 +276,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-3 py-4 flex-1">
+              <MobileTradesAccordion onNavigate={handleMobileNav} />
               <button
                 onClick={() => handleMobileNav("/whatsapp")}
                 className="flex items-center gap-2 w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"

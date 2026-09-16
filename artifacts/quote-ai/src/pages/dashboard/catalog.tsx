@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Download, Loader2, BookOpen, Tag, Ruler, Euro, X, Check, Import } from "lucide-react";
+import { Plus, Pencil, Trash2, Download, Loader2, BookOpen, Search, Check, Import } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -458,6 +456,14 @@ export default function CatalogPage() {
     return a.localeCompare(b);
   });
 
+  const sortedItems = [...items].sort((a, b) => {
+    const catA = a.categoria ?? noCategoryLabel, catB = b.categoria ?? noCategoryLabel;
+    return catA === catB ? a.nome.localeCompare(b.nome) : catA.localeCompare(catB);
+  });
+  const [search, setSearch] = useState("");
+  const q = search.trim().toLowerCase();
+  const visibleItems = q ? sortedItems.filter(i => i.nome.toLowerCase().includes(q) || (i.categoria ?? "").toLowerCase().includes(q)) : sortedItems;
+
   if (!isPro) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
@@ -474,141 +480,111 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+    <div className="animate-in fade-in duration-500">
+      <div className="page-head">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2"><BookOpen className="h-7 w-7 text-navy-500" />{t("dashboard.nav.catalog")}</h1>
-          <p className="text-slate-500 mt-1">
-            {t("dashboard.catalog.header.subtitle")}
-          </p>
+          <h1>{t("dashboard.nav.catalog")}</h1>
+          <p className="sub">{t("dashboard.catalog.header.subtitle")}</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={handleImport}
-            disabled={importFromQuotes.isPending}
-          >
-            {importFromQuotes.isPending
-              ? <Loader2 className="h-4 w-4 animate-spin" />
-              : <Download className="h-4 w-4" />}
+        <div className="head-actions">
+          <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleImport} disabled={importFromQuotes.isPending}>
+            {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             {t("dashboard.catalog.importFromQuotes")}
-          </Button>
-          <Button variant="outline" className="gap-2" onClick={() => setIsOcrOpen(true)}>
+          </button>
+          <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setIsOcrOpen(true)}>
             <Import className="h-4 w-4" />
             {t("dashboard.catalog.importFromPhotoPdf")}
-          </Button>
-          <Button className="gap-2" onClick={() => setIsCreateOpen(true)}>
+          </button>
+          <button type="button" className="btn btn-navy" onClick={() => setIsCreateOpen(true)}>
             <Plus className="h-4 w-4" />
             {t("dashboard.catalog.addItem")}
-          </Button>
+          </button>
         </div>
       </div>
 
-      {/* Content */}
       {isLoading ? (
         <div className="space-y-3">
           {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
         </div>
       ) : items.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-            <BookOpen className="h-10 w-10 text-muted-foreground" />
-            <div>
-              <p className="font-medium text-foreground">{t("dashboard.catalog.empty.title")}</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {t("dashboard.catalog.empty.desc")}
-              </p>
-            </div>
-            <div className="flex gap-2 mt-2">
-              <Button variant="outline" className="gap-2" onClick={handleImport} disabled={importFromQuotes.isPending}>
-                {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                {t("dashboard.catalog.importFromQuotes")}
-              </Button>
-              <Button variant="outline" className="gap-2" onClick={() => setIsOcrOpen(true)}>
-                <Import className="h-4 w-4" />
-                {t("dashboard.catalog.importFromPhotoPdf")}
-              </Button>
-              <Button className="gap-2" onClick={() => setIsCreateOpen(true)}>
-                <Plus className="h-4 w-4" />
-                {t("dashboard.catalog.addItem")}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="card" style={{ padding: "40px 22px", textAlign: "center" }}>
+          <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+          <p className="font-medium text-foreground">{t("dashboard.catalog.empty.title")}</p>
+          <p className="text-sm text-muted-foreground mt-1 mb-4">{t("dashboard.catalog.empty.desc")}</p>
+          <div className="flex gap-2 justify-center flex-wrap">
+            <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleImport} disabled={importFromQuotes.isPending}>
+              {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              {t("dashboard.catalog.importFromQuotes")}
+            </button>
+            <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setIsOcrOpen(true)}>
+              <Import className="h-4 w-4" />
+              {t("dashboard.catalog.importFromPhotoPdf")}
+            </button>
+            <button type="button" className="btn btn-navy" onClick={() => setIsCreateOpen(true)}>
+              <Plus className="h-4 w-4" />
+              {t("dashboard.catalog.addItem")}
+            </button>
+          </div>
+        </div>
       ) : (
-        <div className="space-y-6">
-          {/* Summary bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{items.length}</div>
-              <div className="text-sm text-muted-foreground">{t("dashboard.catalog.summary.totalItems")}</div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-2xl font-bold">{categories.filter(c => c !== noCategoryLabel).length}</div>
-              <div className="text-sm text-muted-foreground">{t("dashboard.catalog.summary.categories")}</div>
-            </Card>
-            <Card className="p-4 col-span-2 sm:col-span-1">
-              <div className="text-2xl font-bold">
-                {formatCurrency(items.reduce((s, i) => s + i.prezzoUnitario, 0) / items.length)}
-              </div>
-              <div className="text-sm text-muted-foreground">{t("dashboard.catalog.summary.avgPrice")}</div>
-            </Card>
+        <>
+          <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+            <div className="card stat-card">
+              <p className="lbl">{t("dashboard.catalog.summary.totalItems")}</p>
+              <p className="val">{items.length}</p>
+            </div>
+            <div className="card stat-card">
+              <p className="lbl">{t("dashboard.catalog.summary.categories")}</p>
+              <p className="val">{categories.filter(c => c !== noCategoryLabel).length}</p>
+            </div>
+            <div className="card stat-card">
+              <p className="lbl">{t("dashboard.catalog.summary.avgPrice")}</p>
+              <p className="val">{formatCurrency(items.reduce((s, i) => s + i.prezzoUnitario, 0) / items.length)}</p>
+            </div>
           </div>
 
-          {/* Items by category */}
-          {categories.map(cat => (
-            <Card key={cat}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Tag className="h-4 w-4 text-navy-500" />
-                  {cat}
-                  <Badge variant="secondary" className="ml-auto">{groupedByCategory[cat].length}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y">
-                  {groupedByCategory[cat].map(item => (
-                    <div key={item.id} className="flex items-center gap-3 px-6 py-3 hover:bg-accent transition-colors group">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{item.nome}</div>
-                        {item.note && <div className="text-xs text-muted-foreground truncate">{item.note}</div>}
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant="outline" className="text-xs font-mono">
-                          <Ruler className="h-3 w-3 mr-1 opacity-60" />
-                          {item.um}
-                        </Badge>
-                        <span className="text-sm font-semibold text-green-700 min-w-[80px] text-right">
-                          {formatCurrency(item.prezzoUnitario)}
-                        </span>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                            onClick={() => setEditingItem(item)}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => setDeletingId(item.id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
+          <div className="card" style={{ marginTop: 16 }}>
+            <div className="toolbar">
+              <label className="search sm grow">
+                <Search className="h-4 w-4" />
+                <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("dashboard.catalog.searchPlaceholder")} aria-label={t("dashboard.catalog.searchPlaceholder")} />
+              </label>
+            </div>
+            <div className="tbl-wrap">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>{t("dashboard.catalog.col.item")}</th>
+                    <th>{t("dashboard.catalog.col.category")}</th>
+                    <th>{t("dashboard.catalog.col.unit")}</th>
+                    <th style={{ textAlign: "right" }}>{t("dashboard.catalog.col.unitPrice")}</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleItems.map(item => (
+                    <tr key={item.id} className="group">
+                      <td>
+                        <span className="t-strong">{item.nome}</span>
+                        {item.note && <span className="t-sub">{item.note}</span>}
+                      </td>
+                      <td>{item.categoria || noCategoryLabel}</td>
+                      <td>{item.um}</td>
+                      <td className="t-amt" style={{ textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</td>
+                      <td>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingItem(item)}><Pencil className="h-3.5 w-3.5" /></Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setDeletingId(item.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
                         </div>
-                      </div>
-                    </div>
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </tbody>
+              </table>
+            </div>
+            <div className="card-foot"><span className="foot-note">{t("dashboard.catalog.itemCount").replace("{count}", String(visibleItems.length))}</span></div>
+          </div>
+        </>
       )}
 
       {/* Create dialog */}

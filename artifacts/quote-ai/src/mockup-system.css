@@ -331,3 +331,22 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
    ========================================================== */
 .pbar { height: 6px; width: 110px; background: var(--soft-2); border-radius: 99px; overflow: hidden; flex: none; }
 .pbar i { display: block; height: 100%; border-radius: 99px; background: var(--green); }
+
+/* ==========================================================
+   INVOICES / ANALYTICS / PRICE LIST (Phase 43) — tall bars,
+   horizontal breakdown bars, two-up split grid, small search.
+   ========================================================== */
+.search.sm { width: 230px; padding: 8px 14px; flex: none; }
+.bars.tall { height: 210px; gap: 10px; }
+.bars.tall + .bar-x { gap: 10px; }
+.hbar-row { padding: 14px 22px; border-top: 1px solid var(--soft); }
+.hbar-row:first-of-type { border-top: none; }
+.hbar-top { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.hbar-top span { color: var(--muted-mk); font-weight: 600; font-size: 13px; }
+.hbar { height: 8px; background: var(--soft-2); border-radius: 99px; overflow: hidden; }
+.hbar i { display: block; height: 100%; border-radius: 99px; background: var(--navy); }
+.split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+
+@media (max-width: 980px) {
+  .split-2 { grid-template-columns: 1fr; }
+}

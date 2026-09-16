@@ -142,7 +142,7 @@ function TwoFactorCard() {
         ) : step === "verify" ? (
           <div className="space-y-4">
             {totpUri && (
-              <div className="text-sm text-muted-foreground break-all bg-muted border border-border rounded-xl p-3">
+              <div className="text-sm text-muted-foreground break-all bg-muted border border-border rounded-[var(--radius-sm)] p-3">
                 {t("dashboard.settings.security.scanInstructions")}
                 <div className="mt-2 font-mono text-xs">{totpUri}</div>
               </div>
@@ -161,7 +161,7 @@ function TwoFactorCard() {
           <div className="space-y-3">
             <p className="text-sm text-green-700 font-medium">{t("dashboard.settings.security.twoFactorEnabled")}</p>
             <p className="text-sm text-muted-foreground">{t("dashboard.settings.security.backupCodesHint")}</p>
-            <div className="grid grid-cols-2 gap-2 bg-muted border border-border rounded-xl p-4 font-mono text-sm">
+            <div className="grid grid-cols-2 gap-2 bg-muted border border-border rounded-[var(--radius-sm)] p-4 font-mono text-sm">
               {backupCodes.map((code) => <span key={code}>{code}</span>)}
             </div>
             <Button
@@ -212,7 +212,7 @@ function SessionsCard() {
     }
   }
 
-  if (isLoading) return <Skeleton className="h-32 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-32 w-full rounded-[var(--radius)]" />;
 
   return (
     <Card>
@@ -225,7 +225,7 @@ function SessionsCard() {
       </CardHeader>
       <CardContent className="space-y-3">
         {(sessions ?? []).map((s) => (
-          <div key={s.token} className="flex items-center justify-between border border-border rounded-xl px-4 py-3">
+          <div key={s.token} className="flex items-center justify-between border border-border rounded-[var(--radius-sm)] px-4 py-3">
             <div className="text-sm">
               <div className="font-medium text-foreground">{s.userAgent || t("dashboard.settings.security.unknownDevice")}</div>
               <div className="text-muted-foreground text-xs">{s.ipAddress || "—"} · {s.token === session?.session.token ? t("dashboard.settings.security.currentSession") : new Date(s.createdAt).toLocaleString()}</div>
@@ -246,7 +246,7 @@ function AuditLogCard() {
   const { t, lang } = useLanguage();
   const { data, isLoading } = useQuery({ queryKey: ["security-audit-log"], queryFn: securityApi.auditLog });
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
 
   return (
     <Card>

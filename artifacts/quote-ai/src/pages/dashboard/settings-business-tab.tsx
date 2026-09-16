@@ -135,8 +135,8 @@ export function BusinessTab() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-48 w-full rounded-xl" />
-        <Skeleton className="h-32 w-full rounded-xl" />
+        <Skeleton className="h-48 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
       </div>
     );
   }
@@ -229,7 +229,7 @@ export function BusinessTab() {
             <Input id="homeStarsProfileUrl" type="url" value={homeStarsProfileUrl} onChange={(e) => setHomeStarsProfileUrl(e.target.value)} placeholder="https://homestars.com/companies/..." />
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.homeStarsProfileUrlHint")}</p>
           </div>
-          <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+          <div className="flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
             <div>
               <div className="text-sm font-medium">{t("dashboard.settings.business.sendReviewRequests")}</div>
               <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.sendReviewRequestsHint")}</div>
@@ -261,7 +261,7 @@ export function BusinessTab() {
           <CardDescription>{t("dashboard.settings.business.automationDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between rounded-lg border px-4 py-3">
+          <div className="flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
             <div>
               <div className="text-sm font-medium">{t("dashboard.settings.business.notifyAccepted")}</div>
               <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.notifyAcceptedHint")}</div>
@@ -270,7 +270,7 @@ export function BusinessTab() {
           </div>
 
           {/* Phase 4: invoice automation */}
-          <div className="mt-3 flex items-center justify-between rounded-lg border px-4 py-3">
+          <div className="mt-3 flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
             <div>
               <div className="text-sm font-medium">{t("dashboard.settings.business.autoSendInvoices")}</div>
               <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.autoSendInvoicesHint")}</div>
@@ -278,7 +278,7 @@ export function BusinessTab() {
             <Switch checked={autoSendInvoices} onCheckedChange={setAutoSendInvoices} />
           </div>
           {!autoSendInvoices && (
-            <div className="mt-3 flex items-center justify-between gap-4 rounded-lg border px-4 py-3">
+            <div className="mt-3 flex items-center justify-between gap-4 rounded-[var(--radius-sm)] border px-4 py-3">
               <div>
                 <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReviewWindow")}</div>
                 <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceReviewWindowHint")}</div>
@@ -291,7 +291,7 @@ export function BusinessTab() {
               </select>
             </div>
           )}
-          <div className="mt-3 flex items-center justify-between rounded-lg border px-4 py-3">
+          <div className="mt-3 flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
             <div>
               <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReminders")}</div>
               <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceRemindersHint")}</div>

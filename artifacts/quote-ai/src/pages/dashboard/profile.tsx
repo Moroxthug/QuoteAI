@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
@@ -155,8 +155,8 @@ export default function ProfileSettings() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("dashboard.profile.title")}</h1>
-        <p className="text-muted-foreground mt-1">{t("dashboard.profile.subtitle")}</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2"><User className="h-7 w-7 text-navy-500" />{t("dashboard.profile.title")}</h1>
+        <p className="text-slate-500 mt-1">{t("dashboard.profile.subtitle")}</p>
       </div>
 
       {/* Logo Upload Card — hidden for Starter, replaced with upgrade prompt */}
@@ -205,7 +205,7 @@ export default function ProfileSettings() {
           <CardContent>
             <div className="flex items-center gap-6">
               {/* Logo preview */}
-              <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
+              <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-[var(--radius-sm)] flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
                 {currentLogoUrl ? (
                   <img
                     src={currentLogoUrl}

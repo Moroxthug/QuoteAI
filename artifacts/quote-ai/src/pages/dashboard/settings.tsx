@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
@@ -152,8 +152,8 @@ function AccountTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-64 w-full rounded-[var(--radius)]" />
       </div>
     );
   }
@@ -195,7 +195,7 @@ function AccountTab() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6">
-              <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
+              <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-[var(--radius-sm)] flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
                 {currentLogoUrl ? (
                   <img src={currentLogoUrl} alt={t("dashboard.profile.logo.altText")} className="max-h-full max-w-full object-contain p-1" />
                 ) : (
@@ -317,7 +317,7 @@ function AccountTab() {
                 <FormLabel className="text-xs font-bold text-muted-foreground block uppercase tracking-wider">{t("dashboard.settings.account.widgetCard.embedCodeLabel")}</FormLabel>
                 <p className="text-xs text-muted-foreground">{t("dashboard.settings.account.widgetCard.embedCodeDesc")}</p>
                 <div className="relative">
-                  <pre className="p-4 bg-slate-950 text-slate-200 rounded-xl overflow-x-auto font-mono text-[10px] leading-relaxed max-h-40 whitespace-pre-wrap select-all border border-slate-800">
+                  <pre className="p-4 bg-slate-950 text-slate-200 rounded-[var(--radius)] overflow-x-auto font-mono text-[10px] leading-relaxed max-h-40 whitespace-pre-wrap select-all border border-slate-800">
 {`<!-- QuoteAI Widget Funnel -->
 <div id="quoteai-widget">
   <a href="https://quoteai.ca" rel="noopener">${t("dashboard.settings.account.widgetCard.embedAnchorText")}</a>
@@ -343,7 +343,7 @@ function AccountTab() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-6 border border-dashed rounded-xl bg-muted/10 space-y-3">
+            <div className="text-center py-6 border border-dashed rounded-[var(--radius)] bg-muted/10 space-y-3">
               <p className="text-sm text-muted-foreground">{t("dashboard.settings.account.widgetCard.noApiKeyDesc")}</p>
               <Button onClick={handleGenerateApiKey} disabled={generatingKey}>
                 {generatingKey ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
@@ -436,7 +436,7 @@ function BillingTab() {
     }
   };
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   const isStarter = sub?.plan === "monthly_starter";
   const isPro = sub?.plan === "monthly_pro";
   const isElite = sub?.plan === "monthly_elite";
@@ -454,7 +454,7 @@ function BillingTab() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${isElite ? "bg-amber-200" : isPro ? "bg-amber-100" : "bg-navy-100"}`}>
+                <div className={`h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center ${isElite ? "bg-amber-200" : isPro ? "bg-amber-100" : "bg-navy-100"}`}>
                   {isElite ? <Crown className="h-6 w-6 text-amber-700" /> : isPro ? <Crown className="h-6 w-6 text-amber-600" /> : <Zap className="h-6 w-6 text-navy-500" />}
                 </div>
                 <div>
@@ -469,18 +469,18 @@ function BillingTab() {
           </CardHeader>
           <CardContent className="space-y-5">
             {isStarter && sub.quotaUsed != null && sub.quotaLimit != null && (
-              <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
+              <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-navy-100">
                 <div className="flex items-center gap-2 mb-3"><BarChart3 className="h-4 w-4 text-navy-500" /><span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span></div>
                 <QuotaBar used={sub.quotaUsed} limit={sub.quotaLimit} />
                 {resetDate && <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1"><RefreshCw className="h-3 w-3" />{t("dashboard.billing.quotaResetsOn").replace("{date}", resetDate)}</p>}
                 {(sub.quotaRemaining ?? 0) <= 3 && (sub.quotaRemaining ?? 0) > 0 && (
-                  <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                  <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-[var(--radius-sm)] p-2.5">
                     <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />{t("dashboard.settings.billing.almostOutShort")}
                   </div>
                 )}
               </div>
             )}
-            <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
+            <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-navy-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isElite ? (
@@ -516,7 +516,7 @@ function BillingTab() {
             <CardHeader>
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center"><XCircle className="h-5 w-5 text-muted-foreground" /></div>
+                  <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-muted flex items-center justify-center"><XCircle className="h-5 w-5 text-muted-foreground" /></div>
                   <div><CardTitle>{t("dashboard.billing.noActiveSubTitle")}</CardTitle><CardDescription className="mt-0.5">{t("dashboard.settings.billing.noActiveSubDesc")}</CardDescription></div>
                 </div>
                 <Button variant="outline" size="sm" onClick={handleSync} disabled={isSyncing} className="gap-2 shrink-0">
@@ -614,7 +614,7 @@ function WhatsappUpsellCard() {
       <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-navy-500" />
             </div>
             <div>
@@ -632,7 +632,7 @@ function WhatsappUpsellCard() {
               { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsappUpsell.voice.desc") },
               { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
-              <div key={item.label} className="bg-card/70 rounded-xl p-3 text-center border border-navy-100">
+              <div key={item.label} className="bg-card/70 rounded-[var(--radius)] p-3 text-center border border-navy-100">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
@@ -745,7 +745,7 @@ function WhatsappTab() {
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   const hasWhatsappAccess = isPro || isElite;
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
 
   if (!hasWhatsappAccess) return <WhatsappUpsellCard />;
 
@@ -756,7 +756,7 @@ function WhatsappTab() {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                   <MessageCircle className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
@@ -782,7 +782,7 @@ function WhatsappTab() {
           </CardHeader>
           <CardContent className="space-y-4">
             {usage != null && usage.limit != null && (
-              <div className="bg-card/70 rounded-xl p-4 border border-emerald-100">
+              <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-emerald-100">
                 <div className="flex items-center gap-2 mb-3">
                   <BarChart3 className="h-4 w-4 text-emerald-600" />
                   <span className="text-sm font-semibold">{t("dashboard.settings.whatsapp.usageThisMonth")}</span>
@@ -806,20 +806,20 @@ function WhatsappTab() {
                   </div>
                 </div>
                 {usage.used >= usage.limit && (
-                  <div className="mt-3 flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2.5">
+                  <div className="mt-3 flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-[var(--radius-sm)] p-2.5">
                     <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                     {t("dashboard.settings.whatsapp.limitReached")}
                   </div>
                 )}
                 {usage.used < usage.limit && usage.limit - usage.used <= 5 && (
-                  <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                  <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-[var(--radius-sm)] p-2.5">
                     <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                     {t("dashboard.settings.whatsapp.almostOut")}
                   </div>
                 )}
               </div>
             )}
-            <div className="bg-card/70 rounded-xl p-4 border border-emerald-100 text-sm text-muted-foreground space-y-1.5">
+            <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-emerald-100 text-sm text-muted-foreground space-y-1.5">
               <p className="font-semibold text-foreground mb-2">{t("dashboard.settings.whatsapp.howToUseTitle")}</p>
               <p>{t("dashboard.settings.whatsapp.howToUse1")}</p>
               <p>{t("dashboard.settings.whatsapp.howToUse2")}</p>
@@ -859,7 +859,7 @@ function WhatsappTab() {
       <Card className="border-navy-200">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-navy-600" />
             </div>
             <div>
@@ -871,7 +871,7 @@ function WhatsappTab() {
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 rounded-xl p-4 text-sm text-navy-700 dark:text-navy-300 space-y-1">
+          <div className="bg-navy-50 dark:bg-navy-500/15 border border-navy-200 dark:border-navy-800/40 rounded-[var(--radius)] p-4 text-sm text-navy-700 dark:text-navy-300 space-y-1">
             <p className="font-semibold">{t("dashboard.settings.whatsapp.checkPhone")}</p>
             <p className="text-navy-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
           </div>
@@ -925,7 +925,7 @@ function WhatsappTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-muted flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-muted flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
@@ -941,7 +941,7 @@ function WhatsappTab() {
               { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsapp.connect.voice.desc") },
               { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
-              <div key={item.label} className="bg-muted rounded-xl p-3 text-center">
+              <div key={item.label} className="bg-muted rounded-[var(--radius)] p-3 text-center">
                 <div className="text-2xl mb-1">{item.icon}</div>
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
@@ -950,8 +950,8 @@ function WhatsappTab() {
           </div>
 
           {status?.businessNumber && (
-            <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-              <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+            <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-[var(--radius)] p-4">
+              <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center shrink-0">
                 <MessageCircle className="h-5 w-5 text-emerald-600" />
               </div>
               <div className="flex-1 min-w-0">
@@ -1023,7 +1023,7 @@ function QuickbooksUpsellCard() {
     <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+          <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
             <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
@@ -1074,7 +1074,7 @@ function QuickbooksMappingCard() {
     );
   };
 
-  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   return (
     <Card>
@@ -1221,7 +1221,7 @@ function QuickbooksTab() {
     );
   };
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   if (!isElite) return <QuickbooksUpsellCard />;
 
   if (!isConnected) {
@@ -1229,7 +1229,7 @@ function QuickbooksTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
@@ -1254,7 +1254,7 @@ function QuickbooksTab() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                 <Building2 className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
@@ -1313,7 +1313,7 @@ function WaveUpsellCard() {
     <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+          <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
             <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
@@ -1372,7 +1372,7 @@ function WaveMappingCard() {
     );
   };
 
-  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   return (
     <Card>
@@ -1532,7 +1532,7 @@ function WaveTab() {
     );
   };
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   if (!isElite) return <WaveUpsellCard />;
 
   if (!isConnected) {
@@ -1540,7 +1540,7 @@ function WaveTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
@@ -1565,7 +1565,7 @@ function WaveTab() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                 <Building2 className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
@@ -1613,7 +1613,7 @@ function StripeConnectTab() {
 
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   const connected = status?.connected ?? false;
   const chargesEnabled = status?.chargesEnabled ?? false;
@@ -1622,7 +1622,7 @@ function StripeConnectTab() {
     <Card className={connected && chargesEnabled ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50" : undefined}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-navy-100")}>
+          <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-navy-100")}>
             <CreditCard className={cn("h-6 w-6", connected && chargesEnabled ? "text-emerald-600" : "text-navy-500")} />
           </div>
           <div>
@@ -1676,7 +1676,7 @@ function FinanceitTab() {
 
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   const connected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
@@ -1685,7 +1685,7 @@ function FinanceitTab() {
     <Card className={connected && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-navy-100")}>
+          <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-navy-100")}>
             <Landmark className={cn("h-6 w-6", connected && isEnabled ? "text-amber-600" : "text-navy-500")} />
           </div>
           <div>
@@ -1768,7 +1768,7 @@ function FlinksConnectDialog({ open, onOpenChange, onConnected }: { open: boolea
           <DialogTitle>{t("dashboard.settings.flinks.connectTitle")}</DialogTitle>
           <DialogDescription>{t("dashboard.settings.flinks.connectDialogDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="flex-1 rounded-lg overflow-hidden border border-border bg-muted/30">
+        <div className="flex-1 rounded-[var(--radius-sm)] overflow-hidden border border-border bg-muted/30">
           {isLoading || !connectUrlData?.url ? (
             <div className="h-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
           ) : (
@@ -1794,7 +1794,7 @@ function FlinksAccountPicker({ accounts, onPick, isPending }: { accounts: Flinks
           type="button"
           disabled={isPending}
           onClick={() => onPick(a)}
-          className="w-full text-left px-3 py-2 rounded-lg border border-border hover:border-amber-300 hover:bg-amber-50 transition-colors text-sm flex items-center justify-between disabled:opacity-50"
+          className="w-full text-left px-3 py-2 rounded-[var(--radius-sm)] border border-border hover:border-amber-300 hover:bg-amber-50 transition-colors text-sm flex items-center justify-between disabled:opacity-50"
         >
           <span>{a.name}{a.last4 ? ` ••••${a.last4}` : ""}</span>
           <span className="text-xs text-muted-foreground">{a.institution}</span>
@@ -1833,7 +1833,7 @@ function FlinksTransactionsCard() {
     onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
   });
 
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
   const transactions = data?.transactions ?? [];
   if (transactions.length === 0) {
     return (
@@ -1850,7 +1850,7 @@ function FlinksTransactionsCard() {
       </CardHeader>
       <CardContent className="space-y-2">
         {transactions.map((tx) => (
-          <div key={tx.id} className="border border-border rounded-lg p-3 space-y-2">
+          <div key={tx.id} className="border border-border rounded-[var(--radius-sm)] p-3 space-y-2">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <p className="text-sm font-medium">{tx.description || t("dashboard.settings.flinks.unlabeledTransaction")}</p>
@@ -1950,7 +1950,7 @@ function FlinksTab() {
 
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   const connected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
@@ -1961,7 +1961,7 @@ function FlinksTab() {
       <Card className={connected && hasAccount && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-navy-100")}>
+            <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-navy-100")}>
               <Banknote className={cn("h-6 w-6", connected && hasAccount ? "text-amber-600" : "text-navy-500")} />
             </div>
             <div>
@@ -2087,7 +2087,7 @@ function MetaLeadAdsTab() {
 
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   const connected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
@@ -2103,7 +2103,7 @@ function MetaLeadAdsTab() {
       <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
+            <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
               <Megaphone className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
@@ -2212,7 +2212,7 @@ function GoogleLsaTab() {
 
   const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   const connected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
@@ -2222,7 +2222,7 @@ function GoogleLsaTab() {
       <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className={cn("h-11 w-11 rounded-xl flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
+            <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
               <Search className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
@@ -2340,7 +2340,7 @@ function DeveloperApiTab() {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-xl flex items-center justify-center bg-slate-100">
+          <div className="h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center bg-slate-100">
             <KeyRound className="h-6 w-6 text-slate-600" />
           </div>
           <div>
@@ -2354,7 +2354,7 @@ function DeveloperApiTab() {
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground">{t("dashboard.settings.developerApi.apiKeys")}</h4>
           {revealedKey && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+            <div className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.keyRevealWarning")}</p>
               <div className="flex items-center gap-2">
                 <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedKey}</code>
@@ -2365,10 +2365,10 @@ function DeveloperApiTab() {
               <Button size="sm" variant="ghost" onClick={() => setRevealedKey(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
             </div>
           )}
-          {keysLoading ? <Skeleton className="h-16 w-full rounded-lg" /> : (
+          {keysLoading ? <Skeleton className="h-16 w-full rounded-[var(--radius-sm)]" /> : (
             <div className="space-y-2">
               {keys.filter(k => !k.revokedAt).map((k) => (
-                <div key={k.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
+                <div key={k.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border p-2.5">
                   <div>
                     <p className="text-sm font-medium">{k.name}</p>
                     <p className="text-xs text-muted-foreground">{k.keyPrefix}••••••••• · {k.role}</p>
@@ -2393,7 +2393,7 @@ function DeveloperApiTab() {
         <div className="space-y-3 border-t pt-4">
           <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h4>
           {revealedSecret && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 space-y-2">
+            <div className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.secretRevealWarning")}</p>
               <div className="flex items-center gap-2">
                 <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedSecret}</code>
@@ -2404,10 +2404,10 @@ function DeveloperApiTab() {
               <Button size="sm" variant="ghost" onClick={() => setRevealedSecret(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
             </div>
           )}
-          {webhooksLoading ? <Skeleton className="h-16 w-full rounded-lg" /> : (
+          {webhooksLoading ? <Skeleton className="h-16 w-full rounded-[var(--radius-sm)]" /> : (
             <div className="space-y-2">
               {webhooks.map((w) => (
-                <div key={w.id} className="flex items-center justify-between gap-3 rounded-lg border p-2.5">
+                <div key={w.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border p-2.5">
                   <div>
                     <p className="text-sm font-medium break-all">{w.url}</p>
                     <p className="text-xs text-muted-foreground">{w.events.join(", ")}</p>
@@ -2486,14 +2486,14 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
     );
   };
 
-  if (isLoading) return <Skeleton className="h-32 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-32 w-full rounded-[var(--radius)]" />;
 
   if (!isConnected) {
     return (
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-sky-100 flex items-center justify-center">
               <CalendarDays className="h-5 w-5 text-sky-600" />
             </div>
             <CardTitle className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</CardTitle>
@@ -2514,7 +2514,7 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-sky-100 flex items-center justify-center">
               <CalendarDays className="h-5 w-5 text-sky-600" />
             </div>
             <div>
@@ -2602,14 +2602,14 @@ function EmailConnectionCard() {
     );
   };
 
-  if (isLoading) return <Skeleton className="h-32 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-32 w-full rounded-[var(--radius)]" />;
 
   if (!isConnected) {
     return (
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-rose-100 flex items-center justify-center">
               <Mail className="h-5 w-5 text-rose-600" />
             </div>
             <CardTitle className="text-base">Gmail</CardTitle>
@@ -2630,7 +2630,7 @@ function EmailConnectionCard() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-rose-100 flex items-center justify-center">
               <Mail className="h-5 w-5 text-rose-600" />
             </div>
             <div>
@@ -2721,8 +2721,8 @@ function WidgetTab() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-64 w-full rounded-[var(--radius)]" />
       </div>
     );
   }
@@ -2744,7 +2744,7 @@ function WidgetTab() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-xl bg-navy-100 flex items-center justify-center">
+            <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <Zap className="h-6 w-6 text-navy-600" />
             </div>
             <div>
@@ -2785,7 +2785,7 @@ function WidgetTab() {
                 </Button>
               </div>
             ) : (
-              <div className="bg-muted rounded-xl p-4 text-center border border-dashed border-border">
+              <div className="bg-muted rounded-[var(--radius)] p-4 text-center border border-dashed border-border">
                 <p className="text-sm text-muted-foreground mb-3">{t("dashboard.settings.widget.noKeyDesc")}</p>
                 <Button
                   onClick={handleGenerateKey}
@@ -2806,7 +2806,7 @@ function WidgetTab() {
                 {t("dashboard.settings.widget.step2Desc")}
               </p>
               <div className="relative">
-                <pre className="p-4 bg-gray-900 text-gray-100 rounded-xl overflow-x-auto font-mono text-xs leading-relaxed max-h-48 whitespace-pre-wrap">
+                <pre className="p-4 bg-gray-900 text-gray-100 rounded-[var(--radius)] overflow-x-auto font-mono text-xs leading-relaxed max-h-48 whitespace-pre-wrap">
                   {embedCode}
                 </pre>
                 <Button
@@ -2852,7 +2852,7 @@ function UsageTab() {
   const { t } = useLanguage();
   const { data, isLoading } = useQuery({ queryKey: ["usage-summary"], queryFn: usageApi.summary });
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-2xl" />;
+  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   if (!data) return null;
 
   return (
@@ -2896,18 +2896,18 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("dashboard.settings.title")}</h1>
-        <p className="text-muted-foreground mt-1">{t("dashboard.settings.subtitle")}</p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2"><SettingsIcon className="h-7 w-7 text-navy-500" />{t("dashboard.settings.title")}</h1>
+        <p className="text-slate-500 mt-1">{t("dashboard.settings.subtitle")}</p>
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-muted rounded-full w-fit">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "px-4 py-2 text-sm font-medium rounded-lg transition-all",
+              "px-4 py-2 text-sm font-medium rounded-full transition-all",
               activeTab === tab.id
                 ? "bg-card text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"

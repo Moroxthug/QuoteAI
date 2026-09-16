@@ -316,7 +316,7 @@ function OcrImportDialog({
             <p className="text-sm text-muted-foreground">
               {t("dashboard.catalog.ocr.foundItemsDesc").replace("{count}", String(previewItems.length))}
             </p>
-            <div className="max-h-80 overflow-y-auto space-y-1 border rounded-lg divide-y">
+            <div className="max-h-80 overflow-y-auto space-y-1 border rounded-[var(--radius-sm)] divide-y">
               {previewItems.map((it, i) => (
                 <div key={i} className="flex items-center gap-2 px-3 py-2">
                   <input
@@ -478,8 +478,8 @@ export default function CatalogPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.nav.catalog")}</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2"><BookOpen className="h-7 w-7 text-navy-500" />{t("dashboard.nav.catalog")}</h1>
+          <p className="text-slate-500 mt-1">
             {t("dashboard.catalog.header.subtitle")}
           </p>
         </div>

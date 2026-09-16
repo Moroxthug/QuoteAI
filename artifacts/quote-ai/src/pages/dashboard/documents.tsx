@@ -89,9 +89,9 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
   const lavorazioni = (doc.extractedData as { lavorazioni?: Array<{ tipo: string; prezzoUnitario: number; um?: string | null; zona?: string | null }> } | null)?.lavorazioni ?? [];
 
   return (
-    <div className="border border-border rounded-xl p-4 bg-card hover:shadow-sm transition-shadow">
+    <div className="border border-border rounded-[var(--radius)] p-4 bg-card hover:shadow-sm transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="h-9 w-9 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0">
+        <div className="h-9 w-9 rounded-[var(--radius-sm)] bg-muted border border-border flex items-center justify-center shrink-0">
           {isPdf ? (
             <FileText className="h-4 w-4 text-red-500" />
           ) : isDocx ? (
@@ -132,7 +132,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
           )}
 
           {expanded && lavorazioni.length > 0 && (
-            <div className="mt-2 rounded-lg bg-muted border border-border overflow-hidden">
+            <div className="mt-2 rounded-[var(--radius-sm)] bg-muted border border-border overflow-hidden">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="border-b border-border bg-muted/60">
@@ -209,7 +209,7 @@ function PriceAlerts() {
       </CardHeader>
       <CardContent className="px-5 pb-4 space-y-2">
         {alerts.map((alert) => (
-          <div key={alert.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-100 bg-card p-3">
+          <div key={alert.id} className="flex items-center justify-between gap-3 rounded-[var(--radius-sm)] border border-amber-100 bg-card p-3">
             <div className="flex items-center gap-2 min-w-0">
               {alert.direction === "up" ? (
                 <TrendingUp className="h-4 w-4 text-red-500 shrink-0" />
@@ -259,7 +259,7 @@ function PriceComparison() {
         {comparisons.map((group) => {
           const cheapest = group.vendors[0];
           return (
-            <div key={`${group.workType}::${group.zone ?? ""}`} className="rounded-lg border border-border p-3">
+            <div key={`${group.workType}::${group.zone ?? ""}`} className="rounded-[var(--radius-sm)] border border-border p-3">
               <p className="text-xs font-semibold text-foreground">
                 {group.workType}
                 {group.zone && <span className="text-muted-foreground font-normal"> — {group.zone}</span>}
@@ -333,8 +333,8 @@ export default function DocumentsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Quote Archive</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2"><FolderOpen className="h-7 w-7 text-navy-500" />Quote Archive</h1>
+        <p className="text-slate-500 mt-1 text-sm">
           Upload existing quotes to extract your market prices and improve AI estimates.
         </p>
       </div>
@@ -345,7 +345,7 @@ export default function DocumentsPage() {
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         className={cn(
-          "border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer",
+          "border-2 border-dashed rounded-[var(--radius)] p-8 text-center transition-colors cursor-pointer",
           isDragging ? "border-navy-400 bg-navy-50 dark:bg-navy-500/15" : "border-border bg-muted/50 hover:border-navy-300 hover:bg-navy-50/30 dark:hover:bg-navy-500/10"
         )}
         onClick={() => fileInputRef.current?.click()}
@@ -362,7 +362,7 @@ export default function DocumentsPage() {
           {uploadMut.isPending ? (
             <Loader2 className="h-8 w-8 text-navy-400 animate-spin" />
           ) : (
-            <div className="h-12 w-12 rounded-xl bg-navy-100 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <Upload className="h-5 w-5 text-navy-600" />
             </div>
           )}
@@ -385,7 +385,7 @@ export default function DocumentsPage() {
         )}>
           <CardContent className="py-4 px-5 flex items-center gap-3">
             <div className={cn(
-              "h-9 w-9 rounded-lg flex items-center justify-center shrink-0",
+              "h-9 w-9 rounded-[var(--radius-sm)] flex items-center justify-center shrink-0",
               hasEnoughForIntelligence ? "bg-navy-100" : "bg-amber-100"
             )}>
               <TrendingUp className={cn("h-4 w-4", hasEnoughForIntelligence ? "text-navy-600" : "text-amber-600")} />
@@ -427,7 +427,7 @@ export default function DocumentsPage() {
           <CardContent className="px-5 pb-4">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {priceSummary.items.slice(0, 12).map((item) => (
-                <div key={item.workType} className="rounded-lg border border-border bg-muted/50 p-3">
+                <div key={item.workType} className="rounded-[var(--radius-sm)] border border-border bg-muted/50 p-3">
                   <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{item.workType}</p>
                   <p className="text-lg font-bold text-navy-700 mt-1">
                     {formatCurrency(item.avgUnitPrice)}

@@ -159,8 +159,8 @@ export default function OnboardingPage() {
             <>
               {/* Welcome header */}
               <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15))" }}>
+                <div className="mx-auto h-16 w-16 rounded-[var(--radius)] flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Building2 className="h-8 w-8 text-navy-500" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("onboarding.title")}</h1>
@@ -169,12 +169,12 @@ export default function OnboardingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+              <div className="bg-white rounded-[var(--radius)] border border-gray-100 shadow-sm p-6 space-y-5">
                 {/* Logo upload */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">{t("onboarding.companyLogo")} <span className="text-gray-400 font-normal">({t("onboarding.optional")})</span></Label>
                   <div className="flex items-center gap-4">
-                    <div className="w-20 h-14 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden shrink-0">
+                    <div className="w-20 h-14 border-2 border-dashed border-gray-200 rounded-[var(--radius-sm)] flex items-center justify-center bg-gray-50 overflow-hidden shrink-0">
                       {logoPreview ? (
                         <img src={logoPreview} alt="Logo" className="max-h-full max-w-full object-contain p-1" />
                       ) : (
@@ -258,8 +258,8 @@ export default function OnboardingPage() {
             <>
               {/* Step 2 header */}
               <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.15))" }}>
+                <div className="mx-auto h-16 w-16 rounded-[var(--radius)] flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <MapPin className="h-8 w-8 text-navy-500" />
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">{t("onboarding.step2Title")}</h1>
@@ -268,7 +268,7 @@ export default function OnboardingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+              <div className="bg-white rounded-[var(--radius)] border border-gray-100 shadow-sm p-6 space-y-5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="province" className="text-sm font-medium">{t("onboarding.province")}</Label>

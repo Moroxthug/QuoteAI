@@ -16,6 +16,7 @@ import {
   RefreshCw,
   XCircle,
   Loader2,
+  CreditCard as CreditCardIcon,
 } from "lucide-react";
 
 
@@ -70,8 +71,8 @@ export default function BillingPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
       </div>
     );
   }
@@ -110,8 +111,8 @@ export default function BillingPage() {
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.billing.title")}</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-2"><CreditCardIcon className="h-7 w-7 text-navy-500" />{t("dashboard.billing.title")}</h1>
+        <p className="text-slate-500 mt-1">
           {t("dashboard.billing.subtitle")}
         </p>
       </div>
@@ -125,7 +126,7 @@ export default function BillingPage() {
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-11 w-11 rounded-xl flex items-center justify-center ${isPro ? "bg-amber-100" : "bg-navy-100"}`}
+                  className={`h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center ${isPro ? "bg-amber-100" : "bg-navy-100"}`}
                 >
                   {isPro ? (
                     <Crown className="h-6 w-6 text-amber-600" />
@@ -154,7 +155,7 @@ export default function BillingPage() {
             {isStarter &&
               sub.quotaUsed != null &&
               sub.quotaLimit != null && (
-                <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
+                <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-navy-100">
                   <div className="flex items-center gap-2 mb-3">
                     <BarChart3 className="h-4 w-4 text-navy-500" />
                     <span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span>
@@ -170,13 +171,13 @@ export default function BillingPage() {
                     </p>
                   )}
                   {(sub.quotaRemaining ?? 0) <= 3 && (sub.quotaRemaining ?? 0) > 0 && (
-                    <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                    <div className="mt-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-[var(--radius-sm)] p-2.5">
                       <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                       {t("dashboard.billing.almostOutWarning")}
                     </div>
                   )}
                   {(sub.quotaRemaining ?? 0) === 0 && (
-                    <div className="mt-3 flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2.5">
+                    <div className="mt-3 flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-[var(--radius-sm)] p-2.5">
                       <XCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
                       {t("dashboard.billing.quotaExhausted")}
                     </div>
@@ -185,7 +186,7 @@ export default function BillingPage() {
               )}
 
             {/* Plan features */}
-            <div className="bg-card/70 rounded-xl p-4 border border-navy-100">
+            <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-navy-100">
               <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
               <ul className="space-y-2">
                 {isPro ? (
@@ -249,7 +250,7 @@ export default function BillingPage() {
         <Card className="border-dashed">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
+              <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-muted flex items-center justify-center">
                 <XCircle className="h-5 w-5 text-muted-foreground" />
               </div>
               <div>

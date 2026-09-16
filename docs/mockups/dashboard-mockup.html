@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuoteAI — Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ========== QUOTEAI WORKSPACE — Intuit-style system ========== */
+:root{
+  --navy:#101031; --navy-hover:#24244a;
+  --ink:#393a3d; --muted:#6b6c72; --faint:#8f9198;
+  --line:#dfe1e6; --soft:#f4f5f7; --soft-2:#eceef2;
+  --green:#2ca01c; --green-dark:#1f7d12; --green-t:#e9f6e6;
+  --purple:#6c2bd9; --purple-t:#eeecfc;
+  --teal:#0f97a2; --teal-dark:#0b7c86; --teal-t:#e3f5f4;
+  --yellow:#ffe01b; --yellow-t:#fdf6c9; --yellow-dark:#7a5c00;
+  --red:#d9480f; --red-t:#fdeee5;
+  --radius:18px;
+  --font:'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --shadow-card:0 14px 34px rgba(16,16,49,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);font-size:16px;line-height:1.55;color:var(--ink);background:var(--soft);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;background:none;border:none;cursor:pointer;color:inherit}
+input,select,textarea{font-family:inherit}
+ul{list-style:none}
+h1,h2,h3{color:var(--navy);font-weight:700;letter-spacing:-.015em;line-height:1.2}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:6px}
+svg.ic{width:19px;height:19px;flex:none}
+.chev{width:.7em;height:.7em}
+
+.cta-link{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14.5px;color:var(--navy)}
+.cta-link .chev{transition:transform .3s var(--ease)}
+.cta-link:hover .chev{transform:translateX(4px)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:999px;padding:12px 24px;font-size:15px;font-weight:700;line-height:1;transition:background .25s,color .25s,transform .25s var(--ease);white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:var(--navy-hover)}
+.btn-white{background:#fff;color:var(--navy)}.btn-white:hover{background:#eceef2}
+.btn-outline-navy{border:2px solid var(--navy);color:var(--navy)}.btn-outline-navy:hover{background:var(--soft-2)}
+.btn-sm{padding:9px 18px;font-size:13.5px}
+.chip{display:inline-flex;align-items:center;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip-green{background:var(--green-t);color:var(--green-dark)}
+.chip-teal{background:var(--teal-t);color:var(--teal-dark)}
+.chip-yellow{background:var(--yellow-t);color:var(--yellow-dark)}
+.chip-grey{background:var(--soft-2);color:var(--muted)}
+.chip-red{background:var(--red-t);color:var(--red)}
+.chip-purple{background:var(--purple-t);color:var(--purple)}
+
+/* ========== FRAME ========== */
+.app{display:flex;min-height:100vh}
+.sidebar{width:266px;flex:none;background:var(--navy);color:#b7b9cc;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;overflow-x:hidden;transition:width .35s var(--ease);z-index:70;scrollbar-width:thin;scrollbar-color:#3a3a5e transparent}
+.sidebar::-webkit-scrollbar{width:6px}.sidebar::-webkit-scrollbar-thumb{background:#3a3a5e;border-radius:3px}
+.sb-top{display:flex;align-items:center;gap:10px;padding:20px 18px 14px}
+.sb-mark{display:none;width:36px;height:36px;border-radius:11px;background:#fff;color:var(--navy);font-weight:800;font-size:19px;align-items:center;justify-content:center;flex:none}
+.sb-word{font-size:23px;font-weight:800;letter-spacing:-.03em;color:#fff}
+.sb-collapse{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;color:#fff;transition:background .2s,transform .35s var(--ease)}
+.sb-collapse:hover{background:rgba(255,255,255,.12)}
+.sb-collapse .chev{width:12px;height:12px}
+.sb-new{margin:6px 14px 14px}
+.sb-group{margin:16px 26px 6px;font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#6f7191}
+.sb-link{display:flex;align-items:center;gap:12px;margin:2px 12px;padding:10px 12px;border-radius:10px;font-size:14.5px;font-weight:600;color:#b7b9cc;transition:background .2s,color .2s}
+.sb-link svg.ic{opacity:.9}
+.sb-link:hover{background:rgba(255,255,255,.08);color:#fff}
+.sb-link.active{background:rgba(255,255,255,.14);color:#fff}
+.sb-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge-pro{font-size:10px;font-weight:800;letter-spacing:.08em;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:2px 8px;color:#b7b9cc;flex:none}
+.sb-link.active .badge-pro,.sb-link:hover .badge-pro{color:#fff;border-color:rgba(255,255,255,.5)}
+.sb-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.14);padding:12px 0 16px}
+.count-chip{margin-left:auto;background:#fff;color:var(--navy);font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px;flex:none}
+.sb-user{display:flex;align-items:center;gap:11px;margin:10px 14px 0;padding:10px;border-radius:12px;background:rgba(255,255,255,.07)}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--navy);font-size:13px;font-weight:800;display:grid;place-items:center;flex:none}
+.sb-userinfo b{display:block;color:#fff;font-size:13.5px;line-height:1.25}
+.sb-userinfo span{font-size:12px;color:#8f91a6;font-weight:600}
+.app.rail .sidebar{width:80px}
+.app.rail .sb-word,.app.rail .sb-txt,.app.rail .badge-pro,.app.rail .sb-group,.app.rail .sb-userinfo,.app.rail .count-chip,.app.rail .sb-new .btn-txt{display:none}
+.app.rail .sb-top{flex-direction:column;gap:12px;padding:18px 10px 10px}
+.app.rail .sb-mark{display:flex}
+.app.rail .sb-collapse{margin-left:0;transform:rotate(180deg)}
+.app.rail .sb-new{margin:4px 12px 12px;padding:12px}
+.app.rail .sb-link{justify-content:center;padding:11px 0;margin:2px 14px}
+.app.rail .sb-user{justify-content:center;padding:8px}
+.scrim{position:fixed;inset:0;background:rgba(16,16,49,.5);opacity:0;visibility:hidden;transition:opacity .3s;z-index:65}
+.scrim.show{opacity:1;visibility:visible}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* topbar */
+.topbar{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line);height:64px;display:flex;align-items:center;gap:14px;padding:0 clamp(18px,3vw,36px)}
+.tb-menu{display:none;width:40px;height:40px;place-items:center;border-radius:10px;color:var(--navy)}
+.tb-menu:hover{background:var(--soft)}
+.search{display:flex;align-items:center;gap:10px;background:var(--soft);border:1px solid transparent;border-radius:999px;padding:9px 16px;width:min(380px,42vw);color:var(--faint);transition:background .25s,border-color .25s}
+.search:focus-within{background:#fff;border-color:var(--line);color:var(--navy)}
+.search input{border:none;outline:none;background:transparent;flex:1;font-size:14.5px;color:var(--ink);min-width:0}
+.search input::placeholder{color:var(--faint)}
+.search.sm{width:230px;padding:8px 14px;flex:none}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.tb-support{font-size:14.5px;font-weight:700;color:var(--navy)}
+.tb-support:hover{text-decoration:underline;text-underline-offset:3px}
+.bell-wrap{position:relative}
+.bell{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--navy);position:relative}
+.bell:hover{background:var(--soft)}
+.bell .dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--green);border:2px solid #fff}
+.bell .dot.clear{display:none}
+.pop{position:absolute;right:0;top:calc(100% + 10px);width:330px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-card);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .25s,transform .3s var(--ease),visibility .3s;overflow:hidden;z-index:60}
+.pop.open{opacity:1;visibility:visible;transform:none}
+.pop h3{font-size:14.5px;padding:16px 18px 12px;border-bottom:1px solid var(--soft)}
+.pop-row{padding:14px 18px;border-bottom:1px solid var(--soft)}
+.pop-row b{display:block;font-size:14px;color:var(--navy)}
+.pop-row span{font-size:12.5px;color:var(--faint);font-weight:600}
+.pop-row p{font-size:13px;color:var(--muted);margin-top:3px}
+.pop-foot{padding:12px 18px}
+.tb-avatar{width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;font-size:13.5px;font-weight:800;display:grid;place-items:center}
+
+/* content + views */
+.content{padding:clamp(20px,3vw,34px);max-width:1460px;width:100%;margin-inline:auto}
+.view{display:none}
+.view.active{display:block;animation:viewIn .45s var(--ease)}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+.page-head h1{font-size:clamp(1.5rem,2.4vw,1.85rem);font-weight:800}
+.page-head .sub{color:var(--muted);font-size:14.5px;font-weight:600;margin-top:5px}
+.head-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.card + .card,.card + .stack,.stack + .card{margin-top:16px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px;border-bottom:1px solid var(--soft);flex-wrap:wrap}
+.card-head h2{font-size:17px;font-weight:700}
+.card-head .sub{font-size:13px;color:var(--faint);font-weight:600;margin-top:2px}
+.card-foot{padding:14px 22px;border-top:1px solid var(--soft);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.foot-note{font-size:13px;color:var(--faint);font-weight:600}
+
+/* stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-grid + *{margin-top:16px}
+.stat-card{padding:20px 22px}
+.stat-card .lbl{font-size:13px;font-weight:600;color:var(--muted)}
+.stat-card .val{font-size:clamp(1.5rem,2.2vw,1.9rem);font-weight:800;letter-spacing:-.02em;color:var(--navy);margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.stat-card .delta{font-size:12.5px;font-weight:700;color:var(--green-dark)}
+.stat-card .delta.flat{color:var(--muted)}
+.stat-card .delta.neg{color:var(--red)}
+
+/* toolbar + pills */
+.toolbar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--soft);flex-wrap:wrap}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font-size:13.5px;font-weight:700;color:var(--muted);transition:all .25s}
+.pill:hover{border-color:var(--navy);color:var(--navy)}
+.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.toolbar .grow{margin-left:auto}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.tbl th{text-align:left;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:700;padding:12px 22px;border-bottom:1px solid var(--soft);white-space:nowrap}
+.tbl td{padding:14px 22px;border-top:1px solid var(--soft);vertical-align:middle;font-weight:600;white-space:nowrap}
+.tbl tbody tr:first-child td{border-top:none}
+.tbl tbody tr{transition:background .2s}
+.tbl tbody tr:hover{background:#fafbfc}
+.tbl tbody tr.hide{display:none}
+.t-strong{color:var(--navy);font-weight:700}
+.t-sub{display:block;font-size:12.5px;color:var(--faint);font-weight:600;margin-top:1px}
+.t-amt{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.cell-ic{width:34px;height:34px;border-radius:9px;background:var(--soft);display:grid;place-items:center;color:var(--navy)}
+.avat{width:34px;height:34px;border-radius:50%;background:var(--soft-2);color:var(--navy);font-size:12px;font-weight:800;display:grid;place-items:center;flex:none}
+.cell-flex{display:flex;align-items:center;gap:12px}
+.pbar{height:6px;width:110px;background:var(--soft-2);border-radius:99px;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:99px;background:var(--green)}
+
+/* segmented (pricing component) */
+.seg{position:relative;display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg-b{position:relative;z-index:1;padding:8px 18px;font-size:13.5px;font-weight:700;border-radius:999px;color:var(--muted);transition:color .3s}
+.seg-thumb{position:absolute;top:4px;left:4px;width:calc(33.333% - 3px);height:calc(100% - 8px);background:var(--navy);border-radius:999px;transition:transform .35s var(--ease)}
+.seg[data-period="q"] .seg-thumb{transform:translateX(100%)}
+.seg[data-period="y"] .seg-thumb{transform:translateX(200%)}
+.seg[data-period="m"] .seg-b:nth-child(1),.seg[data-period="q"] .seg-b:nth-child(2),.seg[data-period="y"] .seg-b:nth-child(3){color:#fff}
+
+/* dashboard pieces */
+.composer{overflow:hidden}
+.comp-row{display:flex;align-items:center;gap:13px;padding:16px 20px}
+.comp-ic{width:38px;height:38px;border-radius:10px;background:var(--soft);color:var(--navy);display:grid;place-items:center;flex:none}
+.comp-row input{flex:1;border:none;outline:none;font-size:15.5px;color:var(--ink);min-width:0}
+.comp-row input::placeholder{color:var(--faint)}
+.comp-mic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--muted);flex:none}
+.comp-mic:hover{background:var(--soft);color:var(--navy)}
+.comp-send{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;flex:none;transition:background .25s,transform .25s var(--ease)}
+.comp-send:hover{background:var(--navy-hover)}
+.comp-send .chev{width:16px;height:16px}
+.comp-client{border-top:1px solid var(--soft);display:flex;align-items:center;gap:12px;width:100%;padding:13px 20px;font-size:14.5px;font-weight:600;color:var(--muted);text-align:left;transition:background .2s}
+.comp-client:hover{background:var(--soft)}
+.comp-client svg.ic{color:var(--faint)}
+.comp-client .opt{margin-left:auto;display:flex;align-items:center;gap:7px;color:var(--faint);font-size:13px;font-weight:600}
+.comp-client .opt .chev{width:11px;height:11px}
+.prog{height:3px;background:var(--soft-2);opacity:0;transition:opacity .2s}
+.prog i{display:block;height:100%;width:0;background:var(--green)}
+.composer.busy .prog{opacity:1}
+.comp-status{display:none;padding:0 20px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.composer.busy .comp-status{display:block}
+.comp-row.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.mid-grid{display:grid;grid-template-columns:1.85fr 1fr;gap:16px;margin-top:16px}
+.q-row{display:flex;align-items:center;gap:14px;padding:15px 22px;border-top:1px solid var(--soft);transition:background .2s;cursor:pointer}
+.q-row:first-of-type{border-top:none}
+.q-row:hover{background:#fafbfc}
+.q-ic{width:38px;height:38px;border-radius:10px;background:var(--soft);color:var(--navy);display:grid;place-items:center;flex:none}
+.q-body{min-width:0;flex:1}
+.q-title{font-size:15px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.q-meta{display:flex;align-items:center;gap:9px;margin-top:4px}
+.q-date{font-size:12.5px;color:var(--faint);font-weight:600}
+.q-amt{font-size:15.5px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.q-row>.chev{width:13px;height:13px;color:var(--faint)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:118px;margin-top:6px}
+.bars.tall{height:210px;gap:10px}
+.bar{flex:1;background:#d9ecd4;border-radius:4px 4px 0 0;height:0;transition:height .9s var(--ease);transition-delay:var(--d,0s)}
+.bar.hot{background:var(--green)}
+.loaded .bar{height:var(--h)}
+.bar-x{display:flex;gap:8px;margin-top:8px}
+.bar-x span{flex:1;text-align:center;font-size:11px;font-weight:600;color:var(--faint)}
+.bars.tall + .bar-x{gap:10px}
+.act-body{padding:20px 22px 18px}
+.fu-row{display:flex;align-items:center;gap:12px;padding:13px 22px;border-top:1px solid var(--soft)}
+.fu-row:first-of-type{border-top:none}
+.fu-row b{display:block;font-size:14px;color:var(--navy)}
+.fu-row span{font-size:12.5px;color:var(--faint);font-weight:600}
+.fu-row .chip{margin-left:auto;flex:none}
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.qa{display:flex;align-items:center;gap:14px;padding:18px 20px;transition:transform .3s var(--ease),box-shadow .3s;text-align:left;width:100%}
+.qa:hover{transform:translateY(-3px);box-shadow:var(--shadow-card)}
+.qa-ic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:none}
+.qa-ic.green{background:var(--green-t);color:var(--green-dark)}
+.qa-ic.navy{background:var(--soft-2);color:var(--navy)}
+.qa-ic.teal{background:var(--teal-t);color:var(--teal-dark)}
+.qa b{font-size:15px;font-weight:700;color:var(--navy)}
+.qa span{display:block;font-size:12.5px;color:var(--faint);font-weight:600;margin-top:1px}
+.qa .chev{margin-left:auto;width:13px;height:13px;color:var(--faint)}
+
+/* kanban */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.kan-col{background:var(--soft-2);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.kan-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 2px}
+.kan-head b{font-size:13px;font-weight:800;color:var(--navy);letter-spacing:.02em}
+.kan-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;transition:transform .25s var(--ease),box-shadow .25s;cursor:pointer}
+.kan-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-card)}
+.kan-card b{display:block;font-size:14px;color:var(--navy)}
+.kan-card .ksub{font-size:12.5px;color:var(--faint);font-weight:600;margin:2px 0 10px}
+.kan-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kan-foot .t-amt{font-size:13.5px}
+
+/* assistant */
+.chat-grid{display:grid;grid-template-columns:270px 1fr;gap:16px;align-items:start}
+.th-list .th-row{display:flex;flex-direction:column;gap:2px;padding:14px 20px;border-top:1px solid var(--soft);cursor:pointer;transition:background .2s}
+.th-list .th-row:first-child{border-top:none}
+.th-list .th-row:hover{background:#fafbfc}
+.th-list .th-row.on{background:var(--soft)}
+.th-row b{font-size:14px;color:var(--navy)}
+.th-row span{font-size:12.5px;color:var(--faint);font-weight:600}
+.chat-head{display:flex;align-items:center;gap:11px;padding:16px 22px;border-bottom:1px solid var(--soft)}
+.chat-av{width:36px;height:36px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center}
+.chat-head b{font-size:15px}
+.chat-head small{display:block;font-size:12.5px;color:var(--faint);font-weight:600}
+.chat-body{padding:22px;display:flex;flex-direction:column;gap:12px;min-height:380px;max-height:480px;overflow-y:auto}
+.bubble{max-width:82%;border-radius:16px;padding:12px 16px;font-size:14.5px;line-height:1.55}
+.bubble.user{align-self:flex-end;background:var(--navy);color:#fff;border-bottom-right-radius:5px}
+.bubble.ai{align-self:flex-start;background:var(--soft);border-bottom-left-radius:5px}
+.bubble.typing{display:flex;gap:5px;align-items:center}
+.bubble.typing i{width:6px;height:6px;border-radius:50%;background:var(--faint);animation:tp 1s infinite}
+.bubble.typing i:nth-child(2){animation-delay:.15s}.bubble.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{50%{opacity:.3;transform:translateY(-3px)}}
+.chat-sug{display:flex;gap:8px;flex-wrap:wrap;padding:0 22px 14px}
+.chat-in{display:flex;gap:10px;align-items:center;padding:14px 22px;border-top:1px solid var(--soft)}
+.chat-in input{flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 18px;font-size:14.5px;outline:none;transition:border-color .2s,box-shadow .2s}
+.chat-in input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,16,49,.08)}
+
+/* analytics extras */
+.hbar-row{padding:14px 22px;border-top:1px solid var(--soft)}
+.hbar-row:first-of-type{border-top:none}
+.hbar-top{display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.hbar-top span{color:var(--muted);font-weight:600;font-size:13px}
+.hbar{height:8px;background:var(--soft-2);border-radius:99px;overflow:hidden}
+.hbar i{display:block;height:100%;border-radius:99px;background:var(--navy)}
+.split-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+
+/* forms / settings */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:22px}
+.form-grid .full{grid-column:1/-1}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14.5px;color:var(--ink);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(16,16,49,.08)}
+.set-row{display:flex;align-items:center;gap:16px;padding:16px 22px;border-top:1px solid var(--soft)}
+.set-row:first-of-type{border-top:none}
+.set-row .txt{flex:1}
+.set-row b{display:block;font-size:14.5px;color:var(--navy)}
+.set-row span{font-size:13px;color:var(--muted);font-weight:600}
+.tgl{width:40px;height:23px;border-radius:99px;background:var(--soft-2);position:relative;flex:none;transition:background .25s}
+.tgl::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .25s var(--ease)}
+.tgl.on{background:var(--green)}
+.tgl.on::after{transform:translateX(17px)}
+.logo-drop{display:flex;align-items:center;gap:16px;padding:22px}
+.logo-tile{width:64px;height:64px;border-radius:14px;background:var(--navy);color:#fff;font-weight:800;font-size:26px;display:grid;place-items:center;letter-spacing:-.03em}
+
+/* import */
+.steps-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step-card{padding:22px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center;margin-bottom:14px}
+.step-card b{display:block;font-size:15px;color:var(--navy);margin-bottom:5px}
+.step-card p{font-size:13.5px;color:var(--muted)}
+.src-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:22px}
+.src{border:1.5px solid var(--line);border-radius:14px;padding:18px;text-align:left;transition:border-color .25s,background .25s,transform .25s var(--ease)}
+.src:hover{transform:translateY(-3px)}
+.src b{display:block;font-size:15px;color:var(--navy)}
+.src p{font-size:13px;color:var(--muted);margin:4px 0 10px}
+.src.on{border-color:var(--navy);background:var(--soft)}
+.dropzone{margin:0 22px 22px;border:2px dashed var(--line);border-radius:16px;padding:38px 24px;text-align:center;transition:border-color .25s,background .25s}
+.dropzone:hover{border-color:var(--navy);background:var(--soft)}
+.dropzone b{display:block;font-size:15px;color:var(--navy);margin-bottom:4px}
+.dropzone p{font-size:13.5px;color:var(--muted);margin-bottom:16px}
+
+/* notifications view */
+.n-row{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-top:1px solid var(--soft)}
+.n-row:first-of-type{border-top:none}
+.n-row.unread{background:#fafbfc}
+.n-dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:none}
+.n-dot.green{background:var(--green)}.n-dot.teal{background:var(--teal)}.n-dot.yellow{background:var(--yellow)}.n-dot.grey{background:var(--line)}
+.n-row b{display:block;font-size:14.5px;color:var(--navy)}
+.n-row p{font-size:13.5px;color:var(--muted);margin-top:2px}
+.n-time{margin-left:auto;font-size:12.5px;color:var(--faint);font-weight:600;white-space:nowrap}
+
+/* toast */
+.toast{position:fixed;right:24px;bottom:24px;z-index:90;background:var(--navy);color:#fff;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 20px 44px rgba(16,16,49,.3);opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .3s,transform .4s var(--ease),visibility .4s;max-width:400px}
+.toast.show{opacity:1;visibility:visible;transform:none}
+.toast p{font-size:14px;font-weight:600}
+.toast .cta-link{color:#fff;font-size:14px;flex:none}
+
+/* responsive */
+@media (max-width:1180px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .mid-grid,.split-2,.chat-grid{grid-template-columns:1fr}
+  .kanban{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:980px){
+  .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .35s var(--ease);width:280px!important}
+  .sidebar.open{transform:none;box-shadow:0 0 60px rgba(16,16,49,.4)}
+  .app.rail .sidebar .sb-word,.app.rail .sidebar .sb-txt,.app.rail .sidebar .sb-group,.app.rail .sidebar .sb-userinfo,.app.rail .sidebar .badge-pro,.app.rail .sidebar .count-chip{display:revert}
+  .app.rail .sb-top{flex-direction:row}
+  .app.rail .sb-mark{display:none}
+  .app.rail .sb-collapse{margin-left:auto;transform:none}
+  .app.rail .sb-link{justify-content:flex-start;padding:10px 12px;margin:2px 12px}
+  .app.rail .sb-new .btn-txt{display:revert}
+  .sb-collapse{display:none}
+  .tb-menu{display:grid}
+  .tb-support{display:none}
+  .qa-grid,.steps-3,.src-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .stat-grid{grid-template-columns:1fr}
+  .search{display:none}
+  .kanban{grid-template-columns:1fr}
+  .head-actions .btn{width:100%;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  .loaded .bar{height:var(--h)}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="chev-r" viewBox="0 0 16 16"><path d="M5.5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="chev-d" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3.5h7l4 4v13h-11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 12h5M9.5 15.5h5M9.5 8.5h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.2 19.3c.8-2.9 3.1-4.5 5.8-4.5s5 1.6 5.8 4.5M15.4 5.9a3.2 3.2 0 010 5.4M17.6 15c1.9.6 3 2 3.6 4.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-contract" viewBox="0 0 24 24"><path d="M6.5 3.5h7l4 4v13h-11z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 9h5M9.5 15.5c.9-.8 1.6.8 2.5 0s1.6.7 2.5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-case" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 7.5V6a2 2 0 012-2h2a2 2 0 012 2v1.5M3.5 12.5h17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 15.5v3.6l4-3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M6 20v-8M11 20V5M16 20v-5M21 20v-10M3.5 20h17.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="4.3" cy="6.5" r="1.1" fill="currentColor"/><circle cx="4.3" cy="12" r="1.1" fill="currentColor"/><circle cx="4.3" cy="17.5" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-1.8-1.3-1.9 1.3-1.8-1.3-1.8 1.3-1.9-1.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 8.5h5M9.5 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="4.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 9v10.5h13V9M10 13h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4v10M8 10.5l4 4 4-4M4.5 19.5h15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5v2.6M12 17.9v2.6M3.5 12h2.6M17.9 12h2.6M6 6l1.8 1.8M16.2 16.2L18 18M18 6l-1.8 1.8M7.8 16.2L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 4a5.5 5.5 0 015.5 5.5c0 3.4.9 5 1.8 6H4.7c.9-1 1.8-2.6 1.8-6A5.5 5.5 0 0112 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 18.5a2.2 2.2 0 004 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9.2" y="3.5" width="5.6" height="9" rx="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M6 11.5a6 6 0 0012 0M12 17.5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.9"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M4.5 12h14M13 6.5l5.5 5.5-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 19.5c.9-3.2 3.4-5 6.5-5s5.6 1.8 6.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 7.5h2M13 7.5h2M9 11.5h2M13 11.5h2M9 15.5h2M13 15.5h2M10.5 20.5v-2.5h3v2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-2.5-6.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="app" id="app">
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="sb-top">
+    <span class="sb-mark">q</span>
+    <span class="sb-word">quoteai</span>
+    <button class="sb-collapse" id="collapseBtn" aria-label="Collapse sidebar" aria-expanded="false"><svg class="chev"><use href="#chev-r" transform="rotate(180 8 8)"/></svg></button>
+  </div>
+  <button class="btn btn-white sb-new" data-goto-new><svg class="ic"><use href="#i-plus"/></svg><span class="btn-txt">New quote</span></button>
+
+  <p class="sb-group">Manage</p>
+  <a class="sb-link active" data-view="dashboard" href="#"><svg class="ic"><use href="#i-grid"/></svg><span class="sb-txt">Dashboard</span></a>
+  <a class="sb-link" data-view="quotes" href="#"><svg class="ic"><use href="#i-doc"/></svg><span class="sb-txt">Quotes</span></a>
+  <a class="sb-link" data-view="clients" href="#"><svg class="ic"><use href="#i-users"/></svg><span class="sb-txt">Clients</span></a>
+  <a class="sb-link" data-view="leads" href="#"><svg class="ic"><use href="#i-target"/></svg><span class="sb-txt">Leads</span></a>
+
+  <p class="sb-group">Operations</p>
+  <a class="sb-link" data-view="contracts" href="#"><svg class="ic"><use href="#i-contract"/></svg><span class="sb-txt">Contracts</span><span class="badge-pro">PRO</span></a>
+  <a class="sb-link" data-view="jobs" href="#"><svg class="ic"><use href="#i-case"/></svg><span class="sb-txt">Jobs</span><span class="badge-pro">PRO</span></a>
+  <a class="sb-link" data-view="team" href="#"><svg class="ic"><use href="#i-users"/></svg><span class="sb-txt">Team</span><span class="badge-pro">PRO</span></a>
+  <a class="sb-link" data-view="assistant" href="#"><svg class="ic"><use href="#i-chat"/></svg><span class="sb-txt">Assistant</span><span class="badge-pro">PRO</span></a>
+
+  <p class="sb-group">Insights</p>
+  <a class="sb-link" data-view="analytics" href="#"><svg class="ic"><use href="#i-chart"/></svg><span class="sb-txt">Analytics</span></a>
+  <a class="sb-link" data-view="pricelist" href="#"><svg class="ic"><use href="#i-list"/></svg><span class="sb-txt">Price list</span><span class="badge-pro">PRO</span></a>
+  <a class="sb-link" data-view="invoices" href="#"><svg class="ic"><use href="#i-receipt"/></svg><span class="sb-txt">Invoices</span><span class="badge-pro">PRO</span></a>
+
+  <p class="sb-group">Workspace</p>
+  <a class="sb-link" data-view="archive" href="#"><svg class="ic"><use href="#i-box"/></svg><span class="sb-txt">Archive</span></a>
+  <a class="sb-link" data-view="import" href="#"><svg class="ic"><use href="#i-import"/></svg><span class="sb-txt">Import</span></a>
+  <a class="sb-link" data-view="settings" href="#"><svg class="ic"><use href="#i-gear"/></svg><span class="sb-txt">Settings</span></a>
+
+  <div class="sb-bottom">
+    <a class="sb-link" data-view="notifications" href="#"><svg class="ic"><use href="#i-bell"/></svg><span class="sb-txt">Notifications</span><span class="count-chip" id="sbCount">2</span></a>
+    <div class="sb-user">
+      <span class="sb-avatar">MB</span>
+      <span class="sb-userinfo"><b>M. Bouchtaoui</b><span>Elite plan</span></span>
+    </div>
+  </div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<!-- ============ MAIN ============ -->
+<div class="main">
+  <header class="topbar">
+    <button class="tb-menu" id="menuBtn" aria-label="Open navigation"><svg class="ic" style="width:22px;height:22px"><use href="#i-menu"/></svg></button>
+    <label class="search"><svg class="ic" style="width:17px;height:17px"><use href="#i-search"/></svg><input type="search" placeholder="Search quotes, clients, invoices" aria-label="Search"></label>
+    <div class="tb-right">
+      <a class="tb-support" href="#">Support</a>
+      <div class="bell-wrap">
+        <button class="bell" id="bellBtn" aria-label="Notifications" aria-expanded="false"><svg class="ic"><use href="#i-bell"/></svg><span class="dot" id="bellDot"></span></button>
+        <div class="pop" id="bellPop">
+          <h3>Notifications</h3>
+          <div class="pop-row"><b>Quote #2046 unlocked</b><span>2 hours ago</span><p>Rivera Group unlocked the full breakdown.</p></div>
+          <div class="pop-row"><b>Payment received</b><span>Yesterday</span><p>$4,150 paid by card on invoice #118.</p></div>
+          <div class="pop-foot"><a class="cta-link" href="#" data-mark-read>Mark all as read <svg class="chev"><use href="#chev-r"/></svg></a></div>
+        </div>
+      </div>
+      <span class="tb-avatar" aria-label="Account: M. Bouchtaoui">MB</span>
+    </div>
+  </header>
+
+  <main class="content">
+
+  <!-- ================= DASHBOARD ================= -->
+  <section class="view active" data-view="dashboard">
+    <div class="page-head">
+      <div><h1 id="greeting">Good morning, Bouchtaoui</h1><p class="sub">Elite plan active — unlimited quotes.</p></div>
+      <div class="head-actions">
+        <div class="seg" data-period="m" id="periodSeg" role="group" aria-label="Reporting period">
+          <button class="seg-b" data-period="m">Month</button><button class="seg-b" data-period="q">Quarter</button><button class="seg-b" data-period="y">Year</button><span class="seg-thumb"></span>
+        </div>
+        <button class="btn btn-navy" data-goto-new><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>New quote</button>
+      </div>
+    </div>
+
+    <section class="card composer" id="composer">
+      <div class="comp-row" id="compRow">
+        <span class="comp-ic"><svg class="ic"><use href="#i-doc"/></svg></span>
+        <input id="compInput" type="text" placeholder="Describe the job and get a quote in 30 seconds..." aria-label="Describe the job">
+        <button class="comp-mic" aria-label="Dictate"><svg class="ic"><use href="#i-mic"/></svg></button>
+        <button class="comp-send" id="compSend" aria-label="Generate quote"><svg class="chev"><use href="#i-arrow-r"/></svg></button>
+      </div>
+      <div class="prog"><i id="progBar"></i></div>
+      <p class="comp-status">Drafting your quote from the description...</p>
+      <button class="comp-client"><svg class="ic"><use href="#i-person"/></svg> Client <span class="opt">Optional <svg class="chev"><use href="#chev-d"/></svg></span></button>
+    </section>
+
+    <section class="stat-grid" style="margin-top:16px">
+      <div class="card stat-card"><p class="lbl">Quotes this period</p><p class="val" id="stQuotes">0</p><p class="delta" id="dlQuotes"></p></div>
+      <div class="card stat-card"><p class="lbl">Unlocked</p><p class="val" id="stUnlocked">0</p><p class="delta flat" id="dlUnlocked"></p></div>
+      <div class="card stat-card"><p class="lbl">Unlocked revenue</p><p class="val" id="stRevenue">$0</p><p class="delta" id="dlRevenue"></p></div>
+      <div class="card stat-card"><p class="lbl">Average value</p><p class="val" id="stAvg">$0</p><p class="delta" id="dlAvg"></p></div>
+    </section>
+
+    <section class="mid-grid">
+      <div class="card">
+        <div class="card-head"><div><h2>Recent quotes</h2><p class="sub" id="recentSub">Last 2 generated</p></div><a class="cta-link" href="#" data-goto="quotes">View all <svg class="chev"><use href="#chev-r"/></svg></a></div>
+        <div id="quoteList">
+          <div class="q-row"><span class="q-ic"><svg class="ic"><use href="#i-doc"/></svg></span><div class="q-body"><p class="q-title">Rivera Group — office fit-out</p><p class="q-meta"><span class="chip chip-green">Unlocked</span><span class="q-date">2026-09-12</span></p></div><span class="q-amt">$96,603</span><svg class="chev"><use href="#chev-r"/></svg></div>
+          <div class="q-row"><span class="q-ic"><svg class="ic"><use href="#i-doc"/></svg></span><div class="q-body"><p class="q-title">Nakamura kitchen remodel</p><p class="q-meta"><span class="chip chip-green">Unlocked</span><span class="q-date">2026-09-12</span></p></div><span class="q-amt">$97,803</span><svg class="chev"><use href="#chev-r"/></svg></div>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="card" id="actCard">
+          <div class="card-head"><div><h2>Revenue by week</h2><p class="sub">Unlocked value, last 8 weeks</p></div></div>
+          <div class="act-body">
+            <div class="bars">
+              <span class="bar" style="--h:34%;--d:.05s"></span><span class="bar" style="--h:52%;--d:.1s"></span><span class="bar" style="--h:41%;--d:.15s"></span><span class="bar" style="--h:66%;--d:.2s"></span><span class="bar" style="--h:58%;--d:.25s"></span><span class="bar" style="--h:74%;--d:.3s"></span><span class="bar" style="--h:63%;--d:.35s"></span><span class="bar hot" style="--h:88%;--d:.4s"></span>
+            </div>
+            <div class="bar-x"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div><h2>Follow-ups due</h2><p class="sub">From your CRM pipeline</p></div></div>
+          <div class="fu-row"><div><b>Rivera Group</b><span>Quote viewed 3 times</span></div><span class="chip chip-yellow">Today</span></div>
+          <div class="fu-row"><div><b>Bloom Cafe</b><span>Follow-up call scheduled</span></div><span class="chip chip-yellow">Today</span></div>
+          <div class="fu-row"><div><b>Osei bathroom</b><span>Send revised scope</span></div><span class="chip chip-grey">Tomorrow</span></div>
+          <div class="card-foot"><a class="cta-link" href="#" data-goto="leads">Open CRM <svg class="chev"><use href="#chev-r"/></svg></a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="qa-grid">
+      <button class="card qa" data-goto-new><span class="qa-ic green"><svg class="ic"><use href="#i-plus"/></svg></span><span><b>New quote</b><span>Start from a description</span></span><svg class="chev"><use href="#chev-r"/></svg></button>
+      <button class="card qa" data-goto="quotes"><span class="qa-ic navy"><svg class="ic"><use href="#i-doc"/></svg></span><span><b>All quotes</b><span>Search and filter everything</span></span><svg class="chev"><use href="#chev-r"/></svg></button>
+      <button class="card qa" data-goto="settings"><span class="qa-ic teal"><svg class="ic"><use href="#i-building"/></svg></span><span><b>Business profile</b><span>Branding, price list, terms</span></span><svg class="chev"><use href="#chev-r"/></svg></button>
+    </section>
+  </section>
+
+  <!-- ================= QUOTES ================= -->
+  <section class="view" data-view="quotes">
+    <div class="page-head">
+      <div><h1>Quotes</h1><p class="sub">Every quote you have drafted, sent and signed.</p></div>
+      <div class="head-actions"><button class="btn btn-navy" data-goto-new><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>New quote</button></div>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="pills" data-filter-group>
+          <button class="pill on" data-filter="all">All</button>
+          <button class="pill" data-filter="draft">Draft</button>
+          <button class="pill" data-filter="sent">Sent</button>
+          <button class="pill" data-filter="unlocked">Unlocked</button>
+          <button class="pill" data-filter="signed">Signed</button>
+        </div>
+        <label class="search sm grow"><svg class="ic" style="width:16px;height:16px"><use href="#i-search"/></svg><input type="search" data-search placeholder="Search quotes" aria-label="Search quotes"></label>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" data-filterable data-searchable>
+          <thead><tr><th>Quote</th><th>Client</th><th>Status</th><th>Date</th><th style="text-align:right">Value</th><th></th></tr></thead>
+          <tbody>
+            <tr data-status="draft"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2047 Nakamura kitchen remodel</span><span class="t-sub">8 line items</span></span></span></td><td>Nakamura Holdings</td><td><span class="chip chip-yellow">Draft</span></td><td>2026-09-16</td><td class="t-amt" style="text-align:right">—</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="unlocked"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2046 Rivera Group office fit-out</span><span class="t-sub">14 line items</span></span></span></td><td>Rivera Group</td><td><span class="chip chip-green">Unlocked</span></td><td>2026-09-12</td><td class="t-amt" style="text-align:right">$96,603</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="sent"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2045 Bloom Cafe interior refresh</span><span class="t-sub">6 line items</span></span></span></td><td>Bloom Cafe Ltd</td><td><span class="chip chip-teal">Sent</span></td><td>2026-09-10</td><td class="t-amt" style="text-align:right">$24,750</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="sent"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2044 Osei bathroom renovation</span><span class="t-sub">9 line items</span></span></span></td><td>Osei Residence</td><td><span class="chip chip-teal">Sent</span></td><td>2026-09-08</td><td class="t-amt" style="text-align:right">$18,300</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="signed"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2043 Fieldstone patio phase 2</span><span class="t-sub">11 line items</span></span></span></td><td>Fieldstone Landscapes</td><td><span class="chip chip-green">Signed</span></td><td>2026-09-05</td><td class="t-amt" style="text-align:right">$41,200</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="unlocked"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2042 Hexagon studio build-out</span><span class="t-sub">12 line items</span></span></span></td><td>Hexagon Media</td><td><span class="chip chip-green">Unlocked</span></td><td>2026-09-03</td><td class="t-amt" style="text-align:right">$68,400</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="signed"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2041 Copper Peak cabin rewire</span><span class="t-sub">7 line items</span></span></span></td><td>Copper Peak Resorts</td><td><span class="chip chip-green">Signed</span></td><td>2026-08-29</td><td class="t-amt" style="text-align:right">$32,950</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="draft"><td><span class="cell-flex"><span class="cell-ic"><svg class="ic"><use href="#i-doc"/></svg></span><span><span class="t-strong">#2040 Vela Home staging package</span><span class="t-sub">4 line items</span></span></span></td><td>Vela Home</td><td><span class="chip chip-yellow">Draft</span></td><td>2026-08-27</td><td class="t-amt" style="text-align:right">—</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note" data-count-note>Showing 8 of 8 quotes</span><a class="cta-link" href="#">Export CSV <svg class="chev"><use href="#chev-r"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ================= CLIENTS ================= -->
+  <section class="view" data-view="clients">
+    <div class="page-head">
+      <div><h1>Clients</h1><p class="sub">Everyone you have quoted, won or worked with.</p></div>
+      <div class="head-actions"><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>Add client</button></div>
+    </div>
+    <div class="card">
+      <div class="toolbar"><label class="search sm"><svg class="ic" style="width:16px;height:16px"><use href="#i-search"/></svg><input type="search" data-search placeholder="Search clients" aria-label="Search clients"></label></div>
+      <div class="tbl-wrap">
+        <table class="tbl" data-searchable>
+          <thead><tr><th>Client</th><th>Contact</th><th>Quotes</th><th>Lifetime value</th><th>Status</th><th>Last activity</th></tr></thead>
+          <tbody>
+            <tr><td><span class="cell-flex"><span class="avat">RG</span><span><span class="t-strong">Rivera Group</span><span class="t-sub">Commercial interiors</span></span></span></td><td>ana@riveragroup.com</td><td>8</td><td class="t-amt">$212,400</td><td><span class="chip chip-green">Active</span></td><td>2026-09-12</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">NH</span><span><span class="t-strong">Nakamura Holdings</span><span class="t-sub">Residential remodels</span></span></span></td><td>ken@nakamura.co</td><td>5</td><td class="t-amt">$148,900</td><td><span class="chip chip-green">Active</span></td><td>2026-09-16</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">FL</span><span><span class="t-strong">Fieldstone Landscapes</span><span class="t-sub">Subcontract partner</span></span></span></td><td>priya@fieldstone.io</td><td>6</td><td class="t-amt">$96,300</td><td><span class="chip chip-green">Active</span></td><td>2026-09-05</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">BC</span><span><span class="t-strong">Bloom Cafe Ltd</span><span class="t-sub">Hospitality</span></span></span></td><td>hello@bloomcafe.com</td><td>3</td><td class="t-amt">$41,050</td><td><span class="chip chip-teal">Prospect</span></td><td>2026-09-10</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">HM</span><span><span class="t-strong">Hexagon Media</span><span class="t-sub">Studio build-outs</span></span></span></td><td>ops@hexagon.media</td><td>2</td><td class="t-amt">$68,400</td><td><span class="chip chip-green">Active</span></td><td>2026-09-03</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">OR</span><span><span class="t-strong">Osei Residence</span><span class="t-sub">Private client</span></span></span></td><td>h.osei@mail.com</td><td>2</td><td class="t-amt">$18,300</td><td><span class="chip chip-teal">Prospect</span></td><td>2026-09-08</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">CP</span><span><span class="t-strong">Copper Peak Resorts</span><span class="t-sub">Hospitality group</span></span></span></td><td>facilities@copperpeak.com</td><td>4</td><td class="t-amt">$87,600</td><td><span class="chip chip-grey">Inactive</span></td><td>2026-08-29</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">7 clients · 30 quotes all-time</span></div>
+    </div>
+  </section>
+
+  <!-- ================= LEADS ================= -->
+  <section class="view" data-view="leads">
+    <div class="page-head">
+      <div><h1>Leads</h1><p class="sub">Your pipeline, scored and sorted by the assistant.</p></div>
+      <div class="head-actions"><button class="btn btn-outline-navy btn-sm">Import leads</button><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>Add lead</button></div>
+    </div>
+    <div class="kanban">
+      <div class="kan-col">
+        <div class="kan-head"><b>New</b><span class="chip chip-grey">3</span></div>
+        <div class="kan-card"><b>Alvarez deck repair</b><p class="ksub">Missed call · Score 92</p><div class="kan-foot"><span class="t-amt">$8,500</span><span class="chip chip-yellow">Hot</span></div></div>
+        <div class="kan-card"><b>Granite &amp; Co showroom</b><p class="ksub">Referral · Score 68</p><div class="kan-foot"><span class="t-amt">$15,200</span><span class="chip chip-grey">Warm</span></div></div>
+        <div class="kan-card"><b>Juniper Labs office</b><p class="ksub">Web form · Score 81</p><div class="kan-foot"><span class="t-amt">$52,000</span><span class="chip chip-yellow">Hot</span></div></div>
+      </div>
+      <div class="kan-col">
+        <div class="kan-head"><b>Contacted</b><span class="chip chip-grey">2</span></div>
+        <div class="kan-card"><b>Marrow Studio</b><p class="ksub">Instagram · Score 57</p><div class="kan-foot"><span class="t-amt">$9,800</span><span class="chip chip-grey">Warm</span></div></div>
+        <div class="kan-card"><b>Vela Home staging</b><p class="ksub">Referral · Score 64</p><div class="kan-foot"><span class="t-amt">$12,400</span><span class="chip chip-grey">Warm</span></div></div>
+      </div>
+      <div class="kan-col">
+        <div class="kan-head"><b>Quoted</b><span class="chip chip-grey">2</span></div>
+        <div class="kan-card"><b>Rivera Group phase 2</b><p class="ksub">Quote #2046 · viewed 3x</p><div class="kan-foot"><span class="t-amt">$96,603</span><span class="chip chip-teal">Follow up</span></div></div>
+        <div class="kan-card"><b>Osei bathroom</b><p class="ksub">Quote #2044 · opened 1x</p><div class="kan-foot"><span class="t-amt">$18,300</span><span class="chip chip-teal">Follow up</span></div></div>
+      </div>
+      <div class="kan-col">
+        <div class="kan-head"><b>Won</b><span class="chip chip-grey">1</span></div>
+        <div class="kan-card"><b>Fieldstone patio phase 2</b><p class="ksub">Signed 2026-09-06</p><div class="kan-foot"><span class="t-amt">$41,200</span><span class="chip chip-green">Signed</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTRACTS ================= -->
+  <section class="view" data-view="contracts">
+    <div class="page-head">
+      <div><h1>Contracts</h1><p class="sub">Agreements attached to signed quotes.</p></div>
+      <div class="head-actions"><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>New contract</button></div>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <div class="pills" data-filter-group>
+          <button class="pill on" data-filter="all">All</button>
+          <button class="pill" data-filter="review">In review</button>
+          <button class="pill" data-filter="signed">Signed</button>
+          <button class="pill" data-filter="expired">Expired</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" data-filterable>
+          <thead><tr><th>Contract</th><th>Client</th><th>Status</th><th>Sent</th><th>Signed</th><th></th></tr></thead>
+          <tbody>
+            <tr data-status="review"><td><span class="t-strong">C-118 Master services</span><span class="t-sub">Quote #2046</span></td><td>Rivera Group</td><td><span class="chip chip-yellow">In review</span></td><td>2026-09-12</td><td>—</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="review"><td><span class="t-strong">C-114 Interior refresh</span><span class="t-sub">Quote #2045</span></td><td>Bloom Cafe Ltd</td><td><span class="chip chip-yellow">In review</span></td><td>2026-09-10</td><td>—</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="signed"><td><span class="t-strong">C-117 Patio phase 2</span><span class="t-sub">Quote #2043</span></td><td>Fieldstone Landscapes</td><td><span class="chip chip-green">Signed</span></td><td>2026-09-05</td><td>2026-09-06</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="signed"><td><span class="t-strong">C-116 Cabin rewire</span><span class="t-sub">Quote #2041</span></td><td>Copper Peak Resorts</td><td><span class="chip chip-green">Signed</span></td><td>2026-08-29</td><td>2026-08-30</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+            <tr data-status="expired"><td><span class="t-strong">C-115 Studio build-out</span><span class="t-sub">Quote #2038</span></td><td>Hexagon Media</td><td><span class="chip chip-grey">Expired</span></td><td>2026-08-14</td><td>—</td><td><svg class="chev" style="color:var(--faint)"><use href="#chev-r"/></svg></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">Showing 5 of 5 contracts</span></div>
+    </div>
+  </section>
+
+  <!-- ================= JOBS ================= -->
+  <section class="view" data-view="jobs">
+    <div class="page-head">
+      <div><h1>Jobs</h1><p class="sub">Scheduled, in progress and completed work.</p></div>
+      <div class="head-actions"><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>Schedule job</button></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Job</th><th>Client</th><th>Schedule</th><th>Crew</th><th>Progress</th><th style="text-align:right">Value</th></tr></thead>
+          <tbody>
+            <tr><td><span class="t-strong">Fieldstone patio phase 2</span><span class="t-sub">Job #J-22</span></td><td>Fieldstone Landscapes</td><td>Sep 8 – Sep 26</td><td>4</td><td><span class="cell-flex"><span class="pbar"><i style="width:62%"></span></span><span class="chip chip-teal">In progress</span></span></td><td class="t-amt" style="text-align:right">$41,200</td></tr>
+            <tr><td><span class="t-strong">Copper Peak cabin rewire</span><span class="t-sub">Job #J-21</span></td><td>Copper Peak Resorts</td><td>Sep 1 – Sep 12</td><td>3</td><td><span class="cell-flex"><span class="pbar"><i style="width:100%"></span></span><span class="chip chip-green">Completed</span></span></td><td class="t-amt" style="text-align:right">$32,950</td></tr>
+            <tr><td><span class="t-strong">Rivera Group fit-out</span><span class="t-sub">Job #J-23</span></td><td>Rivera Group</td><td>Sep 22 – Oct 30</td><td>6</td><td><span class="cell-flex"><span class="pbar"><i style="width:0%"></span></span><span class="chip chip-grey">Scheduled</span></span></td><td class="t-amt" style="text-align:right">$96,603</td></tr>
+            <tr><td><span class="t-strong">Nakamura kitchen remodel</span><span class="t-sub">Job #J-24</span></td><td>Nakamura Holdings</td><td>Oct 6 – Nov 14</td><td>5</td><td><span class="cell-flex"><span class="pbar"><i style="width:0%"></span></span><span class="chip chip-grey">Scheduled</span></span></td><td class="t-amt" style="text-align:right">$97,803</td></tr>
+            <tr><td><span class="t-strong">Bloom Cafe refresh</span><span class="t-sub">Job #J-20</span></td><td>Bloom Cafe Ltd</td><td>On hold</td><td>2</td><td><span class="cell-flex"><span class="pbar"><i style="width:18%"></span></span><span class="chip chip-yellow">On hold</span></span></td><td class="t-amt" style="text-align:right">$24,750</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">2 scheduled · 1 in progress · 1 completed this month</span></div>
+    </div>
+  </section>
+
+  <!-- ================= TEAM ================= -->
+  <section class="view" data-view="team">
+    <div class="page-head">
+      <div><h1>Team</h1><p class="sub">4 of 10 seats used on the Elite plan.</p></div>
+      <div class="head-actions"><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>Invite member</button></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Member</th><th>Role</th><th>Email</th><th>Quotes this month</th><th>Last active</th></tr></thead>
+          <tbody>
+            <tr><td><span class="cell-flex"><span class="avat" style="background:var(--navy);color:#fff">MB</span><span><span class="t-strong">M. Bouchtaoui</span><span class="t-sub">You</span></span></span></td><td><span class="chip chip-purple">Owner</span></td><td>m@studiobouchtaoui.com</td><td>2</td><td>Now</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">SM</span><span class="t-strong">Sofia Marin</span></span></td><td><span class="chip chip-teal">Admin</span></td><td>sofia@studiobouchtaoui.com</td><td>3</td><td>25 minutes ago</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">DK</span><span class="t-strong">Dan Kovac</span></span></td><td><span class="chip chip-grey">Member</span></td><td>dan@studiobouchtaoui.com</td><td>1</td><td>Yesterday</td></tr>
+            <tr><td><span class="cell-flex"><span class="avat">LF</span><span class="t-strong">Lea Fontaine</span></span></td><td><span class="chip chip-grey">Member</span></td><td>lea@studiobouchtaoui.com</td><td>1</td><td>2026-09-14</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">6 seats available</span><a class="cta-link" href="#" data-goto="settings">Manage permissions <svg class="chev"><use href="#chev-r"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ================= ASSISTANT ================= -->
+  <section class="view" data-view="assistant">
+    <div class="page-head">
+      <div><h1>Assistant</h1><p class="sub">Drafts, follow-ups and answers — with your approval.</p></div>
+      <div class="head-actions"><span class="chip chip-purple">Included in Elite</span></div>
+    </div>
+    <div class="chat-grid">
+      <div class="card th-list">
+        <div class="card-head"><div><h2>Threads</h2></div></div>
+        <div class="th-row on"><b>Rivera Group follow-up</b><span>Today, 9:14</span></div>
+        <div class="th-row"><b>Weekly pipeline summary</b><span>Monday</span></div>
+        <div class="th-row"><b>Why did #2044 stall</b><span>2026-09-11</span></div>
+        <div class="th-row"><b>Deposit terms comparison</b><span>2026-09-08</span></div>
+      </div>
+      <div class="card">
+        <div class="chat-head">
+          <span class="chat-av"><svg class="ic"><use href="#i-chat"/></svg></span>
+          <div><b>Assistant</b><small>Online · works from your quotes, clients and price list</small></div>
+        </div>
+        <div class="chat-body" id="chatBody">
+          <div class="bubble user">Anything I should chase today?</div>
+          <div class="bubble ai">Rivera Group opened quote #2046 three times but has not signed. I drafted a warm follow-up highlighting the phased-payment option. Bloom Cafe has not opened #2045 in four days — I can send a shorter nudge tomorrow at 10:00.</div>
+        </div>
+        <div class="chat-sug">
+          <button class="pill" data-sug="Send the Rivera follow-up now">Send the Rivera follow-up now</button>
+          <button class="pill" data-sug="Summarize this week's pipeline">Summarize this week's pipeline</button>
+          <button class="pill" data-sug="Why did quote #2044 stall?">Why did quote #2044 stall?</button>
+        </div>
+        <div class="chat-in">
+          <input id="chatInput" type="text" placeholder="Ask the assistant..." aria-label="Message the assistant">
+          <button class="comp-send" id="chatSend" aria-label="Send message"><svg class="chev"><use href="#i-send"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ANALYTICS ================= -->
+  <section class="view" data-view="analytics">
+    <div class="page-head">
+      <div><h1>Analytics</h1><p class="sub">September 2026 · compared with the prior period.</p></div>
+      <div class="head-actions">
+        <div class="seg" data-period="m" id="anSeg" role="group" aria-label="Range">
+          <button class="seg-b" data-period="m">Month</button><button class="seg-b" data-period="q">Quarter</button><button class="seg-b" data-period="y">Year</button><span class="seg-thumb"></span>
+        </div>
+        <button class="btn btn-outline-navy btn-sm">Export report</button>
+      </div>
+    </div>
+    <section class="stat-grid">
+      <div class="card stat-card"><p class="lbl">Unlocked revenue</p><p class="val">$194,406</p><p class="delta">+18% vs prior period</p></div>
+      <div class="card stat-card"><p class="lbl">Win rate</p><p class="val">42%</p><p class="delta">+6 pts vs prior period</p></div>
+      <div class="card stat-card"><p class="lbl">Average quote value</p><p class="val">$97,203</p><p class="delta">+6% vs prior period</p></div>
+      <div class="card stat-card"><p class="lbl">Median time to send</p><p class="val">1.8 days</p><p class="delta">-64% vs prior period</p></div>
+    </section>
+    <div class="card" id="anChart" style="margin-top:16px">
+      <div class="card-head"><div><h2>Unlocked revenue by month</h2><p class="sub">Last 12 months</p></div></div>
+      <div class="act-body">
+        <div class="bars tall">
+          <span class="bar" style="--h:28%;--d:.03s"></span><span class="bar" style="--h:36%;--d:.06s"></span><span class="bar" style="--h:31%;--d:.09s"></span><span class="bar" style="--h:44%;--d:.12s"></span><span class="bar" style="--h:40%;--d:.15s"></span><span class="bar" style="--h:52%;--d:.18s"></span><span class="bar" style="--h:47%;--d:.21s"></span><span class="bar" style="--h:61%;--d:.24s"></span><span class="bar" style="--h:58%;--d:.27s"></span><span class="bar" style="--h:72%;--d:.3s"></span><span class="bar" style="--h:66%;--d:.33s"></span><span class="bar hot" style="--h:88%;--d:.36s"></span>
+        </div>
+        <div class="bar-x"><span>O</span><span>N</span><span>D</span><span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span></div>
+      </div>
+    </div>
+    <div class="split-2">
+      <div class="card">
+        <div class="card-head"><div><h2>Revenue by service</h2><p class="sub">Share of unlocked value</p></div></div>
+        <div class="hbar-row"><div class="hbar-top">Kitchen remodels <span>$86,400 · 44%</span></div><div class="hbar"><i style="width:44%"></i></div></div>
+        <div class="hbar-row"><div class="hbar-top">Office fit-outs <span>$62,300 · 32%</span></div><div class="hbar"><i style="width:32%"></i></div></div>
+        <div class="hbar-row"><div class="hbar-top">Exteriors <span>$28,900 · 15%</span></div><div class="hbar"><i style="width:15%"></i></div></div>
+        <div class="hbar-row"><div class="hbar-top">Other <span>$16,806 · 9%</span></div><div class="hbar"><i style="width:9%"></i></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Top clients</h2><p class="sub">By unlocked revenue</p></div></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>Client</th><th>Quotes</th><th>Won</th><th style="text-align:right">Revenue</th></tr></thead>
+            <tbody>
+              <tr><td class="t-strong">Rivera Group</td><td>8</td><td>5</td><td class="t-amt" style="text-align:right">$212,400</td></tr>
+              <tr><td class="t-strong">Nakamura Holdings</td><td>5</td><td>4</td><td class="t-amt" style="text-align:right">$148,900</td></tr>
+              <tr><td class="t-strong">Fieldstone Landscapes</td><td>6</td><td>4</td><td class="t-amt" style="text-align:right">$96,300</td></tr>
+              <tr><td class="t-strong">Copper Peak Resorts</td><td>4</td><td>2</td><td class="t-amt" style="text-align:right">$87,600</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PRICE LIST ================= -->
+  <section class="view" data-view="pricelist">
+    <div class="page-head">
+      <div><h1>Price list</h1><p class="sub">What the assistant prices from. Margins update with material costs.</p></div>
+      <div class="head-actions"><button class="btn btn-outline-navy btn-sm">Import costs</button><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>Add item</button></div>
+    </div>
+    <div class="card">
+      <div class="toolbar"><label class="search sm"><svg class="ic" style="width:16px;height:16px"><use href="#i-search"/></svg><input type="search" data-search placeholder="Search items" aria-label="Search items"></label></div>
+      <div class="tbl-wrap">
+        <table class="tbl" data-searchable>
+          <thead><tr><th>Item</th><th>Category</th><th>Unit</th><th style="text-align:right">Unit price</th><th>Margin</th></tr></thead>
+          <tbody>
+            <tr><td class="t-strong">Demo &amp; disposal</td><td>Site work</td><td>Each</td><td class="t-amt" style="text-align:right">$1,450</td><td><span class="chip chip-green">62%</span></td></tr>
+            <tr><td class="t-strong">Cabinetry install</td><td>Millwork</td><td>Linear ft</td><td class="t-amt" style="text-align:right">$440</td><td><span class="chip chip-green">58%</span></td></tr>
+            <tr><td class="t-strong">Quartz countertop, templated</td><td>Surfaces</td><td>Sq ft</td><td class="t-amt" style="text-align:right">$92</td><td><span class="chip chip-yellow">41%</span></td></tr>
+            <tr><td class="t-strong">Plumbing rough-in</td><td>Mechanical</td><td>Each</td><td class="t-amt" style="text-align:right">$1,850</td><td><span class="chip chip-green">55%</span></td></tr>
+            <tr><td class="t-strong">Electrical permit &amp; inspection</td><td>Admin</td><td>Each</td><td class="t-amt" style="text-align:right">$420</td><td><span class="chip chip-green">70%</span></td></tr>
+            <tr><td class="t-strong">Painting, two coats</td><td>Finishes</td><td>Sq ft</td><td class="t-amt" style="text-align:right">$3.80</td><td><span class="chip chip-yellow">49%</span></td></tr>
+            <tr><td class="t-strong">Site supervision</td><td>Labor</td><td>Hour</td><td class="t-amt" style="text-align:right">$95</td><td><span class="chip chip-green">66%</span></td></tr>
+            <tr><td class="t-strong">Dumpster rental</td><td>Site work</td><td>Week</td><td class="t-amt" style="text-align:right">$380</td><td><span class="chip chip-grey">35%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">8 active items · costs synced 2026-09-15</span></div>
+    </div>
+  </section>
+
+  <!-- ================= INVOICES ================= -->
+  <section class="view" data-view="invoices">
+    <div class="page-head">
+      <div><h1>Invoices</h1><p class="sub">Generated from signed quotes. Reminders run automatically.</p></div>
+      <div class="head-actions"><button class="btn btn-navy"><svg class="ic" style="width:16px;height:16px"><use href="#i-plus"/></svg>New invoice</button></div>
+    </div>
+    <section class="stat-grid">
+      <div class="card stat-card"><p class="lbl">Outstanding</p><p class="val">$14,980</p><p class="delta flat">2 open invoices</p></div>
+      <div class="card stat-card"><p class="lbl">Overdue</p><p class="val">$2,140</p><p class="delta neg">1 invoice · reminder sent</p></div>
+      <div class="card stat-card"><p class="lbl">Paid this month</p><p class="val">$23,250</p><p class="delta">+12% vs August</p></div>
+      <div class="card stat-card"><p class="lbl">Collection rate</p><p class="val">94%</p><p class="delta">+3 pts vs prior period</p></div>
+    </section>
+    <div class="card" style="margin-top:16px">
+      <div class="toolbar">
+        <div class="pills" data-filter-group>
+          <button class="pill on" data-filter="all">All</button>
+          <button class="pill" data-filter="paid">Paid</button>
+          <button class="pill" data-filter="due">Due</button>
+          <button class="pill" data-filter="overdue">Overdue</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl" data-filterable>
+          <thead><tr><th>Invoice</th><th>Client</th><th>Issued</th><th>Due</th><th style="text-align:right">Amount</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr data-status="due"><td class="t-strong">#121</td><td>Nakamura Holdings</td><td>2026-09-16</td><td>2026-09-30</td><td class="t-amt" style="text-align:right">$12,840</td><td><span class="chip chip-yellow">Due</span></td></tr>
+            <tr data-status="paid"><td class="t-strong">#120</td><td>Rivera Group</td><td>2026-09-12</td><td>2026-09-26</td><td class="t-amt" style="text-align:right">$12,800</td><td><span class="chip chip-green">Paid</span></td></tr>
+            <tr data-status="paid"><td class="t-strong">#119</td><td>Bloom Cafe Ltd</td><td>2026-09-02</td><td>2026-09-16</td><td class="t-amt" style="text-align:right">$6,300</td><td><span class="chip chip-green">Paid</span></td></tr>
+            <tr data-status="paid"><td class="t-strong">#118</td><td>Fieldstone Landscapes</td><td>2026-08-28</td><td>2026-09-11</td><td class="t-amt" style="text-align:right">$4,150</td><td><span class="chip chip-green">Paid</span></td></tr>
+            <tr data-status="overdue"><td class="t-strong">#116</td><td>Oakline Props</td><td>2026-08-14</td><td>2026-08-28</td><td class="t-amt" style="text-align:right">$2,140</td><td><span class="chip chip-red">Overdue</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">Showing 5 of 5 invoices</span><a class="cta-link" href="#">Open payments <svg class="chev"><use href="#chev-r"/></svg></a></div>
+    </div>
+  </section>
+
+  <!-- ================= ARCHIVE ================= -->
+  <section class="view" data-view="archive">
+    <div class="page-head">
+      <div><h1>Archive</h1><p class="sub">Archived records stay searchable and restorable.</p></div>
+    </div>
+    <div class="card">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Record</th><th>Type</th><th>Archived</th><th>Archived by</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="t-strong">Quote #1998 — Marrow Studio</td><td><span class="chip chip-grey">Quote</span></td><td>2026-07-02</td><td>Sofia Marin</td><td><a class="cta-link" href="#" data-restore>Restore <svg class="chev"><use href="#chev-r"/></svg></a></td></tr>
+            <tr><td class="t-strong">Oakline Props</td><td><span class="chip chip-grey">Client</span></td><td>2026-06-18</td><td>M. Bouchtaoui</td><td><a class="cta-link" href="#" data-restore>Restore <svg class="chev"><use href="#chev-r"/></svg></a></td></tr>
+            <tr><td class="t-strong">Invoice #097</td><td><span class="chip chip-grey">Invoice</span></td><td>2026-05-30</td><td>Sofia Marin</td><td><a class="cta-link" href="#" data-restore>Restore <svg class="chev"><use href="#chev-r"/></svg></a></td></tr>
+            <tr><td class="t-strong">Quote #1974 — Vela Home</td><td><span class="chip chip-grey">Quote</span></td><td>2026-05-12</td><td>M. Bouchtaoui</td><td><a class="cta-link" href="#" data-restore>Restore <svg class="chev"><use href="#chev-r"/></svg></a></td></tr>
+            <tr><td class="t-strong">Job #J-14 — Marrow Studio</td><td><span class="chip chip-grey">Job</span></td><td>2026-04-11</td><td>Dan Kovac</td><td><a class="cta-link" href="#" data-restore>Restore <svg class="chev"><use href="#chev-r"/></svg></a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-foot"><span class="foot-note">5 archived records</span></div>
+    </div>
+  </section>
+
+  <!-- ================= IMPORT ================= -->
+  <section class="view" data-view="import">
+    <div class="page-head">
+      <div><h1>Import</h1><p class="sub">Bring clients, items and open invoices from your old tools.</p></div>
+    </div>
+    <div class="steps-3">
+      <div class="card step-card"><span class="step-num">1</span><b>Choose a source</b><p>Connect an accounting tool or upload a spreadsheet export.</p></div>
+      <div class="card step-card"><span class="step-num">2</span><b>Map your fields</b><p>We match columns automatically. You confirm anything unclear.</p></div>
+      <div class="card step-card"><span class="step-num">3</span><b>Review and finish</b><p>Duplicates are flagged. Nothing overwrites existing records.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-head"><div><h2>1 · Choose a source</h2><p class="sub">QuickBooks and Xero include free white-glove migration on annual plans.</p></div></div>
+      <div class="src-grid">
+        <button class="src on"><b>QuickBooks</b><p>Clients, items, invoices, history</p><span class="chip chip-green">Recommended</span></button>
+        <button class="src"><b>Xero</b><p>Clients, items, invoices</p><span class="chip chip-grey">Supported</span></button>
+        <button class="src"><b>CSV file</b><p>Any spreadsheet export</p><span class="chip chip-grey">Manual mapping</span></button>
+      </div>
+      <div class="dropzone">
+        <b>Drop your CSV here</b>
+        <p>Up to 20 MB. Columns are mapped in the next step.</p>
+        <button class="btn btn-outline-navy btn-sm">Choose file</button>
+      </div>
+      <div class="card-foot"><span class="foot-note">Last import: 2026-03-04 · 412 records</span><button class="btn btn-navy btn-sm" id="startImport">Start import</button></div>
+    </div>
+  </section>
+
+  <!-- ================= SETTINGS ================= -->
+  <section class="view" data-view="settings">
+    <div class="page-head">
+      <div><h1>Settings</h1><p class="sub">Business profile, branding, defaults, security and billing.</p></div>
+      <div class="head-actions"><button class="btn btn-navy" id="saveSettings">Save changes</button></div>
+    </div>
+    <div class="stack">
+      <div class="card">
+        <div class="card-head"><div><h2>Business profile</h2><p class="sub">Shown on quotes, contracts and invoices.</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label for="f1">Business name</label><input id="f1" value="Studio Bouchtaoui"></div>
+          <div class="field"><label for="f2">Legal name</label><input id="f2" value="Studio Bouchtaoui Inc."></div>
+          <div class="field"><label for="f3">Email</label><input id="f3" type="email" value="m@studiobouchtaoui.com"></div>
+          <div class="field"><label for="f4">Phone</label><input id="f4" value="+1 (514) 555-0182"></div>
+          <div class="field full"><label for="f5">Address</label><input id="f5" value="482 Rue Saint-Paul, Montreal, QC"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Branding</h2><p class="sub">Logo and tagline used on client-facing documents.</p></div></div>
+        <div class="logo-drop">
+          <span class="logo-tile">q</span>
+          <div style="flex:1"><b style="font-size:14.5px;color:var(--navy)">logo-studiobouchtaoui.svg</b><span class="t-sub">PNG or SVG, up to 2 MB</span></div>
+          <button class="btn btn-outline-navy btn-sm">Replace</button>
+        </div>
+        <div class="form-grid" style="padding-top:0">
+          <div class="field full"><label for="f6">Tagline on documents</label><input id="f6" value="Built properly. Priced plainly."></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Quote defaults</h2><p class="sub">Applied to every new quote the assistant drafts.</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label for="f7">Currency</label><select id="f7"><option>USD — US Dollar</option><option>CAD — Canadian Dollar</option><option>EUR — Euro</option></select></div>
+          <div class="field"><label for="f8">Payment terms</label><select id="f8"><option>Net 15</option><option>Due on receipt</option><option>Net 30</option></select></div>
+          <div class="field"><label for="f9">Tax rate</label><input id="f9" value="8.25%"></div>
+          <div class="field"><label for="f10">Deposit required</label><input id="f10" value="30%"></div>
+          <div class="field"><label for="f11">Quote expiry</label><input id="f11" value="14 days"></div>
+        </div>
+        <div class="set-row"><div class="txt"><b>Include optional alternates</b><span>Add a good / better / best column to drafts.</span></div><button class="tgl on" aria-pressed="true" aria-label="Include optional alternates"></button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Notifications</h2><p class="sub">What reaches your inbox and phone.</p></div></div>
+        <div class="set-row"><div class="txt"><b>Quote viewed by client</b><span>Instant email and push.</span></div><button class="tgl on" aria-pressed="true" aria-label="Quote viewed alerts"></button></div>
+        <div class="set-row"><div class="txt"><b>Payment received</b><span>Instant email and push.</span></div><button class="tgl on" aria-pressed="true" aria-label="Payment alerts"></button></div>
+        <div class="set-row"><div class="txt"><b>New lead captured</b><span>Instant push to owners and admins.</span></div><button class="tgl on" aria-pressed="true" aria-label="New lead alerts"></button></div>
+        <div class="set-row"><div class="txt"><b>Weekly summary</b><span>Mondays at 8:00, pipeline and cash in one email.</span></div><button class="tgl" aria-pressed="false" aria-label="Weekly summary"></button></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Billing &amp; plan</h2><p class="sub">Elite plan · renews 2026-10-01.</p></div></div>
+        <div class="set-row"><div class="txt"><b>Elite plan</b><span>$160 per month · unlimited quotes, 10 seats.</span></div><span class="chip chip-purple">Current</span><button class="btn btn-outline-navy btn-sm">Change plan</button></div>
+        <div class="set-row"><div class="txt"><b>Payment method</b><span>Visa ending 4242 · expires 08/28.</span></div><a class="cta-link" href="#">Update <svg class="chev"><use href="#chev-r"/></svg></a></div>
+        <div class="set-row"><div class="txt"><b>Billing history</b><span>12 receipts available.</span></div><a class="cta-link" href="#">View receipts <svg class="chev"><use href="#chev-r"/></svg></a></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>Security</h2><p class="sub">Account protection for every seat.</p></div></div>
+        <div class="set-row"><div class="txt"><b>Two-factor authentication</b><span>Required for owners and admins.</span></div><button class="tgl on" aria-pressed="true" aria-label="Two-factor authentication"></button></div>
+        <div class="set-row"><div class="txt"><b>Single sign-on</b><span>SAML for Enterprise workspaces.</span></div><button class="tgl" aria-pressed="false" aria-label="Single sign-on"></button></div>
+        <div class="set-row"><div class="txt"><b>Active sessions</b><span>3 devices signed in.</span></div><a class="cta-link" href="#">Manage <svg class="chev"><use href="#chev-r"/></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NOTIFICATIONS ================= -->
+  <section class="view" data-view="notifications">
+    <div class="page-head">
+      <div><h1>Notifications</h1><p class="sub">Everything that happened while you were on the tools.</p></div>
+      <div class="head-actions"><button class="btn btn-outline-navy btn-sm" data-mark-read>Mark all as read</button></div>
+    </div>
+    <div class="card" id="notifList">
+      <div class="n-row unread"><span class="n-dot green"></span><div><b>Quote #2046 unlocked by Rivera Group</b><p>The full line-item breakdown was unlocked. A follow-up draft is ready in Assistant.</p></div><span class="n-time">2 hours ago</span></div>
+      <div class="n-row unread"><span class="n-dot teal"></span><div><b>Payment received — $4,150</b><p>Invoice #118 paid by card. Reconciled automatically.</p></div><span class="n-time">Yesterday</span></div>
+      <div class="n-row"><span class="n-dot yellow"></span><div><b>Follow-up sent to Bloom Cafe</b><p>Assistant sent the scheduled nudge for quote #2045.</p></div><span class="n-time">2026-09-14</span></div>
+      <div class="n-row"><span class="n-dot grey"></span><div><b>Price list updated</b><p>3 material costs changed. 2 open quotes were re-priced for review.</p></div><span class="n-time">2026-09-12</span></div>
+      <div class="n-row"><span class="n-dot grey"></span><div><b>Lea Fontaine joined the team</b><span class="t-sub"></span><p>Member seat assigned. Welcome email sent.</p></div><span class="n-time">2026-09-10</span></div>
+    </div>
+  </section>
+
+  </main>
+</div>
+</div>
+
+<div class="toast" id="toast" role="status">
+  <p id="toastMsg">Done.</p>
+  <a class="cta-link" href="#" id="toastLink">View <svg class="chev"><use href="#chev-r"/></svg></a>
+</div>
+
+<script>
+(function(){
+"use strict";
+var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $ = function(s,c){ return (c||document).querySelector(s); };
+var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+
+/* ---------- toast ---------- */
+function showToast(msg, linkText, linkView){
+  $('#toastMsg').textContent = msg;
+  var link = $('#toastLink');
+  if(linkText){ link.style.display='inline-flex'; link.firstChild.textContent = linkText + ' '; link.dataset.goto = linkView || ''; }
+  else { link.style.display='none'; }
+  var t = $('#toast');
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(function(){ t.classList.remove('show'); }, 4200);
+}
+$('#toastLink').addEventListener('click', function(e){
+  e.preventDefault();
+  if(this.dataset.goto) setView(this.dataset.goto);
+  $('#toast').classList.remove('show');
+});
+
+/* ---------- view switching ---------- */
+function setView(key){
+  $$('.view').forEach(function(v){ v.classList.toggle('active', v.dataset.view === key); });
+  $$('.sb-link[data-view]').forEach(function(l){ l.classList.toggle('active', l.dataset.view === key); });
+  window.scrollTo({top:0, behavior: RM ? 'auto' : 'smooth'});
+  if(window.innerWidth <= 980){ sidebar.classList.remove('open'); scrim.classList.remove('show'); }
+  var active = $('.view.active');
+  if(active && active.querySelector('.bars')) active.classList.add('loaded');
+}
+$$('.sb-link[data-view]').forEach(function(link){
+  link.addEventListener('click', function(e){ e.preventDefault(); setView(link.dataset.view); });
+});
+$$('[data-goto]').forEach(function(el){
+  el.addEventListener('click', function(e){ e.preventDefault(); setView(el.dataset.goto); });
+});
+
+/* ---------- sidebar collapse + mobile ---------- */
+var app = $('#app'), sidebar = $('#sidebar'), scrim = $('#scrim');
+$('#collapseBtn').addEventListener('click', function(){
+  var rail = app.classList.toggle('rail');
+  this.setAttribute('aria-expanded', rail);
+});
+$('#menuBtn').addEventListener('click', function(){ sidebar.classList.add('open'); scrim.classList.add('show'); });
+scrim.addEventListener('click', function(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); });
+
+/* ---------- bell popover ---------- */
+var bellBtn = $('#bellBtn'), bellPop = $('#bellPop');
+bellBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  var open = bellPop.classList.toggle('open');
+  bellBtn.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', function(e){
+  if(!bellPop.contains(e.target) && !bellBtn.contains(e.target)){ bellPop.classList.remove('open'); bellBtn.setAttribute('aria-expanded','false'); }
+});
+
+/* ---------- notifications: mark all read ---------- */
+$$('[data-mark-read]').forEach(function(el){
+  el.addEventListener('click', function(e){
+    e.preventDefault();
+    $('#bellDot').classList.add('clear');
+    var chip = $('#sbCount'); if(chip) chip.style.display = 'none';
+    $$('#notifList .n-row.unread').forEach(function(r){
+      r.classList.remove('unread');
+      var d = r.querySelector('.n-dot'); if(d) d.className = 'n-dot grey';
+    });
+    bellPop.classList.remove('open');
+    showToast('All notifications marked as read.', null);
+  });
+});
+
+/* ---------- greeting ---------- */
+var h = new Date().getHours();
+$('#greeting').textContent = 'Good ' + (h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening') + ', Bouchtaoui';
+
+/* ---------- dashboard period + counters ---------- */
+var DATA = {
+  m:{ q:2, u:2, rev:194406, avg:97203, dq:'+2 vs August', du:'2 of 2 unlocked', dr:'+18% vs August', da:'+6% vs August' },
+  q:{ q:7, u:5, rev:612480, avg:87497, dq:'+3 vs prior quarter', du:'5 of 7 unlocked', dr:'+22% vs prior quarter', da:'+4% vs prior quarter' },
+  y:{ q:31, u:24, rev:2418900, avg:78029, dq:'+11 vs prior year', du:'24 of 31 unlocked', dr:'+31% vs prior year', da:'+9% vs prior year' }
+};
+var money = function(v){ return '$' + Math.round(v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); };
+var plain = function(v){ return Math.round(v).toString(); };
+function animate(el, from, to, fmt){
+  if(RM || from === to){ el.textContent = fmt(to); return; }
+  var dur = 700, t0 = performance.now();
+  (function tick(t){
+    var p = Math.min((t - t0)/dur, 1), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(from + (to - from) * e);
+    if(p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+var current = { q:0, u:0, rev:0, avg:0 };
+function setPeriod(key){
+  var d = DATA[key];
+  animate($('#stQuotes'), current.q, d.q, plain);
+  animate($('#stUnlocked'), current.u, d.u, plain);
+  animate($('#stRevenue'), current.rev, d.rev, money);
+  animate($('#stAvg'), current.avg, d.avg, money);
+  $('#dlQuotes').textContent = d.dq; $('#dlUnlocked').textContent = d.du;
+  $('#dlRevenue').textContent = d.dr; $('#dlAvg').textContent = d.da;
+  current = { q:d.q, u:d.u, rev:d.rev, avg:d.avg };
+}
+$$('.seg').forEach(function(seg){
+  $$('.seg-b', seg).forEach(function(b){
+    b.addEventListener('click', function(){
+      if(seg.dataset.period === b.dataset.period) return;
+      seg.dataset.period = b.dataset.period;
+      if(seg.id === 'periodSeg') setPeriod(b.dataset.period);
+    });
+  });
+});
+setPeriod('m');
+requestAnimationFrame(function(){ setTimeout(function(){ $('#actCard').classList.add('loaded'); $('#anChart').classList.add('loaded'); }, 150); });
+
+/* ---------- composer ---------- */
+var composer = $('#composer'), input = $('#compInput'), prog = $('#progBar'), draftCount = 0;
+function createDraft(){
+  var text = input.value.trim();
+  if(!text){
+    var row = $('#compRow');
+    row.classList.remove('shake'); void row.offsetWidth; row.classList.add('shake');
+    input.focus(); return;
+  }
+  composer.classList.add('busy'); input.disabled = true;
+  prog.style.transition = RM ? 'none' : 'width 1.4s linear';
+  prog.style.width = '100%';
+  setTimeout(function(){
+    composer.classList.remove('busy'); input.disabled = false;
+    prog.style.transition = 'none'; prog.style.width = '0';
+    var title = text.charAt(0).toUpperCase() + text.slice(1);
+    if(title.length > 46) title = title.slice(0, 46) + '...';
+    draftCount++;
+    var el = document.createElement('div');
+    el.className = 'q-row';
+    el.innerHTML = '<span class="q-ic"><svg class="ic"><use href="#i-doc"/></svg></span><div class="q-body"><p class="q-title"></p><p class="q-meta"><span class="chip chip-yellow">Draft</span><span class="q-date">2026-09-16</span></p></div><span class="q-amt">—</span><svg class="chev"><use href="#chev-r"/></svg>';
+    $('.q-title', el).textContent = title;
+    var list = $('#quoteList');
+    list.insertBefore(el, list.firstChild);
+    $('#recentSub').textContent = 'Last ' + (2 + draftCount) + ' generated';
+    input.value = '';
+    var seg = $('#periodSeg');
+    if(seg.dataset.period === 'm'){ animate($('#stQuotes'), current.q, current.q + 1, plain); current.q += 1; }
+    showToast('Draft quote created. Review and send when ready.', 'Open quotes', 'quotes');
+    input.focus();
+  }, RM ? 60 : 1500);
+}
+$('#compSend').addEventListener('click', createDraft);
+input.addEventListener('keydown', function(e){ if(e.key === 'Enter') createDraft(); });
+$$('[data-goto-new]').forEach(function(b){
+  b.addEventListener('click', function(){
+    setView('dashboard');
+    setTimeout(function(){ input.focus(); input.scrollIntoView({behavior: RM ? 'auto' : 'smooth', block:'center'}); }, 60);
+  });
+});
+
+/* ---------- generic pill filters + search ---------- */
+function applyFilters(view){
+  var pillOn = view.querySelector('.pill.on[data-filter]');
+  var filter = pillOn ? pillOn.dataset.filter : 'all';
+  var q = view.querySelector('[data-search]');
+  var query = q ? q.value.trim().toLowerCase() : '';
+  $$('table[data-filterable] tbody tr, table[data-searchable] tbody tr', view).forEach(function(tr){
+    var okF = filter === 'all' || tr.dataset.status === filter;
+    var okQ = !query || tr.textContent.toLowerCase().indexOf(query) !== -1;
+    tr.classList.toggle('hide', !(okF && okQ));
+  });
+  var note = view.querySelector('[data-count-note]');
+  if(note){
+    var all = $$('table tbody tr', view).length;
+    var shown = $$('table tbody tr', view).filter(function(r){ return !r.classList.contains('hide'); }).length;
+    note.textContent = 'Showing ' + shown + ' of ' + all + ' quotes';
+  }
+}
+$$('.pill[data-filter]').forEach(function(pill){
+  pill.addEventListener('click', function(){
+    var group = pill.closest('[data-filter-group]');
+    $$('.pill', group).forEach(function(p){ p.classList.toggle('on', p === pill); });
+    applyFilters(pill.closest('.view'));
+  });
+});
+$$('[data-search]').forEach(function(inp){
+  inp.addEventListener('input', function(){ applyFilters(inp.closest('.view')); });
+});
+
+/* ---------- toggles ---------- */
+$$('.tgl').forEach(function(t){
+  t.addEventListener('click', function(){
+    var on = t.classList.toggle('on');
+    t.setAttribute('aria-pressed', on);
+  });
+});
+
+/* ---------- import sources ---------- */
+$$('.src').forEach(function(s){
+  s.addEventListener('click', function(){
+    $$('.src').forEach(function(o){ o.classList.toggle('on', o === s); });
+  });
+});
+$('#startImport').addEventListener('click', function(){
+  showToast('Import scheduled. We will email you when mapping is ready.', null);
+});
+
+/* ---------- settings save ---------- */
+$('#saveSettings').addEventListener('click', function(){ showToast('Settings saved for Studio Bouchtaoui.', null); });
+
+/* ---------- archive restore ---------- */
+$$('[data-restore]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    var tr = a.closest('tr');
+    tr.style.opacity = '0';
+    setTimeout(function(){ tr.remove(); }, RM ? 0 : 250);
+    showToast('Record restored to its original section.', null);
+  });
+});
+
+/* ---------- assistant chat ---------- */
+var chatBody = $('#chatBody'), chatInput = $('#chatInput');
+var replies = [
+  'Done. The follow-up is queued for 15:00 today and references the phased-payment option they viewed twice.',
+  'This week: 4 new leads worth $87,900, 2 quotes sent, 1 signed ($41,200). Win rate is up 6 points on last week.',
+  'Quote #2044 was opened once on September 9 and never again. The deposit line was 50% — your signed quotes average 30%. I suggest re-sending at 30% with a shorter scope summary.'
+];
+var replyIdx = 0;
+function sendChat(text){
+  if(!text.trim()) return;
+  var u = document.createElement('div');
+  u.className = 'bubble user'; u.textContent = text;
+  chatBody.appendChild(u);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  var t = document.createElement('div');
+  t.className = 'bubble ai typing'; t.innerHTML = '<i></i><i></i><i></i>';
+  chatBody.appendChild(t);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  setTimeout(function(){
+    t.classList.remove('typing');
+    t.textContent = replies[replyIdx % replies.length];
+    replyIdx++;
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }, RM ? 60 : 1100);
+}
+$('#chatSend').addEventListener('click', function(){ sendChat(chatInput.value); chatInput.value = ''; });
+chatInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ sendChat(chatInput.value); chatInput.value = ''; } });
+$$('[data-sug]').forEach(function(p){
+  p.addEventListener('click', function(){ sendChat(p.dataset.sug); });
+});
+$$('.th-row').forEach(function(r){
+  r.addEventListener('click', function(){
+    $$('.th-row').forEach(function(o){ o.classList.toggle('on', o === r); });
+  });
+});
+})();
+</script>
+</body>
+</html>

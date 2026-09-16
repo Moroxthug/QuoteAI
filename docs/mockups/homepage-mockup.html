@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuoteAI — The AI platform for getting quotes signed</title>
+<meta name="description" content="QuoteAI is the AI-driven platform for modern service businesses: quotes, CRM, invoicing and payments in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   QUOTEAI — built on Intuit's design language
+   navy #101031 · ink #393A3D · product colors · pill buttons
+   ========================================================== */
+:root{
+  --navy:#101031;
+  --navy-hover:#24244a;
+  --ink:#393a3d;
+  --muted:#6b6c72;
+  --faint:#8f9198;
+  --line:#dfe1e6;
+  --soft:#f4f5f7;
+  --white:#ffffff;
+  --green:#2ca01c;
+  --green-dark:#1f7d12;
+  --purple:#6c2bd9;
+  --purple-dark:#5a21bd;
+  --teal:#0f97a2;
+  --teal-dark:#0b7c86;
+  --yellow:#ffe01b;
+  --radius:18px;
+  --font:'Figtree',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --shadow-lift:0 24px 48px rgba(16,16,49,.16);
+  --shadow-card:0 14px 34px rgba(16,16,49,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{font-family:var(--font);font-size:16px;line-height:1.6;color:var(--ink);background:var(--white);-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;background:none;border:none;cursor:pointer;color:inherit}
+ul{list-style:none}
+h1,h2,h3,h4{color:var(--navy);font-weight:700;letter-spacing:-.015em;line-height:1.15}
+:focus-visible{outline:2px solid var(--navy);outline-offset:3px;border-radius:4px}
+.on-dark :focus-visible{outline-color:#fff}
+
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:clamp(20px,4vw,40px)}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.on-dark .eyebrow{color:#b7b9cc}
+.sec-title{font-size:clamp(1.9rem,3.4vw,2.9rem);font-weight:800;margin:14px 0 16px}
+.sec-sub{font-size:clamp(1.02rem,1.3vw,1.15rem);color:var(--muted);max-width:640px}
+
+/* chevron glyph used everywhere, like Intuit's links */
+.chev{width:.72em;height:.72em;flex:none}
+.cta-link{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:16px;color:var(--navy)}
+.cta-link .chev{transition:transform .3s var(--ease)}
+.cta-link:hover .chev{transform:translateX(5px)}
+.cta-link.light{color:#fff}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:15px 32px;font-size:16px;font-weight:700;line-height:1;letter-spacing:.01em;transition:background .25s,color .25s,transform .25s var(--ease),box-shadow .25s;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-hover)}
+.btn-white{background:#fff;color:var(--navy)}
+.btn-white:hover{background:#eceef2}
+.btn-outline-light{border:2px solid rgba(255,255,255,.65);color:#fff}
+.btn-outline-light:hover{background:rgba(255,255,255,.12)}
+.btn-outline-navy{border:2px solid var(--navy);color:var(--navy)}
+.btn-outline-navy:hover{background:var(--soft)}
+
+/* ---------- Reveal ---------- */
+html.js .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .8s var(--ease);transition-delay:var(--d,0s)}
+html.js .reveal.in{opacity:1;transform:none}
+
+/* ==========================================================
+   ANNOUNCEMENT BAR
+   ========================================================== */
+.annc{background:var(--navy);color:#fff;font-size:14px;font-weight:600;text-align:center;padding:10px 48px 10px 20px;position:relative}
+.annc a{color:#fff;text-decoration:underline;text-underline-offset:3px;margin-left:10px;font-weight:700}
+.annc a:hover{color:#d9dbe6}
+.annc-x{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:28px;height:28px;display:grid;place-items:center;color:#fff;opacity:.75}
+.annc-x:hover{opacity:1}
+.annc.gone{display:none}
+
+/* ==========================================================
+   HEADER + MEGA MENU
+   ========================================================== */
+.site-head{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.site-head.scrolled{border-bottom-color:var(--line);box-shadow:0 10px 30px rgba(16,16,49,.07)}
+.hd-in{display:flex;align-items:center;gap:34px;height:78px}
+.logo{font-size:25px;font-weight:800;letter-spacing:-.03em;color:var(--navy)}
+.main-nav{display:flex;align-items:center;gap:30px;margin-left:6px}
+.main-nav>li{position:relative}
+.nav-link{display:inline-flex;align-items:center;gap:6px;font-size:15.5px;font-weight:600;color:var(--navy);padding:8px 0;position:relative}
+.nav-link::after{content:"";position:absolute;left:0;bottom:2px;height:2px;width:0;background:var(--navy);transition:width .3s var(--ease)}
+.nav-link:hover::after{width:100%}
+.nav-link .chev-down{width:11px;height:11px;transition:transform .3s var(--ease)}
+.has-mega.open .nav-link .chev-down,.has-mega:hover .nav-link .chev-down{transform:rotate(180deg)}
+.hd-right{margin-left:auto;display:flex;align-items:center;gap:22px}
+.hd-signin{font-size:15.5px;font-weight:700;color:var(--navy)}
+.hd-signin:hover{text-decoration:underline;text-underline-offset:3px}
+.hd-search{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;color:var(--navy)}
+.hd-search:hover{background:var(--soft)}
+.hd-cta{padding:12px 24px;font-size:15px}
+.menu-btn{display:none;width:42px;height:42px;place-items:center;color:var(--navy)}
+.menu-btn svg{width:24px;height:24px}
+.menu-btn .ic-close{display:none}
+.menu-btn.open .ic-menu{display:none}
+.menu-btn.open .ic-close{display:block}
+
+/* mega menu */
+.mega{position:absolute;left:0;right:0;top:100%;background:#fff;border-top:1px solid var(--line);box-shadow:0 34px 60px rgba(16,16,49,.14);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s ease,transform .3s var(--ease),visibility .3s}
+.has-mega.open .mega,.has-mega:hover .mega,.has-mega:focus-within .mega{opacity:1;visibility:visible;transform:none}
+.mega-in{max-width:1240px;margin-inline:auto;padding:34px clamp(20px,4vw,40px) 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.mega-card{border-radius:16px;padding:24px;min-height:168px;display:flex;flex-direction:column;gap:8px;color:#fff;transition:transform .3s var(--ease)}
+.mega-card:hover{transform:translateY(-4px)}
+.mega-card b{font-size:19px;font-weight:800;letter-spacing:-.01em}
+.mega-card p{font-size:14px;line-height:1.5;opacity:.9;flex:1}
+.mega-card .cta-link{font-size:14.5px;color:#fff}
+.mc-green{background:var(--green)}
+.mc-purple{background:var(--purple)}
+.mc-teal{background:var(--teal)}
+.mc-yellow{background:var(--yellow);color:var(--navy)}
+.mc-yellow p{opacity:.8}
+.mc-yellow .cta-link{color:var(--navy)}
+
+/* mobile menu */
+.m-menu{display:none;background:#fff;border-bottom:1px solid var(--line);padding:10px clamp(20px,4vw,40px) 30px;box-shadow:0 30px 50px rgba(16,16,49,.1)}
+.m-menu.open{display:block;animation:mIn .3s var(--ease)}
+@keyframes mIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.m-menu .m-label{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:18px 0 6px}
+.m-menu a.m-link{display:flex;align-items:center;gap:12px;padding:13px 0;font-size:17px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--soft)}
+.m-dot{width:10px;height:10px;border-radius:3px;flex:none}
+.m-menu .btn{width:100%;margin-top:22px}
+
+/* ==========================================================
+   HERO
+   ========================================================== */
+.hero{background:var(--navy);color:#fff;overflow:hidden}
+.hero.on-dark h1{color:#fff}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(40px,6vw,90px);align-items:center;padding:clamp(70px,9vw,124px) 0}
+.hero-kicker{font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#b7b9cc;margin-bottom:26px}
+.hero h1{font-size:clamp(2.6rem,5vw,4.3rem);font-weight:800;letter-spacing:-.025em;line-height:1.06}
+html.js .lm{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+html.js .lm>span{display:block;transform:translateY(112%);transition:transform 1s var(--ease);transition-delay:var(--d,0s)}
+html.js .hero.in .lm>span{transform:none}
+.hero-sub{margin:28px 0 38px;font-size:clamp(1.05rem,1.4vw,1.2rem);color:#c9cad6;max-width:520px}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
+.hero-note{margin-top:26px;font-size:14px;color:#8f91a6;font-weight:600}
+.hero-media{position:relative}
+.hero-media img{border-radius:20px;aspect-ratio:9/7;object-fit:cover;width:100%}
+.hero-media::after{content:"";position:absolute;inset:-14px;border:1px solid rgba(255,255,255,.22);border-radius:30px;pointer-events:none}
+
+/* ==========================================================
+   PRODUCT TILES  (the Intuit four-tile module)
+   ========================================================== */
+.products{padding:clamp(80px,9vw,120px) 0}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:clamp(36px,4vw,56px)}
+.tile{border-radius:20px;padding:32px 28px;min-height:310px;display:flex;flex-direction:column;gap:14px;color:#fff;transition:transform .35s var(--ease),box-shadow .35s}
+.tile:hover{transform:translateY(-7px);box-shadow:var(--shadow-lift)}
+.tile h3{font-size:25px;font-weight:800;color:inherit;letter-spacing:-.01em}
+.tile p{font-size:15px;line-height:1.55;opacity:.92;flex:1}
+.tile .cta-link{color:inherit;font-size:15.5px}
+.tile-green{background:var(--green)}
+.tile-green:hover{background:var(--green-dark)}
+.tile-purple{background:var(--purple)}
+.tile-purple:hover{background:var(--purple-dark)}
+.tile-teal{background:var(--teal)}
+.tile-teal:hover{background:var(--teal-dark)}
+.tile-yellow{background:var(--yellow);color:var(--navy)}
+.tile-yellow p{opacity:.85}
+
+/* ==========================================================
+   STORY BLOCKS
+   ========================================================== */
+.stories{background:var(--soft);padding:clamp(60px,7vw,96px) 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,96px);align-items:center;padding:clamp(36px,4vw,56px) 0}
+.split-media img{border-radius:var(--radius);aspect-ratio:10/7;object-fit:cover;width:100%;box-shadow:var(--shadow-card)}
+.split.rev .split-media{order:-1}
+.split-body .eyebrow{display:block;margin-bottom:6px}
+.split-body h2{font-size:clamp(1.6rem,2.6vw,2.25rem);font-weight:800;margin-bottom:16px}
+.split-body p{color:var(--muted);margin-bottom:26px;max-width:480px}
+
+/* ==========================================================
+   IMPACT STATS
+   ========================================================== */
+.impact{background:var(--navy);color:#fff;padding:clamp(80px,9vw,116px) 0}
+.impact .sec-title{color:#fff}
+.impact .sec-sub{color:#b7b9cc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:clamp(44px,5vw,68px);border-top:1px solid rgba(255,255,255,.16);padding-top:clamp(36px,4vw,52px)}
+.stat b{display:block;font-size:clamp(2.3rem,3.6vw,3.4rem);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.stat span{display:block;margin-top:10px;font-size:15px;color:#b7b9cc;font-weight:600}
+
+/* ==========================================================
+   NEWSROOM
+   ========================================================== */
+.newsroom{padding:clamp(80px,9vw,120px) 0}
+.news-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(36px,4vw,52px)}
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.news-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:transform .35s var(--ease),box-shadow .35s}
+.news-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-card)}
+.news-media{overflow:hidden}
+.news-media img{aspect-ratio:16/10;object-fit:cover;width:100%;transition:transform .7s var(--ease)}
+.news-card:hover .news-media img{transform:scale(1.045)}
+.news-body{padding:26px 26px 28px;display:flex;flex-direction:column;gap:12px;flex:1}
+.news-meta{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.news-body h3{font-size:19.5px;line-height:1.3;font-weight:700;flex:1}
+.news-body .cta-link{font-size:15px}
+
+/* ==========================================================
+   CTA BAND
+   ========================================================== */
+.trial{position:relative;color:#fff;overflow:hidden}
+.trial-bg{position:absolute;inset:0}
+.trial-bg img{width:100%;height:100%;object-fit:cover}
+.trial-bg::after{content:"";position:absolute;inset:0;background:rgba(16,16,49,.84)}
+.trial-in{position:relative;z-index:1;text-align:center;padding:clamp(90px,11vw,150px) 0}
+.trial h2{color:#fff;font-size:clamp(2rem,4vw,3.2rem);font-weight:800;margin:16px auto 18px;max-width:720px}
+.trial p{color:#c9cad6;font-size:clamp(1.02rem,1.3vw,1.15rem);max-width:540px;margin:0 auto 38px}
+.trial-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.trial-note{margin-top:24px;font-size:14px;color:#8f91a6;font-weight:600}
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+.footer{background:var(--navy);color:#b7b9cc;padding:clamp(60px,7vw,84px) 0 0;font-size:14.5px}
+.ft-grid{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:44px;padding-bottom:56px}
+.ft-brand .logo{color:#fff}
+.ft-brand p{margin:18px 0 26px;max-width:300px;font-size:14.5px;color:#8f91a6}
+.socials{display:flex;gap:12px}
+.socials a{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;color:#fff;transition:background .25s,border-color .25s}
+.socials a:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.5)}
+.socials svg{width:17px;height:17px}
+.ft-col h4{color:#fff;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:20px}
+.ft-col a{display:block;color:#b7b9cc;padding:6.5px 0;font-weight:500;transition:color .2s}
+.ft-col a:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.ft-fine{border-top:1px solid rgba(255,255,255,.14);padding:26px 0;font-size:12.5px;line-height:1.75;color:#8f91a6;max-width:1000px}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.14);padding:24px 0 30px;display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;font-size:13px;color:#8f91a6}
+.ft-legal{display:flex;gap:22px;flex-wrap:wrap}
+.ft-legal a:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.locale{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:9px 18px;color:#fff;font-weight:700;font-size:13px}
+.locale:hover{background:rgba(255,255,255,.1)}
+.locale svg{width:15px;height:15px}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width:1080px){
+  .main-nav{display:none}
+  .menu-btn{display:grid}
+  .hd-search{display:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:40px 32px}
+  .news-grid{grid-template-columns:1fr;max-width:560px}
+  .mega-in{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;padding-top:60px}
+  .hero-media{max-width:600px}
+  .split{grid-template-columns:1fr;gap:32px}
+  .split.rev .split-media{order:0}
+  .ft-grid{grid-template-columns:1fr 1fr}
+  .hd-signin{display:none}
+}
+@media (max-width:620px){
+  .tiles{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr}
+  .ft-grid{grid-template-columns:1fr}
+  .hero-actions .btn{width:100%}
+  .hd-cta{padding:11px 18px;font-size:14px}
+  .ft-bottom{justify-content:flex-start}
+}
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}
+  html.js .reveal,html.js .lm>span{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SVG icons (chevrons, arrows, menu, search, socials) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="chev-r" viewBox="0 0 16 16"><path d="M5.5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="chev-d" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 12h17M12 3.5c-5.5 4.8-5.5 12.2 0 17M12 3.5c5.5 4.8 5.5 12.2 0 17" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M4.5 4.5l15 15M19.5 4.5l-15 15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="7" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-yt" viewBox="0 0 24 24"><rect x="2.8" y="5.8" width="18.4" height="12.4" rx="3.4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.4 9.4l4.8 2.6-4.8 2.6z" fill="currentColor"/></symbol>
+  <symbol id="i-li" viewBox="0 0 24 24"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="7.8" cy="8" r="1.35" fill="currentColor"/><path d="M7 11h1.7v6H7zM11.3 11H13v.9c.4-.6 1.2-1.1 2.3-1.1 1.8 0 2.9 1.2 2.9 3.5V17h-1.7v-2.5c0-1.4-.5-2.1-1.5-2.1-1 0-1.7.7-1.7 2.2V17h-2z" fill="currentColor"/></symbol>
+</svg>
+
+<!-- ===== ANNOUNCEMENT ===== -->
+<div class="annc" id="annc">
+  Introducing Copilot 2.0 — full quotes drafted from a single voice note.<a href="#trial">See what's new</a>
+  <button class="annc-x" id="anncX" aria-label="Dismiss announcement"><svg class="chev" style="width:14px;height:14px"><use href="#i-close"/></svg></button>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-head" id="siteHead">
+  <div class="wrap hd-in">
+    <a class="logo" href="#top">quoteai</a>
+    <nav aria-label="Primary">
+      <ul class="main-nav">
+        <li class="has-mega" id="megaItem">
+          <button class="nav-link" id="megaBtn" aria-expanded="false" aria-controls="megaMenu">
+            Our products <svg class="chev-down"><use href="#chev-d"/></svg>
+          </button>
+        </li>
+        <li><a class="nav-link" href="#story-quotes">AI Quotes</a></li>
+        <li><a class="nav-link" href="#story-crm">CRM</a></li>
+        <li><a class="nav-link" href="#story-invoicing">Invoicing</a></li>
+        <li><a class="nav-link" href="#newsroom">Newsroom</a></li>
+      </ul>
+    </nav>
+    <div class="hd-right">
+      <button class="hd-search" aria-label="Search"><svg style="width:19px;height:19px"><use href="#i-search"/></svg></button>
+      <a class="hd-signin" href="#">Sign in</a>
+      <a class="btn btn-navy hd-cta" href="#trial">Start free trial</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <svg class="ic-menu"><use href="#i-menu"/></svg>
+        <svg class="ic-close"><use href="#i-close"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- mega menu -->
+  <div class="mega" id="megaMenu">
+    <div class="mega-in">
+      <a class="mega-card mc-green" href="#story-quotes">
+        <b>AI Quotes</b>
+        <p>Priced, branded, e-signable quotes drafted by Copilot in seconds.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="mega-card mc-purple" href="#story-crm">
+        <b>Smart CRM</b>
+        <p>Every lead captured, scored and followed up — automatically.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="mega-card mc-teal" href="#story-invoicing">
+        <b>Invoicing &amp; Payments</b>
+        <p>Invoices, reminders and reconciliation that run themselves.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="mega-card mc-yellow" href="#story-invoicing">
+        <b>Integrations</b>
+        <p>200+ connections to the tools you already run your business on.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- mobile menu -->
+  <div class="m-menu" id="mMenu">
+    <p class="m-label">Products</p>
+    <a class="m-link" href="#story-quotes"><span class="m-dot" style="background:var(--green)"></span>AI Quotes</a>
+    <a class="m-link" href="#story-crm"><span class="m-dot" style="background:var(--purple)"></span>Smart CRM</a>
+    <a class="m-link" href="#story-invoicing"><span class="m-dot" style="background:var(--teal)"></span>Invoicing &amp; Payments</a>
+    <a class="m-link" href="#story-invoicing"><span class="m-dot" style="background:var(--yellow)"></span>Integrations</a>
+    <p class="m-label">Company</p>
+    <a class="m-link" href="#newsroom">Newsroom</a>
+    <a class="m-link" href="#impact">Impact</a>
+    <a class="m-link" href="#">Sign in</a>
+    <a class="btn btn-navy" href="#trial">Start free trial</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===== HERO ===== -->
+<section class="hero on-dark" id="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="hero-kicker">The AI-driven expert platform for small business</p>
+      <h1>
+        <span class="lm" style="--d:.05s"><span>Get the quote signed</span></span>
+        <span class="lm" style="--d:.17s"><span>before the competition</span></span>
+        <span class="lm" style="--d:.29s"><span>finds their keys.</span></span>
+      </h1>
+      <p class="hero-sub">QuoteAI drafts priced quotes, runs your CRM, and chases invoices — one intelligent platform for every moment money moves in your business.</p>
+      <div class="hero-actions">
+        <a class="btn btn-white" href="#trial">Start your free trial</a>
+        <a class="btn btn-outline-light" href="#products">See the products</a>
+      </div>
+      <p class="hero-note">30 days free. No credit card required.</p>
+    </div>
+    <div class="hero-media reveal" style="--d:.25s">
+      <img src="https://picsum.photos/seed/quoteai-smallbusiness-owner/1080/840" alt="A small business owner reviewing a quote on a tablet" width="1080" height="840">
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRODUCTS ===== -->
+<section class="products" id="products">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="eyebrow">Our products</p>
+      <h2 class="sec-title">One platform. Every money moment.</h2>
+      <p class="sec-sub">Four products that share one brain — so a lead becomes a quote, a quote becomes an invoice, and an invoice becomes money, without anything falling through the cracks.</p>
+    </div>
+    <div class="tiles">
+      <a class="tile tile-green reveal" style="--d:0s" href="#story-quotes">
+        <h3>AI Quotes</h3>
+        <p>Describe the job out loud. Copilot scopes it, prices it from your price book, and hands you a branded quote ready to send and sign.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="tile tile-purple reveal" style="--d:.08s" href="#story-crm">
+        <h3>Smart CRM</h3>
+        <p>Leads from calls, forms and referrals land in one pipeline — scored, logged and nurtured with follow-ups written for you.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="tile tile-teal reveal" style="--d:.16s" href="#story-invoicing">
+        <h3>Invoicing &amp; Payments</h3>
+        <p>Accepted quotes become invoices instantly. Polite reminders go out on schedule and payments reconcile themselves.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+      <a class="tile tile-yellow reveal" style="--d:.24s" href="#story-invoicing">
+        <h3>Integrations</h3>
+        <p>Two hundred plus connections — payments, email, calendars and books — plus a full API, so everything stays in sync.</p>
+        <span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STORY BLOCKS ===== -->
+<section class="stories" id="platform">
+  <div class="wrap">
+
+    <div class="split" id="story-quotes">
+      <div class="split-media reveal">
+        <img src="https://picsum.photos/seed/quoteai-contractor-onsite/980/686" alt="A contractor reviewing a quote on site" loading="lazy">
+      </div>
+      <div class="split-body reveal" style="--d:.12s">
+        <span class="eyebrow">AI Quotes</span>
+        <h2>A priced, branded quote before the client gets home.</h2>
+        <p>Copilot listens to the job, pulls live pricing from your approved price book, and composes the quote for your review. Edit anything, send it with e-signature, and see exactly when it gets opened.</p>
+        <a class="cta-link" href="#trial">Explore AI Quotes <svg class="chev"><use href="#chev-r"/></svg></a>
+      </div>
+    </div>
+
+    <div class="split rev" id="story-crm">
+      <div class="split-media reveal">
+        <img src="https://picsum.photos/seed/quoteai-team-planning/980/686" alt="A small team planning their week" loading="lazy">
+      </div>
+      <div class="split-body reveal" style="--d:.12s">
+        <span class="eyebrow">Smart CRM</span>
+        <h2>Every lead captured. Nothing left to memory.</h2>
+        <p>Calls, emails and walk-ins are logged automatically and scored by AI, so you always know which job to chase next. Follow-ups are drafted in your voice and sent on schedule — with your approval.</p>
+        <a class="cta-link" href="#trial">Explore Smart CRM <svg class="chev"><use href="#chev-r"/></svg></a>
+      </div>
+    </div>
+
+    <div class="split" id="story-invoicing">
+      <div class="split-media reveal">
+        <img src="https://picsum.photos/seed/quoteai-cafe-owner/980/686" alt="A cafe owner at the counter of her business" loading="lazy">
+      </div>
+      <div class="split-body reveal" style="--d:.12s">
+        <span class="eyebrow">Invoicing &amp; Payments</span>
+        <h2>Invoices that chase themselves.</h2>
+        <p>The moment a quote is signed, the invoice goes out — deposit links included. Smart reminders escalate at the right time, and card, ACH and tap-to-pay payments reconcile automatically.</p>
+        <a class="cta-link" href="#trial">Explore Invoicing <svg class="chev"><use href="#chev-r"/></svg></a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== IMPACT ===== -->
+<section class="impact on-dark" id="impact">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="eyebrow">Impact</p>
+      <h2 class="sec-title">Momentum our customers can measure.</h2>
+      <p class="sec-sub">Teams on QuoteAI quote faster, win more, and get paid sooner. Here is what that looks like across the platform.</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat reveal" style="--d:0s"><b><span data-count="42000" data-suffix="+">0</span></b><span>teams run their business on QuoteAI</span></div>
+      <div class="stat reveal" style="--d:.08s"><b><span data-count="12" data-suffix="×">0</span></b><span>faster quote turnaround on average</span></div>
+      <div class="stat reveal" style="--d:.16s"><b><span data-count="38" data-prefix="+" data-suffix="%">0</span></b><span>average lift in win rate</span></div>
+      <div class="stat reveal" style="--d:.24s"><b><span data-count="4.2" data-decimals="1" data-prefix="$" data-suffix="B">0</span></b><span>quoted through the platform</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== NEWSROOM ===== -->
+<section class="newsroom" id="newsroom">
+  <div class="wrap">
+    <div class="news-head reveal">
+      <div>
+        <p class="eyebrow">Newsroom</p>
+        <h2 class="sec-title">The latest from QuoteAI</h2>
+      </div>
+      <a class="cta-link" href="#">View all news <svg class="chev"><use href="#chev-r"/></svg></a>
+    </div>
+    <div class="news-grid">
+      <article class="news-card reveal" style="--d:0s">
+        <div class="news-media"><img src="https://picsum.photos/seed/quoteai-product-launch/840/525" alt="Product launch event" loading="lazy"></div>
+        <div class="news-body">
+          <p class="news-meta">Product · September 9, 2026</p>
+          <h3>Copilot 2.0 drafts complete quotes from a single voice note</h3>
+          <a class="cta-link" href="#">Read more <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </article>
+      <article class="news-card reveal" style="--d:.1s">
+        <div class="news-media"><img src="https://picsum.photos/seed/quoteai-award-ceremony/840/525" alt="Award ceremony on stage" loading="lazy"></div>
+        <div class="news-body">
+          <p class="news-meta">Press release · August 28, 2026</p>
+          <h3>QuoteAI named to the 2026 Fintech Forward 50 list</h3>
+          <a class="cta-link" href="#">Read more <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </article>
+      <article class="news-card reveal" style="--d:.2s">
+        <div class="news-media"><img src="https://picsum.photos/seed/quoteai-customer-landscapes/840/525" alt="Landscaping team at work" loading="lazy"></div>
+        <div class="news-body">
+          <p class="news-meta">Customer story · August 12, 2026</p>
+          <h3>How Fieldstone Landscapes cut quote turnaround from days to minutes</h3>
+          <a class="cta-link" href="#">Read more <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TRIAL CTA ===== -->
+<section class="trial on-dark" id="trial">
+  <div class="trial-bg"><img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true"></div>
+  <div class="wrap trial-in reveal">
+    <p class="eyebrow">Get started</p>
+    <h2>Ready to win more work?</h2>
+    <p>Start your 30-day free trial today. Set up in an afternoon, with free migration from the tools you use now.</p>
+    <div class="trial-actions">
+      <a class="btn btn-white" href="#">Start your free trial</a>
+      <a class="btn btn-outline-light" href="#">Talk to sales</a>
+    </div>
+    <p class="trial-note">No credit card required · Cancel anytime</p>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer on-dark">
+  <div class="wrap">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <a class="logo" href="#top">quoteai</a>
+        <p>The AI-driven expert platform that helps small businesses quote, manage, invoice and get paid — all in one place.</p>
+        <div class="socials">
+          <a href="#" aria-label="X"><svg><use href="#i-x"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg><use href="#i-li"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg><use href="#i-insta"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg><use href="#i-yt"/></svg></a>
+        </div>
+      </div>
+      <div class="ft-col">
+        <h4>Products</h4>
+        <a href="#story-quotes">AI Quotes</a>
+        <a href="#story-crm">Smart CRM</a>
+        <a href="#story-invoicing">Invoicing &amp; Payments</a>
+        <a href="#">Integrations</a>
+        <a href="#">Copilot</a>
+      </div>
+      <div class="ft-col">
+        <h4>Company</h4>
+        <a href="#">About us</a>
+        <a href="#">Careers</a>
+        <a href="#newsroom">Newsroom</a>
+        <a href="#impact">Impact</a>
+        <a href="#">Investors</a>
+      </div>
+      <div class="ft-col">
+        <h4>Resources</h4>
+        <a href="#">Blog</a>
+        <a href="#">Help center</a>
+        <a href="#">API documentation</a>
+        <a href="#">Community</a>
+        <a href="#">System status</a>
+      </div>
+      <div class="ft-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of service</a>
+        <a href="#">Privacy</a>
+        <a href="#">Cookies</a>
+        <a href="#">Security</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+    <p class="ft-fine">QuoteAI Inc. provides quoting, CRM, invoicing and payment services for small businesses. Features, availability and pricing vary by plan and region and may change without notice. Performance figures referenced on this page reflect aggregated, anonymized customer data for the twelve months ending September 2026 and individual results may vary. Payment processing is provided by QuoteAI Payments, a licensed provider.</p>
+    <div class="ft-bottom">
+      <span>© 2026 QuoteAI Inc. All rights reserved.</span>
+      <div class="ft-legal">
+        <a href="#">Terms</a><a href="#">Privacy</a><a href="#">Cookies</a><a href="#">Do not sell or share my personal information</a><a href="#">Sitemap</a>
+      </div>
+      <a class="locale" href="#"><svg><use href="#i-globe"/></svg> United States · English</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+document.documentElement.classList.add('js');
+var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $  = function(s,c){ return (c||document).querySelector(s); };
+var $$ = function(s,c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+
+/* announcement */
+$('#anncX').addEventListener('click', function(){ $('#annc').classList.add('gone'); });
+
+/* header scroll state */
+var head = $('#siteHead');
+function onScroll(){ head.classList.toggle('scrolled', window.scrollY > 8); }
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+/* mega menu */
+var megaItem = $('#megaItem'), megaBtn = $('#megaBtn');
+megaBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  var open = megaItem.classList.toggle('open');
+  megaBtn.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', function(e){
+  if(!megaItem.contains(e.target)){
+    megaItem.classList.remove('open');
+    megaBtn.setAttribute('aria-expanded','false');
+  }
+});
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    megaItem.classList.remove('open');
+    megaBtn.setAttribute('aria-expanded','false');
+  }
+});
+
+/* mobile menu */
+var menuBtn = $('#menuBtn'), mMenu = $('#mMenu');
+menuBtn.addEventListener('click', function(){
+  var open = mMenu.classList.toggle('open');
+  menuBtn.classList.toggle('open', open);
+  menuBtn.setAttribute('aria-expanded', open);
+});
+$$('#mMenu a').forEach(function(a){
+  a.addEventListener('click', function(){
+    mMenu.classList.remove('open');
+    menuBtn.classList.remove('open');
+    menuBtn.setAttribute('aria-expanded','false');
+  });
+});
+
+/* hero entrance */
+requestAnimationFrame(function(){
+  setTimeout(function(){ $('#hero').classList.add('in'); }, 80);
+});
+
+/* reveal on scroll */
+var reveals = $$('.reveal');
+if(RM || !('IntersectionObserver' in window)){
+  reveals.forEach(function(el){ el.classList.add('in'); });
+}else{
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+    });
+  }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+  reveals.forEach(function(el){ io.observe(el); });
+}
+
+/* counters */
+function fmt(el, v){
+  var dec = parseInt(el.dataset.decimals || '0', 10);
+  var s = v.toFixed(dec);
+  s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (el.dataset.prefix||'') + s + (el.dataset.suffix||'');
+}
+function runCount(el){
+  var target = parseFloat(el.dataset.count);
+  if(RM){ el.textContent = fmt(el, target); return; }
+  var dur = 1600, t0 = performance.now();
+  function tick(t){
+    var p = Math.min((t - t0)/dur, 1);
+    var e = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(el, target * e);
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+if('IntersectionObserver' in window){
+  var cio = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ runCount(en.target); cio.unobserve(en.target); }
+    });
+  }, {threshold:.6});
+  $$('[data-count]').forEach(function(el){ cio.observe(el); });
+}else{
+  $$('[data-count]').forEach(runCount);
+}
+})();
+</script>
+</body>
+</html>

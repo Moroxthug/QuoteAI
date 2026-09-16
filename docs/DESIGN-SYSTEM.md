@@ -1,4 +1,6 @@
-# QuoteAI visual redesign — design system reference
+# QuoteAI visual redesign — design system reference (Phases 30-37, SUPERSEDED)
+
+**Superseded 2026-09-16 by `docs/PIXEL-REDESIGN-PLAN.md`.** Phases 30-37 (documented below) treated the two mockups as a palette/radius reference layered onto the existing shadcn+Tailwind components. The user clarified the actual ask was full pixel-accurate parity with the mockups' own CSS classes and structure — read `docs/PIXEL-REDESIGN-PLAN.md` (and the two files at `docs/mockups/*.html`, now saved permanently) before starting any new redesign phase. This file is kept for historical record of what Phases 30-37 actually changed, not as current guidance.
 
 **Status**: Phases 30-36 built & pushed. Supersedes `docs/HOMEPAGE-DESIGN-PLAN.md`'s palette/radius recommendations — see the note at the top of that file. Numbered as Phase 30 onward (not 29 — Phase 29 was already used by Google Local Services Ads lead capture, see `docs/EDGE-FEATURES-PLAN.md`). Each remaining phase is intended to run as its own conversation.
 

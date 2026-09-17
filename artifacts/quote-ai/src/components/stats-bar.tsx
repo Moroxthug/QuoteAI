@@ -21,56 +21,58 @@ function StatTile({
 }) {
   const { ref, display } = useCountUp(target, 1400, decimals);
   return (
-    <div ref={ref as React.RefObject<HTMLDivElement>} className="text-center px-4">
-      <div className="text-3xl sm:text-4xl font-bold text-gray-900 tabular-nums">
+    <div ref={ref as React.RefObject<HTMLDivElement>} className="stat">
+      <b className="tabular-nums">
         {display}
         {suffix}
-      </div>
-      <div className="text-xs sm:text-sm text-gray-500 mt-1.5 leading-snug">{label}</div>
+      </b>
+      <span>{label}</span>
     </div>
   );
 }
 
+/** Dark full-bleed "impact" band (docs/mockups/homepage-mockup.html .impact) — real, live-counted stats, no invented numbers. */
 export function StatsBar() {
   const { lang } = useLanguage();
 
   return (
-    <section className="py-8 sm:py-10 bg-white border-y border-gray-100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
-          <div className="pb-4 sm:pb-0">
-            <StatTile
-              target={30}
-              suffix={lang === "fr" ? " s" : " sec"}
-              label={lang === "fr" ? "Pour générer une soumission" : "To generate a quote"}
-            />
-          </div>
-          <div className="pb-4 sm:pb-0">
-            <StatTile
-              target={TRADES_COUNT}
-              suffix="+"
-              label={lang === "fr" ? "Métiers pris en charge" : "Trades supported"}
-            />
-          </div>
-          <div className="pt-4 sm:pt-0">
-            <StatTile
-              target={CITIES_COUNT}
-              suffix="+"
-              label={lang === "fr" ? "Villes canadiennes couvertes" : "Canadian cities covered"}
-            />
-          </div>
-          <div className="pt-4 sm:pt-0">
-            <StatTile
-              target={RATING}
-              decimals={1}
-              suffix="/5"
-              label={
-                lang === "fr"
-                  ? `Note moyenne (${AGGREGATE_RATING.reviewCount} avis)`
-                  : `Average rating (${AGGREGATE_RATING.reviewCount} reviews)`
-              }
-            />
-          </div>
+    <section className="impact on-dark" id="impact">
+      <div className="wrap">
+        <div>
+          <p className="eyebrow">{lang === "fr" ? "Impact" : "Impact"}</p>
+          <h2 className="sec-title">{lang === "fr" ? "Un rythme que nos clients peuvent mesurer." : "Momentum our customers can measure."}</h2>
+          <p className="sec-sub">
+            {lang === "fr"
+              ? "Les équipes sur quoteai chiffrent plus vite et couvrent tout le pays. Voici à quoi ça ressemble sur la plateforme."
+              : "Teams on quoteai quote faster and cover the whole country. Here is what that looks like across the platform."}
+          </p>
+        </div>
+        <div className="stat-grid">
+          <StatTile
+            target={30}
+            suffix={lang === "fr" ? " s" : " sec"}
+            label={lang === "fr" ? "Pour générer une soumission" : "To generate a quote"}
+          />
+          <StatTile
+            target={TRADES_COUNT}
+            suffix="+"
+            label={lang === "fr" ? "Métiers pris en charge" : "Trades supported"}
+          />
+          <StatTile
+            target={CITIES_COUNT}
+            suffix="+"
+            label={lang === "fr" ? "Villes canadiennes couvertes" : "Canadian cities covered"}
+          />
+          <StatTile
+            target={RATING}
+            decimals={1}
+            suffix="/5"
+            label={
+              lang === "fr"
+                ? `Note moyenne (${AGGREGATE_RATING.reviewCount} avis)`
+                : `Average rating (${AGGREGATE_RATING.reviewCount} reviews)`
+            }
+          />
         </div>
       </div>
     </section>

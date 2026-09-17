@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowRight, CheckCircle2, FileText, Zap, Lock, Star, Sparkles, Mic, ImagePlus, Check, X, Loader2, ChevronDown, Shield, Cpu, DollarSign, Hammer, Users, ListChecks, Building2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, Zap, Lock, Star, Sparkles, Mic, ImagePlus, Check, X, Loader2, ChevronDown, Shield, Cpu, DollarSign, Users } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { RevealHeading } from "@/components/reveal-heading";
@@ -13,6 +13,7 @@ import { TRADE_LABELS } from "@/i18n/translations";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SECTORS } from "@/data/seo-data";
 import { cityBasePath } from "@/data/seo-render-engine";
+import { BLOG_ARTICLES } from "@/data/blog-data";
 const DemoPlayer = lazy(() => import("@/components/demo/DemoPlayer"));
 
 function ScrollSection({
@@ -131,6 +132,9 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Copy */}
             <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
+              <p className="hero-kicker !text-navy-500 justify-center lg:justify-start flex items-center gap-2 mb-3">
+                {lang === "fr" ? "La plateforme IA pour les petites entreprises" : "The AI-driven platform for small business"}
+              </p>
               <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
                 {lang === "fr" ? (
                   <RevealHeading
@@ -282,8 +286,46 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── SECTION 1BIS: Animated stats bar ──────────────────── */}
-      <StatsBar />
+      {/* ── SECTION 1BIS: Product tiles ───────────────────────── */}
+      <ScrollSection className="products" id="products">
+        <div className="wrap">
+          <div>
+            <p className="eyebrow">{lang === "fr" ? "Nos produits" : "Our products"}</p>
+            <h2 className="sec-title">{lang === "fr" ? "Une plateforme. Chaque étape de l'argent." : "One platform. Every money moment."}</h2>
+            <p className="sec-sub">
+              {lang === "fr"
+                ? "Quatre produits qui partagent un seul cerveau — pour qu'un prospect devienne une soumission, qu'une soumission devienne une facture, et qu'une facture devienne de l'argent, sans rien perdre en chemin."
+                : "Four products that share one brain — so a lead becomes a quote, a quote becomes an invoice, and an invoice becomes money, without anything falling through the cracks."}
+            </p>
+          </div>
+          <div className="tiles">
+            <Link href="#story-quotes" className="tile tile-green">
+              <FileText className="h-6 w-6" />
+              <h3>{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</h3>
+              <p>{lang === "fr" ? "Décrivez le travail à voix haute. L'IA le chiffre à partir de votre liste de prix et vous remet une soumission prête à envoyer et à signer." : "Describe the job out loud. The AI scopes it, prices it from your price list, and hands you a branded quote ready to send and sign."}</p>
+              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-4 w-4" /></span>
+            </Link>
+            <Link href="#story-crm" className="tile tile-purple">
+              <Users className="h-6 w-6" />
+              <h3>{lang === "fr" ? "CRM intelligent" : "Smart CRM"}</h3>
+              <p>{lang === "fr" ? "Chaque soumission acceptée devient un chantier avec tâches, équipe et fournisseurs suivis dans un seul pipeline." : "Every accepted quote becomes a job site — tasks, team members, and suppliers tracked in a single pipeline."}</p>
+              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-4 w-4" /></span>
+            </Link>
+            <Link href="#story-invoicing" className="tile tile-teal">
+              <DollarSign className="h-6 w-6" />
+              <h3>{lang === "fr" ? "Facturation & paiements" : "Invoicing & Payments"}</h3>
+              <p>{lang === "fr" ? "Les soumissions acceptées deviennent des factures instantanément, avec contrats et suivi de budget en continu." : "Accepted quotes become invoices instantly, with contracts and budget tracking that stay in sync."}</p>
+              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-4 w-4" /></span>
+            </Link>
+            <Link href="/whatsapp/" className="tile tile-yellow">
+              <Zap className="h-6 w-6" />
+              <h3>{lang === "fr" ? "Intégrations" : "Integrations"}</h3>
+              <p>{lang === "fr" ? "WhatsApp, imports de tableurs, et les outils que vous utilisez déjà pour gérer votre entreprise." : "WhatsApp, spreadsheet imports, and the tools you already run your business on."}</p>
+              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="h-4 w-4" /></span>
+            </Link>
+          </div>
+        </div>
+      </ScrollSection>
 
       {/* ── SECTION 2: Demo Video ─────────────────────────────── */}
       <section className="py-8 bg-white">
@@ -309,135 +351,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── SECTION 3: WhatsApp teaser ────────────────────────── */}
-      <ScrollSection className="py-0">
-        <Link href="/whatsapp/">
-          <div className="relative overflow-hidden cursor-pointer group" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 50%, #0a1628 100%)" }}>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: "radial-gradient(ellipse, var(--qa-navy), transparent)" }} />
+      {/* ── SECTION 3/4/5/5BIS: Story splits (AI Quotes / Smart CRM / Invoicing / Integrations) ── */}
+      <ScrollSection className="stories" id="platform">
+        <div className="wrap">
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-              <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5">
-
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.118 1.532 5.845L0 24l6.348-1.51A11.933 11.933 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.65-.5-5.18-1.373L2 22l1.415-4.664A9.958 9.958 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold text-green-400 uppercase tracking-wider">{lang === "fr" ? "Nouveau" : "New"}</span>
-                      <span className="text-xs text-gray-600">·</span>
-                      <span className="text-xs text-gray-500">{lang === "fr" ? "Directement depuis votre téléphone" : "Straight from your phone"}</span>
-                    </div>
-                    <p className="text-white font-bold text-base sm:text-lg leading-snug">
-                      {lang === "fr" ? "Créez des soumissions directement depuis" : "Create quotes directly from"}{" "}
-                      <span className="text-transparent bg-clip-text" style={{ backgroundImage: "linear-gradient(135deg, #25D366, var(--qa-teal))" }}>
-                        WhatsApp
-                      </span>
-                    </p>
-                    <p className="text-gray-400 text-xs sm:text-sm mt-0.5">
-                      {lang === "fr" ? "Note vocale, texte ou photo → PDF professionnel en 60 secondes. Aucune application à ouvrir." : "Voice note, text, or photo → professional PDF in 60 seconds. No app to open."}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0 group-hover:gap-3 transition-all">
-                  <span className="text-sm font-semibold text-navy-300 group-hover:text-white transition-colors">{lang === "fr" ? "Voir comment ça marche" : "See how it works"}</span>
-                  <ArrowRight className="h-4 w-4 text-navy-400 group-hover:text-white transition-colors" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Link>
-      </ScrollSection>
-
-      {/* ── SECTION 4: How it works ──────────────────────────── */}
-      <ScrollSection className="py-14 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-14 items-center">
-
-              <div className="flex justify-center">
-                <WhatsAppChatDemo />
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
-                  {lang === "fr" ? (
-                    <>D'une note vocale au PDF<br /><span className="text-navy-600">sans toucher un ordinateur</span></>
-                  ) : (
-                    <>From voice note to PDF<br /><span className="text-navy-600">without touching a computer</span></>
-                  )}
-                </h2>
-
-                <div className="space-y-5 mb-8">
-                  {(lang === "fr" ? [
-                    { num: "1", title: "Envoyez une note vocale, un texte ou une photo", desc: "Directement sur WhatsApp. Décrivez le travail comme vous le feriez avec un client." },
-                    { num: "2", title: "L'IA génère un aperçu", desc: "Sections, prix et taxes en 60 secondes. Corrigez ou approuvez immédiatement." },
-                    { num: "3", title: "Recevez le PDF dans le clavardage", desc: "Envoyez-le à votre client d'un geste. La soumission est aussi sauvegardée sur quoteai.ca." },
-                  ] : [
-                    { num: "1", title: "Send a voice note, text, or photo", desc: "Right on WhatsApp. Describe the job just like you'd talk to a client." },
-                    { num: "2", title: "The AI generates a preview", desc: "Sections, prices, and tax in 60 seconds. Correct or approve it right away." },
-                    { num: "3", title: "Get the PDF in chat", desc: "Send it to your client with a tap. The quote is also saved on quoteai.ca." },
-                  ]).map((s) => (
-                    <div key={s.num} className="flex gap-4">
-                      <div
-                        className="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white"
-                        style={{ background: "linear-gradient(135deg, var(--grad-from), var(--grad-to))" }}
-                      >
-                        {s.num}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 text-sm mb-0.5">{s.title}</p>
-                        <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <Link
-                  href="/whatsapp/"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-navy-600 hover:text-navy-700 transition-colors group"
-                >
-                  {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"}
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      </ScrollSection>
-
-      {/* ── SECTION 5: Quote demo ────────────────────────── */}
-      <ScrollSection id="demo" className="py-14 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-10 items-center max-w-5xl mx-auto">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-4 leading-snug">
-                {lang === "fr" ? (
-                  <>D'un simple texte à un{" "}<span className="gradient-text">document professionnel</span>.</>
-                ) : (
-                  <>From a simple text to a{" "}<span className="gradient-text">professional document</span>.</>
-                )}
-              </h2>
-              <div className="bg-gray-50 p-5 rounded-xl mb-4 font-mono text-sm border border-gray-100 text-gray-700">
-                {lang === "fr"
-                  ? "« Je dois peindre un appartement de 800 pi² avec deux couches de peinture lavable blanche. Il faut aussi refaire l'enduit d'un mur endommagé au salon. »"
-                  : "\"I need to paint an 800 sq ft apartment with two coats of white washable paint. Also include skim-coating a damaged wall in the living room.\""}
-              </div>
-              <ArrowRight className="h-6 w-6 text-navy-500 mx-auto lg:mx-0 mb-4 rotate-90 lg:rotate-0" />
-              <p className="text-sm text-gray-500 leading-relaxed">
-                {lang === "fr"
-                  ? "Notre moteur d'IA comprend le langage naturel, identifie chaque poste de coût, estime les quantités et présente le tout dans un format standard."
-                  : "Our AI engine understands natural language, identifies each individual cost item, estimates quantities, and lays it all out in a standard format."}
-              </p>
-            </div>
-
-            <div className="relative">
-              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden flex flex-col h-[420px]">
+          <div className="split" id="story-quotes">
+            <div className="split-media">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden flex flex-col w-full max-w-[420px]">
                 <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2 shrink-0">
                   <div className="flex gap-1.5">
                     <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
@@ -446,224 +366,224 @@ export default function Home() {
                   </div>
                   <div className="text-xs font-medium text-gray-400 ml-4">Quote_John_Smith.pdf</div>
                 </div>
-
-                <div className="flex-1 overflow-hidden bg-white text-black text-[11px] p-5 select-none">
-                  <div className="flex justify-between items-start border-b-2 border-slate-800 pb-3 mb-3">
+                <div className="bg-white text-black text-[10px] p-4 select-none">
+                  <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5 mb-2.5">
                     <div>
-                      <div className="text-sm font-bold text-slate-800">Smith Painting Co.</div>
-                      <div className="text-slate-500 text-[10px] mt-0.5">GST/HST: 123456789 RT0001</div>
-                      <div className="text-slate-500 text-[10px]">12 Roma St, Toronto, ON</div>
-                      <div className="text-slate-500 text-[10px]">Tel: +1 416 555 0123</div>
+                      <div className="text-xs font-bold text-slate-800">Smith Painting Co.</div>
+                      <div className="text-slate-500 text-[9px] mt-0.5">GST/HST: 123456789 RT0001</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Quote</div>
-                      <div className="text-xs font-bold text-slate-700 mt-1">N. 2024-042</div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">Date: 05/06/2024</div>
+                      <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest">Quote</div>
+                      <div className="text-[10px] font-bold text-slate-700 mt-0.5">N. 2024-042</div>
                     </div>
                   </div>
-
-                  <div className="text-center mb-2.5">
-                    <div className="text-[10px] font-bold uppercase tracking-wide text-slate-800">
-                      QUOTE FOR PAINTING WORK
-                    </div>
-                    <div className="text-[9px] text-slate-500 italic mt-0.5">Apartment, 8 Verdi St — Toronto</div>
-                  </div>
-
-                  <div className="mb-2.5">
-                    <div className="text-[9px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Bill To</div>
-                    <div className="bg-slate-50 border border-slate-200 rounded px-3 py-1.5">
-                      <div className="font-semibold text-slate-800">Mario Rossi</div>
-                      <div className="text-slate-500 text-[10px]">8 Verdi St, Toronto, ON</div>
-                    </div>
-                  </div>
-
-                  <div className="mb-2.5">
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">1. Summary</div>
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-slate-800 text-white">
-                          <th className="py-1 px-2 text-left text-[9px] font-semibold">Section</th>
-                          <th className="py-1 px-2 text-right text-[9px] font-semibold">Net amount</th>
-                          <th className="py-1 px-2 text-left text-[9px] font-semibold hidden sm:table-cell">Notes</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="bg-white">
-                          <td className="py-1 px-2 text-slate-700">A. Wall painting</td>
-                          <td className="py-1 px-2 text-right font-medium text-slate-800">$1,200.00</td>
-                          <td className="py-1 px-2 text-slate-400 italic hidden sm:table-cell">Standard item</td>
-                        </tr>
-                        <tr className="bg-slate-50">
-                          <td className="py-1 px-2 text-slate-700">B. Skim coating & prep</td>
-                          <td className="py-1 px-2 text-right font-medium text-slate-800">$250.00</td>
-                          <td className="py-1 px-2 text-slate-400 italic hidden sm:table-cell">Extra item</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="mb-2.5">
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">2. Detailed Breakdown</div>
-                    <div className="border border-slate-200 rounded overflow-hidden">
-                      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-100">
-                        <span className="font-bold text-slate-800 text-[10px]">A. Wall painting</span>
-                        <span className="text-[10px] font-semibold text-slate-700">$1,200.00</span>
-                      </div>
-                      <table className="w-full">
-                        <thead>
-                          <tr className="bg-slate-700 text-white">
-                            <th className="py-1 px-2 text-left text-[9px]">Description</th>
-                            <th className="py-1 px-1 text-center text-[9px] w-8">Unit</th>
-                            <th className="py-1 px-1 text-center text-[9px] w-8">Qty</th>
-                            <th className="py-1 px-2 text-right text-[9px] w-16">Unit price</th>
-                            <th className="py-1 px-2 text-right text-[9px] w-16">Total</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="bg-white">
-                            <td className="py-1 px-2 text-slate-700">White washable paint (2 coats)</td>
-                            <td className="py-1 px-1 text-center text-slate-500">sq ft</td>
-                            <td className="py-1 px-1 text-center text-slate-500">800</td>
-                            <td className="py-1 px-2 text-right text-slate-600">$1.50</td>
-                            <td className="py-1 px-2 text-right font-medium text-slate-800">$1,200.00</td>
-                          </tr>
-                          <tr className="bg-slate-200">
-                            <td colSpan={4} className="py-1 px-2 font-bold text-slate-700 text-right text-[9px]">Subtotal, section A</td>
-                            <td className="py-1 px-2 text-right font-bold text-slate-800">$1,200.00</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
+                  <table className="w-full mb-2">
+                    <thead>
+                      <tr className="bg-slate-800 text-white">
+                        <th className="py-1 px-2 text-left text-[8px] font-semibold">Section</th>
+                        <th className="py-1 px-2 text-right text-[8px] font-semibold">Net amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td className="py-1 px-2 text-slate-700">A. Wall painting</td><td className="py-1 px-2 text-right font-medium text-slate-800">$1,200.00</td></tr>
+                      <tr className="bg-slate-50"><td className="py-1 px-2 text-slate-700">B. Skim coating & prep</td><td className="py-1 px-2 text-right font-medium text-slate-800">$250.00</td></tr>
+                    </tbody>
+                  </table>
                   <div className="flex justify-end">
-                    <div className="w-52 border border-slate-200 rounded overflow-hidden">
-                      <div className="flex justify-between px-3 py-1 text-slate-600 border-b border-slate-100">
-                        <span>Subtotal:</span>
-                        <span className="font-medium">$1,450.00</span>
-                      </div>
-                      <div className="flex justify-between px-3 py-1 text-slate-600 border-b border-slate-100">
-                        <span>HST (13%):</span>
-                        <span className="font-medium">$319.00</span>
-                      </div>
-                      <div className="flex justify-between px-3 py-1.5 bg-slate-800 text-white font-bold text-xs">
-                        <span>TOTAL</span>
-                        <span>$1,769.00</span>
-                      </div>
+                    <div className="w-44 border border-slate-200 rounded overflow-hidden">
+                      <div className="flex justify-between px-2 py-1 text-slate-600 border-b border-slate-100"><span>Subtotal:</span><span className="font-medium">$1,450.00</span></div>
+                      <div className="flex justify-between px-2 py-1 text-slate-600 border-b border-slate-100"><span>HST (13%):</span><span className="font-medium">$319.00</span></div>
+                      <div className="flex justify-between px-2 py-1.5 bg-slate-800 text-white font-bold text-[10px]"><span>TOTAL</span><span>$1,769.00</span></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+            <div className="split-body">
+              <span className="eyebrow">{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</span>
+              <h2>{lang === "fr" ? <>D'un simple texte à un <span className="gradient-text">document professionnel</span>.</> : <>From a simple text to a <span className="gradient-text">professional document</span>.</>}</h2>
+              <div className="bg-gray-50 p-4 rounded-xl mb-4 font-mono text-xs border border-gray-100 text-gray-700">
+                {lang === "fr"
+                  ? "« Je dois peindre un appartement de 800 pi² avec deux couches de peinture lavable blanche. Il faut aussi refaire l'enduit d'un mur endommagé au salon. »"
+                  : "\"I need to paint an 800 sq ft apartment with two coats of white washable paint. Also include skim-coating a damaged wall in the living room.\""}
+              </div>
+              <p>
+                {lang === "fr"
+                  ? "Notre moteur d'IA comprend le langage naturel, identifie chaque poste de coût, estime les quantités et présente le tout dans un format standard, prêt à envoyer et à signer."
+                  : "Our AI engine understands natural language, identifies each individual cost item, estimates quantities, and lays it all out in a standard format, ready to send and sign."}
+              </p>
+              <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="cta-link">
+                {lang === "fr" ? "Essayer maintenant" : "Try it now"} <ArrowRight className="chev h-4 w-4" />
+              </button>
+            </div>
           </div>
+
+          <div className="split rev" id="story-crm">
+            <div className="split-media">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden w-full max-w-[420px]">
+                <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                  </div>
+                  <div className="text-xs font-medium text-gray-400 ml-4">Job Site · Mario Rossi Renovation</div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Budget</div>
+                      <div className="text-lg font-bold text-gray-900">$1,769.00</div>
+                    </div>
+                    <span className="chip chip-green">{lang === "fr" ? "En cours" : "In progress"}</span>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    {[
+                      { done: true, label: lang === "fr" ? "Visite et mesures" : "Site visit and measurements" },
+                      { done: true, label: lang === "fr" ? "Matériaux commandés" : "Materials ordered (Rossi Hardware)" },
+                      { done: false, label: lang === "fr" ? "Peinture des murs" : "Wall painting" },
+                      { done: false, label: lang === "fr" ? "Enduit du salon" : "Living room skim coating" },
+                    ].map((t) => (
+                      <div key={t.label} className="flex items-center gap-2.5 text-sm">
+                        <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${t.done ? "bg-navy-600" : "border border-gray-300"}`}>
+                          {t.done && <Check className="h-3 w-3 text-white" />}
+                        </div>
+                        <span className={t.done ? "text-gray-400 line-through" : "text-gray-700"}>{t.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Users className="h-3.5 w-3.5" />
+                      {lang === "fr" ? "2 membres assignés" : "2 team members assigned"}
+                    </div>
+                    <span className="text-xs font-semibold text-navy-600">{lang === "fr" ? "Lié à la soumission" : "Linked to the quote"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="split-body">
+              <span className="eyebrow">{lang === "fr" ? "CRM intelligent · Inclus dans tous les forfaits" : "Smart CRM · Included in every plan"}</span>
+              <h2>{lang === "fr" ? <>Une soumission acceptée <span className="text-navy-600">devient un chantier</span>.</> : <>An accepted quote <span className="text-navy-600">becomes a job site</span>.</>}</h2>
+              <p>
+                {lang === "fr"
+                  ? "Ouvrez le chantier en un clic depuis la soumission acceptée : client, montant et postes sont déjà liés. Organisez le travail en tâches, assignez votre équipe et vos fournisseurs, et gardez chaque coût extra rattaché au budget de départ."
+                  : "Open the job site in one click from the accepted quote: client, amount, and line items are already linked. Organize the work into tasks, assign your team and suppliers, and keep every extra cost tied to the starting budget."}
+              </p>
+              <Link href="/dashboard/jobs" className="cta-link">
+                {lang === "fr" ? "Voir la gestion de chantier" : "See job management"} <ArrowRight className="chev h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="split" id="story-invoicing">
+            <div className="split-media">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden w-full max-w-[420px]">
+                <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                  </div>
+                  <div className="text-xs font-medium text-gray-400 ml-4">Invoice_2024-042.pdf</div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">{lang === "fr" ? "Facture" : "Invoice"} #2024-042</div>
+                      <div className="text-lg font-bold text-gray-900">$1,769.00</div>
+                    </div>
+                    <span className="chip chip-teal">{lang === "fr" ? "Payée" : "Paid"}</span>
+                  </div>
+                  <div className="space-y-2 mb-4 text-sm text-gray-600">
+                    <div className="flex justify-between"><span>{lang === "fr" ? "Soumission acceptée" : "Quote accepted"}</span><span className="text-gray-400">Jun 5</span></div>
+                    <div className="flex justify-between"><span>{lang === "fr" ? "Facture envoyée" : "Invoice sent"}</span><span className="text-gray-400">Jun 5</span></div>
+                    <div className="flex justify-between"><span>{lang === "fr" ? "Paiement reçu" : "Payment received"}</span><span className="text-gray-400">Jun 9</span></div>
+                  </div>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <DollarSign className="h-3.5 w-3.5" />
+                      {lang === "fr" ? "Réglée par carte" : "Settled by card"}
+                    </div>
+                    <span className="text-xs font-semibold text-navy-600">{lang === "fr" ? "Lié à la soumission" : "Linked to the quote"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="split-body">
+              <span className="eyebrow">{lang === "fr" ? "Facturation & paiements" : "Invoicing & Payments"}</span>
+              <h2>{lang === "fr" ? <>Des factures qui se <span className="text-navy-600">suivent toutes seules</span>.</> : <>Invoices that <span className="text-navy-600">chase themselves</span>.</>}</h2>
+              <p>
+                {lang === "fr"
+                  ? "Dès qu'une soumission est acceptée, la facture correspondante est prête à envoyer — postes, taxes et montant déjà liés. Suivez les contrats et le budget de chaque chantier sans ressaisir une seule ligne."
+                  : "The moment a quote is accepted, the matching invoice is ready to send — line items, tax, and amount already linked. Track contracts and each job's budget without retyping a single line."}
+              </p>
+              <Link href="/dashboard/invoices" className="cta-link">
+                {lang === "fr" ? "Voir la facturation" : "See invoicing"} <ArrowRight className="chev h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="split rev" id="story-whatsapp">
+            <div className="split-media">
+              <WhatsAppChatDemo />
+            </div>
+            <div className="split-body">
+              <span className="eyebrow">{lang === "fr" ? "Intégrations" : "Integrations"}</span>
+              <h2>{lang === "fr" ? <>D'une note vocale au PDF <span className="text-navy-600">sans toucher un ordinateur</span>.</> : <>From voice note to PDF <span className="text-navy-600">without touching a computer</span>.</>}</h2>
+              <div className="space-y-4 mb-6">
+                {(lang === "fr" ? [
+                  { num: "1", title: "Envoyez une note vocale, un texte ou une photo", desc: "Directement sur WhatsApp." },
+                  { num: "2", title: "L'IA génère un aperçu", desc: "Sections, prix et taxes en 60 secondes." },
+                  { num: "3", title: "Recevez le PDF dans le clavardage", desc: "Envoyez-le d'un geste, sauvegardé sur quoteai.ca." },
+                ] : [
+                  { num: "1", title: "Send a voice note, text, or photo", desc: "Right on WhatsApp." },
+                  { num: "2", title: "The AI generates a preview", desc: "Sections, prices, and tax in 60 seconds." },
+                  { num: "3", title: "Get the PDF in chat", desc: "Send it with a tap, saved on quoteai.ca." },
+                ]).map((s) => (
+                  <div key={s.num} className="flex gap-3">
+                    <div className="w-7 h-7 rounded-lg text-xs font-bold shrink-0 flex items-center justify-center text-white bg-navy-700">{s.num}</div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{s.title}</p>
+                      <p className="text-sm text-gray-500">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link href="/whatsapp/" className="cta-link">
+                {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"} <ArrowRight className="chev h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
         </div>
       </ScrollSection>
 
-      {/* ── SECTION 5BIS: Accepted quote → Job Site CRM ────── */}
-      <ScrollSection className="py-14 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-14 items-center">
+      {/* ── Impact: real, live-counted stats (docs/mockups .impact band) ── */}
+      <StatsBar />
 
-              <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-navy-600 uppercase tracking-wider mb-3">
-                  <Hammer className="h-3.5 w-3.5" />
-                  {lang === "fr" ? "Inclus dans tous les forfaits" : "Included in every plan"}
-                </div>
-                <h2 className="text-xl font-semibold tracking-tight text-gray-900 mb-6 leading-snug">
-                  {lang === "fr" ? (
-                    <>Une soumission acceptée<br /><span className="text-navy-600">devient un chantier</span></>
-                  ) : (
-                    <>An accepted quote<br /><span className="text-navy-600">becomes a job site</span></>
-                  )}
-                </h2>
-
-                <div className="space-y-5 mb-8">
-                  {(lang === "fr" ? [
-                    { icon: Hammer, title: "Un clic, aucune ressaisie", desc: "Ouvrez le chantier directement depuis la soumission acceptée : client, montant et postes sont déjà liés." },
-                    { icon: ListChecks, title: "Suivi des tâches et de l'avancement", desc: "Organisez le travail en tâches avec des échéances, sans quitter quoteai." },
-                    { icon: Users, title: "Membres d'équipe et fournisseurs", desc: "Assignez le chantier à votre équipe et suivez les fournisseurs impliqués." },
-                    { icon: Building2, title: "Budget et coûts extra maîtrisés", desc: "Chaque dépense hors soumission initiale reste liée au chantier et à son budget de départ." },
-                  ] : [
-                    { icon: Hammer, title: "One click, zero re-typing", desc: "Open the job site straight from the accepted quote: client, amount, and line items are already linked." },
-                    { icon: ListChecks, title: "Tasks and progress tracking", desc: "Organize the work into tasks with deadlines, without leaving quoteai." },
-                    { icon: Users, title: "Team members and suppliers", desc: "Assign the job site to your team and keep track of the suppliers involved." },
-                    { icon: Building2, title: "Budget and extra costs under control", desc: "Every expense outside the original quote stays linked to the job site and its starting budget." },
-                  ]).map((s) => (
-                    <div key={s.title} className="flex gap-4">
-                      <div
-                        className="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white"
-                        style={{ background: "linear-gradient(135deg, var(--grad-from), var(--grad-to))" }}
-                      >
-                        <s.icon className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 text-sm mb-0.5">{s.title}</p>
-                        <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <Link
-                  href="/dashboard/jobs"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-navy-600 hover:text-navy-700 transition-colors group"
-                >
-                  {lang === "fr" ? "Voir la gestion de chantier" : "See job management"}
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-
-              <div className="relative">
-                <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden">
-                  <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                    </div>
-                    <div className="text-xs font-medium text-gray-400 ml-4">Job Site · Mario Rossi Renovation</div>
-                  </div>
-
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Budget</div>
-                        <div className="text-lg font-bold text-gray-900">$1,769.00</div>
-                      </div>
-                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1">
-                        In progress
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 mb-4">
-                      {[
-                        { done: true, label: "Site visit and measurements" },
-                        { done: true, label: "Materials ordered (Rossi Hardware)" },
-                        { done: false, label: "Wall painting" },
-                        { done: false, label: "Living room skim coating" },
-                      ].map((t) => (
-                        <div key={t.label} className="flex items-center gap-2.5 text-sm">
-                          <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${t.done ? "bg-navy-600" : "border border-gray-300"}`}>
-                            {t.done && <Check className="h-3 w-3 text-white" />}
-                          </div>
-                          <span className={t.done ? "text-gray-400 line-through" : "text-gray-700"}>{t.label}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Users className="h-3.5 w-3.5" />
-                        2 team members assigned
-                      </div>
-                      <span className="text-xs font-semibold text-navy-600">Linked to the quote</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
+      {/* ── Newsroom: latest real blog posts ──────────────────── */}
+      <ScrollSection className="newsroom" id="newsroom">
+        <div className="wrap">
+          <div className="news-head">
+            <div>
+              <p className="eyebrow">{lang === "fr" ? "Blogue" : "Newsroom"}</p>
+              <h2 className="sec-title">{lang === "fr" ? "Les dernières nouvelles de quoteai" : "The latest from quoteai"}</h2>
             </div>
+            <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all articles"} <ArrowRight className="chev h-4 w-4" /></Link>
+          </div>
+          <div className="news-grid">
+            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
+              <Link key={article.slug} href={`/blog/${article.slug}/`} className="news-card">
+                <div className="news-body">
+                  <p className="news-meta">
+                    {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" })}
+                  </p>
+                  <h3>{article.title}</h3>
+                  <span className="cta-link">{lang === "fr" ? "Lire l'article" : "Read more"} <ArrowRight className="chev h-4 w-4" /></span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </ScrollSection>
@@ -1142,28 +1062,29 @@ export default function Home() {
         </div>
       </ScrollSection>
 
-      {/* ── SECTION 11 (positional): Closing CTA ──────────────────── */}
-      <ScrollSection className="relative overflow-hidden">
-        <div className="relative overflow-hidden py-16" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 55%, #0a1628 100%)" }}>
+      {/* ── Trial CTA band (docs/mockups .trial) ──────────────── */}
+      <ScrollSection className="trial on-dark" id="trial">
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 55%, #0a1628 100%)" }}>
           <div className="mesh-blob mesh-blob-1" style={{ opacity: 0.6 }} />
           <div className="mesh-blob mesh-blob-2" style={{ opacity: 0.6 }} />
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white mb-3">
-              {lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}
-            </h2>
-            <p className="text-sm text-gray-400 mb-7 max-w-md mx-auto leading-relaxed">
-              {lang === "fr"
-                ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine."
-                : "Join hundreds of Canadian contractors and tradespeople who save hours every week."}
-            </p>
-            <button
-              onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")}
-              className="btn-gradient inline-flex h-11 items-center justify-center px-8 text-sm font-semibold"
-            >
-              {lang === "fr" ? "Créez votre compte gratuit" : "Create Your Free Account"}
-              <ArrowRight className="ml-2 h-4 w-4" />
+        </div>
+        <div className="wrap trial-in">
+          <p className="eyebrow">{lang === "fr" ? "Commencer" : "Get started"}</p>
+          <h2>{lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}</h2>
+          <p>
+            {lang === "fr"
+              ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine. Essai gratuit de 7 jours, sans carte de crédit."
+              : "Join hundreds of Canadian contractors and tradespeople who save hours every week. 7-day free trial, no credit card required."}
+          </p>
+          <div className="trial-actions">
+            <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
+              {lang === "fr" ? "Créez votre compte gratuit" : "Create your free account"}
             </button>
+            <Link href="#pricing" className="btn btn-outline-light">
+              {lang === "fr" ? "Voir les forfaits" : "See plans"}
+            </Link>
           </div>
+          <p className="trial-note">{lang === "fr" ? "Sans carte de crédit · Annulez à tout moment" : "No credit card required · Cancel anytime"}</p>
         </div>
       </ScrollSection>
     </div>

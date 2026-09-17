@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useRef } from "react";
 import { Link, useLocation } from "wouter";
-import { ArrowRight, CheckCircle2, FileText, Zap, Lock, Star, Sparkles, Mic, ImagePlus, Check, X, Loader2, ChevronDown, Shield, Cpu, DollarSign, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileText, Zap, Lock, Star, Sparkles, Check, X, Loader2, ChevronDown, Shield, Cpu, DollarSign, Users } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { RevealHeading } from "@/components/reveal-heading";
@@ -117,169 +117,105 @@ export default function Home() {
         frCanonical="https://quoteai.ca/fr/"
       />
 
-      {/* ── SEZIONE 1: Hero con scena 3D ──────────────────────── */}
-      <section
-        className="relative overflow-hidden pt-20 pb-16 bg-white"
-        onMouseMove={handleHeroMove}
-        onMouseLeave={handleHeroLeave}
-      >
-        <div className="hero-grid-bg" />
-        <div className="mesh-blob mesh-blob-1" />
-        <div className="mesh-blob mesh-blob-2" />
-        <div className="mesh-blob mesh-blob-3" />
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Copy */}
-            <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-              <p className="hero-kicker !text-navy-500 justify-center lg:justify-start flex items-center gap-2 mb-3">
-                {lang === "fr" ? "La plateforme IA pour les petites entreprises" : "The AI-driven platform for small business"}
-              </p>
-              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
-                {lang === "fr" ? (
-                  <RevealHeading
-                    lines={[
-                      [{ text: "Créez" }, { text: "des" }, { text: "soumissions" }, { text: "professionnelles" }],
-                      [{ text: "en" }, { text: "30", gradient: true }, { text: "secondes", gradient: true }, { text: "avec" }, { text: "l'IA" }],
-                    ]}
-                  />
-                ) : (
-                  <RevealHeading
-                    lines={[
-                      [{ text: "Create" }, { text: "professional" }, { text: "quotes" }],
-                      [{ text: "in" }, { text: "30", gradient: true }, { text: "seconds", gradient: true }, { text: "with" }, { text: "AI" }],
-                    ]}
-                  />
-                )}
-              </h1>
-              <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
-                {lang === "fr" ? (
-                  <>Décrivez le travail dans vos propres mots — <span className="quoteai-word font-semibold">quoteai</span> génère une soumission professionnelle avec postes, quantités et taxes. Prête à envoyer à votre client.</>
-                ) : (
-                  <>Describe the job in your own words — <span className="quoteai-word font-semibold">quoteai</span> generates a professional quote with line items, quantities, and tax. Ready to send to your client.</>
-                )}
-              </p>
-
-              {/* AI bar */}
-              <div className="ai-bar-glow flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-navy-400 focus-within:ring-2 focus-within:ring-navy-100 transition-all mb-3 max-w-lg mx-auto lg:mx-0">
-                <div className="group relative shrink-0">
-                  <button
-                    disabled
-                    className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-400 cursor-not-allowed hover:bg-gray-100 transition-colors"
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                  </button>
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 bg-gray-900 text-white text-[11px] font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-                    Coming soon
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-                  </div>
-                </div>
-                <Sparkles className="h-4 w-4 text-navy-400 shrink-0" />
-                <input
-                  ref={homepageInputRef}
-                  value={homepageInput}
-                  onChange={(e) => setHomepageInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && homepageInput.trim()) handleHomepageSubmit(); }}
-                  placeholder={lang === "fr" ? "Décrivez le travail et obtenez une soumission en 30 secondes..." : "Describe the job and get a quote in 30 seconds..."}
-                  className="flex-1 text-sm outline-none placeholder:text-gray-400 text-gray-800 bg-transparent min-w-0"
+      {/* ── HERO (docs/mockups .hero — locked, literal) ───────── */}
+      <section className="hero on-dark" id="hero" onMouseMove={handleHeroMove} onMouseLeave={handleHeroLeave}>
+        <div className="wrap hero-grid">
+          <div>
+            <p className="hero-kicker">
+              {lang === "fr" ? "La plateforme IA pour les petites entreprises" : "The AI-driven platform for small business"}
+            </p>
+            <h1>
+              {lang === "fr" ? (
+                <RevealHeading
+                  lines={[
+                    [{ text: "Créez" }, { text: "des" }, { text: "soumissions" }],
+                    [{ text: "professionnelles" }, { text: "en" }, { text: "30" }, { text: "secondes" }],
+                    [{ text: "avec" }, { text: "l'IA." }],
+                  ]}
                 />
-                <div className="group relative shrink-0">
-                  <button
-                    disabled
-                    className="h-8 w-8 flex items-center justify-center rounded-xl text-gray-400 cursor-not-allowed hover:bg-gray-100 transition-colors"
-                  >
-                    <Mic className="h-4 w-4" />
-                  </button>
-                  <div className="absolute bottom-full right-0 mb-2 px-2.5 py-1 bg-gray-900 text-white text-[11px] font-medium rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
-                    Coming soon
-                    <div className="absolute top-full right-3 border-4 border-transparent border-t-gray-900" />
-                  </div>
-                </div>
-                <button
-                  onClick={handleHomepageSubmit}
-                  disabled={!homepageInput.trim()}
-                  className="shrink-0 btn-gradient inline-flex h-8 w-8 items-center justify-center rounded-xl disabled:opacity-40 transition-all"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-              <p className="text-xs text-gray-400 mb-6">{lang === "fr" ? "Essai gratuit de 7 jours · Sans carte de crédit" : "7-day free trial · No credit card required"}</p>
-
-              <div className="flex justify-center lg:justify-start gap-3">
-                <button
-                  onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")}
-                  className="btn-gradient inline-flex h-9 items-center px-5 text-sm font-semibold rounded-lg"
-                >
-                  {lang === "fr" ? "Commencer gratuitement" : "Start for free"}
-                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                </button>
-                <Link
-                  href="#pricing"
-                  className="btn-gradient-outline inline-flex h-9 items-center px-5 text-sm font-semibold rounded-lg"
-                >
-                  {lang === "fr" ? "Voir les forfaits" : "See plans"}
-                </Link>
-              </div>
+              ) : (
+                <RevealHeading
+                  lines={[
+                    [{ text: "Create" }, { text: "professional" }],
+                    [{ text: "quotes" }, { text: "in" }, { text: "30" }, { text: "seconds" }],
+                    [{ text: "with" }, { text: "AI." }],
+                  ]}
+                />
+              )}
+            </h1>
+            <p className="hero-sub">
+              {lang === "fr"
+                ? "quoteai génère vos soumissions chiffrées, suit vos chantiers et garde vos factures organisées — une seule plateforme intelligente pour chaque étape de votre entreprise."
+                : "quoteai drafts priced quotes, tracks your job sites, and keeps your invoices organized — one intelligent platform for every moment of your business."}
+            </p>
+            <div className="hero-actions">
+              <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
+                {lang === "fr" ? "Essayez gratuitement" : "Start your free trial"}
+              </button>
+              <Link href="#products" className="btn btn-outline-light">
+                {lang === "fr" ? "Voir les produits" : "See the products"}
+              </Link>
             </div>
+            <p className="hero-note">{lang === "fr" ? "Essai gratuit de 7 jours. Sans carte de crédit." : "7-day free trial. No credit card required."}</p>
+          </div>
 
-            {/* 3D scene: floating quote document */}
-            <div className="hero-3d-stage hidden lg:flex justify-center items-center relative h-[420px]">
-              <div ref={heroDocRef} className="hero-doc relative w-[320px]">
-                <div className="absolute -bottom-12 left-8 right-8 h-8 rounded-[50%] bg-navy-900/15 blur-xl" style={{ transform: "translateZ(-60px)" }} />
-                <div className="hero-doc-layer rounded-2xl overflow-hidden border border-gray-100 shadow-2xl shadow-navy-200/60 bg-white">
-                  <div className="bg-gray-900 px-3 py-2 flex items-center gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                    </div>
-                    <div className="text-[10px] font-medium text-gray-400 ml-2">Quote_John_Smith.pdf</div>
+          {/* Product screenshot in the hero-media slot (no stock photography) */}
+          <div className="hero-3d-stage hidden lg:flex justify-center items-center relative h-[420px]">
+            <div ref={heroDocRef} className="hero-doc relative w-[320px]">
+              <div className="absolute -bottom-12 left-8 right-8 h-8 rounded-[50%] bg-black/25 blur-xl" style={{ transform: "translateZ(-60px)" }} />
+              <div className="hero-doc-layer rounded-2xl overflow-hidden border border-gray-100 shadow-2xl bg-white">
+                <div className="bg-gray-900 px-3 py-2 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
                   </div>
-                  <div className="bg-white text-black text-[9px] p-4 select-none">
-                    <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5 mb-2.5">
-                      <div>
-                        <div className="font-bold text-slate-800 text-[11px]">Smith Painting Co.</div>
-                        <div className="text-slate-500 text-[9px] mt-0.5">GST/HST: 123456789 RT0001</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest">Quote</div>
-                        <div className="text-[10px] font-bold text-slate-700 mt-0.5">N. 2024-042</div>
-                      </div>
+                  <div className="text-[10px] font-medium text-gray-400 ml-2">Quote_John_Smith.pdf</div>
+                </div>
+                <div className="bg-white text-black text-[9px] p-4 select-none">
+                  <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5 mb-2.5">
+                    <div>
+                      <div className="font-bold text-slate-800 text-[11px]">Smith Painting Co.</div>
+                      <div className="text-slate-500 text-[9px] mt-0.5">GST/HST: 123456789 RT0001</div>
                     </div>
-                    <table className="w-full mb-2">
-                      <thead>
-                        <tr className="bg-slate-800 text-white">
-                          <th className="py-0.5 px-1.5 text-left text-[8px] font-semibold">Section</th>
-                          <th className="py-0.5 px-1.5 text-right text-[8px] font-semibold">Net amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr><td className="py-0.5 px-1.5 text-slate-700">A. Wall painting</td><td className="py-0.5 px-1.5 text-right font-medium text-slate-800">$1,200.00</td></tr>
-                        <tr className="bg-slate-50"><td className="py-0.5 px-1.5 text-slate-700">B. Skim coating & prep</td><td className="py-0.5 px-1.5 text-right font-medium text-slate-800">$250.00</td></tr>
-                      </tbody>
-                    </table>
-                    <div className="flex justify-end">
-                      <div className="w-44 border border-slate-200 rounded overflow-hidden">
-                        <div className="flex justify-between px-2 py-0.5 text-slate-600 border-b border-slate-100 text-[9px]"><span>Subtotal:</span><span className="font-medium">$1,450.00</span></div>
-                        <div className="flex justify-between px-2 py-0.5 text-slate-600 border-b border-slate-100 text-[9px]"><span>HST (13%):</span><span className="font-medium">$319.00</span></div>
-                        <div className="flex justify-between px-2 py-1 bg-slate-800 text-white font-bold text-[10px]"><span>TOTAL</span><span>$1,769.00</span></div>
-                      </div>
+                    <div className="text-right">
+                      <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest">Quote</div>
+                      <div className="text-[10px] font-bold text-slate-700 mt-0.5">N. 2024-042</div>
                     </div>
                   </div>
+                  <table className="w-full mb-2">
+                    <thead>
+                      <tr className="bg-slate-800 text-white">
+                        <th className="py-0.5 px-1.5 text-left text-[8px] font-semibold">Section</th>
+                        <th className="py-0.5 px-1.5 text-right text-[8px] font-semibold">Net amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td className="py-0.5 px-1.5 text-slate-700">A. Wall painting</td><td className="py-0.5 px-1.5 text-right font-medium text-slate-800">$1,200.00</td></tr>
+                      <tr className="bg-slate-50"><td className="py-0.5 px-1.5 text-slate-700">B. Skim coating & prep</td><td className="py-0.5 px-1.5 text-right font-medium text-slate-800">$250.00</td></tr>
+                    </tbody>
+                  </table>
+                  <div className="flex justify-end">
+                    <div className="w-44 border border-slate-200 rounded overflow-hidden">
+                      <div className="flex justify-between px-2 py-0.5 text-slate-600 border-b border-slate-100 text-[9px]"><span>Subtotal:</span><span className="font-medium">$1,450.00</span></div>
+                      <div className="flex justify-between px-2 py-0.5 text-slate-600 border-b border-slate-100 text-[9px]"><span>HST (13%):</span><span className="font-medium">$319.00</span></div>
+                      <div className="flex justify-between px-2 py-1 bg-slate-800 text-white font-bold text-[10px]"><span>TOTAL</span><span>$1,769.00</span></div>
+                    </div>
+                  </div>
                 </div>
-                {/* floating chips */}
-                <div className="hero-float-chip absolute -left-16 top-10 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-lg bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /></div>
-                  <div className="text-[11px] font-semibold text-gray-700">Tax calculated</div>
-                </div>
-                <div className="hero-float-chip absolute -right-14 top-40 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-2s" }}>
-                  <div className="h-6 w-6 rounded-lg bg-navy-50 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-navy-500" /></div>
-                  <div className="text-[11px] font-semibold text-gray-700">Generated in 30 sec</div>
-                </div>
-                <div className="hero-float-chip absolute -left-10 bottom-2 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-3.2s" }}>
-                  <div className="h-6 w-6 rounded-lg bg-teal-50 flex items-center justify-center"><DollarSign className="h-3.5 w-3.5 text-teal-500" /></div>
-                  <div className="text-[11px] font-semibold text-gray-700">$1,769.00 total</div>
-                </div>
+              </div>
+              {/* floating chips */}
+              <div className="hero-float-chip absolute -left-16 top-10 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2">
+                <div className="h-6 w-6 rounded-lg bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /></div>
+                <div className="text-[11px] font-semibold text-gray-700">Tax calculated</div>
+              </div>
+              <div className="hero-float-chip absolute -right-14 top-40 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-2s" }}>
+                <div className="h-6 w-6 rounded-lg bg-navy-50 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-navy-500" /></div>
+                <div className="text-[11px] font-semibold text-gray-700">Generated in 30 sec</div>
+              </div>
+              <div className="hero-float-chip absolute -left-10 bottom-2 bg-white rounded-xl border border-gray-100 shadow-lg px-3 py-2 flex items-center gap-2" style={{ animationDelay: "-3.2s" }}>
+                <div className="h-6 w-6 rounded-lg bg-teal-50 flex items-center justify-center"><DollarSign className="h-3.5 w-3.5 text-teal-500" /></div>
+                <div className="text-[11px] font-semibold text-gray-700">$1,769.00 total</div>
               </div>
             </div>
           </div>
@@ -327,31 +263,7 @@ export default function Home() {
         </div>
       </ScrollSection>
 
-      {/* ── SECTION 2: Demo Video ─────────────────────────────── */}
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4 max-w-3xl">
-          <div className="rounded-xl overflow-hidden border border-gray-100 shadow-md flex flex-col">
-            <div className="bg-gray-900 px-3 py-2 flex items-center gap-2 shrink-0">
-              <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-              </div>
-              <div className="text-[11px] font-medium text-gray-400 ml-2">quoteai.ca — demo</div>
-            </div>
-            <div style={{ aspectRatio: "16/9", position: "relative", overflow: "hidden" }}>
-              <Suspense fallback={<div className="w-full h-full bg-gray-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-navy-500 border-t-transparent rounded-full animate-spin" /></div>}>
-                <div className="absolute inset-0" style={{ transform: "scale(1)", transformOrigin: "top left", width: "100%", height: "100%" }}>
-                  <DemoPlayer loop={true} />
-                </div>
-              </Suspense>
-            </div>
-          </div>
-          <p className="text-xs text-gray-400 text-center mt-3">{lang === "fr" ? "Démo en direct — aucun effet, aucun montage" : "Live demo — no effects, no editing"}</p>
-        </div>
-      </section>
-
-      {/* ── SECTION 3/4/5/5BIS: Story splits (AI Quotes / Smart CRM / Invoicing / Integrations) ── */}
+      {/* ── SECTION 3/4/5: Story splits (AI Quotes / Smart CRM / Invoicing — locked, literal 3) ── */}
       <ScrollSection className="stories" id="platform">
         <div className="wrap">
 
@@ -524,6 +436,122 @@ export default function Home() {
             </div>
           </div>
 
+        </div>
+      </ScrollSection>
+
+      {/* ── Impact: real, live-counted stats (docs/mockups .impact band) ── */}
+      <StatsBar />
+
+      {/* ── Newsroom: latest real blog posts ──────────────────── */}
+      <ScrollSection className="newsroom" id="newsroom">
+        <div className="wrap">
+          <div className="news-head">
+            <div>
+              <p className="eyebrow">{lang === "fr" ? "Blogue" : "Newsroom"}</p>
+              <h2 className="sec-title">{lang === "fr" ? "Les dernières nouvelles de quoteai" : "The latest from quoteai"}</h2>
+            </div>
+            <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all articles"} <ArrowRight className="chev h-4 w-4" /></Link>
+          </div>
+          <div className="news-grid">
+            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
+              <Link key={article.slug} href={`/blog/${article.slug}/`} className="news-card">
+                <div className="news-body">
+                  <p className="news-meta">
+                    {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" })}
+                  </p>
+                  <h3>{article.title}</h3>
+                  <span className="cta-link">{lang === "fr" ? "Lire l'article" : "Read more"} <ArrowRight className="chev h-4 w-4" /></span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </ScrollSection>
+
+      {/* ── Trial CTA band (docs/mockups .trial — locked position: right after newsroom) ── */}
+      <ScrollSection className="trial on-dark" id="trial">
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 55%, #0a1628 100%)" }}>
+          <div className="mesh-blob mesh-blob-1" style={{ opacity: 0.6 }} />
+          <div className="mesh-blob mesh-blob-2" style={{ opacity: 0.6 }} />
+        </div>
+        <div className="wrap trial-in">
+          <p className="eyebrow">{lang === "fr" ? "Commencer" : "Get started"}</p>
+          <h2>{lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}</h2>
+          <p>
+            {lang === "fr"
+              ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine. Essai gratuit de 7 jours, sans carte de crédit."
+              : "Join hundreds of Canadian contractors and tradespeople who save hours every week. 7-day free trial, no credit card required."}
+          </p>
+          <div className="trial-actions">
+            <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
+              {lang === "fr" ? "Créez votre compte gratuit" : "Create your free account"}
+            </button>
+            <Link href="#pricing" className="btn btn-outline-light">
+              {lang === "fr" ? "Voir les forfaits" : "See plans"}
+            </Link>
+          </div>
+          <p className="trial-note">{lang === "fr" ? "Sans carte de crédit · Annulez à tout moment" : "No credit card required · Cancel anytime"}</p>
+        </div>
+      </ScrollSection>
+
+      {/* ── Appended below the locked structure (per user decision): everything the
+          mockup doesn't have a slot for, reskinned into the same vocabulary rather
+          than dropped — try-it bar + demo video, WhatsApp integrations, pricing,
+          comparison table, testimonials, guides, sectors accordion, SEO deep-dive. ── */}
+
+      {/* Try it yourself + demo video */}
+      <ScrollSection className="py-16 bg-white">
+        <div className="wrap">
+          <div className="text-center max-w-xl mx-auto mb-8">
+            <p className="eyebrow">{lang === "fr" ? "Essayez-le" : "Try it yourself"}</p>
+            <h2 className="sec-title !text-[1.9rem]">{lang === "fr" ? "Décrivez le travail, obtenez une soumission" : "Describe the job, get a quote"}</h2>
+          </div>
+          <div className="ai-bar-glow flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm focus-within:border-navy-400 focus-within:ring-2 focus-within:ring-navy-100 transition-all max-w-lg mx-auto mb-3">
+            <Sparkles className="h-4 w-4 text-navy-400 shrink-0" />
+            <input
+              ref={homepageInputRef}
+              value={homepageInput}
+              onChange={(e) => setHomepageInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && homepageInput.trim()) handleHomepageSubmit(); }}
+              placeholder={lang === "fr" ? "Décrivez le travail et obtenez une soumission en 30 secondes..." : "Describe the job and get a quote in 30 seconds..."}
+              className="flex-1 text-sm outline-none placeholder:text-gray-400 text-gray-800 bg-transparent min-w-0"
+            />
+            <button
+              onClick={handleHomepageSubmit}
+              disabled={!homepageInput.trim()}
+              className="shrink-0 btn-gradient inline-flex h-8 w-8 items-center justify-center rounded-xl disabled:opacity-40 transition-all"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 text-center mb-10">{lang === "fr" ? "Essai gratuit de 7 jours · Sans carte de crédit" : "7-day free trial · No credit card required"}</p>
+
+          <div className="max-w-3xl mx-auto">
+            <div className="rounded-xl overflow-hidden border border-gray-100 shadow-md flex flex-col">
+              <div className="bg-gray-900 px-3 py-2 flex items-center gap-2 shrink-0">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                </div>
+                <div className="text-[11px] font-medium text-gray-400 ml-2">quoteai.ca — demo</div>
+              </div>
+              <div style={{ aspectRatio: "16/9", position: "relative", overflow: "hidden" }}>
+                <Suspense fallback={<div className="w-full h-full bg-gray-950 flex items-center justify-center"><div className="w-8 h-8 border-2 border-navy-500 border-t-transparent rounded-full animate-spin" /></div>}>
+                  <div className="absolute inset-0" style={{ transform: "scale(1)", transformOrigin: "top left", width: "100%", height: "100%" }}>
+                    <DemoPlayer loop={true} />
+                  </div>
+                </Suspense>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 text-center mt-3">{lang === "fr" ? "Démo en direct — aucun effet, aucun montage" : "Live demo — no effects, no editing"}</p>
+          </div>
+        </div>
+      </ScrollSection>
+
+      {/* WhatsApp / Integrations (reuses the locked .stories/.split vocabulary, outside the primary 3-split structure) */}
+      <ScrollSection className="stories">
+        <div className="wrap">
           <div className="split rev" id="story-whatsapp">
             <div className="split-media">
               <WhatsAppChatDemo />
@@ -554,36 +582,6 @@ export default function Home() {
                 {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"} <ArrowRight className="chev h-4 w-4" />
               </Link>
             </div>
-          </div>
-
-        </div>
-      </ScrollSection>
-
-      {/* ── Impact: real, live-counted stats (docs/mockups .impact band) ── */}
-      <StatsBar />
-
-      {/* ── Newsroom: latest real blog posts ──────────────────── */}
-      <ScrollSection className="newsroom" id="newsroom">
-        <div className="wrap">
-          <div className="news-head">
-            <div>
-              <p className="eyebrow">{lang === "fr" ? "Blogue" : "Newsroom"}</p>
-              <h2 className="sec-title">{lang === "fr" ? "Les dernières nouvelles de quoteai" : "The latest from quoteai"}</h2>
-            </div>
-            <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all articles"} <ArrowRight className="chev h-4 w-4" /></Link>
-          </div>
-          <div className="news-grid">
-            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
-              <Link key={article.slug} href={`/blog/${article.slug}/`} className="news-card">
-                <div className="news-body">
-                  <p className="news-meta">
-                    {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" })}
-                  </p>
-                  <h3>{article.title}</h3>
-                  <span className="cta-link">{lang === "fr" ? "Lire l'article" : "Read more"} <ArrowRight className="chev h-4 w-4" /></span>
-                </div>
-              </Link>
-            ))}
           </div>
         </div>
       </ScrollSection>
@@ -1062,31 +1060,6 @@ export default function Home() {
         </div>
       </ScrollSection>
 
-      {/* ── Trial CTA band (docs/mockups .trial) ──────────────── */}
-      <ScrollSection className="trial on-dark" id="trial">
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #0f0f1a 0%, #1a0a2e 55%, #0a1628 100%)" }}>
-          <div className="mesh-blob mesh-blob-1" style={{ opacity: 0.6 }} />
-          <div className="mesh-blob mesh-blob-2" style={{ opacity: 0.6 }} />
-        </div>
-        <div className="wrap trial-in">
-          <p className="eyebrow">{lang === "fr" ? "Commencer" : "Get started"}</p>
-          <h2>{lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}</h2>
-          <p>
-            {lang === "fr"
-              ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine. Essai gratuit de 7 jours, sans carte de crédit."
-              : "Join hundreds of Canadian contractors and tradespeople who save hours every week. 7-day free trial, no credit card required."}
-          </p>
-          <div className="trial-actions">
-            <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
-              {lang === "fr" ? "Créez votre compte gratuit" : "Create your free account"}
-            </button>
-            <Link href="#pricing" className="btn btn-outline-light">
-              {lang === "fr" ? "Voir les forfaits" : "See plans"}
-            </Link>
-          </div>
-          <p className="trial-note">{lang === "fr" ? "Sans carte de crédit · Annulez à tout moment" : "No credit card required · Cancel anytime"}</p>
-        </div>
-      </ScrollSection>
     </div>
   );
 }

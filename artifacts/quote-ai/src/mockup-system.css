@@ -480,7 +480,16 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
    CTA, footer. Ported from docs/mockups/homepage-mockup.html.
    ========================================================== */
 
-.hero-kicker { font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #b7b9cc; }
+.hero-kicker { font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: #b7b9cc; margin-bottom: 26px; }
+
+/* hero (locked, literal) */
+.hero { background: var(--navy); color: #fff; overflow: hidden; position: relative; }
+.hero.on-dark h1 { color: #fff; }
+.hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(40px, 6vw, 90px); align-items: center; padding: clamp(56px, 9vw, 100px) 0; position: relative; z-index: 1; }
+.hero h1 { font-size: clamp(2.3rem, 4.4vw, 3.6rem); font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+.hero-sub { margin: 24px 0 32px; font-size: clamp(1rem, 1.3vw, 1.1rem); color: #c9cad6; max-width: 480px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-note { margin-top: 22px; font-size: 13.5px; color: #8f91a6; font-weight: 600; }
 
 /* announcement bar */
 .annc { background: var(--navy); color: #fff; font-size: 14px; font-weight: 600; text-align: center; padding: 10px 48px 10px 20px; position: relative; }
@@ -605,6 +614,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
   .ft-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; padding-top: 48px; }
   .split { grid-template-columns: 1fr; gap: 28px; }
   .split.rev .split-media { order: 0; }
   .hd-signin { display: none; }
@@ -614,4 +624,5 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
   .impact .stat-grid { grid-template-columns: 1fr; }
   .ft-grid { grid-template-columns: 1fr; }
   .ft-bottom { justify-content: flex-start; }
+  .hero-actions .btn { width: 100%; }
 }

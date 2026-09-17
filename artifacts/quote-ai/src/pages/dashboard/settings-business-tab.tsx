@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { MockupToggle } from "@/components/ui/mockup-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -142,170 +140,186 @@ export function BusinessTab() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <MapPin className="h-5 w-5 text-navy-600" />
-            {t("dashboard.settings.business.identityTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.settings.business.identityDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="province">{t("dashboard.settings.business.province")}</Label>
-              <select
-                id="province"
-                value={province}
-                onChange={(e) => setProvince(e.target.value)}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="">{t("dashboard.settings.business.provinceSelect")}</option>
-                {CANADIAN_PROVINCES.map((p) => (
-                  <option key={p.code} value={p.code}>{lang === "fr" ? p.fr : p.en}</option>
-                ))}
-              </select>
-              {taxHint && (
-                <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.taxApplied")}: <strong>{taxHint}</strong></p>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="gst">{t("dashboard.settings.business.gstHst")}</Label>
-              <Input id="gst" value={gstHstNumber} onChange={(e) => setGstHstNumber(e.target.value)} placeholder="123456789 RT0001" />
-            </div>
-            {province === "QC" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="qst">{t("dashboard.settings.business.qst")}</Label>
-                <Input id="qst" value={qstNumber} onChange={(e) => setQstNumber(e.target.value)} placeholder="1234567890 TQ0001" />
-              </div>
+    <div className="stack">
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-navy-600" />
+              {t("dashboard.settings.business.identityTitle")}
+            </h2>
+            <p className="sub">{t("dashboard.settings.business.identityDesc")}</p>
+          </div>
+        </div>
+        <div className="form-grid">
+          <div className="field">
+            <Label htmlFor="province">{t("dashboard.settings.business.province")}</Label>
+            <select
+              id="province"
+              value={province}
+              onChange={(e) => setProvince(e.target.value)}
+            >
+              <option value="">{t("dashboard.settings.business.provinceSelect")}</option>
+              {CANADIAN_PROVINCES.map((p) => (
+                <option key={p.code} value={p.code}>{lang === "fr" ? p.fr : p.en}</option>
+              ))}
+            </select>
+            {taxHint && (
+              <span className="text-xs text-muted-foreground mt-1 block">{t("dashboard.settings.business.taxApplied")}: <strong>{taxHint}</strong></span>
             )}
-            {(province === "BC" || province === "SK" || province === "MB") && (
-              <div className="space-y-1.5">
-                <Label htmlFor="pst">{t("dashboard.settings.business.pst")}</Label>
-                <Input id="pst" value={pstNumber} onChange={(e) => setPstNumber(e.target.value)} placeholder="PST-1234-5678" />
-              </div>
-            )}
-            <div className="space-y-1.5">
-              <Label htmlFor="licence">{t("dashboard.settings.business.licence")}</Label>
-              <Input id="licence" value={licenceNumber} onChange={(e) => setLicenceNumber(e.target.value)} placeholder={province === "QC" ? "RBQ 1234-5678-01" : t("dashboard.settings.business.licencePlaceholder")} />
-              <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.licenceHint")}</p>
-            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Landmark className="h-5 w-5 text-navy-600" />
-            {t("dashboard.settings.business.paymentsTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.settings.business.paymentsDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-1.5">
-          <Label htmlFor="etransfer">{t("dashboard.settings.business.etransferEmail")}</Label>
-          <Input id="etransfer" type="email" value={etransferEmail} onChange={(e) => setEtransferEmail(e.target.value)} placeholder="payments@yourcompany.ca" />
-          <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.etransferHint")}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Star className="h-5 w-5 text-navy-600" />
-            {t("dashboard.settings.business.reviewsTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.settings.business.reviewsDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="googleReviewUrl">{t("dashboard.settings.business.googleReviewUrl")}</Label>
-            <Input id="googleReviewUrl" type="url" value={googleReviewUrl} onChange={(e) => setGoogleReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" />
-            <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.googleReviewUrlHint")}</p>
+          <div className="field">
+            <Label htmlFor="gst">{t("dashboard.settings.business.gstHst")}</Label>
+            <Input id="gst" value={gstHstNumber} onChange={(e) => setGstHstNumber(e.target.value)} placeholder="123456789 RT0001" />
           </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="homeStarsProfileUrl">{t("dashboard.settings.business.homeStarsProfileUrl")}</Label>
-            <Input id="homeStarsProfileUrl" type="url" value={homeStarsProfileUrl} onChange={(e) => setHomeStarsProfileUrl(e.target.value)} placeholder="https://homestars.com/companies/..." />
-            <p className="text-xs text-muted-foreground">{t("dashboard.settings.business.homeStarsProfileUrlHint")}</p>
-          </div>
-          <div className="flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
-            <div>
-              <div className="text-sm font-medium">{t("dashboard.settings.business.sendReviewRequests")}</div>
-              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.sendReviewRequestsHint")}</div>
-            </div>
-            <Switch checked={sendReviewRequests} onCheckedChange={setSendReviewRequests} disabled={!googleReviewUrl} />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CalendarClock className="h-5 w-5 text-navy-600" />
-            {t("dashboard.settings.business.scheduleTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.settings.business.scheduleDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PaymentScheduleEditor value={schedule} onChange={setSchedule} total={0} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Zap className="h-5 w-5 text-navy-600" />
-            {t("dashboard.settings.business.automationTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.settings.business.automationDesc")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
-            <div>
-              <div className="text-sm font-medium">{t("dashboard.settings.business.notifyAccepted")}</div>
-              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.notifyAcceptedHint")}</div>
-            </div>
-            <Switch checked={notifyOnQuoteAccepted} onCheckedChange={setNotifyOnQuoteAccepted} />
-          </div>
-
-          {/* Phase 4: invoice automation */}
-          <div className="mt-3 flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
-            <div>
-              <div className="text-sm font-medium">{t("dashboard.settings.business.autoSendInvoices")}</div>
-              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.autoSendInvoicesHint")}</div>
-            </div>
-            <Switch checked={autoSendInvoices} onCheckedChange={setAutoSendInvoices} />
-          </div>
-          {!autoSendInvoices && (
-            <div className="mt-3 flex items-center justify-between gap-4 rounded-[var(--radius-sm)] border px-4 py-3">
-              <div>
-                <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReviewWindow")}</div>
-                <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceReviewWindowHint")}</div>
-              </div>
-              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={invoiceAutoSendAfterHours} onChange={(e) => setInvoiceAutoSendAfterHours(Number(e.target.value))}>
-                <option value={0}>{t("dashboard.settings.business.reviewNever")}</option>
-                <option value={24}>24 h</option>
-                <option value={48}>48 h</option>
-                <option value={72}>72 h</option>
-              </select>
+          {province === "QC" && (
+            <div className="field">
+              <Label htmlFor="qst">{t("dashboard.settings.business.qst")}</Label>
+              <Input id="qst" value={qstNumber} onChange={(e) => setQstNumber(e.target.value)} placeholder="1234567890 TQ0001" />
             </div>
           )}
-          <div className="mt-3 flex items-center justify-between rounded-[var(--radius-sm)] border px-4 py-3">
-            <div>
-              <div className="text-sm font-medium">{t("dashboard.settings.business.invoiceReminders")}</div>
-              <div className="text-xs text-muted-foreground">{t("dashboard.settings.business.invoiceRemindersHint")}</div>
+          {(province === "BC" || province === "SK" || province === "MB") && (
+            <div className="field">
+              <Label htmlFor="pst">{t("dashboard.settings.business.pst")}</Label>
+              <Input id="pst" value={pstNumber} onChange={(e) => setPstNumber(e.target.value)} placeholder="PST-1234-5678" />
             </div>
-            <Switch checked={invoiceReminders} onCheckedChange={setInvoiceReminders} />
+          )}
+          <div className="field">
+            <Label htmlFor="licence">{t("dashboard.settings.business.licence")}</Label>
+            <Input id="licence" value={licenceNumber} onChange={(e) => setLicenceNumber(e.target.value)} placeholder={province === "QC" ? "RBQ 1234-5678-01" : t("dashboard.settings.business.licencePlaceholder")} />
+            <span className="text-xs text-muted-foreground mt-1 block">{t("dashboard.settings.business.licenceHint")}</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2">
+              <Landmark className="h-5 w-5 text-navy-600" />
+              {t("dashboard.settings.business.paymentsTitle")}
+            </h2>
+            <p className="sub">{t("dashboard.settings.business.paymentsDesc")}</p>
+          </div>
+        </div>
+        <div className="form-grid">
+          <div className="field full">
+            <Label htmlFor="etransfer">{t("dashboard.settings.business.etransferEmail")}</Label>
+            <Input id="etransfer" type="email" value={etransferEmail} onChange={(e) => setEtransferEmail(e.target.value)} placeholder="payments@yourcompany.ca" />
+            <span className="text-xs text-muted-foreground mt-1 block">{t("dashboard.settings.business.etransferHint")}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-navy-600" />
+              {t("dashboard.settings.business.reviewsTitle")}
+            </h2>
+            <p className="sub">{t("dashboard.settings.business.reviewsDesc")}</p>
+          </div>
+        </div>
+        <div className="form-grid">
+          <div className="field full">
+            <Label htmlFor="googleReviewUrl">{t("dashboard.settings.business.googleReviewUrl")}</Label>
+            <Input id="googleReviewUrl" type="url" value={googleReviewUrl} onChange={(e) => setGoogleReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" />
+            <span className="text-xs text-muted-foreground mt-1 block">{t("dashboard.settings.business.googleReviewUrlHint")}</span>
+          </div>
+          <div className="field full">
+            <Label htmlFor="homeStarsProfileUrl">{t("dashboard.settings.business.homeStarsProfileUrl")}</Label>
+            <Input id="homeStarsProfileUrl" type="url" value={homeStarsProfileUrl} onChange={(e) => setHomeStarsProfileUrl(e.target.value)} placeholder="https://homestars.com/companies/..." />
+            <span className="text-xs text-muted-foreground mt-1 block">{t("dashboard.settings.business.homeStarsProfileUrlHint")}</span>
+          </div>
+        </div>
+        <div className="set-row">
+          <div className="txt">
+            <b>{t("dashboard.settings.business.sendReviewRequests")}</b>
+            <span>{t("dashboard.settings.business.sendReviewRequestsHint")}</span>
+          </div>
+          <MockupToggle
+            checked={sendReviewRequests}
+            onCheckedChange={setSendReviewRequests}
+            disabled={!googleReviewUrl}
+            label={t("dashboard.settings.business.sendReviewRequests")}
+          />
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2">
+              <CalendarClock className="h-5 w-5 text-navy-600" />
+              {t("dashboard.settings.business.scheduleTitle")}
+            </h2>
+            <p className="sub">{t("dashboard.settings.business.scheduleDesc")}</p>
+          </div>
+        </div>
+        <div className="p-5">
+          <PaymentScheduleEditor value={schedule} onChange={setSchedule} total={0} />
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-navy-600" />
+              {t("dashboard.settings.business.automationTitle")}
+            </h2>
+            <p className="sub">{t("dashboard.settings.business.automationDesc")}</p>
+          </div>
+        </div>
+        <div className="set-row">
+          <div className="txt">
+            <b>{t("dashboard.settings.business.notifyAccepted")}</b>
+            <span>{t("dashboard.settings.business.notifyAcceptedHint")}</span>
+          </div>
+          <MockupToggle checked={notifyOnQuoteAccepted} onCheckedChange={setNotifyOnQuoteAccepted} label={t("dashboard.settings.business.notifyAccepted")} />
+        </div>
+
+        {/* Phase 4: invoice automation */}
+        <div className="set-row">
+          <div className="txt">
+            <b>{t("dashboard.settings.business.autoSendInvoices")}</b>
+            <span>{t("dashboard.settings.business.autoSendInvoicesHint")}</span>
+          </div>
+          <MockupToggle checked={autoSendInvoices} onCheckedChange={setAutoSendInvoices} label={t("dashboard.settings.business.autoSendInvoices")} />
+        </div>
+        {!autoSendInvoices && (
+          <div className="set-row">
+            <div className="txt">
+              <b>{t("dashboard.settings.business.invoiceReviewWindow")}</b>
+              <span>{t("dashboard.settings.business.invoiceReviewWindowHint")}</span>
+            </div>
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={invoiceAutoSendAfterHours}
+              onChange={(e) => setInvoiceAutoSendAfterHours(Number(e.target.value))}
+            >
+              <option value={0}>{t("dashboard.settings.business.reviewNever")}</option>
+              <option value={24}>24 h</option>
+              <option value={48}>48 h</option>
+              <option value={72}>72 h</option>
+            </select>
+          </div>
+        )}
+        <div className="set-row">
+          <div className="txt">
+            <b>{t("dashboard.settings.business.invoiceReminders")}</b>
+            <span>{t("dashboard.settings.business.invoiceRemindersHint")}</span>
+          </div>
+          <MockupToggle checked={invoiceReminders} onCheckedChange={setInvoiceReminders} label={t("dashboard.settings.business.invoiceReminders")} />
+        </div>
+      </div>
 
       <div className="flex justify-end">
-        <Button onClick={save} disabled={saving} className="gap-2">
+        <button onClick={save} disabled={saving} className="btn btn-navy gap-2">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {t("dashboard.settings.business.save")}
-        </Button>
+        </button>
       </div>
     </div>
   );

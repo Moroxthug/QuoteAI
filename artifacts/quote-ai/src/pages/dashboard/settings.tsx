@@ -22,8 +22,6 @@ import {
   useGetEmailConnectionsStatus, getGetEmailConnectionsStatusQueryKey, useGetEmailConnectionConnectUrl,
   getGetEmailConnectionConnectUrlQueryKey, useDisconnectEmailConnection, useToggleEmailConnection,
 } from "@workspace/api-client-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -32,7 +30,6 @@ import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle,
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -162,38 +159,38 @@ function AccountTab() {
     <div className="space-y-6">
       {/* Logo */}
       {isStarter ? (
-        <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
-          <CardHeader>
+        <div className="card border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
+          <div className="card-head">
             <div className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-navy-500" />
-              <CardTitle>{t("dashboard.profile.logoProOnly.title")}</CardTitle>
+              <h2>{t("dashboard.profile.logoProOnly.title")}</h2>
             </div>
-            <CardDescription>
+            <p className="sub">
               {t("dashboard.settings.account.logoStarterDesc1")}<br/>
               {t("dashboard.settings.account.logoStarterDesc2")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="p-5">
             <div className="flex items-center gap-4">
               <div className="flex-1 space-y-1.5">
                 {[t("dashboard.profile.logoProOnly.feature1"), t("dashboard.profile.logoProOnly.feature2"), t("dashboard.profile.logoProOnly.feature3")].map(f => (
                   <div key={f} className="flex items-center gap-2 text-sm"><span className="text-navy-500 font-bold">✓</span> {f}</div>
                 ))}
               </div>
-              <Button onClick={() => createPortal.mutate(undefined, { onSuccess: (r) => { window.open(r.url, "_blank"); } })} disabled={createPortal.isPending}>
+              <button onClick={() => createPortal.mutate(undefined, { onSuccess: (r) => { window.open(r.url, "_blank"); } })} disabled={createPortal.isPending} className="btn btn-navy">
                 {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Crown className="h-4 w-4 mr-2" />}
                 {t("dashboard.profile.logoProOnly.upgradeButton")}
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("dashboard.profile.logo.title")}</CardTitle>
-            <CardDescription>{t("dashboard.settings.account.logoDesc")}</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <div className="card">
+          <div className="card-head">
+            <h2>{t("dashboard.profile.logo.title")}</h2>
+            <p className="sub">{t("dashboard.settings.account.logoDesc")}</p>
+          </div>
+          <div className="p-5">
             <div className="flex items-center gap-6">
               <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-[var(--radius-sm)] flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
                 {currentLogoUrl ? (
@@ -206,31 +203,31 @@ function AccountTab() {
               </div>
               <div className="space-y-2">
                 <input ref={fileInputRef} type="file" accept=".svg,.png,.jpg,.jpeg" className="hidden" onChange={handleLogoUpload} disabled={isUploadingLogo} />
-                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploadingLogo} className="gap-2">
+                <button type="button"   onClick={() => fileInputRef.current?.click()} disabled={isUploadingLogo} className="btn btn-outline-navy btn-sm gap-2">
                   {isUploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   {isUploadingLogo ? t("dashboard.profile.logo.uploading") : t("dashboard.profile.logo.uploadButton")}
-                </Button>
+                </button>
                 {currentLogoUrl && (
-                  <Button type="button" variant="ghost" size="sm" onClick={handleRemoveLogo} className="gap-2 text-destructive hover:text-destructive block">
+                  <button type="button"   onClick={handleRemoveLogo} className="btn btn-outline-navy btn-sm gap-2 text-destructive hover:text-destructive block">
                     <X className="h-4 w-4" />{t("dashboard.profile.logo.remove")}
-                  </Button>
+                  </button>
                 )}
                 <p className="text-xs text-muted-foreground">{t("dashboard.settings.account.logoFormatsShort")}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Profile form */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("dashboard.profile.businessData.title")}</CardTitle>
-              <CardDescription>{t("dashboard.profile.businessData.desc")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="card">
+            <div className="card-head">
+              <h2>{t("dashboard.profile.businessData.title")}</h2>
+              <p className="sub">{t("dashboard.profile.businessData.desc")}</p>
+            </div>
+            <div className="p-5 space-y-4">
               <FormField control={form.control} name="companyName" render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("dashboard.profile.businessData.companyNameLabel")}</FormLabel>
@@ -268,29 +265,29 @@ function AccountTab() {
                   <FormMessage />
                 </FormItem>
               )} />
-            </CardContent>
-            <CardFooter className="flex justify-end border-t p-6">
-              <Button type="submit" disabled={updateProfile.isPending} className="min-w-[120px]">
+            </div>
+            <div className="card-foot flex justify-end border-t p-6">
+              <button type="submit" disabled={updateProfile.isPending} className="btn btn-navy min-w-[120px]">
                 {updateProfile.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                 {t("dashboard.profile.businessData.saveButton")}
-              </Button>
-            </CardFooter>
-          </Card>
+              </button>
+            </div>
+          </div>
         </form>
       </Form>
 
       {/* Widget Funnel Integration Card */}
-      <Card className="mt-6">
-        <CardHeader>
+      <div className="card mt-6">
+        <div className="card-head">
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-navy-500" />
-            <CardTitle>{t("dashboard.settings.account.widgetCard.title")}</CardTitle>
+            <h2>{t("dashboard.settings.account.widgetCard.title")}</h2>
           </div>
-          <CardDescription>
+          <p className="sub">
             {t("dashboard.settings.account.widgetCard.desc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="p-5 space-y-4">
           {profile?.apiKey ? (
             <div className="space-y-4">
               <div className="space-y-1.5">
@@ -301,15 +298,13 @@ function AccountTab() {
                     value={profile.apiKey}
                     className="font-mono text-xs bg-muted/30 text-center"
                   />
-                  <Button
-                    onClick={handleGenerateApiKey}
+                  <button onClick={handleGenerateApiKey}
                     disabled={generatingKey}
-                    variant="outline"
-                    className="shrink-0"
-                  >
+                    
+                    className="btn btn-outline-navy shrink-0">
                     {generatingKey ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                     {t("dashboard.settings.account.widgetCard.regenerate")}
-                  </Button>
+                  </button>
                 </div>
               </div>
 
@@ -328,31 +323,28 @@ function AccountTab() {
   async
 ></script>`}
                   </pre>
-                  <Button
-                    size="sm"
-                    onClick={() => {
+                  <button onClick={() => {
                       const code = `<!-- QuoteAI Widget Funnel -->\n<div id="quoteai-widget">\n  <a href="https://quoteai.ca" rel="noopener">${t("dashboard.settings.account.widgetCard.embedAnchorText")}</a>\n</div>\n<script\n  src="${typeof window !== "undefined" ? window.location.origin : "https://quoteai.ca"}/widget.js"\n  data-api-key="${profile.apiKey}"\n  async\n></script>`;
                       navigator.clipboard.writeText(code);
                       toast({ title: t("dashboard.settings.account.widgetCard.codeCopiedTitle"), description: t("dashboard.settings.account.widgetCard.codeCopiedDesc") });
                     }}
-                    className="absolute right-3 top-3 text-[10px] font-semibold h-7 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700"
-                  >
+                    className="btn btn-navy btn-sm absolute right-3 top-3 text-[10px] font-semibold h-7 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700">
                     {t("dashboard.settings.account.widgetCard.copy")}
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-6 border border-dashed rounded-[var(--radius)] bg-muted/10 space-y-3">
               <p className="text-sm text-muted-foreground">{t("dashboard.settings.account.widgetCard.noApiKeyDesc")}</p>
-              <Button onClick={handleGenerateApiKey} disabled={generatingKey}>
+              <button onClick={handleGenerateApiKey} disabled={generatingKey} className="btn btn-navy">
                 {generatingKey ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Zap className="h-4 w-4 mr-2" />}
                 {t("dashboard.settings.account.widgetCard.enableWidgetButton")}
-              </Button>
+              </button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -360,12 +352,11 @@ function AccountTab() {
 function QuotaBar({ used, limit }: { used: number; limit: number }) {
   const { t } = useLanguage();
   const pct = Math.min(100, Math.round((used / limit) * 100));
-  const color = pct >= 90 ? "bg-red-500" : pct >= 70 ? "bg-amber-500" : "bg-navy-500";
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-sm"><span className="text-muted-foreground">{t("dashboard.billing.quotesUsed")}</span><span className="font-semibold">{used} / {limit}</span></div>
-      <div className="w-full h-2.5 rounded-full bg-muted overflow-hidden">
-        <div className={`h-full rounded-full transition-all duration-500 ${color}`} style={{ width: `${pct}%` }} />
+      <div className="hbar">
+        <i style={{ width: `${pct}%`, background: pct >= 90 ? "var(--red)" : pct >= 70 ? "var(--yellow-dark)" : "var(--navy)" }} />
       </div>
       <div className="flex justify-between text-xs text-muted-foreground"><span>{t("dashboard.settings.whatsapp.remaining").replace("{count}", String(limit - used))}</span><span>{t("dashboard.billing.pctUsed").replace("{pct}", String(pct))}</span></div>
     </div>
@@ -450,24 +441,24 @@ function BillingTab() {
   return (
     <div className="space-y-6">
       {isActive ? (
-        <Card className={`border-2 ${isElite ? "border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50" : isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-navy-50" : "border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50"}`}>
-          <CardHeader className="pb-3">
+        <div className={cn("card", `border-2 ${isElite ? "border-amber-400 bg-gradient-to-br from-amber-50 to-orange-50" : isPro ? "border-amber-300 bg-gradient-to-br from-amber-50 to-navy-50" : "border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50"}`)}>
+          <div className="card-head pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className={`h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center ${isElite ? "bg-amber-200" : isPro ? "bg-amber-100" : "bg-navy-100"}`}>
                   {isElite ? <Crown className="h-6 w-6 text-amber-700" /> : isPro ? <Crown className="h-6 w-6 text-amber-600" /> : <Zap className="h-6 w-6 text-navy-500" />}
                 </div>
                 <div>
-                  <CardTitle className="text-xl">QuoteAI {planLabel}</CardTitle>
+                  <h2 className="text-xl">QuoteAI {planLabel}</h2>
                   <p className="text-sm text-muted-foreground mt-0.5">{planPrice}</p>
                 </div>
               </div>
-              <Badge className={`text-xs ${isElite ? "bg-amber-100 text-amber-800 border-amber-300" : isPro ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-navy-100 text-navy-700 border-navy-200"}`} variant="outline">
+              <span className={cn("chip", isElite ? "chip-yellow" : isPro ? "chip-purple" : "chip-teal")}>
                 <CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.billing.active")}
-              </Badge>
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
+          </div>
+          <div className="p-5 space-y-5">
             {isStarter && sub.quotaUsed != null && sub.quotaLimit != null && (
               <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-navy-100">
                 <div className="flex items-center gap-2 mb-3"><BarChart3 className="h-4 w-4 text-navy-500" /><span className="text-sm font-semibold">{t("dashboard.billing.monthlyUsage")}</span></div>
@@ -499,33 +490,33 @@ function BillingTab() {
             )}
             <div className="flex flex-wrap gap-3 pt-1">
               {(isStarter || isPro) && (
-                <Button onClick={handleManage} disabled={createPortal.isPending} className="gap-2">
+                <button onClick={handleManage} disabled={createPortal.isPending} className="btn btn-navy gap-2">
                   {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}{isStarter ? t("dashboard.billing.upgradeToPro") : t("dashboard.settings.billing.upgradeToElite")}
-                </Button>
+                </button>
               )}
-              <Button variant="outline" onClick={handleManage} disabled={createPortal.isPending} className="gap-2">
+              <button onClick={handleManage} disabled={createPortal.isPending} className="btn btn-outline-navy gap-2">
                 <ArrowUpRight className="h-4 w-4" />{t("dashboard.billing.manageSubscription")}
-              </Button>
+              </button>
             </div>
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.billing.managedByStripeShort")}</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <>
-          <Card className="border-dashed">
-            <CardHeader>
+          <div className="card border-dashed">
+            <div className="card-head">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-muted flex items-center justify-center"><XCircle className="h-5 w-5 text-muted-foreground" /></div>
-                  <div><CardTitle>{t("dashboard.billing.noActiveSubTitle")}</CardTitle><CardDescription className="mt-0.5">{t("dashboard.settings.billing.noActiveSubDesc")}</CardDescription></div>
+                  <div><h2>{t("dashboard.billing.noActiveSubTitle")}</h2><p className="sub mt-0.5">{t("dashboard.settings.billing.noActiveSubDesc")}</p></div>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleSync} disabled={isSyncing} className="gap-2 shrink-0">
+                <button onClick={handleSync} disabled={isSyncing} className="btn btn-outline-navy btn-sm gap-2 shrink-0">
                   {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                   {t("dashboard.settings.billing.verifySubscription")}
-                </Button>
+                </button>
               </div>
-            </CardHeader>
-          </Card>
+            </div>
+          </div>
 
           {subscriptionPlans.length > 0 && (
             <div className="grid sm:grid-cols-3 gap-4">
@@ -533,14 +524,14 @@ function BillingTab() {
                 const isPlanPro = plan.id === "monthly_pro";
                 const isPlanElite = plan.id === "monthly_elite";
                 return (
-                  <Card key={plan.id} className={`flex flex-col ${isPlanPro ? "border-2 border-navy-300 shadow-lg" : isPlanElite ? "border-2 border-amber-300" : ""}`}>
-                    <CardHeader className="pb-2">
+                  <div key={plan.id} className={cn("card", `flex flex-col ${isPlanPro ? "border-2 border-navy-300 shadow-lg" : isPlanElite ? "border-2 border-amber-300" : ""}`)}>
+                    <div className="card-head pb-2">
                       {isPlanPro && <span className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">{t("dashboard.settings.billing.mostPopular")}</span>}
                       {isPlanElite && <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">{t("dashboard.settings.billing.unlimited")}</span>}
-                      <CardTitle className="text-lg">{plan.name}</CardTitle>
+                      <h2 className="text-lg">{plan.name}</h2>
                       <p className="text-2xl font-extrabold">${plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                    </CardHeader>
-                    <CardContent className="flex-1 pb-0">
+                    </div>
+                    <div className="p-5 flex-1 pb-0">
                       <ul className="space-y-1.5 mb-4">
                         {plan.features.map((f: string, i: number) => (
                           <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -549,19 +540,17 @@ function BillingTab() {
                           </li>
                         ))}
                       </ul>
-                    </CardContent>
-                    <CardFooter className="pt-3">
-                      <Button
-                        className={`w-full gap-2 ${isPlanPro ? "btn-gradient" : isPlanElite ? "bg-amber-500 hover:bg-amber-600 text-white border-0" : ""}`}
-                        variant={isPlanPro || isPlanElite ? "default" : "outline"}
+                    </div>
+                    <div className="card-foot pt-3">
+                      <button className={cn("btn btn-navy", `w-full gap-2 ${isPlanPro ? "btn-gradient" : isPlanElite ? "bg-amber-500 hover:bg-amber-600 text-white border-0" : ""}`)}
+                        
                         onClick={() => handleCheckout(plan.id)}
-                        disabled={loadingPlanId === plan.id}
-                      >
+                        disabled={loadingPlanId === plan.id}>
                         {loadingPlanId === plan.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
                         {loadingPlanId === plan.id ? t("dashboard.settings.billing.pleaseWait") : t("dashboard.settings.billing.choosePlan").replace("{name}", plan.name)}
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                      </button>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -570,20 +559,20 @@ function BillingTab() {
       )}
 
       {isActive && (isStarter || isPro) && (
-        <Card>
-          <CardContent className="pt-4">
+        <div className="card">
+          <div className="p-5 pt-4">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <p className="text-sm font-medium">{t("dashboard.settings.billing.undetectedSubTitle")}</p>
                 <p className="text-xs text-muted-foreground">{t("dashboard.settings.billing.undetectedSubDesc")}</p>
               </div>
-              <Button variant="outline" size="sm" onClick={handleSync} disabled={isSyncing} className="gap-2 shrink-0">
+              <button onClick={handleSync} disabled={isSyncing} className="btn btn-outline-navy btn-sm gap-2 shrink-0">
                 {isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 {t("dashboard.settings.billing.verifySubscription")}
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -611,21 +600,21 @@ function WhatsappUpsellCard() {
 
   return (
     <div className="space-y-4">
-      <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
-        <CardHeader>
+      <div className="card border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-navy-500" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.whatsappUpsell.title")}</CardTitle>
-              <CardDescription className="mt-0.5">
+              <h2>{t("dashboard.settings.whatsappUpsell.title")}</h2>
+              <p className="sub mt-0.5">
                 {t("dashboard.settings.whatsappUpsell.desc")}
-              </CardDescription>
+              </p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { icon: "📝", label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsappUpsell.text.desc") },
@@ -640,25 +629,21 @@ function WhatsappUpsellCard() {
             ))}
           </div>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button
-              className="btn-gradient gap-2"
+            <button className="btn btn-navy btn-gradient gap-2"
               onClick={() => handleCheckout("monthly_pro")}
-              disabled={loadingPlanId === "monthly_pro"}
-            >
+              disabled={loadingPlanId === "monthly_pro"}>
               {loadingPlanId === "monthly_pro" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
               {t("dashboard.settings.whatsappUpsell.upgradeToProPrice")}
-            </Button>
-            <Button
-              className="bg-amber-500 hover:bg-amber-600 text-white border-0 gap-2"
+            </button>
+            <button className="btn btn-navy bg-amber-500 hover:bg-amber-600 text-white border-0 gap-2"
               onClick={() => handleCheckout("monthly_elite")}
-              disabled={loadingPlanId === "monthly_elite"}
-            >
+              disabled={loadingPlanId === "monthly_elite"}>
               {loadingPlanId === "monthly_elite" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
               {t("dashboard.settings.whatsappUpsell.upgradeToElitePrice")}
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -752,35 +737,27 @@ function WhatsappTab() {
   if (isConnected) {
     return (
       <div className="space-y-4">
-        <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
-          <CardHeader className="pb-3">
+        <div className="card border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+          <div className="card-head pb-3">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
                 <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                   <MessageCircle className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg">{t("dashboard.settings.whatsapp.connectedTitle")}</CardTitle>
+                  <h2 className="text-lg">{t("dashboard.settings.whatsapp.connectedTitle")}</h2>
                   <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
                     <Phone className="h-3.5 w-3.5" />
                     +{status?.phoneNumber}
                   </p>
                 </div>
               </div>
-              <Badge
-                className={cn(
-                  "text-xs",
-                  isEnabled
-                    ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                    : "bg-muted text-muted-foreground border-border"
-                )}
-                variant="outline"
-              >
+              <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
                 {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-              </Badge>
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          </div>
+          <div className="p-5 space-y-4">
             {usage != null && usage.limit != null && (
               <div className="bg-card/70 rounded-[var(--radius)] p-4 border border-emerald-100">
                 <div className="flex items-center gap-2 mb-3">
@@ -792,12 +769,12 @@ function WhatsappTab() {
                     <span className="text-muted-foreground">{t("dashboard.settings.whatsapp.used")}</span>
                     <span className="font-semibold">{usage.used} / {usage.limit}</span>
                   </div>
-                  <div className="w-full h-2.5 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        usage.used >= usage.limit ? "bg-red-500" : usage.used >= usage.limit * 0.8 ? "bg-amber-500" : "bg-emerald-500"
-                      }`}
-                      style={{ width: `${Math.min(100, Math.round((usage.used / usage.limit) * 100))}%` }}
+                  <div className="hbar">
+                    <i
+                      style={{
+                        width: `${Math.min(100, Math.round((usage.used / usage.limit) * 100))}%`,
+                        background: usage.used >= usage.limit ? "var(--red)" : usage.used >= usage.limit * 0.8 ? "var(--yellow-dark)" : "var(--green)",
+                      }}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
@@ -827,50 +804,42 @@ function WhatsappTab() {
               <p>{t("dashboard.settings.whatsapp.howToUse4")}</p>
             </div>
             <div className="flex flex-wrap gap-3 pt-1">
-              <Button
-                variant={isEnabled ? "outline" : "default"}
-                size="sm"
-                onClick={handleToggle}
+              <button onClick={handleToggle}
                 disabled={toggleWa.isPending}
-                className="gap-2"
-              >
+                className="btn btn-navy btn-sm gap-2">
                 {toggleWa.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")} {t("dashboard.settings.whatsapp.integrationSuffix")}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDisconnect}
+              </button>
+              <button onClick={handleDisconnect}
                 disabled={disconnectWa.isPending}
-                className="gap-2 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/5"
-              >
+                className="btn btn-outline-navy btn-sm gap-2 text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/5">
                 {disconnectWa.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
                 {t("dashboard.settings.whatsapp.disconnectButton")}
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (otpState) {
     return (
-      <Card className="border-navy-200">
-        <CardHeader>
+      <div className="card border-navy-200">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-navy-600" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.whatsapp.enterCodeTitle")}</CardTitle>
-              <CardDescription className="mt-0.5">
+              <h2>{t("dashboard.settings.whatsapp.enterCodeTitle")}</h2>
+              <p className="sub mt-0.5">
                 {t("dashboard.settings.whatsapp.codeSentDesc").replace("{phone}", otpState.phoneNumber)}
-              </CardDescription>
+              </p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+        </div>
+        <div className="p-5 space-y-5">
           <div className="bg-navy-50 border border-navy-200 rounded-[var(--radius)] p-4 text-sm text-navy-700 space-y-1">
             <p className="font-semibold">{t("dashboard.settings.whatsapp.checkPhone")}</p>
             <p className="text-navy-500">{t("dashboard.settings.whatsapp.codeInstructions")}</p>
@@ -888,53 +857,47 @@ function WhatsappTab() {
                 maxLength={6}
                 inputMode="numeric"
               />
-              <Button
-                onClick={handleVerify}
+              <button onClick={handleVerify}
                 disabled={otpInput.length !== 6 || verifyWa.isPending}
-                className="gap-2 btn-gradient"
-              >
+                className="btn btn-navy gap-2 btn-gradient">
                 {verifyWa.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                 {t("dashboard.settings.whatsapp.verify")}
-              </Button>
+              </button>
             </div>
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.whatsapp.codeValidFor")}</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => { connectWa.mutate({ data: { phoneNumber: otpState.phoneNumber } }); }}
+            <button onClick={() => { connectWa.mutate({ data: { phoneNumber: otpState.phoneNumber } }); }}
               disabled={connectWa.isPending}
-              className="text-muted-foreground gap-2"
-            >
+              className="btn btn-outline-navy btn-sm text-muted-foreground gap-2">
               {connectWa.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
               {t("dashboard.settings.whatsapp.resendCode")}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => { setOtpState(null); setOtpInput(""); }} className="text-muted-foreground">
+            </button>
+            <button onClick={() => { setOtpState(null); setOtpInput(""); }} className="btn btn-outline-navy btn-sm text-muted-foreground">
               {t("dashboard.settings.whatsapp.cancel")}
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
+      <div className="card">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-muted flex items-center justify-center">
               <MessageCircle className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.whatsapp.connectTitle")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.whatsapp.connectDesc")}</CardDescription>
+              <h2>{t("dashboard.settings.whatsapp.connectTitle")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.whatsapp.connectDesc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+        </div>
+        <div className="p-5 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { icon: "📝", label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsapp.connect.text.desc") },
@@ -964,10 +927,10 @@ function WhatsappTab() {
                 rel="noopener noreferrer"
                 className="shrink-0"
               >
-                <Button variant="outline" size="sm" className="gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+                <button className="btn btn-outline-navy btn-sm gap-2 border-emerald-300 text-emerald-700 hover:bg-emerald-50">
                   <Phone className="h-3.5 w-3.5" />
                   +{status.businessNumber}
-                </Button>
+                </button>
               </a>
             </div>
           )}
@@ -982,19 +945,17 @@ function WhatsappTab() {
                 onKeyDown={(e) => { if (e.key === "Enter" && phoneInput.trim()) handleConnect(); }}
                 className="flex-1"
               />
-              <Button
-                onClick={handleConnect}
+              <button onClick={handleConnect}
                 disabled={!phoneInput.trim() || connectWa.isPending}
-                className="gap-2 btn-gradient"
-              >
+                className="btn btn-navy gap-2 btn-gradient">
                 {connectWa.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {t("dashboard.settings.whatsapp.connectButton")}
-              </Button>
+              </button>
             </div>
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.whatsapp.formatHint")}</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1020,25 +981,25 @@ function QuickbooksUpsellCard() {
   };
 
   return (
-    <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
-      <CardHeader>
+    <div className="card border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
+      <div className="card-head">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
             <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
-            <CardTitle>{t("dashboard.settings.quickbooksUpsell.title")}</CardTitle>
-            <CardDescription className="mt-0.5">{t("dashboard.settings.quickbooksUpsell.desc")}</CardDescription>
+            <h2>{t("dashboard.settings.quickbooksUpsell.title")}</h2>
+            <p className="sub mt-0.5">{t("dashboard.settings.quickbooksUpsell.desc")}</p>
           </div>
         </div>
-      </CardHeader>
-      <CardFooter>
-        <Button onClick={handleCheckout} disabled={loading} className="gap-2">
+      </div>
+      <div className="card-foot">
+        <button onClick={handleCheckout} disabled={loading} className="btn btn-navy gap-2">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
           {t("dashboard.settings.quickbooksUpsell.cta")}
-        </Button>
-      </CardFooter>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1077,12 +1038,12 @@ function QuickbooksMappingCard() {
   if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.quickbooks.mappingTitle")}</CardTitle>
-        <CardDescription>{t("dashboard.settings.quickbooks.mappingDesc")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.quickbooks.mappingTitle")}</h2>
+        <p className="sub">{t("dashboard.settings.quickbooks.mappingDesc")}</p>
+      </div>
+      <div className="p-5 space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.paymentAccount")}</label>
           <Select value={paymentAccountId} onValueChange={setPaymentAccountId}>
@@ -1117,14 +1078,14 @@ function QuickbooksMappingCard() {
             </div>
           ))}
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={handleSave} disabled={updateMapping.isPending} className="gap-2">
+      </div>
+      <div className="card-foot">
+        <button onClick={handleSave} disabled={updateMapping.isPending} className="btn btn-navy gap-2">
           {updateMapping.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {t("dashboard.settings.quickbooks.saveMapping")}
-        </Button>
-      </CardFooter>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1151,11 +1112,11 @@ function QuickbooksSyncLogCard() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.quickbooks.syncLogTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.quickbooks.syncLogTitle")}</h2>
+      </div>
+      <div className="p-5 space-y-2">
         {log.entries.map((e) => (
           <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -1170,14 +1131,14 @@ function QuickbooksSyncLogCard() {
               </div>
             </div>
             {e.status === "failed" && (
-              <Button size="sm" variant="outline" className="gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
+              <button className="btn btn-outline-navy btn-sm gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
                 <RefreshCw className="h-3.5 w-3.5" /> {t("dashboard.settings.quickbooks.retry")}
-              </Button>
+              </button>
             )}
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -1226,63 +1187,63 @@ function QuickbooksTab() {
 
   if (!isConnected) {
     return (
-      <Card>
-        <CardHeader>
+      <div className="card">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.quickbooks.connectTitle")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.quickbooks.connectDesc")}</CardDescription>
+              <h2>{t("dashboard.settings.quickbooks.connectTitle")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.quickbooks.connectDesc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardFooter>
-          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="gap-2">
+        </div>
+        <div className="card-foot">
+          <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
             {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
             {t("dashboard.settings.quickbooks.connectCta")}
-          </Button>
-        </CardFooter>
-      </Card>
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
-        <CardHeader className="pb-3">
+      <div className="card border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+        <div className="card-head pb-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                 <Building2 className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <CardTitle className="text-lg">{status?.companyName || t("dashboard.settings.quickbooks.connectedTitle")}</CardTitle>
+                <h2 className="text-lg">{status?.companyName || t("dashboard.settings.quickbooks.connectedTitle")}</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">{t("dashboard.settings.quickbooks.connectedSince")} {status?.connectedAt ? new Date(status.connectedAt).toLocaleDateString() : ""}</p>
               </div>
             </div>
-            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+            <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
               {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-            </Badge>
+            </span>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="p-5 space-y-4">
           {status?.lastSyncedAt && (
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.quickbooks.lastSynced")} {new Date(status.lastSyncedAt).toLocaleString()}</p>
           )}
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleQb.isPending} className="gap-2">
+            <button onClick={handleToggle} disabled={toggleQb.isPending} className="btn btn-navy btn-sm gap-2">
               {toggleQb.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectQb.isPending} className="gap-2 text-red-600 hover:text-red-700">
+            </button>
+            <button onClick={handleDisconnect} disabled={disconnectQb.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
               {disconnectQb.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
               {t("dashboard.settings.quickbooks.disconnect")}
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       <QuickbooksMappingCard />
       <QuickbooksSyncLogCard />
     </div>
@@ -1310,25 +1271,25 @@ function WaveUpsellCard() {
   };
 
   return (
-    <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
-      <CardHeader>
+    <div className="card border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
+      <div className="card-head">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
             <Plug className="h-6 w-6 text-navy-500" />
           </div>
           <div>
-            <CardTitle>{t("dashboard.settings.waveUpsell.title")}</CardTitle>
-            <CardDescription className="mt-0.5">{t("dashboard.settings.waveUpsell.desc")}</CardDescription>
+            <h2>{t("dashboard.settings.waveUpsell.title")}</h2>
+            <p className="sub mt-0.5">{t("dashboard.settings.waveUpsell.desc")}</p>
           </div>
         </div>
-      </CardHeader>
-      <CardFooter>
-        <Button onClick={handleCheckout} disabled={loading} className="gap-2">
+      </div>
+      <div className="card-foot">
+        <button onClick={handleCheckout} disabled={loading} className="btn btn-navy gap-2">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
           {t("dashboard.settings.waveUpsell.cta")}
-        </Button>
-      </CardFooter>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1375,12 +1336,12 @@ function WaveMappingCard() {
   if (loadingAccounts) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.wave.mappingTitle")}</CardTitle>
-        <CardDescription>{t("dashboard.settings.wave.mappingDesc")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.wave.mappingTitle")}</h2>
+        <p className="sub">{t("dashboard.settings.wave.mappingDesc")}</p>
+      </div>
+      <div className="p-5 space-y-4">
         <div className="space-y-1.5">
           <label className="text-sm font-medium">{t("dashboard.settings.wave.paymentAccount")}</label>
           <Select value={paymentAccountId} onValueChange={setPaymentAccountId}>
@@ -1428,14 +1389,14 @@ function WaveMappingCard() {
             </div>
           ))}
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button onClick={handleSave} disabled={updateMapping.isPending} className="gap-2">
+      </div>
+      <div className="card-foot">
+        <button onClick={handleSave} disabled={updateMapping.isPending} className="btn btn-navy gap-2">
           {updateMapping.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {t("dashboard.settings.wave.saveMapping")}
-        </Button>
-      </CardFooter>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1462,11 +1423,11 @@ function WaveSyncLogCard() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.wave.syncLogTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.wave.syncLogTitle")}</h2>
+      </div>
+      <div className="p-5 space-y-2">
         {log.entries.map((e) => (
           <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -1481,14 +1442,14 @@ function WaveSyncLogCard() {
               </div>
             </div>
             {e.status === "failed" && (
-              <Button size="sm" variant="outline" className="gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
+              <button className="btn btn-outline-navy btn-sm gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
                 <RefreshCw className="h-3.5 w-3.5" /> {t("dashboard.settings.wave.retry")}
-              </Button>
+              </button>
             )}
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -1537,63 +1498,63 @@ function WaveTab() {
 
   if (!isConnected) {
     return (
-      <Card>
-        <CardHeader>
+      <div className="card">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
               <Building2 className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.wave.connectTitle")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.wave.connectDesc")}</CardDescription>
+              <h2>{t("dashboard.settings.wave.connectTitle")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.wave.connectDesc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardFooter>
-          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="gap-2">
+        </div>
+        <div className="card-foot">
+          <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
             {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
             {t("dashboard.settings.wave.connectCta")}
-          </Button>
-        </CardFooter>
-      </Card>
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
-        <CardHeader className="pb-3">
+      <div className="card border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50">
+        <div className="card-head pb-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
               <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-emerald-100 flex items-center justify-center">
                 <Building2 className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <CardTitle className="text-lg">{status?.businessName || t("dashboard.settings.wave.connectedTitle")}</CardTitle>
+                <h2 className="text-lg">{status?.businessName || t("dashboard.settings.wave.connectedTitle")}</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">{t("dashboard.settings.wave.connectedSince")} {status?.connectedAt ? new Date(status.connectedAt).toLocaleDateString() : ""}</p>
               </div>
             </div>
-            <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+            <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
               {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-            </Badge>
+            </span>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="p-5 space-y-4">
           {status?.lastSyncedAt && (
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.wave.lastSynced")} {new Date(status.lastSyncedAt).toLocaleString()}</p>
           )}
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleWaveMutation.isPending} className="gap-2">
+            <button onClick={handleToggle} disabled={toggleWaveMutation.isPending} className="btn btn-navy btn-sm gap-2">
               {toggleWaveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectWaveMutation.isPending} className="gap-2 text-red-600 hover:text-red-700">
+            </button>
+            <button onClick={handleDisconnect} disabled={disconnectWaveMutation.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
               {disconnectWaveMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
               {t("dashboard.settings.wave.disconnect")}
-            </Button>
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       <WaveMappingCard />
       <WaveSyncLogCard />
     </div>
@@ -1619,32 +1580,32 @@ function StripeConnectTab() {
   const chargesEnabled = status?.chargesEnabled ?? false;
 
   return (
-    <Card className={connected && chargesEnabled ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50" : undefined}>
-      <CardHeader>
+    <div className={cn("card", connected && chargesEnabled ? "border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50" : undefined)}>
+      <div className="card-head">
         <div className="flex items-center gap-3">
           <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && chargesEnabled ? "bg-emerald-100" : "bg-navy-100")}>
             <CreditCard className={cn("h-6 w-6", connected && chargesEnabled ? "text-emerald-600" : "text-navy-500")} />
           </div>
           <div>
-            <CardTitle>{t("dashboard.settings.stripeConnect.title")}</CardTitle>
-            <CardDescription className="mt-0.5">{t("dashboard.settings.stripeConnect.desc")}</CardDescription>
+            <h2>{t("dashboard.settings.stripeConnect.title")}</h2>
+            <p className="sub mt-0.5">{t("dashboard.settings.stripeConnect.desc")}</p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="p-5">
         {connected && (
-          <Badge className={cn("text-xs", chargesEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-800 border-amber-200")} variant="outline">
+          <span className={cn("chip", chargesEnabled ? "chip-green" : "chip-yellow")}>
             {chargesEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.active")}</> : <><AlertCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.onboardingIncomplete")}</>}
-          </Badge>
+          </span>
         )}
-      </CardContent>
-      <CardFooter>
-        <Button onClick={() => onboard.mutate()} disabled={onboard.isPending} className="gap-2">
+      </div>
+      <div className="card-foot">
+        <button onClick={() => onboard.mutate()} disabled={onboard.isPending} className="btn btn-navy gap-2">
           {onboard.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
           {connected ? (chargesEnabled ? t("dashboard.settings.stripeConnect.manage") : t("dashboard.settings.stripeConnect.finishOnboarding")) : t("dashboard.settings.stripeConnect.connectCta")}
-        </Button>
-      </CardFooter>
-    </Card>
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -1682,25 +1643,25 @@ function FinanceitTab() {
   const isEnabled = status?.isEnabled ?? true;
 
   return (
-    <Card className={connected && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
-      <CardHeader>
+    <div className={cn("card", connected && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined)}>
+      <div className="card-head">
         <div className="flex items-center gap-3">
           <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && isEnabled ? "bg-amber-100" : "bg-navy-100")}>
             <Landmark className={cn("h-6 w-6", connected && isEnabled ? "text-amber-600" : "text-navy-500")} />
           </div>
           <div>
-            <CardTitle>{t("dashboard.settings.financeit.title")}</CardTitle>
-            <CardDescription className="mt-0.5">{t("dashboard.settings.financeit.desc")}</CardDescription>
+            <h2>{t("dashboard.settings.financeit.title")}</h2>
+            <p className="sub mt-0.5">{t("dashboard.settings.financeit.desc")}</p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="p-5 space-y-3">
         {connected ? (
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+              <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
                 {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.financeit.active")}</> : t("dashboard.settings.financeit.paused")}
-              </Badge>
+              </span>
               <p className="text-xs text-muted-foreground mt-1.5">{t("dashboard.settings.financeit.dealerIdLabel")}: {status?.dealerId}</p>
             </div>
           </div>
@@ -1714,27 +1675,27 @@ function FinanceitTab() {
             />
           </div>
         )}
-      </CardContent>
-      <CardFooter className="gap-2">
+      </div>
+      <div className="card-foot gap-2">
         {connected ? (
           <>
-            <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+            <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
               {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {isEnabled ? t("dashboard.settings.financeit.pause") : t("dashboard.settings.financeit.resume")}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+            </button>
+            <button onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
               {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
               {t("dashboard.settings.financeit.disconnect")}
-            </Button>
+            </button>
           </>
         ) : (
-          <Button onClick={() => saveDealer.mutate()} disabled={!dealerId.trim() || saveDealer.isPending} className="gap-2">
+          <button onClick={() => saveDealer.mutate()} disabled={!dealerId.trim() || saveDealer.isPending} className="btn btn-navy gap-2">
             {saveDealer.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
             {t("dashboard.settings.financeit.connectCta")}
-          </Button>
+          </button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -1837,18 +1798,18 @@ function FlinksTransactionsCard() {
   const transactions = data?.transactions ?? [];
   if (transactions.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-6 text-sm text-muted-foreground text-center">{t("dashboard.settings.flinks.noTransactions")}</CardContent>
-      </Card>
+      <div className="card">
+        <div className="p-5 py-6 text-sm text-muted-foreground text-center">{t("dashboard.settings.flinks.noTransactions")}</div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">{t("dashboard.settings.flinks.transactionsTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card">
+      <div className="card-head pb-3">
+        <h2 className="text-base">{t("dashboard.settings.flinks.transactionsTitle")}</h2>
+      </div>
+      <div className="p-5 space-y-2">
         {transactions.map((tx) => (
           <div key={tx.id} className="border border-border rounded-[var(--radius-sm)] p-3 space-y-2">
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -1860,28 +1821,27 @@ function FlinksTransactionsCard() {
                 <span className={cn("text-sm font-semibold", tx.amountCents < 0 ? "text-red-600" : "text-emerald-600")}>
                   {(tx.amountCents / 100).toLocaleString(undefined, { style: "currency", currency: "CAD" })}
                 </span>
-                <Badge
-                  variant="outline"
+                <span
                   className={cn(
-                    "text-xs",
-                    tx.matchStatus === "matched" && "bg-emerald-100 text-emerald-700 border-emerald-200",
-                    tx.matchStatus === "ignored" && "bg-muted text-muted-foreground border-border",
-                    tx.matchStatus === "unmatched" && "bg-amber-100 text-amber-800 border-amber-200"
+                    "chip",
+                    tx.matchStatus === "matched" && "chip-green",
+                    tx.matchStatus === "ignored" && "chip-grey",
+                    tx.matchStatus === "unmatched" && "chip-yellow"
                   )}
                 >
                   {t(`dashboard.settings.flinks.status.${tx.matchStatus}`)}
-                </Badge>
+                </span>
               </div>
             </div>
             {tx.matchStatus === "unmatched" && (
               <div className="space-y-2">
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setCandidatesFor(candidatesFor === tx.id ? null : tx.id)} className="gap-1.5">
+                  <button onClick={() => setCandidatesFor(candidatesFor === tx.id ? null : tx.id)} className="btn btn-outline-navy btn-sm gap-1.5">
                     {t("dashboard.settings.flinks.findMatch")}
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => ignoreMutation.mutate(tx.id)} disabled={ignoreMutation.isPending} className="text-muted-foreground">
+                  </button>
+                  <button onClick={() => ignoreMutation.mutate(tx.id)} disabled={ignoreMutation.isPending} className="btn btn-outline-navy btn-sm text-muted-foreground">
                     {t("dashboard.settings.flinks.ignore")}
-                  </Button>
+                  </button>
                 </div>
                 {candidatesFor === tx.id && (
                   <div className="pl-2 border-l-2 border-amber-200 space-y-1.5">
@@ -1906,14 +1866,14 @@ function FlinksTransactionsCard() {
               </div>
             )}
             {tx.matchStatus === "matched" && (
-              <Button size="sm" variant="ghost" onClick={() => unmatchMutation.mutate(tx.id)} disabled={unmatchMutation.isPending} className="text-muted-foreground h-7 px-2 text-xs">
+              <button onClick={() => unmatchMutation.mutate(tx.id)} disabled={unmatchMutation.isPending} className="btn btn-outline-navy btn-sm text-muted-foreground h-7 px-2 text-xs">
                 {t("dashboard.settings.flinks.undoMatch")}
-              </Button>
+              </button>
             )}
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -1958,19 +1918,19 @@ function FlinksTab() {
 
   return (
     <div className="space-y-4">
-      <Card className={connected && hasAccount && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined}>
-        <CardHeader>
+      <div className={cn("card", connected && hasAccount && isEnabled ? "border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50" : undefined)}>
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected && hasAccount ? "bg-amber-100" : "bg-navy-100")}>
               <Banknote className={cn("h-6 w-6", connected && hasAccount ? "text-amber-600" : "text-navy-500")} />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.flinks.title")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.flinks.desc")}</CardDescription>
+              <h2>{t("dashboard.settings.flinks.title")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.flinks.desc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </div>
+        <div className="p-5 space-y-3">
           {!connected && (
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.connectHelp")}</p>
           )}
@@ -1984,9 +1944,9 @@ function FlinksTab() {
           {connected && hasAccount && (
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+                <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
                   {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.financeit.active")}</> : t("dashboard.settings.financeit.paused")}
-                </Badge>
+                </span>
                 <p className="text-xs text-muted-foreground mt-1.5">
                   {status?.institutionName} — {status?.selectedAccount?.name}{status?.selectedAccount?.last4 ? ` ••••${status.selectedAccount.last4}` : ""}
                 </p>
@@ -1996,33 +1956,33 @@ function FlinksTab() {
               </div>
             </div>
           )}
-        </CardContent>
-        <CardFooter className="gap-2 flex-wrap">
+        </div>
+        <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <Button onClick={() => setShowConnect(true)} className="gap-2">
+            <button onClick={() => setShowConnect(true)} className="btn btn-navy gap-2">
               <Plug className="h-4 w-4" />
               {t("dashboard.settings.flinks.connectCta")}
-            </Button>
+            </button>
           ) : (
             <>
               {hasAccount && (
-                <Button variant="outline" size="sm" onClick={() => sync.mutate()} disabled={sync.isPending} className="gap-2">
+                <button onClick={() => sync.mutate()} disabled={sync.isPending} className="btn btn-outline-navy btn-sm gap-2">
                   {sync.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                   {t("dashboard.settings.flinks.syncNow")}
-                </Button>
+                </button>
               )}
-              <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+              <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
                 {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isEnabled ? t("dashboard.settings.financeit.pause") : t("dashboard.settings.financeit.resume")}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              </button>
+              <button onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
                 {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
                 {t("dashboard.settings.flinks.disconnect")}
-              </Button>
+              </button>
             </>
           )}
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
       {connected && hasAccount && <FlinksTransactionsCard />}
       <FlinksConnectDialog
         open={showConnect}
@@ -2040,11 +2000,11 @@ function MetaLeadAdsImportLogCard() {
   if (!log || log.entries.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.metaLeadAds.importLogTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.metaLeadAds.importLogTitle")}</h2>
+      </div>
+      <div className="p-5 space-y-2">
         {log.entries.map((e) => (
           <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -2060,8 +2020,8 @@ function MetaLeadAdsImportLogCard() {
             </div>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2100,54 +2060,54 @@ function MetaLeadAdsTab() {
 
   return (
     <div className="space-y-4">
-      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
-        <CardHeader>
+      <div className={cn("card", connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined)}>
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
               <Megaphone className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.metaLeadAds.title")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.metaLeadAds.desc")}</CardDescription>
+              <h2>{t("dashboard.settings.metaLeadAds.title")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.metaLeadAds.desc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </div>
+        <div className="p-5 space-y-3">
           {!connected && (
             <p className="text-xs text-muted-foreground">{t("dashboard.settings.metaLeadAds.connectHelp")}</p>
           )}
           {connected && (
             <div>
-              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+              <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
                 {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-              </Badge>
+              </span>
               <p className="text-xs text-muted-foreground mt-1.5">{status?.pageName}</p>
               {status?.lastLeadAt && (
                 <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.metaLeadAds.lastLead")} {new Date(status.lastLeadAt).toLocaleString()}</p>
               )}
             </div>
           )}
-        </CardContent>
-        <CardFooter className="gap-2 flex-wrap">
+        </div>
+        <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="gap-2">
+            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
               {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
               {t("dashboard.settings.metaLeadAds.connectCta")}
-            </Button>
+            </button>
           ) : (
             <>
-              <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+              <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
                 {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              </button>
+              <button onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
                 {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
                 {t("dashboard.settings.metaLeadAds.disconnect")}
-              </Button>
+              </button>
             </>
           )}
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
       {connected && <MetaLeadAdsImportLogCard />}
     </div>
   );
@@ -2160,11 +2120,11 @@ function GoogleLsaImportLogCard() {
   if (!log || log.entries.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{t("dashboard.settings.googleLsa.importLogTitle")}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.googleLsa.importLogTitle")}</h2>
+      </div>
+      <div className="p-5 space-y-2">
         {log.entries.map((e) => (
           <div key={e.id} className="flex items-center justify-between gap-3 text-sm py-1.5 border-b last:border-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -2180,8 +2140,8 @@ function GoogleLsaImportLogCard() {
             </div>
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2219,19 +2179,19 @@ function GoogleLsaTab() {
 
   return (
     <div className="space-y-4">
-      <Card className={connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined}>
-        <CardHeader>
+      <div className={cn("card", connected && isEnabled ? "border-blue-200 bg-gradient-to-br from-blue-50 to-navy-50" : undefined)}>
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className={cn("h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center", connected ? "bg-blue-100" : "bg-navy-100")}>
               <Search className={cn("h-6 w-6", connected ? "text-blue-600" : "text-navy-500")} />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.googleLsa.title")}</CardTitle>
-              <CardDescription className="mt-0.5">{t("dashboard.settings.googleLsa.desc")}</CardDescription>
+              <h2>{t("dashboard.settings.googleLsa.title")}</h2>
+              <p className="sub mt-0.5">{t("dashboard.settings.googleLsa.desc")}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
+        </div>
+        <div className="p-5 space-y-3">
           {!connected && (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">{t("dashboard.settings.googleLsa.connectHelp")}</p>
@@ -2245,36 +2205,36 @@ function GoogleLsaTab() {
           )}
           {connected && (
             <div>
-              <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+              <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
                 {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-              </Badge>
+              </span>
               <p className="text-xs text-muted-foreground mt-1.5">{status?.lsaCustomerId}</p>
               {status?.lastLeadAt && (
                 <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.googleLsa.lastLead")} {new Date(status.lastLeadAt).toLocaleString()}</p>
               )}
             </div>
           )}
-        </CardContent>
-        <CardFooter className="gap-2 flex-wrap">
+        </div>
+        <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <Button onClick={() => connect.mutate(lsaCustomerId)} disabled={connect.isPending || !lsaCustomerId.trim()} className="gap-2">
+            <button onClick={() => connect.mutate(lsaCustomerId)} disabled={connect.isPending || !lsaCustomerId.trim()} className="btn btn-navy gap-2">
               {connect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
               {t("dashboard.settings.googleLsa.connectCta")}
-            </Button>
+            </button>
           ) : (
             <>
-              <Button variant="outline" size="sm" onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="gap-2">
+              <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
                 {toggle.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="gap-2 text-red-600 hover:text-red-700">
+              </button>
+              <button onClick={() => disconnect.mutate()} disabled={disconnect.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
                 {disconnect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
                 {t("dashboard.settings.googleLsa.disconnect")}
-              </Button>
+              </button>
             </>
           )}
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
       {connected && <GoogleLsaImportLogCard />}
     </div>
   );
@@ -2337,19 +2297,19 @@ function DeveloperApiTab() {
   const webhooks = webhooksData?.items ?? [];
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="card">
+      <div className="card-head">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-[var(--radius-sm)] flex items-center justify-center bg-slate-100">
             <KeyRound className="h-6 w-6 text-slate-600" />
           </div>
           <div>
-            <CardTitle>{t("dashboard.settings.developerApi.title")}</CardTitle>
-            <CardDescription className="mt-0.5">{t("dashboard.settings.developerApi.desc")}</CardDescription>
+            <h2>{t("dashboard.settings.developerApi.title")}</h2>
+            <p className="sub mt-0.5">{t("dashboard.settings.developerApi.desc")}</p>
           </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      </div>
+      <div className="p-5 space-y-6">
         {/* API keys */}
         <div className="space-y-3">
           <h4 className="text-sm font-semibold text-foreground">{t("dashboard.settings.developerApi.apiKeys")}</h4>
@@ -2358,11 +2318,11 @@ function DeveloperApiTab() {
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.keyRevealWarning")}</p>
               <div className="flex items-center gap-2">
                 <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedKey}</code>
-                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedKey); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
+                <button onClick={() => { navigator.clipboard.writeText(revealedKey); toast({ title: t("dashboard.settings.developerApi.copied") }); }} className="btn btn-outline-navy btn-sm">
                   <Copy className="h-3.5 w-3.5" />
-                </Button>
+                </button>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => setRevealedKey(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
+              <button onClick={() => setRevealedKey(null)} className="btn btn-outline-navy btn-sm">{t("dashboard.settings.developerApi.dismiss")}</button>
             </div>
           )}
           {keysLoading ? <Skeleton className="h-16 w-full rounded-[var(--radius-sm)]" /> : (
@@ -2373,19 +2333,19 @@ function DeveloperApiTab() {
                     <p className="text-sm font-medium">{k.name}</p>
                     <p className="text-xs text-muted-foreground">{k.keyPrefix}••••••••• · {k.role}</p>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => revokeKey.mutate(k.id)} disabled={revokeKey.isPending}>
+                  <button className="btn btn-outline-navy btn-sm text-red-600 hover:text-red-700" onClick={() => revokeKey.mutate(k.id)} disabled={revokeKey.isPending}>
                     <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                  </button>
                 </div>
               ))}
             </div>
           )}
           <div className="flex items-center gap-2">
             <Input value={keyName} onChange={(e) => setKeyName(e.target.value)} placeholder={t("dashboard.settings.developerApi.keyNamePlaceholder")} className="max-w-xs" />
-            <Button size="sm" onClick={() => createKey.mutate()} disabled={!keyName.trim() || createKey.isPending} className="gap-2">
+            <button onClick={() => createKey.mutate()} disabled={!keyName.trim() || createKey.isPending} className="btn btn-navy btn-sm gap-2">
               {createKey.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
               {t("dashboard.settings.developerApi.createKey")}
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -2397,11 +2357,11 @@ function DeveloperApiTab() {
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.secretRevealWarning")}</p>
               <div className="flex items-center gap-2">
                 <code className="text-xs bg-card border rounded px-2 py-1.5 flex-1 overflow-x-auto">{revealedSecret}</code>
-                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(revealedSecret); toast({ title: t("dashboard.settings.developerApi.copied") }); }}>
+                <button onClick={() => { navigator.clipboard.writeText(revealedSecret); toast({ title: t("dashboard.settings.developerApi.copied") }); }} className="btn btn-outline-navy btn-sm">
                   <Copy className="h-3.5 w-3.5" />
-                </Button>
+                </button>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => setRevealedSecret(null)}>{t("dashboard.settings.developerApi.dismiss")}</Button>
+              <button onClick={() => setRevealedSecret(null)} className="btn btn-outline-navy btn-sm">{t("dashboard.settings.developerApi.dismiss")}</button>
             </div>
           )}
           {webhooksLoading ? <Skeleton className="h-16 w-full rounded-[var(--radius-sm)]" /> : (
@@ -2413,12 +2373,12 @@ function DeveloperApiTab() {
                     <p className="text-xs text-muted-foreground">{w.events.join(", ")}</p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <Button size="sm" variant="outline" onClick={() => toggleWebhook.mutate({ id: w.id, isEnabled: !w.isEnabled })} disabled={toggleWebhook.isPending}>
+                    <button onClick={() => toggleWebhook.mutate({ id: w.id, isEnabled: !w.isEnabled })} disabled={toggleWebhook.isPending} className="btn btn-outline-navy btn-sm">
                       {w.isEnabled ? t("dashboard.settings.developerApi.pause") : t("dashboard.settings.developerApi.resume")}
-                    </Button>
-                    <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => deleteWebhook.mutate(w.id)} disabled={deleteWebhook.isPending}>
+                    </button>
+                    <button className="btn btn-outline-navy btn-sm text-red-600 hover:text-red-700" onClick={() => deleteWebhook.mutate(w.id)} disabled={deleteWebhook.isPending}>
                       <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -2438,14 +2398,14 @@ function DeveloperApiTab() {
                 </button>
               ))}
             </div>
-            <Button size="sm" onClick={() => createWebhook.mutate()} disabled={!webhookUrl.trim() || webhookEvents.length === 0 || createWebhook.isPending} className="gap-2">
+            <button onClick={() => createWebhook.mutate()} disabled={!webhookUrl.trim() || webhookEvents.length === 0 || createWebhook.isPending} className="btn btn-navy btn-sm gap-2">
               {createWebhook.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Webhook className="h-4 w-4" />}
               {t("dashboard.settings.developerApi.addWebhook")}
-            </Button>
+            </button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2490,59 +2450,59 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
 
   if (!isConnected) {
     return (
-      <Card>
-        <CardHeader className="pb-3">
+      <div className="card">
+        <div className="card-head pb-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-sky-100 flex items-center justify-center">
               <CalendarDays className="h-5 w-5 text-sky-600" />
             </div>
-            <CardTitle className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</CardTitle>
+            <h2 className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</h2>
           </div>
-        </CardHeader>
-        <CardFooter>
-          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} variant="outline" size="sm" className="gap-2">
+        </div>
+        <div className="card-foot">
+          <button onClick={handleConnect} disabled={getConnectUrl.isFetching}   className="btn btn-outline-navy btn-sm gap-2">
             {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
             {t("dashboard.settings.calendar.connectCta")}
-          </Button>
-        </CardFooter>
-      </Card>
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="border-sky-200 bg-gradient-to-br from-sky-50 to-teal-50">
-      <CardHeader className="pb-3">
+    <div className="card border-sky-200 bg-gradient-to-br from-sky-50 to-teal-50">
+      <div className="card-head pb-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-sky-100 flex items-center justify-center">
               <CalendarDays className="h-5 w-5 text-sky-600" />
             </div>
             <div>
-              <CardTitle className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</CardTitle>
+              <h2 className="text-base">{CALENDAR_PROVIDER_LABEL[provider]}</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
             </div>
           </div>
-          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+          <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
             {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-          </Badge>
+          </span>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="p-5 space-y-3">
         {conn?.lastSyncedAt && (
           <p className="text-xs text-muted-foreground">{t("dashboard.settings.calendar.lastSynced")} {new Date(conn.lastSyncedAt).toLocaleString()}</p>
         )}
         <div className="flex flex-wrap gap-3">
-          <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleCal.isPending} className="gap-2">
+          <button onClick={handleToggle} disabled={toggleCal.isPending} className="btn btn-navy btn-sm gap-2">
             {toggleCal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectCal.isPending} className="gap-2 text-red-600 hover:text-red-700">
+          </button>
+          <button onClick={handleDisconnect} disabled={disconnectCal.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
             {disconnectCal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
             {t("dashboard.settings.calendar.disconnect")}
-          </Button>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2606,61 +2566,61 @@ function EmailConnectionCard() {
 
   if (!isConnected) {
     return (
-      <Card>
-        <CardHeader className="pb-3">
+      <div className="card">
+        <div className="card-head pb-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-rose-100 flex items-center justify-center">
               <Mail className="h-5 w-5 text-rose-600" />
             </div>
-            <CardTitle className="text-base">Gmail</CardTitle>
+            <h2 className="text-base">Gmail</h2>
           </div>
-        </CardHeader>
-        <CardFooter>
-          <Button onClick={handleConnect} disabled={getConnectUrl.isFetching} variant="outline" size="sm" className="gap-2">
+        </div>
+        <div className="card-foot">
+          <button onClick={handleConnect} disabled={getConnectUrl.isFetching}   className="btn btn-outline-navy btn-sm gap-2">
             {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
             {t("dashboard.settings.emailSend.connectCta")}
-          </Button>
-        </CardFooter>
-      </Card>
+          </button>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="border-rose-200 bg-gradient-to-br from-rose-50 to-orange-50">
-      <CardHeader className="pb-3">
+    <div className="card border-rose-200 bg-gradient-to-br from-rose-50 to-orange-50">
+      <div className="card-head pb-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-rose-100 flex items-center justify-center">
               <Mail className="h-5 w-5 text-rose-600" />
             </div>
             <div>
-              <CardTitle className="text-base">Gmail</CardTitle>
+              <h2 className="text-base">Gmail</h2>
               <p className="text-xs text-muted-foreground mt-0.5">{conn?.accountEmail}</p>
             </div>
           </div>
-          <Badge className={cn("text-xs", isEnabled ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")} variant="outline">
+          <span className={cn("chip", isEnabled ? "chip-green" : "chip-grey")}>
             {isEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.active")}</> : <><XCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.whatsapp.disabled")}</>}
-          </Badge>
+          </span>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="p-5 space-y-3">
         {conn?.lastSendError ? (
           <p className="text-xs text-red-600">{t("dashboard.settings.emailSend.lastSendFailed")}</p>
         ) : conn?.lastSendAt ? (
           <p className="text-xs text-muted-foreground">{t("dashboard.settings.emailSend.lastSend")} {new Date(conn.lastSendAt).toLocaleString()}</p>
         ) : null}
         <div className="flex flex-wrap gap-3">
-          <Button variant={isEnabled ? "outline" : "default"} size="sm" onClick={handleToggle} disabled={toggleEmail.isPending} className="gap-2">
+          <button onClick={handleToggle} disabled={toggleEmail.isPending} className="btn btn-navy btn-sm gap-2">
             {toggleEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {isEnabled ? t("dashboard.settings.whatsapp.disable") : t("dashboard.settings.whatsapp.enable")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDisconnect} disabled={disconnectEmail.isPending} className="gap-2 text-red-600 hover:text-red-700">
+          </button>
+          <button onClick={handleDisconnect} disabled={disconnectEmail.isPending} className="btn btn-outline-navy btn-sm gap-2 text-red-600 hover:text-red-700">
             {disconnectEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2Off className="h-4 w-4" />}
             {t("dashboard.settings.emailSend.disconnect")}
-          </Button>
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2741,21 +2701,21 @@ function WidgetTab() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
+      <div className="card">
+        <div className="card-head">
           <div className="flex items-center gap-3">
             <div className="h-11 w-11 rounded-[var(--radius-sm)] bg-navy-100 flex items-center justify-center">
               <Zap className="h-6 w-6 text-navy-600" />
             </div>
             <div>
-              <CardTitle>{t("dashboard.settings.widget.title")}</CardTitle>
-              <CardDescription className="mt-0.5">
+              <h2>{t("dashboard.settings.widget.title")}</h2>
+              <p className="sub mt-0.5">
                 {t("dashboard.settings.widget.desc")}
-              </CardDescription>
+              </p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-5">
+        </div>
+        <div className="p-5 space-y-5">
           <div className="space-y-4">
             <h3 className="text-sm font-semibold">{t("dashboard.settings.widget.step1Title")}</h3>
             <p className="text-xs text-muted-foreground">
@@ -2768,33 +2728,25 @@ function WidgetTab() {
                   value={apiKey}
                   className="font-mono text-sm bg-muted flex-1"
                 />
-                <Button
-                  variant="outline"
-                  onClick={() => copyToClipboard(apiKey, "key")}
-                  className="gap-2 shrink-0"
-                >
+                <button onClick={() => copyToClipboard(apiKey, "key")}
+                  className="btn btn-outline-navy gap-2 shrink-0">
                   {copied === "key" ? t("dashboard.settings.widget.copied") : t("dashboard.settings.widget.copy")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleGenerateKey}
+                </button>
+                <button onClick={handleGenerateKey}
                   disabled={generating}
-                  className="text-muted-foreground hover:text-foreground shrink-0"
-                >
+                  className="btn btn-outline-navy text-muted-foreground hover:text-foreground shrink-0">
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-                </Button>
+                </button>
               </div>
             ) : (
               <div className="bg-muted rounded-[var(--radius)] p-4 text-center border border-dashed border-border">
                 <p className="text-sm text-muted-foreground mb-3">{t("dashboard.settings.widget.noKeyDesc")}</p>
-                <Button
-                  onClick={handleGenerateKey}
+                <button onClick={handleGenerateKey}
                   disabled={generating}
-                  className="btn-gradient gap-2"
-                >
+                  className="btn btn-navy btn-gradient gap-2">
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {t("dashboard.settings.widget.generateKeyButton")}
-                </Button>
+                </button>
               </div>
             )}
           </div>
@@ -2809,19 +2761,15 @@ function WidgetTab() {
                 <pre className="p-4 bg-gray-900 text-gray-100 rounded-[var(--radius)] overflow-x-auto font-mono text-xs leading-relaxed max-h-48 whitespace-pre-wrap">
                   {embedCode}
                 </pre>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => copyToClipboard(embedCode, "code")}
-                  className="absolute right-3 top-3 gap-1.5"
-                >
+                <button onClick={() => copyToClipboard(embedCode, "code")}
+                  className="btn btn-navy btn-sm absolute right-3 top-3 gap-1.5">
                   {copied === "code" ? t("dashboard.settings.widget.copied") : t("dashboard.settings.widget.copyCode")}
-                </Button>
+                </button>
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
@@ -2837,11 +2785,8 @@ function UsageMeter({ label, used, allowance }: { label: string; used: number; a
         </span>
       </div>
       {allowance !== null && (
-        <div className="h-2 rounded-full bg-muted overflow-hidden">
-          <div
-            className={cn("h-full rounded-full", pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-emerald-500")}
-            style={{ width: `${pct}%` }}
-          />
+        <div className="hbar">
+          <i style={{ width: `${pct}%`, background: pct >= 100 ? "var(--red)" : pct >= 80 ? "var(--yellow-dark)" : "var(--green)" }} />
         </div>
       )}
     </div>
@@ -2856,17 +2801,17 @@ function UsageTab() {
   if (!data) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("dashboard.settings.tabs.usage")}</CardTitle>
-        <CardDescription>{t("dashboard.settings.usage.subtitle")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5">
+    <div className="card">
+      <div className="card-head">
+        <h2>{t("dashboard.settings.tabs.usage")}</h2>
+        <p className="sub">{t("dashboard.settings.usage.subtitle")}</p>
+      </div>
+      <div className="p-5 space-y-5">
         <UsageMeter label={t("dashboard.settings.usage.receiptScans")} used={data.receiptScans.used} allowance={data.receiptScans.allowance} />
         <UsageMeter label={t("dashboard.settings.usage.whatsappMessages")} used={data.whatsappMessages.used} allowance={data.whatsappMessages.allowance} />
         <p className="text-xs text-muted-foreground pt-2 border-t">{t("dashboard.settings.usage.resetNote")}</p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -2894,24 +2839,21 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2"><SettingsIcon className="h-7 w-7 text-navy-500" />{t("dashboard.settings.title")}</h1>
-        <p className="text-slate-500 mt-1">{t("dashboard.settings.subtitle")}</p>
+    <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
+      <div className="page-head">
+        <div>
+          <h1 className="flex items-center gap-2"><SettingsIcon className="h-7 w-7 text-navy-500" />{t("dashboard.settings.title")}</h1>
+          <p className="sub">{t("dashboard.settings.subtitle")}</p>
+        </div>
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 p-1 bg-muted rounded-full w-fit">
+      <div className="pills mb-4">
         {TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "px-4 py-2 text-sm font-medium rounded-full transition-all",
-              activeTab === tab.id
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
+            className={cn("pill", activeTab === tab.id && "on")}
           >
             {tab.label}
           </button>

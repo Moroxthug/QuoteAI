@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -100,43 +98,45 @@ function TwoFactorCard() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          {twoFactorEnabled ? <ShieldCheck className="h-5 w-5 text-green-600" /> : <ShieldOff className="h-5 w-5 text-muted-foreground" />}
-          {t("dashboard.settings.security.twoFactorTitle")}
-        </CardTitle>
-        <CardDescription>{t("dashboard.settings.security.twoFactorDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="flex items-center gap-2">
+            {twoFactorEnabled ? <ShieldCheck className="h-5 w-5 text-green-600" /> : <ShieldOff className="h-5 w-5 text-muted-foreground" />}
+            {t("dashboard.settings.security.twoFactorTitle")}
+          </h2>
+          <p className="sub">{t("dashboard.settings.security.twoFactorDescription")}</p>
+        </div>
+      </div>
+      <div className="p-5 space-y-4">
         {twoFactorEnabled && step === "idle" ? (
           !showDisable ? (
-            <Button variant="outline" onClick={() => setShowDisable(true)}>
+            <button className="btn btn-outline-navy" onClick={() => setShowDisable(true)}>
               {t("dashboard.settings.security.disable")}
-            </Button>
+            </button>
           ) : (
             <form onSubmit={handleDisable} className="space-y-3">
               <Input type="password" required placeholder={t("dashboard.settings.security.passwordPlaceholder")} value={disablePassword} onChange={(e) => setDisablePassword(e.target.value)} />
               <div className="flex gap-2">
-                <Button type="submit" variant="destructive" disabled={loading}>
+                <button type="submit" disabled={loading} className="btn btn-navy" style={{ background: "var(--red)", borderColor: "var(--red)" }}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("dashboard.settings.security.confirmDisable")}
-                </Button>
-                <Button type="button" variant="ghost" onClick={() => setShowDisable(false)}>
+                </button>
+                <button type="button" className="btn btn-outline-navy" onClick={() => setShowDisable(false)}>
                   {t("dashboard.settings.security.cancel")}
-                </Button>
+                </button>
               </div>
             </form>
           )
         ) : !twoFactorEnabled && step === "idle" ? (
-          <Button onClick={() => setStep("password")}>{t("dashboard.settings.security.enable")}</Button>
+          <button className="btn btn-navy" onClick={() => setStep("password")}>{t("dashboard.settings.security.enable")}</button>
         ) : step === "password" ? (
           <form onSubmit={handleEnableStart} className="space-y-3">
             <Input type="password" required autoFocus placeholder={t("dashboard.settings.security.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} />
             <div className="flex gap-2">
-              <Button type="submit" disabled={loading}>
+              <button type="submit" disabled={loading} className="btn btn-navy">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("dashboard.settings.security.continue")}
-              </Button>
-              <Button type="button" variant="ghost" onClick={reset}>{t("dashboard.settings.security.cancel")}</Button>
+              </button>
+              <button type="button" className="btn btn-outline-navy" onClick={reset}>{t("dashboard.settings.security.cancel")}</button>
             </div>
           </form>
         ) : step === "verify" ? (
@@ -150,10 +150,10 @@ function TwoFactorCard() {
             <form onSubmit={handleVerify} className="space-y-3">
               <Input required autoFocus inputMode="numeric" placeholder="123456" value={verifyCode} onChange={(e) => setVerifyCode(e.target.value)} className="text-center tracking-widest" />
               <div className="flex gap-2">
-                <Button type="submit" disabled={loading}>
+                <button type="submit" disabled={loading} className="btn btn-navy">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("dashboard.settings.security.verifyAndEnable")}
-                </Button>
-                <Button type="button" variant="ghost" onClick={reset}>{t("dashboard.settings.security.cancel")}</Button>
+                </button>
+                <button type="button" className="btn btn-outline-navy" onClick={reset}>{t("dashboard.settings.security.cancel")}</button>
               </div>
             </form>
           </div>
@@ -164,9 +164,9 @@ function TwoFactorCard() {
             <div className="grid grid-cols-2 gap-2 bg-muted border border-border rounded-[var(--radius-sm)] p-4 font-mono text-sm">
               {backupCodes.map((code) => <span key={code}>{code}</span>)}
             </div>
-            <Button
+            <button
               type="button"
-              variant="outline"
+              className="btn btn-outline-navy"
               onClick={() => {
                 void navigator.clipboard.writeText(backupCodes.join("\n"));
                 setCopied(true);
@@ -175,12 +175,12 @@ function TwoFactorCard() {
             >
               {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
               {t("dashboard.settings.security.copyBackupCodes")}
-            </Button>
-            <Button type="button" onClick={reset} className="ml-2">{t("dashboard.settings.security.done")}</Button>
+            </button>
+            <button type="button" className="btn btn-navy ml-2" onClick={reset}>{t("dashboard.settings.security.done")}</button>
           </div>
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -215,30 +215,32 @@ function SessionsCard() {
   if (isLoading) return <Skeleton className="h-32 w-full rounded-[var(--radius)]" />;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Monitor className="h-5 w-5" />
-          {t("dashboard.settings.security.sessionsTitle")}
-        </CardTitle>
-        <CardDescription>{t("dashboard.settings.security.sessionsDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="flex items-center gap-2">
+            <Monitor className="h-5 w-5" />
+            {t("dashboard.settings.security.sessionsTitle")}
+          </h2>
+          <p className="sub">{t("dashboard.settings.security.sessionsDescription")}</p>
+        </div>
+      </div>
+      <div>
         {(sessions ?? []).map((s) => (
-          <div key={s.token} className="flex items-center justify-between border border-border rounded-[var(--radius-sm)] px-4 py-3">
-            <div className="text-sm">
-              <div className="font-medium text-foreground">{s.userAgent || t("dashboard.settings.security.unknownDevice")}</div>
-              <div className="text-muted-foreground text-xs">{s.ipAddress || "—"} · {s.token === session?.session.token ? t("dashboard.settings.security.currentSession") : new Date(s.createdAt).toLocaleString()}</div>
+          <div key={s.token} className="set-row">
+            <div className="txt">
+              <b>{s.userAgent || t("dashboard.settings.security.unknownDevice")}</b>
+              <span>{s.ipAddress || "—"} · {s.token === session?.session.token ? t("dashboard.settings.security.currentSession") : new Date(s.createdAt).toLocaleString()}</span>
             </div>
             {s.token !== session?.session.token && (
-              <Button variant="ghost" size="sm" disabled={revokingToken === s.token} onClick={() => void handleRevoke(s.token)}>
+              <button className="btn btn-outline-navy btn-sm" disabled={revokingToken === s.token} onClick={() => void handleRevoke(s.token)}>
                 {revokingToken === s.token ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
-              </Button>
+              </button>
             )}
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -249,12 +251,14 @@ function AuditLogCard() {
   if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("dashboard.settings.security.auditLogTitle")}</CardTitle>
-        <CardDescription>{t("dashboard.settings.security.auditLogDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="card">
+      <div className="card-head">
+        <div>
+          <h2>{t("dashboard.settings.security.auditLogTitle")}</h2>
+          <p className="sub">{t("dashboard.settings.security.auditLogDescription")}</p>
+        </div>
+      </div>
+      <div className="p-5">
         {!data?.events.length ? (
           <p className="text-sm text-muted-foreground">{t("dashboard.settings.security.auditLogEmpty")}</p>
         ) : (
@@ -270,14 +274,14 @@ function AuditLogCard() {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
 export function SecurityTab() {
   return (
-    <div className="space-y-6">
+    <div className="stack">
       <TwoFactorCard />
       <SessionsCard />
       <AuditLogCard />

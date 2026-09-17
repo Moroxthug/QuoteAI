@@ -3,12 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useGetBusinessProfile, useUpdateBusinessProfile, useGetSubscription, useCreateCustomerPortalSession } from "@workspace/api-client-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, User } from "lucide-react";
+import { Loader2, Upload, X, ImageIcon, Crown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
@@ -55,7 +52,7 @@ export default function ProfileSettings() {
 
   const currentLogoUrl = logoPreview ?? profile?.logoUrl ?? null;
 
-  const form = useForm<ProfileFormValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     values: {
       companyName: profile?.companyName || "",
@@ -135,45 +132,42 @@ export default function ProfileSettings() {
 
   if (isLoading) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div>
-          <Skeleton className="h-8 w-48 mb-2" />
-          <Skeleton className="h-4 w-64" />
+      <div className="animate-in fade-in duration-500">
+        <div className="page-head">
+          <div><Skeleton className="h-8 w-48 mb-2" /><Skeleton className="h-4 w-64" /></div>
         </div>
-        <Card>
-          <CardHeader><Skeleton className="h-6 w-32" /></CardHeader>
-          <CardContent className="space-y-4">
+        <div className="card">
+          <div className="card-head"><Skeleton className="h-6 w-32" /></div>
+          <div className="p-5 space-y-4">
             <Skeleton className="h-20 w-full" />
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2"><User className="h-7 w-7 text-navy-500" />{t("dashboard.profile.title")}</h1>
-        <p className="text-slate-500 mt-1">{t("dashboard.profile.subtitle")}</p>
+    <div className="animate-in fade-in duration-500">
+      <div className="page-head">
+        <div>
+          <h1>{t("dashboard.profile.title")}</h1>
+          <p className="sub">{t("dashboard.profile.subtitle")}</p>
+        </div>
       </div>
 
-      {/* Logo Upload Card — hidden for Starter, replaced with upgrade prompt */}
-      {isStarter ? (
-        <Card className="border-navy-200 bg-gradient-to-br from-navy-50 to-teal-50">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-navy-500" />
-              <CardTitle>{t("dashboard.profile.logoProOnly.title")}</CardTitle>
+      <div className="stack">
+        {/* Logo — hidden for Starter, replaced with upgrade prompt */}
+        {isStarter ? (
+          <div className="card" style={{ background: "linear-gradient(135deg,var(--soft),var(--teal-t))" }}>
+            <div className="card-head">
+              <div>
+                <h2 className="flex items-center gap-2"><Crown className="h-5 w-5 text-navy-500" />{t("dashboard.profile.logoProOnly.title")}</h2>
+                <p className="sub">{t("dashboard.profile.logoProOnly.desc1")}<br />{t("dashboard.profile.logoProOnly.desc2")}</p>
+              </div>
             </div>
-            <CardDescription>
-              {t("dashboard.profile.logoProOnly.desc1")}<br/>
-              {t("dashboard.profile.logoProOnly.desc2")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4">
+            <div className="p-5 flex items-center gap-4">
               <div className="flex-1 space-y-1.5">
                 {[t("dashboard.profile.logoProOnly.feature1"), t("dashboard.profile.logoProOnly.feature2"), t("dashboard.profile.logoProOnly.feature3")].map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm text-foreground">
@@ -181,182 +175,89 @@ export default function ProfileSettings() {
                   </div>
                 ))}
               </div>
-              <Button
-                onClick={handleUpgrade}
-                disabled={createPortal.isPending}
-                className="shrink-0"
-              >
-                {createPortal.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Crown className="h-4 w-4 mr-2" />
-                )}
+              <Button onClick={handleUpgrade} disabled={createPortal.isPending} className="shrink-0">
+                {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Crown className="h-4 w-4 mr-2" />}
                 {t("dashboard.profile.logoProOnly.upgradeButton")}
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("dashboard.profile.logo.title")}</CardTitle>
-            <CardDescription>{t("dashboard.profile.logo.desc")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-6">
-              {/* Logo preview */}
-              <div className="w-32 h-20 border-2 border-dashed border-muted-foreground/30 rounded-[var(--radius-sm)] flex items-center justify-center bg-muted/20 overflow-hidden shrink-0">
-                {currentLogoUrl ? (
-                  <img
-                    src={currentLogoUrl}
-                    alt={t("dashboard.profile.logo.altText")}
-                    className="max-h-full max-w-full object-contain p-1"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                    <ImageIcon className="h-6 w-6" />
-                    <span className="text-xs">{t("dashboard.profile.logo.none")}</span>
-                  </div>
-                )}
+          </div>
+        ) : (
+          <div className="card">
+            <div className="card-head">
+              <div><h2>{t("dashboard.profile.logo.title")}</h2><p className="sub">{t("dashboard.profile.logo.desc")}</p></div>
+            </div>
+            <div className="logo-drop">
+              <div className="logo-tile">
+                {currentLogoUrl ? <img src={currentLogoUrl} alt={t("dashboard.profile.logo.altText")} /> : <ImageIcon className="h-6 w-6" />}
               </div>
+              <div style={{ flex: 1 }}>
+                <b style={{ fontSize: 14.5, color: "var(--navy)", display: "block" }}>
+                  {currentLogoUrl ? t("dashboard.profile.logo.title") : t("dashboard.profile.logo.none")}
+                </b>
+                <span className="t-sub">{t("dashboard.profile.logo.formatsHint")}</span>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".svg,.png,.jpg,.jpeg"
+                className="hidden"
+                onChange={handleLogoFileChange}
+                disabled={isUploadingLogo}
+              />
+              {currentLogoUrl && (
+                <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleRemoveLogo} style={{ color: "var(--red)", borderColor: "var(--red)" }}>
+                  <X className="h-4 w-4" /> {t("dashboard.profile.logo.remove")}
+                </button>
+              )}
+              <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => fileInputRef.current?.click()} disabled={isUploadingLogo}>
+                {isUploadingLogo ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {isUploadingLogo ? t("dashboard.profile.logo.uploading") : t("dashboard.profile.logo.uploadButton")}
+              </button>
+            </div>
+          </div>
+        )}
 
-              {/* Upload controls */}
-              <div className="space-y-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".svg,.png,.jpg,.jpeg"
-                  className="hidden"
-                  onChange={handleLogoFileChange}
-                  disabled={isUploadingLogo}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploadingLogo}
-                  className="gap-2"
-                >
-                  {isUploadingLogo ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
-                  {isUploadingLogo ? t("dashboard.profile.logo.uploading") : t("dashboard.profile.logo.uploadButton")}
-                </Button>
-                {currentLogoUrl && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemoveLogo}
-                    className="gap-2 text-destructive hover:text-destructive"
-                  >
-                    <X className="h-4 w-4" />
-                    {t("dashboard.profile.logo.remove")}
-                  </Button>
-                )}
-                <p className="text-xs text-muted-foreground">{t("dashboard.profile.logo.formatsHint")}</p>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="card">
+            <div className="card-head">
+              <div><h2>{t("dashboard.profile.businessData.title")}</h2><p className="sub">{t("dashboard.profile.businessData.desc")}</p></div>
+            </div>
+            <div className="form-grid">
+              <div className="field full">
+                <label htmlFor="companyName">{t("dashboard.profile.businessData.companyNameLabel")}</label>
+                <input id="companyName" placeholder={t("dashboard.profile.businessData.companyNamePlaceholder")} {...register("companyName")} />
+                {errors.companyName && <span className="text-xs text-destructive mt-1 block">{errors.companyName.message}</span>}
+              </div>
+              <div className="field">
+                <label htmlFor="vatNumber">{t("dashboard.profile.businessData.vatNumberLabel")}</label>
+                <input id="vatNumber" placeholder={t("dashboard.profile.businessData.vatNumberPlaceholder")} {...register("vatNumber")} />
+                {errors.vatNumber && <span className="text-xs text-destructive mt-1 block">{errors.vatNumber.message}</span>}
+              </div>
+              <div className="field">
+                <label htmlFor="phone">{t("dashboard.profile.businessData.phoneLabel")}</label>
+                <input id="phone" placeholder={t("dashboard.profile.businessData.phonePlaceholder")} {...register("phone")} />
+                {errors.phone && <span className="text-xs text-destructive mt-1 block">{errors.phone.message}</span>}
+              </div>
+              <div className="field">
+                <label htmlFor="email">{t("dashboard.profile.businessData.emailLabel")}</label>
+                <input id="email" type="email" placeholder={t("dashboard.profile.businessData.emailPlaceholder")} {...register("email")} />
+                {errors.email && <span className="text-xs text-destructive mt-1 block">{errors.email.message}</span>}
+              </div>
+              <div className="field">
+                <label htmlFor="address">{t("dashboard.profile.businessData.addressLabel")}</label>
+                <input id="address" placeholder={t("dashboard.profile.businessData.addressPlaceholder")} {...register("address")} />
+                {errors.address && <span className="text-xs text-destructive mt-1 block">{errors.address.message}</span>}
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("dashboard.profile.businessData.title")}</CardTitle>
-              <CardDescription>{t("dashboard.profile.businessData.desc")}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <FormField
-                control={form.control}
-                name="companyName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dashboard.profile.businessData.companyNameLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("dashboard.profile.businessData.companyNamePlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="vatNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("dashboard.profile.businessData.vatNumberLabel")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("dashboard.profile.businessData.vatNumberPlaceholder")} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("dashboard.profile.businessData.phoneLabel")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t("dashboard.profile.businessData.phonePlaceholder")} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dashboard.profile.businessData.emailLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("dashboard.profile.businessData.emailPlaceholder")} type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dashboard.profile.businessData.addressLabel")}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t("dashboard.profile.businessData.addressPlaceholder")} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter className="flex justify-end border-t p-6">
-              <Button type="submit" disabled={updateProfile.isPending} className="min-w-[120px]">
-                {updateProfile.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Save className="h-4 w-4 mr-2" />
-                )}
+            <div className="card-foot" style={{ justifyContent: "flex-end" }}>
+              <button type="submit" className="btn btn-navy btn-sm" disabled={updateProfile.isPending}>
+                {updateProfile.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                 {t("dashboard.profile.businessData.saveButton")}
-              </Button>
-            </CardFooter>
-          </Card>
+              </button>
+            </div>
+          </div>
         </form>
-      </Form>
+      </div>
     </div>
   );
 }

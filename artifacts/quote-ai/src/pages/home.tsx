@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { ArrowRight, FileText, Zap, Users, DollarSign, Check } from "lucide-react";
+import { ArrowRight, FileText, Zap, Users, DollarSign } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { RevealHeading } from "@/components/reveal-heading";
 import { StatsBar } from "@/components/stats-bar";
@@ -26,53 +26,6 @@ function ScrollSection({
     >
       {children}
     </section>
-  );
-}
-
-/** Quote PDF preview used as the hero-media / story-media product screenshot in place of stock photography. */
-function QuoteDocPreview({ title }: { title: string }) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden w-full max-w-[420px]">
-      <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
-        <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-          <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-        </div>
-        <div className="text-xs font-medium text-gray-400 ml-4">{title}</div>
-      </div>
-      <div className="bg-white text-black text-[10px] p-4 select-none">
-        <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5 mb-2.5">
-          <div>
-            <div className="text-xs font-bold text-slate-800">Smith Painting Co.</div>
-            <div className="text-slate-500 text-[9px] mt-0.5">GST/HST: 123456789 RT0001</div>
-          </div>
-          <div className="text-right">
-            <div className="text-[8px] font-semibold text-slate-400 uppercase tracking-widest">Quote</div>
-            <div className="text-[10px] font-bold text-slate-700 mt-0.5">N. 2024-042</div>
-          </div>
-        </div>
-        <table className="w-full mb-2">
-          <thead>
-            <tr className="bg-slate-800 text-white">
-              <th className="py-1 px-2 text-left text-[8px] font-semibold">Section</th>
-              <th className="py-1 px-2 text-right text-[8px] font-semibold">Net amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td className="py-1 px-2 text-slate-700">A. Wall painting</td><td className="py-1 px-2 text-right font-medium text-slate-800">$1,200.00</td></tr>
-            <tr className="bg-slate-50"><td className="py-1 px-2 text-slate-700">B. Skim coating & prep</td><td className="py-1 px-2 text-right font-medium text-slate-800">$250.00</td></tr>
-          </tbody>
-        </table>
-        <div className="flex justify-end">
-          <div className="w-44 border border-slate-200 rounded overflow-hidden">
-            <div className="flex justify-between px-2 py-1 text-slate-600 border-b border-slate-100"><span>Subtotal:</span><span className="font-medium">$1,450.00</span></div>
-            <div className="flex justify-between px-2 py-1 text-slate-600 border-b border-slate-100"><span>HST (13%):</span><span className="font-medium">$319.00</span></div>
-            <div className="flex justify-between px-2 py-1.5 bg-slate-800 text-white font-bold text-[10px]"><span>TOTAL</span><span>$1,769.00</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -143,10 +96,13 @@ export default function Home() {
             </div>
             <p className="hero-note">{lang === "fr" ? "Essai gratuit de 7 jours. Sans carte de crédit." : "7-day free trial. No credit card required."}</p>
           </div>
-
-          {/* hero-media: real product screenshot, no stock photography */}
-          <div className="hero-media hidden lg:block">
-            <QuoteDocPreview title="Quote_John_Smith.pdf" />
+          <div className="hero-media">
+            <img
+              src="https://picsum.photos/seed/quoteai-smallbusiness-owner/1080/840"
+              alt={lang === "fr" ? "Une propriétaire de petite entreprise consultant une soumission sur une tablette" : "A small business owner reviewing a quote on a tablet"}
+              width={1080}
+              height={840}
+            />
           </div>
         </div>
       </section>
@@ -198,7 +154,11 @@ export default function Home() {
 
           <div className="split" id="story-quotes">
             <div className="split-media">
-              <QuoteDocPreview title="Quote_John_Smith.pdf" />
+              <img
+                src="https://picsum.photos/seed/quoteai-contractor-onsite/980/686"
+                alt={lang === "fr" ? "Un entrepreneur consultant une soumission sur le chantier" : "A contractor reviewing a quote on site"}
+                loading="lazy"
+              />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</span>
@@ -216,47 +176,11 @@ export default function Home() {
 
           <div className="split rev" id="story-crm">
             <div className="split-media">
-              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden w-full max-w-[420px]">
-                <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                  </div>
-                  <div className="text-xs font-medium text-gray-400 ml-4">Job Site · Mario Rossi Renovation</div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">Budget</div>
-                      <div className="text-lg font-bold text-gray-900">$1,769.00</div>
-                    </div>
-                    <span className="chip chip-green">{lang === "fr" ? "En cours" : "In progress"}</span>
-                  </div>
-                  <div className="space-y-2 mb-4">
-                    {[
-                      { done: true, label: lang === "fr" ? "Visite et mesures" : "Site visit and measurements" },
-                      { done: true, label: lang === "fr" ? "Matériaux commandés" : "Materials ordered (Rossi Hardware)" },
-                      { done: false, label: lang === "fr" ? "Peinture des murs" : "Wall painting" },
-                      { done: false, label: lang === "fr" ? "Enduit du salon" : "Living room skim coating" },
-                    ].map((t) => (
-                      <div key={t.label} className="flex items-center gap-2.5 text-sm">
-                        <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${t.done ? "bg-navy-600" : "border border-gray-300"}`}>
-                          {t.done && <Check className="h-3 w-3 text-white" />}
-                        </div>
-                        <span className={t.done ? "text-gray-400 line-through" : "text-gray-700"}>{t.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <Users className="h-3.5 w-3.5" />
-                      {lang === "fr" ? "2 membres assignés" : "2 team members assigned"}
-                    </div>
-                    <span className="text-xs font-semibold text-navy-600">{lang === "fr" ? "Lié à la soumission" : "Linked to the quote"}</span>
-                  </div>
-                </div>
-              </div>
+              <img
+                src="https://picsum.photos/seed/quoteai-team-planning/980/686"
+                alt={lang === "fr" ? "Une petite équipe qui planifie sa semaine" : "A small team planning their week"}
+                loading="lazy"
+              />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "CRM intelligent" : "Smart CRM"}</span>
@@ -274,37 +198,11 @@ export default function Home() {
 
           <div className="split" id="story-invoicing">
             <div className="split-media">
-              <div className="bg-white rounded-xl border border-gray-100 shadow-md overflow-hidden w-full max-w-[420px]">
-                <div className="border-b bg-gray-50 px-4 py-2.5 flex items-center gap-2">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                  </div>
-                  <div className="text-xs font-medium text-gray-400 ml-4">Invoice_2024-042.pdf</div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <div className="text-xs text-gray-400 uppercase tracking-wide font-semibold">{lang === "fr" ? "Facture" : "Invoice"} #2024-042</div>
-                      <div className="text-lg font-bold text-gray-900">$1,769.00</div>
-                    </div>
-                    <span className="chip chip-teal">{lang === "fr" ? "Payée" : "Paid"}</span>
-                  </div>
-                  <div className="space-y-2 mb-4 text-sm text-gray-600">
-                    <div className="flex justify-between"><span>{lang === "fr" ? "Soumission acceptée" : "Quote accepted"}</span><span className="text-gray-400">Jun 5</span></div>
-                    <div className="flex justify-between"><span>{lang === "fr" ? "Facture envoyée" : "Invoice sent"}</span><span className="text-gray-400">Jun 5</span></div>
-                    <div className="flex justify-between"><span>{lang === "fr" ? "Paiement reçu" : "Payment received"}</span><span className="text-gray-400">Jun 9</span></div>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <DollarSign className="h-3.5 w-3.5" />
-                      {lang === "fr" ? "Réglée par carte" : "Settled by card"}
-                    </div>
-                    <span className="text-xs font-semibold text-navy-600">{lang === "fr" ? "Lié à la soumission" : "Linked to the quote"}</span>
-                  </div>
-                </div>
-              </div>
+              <img
+                src="https://picsum.photos/seed/quoteai-cafe-owner/980/686"
+                alt={lang === "fr" ? "Une propriétaire de café au comptoir de son commerce" : "A cafe owner at the counter of her business"}
+                loading="lazy"
+              />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "Facturation & paiements" : "Invoicing & Payments"}</span>
@@ -337,8 +235,15 @@ export default function Home() {
             <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all articles"} <ArrowRight className="chev h-4 w-4" /></Link>
           </div>
           <div className="news-grid">
-            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
+            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article, i) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="news-card">
+                <div className="news-media">
+                  <img
+                    src={`https://picsum.photos/seed/quoteai-blog-${i}/840/525`}
+                    alt=""
+                    loading="lazy"
+                  />
+                </div>
                 <div className="news-body">
                   <p className="news-meta">
                     {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" })}
@@ -354,6 +259,9 @@ export default function Home() {
 
       {/* ── TRIAL CTA (docs/mockups .trial — locked, literal) ── */}
       <ScrollSection className="trial on-dark" id="trial">
+        <div className="trial-bg">
+          <img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true" />
+        </div>
         <div className="wrap trial-in">
           <p className="eyebrow">{lang === "fr" ? "Commencer" : "Get started"}</p>
           <h2>{lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}</h2>

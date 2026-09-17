@@ -29,8 +29,8 @@ import {
   type ChangeOrder,
   type CostBudgetLine,
 } from "@workspace/db";
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { writeAudit } from "../lib/notifications.js";
@@ -148,6 +148,7 @@ export function serializeProject(p: typeof projectsTable.$inferSelect) {
     completedAt: iso(p.completedAt),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
+    archivedAt: iso(p.archivedAt),
   };
 }
 
@@ -157,7 +158,7 @@ export function serializeProject(p: typeof projectsTable.$inferSelect) {
 router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const projects = await db.select().from(projectsTable).where(eq(projectsTable.userId, userId)).orderBy(desc(projectsTable.createdAt)).limit(300);
+    const projects = await db.select().from(projectsTable).where(and(eq(projectsTable.userId, userId), isNull(projectsTable.archivedAt))).orderBy(desc(projectsTable.createdAt)).limit(300);
     const ids = projects.map((p) => p.id);
     const clientIds = [...new Set(projects.map((p) => p.clientId).filter((x): x is string => !!x))];
     const clients: { id: string; name: string }[] = clientIds.length ? await db.select({ id: clientsTable.id, name: clientsTable.name }).from(clientsTable).where(inArray(clientsTable.id, clientIds)) : [];
@@ -428,6 +429,42 @@ router.delete("/jobs/:id", requireAuth, requirePermission("jobs", "full"), async
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error deleting job");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/jobs/:id/archive
+router.post("/jobs/:id/archive", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(projectsTable)
+      .set({ archivedAt: new Date(), archivedByName: getUserName(res) })
+      .where(eq(projectsTable.id, project.id))
+      .returning();
+    res.json({ job: serializeProject(updated!) });
+  } catch (err) {
+    req.log.error({ err }, "Error archiving job");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/jobs/:id/restore
+router.post("/jobs/:id/restore", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(projectsTable)
+      .set({ archivedAt: null, archivedByName: null })
+      .where(eq(projectsTable.id, project.id))
+      .returning();
+    res.json({ job: serializeProject(updated!) });
+  } catch (err) {
+    req.log.error({ err }, "Error restoring job");
     res.status(500).json({ error: "Internal server error" });
   }
 });

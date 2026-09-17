@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db, contractsTable, contractSignersTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { and, desc, eq, isNull } from "drizzle-orm";
+import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import {
   createContractFromQuote,
@@ -55,6 +55,7 @@ function serializeContract(c: typeof contractsTable.$inferSelect, signers: (type
     reminderCount: c.reminderCount,
     createdAt: c.createdAt.toISOString(),
     updatedAt: c.updatedAt.toISOString(),
+    archivedAt: c.archivedAt?.toISOString() ?? null,
     signers: signers.map((s) => ({
       id: s.id,
       role: s.role,
@@ -75,10 +76,46 @@ function serializeContract(c: typeof contractsTable.$inferSelect, signers: (type
 router.get("/contracts", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
-    const rows = await db.select().from(contractsTable).where(eq(contractsTable.userId, userId)).orderBy(desc(contractsTable.createdAt)).limit(200);
+    const rows = await db.select().from(contractsTable).where(and(eq(contractsTable.userId, userId), isNull(contractsTable.archivedAt))).orderBy(desc(contractsTable.createdAt)).limit(200);
     res.json({ items: rows.map((c) => serializeContract(c)) });
   } catch (err) {
     req.log.error({ err }, "Error listing contracts");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/contracts/:id/archive
+router.post("/contracts/:id/archive", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const [existing] = await db.select().from(contractsTable).where(eq(contractsTable.id, req.params.id as string));
+    if (!existing || existing.userId !== userId) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(contractsTable)
+      .set({ archivedAt: new Date(), archivedByName: getUserName(res) })
+      .where(eq(contractsTable.id, existing.id))
+      .returning();
+    res.json(serializeContract(updated));
+  } catch (err) {
+    req.log.error({ err }, "Error archiving contract");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/contracts/:id/restore
+router.post("/contracts/:id/restore", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const [existing] = await db.select().from(contractsTable).where(eq(contractsTable.id, req.params.id as string));
+    if (!existing || existing.userId !== userId) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(contractsTable)
+      .set({ archivedAt: null, archivedByName: null })
+      .where(eq(contractsTable.id, existing.id))
+      .returning();
+    res.json(serializeContract(updated));
+  } catch (err) {
+    req.log.error({ err }, "Error restoring contract");
     res.status(500).json({ error: "Internal server error" });
   }
 });

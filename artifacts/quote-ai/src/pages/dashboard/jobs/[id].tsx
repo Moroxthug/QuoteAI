@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera,
+  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,7 @@ export default function JobDetailPage() {
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
 
   const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
+  const archive = useMutation({ mutationFn: () => jobsApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["jobs"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/jobs"); }, onError });
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-64 w-full rounded-[var(--radius)]" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
@@ -91,6 +92,7 @@ export default function JobDetailPage() {
             {job.status === "suspended" && <Button size="sm" onClick={() => setStatus.mutate("active")}>{t("jobs.action.resume")}</Button>}
             {job.status !== "completed" && <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={setStatus.isPending} onClick={() => setStatus.mutate("completed")}><CheckCircle2 className="h-4 w-4" /> {t("jobs.action.complete")}</Button>}
             {job.status === "completed" && <Button size="sm" variant="outline" onClick={() => setStatus.mutate("active")}>{t("jobs.action.reopen")}</Button>}
+            {job.status === "completed" && <Button size="sm" variant="ghost" className="gap-2 text-slate-500" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>}
           </div>
         </div>
       </div>

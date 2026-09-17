@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
 import multer from "multer";
 import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
-import { eq, desc, count, sum, sql, and, avg } from "drizzle-orm";
+import { eq, desc, count, sum, sql, and, avg, isNull } from "drizzle-orm";
 import { getTrialStatus, PLANS } from "./payments.js";
 import {
   UpdateQuoteBody,
@@ -234,6 +234,7 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     templateId: q.templateId ?? "standard",
     createdAt: q.createdAt.toISOString(),
     updatedAt: q.updatedAt.toISOString(),
+    archivedAt: q.archivedAt?.toISOString() ?? null,
     acceptedVariantId: q.acceptedVariantId ?? null,
     variants: variants?.map(serializeQuoteVariant) ?? [],
     attachments: attachments?.map(a => ({
@@ -314,7 +315,7 @@ router.get("/quotes", requireAuth, async (req, res) => {
     const quotes = await db
       .select()
       .from(quotesTable)
-      .where(eq(quotesTable.userId, userId))
+      .where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt)))
       .orderBy(desc(quotesTable.createdAt));
     res.json(quotes.map(q => serializeQuote(q)));
   } catch (err) {
@@ -1500,6 +1501,46 @@ router.delete("/quotes/:id", requireAuth, async (req, res) => {
     res.status(204).end();
   } catch (err) {
     req.log.error({ err }, "Error deleting quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/quotes/:id/archive
+router.post("/quotes/:id/archive", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id } = DeleteQuoteParams.parse(req.params);
+    const [existing] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+    if (existing.userId !== userId) { res.status(403).json({ error: "Forbidden" }); return; }
+    const [updated] = await db
+      .update(quotesTable)
+      .set({ archivedAt: new Date(), archivedByName: getUserName(res) })
+      .where(eq(quotesTable.id, id))
+      .returning();
+    res.json(serializeQuote(updated));
+  } catch (err) {
+    req.log.error({ err }, "Error archiving quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/quotes/:id/restore
+router.post("/quotes/:id/restore", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id } = DeleteQuoteParams.parse(req.params);
+    const [existing] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+    if (existing.userId !== userId) { res.status(403).json({ error: "Forbidden" }); return; }
+    const [updated] = await db
+      .update(quotesTable)
+      .set({ archivedAt: null, archivedByName: null })
+      .where(eq(quotesTable.id, id))
+      .returning();
+    res.json(serializeQuote(updated));
+  } catch (err) {
+    req.log.error({ err }, "Error restoring quote");
     res.status(500).json({ error: "Internal server error" });
   }
 });

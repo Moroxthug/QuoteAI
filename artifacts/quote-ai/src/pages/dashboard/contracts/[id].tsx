@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw,
+  ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -148,6 +148,12 @@ export default function ContractDetailPage() {
     onError: (e: Error) => toast({ title: t("contracts.voidError"), description: e.message, variant: "destructive" }),
   });
 
+  const archiveContract = useMutation({
+    mutationFn: async () => contractsApi.archive(contract!.id),
+    onSuccess: (c) => { refresh({ contract: c }); toast({ title: t("archive.archivedToast") }); },
+    onError: (e: Error) => toast({ title: t("archive.restoreErrorToast"), description: e.message, variant: "destructive" }),
+  });
+
   const contractorSigner = contract?.signers.find((s) => s.role === "contractor");
   const customerSigner = contract?.signers.find((s) => s.role === "customer");
   const isDraft = contract?.status === "draft";
@@ -208,6 +214,9 @@ export default function ContractDetailPage() {
           </a>
           {isOpen && !editing && (
             <Button variant="outline" size="sm" className="gap-1.5 text-red-600 hover:text-red-700" onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("contracts.void")}</Button>
+          )}
+          {!isOpen && !isDraft && (
+            <Button variant="ghost" size="sm" className="gap-1.5 text-slate-500" onClick={() => archiveContract.mutate()} disabled={archiveContract.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>
           )}
         </div>
       </div>

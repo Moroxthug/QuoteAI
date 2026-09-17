@@ -49,23 +49,26 @@ export function NotificationsBell({ variant = "topbar", side = "bottom", align =
   const items = data?.items ?? [];
   const locale = lang === "fr" ? frCA : enCA;
 
-  const trigger =
-    variant === "sidebar" ? (
-      <button type="button" className="sb-link" aria-label={t("notifications.title")}>
+  if (variant === "sidebar") {
+    return (
+      <Link href="/dashboard/notifications" className="sb-link" aria-label={t("notifications.title")}>
         <Bell className="ic" />
         <span className="sb-txt">{t("notifications.title")}</span>
         {unread > 0 && <span className="count-chip">{unread > 99 ? "99+" : unread}</span>}
-      </button>
-    ) : (
-      <button type="button" className="bell" aria-label={t("notifications.title")}>
-        <Bell className="ic" />
-        {unread > 0 && <span className="dot" />}
-      </button>
+      </Link>
     );
+  }
+
+  const trigger = (
+    <button type="button" className="bell" aria-label={t("notifications.title")}>
+      <Bell className="ic" />
+      {unread > 0 && <span className="dot" />}
+    </button>
+  );
 
   return (
     <Popover>
-      <PopoverTrigger asChild>{variant === "topbar" ? <span className="bell-wrap">{trigger}</span> : trigger}</PopoverTrigger>
+      <PopoverTrigger asChild><span className="bell-wrap">{trigger}</span></PopoverTrigger>
       <PopoverContent side={side} align={align} sideOffset={10} className="pop p-0 border-0 shadow-none">
         <div className="flex items-center justify-between">
           <h3 className="!border-0 !pb-2 flex-1">{t("notifications.title")}</h3>

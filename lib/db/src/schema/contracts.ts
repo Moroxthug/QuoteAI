@@ -130,6 +130,9 @@ export const contractsTable = pgTable(
     voidReason: text("void_reason"),
     lastReminderAt: timestamp("last_reminder_at", { withTimezone: true }),
     reminderCount: integer("reminder_count").notNull().default(0),
+    /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    archivedByName: text("archived_by_name"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -137,6 +140,7 @@ export const contractsTable = pgTable(
     index("contracts_user_idx").on(t.userId, t.createdAt),
     index("contracts_quote_idx").on(t.quoteId),
     index("contracts_status_idx").on(t.status, t.sentAt),
+    index("contracts_archived_idx").on(t.userId, t.archivedAt),
   ],
 );
 

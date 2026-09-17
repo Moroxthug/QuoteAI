@@ -177,6 +177,44 @@ paths:
         "204":
           description: Deleted
 
+  /quotes/{id}/archive:
+    post:
+      operationId: archiveQuote
+      tags: [quotes]
+      summary: Soft-archive a quote (moves it to the Archive view)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Archived quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
+  /quotes/{id}/restore:
+    post:
+      operationId: restoreQuote
+      tags: [quotes]
+      summary: Restore an archived quote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Restored quote
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Quote"
+
   /quotes/{id}/generate-pdf:
     post:
       operationId: generateQuotePdf
@@ -1707,6 +1745,9 @@ components:
           type: string
         updatedAt:
           type: string
+        archivedAt:
+          type: string
+          nullable: true
       required:
         - id
         - userId

@@ -65,6 +65,9 @@ export const projectsTable = pgTable("projects", {
   longitude: numeric("longitude", { precision: 9, scale: 6 }),
   /** Phase 23: optional, off by default. When set, a worker clock-in/out beyond this radius just flags the entry — never blocks it. */
   geofenceRadiusMeters: integer("geofence_radius_meters"),
+  /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
+  archivedByName: text("archived_by_name"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

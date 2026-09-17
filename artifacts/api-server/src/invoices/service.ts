@@ -28,7 +28,7 @@ import {
   type BusinessProfile,
   type Client,
 } from "@workspace/db";
-import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
@@ -719,11 +719,11 @@ export async function createCreditNote(params: { invoiceId: string; userId: stri
 // ── Queries for the UI ───────────────────────────────────────────────────────
 
 export async function invoicesForProject(projectId: string): Promise<Invoice[]> {
-  return db.select().from(invoicesTable).where(eq(invoicesTable.projectId, projectId)).orderBy(asc(invoicesTable.issueDate), asc(invoicesTable.createdAt));
+  return db.select().from(invoicesTable).where(and(eq(invoicesTable.projectId, projectId), isNull(invoicesTable.archivedAt))).orderBy(asc(invoicesTable.issueDate), asc(invoicesTable.createdAt));
 }
 
 export async function invoicesForUser(userId: string, limit = 500): Promise<Invoice[]> {
-  return db.select().from(invoicesTable).where(eq(invoicesTable.userId, userId)).orderBy(desc(invoicesTable.issueDate), desc(invoicesTable.createdAt)).limit(limit);
+  return db.select().from(invoicesTable).where(and(eq(invoicesTable.userId, userId), isNull(invoicesTable.archivedAt))).orderBy(desc(invoicesTable.issueDate), desc(invoicesTable.createdAt)).limit(limit);
 }
 
 /** Totals used by the job KPI strip: invoiced (excl. drafts/void/credit) and collected. */

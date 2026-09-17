@@ -28,6 +28,9 @@ export const clientsTable = pgTable(
     // Never gates transactional messages (quotes/contracts/invoices) — only automated reachout.
     marketingUnsubscribeToken: text("marketing_unsubscribe_token").notNull().$defaultFn(() => randomUUID()),
     marketingUnsubscribedAt: timestamp("marketing_unsubscribed_at", { withTimezone: true }),
+    /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    archivedByName: text("archived_by_name"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -35,6 +38,7 @@ export const clientsTable = pgTable(
     index("clients_user_id_idx").on(t.userId),
     uniqueIndex("clients_user_dedup_idx").on(t.userId, t.dedupKey),
     uniqueIndex("clients_marketing_unsubscribe_token_idx").on(t.marketingUnsubscribeToken),
+    index("clients_archived_idx").on(t.userId, t.archivedAt),
   ],
 );
 

@@ -136,6 +136,9 @@ export const invoicesTable = pgTable(
     autoSendAt: timestamp("auto_send_at", { withTimezone: true }),
     reminderCount: integer("reminder_count").notNull().default(0),
     lastReminderAt: timestamp("last_reminder_at", { withTimezone: true }),
+    /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+    archivedByName: text("archived_by_name"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -145,6 +148,7 @@ export const invoicesTable = pgTable(
     index("invoices_status_due_idx").on(t.status, t.dueDate),
     uniqueIndex("invoices_user_number_idx").on(t.userId, t.number),
     uniqueIndex("invoices_public_token_idx").on(t.publicTokenHash),
+    index("invoices_archived_idx").on(t.userId, t.archivedAt),
   ],
 );
 

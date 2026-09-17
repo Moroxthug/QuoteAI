@@ -157,6 +157,7 @@ export interface Quote {
   variants?: QuoteVariant[];
   createdAt: string;
   updatedAt: string;
+  archivedAt?: string | null;
 }
 
 export interface QuoteStats {

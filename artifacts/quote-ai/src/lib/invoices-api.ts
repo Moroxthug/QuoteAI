@@ -71,6 +71,7 @@ export type InvoiceDto = {
   lastReminderAt: string | null;
   createdAt: string;
   updatedAt: string;
+  archivedAt: string | null;
 };
 
 export type InvoicePaymentDto = { id: string; date: string; amountCents: number; method: PaymentMethod; reference: string; note: string; creditNoteId: string | null; createdAt: string };
@@ -105,6 +106,8 @@ export const invoicesApi = {
     req<{ invoice: InvoiceDto; payment: InvoicePaymentDto }>(`/api/invoices/${id}/payments`, { method: "POST", body: json(body) }),
   removePayment: (id: string, pid: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/payments/${pid}`, { method: "DELETE" }),
   void: (id: string, reason?: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/void`, { method: "POST", body: json({ reason }) }),
+  archive: (id: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/archive`, { method: "POST", body: "{}" }),
+  restore: (id: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/restore`, { method: "POST", body: "{}" }),
   creditNote: (id: string, body: { amountCents: number; description: string; reason?: string; send?: boolean }) =>
     req<{ creditNote: InvoiceDto; invoice: InvoiceDto }>(`/api/invoices/${id}/credit-note`, { method: "POST", body: json(body) }),
   confirmEtransfer: (id: string) => req<{ invoice: InvoiceDto }>(`/api/invoices/${id}/confirm-etransfer`, { method: "POST", body: "{}" }),

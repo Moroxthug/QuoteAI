@@ -125,11 +125,15 @@ export const quotesTable = pgTable("quotes", {
   totalTokens: integer("total_tokens"),
   modelUsed: text("model_used"),
   apiCost: numeric("api_cost", { precision: 10, scale: 6 }),
+  /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
+  archivedByName: text("archived_by_name"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 }, (t) => [
   index("quotes_followup_due_idx").on(t.status, t.nextFollowUpAt),
   uniqueIndex("quotes_unsubscribe_token_idx").on(t.unsubscribeToken),
+  index("quotes_archived_idx").on(t.userId, t.archivedAt),
 ]);
 
 export const quoteAttachmentsTable = pgTable("quote_attachments", {

@@ -3,7 +3,7 @@ import { Link, useParams, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { ArrowLeft, Receipt, Send, Download, Banknote, Ban, FileMinus, BellRing, Pencil, Check, X, Loader2, Copy, ExternalLink, Trash2, Briefcase, Clock, AlertTriangle, MailQuestion } from "lucide-react";
+import { ArrowLeft, Receipt, Send, Download, Banknote, Ban, FileMinus, BellRing, Pencil, Check, X, Loader2, Copy, ExternalLink, Trash2, Briefcase, Clock, AlertTriangle, MailQuestion, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,6 +41,7 @@ export default function InvoiceDetailPage() {
 
   const remind = useMutation({ mutationFn: () => invoicesApi.remind(id!), onSuccess: () => { refresh(); toast({ title: t("invoices.reminderSent") }); }, onError });
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
+  const archive = useMutation({ mutationFn: () => invoicesApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/invoices"); }, onError });
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-96 w-full rounded-[var(--radius)]" /></div>;
   if (error || !data) return <div className="p-8 text-center text-slate-500">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-navy-600 underline">{t("invoices.backToList")}</Link></div>;
@@ -78,6 +79,7 @@ export default function InvoiceDetailPage() {
             {open && <Button variant="outline" size="sm" className="gap-2" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</Button>}
             {(open || inv.status === "paid") && !isCredit && <Button variant="outline" size="sm" className="gap-2" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</Button>}
             {inv.status !== "void" && !isDraft && <Button variant="ghost" size="sm" className="gap-2 text-slate-500" onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("invoices.void")}</Button>}
+            {(inv.status === "paid" || inv.status === "void") && <Button variant="ghost" size="sm" className="gap-2 text-slate-500" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>}
           </div>
         </div>
       </div>

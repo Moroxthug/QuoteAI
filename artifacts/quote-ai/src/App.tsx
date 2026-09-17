@@ -43,6 +43,8 @@ const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
 const DocumentsPage = lazy(() => import("@/pages/dashboard/documents"));
+const ArchivePage = lazy(() => import("@/pages/dashboard/archive"));
+const NotificationsPage = lazy(() => import("@/pages/dashboard/notifications"));
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
 const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
@@ -196,6 +198,12 @@ function Router() {
       <Route path="/crm/:rest*" component={() => <Redirect to="/dashboard/jobs" />} />
       <Route path="/dashboard/documents" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><DocumentsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/archive" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><ArchivePage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/notifications" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><NotificationsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}

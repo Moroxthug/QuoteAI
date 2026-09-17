@@ -47,6 +47,7 @@ export type ContractDto = {
   reminderCount: number;
   createdAt: string;
   updatedAt: string;
+  archivedAt: string | null;
   signers: { id: string; role: "contractor" | "customer"; name: string; email: string; status: string; signatureType: string | null; signedAt: string | null; viewedAt: string | null; declinedAt: string | null; declineReason: string | null }[];
   events: { id: string; type: string; actor: string; detail: unknown; createdAt: string }[];
 };
@@ -76,6 +77,8 @@ export const contractsApi = {
     req<{ contract: ContractDto }>(`/api/contracts/${id}/sign`, { method: "POST", body: JSON.stringify(body) }),
   send: (id: string, body: { message?: string } = {}) => req<{ contract: ContractDto }>(`/api/contracts/${id}/send`, { method: "POST", body: JSON.stringify(body) }),
   void: (id: string, reason?: string) => req<{ contract: ContractDto }>(`/api/contracts/${id}/void`, { method: "POST", body: JSON.stringify({ reason }) }),
+  archive: (id: string) => req<ContractDto>(`/api/contracts/${id}/archive`, { method: "POST", body: "{}" }),
+  restore: (id: string) => req<ContractDto>(`/api/contracts/${id}/restore`, { method: "POST", body: "{}" }),
   pdfUrl: (id: string, download = false) => `/api/contracts/${id}/pdf${download ? "?download=1" : ""}`,
 };
 

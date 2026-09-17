@@ -1,10 +1,10 @@
-import { useListQuotes, useDeleteQuote, useDuplicateQuote, getListQuotesQueryKey } from "@workspace/api-client-react";
+import { useListQuotes, useDeleteQuote, useDuplicateQuote, useArchiveQuote, getListQuotesQueryKey } from "@workspace/api-client-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight } from "lucide-react";
+import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight, Archive } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ export default function QuotesList() {
   const { data: quotes, isLoading } = useListQuotes();
   const deleteQuote = useDeleteQuote();
   const duplicateQuote = useDuplicateQuote();
+  const archiveQuote = useArchiveQuote();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
@@ -47,6 +48,16 @@ export default function QuotesList() {
         queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
       },
       onError: () => toast({ title: t("dashboard.quotesList.deleteErrorToast"), variant: "destructive" }),
+    });
+  };
+
+  const handleArchive = (id: string) => {
+    archiveQuote.mutate({ id }, {
+      onSuccess: () => {
+        toast({ title: t("dashboard.quotesList.archivedToast") });
+        queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+      },
+      onError: () => toast({ title: t("dashboard.quotesList.archiveErrorToast"), variant: "destructive" }),
     });
   };
 
@@ -191,6 +202,12 @@ export default function QuotesList() {
                                 className="cursor-pointer text-sm"
                               >
                                 <Copy className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.duplicate")}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleArchive(quote.id)}
+                                className="cursor-pointer text-sm"
+                              >
+                                <Archive className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.archive")}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem

@@ -16,7 +16,7 @@ import {
   type InvoiceLine,
 } from "@workspace/db";
 import { and, eq, inArray } from "drizzle-orm";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
@@ -107,6 +107,7 @@ export function serializeInvoice(inv: Invoice, extra: { projectName?: string | n
     lastReminderAt: iso(inv.lastReminderAt),
     createdAt: inv.createdAt.toISOString(),
     updatedAt: inv.updatedAt.toISOString(),
+    archivedAt: iso(inv.archivedAt),
   };
 }
 
@@ -371,6 +372,42 @@ router.delete("/invoices/:id", requireAuth, requirePermission("invoicing", "full
   } catch (err) {
     req.log.error({ err }, "Error deleting invoice");
     fail(res, err, "Could not delete the invoice");
+  }
+});
+
+// POST /api/invoices/:id/archive
+router.post("/invoices/:id/archive", requireAuth, requirePermission("invoicing", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const loaded = await loadInvoice(req.params.id as string);
+    if (!loaded || loaded.invoice.userId !== userId) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(invoicesTable)
+      .set({ archivedAt: new Date(), archivedByName: getUserName(res) })
+      .where(eq(invoicesTable.id, loaded.invoice.id))
+      .returning();
+    res.json({ invoice: serializeInvoice(updated) });
+  } catch (err) {
+    req.log.error({ err }, "Error archiving invoice");
+    fail(res, err, "Could not archive the invoice");
+  }
+});
+
+// POST /api/invoices/:id/restore
+router.post("/invoices/:id/restore", requireAuth, requirePermission("invoicing", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const loaded = await loadInvoice(req.params.id as string);
+    if (!loaded || loaded.invoice.userId !== userId) { res.status(404).json({ error: "Not found" }); return; }
+    const [updated] = await db
+      .update(invoicesTable)
+      .set({ archivedAt: null, archivedByName: null })
+      .where(eq(invoicesTable.id, loaded.invoice.id))
+      .returning();
+    res.json({ invoice: serializeInvoice(updated) });
+  } catch (err) {
+    req.log.error({ err }, "Error restoring invoice");
+    fail(res, err, "Could not restore the invoice");
   }
 });
 

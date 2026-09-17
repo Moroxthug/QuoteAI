@@ -29,6 +29,7 @@ export type JobSummaryDto = {
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  archivedAt: string | null;
   clientName: string | null;
   milestoneCount: number;
   milestonesDone: number;
@@ -248,6 +249,8 @@ export const jobsApi = {
   update: (id: string, body: { name?: string; description?: string; status?: JobStatus; address?: string; plannedStart?: string | null; plannedEnd?: string | null; contractValueCents?: number; latitude?: number | null; longitude?: number | null; geofenceRadiusMeters?: number | null }) =>
     req<{ job: JobSummaryDto }>(`/api/jobs/${id}`, { method: "PUT", body: json(body) }),
   remove: (id: string) => req<{ success: true }>(`/api/jobs/${id}`, { method: "DELETE" }),
+  archive: (id: string) => req<{ job: JobSummaryDto }>(`/api/jobs/${id}/archive`, { method: "POST", body: "{}" }),
+  restore: (id: string) => req<{ job: JobSummaryDto }>(`/api/jobs/${id}/restore`, { method: "POST", body: "{}" }),
 
   saveSetup: (id: string, body: SetupEdits) => req<JobDetailDto>(`/api/jobs/${id}/setup`, { method: "PUT", body: json(body) }),
   confirmSetup: (id: string, body: SetupEdits) => req<JobDetailDto>(`/api/jobs/${id}/setup/confirm`, { method: "POST", body: json(body) }),

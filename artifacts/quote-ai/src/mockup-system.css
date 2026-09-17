@@ -436,3 +436,27 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 @media (max-width: 980px) {
   .form-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================
+   IMPORT / DOCUMENTS / ONBOARDING (Phase 46)
+   — steps-3, src-grid, dropzone.
+   ========================================================== */
+.steps-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.step-card { padding: 22px; }
+.step-num { width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: 800; display: grid; place-items: center; margin-bottom: 14px; }
+.step-card b { display: block; font-size: 15px; color: var(--navy); margin-bottom: 5px; }
+.step-card p { font-size: 13.5px; color: var(--muted-mk); }
+.src-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 22px; }
+.src { border: 1.5px solid var(--line); border-radius: 14px; padding: 18px; text-align: left; transition: border-color .25s, background .25s, transform .25s var(--ease-mk); background: #fff; }
+.src:hover { transform: translateY(-3px); }
+.src b { display: block; font-size: 15px; color: var(--navy); }
+.src p { font-size: 13px; color: var(--muted-mk); margin: 4px 0 10px; }
+.src.on { border-color: var(--navy); background: var(--soft); }
+.dropzone { margin: 0 22px 22px; border: 2px dashed var(--line); border-radius: 16px; padding: 38px 24px; text-align: center; transition: border-color .25s, background .25s; }
+.dropzone:hover { border-color: var(--navy); background: var(--soft); }
+.dropzone b { display: block; font-size: 15px; color: var(--navy); margin-bottom: 4px; }
+.dropzone p { font-size: 13.5px; color: var(--muted-mk); margin-bottom: 16px; }
+
+@media (max-width: 980px) {
+  .steps-3, .src-grid { grid-template-columns: 1fr; }
+}

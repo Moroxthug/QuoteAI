@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>quoteai – Instant Quotes for Canadian Contractors | AI in 30s</title>
+<meta name="description" content="quoteai turns a plain-language job description into a priced, branded, tax-calculated quote in 30 seconds — then runs leads, job sites, contracts and invoices until you're paid. Built for Canadian trades.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#101031;--navy-hover:#24244a;--ink:#393a3d;--muted:#6b6c72;--faint:#8f9198;--line:#dfe1e6;--soft:#f4f5f7;--soft-2:#eceef2;--green:#2ca01c;--green-dark:#1f7d12;--green-t:#e9f6e6;--purple:#6c2bd9;--purple-t:#eeecfc;--teal:#0f97a2;--teal-dark:#0b7c86;--teal-t:#e3f5f4;--yellow:#ffe01b;--radius:18px;--font:'Figtree',system-ui,sans-serif;--ease:cubic-bezier(.2,.7,.2,1);--shadow-card:0 14px 34px rgba(16,16,49,.10);--shadow-lift:0 24px 48px rgba(16,16,49,.16)}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{font:16px/1.6 var(--font);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}img{display:block;max-width:100%}a{color:inherit;text-decoration:none}button{font:inherit;background:none;border:none;cursor:pointer;color:inherit}ul{list-style:none}h1,h2,h3{color:var(--navy);font-weight:700;letter-spacing:-.015em;line-height:1.15}:focus-visible{outline:2px solid var(--navy);outline-offset:2px;border-radius:6px}svg.ic{width:19px;height:19px;flex:none}.chev{width:.7em;height:.7em}
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:clamp(20px,4vw,40px)}
+.sec{padding:clamp(64px,8vw,104px) 0}.sec.soft{background:var(--soft)}
+.eyebrow{font-size:12.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--green-dark)}
+.eyebrow.grey{color:var(--muted)}.eyebrow.on-dark{color:#8ef07f}
+.h2{font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:800;letter-spacing:-.02em}
+.lead{font-size:clamp(1.02rem,1.35vw,1.18rem);color:var(--muted);max-width:620px}
+.on-dark .lead{color:#c9cad6}
+html.js .lm{display:block;overflow:hidden;padding-bottom:.07em;margin-bottom:-.07em}
+html.js .lm>span{display:block;transform:translateY(112%);transition:transform 1s var(--ease);transition-delay:var(--d,0s)}
+html.js .in .lm>span{transform:none}
+html.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .8s var(--ease);transition-delay:var(--d,0s)}
+html.js .reveal.in{opacity:1;transform:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:999px;padding:14px 28px;font-size:15.5px;font-weight:700;line-height:1;transition:background .25s,color .25s,transform .25s var(--ease),box-shadow .25s;white-space:nowrap}
+.btn:active{transform:scale(.98)}.btn-navy{background:var(--navy);color:#fff}.btn-navy:hover{background:var(--navy-hover);box-shadow:0 10px 26px rgba(16,16,49,.25)}.btn-white{background:#fff;color:var(--navy)}.btn-white:hover{background:#eceef2}.btn-outline-light{border:2px solid rgba(255,255,255,.55);color:#fff}.btn-outline-light:hover{background:rgba(255,255,255,.12)}.btn-sm{padding:10px 20px;font-size:14.5px}
+.cta-link{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--navy)}
+.cta-link .chev{transition:transform .3s var(--ease)}.cta-link:hover .chev{transform:translateX(5px)}
+.chip{display:inline-flex;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip-green{background:var(--green-t);color:var(--green-dark)}.chip-teal{background:var(--teal-t);color:var(--teal-dark)}.chip-purple{background:var(--purple-t);color:var(--purple)}.chip-grey{background:var(--soft-2);color:var(--muted)}.chip-new{background:var(--green);color:#fff}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius)}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;margin-bottom:clamp(30px,4vw,48px);flex-wrap:wrap}
+.sec-head .h2{margin:14px 0 14px}
+/* chrome */
+.annc{background:var(--navy);color:#fff;font-size:14px;font-weight:600;text-align:center;padding:10px 48px 10px 20px;position:relative}
+.annc a{color:#8ef07f;text-decoration:underline;text-underline-offset:3px;margin-left:8px;font-weight:700}
+.annc-x{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:.75;color:#fff;width:26px;height:26px;display:grid;place-items:center}.annc-x:hover{opacity:1}.annc.gone{display:none}
+.site-head{position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.site-head.scrolled{border-bottom-color:var(--line);box-shadow:0 10px 30px rgba(16,16,49,.07)}
+.hd{display:flex;align-items:center;gap:28px;height:78px}
+.logo{font-size:25px;font-weight:800;letter-spacing:-.03em;color:var(--navy)}
+.nav{display:flex;align-items:center;gap:24px;margin-left:4px}
+.nav-link{display:inline-flex;align-items:center;gap:7px;font-size:15.5px;font-weight:600;color:var(--navy);padding:7px 0;position:relative}
+.nav-link::after{content:"";position:absolute;left:0;bottom:1px;height:2px;width:0;background:var(--navy);transition:width .3s var(--ease)}
+.nav-link:hover::after{width:100%}
+.nav-link .chev-d{width:11px;height:11px;transition:transform .3s var(--ease)}
+.has-mega{position:relative}
+.has-mega.open .chev-d,.has-mega:hover .chev-d{transform:rotate(180deg)}
+.mega{position:absolute;left:50%;transform:translate(-50%,10px);top:100%;width:min(880px,92vw);background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 34px 60px rgba(16,16,49,.16);opacity:0;visibility:hidden;transition:opacity .25s,transform .3s var(--ease),visibility .3s;padding:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;z-index:70}
+.has-mega.open .mega,.has-mega:hover .mega,.has-mega:focus-within .mega{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.mega-card{border-radius:13px;padding:20px;min-height:158px;display:flex;flex-direction:column;gap:7px;color:#fff;transition:transform .3s var(--ease)}
+.mega-card:hover{transform:translateY(-4px)}
+.mega-card b{font-size:17px;font-weight:800}.mega-card p{font-size:13px;line-height:1.5;opacity:.9;flex:1}
+.mega-card .cta-link{font-size:13.5px;color:inherit}
+.mc-green{background:var(--green)}.mc-purple{background:var(--purple)}.mc-teal{background:var(--teal)}.mc-yellow{background:var(--yellow);color:var(--navy)}
+.hd-r{margin-left:auto;display:flex;align-items:center;gap:16px}
+.hd-fr{font-size:13.5px;font-weight:800;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 12px}.hd-fr:hover{color:var(--navy);border-color:var(--navy)}
+.signin{font-size:15.5px;font-weight:700;color:var(--navy)}.signin:hover{text-decoration:underline;text-underline-offset:3px}
+.menu-btn{display:none;width:42px;height:42px;place-items:center;color:var(--navy)}
+.mnav{display:none;background:#fff;border-bottom:1px solid var(--line);padding:10px 24px 26px;box-shadow:0 30px 50px rgba(16,16,49,.1)}
+.mnav.open{display:block}
+.mnav a{display:block;padding:12px 4px;font-weight:700;font-size:16.5px;color:var(--navy);border-bottom:1px solid var(--soft)}
+.mnav .btn{width:100%;margin-top:18px}
+/* hero */
+.hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(circle,rgba(44,160,28,.20),transparent 65%);bottom:-360px;right:-180px;pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(36px,5vw,72px);align-items:center;padding:clamp(64px,8vw,110px) 0}
+.hero h1{color:#fff;font-size:clamp(2.4rem,4.6vw,3.9rem);font-weight:800;letter-spacing:-.03em;line-height:1.05}
+.hero .lead{margin-top:24px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.hero-note{margin-top:24px;font-size:14px;color:#8f91a6;font-weight:600}
+.doc-mock{background:#fff;border-radius:16px;box-shadow:var(--shadow-lift);overflow:hidden;color:var(--ink)}
+.dm-bar{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--soft);background:#fbfbfe}
+.dm-bar b{font-size:13.5px;color:var(--navy)}.dm-bar .chip{margin-left:auto}
+.dm-body{padding:20px 22px}
+.dm-co{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:14px;flex-wrap:wrap}
+.dm-co b{display:block;font-size:14.5px;color:var(--navy)}
+.dm-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px dashed var(--line);font-size:14px;font-weight:600}
+.dm-row:first-of-type{border-top:none}
+.dm-row .v{font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+.dm-tot{border-top:1px solid var(--line);margin-top:8px;padding-top:10px}
+.dm-grand{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0 2px}
+.dm-grand span{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dm-grand b{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--navy)}
+.dm-chips{display:flex;gap:8px;flex-wrap:wrap;padding:12px 22px 18px;border-top:1px solid var(--soft)}
+/* tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tile{border-radius:20px;padding:28px 26px;min-height:280px;display:flex;flex-direction:column;gap:12px;color:#fff;transition:transform .35s var(--ease),box-shadow .35s}
+.tile:hover{transform:translateY(-7px);box-shadow:var(--shadow-lift)}
+.tile h3{color:inherit;font-size:21px;font-weight:800;letter-spacing:-.01em}
+.tile p{font-size:14.5px;line-height:1.55;opacity:.92;flex:1}
+.tile .cta-link{color:inherit;font-size:14.5px}
+.t-green{background:var(--green)}.t-purple{background:var(--purple)}.t-teal{background:var(--teal)}.t-yellow{background:var(--yellow);color:var(--navy)}
+.also{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:28px}
+.also .lbl{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+/* stories */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(36px,5vw,80px);align-items:center;padding:clamp(30px,4vw,50px) 0}
+.split.rev .split-media{order:-1}
+.split-body .eyebrow{margin-bottom:6px}
+.split-body h2{font-size:clamp(1.6rem,2.6vw,2.25rem);font-weight:800;margin-bottom:16px}
+.split-body p{color:var(--muted);margin-bottom:26px;max-width:480px}
+.split-media img{border-radius:var(--radius);aspect-ratio:10/7;object-fit:cover;width:100%;box-shadow:var(--shadow-card)}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:clamp(30px,4vw,44px)}
+.step{border-top:1px solid var(--line);padding-top:22px}
+.step .n{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font-size:14px;font-weight:800;display:grid;place-items:center;margin-bottom:14px}
+.step b{display:block;font-size:16px;color:var(--navy);margin-bottom:6px}
+.step p{font-size:14px;color:var(--muted)}
+/* comparison */
+.cmp-wrap{overflow-x:auto}
+table.cmp{width:100%;border-collapse:collapse;font-size:14.5px;min-width:760px}
+.cmp th{text-align:left;padding:14px 20px;font-size:13px;font-weight:800;color:var(--navy);border-bottom:1px solid var(--line)}
+.cmp th.q{background:var(--green-t);color:var(--green-dark)}
+.cmp td{padding:14px 20px;border-top:1px solid var(--soft);font-weight:600;color:var(--muted)}
+.cmp td:first-child{color:var(--navy);font-weight:700}
+.cmp td.q{background:var(--green-t);color:var(--green-dark);font-weight:700}
+.cmp-cta{text-align:center;margin-top:32px}
+/* impact */
+.impact{background:var(--navy);color:#fff}
+.impact .h2{color:#fff}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;margin-top:clamp(40px,5vw,60px);border-top:1px solid rgba(255,255,255,.16);padding-top:clamp(36px,4vw,52px)}
+.stat b{display:block;font-size:clamp(2rem,3.4vw,2.9rem);font-weight:800;letter-spacing:-.02em}
+.stat b em{font-style:normal;color:#8ef07f}
+.stat span{display:block;margin-top:8px;font-size:14px;color:#b7b9cc;font-weight:600}
+/* newsroom + guides cards */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.news-card{overflow:hidden;display:flex;flex-direction:column;transition:transform .35s var(--ease),box-shadow .35s}
+.news-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-card)}
+.news-media{overflow:hidden}
+.news-media img{aspect-ratio:16/10;object-fit:cover;width:100%;transition:transform .7s var(--ease)}
+.news-card:hover .news-media img{transform:scale(1.045)}
+.news-body{padding:24px;display:flex;flex-direction:column;gap:12px;flex:1}
+.news-meta{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:10px}
+.news-body h3{font-size:18px;line-height:1.32;flex:1}
+.news-body p{font-size:14px;color:var(--muted)}
+/* reviews */
+.rev-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.rev-card{padding:32px;display:flex;flex-direction:column;gap:20px}
+.stars{display:inline-flex;gap:3px;color:#f5b301}
+.stars svg{width:16px;height:16px}
+.rev-quote{border-left:3px solid var(--green);padding:6px 0 6px 22px;font-size:clamp(1.05rem,1.6vw,1.25rem);font-weight:700;color:var(--navy);line-height:1.5;letter-spacing:-.01em}
+.rev-who{display:flex;align-items:center;gap:13px;margin-top:auto}
+.rav{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+.rav.g{background:var(--green-t);color:var(--green-dark)}.rav.t{background:var(--teal-t);color:var(--teal-dark)}
+.rev-who b{display:block;font-size:14.5px;color:var(--navy)}
+.rev-who span{font-size:12.5px;color:var(--faint);font-weight:600}
+.rev-who .chip{margin-left:auto}
+/* trades marquee */
+.marquee{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq-track{display:flex;gap:12px;width:max-content;animation:mq 46s linear infinite}
+.mq-track:hover{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.wm{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap}
+.cov-note{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}
+/* deep dive */
+.dd-feats{display:flex;flex-direction:column;gap:14px}
+.dd-feat{display:flex;gap:14px;align-items:flex-start;padding:18px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.dd-feat .fi{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none}
+.fi.g{background:var(--green-t);color:var(--green-dark)}.fi.t{background:var(--teal-t);color:var(--teal-dark)}.fi.p{background:var(--purple-t);color:var(--purple)}
+.dd-feat b{display:block;font-size:14.5px;color:var(--navy);margin-bottom:3px}
+.dd-feat p{font-size:13px;color:var(--muted)}
+.dd-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:clamp(28px,4vw,40px)}
+.dd-card{padding:26px}
+.dd-card h3{font-size:17px;margin-bottom:8px}
+.dd-card p{font-size:14px;color:var(--muted)}
+/* cta */
+.cta{position:relative;color:#fff;overflow:hidden}
+.cta-bg{position:absolute;inset:0}
+.cta-bg img{width:100%;height:100%;object-fit:cover}
+.cta-bg::after{content:"";position:absolute;inset:0;background:rgba(16,16,49,.84)}
+.cta-in{position:relative;z-index:1;text-align:center;padding:clamp(72px,9vw,110px) 0}
+.cta h2{color:#fff;font-size:clamp(2rem,4vw,3.1rem);font-weight:800;margin:16px auto 18px;max-width:720px}
+.cta p{color:#c9cad6;max-width:560px;margin:0 auto 36px}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.cta-fine{margin-top:24px;font-size:13px;color:#8f91a6;font-weight:600}
+/* footer */
+.footer{background:var(--navy);color:#b7b9cc;padding:clamp(56px,7vw,80px) 0 0;font-size:14.5px}
+.ft-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr 1fr;gap:34px;padding-bottom:52px}
+.ft-brand .logo{color:#fff}
+.ft-brand p{margin:16px 0 0;max-width:270px;font-size:14px;color:#8f91a6}
+.ft-col h4{color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.ft-col a{display:block;color:#b7b9cc;padding:5px 0;font-weight:500;font-size:13.5px}
+.ft-col a:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.ft-col a .chip-new{margin-left:6px;font-size:10px;padding:2px 7px}
+.ft-fine{border-top:1px solid rgba(255,255,255,.14);padding:24px 0;font-size:12.5px;line-height:1.75;color:#8f91a6;max-width:1000px}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.14);padding:22px 0 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:13px;color:#8f91a6}
+.ft-legal{display:flex;gap:20px;flex-wrap:wrap}.ft-legal a:hover{color:#fff;text-decoration:underline}
+.locale{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:9px 18px;color:#fff;font-weight:700;font-size:13px}
+@media (max-width:1080px){.nav{display:none}.menu-btn{display:grid}.tiles{grid-template-columns:repeat(2,1fr)}.stat-grid{grid-template-columns:repeat(2,1fr)}.news-grid{grid-template-columns:1fr;max-width:560px;margin-inline:auto}.steps3{grid-template-columns:1fr}.dd-grid{grid-template-columns:1fr}.ft-grid{grid-template-columns:1fr 1fr 1fr}}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}.split.rev .split-media{order:0}.rev-grid{grid-template-columns:1fr}}
+@media (max-width:640px){.tiles{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr}.ft-grid{grid-template-columns:1fr 1fr}.signin,.hd-fr{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}html.js .reveal,html.js .lm>span{opacity:1;transform:none}.mq-track{animation:none;flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="chev-r" viewBox="0 0 16 16"><path d="M5.5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="chev-d" viewBox="0 0 16 16"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.8 6.3.8-4.6 4.4 1.2 6.2L12 17l-5.7 3 1.2-6.2L2.9 9.4l6.3-.8z" fill="currentColor"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-1.8-1.3-1.9 1.3-1.8-1.3-1.8 1.3-1.9-1.3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 8.5h5M9.5 12h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.8l7.2 3v5.4c0 5-3.6 8.6-7.2 10-3.6-1.4-7.2-5-7.2-10V5.8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8.6 12l2.4 2.4 4.4-4.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.2 2 4.4 13.6h6l-1.2 8.4 8.8-11.6h-6z" fill="currentColor"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 15.5v3.6l4-3.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 12h17M12 3.5c-5.5 4.8-5.5 12.2 0 17M12 3.5c5.5 4.8 5.5 12.2 0 17" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<div class="annc" id="annc">New · Quote from a WhatsApp voice note — text, voice or photo becomes a PDF in 60 seconds.<a href="#whatsapp">See how it works</a><button class="annc-x" id="anncX" aria-label="Dismiss"><svg class="ic" style="width:13px;height:13px"><use href="#i-close"/></svg></button></div>
+
+<header class="site-head" id="head">
+  <div class="wrap hd">
+    <a class="logo" href="#top">quoteai</a>
+    <nav class="nav" aria-label="Primary">
+      <span class="has-mega" id="megaItem">
+        <button class="nav-link" id="megaBtn" aria-expanded="false">Our products <svg class="chev-d"><use href="#chev-d"/></svg></button>
+        <div class="mega">
+          <a class="mega-card mc-green" href="#story-quotes"><b>AI Quotes</b><p>Plain language or a WhatsApp voice note in — a priced, branded, tax-calculated quote out in 30 seconds.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+          <a class="mega-card mc-purple" href="#story-jobs"><b>CRM &amp; Job Sites</b><p>Kanban leads before the quote; tasks, team, suppliers and budget after it's signed.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+          <a class="mega-card mc-teal" href="#story-invoicing"><b>Contracts &amp; Invoicing</b><p>Contracts and invoices generated from the accepted quote, with a public client view.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+          <a class="mega-card mc-yellow" href="#products"><b>Team &amp; Analytics</b><p>Roles and invites, revenue and win-rate dashboards, imports and the AI assistant.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        </div>
+      </span>
+      <a class="nav-link" href="#trades">Trades</a>
+      <a class="nav-link" href="#whatsapp">WhatsApp <span class="chip chip-new">New</span></a>
+      <a class="nav-link" href="#guides">Guides</a>
+    </nav>
+    <div class="hd-r">
+      <a class="hd-fr" href="#" aria-label="Passer au français">FR</a>
+      <a class="signin" href="#">Log in</a>
+      <a class="btn btn-navy btn-sm" href="#trial">Start for free</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false"><svg class="ic" style="width:23px;height:23px"><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+  <div class="mnav" id="mnav">
+    <a href="#products">Our products</a><a href="#trades">Trades</a><a href="#whatsapp">WhatsApp</a><a href="#guides">Guides</a><a href="#comparison">Compare</a><a href="#">Log in</a><a href="#">FR</a>
+    <a class="btn btn-navy" href="#trial">Start for free</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero on-dark" id="hero">
+    <div class="wrap hero-grid">
+      <div id="heroCopy">
+        <p class="eyebrow on-dark" style="margin-bottom:22px">The AI-driven expert platform for Canadian trades</p>
+        <h1>
+          <span class="lm"><span>Create professional</span></span>
+          <span class="lm" style="--d:.12s"><span>quotes in 30 seconds</span></span>
+          <span class="lm" style="--d:.24s"><span>with AI.</span></span>
+        </h1>
+        <p class="lead">Describe the job in your own words — quoteai generates a priced, branded quote with line items, quantities and GST/HST by province. Then it runs the rest of the path: leads, job sites, contracts, invoices, paid.</p>
+        <div class="hero-cta">
+          <a class="btn btn-white" href="#trial">Start for free</a>
+          <a class="btn btn-outline-light" href="#plans">See plans</a>
+        </div>
+        <p class="hero-note">7-day free trial · No credit card required · Bilingual FR / EN</p>
+      </div>
+      <div class="reveal" style="--d:.2s">
+        <div class="doc-mock">
+          <div class="dm-bar"><b>Quote_John_Smith.pdf</b><span class="chip chip-grey">PDF</span></div>
+          <div class="dm-body">
+            <div class="dm-co"><span><b>Smith Painting Co.</b>GST/HST: 123456789 RT0001</span><span style="text-align:right"><b>Quote N. 2024-042</b>Toronto, ON</span></div>
+            <div class="dm-row"><span>A. Wall painting</span><span class="v">$1,200.00</span></div>
+            <div class="dm-row"><span>B. Skim coating &amp; prep</span><span class="v">$250.00</span></div>
+            <div class="dm-tot">
+              <div class="dm-row"><span>Subtotal</span><span class="v">$1,450.00</span></div>
+              <div class="dm-row"><span>HST (13%)</span><span class="v">$319.00</span></div>
+              <div class="dm-grand"><span>Total</span><b>$1,769.00</b></div>
+            </div>
+          </div>
+          <div class="dm-chips"><span class="chip chip-green">Tax calculated</span><span class="chip chip-teal">Generated in 30 sec</span><span class="chip chip-grey">E-signature built in</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="sec" id="products">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="eyebrow">Our products</span>
+          <h2 class="h2">One platform, from lead to paid.</h2>
+        </div>
+        <p class="lead">Not a one-trick quote generator. Every step a job actually flows through — lead, quote, job site, contract, invoice, payment — lives in one place, built for Canadian trades.</p>
+      </div>
+      <div class="tiles">
+        <a class="tile t-green reveal" style="--d:0s" href="#story-quotes"><h3>AI Quotes</h3><p>Describe the job in plain language — or send a WhatsApp voice note or photo — and get a priced, branded quote with line items, quantities and GST/HST by province in about 30 seconds. Backed by your price catalog, signed with e-signature.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        <a class="tile t-purple reveal" style="--d:.07s" href="#story-jobs"><h3>CRM &amp; Leads</h3><p>Incoming leads land in a kanban pipeline before they become quotes. Score them, follow up, and move them to signed without a spreadsheet in sight.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        <a class="tile t-teal reveal" style="--d:.14s" href="#story-jobs"><h3>Job Sites</h3><p>An accepted quote becomes a job: tasks with deadlines, team assignment, supplier tracking and budget vs actual — linked to the original quote.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        <a class="tile t-yellow reveal" style="--d:0s" href="#story-invoicing"><h3>Invoicing &amp; Payments</h3><p>Invoices generate from accepted quotes or jobs, with a public invoice view for clients. Reminders go out on schedule until it's paid.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        <a class="tile t-green reveal" style="--d:.07s" href="#story-invoicing"><h3>Contracts &amp; Documents</h3><p>Contracts generate from accepted quotes and jobs. Every file, quote, client and invoice stays searchable in one archive — soft-delete included.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+        <a class="tile t-purple reveal" style="--d:.14s" href="#products"><h3>Team, Analytics &amp; Assistant</h3><p>Multi-user accounts with roles and invites, dashboards for revenue, win rate and turnaround, an AI assistant inside your dashboard, and imports for your existing price lists and client data.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></a>
+      </div>
+      <div class="also reveal">
+        <span class="lbl">Also included</span>
+        <span class="chip chip-grey">WhatsApp quoting</span><span class="chip chip-grey">E-signature</span><span class="chip chip-grey">Price catalog</span><span class="chip chip-grey">GST/HST by province</span><span class="chip chip-grey">Bilingual FR / EN</span><span class="chip chip-grey">Worker time tracking</span><span class="chip chip-grey">Team invites</span><span class="chip chip-grey">Spreadsheet &amp; PDF imports</span><span class="chip chip-grey">Documents &amp; archive</span><span class="chip chip-grey">AI Assistant</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORIES -->
+  <section class="sec soft">
+    <div class="wrap">
+      <div class="split" id="story-quotes">
+        <div class="split-media reveal"><img src="https://picsum.photos/seed/quoteai-contractor-onsite/980/686" alt="A contractor reviewing a quote on site" loading="lazy"></div>
+        <div class="split-body reveal" style="--d:.12s">
+          <span class="eyebrow">AI Quotes</span>
+          <h2>From a plain sentence to a signed quote.</h2>
+          <p>The engine reads your description, picks the cost items, estimates quantities and applies your province's tax. You review, the client e-signs, and the deposit request goes out the same day.</p>
+          <a class="cta-link" href="#trial">Explore AI Quotes <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </div>
+      <div class="split rev" id="story-jobs">
+        <div class="split-media reveal"><img src="https://picsum.photos/seed/quoteai-team-jobsite/980/686" alt="A crew working on a job site" loading="lazy"></div>
+        <div class="split-body reveal" style="--d:.12s">
+          <span class="eyebrow">Job Sites</span>
+          <h2>An accepted quote becomes a job site.</h2>
+          <p>Open the job straight from the signed quote — client, amount and line items already linked. Track tasks, assign your team, log suppliers and watch budget vs actual as costs land.</p>
+          <a class="cta-link" href="#trial">Explore job sites <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </div>
+      <div class="split" id="story-invoicing">
+        <div class="split-media reveal"><img src="https://picsum.photos/seed/quoteai-cafe-owner/980/686" alt="A business owner reviewing an invoice" loading="lazy"></div>
+        <div class="split-body reveal" style="--d:.12s">
+          <span class="eyebrow">Invoicing &amp; Payments</span>
+          <h2>Invoices that chase themselves.</h2>
+          <p>Generated from the accepted quote or job, sent with a public client view, reminded politely on schedule, and reconciled when paid. Contracts come from the same source of truth.</p>
+          <a class="cta-link" href="#trial">Explore invoicing <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHATSAPP -->
+  <section class="sec" id="whatsapp">
+    <div class="wrap">
+      <div class="split">
+        <div class="reveal">
+          <span class="chip chip-new">New</span>
+          <span class="eyebrow grey" style="margin-left:10px">Straight from your phone</span>
+          <h2 class="h2" style="margin:16px 0 14px">The whole quote flow, on WhatsApp.</h2>
+          <p class="lead">Voice note, text or photo — the assistant drafts the quote, you correct or approve it in chat, and the PDF lands back in the conversation. Saved to your account automatically. No app to open.</p>
+          <a class="cta-link" href="#trial" style="margin-top:22px">See the full feature <svg class="chev"><use href="#chev-r"/></svg></a>
+        </div>
+        <div class="split-media reveal" style="--d:.15s"><img src="https://picsum.photos/seed/quoteai-whatsapp-phone/980/686" alt="A tradesperson sending a voice note from a phone" loading="lazy"></div>
+      </div>
+      <div class="steps3">
+        <div class="step reveal" style="--d:0s"><span class="n">1</span><b>Send a voice note, text, or photo</b><p>Right on WhatsApp. Describe the job just like you'd talk to a client.</p></div>
+        <div class="step reveal" style="--d:.1s"><span class="n">2</span><b>The AI generates a preview</b><p>Sections, prices, and tax in 60 seconds. Correct or approve it right away.</p></div>
+        <div class="step reveal" style="--d:.2s"><span class="n">3</span><b>Get the PDF in chat</b><p>Send it to your client with a tap. The quote is also saved on quoteai.ca.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="sec soft" id="comparison">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="eyebrow grey">Comparison</span>
+          <h2 class="h2">Honest side-by-side</h2>
+        </div>
+        <p class="lead">Trades buy on one question: does it save me the 30 minutes of paperwork? Here is how quoteai compares to the alternatives you already know.</p>
+      </div>
+      <div class="card cmp-wrap reveal">
+        <table class="cmp">
+          <thead><tr><th>Feature</th><th class="q">quoteai</th><th>Jobber / Housecall Pro</th><th>Excel &amp; Word</th></tr></thead>
+          <tbody>
+            <tr><td>Quote from a plain-language description</td><td class="q">~30 seconds</td><td>Not offered</td><td>Manual, 30–60 min</td></tr>
+            <tr><td>Canadian GST/HST by province</td><td class="q">Automatic</td><td>Manual tax setup</td><td>Manual formulas</td></tr>
+            <tr><td>Quoting over WhatsApp</td><td class="q">Built in</td><td>Not offered</td><td>Not possible</td></tr>
+            <tr><td>Bilingual FR / EN</td><td class="q">Yes</td><td>Limited</td><td>Manual</td></tr>
+            <tr><td>Lead → quote → job → invoice → paid</td><td class="q">One platform</td><td>Modules &amp; plan gates</td><td>Separate files</td></tr>
+            <tr><td>Time to first quote</td><td class="q">30 seconds</td><td>Hours of onboarding</td><td>Hours per document</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cmp-cta reveal"><a class="btn btn-navy" href="#trial">Try quoteai for free</a></div>
+    </div>
+  </section>
+
+  <!-- IMPACT -->
+  <section class="sec impact on-dark" id="impact">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="eyebrow on-dark">Impact</span>
+        <h2 class="h2" style="margin:14px 0 14px">Built for the way Canadian trades actually work.</h2>
+        <p class="lead">Tax handled, languages covered, and the paperwork gone — measured in the numbers our users report.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat reveal" style="--d:0s"><b><span data-count="30" data-suffix=" sec">0</span></b><span>median time to a finished quote, down from 30–60 min</span></div>
+        <div class="stat reveal" style="--d:.08s"><b><span data-count="6" data-prefix="4–" data-suffix=" hrs">0</span></b><span>saved per week, back into the job site or family</span></div>
+        <div class="stat reveal" style="--d:.16s"><b><span data-count="18">0</span></b><span>trade verticals with dedicated pages and vocabulary</span></div>
+        <div class="stat reveal" style="--d:.24s"><b><em><span data-count="5" data-decimals="1" data-suffix="/5">0</span></em></b><span>average verified rating from Canadian contractors</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSROOM -->
+  <section class="sec" id="newsroom">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="eyebrow">Newsroom</span>
+          <h2 class="h2">The latest from quoteai</h2>
+        </div>
+        <a class="cta-link" href="#">View all news <svg class="chev"><use href="#chev-r"/></svg></a>
+      </div>
+      <div class="news-grid">
+        <article class="card news-card reveal" style="--d:0s"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-whatsapp-launch/840/525" alt="Phone showing a WhatsApp quote" loading="lazy"></div><div class="news-body"><p class="news-meta">Product · September 9, 2026</p><h3>WhatsApp quoting is live: voice note in, PDF out</h3><a class="cta-link" href="#whatsapp">Read more <svg class="chev"><use href="#chev-r"/></svg></a></div></article>
+        <article class="card news-card reveal" style="--d:.1s"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-job-sites/840/525" alt="Job site board with tasks" loading="lazy"></div><div class="news-body"><p class="news-meta">Product · August 28, 2026</p><h3>Job sites: budgets, suppliers and team assignment from the signed quote</h3><a class="cta-link" href="#story-jobs">Read more <svg class="chev"><use href="#chev-r"/></svg></a></div></article>
+        <article class="card news-card reveal" style="--d:.2s"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-trade-pages/840/525" alt="Map of Canadian cities" loading="lazy"></div><div class="news-body"><p class="news-meta">Coverage · August 12, 2026</p><h3>18 trades × 15+ cities: local quote pages across Canada</h3><a class="cta-link" href="#trades">Read more <svg class="chev"><use href="#chev-r"/></svg></a></div></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="sec soft" id="reviews">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="eyebrow">Verified reviews</span>
+          <h2 class="h2">What people say about us</h2>
+        </div>
+        <span class="chip chip-green" style="align-self:center">5.0/5 · 2 reviews</span>
+      </div>
+      <div class="rev-grid">
+        <article class="card rev-card reveal" style="--d:0s">
+          <span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+          <p class="rev-quote">I used to spend 3-4 hours after work every day putting together quotes, managing job sites, and getting a clear picture of each project. With QuoteAI I do it all in a few minutes, and it's always reliable. Highly recommend.</p>
+          <div class="rev-who"><span class="rav g">RB</span><div><b>RBA Construction</b><span>rba-construction.ca</span></div><span class="chip chip-grey">Verified</span></div>
+        </article>
+        <article class="card rev-card reveal" style="--d:.1s">
+          <span class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+          <p class="rev-quote">QuoteAI solved our whole quoting headache — professional, polished quotes with our logo on them. Fantastic.</p>
+          <div class="rev-who"><span class="rav t">AC</span><div><b>Abdul Contracting</b><span>abdulcontracting.ca</span></div><span class="chip chip-grey">Verified</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDES -->
+  <section class="sec" id="guides">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <div>
+          <span class="eyebrow grey">Guides</span>
+          <h2 class="h2">No more spreadsheets. Forget Excel and Word.</h2>
+        </div>
+        <p class="lead">Excel templates break. Word documents don't calculate. With quoteai you describe the job in your own words and in 30 seconds you have a professional document ready to send.</p>
+      </div>
+      <div class="news-grid">
+        <a class="card news-card reveal" style="--d:0s" href="#"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-guide-excel/840/525" alt="Spreadsheet with broken formulas" loading="lazy"></div><div class="news-body"><p class="news-meta"><span class="chip chip-green">vs Excel</span></p><h3>Alternative to an Excel quote</h3><p>No formulas. No errors. Just results.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></div></a>
+        <a class="card news-card reveal" style="--d:.1s" href="#"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-guide-word/840/525" alt="Word document template" loading="lazy"></div><div class="news-body"><p class="news-meta"><span class="chip chip-teal">vs Word</span></p><h3>Alternative to a Word template</h3><p>Professional PDF in one click, no manual formatting.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></div></a>
+        <a class="card news-card reveal" style="--d:.2s" href="#"><div class="news-media"><img src="https://picsum.photos/seed/quoteai-guide-howto/840/525" alt="Checklist for writing a quote" loading="lazy"></div><div class="news-body"><p class="news-meta"><span class="chip chip-purple">Guide</span></p><h3>How to write a quote</h3><p>A practical guide for Canadian contractors and small businesses.</p><span class="cta-link">Learn more <svg class="chev"><use href="#chev-r"/></svg></span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRADES & CITIES -->
+  <section class="sec soft" id="trades">
+    <div class="wrap">
+      <div class="sec-head reveal" style="justify-content:center;text-align:center;flex-direction:column;align-items:center">
+        <span class="eyebrow grey">Coverage</span>
+        <h2 class="h2">Quotes for every trade and city</h2>
+        <p class="lead" style="margin-inline:auto">Eighteen trade verticals with their own vocabulary, crossed with 15+ Canadian cities for local pages — each applying your province's tax rules automatically.</p>
+      </div>
+    </div>
+    <div class="marquee reveal">
+      <div class="mq-track" id="mqTrack">
+        <span class="wm">Painter</span><span class="wm">Electrician</span><span class="wm">Plumber</span><span class="wm">General contractor</span><span class="wm">Renovation contractor</span><span class="wm">Welder &amp; fabricator</span><span class="wm">Carpenter &amp; cabinetmaker</span><span class="wm">HVAC technician</span><span class="wm">Freelance</span><span class="wm">Building consultant</span><span class="wm">Mason</span><span class="wm">Landscaper</span><span class="wm">Tile installer</span><span class="wm">Window &amp; door installer</span><span class="wm">Roofer</span><span class="wm">Air conditioning installer</span><span class="wm">Decorative painter</span><span class="wm">Flooring installer</span>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="cov-note reveal">
+        <span class="chip chip-green">18 trade verticals</span>
+        <span class="chip chip-teal">15+ Canadian cities</span>
+        <span class="chip chip-grey">Bilingual FR / EN</span>
+        <span class="chip chip-grey">GST/HST by province</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEEP DIVE -->
+  <section class="sec" id="deep-dive">
+    <div class="wrap">
+      <div class="split" style="padding-top:0">
+        <div class="reveal">
+          <span class="eyebrow grey">Deep dive</span>
+          <h2 class="h2" style="margin:14px 0 16px">What is quoteai and who it's for</h2>
+          <p class="lead">quoteai is a Canadian software that uses artificial intelligence to turn a plain-language description into a complete, professional quote. It's built for contractors, skilled tradespeople, and small businesses that send client quotes every week — painters, electricians, plumbers, masons, metalworkers, carpenters, renovation companies, and every trade in construction and mechanical/electrical work. The goal is simple: cut the time it takes to put together a quote from 30-60 minutes down to 30 seconds, without giving up the quality of the final document.</p>
+        </div>
+        <div class="dd-feats reveal" style="--d:.12s">
+          <div class="dd-feat"><span class="fi g"><svg class="ic"><use href="#i-receipt"/></svg></span><div><b>Built-in Canadian tax</b><p>Automatic GST/HST calculation by province.</p></div></div>
+          <div class="dd-feat"><span class="fi t"><svg class="ic"><use href="#i-shield"/></svg></span><div><b>Securely stored data</b><p>Stripe handles payments, sessions are protected with encrypted cookies.</p></div></div>
+          <div class="dd-feat"><span class="fi p"><svg class="ic"><use href="#i-bolt"/></svg></span><div><b>AI trained for the trades</b><p>Technical vocabulary for construction and mechanical trades.</p></div></div>
+        </div>
+      </div>
+      <div class="dd-grid">
+        <div class="card dd-card reveal" style="--d:0s"><h3>How it actually works</h3><p>Open quoteai on your phone right on the job site, or from home in the evening. Describe the job the way you'd explain it to a coworker: "Paint an 800 sq ft apartment, two coats of white washable paint, skim-coat the bathroom wall." In thirty seconds the AI engine builds a quote organized into sections, with cost items, units of measure (square feet, hours, per unit), market-rate unit prices, and automatic tax calculation. You can edit every line item, swap in your own price list, and add or remove sections. When you're ready, download the PDF, send it over WhatsApp or email, and the document is saved to your account for future edits.</p></div>
+        <div class="card dd-card reveal" style="--d:.08s"><h3>Why it works better than Excel or traditional software</h3><p>Traditional quoting software is built for the office: it requires installation, an upfront setup of price lists and codes, and hours of training. Excel is free but forces you to start from a blank sheet or a template built years ago every single time. quoteai removes both problems: there's nothing to install (just a browser), nothing to configure up front (the AI already knows average market prices), and every quote is structured from the start. On average, our users report saving 4-6 hours a week — time that goes back into the job site or their family.</p></div>
+        <div class="card dd-card reveal" style="--d:.16s"><h3>Security and Canadian tax compliance</h3><p>All data is stored on secure, encrypted infrastructure, sessions are protected with encrypted cookies, and payments are processed through Stripe. Tax handling follows Canadian rules: GST/HST is calculated automatically based on your province, at the rate that applies to your work. Your business details (business number, GST/HST number) are saved once and applied to every quote automatically.</p></div>
+        <div class="card dd-card reveal" style="--d:.24s" id="plans"><h3>What it costs to get started</h3><p>Signing up is free, and your first quote is generated without entering a credit card. From there you can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited). You can change or cancel your plan at any time from your account. Thousands of Canadian contractors already use quoteai every week.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta on-dark" id="trial">
+    <div class="cta-bg"><img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true"></div>
+    <div class="wrap cta-in reveal">
+      <span class="eyebrow on-dark">Get started</span>
+      <h2>Ready to transform your business?</h2>
+      <p>Join hundreds of Canadian contractors and tradespeople who save hours every week.</p>
+      <div class="cta-actions">
+        <a class="btn btn-white" href="#">Create your free account</a>
+        <a class="btn btn-outline-light" href="#plans">See plans</a>
+      </div>
+      <p class="cta-fine">7-day free trial · No credit card required · Single quotes from $5</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap ft-grid">
+    <div class="ft-brand">
+      <a class="logo" href="#top">quoteai</a>
+      <p>AI-powered quoting software for Canadian tradespeople and small businesses. Fast, professional, ready in 30 seconds.</p>
+    </div>
+    <div class="ft-col"><h4>Trades</h4><a href="#trades">Painter</a><a href="#trades">Electrician</a><a href="#trades">Plumber</a><a href="#trades">General contractors</a><a href="#trades">Renovations</a><a href="#trades">HVAC</a><a href="#trades">Roofing</a><a href="#trades">All 18 trades</a></div>
+    <div class="ft-col"><h4>Features</h4><a href="#whatsapp">WhatsApp<span class="chip-new chip">New</span></a><a href="#story-jobs">Job sites</a><a href="#story-invoicing">Contracts</a><a href="#products">Analytics</a><a href="#products">AI Assistant</a><a href="#products">Imports</a></div>
+    <div class="ft-col"><h4>Guides</h4><a href="#guides">Blog &amp; guides</a><a href="#guides">Excel template</a><a href="#guides">Word template</a><a href="#guides">How to write a quote</a><a href="#guides">Free quotes</a></div>
+    <div class="ft-col"><h4>Company</h4><a href="#">About us</a><a href="#">Contact</a><a href="#newsroom">Newsroom</a><a href="#reviews">Reviews</a></div>
+    <div class="ft-col"><h4>Support</h4><a href="#">Help center</a><a href="#">Privacy policy</a><a href="#">Terms of service</a><a href="#">Sitemap</a></div>
+  </div>
+  <div class="wrap"><p class="ft-fine">quoteai is a Canadian quoting platform for contractors and small businesses. GST/HST is calculated automatically by province and business details are applied to every quote. Payments are processed by Stripe; sessions are protected with encrypted cookies. Plans: Starter $19 (10 quotes), Pro $49 (60 quotes), Elite $59 (unlimited); single quotes $5 to $13. Features, availability and pricing may change without notice.</p></div>
+  <div class="wrap ft-bottom">
+    <span>© 2026 quoteai. All rights reserved.</span>
+    <div class="ft-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Sitemap</a></div>
+    <a class="locale" href="#"><svg class="ic" style="width:15px;height:15px"><use href="#i-globe"/></svg>Canada · English · FR</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+document.documentElement.classList.add('js');
+var RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var $=function(s,c){return (c||document).querySelector(s);};
+var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));};
+$('#anncX').addEventListener('click',function(){$('#annc').classList.add('gone');});
+var head=$('#head');function onS(){head.classList.toggle('scrolled',window.scrollY>8);}window.addEventListener('scroll',onS,{passive:true});onS();
+var mi=$('#megaItem'),mb2=$('#megaBtn');
+mb2.addEventListener('click',function(e){e.stopPropagation();var o=mi.classList.toggle('open');mb2.setAttribute('aria-expanded',o);});
+document.addEventListener('click',function(e){if(!mi.contains(e.target)){mi.classList.remove('open');mb2.setAttribute('aria-expanded','false');}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){mi.classList.remove('open');mb2.setAttribute('aria-expanded','false');}});
+var mb=$('#menuBtn'),mn=$('#mnav');
+mb.addEventListener('click',function(){var o=mn.classList.toggle('open');mb.setAttribute('aria-expanded',o);});
+$$('#mnav a').forEach(function(a){a.addEventListener('click',function(){mn.classList.remove('open');mb.setAttribute('aria-expanded','false');});});
+requestAnimationFrame(function(){setTimeout(function(){$('#heroCopy').classList.add('in');},80);});
+var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+$$('.reveal').forEach(function(el){io.observe(el);});
+function runCount(el){var t=parseFloat(el.dataset.count),dec=parseInt(el.dataset.decimals||'0',10),pre=el.dataset.prefix||'',suf=el.dataset.suffix||'';var fmt=function(v){return pre+v.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',')+suf;};if(RM){el.textContent=fmt(t);return;}var d=1500,t0=performance.now();(function tick(t2){var p=Math.min((t2-t0)/d,1),e=1-Math.pow(1-p,3);el.textContent=fmt(t*e);if(p<1)requestAnimationFrame(tick);})(t0);}
+var cio=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){runCount(en.target);cio.unobserve(en.target);}});},{threshold:.6});
+$$('[data-count]').forEach(function(el){cio.observe(el);});
+var mq=$('#mqTrack');if(mq)mq.innerHTML+=mq.innerHTML;
+})();
+</script>
+</body>
+</html>

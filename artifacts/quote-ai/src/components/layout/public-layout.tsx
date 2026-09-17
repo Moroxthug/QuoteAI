@@ -304,14 +304,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               </>
             ) : (
-              <>
-                <Link href="/dashboard" className="hd-signin">
-                  {t("nav.dashboard")}
-                </Link>
-                <Link href="/dashboard" className="btn btn-navy hd-cta">
-                  {t("nav.goToDashboard")}
-                </Link>
-              </>
+              <Link href="/dashboard" className="btn btn-navy hd-cta">
+                {t("nav.goToDashboard")}
+              </Link>
             )}
             <button className="menu-btn" onClick={() => setMobileMenuOpen(true)} aria-label={t("nav.openMenu")}>
               <Menu className="h-5 w-5" />
@@ -359,10 +354,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   <button onClick={() => handleMobileNav("/sign-up")} className="btn btn-navy">{t("nav.signUp")}</button>
                 </>
               ) : (
-                <>
-                  <button onClick={() => handleMobileNav("/dashboard")} className="m-link">{t("nav.dashboard")}</button>
-                  <button onClick={() => handleMobileNav("/dashboard")} className="btn btn-navy">{t("nav.goToDashboard")}</button>
-                </>
+                <button onClick={() => handleMobileNav("/dashboard")} className="btn btn-navy">{t("nav.goToDashboard")}</button>
               )}
             </nav>
           </div>

@@ -56,7 +56,7 @@ function ProductsMegaMenu() {
         <ChevronDown className="chev-down h-2.5 w-2.5" />
       </button>
       {open && (
-        <div className="mega mega-menu-panel">
+        <div className="mega">
           <div className="mega-in">
             {tiles.map((tile) => (
               <Link key={tile.title} href={tile.href} onClick={() => setOpen(false)} className={cn("mega-card", tile.cls)}>
@@ -99,7 +99,7 @@ function TradesMegaMenu() {
       </button>
 
       {open && (
-        <div className="mega-menu-panel absolute left-0 top-full mt-2 w-[560px] bg-white rounded-2xl border border-gray-100 shadow-2xl shadow-navy-200/30 overflow-hidden">
+        <div className="absolute left-0 top-full mt-2 w-[560px] bg-white rounded-2xl border border-gray-100 shadow-2xl shadow-navy-200/30 overflow-hidden">
           <div className="grid grid-cols-3 p-6 gap-6">
             <div className="col-span-2">
               <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
@@ -470,17 +470,13 @@ function SupportModal({ onClose }: { onClose: () => void }) {
         {sent ? (
           <div className="px-6 py-12 text-center">
             <div className="flex items-center justify-center mb-4">
-              <div className="h-14 w-14 rounded-full flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.12))" }}>
-                <CheckCircle2 className="h-7 w-7 text-navy-500" />
+              <div className="h-14 w-14 rounded-full flex items-center justify-center bg-navy-50">
+                <CheckCircle2 className="h-7 w-7 text-navy-600" />
               </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("support.sentTitle")}</h3>
             <p className="text-sm text-gray-500 mb-6">{t("support.sentBody")}</p>
-            <button
-              onClick={onClose}
-              className="btn-gradient inline-flex h-10 items-center justify-center px-6 text-sm font-semibold"
-            >
+            <button onClick={onClose} className="btn btn-navy">
               {t("support.close")}
             </button>
           </div>
@@ -530,10 +526,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-400 focus:border-transparent transition-all"
               />
             </div>
-            <button
-              type="submit"
-              className="btn-gradient inline-flex h-11 w-full items-center justify-center gap-2 text-sm font-semibold mt-1"
-            >
+            <button type="submit" className="btn btn-navy w-full mt-1">
               <Send className="h-4 w-4" />
               {t("support.submit")}
             </button>

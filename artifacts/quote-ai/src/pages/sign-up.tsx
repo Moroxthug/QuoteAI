@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
-import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle, Lock, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
@@ -82,7 +82,7 @@ export default function SignUpPage() {
           <div className="flex justify-center mb-6">
             <Logo />
           </div>
-          <div className="text-4xl mb-4">🔒</div>
+          <div className="flex justify-center mb-4"><Lock className="h-9 w-9 text-gray-400" /></div>
           <h1 className="text-xl font-bold text-gray-900 mb-2">{t("signUp.betaClosedTitle")}</h1>
           <p className="text-sm text-gray-500 mb-6">
             {t("signUp.betaClosedBody")}
@@ -116,7 +116,7 @@ export default function SignUpPage() {
 
             {verificationSent ? (
               <div className="text-center py-4">
-                <div className="text-4xl mb-3">📧</div>
+                <div className="flex justify-center mb-3"><Mail className="h-9 w-9 text-navy-500" /></div>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">{t("signUp.checkEmailTitle")}</h2>
                 <p className="text-sm text-gray-500 mb-6">
                   {t("signUp.checkEmailBodyPrefix")} <strong>{email}</strong>. {t("signUp.checkEmailBodySuffix")}

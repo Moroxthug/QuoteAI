@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
-import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, AlertCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
@@ -225,7 +225,7 @@ export default function SignInPage() {
               </>
             ) : resetSent ? (
               <div className="text-center py-4">
-                <div className="text-4xl mb-3">📧</div>
+                <div className="flex justify-center mb-3"><Mail className="h-9 w-9 text-navy-500" /></div>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">{t("signIn.emailSentTitle")}</h2>
                 <p className="text-sm text-gray-500 mb-6">
                   {t("signIn.emailSentBodyPrefix")} <strong>{resetEmail}</strong> {t("signIn.emailSentBodySuffix")}

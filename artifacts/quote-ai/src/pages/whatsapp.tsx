@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { ArrowRight, Mic, FileText, Zap, Check, MessageCircle } from "lucide-react";
+import { ArrowRight, Mic, FileText, Zap, Check, MessageCircle, X } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { useAuth } from "@/hooks/use-auth";
 import { WhatsAppChatDemo } from "@/components/whatsapp-chat-demo";
@@ -134,7 +134,7 @@ export default function WhatsappPage() {
                 </div>
 
                 <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex gap-3">
-                  <span className="text-amber-500 text-lg shrink-0">⚡</span>
+                  <Zap className="h-5 w-5 text-amber-500 shrink-0" />
                   <div>
                     <p className="text-sm font-semibold text-amber-900">{t("whatsapp.comingSoonTitle")}</p>
                     <p className="text-xs text-amber-700 mt-0.5">{t("whatsapp.comingSoonDesc")}</p>
@@ -193,11 +193,11 @@ export default function WhatsappPage() {
 
           <div className="grid sm:grid-cols-2 gap-4 mb-10 text-left">
             {[
-              { emoji: "😓", label: t("whatsapp.withoutQuoteAi"), items: [t("whatsapp.without1"), t("whatsapp.without2"), t("whatsapp.without3"), t("whatsapp.without4"), t("whatsapp.without5")] },
-              { emoji: "⚡", label: t("whatsapp.withQuoteAiWhatsapp"), items: [t("whatsapp.with1"), t("whatsapp.with2"), t("whatsapp.with3"), t("whatsapp.with4"), t("whatsapp.with5")], highlight: true },
+              { Icon: X, label: t("whatsapp.withoutQuoteAi"), items: [t("whatsapp.without1"), t("whatsapp.without2"), t("whatsapp.without3"), t("whatsapp.without4"), t("whatsapp.without5")] },
+              { Icon: Zap, label: t("whatsapp.withQuoteAiWhatsapp"), items: [t("whatsapp.with1"), t("whatsapp.with2"), t("whatsapp.with3"), t("whatsapp.with4"), t("whatsapp.with5")], highlight: true },
             ].map((col) => (
               <div key={col.label} className={`rounded-xl p-4 ${col.highlight ? "border border-navy-500/40 bg-navy-950/40" : "bg-gray-900"}`}>
-                <p className="text-sm font-bold text-white mb-3">{col.emoji} {col.label}</p>
+                <p className="text-sm font-bold text-white mb-3 flex items-center gap-1.5"><col.Icon className="h-4 w-4" /> {col.label}</p>
                 <ul className="space-y-1.5">
                   {col.items.map((item) => (
                     <li key={item} className="flex items-center gap-2 text-xs text-gray-400">

@@ -291,24 +291,6 @@ export default function SupportBot() {
 
   return (
     <>
-      <style>{`
-        @keyframes wave-arm {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(-25deg); }
-        }
-        @keyframes float-bot {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-4px); }
-        }
-        .robot-arm {
-          transform-origin: 16px 20px;
-          animation: wave-arm 2s ease-in-out infinite;
-        }
-        .robot-body {
-          animation: float-bot 3s ease-in-out infinite;
-        }
-      `}</style>
-
       {/* Dismiss target zone in bottom-left when dragging */}
       {isDragging && (
         <div
@@ -345,42 +327,7 @@ export default function SupportBot() {
           isOpen ? "rotate-90 bg-slate-800" : ""
         }`}
       >
-        {isOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="robot-body"
-          >
-            {/* Robot Head */}
-            <rect x="6" y="8" width="20" height="14" rx="3" fill="currentColor" />
-            {/* Eyes */}
-            <circle cx="11" cy="14" r="2" fill="#000" />
-            <circle cx="11" cy="14" r="0.75" fill="#fff" />
-            <circle cx="21" cy="14" r="2" fill="#000" />
-            <circle cx="21" cy="14" r="0.75" fill="#fff" />
-            {/* Mouth */}
-            <path d="M13 18 H19" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
-            {/* Antennas */}
-            <rect x="15" y="4" width="2" height="4" fill="currentColor" />
-            <circle cx="16" cy="3" r="2" fill="#FFE248" />
-            {/* Ears / Sidebolts */}
-            <rect x="4" y="13" width="2" height="4" rx="0.5" fill="currentColor" />
-            <rect x="26" y="13" width="2" height="4" rx="0.5" fill="currentColor" />
-            {/* Waving Arm */}
-            <path
-              d="M26 15 C28 12 30 12 30 9"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              className="robot-arm"
-            />
-          </svg>
-        )}
+        {isOpen ? <X className="h-6 w-6" /> : <MessageSquare className="h-6 w-6" />}
       </button>
 
       {/* Floating Chat Panel */}

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db, invoicesTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { requireApiKey, publicApiLimiter } from "../../middlewares/apiKeyAuth.js";
 import { requirePermission } from "../../middlewares/requirePermission.js";
 import { getUserId } from "../../middlewares/authMiddleware.js";
@@ -22,7 +22,7 @@ router.get("/invoices", requireApiKey, publicApiLimiter, requirePermission("invo
   try {
     const userId = getUserId(res);
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
-    const invoices = await db.select().from(invoicesTable).where(eq(invoicesTable.userId, userId)).orderBy(desc(invoicesTable.createdAt)).limit(limit);
+    const invoices = await db.select().from(invoicesTable).where(and(eq(invoicesTable.userId, userId), isNull(invoicesTable.archivedAt))).orderBy(desc(invoicesTable.createdAt)).limit(limit);
     res.json({ items: invoices.map((inv) => serializeInvoice(inv)) });
   } catch (err) {
     req.log.error({ err }, "Public API: error listing invoices");

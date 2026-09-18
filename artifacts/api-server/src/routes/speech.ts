@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { requireAuth } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { openai, toFile } from "@workspace/integrations-openai-ai-server";
 import { logger } from "../lib/logger.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
@@ -39,6 +40,7 @@ const router = Router();
 router.post(
   "/speech/transcribe",
   requireAuth,
+  requirePermission("quotes", "edit"),
   speechLimiter,
   (req, res, next) => {
     audioUpload.single("audio")(req, res, (err) => {

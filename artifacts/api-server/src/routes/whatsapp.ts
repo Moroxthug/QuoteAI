@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import {
   db,
   whatsappConnectionsTable,
@@ -1399,7 +1400,7 @@ router.get("/whatsapp/usage", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/whatsapp/connect", requireAuth, async (req, res) => {
+router.post("/whatsapp/connect", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { phoneNumber } = req.body as { phoneNumber?: string };
@@ -1434,7 +1435,7 @@ router.post("/whatsapp/connect", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/whatsapp/verify", requireAuth, async (req, res) => {
+router.post("/whatsapp/verify", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { phoneNumber, otp } = req.body as { phoneNumber?: string; otp?: string };
@@ -1462,7 +1463,7 @@ router.post("/whatsapp/verify", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/whatsapp/disconnect", requireAuth, async (req, res) => {
+router.delete("/whatsapp/disconnect", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     await db.delete(whatsappConnectionsTable).where(eq(whatsappConnectionsTable.userId, userId));
@@ -1473,7 +1474,7 @@ router.delete("/whatsapp/disconnect", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/whatsapp/toggle", requireAuth, async (req, res) => {
+router.patch("/whatsapp/toggle", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { isEnabled } = req.body as { isEnabled?: boolean };

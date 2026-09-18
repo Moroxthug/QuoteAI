@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db, projectsTable, businessProfilesTable, hasFeature, minimumPlanFor, type AssistantMessage, type AssistantProposal } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import { getOrCreateConversation, loadConversation, clearConversation, runAssistantTurn, type Lang } from "../assistant/service.js";
 import { confirmProposal, dismissProposal, ProposalError } from "../assistant/apply.js";
@@ -56,7 +57,7 @@ router.get("/assistant/conversation", requireAuth, async (req, res) => {
 });
 
 // POST /api/assistant/conversations/:id/messages { content, language? }
-router.post("/assistant/conversations/:id/messages", requireAuth, chatLimiter, async (req, res) => {
+router.post("/assistant/conversations/:id/messages", requireAuth, requirePermission("jobs", "view"), chatLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireAssistant(userId);
@@ -74,7 +75,7 @@ router.post("/assistant/conversations/:id/messages", requireAuth, chatLimiter, a
 });
 
 // DELETE /api/assistant/conversations/:id — start over
-router.delete("/assistant/conversations/:id", requireAuth, async (req, res) => {
+router.delete("/assistant/conversations/:id", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
     const ok = await clearConversation(getUserId(res), req.params.id as string);
     if (!ok) { res.status(404).json({ error: "Not found" }); return; }
@@ -86,7 +87,7 @@ router.delete("/assistant/conversations/:id", requireAuth, async (req, res) => {
 });
 
 // POST /api/assistant/proposals/:id/confirm
-router.post("/assistant/proposals/:id/confirm", requireAuth, async (req, res) => {
+router.post("/assistant/proposals/:id/confirm", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const out = await confirmProposal({ userId: getUserId(res), proposalId: req.params.id as string, ip: req.ip });
     res.json({ proposal: serializeProposal(out.proposal), link: out.link });
@@ -98,7 +99,7 @@ router.post("/assistant/proposals/:id/confirm", requireAuth, async (req, res) =>
 });
 
 // POST /api/assistant/proposals/:id/dismiss
-router.post("/assistant/proposals/:id/dismiss", requireAuth, async (req, res) => {
+router.post("/assistant/proposals/:id/dismiss", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const proposal = await dismissProposal({ userId: getUserId(res), proposalId: req.params.id as string });
     res.json({ proposal: serializeProposal(proposal) });

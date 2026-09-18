@@ -22,6 +22,7 @@ import {
 } from "@workspace/db";
 import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { hashToken, newRawToken } from "../contracts/service.js";
@@ -103,9 +104,11 @@ router.get("/team/workers", requireAuth, async (req, res) => {
 });
 
 // POST /api/team/workers
-router.post("/team/workers", requireAuth, async (req, res) => {
+router.post("/team/workers", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    const gate = await requireTeamFeature(userId);
+    if (!gate.ok) { planRequired(res, gate.plan, "Worker time tracking"); return; }
     const body = WorkerBody.safeParse(req.body);
     if (!body.success) {
       res.status(400).json({ error: "Invalid parameters", details: body.error });
@@ -135,7 +138,7 @@ router.post("/team/workers", requireAuth, async (req, res) => {
 });
 
 // PUT /api/team/workers/:wid
-router.put("/team/workers/:wid", requireAuth, async (req, res) => {
+router.put("/team/workers/:wid", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const w = await ownedWorker(userId, req.params.wid as string);
@@ -170,7 +173,7 @@ router.put("/team/workers/:wid", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/team/workers/:wid — hard delete only when no hours were ever logged; otherwise deactivate
-router.delete("/team/workers/:wid", requireAuth, async (req, res) => {
+router.delete("/team/workers/:wid", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const w = await ownedWorker(userId, req.params.wid as string);
@@ -193,7 +196,7 @@ router.delete("/team/workers/:wid", requireAuth, async (req, res) => {
 });
 
 // POST /api/team/workers/:wid/invite — (re)issue the magic link; emails it when the worker has an email
-router.post("/team/workers/:wid/invite", requireAuth, async (req, res) => {
+router.post("/team/workers/:wid/invite", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);
@@ -231,7 +234,7 @@ router.post("/team/workers/:wid/invite", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/team/workers/:wid/invite — revoke
-router.delete("/team/workers/:wid/invite", requireAuth, async (req, res) => {
+router.delete("/team/workers/:wid/invite", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const w = await ownedWorker(userId, req.params.wid as string);
@@ -288,7 +291,7 @@ router.get("/team/time-entries", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/time-entries — company logs hours for a worker
-router.post("/jobs/:id/time-entries", requireAuth, async (req, res) => {
+router.post("/jobs/:id/time-entries", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);
@@ -374,7 +377,7 @@ const TimeEntryUpdateBody = z.object({
 });
 
 // PUT /api/team/time-entries/:tid — edit / approve / reject
-router.put("/team/time-entries/:tid", requireAuth, async (req, res) => {
+router.put("/team/time-entries/:tid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [entry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.id, req.params.tid as string), eq(timeEntriesTable.userId, userId)));
@@ -401,7 +404,7 @@ router.put("/team/time-entries/:tid", requireAuth, async (req, res) => {
 });
 
 // POST /api/team/time-entries/approve — bulk approve
-router.post("/team/time-entries/approve", requireAuth, async (req, res) => {
+router.post("/team/time-entries/approve", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);
@@ -421,7 +424,7 @@ router.post("/team/time-entries/approve", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/team/time-entries/:tid — removes the derived labour cost too
-router.delete("/team/time-entries/:tid", requireAuth, async (req, res) => {
+router.delete("/team/time-entries/:tid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [entry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.id, req.params.tid as string), eq(timeEntriesTable.userId, userId)));
@@ -514,7 +517,7 @@ router.get("/team/equipment", requireAuth, async (req, res) => {
 });
 
 // POST /api/team/equipment
-router.post("/team/equipment", requireAuth, async (req, res) => {
+router.post("/team/equipment", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);
@@ -534,7 +537,7 @@ router.post("/team/equipment", requireAuth, async (req, res) => {
 });
 
 // PUT /api/team/equipment/:eid
-router.put("/team/equipment/:eid", requireAuth, async (req, res) => {
+router.put("/team/equipment/:eid", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const e = await ownedEquipment(userId, req.params.eid as string);
@@ -559,7 +562,7 @@ router.put("/team/equipment/:eid", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/team/equipment/:eid — deactivate when usage exists (usage rows carry the job costs)
-router.delete("/team/equipment/:eid", requireAuth, async (req, res) => {
+router.delete("/team/equipment/:eid", requireAuth, requirePermission("team", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const e = await ownedEquipment(userId, req.params.eid as string);
@@ -582,7 +585,7 @@ router.delete("/team/equipment/:eid", requireAuth, async (req, res) => {
 });
 
 // POST /api/jobs/:id/equipment-usage — log usage → equipment cost entry
-router.post("/jobs/:id/equipment-usage", requireAuth, async (req, res) => {
+router.post("/jobs/:id/equipment-usage", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);
@@ -617,7 +620,7 @@ router.post("/jobs/:id/equipment-usage", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/jobs/:id/equipment-usage/:uid
-router.delete("/jobs/:id/equipment-usage/:uid", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/equipment-usage/:uid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [usage] = await db.select().from(equipmentUsageTable).where(and(eq(equipmentUsageTable.id, req.params.uid as string), eq(equipmentUsageTable.userId, userId), eq(equipmentUsageTable.projectId, req.params.id as string)));
@@ -638,7 +641,7 @@ router.delete("/jobs/:id/equipment-usage/:uid", requireAuth, async (req, res) =>
 
 // ── Assignments (moved here from the legacy CRM router) ──────────────────────
 
-router.post("/jobs/:id/assignments", requireAuth, async (req, res) => {
+router.post("/jobs/:id/assignments", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
@@ -669,7 +672,7 @@ router.post("/jobs/:id/assignments", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/jobs/:id/assignments/:aid", requireAuth, async (req, res) => {
+router.delete("/jobs/:id/assignments/:aid", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);

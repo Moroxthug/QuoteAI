@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db, contractsTable, contractSignersTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import {
   createContractFromQuote,
@@ -85,7 +86,7 @@ router.get("/contracts", requireAuth, async (req, res) => {
 });
 
 // POST /api/contracts/:id/archive
-router.post("/contracts/:id/archive", requireAuth, async (req, res) => {
+router.post("/contracts/:id/archive", requireAuth, requirePermission("contracts", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [existing] = await db.select().from(contractsTable).where(eq(contractsTable.id, req.params.id as string));
@@ -103,7 +104,7 @@ router.post("/contracts/:id/archive", requireAuth, async (req, res) => {
 });
 
 // POST /api/contracts/:id/restore
-router.post("/contracts/:id/restore", requireAuth, async (req, res) => {
+router.post("/contracts/:id/restore", requireAuth, requirePermission("contracts", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const [existing] = await db.select().from(contractsTable).where(eq(contractsTable.id, req.params.id as string));
@@ -138,7 +139,7 @@ router.get("/contracts/by-quote/:quoteId", requireAuth, async (req, res) => {
 });
 
 // POST /api/contracts/from-quote/:quoteId — draft (AI) a contract from an accepted/unlocked quote
-router.post("/contracts/from-quote/:quoteId", requireAuth, aiLimiter, async (req, res) => {
+router.post("/contracts/from-quote/:quoteId", requireAuth, requirePermission("contracts", "edit"), aiLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireContractsFeature(userId);
@@ -208,7 +209,7 @@ const UpdateContractBody = z.object({
 });
 
 // PUT /api/contracts/:id — edit editable sections and variables (draft only)
-router.put("/contracts/:id", requireAuth, async (req, res) => {
+router.put("/contracts/:id", requireAuth, requirePermission("contracts", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await ownedContract(userId, req.params.id as string);
@@ -274,7 +275,7 @@ const SignBody = z.object({
 });
 
 // POST /api/contracts/:id/sign — the contractor signs (before sending)
-router.post("/contracts/:id/sign", requireAuth, async (req, res) => {
+router.post("/contracts/:id/sign", requireAuth, requirePermission("contracts", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await ownedContract(userId, req.params.id as string);
@@ -321,7 +322,7 @@ router.post("/contracts/:id/sign", requireAuth, async (req, res) => {
 });
 
 // POST /api/contracts/:id/send — email the customer a signing link (also used to resend)
-router.post("/contracts/:id/send", requireAuth, async (req, res) => {
+router.post("/contracts/:id/send", requireAuth, requirePermission("contracts", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const body = z.object({ message: z.string().max(1000).optional() }).safeParse(req.body ?? {});
@@ -348,7 +349,7 @@ router.post("/contracts/:id/send", requireAuth, async (req, res) => {
 });
 
 // POST /api/contracts/:id/void
-router.post("/contracts/:id/void", requireAuth, async (req, res) => {
+router.post("/contracts/:id/void", requireAuth, requirePermission("contracts", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const loaded = await ownedContract(userId, req.params.id as string);

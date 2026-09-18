@@ -556,6 +556,8 @@ router.post("/invoices/:id/void", requireAuth, requirePermission("invoicing", "f
 router.post("/invoices/:id/credit-note", requireAuth, requirePermission("invoicing", "full"), sendLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
+    const gate = await requireInvoicing(userId);
+    if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan }); return; }
     const body = z.object({ amountCents: z.number().int().min(1), description: z.string().min(1).max(500), reason: z.string().max(1000).optional(), send: z.boolean().optional() }).safeParse(req.body);
     if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
     const { creditNote, original } = await createCreditNote({ invoiceId: req.params.id as string, userId, ...body.data, ip: req.ip });

@@ -153,6 +153,8 @@ router.delete("/flinks/disconnect", requireAuth, requirePermission("integrations
 router.post("/flinks/sync", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    const gate = await requireFlinksFeature(userId);
+    if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan }); return; }
     const result = await syncFlinksTransactions(userId);
     res.json({ success: true, ...result });
   } catch (err) {

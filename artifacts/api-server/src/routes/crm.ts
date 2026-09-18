@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { db } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import {
@@ -29,7 +30,7 @@ router.get("/crm/projects", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/crm/projects", requireAuth, async (req, res) => {
+router.post("/crm/projects", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const schema = z.object({
@@ -71,7 +72,7 @@ router.post("/crm/projects", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/crm/projects/:id", requireAuth, async (req, res) => {
+router.put("/crm/projects/:id", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = req.params;
@@ -117,7 +118,7 @@ router.put("/crm/projects/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/crm/projects/:id", requireAuth, async (req, res) => {
+router.delete("/crm/projects/:id", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = req.params;
@@ -168,7 +169,7 @@ router.get("/crm/projects/:projectId/tasks", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/crm/projects/:projectId/tasks", requireAuth, async (req, res) => {
+router.post("/crm/projects/:projectId/tasks", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { projectId } = req.params;
@@ -214,7 +215,7 @@ router.post("/crm/projects/:projectId/tasks", requireAuth, async (req, res) => {
   }
 });
 
-router.patch("/crm/projects/:projectId/tasks/:taskId", requireAuth, async (req, res) => {
+router.patch("/crm/projects/:projectId/tasks/:taskId", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { projectId, taskId } = req.params;
@@ -295,7 +296,7 @@ router.get("/crm/projects/:projectId/assignments", requireAuth, async (req, res)
   }
 });
 
-router.post("/crm/projects/:projectId/assignments", requireAuth, async (req, res) => {
+router.post("/crm/projects/:projectId/assignments", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { projectId } = req.params;
@@ -347,7 +348,7 @@ router.post("/crm/projects/:projectId/assignments", requireAuth, async (req, res
   }
 });
 
-router.delete("/crm/projects/:projectId/assignments/:assignmentId", requireAuth, async (req, res) => {
+router.delete("/crm/projects/:projectId/assignments/:assignmentId", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { projectId, assignmentId } = req.params;
@@ -394,7 +395,7 @@ router.get("/crm/collaborators", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/crm/collaborators", requireAuth, async (req, res) => {
+router.post("/crm/collaborators", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const schema = z.object({
@@ -445,7 +446,7 @@ router.get("/crm/suppliers", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/crm/suppliers", requireAuth, async (req, res) => {
+router.post("/crm/suppliers", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const schema = z.object({

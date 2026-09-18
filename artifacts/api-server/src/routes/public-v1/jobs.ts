@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db, projectsTable, quotesTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { requireApiKey, publicApiLimiter } from "../../middlewares/apiKeyAuth.js";
 import { requirePermission } from "../../middlewares/requirePermission.js";
 import { getUserId } from "../../middlewares/authMiddleware.js";
@@ -22,7 +22,7 @@ router.get("/jobs", requireApiKey, publicApiLimiter, requirePermission("jobs", "
   try {
     const userId = getUserId(res);
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
-    const projects = await db.select().from(projectsTable).where(eq(projectsTable.userId, userId)).orderBy(desc(projectsTable.createdAt)).limit(limit);
+    const projects = await db.select().from(projectsTable).where(and(eq(projectsTable.userId, userId), isNull(projectsTable.archivedAt))).orderBy(desc(projectsTable.createdAt)).limit(limit);
     res.json({ items: projects.map(serializeProject) });
   } catch (err) {
     req.log.error({ err }, "Public API: error listing jobs");

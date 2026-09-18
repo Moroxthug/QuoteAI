@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
 import { db, businessProfilesTable, normalizeProvince, getTaxProfile, paymentScheduleSchema, DEFAULT_AUTOMATION_SETTINGS, effectivePlan, hasFeature, PRODUCT_FEATURES, type BusinessProfile } from "@workspace/db";
 import { z } from "zod";
@@ -107,7 +108,7 @@ router.get("/business-profile", requireAuth, async (req, res) => {
   }
 });
 
-router.put("/business-profile", requireAuth, async (req, res) => {
+router.put("/business-profile", requireAuth, requirePermission("settings", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const parsed = UpdateBusinessProfileBody.safeParse(req.body);
@@ -207,6 +208,7 @@ router.put("/business-profile", requireAuth, async (req, res) => {
 router.post(
   "/business-profile/logo",
   requireAuth,
+  requirePermission("settings", "edit"),
   uploadLogo,
   async (req, res) => {
     try {
@@ -268,7 +270,7 @@ router.post(
   }
 );
 
-router.post("/business-profile/apikey", requireAuth, async (req, res) => {
+router.post("/business-profile/apikey", requireAuth, requirePermission("settings", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const newApiKey = `quoteai_pk_${randomBytes(24).toString("hex")}`;

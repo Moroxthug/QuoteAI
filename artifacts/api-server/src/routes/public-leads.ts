@@ -2,13 +2,15 @@ import { Router } from "express";
 import { db, leadsTable, leadEventsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
+import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
+const unsubscribeLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "Too many requests" });
 
 // CASL requires a working unsubscribe link that takes effect without delay.
 // No auth — the token itself (a random uuid, never the lead id) is the
 // credential, exactly like an invoice/contract share link.
-router.get("/public/leads/unsubscribe", async (req, res) => {
+router.get("/public/leads/unsubscribe", unsubscribeLimiter, async (req, res) => {
   const token = String(req.query.token ?? "");
   if (!token) {
     res.status(400).send("Missing unsubscribe link.");

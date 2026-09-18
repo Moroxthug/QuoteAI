@@ -160,3 +160,26 @@ For each: connect from Settings → Integrations, trigger the real event, confir
 - knip reports 105 unused exports / 33 unused exported types (warn-level, does not fail CI). Mostly API surface of service modules; prune opportunistically.
 - 60 `no-explicit-any` warnings, concentrated in `admin.tsx` and the API/DB edges.
 - `sitemap.xml` lastmod churn.
+
+### Phase 62 — Backend route matrix audit (2026-09-18)
+
+**Built**
+- `artifacts/api-server/scripts/route-matrix.ts` — a TypeScript-AST parser (no module execution, no DB) over `src/app.ts` + `src/routes/**`. For each of the **342 registered routes in 50 files** it records: mount path, middleware chain (including `router.use("/admin", requireAdmin)` prefix middleware), auth kind, `requirePermission(area, action)`, rate limiter, zod/manual validation, plan/feature gate, tenant scoping of `:param` handlers (`predicate` / `post-check` / `helper` / `NONE` — the handler's reach includes every same-file helper it calls, transitively), archived filtering on list endpoints, token-comparison style on public token routes, and signature-verification evidence on inbound webhooks. `pnpm --filter @workspace/api-server route-matrix` writes `docs/ROUTE-MATRIX.md`.
+- `scripts/route-matrix.test.ts` — 11 vitest assertions (in CI via `pnpm test`): every un-authed route is on a reasoned public allowlist (and the allowlist stays honest); every mutating session route names a permission; every public-API route is permissioned + rate limited; 29 feature entry points check their flag; every `:param` handler scopes by org; list endpoints exclude archived rows; every public token route is rate limited and never `===`-compares a secret; every inbound webhook verifies its signature; the committed matrix is up to date. Verified the guard bites: dropping one `requirePermission` fails rule 2 + the freshness check.
+
+**Found / fixed**
+- **76 mutating session routes had no `requirePermission`** — the Phase 13 claim only held for `jobs`/`costs`/`invoicing`. A `viewer` or `foreman` team member could create/delete quotes, edit the business profile, connect/disconnect WhatsApp, manage workers/equipment, void contracts, unlock quotes via Stripe, etc. Added permissions to 72 routes: quotes/catalog/documents/speech → `quotes:edit` (delete/archive/restore → `quotes:full`); contracts → `contracts:edit` (void/archive/restore → `full`); crm + assistant → `jobs:view|edit`; business-profile → `settings:edit`; payments unlock/sync → `settings:full`; WhatsApp → `integrations:full`; workers/equipment → `team:full`; time entries/assignments/equipment usage → `jobs:edit` (approve → `jobs:full`). The 4 remaining are allowlisted with reasons (notifications read, signed-upload URL, invite accept, org switch). `requirePermission` is now generic over `Request<P>` like `requireAuth` (crm.ts stopped typechecking otherwise).
+- **Public API v1 lists (`/api/v1/public/quotes|jobs|invoices`) returned archived rows** — Phase 47 predates them. Now `isNull(archivedAt)`. Clients lists stay unfiltered by design (parity with the virtual `/api/clients`).
+- Three feature entry points missed the plan gate while their siblings had it: `POST /team/workers` (team_time), `POST /invoices/:id/credit-note` (invoicing), `POST /flinks/sync` (flinks_bank_feed). Gated.
+- Four un-authed token routes had no rate limiter: the three CASL unsubscribe links and `GET /team/invite/:token`. Now 30/min per IP.
+- `POST /sign/:token/verify` compared the OTP hash with `===`; now `timingSafeEqual`. (Every other public token route is a hashed DB lookup or already timing-safe.)
+- Tenant scoping: 114 `:param` handlers under session/API-key auth. 90 predicate, 24 post-fetch check, 20 via an imported service — all 20 services read by hand, every one filters `userId` or throws on mismatch. Only `POST /team/invite/:token/accept` has no org predicate (it *joins* an org; allowlisted). **No IDOR found.**
+- Webhooks: all 6 inbound endpoints verify (Stripe `constructEvent` ×2, Financeit/Resend HMAC `timingSafeEqual`, Meta/WhatsApp `x-hub-signature-256` in `app.ts` before `express.json()`).
+
+**Policy decided here**
+- Feature gating is enforced at the *entry* route (create / connect / send); read/update/delete of existing rows stays open after a downgrade so nobody is locked out of their data. `FEATURE_ENTRY_ROUTES` in the test is the list.
+- `catalog`, `quote_email`, `acceptance_notifications` are in `PLAN_FEATURES` but enforced nowhere (UI or API) — always have been. Product decision, added to deferred work.
+
+**Deferred**
+- The frontend is not role-aware: nothing in `quote-ai/src` reads the actor's role, so a viewer still sees every button and now gets a 403 toast instead of succeeding. Role-aware UI (hide/disable per `roleCan`) → Phase 66 bug list / deferred work. Note the matrix gives `admin` only `settings:view`, so admins can no longer edit the business profile via the API — confirm that is intended during 66.
+- `validation` column shows 60-odd `manual` rows (hand-rolled `req.body` checks); converting to zod is opportunistic.

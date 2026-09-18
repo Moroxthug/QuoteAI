@@ -39,7 +39,8 @@
         "src/app.ts",
         "build.mjs",
         "src/**/*.test.ts",
-        "src/e2e/**"
+        "src/e2e/**",
+        "scripts/*.ts"
       ]
     },
     "artifacts/quote-ai": {

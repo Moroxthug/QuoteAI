@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import {
   db,
   uploadedDocumentsTable,
@@ -248,6 +249,7 @@ router.get("/documents", requireAuth, async (req, res) => {
 router.post(
   "/documents/upload",
   requireAuth,
+  requirePermission("quotes", "edit"),
   (req, res, next) => {
     documentUpload.single("file")(req, res, (err) => {
       if (err instanceof multer.MulterError || err instanceof Error) {
@@ -393,7 +395,7 @@ router.get("/documents/price-alerts", requireAuth, async (req, res) => {
 });
 
 // POST /api/documents/price-alerts/:id/dismiss
-router.post("/documents/price-alerts/:id/dismiss", requireAuth, async (req, res) => {
+router.post("/documents/price-alerts/:id/dismiss", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const alertId = String(req.params.id);
@@ -470,7 +472,7 @@ router.get("/documents/price-comparison", requireAuth, async (req, res) => {
 });
 
 // POST /api/documents/:id/extract
-router.post("/documents/:id/extract", requireAuth, documentAiLimiter, async (req, res) => {
+router.post("/documents/:id/extract", requireAuth, requirePermission("quotes", "edit"), documentAiLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const docId = String(req.params.id);
@@ -591,7 +593,7 @@ router.post("/documents/:id/extract", requireAuth, documentAiLimiter, async (req
 });
 
 // DELETE /api/documents/:id
-router.delete("/documents/:id", requireAuth, async (req, res) => {
+router.delete("/documents/:id", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const docId = String(req.params.id);

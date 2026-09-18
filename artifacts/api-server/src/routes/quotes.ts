@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
 import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
@@ -391,7 +392,7 @@ ${examples.join("\n\n---\n\n")}`;
 }
 
 // POST /api/quotes  (multipart/form-data: rawInput, clientData?, companySnapshot?, images[])
-router.post("/quotes", requireAuth, aiCallLimiter, imageUpload.array("images", 3), async (req, res) => {
+router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, imageUpload.array("images", 3), async (req, res) => {
   try {
     const userId = getUserId(res);
 
@@ -1202,7 +1203,7 @@ router.get("/quotes/:id/variants", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/variants — clone the quote's current pricing into a new variant
-router.post("/quotes/:id/variants", requireAuth, async (req, res) => {
+router.post("/quotes/:id/variants", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -1262,7 +1263,7 @@ router.post("/quotes/:id/variants", requireAuth, async (req, res) => {
 });
 
 // PUT /api/quotes/:id/variants/:variantId
-router.put("/quotes/:id/variants/:variantId", requireAuth, async (req, res) => {
+router.put("/quotes/:id/variants/:variantId", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id, variantId } = req.params as { id: string; variantId: string };
@@ -1313,7 +1314,7 @@ router.put("/quotes/:id/variants/:variantId", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/quotes/:id/variants/:variantId
-router.delete("/quotes/:id/variants/:variantId", requireAuth, async (req, res) => {
+router.delete("/quotes/:id/variants/:variantId", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id, variantId } = req.params as { id: string; variantId: string };
@@ -1359,7 +1360,7 @@ router.delete("/quotes/:id/variants/:variantId", requireAuth, async (req, res) =
 });
 
 // PUT /api/quotes/:id
-router.put("/quotes/:id", requireAuth, async (req, res) => {
+router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = UpdateQuoteParams.parse(req.params);
@@ -1477,7 +1478,7 @@ router.put("/quotes/:id", requireAuth, async (req, res) => {
 });
 
 // DELETE /api/quotes/:id
-router.delete("/quotes/:id", requireAuth, async (req, res) => {
+router.delete("/quotes/:id", requireAuth, requirePermission("quotes", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = DeleteQuoteParams.parse(req.params);
@@ -1505,7 +1506,7 @@ router.delete("/quotes/:id", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/archive
-router.post("/quotes/:id/archive", requireAuth, async (req, res) => {
+router.post("/quotes/:id/archive", requireAuth, requirePermission("quotes", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = DeleteQuoteParams.parse(req.params);
@@ -1525,7 +1526,7 @@ router.post("/quotes/:id/archive", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/restore
-router.post("/quotes/:id/restore", requireAuth, async (req, res) => {
+router.post("/quotes/:id/restore", requireAuth, requirePermission("quotes", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = DeleteQuoteParams.parse(req.params);
@@ -1545,7 +1546,7 @@ router.post("/quotes/:id/restore", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/generate-pdf
-router.post("/quotes/:id/generate-pdf", requireAuth, async (req, res) => {
+router.post("/quotes/:id/generate-pdf", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { id } = GenerateQuotePdfParams.parse(req.params);
@@ -1636,7 +1637,7 @@ router.post("/quotes/:id/generate-pdf", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/send-pdf-email — send quote PDF to client via email
-router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
+router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -1706,7 +1707,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/duplicate — clone a quote as a new draft
-router.post("/quotes/:id/duplicate", requireAuth, async (req, res) => {
+router.post("/quotes/:id/duplicate", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -1768,7 +1769,7 @@ router.post("/quotes/:id/duplicate", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/:id/regenerate — re-run AI on an existing quote
-router.post("/quotes/:id/regenerate", requireAuth, aiCallLimiter, async (req, res) => {
+router.post("/quotes/:id/regenerate", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -1981,7 +1982,7 @@ When you use a price-list item, apply the exact unit price or a very close one. 
 });
 
 // POST /api/quotes/:id/upgrade-to-capitolato — rewrite descriptions in professional capitolato style (Pro only)
-router.post("/quotes/:id/upgrade-to-capitolato", requireAuth, aiCallLimiter, async (req, res) => {
+router.post("/quotes/:id/upgrade-to-capitolato", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -2124,7 +2125,7 @@ FUNDAMENTAL RULE: return ONLY valid JSON with this exact structure (no additiona
 });
 
 // POST /api/quotes/:id/generate-pdf-pro — server-side PDF for capitolato quotes (Pro only)
-router.post("/quotes/:id/generate-pdf-pro", requireAuth, async (req, res) => {
+router.post("/quotes/:id/generate-pdf-pro", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
@@ -3807,7 +3808,7 @@ async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRow, with
 }
 
 // POST /api/quotes/manual — create a manually-built quote (no AI)
-router.post("/quotes/manual", requireAuth, async (req, res) => {
+router.post("/quotes/manual", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const result = await createManualQuote(userId, req.body as ManualQuoteInput);
@@ -3823,7 +3824,7 @@ router.post("/quotes/manual", requireAuth, async (req, res) => {
 });
 
 // POST /api/quotes/suggest-item-description — AI helper for manual quote items
-router.post("/quotes/suggest-item-description", requireAuth, aiCallLimiter, async (req, res) => {
+router.post("/quotes/suggest-item-description", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, async (req, res) => {
   try {
     const { brief, context } = req.body as { brief?: string; context?: string };
     if (!brief || typeof brief !== "string" || !brief.trim()) {

@@ -2,13 +2,15 @@ import { Router } from "express";
 import { db, quotesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
+import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
+const unsubscribeLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "Too many requests" });
 
 // Working unsubscribe link for Phase 21 quote follow-up reminders, same
 // pattern as public-leads.ts. No auth — the token itself (a random uuid,
 // never the quote id) is the credential.
-router.get("/public/quotes/unsubscribe", async (req, res) => {
+router.get("/public/quotes/unsubscribe", unsubscribeLimiter, async (req, res) => {
   const token = String(req.query.token ?? "");
   if (!token) {
     res.status(400).send("Missing unsubscribe link.");

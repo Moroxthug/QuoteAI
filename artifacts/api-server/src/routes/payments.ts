@@ -282,7 +282,7 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/payments/unlock-quote", requireAuth, async (req, res) => {
+router.post("/payments/unlock-quote", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { quoteId } = req.body as { quoteId: string };
@@ -355,7 +355,7 @@ router.post("/payments/portal", requireAuth, requirePermission("settings", "full
   }
 });
 
-router.post("/payments/sync-subscription", requireAuth, async (req, res) => {
+router.post("/payments/sync-subscription", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const stripe = await getUncachableStripeClient();

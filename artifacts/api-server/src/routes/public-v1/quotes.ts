@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, quotesTable } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { requireApiKey, publicApiLimiter } from "../../middlewares/apiKeyAuth.js";
 import { requirePermission } from "../../middlewares/requirePermission.js";
 import { getUserId } from "../../middlewares/authMiddleware.js";
@@ -14,7 +14,7 @@ router.get("/quotes", requireApiKey, publicApiLimiter, requirePermission("quotes
   try {
     const userId = getUserId(res);
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
-    const quotes = await db.select().from(quotesTable).where(eq(quotesTable.userId, userId)).orderBy(desc(quotesTable.createdAt)).limit(limit);
+    const quotes = await db.select().from(quotesTable).where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt))).orderBy(desc(quotesTable.createdAt)).limit(limit);
     res.json({ items: quotes.map((q) => serializeQuote(q)) });
   } catch (err) {
     req.log.error({ err }, "Public API: error listing quotes");

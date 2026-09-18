@@ -19,6 +19,7 @@ import { getBaseUrl } from "../lib/baseUrl.js";
 import { hashToken, newRawToken } from "../contracts/service.js";
 import { sendTeamMemberInviteEmail } from "../lib/emailTeam.js";
 import { logger } from "../lib/logger.js";
+import { ipRateLimiter } from "../lib/rateLimit.js";
 
 // ── Phase 7: team accounts — invite/accept, role management, org switcher ──
 // "Organization" = the owner's own business_profiles.userId; members are
@@ -236,8 +237,11 @@ router.delete("/team/members/:id", requireAuth, requirePermission("team", "full"
 
 // ── Public invite lookup + accept ───────────────────────────────────────────
 
+// Token-guessing budget for the unauthenticated invite preview (Phase 62) — same shape as the other public token routes.
+const invitePreviewLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "Too many requests" });
+
 // GET /api/team/invite/:token — no auth required, just previews the invite
-router.get("/team/invite/:token", async (req, res) => {
+router.get("/team/invite/:token", invitePreviewLimiter, async (req, res) => {
   try {
     const tokenHash = hashToken(req.params.token as string);
     const [member] = await db.select().from(organizationMembersTable).where(eq(organizationMembersTable.inviteTokenHash, tokenHash));

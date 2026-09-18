@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { createHash, randomInt } from "node:crypto";
+import { createHash, randomInt, timingSafeEqual } from "node:crypto";
 import { db, contractsTable, contractSignersTable, authUsersTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { ipRateLimiter } from "../lib/rateLimit.js";
@@ -148,7 +148,10 @@ router.post("/sign/:token/verify", otpLimiter, async (req, res) => {
       res.status(429).json({ error: "too_many_attempts" });
       return;
     }
-    const ok = createHash("sha256").update(`${signer.id}:${body.data.code}`).digest("hex") === signer.otpHash;
+    // Constant-time compare (Phase 62): a `===` on the hex digests would leak how many leading bytes matched.
+    const expected = Buffer.from(signer.otpHash, "hex");
+    const provided = createHash("sha256").update(`${signer.id}:${body.data.code}`).digest();
+    const ok = expected.length === provided.length && timingSafeEqual(expected, provided);
     if (!ok) {
       await db.update(contractSignersTable).set({ otpAttempts: signer.otpAttempts + 1 }).where(eq(contractSignersTable.id, signer.id));
       res.status(400).json({ error: "invalid_code", attemptsLeft: OTP_MAX_ATTEMPTS - signer.otpAttempts - 1 });

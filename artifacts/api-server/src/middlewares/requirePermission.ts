@@ -25,8 +25,11 @@ export function roleCan(role: TeamMemberRole, area: PermissionArea, action: Perm
 }
 
 /** Wrap after `requireAuth`. Blocks a role that doesn't meet `action` on `area`. */
+// Generic over P for the same reason requireAuth is (see authMiddleware.ts):
+// without it, req.params in a route that also passes requireAuth<P> collapses
+// to string | string[] and every `eq(table.id, id)` stops typechecking.
 export function requirePermission(area: PermissionArea, action: PermissionAction) {
-  return (_req: Request, res: Response, next: NextFunction): void => {
+  return <P = Record<string, string>>(_req: Request<P>, res: Response, next: NextFunction): void => {
     const role = getActorRole(res);
     if (!roleCan(role, area, action)) {
       res.status(403).json({ error: "FORBIDDEN", message: `Your role (${role}) doesn't have ${action} access to ${area}.` });

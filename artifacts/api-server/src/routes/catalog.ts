@@ -1,6 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
+import { requirePermission } from "../middlewares/requirePermission.js";
 import { db, priceCatalogItemsTable, quotesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import type { QuoteChapter } from "@workspace/db";
@@ -86,7 +87,7 @@ router.get("/catalog", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/catalog", requireAuth, async (req, res) => {
+router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { nome, categoria, um, prezzoUnitario, note } = req.body as {
@@ -121,7 +122,7 @@ router.post("/catalog", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/catalog/bulk", requireAuth, async (req, res) => {
+router.post("/catalog/bulk", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const items = req.body as Array<{
@@ -165,7 +166,7 @@ router.post("/catalog/bulk", requireAuth, async (req, res) => {
 });
 
 
-router.post("/catalog/import-from-quotes", requireAuth, async (req, res) => {
+router.post("/catalog/import-from-quotes", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
 
@@ -242,6 +243,7 @@ router.post("/catalog/import-from-quotes", requireAuth, async (req, res) => {
 router.post(
   "/catalog/import-ocr",
   requireAuth,
+  requirePermission("quotes", "edit"),
   catalogOcrLimiter,
   catalogOcrUpload.array("files", 3),
   async (req, res) => {
@@ -335,7 +337,7 @@ router.post(
   }
 );
 
-router.put("/catalog/:id", requireAuth, async (req, res) => {
+router.put("/catalog/:id", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = String(req.params.id);
@@ -372,7 +374,7 @@ router.put("/catalog/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.delete("/catalog/:id", requireAuth, async (req, res) => {
+router.delete("/catalog/:id", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const id = String(req.params.id);

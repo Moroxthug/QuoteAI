@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { ArrowRight, Mic, FileText, Zap, Check, X } from "lucide-react";
+import { Mic, FileText, Zap, Check, X } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { useAuth } from "@/hooks/use-auth";
 import { useScrollFade } from "@/hooks/use-scroll-fade";

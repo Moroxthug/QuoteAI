@@ -1,5 +1,5 @@
 import { db, quotesTable } from "@workspace/db";
-import { and, eq, isNull, lte, ne } from "drizzle-orm";
+import { and, isNull, lte, ne } from "drizzle-orm";
 import { raiseAutomation } from "../lib/automation.js";
 
 // ── Daily quote follow-up scan (cron) ───────────────────────────────────────

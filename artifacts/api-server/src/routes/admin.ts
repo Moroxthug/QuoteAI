@@ -133,7 +133,7 @@ router.get("/admin/users", async (_req, res) => {
       .limit(200);
 
     const userIds = profiles.map(p => p.userId);
-    let authUsers: Record<string, { email: string; name: string }> = {};
+    const authUsers: Record<string, { email: string; name: string }> = {};
 
     if (userIds.length > 0) {
       try {
@@ -697,7 +697,7 @@ router.get("/admin/search-console", async (req, res) => {
             gscKey = content;
             break;
           }
-        } catch (e) {
+        } catch {
           // ignore
         }
       }

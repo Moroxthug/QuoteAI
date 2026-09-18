@@ -101,8 +101,6 @@ async function buildAll() {
       "zeromq",
       "zeromq-prebuilt",
       "playwright",
-      "puppeteer",
-      "puppeteer-core",
       "electron",
     ],
     sourcemap: "linked",

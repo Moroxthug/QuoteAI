@@ -67,7 +67,7 @@ const CLAUSES = {
     en: `The Customer agrees to pay the Contractor the Contract Price of **${money(v.total, lang)}** (${money(v.subtotal, lang)} before applicable taxes) for the Work, as detailed in the price table below. The Contract Price is a fixed price for the Work described in Section 2 and may only be changed by a written change order under Section 6.`,
     fr: `Le Client s'engage à payer à l'Entrepreneur le prix du contrat de **${money(v.total, lang)}** (${money(v.subtotal, lang)} avant taxes applicables) pour les Travaux, tel que détaillé dans le tableau ci-dessous. Le prix du contrat est un prix forfaitaire pour les Travaux décrits à l'article 2 et ne peut être modifié que par un avenant écrit conformément à l'article 6.`,
   }),
-  payment: (v: ContractVariables, lang: Lang): L => {
+  payment: (v: ContractVariables, _lang: Lang): L => {
     const holdback = v.paymentSchedule.holdback.enabled
       ? {
           en: ` A statutory holdback of ${v.paymentSchedule.holdback.percent}% will be retained from each progress payment and released in accordance with Section 11.`,

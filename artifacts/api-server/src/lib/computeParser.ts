@@ -102,7 +102,7 @@ export function parseComputoMetrico(text: string): ParsedChapter[] | null {
     }
     const multiMatch = line.match(VOCE_MULTI_RE);
     if (multiMatch) {
-      const [, qty, um, pu, _puUm, qty2, _um2, tot] = multiMatch;
+      const [, qty, um, _pu, _puUm, qty2, _um2, tot] = multiMatch;
       const q = parseEuro(qty);
       const q2 = parseEuro(qty2);
       const t = parseEuro(tot);

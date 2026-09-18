@@ -5,7 +5,6 @@ import { db, businessProfilesTable, calendarSyncedEventsTable, hasFeature, minim
 import { eq, desc } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
-import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { buildGoogleAuthUrl } from "../lib/googleCalendarClient.js";
 import { buildOutlookAuthUrl } from "../lib/outlookCalendarClient.js";

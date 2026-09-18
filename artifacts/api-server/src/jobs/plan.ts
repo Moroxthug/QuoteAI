@@ -140,7 +140,7 @@ export function buildFallbackPlan(params: {
   const completionTerm = schedule.terms.find((t) => t.trigger === "on_completion") ?? null;
 
   // 1. Work milestones: one per chapter, or one per payment term when the quote has no usable chapters.
-  let work: Omit<PlannedMilestone, "durationDays">[] = [];
+  let work: Omit<PlannedMilestone, "durationDays">[];
   const usableChapters = chapters.filter((c) => c && c.titolo).slice(0, MAX_MILESTONES - 1);
   if (usableChapters.length > 0 && milestoneTerms.length <= usableChapters.length) {
     const keyed = usableChapters.map((c, i) => ({ key: `chapter-${(c.lettera || String(i + 1)).toString().toUpperCase()}`, title: c.titolo, chapter: c }));

@@ -130,7 +130,7 @@ async function execute(proposal: AssistantProposal, userId: string, ip: string |
       const project = await ownedProject(userId, String(p.projectId));
       const kind = String(p.kind);
       const ctx = await buildInvoiceContext({ userId, projectId: project.id });
-      let out: { invoice: { id: string }; created: boolean } | null = null;
+      let out: { invoice: { id: string }; created: boolean } | null;
       if (kind === "deposit") {
         if (!ctx.contract) throw new ProposalError("This job has no signed contract");
         out = await draftDepositInvoice({ contract: ctx.contract, projectId: project.id, source: "manual", actor: "contractor" });

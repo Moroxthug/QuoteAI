@@ -6,13 +6,11 @@ import {
   SECTORS,
   CITIES,
   ACTIVE_CITIES,
-  CITIES_BY_SLUG,
   CITY_SECTORS,
   getCityTitle,
   getCityDesc,
   RELATED_SECTORS,
   CITY_CONTEXT,
-  SECTOR_KEY_BY_FR_SLUG,
   FRENCH_PRIMARY_CITY_SLUGS,
 } from "../src/data/seo-data.js";
 import type { SectorData, CityData } from "../src/data/seo-data.js";
@@ -140,6 +138,9 @@ function buildHeadBlock(opts: {
 /**
  * Strip dashboard and charts chunk modulepreloads so SEO pages don't
  * eagerly fetch code that is only needed inside the authenticated dashboard.
+ * Since Phase 61 the Vite config no longer emits a "dashboard" manual chunk
+ * (the entry no longer statically reaches it), so this is a no-op guard kept
+ * in case a manual chunk is reintroduced.
  */
 function pruneModulepreload(html: string): string {
   return html.replace(

@@ -143,3 +143,20 @@ For each: connect from Settings → Integrations, trigger the real event, confir
 ## 3. Build log
 
 *(append one entry per phase as it completes: date, commit, what was found, what was fixed, what was deferred)*
+
+### Phase 61 — Static integrity (2026-09-18)
+
+**Found / fixed**
+- Root `pnpm run typecheck` already passed: the `lib/api-zod` zod v3/v4 mismatch had been resolved by an earlier orval regen (Phase 25) and the CI comment was stale. It is now CI's first step.
+- ESLint did not exist. Added flat `eslint.config.mjs` (`@eslint/js` + `typescript-eslint` + `react-hooks`, `no-unused-vars` as error with `_` escape, `no-explicit-any` as warning). First run: **82 errors / 73 warnings**. All 82 errors fixed: 69 unused imports/vars (incl. a 45-line dead `sendWhatsappImage` in `routes/whatsapp.ts`, dead `EXTRACTION_MIME_TYPES`, dead `MESSAGE_ID_WINDOW_MS`), 3 `no-useless-assignment`, 2 `prefer-const`, a literal BOM in a template string (`team.ts` payroll CSV → `\uFEFF`), 3 `preserve-caught-error`, 2 worklet globals. 68 warnings remain (60 `any`, 13 → 8 `react-hooks/exhaustive-deps`, all "load on mount" patterns — left deliberately). Scripts: `pnpm lint` (CI, warnings allowed) / `pnpm lint:strict`.
+- **Bundle: the marketing homepage was modulepreloading the entire 1.5 MB dashboard chunk + the 237 KB seo chunk.** Cause: `manualChunks` grouped `/pages/dashboard/` into one chunk, Rollup pulled every shared module those pages touch (`ui/*`, `use-toast`, the auth client…) into it, so the public entry statically imported it — `lazy()` on the routes was defeated. Fixed by removing the page-level manual chunks (vendor splits kept) and making `DashboardLayout` lazy in `App.tsx`. Homepage first-load JS **2.64 MB → 1.48 MB**; recharts (386 KB) is now genuinely lazy; each dashboard route is its own chunk. Verified in the Browser pane against a mock API (dashboard home + analytics render through the lazy layout, no console errors from the change).
+- Dead code (`knip`, config in `knip.json`, `pnpm knip` in CI): deleted 18 files — `generateQuotePreviewImage.ts` (puppeteer), the unmounted homepage demo player (`components/demo/*`, `lib/video/*`, framer-motion), `ui/badge|card|switch`, `use-mobile`, the EUR-era Stripe seed scripts, two broken one-off migration runners. Removed 35 unused dependencies (puppeteer — no more Chromium download on install/CI; 15 radix packages; cookie-parser, http-proxy-middleware, @swc/helpers, @opentelemetry/semantic-conventions, html2pdf.js, sonner, vaul, next-themes, embla, input-otp, react-day-picker, react-icons, react-resizable-panels, framer-motion, stripe in scripts).
+- `pnpm test` in CI had been **red the whole time**: `incentives/matching.test.ts` is a plain `node:assert` script vitest reported as "no test suite". Converted it and the two excluded assert scripts (`analytics/math`, `invoices/math`) into vitest suites — 7 files / 22 tests now run in CI.
+- Working tree: `sitemap.xml` committed (it is regenerated with today's `lastmod` by `prebuild`, so it will keep drifting — root cause is Phase 68's); `incentives.ts` had no stray edit.
+- `test.yml` now runs: root typecheck → lint → knip → unit tests → `pnpm -r build`.
+
+**Deferred (to 68 unless noted)**
+- Main chunk still carries `translations.ts` (383 KB, both languages), `posthog-js` (284 KB — could be dynamically imported), `seo-data.ts` (129 KB, home only needs slug→label) and `blog-data.ts` (61 KB, home only needs 3 article summaries). Splitting these is the Phase 68 bundle-budget work.
+- knip reports 105 unused exports / 33 unused exported types (warn-level, does not fail CI). Mostly API surface of service modules; prune opportunistically.
+- 60 `no-explicit-any` warnings, concentrated in `admin.tsx` and the API/DB edges.
+- `sitemap.xml` lastmod churn.

@@ -308,7 +308,7 @@ export default function QuoteDetail() {
           toast({ title: t("dashboard.quoteDetail.descriptionUpdated"), description: t("dashboard.quoteDetail.descriptionUpdatedDesc") });
         }
       });
-    } catch (err) {
+    } catch {
       toast({ title: t("dashboard.quoteDetail.error"), description: t("dashboard.quoteDetail.errorRegenerateDesc"), variant: "destructive" });
     } finally {
       setRegeneratingVoceKey(null);

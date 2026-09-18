@@ -8,7 +8,6 @@ import {
   projectsTable,
   milestonesTable,
   projectTasksTable,
-  costBudgetLinesTable,
   costEntriesTable,
   invoicesTable,
   timeEntriesTable,

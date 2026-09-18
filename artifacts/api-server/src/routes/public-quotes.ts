@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable } from "@workspace/db";
-import { eq, sql, or, isNull } from "drizzle-orm";
+import { eq, or, isNull } from "drizzle-orm";
 import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { logger } from "../lib/logger.js";
-import type { QuoteChapter, QuoteDiscount, QuoteClientData } from "@workspace/db";
+import type { QuoteChapter, QuoteClientData } from "@workspace/db";
 import { sendWidgetLeadNotification, sendWidgetClientConfirmationEmail } from "../lib/email.js";
 import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
 import { raiseAutomation } from "../lib/automation.js";
@@ -365,7 +365,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
     try {
       const cleaned = content.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
       aiData = JSON.parse(cleaned);
-    } catch (err) {
+    } catch {
       logger.error({ content }, "Failed to parse public API quote JSON");
       res.status(422).json({ error: "The AI could not structure the quote. Try again with a different description." });
       return;

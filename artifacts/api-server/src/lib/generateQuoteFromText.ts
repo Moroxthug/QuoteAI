@@ -1,7 +1,6 @@
 import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable } from "@workspace/db";
 import { eq, desc, count, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
-import { generateNumeroPreventivo } from "./quoteNumber.js";
 import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData } from "@workspace/db";
 import type { Logger } from "pino";
 import { trackEvent } from "./telemetry.js";
@@ -346,7 +345,7 @@ export async function buildQuoteFromAI({
         totalAmount: result.totale,
       });
       return result;
-    } catch (parseErr) {
+    } catch {
       trackEvent(userId, "quote_generation_failed", {
         latencyMs,
         error: "Failed to parse AI JSON response",
@@ -482,7 +481,7 @@ Return the COMPLETE updated quote in valid JSON with the same structure. Recalcu
         totalAmount: result.totale,
       });
       return result;
-    } catch (parseErr) {
+    } catch {
       trackEvent(userId, "quote_regeneration_failed", {
         latencyMs,
         error: "Failed to parse AI JSON response",

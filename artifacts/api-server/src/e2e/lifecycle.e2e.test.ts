@@ -57,7 +57,7 @@ import {
   invoicesTable,
   automationRunsTable,
 } from "@workspace/db";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import "../automations/index.js"; // registers automation handlers
 import { raiseAutomation } from "../lib/automation.js";
 import { logContractEvent, finalizeContract } from "../contracts/service.js";

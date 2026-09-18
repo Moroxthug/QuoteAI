@@ -9,7 +9,6 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
 import { quotesTable } from "./quotes";
 import { clientsTable } from "./clients";
 

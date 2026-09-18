@@ -19,7 +19,6 @@ import {
   type PendingQuoteData,
 } from "../lib/generateQuoteFromText.js";
 import { generateQuoteWhatsappPdfBuffer } from "../lib/generateQuoteWhatsappPdfBuffer.js";
-import { generateQuotePreviewImage } from "../lib/generateQuotePreviewImage.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { randomUUID } from "crypto";
@@ -41,7 +40,6 @@ const MAX_ITERATIONS = 3; // max correction rounds before forcing save-as-draft
 // ── In-memory deduplication + per-number lock ──────────────────────────────────
 const processedMessageIds = new Set<string>();
 const processingLocks = new Map<string, boolean>();
-const MESSAGE_ID_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 function isDuplicateMessage(messageId: string): boolean {
   if (processedMessageIds.has(messageId)) return true;
@@ -141,53 +139,6 @@ async function uploadMetaMedia(buffer: Buffer, mimeType: string, filename: strin
   } catch (err) {
     logger.error({ err }, "WhatsApp media upload error");
     return null;
-  }
-}
-
-async function sendWhatsappImage(to: string, imageBuffer: Buffer, caption: string): Promise<void> {
-  if (!WA_TOKEN || !WA_PHONE_ID) return;
-
-  const mediaId = await uploadMetaMedia(imageBuffer, "image/png", "preventivo_preview.png");
-
-  if (mediaId) {
-    const res = await fetch(`https://graph.facebook.com/v20.0/${WA_PHONE_ID}/messages`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to,
-        type: "image",
-        image: { id: mediaId, caption },
-      }),
-    });
-    if (res.ok) { recordWhatsappUsageFromContext(); return; }
-    logger.error({ err: await res.text(), to }, "WhatsApp image send (media-id) failed — trying link fallback");
-  }
-
-  // Fallback: Object Storage presigned URL
-  let subPath: string | null = null;
-  try {
-    subPath = `whatsapp-previews/${randomUUID()}.png`;
-    await objectStorage.uploadObjectBuffer({ subPath, buffer: imageBuffer, contentType: "image/png" });
-    const presignedUrl = await objectStorage.getPresignedGetURL(subPath, 3600);
-    const res = await fetch(`https://graph.facebook.com/v20.0/${WA_PHONE_ID}/messages`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to,
-        type: "image",
-        image: { link: presignedUrl, caption },
-      }),
-    });
-    if (!res.ok) {
-      logger.error({ err: await res.text(), to }, "WhatsApp image send (link fallback) failed");
-    } else {
-      recordWhatsappUsageFromContext();
-      void objectStorage.deleteObjectBuffer(subPath).catch(e => logger.warn({ e, subPath }, "Image cleanup failed"));
-    }
-  } catch (err) {
-    logger.error({ err }, "WhatsApp image storage fallback failed");
   }
 }
 
@@ -1196,7 +1147,7 @@ async function finalizeQuote(
   from: string,
   userId: string,
   data: PendingQuoteData,
-  profile: typeof businessProfilesTable.$inferSelect,
+  _profile: typeof businessProfilesTable.$inferSelect,
 ) {
   await sendWhatsappText(from, "⏳ Saving the quote and generating the PDF...");
 

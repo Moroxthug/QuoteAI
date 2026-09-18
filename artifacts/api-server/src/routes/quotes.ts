@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
 import multer from "multer";
-import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, quoteChapterSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
+import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { eq, desc, count, sum, sql, and, avg, isNull } from "drizzle-orm";
@@ -16,8 +16,7 @@ import {
 } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
-import type { QuoteChapter, QuoteChapterItem, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData, QuoteItem } from "@workspace/db";
-import { logger } from "../lib/logger.js";
+import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData, QuoteItem } from "@workspace/db";
 import pdfmake from "pdfmake";
 import type { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 import {
@@ -795,7 +794,7 @@ Write all output text in English.`
       // one produced by Italian computo-metrico software. The AI summarizes C/D/E chapters; we don't.
       req.log.info({ userId, totalVoci: numberedData.totalVoci, targetTotalEur }, "Numbered computo: bypassing AI, using actual prices from document");
 
-      const chaptersRaw = numberedData.sections.map((s, idx) => {
+      const chaptersRaw = numberedData.sections.map((s) => {
         const voci = s.voci.map(v => {
           // Use actual price from the document; fall back to estimation only if missing
           let pu = v.prezzoUnitario;
@@ -3427,7 +3426,7 @@ async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: ProfileRow)
       // Acceptance signature section
       ...signatureSection,
     ],
-    footer: (currentPage: number, _pageCount: number): Content => ({
+    footer: (_currentPage: number, _pageCount: number): Content => ({
       margin: [40, 0, 40, 14] as [number, number, number, number],
       columns: [
         {
@@ -3785,7 +3784,7 @@ async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRow, with
 
       ...signatureSection,
     ],
-    footer: (currentPage: number, _pageCount: number): Content => ({
+    footer: (_currentPage: number, _pageCount: number): Content => ({
       margin: [40, 0, 40, 14] as [number, number, number, number],
       columns: [
         {

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import multer from "multer";
-import { db, businessProfilesTable, normalizeProvince, getTaxProfile, paymentScheduleSchema, DEFAULT_AUTOMATION_SETTINGS, PLAN_FEATURES, effectivePlan, hasFeature, PRODUCT_FEATURES, type BusinessProfile } from "@workspace/db";
+import { db, businessProfilesTable, normalizeProvince, getTaxProfile, paymentScheduleSchema, DEFAULT_AUTOMATION_SETTINGS, effectivePlan, hasFeature, PRODUCT_FEATURES, type BusinessProfile } from "@workspace/db";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { UpdateBusinessProfileBody } from "@workspace/api-zod";

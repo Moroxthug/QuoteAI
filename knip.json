@@ -1,0 +1,70 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": [
+    "lib/integrations/**",
+    "lib/integrations-openai-ai-react/src/audio/audio-playback-worklet.js"
+  ],
+  "ignoreDependencies": [
+    "prettier",
+    "pdfkit",
+    "pdf-parse",
+    "mammoth",
+    "xlsx",
+    "@google/genai",
+    "@types/react-dom",
+    "@types/pdf-parse"
+  ],
+  "ignoreBinaries": [
+    "ffmpeg"
+  ],
+  "rules": {
+    "exports": "warn",
+    "types": "warn",
+    "nsExports": "warn",
+    "nsTypes": "warn",
+    "enumMembers": "warn",
+    "duplicates": "warn",
+    "catalog": "warn"
+  },
+  "workspaces": {
+    ".": {
+      "entry": [
+        "eslint.config.mjs",
+        "api/index.js"
+      ]
+    },
+    "artifacts/api-server": {
+      "entry": [
+        "src/index.ts",
+        "src/app.ts",
+        "build.mjs",
+        "src/**/*.test.ts",
+        "src/e2e/**"
+      ]
+    },
+    "artifacts/quote-ai": {
+      "entry": [
+        "src/main.tsx",
+        "index.html",
+        "scripts/*.ts",
+        "server/*.mjs",
+        "vite.config.ts"
+      ]
+    },
+    "lib/*": {
+      "entry": [
+        "src/index.ts"
+      ]
+    },
+    "scripts": {
+      "entry": [
+        "src/*.ts"
+      ]
+    },
+    "lib/api-spec": {
+      "entry": [
+        "orval.config.ts"
+      ]
+    }
+  }
+}

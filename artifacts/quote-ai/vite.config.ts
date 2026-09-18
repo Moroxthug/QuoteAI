@@ -26,19 +26,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (
-            id.includes("recharts") ||
-            id.includes("d3-") ||
-            id.includes("victory") ||
-            id.includes("/pages/dashboard/") ||
-            id.includes("DashboardLayout") ||
-            id.includes("dashboard-layout")
-          ) {
-            return "dashboard";
-          }
-          if (id.includes("/pages/seo/") || id.includes("seo-data") || id.includes("seo-render-engine")) {
-            return "seo";
-          }
+          // Only long-lived vendor libraries are grouped by hand (cache stability).
+          // recharts is deliberately NOT grouped: a manual chunk drags its whole
+          // dependency tree in and every page chunk ended up importing it. Grouping app pages into a
+          // manual chunk made Rollup pull every shared module those pages touch
+          // (ui/*, hooks, the auth client) into that chunk, so the public entry
+          // ended up statically importing — and modulepreloading — the whole
+          // 1.5 MB dashboard bundle on the marketing homepage (Phase 61).
+          // Lazy routes now split naturally, one chunk per page.
           if (id.includes("node_modules/lucide-react")) {
             return "vendor-icons";
           }

@@ -474,7 +474,7 @@ router.get("/team/payroll-summary.csv", requireAuth, async (req, res) => {
     for (const [wid, t] of totals) lines.push([names.worker.get(wid) ?? "", wtype.get(wid) ?? "", "", "", t.hours.toFixed(2), "", money(t.gross), "", money(t.burden), money(t.total), ""].map(esc).join(","));
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="payroll-summary-${q.data.from}-${q.data.to}.csv"`);
-    res.send(`﻿${lines.join("\r\n")}`);
+    res.send(`\uFEFF${lines.join("\r\n")}`);
   } catch (err) {
     req.log.error({ err }, "Error exporting payroll summary");
     res.status(500).json({ error: "Internal server error" });

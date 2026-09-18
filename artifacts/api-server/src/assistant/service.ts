@@ -137,7 +137,7 @@ export async function runAssistantTurn(params: { conversation: AssistantConversa
     messages.push({ role: "assistant", content: choice.content ?? null, tool_calls: calls.map((c) => ({ id: c.id, type: "function" as const, function: { name: c.function.name, arguments: c.function.arguments } })) });
 
     for (const call of calls) {
-      let args: unknown = {};
+      let args: unknown;
       try { args = call.function.arguments ? JSON.parse(call.function.arguments) : {}; } catch { args = {}; }
       let result: unknown;
       const kind = PROPOSAL_TOOLS[call.function.name];

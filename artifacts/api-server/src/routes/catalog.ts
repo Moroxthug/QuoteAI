@@ -1,11 +1,9 @@
 import { Router } from "express";
 import multer from "multer";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
-import type { Response } from "express";
 import { db, priceCatalogItemsTable, quotesTable } from "@workspace/db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import type { QuoteChapter } from "@workspace/db";
-import { logger } from "../lib/logger.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 import { userRateLimiter } from "../lib/rateLimit.js";

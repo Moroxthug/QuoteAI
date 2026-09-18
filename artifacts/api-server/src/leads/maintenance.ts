@@ -1,5 +1,5 @@
 import { db, leadsTable } from "@workspace/db";
-import { and, eq, inArray, isNull, lte } from "drizzle-orm";
+import { and, inArray, isNull, lte } from "drizzle-orm";
 import { raiseAutomation } from "../lib/automation.js";
 
 // ── Daily lead follow-up scan (cron) ────────────────────────────────────────

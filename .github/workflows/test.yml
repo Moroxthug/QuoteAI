@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # lib/db/drizzle.config.ts refuses to load without a DATABASE_URL; the
+      # static checks below never open a connection, so any placeholder works.
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -16,11 +20,14 @@ jobs:
           node-version: 20
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run test
-      # `pnpm run typecheck` at the repo root is intentionally not run here yet:
-      # lib/api-zod's generated client fails `tsc --build` on a pre-existing
-      # zod v3-vs-v4 mismatch (orval emits v4-only APIs against the v3.25 the
-      # repo pins) unrelated to any app code, so it would fail every PR. Once
-      # that's resolved, add `pnpm run typecheck` as a second step here.
-      - run: pnpm --filter @workspace/api-server run typecheck
-      - run: pnpm --filter @workspace/quote-ai run typecheck
+      # Phase 61 (docs/QA-VERIFICATION-PLAN.md): the full static toolchain.
+      - name: Typecheck (root — libs + both apps + scripts)
+        run: pnpm run typecheck
+      - name: Lint
+        run: pnpm run lint
+      - name: Dead code (knip)
+        run: pnpm run knip
+      - name: Unit tests
+        run: pnpm run test
+      - name: Build
+        run: pnpm -r --if-present run build

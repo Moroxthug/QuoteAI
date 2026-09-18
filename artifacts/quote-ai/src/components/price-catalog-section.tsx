@@ -244,7 +244,7 @@ export function PriceCatalogSection() {
         }
 
         setCsvPreview(parsedItems);
-      } catch (err) {
+      } catch {
         setCsvError(t("catalog.csv.errorReadingFile"));
       }
     };

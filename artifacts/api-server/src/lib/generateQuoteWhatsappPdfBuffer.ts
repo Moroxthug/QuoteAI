@@ -383,7 +383,7 @@ export async function generateQuoteWhatsappPdfBuffer(quote: QuoteRow, profile: P
 
       ...signatureSection,
     ],
-    footer: (currentPage: number, _pageCount: number): Content => ({
+    footer: (_currentPage: number, _pageCount: number): Content => ({
       margin: [40, 0, 40, 14] as [number, number, number, number],
       columns: [
         {

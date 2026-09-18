@@ -57,7 +57,6 @@ const BlogArticlePage = lazy(() => import("@/pages/blog/[slug]"));
 const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
 
 import { PublicLayout } from "@/components/layout/public-layout";
-import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
@@ -96,6 +95,20 @@ function OnboardingGuard({ children }: { children: React.ReactNode }) {
 
 function DashSuspense({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={null}>{children}</Suspense>;
+}
+
+// Lazy so the dashboard chunk is not a static dependency of the public entry:
+// a static import here would make Vite modulepreload the whole dashboard
+// bundle on the marketing homepage (Phase 61 finding).
+const DashboardLayoutLazy = lazy(() =>
+  import("@/components/layout/dashboard-layout").then((m) => ({ default: m.DashboardLayout })),
+);
+function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <DashboardLayoutLazy>{children}</DashboardLayoutLazy>
+    </Suspense>
+  );
 }
 
 function Router() {

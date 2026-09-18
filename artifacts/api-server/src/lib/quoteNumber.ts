@@ -1,5 +1,5 @@
 import { db, quotesTable } from "@workspace/db";
-import { eq, count, sql } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 
 /**
  * Generates the next progressive quote number for a user.

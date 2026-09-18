@@ -3,16 +3,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import {
   Users, TrendingUp, FileText, DollarSign, ToggleLeft, ToggleRight,
-  RefreshCw, ArrowLeft, Crown, Zap, Calendar, BarChart3,
+  RefreshCw, ArrowLeft, Crown, Zap, BarChart3,
   ChevronUp, ChevronDown, Minus, Search, Settings, ShieldAlert,
-  Sparkles, CheckCircle2, AlertTriangle, PlayCircle, Activity,
-  Globe, Search as SearchIcon, Award, HeartHandshake, Eye,
-  MessageSquare, Bot, Send, X, Mail
+  Sparkles, CheckCircle2, AlertTriangle, Activity,
+  Globe, Award, HeartHandshake, Eye,
+  MessageSquare, Bot, Send, Mail
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip,
-  ResponsiveContainer, AreaChart, Area, BarChart, Bar, Legend
+  ResponsiveContainer, AreaChart, Area
 } from "recharts";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -229,7 +229,6 @@ export default function AdminPage() {
   const [selectedConvId, setSelectedConvId] = useState<number | null>(null);
   const [convMessages, setConvMessages] = useState<any[]>([]);
   const [adminReply, setAdminReply] = useState("");
-  const [supportLoading, setSupportLoading] = useState(false);
 
   // Client monitoring / widget control state
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
@@ -258,7 +257,7 @@ export default function AdminPage() {
     try {
       const data = await authFetch("/api/admin/margin?days=30");
       setMarginRows((data as { rows: MarginRow[] }).rows ?? []);
-    } catch (e) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: "Failed to load margin data" });
     } finally {
       setMarginLoading(false);
@@ -270,7 +269,7 @@ export default function AdminPage() {
     try {
       const data = await authFetch("/api/admin/widget/stats");
       setWidgetStats(data);
-    } catch (e) {
+    } catch {
       toast({
         variant: "destructive",
         title: t("admin.error"),
@@ -290,7 +289,7 @@ export default function AdminPage() {
     try {
       const res = await authFetch("/api/admin/email-events");
       if (res.success) setEmailEvents(res.events || []);
-    } catch (e: any) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadEmailEvents") });
     } finally {
       setLoadingEmailEvents(false);
@@ -471,7 +470,7 @@ export default function AdminPage() {
       });
       setAdminOnline(newStatus);
       toast({ title: t("admin.operatorStatusUpdated"), description: (newStatus ? t("admin.nowOnlineForSupport") : t("admin.nowOfflineForSupport")) });
-    } catch (e) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorUpdateStatus") });
     }
   }
@@ -554,7 +553,7 @@ export default function AdminPage() {
     try {
       const u = await authFetch("/api/admin/users");
       setUsers(u as AdminUser[]);
-    } catch (e: any) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadUsers") });
     } finally {
       setLoading(false);
@@ -566,7 +565,7 @@ export default function AdminPage() {
     try {
       const data = await authFetch(`/api/admin/users/${targetUserId}/quotes`);
       setClientQuotes(data);
-    } catch (e) {
+    } catch {
       toast({
         variant: "destructive",
         title: t("admin.error"),
@@ -599,7 +598,7 @@ export default function AdminPage() {
         toast({ title: t("admin.apiKeyUpdated"), description: t("admin.apiKeyUpdatedDesc") });
         loadUsers();
       }
-    } catch (e) {
+    } catch {
       toast({
         variant: "destructive",
         title: t("admin.error"),
@@ -617,7 +616,7 @@ export default function AdminPage() {
       setGscSummary(res.summary);
       setGscKeywords(res.keywords);
       setGscTrends(res.trends);
-    } catch (e: any) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorLoadSearchConsole") });
     } finally {
       setGscLoading(false);
@@ -632,7 +631,7 @@ export default function AdminPage() {
       const res = await authFetch("/api/admin/seo-audit");
       setSeoResult(res);
       toast({ title: t("admin.scanComplete"), description: t("admin.scanCompleteDesc") });
-    } catch (e: any) {
+    } catch {
       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorSeoAudit") });
     } finally {
       setSeoScanning(false);
@@ -2156,7 +2155,7 @@ export default function AdminPage() {
                                       await authFetch(`/api/support/conversations/${selectedConvId}/join`, { method: "POST" });
                                       loadSupportConvs();
                                       toast({ title: t("admin.chatTakenOver"), description: t("admin.chatTakenOverDesc") });
-                                    } catch (e) {
+                                    } catch {
                                       toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorTakeOverChat") });
                                     }
                                   }}
@@ -2173,7 +2172,7 @@ export default function AdminPage() {
                                         await authFetch(`/api/support/conversations/${selectedConvId}/close`, { method: "POST" });
                                         loadSupportConvs();
                                         toast({ title: t("admin.chatClosed"), description: t("admin.chatClosedDesc") });
-                                      } catch (e) {
+                                      } catch {
                                         toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorCloseChat") });
                                       }
                                     }
@@ -2240,7 +2239,7 @@ export default function AdminPage() {
                                   // Refresh messages
                                   const msgs = await authFetch(`/api/support/conversations/${selectedConvId}/messages`);
                                   setConvMessages(msgs);
-                                } catch (err) {
+                                } catch {
                                   toast({ variant: "destructive", title: t("admin.error"), description: t("admin.errorSendMessage") });
                                 }
                               }}

@@ -147,7 +147,7 @@ app.post(
       const isActive = status === "active" || status === "trialing";
 
       // 1. Look up by stripeCustomerId already in DB
-      let [existing] = await db
+      const [existing] = await db
         .select({ userId: businessProfilesTable.userId })
         .from(businessProfilesTable)
         .where(eq(businessProfilesTable.stripeCustomerId, customerId));

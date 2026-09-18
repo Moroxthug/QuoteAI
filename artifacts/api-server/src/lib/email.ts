@@ -521,7 +521,7 @@ export async function sendQuotePdfEmail(params: {
     logger.info({ to: params.toEmail, quoteNumber: params.quoteNumber }, "Quote PDF email sent");
   } catch (err) {
     logger.error({ err }, "Failed to send quote PDF email");
-    throw new Error("Failed to send the quote email");
+    throw new Error("Failed to send the quote email", { cause: err });
   }
 }
 
@@ -541,7 +541,7 @@ export async function sendWidgetLeadNotification(params: {
     logger.warn("RESEND_API_KEY not set — skipping widget lead notification email");
     return;
   }
-  const { toEmail, companyName, clientName, clientEmail, clientPhone, rawInput, totale, prezzoMinimo, prezzoMassimo } = params;
+  const { toEmail, clientName, clientEmail, clientPhone, rawInput, totale, prezzoMinimo, prezzoMassimo } = params;
   const safeClientName = escapeHtml(clientName);
   const safeClientEmail = escapeHtml(clientEmail);
   const safeClientPhone = escapeHtml(clientPhone);

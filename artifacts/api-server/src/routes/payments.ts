@@ -7,7 +7,6 @@ import { eq, sql } from "drizzle-orm";
 import { CreateCheckoutSessionBody } from "@workspace/api-zod";
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import Stripe from "stripe";
 
 const TRIAL_DAYS = 7;
 const TRIAL_DOWNLOAD_LIMIT = 3;

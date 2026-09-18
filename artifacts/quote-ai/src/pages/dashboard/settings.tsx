@@ -75,10 +75,10 @@ function AccountTab() {
     try {
       const res = await fetch("/api/business-profile/apikey", { method: "POST" });
       if (!res.ok) throw new Error(t("dashboard.settings.account.apiKeyGenFailed"));
-      const data = await res.json() as { apiKey: string };
+      await res.json();
       queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey() });
       toast({ title: t("dashboard.settings.account.apiKeyGenerated") });
-    } catch (err) {
+    } catch {
       toast({ title: t("dashboard.settings.account.apiKeyGenError"), variant: "destructive" });
     } finally {
       setGeneratingKey(false);

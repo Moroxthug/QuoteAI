@@ -116,7 +116,9 @@ if (!existsSync(distDir)) {
 
 console.log(`\nScanning HTML files in ${distDir}…`);
 
-const allFiles = collectHtmlFiles(distDir);
+// dist/index.html and dist/fr/index.html are the SPA shell (SEO head only, empty #root by design — see prerender-seo.ts)
+const SPA_SHELLS = new Set([join(distDir, "index.html"), join(distDir, "fr", "index.html")]);
+const allFiles = collectHtmlFiles(distDir).filter((f) => !SPA_SHELLS.has(f));
 if (allFiles.length === 0) {
   console.error("✗ No index.html files found in dist/public");
   process.exit(1);

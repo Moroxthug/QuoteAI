@@ -24,6 +24,8 @@ for (const region of REGION_NAMES_SORTED) {
   CITIES_BY_REGION[region].sort((a, b) => a.name.localeCompare(b.name, "en-CA"));
 }
 
+const FI_COLORS = ["g", "t", "p"] as const;
+
 function ExcelWordComparisonBlock({ tool }: { tool: "Excel" | "Word" }) {
   const { t } = useLanguage();
   const rows = tool === "Excel"
@@ -49,43 +51,47 @@ function ExcelWordComparisonBlock({ tool }: { tool: "Excel" | "Word" }) {
       ];
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {t("seo.compare.headingPrefix").replace("{tool}", tool)} <span className="gradient-text">quoteai</span>: {t("seo.compare.headingSuffix")}
+    <section className="sec soft">
+      <div className="wrap" style={{ maxWidth: 760 }}>
+        <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+          <span className="eyebrow grey">{t("seo.compare.headingPrefix").replace("{tool}", tool)}</span>
+          <h2 className="h2">
+            quoteai {t("seo.compare.headingSuffix")}
           </h2>
-          <p className="text-gray-500 mt-3 text-base">{t("seo.compare.subtitle").replace("{tool}", tool)}</p>
+          <p className="lead" style={{ margin: "0 auto" }}>{t("seo.compare.subtitle").replace("{tool}", tool)}</p>
         </div>
-        <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-          <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-100">
-            <div className="py-3 px-5 text-sm font-semibold text-gray-500">{t("seo.compare.featureCol")}</div>
-            <div className="py-3 px-5 text-sm font-semibold text-gray-600 text-center border-l border-gray-100">{t("seo.compare.templateCol").replace("{tool}", tool)}</div>
-            <div className="py-3 px-5 text-sm font-semibold text-center border-l border-gray-100" style={{ color: "#7C3AED" }}>quoteai AI</div>
-          </div>
-          {rows.map((r, i) => (
-            <div key={i} className={`grid grid-cols-3 border-b border-gray-50 ${i % 2 === 0 ? "bg-white" : "bg-gray-50/40"}`}>
-              <div className="py-3.5 px-5 text-sm text-gray-700 flex items-center">{r.label}</div>
-              <div className="py-3.5 px-5 flex items-center justify-center border-l border-gray-100">
-                {r.old
-                  ? <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  : <X className="h-5 w-5 text-red-300" />}
-              </div>
-              <div className="py-3.5 px-5 flex items-center justify-center border-l border-gray-100">
-                {r.new
-                  ? <CheckCircle2 className="h-5 w-5 text-navy-500" />
-                  : <X className="h-5 w-5 text-red-300" />}
-              </div>
-            </div>
-          ))}
+        <div className="card cmp-wrap">
+          <table className="cmp">
+            <thead>
+              <tr>
+                <th>{t("seo.compare.featureCol")}</th>
+                <th>{t("seo.compare.templateCol").replace("{tool}", tool)}</th>
+                <th className="q">quoteai AI</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.label}>
+                  <td>{r.label}</td>
+                  <td style={{ textAlign: "center" }}>
+                    {r.old
+                      ? <CheckCircle2 className="h-4 w-4" style={{ color: "var(--green)", display: "inline-block" }} />
+                      : <X className="h-4 w-4" style={{ color: "var(--red)", display: "inline-block" }} />}
+                  </td>
+                  <td className="q" style={{ textAlign: "center" }}>
+                    {r.new
+                      ? <CheckCircle2 className="h-4 w-4" style={{ color: "var(--green-dark)", display: "inline-block" }} />
+                      : <X className="h-4 w-4" style={{ color: "var(--red)", display: "inline-block" }} />}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <div className="mt-8 text-center">
-          <Link
-            href="/sign-up/"
-            className="btn-gradient inline-flex h-12 items-center justify-center px-8 text-base font-semibold"
-          >
+        <div className="cmp-cta">
+          <Link href="/sign-up/" className="btn btn-navy">
             {t("seo.compare.cta")}
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="chev h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -104,28 +110,19 @@ function ComeFareGuideBlock() {
   ];
 
   return (
-    <section className="py-20 bg-gray-50/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {t("seo.guide.heading")}
-          </h2>
-          <p className="text-gray-500 mt-3 text-base">{t("seo.guide.subtitle")}</p>
+    <section className="sec">
+      <div className="wrap" style={{ maxWidth: 760 }}>
+        <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+          <h2 className="h2">{t("seo.guide.heading")}</h2>
+          <p className="lead" style={{ margin: "0 auto" }}>{t("seo.guide.subtitle")}</p>
         </div>
-        <div className="space-y-6">
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {steps.map((s) => (
-            <div key={s.n} className="bg-white rounded-2xl p-6 card-soft">
-              <div className="flex items-start gap-4">
-                <div
-                  className="h-9 w-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 mt-0.5"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}
-                >
-                  {s.n}
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 mb-2">{s.h}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{s.body}</p>
-                </div>
+            <div key={s.n} className="card" style={{ padding: 22, display: "flex", gap: 16, alignItems: "flex-start" }}>
+              <span style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--navy)", color: "#fff", fontSize: 14, fontWeight: 800, display: "grid", placeItems: "center", flexShrink: 0 }}>{s.n}</span>
+              <div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>{s.h}</h3>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{s.body}</p>
               </div>
             </div>
           ))}
@@ -189,54 +186,55 @@ function PreventiviGratisPlansBlock() {
   ];
 
   return (
-    <section className="py-20 bg-gray-50/60">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {t("seo.plans.heading")}
-          </h2>
-          <p className="text-gray-500 mt-3 text-base">{t("seo.plans.subtitle")}</p>
+    <section className="sec soft">
+      <div className="wrap" style={{ maxWidth: 980 }}>
+        <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+          <h2 className="h2">{t("seo.plans.heading")}</h2>
+          <p className="lead" style={{ margin: "0 auto" }}>{t("seo.plans.subtitle")}</p>
         </div>
         <div className="grid md:grid-cols-3 gap-5">
           {plans.map((p) => (
             <div
               key={p.name}
-              className={`relative rounded-2xl p-6 flex flex-col ${p.highlight ? "shadow-lg border-2 border-navy-400 bg-white" : "border border-gray-100 bg-white card-soft"}`}
+              className="card"
+              style={{
+                position: "relative",
+                padding: 26,
+                display: "flex",
+                flexDirection: "column",
+                borderColor: p.highlight ? "var(--navy)" : undefined,
+                borderWidth: p.highlight ? 2 : undefined,
+                boxShadow: p.highlight ? "var(--shadow-card)" : undefined,
+              }}
             >
               {p.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white"
-                    style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}>
-                    {p.badge}
-                  </span>
-                </div>
+                <span className="chip chip-new" style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)" }}>
+                  {p.badge}
+                </span>
               )}
-              <div className="mb-5">
-                <h3 className="text-base font-semibold text-gray-900 mb-1">{p.name}</h3>
-                <div className="flex items-baseline gap-0.5">
-                  <span className="text-3xl font-extrabold text-gray-900">{p.price}</span>
-                  <span className="text-sm text-gray-500">{p.period}</span>
+              <div style={{ marginBottom: 20 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)", marginBottom: 4 }}>{p.name}</h3>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 2 }}>
+                  <span style={{ fontSize: 30, fontWeight: 800, color: "var(--navy)" }}>{p.price}</span>
+                  <span style={{ fontSize: 14, color: "var(--muted-mk)" }}>{p.period}</span>
                 </div>
               </div>
-              <ul className="space-y-2.5 mb-6 flex-1">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, flex: 1 }}>
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-navy-500 shrink-0" />
+                  <li key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, color: "var(--muted-mk)" }}>
+                    <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--green)" }} />
                     {f}
                   </li>
                 ))}
               </ul>
-              <Link
-                href={p.href}
-                className={`inline-flex h-10 items-center justify-center px-5 rounded-lg text-sm font-semibold transition-colors ${p.highlight ? "btn-gradient" : "btn-gradient-outline"}`}
-              >
+              <Link href={p.href} className={`btn btn-sm ${p.highlight ? "btn-navy" : "btn-outline-navy"}`}>
                 {p.cta}
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                <ArrowRight className="chev h-4 w-4" />
               </Link>
             </div>
           ))}
         </div>
-        <p className="text-center text-sm text-gray-400 mt-6">{t("seo.plans.footerNote")}</p>
+        <p style={{ textAlign: "center", fontSize: 13, color: "var(--faint)", marginTop: 24 }}>{t("seo.plans.footerNote")}</p>
       </div>
     </section>
   );
@@ -276,7 +274,6 @@ export default function SeoLanding() {
   const label = isFr ? s.fr.label : s.label;
 
   const canonical = `https://quoteai.ca${base}/${sSlugForLang}/`;
-  const enCanonical = `https://quoteai.ca/quotes/${s.slug}/`;
   const frCanonical = `https://quoteai.ca/fr/soumissions/${s.frSlug}/`;
   const jsonLd = [
     {
@@ -324,71 +321,58 @@ export default function SeoLanding() {
         lang={engineLang}
         frCanonical={frCanonical}
       />
+
+      <div className="wrap">
+        <nav aria-label={t("seo.city.breadcrumbAria")} className="crumbs">
+          <Link href={isFr ? "/fr" : "/"}>{t("blog.breadcrumbHome")}</Link>
+          <span className="crumb-sep" aria-hidden="true">/</span>
+          <span className="crumb-current" aria-current="page">{h1Highlight}</span>
+        </nav>
+      </div>
+
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white pt-24 pb-20" aria-label="Hero">
-        <div
-          className="absolute inset-0 opacity-30 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.12) 0%, transparent 70%)",
-          }}
-        />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 items-center">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full bg-navy-50 border border-navy-100 px-4 py-1.5 text-sm font-medium text-navy-700 mb-8">
-                <Star className="h-3.5 w-3.5 fill-current" />
-                {t("seo.builtForMarket")}
-              </div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl mb-6 leading-[1.1]">
-                {h1}{" "}
-                <span className="gradient-text">{h1Highlight}</span>
-              </h1>
-              <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                {intro}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link
-                  href="/sign-up/"
-                  className="btn-gradient inline-flex h-14 items-center justify-center px-8 text-lg font-semibold"
-                >
-                  {t("seo.heroCtaPrimary")}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-                <Link
-                  href="#come-funziona"
-                  className="btn-gradient-outline inline-flex h-14 items-center justify-center px-8 text-lg font-semibold"
-                >
-                  {t("seo.heroCtaSecondary")}
-                </Link>
-              </div>
-              <p className="text-sm text-gray-400 mt-5">{t("seo.heroCaption")}</p>
+      <section className="hero on-dark" id="hero">
+        <div className="wrap hero-grid" style={{ padding: "clamp(36px, 5vw, 64px) 0 clamp(64px, 8vw, 96px)" }}>
+          <div>
+            <p className="eyebrow on-dark" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <Star className="h-3.5 w-3.5" style={{ fill: "currentColor" }} />
+              {t("seo.builtForMarket")}
+            </p>
+            <h1>
+              {h1} <em style={{ fontStyle: "normal", color: "#8ef07f" }}>{h1Highlight}</em>
+            </h1>
+            <p className="lead">{intro}</p>
+            <div className="hero-cta">
+              <Link href="/sign-up/" className="btn btn-white">
+                {t("seo.heroCtaPrimary")}
+                <ArrowRight className="chev h-4 w-4" />
+              </Link>
+              <Link href="#how-it-works" className="btn btn-outline-light">
+                {t("seo.heroCtaSecondary")}
+              </Link>
             </div>
-            <div className="hidden lg:block">
-              <QuotePreviewMockup sector={s} />
-            </div>
+            <p className="hero-note">{t("seo.heroCaption")}</p>
+          </div>
+          <div className="hidden lg:block">
+            <QuotePreviewMockup sector={s} />
           </div>
         </div>
       </section>
 
       {/* ── Benefits ─────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-gray-900">{h2Benefits}</h2>
+      <section className="sec soft">
+        <div className="wrap">
+          <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+            <h2 className="h2">{h2Benefits}</h2>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((b) => (
-              <div key={b.title} className="card-soft bg-white p-7 rounded-2xl flex flex-col">
-                <div
-                  className="h-10 w-10 rounded-xl flex items-center justify-center mb-5 text-white shrink-0"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}
-                >
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {benefits.map((b, i) => (
+              <div key={b.title} className="dd-feat" style={{ flexDirection: "column", alignItems: "flex-start" }}>
+                <span className={`fi ${FI_COLORS[i % FI_COLORS.length]}`}>
                   <CheckCircle2 className="h-5 w-5" />
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{b.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{b.desc}</p>
+                </span>
+                <b>{b.title}</b>
+                <p>{b.desc}</p>
               </div>
             ))}
           </div>
@@ -396,22 +380,17 @@ export default function SeoLanding() {
       </section>
 
       {/* ── How it works ─────────────────────────────────── */}
-      <section id="come-funziona" className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-gray-900">{h2HowItWorks}</h2>
+      <section id="how-it-works" className="sec">
+        <div className="wrap" style={{ maxWidth: 960 }}>
+          <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+            <h2 className="h2">{h2HowItWorks}</h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="steps3">
             {howItWorks.map((step, i) => (
-              <div key={i} className="relative">
-                <div
-                  className="h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-5"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}
-                >
-                  {i + 1}
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{step.step}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              <div key={i} className="step">
+                <span className="n">{i + 1}</span>
+                <b>{step.step}</b>
+                <p>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -419,16 +398,16 @@ export default function SeoLanding() {
       </section>
 
       {/* ── Use cases ────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">{h2UseCases}</h2>
+      <section className="sec soft">
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+            <h2 className="h2">{h2UseCases}</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {useCases.map((uc) => (
-              <div key={uc} className="flex items-center gap-3 bg-white rounded-xl px-5 py-3.5 card-soft">
-                <CheckCircle2 className="h-4 w-4 text-navy-500 shrink-0" />
-                <span className="text-sm text-gray-700">{uc}</span>
+              <div key={uc} className="card" style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 18px" }}>
+                <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--green)" }} />
+                <span style={{ fontSize: 14, color: "var(--ink)" }}>{uc}</span>
               </div>
             ))}
           </div>
@@ -442,37 +421,31 @@ export default function SeoLanding() {
       {slug === "free-quote" && <PreventiviGratisPlansBlock />}
 
       {/* ── "Built for the Canadian market" ──────────────── */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="rounded-2xl p-10 md:p-14 relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06))" }}>
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="h-10 w-10 rounded-xl flex items-center justify-center text-white shrink-0"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}>
-                  <Building2 className="h-5 w-5" />
+      <section className="sec">
+        <div className="wrap" style={{ maxWidth: 980 }}>
+          <div className="card" style={{ padding: "clamp(28px, 4vw, 48px)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
+              <span className="fi p"><Building2 className="h-5 w-5" /></span>
+              <h2 className="h2" style={{ fontSize: 22 }}>{t("seo.builtForMarket")}</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div>
+                <div style={{ fontWeight: 700, color: "var(--navy)", marginBottom: 6, display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                  <TrendingUp className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("seo.marketSection.taxTitle")}
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">{t("seo.builtForMarket")}</h2>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{t("seo.marketSection.taxBody")}</p>
               </div>
-              <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-600 leading-relaxed">
-                <div>
-                  <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.taxTitle")}
-                  </div>
-                  <p>{t("seo.marketSection.taxBody")}</p>
+              <div>
+                <div style={{ fontWeight: 700, color: "var(--navy)", marginBottom: 6, display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                  <Shield className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("seo.marketSection.businessTitle")}
                 </div>
-                <div>
-                  <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.businessTitle")}
-                  </div>
-                  <p>{t("seo.marketSection.businessBody")}</p>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{t("seo.marketSection.businessBody")}</p>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, color: "var(--navy)", marginBottom: 6, display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                  <FileText className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("seo.marketSection.lexiconTitle")}
                 </div>
-                <div>
-                  <div className="font-semibold text-gray-900 mb-1.5 flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-navy-500" /> {t("seo.marketSection.lexiconTitle")}
-                  </div>
-                  <p>{t("seo.marketSection.lexiconBody")}</p>
-                </div>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{t("seo.marketSection.lexiconBody")}</p>
               </div>
             </div>
           </div>
@@ -480,16 +453,16 @@ export default function SeoLanding() {
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────── */}
-      <section className="py-20 bg-gray-50/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">{h2Faq}</h2>
+      <section className="sec soft">
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+            <h2 className="h2">{h2Faq}</h2>
           </div>
-          <div className="space-y-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {faq.map((f) => (
-              <div key={f.q} className="bg-white rounded-2xl p-6 card-soft">
-                <h3 className="text-base font-semibold text-gray-900 mb-2">{f.q}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{f.a}</p>
+              <div key={f.q} className="card" style={{ padding: 22 }}>
+                <h3 style={{ fontSize: 15.5, fontWeight: 700, color: "var(--navy)", marginBottom: 8 }}>{f.q}</h3>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{f.a}</p>
               </div>
             ))}
           </div>
@@ -498,27 +471,24 @@ export default function SeoLanding() {
 
       {/* ── Quotes in major cities ─────────────────────────── */}
       {CITY_SECTORS.includes(slug) && TIER1_CITIES.length > 0 && (
-        <section className="py-16 bg-gray-50/60">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900">
+        <section className="sec">
+          <div className="wrap" style={{ maxWidth: 980 }}>
+            <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+              <h2 className="h2" style={{ fontSize: 26 }}>
                 {t("seo.cityHub.heading").replace("{trade}", labelPlural)}
               </h2>
-              <p className="text-sm text-gray-500 mt-2">
-                {t("seo.cityHub.subtitle")}
-              </p>
+              <p className="lead" style={{ margin: "0 auto" }}>{t("seo.cityHub.subtitle")}</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {TIER1_CITIES.map((city) => (
                 <Link
                   key={city.slug}
                   href={`${base}/${sSlugForLang}/${city.slug}/`}
-                  className="flex items-center gap-2.5 bg-white hover:bg-navy-50 border border-gray-100 hover:border-navy-200 rounded-xl px-4 py-3 transition-colors group"
+                  className="card"
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", fontSize: 14, fontWeight: 600, color: "var(--ink)" }}
                 >
-                  <MapPin className="h-3.5 w-3.5 text-navy-400 group-hover:text-navy-600 shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-navy-700 truncate">
-                    {city.name}
-                  </span>
+                  <MapPin className="h-4 w-4 shrink-0" style={{ color: "var(--navy)" }} />
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{city.name}</span>
                 </Link>
               ))}
             </div>
@@ -528,34 +498,31 @@ export default function SeoLanding() {
 
       {/* ── All cities (internal links for indexing) ──────── */}
       {CITY_SECTORS.includes(slug) && (
-        <section className="py-16 bg-white border-t border-gray-100">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-            <div className="text-center mb-8">
-              <h2 className="text-xl font-bold text-gray-900">
+        <section className="sec soft">
+          <div className="wrap" style={{ maxWidth: 1080 }}>
+            <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+              <h2 className="h2" style={{ fontSize: 22 }}>
                 {t("seo.allCities.heading").replace("{trade}", labelPlural)}
               </h2>
-              <p className="text-sm text-gray-500 mt-2">
-                {t("seo.allCities.subtitle")}
-              </p>
+              <p className="lead" style={{ margin: "0 auto" }}>{t("seo.allCities.subtitle")}</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {REGION_NAMES_SORTED.map((region) => (
                 <div key={region}>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-navy-600 mb-2.5">
+                  <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)", marginBottom: 10 }}>
                     {region}
                   </h3>
-                  <ul className="space-y-1.5">
+                  <div className="blog-links" style={{ flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
                     {CITIES_BY_REGION[region].map((city) => (
-                      <li key={city.slug}>
-                        <Link
-                          href={`${base}/${sSlugForLang}/${city.slug}/`}
-                          className="text-sm text-gray-500 hover:text-navy-600 transition-colors"
-                        >
-                          {label} {city.name}
-                        </Link>
-                      </li>
+                      <Link
+                        key={city.slug}
+                        href={`${base}/${sSlugForLang}/${city.slug}/`}
+                        style={{ fontSize: 14, color: "var(--muted-mk)" }}
+                      >
+                        {label} {city.name}
+                      </Link>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               ))}
             </div>
@@ -564,21 +531,22 @@ export default function SeoLanding() {
       )}
 
       {RELATED_SECTORS[slug] && (
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-            <div className="text-center mb-10">
-              <h2 className="text-2xl font-bold text-gray-900">{t("seo.seeAlso.heading")}</h2>
-              <p className="text-sm text-gray-500 mt-2">{t("seo.seeAlso.subtitle")}</p>
+        <section className="sec">
+          <div className="wrap" style={{ maxWidth: 980 }}>
+            <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+              <h2 className="h2" style={{ fontSize: 24 }}>{t("seo.seeAlso.heading")}</h2>
+              <p className="lead" style={{ margin: "0 auto" }}>{t("seo.seeAlso.subtitle")}</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {RELATED_SECTORS[slug].map((r) => (
                 <Link
                   key={r.slug}
                   href={`${base}/${isFr ? (SECTORS[r.slug]?.frSlug ?? r.slug) : r.slug}/`}
-                  className="flex items-center gap-3 bg-gray-50 hover:bg-navy-50 border border-gray-100 hover:border-navy-200 rounded-xl px-5 py-3.5 transition-colors group"
+                  className="card"
+                  style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 18px", fontSize: 14, fontWeight: 600, color: "var(--ink)" }}
                 >
-                  <ArrowRight className="h-4 w-4 text-navy-400 group-hover:text-navy-600 shrink-0" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-navy-700">{t("seo.quotesForLink")} {isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0" style={{ color: "var(--navy)" }} />
+                  {t("seo.quotesForLink")} {isFr ? (SECTORS[r.slug]?.fr.label ?? r.label) : r.label}
                 </Link>
               ))}
             </div>
@@ -593,36 +561,28 @@ export default function SeoLanding() {
           .filter((a): a is (typeof BLOG_ARTICLES)[number] => a !== undefined);
         if (articles.length === 0) return null;
         return (
-          <section className="py-16 bg-gray-50/60">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="h-9 w-9 rounded-xl flex items-center justify-center text-white shrink-0"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #06B6D4)" }}>
-                  <BookOpen className="h-4.5 w-4.5" />
-                </div>
+          <section className="sec soft">
+            <div className="wrap" style={{ maxWidth: 1080 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
+                <span className="fi g"><BookOpen className="h-4 w-4" /></span>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{t("seo.insights.heading")}</h2>
-                  <p className="text-sm text-gray-500 mt-0.5">{t("seo.insights.subtitlePrefix")} {h1Highlight.toLowerCase()}</p>
+                  <h2 className="h2" style={{ fontSize: 22 }}>{t("seo.insights.heading")}</h2>
+                  <p style={{ fontSize: 13.5, color: "var(--muted-mk)", marginTop: 2 }}>{t("seo.insights.subtitlePrefix")} {h1Highlight.toLowerCase()}</p>
                 </div>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((a) => (
-                  <Link
-                    key={a.slug}
-                    href={`/blog/${a.slug}/`}
-                    className="group flex flex-col bg-white rounded-xl border border-gray-100 hover:border-navy-200 hover:shadow-sm transition-all p-5"
-                  >
-                    <span className="text-xs font-semibold text-navy-600 mb-2">{a.category}</span>
-                    <span className="text-sm font-semibold text-gray-800 group-hover:text-navy-700 transition-colors leading-snug mb-2">
-                      {a.title}
-                    </span>
-                    <span className="text-xs text-gray-400 mt-auto">{a.readingTimeMin} {t("blog.readingTimeSuffix")}</span>
+                  <Link key={a.slug} href={`/blog/${a.slug}/`} className="card" style={{ padding: 20, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <span className="chip chip-teal" style={{ alignSelf: "flex-start" }}>{a.category}</span>
+                    <span style={{ fontSize: 14.5, fontWeight: 700, color: "var(--navy)", lineHeight: 1.4 }}>{a.title}</span>
+                    <span style={{ fontSize: 12.5, color: "var(--faint)", marginTop: "auto" }}>{a.readingTimeMin} {t("blog.readingTimeSuffix")}</span>
                   </Link>
                 ))}
               </div>
-              <div className="mt-6 text-center">
-                <Link href="/blog/" className="text-sm font-medium text-navy-600 hover:text-navy-800 transition-colors">
+              <div style={{ textAlign: "center", marginTop: 28 }}>
+                <Link href="/blog/" className="cta-link" style={{ display: "inline-flex" }}>
                   {t("seo.insights.viewAll")}
+                  <ArrowRight className="chev h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -631,26 +591,26 @@ export default function SeoLanding() {
       })()}
 
       {/* ── Final CTA ────────────────────────────────────── */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-2xl">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Clock className="h-5 w-5 text-navy-500" />
-            <span className="text-sm font-semibold text-navy-600">{t("seo.finalCta.badge")}</span>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <section className="cta on-dark">
+        <div className="cta-bg">
+          <img src={`https://picsum.photos/seed/quoteai-seo-${s.slug}/1800/900`} alt="" aria-hidden="true" loading="lazy" />
+        </div>
+        <div className="wrap cta-in">
+          <span className="eyebrow on-dark" style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+            <Clock className="h-3.5 w-3.5" />
+            {t("seo.finalCta.badge")}
+          </span>
+          <h2>
             {t("seo.finalCta.headingPrefix")}{" "}
-            <span className="gradient-text">{t("seo.finalCta.headingHighlight")}</span>?
+            <em style={{ fontStyle: "normal", color: "#8ef07f" }}>{t("seo.finalCta.headingHighlight")}</em>?
           </h2>
-          <p className="text-lg text-gray-500 mb-10">
-            {t("seo.finalCta.bodyPrefix")} {h1Highlight.toLowerCase()} {t("seo.finalCta.bodySuffix")}
-          </p>
-          <Link
-            href="/sign-up/"
-            className="btn-gradient inline-flex h-14 items-center justify-center px-10 text-lg font-semibold"
-          >
-            {t("blog.ctaButton")}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
+          <p>{t("seo.finalCta.bodyPrefix")} {h1Highlight.toLowerCase()} {t("seo.finalCta.bodySuffix")}</p>
+          <div className="cta-actions">
+            <Link href="/sign-up/" className="btn btn-white">
+              {t("blog.ctaButton")}
+              <ArrowRight className="chev h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </section>
     </div>

@@ -2,9 +2,6 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetQuoteQueryKey } from "@workspace/api-client-react";
 import { CalendarClock, Pencil, Save, X, Loader2, Sparkles } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
@@ -78,77 +75,66 @@ export function PaymentScheduleCard({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <CalendarClock className="h-4 w-4 text-muted-foreground" />
-              {t("paymentSchedule.title")}
-            </CardTitle>
-            <CardDescription className="text-xs mt-1">{t("paymentSchedule.description")}</CardDescription>
-          </div>
-          {!editing && !locked && (
-            <Button variant="ghost" size="sm" className="h-7 px-2 gap-1 text-xs" onClick={startEdit}>
-              <Pencil className="h-3 w-3" /> {t("paymentSchedule.edit")}
-            </Button>
-          )}
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="flex items-center gap-2"><CalendarClock className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("paymentSchedule.title")}</h2>
+          <p className="sub">{t("paymentSchedule.description")}</p>
         </div>
-      </CardHeader>
-      <CardContent className="pt-0 space-y-3">
-        {editing && draft ? (
-          <>
-            <PaymentScheduleEditor value={draft} onChange={setDraft} total={total} />
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setEditing(false)} disabled={saving} className="gap-1">
-                <X className="h-3.5 w-3.5" /> {t("paymentSchedule.cancel")}
-              </Button>
-              <Button size="sm" onClick={save} disabled={saving} className="gap-1">
-                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-                {t("paymentSchedule.save")}
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <ol className="space-y-2">
-              {schedule.terms.map((term, i) => (
-                <li key={term.id} className="flex items-start justify-between gap-3 text-sm">
-                  <div className="flex items-start gap-2 min-w-0">
-                    <span className="h-5 w-5 rounded-full bg-navy-100 text-navy-700 text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                    <div className="min-w-0">
-                      <div className="text-slate-800 font-medium leading-tight truncate">{term.label || t(`paymentSchedule.type.${term.type}`)}</div>
-                      <div className="text-[11px] text-slate-400">
-                        {t(`paymentSchedule.type.${term.type}`)}
-                        {term.dueDays > 0 ? ` · ${t("paymentSchedule.net").replace("{days}", String(term.dueDays))}` : ""}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="font-semibold text-slate-800">{formatCad(paymentTermAmount(term, total))}</div>
-                    {term.amountType === "percent" && <div className="text-[11px] text-slate-400">{term.value}%</div>}
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <div className="flex items-center justify-between pt-2 border-t text-xs">
-              <div className="flex items-center gap-1.5">
-                {schedule.derived ? (
-                  <Badge variant="secondary" className="gap-1 text-[10px] font-medium">
-                    <Sparkles className="h-3 w-3" /> {t("paymentSchedule.derivedBadge")}
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="text-[10px] font-medium">{t("paymentSchedule.customBadge")}</Badge>
-                )}
-                {schedule.holdback.enabled && (
-                  <Badge variant="outline" className="text-[10px] font-medium">{t("paymentSchedule.holdbackBadge").replace("{pct}", String(schedule.holdback.percent))}</Badge>
-                )}
-              </div>
-              <span className="text-slate-500">{t("paymentSchedule.total")}: <strong className="text-slate-800">{formatCad(total)}</strong></span>
-            </div>
-          </>
+        {!editing && !locked && (
+          <button type="button" className="text-link" onClick={startEdit}>
+            <Pencil /> {t("paymentSchedule.edit")}
+          </button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+      {editing && draft ? (
+        <div className="act-body">
+          <PaymentScheduleEditor value={draft} onChange={setDraft} total={total} />
+          <div className="flex justify-end gap-2" style={{ marginTop: 14 }}>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(false)} disabled={saving}>
+              <X className="h-3.5 w-3.5" /> {t("paymentSchedule.cancel")}
+            </button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+              {t("paymentSchedule.save")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div>
+            {schedule.terms.map((term, i) => (
+              <div key={term.id} className="item-row">
+                <span className="ms-num" style={{ width: 26, height: 26, fontSize: 11.5 }}>{i + 1}</span>
+                <div className="grow">
+                  <b className="ttl">{term.label || t(`paymentSchedule.type.${term.type}`)}</b>
+                  <span className="sub">
+                    {t(`paymentSchedule.type.${term.type}`)}
+                    {term.dueDays > 0 ? ` · ${t("paymentSchedule.net").replace("{days}", String(term.dueDays))}` : ""}
+                  </span>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <span className="amt">{formatCad(paymentTermAmount(term, total))}</span>
+                  {term.amountType === "percent" && <span className="sub">{term.value}%</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="card-foot">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {schedule.derived ? (
+                <span className="chip chip-grey"><Sparkles className="h-3 w-3 mr-1" /> {t("paymentSchedule.derivedBadge")}</span>
+              ) : (
+                <span className="chip chip-grey">{t("paymentSchedule.customBadge")}</span>
+              )}
+              {schedule.holdback.enabled && (
+                <span className="chip chip-teal">{t("paymentSchedule.holdbackBadge").replace("{pct}", String(schedule.holdback.percent))}</span>
+              )}
+            </div>
+            <span className="foot-note">{t("paymentSchedule.total")}: <b style={{ color: "var(--navy)" }}>{formatCad(total)}</b></span>
+          </div>
+        </>
+      )}
+    </section>
   );
 }

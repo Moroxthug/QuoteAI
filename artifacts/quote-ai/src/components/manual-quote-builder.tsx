@@ -1,12 +1,9 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Plus, Trash2, ChevronDown, ChevronUp, Sparkles, Loader2,
-  GripVertical, X,
+  GripVertical, X, CheckCircle2, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { useCreateManualQuote, useSuggestItemDescription, useListCatalogItems } from "@workspace/api-client-react";
 import type { CreateManualQuoteBody } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
@@ -151,16 +148,12 @@ function AISuggestButton({
       onClick={handleClick}
       disabled={suggest.isPending}
       title={t("manualQuote.improveWithAi")}
-      className={cn(
-        "shrink-0 h-7 w-7 flex items-center justify-center rounded-lg transition-colors",
-        suggest.isPending
-          ? "bg-navy-100 text-navy-400 cursor-wait"
-          : "text-muted-foreground hover:text-navy-500 hover:bg-navy-50"
-      )}
+      className="ic-btn"
+      aria-label={t("manualQuote.improveWithAi")}
     >
       {suggest.isPending
-        ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        : <Sparkles className="h-3.5 w-3.5" />}
+        ? <Loader2 className="animate-spin" />
+        : <Sparkles />}
     </button>
   );
 }
@@ -304,253 +297,247 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
   const isSubmitting = createManualQuote.isPending;
 
   return (
-    <div className="space-y-4">
+    <div className="stack">
 
       {/* ── Template ── */}
-      <div className="card p-4 space-y-3">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.pdfTemplate")}</p>
-        <div className="grid grid-cols-3 gap-2">
+      <section className="card">
+        <div className="card-head"><div><h2>{t("manualQuote.pdfTemplate")}</h2></div></div>
+        <div className="src-grid" style={{ paddingTop: 16 }}>
           {TEMPLATES.map(tpl => (
             <button
               key={tpl.id}
               type="button"
               onClick={() => setTemplateId(tpl.id)}
-              className={cn(
-                "text-left p-3 rounded-xl border-2 transition-all",
-                templateId === tpl.id
-                  ? "border-navy-400 bg-navy-50"
-                  : "border-border hover:border-navy-200"
-              )}
+              className={cn("src sm", templateId === tpl.id && "on")}
             >
-              <p className={cn("text-xs font-semibold", templateId === tpl.id ? "text-navy-700" : "text-foreground")}>{tpl.label}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{tpl.desc}</p>
+              <b>{templateId === tpl.id && <CheckCircle2 />}{tpl.label}</b>
+              <p>{tpl.desc}</p>
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* ── Title & Description ── */}
-      <div className="card p-4 space-y-3">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.quoteHeader")}</p>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.jobSubject")}</Label>
-          <Input
-            placeholder={t("manualQuote.jobSubjectPlaceholder")}
-            value={titoloRiga2}
-            onChange={e => setTitoloRiga2(e.target.value)}
-            className="h-9 text-sm"
-            disabled={isSubmitting}
-          />
+      <section className="card">
+        <div className="card-head"><div><h2>{t("manualQuote.quoteHeader")}</h2></div></div>
+        <div className="form-grid tight">
+          <div className="field full">
+            <label>{t("manualQuote.jobSubject")}</label>
+            <input
+              placeholder={t("manualQuote.jobSubjectPlaceholder")}
+              value={titoloRiga2}
+              onChange={e => setTitoloRiga2(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div className="field full">
+            <label>{t("manualQuote.documentTitle")}</label>
+            <input
+              value={titoloRiga1}
+              onChange={e => setTitoloRiga1(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div className="field full">
+            <label>{t("manualQuote.generalDescription")}</label>
+            <textarea
+              value={descrizione}
+              onChange={e => setDescrizione(e.target.value)}
+              placeholder={t("manualQuote.generalDescriptionPlaceholder")}
+              rows={2}
+              style={{ resize: "none" }}
+              disabled={isSubmitting}
+            />
+          </div>
         </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.documentTitle")}</Label>
-          <Input
-            value={titoloRiga1}
-            onChange={e => setTitoloRiga1(e.target.value)}
-            className="h-9 text-sm text-muted-foreground"
-            disabled={isSubmitting}
-          />
-        </div>
-        <div className="space-y-1">
-          <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.generalDescription")}</Label>
-          <textarea
-            value={descrizione}
-            onChange={e => setDescrizione(e.target.value)}
-            placeholder={t("manualQuote.generalDescriptionPlaceholder")}
-            rows={2}
-            className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition-shadow"
-            disabled={isSubmitting}
-          />
-        </div>
-      </div>
+      </section>
 
       {/* ── Chapters ── */}
-      <div className="space-y-3">
+      <div>
         {chapters.map((ch, chIdx) => {
           const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
           const lettera = letters[chIdx] ?? String(chIdx + 1);
           const capSubtotale = computeCapSubtotale(ch);
 
           return (
-            <div key={ch.id} className="card overflow-hidden">
+            <div key={ch.id} className="chap-block">
               {/* Chapter header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
-                <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="font-bold text-sm text-navy-600 shrink-0 w-5">{lettera}</span>
+              <div className="chap-head">
+                <GripVertical className="chev" />
+                <span className="let">{lettera}</span>
                 <input
                   value={ch.titolo}
                   onChange={e => updateChapter(ch.id, { titolo: e.target.value })}
                   placeholder={`${t("manualQuote.chapterWord")} ${lettera}`}
-                  className="flex-1 text-sm font-semibold text-foreground bg-transparent outline-none placeholder:text-muted-foreground min-w-0"
+                  className="inl"
                   disabled={isSubmitting}
                 />
-                <span className="text-xs text-muted-foreground font-mono shrink-0">$ {fmt(capSubtotale)}</span>
+                <span className="amt">$ {fmt(capSubtotale)}</span>
                 <button
                   type="button"
                   onClick={() => updateChapter(ch.id, { collapsed: !ch.collapsed })}
-                  className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-accent transition-colors shrink-0"
+                  className="ic-btn"
+                  aria-label={ch.collapsed ? "Expand" : "Collapse"}
                 >
-                  {ch.collapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+                  {ch.collapsed ? <ChevronDown /> : <ChevronUp />}
                 </button>
                 {chapters.length > 1 && (
                   <button
                     type="button"
                     onClick={() => removeChapter(ch.id)}
-                    className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors shrink-0"
+                    className="ic-btn danger"
                     disabled={isSubmitting}
+                    aria-label={t("manualQuote.chapterWord")}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 />
                   </button>
                 )}
               </div>
 
               {!ch.collapsed && (
-                <div className="p-4 space-y-2">
+                <div className="li-body">
                   {/* Column headers */}
-                  <div className="grid grid-cols-[1fr_64px_80px_88px_72px_28px] gap-2 px-1">
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colDescription")}</p>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colUnit")}</p>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colQty")}</p>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">{t("manualQuote.colUnitPrice")}</p>
-                    <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide text-right">{t("manualQuote.colTotal")}</p>
+                  <div className="li-head">
+                    <span>{t("manualQuote.colDescription")}</span>
+                    <span>{t("manualQuote.colUnit")}</span>
+                    <span>{t("manualQuote.colQty")}</span>
+                    <span>{t("manualQuote.colUnitPrice")}</span>
+                    <span className="r">{t("manualQuote.colTotal")}</span>
                     <span />
                   </div>
 
                   {/* Line items */}
-                  {ch.voci.map(v => {
-                    const voceTot = computeVoceTotale(v);
-                    return (
-                      <div key={v.id} className="grid grid-cols-[1fr_64px_80px_88px_72px_28px] gap-2 items-center">
-                        {/* Description + AI */}
-                        <div className="flex items-center gap-1 min-w-0 relative">
-                          <input
-                            value={v.descrizione}
-                            onChange={e => updateVoce(ch.id, v.id, { descrizione: e.target.value })}
-                            onFocus={() => setActiveVoceId(v.id)}
-                            onBlur={() => setTimeout(() => setActiveVoceId(null), 250)}
-                            placeholder={t("manualQuote.itemDescriptionPlaceholder")}
-                            className="flex-1 h-8 px-2.5 rounded-lg border border-border text-xs text-foreground placeholder:text-muted-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition min-w-0"
+                  <div>
+                    {ch.voci.map(v => {
+                      const voceTot = computeVoceTotale(v);
+                      return (
+                        <div key={v.id} className="li-row">
+                          {/* Description + AI */}
+                          <div className="desc">
+                            <input
+                              value={v.descrizione}
+                              onChange={e => updateVoce(ch.id, v.id, { descrizione: e.target.value })}
+                              onFocus={() => setActiveVoceId(v.id)}
+                              onBlur={() => setTimeout(() => setActiveVoceId(null), 250)}
+                              placeholder={t("manualQuote.itemDescriptionPlaceholder")}
+                              className="inp-sm"
+                              disabled={isSubmitting}
+                            />
+                            <AISuggestButton
+                              voce={v}
+                              chapterTitle={ch.titolo}
+                              projectTitle={titoloRiga2}
+                              onSuggest={desc => updateVoce(ch.id, v.id, { descrizione: desc })}
+                            />
+
+                            {activeVoceId === v.id && v.descrizione.trim().length >= 2 && (() => {
+                              const suggestions = catalogItems.filter(item =>
+                                item.nome.toLowerCase().includes(v.descrizione.toLowerCase())
+                              ).slice(0, 5);
+
+                              if (suggestions.length === 0) return null;
+
+                              return (
+                                <div className="sugg">
+                                  {suggestions.map(item => (
+                                    <button
+                                      key={item.id}
+                                      type="button"
+                                      onClick={() => {
+                                        updateVoce(ch.id, v.id, {
+                                          descrizione: item.nome,
+                                          um: item.um,
+                                          prezzoUnitario: String(item.prezzoUnitario),
+                                        });
+                                        setActiveVoceId(null);
+                                      }}
+                                    >
+                                      <b>{item.nome}</b>
+                                      <span>({item.um}) ${item.prezzoUnitario}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              );
+                            })()}
+                          </div>
+
+                          {/* U.M. */}
+                          <select
+                            value={v.um}
+                            onChange={e => updateVoce(ch.id, v.id, { um: e.target.value })}
+                            className="inp-sm um"
                             disabled={isSubmitting}
-                          />
-                          <AISuggestButton
-                            voce={v}
-                            chapterTitle={ch.titolo}
-                            projectTitle={titoloRiga2}
-                            onSuggest={desc => updateVoce(ch.id, v.id, { descrizione: desc })}
-                          />
-
-                          {activeVoceId === v.id && v.descrizione.trim().length >= 2 && (() => {
-                            const suggestions = catalogItems.filter(item =>
-                              item.nome.toLowerCase().includes(v.descrizione.toLowerCase())
-                            ).slice(0, 5);
-
-                            if (suggestions.length === 0) return null;
-
-                            return (
-                              <div className="absolute left-0 right-0 top-9 bg-card border border-border rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto divide-y">
-                                {suggestions.map(item => (
-                                  <button
-                                    key={item.id}
-                                    type="button"
-                                    onClick={() => {
-                                      updateVoce(ch.id, v.id, {
-                                        descrizione: item.nome,
-                                        um: item.um,
-                                        prezzoUnitario: String(item.prezzoUnitario),
-                                      });
-                                      setActiveVoceId(null);
-                                    }}
-                                    className="w-full text-left px-3 py-2 hover:bg-navy-50 text-[11px] flex justify-between gap-2"
-                                  >
-                                    <span className="font-semibold text-foreground truncate">{item.nome}</span>
-                                    <span className="text-muted-foreground shrink-0 font-mono">({item.um}) ${item.prezzoUnitario}</span>
-                                  </button>
-                                ))}
-                              </div>
-                            );
-                          })()}
-                        </div>
-
-                        {/* U.M. */}
-                        <select
-                          value={v.um}
-                          onChange={e => updateVoce(ch.id, v.id, { um: e.target.value })}
-                          className="h-8 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent px-1.5 transition w-full"
-                          disabled={isSubmitting}
-                        >
-                          {UM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
-                        </select>
-
-                        {/* Quantity */}
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          value={v.quantita}
-                          onChange={e => updateVoce(ch.id, v.id, { quantita: e.target.value })}
-                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition text-right w-full"
-                          disabled={isSubmitting}
-                        />
-
-                        {/* Unit Price */}
-                        <input
-                          type="number"
-                          min="0"
-                          step="any"
-                          value={v.prezzoUnitario}
-                          onChange={e => updateVoce(ch.id, v.id, { prezzoUnitario: e.target.value })}
-                          placeholder="0,00"
-                          className="h-8 px-2 rounded-lg border border-border text-xs text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition text-right w-full"
-                          disabled={isSubmitting}
-                        />
-
-                        {/* Line item total */}
-                        <p className={cn("text-xs text-right font-mono shrink-0", voceTot > 0 ? "text-foreground" : "text-muted-foreground")}>
-                          {voceTot > 0 ? `$ ${fmt(voceTot)}` : "—"}
-                        </p>
-
-                        {/* Remove line item */}
-                        {ch.voci.length > 1 ? (
-                          <button
-                            type="button"
-                            onClick={() => removeVoce(ch.id, v.id)}
-                            className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-50 transition-colors"
-                            disabled={isSubmitting}
+                            aria-label={t("manualQuote.colUnit")}
                           >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        ) : <span />}
-                      </div>
-                    );
-                  })}
+                            {UM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
+                          </select>
+
+                          {/* Quantity */}
+                          <input
+                            type="number"
+                            min="0"
+                            step="any"
+                            value={v.quantita}
+                            onChange={e => updateVoce(ch.id, v.id, { quantita: e.target.value })}
+                            className="inp-sm r qty"
+                            disabled={isSubmitting}
+                            aria-label={t("manualQuote.colQty")}
+                          />
+
+                          {/* Unit Price */}
+                          <input
+                            type="number"
+                            min="0"
+                            step="any"
+                            value={v.prezzoUnitario}
+                            onChange={e => updateVoce(ch.id, v.id, { prezzoUnitario: e.target.value })}
+                            placeholder="0.00"
+                            className="inp-sm r price"
+                            disabled={isSubmitting}
+                            aria-label={t("manualQuote.colUnitPrice")}
+                          />
+
+                          {/* Line item total */}
+                          <span className={cn("tot", voceTot <= 0 && "faint")}>
+                            {voceTot > 0 ? `$ ${fmt(voceTot)}` : "—"}
+                          </span>
+
+                          {/* Remove line item */}
+                          {ch.voci.length > 1 ? (
+                            <button
+                              type="button"
+                              onClick={() => removeVoce(ch.id, v.id)}
+                              className="ic-btn danger"
+                              disabled={isSubmitting}
+                              aria-label={t("manualQuote.colDescription")}
+                            >
+                              <X />
+                            </button>
+                          ) : <span />}
+                        </div>
+                      );
+                    })}
+                  </div>
 
                   {/* Add voce */}
-                  <button
-                    type="button"
-                    onClick={() => addVoce(ch.id)}
-                    className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-navy-600 hover:bg-navy-50 px-2.5 py-1.5 rounded-lg transition-colors"
-                    disabled={isSubmitting}
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    {t("manualQuote.addItem")}
+                  <button type="button" onClick={() => addVoce(ch.id)} className="text-link" disabled={isSubmitting}>
+                    <Plus /> {t("manualQuote.addItem")}
                   </button>
 
                   {/* Chapter note */}
-                  <div className="pt-1 border-t border-border">
+                  <div className="obs">
                     <input
                       value={ch.osservazione}
                       onChange={e => updateChapter(ch.id, { osservazione: e.target.value })}
                       placeholder={t("manualQuote.chapterNotePlaceholder")}
-                      className="w-full h-7 px-2.5 rounded-lg border border-dashed border-border text-xs text-muted-foreground placeholder:text-muted-foreground bg-transparent focus:outline-none focus:border-navy-300 transition"
+                      className="inp-sm dashed"
                       disabled={isSubmitting}
                     />
                   </div>
 
                   {/* Chapter subtotal */}
-                  <div className="flex justify-end pt-1">
-                    <span className="text-xs text-muted-foreground font-medium">
-                      {t("manualQuote.subtotalPrefix")} {lettera}: <span className="font-mono font-semibold text-foreground">$ {fmt(capSubtotale)}</span>
-                    </span>
+                  <div className="sub">
+                    {t("manualQuote.subtotalPrefix")} {lettera}: <b>$ {fmt(capSubtotale)}</b>
                   </div>
                 </div>
               )}
@@ -562,33 +549,29 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         <button
           type="button"
           onClick={addChapter}
-          className="w-full py-3 rounded-2xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-navy-300 hover:text-navy-500 hover:bg-navy-50/30 transition-all flex items-center justify-center gap-2"
+          className="add-dashed"
+          style={{ marginTop: 12 }}
           disabled={isSubmitting || chapters.length >= 26}
         >
-          <Plus className="h-4 w-4" />
+          <Plus />
           {t("manualQuote.addChapter")}
         </button>
       </div>
 
       {/* ── Totals & Tax ── */}
-      <div className="card p-4 space-y-3">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.financialSummary")}</p>
+      <section className="card">
+        <div className="card-head"><div><h2>{t("manualQuote.financialSummary")}</h2></div></div>
 
         {/* Tax rate selector */}
-        <div className="flex items-center gap-3">
-          <Label className="text-xs font-medium text-muted-foreground shrink-0">{t("manualQuote.taxRate")}</Label>
-          <div className="flex gap-2 flex-wrap">
+        <div className="tax-row">
+          <span>{t("manualQuote.taxRate")}</span>
+          <div className="pills">
             {IVA_OPTIONS.map(iva => (
               <button
                 key={iva}
                 type="button"
                 onClick={() => setIvaPercentuale(iva)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
-                  ivaPercentuale === iva
-                    ? "border-navy-400 bg-navy-50 text-navy-700"
-                    : "border-border text-muted-foreground hover:border-navy-200"
-                )}
+                className={cn("pill sm", ivaPercentuale === iva && "on")}
                 disabled={isSubmitting}
               >
                 {iva === 0 ? t("manualQuote.taxExempt") : `${iva}%`}
@@ -598,90 +581,64 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
         </div>
 
         {/* Totals breakdown */}
-        <div className="space-y-1 pt-1 border-t border-border">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{t("manualQuote.taxableAmount")}</span>
-            <span className="font-mono">$ {fmt(subtotale)}</span>
-          </div>
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>{t("manualQuote.taxLabel")} {ivaPercentuale === 0 ? t("manualQuote.taxExempt") : `${ivaPercentuale}%`}</span>
-            <span className="font-mono">$ {fmt(ivaValore)}</span>
-          </div>
-          <div className="flex justify-between text-base font-bold text-foreground pt-1 border-t border-border">
-            <span>{t("manualQuote.total")}</span>
-            <span className="font-mono text-navy-700">$ {fmt(totale)}</span>
-          </div>
+        <div className="kv-list">
+          <div className="kv"><span>{t("manualQuote.taxableAmount")}</span><b>$ {fmt(subtotale)}</b></div>
+          <div className="kv"><span>{t("manualQuote.taxLabel")} {ivaPercentuale === 0 ? t("manualQuote.taxExempt") : `${ivaPercentuale}%`}</span><b>$ {fmt(ivaValore)}</b></div>
+          <div className="kv total"><span>{t("manualQuote.total")}</span><b>$ {fmt(totale)}</b></div>
         </div>
-      </div>
+      </section>
 
       {/* ── Payment terms ── */}
-      <div className="card p-4 space-y-3">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.paymentTerms")}</p>
-        <div className="space-y-1.5">
+      <section className="card">
+        <div className="card-head"><div><h2>{t("manualQuote.paymentTerms")}</h2></div></div>
+        <div className="term-list">
           {condizioni.map((c, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground shrink-0 w-4">{idx + 1}.</span>
-              <span className="flex-1 text-sm text-foreground">{c}</span>
-              <button
-                type="button"
-                onClick={() => removeCondizione(idx)}
-                className="h-6 w-6 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-50 transition-colors shrink-0"
-                disabled={isSubmitting}
-              >
-                <X className="h-3.5 w-3.5" />
+            <div key={idx} className="term-row">
+              <span className="n">{idx + 1}.</span>
+              <span className="grow">{c}</span>
+              <button type="button" onClick={() => removeCondizione(idx)} className="ic-btn danger" disabled={isSubmitting} aria-label={t("manualQuote.paymentTerms")}>
+                <X />
               </button>
             </div>
           ))}
+          <div className="add">
+            <input
+              value={newCondizione}
+              onChange={e => setNewCondizione(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCondizione(); } }}
+              placeholder={t("manualQuote.addTermPlaceholder")}
+              className="inp-sm"
+              disabled={isSubmitting}
+            />
+            <button type="button" onClick={addCondizione} disabled={!newCondizione.trim() || isSubmitting} className="btn btn-sm btn-outline-navy" aria-label={t("manualQuote.addTermPlaceholder")}>
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2 pt-1">
-          <Input
-            value={newCondizione}
-            onChange={e => setNewCondizione(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCondizione(); } }}
-            placeholder={t("manualQuote.addTermPlaceholder")}
-            className="h-8 text-sm flex-1"
-            disabled={isSubmitting}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addCondizione}
-            disabled={!newCondizione.trim() || isSubmitting}
-            className="h-8 px-3 text-xs"
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </div>
+      </section>
 
       {/* ── Notes ── */}
-      <div className="card p-4 space-y-2">
-        <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.finalNotes")}</Label>
-        <textarea
-          value={note}
-          onChange={e => setNote(e.target.value)}
-          rows={2}
-          className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-navy-300 focus:border-transparent transition-shadow"
-          disabled={isSubmitting}
-        />
-      </div>
+      <section className="card">
+        <div className="card-head"><div><h2>{t("manualQuote.finalNotes")}</h2></div></div>
+        <div className="form-grid tight">
+          <div className="field full">
+            <textarea
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              rows={2}
+              style={{ resize: "none" }}
+              disabled={isSubmitting}
+              aria-label={t("manualQuote.finalNotes")}
+            />
+          </div>
+        </div>
+      </section>
 
       {/* ── Submit ── */}
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={isSubmitting}
-        className={cn(
-          "w-full h-12 rounded-2xl text-sm font-semibold transition-all flex items-center justify-center gap-2",
-          isSubmitting
-            ? "bg-muted text-muted-foreground cursor-not-allowed"
-            : "btn-gradient text-white shadow-sm hover:shadow-md"
-        )}
-      >
+      <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn btn-navy" style={{ width: "100%" }}>
         {isSubmitting
           ? <><Loader2 className="h-4 w-4 animate-spin" />{t("manualQuote.creatingInProgress")}</>
-          : <>{t("manualQuote.createQuote")} &rarr;</>}
+          : <>{t("manualQuote.createQuote")} <ArrowRight className="chev" /></>}
       </button>
     </div>
   );

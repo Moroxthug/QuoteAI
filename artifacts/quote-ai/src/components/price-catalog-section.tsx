@@ -1,14 +1,12 @@
 import { useState, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Plus, Pencil, Trash2, Download, Loader2, BookOpen, Tag, Ruler,
-  Euro, X, Check, Upload, AlertCircle, Search
+  Plus, Pencil, Trash2, Loader2, BookOpen, Tag, Ruler,
+  Check, Upload, AlertCircle, Search
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -309,193 +307,132 @@ export function PriceCatalogSection() {
 
   if (!isPro) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-        <BookOpen className="h-12 w-12 text-muted-foreground animate-pulse" />
-        <h2 className="text-xl font-semibold text-foreground">{t("dashboard.catalog.proOnly.title")}</h2>
-        <p className="text-muted-foreground max-w-md text-sm leading-relaxed">
-          {t("dashboard.catalog.proOnly.desc")}
-        </p>
-        <Button onClick={() => window.location.href = "/dashboard/settings?tab=billing"} className="gap-2 mt-2 font-semibold">
+      <div className="card card-empty" style={{ padding: "56px 22px" }}>
+        <BookOpen />
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)", marginBottom: 6 }}>{t("dashboard.catalog.proOnly.title")}</h2>
+        <p style={{ maxWidth: 440, margin: "0 auto 16px" }}>{t("dashboard.catalog.proOnly.desc")}</p>
+        <button type="button" onClick={() => window.location.href = "/dashboard/settings?tab=billing"} className="btn btn-navy btn-sm">
           {t("dashboard.catalog.proOnly.cta")}
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="stack">
       {/* Upload & CSV Action Card */}
-      <Card className="border border-navy-100 bg-gradient-to-br from-white to-navy-50/20 shadow-sm overflow-hidden">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Upload className="h-4 w-4 text-navy-500" />
-            {t("catalog.csv.importTitle")}
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {t("catalog.csv.importDesc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            <input
-              type="file"
-              accept=".csv"
-              ref={fileInputRef}
-              onChange={handleCsvSelect}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 border-navy-200 hover:bg-navy-50 text-navy-700"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-4 w-4" />
-              {t("catalog.csv.chooseFile")}
-            </Button>
-            {csvFileName && (
-              <span className="text-xs font-medium text-muted-foreground truncate max-w-xs bg-muted px-2.5 py-1 rounded-md border">
-                {csvFileName}
-              </span>
-            )}
-            {csvPreview && (
-              <Button
-                size="sm"
-                className="gap-2 bg-green-600 hover:bg-green-700 text-white shadow-sm ml-auto"
-                onClick={handleBulkUpload}
-                disabled={bulkCreate.isPending}
-              >
-                {bulkCreate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                {t("catalog.csv.confirmImport").replace("{count}", String(csvPreview.length))}
-              </Button>
-            )}
+      <section className="card">
+        <div className="card-head">
+          <div>
+            <h2 className="flex items-center gap-2"><Upload className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("catalog.csv.importTitle")}</h2>
+            <p className="sub">{t("catalog.csv.importDesc")}</p>
           </div>
-
-          {csvError && (
-            <div className="flex items-center gap-2 text-xs font-semibold text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              {csvError}
-            </div>
-          )}
-
-          {/* CSV Preview */}
+        </div>
+        <div className="csv-row">
+          <input type="file" accept=".csv" ref={fileInputRef} onChange={handleCsvSelect} className="hidden" />
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="h-4 w-4" />
+            {t("catalog.csv.chooseFile")}
+          </button>
+          {csvFileName && <span className="fname">{csvFileName}</span>}
           {csvPreview && (
-            <div className="border rounded-lg bg-card overflow-hidden max-h-48 overflow-y-auto">
-              <table className="w-full text-xs text-left border-collapse">
-                <thead className="bg-muted border-b font-semibold text-foreground sticky top-0">
-                  <tr>
-                    <th className="p-2 border-r">{t("catalog.csv.colItem")}</th>
-                    <th className="p-2 border-r w-32">{t("catalog.csv.colCategory")}</th>
-                    <th className="p-2 border-r w-16 text-center">{t("catalog.csv.colUnit")}</th>
-                    <th className="p-2 w-28 text-right">{t("catalog.csv.colPrice")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y text-muted-foreground">
-                  {csvPreview.slice(0, 10).map((row, idx) => (
-                    <tr key={idx} className="hover:bg-accent">
-                      <td className="p-2 border-r truncate max-w-xs">{row.nome}</td>
-                      <td className="p-2 border-r truncate">{row.categoria || "-"}</td>
-                      <td className="p-2 border-r text-center font-mono">{row.um}</td>
-                      <td className="p-2 text-right font-semibold text-green-700">{formatCurrency(row.prezzoUnitario)}</td>
-                    </tr>
-                  ))}
-                  {csvPreview.length > 10 && (
-                    <tr className="bg-muted/50">
-                      <td colSpan={4} className="p-2 text-center text-muted-foreground italic">
-                        {t("catalog.csv.andMoreItems").replace("{count}", String(csvPreview.length - 10))}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <button type="button" className="btn btn-sm btn-navy grow" style={{ background: "var(--green)" }} onClick={handleBulkUpload} disabled={bulkCreate.isPending}>
+              {bulkCreate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              {t("catalog.csv.confirmImport").replace("{count}", String(csvPreview.length))}
+            </button>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        {csvError && (
+          <div className="notice danger">
+            <AlertCircle />
+            <span className="grow">{csvError}</span>
+          </div>
+        )}
+
+        {/* CSV Preview */}
+        {csvPreview && (
+          <div className="csv-preview">
+            <table className="ptbl soft">
+              <thead>
+                <tr>
+                  <th>{t("catalog.csv.colItem")}</th>
+                  <th>{t("catalog.csv.colCategory")}</th>
+                  <th className="c w-um">{t("catalog.csv.colUnit")}</th>
+                  <th className="r w-price">{t("catalog.csv.colPrice")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {csvPreview.slice(0, 10).map((row, idx) => (
+                  <tr key={idx}>
+                    <td className="t-strong">{row.nome}</td>
+                    <td className="faint">{row.categoria || "-"}</td>
+                    <td className="c faint">{row.um}</td>
+                    <td className="r amt">{formatCurrency(row.prezzoUnitario)}</td>
+                  </tr>
+                ))}
+                {csvPreview.length > 10 && (
+                  <tr>
+                    <td colSpan={4} className="c note">{t("catalog.csv.andMoreItems").replace("{count}", String(csvPreview.length - 10))}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {/* Main List Management */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t("catalog.searchPlaceholder")}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="pl-9 h-9"
-            />
-          </div>
-          <Button size="sm" className="gap-2 shrink-0 h-9" onClick={() => setIsCreateOpen(true)}>
+      <section className="card">
+        <div className="toolbar">
+          <label className="search sm grow" style={{ width: "auto", flex: 1 }}>
+            <Search className="h-4 w-4" />
+            <input type="search" placeholder={t("catalog.searchPlaceholder")} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} aria-label={t("catalog.searchPlaceholder")} />
+          </label>
+          <button type="button" className="btn btn-sm btn-navy" onClick={() => setIsCreateOpen(true)}>
             <Plus className="h-4 w-4" />
             {t("dashboard.catalog.addItem")}
-          </Button>
+          </button>
         </div>
 
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="stack" style={{ padding: 22 }}>
             {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-lg" />)}
           </div>
         ) : filteredItems.length === 0 ? (
-          <Card className="border-dashed py-12 text-center">
-            <CardContent className="flex flex-col items-center justify-center gap-3">
-              <BookOpen className="h-8 w-8 text-muted-foreground" />
-              <div className="text-sm font-semibold text-muted-foreground">{t("catalog.noItemsFound")}</div>
-              <div className="text-xs text-muted-foreground">{t("catalog.noItemsFoundDesc")}</div>
-            </CardContent>
-          </Card>
+          <div className="card-empty">
+            <BookOpen />
+            <b style={{ display: "block", color: "var(--navy)" }}>{t("catalog.noItemsFound")}</b>
+            {t("catalog.noItemsFoundDesc")}
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div>
             {categories.map(cat => (
-              <Card key={cat} className="shadow-sm border border-border overflow-hidden">
-                <CardHeader className="py-2.5 px-4 bg-muted/50 border-b">
-                  <CardTitle className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wide">
-                    <Tag className="h-3.5 w-3.5 text-navy-500" />
-                    {cat}
-                    <Badge variant="secondary" className="ml-auto font-mono text-[10px] py-0 px-1.5">{groupedByCategory[cat].length}</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 divide-y">
-                  {groupedByCategory[cat].map(item => (
-                    <div key={item.id} className="flex items-center gap-3 px-4 py-2 hover:bg-accent transition-colors group">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-xs text-foreground truncate">{item.nome}</div>
-                        {item.note && <div className="text-[10px] text-muted-foreground truncate mt-0.5">{item.note}</div>}
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant="outline" className="text-[10px] font-mono h-5 px-1.5">
-                          <Ruler className="h-2.5 w-2.5 mr-1 opacity-60" />
-                          {item.um}
-                        </Badge>
-                        <span className="text-xs font-bold text-green-700 min-w-[70px] text-right">
-                          {formatCurrency(item.prezzoUnitario)}
-                        </span>
-                        <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6 rounded-md"
-                            onClick={() => setEditingItem(item)}
-                          >
-                            <Pencil className="h-3 w-3" />
-                          </Button>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6 rounded-md text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => setDeletingId(item.id)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
+              <div key={cat} className="cat-group">
+                <div className="cat-head">
+                  <Tag />
+                  {cat}
+                  <span className="chip chip-grey">{groupedByCategory[cat].length}</span>
+                </div>
+                {groupedByCategory[cat].map(item => (
+                  <div key={item.id} className="item-row">
+                    <div className="grow">
+                      <b className="ttl">{item.nome}</b>
+                      {item.note && <span className="sub">{item.note}</span>}
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
+                    <span className="chip chip-grey"><Ruler className="h-3 w-3 mr-1" style={{ opacity: .6 }} />{item.um}</span>
+                    <span className="amt" style={{ color: "var(--green-dark)", minWidth: 80, textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</span>
+                    <div className="hover-act">
+                      <button type="button" className="ic-btn" onClick={() => setEditingItem(item)} aria-label={t("dashboard.catalog.dialog.editTitle")}><Pencil /></button>
+                      <button type="button" className="ic-btn danger" onClick={() => setDeletingId(item.id)} aria-label={t("dashboard.catalog.delete.title")}><Trash2 /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             ))}
           </div>
         )}
-      </div>
+      </section>
 
       {/* Item Form Dialog */}
       {(isCreateOpen || editingItem) && (

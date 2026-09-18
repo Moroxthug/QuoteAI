@@ -1,0 +1,145 @@
+# QuoteAI — Full verification plan (Phases 61-70)
+
+Written 2026-09-18, right after Phase 60 closed the pixel redesign. Every *build* plan is now complete:
+
+| Plan | Phases | Status |
+|---|---|---|
+| `JOB-LIFECYCLE-PLAN.md` | 0-6 | 0-5 built. **6 (launch readiness) half-done** — see §1 |
+| `GROWTH-PLATFORM-PLAN.md` | 7-14 | all built |
+| `EDGE-FEATURES-PLAN.md` | 15-29 | all built (several gated on external partner access) |
+| `PIXEL-REDESIGN-PLAN.md` | 38-60 | all built |
+
+So "what's left" is not features — it is proving that ~60 phases shipped back-to-back (typecheck + code review + mock/fake-data browser checks, almost never against a live backend) actually work together. This document is that plan. Same convention as before: **one phase per conversation**, each ends with a written result in this file's §3 build log, auto-pushed.
+
+---
+
+## 1. What is genuinely still open (carried from every plan's "not done" notes)
+
+**Code / verification never done**
+- Phase 6's `artifacts/api-server/src/e2e/lifecycle.e2e.test.ts` — built, **never run** (needs a disposable Supabase project; never the linked production one).
+- Phase 4 (contract → deposit invoice → send → pay, `/api/cron/tick`) and Phase 5 (assistant tool-calling, `/dashboard/analytics`) — never live-tested.
+- Mobile responsiveness — code review + emulated viewport only, no real device.
+- Only 7 unit test files exist (`analytics/math`, `invoices/math`, `incentives/matching`, `crypto`, `requirePermission`, `connectedEmailSend`, `gmailSendClient`). Everything from Phase 7 on (team invites, lead sequencing, archive filtering, imports review queue, variants, clock-in, all OAuth syncs) has zero coverage.
+- Root `pnpm run typecheck` still fails on `lib/api-zod` (zod v3/v4 mismatch), so CI (`.github/workflows/test.yml`) only typechecks the two apps.
+- No ESLint config at all (`npx eslint` errors out) — unused imports/dead code are only caught by hand.
+- Phase 29's `local_services_lead_conversation` contact-detail lookup left as a follow-up.
+- Phase 47 note: dashboard Clients is a virtual list from `quotes.client_data`; `clientsTable.archivedAt` exists but nothing sets it.
+- `artifacts/quote-ai/public/sitemap.xml` has an uncommitted 9-line local change sitting in the working tree (and `lib/db/src/schema/incentives.ts` had one for weeks — check whether it is still there).
+
+**Configuration / external (user-owned, not code)**
+- Vercel env vars for QuickBooks / Google Calendar / Outlook / `INVOICE_LINK_SECRET` — QuickBooks + Google were registered 2026-09-14; **Outlook (Entra ID) still not**.
+- Three WhatsApp templates never submitted to Meta (lead follow-up, review request, photo share) → silently fall back to email.
+- Partner-gated integrations with no real credentials: Wave (25), Financeit (16), Flinks (27), Google LSA (29). Meta Lead Ads (28) works once `META_APP_ID` is set.
+- No monitoring/alerting on `automation_runs` failures; no error tracker (no Sentry or equivalent anywhere in `src/`).
+- Legal review of contract templates; help-centre content; a real pentest.
+
+**Deliberate v1 scope cuts (not bugs, just record them in the launch notes)**
+- Hardcoded lead-follow-up cadence and review-request delay (no editor UI); no SMS channel.
+- QuickBooks/Wave: one line per invoice/cost, exact-name customer matching only.
+- Calendar sync: primary calendar only, milestones only.
+- No thumbnail generation for job photos.
+- `pages/admin.tsx` stays on shadcn.
+
+---
+
+## 2. Verification phases
+
+Each phase lists **what**, **how** (concrete commands / steps), **exit criteria**, and **who** (Claude / user / human-only). Order matters: 61-63 make the later phases cheap; 66-67 need the staging environment 63 creates.
+
+### Phase 61 — Static integrity: make the toolchain trustworthy
+*Everything later leans on "typecheck clean" meaning something.*
+- Fix the `lib/api-zod` zod v3-vs-v4 mismatch (pin orval output or upgrade zod) so **root** `pnpm run typecheck` passes, then add it to `test.yml`.
+- Add a flat `eslint.config.js` (typescript-eslint + react-hooks + `no-unused-vars`) and fix what it finds — Phase 60 already spotted `Users` unused in `leads/index.tsx` and `data` in `settings.tsx` via `--noUnusedLocals`; expect dozens more.
+- `pnpm -r build` clean; inspect the Vite bundle report for accidental heavy imports (the dashboard chunks are lazy-loaded — confirm nothing pulls `admin.tsx` or the blog data into the main chunk).
+- Dead-code sweep: `knip` or `ts-prune` over both apps (Phase 49 did this by hand for `components/ui/`; nothing has done it for `lib/` or `api-server/src/`).
+- Resolve the two stray working-tree edits (`sitemap.xml`, `incentives.ts`): commit or discard, explicitly.
+- Exit: CI runs lint + root typecheck + tests + build on every push, green.
+- Who: Claude.
+
+### Phase 62 — Backend route matrix audit
+*47 route files, ~250 handlers, written across 55 phases by different sessions.*
+- Generate a table (script under `artifacts/api-server/scripts/`) of every registered route → middleware chain (`requireAuth`? `requirePermission(which)`? `requirePlan`/feature flag? rate limit? zod body/query schema?). Post-Phase-13 cleanup claimed every route in `jobs`/`costs`/`invoicing` is gated — verify mechanically, not by memory.
+- Rules to assert: every non-public route has `requireAuth`; every mutating route has a permission; every Elite/Pro feature route checks the flag; every `:id` handler scopes by `organizationId` (grep for `eq(table.id, id)` **without** an org predicate); every list endpoint filters `archivedAt IS NULL` (Phase 47) — clients is the known exception; every public token route (`/p/:id`, `/i/:token`, `/sign/:token`, `/api/public-*`) is rate limited (`lib/rateLimit.ts`) and constant-time compares tokens.
+- Write the result as a vitest that fails when a new route breaks a rule (turn the audit into a regression guard).
+- Exit: matrix committed, zero unexplained rows, test in CI.
+- Who: Claude.
+
+### Phase 63 — Staging environment + the e2e suite, finally run
+- User creates a **disposable Supabase project** (never the linked `quoteai`), pastes `DATABASE_URL`/`SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` into `.env.staging`.
+- Apply migrations `0001` → `0032` in order with `supabase db query`; diff `lib/db/src/schema/*` against the resulting DB (`drizzle-kit check`/introspect) — this is the first time schema-vs-migrations drift can be measured. Phase 17 already found one migration (`0015`) that had never actually run in production; assume there are others.
+- Run `lifecycle.e2e.test.ts` (ON/EN holdback + QC/FR no-holdback). Fix what breaks.
+- Extend the suite with one scenario per growth/edge feature that has a service layer: team invite + role denial, lead capture → 1/3/7-day sequencing (`cron/tick` with a frozen clock), review request one-shot gate, archive → list exclusion → restore, import review queue → accept, quote variants, worker clock-in geofence flag, e-Transfer self-report → confirm.
+- Exit: `pnpm test` runs unit + e2e against staging in CI (secrets in GitHub), green.
+- Who: user (project + keys), Claude (everything else).
+
+### Phase 64 — Security pass
+- IDOR sweep with two real accounts on staging: every `:id` route, every storage path, every public token, every export/PDF URL. Phase 6 found one real IDOR by reading code; this is the runtime version.
+- Webhook signature verification on **every** inbound hook (Stripe, Stripe Connect, Meta Lead Ads, WhatsApp, QuickBooks/Wave/Flinks callbacks) — replay a request with a bad signature, expect 4xx.
+- Auth: better-auth session lifetime, 2FA enforcement paths (Phase 13), password reset, email change, invite-link expiry/single-use, team-member removal revokes sessions.
+- Rate limits actually bite (public quote follow-up, sign, invoice pay, lead widget, speech).
+- `pnpm audit` (already a workflow: `dependency-audit.yml` — check it is green), secrets scan of the repo history, CORS origin list, security headers on the Vercel edge (`helmet`-equivalent), CSP for the public pages.
+- Token encryption (`TOKEN_ENCRYPTION_KEY`) covers every stored OAuth token (QuickBooks, Google, Microsoft, Gmail, Wave, Meta, Flinks).
+- Exit: findings list with severities, all High/Critical fixed and re-tested; the rest triaged.
+- Who: Claude; the **external pentest** at the end is user-procured.
+
+### Phase 65 — Integrations live smoke (sandbox/test modes)
+For each: connect from Settings → Integrations, trigger the real event, confirm the side effect, disconnect.
+- Stripe (subscriptions + one-shot unlocks, test mode), Stripe Connect card payments on the public invoice page, e-Transfer self-report flow.
+- QuickBooks sandbox: invoice.paid → sales receipt; cost.confirmed → expense.
+- Google Calendar: milestone → all-day event, milestone date change → event update.
+- Gmail connected send: a contract email actually arrives from the contractor's address; fallback to platform sender when disconnected.
+- WhatsApp Cloud API: confirm the **template-less** paths work and the three unapproved templates degrade to email without erroring (or get the templates submitted — user task, do it in parallel).
+- Meta Lead Ads: use Meta's Lead Ads Testing Tool to push a test lead → appears in `/dashboard/leads`.
+- Wave / Financeit / Flinks / Google LSA: no credentials → verify the UI states are honest ("not connected / coming soon"), nothing throws, cron paths skip cleanly.
+- `/api/cron/tick`: run it manually on staging with seeded due items (reminders, follow-ups, scheduled invoices, LSA poll) — check `automation_runs` rows and idempotency (run twice, nothing doubles).
+- Email deliverability: SPF/DKIM/DMARC for the sending domain, and every transactional template renders in EN + FR.
+- Exit: per-integration checklist with pass/fail; Outlook calendar explicitly marked "not registered".
+- Who: user drives the portals (needs their accounts), Claude verifies logs/DB and fixes.
+
+### Phase 66 — Functional walkthrough of every screen (real account, staging)
+- One scripted journey, EN then FR: sign up → 2FA → onboarding (province, licence, e-transfer, schedule) → import price list (CSV + PDF OCR) → new quote (AI, manual, catalog, tiers) → send → customer accepts on `/p/:id` → contract → both sign → job setup review → assign crew → worker clock-in → costs + receipt review → change order → milestone invoice → customer pays → review request → archive → restore → CSV export → delete account.
+- Then every one of the 56 routes in `App.tsx` and **every dialog from Phase 60** individually: empty state, loading state, error state (kill the API mid-action), validation messages, toasts, keyboard (Tab order, Esc closes, Enter submits), focus return after a modal closes.
+- i18n: run a script that finds `t("…")` keys missing from `fr:` or `en:` (5,948 keys — there will be gaps) and any hardcoded English in JSX.
+- Exit: a bug list, everything P1 fixed, P2s ticketed in `deferred-work`.
+- Who: Claude (Browser pane on staging — the first time dashboard pages can be checked live instead of via the fake-data preview-route trick); user for a second pair of eyes on the journey.
+
+### Phase 67 — Visual & accessibility QA
+- Every page vs `docs/mockups/*.html` at 1280 / 980 / 768 / 640 / 375 — the redesign was verified page-by-page as it was built, never all at once after the later CSS sections landed (Phase 59's `.card + .card` leak was exactly this kind of cross-page regression).
+- Grep survey for leftovers: shadcn `Button|Input|Label|Card|Badge` imports, `slate-`/`navy-500`/`rounded-2xl`/`text-muted-foreground`, emoji, `glow`/`parallax` (per the professional-design rule). Known allowed: `admin.tsx`, react-hook-form `Form`+`Input` stacks in settings/profile, 5 `Select`s in settings, 3 `Button`s in documents/profile — decide whether to leave them or run a small Phase 61b.
+- Print/PDF: quote, contract, invoice, receipt PDFs in EN/FR, ON/QC, with and without logo, long line-item lists (page breaks).
+- Real devices: iPhone Safari + Android Chrome for the public pages (`/p/:id`, `/i/:token`, sign, worker clock-in), the bottom-sheet modals, and the sidebar drawer.
+- Accessibility: axe on every route, contrast on chips/notices, modal focus trap, form labels, `prefers-reduced-motion` for the modal/sheet animations.
+- Exit: zero P1 visual bugs, axe serious/critical = 0.
+- Who: Claude, plus user on real phones.
+
+### Phase 68 — Performance, SEO & content integrity
+- Lighthouse (mobile) on `/`, `/fr`, `/whatsapp`, a blog article, a city/profession landing page, the public quote page: targets Perf ≥ 90, SEO 100, no CLS from the SPA-shell fix.
+- `scripts/prerender-seo.ts` output: every prerendered page has correct `<title>`/canonical/hreflang/OG; sitemap matches `PATHS` (this is where the uncommitted `sitemap.xml` diff gets resolved); `robots.txt`; OG images generated for every article/sector.
+- API: p95 of the dashboard home, quotes list, job detail, analytics with a seeded 500-quote / 50-job org; look for N+1 in `clients.ts` (virtual aggregation over quotes), analytics, archive.
+- Bundle: dashboard first-load JS budget; confirm `admin.tsx` and blog content never ship to the dashboard.
+- Copy: spell/grammar pass over EN and FR public copy and every email template; legal pages reflect the real entity/province.
+- Exit: numbers recorded here; anything under target fixed.
+- Who: Claude.
+
+### Phase 69 — Operations & launch readiness
+- Error tracking (Sentry or Vercel's own) wired into both apps with source maps; alert on `automation_runs.status = 'failed'` and on cron tick not running for > 1 h.
+- Vercel env inventory: script that lists every `process.env.X` in `api-server/src` and diffs against `vercel env ls` — every missing var either set or documented as intentionally absent (Outlook, Wave, Financeit, Flinks, LSA).
+- Backups: confirm Supabase PITR/backup schedule; write and **rehearse** a restore into staging.
+- Runbooks in `docs/RUNBOOKS.md`: cron failure, Stripe webhook backlog, OAuth token revoked, migration rollback, how to rotate `TOKEN_ENCRYPTION_KEY`.
+- Update `deferred-work-post-launch` with what 61-68 left, strike what they closed.
+- Exit: on-call could recover the service from the docs alone.
+- Who: Claude; backup policy decisions are the user's.
+
+### Phase 70 — Human-only gate (not code)
+- Legal review of the province contract templates and the ToS/privacy pages.
+- Help-centre articles for the top 10 flows (Phase 6 content task).
+- WhatsApp template approval, Outlook/Entra app registration, partner credential applications (Wave, Financeit, Flinks, LSA) if those features are meant to be live at launch.
+- External pentest after 64 is closed.
+- Go/no-go review of this document.
+- Who: user.
+
+---
+
+## 3. Build log
+
+*(append one entry per phase as it completes: date, commit, what was found, what was fixed, what was deferred)*

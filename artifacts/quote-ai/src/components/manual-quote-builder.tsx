@@ -307,7 +307,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
     <div className="space-y-4">
 
       {/* ── Template ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+      <div className="card p-4 space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.pdfTemplate")}</p>
         <div className="grid grid-cols-3 gap-2">
           {TEMPLATES.map(tpl => (
@@ -330,7 +330,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Title & Description ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+      <div className="card p-4 space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.quoteHeader")}</p>
         <div className="space-y-1">
           <Label className="text-xs font-medium text-muted-foreground">{t("manualQuote.jobSubject")}</Label>
@@ -372,7 +372,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
           const capSubtotale = computeCapSubtotale(ch);
 
           return (
-            <div key={ch.id} className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+            <div key={ch.id} className="card overflow-hidden">
               {/* Chapter header */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/50">
                 <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -571,7 +571,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Totals & Tax ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+      <div className="card p-4 space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.financialSummary")}</p>
 
         {/* Tax rate selector */}
@@ -615,7 +615,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Payment terms ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-3">
+      <div className="card p-4 space-y-3">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.paymentTerms")}</p>
         <div className="space-y-1.5">
           {condizioni.map((c, idx) => (
@@ -656,7 +656,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       </div>
 
       {/* ── Notes ── */}
-      <div className="bg-card rounded-2xl border border-border shadow-sm p-4 space-y-2">
+      <div className="card p-4 space-y-2">
         <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("manualQuote.finalNotes")}</Label>
         <textarea
           value={note}

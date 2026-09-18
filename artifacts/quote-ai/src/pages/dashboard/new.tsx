@@ -88,7 +88,7 @@ function ClientSelector({
 }: ClientSelectorProps) {
   const { t } = useLanguage();
   return (
-    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+    <div className="card overflow-hidden">
       <div className="px-4 py-3 flex items-center justify-between border-b border-border">
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />
@@ -516,7 +516,7 @@ export default function NewQuote() {
           </div>
 
           {/* Target total input */}
-          <div className="flex items-center gap-2 bg-card rounded-xl border border-border px-3 py-2.5 shadow-sm">
+          <div className="flex items-center gap-2 card px-3 py-2.5">
             <span className="text-xs font-medium text-muted-foreground shrink-0">{t("dashboard.new.targetAmount")}</span>
             <input
               type="text"
@@ -534,7 +534,7 @@ export default function NewQuote() {
           </div>
 
           {/* AI bar card */}
-          <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          <div className="card overflow-hidden">
             {/* Photo strip */}
             {photos.length > 0 && (
               <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">

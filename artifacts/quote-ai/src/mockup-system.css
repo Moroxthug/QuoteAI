@@ -739,3 +739,46 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .auth-center { text-align: center; padding: 8px 0; }
 .auth-spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: auth-spin .7s linear infinite; }
 @keyframes auth-spin { to { transform: rotate(360deg); } }
+
+/* ==========================================================
+   BLOG / ARTICLE PAGES
+   (docs/PIXEL-REDESIGN-PLAN.md, Phase 52 — Blog)
+
+   Listing pages reuse the homepage's .news-grid/.news-card and
+   .tiles-adjacent .card vocabulary directly. This block adds the
+   handful of classes those pages need but the homepage/dashboard
+   don't define: breadcrumbs, the article TOC box, prose-typography
+   overrides for article bodies, and a pill-link list.
+   ========================================================== */
+.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--faint); padding: 16px 0; }
+.crumbs a { color: var(--faint); transition: color .2s; }
+.crumbs a:hover { color: var(--navy); }
+.crumbs .crumb-sep { color: var(--line); }
+.crumbs .crumb-current { color: var(--navy); font-weight: 700; }
+
+.guide-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--soft); color: var(--navy); display: grid; place-items: center; margin-bottom: 6px; }
+
+.blog-toc { border: 1px solid var(--line); background: var(--soft); border-radius: var(--radius-mk); padding: 26px 28px; margin-bottom: 44px; }
+.blog-toc .label { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--navy); margin-bottom: 14px; }
+.blog-toc ol { display: flex; flex-direction: column; gap: 9px; }
+.blog-toc a { font-size: 14px; color: var(--ink); line-height: 1.4; }
+.blog-toc a:hover { color: var(--navy); }
+.blog-toc li.sub { padding-left: 18px; }
+
+.blog-prose {
+  --tw-prose-body: var(--muted-mk);
+  --tw-prose-headings: var(--navy);
+  --tw-prose-links: var(--navy);
+  --tw-prose-bold: var(--navy);
+  --tw-prose-bullets: var(--line);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--navy);
+  --tw-prose-quote-borders: var(--line);
+  --tw-prose-th-borders: var(--line);
+  --tw-prose-td-borders: var(--soft-2);
+}
+
+.blog-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.blog-link-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; color: var(--ink); transition: border-color .2s, color .2s; }
+.blog-link-pill:hover { border-color: var(--navy); color: var(--navy); }
+.blog-link-pill svg { color: var(--teal); flex: none; }

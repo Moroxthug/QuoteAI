@@ -1,10 +1,9 @@
-﻿import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
-import { Plus, Trash2, Upload, Loader2, Sparkles, Receipt, Clock, Wrench, Pencil, CheckCircle2, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Plus, Trash2, Upload, Loader2, Sparkles, Receipt, Clock, Wrench, Pencil, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -53,108 +52,116 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
     return m;
   }, [budget]);
   const pct = budgetTotalCents ? Math.min(100, Math.round((costs.totalCents / budgetTotalCents) * 100)) : 0;
+  const overBudget = !!budgetTotalCents && costs.totalCents > budgetTotalCents;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 stack">
         {/* Dropzone */}
         <div
-          className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50" : "border-slate-200 bg-card hover:border-navy-300")}
+          className={cn("dropzone flush", dragging && "on")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
           onClick={() => fileInput.current?.click()}
         >
           <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center">{scan.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
-            <div className="font-semibold text-slate-900 text-sm">{scan.isPending ? t("jobs.costs.scanning") : t("jobs.costs.dropTitle")}</div>
-            <div className="text-xs text-slate-500 max-w-md">{t("jobs.costs.dropDesc")}</div>
-          </div>
+          <div className="dz-ic">{scan.isPending ? <Loader2 className="animate-spin" /> : <Upload />}</div>
+          <b>{scan.isPending ? t("jobs.costs.scanning") : t("jobs.costs.dropTitle")}</b>
+          <p>{t("jobs.costs.dropDesc")}</p>
         </div>
 
         {/* Review queue */}
         {pending.length > 0 && (
-          <section className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4 space-y-2">
-            <div className="flex items-center gap-2 text-sm font-bold text-amber-900"><Sparkles className="h-4 w-4" /> {t("jobs.costs.toReview")} <span className="text-[10px] bg-amber-200 text-amber-900 rounded-full px-1.5">{pending.length}</span></div>
-            <ul className="divide-y divide-amber-100">
+          <section className="card" style={{ borderColor: "var(--yellow)" }}>
+            <div className="card-head">
+              <div><h2 className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4" style={{ color: "var(--yellow-dark)" }} /> {t("jobs.costs.toReview")} <span className="chip chip-yellow">{pending.length}</span></h2></div>
+            </div>
+            <div>
               {pending.map((e) => (
-                <li key={e.id} className="flex items-center gap-3 py-2 text-sm">
-                  <button className="min-w-0 flex-1 text-left" onClick={() => setDialog({ open: true, entry: e })}>
-                    <div className="font-medium text-slate-900 truncate">{e.vendor || t("jobs.costs.unknownVendor")} <span className="font-normal text-slate-500">· {e.description}</span></div>
-                    <div className="text-xs text-slate-500">{e.date ? format(day(e.date)!, "PP", { locale }) : "—"} · {t(`jobs.cost.${e.category}`)}{e.aiExtraction ? ` · ${t(`jobs.costs.confidence.${e.aiExtraction.confidence}`)}` : ""}</div>
+                <div key={e.id} className="item-row">
+                  <button type="button" className="grow text-left" onClick={() => setDialog({ open: true, entry: e })}>
+                    <span className="ttl"><b>{e.vendor || t("jobs.costs.unknownVendor")}</b> <span style={{ color: "var(--muted-mk)" }}>· {e.description}</span></span>
+                    <span className="sub">{e.date ? format(day(e.date)!, "PP", { locale }) : "—"} · {t(`jobs.cost.${e.category}`)}{e.aiExtraction ? ` · ${t(`jobs.costs.confidence.${e.aiExtraction.confidence}`)}` : ""}</span>
                   </button>
-                  <span className="font-semibold whitespace-nowrap">{formatCents(e.totalCents)}</span>
-                  <Button size="sm" variant="outline" className="h-8" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</Button>
-                  <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700 gap-1" disabled={confirm.isPending || !e.totalCents} onClick={() => confirm.mutate(e.id)}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.costs.confirm")}</Button>
-                </li>
+                  <span className="amt">{formatCents(e.totalCents)}</span>
+                  <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>
+                  <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={confirm.isPending || !e.totalCents} onClick={() => confirm.mutate(e.id)}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.costs.confirm")}</button>
+                </div>
               ))}
-            </ul>
+            </div>
           </section>
         )}
 
         {/* Entries */}
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900">{t("jobs.costs.entries")}</h2>
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center gap-1 text-xs text-slate-500"><Filter className="h-3.5 w-3.5" />
-                <select value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} className="h-8 rounded-md border border-slate-200 bg-card px-2 text-xs">
+        <section className="card">
+          <div className="card-head">
+            <div><h2>{t("jobs.costs.entries")}</h2></div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="field">
+                <select value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} style={{ padding: "8px 12px", fontSize: 13.5 }}>
                   <option value="all">{t("jobs.costs.allCategories")}</option>
                   {COST_CATEGORY_KEYS.map((c) => <option key={c} value={c}>{t(`jobs.cost.${c}`)}</option>)}
                 </select>
               </div>
-              <Button size="sm" className="h-8 gap-1" onClick={() => setDialog({ open: true, entry: null })}><Plus className="h-4 w-4" /> {t("jobs.costs.add")}</Button>
+              <button type="button" className="btn btn-sm btn-navy" onClick={() => setDialog({ open: true, entry: null })}><Plus className="h-4 w-4" /> {t("jobs.costs.add")}</button>
             </div>
           </div>
-          {confirmed.length === 0 ? <p className="text-sm text-slate-400 py-6 text-center">{t("jobs.costs.empty")}</p> : (
-            <ul className="divide-y">
+          {confirmed.length === 0 ? <div className="card-empty">{t("jobs.costs.empty")}</div> : (
+            <div>
               {confirmed.map((e) => {
                 const Icon = SOURCE_ICON[e.source];
                 const derived = e.source === "time_entry" || e.source === "equipment";
                 return (
-                  <li key={e.id} className="flex items-center gap-3 py-2 text-sm group">
-                    <span className="h-7 w-7 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center shrink-0" title={t(`jobs.costs.source.${e.source}`)}><Icon className="h-3.5 w-3.5" /></span>
-                    <span className="text-xs text-slate-400 w-20 shrink-0">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate text-slate-800">{e.vendor && !derived ? <span className="font-medium">{e.vendor}</span> : null}{e.vendor && !derived && e.description ? " · " : ""}{e.description}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{t(`jobs.cost.${e.category}`)}{e.milestoneTitle ? ` · ${e.milestoneTitle}` : ""}{e.taxCents ? ` · ${t("jobs.costs.tax")} ${formatCents(e.taxCents)}` : ""}</div>
+                  <div key={e.id} className="item-row">
+                    <span className="ic" title={t(`jobs.costs.source.${e.source}`)}><Icon /></span>
+                    <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
+                    <div className="grow">
+                      <span className="ttl">{e.vendor && !derived ? <b>{e.vendor}</b> : null}{e.vendor && !derived && e.description ? " · " : ""}{e.description}</span>
+                      <span className="sub">{t(`jobs.cost.${e.category}`)}{e.milestoneTitle ? ` · ${e.milestoneTitle}` : ""}{e.taxCents ? ` · ${t("jobs.costs.tax")} ${formatCents(e.taxCents)}` : ""}</span>
                     </div>
-                    <span className="font-medium whitespace-nowrap">{formatCents(e.totalCents)}</span>
-                    {!derived && <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-slate-700" onClick={() => setDialog({ open: true, entry: e })}><Pencil className="h-3.5 w-3.5" /></button>}
-                    {!derived && <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => del.mutate(e.id)}><Trash2 className="h-4 w-4" /></button>}
-                  </li>
+                    <span className="amt">{formatCents(e.totalCents)}</span>
+                    {!derived && (
+                      <div className="hover-act">
+                        <button type="button" className="ic-btn" onClick={() => setDialog({ open: true, entry: e })}><Pencil /></button>
+                        <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>
+                      </div>
+                    )}
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           )}
         </section>
       </div>
 
-      <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3 h-fit">
-        <div className="flex items-center justify-between"><h3 className="text-sm font-bold text-slate-900">{t("jobs.costs.budgetVsActual")}</h3><Link href={`/dashboard/jobs/${job.id}/setup`} className="text-xs text-navy-600 hover:underline">{t("jobs.costs.editBudget")}</Link></div>
-        <div>
-          <div className="flex justify-between text-sm"><span className="text-slate-500">{t("jobs.kpi.costs")}</span><span className="font-semibold">{formatCents(costs.totalCents)}</span></div>
-          <div className="h-2 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", costs.totalCents > budgetTotalCents && budgetTotalCents ? "bg-rose-500" : "bg-emerald-500")} style={{ width: `${pct}%` }} /></div>
-          <div className="flex justify-between text-xs text-slate-400 mt-1"><span>{t("jobs.kpi.budget")}</span><span>{formatCents(budgetTotalCents)}</span></div>
-          {costs.pendingCents > 0 && <div className="text-[11px] text-amber-700 mt-1">{t("jobs.costs.pendingHint")} {formatCents(costs.pendingCents)}</div>}
+      <section className="card h-fit">
+        <div className="card-head">
+          <div><h2>{t("jobs.costs.budgetVsActual")}</h2></div>
+          <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-link">{t("jobs.costs.editBudget")}</Link>
         </div>
-        <ul className="space-y-2 pt-2 border-t">
-          {COST_CATEGORY_KEYS.map((c) => {
-            const actual = costs.byCategory[c] ?? 0;
-            const planned = budgetByCat[c];
-            if (!actual && !planned) return null;
-            const p = planned ? Math.min(100, Math.round((actual / planned) * 100)) : actual ? 100 : 0;
-            const over = planned > 0 && actual > planned;
-            return (
-              <li key={c}>
-                <div className="flex justify-between text-xs"><span className="text-slate-600">{t(`jobs.cost.${c}`)}</span><span className={cn("font-medium", over ? "text-rose-600" : "text-slate-800")}>{formatCents(actual)} <span className="text-slate-400 font-normal">/ {formatCents(planned)}</span></span></div>
-                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1"><div className={cn("h-full", over ? "bg-rose-500" : "bg-navy-500")} style={{ width: `${p}%` }} /></div>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="text-[11px] text-slate-400 pt-1">{t("jobs.costs.derivedHint")}</p>
+        <div>
+        <div className="hbar-row">
+          <div className="hbar-top">{t("jobs.kpi.costs")}<span>{formatCents(costs.totalCents)}</span></div>
+          <div className="hbar"><i style={{ width: `${pct}%`, background: overBudget ? "var(--red)" : "var(--green)" }} /></div>
+          <div className="hbar-top" style={{ marginTop: 8, marginBottom: 0 }}><span>{t("jobs.kpi.budget")}</span><span>{formatCents(budgetTotalCents)}</span></div>
+          {costs.pendingCents > 0 && <p className="field-hint" style={{ color: "var(--yellow-dark)" }}>{t("jobs.costs.pendingHint")} {formatCents(costs.pendingCents)}</p>}
+        </div>
+        {COST_CATEGORY_KEYS.map((c) => {
+          const actual = costs.byCategory[c] ?? 0;
+          const planned = budgetByCat[c];
+          if (!actual && !planned) return null;
+          const p = planned ? Math.min(100, Math.round((actual / planned) * 100)) : actual ? 100 : 0;
+          const over = planned > 0 && actual > planned;
+          return (
+            <div key={c} className="hbar-row">
+              <div className="hbar-top" style={{ fontSize: 13 }}>{t(`jobs.cost.${c}`)}<span style={over ? { color: "var(--red)" } : undefined}>{formatCents(actual)} <span style={{ color: "var(--faint)" }}>/ {formatCents(planned)}</span></span></div>
+              <div className="hbar" style={{ height: 6 }}><i style={{ width: `${p}%`, background: over ? "var(--red)" : undefined }} /></div>
+            </div>
+          );
+        })}
+        </div>
+        <div className="card-foot"><span className="foot-note">{t("jobs.costs.derivedHint")}</span></div>
       </section>
 
       <CostEntryDialog jobId={job.id} entry={dialog.entry} milestones={milestones} open={dialog.open} onOpenChange={(v) => setDialog((d) => ({ ...d, open: v }))} />

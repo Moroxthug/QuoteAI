@@ -1,63 +1,69 @@
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { JobStatus, MilestoneStatus, ChangeOrderStatus } from "@/lib/jobs-api";
 import type { InvoiceStatus, InvoiceType } from "@/lib/invoices-api";
 
+/**
+ * Status chips for jobs / milestones / change orders / invoices, on the
+ * locked `.chip-*` vocabulary (Phase 57 — docs/PIXEL-REDESIGN-PLAN.md).
+ * Same mapping the list pages use: green = done/paid, teal = in progress,
+ * yellow = waiting on someone, red = problem, purple = planned/viewed,
+ * grey = draft/closed.
+ */
 const JOB: Record<JobStatus, string> = {
-  planning: "bg-slate-100 text-slate-700",
-  active: "bg-blue-100 text-blue-700",
-  suspended: "bg-amber-100 text-amber-700",
-  completed: "bg-emerald-100 text-emerald-700",
+  planning: "chip-grey",
+  active: "chip-teal",
+  suspended: "chip-yellow",
+  completed: "chip-green",
 };
 const MILESTONE: Record<MilestoneStatus, string> = {
-  planned: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
-  in_progress: "bg-blue-100 text-blue-700",
-  completed: "bg-emerald-100 text-emerald-700",
-  skipped: "bg-slate-100 text-slate-500",
+  planned: "chip-purple",
+  in_progress: "chip-teal",
+  completed: "chip-green",
+  skipped: "chip-grey",
 };
 const CO: Record<ChangeOrderStatus, string> = {
-  draft: "bg-slate-100 text-slate-700",
-  sent: "bg-blue-100 text-blue-700",
-  signed: "bg-emerald-100 text-emerald-700",
-  declined: "bg-rose-100 text-rose-700",
-  voided: "bg-slate-100 text-slate-500",
+  draft: "chip-grey",
+  sent: "chip-teal",
+  signed: "chip-green",
+  declined: "chip-red",
+  voided: "chip-grey",
 };
 
 export function JobStatusBadge({ status, pendingReview }: { status: JobStatus; pendingReview?: boolean }) {
   const { t } = useLanguage();
-  if (pendingReview) return <Badge className="font-medium border-0 bg-amber-100 text-amber-800">{t("jobs.status.pending_review")}</Badge>;
-  return <Badge className={cn("font-medium border-0", JOB[status])}>{t(`jobs.status.${status}`)}</Badge>;
+  if (pendingReview) return <span className="chip chip-yellow">{t("jobs.status.pending_review")}</span>;
+  return <span className={cn("chip", JOB[status])}>{t(`jobs.status.${status}`)}</span>;
 }
 
 export function MilestoneStatusBadge({ status }: { status: MilestoneStatus }) {
   const { t } = useLanguage();
-  return <Badge className={cn("font-medium border-0", MILESTONE[status])}>{t(`jobs.milestone.status.${status}`)}</Badge>;
+  return <span className={cn("chip", MILESTONE[status])}>{t(`jobs.milestone.status.${status}`)}</span>;
 }
 
 export function ChangeOrderStatusBadge({ status }: { status: ChangeOrderStatus }) {
   const { t } = useLanguage();
-  return <Badge className={cn("font-medium border-0", CO[status])}>{t(`jobs.co.status.${status}`)}</Badge>;
+  return <span className={cn("chip", CO[status])}>{t(`jobs.co.status.${status}`)}</span>;
 }
 
 const INVOICE: Record<InvoiceStatus, string> = {
-  draft: "bg-slate-100 text-slate-700",
-  sent: "bg-blue-100 text-blue-700",
-  viewed: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
-  pending_confirmation: "bg-amber-100 text-amber-800",
-  partially_paid: "bg-amber-100 text-amber-800",
-  paid: "bg-emerald-100 text-emerald-700",
-  overdue: "bg-rose-100 text-rose-700",
-  void: "bg-slate-100 text-slate-500 line-through",
+  draft: "chip-grey",
+  sent: "chip-teal",
+  viewed: "chip-purple",
+  pending_confirmation: "chip-yellow",
+  partially_paid: "chip-yellow",
+  paid: "chip-green",
+  overdue: "chip-red",
+  void: "chip-grey line-through",
 };
 
 export function InvoiceStatusBadge({ status, scheduled }: { status: InvoiceStatus; scheduled?: boolean }) {
   const { t } = useLanguage();
-  if (status === "draft" && scheduled) return <Badge className="font-medium border-0 bg-[var(--qa-purple-t)] text-[var(--qa-purple)]">{t("invoices.status.scheduled")}</Badge>;
-  return <Badge className={cn("font-medium border-0", INVOICE[status])}>{t(`invoices.status.${status}`)}</Badge>;
+  if (status === "draft" && scheduled) return <span className="chip chip-purple">{t("invoices.status.scheduled")}</span>;
+  return <span className={cn("chip", INVOICE[status])}>{t(`invoices.status.${status}`)}</span>;
 }
 
 export function InvoiceTypeBadge({ type }: { type: InvoiceType }) {
   const { t } = useLanguage();
-  return <Badge variant="outline" className="font-normal text-slate-600">{t(`invoices.type.${type}`)}</Badge>;
+  return <span className="chip chip-grey" style={{ background: "#fff", border: "1px solid var(--line)" }}>{t(`invoices.type.${type}`)}</span>;
 }

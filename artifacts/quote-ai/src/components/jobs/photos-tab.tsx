@@ -1,7 +1,6 @@
-﻿import { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, Loader2, Trash2, Share2, Check, ImageOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -53,72 +52,77 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
   const milestoneTitle = (id: string | null) => (id ? milestones.find((m) => m.id === id)?.title ?? null : null);
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-sm font-bold text-slate-900">{t("jobs.photos.title")}</h3>
-        <p className="text-xs text-slate-500">{t("jobs.photos.desc")}</p>
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2>{t("jobs.photos.title")}</h2>
+          <p className="sub">{t("jobs.photos.desc")}</p>
+        </div>
+        {selected.size > 0 && (
+          <div className="flex items-center gap-3">
+            <span className="foot-note">{selected.size} {t("jobs.photos.selected")}</span>
+            <button type="button" className="btn btn-sm btn-navy" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
+              {share.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
+              {share.isPending ? t("jobs.photos.sharing") : t("jobs.photos.share")}
+            </button>
+          </div>
+        )}
       </div>
 
-      <div
-        className={cn("rounded-2xl border-2 border-dashed p-5 text-center transition-colors cursor-pointer", dragging ? "border-navy-400 bg-navy-50" : "border-slate-200 bg-card hover:border-navy-300")}
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
-        onClick={() => fileInput.current?.click()}
-      >
-        <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="h-10 w-10 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center">{upload.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}</div>
-          <div className="font-semibold text-slate-900 text-sm">{upload.isPending ? t("jobs.photos.uploading") : t("jobs.photos.upload")}</div>
+      <div className="act-body stack">
+        <div
+          className={cn("dropzone flush", dragging && "on")}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
+          onClick={() => fileInput.current?.click()}
+        >
+          <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
+          <div className="dz-ic">{upload.isPending ? <Loader2 className="animate-spin" /> : <Upload />}</div>
+          <b>{upload.isPending ? t("jobs.photos.uploading") : t("jobs.photos.upload")}</b>
         </div>
+
+        {isLoading ? (
+          <div className="card-empty">…</div>
+        ) : photos.length === 0 ? (
+          <div className="card-empty">
+            <ImageOff />
+            {t("jobs.photos.empty")}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {photos.map((p: JobPhotoDto) => {
+              const isSelected = selected.has(p.id);
+              const ms = milestoneTitle(p.milestoneId);
+              return (
+                <div key={p.id} className={cn("photo", isSelected && "on")}>
+                  <button type="button" className="photo-img" onClick={() => toggle(p.id)}>
+                    <img src={jobsApi.photoFileUrl(job.id, p.id)} alt={p.caption || p.fileName} />
+                  </button>
+                  <button type="button" className={cn("chk", isSelected && "on")} onClick={() => toggle(p.id)} aria-pressed={isSelected}>
+                    {isSelected && <Check />}
+                  </button>
+                  <button
+                    type="button"
+                    className="photo-del"
+                    onClick={(e) => { e.stopPropagation(); if (confirm(t("jobs.photos.deleteConfirm"))) del.mutate(p.id); }}
+                    title={t("jobs.photos.delete")}
+                  >
+                    <Trash2 />
+                  </button>
+                  {(ms || p.caption || p.sharedAt) && (
+                    <div className="photo-meta">
+                      {ms && <b>{ms}</b>}
+                      {p.caption && <span className="block truncate">{p.caption}</span>}
+                      {p.sharedAt && <i>{t("jobs.photos.shared")}</i>}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
-
-      {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-lg border border-navy-200 bg-navy-50 px-4 py-2.5">
-          <span className="text-sm text-navy-900">{selected.size} {t("jobs.photos.selected")}</span>
-          <Button size="sm" className="gap-2" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
-            {share.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Share2 className="h-3.5 w-3.5" />}
-            {share.isPending ? t("jobs.photos.sharing") : t("jobs.photos.share")}
-          </Button>
-        </div>
-      )}
-
-      {isLoading ? (
-        <div className="text-sm text-slate-400 py-8 text-center">…</div>
-      ) : photos.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 py-12 text-slate-400">
-          <ImageOff className="h-8 w-8" />
-          <p className="text-sm">{t("jobs.photos.empty")}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {photos.map((p: JobPhotoDto) => {
-            const isSelected = selected.has(p.id);
-            return (
-              <div key={p.id} className={cn("group relative rounded-xl overflow-hidden border bg-card", isSelected ? "border-navy-500 ring-2 ring-navy-200" : "border-slate-200")}>
-                <button className="block w-full aspect-square bg-slate-100" onClick={() => toggle(p.id)}>
-                  <img src={jobsApi.photoFileUrl(job.id, p.id)} alt={p.caption || p.fileName} className="w-full h-full object-cover" />
-                </button>
-                <div className={cn("absolute top-2 left-2 h-5 w-5 rounded-full border-2 flex items-center justify-center", isSelected ? "bg-navy-600 border-navy-600" : "bg-card/80 border-white")} onClick={() => toggle(p.id)}>
-                  {isSelected && <Check className="h-3 w-3 text-white" />}
-                </div>
-                <button
-                  className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center hover:bg-red-600"
-                  onClick={(e) => { e.stopPropagation(); if (confirm(t("jobs.photos.deleteConfirm"))) del.mutate(p.id); }}
-                  title={t("jobs.photos.delete")}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </button>
-                <div className="p-2 space-y-0.5">
-                  {milestoneTitle(p.milestoneId) && <div className="text-[10px] text-navy-600 truncate">{milestoneTitle(p.milestoneId)}</div>}
-                  {p.caption && <div className="text-[11px] text-slate-600 truncate">{p.caption}</div>}
-                  {p.sharedAt && <div className="text-[10px] text-emerald-600">{t("jobs.photos.shared")}</div>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    </section>
   );
 }

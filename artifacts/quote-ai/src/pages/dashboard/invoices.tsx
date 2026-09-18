@@ -190,32 +190,31 @@ export function InvoiceRow({ inv, locale, compact }: { inv: InvoiceDto; locale: 
   const { t } = useLanguage();
   const overdue = inv.status === "overdue";
   const scheduled = inv.status === "draft" && !!inv.scheduledFor && new Date(inv.scheduledFor) > new Date();
+  const when = inv.status === "paid" && inv.paidAt ? `${t("invoices.paidOn")} ${format(new Date(inv.paidAt), "PP", { locale })}`
+    : isOpenInvoice(inv.status) ? `${inv.paidCents > 0 ? `${formatCents(inv.balanceCents)} ${t("invoices.due")} · ` : ""}${t("invoices.dueOn")} ${format(new Date(inv.dueDate), "PP", { locale })}`
+    : scheduled ? `${t("invoices.sendableOn")} ${format(new Date(inv.scheduledFor!), "PP", { locale })}`
+    : format(new Date(inv.issueDate), "PP", { locale });
   return (
-    <Link href={`/dashboard/invoices/${inv.id}`} className="flex items-center gap-4 px-4 py-3.5 hover:bg-slate-50 transition-colors">
-      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shrink-0", overdue ? "bg-rose-50 text-rose-600" : inv.status === "paid" ? "bg-emerald-50 text-emerald-600" : "bg-navy-50 text-navy-600")}>
-        {overdue ? <AlertTriangle className="h-5 w-5" /> : <Receipt className="h-5 w-5" />}
-      </div>
-      <div className="min-w-0 flex-1">
+    <Link href={`/dashboard/invoices/${inv.id}`} className="q-row">
+      <span className={cn("q-ic", overdue && "bg-[var(--red-t)] text-[var(--red)]", inv.status === "paid" && "bg-[var(--green-t)] text-[var(--green-dark)]")}>
+        {overdue ? <AlertTriangle className="h-4 w-4" /> : <Receipt className="h-4 w-4" />}
+      </span>
+      <div className="q-body">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-slate-900">{inv.number}</span>
+          <p className="q-title">{inv.number}</p>
           <InvoiceStatusBadge status={inv.status} scheduled={scheduled} />
           {!compact && <InvoiceTypeBadge type={inv.type} />}
-          {inv.autoSendAt && inv.status === "draft" && <span className="text-[11px] text-amber-700 bg-amber-50 rounded px-1.5 py-0.5">{t("invoices.autoSendAt")} {format(new Date(inv.autoSendAt), "PPp", { locale })}</span>}
+          {inv.autoSendAt && inv.status === "draft" && <span className="chip chip-yellow">{t("invoices.autoSendAt")} {format(new Date(inv.autoSendAt), "PPp", { locale })}</span>}
         </div>
-        <div className="text-sm text-slate-500 truncate">
-          {inv.clientName}{inv.projectName ? ` · ${inv.projectName}` : ""}{inv.paymentTermLabel && !compact ? ` · ${inv.paymentTermLabel}` : ""}
+        <div className="q-meta">
+          <span className="q-date truncate">{inv.clientName}{inv.projectName ? ` · ${inv.projectName}` : ""}{inv.paymentTermLabel && !compact ? ` · ${inv.paymentTermLabel}` : ""}</span>
         </div>
       </div>
       <div className="text-right shrink-0">
-        <div className={cn("font-semibold", inv.type === "credit_note" ? "text-rose-600" : "text-slate-900")}>{formatCents(inv.totalCents)}</div>
-        <div className={cn("text-xs", overdue ? "text-rose-600 font-medium" : "text-slate-400")}>
-          {inv.status === "paid" && inv.paidAt ? `${t("invoices.paidOn")} ${format(new Date(inv.paidAt), "PP", { locale })}`
-            : isOpenInvoice(inv.status) ? `${inv.paidCents > 0 ? `${formatCents(inv.balanceCents)} ${t("invoices.due")} · ` : ""}${t("invoices.dueOn")} ${format(new Date(inv.dueDate), "PP", { locale })}`
-            : scheduled ? `${t("invoices.sendableOn")} ${format(new Date(inv.scheduledFor!), "PP", { locale })}`
-            : format(new Date(inv.issueDate), "PP", { locale })}
-        </div>
+        <div className={cn("q-amt", inv.type === "credit_note" && "text-[var(--red)]")}>{formatCents(inv.totalCents)}</div>
+        <div className="q-date" style={overdue ? { color: "var(--red)" } : undefined}>{when}</div>
       </div>
-      <ChevronRight className="h-4 w-4 text-slate-300 shrink-0" />
+      <ChevronRight className="chev" />
     </Link>
   );
 }

@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Receipt, Upload, Loader2, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type CostEntryDto, type JobSummaryDto } from "@/lib/jobs-api";
@@ -28,28 +27,30 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const openJobs = jobs.filter((j) => j.status === "planning" || j.status === "active").map((j) => ({ id: j.id, name: j.name }));
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-card p-3 md:p-4 flex flex-wrap items-center gap-3">
+    <div className="card">
+      <div className="item-row" style={{ borderTop: "none" }}>
       <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) scan.mutate(f); e.target.value = ""; }} />
-      <div className="h-9 w-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0"><Receipt className="h-4 w-4" /></div>
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold text-slate-900">{entries.length ? `${entries.length} ${t("jobs.receipts.toReview")}` : t("jobs.receipts.title")}</div>
-        <div className="text-xs text-slate-500">{t("jobs.receipts.desc")}</div>
+        <span className="ic warn"><Receipt /></span>
+        <div className="grow">
+          <b className="ttl">{entries.length ? `${entries.length} ${t("jobs.receipts.toReview")}` : t("jobs.receipts.title")}</b>
+          <span className="sub">{t("jobs.receipts.desc")}</span>
+        </div>
+        <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>{scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}</button>
       </div>
-      <Button size="sm" variant="outline" className="gap-2" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>{scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}</Button>
       {entries.length > 0 && (
-        <ul className="w-full divide-y border-t mt-1 pt-1">
+        <div>
           {entries.map((e) => (
-            <li key={e.id} className="flex items-center gap-3 py-2 text-sm">
-              <Sparkles className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-              <button className="min-w-0 flex-1 text-left" onClick={() => setDialog({ open: true, entry: e })}>
-                <div className="truncate"><span className="font-medium text-slate-900">{e.vendor || t("jobs.costs.unknownVendor")}</span> <span className="text-slate-500">· {e.description}</span></div>
-                <div className="text-[11px] text-slate-400 truncate">{e.projectName ?? <span className="text-amber-700">{t("jobs.receipts.noJob")}</span>} · {t(`jobs.cost.${e.category}`)}</div>
+            <div key={e.id} className="item-row">
+              <Sparkles className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--yellow-dark)" }} />
+              <button type="button" className="grow text-left" onClick={() => setDialog({ open: true, entry: e })}>
+                <span className="ttl"><b>{e.vendor || t("jobs.costs.unknownVendor")}</b> <span style={{ color: "var(--muted-mk)" }}>· {e.description}</span></span>
+                <span className="sub">{e.projectName ?? <span style={{ color: "var(--yellow-dark)" }}>{t("jobs.receipts.noJob")}</span>} · {t(`jobs.cost.${e.category}`)}</span>
               </button>
-              <span className="font-semibold whitespace-nowrap">{formatCents(e.totalCents)}</span>
-              <Button size="sm" variant="outline" className="h-8" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</Button>
-            </li>
+              <span className="amt">{formatCents(e.totalCents)}</span>
+              <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
       <CostEntryDialog jobId={dialog.entry?.projectId ?? null} entry={dialog.entry} milestones={[]} jobs={openJobs} open={dialog.open} onOpenChange={(v) => setDialog((d) => ({ ...d, open: v }))} />
     </div>

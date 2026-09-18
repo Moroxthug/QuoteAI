@@ -15,9 +15,9 @@ const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 /** Overview-tab insights: margin & schedule health, budget vs actual, cost curve, milestone slips. */
 export function OverviewCharts({ jobId, locale, jobStatus }: { jobId: string; locale: typeof enCA; jobStatus: string }) {
   const { data, isLoading } = useQuery({ queryKey: ["job-analytics", jobId], queryFn: () => analyticsApi.job(jobId) });
-  if (isLoading || !data) return <div className="grid md:grid-cols-3 gap-3"><Skeleton className="h-24 rounded-2xl" /><Skeleton className="h-24 rounded-2xl" /><Skeleton className="h-24 rounded-2xl" /></div>;
+  if (isLoading || !data) return <div className="grid md:grid-cols-3 gap-4"><Skeleton className="h-24 rounded-[var(--radius-mk)]" /><Skeleton className="h-24 rounded-[var(--radius-mk)]" /><Skeleton className="h-24 rounded-[var(--radius-mk)]" /></div>;
   return (
-    <div className="space-y-4">
+    <div className="stack">
       <HealthStrip data={data} locale={locale} jobStatus={jobStatus} />
       <div className="grid lg:grid-cols-2 gap-4">
         <BudgetChart data={data} />
@@ -31,43 +31,43 @@ export function OverviewCharts({ jobId, locale, jobStatus }: { jobId: string; lo
 function HealthStrip({ data, locale, jobStatus }: { data: JobAnalyticsDto; locale: typeof enCA; jobStatus: string }) {
   const { t } = useLanguage();
   const ev = data.earned;
-  const marginTone = ev.projectedMarginPercent === null ? "" : ev.projectedMarginPercent < 10 ? "text-rose-600" : ev.projectedMarginPercent < 20 ? "text-amber-600" : "text-emerald-600";
+  const marginTone = ev.projectedMarginPercent === null ? undefined : ev.projectedMarginPercent < 10 ? "bad" : ev.projectedMarginPercent < 20 ? "warn" : "ok";
   const behind = data.schedule.daysBehind;
   const done = jobStatus === "completed";
   const gap = ev.billingGapCents;
   return (
-    <div className="grid md:grid-cols-3 gap-3">
+    <div className="grid md:grid-cols-3 gap-4">
       <Tile
-        icon={ev.projectedMarginPercent !== null && ev.projectedMarginPercent < 10 ? <TrendingDown className="h-4 w-4 text-rose-500" /> : <TrendingUp className="h-4 w-4 text-emerald-500" />}
+        icon={ev.projectedMarginPercent !== null && ev.projectedMarginPercent < 10 ? <TrendingDown /> : <TrendingUp />}
         label={t("analytics.job.projectedMargin")}
         value={ev.projectedMarginPercent === null ? "—" : `${ev.projectedMarginPercent}%`}
         tone={marginTone}
         sub={ev.projectedFinalCostCents !== null ? `${t("analytics.job.projectedCost")} ${formatCents(ev.projectedFinalCostCents)}${ev.costPerformance !== null ? ` · CPI ${ev.costPerformance}` : ""}` : t("analytics.job.noCostsYet")}
       />
       <Tile
-        icon={done ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : behind > 0 ? <AlertTriangle className="h-4 w-4 text-rose-500" /> : <Clock className="h-4 w-4 text-emerald-500" />}
+        icon={done ? <CheckCircle2 /> : behind > 0 ? <AlertTriangle /> : <Clock />}
         label={t("analytics.job.schedule")}
         value={done ? t("analytics.job.completed") : behind > 0 ? `${behind} ${t("analytics.job.daysBehind")}` : t("analytics.job.onTrack")}
-        tone={done ? "text-emerald-600" : behind > 0 ? "text-rose-600" : "text-emerald-600"}
+        tone={done ? "ok" : behind > 0 ? "bad" : "ok"}
         sub={data.schedule.forecastEnd && !done ? `${t("analytics.job.forecastEnd")} ${format(day(data.schedule.forecastEnd)!, "PP", { locale })}${behind > 0 && data.schedule.plannedEnd ? ` (${t("analytics.job.planned")} ${format(day(data.schedule.plannedEnd)!, "d MMM", { locale })})` : ""}` : undefined}
       />
       <Tile
-        icon={gap > 0 ? <AlertTriangle className="h-4 w-4 text-amber-500" /> : <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+        icon={gap > 0 ? <AlertTriangle /> : <CheckCircle2 />}
         label={t("analytics.job.unbilled")}
         value={gap > 0 ? formatCents(gap) : formatCents(0)}
-        tone={gap > 0 ? "text-amber-600" : "text-emerald-600"}
+        tone={gap > 0 ? "warn" : "ok"}
         sub={`${t("analytics.job.earned")} ${formatCents(ev.earnedCents)} · ${t("analytics.job.invoicedPreTax")} ${formatCents(ev.invoicedSubtotalCents)}${data.invoices.upcomingCents ? ` · ${t("analytics.job.upcomingTerms")} ${formatCents(data.invoices.upcomingCents)}` : ""}`}
       />
     </div>
   );
 }
 
-function Tile({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub?: string; tone?: string }) {
+function Tile({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-card px-4 py-3">
-      <div className="flex items-center gap-1.5 text-xs text-slate-500">{icon}{label}</div>
-      <div className={cn("text-lg font-bold text-slate-900 mt-0.5", tone)}>{value}</div>
-      {sub && <div className="text-[11px] text-slate-400 mt-0.5 leading-snug">{sub}</div>}
+    <div className="card stat-card">
+      <p className="lbl inline-flex items-center gap-1.5 [&_svg]:h-3.5 [&_svg]:w-3.5">{icon}{label}</p>
+      <p className={cn("val", tone)} style={{ fontSize: "1.35rem" }}>{value}</p>
+      {sub && <p className="sub" style={{ whiteSpace: "normal" }}>{sub}</p>}
     </div>
   );
 }
@@ -131,16 +131,16 @@ function SlipList({ data }: { data: JobAnalyticsDto }) {
   const rows = data.schedule.rows.filter((r) => r.slipDays > 0);
   return (
     <ChartCard title={t("analytics.job.slips")} subtitle={t("analytics.job.slipsHint")}>
-      <ul className="divide-y divide-slate-100">
+      <div>
         {rows.map((r) => (
-          <li key={r.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-            <span className="truncate text-slate-800">{r.title}</span>
-            <span className={cn("shrink-0 text-xs font-medium rounded-full px-2 py-0.5", r.state === "done_late" ? "bg-slate-100 text-slate-600" : "bg-rose-100 text-rose-700")}>
+          <div key={r.id} className="item-row" style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <div className="grow"><span className="ttl">{r.title}</span></div>
+            <span className={cn("chip", r.state === "done_late" ? "chip-grey" : "chip-red")}>
               {t(`analytics.job.state.${r.state}`)} · +{r.slipDays} {t("analytics.days")}
             </span>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </ChartCard>
   );
 }

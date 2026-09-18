@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -6,14 +6,12 @@ import { enCA, frCA } from "date-fns/locale";
 import {
   ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MockupToggle } from "@/components/ui/mockup-toggle";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -23,19 +21,20 @@ import { SignaturePad, type SignatureValue } from "@/components/signature-pad";
 
 const formatCad = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
 
+/** Contract status → locked `.chip-*` colour (Phase 57). */
 export const STATUS_STYLES: Record<ContractDto["status"], string> = {
-  draft: "bg-slate-100 text-slate-700",
-  sent: "bg-blue-100 text-blue-700",
-  viewed: "bg-[var(--qa-purple-t)] text-[var(--qa-purple)]",
-  signed: "bg-emerald-100 text-emerald-700",
-  declined: "bg-red-100 text-red-700",
-  voided: "bg-slate-200 text-slate-500",
-  expired: "bg-amber-100 text-amber-700",
+  draft: "chip-grey",
+  sent: "chip-teal",
+  viewed: "chip-purple",
+  signed: "chip-green",
+  declined: "chip-red",
+  voided: "chip-grey",
+  expired: "chip-yellow",
 };
 
 export function ContractStatusBadge({ status }: { status: ContractDto["status"] }) {
   const { t } = useLanguage();
-  return <Badge className={cn("font-medium border-0", STATUS_STYLES[status])}>{t(`contracts.status.${status}`)}</Badge>;
+  return <span className={cn("chip", STATUS_STYLES[status])}>{t(`contracts.status.${status}`)}</span>;
 }
 
 export default function ContractDetailPage() {
@@ -174,59 +173,57 @@ export default function ContractDetailPage() {
     return (
       <div className="space-y-4">
         <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-[600px] w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-[600px] w-full rounded-[var(--radius-mk)]" />
       </div>
     );
   }
   if (error || !contract || !vars) {
     return (
-      <div className="rounded-[var(--radius)] border bg-card p-12 text-center">
-        <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-3" />
-        <p className="text-slate-700 font-medium">{t("contracts.notFound")}</p>
-        <Link href="/dashboard/contracts" className="text-navy-600 text-sm mt-2 inline-block">{t("contracts.backToList")}</Link>
+      <div className="card card-empty">
+        <AlertTriangle style={{ color: "var(--yellow-dark)" }} />
+        <p style={{ color: "var(--navy)" }}>{t("contracts.notFound")}</p>
+        <Link href="/dashboard/contracts" className="text-link mt-2">{t("contracts.backToList")}</Link>
       </div>
     );
   }
 
+  const backHref = contract.kind === "change_order" && contract.projectId ? `/dashboard/jobs/${contract.projectId}?tab=changes` : "/dashboard/contracts";
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Link href={contract.kind === "change_order" && contract.projectId ? `/dashboard/jobs/${contract.projectId}?tab=changes` : "/dashboard/contracts"} className="text-sm text-slate-500 hover:text-slate-800 inline-flex items-center gap-1 mb-2">
-            <ArrowLeft className="h-3.5 w-3.5" /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}
-          </Link>
-          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-            <FileSignature className="h-7 w-7 text-navy-600" />
-            {contract.contractNumber}
+    <div className="animate-in fade-in duration-300">
+      <Link href={backHref} className="back-link"><ArrowLeft /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}</Link>
+      <div className="page-head">
+        <div className="min-w-0">
+          <div className="title-row">
+            <h1><FileSignature />{contract.contractNumber}</h1>
             <ContractStatusBadge status={contract.status} />
-            {contract.kind === "change_order" && <Badge className="font-medium border-0 bg-amber-100 text-amber-800">{t("contracts.changeOrder")}</Badge>}
-          </h1>
-          <p className="text-slate-500 mt-1 text-sm">
-            {contract.variables.customer.name} · {contract.variables.projectTitle} · <strong className="text-slate-700">{formatCad(contract.variables.total)}</strong>
-            {contract.quoteId && <> · <Link href={`/dashboard/quotes/${contract.quoteId}`} className="text-navy-600 hover:underline">{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link></>}
-            {contract.projectId && <> · <Link href={`/dashboard/jobs/${contract.projectId}`} className="text-navy-600 hover:underline">{t("contracts.openJob")}</Link></>}
-          </p>
+            {contract.kind === "change_order" && <span className="chip chip-yellow">{t("contracts.changeOrder")}</span>}
+          </div>
+          <div className="meta">
+            <span>{contract.variables.customer.name} · {contract.variables.projectTitle} · <strong style={{ color: "var(--navy)" }}>{formatCad(contract.variables.total)}</strong></span>
+            {contract.quoteId && <Link href={`/dashboard/quotes/${contract.quoteId}`}>{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link>}
+            {contract.projectId && <Link href={`/dashboard/jobs/${contract.projectId}`}>{t("contracts.openJob")}</Link>}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <a href={contractsApi.pdfUrl(contract.id, true)} target="_blank" rel="noreferrer">
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="h-4 w-4" /> {contract.hasSignedPdf ? t("contracts.downloadSigned") : t("contracts.downloadPdf")}</Button>
+        <div className="head-actions">
+          <a href={contractsApi.pdfUrl(contract.id, true)} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-navy">
+            <Download className="h-4 w-4" /> {contract.hasSignedPdf ? t("contracts.downloadSigned") : t("contracts.downloadPdf")}
           </a>
           {isOpen && !editing && (
-            <Button variant="outline" size="sm" className="gap-1.5 text-red-600 hover:text-red-700" onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("contracts.void")}</Button>
+            <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("contracts.void")}</button>
           )}
           {!isOpen && !isDraft && (
-            <Button variant="ghost" size="sm" className="gap-1.5 text-slate-500" onClick={() => archiveContract.mutate()} disabled={archiveContract.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>
+            <button type="button" className="text-link" onClick={() => archiveContract.mutate()} disabled={archiveContract.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>
           )}
         </div>
       </div>
 
       {/* Progress */}
       {isOpen && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="steps-inline">
           {steps.map((s, i) => (
-            <div key={s.key} className={cn("rounded-[var(--radius-sm)] border px-3 py-2.5 flex items-center gap-2 text-sm", s.done ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-card border-slate-200 text-slate-500")}>
-              {s.done ? <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" /> : <span className="h-5 w-5 rounded-full border border-slate-300 text-[11px] flex items-center justify-center shrink-0">{i + 1}</span>}
+            <div key={s.key} className={cn("step-pill", s.done && "done")}>
+              {s.done ? <CheckCircle2 /> : <span className="num">{i + 1}</span>}
               {s.label}
             </div>
           ))}
@@ -234,159 +231,161 @@ export default function ContractDetailPage() {
       )}
 
       {contract.status === "declined" && customerSigner?.declineReason && (
-        <div className="rounded-[var(--radius-sm)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          <strong>{t("contracts.declinedReason")}:</strong> {customerSigner.declineReason}
+        <div className="notice danger" style={{ marginBottom: 16 }}>
+          <Ban />
+          <span className="grow"><strong>{t("contracts.declinedReason")}:</strong> {customerSigner.declineReason}</span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Document */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 stack">
           {isDraft && (
-            <div className="flex items-center justify-between rounded-[var(--radius-sm)] border border-navy-200 bg-navy-50 px-4 py-3">
-              <div className="flex items-center gap-2 text-sm text-navy-900">
-                <Sparkles className="h-4 w-4 text-navy-600" />
-                {t("contracts.draftHint")}
+            <div className="notice info">
+              <Sparkles />
+              <span className="grow">{t("contracts.draftHint")}</span>
+              <div className="actions">
+                {editing ? (
+                  <>
+                    <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(false)} disabled={save.isPending}><X className="h-4 w-4" /> {t("contracts.cancel")}</button>
+                    <button type="button" className="btn btn-sm btn-navy" onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {t("contracts.save")}</button>
+                  </>
+                ) : (
+                  <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("contracts.edit")}</button>
+                )}
               </div>
-              {editing ? (
-                <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(false)} disabled={save.isPending}><X className="h-4 w-4 mr-1" /> {t("contracts.cancel")}</Button>
-                  <Button size="sm" onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Save className="h-4 w-4 mr-1" />} {t("contracts.save")}</Button>
-                </div>
-              ) : (
-                <Button size="sm" variant="outline" onClick={() => setEditing(true)}><Pencil className="h-4 w-4 mr-1" /> {t("contracts.edit")}</Button>
-              )}
             </div>
           )}
 
           {editing ? (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">{t("contracts.editTitle")}</CardTitle>
-                <CardDescription>{t("contracts.editDesc")}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.customerName")}</Label>
-                    <Input value={vars.customerName} onChange={(e) => setVars({ ...vars, customerName: e.target.value })} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.customerEmail")}</Label>
-                    <Input type="email" value={vars.customerEmail} onChange={(e) => setVars({ ...vars, customerEmail: e.target.value })} placeholder="client@email.com" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.startDate")}</Label>
-                    <Input type="date" value={vars.startDate} onChange={(e) => setVars({ ...vars, startDate: e.target.value })} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.duration")}</Label>
-                    <Input type="number" min={1} value={vars.estimatedDurationWeeks} onChange={(e) => setVars({ ...vars, estimatedDurationWeeks: e.target.value })} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.warranty")}</Label>
-                    <Input type="number" min={0} value={vars.warrantyMonths} onChange={(e) => setVars({ ...vars, warrantyMonths: e.target.value })} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>{t("contracts.field.holdback")}</Label>
-                    <div className="flex items-center gap-3 h-10">
-                      <Switch checked={vars.holdbackEnabled} onCheckedChange={(v) => setVars({ ...vars, holdbackEnabled: v })} />
-                      {vars.holdbackEnabled && <Input type="number" min={0} max={50} className="w-20" value={vars.holdbackPercent} onChange={(e) => setVars({ ...vars, holdbackPercent: e.target.value })} />}
-                      {vars.holdbackEnabled && <span className="text-sm text-slate-500">%</span>}
-                    </div>
+            <section className="card">
+              <div className="card-head">
+                <div>
+                  <h2>{t("contracts.editTitle")}</h2>
+                  <p className="sub">{t("contracts.editDesc")}</p>
+                </div>
+              </div>
+              <div className="form-grid">
+                <div className="field">
+                  <label>{t("contracts.field.customerName")}</label>
+                  <input value={vars.customerName} onChange={(e) => setVars({ ...vars, customerName: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t("contracts.field.customerEmail")}</label>
+                  <input type="email" value={vars.customerEmail} onChange={(e) => setVars({ ...vars, customerEmail: e.target.value })} placeholder="client@email.com" />
+                </div>
+                <div className="field">
+                  <label>{t("contracts.field.startDate")}</label>
+                  <input type="date" value={vars.startDate} onChange={(e) => setVars({ ...vars, startDate: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t("contracts.field.duration")}</label>
+                  <input type="number" min={1} value={vars.estimatedDurationWeeks} onChange={(e) => setVars({ ...vars, estimatedDurationWeeks: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t("contracts.field.warranty")}</label>
+                  <input type="number" min={0} value={vars.warrantyMonths} onChange={(e) => setVars({ ...vars, warrantyMonths: e.target.value })} />
+                </div>
+                <div className="field">
+                  <label>{t("contracts.field.holdback")}</label>
+                  <div className="field inline" style={{ minHeight: 44 }}>
+                    <MockupToggle checked={vars.holdbackEnabled} onCheckedChange={(v) => setVars({ ...vars, holdbackEnabled: v })} label={t("contracts.field.holdback")} />
+                    {vars.holdbackEnabled && <input type="number" min={0} max={50} style={{ width: 90 }} value={vars.holdbackPercent} onChange={(e) => setVars({ ...vars, holdbackPercent: e.target.value })} />}
+                    {vars.holdbackEnabled && <span>%</span>}
                   </div>
                 </div>
-                <div className="flex items-start justify-between rounded-lg border px-4 py-3 gap-4">
-                  <div>
-                    <div className="text-sm font-medium">{t("contracts.field.directAgreement")}</div>
-                    <div className="text-xs text-slate-500">{t("contracts.field.directAgreementHint")}</div>
-                  </div>
-                  <Switch checked={vars.directAgreement} onCheckedChange={(v) => setVars({ ...vars, directAgreement: v })} />
-                </div>
-                {contract.province === "QC" && contract.language === "en" && (
-                  <div className="flex items-start justify-between rounded-lg border px-4 py-3 gap-4">
-                    <div>
-                      <div className="text-sm font-medium">{t("contracts.field.englishQc")}</div>
-                      <div className="text-xs text-slate-500">{t("contracts.field.englishQcHint")}</div>
-                    </div>
-                    <Switch checked={vars.englishRequestedInQuebec} onCheckedChange={(v) => setVars({ ...vars, englishRequestedInQuebec: v })} />
-                  </div>
-                )}
+              </div>
 
+              <div className="set-row">
+                <div className="txt">
+                  <b>{t("contracts.field.directAgreement")}</b>
+                  <span>{t("contracts.field.directAgreementHint")}</span>
+                </div>
+                <MockupToggle checked={vars.directAgreement} onCheckedChange={(v) => setVars({ ...vars, directAgreement: v })} label={t("contracts.field.directAgreement")} />
+              </div>
+              {contract.province === "QC" && contract.language === "en" && (
+                <div className="set-row">
+                  <div className="txt">
+                    <b>{t("contracts.field.englishQc")}</b>
+                    <span>{t("contracts.field.englishQcHint")}</span>
+                  </div>
+                  <MockupToggle checked={vars.englishRequestedInQuebec} onCheckedChange={(v) => setVars({ ...vars, englishRequestedInQuebec: v })} label={t("contracts.field.englishQc")} />
+                </div>
+              )}
+
+              <div className="form-grid" style={{ borderTop: "1px solid var(--soft)" }}>
                 {contract.document.sections.filter((s) => s.editable).map((s) => (
-                  <div key={s.key} className="space-y-1.5">
-                    <Label className="flex items-center gap-2">{s.heading} <Badge variant="secondary" className="text-[10px] gap-1"><Sparkles className="h-3 w-3" /> {t("contracts.aiDrafted")}</Badge></Label>
-                    <Textarea value={sectionDrafts[s.key] ?? ""} onChange={(e) => setSectionDrafts({ ...sectionDrafts, [s.key]: e.target.value })} rows={s.key === "scope" ? 14 : 5} className="font-mono text-xs leading-relaxed" />
-                    <p className="text-[11px] text-slate-400">{t("contracts.markdownHint")}</p>
+                  <div key={s.key} className="field full">
+                    <label className="flex items-center gap-2">{s.heading} <span className="chip chip-purple"><Sparkles className="h-3 w-3 mr-1" /> {t("contracts.aiDrafted")}</span></label>
+                    <textarea className="mono" value={sectionDrafts[s.key] ?? ""} onChange={(e) => setSectionDrafts({ ...sectionDrafts, [s.key]: e.target.value })} rows={s.key === "scope" ? 14 : 5} />
+                    <p className="field-hint">{t("contracts.markdownHint")}</p>
                   </div>
                 ))}
-
-                <div className="rounded-lg bg-slate-50 border px-4 py-3 text-xs text-slate-500 flex items-start gap-2">
-                  <Lock className="h-3.5 w-3.5 mt-0.5 shrink-0" /> {t("contracts.lockedHint")}
+                <div className="full notice info" style={{ marginTop: 0 }}>
+                  <Lock /> <span className="grow">{t("contracts.lockedHint")}</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </section>
           ) : (
-            <Card className="overflow-hidden">
-              <CardContent className="p-6 md:p-10">
-                <style dangerouslySetInnerHTML={{ __html: data!.css }} />
-                <div dangerouslySetInnerHTML={{ __html: data!.html }} />
-              </CardContent>
-            </Card>
+            <section className="card doc-view">
+              <style dangerouslySetInnerHTML={{ __html: data!.css }} />
+              <div dangerouslySetInnerHTML={{ __html: data!.html }} />
+            </section>
           )}
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">{t("contracts.nextStep")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
+        <div className="stack">
+          <section className="card">
+            <div className="card-head"><div><h2>{t("contracts.nextStep")}</h2></div></div>
+            <div className="act-body stack" style={{ gap: 10 }}>
               {contract.status === "signed" ? (
-                <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-3 text-sm text-emerald-800 flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
-                  <div>{t("contracts.executed").replace("{date}", contract.signedAt ? format(new Date(contract.signedAt), "PPP", { locale }) : "")}</div>
+                <div className="notice ok">
+                  <CheckCircle2 />
+                  <span className="grow">{t("contracts.executed").replace("{date}", contract.signedAt ? format(new Date(contract.signedAt), "PPP", { locale }) : "")}</span>
                 </div>
               ) : !isOpen ? (
-                <p className="text-sm text-slate-500">{t("contracts.closedHint")}</p>
+                <p className="foot-note">{t("contracts.closedHint")}</p>
               ) : contractorSigner?.status !== "signed" ? (
-                <Button className="w-full gap-2" onClick={() => setSignOpen(true)} disabled={editing}><FileSignature className="h-4 w-4" /> {t("contracts.signAsCompany")}</Button>
+                <button type="button" className="btn btn-navy w-full" onClick={() => setSignOpen(true)} disabled={editing}><FileSignature className="h-4 w-4" /> {t("contracts.signAsCompany")}</button>
               ) : !contract.sentAt ? (
-                <Button className="w-full gap-2" onClick={() => setSendOpen(true)} disabled={!canSend || editing}><Send className="h-4 w-4" /> {t("contracts.sendToCustomer")}</Button>
+                <button type="button" className="btn btn-navy w-full" onClick={() => setSendOpen(true)} disabled={!canSend || editing}><Send className="h-4 w-4" /> {t("contracts.sendToCustomer")}</button>
               ) : (
                 <>
-                  <div className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-3 text-sm text-blue-800 flex items-start gap-2">
-                    <Clock className="h-4 w-4 mt-0.5 shrink-0" />
-                    <div>{t("contracts.waitingCustomer").replace("{email}", customerSigner?.email ?? "")}{contract.expiresAt && <div className="text-xs mt-1 text-blue-600">{t("contracts.expires")} {format(new Date(contract.expiresAt), "PPP", { locale })}</div>}</div>
+                  <div className="notice teal">
+                    <Clock />
+                    <span className="grow">
+                      {t("contracts.waitingCustomer").replace("{email}", customerSigner?.email ?? "")}
+                      {contract.expiresAt && <small>{t("contracts.expires")} {format(new Date(contract.expiresAt), "PPP", { locale })}</small>}
+                    </span>
                   </div>
-                  <Button variant="outline" className="w-full gap-2" onClick={() => setSendOpen(true)}><RefreshCw className="h-4 w-4" /> {t("contracts.resend")}</Button>
+                  <button type="button" className="btn btn-outline-navy w-full" onClick={() => setSendOpen(true)}><RefreshCw className="h-4 w-4" /> {t("contracts.resend")}</button>
                 </>
               )}
               {isDraft && contractorSigner?.status === "signed" && (
-                <p className="text-xs text-slate-500 text-center">{t("contracts.editInvalidates")}</p>
+                <p className="foot-note text-center">{t("contracts.editInvalidates")}</p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">{t("contracts.signers")}</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
+          <section className="card">
+            <div className="card-head"><div><h2>{t("contracts.signers")}</h2></div></div>
+            <div>
               {contract.signers.map((s) => (
-                <div key={s.id} className="flex items-start justify-between gap-2 text-sm">
-                  <div className="min-w-0">
-                    <div className="font-medium text-slate-800 truncate">{s.name || "—"}</div>
-                    <div className="text-xs text-slate-500 truncate">{t(`contracts.role.${s.role}`)}{s.email ? ` · ${s.email}` : ""}</div>
+                <div key={s.id} className="item-row">
+                  <div className="grow">
+                    <b className="ttl">{s.name || "—"}</b>
+                    <span className="sub">{t(`contracts.role.${s.role}`)}{s.email ? ` · ${s.email}` : ""}</span>
                   </div>
-                  <Badge variant="secondary" className={cn("shrink-0 text-[10px]", s.status === "signed" && "bg-emerald-100 text-emerald-700", s.status === "declined" && "bg-red-100 text-red-700")}>{t(`contracts.signerStatus.${s.status}`)}</Badge>
+                  <span className={cn("chip", s.status === "signed" ? "chip-green" : s.status === "declined" ? "chip-red" : "chip-grey")}>{t(`contracts.signerStatus.${s.status}`)}</span>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">{t("contracts.details")}</CardTitle></CardHeader>
-            <CardContent className="space-y-1.5 text-sm">
+          <section className="card">
+            <div className="card-head"><div><h2>{t("contracts.details")}</h2></div></div>
+            <div className="py-2">
               <Row label={t("contracts.detail.province")} value={contract.province} />
               <Row label={t("contracts.detail.language")} value={contract.language === "fr" ? "Français" : "English"} />
               <Row label={t("contracts.detail.template")} value={`${contract.templateKey} v${contract.document.templateVersion}`} />
@@ -394,26 +393,24 @@ export default function ContractDetailPage() {
               <Row label={t("contracts.detail.tax")} value={formatCad(contract.variables.taxTotal)} />
               <Row label={t("contracts.detail.total")} value={formatCad(contract.variables.total)} bold />
               {contract.variables.paymentSchedule.holdback.enabled && <Row label={t("contracts.detail.holdback")} value={`${contract.variables.paymentSchedule.holdback.percent}%`} />}
-              {contract.signedPdfHash && <div className="pt-2 text-[10px] text-slate-400 break-all"><span className="font-semibold">SHA-256:</span> {contract.signedPdfHash}</div>}
-            </CardContent>
-          </Card>
+            </div>
+            {contract.signedPdfHash && <div className="card-foot"><span className="foot-note break-all" style={{ fontSize: 11 }}><b>SHA-256:</b> {contract.signedPdfHash}</span></div>}
+          </section>
 
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold">{t("contracts.activity")}</CardTitle></CardHeader>
-            <CardContent>
-              <ol className="space-y-2.5">
-                {[...contract.events].reverse().map((e) => (
-                  <li key={e.id} className="flex items-start gap-2 text-xs">
-                    <span className={cn("h-1.5 w-1.5 rounded-full mt-1.5 shrink-0", e.type === "completed" || e.type === "signed" ? "bg-emerald-500" : e.type === "declined" || e.type === "voided" ? "bg-red-500" : "bg-slate-300")} />
-                    <div>
-                      <div className="text-slate-700">{t(`contracts.event.${e.type}`)}</div>
-                      <div className="text-slate-400">{format(new Date(e.createdAt), "PPp", { locale })}</div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+          <section className="card">
+            <div className="card-head"><div><h2>{t("contracts.activity")}</h2></div></div>
+            <div>
+              {[...contract.events].reverse().map((e) => (
+                <div key={e.id} className="tl-row">
+                  <span className={cn("tl-dot", (e.type === "completed" || e.type === "signed") && "ok", (e.type === "declined" || e.type === "voided") && "bad")} />
+                  <div className="min-w-0">
+                    <b>{t(`contracts.event.${e.type}`)}</b>
+                    <span>{format(new Date(e.createdAt), "PPp", { locale })}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
 
@@ -451,7 +448,7 @@ export default function ContractDetailPage() {
             <DialogTitle>{contract.sentAt ? t("contracts.resend") : t("contracts.sendToCustomer")}</DialogTitle>
             <DialogDescription>{t("contracts.sendDialogDesc").replace("{email}", contract.variables.customer.email ?? "—")}</DialogDescription>
           </DialogHeader>
-          {!contract.variables.customer.email && <div className="rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800">{t("contracts.emailMissing")}</div>}
+          {!contract.variables.customer.email && <div className="notice warn"><AlertTriangle /><span className="grow">{t("contracts.emailMissing")}</span></div>}
           <div className="space-y-1.5">
             <Label>{t("contracts.sendMessage")}</Label>
             <Textarea value={sendMessage} onChange={(e) => setSendMessage(e.target.value)} rows={3} placeholder={t("contracts.sendMessagePlaceholder")} />
@@ -485,10 +482,9 @@ export default function ContractDetailPage() {
 
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
-    <div className="flex justify-between gap-2">
-      <span className="text-slate-500">{label}</span>
-      <span className={cn("text-slate-800", bold && "font-bold")}>{value}</span>
+    <div className={cn("kv", bold && "total")}>
+      <span>{label}</span>
+      <b>{value}</b>
     </div>
   );
 }
-

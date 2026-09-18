@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -43,126 +43,123 @@ export default function InvoiceDetailPage() {
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
   const archive = useMutation({ mutationFn: () => invoicesApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/invoices"); }, onError });
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-96 w-full rounded-[var(--radius)]" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-navy-600 underline">{t("invoices.backToList")}</Link></div>;
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-96 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (error || !data) return <div className="card card-empty">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-link">{t("invoices.backToList")}</Link></div>;
 
   const inv = data.invoice;
   const isDraft = inv.status === "draft";
   const open = isOpenInvoice(inv.status);
   const isCredit = inv.type === "credit_note";
   const scheduled = isDraft && !!inv.scheduledFor && new Date(inv.scheduledFor) > new Date();
+  const overdueDays = Math.floor((Date.now() - new Date(inv.dueDate).getTime()) / 86_400_000);
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <div>
-        <Link href="/dashboard/invoices" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> {t("invoices.backToList")}</Link>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 flex-wrap">
-              <Receipt className="h-7 w-7 text-navy-600 shrink-0" />
-              {inv.number}
-              <InvoiceStatusBadge status={inv.status} scheduled={scheduled} />
-              <InvoiceTypeBadge type={inv.type} />
-            </h1>
-            <div className="text-slate-500 mt-1 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span>{inv.customer.name}{inv.customer.email ? ` · ${inv.customer.email}` : ""}</span>
-              {inv.projectId && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`} className="inline-flex items-center gap-1 hover:text-navy-700"><Briefcase className="h-3.5 w-3.5" />{inv.projectName ?? t("invoices.job")}</Link>}
-              {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`} className="hover:text-navy-700">{t("invoices.creditFor")}</Link>}
-            </div>
+    <div className="animate-in fade-in duration-300">
+      <Link href="/dashboard/invoices" className="back-link"><ArrowLeft /> {t("invoices.backToList")}</Link>
+      <div className="page-head">
+        <div className="min-w-0">
+          <div className="title-row">
+            <h1><Receipt />{inv.number}</h1>
+            <InvoiceStatusBadge status={inv.status} scheduled={scheduled} />
+            <InvoiceTypeBadge type={inv.type} />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <a href={invoicesApi.pdfUrl(inv.id, true)}><Button variant="outline" size="sm" className="gap-2"><Download className="h-4 w-4" /> PDF</Button></a>
-            {isDraft && !editing && <Button variant="outline" size="sm" className="gap-2" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("invoices.edit")}</Button>}
-            {isDraft && <Button variant="outline" size="sm" className="gap-2 text-rose-600 hover:text-rose-700" onClick={() => remove.mutate()} disabled={remove.isPending}><Trash2 className="h-4 w-4" /> {t("invoices.deleteDraft")}</Button>}
-            {(isDraft || open) && !isCredit && <Button size="sm" className="gap-2" onClick={() => setSendOpen(true)}><Send className="h-4 w-4" /> {isDraft ? t("invoices.send") : t("invoices.resend")}</Button>}
-            {open && !isCredit && <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700" onClick={() => setPayOpen(true)}><Banknote className="h-4 w-4" /> {t("invoices.recordPayment")}</Button>}
-            {open && <Button variant="outline" size="sm" className="gap-2" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</Button>}
-            {(open || inv.status === "paid") && !isCredit && <Button variant="outline" size="sm" className="gap-2" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</Button>}
-            {inv.status !== "void" && !isDraft && <Button variant="ghost" size="sm" className="gap-2 text-slate-500" onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("invoices.void")}</Button>}
-            {(inv.status === "paid" || inv.status === "void") && <Button variant="ghost" size="sm" className="gap-2 text-slate-500" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>}
+          <div className="meta">
+            <span>{inv.customer.name}{inv.customer.email ? ` · ${inv.customer.email}` : ""}</span>
+            {inv.projectId && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`}><Briefcase />{inv.projectName ?? t("invoices.job")}</Link>}
+            {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`}>{t("invoices.creditFor")}</Link>}
           </div>
+        </div>
+        <div className="head-actions">
+          <a href={invoicesApi.pdfUrl(inv.id, true)} className="btn btn-sm btn-outline-navy"><Download className="h-4 w-4" /> PDF</a>
+          {isDraft && !editing && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("invoices.edit")}</button>}
+          {isDraft && <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => remove.mutate()} disabled={remove.isPending}><Trash2 className="h-4 w-4" /> {t("invoices.deleteDraft")}</button>}
+          {(isDraft || open) && !isCredit && <button type="button" className="btn btn-sm btn-navy" onClick={() => setSendOpen(true)}><Send className="h-4 w-4" /> {isDraft ? t("invoices.send") : t("invoices.resend")}</button>}
+          {open && !isCredit && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setPayOpen(true)}><Banknote className="h-4 w-4" /> {t("invoices.recordPayment")}</button>}
+          {open && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</button>}
+          {(open || inv.status === "paid") && !isCredit && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</button>}
+          {inv.status !== "void" && !isDraft && <button type="button" className="text-link" onClick={() => setVoidOpen(true)}><Ban /> {t("invoices.void")}</button>}
+          {(inv.status === "paid" || inv.status === "void") && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
         </div>
       </div>
 
       {/* Status strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <section className="stat-grid">
         <Kpi label={isCredit ? t("invoices.creditAmount") : t("invoices.total")} value={formatCents(inv.totalCents)} />
-        <Kpi label={t("invoices.paid")} value={formatCents(inv.paidCents)} accent="text-emerald-600" />
-        <Kpi label={t("invoices.balance")} value={formatCents(inv.balanceCents)} accent={inv.status === "overdue" ? "text-rose-600" : inv.balanceCents > 0 ? "text-blue-600" : undefined} />
-        <Kpi label={t("invoices.dueOn")} value={format(new Date(inv.dueDate), "PP", { locale })} sub={inv.status === "overdue" ? `${Math.floor((Date.now() - new Date(inv.dueDate).getTime()) / 86_400_000)} ${t("invoices.daysOverdue")}` : inv.sentAt ? `${t("invoices.sentOn")} ${format(new Date(inv.sentAt), "PP", { locale })}` : undefined} accent={inv.status === "overdue" ? "text-rose-600" : undefined} />
-      </div>
+        <Kpi label={t("invoices.paid")} value={formatCents(inv.paidCents)} tone="ok" />
+        <Kpi label={t("invoices.balance")} value={formatCents(inv.balanceCents)} tone={inv.status === "overdue" ? "bad" : inv.balanceCents > 0 ? "teal" : undefined} />
+        <Kpi label={t("invoices.dueOn")} value={format(new Date(inv.dueDate), "PP", { locale })} sub={inv.status === "overdue" ? `${overdueDays} ${t("invoices.daysOverdue")}` : inv.sentAt ? `${t("invoices.sentOn")} ${format(new Date(inv.sentAt), "PP", { locale })}` : undefined} tone={inv.status === "overdue" ? "bad" : undefined} />
+      </section>
 
       {scheduled && (
-        <div className="rounded-[var(--radius)] border border-navy-200 bg-navy-50 px-4 py-3 text-sm text-navy-900 flex items-start gap-2">
-          <Clock className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
+        <div className="notice info">
+          <Clock />
+          <span className="grow">{t("invoices.scheduledHint")} <strong>{format(new Date(inv.scheduledFor!), "PPP", { locale })}</strong>. {t("invoices.scheduledHint2")}</span>
         </div>
       )}
       {inv.autoSendAt && isDraft && (
-        <div className="rounded-[var(--radius)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-          <span>{t("invoices.autoSendHint")} <strong>{format(new Date(inv.autoSendAt), "PPp", { locale })}</strong>. {t("invoices.autoSendHint2")}</span>
+        <div className="notice warn">
+          <AlertTriangle />
+          <span className="grow">{t("invoices.autoSendHint")} <strong>{format(new Date(inv.autoSendAt), "PPp", { locale })}</strong>. {t("invoices.autoSendHint2")}</span>
         </div>
       )}
-      {inv.status === "void" && <div className="rounded-[var(--radius)] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">{t("invoices.voidedOn")} {inv.voidedAt ? format(new Date(inv.voidedAt), "PPp", { locale }) : ""}{inv.voidReason ? ` — ${inv.voidReason}` : ""}</div>}
+      {inv.status === "void" && <div className="notice"><Ban /><span className="grow">{t("invoices.voidedOn")} {inv.voidedAt ? format(new Date(inv.voidedAt), "PPp", { locale }) : ""}{inv.voidReason ? ` — ${inv.voidReason}` : ""}</span></div>}
       {inv.status === "pending_confirmation" && <PendingConfirmationBanner invoice={inv} onDone={refresh} />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ marginTop: 16 }}>
+        <div className="lg:col-span-2">
           {editing ? (
             <DraftEditor data={data} onDone={() => { setEditing(false); refresh(); }} onCancel={() => setEditing(false)} />
           ) : (
-            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-5 md:p-8">
+            <section className="card doc-view">
               <style dangerouslySetInnerHTML={{ __html: data.css }} />
               <div dangerouslySetInnerHTML={{ __html: data.html }} />
             </section>
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="stack">
           {data.publicUrl && (
-            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-              <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.publicLink")}</h3>
-              <div className="flex gap-2">
-                <Input readOnly value={data.publicUrl} className="text-xs" />
-                <Button variant="outline" size="icon" onClick={() => { navigator.clipboard.writeText(data.publicUrl!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></Button>
-                <a href={data.publicUrl} target="_blank" rel="noreferrer"><Button variant="outline" size="icon"><ExternalLink className="h-4 w-4" /></Button></a>
+            <section className="card">
+              <div className="card-head"><div><h2>{t("invoices.publicLink")}</h2><p className="sub">{t("invoices.publicLinkHint")}</p></div></div>
+              <div className="act-body">
+                <div className="field inline">
+                  <input readOnly value={data.publicUrl} className="flex-1 min-w-0 text-xs" />
+                  <button type="button" className="ic-btn" title={t("invoices.copied")} onClick={() => { navigator.clipboard.writeText(data.publicUrl!); toast({ title: t("invoices.copied") }); }}><Copy /></button>
+                  <a href={data.publicUrl} target="_blank" rel="noreferrer" className="ic-btn"><ExternalLink /></a>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 mt-2">{t("invoices.publicLinkHint")}</p>
             </section>
           )}
 
           {!isCredit && (
-            <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-bold text-slate-900">{t("invoices.payments")}</h3>
-                {open && <button className="text-xs text-navy-600 hover:underline" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
+            <section className="card">
+              <div className="card-head">
+                <div><h2>{t("invoices.payments")}</h2></div>
+                {open && <button type="button" className="text-link" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
               </div>
-              {data.payments.length === 0 ? <p className="text-sm text-slate-400">{t("invoices.noPayments")}</p> : (
-                <ul className="space-y-2">
+              {data.payments.length === 0 ? <div className="card-empty">{t("invoices.noPayments")}</div> : (
+                <div>
                   {data.payments.map((p) => (
-                    <li key={p.id} className="flex items-start justify-between gap-2 text-sm group">
-                      <div className="min-w-0">
-                        <div className="text-slate-800">{format(new Date(p.date), "PP", { locale })} · {t(`invoices.method.${p.method}`)}</div>
-                        {(p.reference || p.creditNoteId) && <div className="text-xs text-slate-400 truncate">{p.creditNoteId ? <Link href={`/dashboard/invoices/${p.creditNoteId}`} className="hover:underline">{p.reference}</Link> : p.reference}</div>}
+                    <div key={p.id} className="item-row">
+                      <div className="grow">
+                        <b className="ttl">{format(new Date(p.date), "PP", { locale })} · {t(`invoices.method.${p.method}`)}</b>
+                        {(p.reference || p.creditNoteId) && <span className="sub">{p.creditNoteId ? <Link href={`/dashboard/invoices/${p.creditNoteId}`} className="hover:underline">{p.reference}</Link> : p.reference}</span>}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="font-medium text-emerald-700">{formatCents(p.amountCents)}</span>
-                        {!p.creditNoteId && inv.status !== "void" && <RemovePayment invoiceId={inv.id} paymentId={p.id} onDone={refresh} />}
-                      </div>
-                    </li>
+                      <span className="amt" style={{ color: "var(--green-dark)" }}>{formatCents(p.amountCents)}</span>
+                      {!p.creditNoteId && inv.status !== "void" && <RemovePayment invoiceId={inv.id} paymentId={p.id} onDone={refresh} />}
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </section>
           )}
 
-          <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-            <h3 className="text-sm font-bold text-slate-900 mb-2">{t("invoices.activity")}</h3>
-            <ul className="space-y-2">
+          <section className="card">
+            <div className="card-head"><div><h2>{t("invoices.activity")}</h2></div></div>
+            <div>
               {[...data.events].reverse().map((e) => <EventRow key={e.id} e={e} locale={locale} />)}
-            </ul>
-            {open && inv.reminderCount === 0 && <p className="text-xs text-slate-400 mt-3">{t("invoices.reminderSchedule")} {data.reminderDays.join(" / ")} {t("invoices.daysPastDue")}</p>}
+            </div>
+            {open && inv.reminderCount === 0 && <div className="card-foot"><span className="foot-note">{t("invoices.reminderSchedule")} {data.reminderDays.join(" / ")} {t("invoices.daysPastDue")}</span></div>}
           </section>
         </div>
       </div>
@@ -177,12 +174,12 @@ export default function InvoiceDetailPage() {
 
 // ── Pieces ───────────────────────────────────────────────────────────────────
 
-function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
+function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" | "teal" }) {
   return (
-    <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
-      {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}
+    <div className="card stat-card">
+      <p className="lbl">{label}</p>
+      <p className={cn("val", tone)}>{value}</p>
+      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }
@@ -194,14 +191,12 @@ function PendingConfirmationBanner({ invoice, onDone }: { invoice: InvoiceDto; o
   const confirm = useMutation({ mutationFn: () => invoicesApi.confirmEtransfer(invoice.id), onSuccess: () => { onDone(); toast({ title: t("invoices.etransferConfirmed") }); }, onError });
   const reject = useMutation({ mutationFn: () => invoicesApi.rejectEtransfer(invoice.id), onSuccess: () => { onDone(); toast({ title: t("invoices.etransferRejected") }); }, onError });
   return (
-    <div className="rounded-[var(--radius)] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex flex-wrap items-start justify-between gap-3">
-      <div className="flex items-start gap-2">
-        <MailQuestion className="h-4 w-4 mt-0.5 shrink-0" />
-        <span>{t("invoices.pendingConfirmationHint")} <strong>{formatCents(invoice.balanceCents)}</strong>.</span>
-      </div>
-      <div className="flex gap-2 shrink-0">
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={() => reject.mutate()} disabled={reject.isPending || confirm.isPending}>{reject.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />} {t("invoices.notReceived")}</Button>
-        <Button size="sm" className="gap-1.5 bg-emerald-600 hover:bg-emerald-700" onClick={() => confirm.mutate()} disabled={confirm.isPending || reject.isPending}>{confirm.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("invoices.confirmReceived")}</Button>
+    <div className="notice warn">
+      <MailQuestion />
+      <span className="grow">{t("invoices.pendingConfirmationHint")} <strong>{formatCents(invoice.balanceCents)}</strong>.</span>
+      <div className="actions">
+        <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => reject.mutate()} disabled={reject.isPending || confirm.isPending}>{reject.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />} {t("invoices.notReceived")}</button>
+        <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => confirm.mutate()} disabled={confirm.isPending || reject.isPending}>{confirm.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("invoices.confirmReceived")}</button>
       </div>
     </div>
   );
@@ -211,11 +206,15 @@ function EventRow({ e, locale }: { e: InvoiceEventDto; locale: typeof enCA }) {
   const { t } = useLanguage();
   const d = e.detail ?? {};
   const extra = typeof d.to === "string" ? d.to : typeof d.amountCents === "number" ? formatCents(d.amountCents) : typeof d.reason === "string" && d.reason ? d.reason : "";
+  const dot = e.type === "paid" || e.type === "payment_recorded" ? "ok" : e.type === "voided" || e.type === "overdue" ? "bad" : "";
   return (
-    <li className="text-sm">
-      <div className="text-slate-800">{t(`invoices.event.${e.type}`)}{extra ? <span className="text-slate-500"> · {extra}</span> : null}</div>
-      <div className="text-[11px] text-slate-400">{format(new Date(e.createdAt), "PPp", { locale })} · {t(`invoices.actor.${e.actor}`)}</div>
-    </li>
+    <div className="tl-row">
+      <span className={cn("tl-dot", dot)} />
+      <div className="min-w-0">
+        <b>{t(`invoices.event.${e.type}`)}{extra ? <em> · {extra}</em> : null}</b>
+        <span>{format(new Date(e.createdAt), "PPp", { locale })} · {t(`invoices.actor.${e.actor}`)}</span>
+      </div>
+    </div>
   );
 }
 
@@ -223,7 +222,7 @@ function RemovePayment({ invoiceId, paymentId, onDone }: { invoiceId: string; pa
   const { t } = useLanguage();
   const { toast } = useToast();
   const m = useMutation({ mutationFn: () => invoicesApi.removePayment(invoiceId, paymentId), onSuccess: onDone, onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }) });
-  return <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" title={t("invoices.removePayment")} onClick={() => m.mutate()} disabled={m.isPending}><X className="h-4 w-4" /></button>;
+  return <button type="button" className="ic-btn danger" title={t("invoices.removePayment")} onClick={() => m.mutate()} disabled={m.isPending}><X /></button>;
 }
 
 function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDone: () => void; onCancel: () => void }) {
@@ -243,24 +242,26 @@ function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDon
     onSuccess: () => { toast({ title: t("invoices.saved") }); onDone(); },
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
+  const lockedHoldback = inv.type === "deposit" || inv.type === "holdback_release" || inv.type === "credit_note";
   return (
-    <section className="rounded-[var(--radius)] border border-navy-200 bg-card p-5 space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div className="space-y-1"><Label>{t("invoices.field.title")}</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
-        <div className="space-y-1"><Label>{t("invoices.field.customerEmail")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-        <div className="space-y-1"><Label>{t("invoices.field.dueDays")}</Label><Input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" /></div>
-        <div className="space-y-1"><Label>{t("invoices.field.holdback")}</Label><Input value={holdback} onChange={(e) => setHoldback(e.target.value)} inputMode="numeric" disabled={inv.type === "deposit" || inv.type === "holdback_release" || inv.type === "credit_note"} /></div>
-        <div className="space-y-1">
-          <Label>{t("invoices.field.language")}</Label>
-          <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={language} onChange={(e) => setLanguage(e.target.value as "en" | "fr")}><option value="en">English</option><option value="fr">Français</option></select>
+    <section className="card">
+      <div className="card-head"><div><h2>{t("invoices.edit")}</h2><p className="sub">{inv.number}</p></div></div>
+      <div className="form-grid tight">
+        <div className="field"><label>{t("invoices.field.title")}</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
+        <div className="field"><label>{t("invoices.field.customerEmail")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+        <div className="field"><label>{t("invoices.field.dueDays")}</label><input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" /></div>
+        <div className="field"><label>{t("invoices.field.holdback")}</label><input value={holdback} onChange={(e) => setHoldback(e.target.value)} inputMode="numeric" disabled={lockedHoldback} /></div>
+        <div className="field">
+          <label>{t("invoices.field.language")}</label>
+          <select value={language} onChange={(e) => setLanguage(e.target.value as "en" | "fr")}><option value="en">English</option><option value="fr">Français</option></select>
         </div>
-        <div className="space-y-1"><Label>{t("invoices.field.paymentNote")}</Label><Input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder={t("invoices.field.paymentNotePlaceholder")} /></div>
+        <div className="field"><label>{t("invoices.field.paymentNote")}</label><input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder={t("invoices.field.paymentNotePlaceholder")} /></div>
+        <div className="full"><LineEditor rows={rows} onChange={setRows} /></div>
+        <div className="field full"><label>{t("invoices.field.notes")}</label><textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} /></div>
       </div>
-      <LineEditor rows={rows} onChange={setRows} />
-      <div className="space-y-1"><Label>{t("invoices.field.notes")}</Label><Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} /></div>
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onCancel}><X className="h-4 w-4 mr-1" /> {t("jobs.cancel")}</Button>
-        <Button onClick={() => save.mutate()} disabled={save.isPending || toLineInputs(rows).length === 0}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />} {t("invoices.save")}</Button>
+      <div className="card-foot" style={{ justifyContent: "flex-end" }}>
+        <button type="button" className="btn btn-sm btn-outline-navy" onClick={onCancel}><X className="h-4 w-4" /> {t("jobs.cancel")}</button>
+        <button type="button" className="btn btn-sm btn-navy" onClick={() => save.mutate()} disabled={save.isPending || toLineInputs(rows).length === 0}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} {t("invoices.save")}</button>
       </div>
     </section>
   );

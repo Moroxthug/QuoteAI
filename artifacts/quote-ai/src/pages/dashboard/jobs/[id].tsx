@@ -6,8 +6,6 @@ import { enCA, frCA } from "date-fns/locale";
 import {
   ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -58,8 +56,8 @@ export default function JobDetailPage() {
   const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
   const archive = useMutation({ mutationFn: () => jobsApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["jobs"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/jobs"); }, onError });
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius)]" /><Skeleton className="h-64 w-full rounded-[var(--radius)]" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (error || !data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { job, milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
   const done = milestones.filter((m) => m.status === "completed").length;
@@ -68,52 +66,49 @@ export default function JobDetailPage() {
   const actualCosts = costs.totalCents;
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
-      <div>
-        <Link href="/dashboard/jobs" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> {t("jobs.backToList")}</Link>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2 flex-wrap">
-              <Briefcase className="h-7 w-7 text-navy-600 shrink-0" />
-              <EditableName id={job.id} name={job.name} />
-              <JobStatusBadge status={job.status} />
-            </h1>
-            <div className="text-slate-500 mt-1 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
-              {job.client && <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5" />{job.client.name}</span>}
-              {job.address && <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.address}</span>}
-              {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="inline-flex items-center gap-1 hover:text-navy-700"><FileSignature className="h-3.5 w-3.5" />{job.contract.contractNumber}</Link>}
-              {job.plannedStart && job.plannedEnd && <span>{format(day(job.plannedStart)!, "d MMM", { locale })} → {format(day(job.plannedEnd)!, "PP", { locale })}</span>}
-            </div>
+    <div className="animate-in fade-in duration-300">
+      <Link href="/dashboard/jobs" className="back-link"><ArrowLeft /> {t("jobs.backToList")}</Link>
+      <div className="page-head">
+        <div className="min-w-0">
+          <div className="title-row">
+            <h1><Briefcase /><EditableName id={job.id} name={job.name} /></h1>
+            <JobStatusBadge status={job.status} />
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <Link href={`/dashboard/jobs/${job.id}/setup`}><Button variant="outline" size="sm" className="gap-2"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Button></Link>
-            {job.status === "planning" && <Button size="sm" className="gap-2" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</Button>}
-            {job.status === "active" && <Button size="sm" variant="outline" onClick={() => setStatus.mutate("suspended")}>{t("jobs.action.suspend")}</Button>}
-            {job.status === "suspended" && <Button size="sm" onClick={() => setStatus.mutate("active")}>{t("jobs.action.resume")}</Button>}
-            {job.status !== "completed" && <Button size="sm" className="gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={setStatus.isPending} onClick={() => setStatus.mutate("completed")}><CheckCircle2 className="h-4 w-4" /> {t("jobs.action.complete")}</Button>}
-            {job.status === "completed" && <Button size="sm" variant="outline" onClick={() => setStatus.mutate("active")}>{t("jobs.action.reopen")}</Button>}
-            {job.status === "completed" && <Button size="sm" variant="ghost" className="gap-2 text-slate-500" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive className="h-4 w-4" /> {t("dashboard.quotesList.archive")}</Button>}
+          <div className="meta">
+            {job.client && <span><Users />{job.client.name}</span>}
+            {job.address && <span><MapPin />{job.address}</span>}
+            {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`}><FileSignature />{job.contract.contractNumber}</Link>}
+            {job.plannedStart && job.plannedEnd && <span>{format(day(job.plannedStart)!, "d MMM", { locale })} → {format(day(job.plannedEnd)!, "PP", { locale })}</span>}
           </div>
+        </div>
+        <div className="head-actions">
+          <Link href={`/dashboard/jobs/${job.id}/setup`} className="btn btn-sm btn-outline-navy"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Link>
+          {job.status === "planning" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</button>}
+          {job.status === "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("suspended")}>{t("jobs.action.suspend")}</button>}
+          {job.status === "suspended" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.resume")}</button>}
+          {job.status !== "completed" && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={setStatus.isPending} onClick={() => setStatus.mutate("completed")}><CheckCircle2 className="h-4 w-4" /> {t("jobs.action.complete")}</button>}
+          {job.status === "completed" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.reopen")}</button>}
+          {job.status === "completed" && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
         </div>
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <section className="stat-grid cols-5">
         <Kpi label={t("jobs.kpi.value")} value={formatCents(job.totalValueCents)} sub={job.changeOrdersCents ? `${formatCents(job.contractValueCents)} + ${formatCents(job.changeOrdersCents)} ${t("jobs.kpi.co")}` : undefined} />
-        <Kpi label={t("jobs.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={`${formatCents(invoiceTotals.collectedCents)} ${t("jobs.kpi.collected")}${invoiceTotals.outstandingCents ? ` · ${formatCents(invoiceTotals.outstandingCents)} ${t("jobs.kpi.outstanding")}` : ""}`} accent={invoiceTotals.overdueCents ? "text-rose-600" : "text-blue-600"} />
+        <Kpi label={t("jobs.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={`${formatCents(invoiceTotals.collectedCents)} ${t("jobs.kpi.collected")}${invoiceTotals.outstandingCents ? ` · ${formatCents(invoiceTotals.outstandingCents)} ${t("jobs.kpi.outstanding")}` : ""}`} tone={invoiceTotals.overdueCents ? "bad" : "teal"} />
         <Kpi label={t("jobs.kpi.budget")} value={budgetTotalCents ? formatCents(budgetTotalCents) : "—"} sub={projectedMargin !== null ? `${t("jobs.kpi.projectedMargin")} ${projectedMargin}%` : undefined} />
-        <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} accent={budgetTotalCents && actualCosts > budgetTotalCents ? "text-rose-600" : undefined} />
-        <Kpi label={t("jobs.kpi.progress")} value={`${job.progressPercent}%`} sub={`${done}/${milestones.length} ${t("jobs.milestonesShort")}`} accent="text-emerald-600" progress={job.progressPercent} />
-      </div>
+        <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} tone={budgetTotalCents && actualCosts > budgetTotalCents ? "bad" : undefined} />
+        <Kpi label={t("jobs.kpi.progress")} value={`${job.progressPercent}%`} sub={`${done}/${milestones.length} ${t("jobs.milestonesShort")}`} tone="ok" progress={job.progressPercent} />
+      </section>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-full w-fit overflow-x-auto max-w-full">
+      <div className="pills scroll" style={{ marginBottom: 16 }}>
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
           const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "invoices" ? invoiceTotals.draftCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
           return (
-            <button key={k} onClick={() => setTab(k)} className={cn("px-3 py-1.5 text-sm font-medium rounded-full transition-all inline-flex items-center gap-1.5 whitespace-nowrap", tab === k ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-              <Icon className="h-3.5 w-3.5" /> {t(`jobs.tab.${k}`)}{count ? <span className={cn("text-[10px] rounded-full px-1.5", k === "changes" ? "bg-slate-200 text-slate-700" : "bg-amber-200 text-amber-900")}>{count}</span> : null}
+            <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
+              <Icon /> {t(`jobs.tab.${k}`)}{count ? <span className="cnt">{count}</span> : null}
             </button>
           );
         })}
@@ -138,13 +133,13 @@ export default function JobDetailPage() {
 
 // ── Pieces ───────────────────────────────────────────────────────────────────
 
-function Kpi({ label, value, sub, accent, progress }: { label: string; value: string; sub?: string; accent?: string; progress?: number }) {
+function Kpi({ label, value, sub, tone, progress }: { label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" | "teal"; progress?: number }) {
   return (
-    <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
-      {progress !== undefined && <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mt-1.5"><div className="h-full bg-emerald-500" style={{ width: `${progress}%` }} /></div>}
-      {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}
+    <div className="card stat-card">
+      <p className="lbl">{label}</p>
+      <p className={cn("val", tone)}>{value}</p>
+      {progress !== undefined && <div className="pbar"><i style={{ width: `${progress}%` }} /></div>}
+      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }
@@ -157,12 +152,12 @@ function EditableName({ id, name }: { id: string; name: string }) {
     mutationFn: () => jobsApi.update(id, { name: value.trim() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["job", id] }); queryClient.invalidateQueries({ queryKey: ["jobs"] }); setEditing(false); },
   });
-  if (!editing) return <span className="inline-flex items-center gap-2 group"><span className="truncate">{name}</span><button className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-700" onClick={() => { setValue(name); setEditing(true); }}><Pencil className="h-4 w-4" /></button></span>;
+  if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0"><span className="truncate">{name}</span><button type="button" className="ic-btn opacity-0 group-hover:opacity-100" onClick={() => { setValue(name); setEditing(true); }}><Pencil /></button></span>;
   return (
-    <span className="inline-flex items-center gap-1">
-      <Input value={value} onChange={(e) => setValue(e.target.value)} className="h-9 text-lg font-bold w-72" autoFocus onKeyDown={(e) => { if (e.key === "Enter") save.mutate(); if (e.key === "Escape") setEditing(false); }} />
-      <button className="text-emerald-600" onClick={() => save.mutate()} disabled={!value.trim() || save.isPending}><Check className="h-5 w-5" /></button>
-      <button className="text-slate-400" onClick={() => setEditing(false)}><X className="h-5 w-5" /></button>
+    <span className="field inline">
+      <input value={value} onChange={(e) => setValue(e.target.value)} style={{ width: 288, fontSize: 18, fontWeight: 700 }} autoFocus onKeyDown={(e) => { if (e.key === "Enter") save.mutate(); if (e.key === "Escape") setEditing(false); }} />
+      <button type="button" className="ic-btn ok" onClick={() => save.mutate()} disabled={!value.trim() || save.isPending}><Check /></button>
+      <button type="button" className="ic-btn" onClick={() => setEditing(false)}><X /></button>
     </span>
   );
 }
@@ -174,84 +169,96 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
   const terms = job.contract?.paymentSchedule.terms ?? [];
   const total = job.contract?.total ?? job.contractValueCents / 100;
   return (
-    <div className="space-y-4">
-    <OverviewCharts jobId={job.id} locale={locale} jobStatus={job.status} />
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 space-y-4">
-        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-slate-900">{t("jobs.overview.timeline")}</h2>
-            <button className="text-sm text-navy-600 hover:underline" onClick={() => onGoTo("schedule")}>{t("jobs.overview.openSchedule")}</button>
-          </div>
-          <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={() => onGoTo("schedule")} />
-        </section>
-
-        {next && (
-          <section className="rounded-[var(--radius)] border border-blue-100 bg-blue-50/50 p-4 md:p-5">
-            <div className="text-xs uppercase tracking-wide text-blue-600 font-semibold">{t("jobs.overview.upNext")}</div>
-            <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <div className="font-semibold text-slate-900">{next.title}</div>
-                <div className="text-sm text-slate-500">
-                  {next.plannedStart && next.plannedEnd ? `${format(day(next.plannedStart)!, "d MMM", { locale })} → ${format(day(next.plannedEnd)!, "PP", { locale })}` : "—"}
-                  {next.paymentAmountCents ? ` · ${t("jobs.overview.releases")} ${formatCents(next.paymentAmountCents)}` : ""}
-                </div>
-              </div>
-              <MilestoneStatusBadge status={next.status} />
+    <div className="stack">
+      <OverviewCharts jobId={job.id} locale={locale} jobStatus={job.status} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 stack">
+          <section className="card">
+            <div className="card-head">
+              <div><h2>{t("jobs.overview.timeline")}</h2></div>
+              <button type="button" className="text-link" onClick={() => onGoTo("schedule")}>{t("jobs.overview.openSchedule")}</button>
+            </div>
+            <div className="act-body">
+              <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={() => onGoTo("schedule")} />
             </div>
           </section>
-        )}
-      </div>
 
-      <div className="space-y-4">
-        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-slate-900">{t("jobs.overview.payments")}</h3><button className="text-xs text-navy-600 hover:underline" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button></div>
-          {terms.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noSchedule")}</p> : (
-            <ul className="space-y-1.5">
-              {terms.map((x) => {
-                const amount = x.amountType === "percent" ? (total * x.value) / 100 : x.value;
-                const ms = milestones.find((m) => m.paymentTermId === x.id);
-                const inv = data.invoices.find((i) => i.paymentTermId === x.id && i.status !== "void");
-                const released = !!inv || x.trigger === "on_signing" || ms?.status === "completed";
-                return (
-                  <li key={x.id} className="flex items-start gap-2 text-sm">
-                    {inv?.status === "paid" ? <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" /> : released ? <CheckCircle2 className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" /> : <Circle className="h-4 w-4 text-slate-300 mt-0.5 shrink-0" />}
-                    <div className="min-w-0 flex-1">
-                      <div className="text-slate-800 truncate">{x.label}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{inv ? `${inv.number} · ${t(`invoices.status.${inv.status}`)}` : ms ? `${t("jobs.overview.onMilestone")} ${ms.title}` : x.trigger === "on_signing" ? t("jobs.setup.dueNow") : x.trigger === "on_completion" ? t("jobs.overview.onCompletion") : t("jobs.overview.unlinked")}</div>
+          {next && (
+            <section className="card" style={{ borderColor: "var(--teal)" }}>
+              <div className="act-body">
+                <p className="eyebrow" style={{ color: "var(--teal-dark)" }}>{t("jobs.overview.upNext")}</p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <b className="block text-[15px]" style={{ color: "var(--navy)" }}>{next.title}</b>
+                    <span className="foot-note">
+                      {next.plannedStart && next.plannedEnd ? `${format(day(next.plannedStart)!, "d MMM", { locale })} → ${format(day(next.plannedEnd)!, "PP", { locale })}` : "—"}
+                      {next.paymentAmountCents ? ` · ${t("jobs.overview.releases")} ${formatCents(next.paymentAmountCents)}` : ""}
+                    </span>
+                  </div>
+                  <MilestoneStatusBadge status={next.status} />
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+
+        <div className="stack">
+          <section className="card">
+            <div className="card-head">
+              <div><h2>{t("jobs.overview.payments")}</h2></div>
+              <button type="button" className="text-link" onClick={() => onGoTo("invoices")}>{t("jobs.overview.openInvoices")}</button>
+            </div>
+            {terms.length === 0 ? <div className="card-empty">{t("jobs.overview.noSchedule")}</div> : (
+              <div>
+                {terms.map((x) => {
+                  const amount = x.amountType === "percent" ? (total * x.value) / 100 : x.value;
+                  const ms = milestones.find((m) => m.paymentTermId === x.id);
+                  const inv = data.invoices.find((i) => i.paymentTermId === x.id && i.status !== "void");
+                  const released = !!inv || x.trigger === "on_signing" || ms?.status === "completed";
+                  return (
+                    <div key={x.id} className="item-row">
+                      {inv?.status === "paid" ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--green)" }} /> : released ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--teal)" }} /> : <Circle className="h-4 w-4 shrink-0" style={{ color: "var(--line)" }} />}
+                      <div className="grow">
+                        <span className="ttl">{x.label}</span>
+                        <span className="sub">{inv ? `${inv.number} · ${t(`invoices.status.${inv.status}`)}` : ms ? `${t("jobs.overview.onMilestone")} ${ms.title}` : x.trigger === "on_signing" ? t("jobs.setup.dueNow") : x.trigger === "on_completion" ? t("jobs.overview.onCompletion") : t("jobs.overview.unlinked")}</span>
+                      </div>
+                      <span className="amt">{formatCents(Math.round(amount * 100))}</span>
                     </div>
-                    <div className="font-medium text-slate-900 whitespace-nowrap">{formatCents(Math.round(amount * 100))}</div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-
-        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-          <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.overview.budget")}</h3>
-          {budget.length === 0 ? <p className="text-sm text-slate-400">{t("jobs.overview.noBudget")}</p> : (
-            <ul className="space-y-1">
-              {budget.map((b) => (
-                <li key={b.id} className="flex justify-between text-sm"><span className="text-slate-600">{t(`jobs.cost.${b.category}`)}</span><span className="font-medium text-slate-900">{formatCents(b.plannedCents)}</span></li>
-              ))}
-            </ul>
-          )}
-          <button className="text-xs text-navy-600 hover:underline mt-2" onClick={() => onGoTo("costs")}>{t("jobs.overview.openCosts")}</button>
-        </section>
-
-        {changeOrders.length > 0 && (
-          <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-            <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.tab.changes")}</h3>
-            <ul className="space-y-1.5">
-              {changeOrders.map((co) => (
-                <li key={co.id} className="flex items-center justify-between gap-2 text-sm"><span className="truncate">{co.number} · {co.title}</span><ChangeOrderStatusBadge status={co.status} /></li>
-              ))}
-            </ul>
+                  );
+                })}
+              </div>
+            )}
           </section>
-        )}
+
+          <section className="card">
+            <div className="card-head">
+              <div><h2>{t("jobs.overview.budget")}</h2></div>
+              <button type="button" className="text-link" onClick={() => onGoTo("costs")}>{t("jobs.overview.openCosts")}</button>
+            </div>
+            {budget.length === 0 ? <div className="card-empty">{t("jobs.overview.noBudget")}</div> : (
+              <div className="py-2">
+                {budget.map((b) => (
+                  <div key={b.id} className="kv"><span>{t(`jobs.cost.${b.category}`)}</span><b>{formatCents(b.plannedCents)}</b></div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {changeOrders.length > 0 && (
+            <section className="card">
+              <div className="card-head"><div><h2>{t("jobs.tab.changes")}</h2></div></div>
+              <div>
+                {changeOrders.map((co) => (
+                  <div key={co.id} className="item-row">
+                    <div className="grow"><span className="ttl">{co.number} · {co.title}</span></div>
+                    <ChangeOrderStatusBadge status={co.status} />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 }
@@ -272,55 +279,57 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
   const [open, setOpen] = useState<string | null>(milestones.find((m) => m.status === "in_progress")?.id ?? null);
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-bold text-slate-900">{t("jobs.schedule.gantt")}</h2>
-          <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-sm text-navy-600 hover:underline">{t("jobs.schedule.editDates")}</Link>
+    <div className="stack">
+      <section className="card">
+        <div className="card-head">
+          <div><h2>{t("jobs.schedule.gantt")}</h2></div>
+          <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-link">{t("jobs.schedule.editDates")}</Link>
         </div>
-        <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={(mid) => setOpen(mid)} />
+        <div className="act-body">
+          <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={(mid) => setOpen(mid)} />
+        </div>
       </section>
 
-      <div className="space-y-2">
+      <div className="stack" style={{ gap: 10 }}>
         {milestones.map((m: MilestoneDto, idx) => {
           const expanded = open === m.id;
           const doneTasks = m.tasks.filter((x) => x.status === "done").length;
           return (
-            <div key={m.id} className={cn("rounded-[var(--radius)] border bg-card transition-colors", m.status === "in_progress" ? "border-blue-200" : m.status === "completed" ? "border-emerald-100" : "border-slate-200")}>
-              <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(expanded ? null : m.id)}>
-                <div className={cn("h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0", m.status === "completed" ? "bg-emerald-500 text-white" : m.status === "in_progress" ? "bg-blue-500 text-white" : "bg-slate-100 text-slate-600")}>
-                  {m.status === "completed" ? <Check className="h-4 w-4" /> : idx + 1}
-                </div>
-                <div className="min-w-0 flex-1">
+            <div key={m.id} className={cn("card", m.status === "in_progress" && "ms-on", m.status === "completed" && "ms-done")} style={{ marginTop: 0 }}>
+              <div role="button" tabIndex={0} className="item-row cursor-pointer" style={{ borderTop: "none" }} onClick={() => setOpen(expanded ? null : m.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(expanded ? null : m.id); } }}>
+                <span className={cn("ms-num", m.status === "completed" && "done", m.status === "in_progress" && "on")}>
+                  {m.status === "completed" ? <Check /> : idx + 1}
+                </span>
+                <div className="grow">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-slate-900">{m.title}</span>
+                    <b>{m.title}</b>
                     <MilestoneStatusBadge status={m.status} />
-                    {m.paymentAmountCents ? <span className="text-[11px] text-emerald-700 bg-emerald-50 rounded px-1.5 py-0.5">{t("jobs.overview.releases")} {formatCents(m.paymentAmountCents)}</span> : null}
+                    {m.paymentAmountCents ? <span className="chip chip-green">{t("jobs.overview.releases")} {formatCents(m.paymentAmountCents)}</span> : null}
                   </div>
-                  <div className="text-xs text-slate-500 mt-0.5">
+                  <span className="sub">
                     {m.plannedStart && m.plannedEnd ? `${format(day(m.plannedStart)!, "d MMM", { locale })} → ${format(day(m.plannedEnd)!, "d MMM yyyy", { locale })}` : "—"}
                     {m.tasks.length ? ` · ${doneTasks}/${m.tasks.length} ${t("jobs.tasksShort")}` : ""}
-                  </div>
+                  </span>
                 </div>
-                <div className="flex gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                  {m.status === "planned" && <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</Button>}
-                  {(m.status === "planned" || m.status === "in_progress") && <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={() => setMs.mutate({ mid: m.id, status: "completed" })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</Button>}
-                  {m.status === "completed" && <Button size="sm" variant="ghost" className="h-8" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}>{t("jobs.milestone.reopen")}</Button>}
+                <div className="flex gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  {m.status === "planned" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</button>}
+                  {(m.status === "planned" || m.status === "in_progress") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setMs.mutate({ mid: m.id, status: "completed" })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</button>}
+                  {m.status === "completed" && <button type="button" className="text-link" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}>{t("jobs.milestone.reopen")}</button>}
                 </div>
-              </button>
+              </div>
               {expanded && (
-                <div className="px-4 pb-4 pl-[3.75rem] space-y-2">
-                  {m.description && <p className="text-sm text-slate-600">{m.description}</p>}
-                  {m.paymentTermLabel && <p className="text-xs text-slate-500">{t("jobs.milestone.linkedPayment")}: <span className="font-medium text-slate-700">{m.paymentTermLabel}</span></p>}
+                <div className="ms-body">
+                  {m.description && <p>{m.description}</p>}
+                  {m.paymentTermLabel && <p>{t("jobs.milestone.linkedPayment")}: <b>{m.paymentTermLabel}</b></p>}
                   <TaskList tasks={m.tasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
                   {newTask?.milestoneId === m.id ? (
-                    <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (newTask.title.trim()) { addTask.mutate({ title: newTask.title.trim(), milestoneId: m.id }); setNewTask(null); } }}>
-                      <Input autoFocus value={newTask.title} onChange={(e) => setNewTask({ milestoneId: m.id, title: e.target.value })} placeholder={t("jobs.task.placeholder")} className="h-8" />
-                      <Button type="submit" size="sm" className="h-8">{t("jobs.task.add")}</Button>
-                      <Button type="button" size="sm" variant="ghost" className="h-8" onClick={() => setNewTask(null)}>{t("jobs.cancel")}</Button>
+                    <form className="field inline mt-2" onSubmit={(e) => { e.preventDefault(); if (newTask.title.trim()) { addTask.mutate({ title: newTask.title.trim(), milestoneId: m.id }); setNewTask(null); } }}>
+                      <input autoFocus className="flex-1" value={newTask.title} onChange={(e) => setNewTask({ milestoneId: m.id, title: e.target.value })} placeholder={t("jobs.task.placeholder")} style={{ padding: "8px 12px", fontSize: 13.5 }} />
+                      <button type="submit" className="btn btn-sm btn-navy">{t("jobs.task.add")}</button>
+                      <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setNewTask(null)}>{t("jobs.cancel")}</button>
                     </form>
                   ) : (
-                    <button className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1" onClick={() => setNewTask({ milestoneId: m.id, title: "" })}><Plus className="h-3 w-3" /> {t("jobs.task.add")}</button>
+                    <button type="button" className="text-link mt-1" onClick={() => setNewTask({ milestoneId: m.id, title: "" })}><Plus /> {t("jobs.task.add")}</button>
                   )}
                 </div>
               )}
@@ -328,16 +337,18 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
           );
         })}
         {milestones.length === 0 && (
-          <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
-            {t("jobs.schedule.empty")} <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-navy-600 underline">{t("jobs.schedule.addMilestones")}</Link>
+          <div className="card dashed card-empty" style={{ marginTop: 0 }}>
+            {t("jobs.schedule.empty")} <Link href={`/dashboard/jobs/${job.id}/setup`} className="text-link">{t("jobs.schedule.addMilestones")}</Link>
           </div>
         )}
       </div>
 
       {unassignedTasks.length > 0 && (
-        <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4">
-          <h3 className="text-sm font-bold text-slate-900 mb-2">{t("jobs.schedule.otherTasks")}</h3>
-          <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
+        <section className="card">
+          <div className="card-head"><div><h2>{t("jobs.schedule.otherTasks")}</h2></div></div>
+          <div className="act-body">
+            <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
+          </div>
         </section>
       )}
     </div>
@@ -347,15 +358,15 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
 function TaskList({ tasks, onToggle, onDelete }: { tasks: TaskDto[]; onToggle: (t: TaskDto) => void; onDelete: (id: string) => void }) {
   if (tasks.length === 0) return null;
   return (
-    <ul className="space-y-1">
+    <div>
       {tasks.map((x) => (
-        <li key={x.id} className="flex items-center gap-2 text-sm group">
-          <button onClick={() => onToggle(x)} className={cn("h-4 w-4 rounded border flex items-center justify-center shrink-0", x.status === "done" ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 hover:border-navy-400")}>{x.status === "done" && <Check className="h-3 w-3" />}</button>
-          <span className={cn("flex-1 truncate", x.status === "done" && "line-through text-slate-400")}>{x.title}</span>
-          <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => onDelete(x.id)}><Trash2 className="h-3.5 w-3.5" /></button>
-        </li>
+        <div key={x.id} className={cn("task-row", x.status === "done" && "done")}>
+          <button type="button" onClick={() => onToggle(x)} className={cn("chk", x.status === "done" && "on")}>{x.status === "done" && <Check />}</button>
+          <span className="grow">{x.title}</span>
+          <button type="button" className="ic-btn danger" onClick={() => onDelete(x.id)}><Trash2 /></button>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 }
 
@@ -367,38 +378,40 @@ function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeo
   const del = useMutation({ mutationFn: (coId: string) => jobsApi.deleteChangeOrder(job.id, coId), onSuccess: () => queryClient.invalidateQueries({ queryKey: ["job", job.id] }), onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }) });
   const signedTotal = changeOrders.filter((c) => c.status === "signed").reduce((s, c) => s + c.totalCents, 0);
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-500">{t("jobs.co.intro")}</p>
-        <Button size="sm" className="gap-2" onClick={onNew} disabled={!job.contract || job.contract.status !== "signed"}><Plus className="h-4 w-4" /> {t("jobs.co.new")}</Button>
-      </div>
-      {!job.contract && <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2">{t("jobs.co.noContract")}</p>}
-      {changeOrders.length === 0 ? (
-        <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">{t("jobs.co.empty")}</div>
-      ) : (
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
-          {changeOrders.map((co) => (
-            <div key={co.id} className="flex items-center gap-4 px-4 py-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold text-slate-900">{co.number}</span><span className="text-slate-700 truncate">{co.title}</span><ChangeOrderStatusBadge status={co.status} /></div>
-                <div className="text-xs text-slate-500 mt-0.5">
-                  {format(new Date(co.createdAt), "PP", { locale })}
-                  {co.scheduleDeltaDays ? ` · ${co.scheduleDeltaDays > 0 ? "+" : ""}${co.scheduleDeltaDays} ${t("jobs.co.days")}` : ""}
-                  {co.signedAt ? ` · ${t("jobs.co.signedOn")} ${format(new Date(co.signedAt), "PP", { locale })}` : ""}
-                </div>
-              </div>
-              <div className={cn("font-semibold whitespace-nowrap", co.totalCents < 0 ? "text-rose-600" : "text-slate-900")}>{formatCents(co.totalCents)}</div>
-              {co.documentContractId && (
-                <Link href={`/dashboard/contracts/${co.documentContractId}`} className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1 whitespace-nowrap">
-                  {co.status === "draft" ? t("jobs.co.signAndSend") : t("jobs.co.open")} <ExternalLink className="h-3.5 w-3.5" />
-                </Link>
-              )}
-              {co.status === "draft" && <button className="text-slate-300 hover:text-rose-500" onClick={() => del.mutate(co.id)}><Trash2 className="h-4 w-4" /></button>}
-            </div>
-          ))}
-          {signedTotal !== 0 && <div className="px-4 py-2 text-sm text-right text-slate-600 bg-slate-50">{t("jobs.co.signedTotal")} <span className="font-semibold text-slate-900">{formatCents(signedTotal)}</span></div>}
+    <div className="stack">
+      {!job.contract && <div className="notice warn"><FileSignature /><span className="grow">{t("jobs.co.noContract")}</span></div>}
+      <section className="card">
+        <div className="card-head">
+          <div><h2>{t("jobs.tab.changes")}</h2><p className="sub">{t("jobs.co.intro")}</p></div>
+          <button type="button" className="btn btn-sm btn-navy" onClick={onNew} disabled={!job.contract || job.contract.status !== "signed"}><Plus className="h-4 w-4" /> {t("jobs.co.new")}</button>
         </div>
-      )}
+        {changeOrders.length === 0 ? (
+          <div className="card-empty">{t("jobs.co.empty")}</div>
+        ) : (
+          <div>
+            {changeOrders.map((co) => (
+              <div key={co.id} className="item-row">
+                <div className="grow">
+                  <div className="flex items-center gap-2 flex-wrap"><b>{co.number}</b><span className="truncate">{co.title}</span><ChangeOrderStatusBadge status={co.status} /></div>
+                  <span className="sub">
+                    {format(new Date(co.createdAt), "PP", { locale })}
+                    {co.scheduleDeltaDays ? ` · ${co.scheduleDeltaDays > 0 ? "+" : ""}${co.scheduleDeltaDays} ${t("jobs.co.days")}` : ""}
+                    {co.signedAt ? ` · ${t("jobs.co.signedOn")} ${format(new Date(co.signedAt), "PP", { locale })}` : ""}
+                  </span>
+                </div>
+                <span className={cn("amt", co.totalCents < 0 && "neg")}>{formatCents(co.totalCents)}</span>
+                {co.documentContractId && (
+                  <Link href={`/dashboard/contracts/${co.documentContractId}`} className="text-link whitespace-nowrap">
+                    {co.status === "draft" ? t("jobs.co.signAndSend") : t("jobs.co.open")} <ExternalLink />
+                  </Link>
+                )}
+                {co.status === "draft" && <button type="button" className="ic-btn danger" onClick={() => del.mutate(co.id)}><Trash2 /></button>}
+              </div>
+            ))}
+            {signedTotal !== 0 && <div className="card-sum">{t("jobs.co.signedTotal")} <b>{formatCents(signedTotal)}</b></div>}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -416,22 +429,25 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
     return list;
   }, [job, changeOrders, data.invoices, t, locale]);
   return (
-    <div className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden divide-y">
-      {docs.length === 0 && receipts.length === 0 && <div className="p-8 text-center text-sm text-slate-400">{t("jobs.docs.empty")}</div>}
-      {docs.map((d) => (
-        <div key={d.id} className="flex items-center gap-3 px-4 py-3">
-          <div className="h-9 w-9 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center"><FileSignature className="h-4 w-4" /></div>
-          <div className="min-w-0 flex-1"><Link href={d.href} className="font-medium text-slate-900 hover:text-navy-700 truncate block">{d.title}</Link><div className="text-xs text-slate-400">{d.sub}</div></div>
-          {d.pdf && <a href={d.pdf} className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" /> PDF</a>}
-        </div>
-      ))}
-      {receipts.map((r) => (
-        <div key={r.id} className="flex items-center gap-3 px-4 py-3">
-          <div className="h-9 w-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center"><Receipt className="h-4 w-4" /></div>
-          <div className="min-w-0 flex-1"><div className="font-medium text-slate-900 truncate">{r.vendor || t("jobs.costs.unknownVendor")} · {formatCents(r.totalCents)}</div><div className="text-xs text-slate-400">{t("jobs.docs.receipt")} · {r.date ? format(day(r.date)!, "PP", { locale }) : ""}{r.status === "pending_review" ? ` · ${t("jobs.costs.toReview")}` : ""}</div></div>
-          <a href={jobsApi.receiptFileUrl(r.sourceDocumentId!)} target="_blank" rel="noreferrer" className="text-sm text-navy-600 hover:underline inline-flex items-center gap-1"><ExternalLink className="h-3.5 w-3.5" /> {t("jobs.costs.openReceipt")}</a>
-        </div>
-      ))}
-    </div>
+    <section className="card">
+      <div className="card-head"><div><h2>{t("jobs.tab.documents")}</h2></div></div>
+      {docs.length === 0 && receipts.length === 0 && <div className="card-empty">{t("jobs.docs.empty")}</div>}
+      <div>
+        {docs.map((d) => (
+          <div key={d.id} className="item-row">
+            <span className="ic"><FileSignature /></span>
+            <div className="grow"><Link href={d.href} className="hover:underline"><b className="ttl">{d.title}</b></Link><span className="sub">{d.sub}</span></div>
+            {d.pdf && <a href={d.pdf} className="text-link"><Download /> PDF</a>}
+          </div>
+        ))}
+        {receipts.map((r) => (
+          <div key={r.id} className="item-row">
+            <span className="ic warn"><Receipt /></span>
+            <div className="grow"><b className="ttl">{r.vendor || t("jobs.costs.unknownVendor")} · {formatCents(r.totalCents)}</b><span className="sub">{t("jobs.docs.receipt")} · {r.date ? format(day(r.date)!, "PP", { locale }) : ""}{r.status === "pending_review" ? ` · ${t("jobs.costs.toReview")}` : ""}</span></div>
+            <a href={jobsApi.receiptFileUrl(r.sourceDocumentId!)} target="_blank" rel="noreferrer" className="text-link"><ExternalLink /> {t("jobs.costs.openReceipt")}</a>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

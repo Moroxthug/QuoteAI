@@ -3,7 +3,6 @@ import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { enCA } from "date-fns/locale";
 import { Plus, Receipt, CheckCircle2, Circle, Loader2, Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -40,19 +39,21 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
     onError: (e: Error & { code?: string }) => toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : e.code === "NOTHING_TO_INVOICE" ? t("invoices.nothingToInvoice") : t("jobs.error"), description: e.message, variant: "destructive" }),
   });
 
+  const remainingCents = Math.max(0, job.totalValueCents - invoiceTotals.invoicedCents - live.filter((i) => i.status === "draft").reduce((s, i) => s + i.totalCents, 0));
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div>
+      <section className="stat-grid">
         <Kpi label={t("invoices.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={invoiceTotals.draftCount ? `${invoiceTotals.draftCount} ${t("invoices.kpi.drafts")}` : undefined} />
-        <Kpi label={t("invoices.kpi.collected")} value={formatCents(invoiceTotals.collectedCents)} accent="text-emerald-600" />
-        <Kpi label={t("invoices.kpi.outstanding")} value={formatCents(invoiceTotals.outstandingCents)} accent="text-blue-600" sub={invoiceTotals.overdueCents ? `${formatCents(invoiceTotals.overdueCents)} ${t("invoices.kpi.overdue")}` : undefined} />
-        <Kpi label={t("invoices.kpi.remaining")} value={formatCents(Math.max(0, job.totalValueCents - invoiceTotals.invoicedCents - live.filter((i) => i.status === "draft").reduce((s, i) => s + i.totalCents, 0)))} sub={t("invoices.kpi.remainingSub")} />
-      </div>
+        <Kpi label={t("invoices.kpi.collected")} value={formatCents(invoiceTotals.collectedCents)} tone="ok" />
+        <Kpi label={t("invoices.kpi.outstanding")} value={formatCents(invoiceTotals.outstandingCents)} tone="teal" sub={invoiceTotals.overdueCents ? `${formatCents(invoiceTotals.overdueCents)} ${t("invoices.kpi.overdue")}` : undefined} />
+        <Kpi label={t("invoices.kpi.remaining")} value={formatCents(remainingCents)} sub={t("invoices.kpi.remainingSub")} />
+      </section>
 
       {job.contract && terms.length > 0 && (
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5">
-          <h2 className="text-base font-bold text-slate-900 mb-3">{t("invoices.plan.title")}</h2>
-          <ul className="divide-y">
+        <section className="card">
+          <div className="card-head"><div><h2>{t("invoices.plan.title")}</h2></div></div>
+          <div>
             {terms.map((term) => {
               const ms = milestones.find((m) => m.paymentTermId === term.id);
               const inv = live.find((i) => i.paymentTermId === term.id) ?? (term.type === "completion" ? live.find((i) => i.type === "final") : undefined);
@@ -60,57 +61,57 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
               const kind = term.trigger === "on_signing" ? "deposit" : term.type === "completion" || term.trigger === "on_completion" ? "final" : term.trigger === "holdback_release" ? "holdback_release" : "term";
               const amount = job.contract ? Math.round((term.amountType === "percent" ? (job.contract.total * term.value) / 100 : term.value) * 100) : 0;
               return (
-                <li key={term.id} className="flex items-center gap-3 py-2.5">
-                  {inv ? <CheckCircle2 className={cn("h-4 w-4 shrink-0", inv.status === "paid" ? "text-emerald-500" : "text-blue-500")} /> : released ? <Circle className="h-4 w-4 text-amber-400 shrink-0" /> : <Lock className="h-4 w-4 text-slate-300 shrink-0" />}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm text-slate-900 truncate">{term.label}</div>
-                    <div className="text-[11px] text-slate-400 truncate">
+                <div key={term.id} className="item-row">
+                  {inv ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: inv.status === "paid" ? "var(--green)" : "var(--teal)" }} /> : released ? <Circle className="h-4 w-4 shrink-0" style={{ color: "var(--yellow-dark)" }} /> : <Lock className="h-4 w-4 shrink-0" style={{ color: "var(--line)" }} />}
+                  <div className="grow">
+                    <span className="ttl">{term.label}</span>
+                    <span className="sub">
                       {ms ? `${t("jobs.overview.onMilestone")} ${ms.title}` : term.trigger === "on_signing" ? t("invoices.plan.onSigning") : term.trigger === "on_completion" ? t("jobs.overview.onCompletion") : term.trigger === "holdback_release" ? t("invoices.plan.afterLien") : t("jobs.overview.unlinked")}
                       {inv ? ` · ${inv.number} · ${t(`invoices.status.${inv.status}`)}` : released ? ` · ${t("invoices.plan.dueNow")}` : ""}
-                    </div>
+                    </span>
                   </div>
-                  <div className="text-sm font-medium text-slate-900 whitespace-nowrap">{formatCents(inv?.totalCents ?? amount)}</div>
+                  <span className="amt">{formatCents(inv?.totalCents ?? amount)}</span>
                   {inv ? (
-                    <Button size="sm" variant="ghost" className="h-8" onClick={() => navigate(`/dashboard/invoices/${inv.id}`)}>{t("invoices.plan.open")}</Button>
+                    <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${inv.id}`)}>{t("invoices.plan.open")}</button>
                   ) : (
-                    <Button size="sm" variant={released ? "default" : "outline"} className="h-8 gap-1" disabled={create.isPending} onClick={() => create.mutate({ kind, paymentTermId: term.id, milestoneId: ms?.id })}>
+                    <button type="button" className={cn("btn btn-sm", released ? "btn-navy" : "btn-outline-navy")} disabled={create.isPending} onClick={() => create.mutate({ kind, paymentTermId: term.id, milestoneId: ms?.id })}>
                       {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} {t("invoices.plan.create")}
-                    </Button>
+                    </button>
                   )}
-                </li>
+                </div>
               );
             })}
             {holdback?.enabled && !terms.some((x) => x.trigger === "holdback_release") && (
-              <li className="flex items-center gap-3 py-2.5">
-                {live.some((i) => i.type === "holdback_release") ? <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0" /> : <Lock className="h-4 w-4 text-slate-300 shrink-0" />}
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-slate-900">{t("invoices.type.holdback_release")} ({holdback.percent}%)</div>
-                  <div className="text-[11px] text-slate-400">{t("invoices.plan.afterLien")}</div>
+              <div className="item-row">
+                {live.some((i) => i.type === "holdback_release") ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--teal)" }} /> : <Lock className="h-4 w-4 shrink-0" style={{ color: "var(--line)" }} />}
+                <div className="grow">
+                  <span className="ttl">{t("invoices.type.holdback_release")} ({holdback.percent}%)</span>
+                  <span className="sub">{t("invoices.plan.afterLien")}</span>
                 </div>
-                <div className="text-sm font-medium text-slate-900">{formatCents(live.filter((i) => i.type !== "holdback_release").reduce((s, i) => s + i.holdbackCents, 0))}</div>
+                <span className="amt">{formatCents(live.filter((i) => i.type !== "holdback_release").reduce((s, i) => s + i.holdbackCents, 0))}</span>
                 {live.some((i) => i.type === "holdback_release") ? (
-                  <Button size="sm" variant="ghost" className="h-8" onClick={() => navigate(`/dashboard/invoices/${live.find((i) => i.type === "holdback_release")!.id}`)}>{t("invoices.plan.open")}</Button>
+                  <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${live.find((i) => i.type === "holdback_release")!.id}`)}>{t("invoices.plan.open")}</button>
                 ) : (
-                  <Button size="sm" variant="outline" className="h-8 gap-1" disabled={create.isPending || job.status !== "completed"} onClick={() => create.mutate({ kind: "holdback_release" })}><Plus className="h-3.5 w-3.5" /> {t("invoices.plan.create")}</Button>
+                  <button type="button" className="btn btn-sm btn-outline-navy" disabled={create.isPending || job.status !== "completed"} onClick={() => create.mutate({ kind: "holdback_release" })}><Plus className="h-3.5 w-3.5" /> {t("invoices.plan.create")}</button>
                 )}
-              </li>
+              </div>
             )}
-          </ul>
+          </div>
         </section>
       )}
 
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-900">{t("invoices.title")}</h2>
-          <Button size="sm" variant="outline" className="gap-2" onClick={() => setManualOpen(true)}><Plus className="h-4 w-4" /> {t("invoices.manual")}</Button>
+      <section className="card">
+        <div className="card-head">
+          <div><h2>{t("invoices.title")}</h2></div>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setManualOpen(true)}><Plus className="h-4 w-4" /> {t("invoices.manual")}</button>
         </div>
         {invoices.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-card p-8 text-center text-sm text-slate-500">
-            <Receipt className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+          <div className="card-empty">
+            <Receipt />
             {job.contract ? t("invoices.jobEmptyContract") : t("invoices.jobEmpty")}
           </div>
         ) : (
-          <div className="rounded-2xl border border-slate-200 bg-card overflow-hidden divide-y">
+          <div>
             {[...invoices].reverse().map((inv) => <InvoiceRow key={inv.id} inv={inv} locale={locale} compact />)}
           </div>
         )}
@@ -121,12 +122,12 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
   );
 }
 
-function Kpi({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
+function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" | "teal" }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-card px-4 py-3">
-      <div className="text-xs text-slate-500">{label}</div>
-      <div className={cn("text-xl font-bold text-slate-900 mt-0.5", accent)}>{value}</div>
-      {sub && <div className="text-[11px] text-slate-400 mt-0.5 truncate">{sub}</div>}
+    <div className="card stat-card">
+      <p className="lbl">{label}</p>
+      <p className={cn("val", tone)}>{value}</p>
+      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }

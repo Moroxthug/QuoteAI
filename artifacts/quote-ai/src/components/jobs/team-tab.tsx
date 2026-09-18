@@ -4,9 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
 import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -18,9 +15,12 @@ const today = () => new Date().toISOString().slice(0, 10);
 
 export function TimeStatusBadge({ status }: { status: TimeEntryDto["status"] }) {
   const { t } = useLanguage();
-  const cls = status === "approved" ? "bg-emerald-100 text-emerald-700" : status === "rejected" ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-800";
-  return <span className={cn("text-[10px] font-medium rounded px-1.5 py-0.5", cls)}>{t(`team.time.status.${status}`)}</span>;
+  const cls = status === "approved" ? "chip-green" : status === "rejected" ? "chip-red" : "chip-yellow";
+  return <span className={cn("chip", cls)}>{t(`team.time.status.${status}`)}</span>;
 }
+
+/** Compact `.field` control for the inline log-hours / log-usage forms. */
+const tight = { padding: "8px 12px", fontSize: 13.5 } as const;
 
 /**
  * Team tab of a job: who is assigned, hours logged on this job (approve /
@@ -80,142 +80,164 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-2 stack">
         {/* Hours */}
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-navy-600" /> {t("jobs.team.hours")}</h2>
-            <div className="text-xs text-slate-500">{approvedHours.toFixed(1)} h {t("jobs.team.approved")} · <span className="font-medium text-slate-800">{formatCents(approvedCents)}</span>{pendingHours.length ? <span className="ml-2 text-amber-700">{pendingHours.length} {t("jobs.team.pending")}</span> : null}</div>
+        <section className="card">
+          <div className="card-head">
+            <div>
+              <h2 className="inline-flex items-center gap-2"><Clock className="h-4 w-4" /> {t("jobs.team.hours")}</h2>
+              <p className="sub">{approvedHours.toFixed(1)} h {t("jobs.team.approved")} · {formatCents(approvedCents)}{pendingHours.length ? <span style={{ color: "var(--yellow-dark)" }}> · {pendingHours.length} {t("jobs.team.pending")}</span> : null}</p>
+            </div>
           </div>
-          <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_80px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
-            <select value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm col-span-2 xl:col-span-1">
-              <option value="">{t("jobs.team.pickWorker")}</option>
-              {timeWorkers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
-            </select>
-            <Input type="date" value={time.date} onChange={(e) => setTime({ ...time, date: e.target.value })} className="h-9" />
-            <Input type="number" step="0.25" min="0.25" max="24" value={time.hours} onChange={(e) => setTime({ ...time, hours: e.target.value })} placeholder="h" className="h-9" />
-            {milestones.length > 0 ? (
-              <select value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm">
-                <option value="">{t("jobs.costs.wholeJob")}</option>
-                {milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
+          <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_80px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
+            <div className="field col-span-2 xl:col-span-1">
+              <select value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} style={tight}>
+                <option value="">{t("jobs.team.pickWorker")}</option>
+                {timeWorkers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
+            </div>
+            <div className="field"><input type="date" value={time.date} onChange={(e) => setTime({ ...time, date: e.target.value })} style={tight} /></div>
+            <div className="field"><input type="number" step="0.25" min="0.25" max="24" value={time.hours} onChange={(e) => setTime({ ...time, hours: e.target.value })} placeholder="h" style={tight} /></div>
+            {milestones.length > 0 ? (
+              <div className="field">
+                <select value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} style={tight}>
+                  <option value="">{t("jobs.costs.wholeJob")}</option>
+                  {milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
+                </select>
+              </div>
             ) : (
-              <Input value={time.note} onChange={(e) => setTime({ ...time, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} className="h-9" />
+              <div className="field"><input value={time.note} onChange={(e) => setTime({ ...time, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} style={tight} /></div>
             )}
-            <Button type="submit" size="sm" className="h-9 gap-1 col-span-2 xl:col-span-1" disabled={!time.workerId || !time.hours || addTime.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logHours")}</Button>
+            <button type="submit" className="btn btn-sm btn-navy col-span-2 xl:col-span-1" disabled={!time.workerId || !time.hours || addTime.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logHours")}</button>
           </form>
-          {activeWorkers.length === 0 && <p className="text-xs text-slate-400">{t("jobs.team.noWorkersHint")} <Link href="/dashboard/team" className="text-navy-600 underline">{t("jobs.team.openTeam")}</Link></p>}
-          {timeEntries.length === 0 ? <p className="text-sm text-slate-400 py-4 text-center">{t("jobs.team.noHours")}</p> : (
-            <ul className="divide-y">
+          {activeWorkers.length === 0 && <p className="field-hint px-[22px] pt-3">{t("jobs.team.noWorkersHint")} <Link href="/dashboard/team" className="text-link">{t("jobs.team.openTeam")}</Link></p>}
+          {timeEntries.length === 0 ? <div className="card-empty">{t("jobs.team.noHours")}</div> : (
+            <div>
               {timeEntries.map((e) => (
-                <li key={e.id} className={cn("flex items-center gap-3 py-2 text-sm group", e.status === "rejected" && "opacity-60")}>
-                  <span className="text-xs text-slate-400 w-20 shrink-0">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate"><span className="font-medium text-slate-800">{e.workerName}</span> <span className="text-slate-500">· {e.hours} h</span>{e.milestoneTitle ? <span className="text-slate-400"> · {e.milestoneTitle}</span> : null}</div>
-                    {e.note && <div className="text-[11px] text-slate-400 truncate">{e.note}</div>}
+                <div key={e.id} className={cn("item-row", e.status === "rejected" && "muted")}>
+                  <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
+                  <div className="grow">
+                    <span className="ttl"><b>{e.workerName}</b> <span style={{ color: "var(--muted-mk)" }}>· {e.hours} h</span>{e.milestoneTitle ? <span style={{ color: "var(--faint)" }}> · {e.milestoneTitle}</span> : null}</span>
+                    {e.note && <span className="sub">{e.note}</span>}
                   </div>
-                  {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" /></span>}
+                  {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--yellow-dark)" }} /></span>}
                   <TimeStatusBadge status={e.status} />
-                  <span className="font-medium whitespace-nowrap w-20 text-right">{e.status === "approved" ? formatCents(e.costCents) : <span className="text-slate-400">{formatCents(e.costCents)}</span>}</span>
-                  <div className="flex gap-1 shrink-0">
-                    {e.status === "submitted" && <button title={t("jobs.team.approve")} className="h-7 w-7 rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 flex items-center justify-center" onClick={() => setStatus.mutate({ id: e.id, status: "approved" })}><Check className="h-4 w-4" /></button>}
-                    {e.status === "submitted" && <button title={t("jobs.team.reject")} className="h-7 w-7 rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center" onClick={() => setStatus.mutate({ id: e.id, status: "rejected" })}><X className="h-4 w-4" /></button>}
-                    {e.status !== "submitted" && <button title={t("jobs.team.reopen")} className="opacity-0 group-hover:opacity-100 text-xs text-slate-400 hover:text-slate-700 px-1" onClick={() => setStatus.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
-                    <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => delTime.mutate(e.id)}><Trash2 className="h-4 w-4" /></button>
+                  <span className={cn("amt w-20 text-right", e.status !== "approved" && "faint")}>{formatCents(e.costCents)}</span>
+                  <div className="flex gap-1 shrink-0 items-center">
+                    {e.status === "submitted" && <button type="button" title={t("jobs.team.approve")} className="ic-btn ok" onClick={() => setStatus.mutate({ id: e.id, status: "approved" })}><Check /></button>}
+                    {e.status === "submitted" && <button type="button" title={t("jobs.team.reject")} className="ic-btn bad" onClick={() => setStatus.mutate({ id: e.id, status: "rejected" })}><X /></button>}
+                    <div className="hover-act">
+                      {e.status !== "submitted" && <button type="button" title={t("jobs.team.reopen")} className="text-link" style={{ fontSize: 12 }} onClick={() => setStatus.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
+                      <button type="button" className="ic-btn danger" onClick={() => delTime.mutate(e.id)}><Trash2 /></button>
+                    </div>
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </section>
 
         {/* Equipment */}
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 md:p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900 inline-flex items-center gap-2"><Wrench className="h-4 w-4 text-navy-600" /> {t("jobs.team.equipment")}</h2>
-            <div className="text-xs text-slate-500">{t("jobs.team.equipmentCharged")} <span className="font-medium text-slate-800">{formatCents(usageCents)}</span></div>
+        <section className="card">
+          <div className="card-head">
+            <div>
+              <h2 className="inline-flex items-center gap-2"><Wrench className="h-4 w-4" /> {t("jobs.team.equipment")}</h2>
+              <p className="sub">{t("jobs.team.equipmentCharged")} {formatCents(usageCents)}</p>
+            </div>
           </div>
           {activeEquipment.length === 0 ? (
-            <p className="text-xs text-slate-400">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-navy-600 underline">{t("jobs.team.openTeam")}</Link></p>
+            <p className="field-hint px-[22px] py-4">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-link">{t("jobs.team.openTeam")}</Link></p>
           ) : (
-            <form className="grid grid-cols-2 xl:grid-cols-[1fr_130px_90px_1fr_auto] gap-2" onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
-              <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm col-span-2 xl:col-span-1">
-                <option value="">{t("jobs.team.pickEquipment")}</option>
-                {activeEquipment.map((eq) => <option key={eq.id} value={eq.id}>{eq.name} · {formatCents(eq.usageRateCents)}/{t(`team.unit.${eq.usageUnit}`)}</option>)}
-              </select>
-              <Input type="date" value={usage.date} onChange={(e) => setUsage({ ...usage, date: e.target.value })} className="h-9" />
-              <Input type="number" step="0.5" min="0.25" value={usage.quantity} onChange={(e) => setUsage({ ...usage, quantity: e.target.value })} placeholder={selectedEquipment ? t(`team.unit.${selectedEquipment.usageUnit}`) : "#"} className="h-9" />
-              <Input value={usage.note} onChange={(e) => setUsage({ ...usage, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} className="h-9" />
-              <Button type="submit" size="sm" className="h-9 gap-1 col-span-2 xl:col-span-1" disabled={!usage.equipmentId || !usage.quantity || addUsage.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logUsage")}</Button>
+            <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_90px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: equipmentUsage.length ? "1px solid var(--soft)" : undefined }} onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
+              <div className="field col-span-2 xl:col-span-1">
+                <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} style={tight}>
+                  <option value="">{t("jobs.team.pickEquipment")}</option>
+                  {activeEquipment.map((eq) => <option key={eq.id} value={eq.id}>{eq.name} · {formatCents(eq.usageRateCents)}/{t(`team.unit.${eq.usageUnit}`)}</option>)}
+                </select>
+              </div>
+              <div className="field"><input type="date" value={usage.date} onChange={(e) => setUsage({ ...usage, date: e.target.value })} style={tight} /></div>
+              <div className="field"><input type="number" step="0.5" min="0.25" value={usage.quantity} onChange={(e) => setUsage({ ...usage, quantity: e.target.value })} placeholder={selectedEquipment ? t(`team.unit.${selectedEquipment.usageUnit}`) : "#"} style={tight} /></div>
+              <div className="field"><input value={usage.note} onChange={(e) => setUsage({ ...usage, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} style={tight} /></div>
+              <button type="submit" className="btn btn-sm btn-navy col-span-2 xl:col-span-1" disabled={!usage.equipmentId || !usage.quantity || addUsage.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logUsage")}</button>
             </form>
           )}
           {equipmentUsage.length > 0 && (
-            <ul className="divide-y">
+            <div>
               {equipmentUsage.map((u) => (
-                <li key={u.id} className="flex items-center gap-3 py-2 text-sm group">
-                  <span className="text-xs text-slate-400 w-20 shrink-0">{u.date ? format(day(u.date)!, "d MMM yy", { locale }) : "—"}</span>
-                  <div className="flex-1 min-w-0 truncate"><span className="font-medium text-slate-800">{u.equipmentName}</span> <span className="text-slate-500">· {u.quantity} {t(`team.unit.${u.unit}`)}</span>{u.note ? <span className="text-slate-400"> · {u.note}</span> : null}</div>
-                  <span className="font-medium whitespace-nowrap">{formatCents(u.costCents)}</span>
-                  <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => delUsage.mutate(u.id)}><Trash2 className="h-4 w-4" /></button>
-                </li>
+                <div key={u.id} className="item-row">
+                  <span className="date">{u.date ? format(day(u.date)!, "d MMM yy", { locale }) : "—"}</span>
+                  <div className="grow"><span className="ttl"><b>{u.equipmentName}</b> <span style={{ color: "var(--muted-mk)" }}>· {u.quantity} {t(`team.unit.${u.unit}`)}</span>{u.note ? <span style={{ color: "var(--faint)" }}> · {u.note}</span> : null}</span></div>
+                  <span className="amt">{formatCents(u.costCents)}</span>
+                  <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => delUsage.mutate(u.id)}><Trash2 /></button></div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </section>
       </div>
 
       {/* Assigned */}
-      <div className="space-y-4">
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Users className="h-4 w-4 text-navy-600" /> {t("jobs.team.assigned")}</h3>
-            <Link href="/dashboard/team" className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1">{t("jobs.team.openTeam")} <ExternalLink className="h-3 w-3" /></Link>
+      <div className="stack">
+        <section className="card">
+          <div className="card-head">
+            <div><h2 className="inline-flex items-center gap-2"><Users className="h-4 w-4" /> {t("jobs.team.assigned")}</h2></div>
+            <Link href="/dashboard/team" className="text-link">{t("jobs.team.openTeam")} <ExternalLink /></Link>
           </div>
-          {assignments.length === 0 ? <p className="text-sm text-slate-400 py-2 text-center">{t("jobs.team.empty")}</p> : (
-            <ul className="divide-y">
+          {assignments.length === 0 ? <div className="card-empty">{t("jobs.team.empty")}</div> : (
+            <div>
               {assignments.map((a) => (
-                <li key={a.id} className="flex items-center gap-3 py-2 text-sm group">
-                  <div className="h-8 w-8 rounded-full bg-navy-100 text-navy-700 flex items-center justify-center text-xs font-bold">{a.collaboratorName.slice(0, 2).toUpperCase()}</div>
-                  <div className="flex-1 min-w-0"><div className="font-medium text-slate-800 truncate">{a.collaboratorName}</div><div className="text-xs text-slate-400">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</div></div>
-                  <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => unassign.mutate(a.id)}><Trash2 className="h-4 w-4" /></button>
-                </li>
+                <div key={a.id} className="item-row">
+                  <span className="avat">{a.collaboratorName.slice(0, 2)}</span>
+                  <div className="grow"><b className="ttl">{a.collaboratorName}</b><span className="sub">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</span></div>
+                  <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => unassign.mutate(a.id)}><Trash2 /></button></div>
+                </div>
               ))}
-            </ul>
-          )}
-          {available.length > 0 && (
-            <div className="flex gap-2 pt-2 border-t">
-              <select value={pick} onChange={(e) => setPick(e.target.value)} className="h-9 flex-1 rounded-md border border-slate-200 bg-card px-2 text-sm">
-                <option value="">{t("jobs.team.pick")}</option>
-                {available.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-              <Button size="sm" className="h-9" disabled={!pick || assign.isPending} onClick={() => { assign.mutate(pick); setPick(""); }}>{t("jobs.team.assign")}</Button>
             </div>
           )}
-          <form className="space-y-2 pt-2 border-t" onSubmit={(e) => { e.preventDefault(); if (name.trim()) addWorker.mutate({ name: name.trim(), hourlyRateCents: rate ? Math.round(Number(rate) * 100) : undefined }); }}>
-            <Label className="text-xs text-slate-500">{t("jobs.team.newWorker")}</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.team.namePlaceholder")} className="h-9" />
-            <Input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} className="h-9" />
-            <Button type="submit" size="sm" variant="outline" className="w-full h-9" disabled={!name.trim() || addWorker.isPending}>{t("jobs.team.addAndAssign")}</Button>
+          {available.length > 0 && (
+            <div className="flex gap-2 px-[22px] py-4" style={{ borderTop: "1px solid var(--soft)" }}>
+              <div className="field flex-1">
+                <select value={pick} onChange={(e) => setPick(e.target.value)} style={tight}>
+                  <option value="">{t("jobs.team.pick")}</option>
+                  {available.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <button type="button" className="btn btn-sm btn-navy" disabled={!pick || assign.isPending} onClick={() => { assign.mutate(pick); setPick(""); }}>{t("jobs.team.assign")}</button>
+            </div>
+          )}
+          <form className="stack px-[22px] py-4" style={{ gap: 8, borderTop: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (name.trim()) addWorker.mutate({ name: name.trim(), hourlyRateCents: rate ? Math.round(Number(rate) * 100) : undefined }); }}>
+            <div className="field">
+              <label>{t("jobs.team.newWorker")}</label>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.team.namePlaceholder")} style={tight} />
+            </div>
+            <div className="field"><input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} style={tight} /></div>
+            <button type="submit" className="btn btn-sm btn-outline-navy w-full" disabled={!name.trim() || addWorker.isPending}>{t("jobs.team.addAndAssign")}</button>
+            <p className="field-hint">{t("jobs.team.assignHint")}</p>
           </form>
-          <p className="text-[11px] text-slate-400">{t("jobs.team.assignHint")}</p>
         </section>
 
         {/* Geofence */}
-        <section className="rounded-2xl border border-slate-200 bg-card p-4 space-y-3">
-          <h3 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-navy-600" /> {t("jobs.team.geofenceTitle")}</h3>
-          <p className="text-xs text-slate-500">{t("jobs.team.geofenceHint")}</p>
-          <Button type="button" variant="outline" size="sm" className="h-9 gap-1.5 w-full" disabled={locating} onClick={useMyLocation}>
-            {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} {job.latitude ? t("jobs.team.updateLocation") : t("jobs.team.useMyLocation")}
-          </Button>
-          {job.latitude && job.longitude && (
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-500">{t("jobs.team.radiusLabel")}</Label>
-              <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} className="h-9 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
-                <option value="">{t("jobs.team.radiusOff")}</option>
-                {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
-              </select>
+        <section className="card">
+          <div className="card-head">
+            <div>
+              <h2 className="inline-flex items-center gap-2"><MapPin className="h-4 w-4" /> {t("jobs.team.geofenceTitle")}</h2>
+              <p className="sub">{t("jobs.team.geofenceHint")}</p>
             </div>
-          )}
+          </div>
+          <div className="act-body stack" style={{ gap: 12 }}>
+            <button type="button" className="btn btn-sm btn-outline-navy w-full" disabled={locating} onClick={useMyLocation}>
+              {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} {job.latitude ? t("jobs.team.updateLocation") : t("jobs.team.useMyLocation")}
+            </button>
+            {job.latitude && job.longitude && (
+              <div className="field">
+                <label>{t("jobs.team.radiusLabel")}</label>
+                <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} style={tight}>
+                  <option value="">{t("jobs.team.radiusOff")}</option>
+                  {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
+                </select>
+              </div>
+            )}
+          </div>
         </section>
       </div>
     </div>

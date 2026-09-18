@@ -1,30 +1,43 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Link } from "wouter";
+import { SearchX, ArrowRight } from "lucide-react";
+import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function NotFound() {
   const { t } = useLanguage();
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
+    <PublicLayout>
       <SeoHead
         title={t("notFound.title")}
         description={t("notFound.description")}
         canonical=""
         noIndex={true}
       />
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">{t("notFound.heading")}</h1>
-          </div>
 
-          <p className="mt-4 text-sm text-gray-600">
-            {t("notFound.body")}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+      <div className="wrap" style={{ maxWidth: 620, padding: "clamp(64px, 10vw, 120px) 0", textAlign: "center" }}>
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 16,
+            display: "grid",
+            placeItems: "center",
+            margin: "0 auto 24px",
+            background: "var(--soft)",
+            color: "var(--navy)",
+          }}
+        >
+          <SearchX className="h-7 w-7" />
+        </div>
+        <p className="eyebrow" style={{ justifyContent: "center", display: "flex" }}>404</p>
+        <h1 className="h2" style={{ marginBottom: 14 }}>{t("notFound.heading")}</h1>
+        <p className="lead" style={{ margin: "0 auto 32px" }}>{t("notFound.body")}</p>
+        <Link href="/" className="btn btn-navy">
+          {t("errorBoundary.backHome")}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </PublicLayout>
   );
 }

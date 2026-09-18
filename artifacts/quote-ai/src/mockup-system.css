@@ -1297,3 +1297,115 @@ button.chap-head:hover { background: var(--soft-2); }
 .lbl-xs { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
 .pill { display: inline-flex; align-items: center; }
 .pill svg { margin-right: 6px; }
+
+/* ==========================================================
+   JOB SETUP + TEAM TIME QUEUE + GANTT (Phase 59)
+   (docs/PIXEL-REDESIGN-PLAN.md, Phase 59)
+
+   /dashboard/jobs/:id/setup (the AI schedule/budget review
+   page) and the team page's time-entry approval tab were the
+   two dashboard surfaces the Phase 42/57 passes skipped. They
+   reuse the detail-page vocabulary (.card/.stat-card/.notice/
+   .item-row/.ic-btn/.chk/.inp-sm) and add: the editable
+   milestone row grid, the payment-coverage strip, the budget
+   category grid with a $-prefixed input, the sticky save bar,
+   the grouped time-entry sections, and the Gantt chart's own
+   classes (it was still on Tailwind utilities).
+   ========================================================== */
+.stat-card.editable .inp-sm { margin-top: 6px; font-size: 15px; font-weight: 800; color: var(--navy); }
+.stat-card .val.sm { font-size: 15.5px; margin-top: 6px; }
+.stat-card .text-link { margin-top: 4px; font-size: 12.5px; }
+.stat-grid .stat-card.span-2 { grid-column: span 2; }
+/* the mockup's own `.card + .card { margin-top }` sibling rule leaks into grid cells and pushes cards 2..n down 16px; grids space with gap */
+.stat-grid > .card, .qa-grid > .card, .split-2 > .card, .mid-grid > .card, .steps-3 > .card, .kanban > .card { margin-top: 0; }
+
+.ms-edit { display: grid; grid-template-columns: auto minmax(0, 1.3fr) 150px 150px minmax(0, 1fr) 30px; gap: 10px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.ms-edit + .ms-edit { margin-top: 8px; }
+.ms-edit .order { display: flex; flex-direction: column; gap: 2px; }
+.ms-edit .order .ic-btn { width: 22px; height: 18px; border-radius: 5px; }
+.ms-edit .order .ic-btn svg { width: 13px; height: 13px; }
+.ms-edit .desc { min-width: 0; }
+.ms-edit .dates { display: contents; }
+.ms-edit .desc .inp-sm { font-weight: 700; }
+.ms-edit .sub { display: block; font-size: 12px; color: var(--faint); font-weight: 600; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-edit select.inp-sm.linked { color: var(--green-dark); }
+.ms-list { padding: 0 22px 22px; }
+.ms-list .add-dashed { margin-top: 10px; }
+.shift-start { display: flex; align-items: center; gap: 8px; }
+.shift-start .inp-sm { width: 160px; }
+
+.cov-list { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 22px 22px; padding: 12px 16px; border-radius: 12px; background: var(--soft); font-size: 12.5px; font-weight: 700; }
+.cov-list span { display: inline-flex; align-items: center; gap: 5px; color: var(--yellow-dark); }
+.cov-list span.ok { color: var(--green-dark); }
+.cov-list svg { width: 13px; height: 13px; }
+.cov-list span:not(.ok) svg { opacity: .35; }
+
+.budget-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 22px 22px; }
+.budget-grid .cell { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.money-in { position: relative; }
+.money-in > span { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; font-weight: 700; color: var(--faint); pointer-events: none; }
+.money-in .inp-sm { padding-left: 24px; }
+.card-head .totals { font-size: 13.5px; font-weight: 600; color: var(--muted-mk); display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.card-head .totals b { color: var(--navy); font-weight: 800; }
+.card-head .totals .ok { color: var(--green-dark); font-weight: 800; }
+.card-head .totals .warn { color: var(--yellow-dark); font-weight: 800; }
+.card-head .hint { font-size: 12.5px; color: var(--faint); font-weight: 600; margin-top: 4px; }
+
+.save-bar { position: sticky; bottom: 16px; z-index: 20; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 18px; margin-top: 16px; background: rgba(255, 255, 255, .96); backdrop-filter: blur(8px); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 14px 40px rgba(16, 16, 49, .12); }
+.save-bar .foot-note { margin-right: auto; }
+
+/* team → time approval queue */
+.bulk-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.bulk-row .text-link { color: var(--muted-mk); }
+.te-group { padding: 10px 22px; background: var(--soft); border-top: 1px solid var(--line); display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; }
+.te-group:first-child { border-top: none; }
+.te-group b { color: var(--navy); font-weight: 800; }
+.te-group span { color: var(--muted-mk); font-weight: 600; }
+.item-row .chk { cursor: pointer; }
+.item-row .spacer { width: 16px; flex: none; }
+.item-row .flag { color: var(--yellow-dark); display: inline-flex; flex: none; }
+.item-row .flag svg { width: 14px; height: 14px; }
+.item-row .grow a { color: var(--navy); font-weight: 700; }
+.item-row .grow a:hover { text-decoration: underline; }
+.item-row .grow .by { font-size: 11px; color: var(--faint); font-weight: 600; margin-left: 4px; }
+.item-row .grow .dim { color: var(--faint); }
+.tbl .row-act { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+
+/* gantt (components/jobs/gantt.tsx) */
+.gantt { overflow-x: auto; }
+.gantt-in { min-width: 640px; position: relative; padding-bottom: 16px; }
+.gantt-head { display: flex; }
+.gantt-lbl { width: 224px; flex: none; }
+.gantt-axis { position: relative; flex: 1; height: 28px; border-bottom: 1px solid var(--line); }
+.gantt-axis span { position: absolute; top: 0; height: 100%; border-left: 1px solid var(--soft); font-size: 10.5px; font-weight: 700; color: var(--faint); padding: 7px 0 0 5px; white-space: nowrap; }
+.gantt-row { display: flex; align-items: center; }
+.gantt-row.click { cursor: pointer; }
+.gantt-row .gantt-lbl { padding: 8px 12px 8px 0; min-width: 0; }
+.gantt-row .gantt-lbl b { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s; }
+.gantt-row.click:hover .gantt-lbl b { color: var(--navy); }
+.gantt-row .gantt-lbl span { display: block; font-size: 11.5px; font-weight: 600; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gantt-track { position: relative; flex: 1; height: 40px; border-bottom: 1px solid var(--soft); }
+.gantt-track i { position: absolute; top: 0; height: 100%; border-left: 1px solid var(--soft); }
+.gantt-bar { position: absolute; top: 8px; height: 24px; border-radius: 7px; border: 1px solid transparent; font-size: 11px; font-weight: 700; padding: 0 8px; display: flex; align-items: center; overflow: hidden; white-space: nowrap; box-shadow: 0 1px 2px rgba(16, 16, 49, .08); }
+.gantt-bar.planned { background: var(--purple-t); border-color: rgba(114, 79, 232, .3); color: var(--purple); }
+.gantt-bar.in_progress { background: var(--teal); border-color: var(--teal-dark); color: #fff; }
+.gantt-bar.completed { background: var(--green); border-color: var(--green-dark); color: #fff; }
+.gantt-bar.skipped { background: var(--soft-2); border-color: var(--line); color: var(--faint); text-decoration: line-through; }
+.gantt-bar.empty { left: 0; width: 96px; border: 1px dashed var(--line); background: transparent; box-shadow: none; }
+.gantt-today { position: absolute; top: 28px; bottom: 0; border-left: 2px solid var(--red); pointer-events: none; }
+.gantt-today span { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 10.5px; font-weight: 800; color: var(--red); background: #fff; padding: 0 4px; white-space: nowrap; }
+.gantt-none { border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--faint); }
+
+@media (max-width: 980px) {
+  .ms-edit { grid-template-columns: auto minmax(0, 1fr) 30px; }
+  .ms-edit .dates, .ms-edit .pay { grid-column: 2 / 3; }
+  .ms-edit .dates { display: flex; gap: 8px; }
+  .budget-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .ms-list, .budget-grid { padding-left: 16px; padding-right: 16px; }
+  .cov-list { margin-left: 16px; margin-right: 16px; }
+  .ms-edit .dates { flex-direction: column; }
+  .stat-grid .stat-card.span-2 { grid-column: 1 / -1; }
+  .save-bar { bottom: 8px; }
+}

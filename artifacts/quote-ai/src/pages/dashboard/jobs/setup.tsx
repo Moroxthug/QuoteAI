@@ -1,12 +1,9 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, differenceInCalendarDays, format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Sparkles, ArrowLeft, Loader2, Plus, Trash2, ChevronUp, ChevronDown, CheckCircle2, RefreshCw, FileSignature, Wand2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -108,101 +105,103 @@ export default function JobSetupPage() {
   const move = (i: number, dir: -1 | 1) => setMilestones((ms) => { const j = i + dir; if (j < 0 || j >= ms.length) return ms; const copy = [...ms]; [copy[i], copy[j]] = [copy[j]!, copy[i]!]; return copy; });
   const addMs = () => setMilestones((ms) => { const last = ms.at(-1); const s = last?.plannedEnd ? dayStr(addDays(parseDay(last.plannedEnd), 1)) : ""; return [...ms, { title: "", description: "", plannedStart: s, plannedEnd: s, paymentTermId: null, valueCents: 0, taskCount: 0, status: "planned" }]; });
 
-  if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-[var(--radius)]" /></div>;
-  if (error || !data) return <div className="p-8 text-center text-slate-500">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-navy-600 underline">{t("jobs.backToList")}</Link></div>;
+  if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (error || !data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { job } = data;
   const confirmed = job.setupStatus === "confirmed";
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300 max-w-5xl">
-      <div>
-        <Link href={confirmed ? `/dashboard/jobs/${job.id}` : "/dashboard/jobs"} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> {confirmed ? t("jobs.backToJob") : t("jobs.backToList")}</Link>
-        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
-              <Sparkles className="h-7 w-7 text-amber-500" /> {confirmed ? t("jobs.setup.editTitle") : t("jobs.setup.title")}
-            </h1>
-            <p className="text-slate-500 mt-1">
-              {job.contract
-                ? t("jobs.setup.subtitle").replace("{customer}", job.contract.customerName).replace("{contract}", job.contract.contractNumber)
-                : t("jobs.setup.subtitleManual")}
-            </p>
+    <div className="animate-in fade-in duration-300">
+      <Link href={confirmed ? `/dashboard/jobs/${job.id}` : "/dashboard/jobs"} className="back-link"><ArrowLeft /> {confirmed ? t("jobs.backToJob") : t("jobs.backToList")}</Link>
+      <div className="page-head">
+        <div className="min-w-0">
+          <div className="title-row">
+            <h1><Sparkles /> {confirmed ? t("jobs.setup.editTitle") : t("jobs.setup.title")}</h1>
           </div>
-          <div className="flex gap-2">
-            {!confirmed && job.contractId && (
-              <Button variant="outline" size="sm" className="gap-2" disabled={regenerate.isPending} onClick={() => regenerate.mutate()}>
-                {regenerate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} {t("jobs.setup.regenerate")}
-              </Button>
-            )}
-            <Button variant="outline" size="sm" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("jobs.setup.save")}</Button>
-          </div>
+          <p className="sub">
+            {job.contract
+              ? t("jobs.setup.subtitle").replace("{customer}", job.contract.customerName).replace("{contract}", job.contract.contractNumber)
+              : t("jobs.setup.subtitleManual")}
+          </p>
+        </div>
+        <div className="head-actions">
+          {!confirmed && job.contractId && (
+            <button type="button" className="btn btn-sm btn-outline-navy" disabled={regenerate.isPending} onClick={() => regenerate.mutate()}>
+              {regenerate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} {t("jobs.setup.regenerate")}
+            </button>
+          )}
+          <button type="button" className="btn btn-sm btn-outline-navy" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {t("jobs.setup.save")}</button>
         </div>
       </div>
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3 md:col-span-2">
-          <Label className="text-xs text-slate-500">{t("jobs.field.name")}</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} className="mt-1 font-semibold" />
+      <section className="stat-grid">
+        <div className="card stat-card editable span-2">
+          <label className="lbl" htmlFor="setup-name">{t("jobs.field.name")}</label>
+          <input id="setup-name" className="inp-sm" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
-          <div className="text-xs text-slate-500">{t("jobs.contractValue")}</div>
-          <div className="text-xl font-bold text-slate-900 mt-0.5">{formatCents(job.contractValueCents)}</div>
-          {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-[11px] text-navy-600 hover:underline inline-flex items-center gap-1"><FileSignature className="h-3 w-3" /> {job.contract.contractNumber}</Link>}
+        <div className="card stat-card">
+          <div className="lbl">{t("jobs.contractValue")}</div>
+          <div className="val">{formatCents(job.contractValueCents)}</div>
+          {job.contract && <Link href={`/dashboard/contracts/${job.contract.id}`} className="text-link"><FileSignature /> {job.contract.contractNumber}</Link>}
         </div>
-        <div className="rounded-[var(--radius)] border border-slate-200 bg-card px-4 py-3">
-          <div className="text-xs text-slate-500">{t("jobs.setup.window")}</div>
-          <div className="text-sm font-semibold text-slate-900 mt-1">
+        <div className="card stat-card">
+          <div className="lbl">{t("jobs.setup.window")}</div>
+          <div className="val sm">
             {plannedStart && plannedEnd ? `${format(parseDay(plannedStart), "d MMM", { locale })} → ${format(parseDay(plannedEnd), "PP", { locale })}` : "—"}
           </div>
-          <div className="text-[11px] text-slate-400">{milestones.length} {t("jobs.milestonesShort")}</div>
+          <div className="sub">{milestones.length} {t("jobs.milestonesShort")}</div>
         </div>
-      </div>
+      </section>
 
       {job.setupProposal && (
-        <div className="rounded-[var(--radius)] border border-navy-100 bg-navy-50/60 px-4 py-3 text-sm text-navy-900 flex gap-3">
-          <Wand2 className="h-4 w-4 mt-0.5 shrink-0 text-navy-600" />
-          <div>
-            <span className="font-semibold">{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</span>{" "}
-            {job.setupProposal.rationale && <span className="text-navy-800">{job.setupProposal.rationale}</span>}
-            <span className="text-navy-700/80"> {t("jobs.setup.editHint")}</span>
+        <div className="notice info">
+          <Wand2 />
+          <div className="grow">
+            <b>{job.setupProposal.source === "ai" ? t("jobs.setup.aiNote") : t("jobs.setup.fallbackNote")}</b>{" "}
+            {job.setupProposal.rationale && <span>{job.setupProposal.rationale}</span>}
+            <small>{t("jobs.setup.editHint")}</small>
           </div>
         </div>
       )}
 
       {/* Schedule */}
-      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.milestones")}</h2>
-          <div className="flex items-center gap-2 text-sm">
-            <Label className="text-xs text-slate-500">{t("jobs.setup.shiftStart")}</Label>
-            <Input type="date" value={plannedStart ?? ""} onChange={(e) => shiftAll(e.target.value)} className="h-8 w-40" />
+      <section className="card">
+        <div className="card-head">
+          <h2>{t("jobs.setup.milestones")}</h2>
+          <div className="shift-start">
+            <span className="lbl-xs" style={{ marginBottom: 0 }}>{t("jobs.setup.shiftStart")}</span>
+            <input type="date" className="inp-sm" value={plannedStart ?? ""} onChange={(e) => shiftAll(e.target.value)} />
           </div>
         </div>
 
-        <Gantt rows={milestones.map((m, i) => ({ id: m.id ?? `new-${i}`, title: m.title || "…", start: m.plannedStart || null, end: m.plannedEnd || null, status: m.status, paymentAmountCents: termAmount(m.paymentTermId) }))} />
+        <div className="act-body" style={{ paddingTop: 0 }}>
+          <Gantt rows={milestones.map((m, i) => ({ id: m.id ?? `new-${i}`, title: m.title || "…", start: m.plannedStart || null, end: m.plannedEnd || null, status: m.status, paymentAmountCents: termAmount(m.paymentTermId) }))} />
+        </div>
 
-        <div className="space-y-2">
+        <div className="ms-list">
           {milestones.map((m, i) => (
-            <div key={m.id ?? `new-${i}`} className="rounded-[var(--radius-sm)] border border-slate-200 p-3 grid grid-cols-1 md:grid-cols-[auto_minmax(0,1.3fr)_auto_auto_minmax(0,1fr)_auto] gap-2 items-center">
-              <div className="flex md:flex-col gap-1">
-                <button type="button" onClick={() => move(i, -1)} className="text-slate-400 hover:text-slate-700 disabled:opacity-30" disabled={i === 0}><ChevronUp className="h-4 w-4" /></button>
-                <button type="button" onClick={() => move(i, 1)} className="text-slate-400 hover:text-slate-700 disabled:opacity-30" disabled={i === milestones.length - 1}><ChevronDown className="h-4 w-4" /></button>
+            <div key={m.id ?? `new-${i}`} className="ms-edit">
+              <div className="order">
+                <button type="button" className="ic-btn" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up"><ChevronUp /></button>
+                <button type="button" className="ic-btn" onClick={() => move(i, 1)} disabled={i === milestones.length - 1} aria-label="Move down"><ChevronDown /></button>
               </div>
-              <div className="min-w-0">
-                <Input value={m.title} onChange={(e) => updateMs(i, { title: e.target.value })} placeholder={t("jobs.milestone.titlePlaceholder")} className="font-medium" />
-                <div className="text-[11px] text-slate-400 mt-1 truncate">
+              <div className="desc">
+                <input className="inp-sm" value={m.title} onChange={(e) => updateMs(i, { title: e.target.value })} placeholder={t("jobs.milestone.titlePlaceholder")} />
+                <span className="sub">
                   {m.taskCount > 0 ? `${m.taskCount} ${t("jobs.tasksShort")}` : t("jobs.noTasks")}
                   {m.valueCents > 0 ? ` · ${formatCents(m.valueCents)} ${t("jobs.ofWork")}` : ""}
-                </div>
+                </span>
               </div>
-              <Input type="date" value={m.plannedStart} onChange={(e) => updateMs(i, { plannedStart: e.target.value, plannedEnd: m.plannedEnd && e.target.value > m.plannedEnd ? e.target.value : m.plannedEnd })} className="h-9 w-full md:w-36" />
-              <Input type="date" value={m.plannedEnd} min={m.plannedStart || undefined} onChange={(e) => updateMs(i, { plannedEnd: e.target.value })} className="h-9 w-full md:w-36" />
+              <div className="dates">
+                <input type="date" className="inp-sm" value={m.plannedStart} onChange={(e) => updateMs(i, { plannedStart: e.target.value, plannedEnd: m.plannedEnd && e.target.value > m.plannedEnd ? e.target.value : m.plannedEnd })} />
+                <input type="date" className="inp-sm" value={m.plannedEnd} min={m.plannedStart || undefined} onChange={(e) => updateMs(i, { plannedEnd: e.target.value })} />
+              </div>
               <select
                 value={m.paymentTermId ?? ""}
                 onChange={(e) => updateMs(i, { paymentTermId: e.target.value || null })}
-                className={cn("h-9 rounded-md border border-slate-200 bg-card px-2 text-sm", m.paymentTermId ? "text-emerald-700 font-medium" : "text-slate-500")}
+                className={cn("inp-sm pay", m.paymentTermId && "linked")}
               >
                 <option value="">{t("jobs.milestone.noPayment")}</option>
                 {linkableTerms.map((x) => (
@@ -211,20 +210,20 @@ export default function JobSetupPage() {
                   </option>
                 ))}
               </select>
-              <button type="button" onClick={() => setMilestones((ms) => ms.filter((_, idx) => idx !== i))} className="text-slate-300 hover:text-rose-500 justify-self-end"><Trash2 className="h-4 w-4" /></button>
+              <button type="button" className="ic-btn danger" onClick={() => setMilestones((ms) => ms.filter((_, idx) => idx !== i))} aria-label={t("jobs.photos.delete")}><Trash2 /></button>
             </div>
           ))}
-          <Button variant="outline" size="sm" className="gap-2" onClick={addMs}><Plus className="h-4 w-4" /> {t("jobs.milestone.add")}</Button>
+          <button type="button" className="add-dashed" onClick={addMs}><Plus /> {t("jobs.milestone.add")}</button>
         </div>
 
         {/* Payment coverage */}
         {terms.length > 0 && (
-          <div className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 flex flex-wrap gap-x-4 gap-y-1">
+          <div className="cov-list">
             {terms.map((x) => {
               const linked = x.trigger === "on_signing" || x.trigger === "days_after_signing" || x.trigger === "holdback_release" || milestones.some((m) => m.paymentTermId === x.id);
               return (
-                <span key={x.id} className={cn("inline-flex items-center gap-1", linked ? "text-emerald-700" : "text-amber-700")}>
-                  <CheckCircle2 className={cn("h-3 w-3", !linked && "opacity-30")} />
+                <span key={x.id} className={cn(linked && "ok")}>
+                  <CheckCircle2 />
                   {x.amountType === "percent" ? `${x.value}%` : `$${x.value}`} {x.label}
                   {x.trigger === "on_signing" && ` (${t("jobs.setup.dueNow")})`}
                 </span>
@@ -235,28 +234,31 @@ export default function JobSetupPage() {
       </section>
 
       {/* Budget */}
-      <section className="rounded-[var(--radius)] border border-slate-200 bg-card p-4 md:p-5 space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-base font-bold text-slate-900">{t("jobs.setup.budget")}</h2>
-          <div className="text-sm text-slate-600">
-            {t("jobs.setup.budgetTotal")} <span className="font-semibold text-slate-900">{formatCents(budgetTotalCents)}</span>
-            {marginPct !== null && <span className={cn("ml-3 font-semibold", marginPct < 15 ? "text-amber-600" : "text-emerald-600")}>{t("jobs.setup.projectedMargin")} {marginPct}%</span>}
+      <section className="card">
+        <div className="card-head">
+          <div>
+            <h2>{t("jobs.setup.budget")}</h2>
+            <p className="hint">{t("jobs.setup.budgetHint")}</p>
+          </div>
+          <div className="totals">
+            <span>{t("jobs.setup.budgetTotal")} <b>{formatCents(budgetTotalCents)}</b></span>
+            {marginPct !== null && <span className={marginPct < 15 ? "warn" : "ok"}>{t("jobs.setup.projectedMargin")} {marginPct}%</span>}
           </div>
         </div>
-        <p className="text-xs text-slate-500">{t("jobs.setup.budgetHint")}</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="budget-grid">
           {CATEGORIES.map((c) => {
             const line = budget.find((b) => b.category === c);
             return (
-              <div key={c} className="rounded-lg border border-slate-200 px-3 py-2">
-                <Label className="text-xs text-slate-500">{t(`jobs.cost.${c}`)}</Label>
-                <div className="relative mt-1">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
-                  <Input
+              <div key={c} className="cell">
+                <label className="lbl-xs" htmlFor={`budget-${c}`}>{t(`jobs.cost.${c}`)}</label>
+                <div className="money-in">
+                  <span>$</span>
+                  <input
+                    id={`budget-${c}`}
                     type="number" min={0} step="1"
+                    className="inp-sm"
                     value={line?.amount ?? ""}
                     onChange={(e) => setBudget((b) => (line ? b.map((x) => (x.category === c ? { ...x, amount: e.target.value } : x)) : [...b, { category: c, label: t(`jobs.cost.${c}`), amount: e.target.value }]))}
-                    className="pl-6 h-9"
                   />
                 </div>
               </div>
@@ -265,13 +267,13 @@ export default function JobSetupPage() {
         </div>
       </section>
 
-      <div className="sticky bottom-4 flex flex-wrap items-center justify-end gap-2 rounded-[var(--radius)] border border-slate-200 bg-card/95 backdrop-blur px-4 py-3 shadow-lg">
-        <span className="text-xs text-slate-500 mr-auto">{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</span>
-        <Button variant="outline" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</Button>
-        <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700" disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>
+      <div className="save-bar">
+        <span className="foot-note">{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</span>
+        <button type="button" className="btn btn-sm btn-outline-navy" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</button>
+        <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>
           {confirm.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
           {confirmed ? t("jobs.setup.saveAndBack") : t("jobs.setup.confirm")}
-        </Button>
+        </button>
       </div>
     </div>
   );

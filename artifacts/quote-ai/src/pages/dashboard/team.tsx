@@ -51,14 +51,14 @@ export default function TeamPage() {
           const Icon = TAB_ICONS[k];
           const count = k === "time" ? (pending?.items.length ?? 0) : 0;
           return (
-            <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill inline-flex items-center gap-1.5", tab === k && "on")}>
-              <Icon className="h-3.5 w-3.5" /> {t(`team.tab.${k}`)}{count ? <span className="text-[10px] bg-amber-200 text-amber-900 rounded-full px-1.5">{count}</span> : null}
+            <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
+              <Icon /> {t(`team.tab.${k}`)}{count ? <span className="cnt">{count}</span> : null}
             </button>
           );
         })}
       </div>
 
-      {isLoading ? <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius)]" /><Skeleton className="h-16 w-full rounded-[var(--radius)]" /></div> : null}
+      {isLoading ? <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div> : null}
       {tab === "workers" && workers && <WorkersTab workers={workers.items} locale={locale} />}
       {tab === "time" && <TimeTab workers={workers?.items ?? []} locale={locale} />}
       {tab === "equipment" && <EquipmentTab />}
@@ -91,7 +91,7 @@ function MembersTab() {
   return (
     <div className="card">
       <div className="toolbar">
-        <p className="text-sm text-slate-500 m-0">{t("team.members.intro")}</p>
+        <p className="foot-note m-0">{t("team.members.intro")}</p>
         <div className="grow flex items-center gap-2">
           {seats && <span className="foot-note">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
           <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>
@@ -99,7 +99,7 @@ function MembersTab() {
       </div>
 
       {isLoading ? (
-        <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius)]" /></div>
+        <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div>
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
@@ -147,14 +147,14 @@ function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemb
       <td><span className="chip chip-purple">{t(`team.members.role.${member.role}`)}</span></td>
       <td><span className={cn("chip", statusChip)}>{statusLabel}</span></td>
       <td onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-1.5 justify-end">
-          {member.status !== "active" && <Button size="sm" variant="outline" className="h-8 gap-1" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</Button>}
+        <div className="row-act">
+          {member.status !== "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</button>}
           {member.status !== "invited" && (
-            <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
-              {member.status === "suspended" ? <UserCheck className="h-4 w-4" /> : <UserX className="h-4 w-4" />}
+            <button type="button" className="ic-btn" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
+              {member.status === "suspended" ? <UserCheck /> : <UserX />}
             </button>
           )}
-          <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.members.remove")} onClick={onRemove}><Trash2 className="h-4 w-4" /></button>
+          <button type="button" className="ic-btn danger" title={t("team.members.remove")} onClick={onRemove}><Trash2 /></button>
         </div>
       </td>
     </tr>
@@ -232,14 +232,14 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
   return (
     <div className="card">
       <div className="toolbar">
-        <p className="text-sm text-slate-500 m-0">{t("team.workers.intro")}</p>
+        <p className="foot-note m-0">{t("team.workers.intro")}</p>
         <div className="grow flex items-center gap-2">
-          {inactiveCount > 0 && <button className="text-xs text-slate-500 hover:text-slate-800" onClick={() => setShowInactive((v) => !v)}>{showInactive ? t("team.workers.hideInactive") : `${t("team.workers.showInactive")} (${inactiveCount})`}</button>}
+          {inactiveCount > 0 && <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => setShowInactive((v) => !v)}>{showInactive ? t("team.workers.hideInactive") : `${t("team.workers.showInactive")} (${inactiveCount})`}</button>}
           <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, worker: null })}><Plus className="h-4 w-4" /> {t("team.workers.add")}</button>
         </div>
       </div>
       {list.length === 0 ? (
-        <div className="p-10 text-center text-sm text-slate-500">{t("team.workers.empty")}</div>
+        <div className="card-empty">{t("team.workers.empty")}</div>
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
@@ -273,18 +273,18 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
                     {w.pendingCount > 0 && <span className="chip chip-yellow" style={{ marginLeft: 8 }}>{w.pendingCount} {t("team.workers.toApprove")}</span>}
                   </td>
                   <td onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center gap-1.5 justify-end">
+                    <div className="row-act">
                       {w.active && (
                         w.hasInvite ? (
-                          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending} title={`${t("team.workers.linkActiveUntil")} ${w.inviteExpiresAt ? format(new Date(w.inviteExpiresAt), "PP", { locale }) : ""}`}><Link2 className="h-3.5 w-3.5 text-emerald-600" /> {t("team.workers.newLink")}</Button>
+                          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => issue.mutate(w)} disabled={issue.isPending} title={`${t("team.workers.linkActiveUntil")} ${w.inviteExpiresAt ? format(new Date(w.inviteExpiresAt), "PP", { locale }) : ""}`}><Link2 className="h-3.5 w-3.5" style={{ color: "var(--green-dark)" }} /> {t("team.workers.newLink")}</button>
                         ) : (
-                          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => issue.mutate(w)} disabled={issue.isPending}><Link2 className="h-3.5 w-3.5" /> {t("team.workers.timeLink")}</Button>
+                          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => issue.mutate(w)} disabled={issue.isPending}><Link2 className="h-3.5 w-3.5" /> {t("team.workers.timeLink")}</button>
                         )
                       )}
-                      {w.hasInvite && <button className="text-xs text-slate-400 hover:text-rose-600 px-1" onClick={() => revoke.mutate(w.id)}>{t("team.workers.revoke")}</button>}
-                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={t("team.workers.edit")} onClick={() => setEditing({ open: true, worker: w })}><Pencil className="h-4 w-4" /></button>
-                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" title={w.active ? t("team.workers.deactivate") : t("team.workers.reactivate")} onClick={() => toggleActive.mutate(w)}>{w.active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}</button>
-                      <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" title={t("team.workers.delete")} onClick={() => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); }}><Trash2 className="h-4 w-4" /></button>
+                      {w.hasInvite && <button type="button" className="text-link danger" onClick={() => revoke.mutate(w.id)}>{t("team.workers.revoke")}</button>}
+                      <button type="button" className="ic-btn" title={t("team.workers.edit")} onClick={() => setEditing({ open: true, worker: w })}><Pencil /></button>
+                      <button type="button" className="ic-btn" title={w.active ? t("team.workers.deactivate") : t("team.workers.reactivate")} onClick={() => toggleActive.mutate(w)}>{w.active ? <UserX /> : <UserCheck />}</button>
+                      <button type="button" className="ic-btn danger" title={t("team.workers.delete")} onClick={() => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); }}><Trash2 /></button>
                     </div>
                   </td>
                 </tr>
@@ -391,74 +391,75 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
   const submittedIds = items.filter((e) => e.status === "submitted").map((e) => e.id);
 
   return (
-    <div className="space-y-4">
+    <div className="stack">
       <div className="card">
-      <div className="toolbar" style={{ borderBottom: "none" }}>
-        <Filter className="h-4 w-4 text-slate-400" />
-        <select value={status} onChange={(e) => setStatus(e.target.value as TimeEntryStatus | "all")} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm">
-          <option value="submitted">{t("team.time.filter.submitted")}</option>
-          <option value="approved">{t("team.time.filter.approved")}</option>
-          <option value="rejected">{t("team.time.filter.rejected")}</option>
-          <option value="all">{t("team.time.filter.all")}</option>
-        </select>
-        <select value={workerId} onChange={(e) => setWorkerId(e.target.value)} className="h-9 rounded-md border border-slate-200 bg-card px-2 text-sm">
-          <option value="">{t("team.time.allWorkers")}</option>
-          {workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
-        </select>
-        {status !== "submitted" && (
-          <>
-            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-9 w-40" />
-            <span className="text-slate-400 text-sm">→</span>
-            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-9 w-40" />
-          </>
-        )}
-        <div className="flex-1" />
-        <a href={teamApi.payrollCsvUrl(from, to)} className="inline-flex items-center gap-1 text-sm text-navy-700 hover:underline" title={t("team.time.exportHint")}><Download className="h-4 w-4" /> {t("team.time.export")} ({from} → {to})</a>
-      </div>
-      </div>
-
-      {status === "submitted" && submittedIds.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <button className="text-xs text-slate-500 hover:text-slate-800" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
-          <Button size="sm" className="h-8 bg-emerald-600 hover:bg-emerald-700 gap-1" disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</Button>
-          <Button size="sm" variant="outline" className="h-8" disabled={approveMany.isPending} onClick={() => approveMany.mutate(submittedIds)}>{t("team.time.approveAll")} ({submittedIds.length})</Button>
+        <div className="toolbar" style={{ borderBottom: "none" }}>
+          <Filter className="h-4 w-4" style={{ color: "var(--faint)" }} />
+          <select value={status} onChange={(e) => setStatus(e.target.value as TimeEntryStatus | "all")} className="inp-sm" style={{ width: "auto" }}>
+            <option value="submitted">{t("team.time.filter.submitted")}</option>
+            <option value="approved">{t("team.time.filter.approved")}</option>
+            <option value="rejected">{t("team.time.filter.rejected")}</option>
+            <option value="all">{t("team.time.filter.all")}</option>
+          </select>
+          <select value={workerId} onChange={(e) => setWorkerId(e.target.value)} className="inp-sm" style={{ width: "auto" }}>
+            <option value="">{t("team.time.allWorkers")}</option>
+            {workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </select>
+          {status !== "submitted" && (
+            <>
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="inp-sm" style={{ width: 150 }} />
+              <span className="foot-note">→</span>
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="inp-sm" style={{ width: 150 }} />
+            </>
+          )}
+          <div className="grow">
+            <a href={teamApi.payrollCsvUrl(from, to)} className="text-link" title={t("team.time.exportHint")}><Download /> {t("team.time.export")} ({from} → {to})</a>
+          </div>
         </div>
-      )}
 
-      {isLoading ? <Skeleton className="h-32 w-full rounded-[var(--radius)]" /> : items.length === 0 ? (
-        <div className="rounded-[var(--radius)] border border-dashed border-slate-200 bg-card p-10 text-center text-sm text-slate-500">{status === "submitted" ? t("team.time.nothingToApprove") : t("team.time.empty")}</div>
+        {status === "submitted" && submittedIds.length > 0 && (
+          <div className="bulk-row" style={{ margin: "0 18px 14px" }}>
+            <button type="button" className="text-link" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
+            <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</button>
+            <button type="button" className="btn btn-sm btn-outline-navy" disabled={approveMany.isPending} onClick={() => approveMany.mutate(submittedIds)}>{t("team.time.approveAll")} ({submittedIds.length})</button>
+          </div>
+        )}
+      </div>
+
+      {isLoading ? <Skeleton className="h-32 w-full rounded-[var(--radius-mk)]" /> : items.length === 0 ? (
+        <div className="card dashed card-empty">{status === "submitted" ? t("team.time.nothingToApprove") : t("team.time.empty")}</div>
       ) : (
-        <div className="space-y-3">
+        <div className="card">
           {grouped.map(([name, entries]) => (
-            <section key={name} className="rounded-[var(--radius)] border border-slate-200 bg-card overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 text-sm"><span className="font-semibold text-slate-900">{name}</span><span className="text-slate-500">· {entries.reduce((s, e) => s + e.hours, 0).toFixed(2)} h · {formatCents(entries.filter((e) => e.status !== "rejected").reduce((s, e) => s + e.costCents, 0))}</span></div>
-              <ul className="divide-y">
-                {entries.map((e) => (
-                  <li key={e.id} className={cn("flex items-center gap-3 px-4 py-2 text-sm group", e.status === "rejected" && "opacity-60")}>
-                    {e.status === "submitted" ? <input type="checkbox" checked={selected.has(e.id)} onChange={() => toggle(e.id)} className="h-4 w-4 accent-navy-600" /> : <span className="w-4" />}
-                    <span className="text-xs text-slate-400 w-20 shrink-0">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate"><Link href={`/dashboard/jobs/${e.projectId}?tab=team`} className="font-medium text-slate-800 hover:text-navy-700">{e.projectName}</Link> <span className="text-slate-500">· {e.hours} h</span>{e.milestoneTitle ? <span className="text-slate-400"> · {e.milestoneTitle}</span> : null}{e.enteredBy === "worker" ? <span className="text-[10px] text-slate-400 ml-1">({t("team.time.byWorker")})</span> : null}</div>
-                      {e.note && <div className="text-[11px] text-slate-400 truncate">{e.note}</div>}
-                    </div>
-                    {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 text-amber-500 shrink-0" /></span>}
-                    <TimeStatusBadge status={e.status} />
-                    <span className="font-medium whitespace-nowrap w-20 text-right">{formatCents(e.costCents)}</span>
-                    <div className="flex gap-1 shrink-0">
-                      {e.status === "submitted" && <button className="h-7 w-7 rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 flex items-center justify-center" onClick={() => setOne.mutate({ id: e.id, status: "approved" })}><Check className="h-4 w-4" /></button>}
-                      {e.status === "submitted" && <button className="h-7 w-7 rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center" onClick={() => setOne.mutate({ id: e.id, status: "rejected" })}><X className="h-4 w-4" /></button>}
-                      {e.status !== "submitted" && <button className="opacity-0 group-hover:opacity-100 text-xs text-slate-400 hover:text-slate-700 px-1" onClick={() => setOne.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
-                      <button className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500" onClick={() => del.mutate(e.id)}><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            <section key={name}>
+              <div className="te-group"><b>{name}</b><span>· {entries.reduce((s, e) => s + e.hours, 0).toFixed(2)} h · {formatCents(entries.filter((e) => e.status !== "rejected").reduce((s, e) => s + e.costCents, 0))}</span></div>
+              {entries.map((e) => (
+                <div key={e.id} className={cn("item-row", e.status === "rejected" && "muted")}>
+                  {e.status === "submitted" ? (
+                    <button type="button" className={cn("chk", selected.has(e.id) && "on")} aria-pressed={selected.has(e.id)} onClick={() => toggle(e.id)}>{selected.has(e.id) && <Check />}</button>
+                  ) : <span className="spacer" />}
+                  <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
+                  <div className="grow">
+                    <span className="ttl"><Link href={`/dashboard/jobs/${e.projectId}?tab=team`}>{e.projectName}</Link> <span className="dim">· {e.hours} h</span>{e.milestoneTitle ? <span className="dim"> · {e.milestoneTitle}</span> : null}{e.enteredBy === "worker" ? <span className="by">({t("team.time.byWorker")})</span> : null}</span>
+                    {e.note && <span className="sub">{e.note}</span>}
+                  </div>
+                  {e.geofenceFlagged && <span className="flag" title={t("team.time.geofenceFlag")}><MapPin /></span>}
+                  <TimeStatusBadge status={e.status} />
+                  <span className="amt" style={{ width: 80, textAlign: "right" }}>{formatCents(e.costCents)}</span>
+                  <div className={e.status === "submitted" ? "flex gap-1 shrink-0" : "hover-act"}>
+                    {e.status === "submitted" && <button type="button" className="ic-btn ok" title={t("team.time.filter.approved")} onClick={() => setOne.mutate({ id: e.id, status: "approved" })}><Check /></button>}
+                    {e.status === "submitted" && <button type="button" className="ic-btn bad" title={t("team.time.filter.rejected")} onClick={() => setOne.mutate({ id: e.id, status: "rejected" })}><X /></button>}
+                    {e.status !== "submitted" && <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => setOne.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
+                    <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>
+                  </div>
+                </div>
+              ))}
             </section>
           ))}
-          <div className="text-sm text-right text-slate-600">{t("team.time.total")}: <span className="font-semibold text-slate-900">{totals.hours.toFixed(2)} h · {formatCents(totals.cents)}</span></div>
+          <div className="card-sum">{t("team.time.total")}: <b>{totals.hours.toFixed(2)} h · {formatCents(totals.cents)}</b></div>
         </div>
       )}
-      <p className="text-[11px] text-slate-400">{t("team.time.hint")}</p>
+      <p className="foot-note">{t("team.time.hint")}</p>
     </div>
   );
 }
@@ -481,13 +482,13 @@ function EquipmentTab() {
   return (
     <div className="card">
       <div className="toolbar">
-        <p className="text-sm text-slate-500 m-0">{t("team.equipment.intro")}</p>
+        <p className="foot-note m-0">{t("team.equipment.intro")}</p>
         <div className="grow">
           <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</button>
         </div>
       </div>
-      {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius)]" /></div> : items.length === 0 ? (
-        <div className="p-10 text-center text-sm text-slate-500">{t("team.equipment.empty")}</div>
+      {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /></div> : items.length === 0 ? (
+        <div className="card-empty">{t("team.equipment.empty")}</div>
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
@@ -521,10 +522,10 @@ function EquipmentTab() {
                   <td className="t-amt">{formatCents(e.usageRateCents)}/{t(`team.unit.${e.usageUnit}`)}</td>
                   <td>{formatCents(e.usageCentsThisMonth)}</td>
                   <td onClick={(ev) => ev.stopPropagation()}>
-                    <div className="flex items-center gap-1.5 justify-end">
-                      <button className="h-8 w-8 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center" onClick={() => setEditing({ open: true, item: e })}><Pencil className="h-4 w-4" /></button>
-                      <button className="text-xs text-slate-400 hover:text-slate-800 px-1" onClick={() => toggle.mutate(e)}>{e.active ? t("team.workers.deactivate") : t("team.workers.reactivate")}</button>
-                      <button className="h-8 w-8 rounded-md text-slate-300 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center" onClick={() => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); }}><Trash2 className="h-4 w-4" /></button>
+                    <div className="row-act">
+                      <button type="button" className="ic-btn" title={t("team.equipment.edit")} onClick={() => setEditing({ open: true, item: e })}><Pencil /></button>
+                      <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => toggle.mutate(e)}>{e.active ? t("team.workers.deactivate") : t("team.workers.reactivate")}</button>
+                      <button type="button" className="ic-btn danger" title={t("team.equipment.deleteConfirm")} onClick={() => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); }}><Trash2 /></button>
                     </div>
                   </td>
                 </tr>

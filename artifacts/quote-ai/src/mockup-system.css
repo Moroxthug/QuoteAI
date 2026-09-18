@@ -703,3 +703,39 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 @media (prefers-reduced-motion: reduce) {
   .mq-track { animation: none; flex-wrap: wrap; }
 }
+
+/* ==========================================================
+   AUTH PAGES — sign-in / sign-up (docs/PIXEL-REDESIGN-PLAN.md, Phase 50)
+   Simple centered card on locked tokens. Deliberately its own small
+   vocabulary, not the dashboard's .card/.form-grid/.field — these
+   pages render inside PublicLayout next to the locked marketing header.
+   ========================================================== */
+.auth-shell { min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 56px 20px; background: #fff; }
+.auth-card { width: 100%; max-width: 400px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-mk); box-shadow: var(--shadow-card); overflow: hidden; }
+.auth-card-body { padding: 40px 32px 30px; }
+.auth-card-foot { padding: 18px 32px; background: var(--soft); border-top: 1px solid var(--line); text-align: center; font-size: 14px; color: var(--muted-mk); }
+.auth-card-foot a { color: var(--navy); font-weight: 700; }
+.auth-card-foot a:hover { text-decoration: underline; }
+.auth-title { font-size: 22px; font-weight: 800; color: var(--navy); text-align: center; margin-bottom: 4px; }
+.auth-sub { font-size: 14px; color: var(--faint); text-align: center; margin-bottom: 26px; }
+.auth-field { margin-bottom: 16px; }
+.auth-field label { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.auth-field .input-wrap { position: relative; }
+.auth-field input { width: 100%; border: 1px solid var(--line); background: var(--soft); border-radius: 12px; padding: 11px 14px; font-size: 14.5px; color: var(--ink); transition: border-color .2s, background .2s; }
+.auth-field input::placeholder { color: var(--faint); }
+.auth-field input:focus { outline: none; border-color: var(--navy); background: #fff; }
+.auth-field input[type="password"], .auth-field input[data-has-toggle] { padding-right: 42px; }
+.auth-pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--faint); }
+.auth-pw-toggle:hover { color: var(--ink); }
+.auth-row-end { display: flex; justify-content: flex-end; margin: -6px 0 18px; }
+.auth-link { font-size: 13px; color: var(--navy); font-weight: 700; }
+.auth-link:hover { text-decoration: underline; }
+.auth-link-muted { font-size: 13px; color: var(--faint); font-weight: 600; }
+.auth-link-muted:hover { color: var(--muted-mk); }
+.auth-error { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--red); background: var(--red-t); border: 1px solid var(--red-t); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; }
+.auth-fine { font-size: 11.5px; color: var(--faint); text-align: center; line-height: 1.6; margin-top: 18px; }
+.auth-fine a { color: var(--faint); text-decoration: underline; text-underline-offset: 2px; }
+.auth-fine a:hover { color: var(--muted-mk); }
+.auth-center { text-align: center; padding: 8px 0; }
+.auth-spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: auth-spin .7s linear infinite; }
+@keyframes auth-spin { to { transform: rotate(360deg); } }

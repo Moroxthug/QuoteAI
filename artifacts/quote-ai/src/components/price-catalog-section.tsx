@@ -4,13 +4,9 @@ import {
   Plus, Pencil, Trash2, Loader2, BookOpen, Tag, Ruler,
   Check, Upload, AlertCircle, Search
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
+  Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -461,21 +457,15 @@ export function PriceCatalogSection() {
 
       {/* Delete confirm */}
       <AlertDialog open={!!deletingId} onOpenChange={o => { if (!o) setDeletingId(null); }}>
-        <AlertDialogContent className="sm:max-w-sm">
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-sm font-semibold">{t("dashboard.catalog.delete.title")}</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs">
-              {t("dashboard.catalog.delete.desc")}
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("dashboard.catalog.delete.title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("dashboard.catalog.delete.desc")}</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="mt-2.5">
-            <AlertDialogCancel className="text-xs h-8">{t("dashboard.catalog.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700 text-xs h-8 text-white"
-              disabled={deleteItem.isPending}
-            >
-              {deleteItem.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("dashboard.catalog.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="btn-red" disabled={deleteItem.isPending}>
+              {deleteItem.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {t("dashboard.catalog.delete.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -508,81 +498,45 @@ function ItemFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={o => { if (!o) onClose(); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-sm font-bold">{title}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 py-1 text-xs">
-          <div className="space-y-1">
-            <Label className="text-xs">{t("dashboard.catalog.form.descriptionLabel")}</Label>
-            <Input
-              placeholder={t("dashboard.catalog.form.descriptionPlaceholder")}
-              value={form.nome}
-              onChange={e => set("nome", e.target.value)}
-              className="h-8.5 text-xs"
-              autoFocus
-            />
+        <DialogBody>
+          <div className="field">
+            <label>{t("dashboard.catalog.form.descriptionLabel")}</label>
+            <input placeholder={t("dashboard.catalog.form.descriptionPlaceholder")} value={form.nome} onChange={e => set("nome", e.target.value)} autoFocus />
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs">{t("dashboard.catalog.form.unitLabel")}</Label>
-              <Select value={form.um} onValueChange={v => set("um", v)}>
-                <SelectTrigger className="h-8.5 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {UM_OPTIONS.map(u => (
-                    <SelectItem key={u} value={u} className="text-xs">{u}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="form-grid">
+            <div className="field">
+              <label>{t("dashboard.catalog.form.unitLabel")}</label>
+              <select value={form.um} onChange={e => set("um", e.target.value)}>
+                {UM_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">{t("dashboard.catalog.form.unitPriceLabel")}</Label>
-              <Input
-                type="number"
-                min={0}
-                step={0.01}
-                placeholder={t("dashboard.catalog.form.unitPricePlaceholder")}
-                value={form.prezzoUnitario}
-                onChange={e => set("prezzoUnitario", e.target.value)}
-                className="h-8.5 text-xs"
-              />
+            <div className="field">
+              <label>{t("dashboard.catalog.form.unitPriceLabel")}</label>
+              <input type="number" min={0} step={0.01} placeholder={t("dashboard.catalog.form.unitPricePlaceholder")} value={form.prezzoUnitario} onChange={e => set("prezzoUnitario", e.target.value)} />
             </div>
           </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">{t("dashboard.catalog.form.categoryLabel")}</Label>
-            <Select value={form.categoria || "__none__"} onValueChange={v => set("categoria", v === "__none__" ? "" : v)}>
-              <SelectTrigger className="h-8.5 text-xs">
-                <SelectValue placeholder={t("dashboard.catalog.form.categoryPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__none__" className="text-xs">{t("dashboard.catalog.form.noCategoryOption")}</SelectItem>
-                {CATEGORIA_SUGGESTIONS.map(c => (
-                  <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="field">
+            <label>{t("dashboard.catalog.form.categoryLabel")}</label>
+            <select value={form.categoria} onChange={e => set("categoria", e.target.value)}>
+              <option value="">{t("dashboard.catalog.form.noCategoryOption")}</option>
+              {CATEGORIA_SUGGESTIONS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">{t("dashboard.catalog.form.notesLabel")}</Label>
-            <Input
-              placeholder={t("dashboard.catalog.form.notesPlaceholder")}
-              value={form.note}
-              onChange={e => set("note", e.target.value)}
-              className="h-8.5 text-xs"
-            />
+          <div className="field">
+            <label>{t("dashboard.catalog.form.notesLabel")}</label>
+            <input placeholder={t("dashboard.catalog.form.notesPlaceholder")} value={form.note} onChange={e => set("note", e.target.value)} />
           </div>
-        </div>
-        <DialogFooter className="mt-3 gap-2">
-          <Button variant="outline" size="sm" onClick={onClose} disabled={isSaving} className="text-xs h-8">{t("dashboard.catalog.cancel")}</Button>
-          <Button onClick={() => onSave(form)} disabled={!valid || isSaving} className="gap-1.5 text-xs h-8">
-            {isSaving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+        </DialogBody>
+        <DialogFooter>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={onClose} disabled={isSaving}>{t("dashboard.catalog.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" onClick={() => onSave(form)} disabled={!valid || isSaving}>
+            {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
             {t("dashboard.catalog.form.save")}
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

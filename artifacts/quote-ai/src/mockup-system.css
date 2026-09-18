@@ -1409,3 +1409,183 @@ button.chap-head:hover { background: var(--soft-2); }
   .stat-grid .stat-card.span-2 { grid-column: 1 / -1; }
   .save-bar { bottom: 8px; }
 }
+
+/* ==========================================================
+   MODALS (Phase 60)
+   (docs/PIXEL-REDESIGN-PLAN.md, Phase 60)
+
+   Neither mockup contains a modal, so this is the one piece of
+   vocabulary derived from the tokens rather than ported: the
+   .card shell (white, --line border, --radius-mk) lifted with
+   --shadow-lift over the sidebar's own .scrim colour, with the
+   .card-head / .card-foot rhythm for the header and footer.
+   The Radix primitives in components/ui/dialog.tsx,
+   alert-dialog.tsx and command.tsx emit these classes, so every
+   dialog in the app picks them up; dialog bodies use the locked
+   .form-grid/.field, .li-*, .notice, .btn* classes directly.
+   ========================================================== */
+.modal-scrim { position: fixed; inset: 0; z-index: 80; background: rgba(16, 16, 49, .5); }
+.modal-scrim[data-state="open"] { animation: modal-fade .25s var(--ease-mk); }
+.modal-scrim[data-state="closed"] { animation: modal-fade .2s var(--ease-mk) reverse; }
+.modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 81; width: calc(100% - 32px); max-width: 520px; max-height: calc(100vh - 32px); display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-mk); box-shadow: var(--shadow-lift); outline: none; }
+.modal[data-state="open"] { animation: modal-in .3s var(--ease-mk); }
+.modal[data-state="closed"] { animation: modal-out .2s var(--ease-mk); }
+.modal.sm { max-width: 420px; }
+.modal.lg { max-width: 640px; }
+.modal.xl { max-width: 760px; }
+.modal.xxl { max-width: 920px; }
+.modal.tall { height: min(680px, calc(100vh - 32px)); }
+.modal-x { position: absolute; top: 14px; right: 14px; z-index: 1; }
+.modal-head { display: flex; align-items: flex-start; gap: 14px; padding: 20px 56px 18px 22px; border-bottom: 1px solid var(--soft); flex: none; }
+.modal-head .txt { flex: 1; min-width: 0; }
+.modal-head .qa-ic { margin-top: -2px; }
+.modal-head h2 { font-size: 17px; font-weight: 800; color: var(--navy); line-height: 1.3; display: flex; align-items: center; gap: 8px; }
+.modal-head h2 > svg { width: 18px; height: 18px; flex: none; }
+.modal-head .sub { font-size: 13px; color: var(--muted-mk); font-weight: 600; margin-top: 4px; line-height: 1.5; }
+.modal-head .sub b, .modal-head .sub strong { color: var(--navy); font-weight: 800; }
+.modal-body { padding: 20px 22px; overflow-y: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
+.modal-body.flush { padding: 0; gap: 0; }
+.modal-body .form-grid { padding: 0; gap: 14px; grid-template-columns: 1fr 1fr; }
+.modal-body .form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.modal-body .form-grid.one { grid-template-columns: 1fr; }
+.modal-body .form-grid.narrow-2 { grid-template-columns: 1fr 150px; }
+.modal-body .li-body { padding: 0; }
+/* a .field label above a line-item editor must not restyle its .inp-sm cells */
+.field .li-row input { padding: 7px 10px; font-size: 13px; font-weight: 600; border-radius: 8px; }
+.modal-body > .notice { margin: 0; }
+.modal-body .foot-note { line-height: 1.5; }
+.modal-foot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding: 14px 22px; border-top: 1px solid var(--soft); flex: none; }
+.modal-foot .foot-note { margin-right: auto; }
+.modal-foot .btn.wide { flex: 1; }
+
+/* Solid confirm / destructive buttons: modals are the first place
+   the app needs them outside a one-off inline style. */
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover { background: var(--green-dark); }
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: #b93c0a; }
+
+/* Native checkbox row (consent, "send receipt", OCR preview picks). */
+.chk-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer; line-height: 1.45; }
+.chk-row input { width: 16px; height: 16px; margin-top: 2px; flex: none; accent-color: var(--navy); }
+.chk-row.disabled { color: var(--faint); cursor: not-allowed; }
+
+/* Read-only text block (the AI regen dialog quotes the original brief). */
+.quote-box { padding: 12px 16px; border-radius: 12px; background: var(--soft); border: 1px solid var(--line); font-size: 13.5px; font-style: italic; font-weight: 500; line-height: 1.55; color: var(--muted-mk); white-space: pre-line; max-height: 140px; overflow-y: auto; }
+
+/* Copy-link row (team invite / member invite dialogs). */
+.copy-row { display: flex; gap: 8px; align-items: center; }
+.copy-row .inp-sm { flex: 1; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 500; }
+
+/* Money block (cost entry): subtotal, tax split, total. */
+.money-box { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.money-box .row { display: grid; grid-template-columns: 1fr 130px; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; color: var(--muted-mk); }
+.money-box .row.total { border-top: 1px solid var(--soft); padding-top: 10px; color: var(--navy); font-weight: 800; }
+.money-box .taxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.money-box .taxes label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); margin-bottom: 4px; }
+
+/* Receipt review: file preview + AI reading beside the form. */
+.receipt-split { display: grid; grid-template-columns: 1fr 1.1fr; gap: 20px; align-items: start; }
+.receipt-frame { border: 1px solid var(--line); border-radius: 12px; background: var(--soft); overflow: hidden; max-height: 420px; }
+.receipt-frame img { width: 100%; max-height: 420px; object-fit: contain; display: block; }
+.receipt-frame .text-link { justify-content: center; padding: 32px; width: 100%; }
+.ai-read { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--purple-t); border: 1px solid var(--purple-t); font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.ai-read .hd { display: flex; align-items: center; gap: 6px; font-weight: 800; color: var(--purple-dark); margin-bottom: 6px; }
+.ai-read .hd svg { width: 14px; height: 14px; }
+.ai-read .hd .conf { font-weight: 700; }
+.ai-read .hd .conf.high { color: var(--green-dark); }
+.ai-read .hd .conf.medium { color: var(--yellow-dark); }
+.ai-read .hd .conf.low { color: var(--red); }
+.ai-read ul { max-height: 128px; overflow-y: auto; }
+.ai-read li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-top: 1px solid rgba(108, 43, 217, .12); }
+.ai-read li:first-child { border-top: none; }
+.ai-read li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ai-read .warn { display: flex; align-items: flex-start; gap: 6px; margin-top: 6px; color: var(--yellow-dark); }
+.ai-read .warn svg { width: 14px; height: 14px; flex: none; margin-top: 1px; }
+
+/* Line-item editor with no unit column (invoice lines: desc / qty / unit price / amount). */
+.li-head.cols-5, .li-row.cols-5 { grid-template-columns: 1fr 72px 100px 96px 30px; }
+.li-sum { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid var(--soft); font-size: 13px; font-weight: 600; color: var(--muted-mk); }
+.li-sum b { color: var(--navy); font-weight: 800; font-variant-numeric: tabular-nums; }
+.li-sum b.neg { color: var(--red); }
+
+/* Paywall plan pickers. */
+.plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.plan-grid.two { grid-template-columns: repeat(2, 1fr); }
+.plan-opt { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.plan-opt.hot { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
+.plan-opt .tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); padding: 3px 10px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.plan-opt .tag.gold { background: var(--yellow); color: var(--navy); }
+.plan-opt .nm { font-size: 13.5px; font-weight: 800; color: var(--navy); }
+.plan-opt .pr { font-size: 18px; font-weight: 800; color: var(--navy); letter-spacing: -.01em; }
+.plan-opt .pr small { font-size: 11px; font-weight: 600; color: var(--faint); margin-left: 2px; }
+.plan-opt ul { display: flex; flex-direction: column; gap: 4px; flex: 1; margin-bottom: 6px; }
+.plan-opt li { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted-mk); line-height: 1.4; }
+.plan-opt li svg { width: 12px; height: 12px; flex: none; margin-top: 2px; color: var(--green-dark); }
+.plan-opt .btn { width: 100%; }
+.plan-opt.flat { flex-direction: row; align-items: center; flex-wrap: wrap; padding: 14px; }
+.plan-opt.flat .txt { flex: 1; min-width: 0; }
+.plan-opt.flat .txt .nm { display: block; }
+.plan-opt.flat .txt .ds { font-size: 12px; font-weight: 600; color: var(--muted-mk); }
+.plan-opt.flat .pr { font-size: 15px; margin-right: 8px; }
+.plan-opt.flat .btn { width: auto; }
+.or-rule { display: flex; align-items: center; gap: 12px; font-size: 12.5px; font-weight: 700; color: var(--faint); }
+.or-rule::before, .or-rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* Command palette (Ctrl/Cmd+K) inside the same shell. */
+.modal.cmd { max-width: 560px; }
+.cmd-in { display: flex; align-items: center; gap: 10px; padding: 0 18px; border-bottom: 1px solid var(--soft); color: var(--faint); }
+.cmd-in svg { width: 17px; height: 17px; flex: none; }
+.cmd-in input { flex: 1; min-width: 0; height: 52px; border: none; outline: none; background: transparent; font-size: 15px; font-weight: 600; color: var(--ink); }
+.cmd-in input::placeholder { color: var(--faint); font-weight: 600; }
+.cmd-list { max-height: 340px; overflow-y: auto; padding: 8px; }
+.cmd-empty { padding: 28px 12px; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--faint); }
+.cmd-list [cmdk-group-heading] { padding: 10px 10px 4px; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.cmd-item { display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--navy); cursor: pointer; }
+.cmd-item svg { width: 16px; height: 16px; flex: none; color: var(--muted-mk); }
+.cmd-item[data-selected="true"], .cmd-item:hover { background: var(--soft); }
+.cmd-item[data-disabled="true"] { opacity: .5; pointer-events: none; }
+.cmd-item .kbd { margin-left: auto; font-size: 11px; font-weight: 700; color: var(--faint); letter-spacing: .04em; }
+
+@keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in { from { opacity: 0; transform: translate(-50%, -48%) scale(.97); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes modal-out { from { opacity: 1; transform: translate(-50%, -50%) scale(1); } to { opacity: 0; transform: translate(-50%, -48%) scale(.97); } }
+
+@media (max-width: 980px) {
+  .receipt-split { grid-template-columns: 1fr; }
+  .plan-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  /* Bottom sheet on phones. */
+  .modal, .modal.sm, .modal.lg, .modal.xl, .modal.xxl, .modal.cmd { top: auto; bottom: 0; left: 0; transform: none; width: 100%; max-width: none; max-height: 92vh; border-radius: var(--radius-mk) var(--radius-mk) 0 0; border-bottom: none; }
+  .modal.tall { height: 92vh; }
+  .modal[data-state="open"] { animation: sheet-in .3s var(--ease-mk); }
+  .modal[data-state="closed"] { animation: sheet-out .2s var(--ease-mk); }
+  .modal-head { padding: 18px 52px 14px 18px; }
+  .modal-body { padding: 16px 18px; }
+  .modal-foot { padding: 12px 18px; }
+  .modal-foot .btn { flex: 1; }
+  .modal-foot .foot-note { flex-basis: 100%; margin-right: 0; }
+  .modal-body .form-grid, .modal-body .form-grid.cols-3, .modal-body .form-grid.narrow-2 { grid-template-columns: 1fr; }
+  .money-box .taxes { grid-template-columns: repeat(2, 1fr); }
+  .plan-grid, .plan-grid.two { grid-template-columns: 1fr; }
+  /* Line-item rows inside a modal wrap instead of hiding the number cells
+     (the quote editor has its own phone layout; these editors do not). */
+  .modal .li-row, .modal .li-row.cols-5 { grid-template-columns: repeat(3, 1fr) 30px; row-gap: 6px; }
+  .modal .li-row .desc { grid-column: 1 / 4; grid-row: 1; }
+  .modal .li-row .ic-btn { grid-column: 4; grid-row: 1; }
+  .modal .li-row .um, .modal .li-row .qty, .modal .li-row .price, .modal .li-row .tot { display: block; }
+  .modal .li-row .tot { grid-column: 1 / -1; padding-right: 4px; }
+  .modal .li-row.cols-5 .tot { grid-column: 3 / -1; align-self: center; }
+  .modal .li-row + .li-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--soft); }
+}
+@keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(24px); } }
+
+/* Inside a modal the tablet collapse of the line-item grid (980px) is too early: the panel is at most 760px wide, so keep the full grid until the phone sheet takes over. */
+@media (max-width: 980px) and (min-width: 641px) {
+  .modal .li-head { display: grid; }
+  .modal .li-row { grid-template-columns: 1fr 72px 80px 96px 84px 30px; }
+  .modal .li-head.cols-5, .modal .li-row.cols-5 { grid-template-columns: 1fr 72px 100px 96px 30px; }
+  .modal .li-row .tot { display: block; }
+}

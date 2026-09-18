@@ -4,12 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { ArrowLeft, Receipt, Send, Download, Banknote, Ban, FileMinus, BellRing, Pencil, Check, X, Loader2, Copy, ExternalLink, Trash2, Briefcase, Clock, AlertTriangle, MailQuestion, Archive } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -280,17 +276,16 @@ function SendDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
   });
   const scheduled = invoice.status === "draft" && !!invoice.scheduledFor && new Date(invoice.scheduledFor) > new Date();
   return (
-    <SimpleDialog open={open} onOpenChange={onOpenChange} title={invoice.status === "draft" ? t("invoices.send") : t("invoices.resend")} description={`${invoice.number} · ${formatCents(invoice.totalCents)}`}>
-      <div className="space-y-3">
-        {scheduled && <p className="text-xs text-amber-800 bg-amber-50 rounded px-2 py-1.5">{t("invoices.sendEarlyWarning")}</p>}
-        <div className="space-y-1"><Label>{t("invoices.field.customerEmail")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={invoice.status !== "draft"} /></div>
-        <div className="space-y-1"><Label>{t("invoices.field.message")}</Label><Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder={t("invoices.field.messagePlaceholder")} /></div>
-        <p className="text-xs text-slate-500">{t("invoices.sendHint")}</p>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button>
-          <Button onClick={() => send.mutate()} disabled={send.isPending || !email.includes("@")}>{send.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}{t("invoices.sendNow")}</Button>
-        </div>
-      </div>
+    <SimpleDialog open={open} onOpenChange={onOpenChange} title={invoice.status === "draft" ? t("invoices.send") : t("invoices.resend")} description={`${invoice.number} · ${formatCents(invoice.totalCents)}`}
+      footer={<>
+        <span className="foot-note">{t("invoices.sendHint")}</span>
+        <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+        <button type="button" className="btn btn-sm btn-navy" onClick={() => send.mutate()} disabled={send.isPending || !email.includes("@")}>{send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}{t("invoices.sendNow")}</button>
+      </>}
+    >
+      {scheduled && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.sendEarlyWarning")}</span></div>}
+      <div className="field"><label>{t("invoices.field.customerEmail")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={invoice.status !== "draft"} /></div>
+      <div className="field"><label>{t("invoices.field.message")}</label><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder={t("invoices.field.messagePlaceholder")} /></div>
     </SimpleDialog>
   );
 }
@@ -305,27 +300,27 @@ function VoidDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   return (
-    <SimpleDialog open={open} onOpenChange={onOpenChange} title={t("invoices.void")} description={t("invoices.voidDesc")}>
-      <div className="space-y-3">
-        <div className="space-y-1"><Label>{t("invoices.field.reason")}</Label><Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button>
-          <Button variant="destructive" onClick={() => m.mutate()} disabled={m.isPending}>{m.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}{t("invoices.voidConfirm")}</Button>
-        </div>
-      </div>
+    <SimpleDialog open={open} onOpenChange={onOpenChange} title={t("invoices.void")} description={t("invoices.voidDesc")} size="sm"
+      footer={<>
+        <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+        <button type="button" className="btn btn-sm btn-red" onClick={() => m.mutate()} disabled={m.isPending}>{m.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.voidConfirm")}</button>
+      </>}
+    >
+      <div className="field"><label>{t("invoices.field.reason")}</label><textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
     </SimpleDialog>
   );
 }
 
-function SimpleDialog({ open, onOpenChange, title, description, children }: { open: boolean; onOpenChange: (v: boolean) => void; title: string; description?: string; children: React.ReactNode }) {
+function SimpleDialog({ open, onOpenChange, title, description, size, footer, children }: { open: boolean; onOpenChange: (v: boolean) => void; title: string; description?: string; size?: "sm" | "md" | "lg"; footer?: React.ReactNode; children: React.ReactNode }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent size={size}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        {children}
+        <DialogBody>{children}</DialogBody>
+        {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

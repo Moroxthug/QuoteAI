@@ -188,7 +188,7 @@ function QuickSearch({ navItems }: { navItems: NavItem[] }) {
           {isMac ? "⌘K" : "Ctrl K"}
         </kbd>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={open} onOpenChange={setOpen} title={t("dashboard.search.placeholder")}>
         <CommandInput placeholder={t("dashboard.search.placeholder")} />
         <CommandList>
           <CommandEmpty>{t("dashboard.search.empty")}</CommandEmpty>

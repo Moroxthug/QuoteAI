@@ -1,16 +1,12 @@
 import { Link, useParams, useSearch } from "wouter";
 import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Download, Lock, CheckCircle2, Edit2, Save, FileText, FileSpreadsheet, ImageIcon, ChevronDown, ChevronRight, Plus, Trash2, X, Pencil, Sparkles, AlertTriangle, RefreshCw, Loader2, Copy, Star, FileDown, LayoutTemplate, Mail, Hammer } from "lucide-react";
 import { useState, useRef, useEffect, Fragment } from "react";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -1562,263 +1558,185 @@ export default function QuoteDetail() {
 
       {/* ── CAPITOLATO PRO DIALOG ── */}
       <Dialog open={isCapitolatoDialogOpen} onOpenChange={setIsCapitolatoDialogOpen}>
-        <DialogContent className="sm:max-w-[480px]">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-navy-600" />
-              {t("dashboard.quoteDetail.upgradeProSpecTitle")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("dashboard.quoteDetail.upgradeProSpecDesc")}
-            </DialogDescription>
+            <DialogTitle><Star /> {t("dashboard.quoteDetail.upgradeProSpecTitle")}</DialogTitle>
+            <DialogDescription>{t("dashboard.quoteDetail.upgradeProSpecDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="rounded-lg bg-navy-50 border border-navy-200 px-4 py-3 text-sm text-navy-800 space-y-1">
-            <p className="font-semibold">{t("dashboard.quoteDetail.whatWillUpdate")}</p>
-            <ul className="list-disc list-inside space-y-0.5 text-navy-700">
-              <li>{t("dashboard.quoteDetail.updateItem1")}</li>
-              <li>{t("dashboard.quoteDetail.updateItem2")}</li>
-              <li>{t("dashboard.quoteDetail.updateItem3")}</li>
-            </ul>
-          </div>
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => setIsCapitolatoDialogOpen(false)} disabled={upgradeToCapitolato.isPending}>
-              {t("dashboard.quoteDetail.cancel")}
-            </Button>
-            <Button
-              onClick={handleConfirmCapitolatoUpgrade}
-              disabled={upgradeToCapitolato.isPending}
-              className="gap-2 bg-navy-600 hover:bg-navy-700 text-white"
-            >
+          <DialogBody>
+            <div className="notice info" style={{ display: "block" }}>
+              <p>{t("dashboard.quoteDetail.whatWillUpdate")}</p>
+              <ul style={{ listStyle: "disc", paddingLeft: 18, marginTop: 6, fontWeight: 600, color: "var(--muted-mk)" }}>
+                <li>{t("dashboard.quoteDetail.updateItem1")}</li>
+                <li>{t("dashboard.quoteDetail.updateItem2")}</li>
+                <li>{t("dashboard.quoteDetail.updateItem3")}</li>
+              </ul>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsCapitolatoDialogOpen(false)} disabled={upgradeToCapitolato.isPending}>{t("dashboard.quoteDetail.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={handleConfirmCapitolatoUpgrade} disabled={upgradeToCapitolato.isPending}>
               {upgradeToCapitolato.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
               {upgradeToCapitolato.isPending ? t("dashboard.quoteDetail.upgradingInProgress") : t("dashboard.quoteDetail.upgradeNow")}
-            </Button>
-          </div>
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* ── AI REGEN DIALOG ── */}
       <Dialog open={isRegenOpen} onOpenChange={setIsRegenOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-navy-500" />
-              {t("dashboard.quoteDetail.regenerateWithAiTitle")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("dashboard.quoteDetail.regenerateWithAiDesc")}
-            </DialogDescription>
+            <DialogTitle><Sparkles /> {t("dashboard.quoteDetail.regenerateWithAiTitle")}</DialogTitle>
+            <DialogDescription>{t("dashboard.quoteDetail.regenerateWithAiDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="rounded-lg bg-muted/50 border px-4 py-3 text-sm text-muted-foreground italic">
-              "{quote.rawInput}"
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("dashboard.quoteDetail.newInstructions")}</Label>
-              <Textarea
+          <DialogBody>
+            <div className="quote-box">"{quote.rawInput}"</div>
+            <div className="field">
+              <label>{t("dashboard.quoteDetail.newInstructions")}</label>
+              <textarea
                 value={regenDescription}
                 onChange={e => setRegenDescription(e.target.value)}
                 placeholder={t("dashboard.quoteDetail.regenerateExamplePlaceholder")}
-                className="resize-none min-h-[90px]"
+                rows={4}
+                style={{ resize: "none" }}
                 disabled={regenerateQuote.isPending}
               />
-              <p className="text-xs text-muted-foreground">
-                {t("dashboard.quoteDetail.regenerateHint")}
-              </p>
+              <div className="field-hint">{t("dashboard.quoteDetail.regenerateHint")}</div>
             </div>
-            <div className="flex gap-2 justify-end pt-1">
-              <Button variant="outline" onClick={() => { setIsRegenOpen(false); setRegenDescription(""); }} disabled={regenerateQuote.isPending}>
-                {t("dashboard.quoteDetail.cancel")}
-              </Button>
-              <Button onClick={handleRegenerate} disabled={regenerateQuote.isPending} className="gap-2">
-                {regenerateQuote.isPending ? (
-                  <><Loader2 className="h-4 w-4 animate-spin" /> {t("dashboard.quoteDetail.generatingInProgress")}</>
-                ) : (
-                  <><RefreshCw className="h-4 w-4" /> {t("dashboard.quoteDetail.regenerate")}</>
-                )}
-              </Button>
-            </div>
-          </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => { setIsRegenOpen(false); setRegenDescription(""); }} disabled={regenerateQuote.isPending}>{t("dashboard.quoteDetail.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={handleRegenerate} disabled={regenerateQuote.isPending}>
+              {regenerateQuote.isPending ? (
+                <><Loader2 className="h-4 w-4 animate-spin" /> {t("dashboard.quoteDetail.generatingInProgress")}</>
+              ) : (
+                <><RefreshCw className="h-4 w-4" /> {t("dashboard.quoteDetail.regenerate")}</>
+              )}
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
 
       {/* Paywall dialog */}
       <Dialog open={isPaywallOpen} onOpenChange={setIsPaywallOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col p-0">
-          <div className="px-6 pt-5 pb-3 border-b shrink-0">
-            <DialogHeader>
-              {subscription?.isActive && subscription?.plan === "monthly_starter" ? (
-                <>
-                  <DialogTitle className="text-lg">{t("dashboard.quoteDetail.upgradeToProPlanTitle")}</DialogTitle>
-                  <DialogDescription className="text-sm">
-                    {t("dashboard.quoteDetail.starterNoticePrefix")} <strong>Starter</strong> {t("dashboard.quoteDetail.starterNoticeMiddle")}<br/>
-                    {t("dashboard.quoteDetail.starterNoticeSuffix")} <strong>Pro</strong> {t("dashboard.quoteDetail.starterNoticeEnd")}
-                  </DialogDescription>
-                </>
-              ) : (
-                <>
-                  <DialogTitle className="text-lg">{t("dashboard.quoteDetail.unlockQuoteTitle")}</DialogTitle>
-                  <DialogDescription className="text-sm">
-                    {t("dashboard.quoteDetail.choosePlanToDownload")}
-                  </DialogDescription>
-                </>
-              )}
-            </DialogHeader>
-          </div>
+        <DialogContent size="lg">
+          <DialogHeader>
+            {subscription?.isActive && subscription?.plan === "monthly_starter" ? (
+              <>
+                <DialogTitle>{t("dashboard.quoteDetail.upgradeToProPlanTitle")}</DialogTitle>
+                <DialogDescription>
+                  {t("dashboard.quoteDetail.starterNoticePrefix")} <strong>Starter</strong> {t("dashboard.quoteDetail.starterNoticeMiddle")}<br/>
+                  {t("dashboard.quoteDetail.starterNoticeSuffix")} <strong>Pro</strong> {t("dashboard.quoteDetail.starterNoticeEnd")}
+                </DialogDescription>
+              </>
+            ) : (
+              <>
+                <DialogTitle>{t("dashboard.quoteDetail.unlockQuoteTitle")}</DialogTitle>
+                <DialogDescription>{t("dashboard.quoteDetail.choosePlanToDownload")}</DialogDescription>
+              </>
+            )}
+          </DialogHeader>
 
-          <div className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
+          <DialogBody>
             {/* If user is on Starter → show upgrade options */}
             {subscription?.isActive && subscription?.plan === "monthly_starter" ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+              <>
+                <div className="plan-grid two" style={{ paddingTop: 10 }}>
                   {[
-                    { id: "monthly_pro", label: "Pro", price: `$49${t("dashboard.quoteDetail.perMonth")}`, badge: t("dashboard.quoteDetail.mostPopular"), features: [t("dashboard.quoteDetail.feature60Quotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featurePhotoUpload")], highlight: true },
-                    { id: "monthly_elite", label: "Elite", price: `$59${t("dashboard.quoteDetail.perMonth")}`, badge: t("dashboard.quoteDetail.unlimited"), features: [t("dashboard.quoteDetail.featureUnlimitedQuotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featureDedicatedSupport")], highlight: false },
+                    { id: "monthly_pro", label: "Pro", price: "$49", badge: t("dashboard.quoteDetail.mostPopular"), features: [t("dashboard.quoteDetail.feature60Quotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featurePhotoUpload")], highlight: true },
+                    { id: "monthly_elite", label: "Elite", price: "$59", badge: t("dashboard.quoteDetail.unlimited"), features: [t("dashboard.quoteDetail.featureUnlimitedQuotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featureDedicatedSupport")], highlight: false },
                   ].map((opt) => (
-                    <div key={opt.id} className={`relative rounded-xl border p-4 flex flex-col ${opt.highlight ? "border-primary ring-1 ring-primary shadow-sm bg-gradient-to-br from-navy-50 to-teal-50" : "border-amber-300 bg-amber-50/30"}`}>
-                      <div className={`absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-bold px-2 py-0.5 rounded-full text-white whitespace-nowrap ${opt.highlight ? "bg-primary" : "bg-amber-500"}`}>
-                        {opt.badge}
-                      </div>
-                      <div className="font-bold text-sm mb-0.5 mt-1">{opt.label}</div>
-                      <div className="text-base font-extrabold text-foreground mb-2">{opt.price}</div>
-                      <ul className="space-y-1 mb-3 flex-1">
-                        {opt.features.map((f, i) => (
-                          <li key={i} className="flex items-center gap-1.5 text-xs text-foreground">
-                            <CheckCircle2 className={`h-3 w-3 shrink-0 ${opt.highlight ? "text-primary" : "text-amber-500"}`} />
-                            {f}
-                          </li>
-                        ))}
+                    <div key={opt.id} className={cn("plan-opt", opt.highlight && "hot")}>
+                      <span className={cn("tag", !opt.highlight && "gold")}>{opt.badge}</span>
+                      <span className="nm">{opt.label}</span>
+                      <span className="pr">{opt.price}<small>{t("dashboard.quoteDetail.perMonth")}</small></span>
+                      <ul>
+                        {opt.features.map((f, i) => <li key={i}><CheckCircle2 /> {f}</li>)}
                       </ul>
-                      <Button size="sm" className={`w-full text-xs h-8 ${opt.highlight ? "" : "bg-amber-500 hover:bg-amber-600 border-0"}`}
-                        onClick={handleUpgrade} disabled={createPortal.isPending}>
+                      <button type="button" className={cn("btn btn-sm", opt.highlight ? "btn-navy" : "btn-outline-navy")} onClick={handleUpgrade} disabled={createPortal.isPending}>
                         {createPortal.isPending ? "..." : `${t("dashboard.quoteDetail.switchToPrefix")} ${opt.label} →`}
-                      </Button>
+                      </button>
                     </div>
                   ))}
                 </div>
-                <p className="text-[11px] text-muted-foreground text-center">
-                  {t("dashboard.quoteDetail.managedByStripe")}
-                </p>
+                <p className="foot-note" style={{ textAlign: "center" }}>{t("dashboard.quoteDetail.managedByStripe")}</p>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs text-muted-foreground">{t("dashboard.quoteDetail.orSinglePurchase")}</span>
-                  <div className="flex-1 h-px bg-border" />
-                </div>
+                <div className="or-rule">{t("dashboard.quoteDetail.orSinglePurchase")}</div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="plan-grid two">
                   {(Array.isArray(plans) ? plans : []).filter(p => !p.interval).map((plan) => {
                     const isClean = plan.id === "oneshot_clean";
                     return (
-                      <div key={plan.id} className={`rounded-lg border p-3 flex flex-col hover:bg-muted/40 transition-colors ${isClean ? "border-primary/30" : ""}`}>
-                        <div className="font-medium text-sm mb-0.5">{plan.name}</div>
-                        <div className="text-xs text-muted-foreground mb-2">{plan.features[0]}</div>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="font-bold text-sm">${plan.price}</span>
-                          <Button size="sm" variant={isClean ? "default" : "outline"} className="h-7 text-xs px-3"
-                            onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
-                            {createCheckout.isPending ? "..." : t("dashboard.quoteDetail.buy")}
-                          </Button>
-                        </div>
+                      <div key={plan.id} className={cn("plan-opt flat", isClean && "hot")}>
+                        <div className="txt"><span className="nm">{plan.name}</span><span className="ds">{plan.features[0]}</span></div>
+                        <span className="pr">${plan.price}</span>
+                        <button type="button" className={cn("btn btn-sm", isClean ? "btn-navy" : "btn-outline-navy")} onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
+                          {createCheckout.isPending ? "..." : t("dashboard.quoteDetail.buy")}
+                        </button>
                       </div>
                     );
                   })}
                 </div>
-              </div>
+              </>
             ) : (
               <>
                 {/* Subscription plans — 3 columns */}
-                <div className="grid grid-cols-3 gap-2">
-                  {plans?.filter(p => p.interval).map((plan, idx) => {
+                <div className="plan-grid" style={{ paddingTop: 10 }}>
+                  {plans?.filter(p => p.interval).map((plan) => {
                     const isPro = plan.id === "monthly_pro";
                     const isElite = plan.id === "monthly_elite";
                     return (
-                      <div
-                        key={plan.id}
-                        className={`plan-card-enter relative rounded-lg border p-3 flex flex-col ${
-                          isPro ? "border-primary ring-1 ring-primary shadow-sm" : isElite ? "border-amber-300" : ""
-                        }`}
-                        style={{ animationDelay: `${idx * 0.05}s` }}
-                      >
-                        {isPro && (
-                          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                            <span className="bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full">{t("dashboard.quoteDetail.popBadge")}</span>
-                          </div>
-                        )}
-                        {isElite && (
-                          <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                            <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{t("dashboard.quoteDetail.infinityBadge")}</span>
-                          </div>
-                        )}
-                        <div className="font-semibold text-xs mt-1 mb-0.5">{plan.name}</div>
-                        <div className="mb-1.5">
-                          <span className="text-base font-bold">${plan.price}</span>
-                          <span className="text-muted-foreground text-[10px]">{t("dashboard.quoteDetail.perMonth")}</span>
-                        </div>
-                        <ul className="space-y-0.5 mb-2.5 flex-1">
-                          {plan.features.slice(0, 3).map((feature, i) => (
-                            <li key={i} className="flex items-start gap-1 text-muted-foreground">
-                              <CheckCircle2 className={`h-2.5 w-2.5 shrink-0 mt-0.5 ${isPro ? "text-primary" : isElite ? "text-amber-500" : "text-muted-foreground/60"}`} />
-                              <span className="text-[10px] leading-snug">{feature}</span>
-                            </li>
-                          ))}
+                      <div key={plan.id} className={cn("plan-opt plan-card-enter", isPro && "hot")}>
+                        {isPro && <span className="tag">{t("dashboard.quoteDetail.popBadge")}</span>}
+                        {isElite && <span className="tag gold">{t("dashboard.quoteDetail.infinityBadge")}</span>}
+                        <span className="nm">{plan.name}</span>
+                        <span className="pr">${plan.price}<small>{t("dashboard.quoteDetail.perMonth")}</small></span>
+                        <ul>
+                          {plan.features.slice(0, 3).map((feature, i) => <li key={i}><CheckCircle2 /> {feature}</li>)}
                         </ul>
-                        <Button size="sm" className={`w-full text-[10px] h-7 ${isElite ? "bg-amber-500 hover:bg-amber-600 border-0" : ""}`}
-                          variant={isPro ? "default" : isElite ? "default" : "outline"}
-                          onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
+                        <button type="button" className={cn("btn btn-sm", isPro || isElite ? "btn-navy" : "btn-outline-navy")} onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
                           {createCheckout.isPending ? "..." : `${t("dashboard.quoteDetail.choosePrefix")} ${plan.name}`}
-                        </Button>
+                        </button>
                       </div>
                     );
                   })}
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs text-muted-foreground">{t("dashboard.quoteDetail.orSinglePurchase")}</span>
-                  <div className="flex-1 h-px bg-border" />
-                </div>
+                <div className="or-rule">{t("dashboard.quoteDetail.orSinglePurchase")}</div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  {plans?.filter(p => !p.interval).map((plan, idx) => {
+                <div className="plan-grid two">
+                  {plans?.filter(p => !p.interval).map((plan) => {
                     const isClean = plan.id === "oneshot_clean";
                     return (
-                      <div key={plan.id}
-                        className={`plan-card-enter rounded-lg border p-3 flex flex-col hover:bg-muted/40 transition-colors ${isClean ? "border-primary/30" : ""}`}
-                        style={{ animationDelay: `${(idx + 3) * 0.05}s` }}
-                      >
-                        <div className="font-medium text-sm mb-0.5">{plan.name}</div>
-                        <div className="text-xs text-muted-foreground mb-2">{plan.features[0]}</div>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="font-bold text-sm">${plan.price}</span>
-                          <Button size="sm" variant={isClean ? "default" : "outline"} className="h-7 text-xs px-3"
-                            onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
-                            {createCheckout.isPending ? "..." : t("dashboard.quoteDetail.buy")}
-                          </Button>
-                        </div>
+                      <div key={plan.id} className={cn("plan-opt flat plan-card-enter", isClean && "hot")}>
+                        <div className="txt"><span className="nm">{plan.name}</span><span className="ds">{plan.features[0]}</span></div>
+                        <span className="pr">${plan.price}</span>
+                        <button type="button" className={cn("btn btn-sm", isClean ? "btn-navy" : "btn-outline-navy")} onClick={() => handleCheckout(plan.id)} disabled={createCheckout.isPending}>
+                          {createCheckout.isPending ? "..." : t("dashboard.quoteDetail.buy")}
+                        </button>
                       </div>
                     );
                   })}
                 </div>
               </>
             )}
-          </div>
+          </DialogBody>
         </DialogContent>
       </Dialog>
 
       {/* Email send dialog */}
       <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-        <DialogContent className="sm:max-w-[420px]">
+        <DialogContent size="sm">
           <DialogHeader>
-            <DialogTitle className="text-lg">{t("dashboard.quoteDetail.sendQuoteByEmailTitle")}</DialogTitle>
-            <DialogDescription className="text-sm">
-              {t("dashboard.quoteDetail.sendQuoteByEmailDesc")}
-            </DialogDescription>
+            <DialogTitle>{t("dashboard.quoteDetail.sendQuoteByEmailTitle")}</DialogTitle>
+            <DialogDescription>{t("dashboard.quoteDetail.sendQuoteByEmailDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="emailTo">{t("dashboard.quoteDetail.recipientEmailLabel")}</Label>
-              <Input
+          <DialogBody>
+            <div className="field">
+              <label htmlFor="emailTo">{t("dashboard.quoteDetail.recipientEmailLabel")}</label>
+              <input
                 id="emailTo"
                 type="email"
                 placeholder="client@example.com"
@@ -1826,26 +1744,20 @@ export default function QuoteDetail() {
                 onChange={e => setEmailTo(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") handleSendEmail(); }}
               />
+              {quote?.clientData && (
+                <div className="field-hint">
+                  {t("dashboard.quoteDetail.recipientPrefix")} <b style={{ color: "var(--navy)" }}>{(quote.clientData as { nome?: string })?.nome || t("dashboard.quoteDetail.clientFallback")}</b>
+                </div>
+              )}
             </div>
-            {quote?.clientData && (
-              <div className="text-xs text-muted-foreground">
-                {t("dashboard.quoteDetail.recipientPrefix")} <strong>{(quote.clientData as { nome?: string })?.nome || t("dashboard.quoteDetail.clientFallback")}</strong>
-              </div>
-            )}
-          </div>
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setIsEmailDialogOpen(false)}>{t("dashboard.quoteDetail.cancel")}</Button>
-            <Button
-              onClick={handleSendEmail}
-              disabled={!emailTo.trim().includes("@") || sendPdfEmail.isPending}
-              className="gap-2"
-            >
-              {sendPdfEmail.isPending
-                ? <Loader2 className="h-4 w-4 animate-spin" />
-                : <Mail className="h-4 w-4" />}
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(false)}>{t("dashboard.quoteDetail.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={handleSendEmail} disabled={!emailTo.trim().includes("@") || sendPdfEmail.isPending}>
+              {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               {t("dashboard.quoteDetail.send")}
-            </Button>
-          </div>
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

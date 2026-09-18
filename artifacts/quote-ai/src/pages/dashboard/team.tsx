@@ -4,11 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -173,18 +170,21 @@ function InviteMemberDialog({ open, onOpenChange, onInvited, onError }: { open: 
   });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader><DialogTitle>{t("team.members.dialogTitle")}</DialogTitle><DialogDescription>{t("team.members.dialogDesc")}</DialogDescription></DialogHeader>
-        <div className="space-y-3">
-          <div className="space-y-1"><Label>{t("team.members.email")}</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></div>
-          <div className="space-y-1">
-            <Label>{t("team.members.role")}</Label>
-            <select value={role} onChange={(e) => setRole(e.target.value as TeamMemberRole)} className="h-10 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
+        <DialogBody>
+          <div className="field"><label>{t("team.members.email")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></div>
+          <div className="field">
+            <label>{t("team.members.role")}</label>
+            <select value={role} onChange={(e) => setRole(e.target.value as TeamMemberRole)}>
               {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{t(`team.members.role.${r}`)}</option>)}
             </select>
           </div>
-          <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button><Button disabled={!email.trim() || invite.isPending} onClick={() => invite.mutate()} className="gap-2">{invite.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("team.members.send")}</Button></div>
-        </div>
+        </DialogBody>
+        <DialogFooter>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!email.trim() || invite.isPending} onClick={() => invite.mutate()}>{invite.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("team.members.send")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -196,13 +196,15 @@ function MemberInviteLinkDialog({ invite, onClose }: { invite: { url: string; em
   const copy = () => { navigator.clipboard.writeText(invite!.url); setCopied(true); setTimeout(() => setCopied(false), 1500); };
   return (
     <Dialog open={!!invite} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader><DialogTitle>{invite?.emailed ? t("team.members.inviteSent") : t("team.members.inviteNotSent")}</DialogTitle></DialogHeader>
         {invite && (
-          <div className="flex items-center gap-2">
-            <Input readOnly value={invite.url} className="text-xs" />
-            <Button size="sm" variant="outline" onClick={copy} className="gap-1 shrink-0">{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />} {copied ? t("team.invite.copied") : t("team.invite.copy")}</Button>
-          </div>
+          <DialogBody>
+            <div className="copy-row">
+              <input className="inp-sm" readOnly value={invite.url} onFocus={(e) => e.target.select()} />
+              <button type="button" className="btn btn-sm btn-outline-navy" onClick={copy}>{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copied ? t("team.invite.copied") : t("team.invite.copy")}</button>
+            </div>
+          </DialogBody>
         )}
       </DialogContent>
     </Dialog>
@@ -319,23 +321,26 @@ function WorkerDialog({ worker, open, onOpenChange }: { worker: WorkerDto | null
   const setType = (type: WorkerType) => setForm((f) => ({ ...f, type, burden: type === "subcontractor" ? "0" : f.burden === "0" ? "15" : f.burden }));
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent size="lg">
         <DialogHeader><DialogTitle>{worker ? t("team.workers.edit") : t("team.workers.add")}</DialogTitle><DialogDescription>{t("team.workers.dialogDesc")}</DialogDescription></DialogHeader>
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1 col-span-2"><Label>{t("team.workers.name")}</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoFocus /></div>
-            <div className="space-y-1"><Label>{t("team.workers.type")}</Label>
-              <select value={form.type} onChange={(e) => setType(e.target.value as WorkerType)} className="h-10 w-full rounded-md border border-slate-200 bg-card px-2 text-sm"><option value="employee">{t("team.type.employee")}</option><option value="subcontractor">{t("team.type.subcontractor")}</option></select>
+        <DialogBody>
+          <div className="form-grid">
+            <div className="field full"><label>{t("team.workers.name")}</label><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} autoFocus /></div>
+            <div className="field"><label>{t("team.workers.type")}</label>
+              <select value={form.type} onChange={(e) => setType(e.target.value as WorkerType)}><option value="employee">{t("team.type.employee")}</option><option value="subcontractor">{t("team.type.subcontractor")}</option></select>
             </div>
-            <div className="space-y-1"><Label>{t("team.workers.role")}</Label><Input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder={t("team.workers.rolePlaceholder")} /></div>
-            <div className="space-y-1"><Label>{t("team.workers.rate")}</Label><Input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} placeholder="35.00" /></div>
-            <div className="space-y-1"><Label>{t("team.workers.burdenPct")}</Label><Input type="number" step="0.5" value={form.burden} onChange={(e) => setForm({ ...form, burden: e.target.value })} disabled={form.type === "subcontractor"} /></div>
-            <div className="space-y-1"><Label>{t("team.workers.email")}</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
-            <div className="space-y-1"><Label>{t("team.workers.phone")}</Label><Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            <div className="field"><label>{t("team.workers.role")}</label><input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder={t("team.workers.rolePlaceholder")} /></div>
+            <div className="field"><label>{t("team.workers.rate")}</label><input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} placeholder="35.00" /></div>
+            <div className="field"><label>{t("team.workers.burdenPct")}</label><input type="number" step="0.5" value={form.burden} onChange={(e) => setForm({ ...form, burden: e.target.value })} disabled={form.type === "subcontractor"} /></div>
+            <div className="field"><label>{t("team.workers.email")}</label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
+            <div className="field"><label>{t("team.workers.phone")}</label><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
           </div>
-          <p className="text-[11px] text-slate-400">{t("team.workers.burdenHint")}</p>
-          <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button><Button disabled={!form.name.trim() || save.isPending} onClick={() => save.mutate()} className="gap-2">{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("jobs.save")}</Button></div>
-        </div>
+        </DialogBody>
+        <DialogFooter>
+          <span className="foot-note">{t("team.workers.burdenHint")}</span>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!form.name.trim() || save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("jobs.save")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -347,13 +352,15 @@ function InviteDialog({ invite, onClose }: { invite: { worker: WorkerDto; url: s
   const copy = async () => { try { await navigator.clipboard.writeText(invite!.url); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* clipboard blocked: the field is selectable */ } };
   return (
     <Dialog open={!!invite} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent size="lg">
         <DialogHeader><DialogTitle>{t("team.invite.title")} — {invite?.worker.name ?? ""}</DialogTitle><DialogDescription>{invite?.emailed ? `${t("team.invite.emailed")} ${invite.worker.email ?? ""}.` : t("team.invite.notEmailed")}</DialogDescription></DialogHeader>
-        <div className="flex gap-2">
-          <Input readOnly value={invite?.url ?? ""} onFocus={(e) => e.target.select()} className="text-xs" />
-          <Button variant="outline" className="gap-1 shrink-0" onClick={copy}>{copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />} {copied ? t("team.invite.copied") : t("team.invite.copy")}</Button>
-        </div>
-        <p className="text-[11px] text-slate-400">{t("team.invite.hint")}</p>
+        <DialogBody>
+          <div className="copy-row">
+            <input className="inp-sm" readOnly value={invite?.url ?? ""} onFocus={(e) => e.target.select()} />
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={copy}>{copied ? <Check className="h-4 w-4" style={{ color: "var(--green-dark)" }} /> : <Copy className="h-4 w-4" />} {copied ? t("team.invite.copied") : t("team.invite.copy")}</button>
+          </div>
+          <p className="foot-note">{t("team.invite.hint")}</p>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );
@@ -560,33 +567,36 @@ function EquipmentDialog({ item, open, onOpenChange }: { item: EquipmentDto | nu
   });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent size="lg">
         <DialogHeader><DialogTitle>{item ? t("team.equipment.edit") : t("team.equipment.add")}</DialogTitle><DialogDescription>{t("team.equipment.dialogDesc")}</DialogDescription></DialogHeader>
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1 col-span-2"><Label>{t("team.equipment.name")}</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("team.equipment.namePlaceholder")} autoFocus /></div>
-            <div className="space-y-1"><Label>{t("team.equipment.ownership")}</Label>
-              <select value={form.ownership} onChange={(e) => setForm({ ...form, ownership: e.target.value as EquipmentOwnership })} className="h-10 w-full rounded-md border border-slate-200 bg-card px-2 text-sm">
+        <DialogBody>
+          <div className="form-grid">
+            <div className="field full"><label>{t("team.equipment.name")}</label><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("team.equipment.namePlaceholder")} autoFocus /></div>
+            <div className="field"><label>{t("team.equipment.ownership")}</label>
+              <select value={form.ownership} onChange={(e) => setForm({ ...form, ownership: e.target.value as EquipmentOwnership })}>
                 {(["owned", "rented", "financed"] as const).map((o) => <option key={o} value={o}>{t(`team.ownership.${o}`)}</option>)}
               </select>
             </div>
-            <div className="space-y-1"><Label>{t("team.equipment.purchase")}</Label><Input type="number" step="0.01" value={form.purchase} onChange={(e) => setForm({ ...form, purchase: e.target.value })} /></div>
-            <div className="space-y-1"><Label>{t("team.equipment.rate")}</Label><Input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} placeholder="150.00" /></div>
-            <div className="space-y-1"><Label>{t("team.equipment.unit")}</Label>
-              <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value as UsageUnit })} className="h-10 w-full rounded-md border border-slate-200 bg-card px-2 text-sm"><option value="day">{t("team.unit.dayLong")}</option><option value="hour">{t("team.unit.hourLong")}</option></select>
+            <div className="field"><label>{t("team.equipment.purchase")}</label><input type="number" step="0.01" value={form.purchase} onChange={(e) => setForm({ ...form, purchase: e.target.value })} /></div>
+            <div className="field"><label>{t("team.equipment.rate")}</label><input type="number" step="0.01" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} placeholder="150.00" /></div>
+            <div className="field"><label>{t("team.equipment.unit")}</label>
+              <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value as UsageUnit })}><option value="day">{t("team.unit.dayLong")}</option><option value="hour">{t("team.unit.hourLong")}</option></select>
             </div>
             {form.ownership === "financed" && (
               <>
-                <div className="space-y-1"><Label>{t("team.equipment.lender")}</Label><Input value={form.lender} onChange={(e) => setForm({ ...form, lender: e.target.value })} /></div>
-                <div className="space-y-1"><Label>{t("team.equipment.monthly")}</Label><Input type="number" step="0.01" value={form.monthly} onChange={(e) => setForm({ ...form, monthly: e.target.value })} /></div>
-                <div className="space-y-1"><Label>{t("team.equipment.monthsLeft")}</Label><Input type="number" value={form.months} onChange={(e) => setForm({ ...form, months: e.target.value })} /></div>
+                <div className="field"><label>{t("team.equipment.lender")}</label><input value={form.lender} onChange={(e) => setForm({ ...form, lender: e.target.value })} /></div>
+                <div className="field"><label>{t("team.equipment.monthly")}</label><input type="number" step="0.01" value={form.monthly} onChange={(e) => setForm({ ...form, monthly: e.target.value })} /></div>
+                <div className="field"><label>{t("team.equipment.monthsLeft")}</label><input type="number" value={form.months} onChange={(e) => setForm({ ...form, months: e.target.value })} /></div>
               </>
             )}
-            <div className="space-y-1 col-span-2"><Label>{t("team.equipment.notes")}</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
+            <div className="field full"><label>{t("team.equipment.notes")}</label><input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
-          <p className="text-[11px] text-slate-400">{t("team.equipment.rateHint")}</p>
-          <div className="flex justify-end gap-2"><Button variant="ghost" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button><Button disabled={!form.name.trim() || save.isPending} onClick={() => save.mutate()} className="gap-2">{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("jobs.save")}</Button></div>
-        </div>
+        </DialogBody>
+        <DialogFooter>
+          <span className="foot-note">{t("team.equipment.rateHint")}</span>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!form.name.trim() || save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("jobs.save")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

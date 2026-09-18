@@ -6,13 +6,9 @@ import { enCA, frCA } from "date-fns/locale";
 import {
   ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MockupToggle } from "@/components/ui/mockup-toggle";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -416,64 +412,70 @@ export default function ContractDetailPage() {
 
       {/* Sign dialog */}
       <Dialog open={signOpen} onOpenChange={setSignOpen}>
-        <DialogContent className="sm:max-w-[520px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("contracts.signDialogTitle")}</DialogTitle>
             <DialogDescription>{t("contracts.signDialogDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>{t("contracts.signName")}</Label>
-              <Input value={signName} onChange={(e) => setSignName(e.target.value)} />
+          <DialogBody>
+            <div className="field">
+              <label>{t("contracts.signName")}</label>
+              <input value={signName} onChange={(e) => setSignName(e.target.value)} />
             </div>
             <SignaturePad value={signature} onChange={setSignature} defaultName={signName} />
-            <label className="flex items-start gap-2 text-sm text-slate-700 cursor-pointer">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1" />
+            <label className="chk-row">
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
               <span>{t("contracts.consentCompany")}</span>
             </label>
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setSignOpen(false)}>{t("contracts.cancel")}</Button>
-              <Button onClick={() => sign.mutate()} disabled={!signature || !consent || signName.trim().length < 2 || sign.isPending} className="gap-2">
-                {sign.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSignature className="h-4 w-4" />} {t("contracts.signConfirm")}
-              </Button>
-            </div>
-          </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setSignOpen(false)}>{t("contracts.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={() => sign.mutate()} disabled={!signature || !consent || signName.trim().length < 2 || sign.isPending}>
+              {sign.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSignature className="h-4 w-4" />} {t("contracts.signConfirm")}
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Send dialog */}
       <Dialog open={sendOpen} onOpenChange={setSendOpen}>
-        <DialogContent className="sm:max-w-[480px]">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{contract.sentAt ? t("contracts.resend") : t("contracts.sendToCustomer")}</DialogTitle>
             <DialogDescription>{t("contracts.sendDialogDesc").replace("{email}", contract.variables.customer.email ?? "—")}</DialogDescription>
           </DialogHeader>
-          {!contract.variables.customer.email && <div className="notice warn"><AlertTriangle /><span className="grow">{t("contracts.emailMissing")}</span></div>}
-          <div className="space-y-1.5">
-            <Label>{t("contracts.sendMessage")}</Label>
-            <Textarea value={sendMessage} onChange={(e) => setSendMessage(e.target.value)} rows={3} placeholder={t("contracts.sendMessagePlaceholder")} />
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setSendOpen(false)}>{t("contracts.cancel")}</Button>
-            <Button onClick={() => send.mutate()} disabled={send.isPending || !contract.variables.customer.email} className="gap-2">
+          <DialogBody>
+            {!contract.variables.customer.email && <div className="notice warn"><AlertTriangle /><span className="grow">{t("contracts.emailMissing")}</span></div>}
+            <div className="field">
+              <label>{t("contracts.sendMessage")}</label>
+              <textarea value={sendMessage} onChange={(e) => setSendMessage(e.target.value)} rows={3} placeholder={t("contracts.sendMessagePlaceholder")} />
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setSendOpen(false)}>{t("contracts.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" onClick={() => send.mutate()} disabled={send.isPending || !contract.variables.customer.email}>
               {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {t("contracts.sendConfirm")}
-            </Button>
-          </div>
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Void dialog */}
       <Dialog open={voidOpen} onOpenChange={setVoidOpen}>
-        <DialogContent className="sm:max-w-[440px]">
+        <DialogContent size="sm">
           <DialogHeader>
             <DialogTitle>{t("contracts.voidDialogTitle")}</DialogTitle>
             <DialogDescription>{t("contracts.voidDialogDesc")}</DialogDescription>
           </DialogHeader>
-          <Textarea value={voidReason} onChange={(e) => setVoidReason(e.target.value)} rows={2} placeholder={t("contracts.voidReason")} />
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setVoidOpen(false)}>{t("contracts.cancel")}</Button>
-            <Button variant="destructive" onClick={() => voidContract.mutate()} disabled={voidContract.isPending}>{t("contracts.voidConfirm")}</Button>
-          </div>
+          <DialogBody>
+            <div className="field">
+              <textarea value={voidReason} onChange={(e) => setVoidReason(e.target.value)} rows={2} placeholder={t("contracts.voidReason")} />
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setVoidOpen(false)}>{t("contracts.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-red" onClick={() => voidContract.mutate()} disabled={voidContract.isPending}>{voidContract.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("contracts.voidConfirm")}</button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

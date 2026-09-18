@@ -3,12 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Users, Search, Plus, Loader2, Send, Mail, Phone, MessageCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -152,10 +148,10 @@ export default function LeadsListPage() {
                           <span className="flex items-center gap-1 text-xs text-[var(--faint)]">
                             <ChannelIcon className="h-3 w-3" />
                           </span>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="gap-1.5 h-7 text-xs"
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-navy"
+                            style={{ padding: "6px 12px", fontSize: 12.5 }}
                             disabled={!canSend || sendMutation.isPending}
                             onClick={() => sendMutation.mutate(lead.id)}
                           >
@@ -165,7 +161,7 @@ export default function LeadsListPage() {
                               <Send className="h-3 w-3" />
                             )}
                             {t("leads.sendNow")}
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     );
@@ -183,32 +179,33 @@ export default function LeadsListPage() {
             <DialogTitle>{t("leads.newLead")}</DialogTitle>
             <DialogDescription>{t("leads.newLeadDesc")}</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <Label>{t("leads.field.name")}</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          <DialogBody>
+            <div className="field">
+              <label>{t("leads.field.name")}</label>
+              <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} autoFocus />
             </div>
-            <div>
-              <Label>{t("leads.field.email")}</Label>
-              <Input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+            <div className="form-grid">
+              <div className="field">
+                <label>{t("leads.field.email")}</label>
+                <input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+              </div>
+              <div className="field">
+                <label>{t("leads.field.phone")}</label>
+                <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+              </div>
             </div>
-            <div>
-              <Label>{t("leads.field.phone")}</Label>
-              <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+            <div className="field">
+              <label>{t("leads.field.notes")}</label>
+              <textarea rows={3} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
             </div>
-            <div>
-              <Label>{t("leads.field.notes")}</Label>
-              <Textarea value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} />
-            </div>
-            <Button
-              className="w-full gap-2"
-              disabled={!form.name.trim() || createMutation.isPending}
-              onClick={() => createMutation.mutate()}
-            >
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setCreateOpen(false)}>{t("jobs.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" disabled={!form.name.trim() || createMutation.isPending} onClick={() => createMutation.mutate()}>
               {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("leads.create")}
-            </Button>
-          </div>
+            </button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -4,11 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Plus, Loader2, Sparkles } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -135,39 +132,41 @@ function CreateJobDialog({ open, onOpenChange }: { open: boolean; onOpenChange: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("jobs.newJob")}</DialogTitle>
           <DialogDescription>{t("jobs.newJobDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div className="space-y-1">
-            <Label>{t("jobs.field.name")}</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.field.namePlaceholder")} autoFocus />
+        <DialogBody>
+          <div className="field">
+            <label>{t("jobs.field.name")}</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.field.namePlaceholder")} autoFocus />
           </div>
-          <div className="space-y-1">
-            <Label>{t("jobs.field.address")}</Label>
-            <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+          <div className="field">
+            <label>{t("jobs.field.address")}</label>
+            <input value={address} onChange={(e) => setAddress(e.target.value)} />
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="space-y-1">
-              <Label>{t("jobs.field.value")}</Label>
-              <Input type="number" min={0} step="0.01" value={value} onChange={(e) => setValue(e.target.value)} />
+          <div className="form-grid cols-3">
+            <div className="field">
+              <label>{t("jobs.field.value")}</label>
+              <input type="number" min={0} step="0.01" value={value} onChange={(e) => setValue(e.target.value)} />
             </div>
-            <div className="space-y-1">
-              <Label>{t("jobs.field.start")}</Label>
-              <Input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+            <div className="field">
+              <label>{t("jobs.field.start")}</label>
+              <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
             </div>
-            <div className="space-y-1">
-              <Label>{t("jobs.field.end")}</Label>
-              <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
+            <div className="field">
+              <label>{t("jobs.field.end")}</label>
+              <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
             </div>
           </div>
-          <Button className="w-full gap-2" disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>
+        </DialogBody>
+        <DialogFooter>
+          <span className="foot-note">{t("jobs.newJobHint")}</span>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!name.trim() || create.isPending} onClick={() => create.mutate()}>
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} {t("jobs.create")}
-          </Button>
-          <p className="text-[11px] text-slate-400 text-center">{t("jobs.newJobHint")}</p>
-        </div>
+          </button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

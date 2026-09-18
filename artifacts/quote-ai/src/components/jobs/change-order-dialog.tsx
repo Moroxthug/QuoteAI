@@ -2,11 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, Trash2, FileSignature } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCad } from "@/lib/jobs-api";
@@ -57,54 +53,59 @@ export function ChangeOrderDialog({ jobId, open, onOpenChange }: { jobId: string
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent size="xl">
         <DialogHeader>
           <DialogTitle>{t("jobs.co.new")}</DialogTitle>
           <DialogDescription>{t("jobs.co.newDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_140px] gap-3">
-            <div className="space-y-1">
-              <Label>{t("jobs.co.title")}</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("jobs.co.titlePlaceholder")} autoFocus />
+        <DialogBody>
+          <div className="form-grid narrow-2">
+            <div className="field">
+              <label>{t("jobs.co.title")}</label>
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("jobs.co.titlePlaceholder")} autoFocus />
             </div>
-            <div className="space-y-1">
-              <Label>{t("jobs.co.delta")}</Label>
-              <Input type="number" step="1" value={delta} onChange={(e) => setDelta(e.target.value)} />
+            <div className="field">
+              <label>{t("jobs.co.delta")}</label>
+              <input type="number" step="1" value={delta} onChange={(e) => setDelta(e.target.value)} />
             </div>
-          </div>
-          <div className="space-y-1">
-            <Label>{t("jobs.co.description")}</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("jobs.co.descriptionPlaceholder")} />
+            <div className="field full">
+              <label>{t("jobs.co.description")}</label>
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder={t("jobs.co.descriptionPlaceholder")} />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>{t("jobs.co.items")}</Label>
-            <div className="hidden md:grid grid-cols-[1fr_70px_70px_110px_100px_28px] gap-2 text-[11px] uppercase tracking-wide text-slate-400 px-1">
-              <span>{t("jobs.co.item")}</span><span>{t("jobs.co.qty")}</span><span>{t("jobs.co.unit")}</span><span>{t("jobs.co.unitPrice")}</span><span className="text-right">{t("jobs.co.total")}</span><span />
-            </div>
-            {rows.map((r, i) => (
-              <div key={i} className="grid grid-cols-2 md:grid-cols-[1fr_70px_70px_110px_100px_28px] gap-2 items-center">
-                <Input className="col-span-2 md:col-span-1" value={r.descrizione} onChange={(e) => update(i, { descrizione: e.target.value })} placeholder={t("jobs.co.itemPlaceholder")} />
-                <Input type="number" step="0.01" value={r.quantita} onChange={(e) => update(i, { quantita: e.target.value })} />
-                <Input value={r.um} onChange={(e) => update(i, { um: e.target.value })} placeholder="ea" />
-                <Input type="number" step="0.01" value={r.prezzoUnitario} onChange={(e) => update(i, { prezzoUnitario: e.target.value })} placeholder="0.00" />
-                <div className="text-sm font-medium text-right text-slate-800">{formatCad(rowTotal(r))}</div>
-                <button type="button" className="text-slate-300 hover:text-rose-500 justify-self-end" onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, idx) => idx !== i) : rs))}><Trash2 className="h-4 w-4" /></button>
+          <div className="field">
+            <label>{t("jobs.co.items")}</label>
+            <div className="li-body">
+              <div className="li-head">
+                <span>{t("jobs.co.item")}</span><span>{t("jobs.co.qty")}</span><span>{t("jobs.co.unit")}</span><span>{t("jobs.co.unitPrice")}</span><span className="r">{t("jobs.co.total")}</span><span />
               </div>
-            ))}
-            <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => setRows((rs) => [...rs, emptyRow()])}><Plus className="h-3.5 w-3.5" /> {t("jobs.co.addItem")}</Button>
+              <div>
+                {rows.map((r, i) => (
+                  <div key={i} className="li-row">
+                    <div className="desc"><input className="inp-sm" value={r.descrizione} onChange={(e) => update(i, { descrizione: e.target.value })} placeholder={t("jobs.co.itemPlaceholder")} /></div>
+                    <input className="inp-sm r qty" type="number" step="0.01" value={r.quantita} onChange={(e) => update(i, { quantita: e.target.value })} />
+                    <input className="inp-sm c um" value={r.um} onChange={(e) => update(i, { um: e.target.value })} placeholder="ea" />
+                    <input className="inp-sm r price" type="number" step="0.01" value={r.prezzoUnitario} onChange={(e) => update(i, { prezzoUnitario: e.target.value })} placeholder="0.00" />
+                    <div className="tot">{formatCad(rowTotal(r))}</div>
+                    <button type="button" className="ic-btn danger" disabled={rows.length === 1} onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((_, idx) => idx !== i) : rs))}><Trash2 /></button>
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="text-link" onClick={() => setRows((rs) => [...rs, emptyRow()])}><Plus /> {t("jobs.co.addItem")}</button>
+              <div className="li-sum">
+                <span>{t("jobs.co.subtotal")} <small>({t("jobs.co.taxNote")})</small></span>
+                <b className={subtotal < 0 ? "neg" : undefined}>{formatCad(subtotal)}</b>
+              </div>
+            </div>
           </div>
-
-          <div className="rounded-lg bg-slate-50 px-3 py-2 text-sm flex items-center justify-between">
-            <span className="text-slate-500">{t("jobs.co.subtotal")} <span className="text-[11px]">({t("jobs.co.taxNote")})</span></span>
-            <span className={subtotal < 0 ? "font-semibold text-rose-600" : "font-semibold text-slate-900"}>{formatCad(subtotal)}</span>
-          </div>
-
-          <Button className="w-full gap-2" disabled={!valid || create.isPending} onClick={() => create.mutate()}>
+        </DialogBody>
+        <DialogFooter>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!valid || create.isPending} onClick={() => create.mutate()}>
             {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSignature className="h-4 w-4" />} {t("jobs.co.createAndSign")}
-          </Button>
-        </div>
+          </button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

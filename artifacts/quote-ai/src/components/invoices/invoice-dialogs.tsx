@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Plus, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertTriangle, Loader2, Plus, Trash2 } from "lucide-react";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents } from "@/lib/jobs-api";
@@ -31,23 +27,23 @@ export function LineEditor({ rows, onChange }: { rows: Row[]; onChange: (rows: R
   const update = (i: number, patch: Partial<Row>) => onChange(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const subtotal = rows.reduce((s, r) => s + rowCents(r), 0);
   return (
-    <div className="space-y-2">
-      <div className="grid grid-cols-[1fr_70px_110px_100px_28px] gap-2 text-[11px] uppercase tracking-wide text-slate-500 px-1">
-        <span>{t("invoices.line.description")}</span><span className="text-right">{t("invoices.line.qty")}</span><span className="text-right">{t("invoices.line.unit")}</span><span className="text-right">{t("invoices.line.amount")}</span><span />
+    <div className="li-body">
+      <div className="li-head cols-5">
+        <span>{t("invoices.line.description")}</span><span className="r">{t("invoices.line.qty")}</span><span className="r">{t("invoices.line.unit")}</span><span className="r">{t("invoices.line.amount")}</span><span />
       </div>
-      {rows.map((r, i) => (
-        <div key={i} className="grid grid-cols-[1fr_70px_110px_100px_28px] gap-2 items-center">
-          <Input value={r.description} onChange={(e) => update(i, { description: e.target.value })} placeholder={t("invoices.line.placeholder")} className="h-9" />
-          <Input value={r.quantity} onChange={(e) => update(i, { quantity: e.target.value })} inputMode="decimal" className="h-9 text-right" />
-          <Input value={r.unit} onChange={(e) => update(i, { unit: e.target.value })} inputMode="decimal" placeholder="0.00" className="h-9 text-right" />
-          <div className="text-sm text-right font-medium text-slate-800 tabular-nums">{formatCents(rowCents(r))}</div>
-          <button type="button" className="text-slate-300 hover:text-rose-500 disabled:opacity-30" disabled={rows.length === 1} onClick={() => onChange(rows.filter((_, idx) => idx !== i))}><Trash2 className="h-4 w-4" /></button>
-        </div>
-      ))}
-      <div className="flex items-center justify-between">
-        <button type="button" className="text-xs text-navy-600 hover:underline inline-flex items-center gap-1" onClick={() => onChange([...rows, emptyRow()])}><Plus className="h-3 w-3" /> {t("invoices.line.add")}</button>
-        <div className="text-sm text-slate-600">{t("invoices.subtotal")} <span className="font-semibold text-slate-900">{formatCents(subtotal)}</span></div>
+      <div>
+        {rows.map((r, i) => (
+          <div key={i} className="li-row cols-5">
+            <div className="desc"><input className="inp-sm" value={r.description} onChange={(e) => update(i, { description: e.target.value })} placeholder={t("invoices.line.placeholder")} /></div>
+            <input className="inp-sm r qty" value={r.quantity} onChange={(e) => update(i, { quantity: e.target.value })} inputMode="decimal" />
+            <input className="inp-sm r price" value={r.unit} onChange={(e) => update(i, { unit: e.target.value })} inputMode="decimal" placeholder="0.00" />
+            <div className="tot">{formatCents(rowCents(r))}</div>
+            <button type="button" className="ic-btn danger" disabled={rows.length === 1} onClick={() => onChange(rows.filter((_, idx) => idx !== i))}><Trash2 /></button>
+          </div>
+        ))}
       </div>
+      <button type="button" className="text-link" onClick={() => onChange([...rows, emptyRow()])}><Plus /> {t("invoices.line.add")}</button>
+      <div className="li-sum"><span>{t("invoices.subtotal")}</span><b>{formatCents(subtotal)}</b></div>
     </div>
   );
 }
@@ -87,49 +83,49 @@ export function NewInvoiceDialog({ open, onOpenChange, defaultJobId, defaultClie
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent size="xl">
         <DialogHeader>
           <DialogTitle>{t("invoices.new")}</DialogTitle>
           <DialogDescription>{t("invoices.newDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label>{t("invoices.field.job")}</Label>
-              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={jobId} onChange={(e) => setJobId(e.target.value)} disabled={!!defaultJobId}>
+        <DialogBody>
+          <div className="form-grid">
+            <div className="field">
+              <label>{t("invoices.field.job")}</label>
+              <select value={jobId} onChange={(e) => setJobId(e.target.value)} disabled={!!defaultJobId}>
                 <option value="">{t("invoices.field.noJob")}</option>
                 {(jobs?.items ?? []).map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
               </select>
             </div>
             {!jobId && (
-              <div className="space-y-1">
-                <Label>{t("invoices.field.client")}</Label>
-                <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={clientId} onChange={(e) => setClientId(e.target.value)}>
+              <div className="field">
+                <label>{t("invoices.field.client")}</label>
+                <select value={clientId} onChange={(e) => setClientId(e.target.value)}>
                   <option value="">—</option>
                   {clientList.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             )}
-            <div className="space-y-1">
-              <Label>{t("invoices.field.title")}</Label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("invoices.field.titlePlaceholder")} />
+            <div className="field">
+              <label>{t("invoices.field.title")}</label>
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("invoices.field.titlePlaceholder")} />
             </div>
-            <div className="space-y-1">
-              <Label>{t("invoices.field.dueDays")}</Label>
-              <Input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" />
+            <div className="field">
+              <label>{t("invoices.field.dueDays")}</label>
+              <input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" />
             </div>
           </div>
           <LineEditor rows={rows} onChange={setRows} />
-          <div className="space-y-1">
-            <Label>{t("invoices.field.notes")}</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+          <div className="field">
+            <label>{t("invoices.field.notes")}</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
           </div>
-          <p className="text-xs text-slate-500">{t("invoices.taxHint")}</p>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button>
-            <Button disabled={!valid || create.isPending} onClick={() => create.mutate()}>{create.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}{t("invoices.createDraft")}</Button>
-          </div>
-        </div>
+        </DialogBody>
+        <DialogFooter>
+          <span className="foot-note">{t("invoices.taxHint")}</span>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={!valid || create.isPending} onClick={() => create.mutate()}>{create.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.createDraft")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -163,30 +159,30 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("invoices.recordPayment")}</DialogTitle>
-          <DialogDescription>{invoice.number} · {t("invoices.balance")} {formatCents(invoice.balanceCents)}</DialogDescription>
+          <DialogDescription>{invoice.number} · {t("invoices.balance")} <b>{formatCents(invoice.balanceCents)}</b></DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1"><Label>{t("invoices.payment.amount")}</Label><Input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" /></div>
-            <div className="space-y-1"><Label>{t("invoices.payment.date")}</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
-            <div className="space-y-1">
-              <Label>{t("invoices.payment.method")}</Label>
-              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>
+        <DialogBody>
+          <div className="form-grid">
+            <div className="field"><label>{t("invoices.payment.amount")}</label><input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" /></div>
+            <div className="field"><label>{t("invoices.payment.date")}</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
+            <div className="field">
+              <label>{t("invoices.payment.method")}</label>
+              <select value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>
                 {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{t(`invoices.method.${m}`)}</option>)}
               </select>
             </div>
-            <div className="space-y-1"><Label>{t("invoices.payment.reference")}</Label><Input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="e-Transfer #…" /></div>
+            <div className="field"><label>{t("invoices.payment.reference")}</label><input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="e-Transfer #…" /></div>
           </div>
-          <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={receipt} disabled={!invoice.customer.email} onChange={(e) => setReceipt(e.target.checked)} /> {t("invoices.payment.sendReceipt")}</label>
-          {cents > invoice.balanceCents && <p className="text-xs text-amber-700 bg-amber-50 rounded px-2 py-1">{t("invoices.payment.overpay")}</p>}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button>
-            <Button disabled={cents <= 0 || record.isPending} onClick={() => record.mutate()} className="bg-emerald-600 hover:bg-emerald-700">{record.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}{t("invoices.payment.save")}</Button>
-          </div>
-        </div>
+          <label className={invoice.customer.email ? "chk-row" : "chk-row disabled"}><input type="checkbox" checked={receipt} disabled={!invoice.customer.email} onChange={(e) => setReceipt(e.target.checked)} /> {t("invoices.payment.sendReceipt")}</label>
+          {cents > invoice.balanceCents && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.payment.overpay")}</span></div>}
+        </DialogBody>
+        <DialogFooter>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-green" disabled={cents <= 0 || record.isPending} onClick={() => record.mutate()}>{record.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.payment.save")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
@@ -218,20 +214,20 @@ export function CreditNoteDialog({ invoice, open, onOpenChange }: { invoice: Inv
   });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("invoices.creditNote")}</DialogTitle>
           <DialogDescription>{t("invoices.creditNoteDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div className="space-y-1"><Label>{t("invoices.credit.amount")}</Label><Input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0.00" /><p className="text-xs text-slate-500">{t("invoices.credit.amountHint")} {formatCents(invoice.taxableCents)}</p></div>
-          <div className="space-y-1"><Label>{t("invoices.credit.description")}</Label><Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("invoices.credit.descriptionPlaceholder")} /></div>
-          <div className="space-y-1"><Label>{t("invoices.credit.reason")}</Label><Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</Button>
-            <Button disabled={cents <= 0 || cents > invoice.taxableCents || !description.trim() || issue.isPending} onClick={() => issue.mutate()}>{issue.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}{t("invoices.credit.issue")}</Button>
-          </div>
-        </div>
+        <DialogBody>
+          <div className="field"><label>{t("invoices.credit.amount")}</label><input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0.00" /><div className="field-hint">{t("invoices.credit.amountHint")} {formatCents(invoice.taxableCents)}</div></div>
+          <div className="field"><label>{t("invoices.credit.description")}</label><input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("invoices.credit.descriptionPlaceholder")} /></div>
+          <div className="field"><label>{t("invoices.credit.reason")}</label><textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
+        </DialogBody>
+        <DialogFooter>
+          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
+          <button type="button" className="btn btn-sm btn-navy" disabled={cents <= 0 || cents > invoice.taxableCents || !description.trim() || issue.isPending} onClick={() => issue.mutate()}>{issue.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.credit.issue")}</button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -27,7 +27,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -1724,21 +1724,21 @@ function FlinksConnectDialog({ open, onOpenChange, onConnected }: { open: boolea
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[640px] flex flex-col">
+      <DialogContent size="xl" tall>
         <DialogHeader>
           <DialogTitle>{t("dashboard.settings.flinks.connectTitle")}</DialogTitle>
           <DialogDescription>{t("dashboard.settings.flinks.connectDialogDesc")}</DialogDescription>
         </DialogHeader>
-        <div className="flex-1 rounded-[var(--radius-sm)] overflow-hidden border border-border bg-muted/30">
+        <DialogBody className="flush">
           {isLoading || !connectUrlData?.url ? (
-            <div className="h-full flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+            <div className="card-empty" style={{ flex: 1, display: "grid", placeItems: "center" }}><Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--faint)" }} /></div>
           ) : (
-            <iframe src={connectUrlData.url} title="Flinks Connect" className="w-full h-full border-0" />
+            <iframe src={connectUrlData.url} title="Flinks Connect" style={{ width: "100%", height: "100%", border: 0, flex: 1 }} />
           )}
-        </div>
-        {connectMutation.isPending && (
-          <p className="text-xs text-muted-foreground flex items-center gap-2"><Loader2 className="h-3 w-3 animate-spin" /> {t("dashboard.settings.flinks.connecting")}</p>
-        )}
+          {connectMutation.isPending && (
+            <p className="foot-note" style={{ padding: "10px 22px", borderTop: "1px solid var(--soft)", display: "flex", alignItems: "center", gap: 8 }}><Loader2 className="h-3 w-3 animate-spin" /> {t("dashboard.settings.flinks.connecting")}</p>
+          )}
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

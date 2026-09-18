@@ -73,6 +73,7 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 /* ---------- Buttons ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 15px 32px; font-size: 16px; font-weight: 700; line-height: 1; letter-spacing: .01em; transition: background .25s, color .25s, transform .25s var(--ease-mk), box-shadow .25s; white-space: nowrap; }
 .btn:active { transform: scale(.98); }
+.btn:disabled { opacity: .55; pointer-events: none; }
 .btn-navy { background: var(--navy); color: #fff; }
 .btn-navy:hover { background: var(--navy-hover); }
 .btn-white { background: #fff; color: var(--navy); }
@@ -782,3 +783,36 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .blog-link-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; color: var(--ink); transition: border-color .2s, color .2s; }
 .blog-link-pill:hover { border-color: var(--navy); color: var(--navy); }
 .blog-link-pill svg { color: var(--teal); flex: none; }
+
+/* ==========================================================
+   PUBLIC TRANSACTIONAL / DOCUMENT PAGES
+   (docs/PIXEL-REDESIGN-PLAN.md, Phase 55)
+
+   /p/:id quote view, /i/:token invoice view, /sign/:token e-sign,
+   /t/:token worker time entry, /team-invite/:token. These are
+   functional documents a client or worker opens via a link, not
+   marketing pages — no hero/tile/split here, just the page shell,
+   sticky doc header and status-banner vocabulary on the locked
+   tokens. Content cards reuse .card directly (with Tailwind
+   padding utilities, per the interop rule); primary actions reuse
+   .btn/.btn-navy/.btn-outline-navy/.btn-sm.
+   ========================================================== */
+.doc-shell { min-height: 100vh; background: var(--soft); }
+.doc-head { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+
+.doc-banner { border-radius: var(--radius-mk); border: 1px solid var(--line); background: #fff; text-align: center; }
+.doc-banner h1 { color: var(--navy); }
+.doc-banner p { color: var(--muted-mk); }
+.doc-banner.ok { background: var(--green-t); border-color: var(--green-t); }
+.doc-banner.ok h1, .doc-banner.ok p { color: var(--green-dark); }
+.doc-banner.warn { background: var(--yellow-t); border-color: var(--yellow-t); }
+.doc-banner.warn h1, .doc-banner.warn p { color: var(--yellow-dark); }
+.doc-banner.danger { background: var(--red-t); border-color: var(--red-t); }
+.doc-banner.danger h1, .doc-banner.danger p { color: var(--red); }
+.doc-banner.info { background: var(--soft); }
+.doc-banner.info h1, .doc-banner.info p { color: var(--navy); }
+
+.doc-status { display: inline-flex; align-items: center; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; }
+.doc-status.ok { background: var(--green-t); color: var(--green-dark); }
+.doc-status.warn { background: var(--yellow-t); color: var(--yellow-dark); }
+.doc-status.danger { background: var(--red-t); color: var(--red); }

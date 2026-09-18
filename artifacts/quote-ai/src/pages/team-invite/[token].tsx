@@ -1,7 +1,6 @@
 import { useParams, Link } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { teamInviteApi } from "@/lib/team-members-api";
 import { Logo } from "@/components/logo";
@@ -21,50 +20,50 @@ export default function TeamInvitePage() {
   const returnTo = encodeURIComponent(`/team-invite/${token}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-navy-50 to-white flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-slate-100 p-8 text-center space-y-5">
+    <div className="doc-shell flex items-center justify-center p-4">
+      <div className="card w-full max-w-md p-8 text-center space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
         <Logo style={{ height: 28, margin: "0 auto" }} />
 
-        {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto text-navy-500" />}
+        {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: "var(--navy)" }} />}
 
         {!isLoading && err && (
           <div className="space-y-2">
-            <XCircle className="h-10 w-10 text-rose-500 mx-auto" />
-            <p className="text-slate-700 font-medium">{err.message || "This invite link isn't valid."}</p>
+            <XCircle className="h-10 w-10 mx-auto" style={{ color: "var(--red)" }} />
+            <p className="font-medium" style={{ color: "var(--ink)" }}>{err.message || "This invite link isn't valid."}</p>
           </div>
         )}
 
         {!isLoading && preview && !accept.isSuccess && (
           <div className="space-y-4">
-            <h1 className="text-xl font-bold text-slate-900">Join {preview.companyName || "your team"} on QuoteAI</h1>
-            <p className="text-sm text-slate-500">You've been invited as <strong>{preview.role}</strong>, using <strong>{preview.email}</strong>.</p>
+            <h1 className="text-xl font-bold" style={{ color: "var(--navy)" }}>Join {preview.companyName || "your team"} on QuoteAI</h1>
+            <p className="text-sm" style={{ color: "var(--muted-mk)" }}>You've been invited as <strong>{preview.role}</strong>, using <strong>{preview.email}</strong>.</p>
 
             {!isLoaded ? (
-              <Loader2 className="h-5 w-5 animate-spin mx-auto text-navy-500" />
+              <Loader2 className="h-5 w-5 animate-spin mx-auto" style={{ color: "var(--navy)" }} />
             ) : !isSignedIn ? (
               <div className="space-y-2">
-                <p className="text-xs text-slate-400">Sign in or create an account with that email to accept.</p>
+                <p className="text-xs" style={{ color: "var(--faint)" }}>Sign in or create an account with that email to accept.</p>
                 <div className="flex gap-2 justify-center">
-                  <Link href={`/sign-in?next=${returnTo}`}><Button variant="outline">Sign in</Button></Link>
-                  <Link href={`/sign-up?next=${returnTo}`}><Button>Create account</Button></Link>
+                  <Link href={`/sign-in?next=${returnTo}`} className="btn btn-outline-navy btn-sm">Sign in</Link>
+                  <Link href={`/sign-up?next=${returnTo}`} className="btn btn-navy btn-sm">Create account</Link>
                 </div>
               </div>
             ) : user?.email?.toLowerCase() !== preview.email.toLowerCase() ? (
-              <p className="text-sm text-rose-600">You're signed in as {user?.email}. Sign in with {preview.email} instead to accept this invite.</p>
+              <p className="text-sm" style={{ color: "var(--red)" }}>You're signed in as {user?.email}. Sign in with {preview.email} instead to accept this invite.</p>
             ) : (
-              <Button className="gap-2" disabled={accept.isPending} onClick={() => accept.mutate()}>
+              <button className="btn btn-navy" disabled={accept.isPending} onClick={() => accept.mutate()}>
                 {accept.isPending && <Loader2 className="h-4 w-4 animate-spin" />} Accept invite
-              </Button>
+              </button>
             )}
-            {accept.isError && <p className="text-sm text-rose-600">{(accept.error as Error).message}</p>}
+            {accept.isError && <p className="text-sm" style={{ color: "var(--red)" }}>{(accept.error as Error).message}</p>}
           </div>
         )}
 
         {accept.isSuccess && (
           <div className="space-y-3">
-            <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-            <p className="text-slate-700 font-medium">You're in! You now have access to {preview?.companyName}'s account.</p>
-            <Link href="/dashboard"><Button>Go to dashboard</Button></Link>
+            <CheckCircle2 className="h-10 w-10 mx-auto" style={{ color: "var(--green-dark)" }} />
+            <p className="font-medium" style={{ color: "var(--ink)" }}>You're in! You now have access to {preview?.companyName}'s account.</p>
+            <Link href="/dashboard" className="btn btn-navy">Go to dashboard</Link>
           </div>
         )}
       </div>

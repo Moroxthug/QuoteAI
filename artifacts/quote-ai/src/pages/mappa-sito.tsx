@@ -39,57 +39,51 @@ export default function MappaSitoPage() {
         jsonLd={jsonLd}
       />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-white pt-20 pb-12 border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            {t("sitemap.heading")}
-          </h1>
-          <p className="text-lg text-gray-600">
-            {t("sitemap.subheading")}
-          </p>
-        </div>
-      </section>
+      {/* Header */}
+      <header className="wrap" style={{ maxWidth: 700, padding: "clamp(48px, 7vw, 80px) 0 clamp(20px, 3vw, 32px)", textAlign: "center" }}>
+        <h1 className="h2" style={{ marginBottom: 14 }}>{t("sitemap.heading")}</h1>
+        <p className="lead" style={{ margin: "0 auto" }}>{t("sitemap.subheading")}</p>
+      </header>
 
       {/* Main Directory */}
-      <section className="py-16 bg-gray-50/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-8">
-            
+      <section className="sec soft">
+        <div className="wrap" style={{ maxWidth: 1080 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+
             {/* Section 1: Main Pages */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <Globe className="h-5 w-5 text-navy-600" />
-                <h2 className="text-lg font-bold text-gray-900">{t("sitemap.mainPagesTitle")}</h2>
+            <div className="card" style={{ padding: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, paddingBottom: 14, borderBottom: "1px solid var(--soft)" }}>
+                <Globe className="h-5 w-5" style={{ color: "var(--navy)" }} />
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.mainPagesTitle")}</h2>
               </div>
-              <ul className="space-y-2.5 text-sm">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13.5 }}>
                 <li>
-                  <Link href="/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.homePage")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/whatsapp/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/whatsapp/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.whatsappQuotes")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/chi-siamo/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/chi-siamo/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.aboutUs")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contatti/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/contatti/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.contactSupport")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/privacy/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.privacyPolicy")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/termini/" className="text-gray-600 hover:text-navy-600 transition-colors">
+                  <Link href="/termini/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.termsOfService")}
                   </Link>
                 </li>
@@ -97,28 +91,28 @@ export default function MappaSitoPage() {
             </div>
 
             {/* Section 2: Blog & Guides */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <BookOpen className="h-5 w-5 text-navy-600" />
-                <h2 className="text-lg font-bold text-gray-900">{t("sitemap.blogGuidesTitle")}</h2>
+            <div className="card" style={{ padding: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, paddingBottom: 14, borderBottom: "1px solid var(--soft)" }}>
+                <BookOpen className="h-5 w-5" style={{ color: "var(--navy)" }} />
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.blogGuidesTitle")}</h2>
               </div>
-              <ul className="space-y-2.5 text-sm">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13.5 }}>
                 <li>
-                  <Link href="/blog/" className="font-semibold text-gray-800 hover:text-navy-600 transition-colors">
+                  <Link href="/blog/" className="cta-link" style={{ fontSize: "inherit" }}>
                     {t("sitemap.blogIndex")}
                   </Link>
                 </li>
                 {BLOG_CATEGORIES.map((cat) => (
-                  <li key={cat.slug}>
-                    <Link href={`/blog/categoria/${cat.slug}/`} className="text-gray-600 hover:text-navy-600 transition-colors pl-2">
+                  <li key={cat.slug} style={{ paddingLeft: 8 }}>
+                    <Link href={`/blog/categoria/${cat.slug}/`} style={{ color: "var(--muted-mk)" }}>
                       {t("sitemap.category")}: {cat.name}
                     </Link>
                   </li>
                 ))}
-                <li className="pt-2 font-semibold text-gray-800 border-t border-gray-50 mt-2">{t("sitemap.latestArticles")}</li>
+                <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)", fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.latestArticles")}</li>
                 {BLOG_ARTICLES.slice(0, 5).map((art) => (
-                  <li key={art.slug} className="truncate max-w-full">
-                    <Link href={`/blog/${art.slug}/`} className="text-gray-500 hover:text-navy-600 text-xs transition-colors pl-2">
+                  <li key={art.slug} style={{ paddingLeft: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <Link href={`/blog/${art.slug}/`} style={{ color: "var(--faint)", fontSize: 12.5 }}>
                       {art.title}
                     </Link>
                   </li>
@@ -127,15 +121,15 @@ export default function MappaSitoPage() {
             </div>
 
             {/* Section 3: Professions Index */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-                <Layers className="h-5 w-5 text-navy-600" />
-                <h2 className="text-lg font-bold text-gray-900">{t("sitemap.professionsTitle")}</h2>
+            <div className="card" style={{ padding: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18, paddingBottom: 14, borderBottom: "1px solid var(--soft)" }}>
+                <Layers className="h-5 w-5" style={{ color: "var(--navy)" }} />
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.professionsTitle")}</h2>
               </div>
-              <ul className="space-y-2.5 text-sm">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13.5 }}>
                 {Object.entries(SECTORS).map(([slug, sector]) => (
                   <li key={slug}>
-                    <Link href={`/quotes/${slug}/`} className="text-gray-600 hover:text-navy-600 transition-colors">
+                    <Link href={`/quotes/${slug}/`} className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                       {sector.label}
                     </Link>
                   </li>
@@ -146,26 +140,26 @@ export default function MappaSitoPage() {
           </div>
 
           {/* Programmatic Cities Directory */}
-          <div className="mt-12 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
-              <MapPin className="h-6 w-6 text-navy-600" />
+          <div className="card" style={{ marginTop: 24, padding: 32 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28, paddingBottom: 18, borderBottom: "1px solid var(--soft)" }}>
+              <span className="fi g"><MapPin className="h-5 w-5" /></span>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{t("sitemap.localQuotesTitle")}</h2>
-                <p className="text-sm text-gray-500 mt-1">{t("sitemap.localQuotesSubtitle")}</p>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.localQuotesTitle")}</h2>
+                <p style={{ fontSize: 13, color: "var(--faint)", marginTop: 2 }}>{t("sitemap.localQuotesSubtitle")}</p>
               </div>
             </div>
 
-            <div className="space-y-10">
+            <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
               {sortedRegions.map((region) => {
                 const regionCities = citiesByRegion.get(region) || [];
                 return (
-                  <div key={region} className="border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-navy-700 mb-4">{region}</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-4 gap-x-2 text-xs">
+                  <div key={region} style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 28 }}>
+                    <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)", marginBottom: 16 }}>{region}</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", rowGap: 16, columnGap: 8, fontSize: 12.5 }}>
                       {regionCities.map((city) => (
-                        <div key={city.slug} className="flex flex-col gap-1">
-                          <span className="font-bold text-gray-900 border-b border-gray-50 pb-0.5 mb-1">{city.name}</span>
-                          <div className="flex flex-col gap-1.5 pl-1">
+                        <div key={city.slug} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          <span style={{ fontWeight: 700, color: "var(--navy)", borderBottom: "1px solid var(--soft)", paddingBottom: 2, marginBottom: 2 }}>{city.name}</span>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: 2 }}>
                             {CITY_SECTORS.map((sectorSlug) => {
                               const s = SECTORS[sectorSlug];
                               if (!s) return null;
@@ -173,7 +167,7 @@ export default function MappaSitoPage() {
                                 <Link
                                   key={sectorSlug}
                                   href={`/quotes/${sectorSlug}/${city.slug}/`}
-                                  className="text-gray-500 hover:text-navy-600 transition-colors truncate"
+                                  style={{ color: "var(--muted-mk)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
                                   title={`${t("sitemap.quoteFor")} ${s.label} — ${city.name}`}
                                 >
                                   {s.label}

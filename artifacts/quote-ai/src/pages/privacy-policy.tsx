@@ -7,6 +7,7 @@
 */}
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
+import { Link } from "wouter";
 
 export default function PrivacyPage() {
   return (
@@ -16,11 +17,23 @@ export default function PrivacyPage() {
         description="QuoteAI's privacy policy — how we collect, use, and protect your personal information."
         canonical="https://quoteai.ca/privacy-policy/"
       />
-      <div className="container mx-auto px-4 py-16 max-w-3xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 mb-10">Last updated: May 6, 2025</p>
+      <div className="wrap">
+        <nav aria-label="Breadcrumb" className="crumbs">
+          <Link href="/">Home</Link>
+          <span className="crumb-sep" aria-hidden="true">/</span>
+          <span className="crumb-current" aria-current="page">Privacy Policy</span>
+        </nav>
+      </div>
 
-        <div className="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
+      <header className="wrap" style={{ maxWidth: 780, padding: "clamp(12px, 2vw, 24px) 0 clamp(24px, 3vw, 36px)" }}>
+        <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
+          Privacy Policy
+        </h1>
+        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: May 6, 2025</p>
+      </header>
+
+      <div className="wrap" style={{ maxWidth: 780, paddingBottom: "clamp(48px, 6vw, 80px)" }}>
+        <div className="prose blog-prose max-w-none space-y-8 text-sm leading-relaxed">
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Who we are</h2>

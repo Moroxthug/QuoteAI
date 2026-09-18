@@ -1,6 +1,6 @@
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
-import { Mail, MessageCircle, FileText, Clock } from "lucide-react";
+import { Mail, MessageCircle, FileText, Clock, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -52,87 +52,51 @@ export default function ContattiPage() {
         jsonLd={jsonLd}
       />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-white pt-24 pb-16">
-        <div
-          className="absolute inset-0 opacity-30 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,58,237,0.12) 0%, transparent 70%)",
-          }}
-        />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl relative z-10 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5">
-            {t("contact.heroTitlePrefix")}{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              {t("contact.heroTitleHighlight")}
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 leading-relaxed">
-            {t("contact.heroBody")}
-          </p>
-        </div>
-      </section>
+      {/* Header */}
+      <header className="wrap" style={{ maxWidth: 700, padding: "clamp(48px, 7vw, 88px) 0 clamp(20px, 3vw, 32px)", textAlign: "center" }}>
+        <h1 className="h2" style={{ marginBottom: 16 }}>
+          {t("contact.heroTitlePrefix")} <span style={{ color: "var(--green)" }}>{t("contact.heroTitleHighlight")}</span>
+        </h1>
+        <p className="lead" style={{ margin: "0 auto" }}>{t("contact.heroBody")}</p>
+      </header>
 
       {/* Canali di contatto */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="grid md:grid-cols-3 gap-6">
+      <section className="sec soft">
+        <div className="wrap" style={{ maxWidth: 900 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
             {/* Email supporto */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-xl bg-navy-50 flex items-center justify-center mb-5">
-                <Mail className="h-6 w-6 text-navy-600" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">{t("contact.productSupportTitle")}</h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            <div className="card" style={{ padding: 28 }}>
+              <span className="fi p" style={{ marginBottom: 16 }}><Mail className="h-5 w-5" /></span>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", marginBottom: 8 }}>{t("contact.productSupportTitle")}</h2>
+              <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6, marginBottom: 16 }}>
                 {t("contact.productSupportBody")}
               </p>
-              <a
-                href="mailto:info@quoteai.ca"
-                className="text-navy-600 font-semibold text-sm hover:text-navy-800 transition-colors"
-              >
-                info@quoteai.ca →
+              <a href="mailto:info@quoteai.ca" className="cta-link" style={{ fontSize: 14 }}>
+                info@quoteai.ca <ArrowRight className="chev h-3.5 w-3.5" />
               </a>
             </div>
 
             {/* WhatsApp */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-xl bg-green-50 flex items-center justify-center mb-5">
-                <MessageCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">WhatsApp</h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            <div className="card" style={{ padding: 28 }}>
+              <span className="fi g" style={{ marginBottom: 16 }}><MessageCircle className="h-5 w-5" /></span>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", marginBottom: 8 }}>WhatsApp</h2>
+              <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6, marginBottom: 16 }}>
                 {t("contact.whatsappBody")}
               </p>
-              <Link
-                href="/whatsapp/"
-                className="text-green-600 font-semibold text-sm hover:text-green-800 transition-colors"
-              >
-                {t("contact.whatsappLink")} →
+              <Link href="/whatsapp/" className="cta-link" style={{ fontSize: 14 }}>
+                {t("contact.whatsappLink")} <ArrowRight className="chev h-3.5 w-3.5" />
               </Link>
             </div>
 
             {/* Privacy / legale */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center mb-5">
-                <FileText className="h-6 w-6 text-gray-600" />
-              </div>
-              <h2 className="text-lg font-bold text-gray-900 mb-2">{t("contact.privacyLegalTitle")}</h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-4">
+            <div className="card" style={{ padding: 28 }}>
+              <span className="fi t" style={{ marginBottom: 16 }}><FileText className="h-5 w-5" /></span>
+              <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--navy)", marginBottom: 8 }}>{t("contact.privacyLegalTitle")}</h2>
+              <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6, marginBottom: 16 }}>
                 {t("contact.privacyLegalBody")}
               </p>
-              <a
-                href="mailto:privacy@quoteai.ca"
-                className="text-gray-600 font-semibold text-sm hover:text-gray-900 transition-colors"
-              >
-                privacy@quoteai.ca →
+              <a href="mailto:privacy@quoteai.ca" className="cta-link" style={{ fontSize: 14 }}>
+                privacy@quoteai.ca <ArrowRight className="chev h-3.5 w-3.5" />
               </a>
             </div>
           </div>
@@ -140,14 +104,14 @@ export default function ContattiPage() {
       </section>
 
       {/* Tempi di risposta */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <div className="flex items-start gap-4 bg-navy-50 border border-navy-100 rounded-2xl p-6">
-            <Clock className="h-6 w-6 text-navy-600 flex-shrink-0 mt-0.5" />
+      <section className="sec" style={{ paddingBlock: "clamp(24px, 3vw, 40px)" }}>
+        <div className="wrap" style={{ maxWidth: 700 }}>
+          <div className="dd-feat">
+            <span className="fi p"><Clock className="h-5 w-5" /></span>
             <div>
-              <h3 className="font-bold text-gray-900 mb-1">{t("contact.responseTimeTitle")}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {t("contact.responseTimeBodyPrefix")} <strong>{t("contact.responseTimeBodyStrong")}</strong> {t("contact.responseTimeBodySuffix")}
+              <b>{t("contact.responseTimeTitle")}</b>
+              <p>
+                {t("contact.responseTimeBodyPrefix")} <strong style={{ color: "var(--navy)" }}>{t("contact.responseTimeBodyStrong")}</strong> {t("contact.responseTimeBodySuffix")}
               </p>
             </div>
           </div>
@@ -155,14 +119,14 @@ export default function ContattiPage() {
       </section>
 
       {/* FAQ rapide */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">{t("contact.faqTitle")}</h2>
-          <div className="space-y-5">
+      <section className="sec soft">
+        <div className="wrap" style={{ maxWidth: 700 }}>
+          <h2 className="h2" style={{ fontSize: "clamp(1.5rem, 2.4vw, 2rem)", marginBottom: 28 }}>{t("contact.faqTitle")}</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {faqs.map((faq, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{faq.a}</p>
+              <div key={i} className="card" style={{ padding: 22 }}>
+                <h3 style={{ fontSize: 15.5, fontWeight: 700, color: "var(--navy)", marginBottom: 8 }}>{faq.q}</h3>
+                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{faq.a}</p>
               </div>
             ))}
           </div>
@@ -170,17 +134,11 @@ export default function ContattiPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-xl text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("contact.ctaTitle")}</h2>
-          <p className="text-gray-500 mb-6">
-            {t("contact.ctaBody")}
-          </p>
-          <Link
-            href="/sign-up/"
-            className="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white"
-            style={{ background: "linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)" }}
-          >
+      <section className="sec" style={{ textAlign: "center" }}>
+        <div className="wrap" style={{ maxWidth: 480 }}>
+          <h2 className="h2" style={{ fontSize: "clamp(1.4rem, 2.2vw, 1.8rem)", marginBottom: 12 }}>{t("contact.ctaTitle")}</h2>
+          <p className="lead" style={{ margin: "0 auto 24px" }}>{t("contact.ctaBody")}</p>
+          <Link href="/sign-up/" className="btn btn-navy">
             {t("contact.ctaButton")}
           </Link>
         </div>

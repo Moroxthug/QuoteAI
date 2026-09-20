@@ -1,27 +1,12 @@
-import pdfmake from "pdfmake";
+import { getPdfmake } from "../lib/pdfmake.js";
 import type { TDocumentDefinitions, Content, TableCell } from "pdfmake/interfaces";
 import { createHash } from "node:crypto";
 import type { ContractDocument, ContractVariables, ContractSigner, ContractEvent } from "@workspace/db";
 import { paymentTermAmount } from "@workspace/db";
 import { parseBlocks, type Run, fmtMoney, fmtDate, tr, dueLabel, eventLabel } from "./render.js";
 import type { Lang } from "./templates.js";
+import { isWellFormedPngDataUrl } from "../lib/pngDataUrl.js";
 
-type PdfMakeInstance = {
-  fonts: Record<string, Record<string, string>>;
-  createPdf(docDef: TDocumentDefinitions): { getBuffer(): Promise<Buffer> };
-};
-
-let _pdfmake: PdfMakeInstance | null = null;
-function getPdfmake(): PdfMakeInstance {
-  if (_pdfmake) return _pdfmake;
-  const lib = pdfmake as unknown as PdfMakeInstance;
-  lib.fonts = {
-    Roboto: { normal: "Helvetica", bold: "Helvetica-Bold", italics: "Helvetica-Oblique", bolditalics: "Helvetica-BoldOblique" },
-    Serif: { normal: "Times-Roman", bold: "Times-Bold", italics: "Times-Italic", bolditalics: "Times-BoldItalic" },
-  };
-  _pdfmake = lib;
-  return lib;
-}
 
 const INK = "#111827";
 const MUTED = "#6b7280";
@@ -111,8 +96,10 @@ function signatureBlock(role: "contractor" | "customer", v: ContractVariables, s
     { text: party.name, bold: true, fontSize: 11, margin: [0, 2, 0, 4] },
   ];
   if (s?.status === "signed") {
-    if (s.signatureType === "drawn" && s.signatureData?.startsWith("data:image")) {
-      stack.push({ image: s.signatureData, fit: [200, 60], margin: [0, 2, 0, 4] });
+    // Anything pdfkit can't decode falls back to the typed-name rendering
+    // rather than failing the whole signed PDF (the row is already signed).
+    if (s.signatureType === "drawn" && isWellFormedPngDataUrl(s.signatureData)) {
+      stack.push({ image: s.signatureData!, fit: [200, 60], margin: [0, 2, 0, 4] });
     } else {
       stack.push({ text: s.signatureData || s.name, italics: true, fontSize: 20, margin: [0, 4, 0, 4] });
     }

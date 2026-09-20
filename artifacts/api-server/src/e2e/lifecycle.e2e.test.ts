@@ -26,28 +26,15 @@
 //   service, because that logic isn't factored out yet. Each spot says
 //   which route it mirrors.
 //
-// REQUIREMENTS TO RUN
-//   DATABASE_URL, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY must point at a
-//   DISPOSABLE / STAGING project — this test creates a real auth user,
-//   quote, contract, job, invoices and storage objects, and does not assume
-//   it can clean up storage. NEVER point this at the production `quoteai`
-//   Supabase project.
-//
-//   cd artifacts/api-server
-//   DATABASE_URL=... SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
-//     ../../scripts/node_modules/.bin/tsx src/e2e/lifecycle.e2e.test.ts
-//
-// AI calls (contract scope/schedule draft, job plan refinement) are safe to
-// leave unconfigured — every AI call path has a deterministic fallback on
-// error (see contracts/service.ts draftWithAi, jobs/setup.ts refineWithAi).
-// RESEND_API_KEY is safe to leave unset — every email path no-ops with a
-// warning when it's missing.
+// HOW TO RUN — see vitest.e2e.config.ts (loads .env.staging; never point it at
+// data you care about).
+//   pnpm --filter @workspace/api-server test:e2e
+// AI calls are forced onto their deterministic fallbacks (keys are blanked in
+// vitest.e2e.setup.ts) and the Resend SDK is mocked, so no email leaves.
 
-import { randomUUID } from "node:crypto";
+import { describe, test, expect, afterAll } from "vitest";
 import {
   db,
-  authUsersTable,
-  businessProfilesTable,
   quotesTable,
   contractsTable,
   contractSignersTable,
@@ -62,9 +49,11 @@ import "../automations/index.js"; // registers automation handlers
 import { raiseAutomation } from "../lib/automation.js";
 import { logContractEvent, finalizeContract } from "../contracts/service.js";
 import { sendInvoice, recordPayment } from "../invoices/service.js";
+import { createOrg, seedQuote, cleanupAll } from "./harness.js";
+import { TINY_PNG_DATA_URL } from "../lib/pngDataUrl.js";
 
 function assert(cond: unknown, message: string): asserts cond {
-  if (!cond) throw new Error(`ASSERTION FAILED: ${message}`);
+  expect(cond, message).toBeTruthy();
 }
 
 async function raiseAndExpectSuccess(params: Parameters<typeof raiseAutomation>[0]) {
@@ -89,82 +78,21 @@ const SCENARIOS: Scenario[] = [
 
 async function runScenario(s: Scenario) {
   console.log(`\n=== ${s.label} ===`);
-  const userId = `e2e_${randomUUID()}`;
-  const email = `e2e-${randomUUID()}@example.invalid`;
+  const org = await createOrg({ province: s.province, companyName: "E2E Test Co" });
+  const userId = org.userId;
+  console.log("✓ business profile created");
 
-  try {
-    // ── Fixtures: user + business profile ────────────────────────────────
-    await db.insert(authUsersTable).values({ id: userId, name: "E2E Test Co", email });
-    await db.insert(businessProfilesTable).values({
-      userId,
-      companyName: "E2E Test Co",
-      province: s.province,
-      gstHstNumber: "123456789RT0001",
-      qstNumber: s.province === "QC" ? "1234567890TQ0001" : null,
-      licenceNumber: s.province === "QC" ? "RBQ 1234-5678-01" : "LIC-0001",
-      etransferEmail: "payments@e2e-test.invalid",
-      email: "owner@e2e-test.invalid",
-      // Feature-flag override bypasses needing a real Stripe subscription.
-      featureFlags: { contracts: true, jobs: true, costs: true, invoicing: true, team_time: true, analytics_pro: true },
-      automationSettings: { notifyOnQuoteAccepted: true, autoDraftContract: true, autoSendInvoices: false, invoiceAutoSendAfterHours: 0, invoiceReminders: true },
-    });
-    console.log("✓ business profile created");
-
-    // ── Quote (seeded directly — AI quote generation is out of scope here
-    //    and separately unit-tested) ─────────────────────────────────────
-    const [quote] = await db
-      .insert(quotesTable)
-      .values({
-        userId,
-        province: s.province,
-        clientData: {
-          nome: "Jordan Client",
-          indirizzo: "456 Client Ave",
-          city: s.province === "QC" ? "Montréal" : "Ottawa",
-          province: s.province,
-          postalCode: "K1A 0B1",
-          email: "client@e2e-test.invalid",
-          phone: "6135550100",
-        },
-        descrizioneGenerale: "Kitchen renovation",
-        capitoli: [
-          {
-            lettera: "A",
-            titolo: "Demolition and prep",
-            subtotale: 4000,
-            voci: [{ descrizione: "Demo existing cabinets", quantita: 1, um: "lot", prezzoUnitario: 4000, totale: 4000 }],
-          },
-          {
-            lettera: "B",
-            titolo: "Cabinets and countertops",
-            subtotale: 6000,
-            voci: [{ descrizione: "Install cabinets and counters", quantita: 1, um: "lot", prezzoUnitario: 6000, totale: 6000 }],
-          },
-        ],
-        condizioniPagamento: ["30% deposit upon signing", "40% at start of work", "30% upon completion"],
-        paymentSchedule: {
-          currency: "CAD",
-          derived: false,
-          holdback: { enabled: s.holdback, percent: 10 },
-          terms: [
-            { id: "t1", type: "deposit", label: "Deposit", trigger: "on_signing", amountType: "percent", value: 30, dueDays: 0 },
-            { id: "t2", type: "milestone", label: "Start of work", trigger: "milestone", amountType: "percent", value: 40, dueDays: 15 },
-            { id: "t3", type: "completion", label: "Final balance", trigger: "on_completion", amountType: "percent", value: 30, dueDays: 15 },
-          ],
-        },
-        subtotale: "10000",
-        ivaPercentuale: "0", // forces buildVariablesFromQuote to use the real province tax profile
-        totale: "10000",
-        status: "unlocked",
-      })
-      .returning();
-    console.log(`✓ quote seeded (${quote!.id})`);
+  // Quote seeded directly — AI quote generation is out of scope here and
+  // separately unit-tested.
+  const quote = await seedQuote(userId, { province: s.province, holdback: s.holdback });
+  console.log(`✓ quote seeded (${quote.id})`);
+  {
 
     // ── Accept (mirrors POST /api/public/quotes/:id/accept) ─────────────
-    await db.update(quotesTable).set({ status: "accepted", acceptedAt: new Date(), acceptedByName: "Jordan Client" }).where(eq(quotesTable.id, quote!.id));
-    await raiseAndExpectSuccess({ event: "quote.accepted", userId, entityType: "quote", entityId: quote!.id, payload: { acceptedByName: "Jordan Client" } });
+    await db.update(quotesTable).set({ status: "accepted", acceptedAt: new Date(), acceptedByName: "Jordan Client" }).where(eq(quotesTable.id, quote.id));
+    await raiseAndExpectSuccess({ event: "quote.accepted", userId, entityType: "quote", entityId: quote.id, payload: { acceptedByName: "Jordan Client" } });
 
-    const [contract] = await db.select().from(contractsTable).where(eq(contractsTable.quoteId, quote!.id));
+    const [contract] = await db.select().from(contractsTable).where(eq(contractsTable.quoteId, quote.id));
     assert(contract, "contract was not auto-drafted on quote.accepted");
     assert(contract.province === s.province, "contract province mismatch");
     assert(contract.language === s.language, `expected language ${s.language}, got ${contract.language}`);
@@ -185,7 +113,7 @@ async function runScenario(s: Scenario) {
     // ── Customer signs (mirrors POST /api/sign/:token/complete — see file
     //    header note on why this bypasses the token/OTP transport) ───────
     await db.update(contractSignersTable).set({
-      status: "signed", name: "Jordan Client", signatureType: "drawn", signatureData: "data:image/png;base64,iVBORw0KGgo=",
+      status: "signed", name: "Jordan Client", signatureType: "drawn", signatureData: TINY_PNG_DATA_URL,
       consentText: "test consent", signedAt: new Date(),
     }).where(eq(contractSignersTable.id, customerSigner.id));
     await logContractEvent({ contractId: contract.id, type: "signed", actor: "customer", signerId: customerSigner.id });
@@ -255,41 +183,12 @@ async function runScenario(s: Scenario) {
     }
 
     console.log(`=== ${s.label}: PASSED ===`);
-  } finally {
-    // ── Cleanup ───────────────────────────────────────────────────────────
-    const [project] = await db.select().from(projectsTable).where(eq(projectsTable.userId, userId));
-    if (project) {
-      await db.delete(invoicesTable).where(eq(invoicesTable.projectId, project.id));
-      await db.delete(costEntriesTable).where(eq(costEntriesTable.projectId, project.id));
-      await db.delete(milestonesTable).where(eq(milestonesTable.projectId, project.id));
-      await db.delete(projectsTable).where(eq(projectsTable.id, project.id));
-    }
-    await db.delete(automationRunsTable).where(eq(automationRunsTable.userId, userId));
-    const contracts = await db.select().from(contractsTable).where(eq(contractsTable.userId, userId));
-    for (const c of contracts) {
-      await db.delete(contractSignersTable).where(eq(contractSignersTable.contractId, c.id));
-    }
-    await db.delete(contractsTable).where(eq(contractsTable.userId, userId));
-    await db.delete(quotesTable).where(eq(quotesTable.userId, userId));
-    await db.delete(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
-    await db.delete(authUsersTable).where(eq(authUsersTable.id, userId));
-    console.log(`(cleaned up fixtures for ${userId})`);
   }
 }
 
-async function main() {
-  if (!process.env.DATABASE_URL) {
-    console.error("DATABASE_URL is not set — refusing to run (see file header for requirements).");
-    process.exit(1);
-  }
-  for (const s of SCENARIOS) {
+describe("lifecycle: quote → contract → job → invoices", () => {
+  afterAll(cleanupAll);
+  test.each(SCENARIOS)("$label", async (s) => {
     await runScenario(s);
-  }
-  console.log("\nAll lifecycle scenarios passed.");
-  process.exit(0);
-}
-
-main().catch((err) => {
-  console.error("\nLIFECYCLE E2E TEST FAILED:", err);
-  process.exit(1);
+  });
 });

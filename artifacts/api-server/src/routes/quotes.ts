@@ -18,7 +18,7 @@ import {
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
 import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData, QuoteItem } from "@workspace/db";
-import pdfmake from "pdfmake";
+import { getPdfmake } from "../lib/pdfmake.js";
 import type { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 import {
   parseComputoMetrico, isComputoMetrico,
@@ -37,31 +37,6 @@ const aiCallLimiter = userRateLimiter({
   message: "You've reached the hourly limit for AI generations. Please try again later.",
 });
 
-type PdfMakeInstance = {
-  fonts: Record<string, Record<string, string>>;
-  createPdf(docDef: TDocumentDefinitions): { getBuffer(): Promise<Buffer> };
-};
-let _pdfmakeInstance: PdfMakeInstance | null = null;
-function getPdfmake(): PdfMakeInstance {
-  if (_pdfmakeInstance) return _pdfmakeInstance;
-  const lib = pdfmake as unknown as PdfMakeInstance;
-  lib.fonts = {
-    Roboto: {
-      normal: "Helvetica",
-      bold: "Helvetica-Bold",
-      italics: "Helvetica-Oblique",
-      bolditalics: "Helvetica-BoldOblique",
-    },
-    Helvetica: {
-      normal: "Helvetica",
-      bold: "Helvetica-Bold",
-      italics: "Helvetica-Oblique",
-      bolditalics: "Helvetica-BoldOblique",
-    },
-  };
-  _pdfmakeInstance = lib;
-  return lib;
-}
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";

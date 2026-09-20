@@ -10,6 +10,7 @@ import { renderContractHtml, CONTRACT_CSS } from "../contracts/render.js";
 import { sendContractOtpEmail, sendContractDeclinedEmail } from "../lib/emailContracts.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { writeAudit } from "../lib/notifications.js";
+import { isWellFormedPngDataUrl } from "../lib/pngDataUrl.js";
 
 // Public, token-addressed signing flow. Every endpoint is keyed by the raw
 // token from the emailed link (hashed before lookup) and rate-limited by IP.
@@ -195,7 +196,9 @@ router.post("/sign/:token/complete", signLimiter, async (req, res) => {
       res.status(400).json({ error: "invalid_signature", details: body.error });
       return;
     }
-    if (body.data.signatureType === "drawn" && !body.data.signatureData.startsWith("data:image/png;base64,")) {
+    // A corrupt image would only blow up later, inside the signed-PDF render —
+    // after this signer is already recorded as signed. Refuse it here instead.
+    if (body.data.signatureType === "drawn" && !isWellFormedPngDataUrl(body.data.signatureData)) {
       res.status(400).json({ error: "invalid_signature" });
       return;
     }

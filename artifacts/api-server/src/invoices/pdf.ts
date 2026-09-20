@@ -1,4 +1,4 @@
-import pdfmake from "pdfmake";
+import { getPdfmake } from "../lib/pdfmake.js";
 import type { TDocumentDefinitions, Content, TableCell } from "pdfmake/interfaces";
 import { createHash } from "node:crypto";
 import type { Invoice, InvoicePayment, InvoiceParty } from "@workspace/db";
@@ -9,21 +9,6 @@ import { ti, fmtCents, fmtDay, fmtQty, dueText, invoiceTitle, isCreditNote, part
 // is rendered once when the invoice is sent (and cached in storage); drafts
 // are rendered on demand with a DRAFT banner.
 
-type PdfMakeInstance = {
-  fonts: Record<string, Record<string, string>>;
-  createPdf(docDef: TDocumentDefinitions): { getBuffer(): Promise<Buffer> };
-};
-
-let _pdfmake: PdfMakeInstance | null = null;
-function getPdfmake(): PdfMakeInstance {
-  if (_pdfmake) return _pdfmake;
-  const lib = pdfmake as unknown as PdfMakeInstance;
-  lib.fonts = {
-    Roboto: { normal: "Helvetica", bold: "Helvetica-Bold", italics: "Helvetica-Oblique", bolditalics: "Helvetica-BoldOblique" },
-  };
-  _pdfmake = lib;
-  return lib;
-}
 
 const INK = "#111827";
 const MUTED = "#6b7280";

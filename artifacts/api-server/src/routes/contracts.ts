@@ -16,6 +16,7 @@ import {
 } from "../contracts/service.js";
 import { renderContractHtml, CONTRACT_CSS } from "../contracts/render.js";
 import { writeAudit } from "../lib/notifications.js";
+import { isWellFormedPngDataUrl } from "../lib/pngDataUrl.js";
 
 const router = Router();
 const aiLimiter = userRateLimiter({ windowMs: 60_000, max: 10, message: "Too many contract drafts, try again in a minute." });
@@ -292,7 +293,7 @@ router.post("/contracts/:id/sign", requireAuth, requirePermission("contracts", "
       res.status(400).json({ error: "Invalid signature", details: parsed.error });
       return;
     }
-    if (parsed.data.signatureType === "drawn" && !parsed.data.signatureData.startsWith("data:image/png;base64,")) {
+    if (parsed.data.signatureType === "drawn" && !isWellFormedPngDataUrl(parsed.data.signatureData)) {
       res.status(400).json({ error: "Drawn signatures must be PNG data URLs" });
       return;
     }

@@ -1631,3 +1631,72 @@ button.chap-head:hover { background: var(--soft-2); }
 .help-note { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line); border-left: 3px solid var(--teal); background: var(--soft); border-radius: var(--radius-mk); padding: 16px 18px; margin: 28px 0; }
 .help-note svg { color: var(--teal); flex: none; margin-top: 3px; }
 .help-note p { margin: 0; font-size: 14px; color: var(--ink); line-height: 1.6; }
+
+/* ==========================================================
+   SCHEDULE BOARD (Phase 75)
+   (docs/PILOT-LAUNCH-PLAN.md, Phase 75)
+
+   Week view = a lane grid (worker rows × day columns) with a
+   milestone strip on top; day view = lane columns on a time
+   axis. Same vocabulary as the Gantt (Phase 59): --line grid,
+   --soft today tint, milestone status colours, --red for
+   conflicts and the "now" line.
+   ========================================================== */
+.sched { overflow-x: auto; user-select: none; }
+.sched-in.week { min-width: 920px; display: flex; flex-direction: column; }
+.sched-row { display: grid; grid-template-columns: 168px repeat(7, minmax(0, 1fr)); border-top: 1px solid var(--soft); }
+.sched-row.head { border-top: none; position: sticky; top: 0; z-index: 2; background: #fff; }
+.sched-row.ms-row { background: var(--soft); }
+.sched-row.unassigned .sched-lbl b { color: var(--muted-mk); }
+.sched-lbl { padding: 12px 14px; min-width: 0; border-right: 1px solid var(--soft); }
+.sched-lbl b { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-lbl span { display: block; font-size: 11.5px; font-weight: 600; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-day { padding: 10px 10px 8px; font-size: 12.5px; color: var(--muted-mk); border-left: 1px solid var(--soft); border-bottom: 1px solid var(--line); white-space: nowrap; overflow: hidden; }
+.sched-day b { color: var(--navy); font-weight: 800; }
+.sched-day span { font-weight: 600; }
+.sched-day.today { background: var(--soft); }
+.sched-day.today b { color: var(--teal-dark); }
+.sched-day.lane b { display: block; font-size: 13.5px; }
+.sched-day.lane span { display: block; font-size: 11.5px; color: var(--faint); }
+.sched-day.lane.unassigned b { color: var(--muted-mk); }
+.sched-cell { min-height: 56px; padding: 6px; border-left: 1px solid var(--soft); display: flex; flex-direction: column; gap: 4px; cursor: cell; transition: background .15s; }
+.sched-cell.today { background: rgba(23, 162, 184, .05); }
+.sched-cell.sel { background: var(--teal-t); box-shadow: inset 0 0 0 2px var(--teal); }
+.sched-cell.over { background: var(--soft-2); box-shadow: inset 0 0 0 2px var(--navy); }
+.sched-cell.ms { min-height: 36px; cursor: default; }
+.sched-blk { position: relative; display: block; width: 100%; text-align: left; border-radius: 8px; border: 1px solid var(--navy); background: var(--navy); color: #fff; padding: 5px 8px 5px 8px; font-size: 11.5px; line-height: 1.3; cursor: grab; box-shadow: 0 1px 2px rgba(16, 16, 49, .12); overflow: hidden; }
+.sched-blk:active { cursor: grabbing; }
+.sched-blk b { display: block; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-blk span { display: block; font-weight: 600; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sched-blk.allday { background: var(--teal); border-color: var(--teal-dark); }
+.sched-blk.conflict { border-color: var(--red); box-shadow: 0 0 0 2px var(--red-t), 0 1px 2px rgba(16, 16, 49, .12); padding-right: 24px; }
+.sched-blk .sched-warn { position: absolute; top: 5px; right: 6px; width: 14px; height: 14px; color: #fff; background: var(--red); border-radius: 999px; padding: 2px; }
+.sched-blk.timed { position: absolute; left: 4px; right: 4px; width: auto; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; }
+.sched-ms { display: block; border-radius: 6px; padding: 3px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
+.sched-ms b { font-weight: 800; }
+.sched-ms.planned { background: var(--purple-t); border-color: rgba(114, 79, 232, .3); color: var(--purple); }
+.sched-ms.in_progress { background: var(--teal-t); border-color: var(--teal); color: var(--teal-dark); }
+.sched-ms.completed { background: var(--green-t); border-color: var(--green); color: var(--green-dark); }
+.sched-ms.skipped { background: var(--soft-2); border-color: var(--line); color: var(--faint); text-decoration: line-through; }
+.sched-key { display: inline-block; width: 12px; height: 12px; border-radius: 4px; }
+.sched-key.ms { background: var(--purple-t); border: 1px solid rgba(114, 79, 232, .4); }
+.sched-key.blk { background: var(--navy); }
+/* Day view */
+.sched-in.dayv { min-width: 640px; display: grid; }
+.sched-corner { border-bottom: 1px solid var(--line); }
+.sched-corner.strip { border-bottom: 1px solid var(--soft); padding: 6px 6px; font-size: 9.5px; line-height: 1.15; font-weight: 700; color: var(--faint); text-transform: uppercase; letter-spacing: .03em; display: flex; align-items: center; word-break: break-word; }
+.sched-strip { border-bottom: 1px solid var(--soft); border-left: 1px solid var(--soft); padding: 6px; display: flex; flex-wrap: wrap; gap: 4px; min-height: 34px; background: var(--soft); }
+.sched-strip.lane { background: #fff; flex-direction: column; }
+.sched-strip .sched-ms { flex: none; max-width: 260px; }
+.sched-gutter { position: relative; }
+.sched-gutter span { position: absolute; right: 8px; transform: translateY(-50%); font-size: 10.5px; font-weight: 700; color: var(--faint); }
+.sched-col { position: relative; border-left: 1px solid var(--soft); cursor: cell; }
+.sched-col.unassigned { background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(16, 16, 49, .025) 10px 12px); }
+.sched-col i { position: absolute; left: 0; right: 0; border-top: 1px solid var(--soft); pointer-events: none; }
+.sched-sel { position: absolute; left: 4px; right: 4px; background: var(--teal-t); border: 2px dashed var(--teal); border-radius: 8px; pointer-events: none; }
+.sched-now { position: absolute; left: 0; right: 0; border-top: 2px solid var(--red); pointer-events: none; z-index: 1; }
+.sched-now::before { content: ""; position: absolute; left: -4px; top: -5px; width: 8px; height: 8px; border-radius: 999px; background: var(--red); }
+@media (max-width: 640px) {
+  .sched-row { grid-template-columns: 120px repeat(7, minmax(120px, 1fr)); }
+  .sched-in.week { min-width: 980px; }
+}

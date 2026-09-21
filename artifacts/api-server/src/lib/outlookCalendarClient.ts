@@ -81,7 +81,7 @@ export type OutlookEventPayload = {
   body?: { contentType: "text"; content: string };
   start: { dateTime: string; timeZone: "UTC" };
   end: { dateTime: string; timeZone: "UTC" };
-  isAllDay: true;
+  isAllDay: boolean;
 };
 
 export async function createOutlookEvent(accessToken: string, calendarId: string, payload: OutlookEventPayload): Promise<{ id: string }> {

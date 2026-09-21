@@ -7,15 +7,17 @@ import {
   projectAssignmentsTable,
   milestonesTable,
   timeEntriesTable,
+  scheduleBlocksTable,
   businessProfilesTable,
   hasFeature,
 } from "@workspace/db";
-import { and, asc, desc, eq, gte, inArray, isNull, isNotNull } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, isNotNull, lt } from "drizzle-orm";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 import { hashToken } from "../contracts/service.js";
 import { parseIsoDate, toIsoDate, localDayFor } from "../jobs/dates.js";
 import { createNotification } from "../lib/notifications.js";
 import { distanceMeters } from "../lib/geo.js";
+import { blockLabel } from "../schedule/service.js";
 
 /** A clock-in session longer than this is auto-capped at clock-out — a forgotten clock-out shouldn't silently log a 30h day. */
 const MAX_SESSION_HOURS = 16;
@@ -89,6 +91,38 @@ async function ownEntries(worker: { id: string }, jobs: { id: string; name: stri
   return rows.map((r) => serializeOwnEntry(r, jobName.get(r.projectId) ?? null, r.milestoneId ? (msTitle.get(r.milestoneId) ?? null) : null));
 }
 
+/** Phase 75: the worker's own blocks from the start of today (local) for two weeks — what the evening reminder pointed them at. */
+async function workerSchedule(worker: { id: string }, province: string | null, language: "en" | "fr") {
+  const from = localDayFor(new Date(), province);
+  const to = new Date(from.getTime() + 15 * 86_400_000);
+  const rows = await db
+    .select()
+    .from(scheduleBlocksTable)
+    .where(and(eq(scheduleBlocksTable.collaboratorId, worker.id), lt(scheduleBlocksTable.startsAt, to), gte(scheduleBlocksTable.endsAt, from)))
+    .orderBy(asc(scheduleBlocksTable.startsAt))
+    .limit(60);
+  const projectIds = [...new Set(rows.map((r) => r.projectId).filter((x): x is string => !!x))];
+  const projects = new Map<string, { name: string; address: string }>();
+  if (projectIds.length) for (const p of await db.select({ id: projectsTable.id, name: projectsTable.name, address: projectsTable.address }).from(projectsTable).where(inArray(projectsTable.id, projectIds))) projects.set(p.id, p);
+  const milestoneIds = [...new Set(rows.map((r) => r.milestoneId).filter((x): x is string => !!x))];
+  const milestones = new Map<string, string>();
+  if (milestoneIds.length) for (const m of await db.select({ id: milestonesTable.id, title: milestonesTable.title }).from(milestonesTable).where(inArray(milestonesTable.id, milestoneIds))) milestones.set(m.id, m.title);
+  return rows.map((b) => {
+    const project = b.projectId ? projects.get(b.projectId) : undefined;
+    return {
+      id: b.id,
+      projectId: b.projectId,
+      label: blockLabel(b, project?.name ?? null, language),
+      address: project?.address || null,
+      milestoneTitle: b.milestoneId ? (milestones.get(b.milestoneId) ?? null) : null,
+      startsAt: b.startsAt.toISOString(),
+      endsAt: b.endsAt.toISOString(),
+      allDay: b.allDay,
+      notes: b.notes,
+    };
+  });
+}
+
 // GET /api/t/:token
 router.get("/t/:token", viewLimiter, async (req, res) => {
   try {
@@ -104,7 +138,7 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
     const jobs = await workerJobs(r.worker);
     const [openEntry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), isNotNull(timeEntriesTable.clockInAt), isNull(timeEntriesTable.clockOutAt)));
     const activeEntry = openEntry ? serializeOwnEntry(openEntry, jobs.find((j) => j.id === openEntry.projectId)?.name ?? null, null) : null;
-    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)) });
+    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)), schedule: await workerSchedule(r.worker, r.province, r.language === "fr" ? "fr" : "en") });
   } catch (err) {
     req.log.error({ err }, "Error loading worker page");
     res.status(500).json({ error: "Internal server error" });

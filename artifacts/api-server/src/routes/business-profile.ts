@@ -67,6 +67,7 @@ const ProfileExtrasBody = z.object({
       invoiceReminders: z.boolean().optional(),
       smsEnabled: z.boolean().optional(),
       smsReminders: z.boolean().optional(),
+      scheduleReminders: z.boolean().optional(),
     })
     .optional(),
 });

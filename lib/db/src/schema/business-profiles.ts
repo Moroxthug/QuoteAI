@@ -36,6 +36,12 @@ export type AutomationSettings = {
   smsEnabled: boolean;
   /** Phase 74: also text quote / contract / invoice reminders (with the link) when the customer's phone is known. */
   smsReminders: boolean;
+  /**
+   * Phase 75: text (or email, when the worker has no phone) each crew member
+   * the evening before a scheduled block — "Tomorrow 8:00–16:00: Basement
+   * finish, 45 Rue Laurier". Turn off for boards kept purely for the office.
+   */
+  scheduleReminders: boolean;
 };
 
 export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
@@ -46,6 +52,7 @@ export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
   invoiceReminders: true,
   smsEnabled: false,
   smsReminders: false,
+  scheduleReminders: true,
 };
 
 export const businessProfilesTable = pgTable("business_profiles", {

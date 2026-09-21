@@ -82,8 +82,9 @@ async function calendarRequest<T>(accessToken: string, path: string, init?: Requ
 export type GoogleEventPayload = {
   summary: string;
   description?: string;
-  start: { date: string };
-  end: { date: string };
+  /** All-day events use { date }; timed events (Phase 75 schedule blocks) use { dateTime } in RFC 3339 with an offset. */
+  start: { date: string } | { dateTime: string };
+  end: { date: string } | { dateTime: string };
 };
 
 export async function createGoogleEvent(accessToken: string, calendarId: string, payload: GoogleEventPayload): Promise<{ id: string }> {

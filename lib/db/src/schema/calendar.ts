@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { authUsersTable } from "./auth";
 import { milestonesTable } from "./jobs";
+import { scheduleBlocksTable } from "./schedule";
 
 // ── Phase 12: calendar sync ──────────────────────────────────────────────────
 // One-way push (QuoteAI → calendar) of job milestones as all-day events on
@@ -51,7 +52,10 @@ export const calendarSyncedEventsTable = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull(),
     provider: text("provider", { enum: CALENDAR_PROVIDERS }).notNull(),
-    milestoneId: uuid("milestone_id").notNull().references(() => milestonesTable.id, { onDelete: "cascade" }),
+    /** Exactly one of milestone_id / schedule_block_id is set: the row is the sync state of that one thing. */
+    milestoneId: uuid("milestone_id").references(() => milestonesTable.id, { onDelete: "cascade" }),
+    /** Phase 75: timed per-worker events pushed from the schedule board. */
+    scheduleBlockId: uuid("schedule_block_id").references(() => scheduleBlocksTable.id, { onDelete: "cascade" }),
     externalEventId: text("external_event_id"),
     status: text("status", { enum: ["synced", "failed"] }).notNull(),
     error: text("error"),
@@ -60,6 +64,7 @@ export const calendarSyncedEventsTable = pgTable(
   },
   (t) => [
     uniqueIndex("calendar_synced_events_milestone_provider_idx").on(t.milestoneId, t.provider),
+    uniqueIndex("calendar_synced_events_block_provider_idx").on(t.scheduleBlockId, t.provider),
     index("calendar_synced_events_user_idx").on(t.userId, t.updatedAt),
   ],
 );

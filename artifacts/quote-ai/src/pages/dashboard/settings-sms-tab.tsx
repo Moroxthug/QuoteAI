@@ -100,6 +100,13 @@ export function SmsTab() {
             </div>
             <MockupToggle checked={status.smsReminders} onCheckedChange={(v) => update.mutate({ smsReminders: v })} label={t("dashboard.settings.sms.reminders")} />
           </div>
+          <div className="set-row">
+            <div className="txt">
+              <b>{t("dashboard.settings.sms.scheduleReminders")}</b>
+              <span>{t("dashboard.settings.sms.scheduleRemindersHint")}</span>
+            </div>
+            <MockupToggle checked={status.scheduleReminders} onCheckedChange={(v) => update.mutate({ scheduleReminders: v })} label={t("dashboard.settings.sms.scheduleReminders")} />
+          </div>
 
           <div className="space-y-1.5 pt-2 border-t">
             <div className="flex items-baseline justify-between text-sm">

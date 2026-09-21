@@ -70,3 +70,30 @@ export async function sendTeamMemberInviteEmail(params: { toEmail: string; compa
   await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
   logger.info({ to: params.toEmail }, "Team member invite email sent");
 }
+
+/** Phase 75: the evening-before (or same-morning) shift reminder, used when the worker has no phone or the text could not go. */
+export async function sendWorkerScheduleReminderEmail(params: { toEmail: string; workerName: string; companyName: string; kind: "tomorrow" | "today"; body: string; label: string; notes: string; language: EmailLang }): Promise<void> {
+  const { language: lang } = params;
+  const company = escapeHtml(params.companyName);
+  const worker = escapeHtml(params.workerName);
+  const t = lang === "fr"
+    ? {
+        title: params.kind === "tomorrow" ? "Votre horaire de demain" : "Votre horaire d'aujourd'hui",
+        sub: company,
+        body: `Bonjour ${worker},<br/><br/>${escapeHtml(params.body)}`,
+        hint: "Votre page de feuille de temps affiche toutes vos plages à venir. En cas d'empêchement, prévenez votre employeur.",
+        footer: `Envoyé via QuoteAI au nom de ${company}.`,
+        subject: `${params.companyName} — ${params.kind === "tomorrow" ? "demain" : "aujourd'hui"} : ${params.label}`,
+      }
+    : {
+        title: params.kind === "tomorrow" ? "Your schedule for tomorrow" : "Your schedule for today",
+        sub: company,
+        body: `Hi ${worker},<br/><br/>${escapeHtml(params.body)}`,
+        hint: "Your timesheet page lists every upcoming shift. If you can't make it, let your employer know.",
+        footer: `Sent through QuoteAI on behalf of ${company}.`,
+        subject: `${params.companyName} — ${params.kind === "tomorrow" ? "tomorrow" : "today"}: ${params.label}`,
+      };
+  const html = shell({ lang, headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p><p class="muted">${t.hint}</p>`, footer: t.footer });
+  await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });
+  logger.info({ to: params.toEmail }, "Worker schedule reminder email sent");
+}

@@ -28,7 +28,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^GET \/api\/tax-profiles$/, reason: "Phase 71: static Canadian sales-tax table for the quote builder; no data, cache-control 1 day" },
   { match: /^GET \/api\/settings\/registration$/, reason: "public 'is sign-up open' flag read by the auth pages" },
   { match: /^GET \/api\/payments\/plans$/, reason: "public pricing table" },
-  { match: /^GET \/api\/cron\/tick$/, reason: "Vercel cron — handler checks `Authorization: Bearer $CRON_SECRET` itself" },
+  { match: /^GET \/api\/cron\/(tick|evening)$/, reason: "Vercel cron — handler checks `Authorization: Bearer $CRON_SECRET` itself (cronAuthorized)" },
   { match: /^GET \/api\/storage\/public-objects\/\*filePath$/, reason: "public bucket (logos etc.) by design" },
   { match: /^GET \/api\/support\/admin-status$/, reason: "widget reads whether a human is online; no data" },
   { match: /^(GET|POST) \/api\/support\/conversations(\/:id\/(messages|request-human|close))?$/, reason: "anonymous support widget — per-conversation token via requireConversationAccess, IP rate limited" },

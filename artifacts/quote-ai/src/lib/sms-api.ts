@@ -7,6 +7,7 @@ export type SmsStatusDto = {
   fromNumberHint: string | null;
   smsEnabled: boolean;
   smsReminders: boolean;
+  scheduleReminders: boolean;
   usage: { used: number; allowance: number | null };
   ownPhone: string | null;
   identityLine: string;
@@ -27,7 +28,7 @@ export type SmsMessageDto = {
 
 export const smsApi = {
   status: () => req<SmsStatusDto>("/api/sms/status"),
-  updateSettings: (body: { smsEnabled?: boolean; smsReminders?: boolean }) => req<{ smsEnabled: boolean; smsReminders: boolean }>("/api/sms/settings", { method: "PUT", body: json(body) }),
+  updateSettings: (body: { smsEnabled?: boolean; smsReminders?: boolean; scheduleReminders?: boolean }) => req<{ smsEnabled: boolean; smsReminders: boolean; scheduleReminders: boolean }>("/api/sms/settings", { method: "PUT", body: json(body) }),
   sendTest: (lang: "en" | "fr") => req<{ ok: true; segments: number; body: string }>("/api/sms/test", { method: "POST", body: json({ lang }) }),
   messages: (limit = 30) => req<{ items: SmsMessageDto[] }>(`/api/sms/messages?limit=${limit}`),
 };

@@ -12,6 +12,7 @@ import { runPriceIntelligenceTrendCheck } from "../priceIntelligence/maintenance
 import { runFlinksSyncCheck } from "../flinks/maintenance.js";
 import { runGoogleLsaPollCheck } from "../googleLsa/maintenance.js";
 import { runAccountDeletionMaintenance, expireAccountExports } from "../account/service.js";
+import { runScheduleReminderMaintenance } from "../schedule/maintenance.js";
 import { db, cronTicksTable } from "@workspace/db";
 import { eq, lt } from "drizzle-orm";
 import { automationBacklog, pingHeartbeat, recentAutomationFailures, sendOpsAlert } from "../lib/ops.js";
@@ -19,22 +20,27 @@ import { captureException, flush } from "../lib/errorTracking.js";
 
 const router = Router();
 
-// GET /api/cron/tick — invoked by Vercel Cron (see vercel.json). Vercel sends
-// `Authorization: Bearer $CRON_SECRET`; we accept the same header from any
-// caller so it can be triggered manually with curl.
-router.get("/cron/tick", async (req, res) => {
+// Vercel sends `Authorization: Bearer $CRON_SECRET`; we accept the same
+// header from any caller so a tick can be triggered manually with curl.
+function cronAuthorized(req: { headers: { authorization?: string } }, res: { status: (n: number) => { json: (b: unknown) => void } }): boolean {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     res.status(503).json({ error: "CRON_SECRET not configured" });
-    return;
+    return false;
   }
   const header = req.headers.authorization ?? "";
   const expected = Buffer.from(`Bearer ${secret}`);
   const provided = Buffer.from(header);
   if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     res.status(401).json({ error: "Unauthorized" });
-    return;
+    return false;
   }
+  return true;
+}
+
+// GET /api/cron/tick — invoked by Vercel Cron (see vercel.json), once a day.
+router.get("/cron/tick", async (req, res) => {
+  if (!cronAuthorized(req, res)) return;
 
   const startedAt = Date.now();
   // Phase 69: record the tick so /api/healthz/ops can tell a silent scheduler
@@ -57,10 +63,12 @@ router.get("/cron/tick", async (req, res) => {
     // Phase 72: purge accounts whose grace period ended, drop 7-year-old tombstones, expire old export ZIPs.
     const accountDeletions = await runAccountDeletionMaintenance();
     const accountExports = await expireAccountExports();
+    // Phase 75: same-day catch-up for crew reminders (the evening-before pass is /cron/evening).
+    const scheduleReminders = await runScheduleReminderMaintenance();
     // Roll up yesterday's (and today's, in case cron shifted) usage_events into the daily summary.
     const usage = await rollUpUsageForDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
     await rollUpUsageForDate(new Date());
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, usage };
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, usage };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));
@@ -92,6 +100,26 @@ router.get("/cron/tick", async (req, res) => {
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: false, error: message.slice(0, 2000), tookMs: Date.now() - startedAt }).where(eq(cronTicksTable.id, tick.id)).catch(() => undefined);
     await captureException(err, { mechanism: "cron", handled: false, level: "fatal", tags: { route: "GET /api/cron/tick" } });
     await sendOpsAlert("Cron tick failed", [`/api/cron/tick threw after ${Date.now() - startedAt} ms:`, message, "", "Nothing scheduled ran after the failing step; the next tick retries everything. See docs/RUNBOOKS.md → Cron / automation failures."]);
+    await flush(1500);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// GET /api/cron/evening — the second daily cron (23:00 UTC = 19:00 Toronto /
+// 16:00 Vancouver / 20:30 St. John's): texts (or emails) every worker their
+// blocks for tomorrow (Phase 75). Deliberately tiny — nothing else belongs
+// in the evening slot — and it does not touch cron_ticks, which watches the
+// main tick's heartbeat.
+router.get("/cron/evening", async (req, res) => {
+  if (!cronAuthorized(req, res)) return;
+  const startedAt = Date.now();
+  try {
+    const scheduleReminders = await runScheduleReminderMaintenance();
+    res.json({ ok: true, scheduleReminders, tookMs: Date.now() - startedAt });
+  } catch (err) {
+    req.log.error({ err }, "Evening cron failed");
+    await captureException(err, { mechanism: "cron", handled: false, level: "error", tags: { route: "GET /api/cron/evening" } });
+    await sendOpsAlert("Evening cron failed", [`/api/cron/evening threw after ${Date.now() - startedAt} ms:`, err instanceof Error ? err.message : String(err), "", "Crew reminders for tomorrow were not sent; the morning tick sends a same-day catch-up."]);
     await flush(1500);
     res.status(500).json({ ok: false });
   }

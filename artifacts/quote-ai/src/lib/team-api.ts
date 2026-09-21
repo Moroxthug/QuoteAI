@@ -71,7 +71,10 @@ export type WorkerPageDto = {
   entries: WorkerEntryDto[];
   activeEntry: WorkerEntryDto | null;
   today: string;
+  /** Phase 75: the worker's upcoming schedule blocks (today → two weeks). */
+  schedule: WorkerScheduleBlockDto[];
 };
+type WorkerScheduleBlockDto = { id: string; projectId: string | null; label: string; address: string | null; milestoneTitle: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string };
 export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; clockInAt: string | null; clockOutAt: string | null; geofenceFlagged: boolean; createdAt: string };
 
 export const workerApi = {

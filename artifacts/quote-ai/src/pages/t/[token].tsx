@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square } from "lucide-react";
+import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -123,6 +123,29 @@ export default function WorkerTimePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {data.schedule.length > 0 && (
+          <section className="card p-4 space-y-2">
+            <h2 className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.schedule")}</h2>
+            <ul className="divide-y" style={{ borderColor: "var(--soft)" }}>
+              {data.schedule.map((b) => {
+                const s = new Date(b.startsAt);
+                const e = new Date(b.endsAt);
+                const isToday = isoDay(s) === data.today;
+                return (
+                  <li key={b.id} className="py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="font-semibold" style={{ color: isToday ? "var(--teal-dark)" : "var(--ink)" }}>{isToday ? t("worker.today") : format(s, "EEE d MMM", { locale })}</span>
+                      <span className="text-xs tabular-nums" style={{ color: "var(--muted-mk)" }}>{b.allDay ? t("worker.allDay") : `${format(s, "H:mm")}–${format(e, "H:mm")}`}</span>
+                    </div>
+                    <div className="truncate" style={{ color: "var(--navy)" }}>{b.label}{b.milestoneTitle ? ` · ${b.milestoneTitle}` : ""}</div>
+                    {b.address && <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{b.address}</div>}
+                    {b.notes && <div className="text-xs" style={{ color: "var(--faint)" }}>{b.notes}</div>}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
         <section className="card p-4 space-y-4">
           <h1 className="text-base font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Clock className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("worker.clockInOut")}</h1>
 

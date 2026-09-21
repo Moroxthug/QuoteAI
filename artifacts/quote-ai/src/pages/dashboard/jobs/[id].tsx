@@ -23,6 +23,7 @@ import { InvoicesTab } from "@/components/jobs/invoices-tab";
 import { OverviewCharts } from "@/components/jobs/overview-charts";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { PhotosTab } from "@/components/jobs/photos-tab";
+import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
 
 const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "photos", "documents", "assistant"] as const;
 type Tab = (typeof TABS)[number];
@@ -337,6 +338,8 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
           <Gantt rows={milestones.map((m) => ({ id: m.id, title: m.title, start: m.plannedStart, end: m.plannedEnd, status: m.status, paymentAmountCents: m.paymentAmountCents }))} onRowClick={(mid) => setOpen(mid)} />
         </div>
       </section>
+
+      <CrewScheduleCard jobId={job.id} />
 
       <div className="stack" style={{ gap: 10 }}>
         {milestones.map((m: MilestoneDto, idx) => {

@@ -47,6 +47,7 @@ import publicV1Router from "./public-v1";
 import archiveRouter from "./archive";
 import accountRouter from "./account";
 import smsRouter from "./sms";
+import scheduleRouter from "./schedule";
 
 const router: IRouter = Router();
 
@@ -97,6 +98,7 @@ router.use(developerApiRouter);
 router.use(archiveRouter);
 router.use(accountRouter);
 router.use(smsRouter);
+router.use(scheduleRouter);
 router.use("/v1/public", publicV1Router);
 
 export default router;

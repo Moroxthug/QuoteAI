@@ -58,7 +58,7 @@ describe("SMS channel (Phase 74)", () => {
 
     const put = await org.api("/api/sms/settings", { method: "PUT", body: { smsEnabled: true } });
     expect(put.status).toBe(200);
-    expect(put.body).toEqual({ smsEnabled: true, smsReminders: false });
+    expect(put.body).toEqual({ smsEnabled: true, smsReminders: false, scheduleReminders: true });
     const profile = await org.api("/api/business-profile");
     expect(profile.body.automationSettings).toMatchObject({ smsEnabled: true, smsReminders: false, invoiceReminders: true });
 

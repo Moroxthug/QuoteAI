@@ -34,6 +34,7 @@ router.get("/sms/status", requireAuth, requirePermission("settings", "view"), as
       fromNumberHint: smsFromNumberHint(),
       smsEnabled: settings.smsEnabled,
       smsReminders: settings.smsReminders,
+      scheduleReminders: settings.scheduleReminders,
       usage: { used, allowance },
       ownPhone: ownPhone ? formatPhone(ownPhone) : null,
       identityLine: `${profile?.companyName || "QuoteAI"}${ownPhone ? ` (${formatPhone(ownPhone)})` : ""}`,
@@ -47,7 +48,7 @@ router.get("/sms/status", requireAuth, requirePermission("settings", "view"), as
 router.put("/sms/settings", requireAuth, requirePermission("settings", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const body = z.object({ smsEnabled: z.boolean().optional(), smsReminders: z.boolean().optional() }).safeParse(req.body);
+    const body = z.object({ smsEnabled: z.boolean().optional(), smsReminders: z.boolean().optional(), scheduleReminders: z.boolean().optional() }).safeParse(req.body);
     if (!body.success) {
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
@@ -60,7 +61,7 @@ router.put("/sms/settings", requireAuth, requirePermission("settings", "edit"), 
     const automationSettings = { ...(existing.automationSettings ?? {}), ...body.data };
     await db.update(businessProfilesTable).set({ automationSettings }).where(eq(businessProfilesTable.userId, userId));
     const settings = { ...DEFAULT_AUTOMATION_SETTINGS, ...automationSettings };
-    res.json({ smsEnabled: settings.smsEnabled, smsReminders: settings.smsReminders });
+    res.json({ smsEnabled: settings.smsEnabled, smsReminders: settings.smsReminders, scheduleReminders: settings.scheduleReminders });
   } catch (err) {
     req.log.error({ err }, "SMS settings error");
     res.status(500).json({ error: "Internal server error" });

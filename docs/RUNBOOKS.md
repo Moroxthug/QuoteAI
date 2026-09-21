@@ -14,7 +14,7 @@ Phase 69 (docs/QA-VERIFICATION-PLAN.md). Written so that someone with the repo, 
 | Deploys | `git push origin main` → Vercel builds and promotes automatically. Nothing else deploys. |
 | Database | Supabase project **quoteai** (`iwrujhplhilhxweejbtt`, us-west-2, Postgres 17). Connect through the **session pooler** `aws-0-us-west-2.pooler.supabase.com:5432` (the direct `db.*` host is IPv6-only). `DATABASE_URL` in Vercel is that URL. |
 | Storage | Supabase Storage buckets `public-assets` (logos) and `private-assets` (signed contract/invoice PDFs, job photos). |
-| Cron | Vercel Cron, `vercel.json` → `GET /api/cron/tick` **daily at 12:00 UTC** (Hobby plan cap). Bearer `CRON_SECRET`. |
+| Cron | Vercel Cron, `vercel.json` → `GET /api/cron/tick` **daily at 12:00 UTC** and `GET /api/cron/evening` **daily at 23:00 UTC** (crew reminders, Phase 75) — that is the Hobby plan cap: two jobs, once a day each. Both take Bearer `CRON_SECRET`. |
 | Logs | Vercel → project → **Logs** (runtime, pino JSON, `LOG_LEVEL` default `info`). Build logs under Deployments. |
 | Errors | Sentry, when `SENTRY_DSN` / `VITE_SENTRY_DSN` are set (see §1). Otherwise only the Vercel logs. |
 | Admin API | `/api/admin/*`, any signed-in user whose email is in `ADMIN_EMAIL`. Use the browser session or a bearer session token. |
@@ -242,3 +242,20 @@ Inbound (`POST /api/sms/webhook`, Twilio "A message comes in"): signature = HMAC
 | A text went out without the identity line | it did not go through `sendSms` — grep for `api.twilio.com` outside `lib/sms.ts` (there should be none) |
 | Allowance too small for a pilot customer | `featureFlags` do not cover allowances; bump `MONTHLY_USAGE_ALLOWANCE` in `lib/db/src/schema/plans.ts` or move them up a plan |
 | Cost check | Twilio Console → Monitor → Usage; our estimate is `usage_events.unit_cost_cents` (0.8 ¢/segment) in `/api/admin/margin` |
+
+## 12. Schedule board + crew reminders (Phase 75)
+
+**Where**: `artifacts/api-server/src/routes/schedule.ts` (board window + block CRUD), `src/schedule/service.ts` (conflicts, reminder rule, reminder copy — pure), `src/schedule/maintenance.ts` (the reminder sweep), `src/calendar/sync.ts` (`syncBlockToCalendar` / `removeBlockFromCalendar`), `src/routes/worker-time.ts` (`schedule` on `GET /api/t/:token`), table `schedule_blocks`, and `calendar_synced_events.schedule_block_id`.
+
+**How it fits** — a block is one worker (or nobody: the *Unassigned* lane) on one job (or none: shop day) for a stretch of time; `starts_at` / `ends_at` are instants, all-day blocks run local midnight → next local midnight. `GET /api/schedule?from&to[&projectId]` returns the blocks overlapping the window with a server-computed conflict map (same worker, overlapping intervals — touching ends do not count), the active workers, the open jobs and their dated milestones (the overlay). Conflicts are flagged, never refused. Moving a block (time or worker) clears `reminder_sent_at`; a notes-only edit keeps it. Blocks are pushed to Google/Outlook as timed UTC events when the company has `calendar_sync`, alongside the all-day milestone events.
+
+Reminders: `runScheduleReminderMaintenance(now)` runs from **`GET /api/cron/evening` (23:00 UTC)** and, as a same-day catch-up, from the morning tick. Rule (`reminderDue`): a block starting on the company's *next local day* is due once local time is ≥ 15:00 ("Tomorrow 08:00-16:00: Basement finish, 45 Rue Laurier."); a block starting *later today* is due at any time ("Today …"). One send per block: text through `sendSms(purpose = appointment_reminder)` when the worker has a phone and Twilio is configured, else the `sendWorkerScheduleReminderEmail` email, else nothing — but `reminder_sent_at` is stamped in every case so a worker with no contact details does not make the sweep retry daily. Company toggle: `automationSettings.scheduleReminders` (default on; Settings → SMS → "Crew schedule reminders").
+
+| Ask | Do |
+|---|---|
+| Nobody got a reminder last night | Vercel → Logs, `url:/api/cron/evening` — same 401/503/500 triage as §2. `{ sms: 0, email: 0, skipped: 0 }` with blocks due → check the company's `automationSettings.scheduleReminders` and that the block has a `collaborator_id`. Blocks with `reminder_sent_at` already set are never re-sent — clear the column to resend by hand |
+| Reminder went by email although the worker has a phone | Twilio not configured, the number replied STOP, or the plan allowance is used up — `sms_messages` has the `skipped` row with the reason; the email is the designed fallback |
+| Reminder time is wrong by hours | the sweep uses the company's province for local time (`timeZoneForProvince`); a company with no province is treated as Toronto. The board itself shows instants in the *viewer's* browser zone |
+| Worker says the block is missing on their page | `/t/:token` lists blocks from the start of *today* (company-local) for 15 days, assigned to that `collaborator_id`; unassigned blocks never show there |
+| "Double-booked" but the times do not overlap | overlap is computed on instants — check both blocks' `starts_at`/`ends_at` in UTC; an all-day block covers the whole local day |
+| Hobby cron cap | Vercel Hobby allows two cron jobs, once a day each — `tick` and `evening` use both. A third schedule needs O7 (Pro) |

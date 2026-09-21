@@ -259,7 +259,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="ft-col">
             <h4>{t("footer.support")}</h4>
-            <button onClick={() => setSupportOpen(true)}>{t("footer.helpCenter")}</button>
+            <Link href="/help/">{t("footer.helpCenter")}</Link>
+            <button onClick={() => setSupportOpen(true)}>{t("support.contactSupport")}</button>
             <Link href="/privacy-policy/">{t("footer.privacyPolicy")}</Link>
             <Link href="/terms/">{t("footer.terms")}</Link>
             <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>

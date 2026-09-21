@@ -13,7 +13,7 @@ initAnalytics();
 // English + French sector/city landing pages and the blog.
 const STATIC_SEO_RE = /^\/(?:quotes\/[^/]+(?:\/[^/]+)?|fr\/soumissions\/[^/]+(?:\/[^/]+)?|blog(?:\/.*)?)\/?$/;
 // Pages rendered at build time by entry-server.tsx (keep in sync with SSR_PAGES there).
-const SSR_PAGE_RE = /^\/(?:fr|whatsapp|chi-siamo|contatti|privacy-policy|terms|mappa-sito)?\/?$/;
+const SSR_PAGE_RE = /^\/(?:fr|whatsapp|chi-siamo|contatti|privacy-policy|terms|mappa-sito|help(?:\/[a-z0-9-]+)?)?\/?$/;
 
 const rootEl = document.getElementById("root")!;
 const pathname = window.location.pathname;

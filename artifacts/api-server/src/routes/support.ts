@@ -8,6 +8,31 @@ import { ipRateLimiter } from "../lib/rateLimit.js";
 import { moderateSupportMessage } from "../lib/moderation.js";
 import crypto from "crypto";
 
+// Phase 70: the help centre's ten guides (artifacts/quote-ai/src/data/help-articles.ts).
+// Kept as a plain list here so the support bot can point visitors at the
+// right page instead of improvising product behaviour. Update both when a
+// guide is added or renamed.
+const HELP_GUIDES: ReadonlyArray<[slug: string, topic: string]> = [
+  ["getting-started", "account creation, business profile (taxes, licence, e-Transfer email, logo), plans and billing"],
+  ["create-a-quote", "creating a quote from text, voice or photos; editing; catalog; Good/Better/Best options; PDF templates"],
+  ["send-a-quote-and-get-it-accepted", "emailing or sharing a quote, online acceptance, automatic follow-ups on days 2/5/10"],
+  ["contracts-and-e-signature", "province contract templates (ON/BC/AB/QC), review, sending for signature, email-code e-signature, signed PDF and audit certificate"],
+  ["jobs-milestones-and-change-orders", "job setup review, milestones, schedule, calendar sync, change orders, holdback release"],
+  ["invoices-and-getting-paid", "deposit/progress/final invoices, Interac e-Transfer, card payments via Stripe, recording payments, overdue reminders 3/7/14 days"],
+  ["costs-receipts-and-time", "receipt scanning, cost tracking, worker time-entry links, GPS clock-in, payroll CSV export"],
+  ["team-accounts-and-roles", "inviting team members, roles (admin/office/foreman/viewer), seats per plan"],
+  ["leads-and-follow-ups", "lead sources (website widget, WhatsApp, Meta Lead Ads, Google LSA), pipeline, CASL consent and unsubscribe, review requests"],
+  ["integrations-and-imports", "Gmail sending, Google/Outlook calendar, QuickBooks and Wave, Stripe Connect, importing old quotes from CSV/Excel/PDF, public API and Zapier"],
+];
+
+const SUPPORT_SYSTEM_PROMPT = [
+  "You are QuoteAI's AI support assistant. QuoteAI is a web platform for tradespeople and construction businesses in Canada that turns a plain-language job description into a detailed quote, then handles contracts and e-signature, jobs, invoices and payments.",
+  "Reply kindly, professionally and concisely, in the language the user writes in (English or French).",
+  "When a question is covered by a help-centre guide, answer briefly and link the guide as https://quoteai.ca/help/<slug>/ . Do not invent product behaviour that is not in the guide list; if unsure, say so and offer a human agent.",
+  "Guides (slug — topics): " + HELP_GUIDES.map(([slug, topic]) => `${slug} — ${topic}`).join("; ") + ".",
+  "If the user explicitly asks to speak with an agent or a person, or asks about payments, their account, legal questions or technical bugs, tell them they can request a human agent by clicking the button in the chat, or that typing 'talk to an agent' will put them in the queue for human follow-up.",
+].join(" ");
+
 const router = Router();
 
 const MAX_MESSAGE_LENGTH = 4000;
@@ -300,7 +325,7 @@ router.post("/support/conversations/:id/messages", sendMessageLimiter, requireCo
         const formattedMessages = [
           {
             role: "system" as const,
-            content: "You are QuoteAI's AI support assistant. QuoteAI is a cutting-edge web platform for tradespeople and construction businesses in Canada to create detailed quotes and cost estimates from text descriptions. Reply kindly, professionally, and concisely in English. If the user explicitly asks to speak with an agent or a person, or asks complex questions about payments, their account, or technical bugs, tell them they can request a human agent by clicking the button in the chat, or that typing 'talk to an agent' will put them in the queue for human follow-up.",
+            content: SUPPORT_SYSTEM_PROMPT,
           },
           ...history.map(m => ({
             role: (m.role === "user" ? "user" : "assistant") as "user" | "assistant",

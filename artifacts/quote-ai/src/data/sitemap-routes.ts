@@ -28,6 +28,7 @@ const _PUBLIC_ROUTES = [
   { name: "HOME",       path: "/",           priority: "1.0", changefreq: "weekly",  lastmod: "2026-09-20" },
   { name: "WHATSAPP",   path: "/whatsapp",   priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
   { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "HELP",       path: "/help",       priority: "0.8", changefreq: "monthly", lastmod: "2026-09-21" },
   { name: "CHI_SIAMO",  path: "/chi-siamo",  priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
   { name: "CONTATTI",   path: "/contatti",   priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
   { name: "PRIVACY",    path: "/privacy-policy", priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-20" },

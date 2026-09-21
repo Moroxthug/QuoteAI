@@ -7,6 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from "../src/data/seo-data.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
+import { HELP_ARTICLES } from "../src/data/help-articles.js";
 
 const BASE_URL = "https://quoteai.ca";
 
@@ -56,6 +57,11 @@ for (const sectorSlug of CITY_SECTORS) {
       entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/${city.slug}/`, priority, "monthly", "2026-05-01"));
     }
   }
+}
+
+// Help centre (Phase 70) — lastmod is each article's updatedAt
+for (const article of HELP_ARTICLES) {
+  entries.push(url(`${BASE_URL}/help/${article.slug}/`, "0.7", "monthly", article.updatedAt));
 }
 
 // Blog — categories get a stable aggregate date; articles use their real publishedAt

@@ -1619,3 +1619,8 @@ button.chap-head:hover { background: var(--soft-2); }
 @media (max-width: 640px) {
   .btn { white-space: normal; max-width: 100%; text-align: center; }
 }
+
+/* Help centre (Phase 70) — callout inside .blog-prose articles */
+.help-note { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line); border-left: 3px solid var(--teal); background: var(--soft); border-radius: var(--radius-mk); padding: 16px 18px; margin: 28px 0; }
+.help-note svg { color: var(--teal); flex: none; margin-top: 3px; }
+.help-note p { margin: 0; font-size: 14px; color: var(--ink); line-height: 1.6; }

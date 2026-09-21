@@ -18,6 +18,7 @@ import ReactDOMStatic from "react-dom/static";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
 import type { Lang } from "./i18n/translations";
+import { HELP_ARTICLES } from "./data/help-articles";
 
 /** Routes rendered at build time. Keep in sync with SSR_PAGE_RE in main.tsx. */
 export const SSR_PAGES: ReadonlyArray<{ path: string; lang: Lang }> = [
@@ -29,6 +30,9 @@ export const SSR_PAGES: ReadonlyArray<{ path: string; lang: Lang }> = [
   { path: "/privacy-policy", lang: "en" },
   { path: "/terms", lang: "en" },
   { path: "/mappa-sito", lang: "en" },
+  // Phase 70: help centre index + every article (EN; the toggle re-renders FR client-side).
+  { path: "/help", lang: "en" },
+  ...HELP_ARTICLES.map((a) => ({ path: `/help/${a.slug}`, lang: "en" as const })),
 ];
 
 export async function renderPage(path: string, lang: Lang): Promise<string> {

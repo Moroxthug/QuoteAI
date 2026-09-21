@@ -3,11 +3,12 @@ import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
 import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
+import { HELP_ARTICLES } from "@/data/help-articles";
 import { MapPin, Globe, BookOpen, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function MappaSitoPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   // Group cities by region for structured visual hierarchy.
   // Scoped to ACTIVE_CITIES to match what's actually prerendered/sitemapped —
   // must stay in sync with scripts/prerender-seo.ts's mappa-sito builder.
@@ -106,6 +107,18 @@ export default function MappaSitoPage() {
                   <li key={cat.slug} style={{ paddingLeft: 8 }}>
                     <Link href={`/blog/categoria/${cat.slug}/`} style={{ color: "var(--muted-mk)" }}>
                       {t("sitemap.category")}: {cat.name}
+                    </Link>
+                  </li>
+                ))}
+                <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)" }}>
+                  <Link href="/help/" className="cta-link" style={{ fontSize: "inherit" }}>
+                    {t("sitemap.helpCenter")}
+                  </Link>
+                </li>
+                {HELP_ARTICLES.map((a) => (
+                  <li key={a.slug} style={{ paddingLeft: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <Link href={`/help/${a.slug}/`} style={{ color: "var(--muted-mk)", fontSize: 12.5 }}>
+                      {a.title[lang]}
                     </Link>
                   </li>
                 ))}

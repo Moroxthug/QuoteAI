@@ -18,6 +18,8 @@ const TermsPage = lazy(() => import("@/pages/terms"));
 const ChiSiamoPage = lazy(() => import("@/pages/chi-siamo"));
 const ContattiPage = lazy(() => import("@/pages/contatti"));
 const MappaSitoPage = lazy(() => import("@/pages/mappa-sito"));
+const HelpIndexPage = lazy(() => import("@/pages/help/index"));
+const HelpArticlePage = lazy(() => import("@/pages/help/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
@@ -131,6 +133,9 @@ function Router() {
       <Route path="/privacy" component={() => <Redirect to={PATHS.PRIVACY} />} />
       <Route path="/termini" component={() => <Redirect to={PATHS.TERMS} />} />
       <Route path={PATHS.MAPPA_SITO} component={() => <Suspense fallback={null}><MappaSitoPage /></Suspense>} />
+      {/* Help centre — Phase 70; articles from HELP_ARTICLES */}
+      <Route path="/help/:slug" component={() => <PublicLayout><Suspense fallback={null}><HelpArticlePage /></Suspense></PublicLayout>} />
+      <Route path={PATHS.HELP} component={() => <PublicLayout><Suspense fallback={null}><HelpIndexPage /></Suspense></PublicLayout>} />
 
       {/* Auth routes (not indexed) */}
       <Route path="/sign-in" component={() => <PublicLayout><Suspense fallback={null}><SignInPage /></Suspense></PublicLayout>} />

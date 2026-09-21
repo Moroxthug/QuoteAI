@@ -46,6 +46,7 @@ import {
   AGGREGATE_RATING,
 } from "../src/components/testimonials-section.js";
 import { translations } from "../src/i18n/translations.js";
+import { HELP_ARTICLES } from "../src/data/help-articles.js";
 
 function testimonialText(key: string): string {
   return translations.en[`testimonials.${key}.text`] ?? "";
@@ -2330,4 +2331,41 @@ await buildStaticPageHtml({
 
 console.log(`  ✓ 6 SPA pages prerendered (chi-siamo, contatti, privacy-policy, terms, whatsapp, mappa-sito)`);
 
-console.log(`Prerendered ${count} pages total (1 homepage + SEO sector pages + ${BLOG_CATEGORIES.length} category pages + ${BLOG_ARTICLES.length + 1} blog pages + 6 SPA pages).`);
+// Phase 70: help centre — index + one page per article, rendered by the same
+// React tree (the page's own SeoHead title/description are what the head
+// block repeats here; keep them identical so crawler and hydrated DOM agree).
+const helpIndexTitle = translations.en["help.seoTitle"];
+const helpIndexDescription = translations.en["help.seoDescription"];
+await buildStaticPageHtml({
+  slug: "help",
+  title: helpIndexTitle,
+  description: helpIndexDescription,
+  path: "/help/",
+  jsonLd: [buildWebPageJsonLd("Help Centre", helpIndexDescription, "/help/", "CollectionPage"), buildBreadcrumbJsonLd("Help centre", "/help/")],
+  bodyHtml: stripHoistedHead(await renderPage("/help", "en")),
+});
+for (const article of HELP_ARTICLES) {
+  const path = `/help/${article.slug}/`;
+  await buildStaticPageHtml({
+    slug: `help/${article.slug}`,
+    title: `${article.title.en} | quoteai`,
+    description: article.summary.en,
+    path,
+    jsonLd: [
+      buildWebPageJsonLd(article.title.en, article.summary.en, path, "TechArticle"),
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
+          { "@type": "ListItem", position: 2, name: "Help centre", item: `${BASE_URL}/help/` },
+          { "@type": "ListItem", position: 3, name: article.title.en, item: `${BASE_URL}${path}` },
+        ],
+      },
+    ],
+    bodyHtml: stripHoistedHead(await renderPage(`/help/${article.slug}`, "en")),
+  });
+}
+console.log(`  ✓ ${HELP_ARTICLES.length + 1} help-centre pages prerendered`);
+
+console.log(`Prerendered ${count} pages total (1 homepage + SEO sector pages + ${BLOG_CATEGORIES.length} category pages + ${BLOG_ARTICLES.length + 1} blog pages + 6 SPA pages + ${HELP_ARTICLES.length + 1} help pages).`);

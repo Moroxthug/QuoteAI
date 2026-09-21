@@ -514,15 +514,15 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 88 | GET | `/api/support/admin-status` | none | — | — | none | — | n/a | — | — | — |
-| 102 | POST | `/api/support/admin-status` | admin | — | — | manual | — | n/a | — | — | — |
-| 125 | POST | `/api/support/conversations` | none | — | createConversationLimiter | manual | — | n/a | — | — | — |
-| 161 | GET | `/api/support/conversations` | admin | — | — | none | — | n/a | — | — | — |
-| 175 | GET | `/api/support/conversations/:id/messages` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
-| 197 | POST | `/api/support/conversations/:id/messages` | none | requireConversationAccess | sendMessageLimiter | manual | — | n/a | — | — | — |
-| 361 | POST | `/api/support/conversations/:id/request-human` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
-| 391 | POST | `/api/support/conversations/:id/join` | admin | — | — | none | — | n/a | — | — | — |
-| 421 | POST | `/api/support/conversations/:id/close` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
+| 113 | GET | `/api/support/admin-status` | none | — | — | none | — | n/a | — | — | — |
+| 127 | POST | `/api/support/admin-status` | admin | — | — | manual | — | n/a | — | — | — |
+| 150 | POST | `/api/support/conversations` | none | — | createConversationLimiter | manual | — | n/a | — | — | — |
+| 186 | GET | `/api/support/conversations` | admin | — | — | none | — | n/a | — | — | — |
+| 200 | GET | `/api/support/conversations/:id/messages` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
+| 222 | POST | `/api/support/conversations/:id/messages` | none | requireConversationAccess | sendMessageLimiter | manual | — | n/a | — | — | — |
+| 386 | POST | `/api/support/conversations/:id/request-human` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
+| 416 | POST | `/api/support/conversations/:id/join` | admin | — | — | none | — | n/a | — | — | — |
+| 446 | POST | `/api/support/conversations/:id/close` | none | requireConversationAccess | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/team-members.ts
 

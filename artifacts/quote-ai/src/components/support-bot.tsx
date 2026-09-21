@@ -16,11 +16,11 @@ export default function SupportBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [conversationId, setConversationId] = useState<number | null>(() => {
-    const saved = localStorage.getItem("quoteai_support_conv_id");
+    const saved = typeof window === "undefined" ? null : localStorage.getItem("quoteai_support_conv_id");
     return saved ? parseInt(saved) : null;
   });
   const [conversationToken, setConversationToken] = useState<string | null>(() =>
-    localStorage.getItem("quoteai_support_conv_token"),
+    typeof window === "undefined" ? null : localStorage.getItem("quoteai_support_conv_token"),
   );
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
@@ -53,11 +53,15 @@ export default function SupportBot() {
     }
   };
 
+  // Phase 68: only while the panel is open. Polling from every public page
+  // for every visitor (15 s, forever) was a serverless invocation per
+  // visitor-minute and a console error on any host without the API.
   useEffect(() => {
+    if (!isOpen) return;
     checkAdminOnline();
     const interval = setInterval(checkAdminOnline, 15000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isOpen]);
 
   // Token issued when the conversation was created; required on every
   // subsequent call to that conversation (admins bypass it via their session).

@@ -11,19 +11,8 @@ if (!existsSync(outDir)) {
   mkdirSync(outDir, { recursive: true });
 }
 
-// Deve restare in sincronia con SECTOR_OG_IMAGES in src/data/seo-render-engine.ts
-const SECTOR_SLUGS = [
-  "general-contractor",
-  "renovation-contractor",
-  "electrician",
-  "plumber",
-  "painter",
-  "welder-fabricator",
-  "carpenter-cabinetmaker",
-  "hvac-technician",
-  "freelance",
-  "building-consultant",
-];
+// One image per sector — getOgImagePath() in src/data/seo-render-engine.ts resolves /og/sectors/<slug>.png for every SECTORS key.
+const SECTOR_SLUGS = Object.keys(SECTORS);
 
 function escXml(s: string): string {
   return s

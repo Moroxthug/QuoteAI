@@ -1,3 +1,5 @@
+import { SECTOR_SLUGS } from "./seo-slugs.js";
+
 export interface SectorDataFr {
   label: string;
   labelPlural: string;
@@ -1511,11 +1513,23 @@ export const SECTORS: Record<string, SectorData> = {
     jsonLdDescription: "Free online quoting software for Canadian contractors and small businesses. Get started for free, no credit card.",
   },
 };
-
 /** frSlug -> canonical (English) sector key, for resolving /fr/soumissions/:frSlug routes. */
-export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
-  Object.entries(SECTORS).map(([key, s]) => [s.frSlug, key]),
-);
+export { SECTOR_KEY_BY_FR_SLUG } from "./seo-slugs.js";
+
+// Phase 68: seo-slugs.ts is the light copy of slug/label the public entry
+// bundle ships. Any drift between the two files fails the build here (the
+// sitemap and prerender scripts import this module) rather than silently
+// breaking the language toggle or the homepage trade chips.
+(() => {
+  const errors: string[] = [];
+  for (const [key, s] of Object.entries(SECTORS)) {
+    const idx = SECTOR_SLUGS[key];
+    if (!idx) errors.push(`missing "${key}"`);
+    else if (idx.frSlug !== s.frSlug || idx.label !== s.label || idx.frLabel !== s.fr.label) errors.push(`"${key}" differs (frSlug/label/frLabel)`);
+  }
+  for (const key of Object.keys(SECTOR_SLUGS)) if (!SECTORS[key]) errors.push(`extra "${key}"`);
+  if (errors.length) throw new Error(`src/data/seo-slugs.ts is out of sync with SECTORS: ${errors.join(", ")}`);
+})();
 
 export interface SectorReview {
   authorName: string;

@@ -6,15 +6,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
 import Home from "@/pages/home";
-import WhatsappPage from "@/pages/whatsapp";
-import SignInPage from "@/pages/sign-in";
-import SignUpPage from "@/pages/sign-up";
-import OnboardingPage from "@/pages/onboarding";
-import PrivacyPage from "@/pages/privacy-policy";
-import TermsPage from "@/pages/terms";
-import ChiSiamoPage from "@/pages/chi-siamo";
-import ContattiPage from "@/pages/contatti";
-import MappaSitoPage from "@/pages/mappa-sito";
+// Every other public page is lazy (Phase 68): the homepage is the entry's
+// LCP-critical route and these pages — auth, onboarding, legal, contact,
+// WhatsApp, sitemap — were ~55 kB of the bundle it had to load first.
+const WhatsappPage = lazy(() => import("@/pages/whatsapp"));
+const SignInPage = lazy(() => import("@/pages/sign-in"));
+const SignUpPage = lazy(() => import("@/pages/sign-up"));
+const OnboardingPage = lazy(() => import("@/pages/onboarding"));
+const PrivacyPage = lazy(() => import("@/pages/privacy-policy"));
+const TermsPage = lazy(() => import("@/pages/terms"));
+const ChiSiamoPage = lazy(() => import("@/pages/chi-siamo"));
+const ContattiPage = lazy(() => import("@/pages/contatti"));
+const MappaSitoPage = lazy(() => import("@/pages/mappa-sito"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
@@ -59,6 +62,7 @@ const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
 import { PublicLayout } from "@/components/layout/public-layout";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LanguageProvider } from "@/i18n/LanguageContext";
+import type { Lang } from "@/i18n/translations";
 import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/hooks/use-auth";
 import { isOnboardingSkipped } from "@/lib/onboarding-state";
@@ -118,23 +122,23 @@ function Router() {
       <Route path={PATHS.HOME} component={() => <PublicLayout><Home /></PublicLayout>} />
       {/* French homepage — same component, detects lang from the /fr prefix */}
       <Route path="/fr" component={() => <PublicLayout><Home /></PublicLayout>} />
-      <Route path={PATHS.WHATSAPP} component={() => <PublicLayout><WhatsappPage /></PublicLayout>} />
-      <Route path={PATHS.CHI_SIAMO} component={ChiSiamoPage} />
-      <Route path={PATHS.CONTATTI} component={ContattiPage} />
-      <Route path={PATHS.PRIVACY} component={PrivacyPage} />
-      <Route path={PATHS.TERMS} component={TermsPage} />
+      <Route path={PATHS.WHATSAPP} component={() => <PublicLayout><Suspense fallback={null}><WhatsappPage /></Suspense></PublicLayout>} />
+      <Route path={PATHS.CHI_SIAMO} component={() => <Suspense fallback={null}><ChiSiamoPage /></Suspense>} />
+      <Route path={PATHS.CONTATTI} component={() => <Suspense fallback={null}><ContattiPage /></Suspense>} />
+      <Route path={PATHS.PRIVACY} component={() => <Suspense fallback={null}><PrivacyPage /></Suspense>} />
+      <Route path={PATHS.TERMS} component={() => <Suspense fallback={null}><TermsPage /></Suspense>} />
       {/* Old Italian-era paths kept as redirects so existing links/bookmarks keep working */}
       <Route path="/privacy" component={() => <Redirect to={PATHS.PRIVACY} />} />
       <Route path="/termini" component={() => <Redirect to={PATHS.TERMS} />} />
-      <Route path={PATHS.MAPPA_SITO} component={MappaSitoPage} />
+      <Route path={PATHS.MAPPA_SITO} component={() => <Suspense fallback={null}><MappaSitoPage /></Suspense>} />
 
       {/* Auth routes (not indexed) */}
-      <Route path="/sign-in" component={() => <PublicLayout><SignInPage /></PublicLayout>} />
-      <Route path="/sign-in/:rest*" component={() => <PublicLayout><SignInPage /></PublicLayout>} />
-      <Route path="/sign-up" component={() => <PublicLayout><SignUpPage /></PublicLayout>} />
-      <Route path="/sign-up/:rest*" component={() => <PublicLayout><SignUpPage /></PublicLayout>} />
+      <Route path="/sign-in" component={() => <PublicLayout><Suspense fallback={null}><SignInPage /></Suspense></PublicLayout>} />
+      <Route path="/sign-in/:rest*" component={() => <PublicLayout><Suspense fallback={null}><SignInPage /></Suspense></PublicLayout>} />
+      <Route path="/sign-up" component={() => <PublicLayout><Suspense fallback={null}><SignUpPage /></Suspense></PublicLayout>} />
+      <Route path="/sign-up/:rest*" component={() => <PublicLayout><Suspense fallback={null}><SignUpPage /></Suspense></PublicLayout>} />
 
-      <Route path="/onboarding" component={OnboardingPage} />
+      <Route path="/onboarding" component={() => <Suspense fallback={null}><OnboardingPage /></Suspense>} />
 
       {/* Dashboard (private, not indexed) */}
       <Route path="/dashboard" component={() => (
@@ -250,39 +254,45 @@ function Router() {
   );
 }
 
-import posthog from "posthog-js";
+import { identifyUser, resetUser } from "@/lib/analytics";
 
 function PostHogIdentify() {
   const { user, isLoaded } = useAuth();
 
   useEffect(() => {
-    if (isLoaded && user && import.meta.env.VITE_POSTHOG_KEY) {
-      posthog.identify(user.id, {
-        email: user.email,
-        name: user.name,
-      });
-    } else if (isLoaded && !user && import.meta.env.VITE_POSTHOG_KEY) {
-      posthog.reset();
+    if (!isLoaded || !import.meta.env.VITE_POSTHOG_KEY) return;
+    if (user) {
+      identifyUser(user.id, { email: user.email, name: user.name });
+    } else {
+      resetUser();
     }
   }, [user, isLoaded]);
 
   return null;
 }
 
-function App() {
+/**
+ * `ssr` is only passed by scripts/prerender-seo.ts (via entry-server.tsx) to
+ * render the homepage to static HTML at build time; the browser bundle never
+ * sets it, and main.tsx hydrates that markup.
+ */
+function App({ ssr }: { ssr?: { path: string; lang: Lang } } = {}) {
   return (
     <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <TooltipProvider>
-          <PostHogIdentify />
-          <ErrorBoundary>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+      {/* The wouter Router sits above LanguageProvider because the provider
+          reads useLocation() to sync the language with /fr URLs; under the
+          build-time render (ssrPath) that must be the same router. */}
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")} ssrPath={ssr?.path}>
+        <LanguageProvider initialLang={ssr?.lang}>
+          <TooltipProvider>
+            <PostHogIdentify />
+            <ErrorBoundary>
               <Router />
-            </WouterRouter>
-          </ErrorBoundary>
-          <Toaster />
-        </TooltipProvider>
-      </LanguageProvider>
+            </ErrorBoundary>
+            <Toaster />
+          </TooltipProvider>
+        </LanguageProvider>
+      </WouterRouter>
     </QueryClientProvider>
   );
 }

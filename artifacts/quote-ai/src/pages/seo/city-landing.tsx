@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
 import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, getCityTitle, getCityDesc } from "@/data/seo-data";
-import { BLOG_ARTICLES, SECTOR_ARTICLES } from "@/data/blog-data";
+import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import {
   getCityIntro,
   getCityFaqItems,
@@ -365,8 +365,8 @@ export default function SeoCityLanding() {
         const slugs = SECTOR_ARTICLES[s.slug];
         if (!slugs || slugs.length === 0) return null;
         const articles = slugs
-          .map((slug) => BLOG_ARTICLES.find((a) => a.slug === slug))
-          .filter((a): a is (typeof BLOG_ARTICLES)[number] => a !== undefined)
+          .map((slug) => BLOG_INDEX.find((a) => a.slug === slug))
+          .filter((a): a is (typeof BLOG_INDEX)[number] => a !== undefined)
           .slice(0, 3);
         if (articles.length === 0) return null;
         return (

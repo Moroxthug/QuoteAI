@@ -9,11 +9,14 @@
     "test": "pnpm -r --if-present run test",
     "lint": "eslint . --max-warnings=1000",
     "lint:strict": "eslint . --max-warnings=0",
-    "knip": "knip --no-progress"
+    "knip": "knip --no-progress",
+    "spell": "cspell --no-progress artifacts/quote-ai/src/i18n/*.ts artifacts/quote-ai/src/data/*.ts artifacts/quote-ai/src/pages/*.tsx artifacts/api-server/src/lib/email*.ts artifacts/api-server/src/lib/*Messaging.ts"
   },
   "private": true,
   "devDependencies": {
+    "@cspell/dict-fr-fr": "^2.3.2",
     "@eslint/js": "^10.0.1",
+    "cspell": "^10.3.3",
     "eslint": "^10.10.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.12.0",

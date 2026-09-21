@@ -2,7 +2,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Building2, BookOpen, X, MapPin } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
-import { BLOG_ARTICLES, SECTOR_ARTICLES } from "@/data/blog-data";
+import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import { getOgImagePath, getSectorFrContent, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
 import { useLanguage, isFrenchPath } from "@/i18n/LanguageContext";
@@ -557,8 +557,8 @@ export default function SeoLanding() {
       {/* ── Insights ─────────────────────────────────────── */}
       {SECTOR_ARTICLES[slug] && SECTOR_ARTICLES[slug].length > 0 && (() => {
         const articles = SECTOR_ARTICLES[slug]
-          .map((articleSlug) => BLOG_ARTICLES.find((a) => a.slug === articleSlug))
-          .filter((a): a is (typeof BLOG_ARTICLES)[number] => a !== undefined);
+          .map((articleSlug) => BLOG_INDEX.find((a) => a.slug === articleSlug))
+          .filter((a): a is (typeof BLOG_INDEX)[number] => a !== undefined);
         if (articles.length === 0) return null;
         return (
           <section className="sec soft">

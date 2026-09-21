@@ -8,6 +8,11 @@ Disallow: /sign-up
 Disallow: /onboarding
 Disallow: /admin
 Disallow: /api
+Disallow: /p/
+Disallow: /i/
+Disallow: /sign/
+Disallow: /t/
+Disallow: /team-invite/
 
 # City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)
 

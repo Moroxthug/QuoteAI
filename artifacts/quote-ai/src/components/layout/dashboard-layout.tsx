@@ -1,3 +1,4 @@
+import "@/i18n/dashboard";
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

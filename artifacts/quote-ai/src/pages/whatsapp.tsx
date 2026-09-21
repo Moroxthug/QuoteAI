@@ -182,7 +182,7 @@ export default function WhatsappPage() {
       {/* ── CTA ────────────────────────────────────────────── */}
       <ScrollSection className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-whatsapp-cta/1800/900" alt="" aria-hidden="true" />
+          <img src="https://picsum.photos/seed/quoteai-whatsapp-cta/1800/900" alt="" aria-hidden="true" loading="lazy" />
         </div>
         <div className="wrap cta-in">
           <span className="eyebrow on-dark">{t("whatsapp.botProElite")}</span>

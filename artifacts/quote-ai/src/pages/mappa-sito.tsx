@@ -2,7 +2,7 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
-import { BLOG_ARTICLES, BLOG_CATEGORIES } from "@/data/blog-data";
+import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
 import { MapPin, Globe, BookOpen, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -110,7 +110,7 @@ export default function MappaSitoPage() {
                   </li>
                 ))}
                 <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)", fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.latestArticles")}</li>
-                {BLOG_ARTICLES.slice(0, 5).map((art) => (
+                {BLOG_INDEX.slice(0, 5).map((art) => (
                   <li key={art.slug} style={{ paddingLeft: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     <Link href={`/blog/${art.slug}/`} style={{ color: "var(--faint)", fontSize: 12.5 }}>
                       {art.title}

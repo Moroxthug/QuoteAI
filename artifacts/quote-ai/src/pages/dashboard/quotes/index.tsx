@@ -170,7 +170,7 @@ export default function QuotesList() {
                           <span>
                             <span className="t-strong">{quote.descrizioneGenerale || t("dashboard.quotesList.noDescription")}</span>
                             <span className="t-sub">
-                              {quote.items.length} {quote.items.length === 1 ? t("dashboard.quotesList.lineItem") : t("dashboard.quotesList.lineItems")}
+                              {quote.lineItemCount} {quote.lineItemCount === 1 ? t("dashboard.quotesList.lineItem") : t("dashboard.quotesList.lineItems")}
                             </span>
                           </span>
                         </span>

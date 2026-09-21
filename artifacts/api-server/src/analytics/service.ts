@@ -126,12 +126,15 @@ export async function companyAnalytics(userId: string, opts: { months?: number; 
     db.select().from(costEntriesTable).where(and(eq(costEntriesTable.userId, userId), gte(costEntriesTable.date, since))),
   ]);
   const projectIds = projects.map((p) => p.id);
-  const [payments, milestones, budgetLines, allCosts, clients] = await Promise.all([
+  const contractIds = projects.map((p) => p.contractId).filter((x): x is string => !!x);
+  // Phase 68: contracts ride in this round (they only need the project rows above) — two round trips instead of three.
+  const [payments, milestones, budgetLines, allCosts, clients, contracts] = await Promise.all([
     db.select().from(invoicePaymentsTable).where(and(eq(invoicePaymentsTable.userId, userId), gte(invoicePaymentsTable.date, since))),
     projectIds.length ? db.select().from(milestonesTable).where(inArray(milestonesTable.projectId, projectIds)) : Promise.resolve([] as (typeof milestonesTable.$inferSelect)[]),
     projectIds.length ? db.select().from(costBudgetLinesTable).where(inArray(costBudgetLinesTable.projectId, projectIds)) : Promise.resolve([] as (typeof costBudgetLinesTable.$inferSelect)[]),
     projectIds.length ? db.select({ projectId: costEntriesTable.projectId, totalCents: costEntriesTable.totalCents, status: costEntriesTable.status }).from(costEntriesTable).where(inArray(costEntriesTable.projectId, projectIds)) : Promise.resolve([] as { projectId: string | null; totalCents: number; status: string }[]),
     db.select({ id: clientsTable.id, name: clientsTable.name }).from(clientsTable).where(eq(clientsTable.userId, userId)),
+    contractIds.length ? db.select({ id: contractsTable.id, variables: contractsTable.variables }).from(contractsTable).where(inArray(contractsTable.id, contractIds)) : Promise.resolve([] as { id: string; variables: unknown }[]),
   ]);
   const clientName = new Map(clients.map((c) => [c.id, c.name]));
   const invoiceById = new Map(invoices.map((i) => [i.id, i]));
@@ -151,8 +154,6 @@ export async function companyAnalytics(userId: string, opts: { months?: number; 
   const aging = arAging(invoices, now);
 
   // Per-job figures (subtotal via contract when available).
-  const contractIds = projects.map((p) => p.contractId).filter((x): x is string => !!x);
-  const contracts = contractIds.length ? await db.select({ id: contractsTable.id, variables: contractsTable.variables }).from(contractsTable).where(inArray(contractsTable.id, contractIds)) : [];
   const contractById = new Map(contracts.map((c) => [c.id, c.variables as { subtotal?: number; total?: number }]));
   const subtotalOf = (p: Project) => {
     const v = p.contractId ? contractById.get(p.contractId) : undefined;

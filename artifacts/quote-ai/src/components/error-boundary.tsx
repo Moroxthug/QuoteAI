@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from "react";
-import { translations, type Lang } from "@/i18n/translations";
+import { type Lang } from "@/i18n/translations";
+import { lookup } from "@/i18n/registry";
 
 // Class components can't use hooks, so read the persisted language choice
 // directly (mirrors LanguageContext's detection logic) instead of useLanguage().
@@ -15,7 +16,7 @@ function getLang(): Lang {
 
 function t(key: string): string {
   const lang = getLang();
-  return translations[lang][key] ?? translations.en[key] ?? key;
+  return lookup(lang, key);
 }
 
 interface Props {

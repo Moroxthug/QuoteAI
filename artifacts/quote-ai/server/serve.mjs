@@ -3,6 +3,7 @@ import compression from "compression";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import http from "node:http";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, "..", "dist", "public");
@@ -25,6 +26,25 @@ const app = express();
 
 app.disable("x-powered-by");
 app.set("etag", "strong");
+
+// Local QA only (Phase 68 Lighthouse runs against the production build with
+// the e2e API behind it): forward /api/* to API_PROXY_TARGET. Vercel never
+// sets it — there the rewrite in vercel.json routes /api to the function.
+const apiTarget = process.env.API_PROXY_TARGET;
+if (apiTarget) {
+  const target = new URL(apiTarget);
+  app.use("/api", (req, res) => {
+    const upstream = http.request(
+      { host: target.hostname, port: target.port, method: req.method, path: `/api${req.url}`, headers: { ...req.headers, host: target.host } },
+      (up) => {
+        res.writeHead(up.statusCode ?? 502, up.headers);
+        up.pipe(res);
+      },
+    );
+    upstream.on("error", (err) => res.status(502).type("text/plain").send(`proxy error: ${err.message}`));
+    req.pipe(upstream);
+  });
+}
 
 app.use((_req, res, next) => {
   res.setHeader(

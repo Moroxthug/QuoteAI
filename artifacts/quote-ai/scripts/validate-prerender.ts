@@ -14,7 +14,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, relative, dirname } from "node:path";
+import { join, relative, dirname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,7 +22,7 @@ const distDir = join(__dirname, "../dist/public");
 
 // ─── Configuration ─────────────────────────────────────────────────────────
 
-const SAMPLE_SIZE = 50; // how many files to check (or all if fewer exist)
+const SAMPLE_SIZE = Number(process.env.PRERENDER_SAMPLE ?? 0) || Infinity; // Phase 68: every file by default (417 takes < 1 s); PRERENDER_SAMPLE=50 for the old random sample
 const SEED = 42;        // deterministic shuffle seed
 
 // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -103,6 +103,29 @@ function validateHtml(filePath: string, html: string): string[] {
     }
   }
 
+
+  // 5. (Phase 68) head integrity — one <title>, one canonical that matches
+  //    the file's own path, hreflang x-default, og:image that exists in
+  //    dist/public (210 sector/city pages pointed at /og/<slug>.jpg — a 404),
+  //    and <meta charset> ahead of everything else in <head>.
+  const rel = relative(distDir, filePath).split(sep).join("/").replace(/index\.html$/, "");
+  const expectedCanonical = `https://quoteai.ca/${rel}`;
+  const titles = html.match(/<title>/gi) ?? [];
+  if (titles.length !== 1) errors.push(`Expected exactly one <title>, found ${titles.length}`);
+  const canonicals = [...html.matchAll(/<link\s+rel="canonical"\s+href="([^"]*)"/gi)].map((m) => m[1]);
+  if (canonicals.length !== 1) errors.push(`Expected exactly one canonical, found ${canonicals.length}`);
+  else if (canonicals[0] !== expectedCanonical) errors.push(`Canonical ${canonicals[0]} ≠ ${expectedCanonical}`);
+  if (!/<link\s+rel="alternate"\s+hreflang="x-default"/i.test(html)) errors.push("Missing hreflang x-default");
+  const og = html.match(/<meta\s+property="og:image"\s+content="https:\/\/quoteai\.ca(\/[^"]+)"/i);
+  if (!og) errors.push("Missing og:image");
+  else if (!existsSync(join(distDir, og[1]!))) errors.push(`og:image ${og[1]} does not exist in dist/public`);
+  const head = html.slice(html.indexOf("<head>"), html.indexOf("</head>"));
+  const charsetAt = head.search(/<meta\s+charset=/i);
+  const firstTag = head.search(/<(?!head)[a-z]/i);
+  if (charsetAt === -1) errors.push("Missing <meta charset>");
+  else if (charsetAt !== firstTag) errors.push("<meta charset> is not the first element in <head>");
+  const lang = html.match(/<html lang="([^"]*)"/)?.[1];
+  if (rel.startsWith("fr/") ? lang !== "fr-CA" : lang !== "en-CA") errors.push(`<html lang="${lang}"> does not match the route`);
   return errors;
 }
 

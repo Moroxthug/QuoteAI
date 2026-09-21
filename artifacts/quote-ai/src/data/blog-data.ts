@@ -1,28 +1,17 @@
-export interface BlogArticle {
-  slug: string;
-  title: string;
-  /** Shorter title for the <title> tag (≤61 chars so the " | quoteai" suffix stays within 70). Falls back to title. */
-  seoTitle?: string;
-  metaDescription: string;
-  category: string;
-  publishedAt: string;
-  updatedAt?: string;
-  readingTimeMin: number;
-  relatedSectors: string[];
+// Article bodies, keyed by slug. Metadata is in ./blog-index.ts (see the
+// note there); `BLOG_ARTICLES` below joins the two for the article page and
+// the build scripts. Every slug in BLOG_INDEX must have a body here — the
+// join throws at module load (i.e. at build time) if one is missing.
+import { BLOG_INDEX, type BlogArticleMeta } from "./blog-index.js";
+
+export * from "./blog-index.js";
+
+export interface BlogArticle extends BlogArticleMeta {
   contentHtml: string;
 }
 
-export const BLOG_ARTICLES: BlogArticle[] = [
-  {
-    slug: "how-much-does-it-cost-to-paint-an-apartment-in-canada-2026",
-    title: "How Much Does It Cost to Paint an Apartment in Canada in 2026?",
-    seoTitle: "Cost to Paint an Apartment in Canada (2026)",
-    metaDescription: "Updated 2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.",
-    category: "Pricing",
-    publishedAt: "2026-03-04",
-    readingTimeMin: 5,
-    relatedSectors: ["painter", "decorative-painter"],
-    contentHtml: `
+const BLOG_CONTENT: Record<string, string> = {
+  "how-much-does-it-cost-to-paint-an-apartment-in-canada-2026": `
 <p>Painting is one of the most common renovation jobs booked in Canada every year — and one of the easiest to get a wildly inaccurate quote for. Prices swing a lot depending on the city, the condition of the walls, and the finish you choose. Here's what painting an apartment actually costs across Canada in 2026.</p>
 
 <h2>Average painting costs in Canada in 2026</h2>
@@ -71,17 +60,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 </ul>
 <p>With this information, a professional painter using <a href="/quotes/painter/">AI-assisted quoting software</a> can turn around a detailed, itemized PDF estimate on-site — often before they've even left the apartment.</p>
 `,
-  },
-  {
-    slug: "bathroom-renovation-cost-toronto-2026",
-    title: "How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?",
-    seoTitle: "Bathroom Renovation Cost in Toronto (2026)",
-    metaDescription: "Real 2026 CAD price ranges for a bathroom renovation in Toronto: full gut renovations, mid-range refreshes, plumbing and tiling costs, and how Toronto compares to the rest of Ontario.",
-    category: "Pricing",
-    publishedAt: "2026-03-18",
-    readingTimeMin: 6,
-    relatedSectors: ["plumber", "tile-installer", "renovation-contractor"],
-    contentHtml: `
+  "bathroom-renovation-cost-toronto-2026": `
 <p>Bathroom renovations are consistently one of the highest-value projects homeowners take on, and one of the widest-ranging in price. In Toronto specifically, labour costs and permit requirements push totals higher than the national average. Here's a realistic breakdown for 2026.</p>
 
 <h2>Toronto bathroom renovation costs by tier</h2>
@@ -116,17 +95,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>How to compare quotes properly</h2>
 <p>A trustworthy bathroom renovation quote should break out plumbing, tiling, electrical, fixtures, and labour as separate line items — not one lump sum. It should also state whether permits are included and who is responsible for pulling them. Contractors using <a href="/quotes/plumber/">AI quoting tools built for tradespeople</a> can generate this level of detail directly from a site visit, which makes comparing multiple quotes far easier for homeowners.</p>
 `,
-  },
-  {
-    slug: "cost-to-rewire-a-house-canada",
-    title: "Cost to Rewire a House in Canada: 2026 Electrical Pricing Guide",
-    seoTitle: "Cost to Rewire a House in Canada (2026)",
-    metaDescription: "What it costs to rewire a house in Canada in 2026: full rewiring, panel upgrades, cost per square foot, knob-and-tube removal, and regional price differences.",
-    category: "Pricing",
-    publishedAt: "2026-04-02",
-    readingTimeMin: 5,
-    relatedSectors: ["electrician", "hvac-technician"],
-    contentHtml: `
+  "cost-to-rewire-a-house-canada": `
 <p>Rewiring a house is one of the more disruptive — and expensive — renovation jobs, but it's often non-negotiable for older homes with outdated or unsafe wiring. Here's what it realistically costs across Canada in 2026.</p>
 
 <h2>Full house rewiring costs</h2>
@@ -158,17 +127,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Getting an accurate electrical quote</h2>
 <p>A proper rewiring quote should specify the number of circuits, panel size, wiring type being removed, and whether drywall patching is included after the work (most electricians do not include drywall repair — confirm this upfront). Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can produce a detailed, circuit-by-circuit estimate on the spot rather than a vague lump-sum number.</p>
 `,
-  },
-  {
-    slug: "cost-to-reroof-a-home-canada",
-    title: "Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)",
-    seoTitle: "Cost to Re-Roof a Home in Canada (2026)",
-    metaDescription: "2026 CAD pricing to re-roof a home in Canada, including asphalt shingle and metal roofing costs, per-square pricing, and how snow load requirements affect price in colder regions.",
-    category: "Pricing",
-    publishedAt: "2026-04-16",
-    readingTimeMin: 5,
-    relatedSectors: ["roofer", "mason"],
-    contentHtml: `
+  "cost-to-reroof-a-home-canada": `
 <p>A roof is one of the biggest single expenses a homeowner faces, and Canada's climate — heavy snow loads, freeze-thaw cycles, and ice damming — makes roofing specs a bit different than in milder climates. Here's what re-roofing costs across Canada in 2026.</p>
 
 <h2>Re-roofing costs by material</h2>
@@ -197,17 +156,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>What a proper roofing quote should include</h2>
 <p>A complete roofing estimate should specify shingle brand/line, ice and water shield coverage area, ventilation (ridge vents, soffit vents), flashing replacement, and disposal. Roofers using <a href="/quotes/roofer/">AI-powered quoting tools</a> can generate this level of line-item detail immediately after a roof measurement, which makes it much easier for homeowners to compare bids apples-to-apples.</p>
 `,
-  },
-  {
-    slug: "deck-installation-cost-canada-2026",
-    title: "Deck Installation Cost in Canada: 2026 Price Guide by Material",
-    seoTitle: "Deck Installation Cost in Canada (2026)",
-    metaDescription: "2026 CAD pricing for building a deck in Canada: pressure-treated wood vs. composite decking, cost per square foot, permits, and regional price differences.",
-    category: "Pricing",
-    publishedAt: "2026-05-05",
-    readingTimeMin: 4,
-    relatedSectors: ["carpenter-cabinetmaker", "welder-fabricator"],
-    contentHtml: `
+  "deck-installation-cost-canada-2026": `
 <p>Decks are one of the most requested outdoor projects across Canada, especially as homeowners look to extend their living space through the warmer months. Costs vary significantly based on material choice and deck complexity.</p>
 
 <h2>Deck cost by material (installed, per square foot)</h2>
@@ -236,17 +185,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Getting a proper deck quote</h2>
 <p>A solid deck quote should specify footing depth and spacing, joist material and spacing, decking material and fastening method, and railing type — not just a total square footage price. Contractors using <a href="/quotes/carpenter-cabinetmaker/">quoting software for carpenters and builders</a> can put this together with accurate material takeoffs directly from a site visit.</p>
 `,
-  },
-  {
-    slug: "basement-finishing-cost-canada",
-    title: "Basement Finishing Cost in Canada: 2026 Pricing and What to Expect",
-    seoTitle: "Basement Finishing Cost in Canada (2026)",
-    metaDescription: "What it costs to finish a basement in Canada in 2026: framing, insulation, electrical, drywall, flooring, and why waterproofing should be budgeted first.",
-    category: "Pricing",
-    publishedAt: "2026-05-20",
-    readingTimeMin: 5,
-    relatedSectors: ["renovation-contractor", "general-contractor"],
-    contentHtml: `
+  "basement-finishing-cost-canada": `
 <p>Because most Canadian homes have full basements, finishing one is among the most common ways to add livable square footage without an addition. Here's what a realistic basement finishing budget looks like in 2026.</p>
 
 <h2>Basement finishing costs by scope</h2>
@@ -276,17 +215,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Getting a complete basement quote</h2>
 <p>A thorough basement finishing quote should separate framing, electrical, plumbing (if applicable), drywall, flooring, and any egress window work as individual line items, along with a note on whether waterproofing was assessed. Contractors using <a href="/quotes/renovation-contractor/">AI-assisted quoting tools</a> can build this structure quickly from a walkthrough, which gives homeowners a much clearer picture of where their money is going.</p>
 `,
-  },
-  {
-    slug: "how-to-write-a-professional-quote-that-wins-jobs",
-    title: "How to Write a Professional Quote That Actually Wins Jobs",
-    seoTitle: "How to Write a Quote That Wins Jobs",
-    metaDescription: "A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than most tradespeople think.",
-    category: "Advice",
-    publishedAt: "2026-03-10",
-    readingTimeMin: 5,
-    relatedSectors: ["freelance", "how-to-quote"],
-    contentHtml: `
+  "how-to-write-a-professional-quote-that-wins-jobs": `
 <p>A well-built quote is often the difference between a client who signs on the spot and one who quietly goes with a competitor. For tradespeople, the quote is usually the first real "document" a client sees from you — it needs to communicate professionalism and value, not just a number.</p>
 
 <h2>What a professional quote needs to include</h2>
@@ -314,17 +243,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Format matters</h2>
 <p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/quotes/how-to-quote/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
 `,
-  },
-  {
-    slug: "common-quoting-mistakes-contractors-make",
-    title: "7 Quoting Mistakes That Are Costing Canadian Contractors Jobs",
-    seoTitle: "7 Quoting Mistakes Costing You Jobs",
-    metaDescription: "The most common quoting mistakes Canadian tradespeople make — from vague pricing to slow turnaround — and how to fix each one to win more work.",
-    category: "Advice",
-    publishedAt: "2026-04-08",
-    readingTimeMin: 4,
-    relatedSectors: ["how-to-quote", "freelance"],
-    contentHtml: `
+  "common-quoting-mistakes-contractors-make": `
 <p>Most contractors lose jobs not because their pricing is too high, but because of how the quote itself is put together and delivered. Here are the mistakes that show up most often — and what to do instead.</p>
 
 <h2>1. Sending a single lump-sum number</h2>
@@ -351,17 +270,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>The fix: build a repeatable process</h2>
 <p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/quotes/free-quote/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
 `,
-  },
-  {
-    slug: "how-to-price-a-job-labour-materials-markup",
-    title: "How to Price a Job: Labour, Materials, and Markup Explained",
-    seoTitle: "How to Price a Job as a Contractor",
-    metaDescription: "A practical breakdown of how Canadian tradespeople should price jobs — labour rates, material markup, overhead, and profit — so quotes are profitable, not just competitive.",
-    category: "Advice",
-    publishedAt: "2026-05-12",
-    readingTimeMin: 6,
-    relatedSectors: ["freelance", "general-contractor"],
-    contentHtml: `
+  "how-to-price-a-job-labour-materials-markup": `
 <p>A lot of tradespeople price jobs by gut feel, or by matching whatever a competitor seems to charge. That approach works fine until a busy season quietly turns into a break-even one. Here's a straightforward way to price a job so the number on the quote actually protects your margin.</p>
 
 <h2>Start with your true labour cost</h2>
@@ -393,17 +302,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Putting it into a quote</h2>
 <p>None of this needs to be visible to the client line-by-line — most quotes just show labour and materials totals per task. But pricing it this way internally, rather than guessing, is what keeps a full calendar profitable instead of just busy. Quoting software built for tradespeople can apply consistent markup and overhead rules automatically, so every job gets priced the same disciplined way — see how it works for <a href="/quotes/general-contractor/">general contractors and builders</a>.</p>
 `,
-  },
-  {
-    slug: "mobile-quoting-on-the-go-for-contractors",
-    title: "Mobile Quoting: How to Send Professional Quotes From the Job Site",
-    seoTitle: "Mobile Quoting for Contractors",
-    metaDescription: "Why sending a quote from your phone before you leave the job site wins more work, and what to look for in mobile quoting tools built for Canadian tradespeople.",
-    category: "Tools",
-    publishedAt: "2026-06-02",
-    readingTimeMin: 4,
-    relatedSectors: ["free-quote", "how-to-quote"],
-    contentHtml: `
+  "mobile-quoting-on-the-go-for-contractors": `
 <p>For a lot of trades, the biggest bottleneck isn't finding work — it's the hours spent every week turning site visits into finished quotes. Mobile quoting tools are changing that math, and contractors who adopt them tend to close more jobs simply by being first to respond.</p>
 
 <h2>Why speed wins jobs</h2>
@@ -424,17 +323,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>What this replaces</h2>
 <p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/quotes/free-quote/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
 `,
-  },
-  {
-    slug: "winterizing-your-home-contractor-checklist",
-    title: "Winterization Work: A Contractor's Checklist for Canadian Homes",
-    seoTitle: "Winterization Checklist for Contractors",
-    metaDescription: "A practical winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.",
-    category: "Trades",
-    publishedAt: "2026-09-02",
-    readingTimeMin: 5,
-    relatedSectors: ["general-contractor", "hvac-technician"],
-    contentHtml: `
+  "winterizing-your-home-contractor-checklist": `
 <p>Winterization work is a category almost unique to climates like Canada's — and it's a genuine seasonal revenue stream for contractors who offer it proactively rather than waiting for a burst pipe call in January. Here's what belongs on a proper winterization checklist, and roughly what each job costs.</p>
 
 <h2>Exterior and envelope</h2>
@@ -459,17 +348,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Building winterization into your service offering</h2>
 <p>Contractors who run winterization as a standalone seasonal package — rather than a one-off ad hoc request — tend to see strong repeat business, since it's a natural annual touchpoint with past clients. Bundling a few of the checklist items above into a fixed-price fall package (e.g., "Winter-Ready Home Check") gives clients a simple, low-commitment way to book, and gives contractors a predictable quoting template to reuse every season. Tools built for <a href="/quotes/general-contractor/">general contractors</a> make it easy to save a standard winterization package as a reusable quote template.</p>
 `,
-  },
-  {
-    slug: "snow-load-roofing-eavestrough-considerations-canada",
-    title: "Snow Load Roofing and Eavestrough Considerations for Canadian Homes",
-    seoTitle: "Snow Load Roofing Considerations in Canada",
-    metaDescription: "What Canadian roofers and homeowners need to know about snow load ratings, ice damming, and eavestrough design for roofs built to handle a real Canadian winter.",
-    category: "Trades",
-    publishedAt: "2026-09-08",
-    readingTimeMin: 5,
-    relatedSectors: ["roofer", "mason"],
-    contentHtml: `
+  "snow-load-roofing-eavestrough-considerations-canada": `
 <p>Roofing in Canada isn't just about shingles and flashing — snow load and ice management are structural and design considerations that don't come up the same way in most other markets. Here's what matters.</p>
 
 <h2>Understanding snow load ratings</h2>
@@ -496,17 +375,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>What this means for a roofing quote</h2>
 <p>A roofing quote for a Canadian home should account for ice and water shield coverage, confirm whether ventilation upgrades are included, and flag if eavestrough capacity needs to be increased. Roofers using <a href="/quotes/roofer/">quoting tools built for the trade</a> can include these Canada-specific line items automatically rather than relying on generic templates.</p>
 `,
-  },
-  {
-    slug: "basement-waterproofing-guide-canadian-homes",
-    title: "Basement Waterproofing: A Complete Guide for Canadian Homes",
-    seoTitle: "Basement Waterproofing Guide for Canada",
-    metaDescription: "Interior vs. exterior basement waterproofing methods, costs, and warning signs for Canadian homes — and why it matters before finishing a basement.",
-    category: "Trades",
-    publishedAt: "2026-06-20",
-    readingTimeMin: 6,
-    relatedSectors: ["plumber", "renovation-contractor"],
-    contentHtml: `
+  "basement-waterproofing-guide-canadian-homes": `
 <p>Because the vast majority of Canadian homes have full basements, waterproofing is one of the most consistently requested services in the country — and one of the most misunderstood by homeowners comparing quotes.</p>
 
 <h2>Signs a basement needs waterproofing</h2>
@@ -538,17 +407,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Getting a proper waterproofing quote</h2>
 <p>A trustworthy waterproofing quote should specify whether the approach is interior, exterior, or a hybrid, the linear footage being treated, sump pump specs, and warranty terms — waterproofing warranties vary widely between contractors and are worth comparing directly. Contractors using <a href="/quotes/plumber/">quoting software for tradespeople</a> can document this scope clearly so homeowners know exactly what they're paying for.</p>
 `,
-  },
-  {
-    slug: "canada-greener-homes-grant-rebates-contractors-guide-2026",
-    title: "Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide",
-    seoTitle: "Canadian Energy Rebates for Contractors (2026)",
-    metaDescription: "An overview of Canadian federal and provincial rebate programs for energy-efficient renovations — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, and Enbridge programs — for contractors to reference when quoting jobs.",
-    category: "Business",
-    publishedAt: "2026-07-14",
-    readingTimeMin: 6,
-    relatedSectors: ["hvac-technician", "general-contractor", "renovation-contractor"],
-    contentHtml: `
+  "canada-greener-homes-grant-rebates-contractors-guide-2026": `
 <p><strong>Editorial note:</strong> Rebate programs, amounts, and eligibility rules change frequently — sometimes year to year, and sometimes mid-year as program funding is renewed or exhausted. Always verify current amounts and eligibility directly with the relevant program before quoting a client, and treat the figures below as a general orientation rather than guaranteed numbers.</p>
 
 <h2>Why this matters for contractors</h2>
@@ -571,17 +430,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Building this into your quoting process</h2>
 <p>For contractors who frequently quote insulation, heat pump, or high-efficiency HVAC work, it's worth keeping a running note of which programs are currently active in your service area and reviewing it seasonally, since these programs are one of the more effective ways to help a client justify a higher-efficiency (and higher-margin) upgrade. Tools built for <a href="/quotes/hvac-technician/">HVAC and heating contractors</a> make it easy to add a standard rebate-reference note to any quote involving eligible upgrades.</p>
 `,
-  },
-  {
-    slug: "google-business-profile-guide-for-tradespeople",
-    title: "Google Business Profile for Tradespeople: A Complete Setup Guide",
-    seoTitle: "Google Business Profile Guide for Tradespeople",
-    metaDescription: "How Canadian tradespeople can set up and optimize a Google Business Profile to show up in local search results and win more calls from nearby customers.",
-    category: "Business",
-    publishedAt: "2026-08-05",
-    readingTimeMin: 5,
-    relatedSectors: ["freelance", "general-contractor"],
-    contentHtml: `
+  "google-business-profile-guide-for-tradespeople": `
 <p>For local trades — electricians, plumbers, painters, landscapers — a well-optimized Google Business Profile is often the single highest-return marketing asset available, and it's free. Here's how to set one up properly.</p>
 
 <h2>Getting the basics right</h2>
@@ -605,17 +454,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Why this connects to your quoting process</h2>
 <p>A strong Google Business Profile generates more inbound calls and requests — which means more quotes going out. If your quoting process is still slow or manual, an increase in leads from local search can quickly turn into a bottleneck rather than a win. Pairing a strong local presence with fast, professional quoting tools ensures the extra leads actually convert into booked jobs — see how this works for <a href="/quotes/general-contractor/">contractors and tradespeople</a>.</p>
 `,
-  },
-  {
-    slug: "how-to-get-more-reviews-as-a-contractor",
-    title: "How to Get More Reviews as a Contractor (Without Being Pushy)",
-    seoTitle: "How to Get More Contractor Reviews",
-    metaDescription: "Practical, non-awkward ways for Canadian tradespeople to get more Google reviews from happy clients — and why review volume directly affects how much work you win.",
-    category: "Business",
-    publishedAt: "2026-08-22",
-    readingTimeMin: 4,
-    relatedSectors: ["freelance"],
-    contentHtml: `
+  "how-to-get-more-reviews-as-a-contractor": `
 <p>Reviews are one of the strongest trust signals a potential client evaluates before hiring a tradesperson — often more influential than the price on the quote itself. Yet most contractors do finish-quality work and simply never ask for a review. Here's how to fix that without it feeling awkward.</p>
 
 <h2>Ask at the right moment</h2>
@@ -633,126 +472,10 @@ export const BLOG_ARTICLES: BlogArticle[] = [
 <h2>Why review volume compounds</h2>
 <p>Beyond trust-building, review count and recency are factors in local search visibility — profiles with a steady stream of recent reviews tend to be favoured over ones with a handful of old reviews, even if the older reviews are excellent. Treating review collection as an ongoing part of your workflow (rather than a one-time push) pays off steadily over time, especially when paired with fast, professional quoting that gets clients to "yes" in the first place — see tools built for <a href="/quotes/freelance/">independent tradespeople and freelancers</a>.</p>
 `,
-  },
-];
-
-export interface GuideCard {
-  slug: string;
-  title: string;
-  description: string;
-  href: string;
-  icon: string;
-}
-
-export const GUIDE_CARDS: GuideCard[] = [
-  {
-    slug: "how-to-quote",
-    title: "How to Write a Professional Quote",
-    description: "A step-by-step guide: structure, line items, tax, and how to send a quote that clients actually sign. Everything you need to build a quote that converts.",
-    href: "/quotes/how-to-quote",
-    icon: "📋",
-  },
-  {
-    slug: "free-quote",
-    title: "Free Quoting: Get Started Risk-Free",
-    description: "Free and low-cost ways to start generating professional quotes. See how to get going without investing anything upfront.",
-    href: "/quotes/free-quote",
-    icon: "🎁",
-  },
-  {
-    slug: "excel-template",
-    title: "A Better Alternative to Excel Templates",
-    description: "Why the classic Excel quote template no longer cuts it — a direct comparison with modern AI-powered software for tradespeople.",
-    href: "/quotes/excel-template",
-    icon: "📊",
-  },
-  {
-    slug: "word-template",
-    title: "A Better Alternative to Word Templates",
-    description: "From a Word document to an automatic, professional PDF — how to make the switch without the hassle.",
-    href: "/quotes/word-template",
-    icon: "📄",
-  },
-];
-
-export const BLOG_LIST_TITLE = "quoteai Blog — Guides and Advice for Canadian Tradespeople";
-export const BLOG_LIST_DESCRIPTION = "Practical guides, real Canadian market pricing, and professional advice for tradespeople and small businesses: how to write quotes, win more jobs, and grow.";
-
-export interface BlogCategory {
-  slug: string;
-  name: string;
-  description: string;
-  color: string;
-}
-
-export const BLOG_CATEGORIES: BlogCategory[] = [
-  {
-    slug: "trades",
-    name: "Trades",
-    description: "Practical guides for painters, electricians, plumbers, roofers, and other trades — including Canada-specific work like winterization and snow load roofing.",
-    color: "bg-navy-50 text-navy-700 border-navy-200 hover:border-navy-400",
-  },
-  {
-    slug: "pricing",
-    name: "Pricing",
-    description: "Up-to-date Canadian pricing for the most common jobs: cost per square foot, per room, and per project, with regional differences called out.",
-    color: "bg-teal-50 text-teal-700 border-teal-200 hover:border-teal-400",
-  },
-  {
-    slug: "advice",
-    name: "Advice",
-    description: "Practical advice for winning more jobs, improving your quotes, and pricing work profitably as a contractor.",
-    color: "bg-amber-50 text-amber-700 border-amber-200 hover:border-amber-400",
-  },
-  {
-    slug: "tools",
-    name: "Tools",
-    description: "Reviews and comparisons of the best digital tools for tradespeople — software, apps, and AI-powered solutions.",
-    color: "bg-green-50 text-green-700 border-green-200 hover:border-green-400",
-  },
-  {
-    slug: "innovation",
-    name: "Innovation",
-    description: "How AI and new technology are changing the way tradespeople quote, manage, and grow their businesses.",
-    color: "bg-blue-50 text-blue-700 border-blue-200 hover:border-blue-400",
-  },
-  {
-    slug: "business",
-    name: "Business",
-    description: "Business management, local marketing, and growth strategies for Canadian tradespeople and small businesses.",
-    color: "bg-rose-50 text-rose-700 border-rose-200 hover:border-rose-400",
-  },
-];
-
-export function getCategoryBySlug(slug: string): BlogCategory | undefined {
-  return BLOG_CATEGORIES.find((c) => c.slug === slug);
-}
-
-export function getArticlesByCategory(categoryName: string): BlogArticle[] {
-  return BLOG_ARTICLES.filter((a) => a.category.toLowerCase() === categoryName.toLowerCase());
-}
-
-export const SECTOR_ARTICLES: Record<string, string[]> = {
-  painter: ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  "decorative-painter": ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-get-more-reviews-as-a-contractor"],
-  electrician: ["cost-to-rewire-a-house-canada", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  plumber: ["bathroom-renovation-cost-toronto-2026", "basement-waterproofing-guide-canadian-homes", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-get-more-reviews-as-a-contractor"],
-  "hvac-technician": ["cost-to-rewire-a-house-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  mason: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "basement-finishing-cost-canada", "how-to-price-a-job-labour-materials-markup"],
-  "general-contractor": ["basement-finishing-cost-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "google-business-profile-guide-for-tradespeople", "how-to-price-a-job-labour-materials-markup"],
-  "renovation-contractor": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "basement-waterproofing-guide-canadian-homes", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  "carpenter-cabinetmaker": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "welder-fabricator": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make"],
-  "tile-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  landscaper: ["deck-installation-cost-canada-2026", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
-  freelance: ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-price-a-job-labour-materials-markup", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
-  "building-consultant": ["basement-finishing-cost-canada", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  "window-door-installer": ["cost-to-reroof-a-home-canada", "how-to-price-a-job-labour-materials-markup", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  roofer: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "winterizing-your-home-contractor-checklist"],
-  "air-conditioning-installer": ["canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  "flooring-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  "excel-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "word-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "how-to-quote": ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors"],
-  "free-quote": ["mobile-quoting-on-the-go-for-contractors", "how-to-write-a-professional-quote-that-wins-jobs"],
 };
+
+export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {
+  const contentHtml = BLOG_CONTENT[meta.slug];
+  if (contentHtml === undefined) throw new Error(`blog-data.ts: no contentHtml for article "${meta.slug}"`);
+  return { ...meta, contentHtml };
+});

@@ -22,7 +22,6 @@ import {
   ACTIVE_CITY_SLUGS,
   CITY_SECTORS,
   SECTORS,
-  SECTOR_KEY_BY_FR_SLUG,
 } from "./seo-data.js";
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
 import type { CityIntelligence } from "./seo-intelligence.js";
@@ -51,39 +50,6 @@ function sectorPathSlug(sector: SectorData, lang: Lang): string {
   return lang === "fr-CA" ? sector.frSlug : sector.slug;
 }
 
-/**
- * Given the current pathname, returns the equivalent URL in the other
- * language, or null if this path has no distinct counterpart (dashboard,
- * auth, blog, etc. — the language toggle there just flips chrome text
- * without navigating).
- */
-export function getLanguageCounterpartPath(pathname: string): string | null {
-  if (pathname === "/") return "/fr";
-  if (pathname === "/fr" || pathname === "/fr/") return "/";
-
-  const enCity = pathname.match(/^\/quotes\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/);
-  if (enCity) {
-    const sector = SECTORS[enCity[1]];
-    if (sector) return `/fr/soumissions/${sector.frSlug}/${enCity[2]}/`;
-  }
-  const enSector = pathname.match(/^\/quotes\/([a-z0-9-]+)\/?$/);
-  if (enSector) {
-    const sector = SECTORS[enSector[1]];
-    if (sector) return `/fr/soumissions/${sector.frSlug}/`;
-  }
-  const frCity = pathname.match(/^\/fr\/soumissions\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/);
-  if (frCity) {
-    const key = SECTOR_KEY_BY_FR_SLUG[frCity[1]];
-    if (key) return `/quotes/${key}/${frCity[2]}/`;
-  }
-  const frSector = pathname.match(/^\/fr\/soumissions\/([a-z0-9-]+)\/?$/);
-  if (frSector) {
-    const key = SECTOR_KEY_BY_FR_SLUG[frSector[1]];
-    if (key) return `/quotes/${key}/`;
-  }
-  return null;
-}
-
 // ─── Deterministic hash ────────────────────────────────────────────────────
 
 export function strHash(s: string): number {
@@ -91,22 +57,13 @@ export function strHash(s: string): number {
 }
 
 // ─── OG image path ────────────────────────────────────────────────────────
-
-const SECTOR_OG_IMAGES: Record<string, string> = {
-  "general-contractor": "/og/sectors/general-contractor.png",
-  "renovation-contractor": "/og/sectors/renovation-contractor.png",
-  electrician: "/og/sectors/electrician.png",
-  plumber: "/og/sectors/plumber.png",
-  painter: "/og/sectors/painter.png",
-  "welder-fabricator": "/og/sectors/welder-fabricator.png",
-  "carpenter-cabinetmaker": "/og/sectors/carpenter-cabinetmaker.png",
-  "hvac-technician": "/og/sectors/hvac-technician.png",
-  freelance: "/og/sectors/freelance.png",
-  "building-consultant": "/og/sectors/building-consultant.png",
-};
+// scripts/generate-sector-og-images.ts renders /og/sectors/<slug>.png for
+// every entry in SECTORS at build time (Phase 68: it used to cover 10 of the
+// 22 sectors, and the prerender script carried a stale copy of this map that
+// pointed at /og/<slug>.jpg — a 404 on all 210 sector/city pages).
 
 export function getOgImagePath(sectorSlug: string): string {
-  return SECTOR_OG_IMAGES[sectorSlug] ?? "/opengraph.jpg";
+  return sectorSlug in SECTORS ? `/og/sectors/${sectorSlug}.png` : "/opengraph.jpg";
 }
 
 // ─── Intro text — 4 variants, sectorType-aware, deterministic by city.slug ─

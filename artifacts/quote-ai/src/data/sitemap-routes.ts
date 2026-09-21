@@ -3,6 +3,8 @@ export interface PublicRoute {
   path: string;
   priority: string;
   changefreq: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  /** ISO date of the last meaningful content change. Bump it when the page copy changes — the sitemap must be deterministic (Phase 68: a build-date lastmod made sitemap.xml churn on every build). */
+  lastmod: string;
 }
 
 /**
@@ -23,14 +25,14 @@ export interface PublicRoute {
  *     (those are generated from SECTORS, CITIES, BLOG_ARTICLES, BLOG_CATEGORIES data files)
  */
 const _PUBLIC_ROUTES = [
-  { name: "HOME",       path: "/",           priority: "1.0", changefreq: "weekly"  },
-  { name: "WHATSAPP",   path: "/whatsapp",   priority: "0.8", changefreq: "weekly"  },
-  { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly"  },
-  { name: "CHI_SIAMO",  path: "/chi-siamo",  priority: "0.7", changefreq: "yearly"  },
-  { name: "CONTATTI",   path: "/contatti",   priority: "0.7", changefreq: "yearly"  },
-  { name: "PRIVACY",    path: "/privacy-policy", priority: "0.4", changefreq: "yearly"  },
-  { name: "TERMS",      path: "/terms",       priority: "0.4", changefreq: "yearly"  },
-  { name: "MAPPA_SITO", path: "/mappa-sito", priority: "0.5", changefreq: "monthly" },
+  { name: "HOME",       path: "/",           priority: "1.0", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "WHATSAPP",   path: "/whatsapp",   priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "CHI_SIAMO",  path: "/chi-siamo",  priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
+  { name: "CONTATTI",   path: "/contatti",   priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
+  { name: "PRIVACY",    path: "/privacy-policy", priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-20" },
+  { name: "TERMS",      path: "/terms",       priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-20" },
+  { name: "MAPPA_SITO", path: "/mappa-sito", priority: "0.5", changefreq: "monthly", lastmod: "2026-09-20" },
 ] as const satisfies ReadonlyArray<PublicRoute>;
 
 /** Full route objects used by generate-sitemap.ts */

@@ -12,7 +12,8 @@
     "xlsx",
     "@google/genai",
     "@types/react-dom",
-    "@types/pdf-parse"
+    "@types/pdf-parse",
+    "@fontsource-variable/figtree"
   ],
   "ignoreBinaries": [
     "ffmpeg"
@@ -49,7 +50,8 @@
         "index.html",
         "scripts/*.ts",
         "server/*.mjs",
-        "vite.config.ts"
+        "vite.config.ts",
+        "src/entry-server.tsx"
       ]
     },
     "lib/*": {

@@ -1,0 +1,17 @@
+{
+  "version": "0.2",
+  "language": "en,fr-FR",
+  "import": ["@cspell/dict-fr-fr/cspell-ext.json"],
+  "dictionaries": ["fr-fr", "companies", "softwareTerms"],
+  "ignorePaths": ["node_modules", "dist", ".qa", "**/*.png", "**/*.jpg"],
+  "ignoreRegExpList": [
+    "/https?:\\/\\/\\S+/",
+    "/\\b[a-z][a-zA-Z0-9]*(\\.[a-zA-Z0-9_-]+)+\\b/",
+    "/\\b[A-Z0-9]*[0-9][A-Z0-9]*\\b/",
+    "/&[a-z]+;/",
+    "/\\$\\{[^}]*\\}/",
+    "/\\b[a-z]+[A-Z][a-zA-Z]*\\b/"
+  ],
+  "minWordLength": 4,
+  "words": []
+}

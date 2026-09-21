@@ -52,7 +52,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Quote"
+                  $ref: "#/components/schemas/QuoteSummary"
     post:
       operationId: createQuote
       tags: [quotes]
@@ -1768,6 +1768,66 @@ components:
         - status
         - rawInput
         - capitolatoPro
+        - createdAt
+        - updatedAt
+
+    # Phase 68: the list endpoint returns this instead of the full Quote —
+    # 500 quotes with their chapters, line items, raw input and company
+    # snapshot were 1.5 MB and 1.7 s; the list pages only read these fields.
+    QuoteSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        clientId:
+          type: string
+          nullable: true
+        province:
+          type: string
+          nullable: true
+        clientData:
+          $ref: "#/components/schemas/QuoteClientData"
+        descrizioneGenerale:
+          type: string
+        lineItemCount:
+          type: integer
+        subtotale:
+          type: number
+        ivaValore:
+          type: number
+        totale:
+          type: number
+        status:
+          type: string
+          enum: [draft, unlocked, pending_payment, accepted]
+        acceptedAt:
+          type: string
+          nullable: true
+        pdfUrl:
+          type: string
+          nullable: true
+        capitolatoPro:
+          type: boolean
+        templateId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        archivedAt:
+          type: string
+          nullable: true
+      required:
+        - id
+        - clientData
+        - descrizioneGenerale
+        - lineItemCount
+        - subtotale
+        - ivaValore
+        - totale
+        - status
+        - capitolatoPro
+        - templateId
         - createdAt
         - updatedAt
 

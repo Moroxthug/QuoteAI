@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
           Privacy Policy
         </h1>
-        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: May 6, 2025</p>
+        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 20, 2026</p>
       </header>
 
       <div className="wrap" style={{ maxWidth: 780, paddingBottom: "clamp(48px, 6vw, 80px)" }}>
@@ -96,10 +96,15 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">5. Who we share information with</h2>
             <p>Personal information may be shared with the following categories of recipients:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>Stripe Inc.</strong> — payment processing.</li>
-              <li><strong>OpenAI, LLC</strong> — AI-generated quotes. Only the job description text is sent.</li>
-              <li><strong>Cloud hosting providers</strong> — infrastructure and hosting.</li>
-              <li><strong>Resend Inc.</strong> — transactional email delivery.</li>
+              <li><strong>Stripe Inc.</strong> — payment processing and payouts (Stripe Connect).</li>
+              <li><strong>AI providers (Groq, Inc. or OpenAI, LLC)</strong> — quote, contract and document generation. The job description, the photos and documents you attach, your price catalogue and the client details on the quote are sent under their API terms of service.</li>
+              <li><strong>Vercel Inc. and Supabase Inc.</strong> — application hosting, database and file storage.</li>
+              <li><strong>Resend Inc.</strong> — transactional email delivery; Gmail (Google LLC) or Outlook (Microsoft Corporation) when you connect your own mailbox to send from it.</li>
+              <li><strong>Meta Platforms, Inc.</strong> — WhatsApp Business messages you choose to send to clients, and Meta Lead Ads if you connect an ad account.</li>
+              <li><strong>Google LLC and Microsoft Corporation</strong> — calendar sync (Google Calendar, Outlook) when you connect a calendar.</li>
+              <li><strong>Intuit Inc. (QuickBooks) and Wave Financial Inc.</strong> — accounting sync when you connect them.</li>
+              <li><strong>Financeit Canada Inc. and Flinks Technology Inc.</strong> — client financing offers and bank-transaction matching when you enable them.</li>
+              <li><strong>PostHog, Inc. and Google LLC (Google Analytics)</strong> — product analytics and website traffic measurement.</li>
             </ul>
             <p className="mt-3">
               We do not sell personal information to third parties. Where information is processed or

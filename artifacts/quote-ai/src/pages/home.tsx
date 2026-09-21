@@ -7,8 +7,8 @@ import { TestimonialsSection } from "@/components/testimonials-section";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { BLOG_ARTICLES } from "@/data/blog-data";
-import { SECTORS } from "@/data/seo-data";
+import { BLOG_INDEX } from "@/data/blog-index";
+import { sectorLabel } from "@/data/seo-slugs";
 
 function ScrollSection({
   children,
@@ -44,7 +44,7 @@ export default function Home() {
   const { lang } = useLanguage();
   const [, navigate] = useLocation();
 
-  const tradeLabel = (slug: string) => (lang === "fr" ? SECTORS[slug]?.fr.label : SECTORS[slug]?.label) ?? slug;
+  const tradeLabel = (slug: string) => sectorLabel(slug, lang);
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -388,7 +388,7 @@ export default function Home() {
             <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all news"} <ArrowRight className="chev h-4 w-4" /></Link>
           </div>
           <div className="news-grid">
-            {[...BLOG_ARTICLES].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article, i) => (
+            {[...BLOG_INDEX].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article, i) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                 <div className="news-media">
                   <img src={`https://picsum.photos/seed/quoteai-blog-${i}/840/525`} alt="" loading="lazy" />
@@ -556,7 +556,7 @@ export default function Home() {
       {/* ── CTA ────────────────────────────────────────────── */}
       <ScrollSection className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true" />
+          <img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true" loading="lazy" />
         </div>
         <div className="wrap cta-in">
           <span className="eyebrow on-dark">{lang === "fr" ? "Commencer" : "Get started"}</span>

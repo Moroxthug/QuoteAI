@@ -24,7 +24,7 @@ So "what's left" is not features — it is proving that ~60 phases shipped back-
 - No ESLint config at all (`npx eslint` errors out) — unused imports/dead code are only caught by hand.
 - Phase 29's `local_services_lead_conversation` contact-detail lookup left as a follow-up.
 - Phase 47 note: dashboard Clients is a virtual list from `quotes.client_data`; `clientsTable.archivedAt` exists but nothing sets it.
-- `artifacts/quote-ai/public/sitemap.xml` has an uncommitted 9-line local change sitting in the working tree (and `lib/db/src/schema/incentives.ts` had one for weeks — check whether it is still there).
+- ~~`artifacts/quote-ai/public/sitemap.xml` has an uncommitted 9-line local change sitting in the working tree~~ → the build date was the `lastmod`; fixed dates since Phase 68 (`incentives.ts` was clean).
 
 **Configuration / external (user-owned, not code)**
 - Vercel env vars for QuickBooks / Google Calendar / Outlook / `INVOICE_LINK_SECRET` — QuickBooks + Google were registered 2026-09-14; **Outlook (Entra ID) still not**, nor Gmail send (`GMAIL_SEND_*`), WhatsApp (`WHATSAPP_*`), Meta (`META_*`). Since Phase 65 every unregistered integration shows "not available yet" instead of a broken Connect button.
@@ -360,3 +360,54 @@ For each: connect from Settings → Integrations, trigger the real event, confir
 - Dialog focus-return (Phase 66 note): Radix returns focus to the previously focused element; the case observed in 66 (opener re-rendered/unmounted) was not reproduced here — re-check on device.
 
 **Verification**: `pnpm typecheck` (root) · `pnpm lint` 0 errors (69 warnings, unchanged) · `pnpm knip` · unit 11 files / 43 tests · e2e 7 files / 59 tests green against `quoteai` · `qa:visual` 364 pages clean · `qa:pdf` 44/44 · `docs/ROUTE-MATRIX.md` regenerated (limiter change) · migration 0033 applied.
+
+### Phase 68 — Performance, SEO & content integrity (2026-09-20/21)
+
+**Built**
+- `pnpm --filter @workspace/quote-ai qa:lighthouse` (`scripts/lighthouse.ts`, devDeps `lighthouse` + `chrome-launcher`): serves `dist/public` through `server/serve.mjs` (which now proxies `/api` to `API_PROXY_TARGET`, local QA only), runs Lighthouse's default mobile profile N times per URL (median), writes `.qa/lighthouse/report.{md,json}` plus one HTML report per URL, exit 1 under Perf ≥ 90 / SEO 100 / CLS ≤ 0.1. Flags `--urls`, `--runs`, `--api=<e2e API>` (public quote page; pair with `qa:visual --keep`), `--base=<any origin>`. Under Git Bash use `MSYS_NO_PATHCONV=1` or paths without the leading slash.
+- `pnpm --filter @workspace/api-server qa:perf` (`src/e2e/api-perf.ts`): seeds 500 quotes / 50 jobs (+ milestones, costs, invoices, payments) into a fresh account by direct insert, samples 12 read endpoints × 20 after warm-up, p50/p95/max + payload → `.qa/perf/report.md`, exit 1 over budget.
+- Build-time React rendering of the eight React-owned public pages (`src/entry-server.tsx`, `vite build --ssr`, `react-dom/static` `prerenderToNodeStream`, `main.tsx` `hydrateRoot`): `/`, `/fr`, `/whatsapp`, `/chi-siamo`, `/contatti`, `/privacy-policy`, `/terms`, `/mappa-sito`. The hand-written bodies these replace in `prerender-seo.ts` had drifted to the pre-redesign layout. `main.tsx` imports `App` on demand: the 233 static SEO/blog pages never load it.
+- `validate-prerender` checks every file (was a 50-file sample) and asserts one `<title>`, one canonical matching the path, hreflang x-default, an `og:image` that exists in `dist/public`, `<meta charset>` first, `<html lang>` matching the route. `i18n-audit` §4 checks the dictionary split. `qa:visual` scans every page's text for raw translation keys (`RAWKEY:`).
+- Root `pnpm spell` (cspell, EN + fr-FR) over the public copy and email templates; `cspell.json`.
+- DB migration `0034_phase68_invoice_payments_user_idx.sql` (applied to `quoteai`). Launch config `quote-ai-static` (production build on :5199).
+
+**Numbers** — Lighthouse mobile, medians of 3, local static server (Vercel's CDN can only be faster; run-to-run spread ±3–5):
+
+| URL | before | after | LCP | TBT | CLS | JS |
+|---|---|---|---|---|---|---|
+| `/` | 74 (LCP 5.3 s, JS 402 kB) | **93** | 2.6 s | 111 ms | 0 | 197 kB |
+| `/fr/` | ≈74 | **92** | 2.6 s | 122 ms | 0 | 197 kB |
+| `/whatsapp/` | — | **92** | 2.6 s | 168 ms | 0 | 202 kB |
+| blog article | — (CLS 0.08) | **99** | 1.7 s | 109 ms | 0 | 87 kB |
+| `/quotes/painter/` | — (CLS 0.08) | **99** | 1.9 s | 45 ms | 0 | 87 kB |
+| `/quotes/painter/toronto/` | — | **99** | 1.9 s | 46 ms | 0 | 87 kB |
+| `/fr/soumissions/peintre/montreal/` | 62 (CLS 0.79) | **98** | 1.8 s | 135 ms | 0 | 87 kB |
+| `/p/:id` (public quote, e2e API behind the proxy) | — | **92** | 2.7 s | 106 ms | 0 | 210 kB |
+
+SEO 100 and Best Practices 96–100 everywhere; a11y 92–98 (the static SEO bodies' moderate axe leftovers from Phase 67). Public entry chunk 1 120 kB → 60 kB (+ an `App` chunk of 311 kB loaded only on hydrated/SPA routes and `modulepreload`ed on the rendered pages). Dashboard home first load ≈ 60 + 311 + 208 (react) + 35 (query) + 32 (icons) + 268 (dashboard dictionary) + 33 (layout) + page ≈ 290 kB gzipped; `admin.tsx` (79 kB) and the blog bodies (54 kB) ship only on their own routes.
+
+API p95 with 500 quotes / 50 jobs (local app → staging Postgres): dashboard home 91 ms · **quotes list 1 731 ms / 1.46 MB → 315 ms / 266 kB** · clients 82 ms · jobs list 138 ms · job detail 173 ms · job analytics 136 ms · company analytics 585 ms (3 → 2 query rounds, new payments index) · invoices 181 ms · contracts / archive / notifications / profile < 100 ms. No N+1 anywhere; `clients.ts` is a single GROUP BY.
+
+**Found → fixed**
+1. **Figtree never loaded in production** — the Google Fonts `@import` sat after the `@font-face` rules, so PostCSS dropped it at build and every page rendered in Inter. Self-hosted from `@fontsource-variable/figtree` (20 kB latin woff2, preloaded); `@import`s moved to the top of `index.css`. P1 (the locked typeface).
+2. **Every sector, city and blog page shipped two headers, the top one in Italian** ("Accedi / Registrati" — `SeoNavShell` inserted above the static body), and the 210 city pages + 23 blog pages had **no site header or footer** of their own. `/fr/soumissions/*` was not matched by `main.tsx` at all and got the whole App rendered over the static body (CLS 0.79). Now: bodies wrapped in the static layout, the nav shell replaces the static `header.sticky` within one frame, EN/FR labels. P1.
+3. **`og:image` 404 on all 210 sector/city pages** (`/og/<slug>.jpg` vs the generated `/og/sectors/<slug>.png`); 12 of 22 sectors had no OG image. One map (`getOgImagePath`) for the engine, the generator (all sectors now) and the prerender; 78 stale Italian-era blog OG PNGs deleted. P2.
+4. **`GET /api/quotes` returned every quote in full** (chapters, line items, raw input, company snapshot): 1.46 MB / 1.7 s at 500 quotes. New `QuoteSummary` (openapi + codegen), `lineItemCount` computed in SQL. P1 at scale.
+5. `support-bot` polled `/api/support/admin-status` every 15 s from every public page for every visitor (a serverless invocation per visitor-minute, a console error on any host without the API); now only while the panel is open.
+6. Header logo PNG 1545×688 / 134 kB displayed at 162×72 → 323×144 / 6 kB. 466 kB of unreferenced public assets removed (`prevai-*.png`, workbench PNG, the 12 MB `ai-particles.mp4`, Italian testimonial logos). Decorative 1800×900 CTA images `loading="lazy"`.
+7. `posthog-js` (285 kB) and gtag (170 kB) no longer load before first paint: first user interaction or 5 s, whichever comes first (events queue meanwhile). CSP hashes regenerated.
+8. `<meta charset>` was preceded by the injected `<title>` (with an en dash) on every prerendered page; the head block is now injected after charset/viewport.
+9. `sitemap.xml` used the build date as `lastmod` for the static routes, so it churned on every build (the §1 item). `PUBLIC_ROUTES` carry a fixed `lastmod`.
+10. Customer-private token pages (`/p`, `/i`, `/sign`, `/t`, `/team-invite`) were indexable: `noindex` in the shell script, `Disallow` in robots.txt.
+11. Bundle: translation dictionary split (`translations.ts` 850 core keys / `translations.dashboard.ts` 2 235 keys registered by the dashboard layout + admin page); `seo-data` (117 kB) and the blog bodies out of the entry (`seo-slugs.ts`, `blog-index.ts`, sync assertion at build); `mappa-sito`, auth, legal and contact pages lazy; `@radix-ui` no longer a manual chunk (the homepage loaded all 136 kB for Tooltip + Toast).
+12. Privacy policy §5 listed only Stripe / OpenAI / Resend; it now names the processors the product actually uses (Groq or OpenAI, Vercel, Supabase, Gmail/Outlook, Meta/WhatsApp, Google/Microsoft calendars, QuickBooks/Wave, Financeit/Flinks, PostHog/GA) and what the AI receives. Both legal pages said "Last updated: May 6, 2025".
+13. Copy: cspell EN+FR over 21 files → 129 unknown words, all trade jargon, proper nouns or accented French; the only Italian left is in code comments. The legal entity is still "QuoteAI, a business operating from Ontario" — the registered name and address are the user's (§1).
+
+**Found → deferred** (→ `deferred-work-post-launch`)
+- The 233 static SEO/blog pages still use the hand-built pre-redesign bodies (violet gradient buttons, "Need help?" bubble) while the React versions are the navy redesign — crawlers and users see a different site on those pages. Fix = render them through `entry-server.tsx` like the eight pages above and delete ~1 800 lines of `prerender-seo.ts`; an SEO-content diff comes first (the hand-built bodies carry extra "Osservatorio" / "Quanto costa" text). P2.
+- Homepage `SeoHead` title/description differ from the prerendered ones (crawler vs post-hydration).
+- Critical-CSS inlining: the 35 kB gz stylesheet is the last render-blocking request (homepage LCP 2.6 s → ~2.2 s).
+- 14 `picsum.photos` placeholder images (Phase 67) unchanged — real photography is content.
+- Company analytics p95 ~600 ms: the per-project loops are O(P×N) in JS; fine to a few hundred jobs.
+
+**Verification**: `pnpm typecheck` · `pnpm lint` 0 errors (69 warnings) · `pnpm knip` · unit 11 files / 43 tests · e2e 7 files / 59 tests green against `quoteai` · `qa:visual` EN+FR @1280, 104 pages, 0 raw keys / 0 console errors · `validate-prerender` 417/417 · `validate-sitemap` 417/417 · `i18n-audit` clean · `qa:lighthouse` (8 URLs above) · `qa:perf` 12 endpoints within budget · `docs/ROUTE-MATRIX.md` regenerated · migration 0034 applied.

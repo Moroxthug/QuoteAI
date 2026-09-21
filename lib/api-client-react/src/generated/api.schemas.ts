@@ -161,6 +161,36 @@ export interface Quote {
   archivedAt?: string | null;
 }
 
+export type QuoteSummaryStatus = typeof QuoteSummaryStatus[keyof typeof QuoteSummaryStatus];
+
+
+export const QuoteSummaryStatus = {
+  draft: 'draft',
+  unlocked: 'unlocked',
+  pending_payment: 'pending_payment',
+  accepted: 'accepted',
+} as const;
+
+export interface QuoteSummary {
+  id: string;
+  clientId?: string | null;
+  province?: string | null;
+  clientData: QuoteClientData;
+  descrizioneGenerale: string;
+  lineItemCount: number;
+  subtotale: number;
+  ivaValore: number;
+  totale: number;
+  status: QuoteSummaryStatus;
+  acceptedAt?: string | null;
+  pdfUrl?: string | null;
+  capitolatoPro: boolean;
+  templateId: string;
+  createdAt: string;
+  updatedAt: string;
+  archivedAt?: string | null;
+}
+
 export interface QuoteStats {
   total: number;
   draft: number;

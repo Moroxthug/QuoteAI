@@ -27,7 +27,7 @@ bootstrapQaEnv("qa-visual");
 process.env.NODE_ENV = "development";
 
 import { spawn, type ChildProcess } from "node:child_process";
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
@@ -35,6 +35,15 @@ import { chromium, type Browser, type BrowserContext, type Page } from "playwrig
 const require = createRequire(import.meta.url);
 const AXE_PATH = require.resolve("axe-core/axe.min.js");
 const ROOT = resolve(import.meta.dirname, "../../../..");
+
+// Phase 68: the translation dictionary is split (core vs lazy dashboard chunk).
+// A key that ends up in the wrong half renders as its raw id ("jobs.tab.costs"),
+// so every page's text is scanned for known key ids.
+const TRANSLATION_KEYS: Set<string> = new Set(
+  ["translations.ts", "translations.dashboard.ts"].flatMap((name) =>
+    [...readFileSync(resolve(ROOT, "artifacts/quote-ai/src/i18n", name), "utf8").matchAll(/^\s*"([a-zA-Z0-9_.-]+)":/gm)].map((m) => m[1]!),
+  ),
+);
 
 // ── CLI ──────────────────────────────────────────────────────────────────────
 const args = new Map<string, string>();
@@ -130,7 +139,7 @@ type PageResult = {
   title: string; screenshot: string;
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
   axe: Array<{ id: string; impact: string; help: string; count: number; targets: string[]; detail: string[] }>;
-  consoleErrors: string[]; failedRequests: string[]; boundary: string | null; error?: string;
+  consoleErrors: string[]; failedRequests: string[]; boundary: string | null; rawKeys: string[]; error?: string;
 };
 
 async function settle(page: Page) {
@@ -191,7 +200,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
   const file = resolve(dir, `${slug(r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, axe: [], consoleErrors, failedRequests, boundary: null };
+  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, axe: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -201,6 +210,8 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
       const m = /Something went wrong|Une erreur est survenue|Can't reach QuoteAI|Impossible de joindre/i.exec(t);
       return m ? m[0] : null;
     });
+    const tokens: string[] = await page.evaluate(() => Array.from(new Set((document.body.innerText.match(/\b[a-z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9_-]+){1,6}\b/g) ?? []))));
+    result.rawKeys = tokens.filter((t) => TRANSLATION_KEYS.has(t));
     result.overflow = await overflow(page);
     if (SCREENSHOTS) await page.screenshot({ path: file, fullPage: true });
     if (RUN_AXE) result.axe = await runAxe(page);
@@ -246,6 +257,8 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
 
   lines.push("## Overflow details", "");
   for (const r of results) if (r.overflow) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.overflow.scrollWidth}/${r.overflow.clientWidth} — ${r.overflow.offenders.join(", ")}`);
+  lines.push("", "## Raw translation keys on the page", "");
+  for (const r of results) if (r.rawKeys.length) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.rawKeys.join(", ")}`);
   lines.push("", "## Console errors / failed requests", "");
   for (const r of results) {
     if (!r.consoleErrors.length && !r.failedRequests.length) continue;
@@ -304,7 +317,7 @@ try {
         for (const r of rs) {
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
-          const flags = [res.overflow && "OVERFLOW", res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.error && `ERROR:${res.error}`].filter(Boolean);
+          const flags = [res.overflow && "OVERFLOW", res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
           console.log(`${lang}@${String(width).padStart(4)} ${r.path.padEnd(60)} ${flags.join(" ") || "ok"}`);
         }
       }
@@ -314,7 +327,8 @@ try {
   writeReport(results, { langs: LANGS, widthsEn: WIDTHS_EN, widthsFr: WIDTHS_FR, province: PROVINCE, routes: all.length, pages: results.length, seconds: Math.round((Date.now() - t0) / 1000) });
   const serious = results.reduce((s, r) => s + r.axe.filter((a) => a.impact !== "moderate").reduce((x, a) => x + a.count, 0), 0);
   const overflows = results.filter((r) => r.overflow).length;
-  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, axe serious/critical nodes ${serious} → ${resolve(OUT, "report.md")}`);
+  const rawKeyPages = results.filter((r) => r.rawKeys.length).length;
+  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, axe serious/critical nodes ${serious}, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
   if (KEEP) {
     console.log(`[qa-visual] --keep: account ${org.email} left in place; bearer ${org.token}; frontend ${frontend} (API ${apiBase}). Ctrl-C to stop.`);
     await new Promise(() => {});

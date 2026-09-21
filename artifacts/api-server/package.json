@@ -16,7 +16,8 @@
     "walkthrough": "tsx src/e2e/walkthrough.ts",
     "walkthrough:cleanup": "tsx src/e2e/walkthrough-cleanup.ts",
     "qa:visual": "tsx src/e2e/visual-a11y.ts",
-    "qa:pdf": "tsx src/e2e/pdf-matrix.ts"
+    "qa:pdf": "tsx src/e2e/pdf-matrix.ts",
+    "qa:perf": "tsx src/e2e/api-perf.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

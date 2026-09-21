@@ -4,7 +4,7 @@ import {
   BLOG_CATEGORIES,
   getCategoryBySlug,
   getArticlesByCategory,
-} from "@/data/blog-data";
+} from "@/data/blog-index";
 import { SeoHead } from "@/components/seo-head";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -156,7 +156,7 @@ export default function BlogCategoryPage() {
 
       <section className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-blog-category-cta/1800/900" alt="" aria-hidden="true" />
+          <img src="https://picsum.photos/seed/quoteai-blog-category-cta/1800/900" alt="" aria-hidden="true" loading="lazy" />
         </div>
         <div className="wrap cta-in">
           <h2>

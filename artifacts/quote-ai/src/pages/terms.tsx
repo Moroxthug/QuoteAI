@@ -29,7 +29,7 @@ export default function TermsPage() {
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
           Terms of Service
         </h1>
-        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: May 6, 2025</p>
+        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 17, 2026</p>
       </header>
 
       <div className="wrap" style={{ maxWidth: 780, paddingBottom: "clamp(48px, 6vw, 80px)" }}>

@@ -59,6 +59,7 @@ import type {
   QuickbooksToggleBody,
   Quote,
   QuoteStats,
+  QuoteSummary,
   QuoteVariant,
   RegenerateQuoteBody,
   SendQuotePdfEmail200,
@@ -208,9 +209,9 @@ export const getListQuotesUrl = () => {
 /**
  * @summary List all quotes for the authenticated user
  */
-export const listQuotes = async ( options?: Parameters<typeof customFetch>[1]): Promise<Quote[]> => {
+export const listQuotes = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuoteSummary[]> => {
 
-  return customFetch<Quote[]>(getListQuotesUrl(),
+  return customFetch<QuoteSummary[]>(getListQuotesUrl(),
   {
     ...options,
     method: 'GET'

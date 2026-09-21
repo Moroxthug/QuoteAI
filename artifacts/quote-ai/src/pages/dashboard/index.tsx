@@ -7,7 +7,7 @@ import {
   useGetBusinessProfile,
   useListQuotes,
 } from "@workspace/api-client-react";
-import type { Quote } from "@workspace/api-client-react";
+import type { QuoteSummary } from "@workspace/api-client-react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -98,7 +98,7 @@ function periodRange(period: Period, offset: number): { start: Date; end: Date }
   };
 }
 
-function computePeriodStats(quotes: Quote[], period: Period, offset: number) {
+function computePeriodStats(quotes: QuoteSummary[], period: Period, offset: number) {
   const { start, end } = periodRange(period, offset);
   const inRange = quotes.filter(q => {
     const d = new Date(q.createdAt);
@@ -115,7 +115,7 @@ function deltaPct(current: number, previous: number): number | null {
   return Math.round(((current - previous) / previous) * 100);
 }
 
-function weeklyRevenueBuckets(quotes: Quote[]): number[] {
+function weeklyRevenueBuckets(quotes: QuoteSummary[]): number[] {
   const now = new Date();
   const dow = now.getDay();
   const diffToMonday = (dow + 6) % 7;

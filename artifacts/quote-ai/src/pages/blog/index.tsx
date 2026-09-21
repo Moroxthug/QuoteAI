@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { ArrowRight, ClipboardList, Gift, BarChart3, FileText } from "lucide-react";
-import { BLOG_ARTICLES, BLOG_CATEGORIES, BLOG_LIST_TITLE, BLOG_LIST_DESCRIPTION, GUIDE_CARDS } from "@/data/blog-data";
+import { BLOG_INDEX, BLOG_CATEGORIES, BLOG_LIST_TITLE, BLOG_LIST_DESCRIPTION, GUIDE_CARDS } from "@/data/blog-index";
 import { SeoHead } from "@/components/seo-head";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
@@ -116,7 +116,7 @@ export default function BlogPage() {
       <ScrollSection className="sec" id="articles">
         <div className="wrap">
           <div className="news-grid">
-            {BLOG_ARTICLES.map((article, i) => (
+            {BLOG_INDEX.map((article, i) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                 <div className="news-media">
                   <img src={`https://picsum.photos/seed/quoteai-blog-${i}/840/525`} alt="" loading="lazy" />
@@ -142,7 +142,7 @@ export default function BlogPage() {
 
       <ScrollSection className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-blog-cta/1800/900" alt="" aria-hidden="true" />
+          <img src="https://picsum.photos/seed/quoteai-blog-cta/1800/900" alt="" aria-hidden="true" loading="lazy" />
         </div>
         <div className="wrap cta-in">
           <h2>

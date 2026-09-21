@@ -5,7 +5,7 @@ import path from "path";
 const port = Number(process.env.PORT ?? "5173");
 const basePath = process.env.BASE_PATH ?? "/";
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   base: basePath,
   plugins: [
     react(),
@@ -19,13 +19,18 @@ export default defineConfig({
     dedupe: ["react", "react-dom"],
   },
   root: path.resolve(import.meta.dirname),
+  ssr: {
+    // CommonJS packages whose named exports tsx (which runs the prerender script) cannot resolve: bundle them into dist/server.
+    noExternal: ["react-helmet-async"],
+  },
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        manualChunks(id) {
+        // Not for the SSR build of entry-server.tsx (one Node file; Rollup rejects manual chunks there).
+        manualChunks: isSsrBuild ? undefined : (id) => {
           // Only long-lived vendor libraries are grouped by hand (cache stability).
           // recharts is deliberately NOT grouped: a manual chunk drags its whole
           // dependency tree in and every page chunk ended up importing it. Grouping app pages into a
@@ -34,11 +39,13 @@ export default defineConfig({
           // ended up statically importing — and modulepreloading — the whole
           // 1.5 MB dashboard bundle on the marketing homepage (Phase 61).
           // Lazy routes now split naturally, one chunk per page.
+          // @radix-ui used to be grouped too: a grouped chunk holds every
+          // primitive used anywhere, and the public entry (which needs only
+          // Tooltip/Toast) had to load all 136 kB of it on the homepage.
+          // Rollup now splits it by usage (Phase 68). lucide-react stays
+          // grouped — split by usage it became ~150 one-icon chunks.
           if (id.includes("node_modules/lucide-react")) {
             return "vendor-icons";
-          }
-          if (id.includes("node_modules/@radix-ui")) {
-            return "vendor-radix";
           }
           if (
             id.includes("node_modules/react-helmet-async") ||
@@ -81,4 +88,4 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
   },
-});
+}));

@@ -9,7 +9,6 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 
 const BASE_URL = "https://quoteai.ca";
-const TODAY = new Date().toISOString().split("T")[0];
 
 // The half-dozen highest-population metros get a slightly higher priority
 // than the rest of ACTIVE_CITIES.
@@ -17,7 +16,7 @@ const TIER1_CITY_SLUGS = new Set([
   "toronto", "montreal", "vancouver", "calgary", "ottawa", "edmonton",
 ]);
 
-function url(loc: string, priority: string, changefreq: string, lastmod = TODAY): string {
+function url(loc: string, priority: string, changefreq: string, lastmod: string): string {
   return `  <url>
     <loc>${loc}</loc>
     <lastmod>${lastmod}</lastmod>
@@ -28,13 +27,15 @@ function url(loc: string, priority: string, changefreq: string, lastmod = TODAY)
 
 const entries: string[] = [];
 
-// Static public routes — add trailing slash to all paths except root "/"
+// Static public routes — add trailing slash to all paths except root "/".
+// Every lastmod below is a fixed date so the committed sitemap.xml only
+// changes when content does (no build-date churn).
 for (const route of PUBLIC_ROUTES) {
   const loc = route.path === "/" ? `${BASE_URL}/` : `${BASE_URL}${route.path}/`;
-  entries.push(url(loc, route.priority, route.changefreq));
+  entries.push(url(loc, route.priority, route.changefreq, route.lastmod));
 }
 // French homepage
-entries.push(url(`${BASE_URL}/fr/`, "1.0", "weekly"));
+entries.push(url(`${BASE_URL}/fr/`, "1.0", "weekly", PUBLIC_ROUTES.find((r) => r.path === "/")!.lastmod));
 
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
@@ -94,6 +95,11 @@ Disallow: /sign-up
 Disallow: /onboarding
 Disallow: /admin
 Disallow: /api
+Disallow: /p/
+Disallow: /i/
+Disallow: /sign/
+Disallow: /t/
+Disallow: /team-invite/
 
 # City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)
 ${inactiveCitySlugs.map((slug) => `Disallow: /quotes/*/${slug}/`).join("\n")}

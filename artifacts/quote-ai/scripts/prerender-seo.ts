@@ -1,10 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   SECTORS,
-  CITIES,
   ACTIVE_CITIES,
   CITY_SECTORS,
   getCityTitle,
@@ -30,6 +29,7 @@ import {
   getSectorFrContent,
   DEMAND_TEXT_FR,
   buildCityJsonLd as buildCityJsonLdFromEngine,
+  getOgImagePath,
 } from "../src/data/seo-render-engine.js";
 import {
   BLOG_ARTICLES,
@@ -62,24 +62,10 @@ if (!existsSync(templatePath)) {
 
 const BASE_URL = "https://quoteai.ca";
 
-const SECTOR_OG_IMAGES: Record<string, string> = {
-  "general-contractor": "/og/general-contractor.jpg",
-  "renovation-contractor": "/og/renovation-contractor.jpg",
-  electrician: "/og/electrician.jpg",
-  plumber: "/og/plumber.jpg",
-  painter: "/og/painter.jpg",
-  "welder-fabricator": "/og/welder-fabricator.jpg",
-  "carpenter-cabinetmaker": "/og/carpenter-cabinetmaker.jpg",
-  "hvac-technician": "/og/hvac-technician.jpg",
-  freelance: "/og/freelance.jpg",
-  "building-consultant": "/og/building-consultant.jpg",
-};
 
 // ─── Core utilities ────────────────────────────────────────────────────────
 
-function ogImage(sectorSlug: string): string {
-  return SECTOR_OG_IMAGES[sectorSlug] ?? "/opengraph.jpg";
-}
+const ogImage = getOgImagePath; // one map for the engine, the OG generator and this script
 
 function esc(s: string): string {
   return s
@@ -160,13 +146,42 @@ function injectHead(template: string, headBlock: string, lang: "en" | "fr" = "en
   html = html.replace(/<meta\s+name="twitter:[^"]*"[^>]*\/?>/gi, "");
   html = html.replace(/<meta\s+name="keywords"[^>]*\/?>/gi, "");
   html = html.replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi, "");
-  html = html.replace("<head>", `<head>\n${headBlock}`);
+  // After <meta charset> + viewport: the charset declaration must stay within
+  // the first 1024 bytes of the document, and a <title> with an en dash was
+  // landing in front of it (Phase 68).
+  const viewport = /<meta\s+name="viewport"[^>]*>/i.exec(html);
+  html = viewport
+    ? html.slice(0, viewport.index + viewport[0].length) + `\n${headBlock}` + html.slice(viewport.index + viewport[0].length)
+    : html.replace("<head>", `<head>\n${headBlock}`);
   return html;
 }
 
 function injectBody(html: string, bodyHtml: string): string {
   if (!bodyHtml) return html;
   return html.replace(/<div id="root"><\/div>/, `<div id="root">${bodyHtml}</div>`);
+}
+
+// main.tsx imports the App on demand (static SEO pages never load it). The
+// build-time-rendered pages hydrate with it, so they preload the chunk — and
+// the chunks it statically pulls in — to avoid a second round trip before
+// hydration. The names carry content hashes, so they are read off dist/.
+const APP_PRELOADS: string[] = (() => {
+  const assets = join(distDir, "assets");
+  const app = readdirSync(assets).find((f) => /^App-[\w-]+\.js$/.test(f));
+  if (!app) return [];
+  const seen = new Set<string>();
+  const walk = (file: string) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    const src = readFileSync(join(assets, file), "utf8");
+    for (const m of src.matchAll(/(?:^|[^.\w])import\s*["']\.\/([\w-]+\.js)["']|from\s*["']\.\/([\w-]+\.js)["']/g)) walk((m[1] ?? m[2])!);
+  };
+  walk(app);
+  return [...seen];
+})();
+function injectAppPreload(html: string): string {
+  const links = APP_PRELOADS.map((f) => `<link rel="modulepreload" crossorigin href="/assets/${f}">`).join("\n    ");
+  return links ? html.replace("</head>", `    ${links}\n  </head>`) : html;
 }
 
 function writeRoute(relPath: string, html: string): void {
@@ -1493,6 +1508,24 @@ function buildCityBodyHtmlFr(s: SectorData, city: CityData): string {
 // ─── Main execution ─────────────────────────────────────────────────────────
 
 const template = pruneModulepreload(readFileSync(templatePath, "utf-8"));
+
+// Phase 68: "/", "/fr" and the six static pages (about, contact, privacy,
+// terms, WhatsApp, sitemap) are rendered by the real React tree — built with
+// `vite build --ssr src/entry-server.tsx --outDir dist/server`, see the
+// `build` script — and hydrated by main.tsx, so the hero paints from HTML and
+// crawlers see the same DOM users get (the hand-written bodies this replaced
+// had drifted to the pre-redesign layout). React 19 hoists <title>/<meta>/
+// <link> to the front of the string; the head is authored by buildHeadBlock()
+// here, so those are stripped.
+const ssrEntry = join(__dirname, "../dist/server/entry-server.js");
+if (!existsSync(ssrEntry)) {
+  console.error("dist/server/entry-server.js not found — run `vite build --ssr src/entry-server.tsx --outDir dist/server` first");
+  process.exit(1);
+}
+const { renderPage } = (await import(pathToFileURL(ssrEntry).href)) as { renderPage: (path: string, lang: "en" | "fr") => Promise<string> };
+function stripHoistedHead(html: string): string {
+  return html.replace(/^(?:\s*(?:<(?:link|meta)\b[^>]*\/?>|<title>[^<]*<\/title>))+/, "");
+}
 let count = 0;
 
 console.log("Prerendering SEO pages...");
@@ -1549,7 +1582,7 @@ const homepageHeadBlock = buildHeadBlock({
   lang: "en",
   altUrl: `${BASE_URL}/fr/`,
 });
-const homepageHtml = injectHead(template, homepageHeadBlock);
+const homepageHtml = injectAppPreload(injectBody(injectHead(template, homepageHeadBlock), stripHoistedHead(await renderPage("/", "en"))));
 writeFileSync(templatePath, homepageHtml, "utf-8");
 count++;
 console.log("  ✓ Homepage prerendered");
@@ -1582,7 +1615,7 @@ const homepageHeadBlockFr = buildHeadBlock({
   lang: "fr",
   altUrl: `${BASE_URL}/`,
 });
-const homepageHtmlFr = injectHead(template, homepageHeadBlockFr, "fr");
+const homepageHtmlFr = injectAppPreload(injectBody(injectHead(template, homepageHeadBlockFr, "fr"), stripHoistedHead(await renderPage("/fr", "fr"))));
 writeRoute("fr", homepageHtmlFr);
 count++;
 console.log("  ✓ French homepage prerendered");
@@ -1646,7 +1679,8 @@ for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
       lang: "en",
       altUrl: isFrenchPrimaryCity ? cityFrCanonical : undefined,
     });
-    const cityBodyHtml = buildCityBodyHtml(sector, city);
+    // Phase 68: the 210 city pages and the 23 blog pages were written without the site header/footer — in production they showed only the (Italian) nav shell and no footer.
+    const cityBodyHtml = wrapInPublicLayout(buildCityBodyHtml(sector, city));
     const cityHtml = injectBody(injectHead(template, cityHeadBlock), cityBodyHtml);
     writeRoute(`quotes/${sectorSlug}/${city.slug}`, cityHtml);
     count++;
@@ -2117,7 +2151,7 @@ const blogListHeadBlock = buildHeadBlock({
   ogImagePath: "/opengraph.jpg",
   jsonLd: buildBlogListJsonLd(),
 });
-const blogListHtml = injectBody(injectHead(template, blogListHeadBlock), buildBlogListBodyHtml());
+const blogListHtml = injectBody(injectHead(template, blogListHeadBlock), wrapInPublicLayout(buildBlogListBodyHtml()));
 writeRoute("blog", blogListHtml);
 count++;
 console.log("  ✓ Blog list page prerendered");
@@ -2132,7 +2166,7 @@ for (const category of BLOG_CATEGORIES) {
     ogImagePath: "/opengraph.jpg",
     jsonLd: buildBlogCategoryJsonLd(category),
   });
-  const categoryHtml = injectBody(injectHead(template, categoryHeadBlock), buildBlogCategoryBodyHtml(category));
+  const categoryHtml = injectBody(injectHead(template, categoryHeadBlock), wrapInPublicLayout(buildBlogCategoryBodyHtml(category)));
   writeRoute(`blog/categoria/${category.slug}`, categoryHtml);
   count++;
 }
@@ -2149,13 +2183,13 @@ for (const article of BLOG_ARTICLES) {
     ogImagePath: articleOgImage,
     jsonLd: buildArticleJsonLd(article, articleOgImage),
   });
-  const articleHtml = injectBody(injectHead(template, articleHeadBlock), buildBlogArticleBodyHtml(article));
+  const articleHtml = injectBody(injectHead(template, articleHeadBlock), wrapInPublicLayout(buildBlogArticleBodyHtml(article)));
   writeRoute(`blog/${article.slug}`, articleHtml);
   count++;
 }
 console.log(`  ✓ ${BLOG_ARTICLES.length} blog articles prerendered`);
 
-// ─── Static SPA pages prerender ─────────────────────────────────────────────
+// ─── Static SPA pages prerender (bodies from entry-server.tsx, see above) ───
 
 function buildBreadcrumbJsonLd(name: string, path: string): object {
   return {
@@ -2180,141 +2214,7 @@ function buildWebPageJsonLd(name: string, description: string, path: string, typ
   };
 }
 
-function buildMappaSitoBodyHtml(): string {
-  const breadcrumb = buildBreadcrumb([
-    { name: "Home", href: "/" },
-    { name: "Site Map", href: null },
-  ]);
-
-  const mainPages = `
-    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Main Pages</h2>
-      </div>
-      <ul class="space-y-2.5 text-sm">
-        <li><a href="/" class="text-gray-600 hover:text-violet-600 transition-colors">Home Page</a></li>
-        <li><a href="/whatsapp/" class="text-gray-600 hover:text-violet-600 transition-colors">Quotes on WhatsApp</a></li>
-        <li><a href="/chi-siamo/" class="text-gray-600 hover:text-violet-600 transition-colors">About Us</a></li>
-        <li><a href="/contatti/" class="text-gray-600 hover:text-violet-600 transition-colors">Contact &amp; Support</a></li>
-        <li><a href="/privacy-policy/" class="text-gray-600 hover:text-violet-600 transition-colors">Privacy Policy</a></li>
-        <li><a href="/terms/" class="text-gray-600 hover:text-violet-600 transition-colors">Terms of Service</a></li>
-      </ul>
-    </div>
-  `;
-
-  const blogCats = BLOG_CATEGORIES.map((cat) => `
-    <li><a href="/blog/categoria/${cat.slug}/" class="text-gray-600 hover:text-violet-600 transition-colors pl-2">Category: ${cat.name}</a></li>
-  `).join("");
-
-  const blogArts = BLOG_ARTICLES.slice(0, 5).map((art) => `
-    <li class="truncate max-w-full"><a href="/blog/${art.slug}/" class="text-gray-500 hover:text-violet-600 text-xs transition-colors pl-2">${esc(art.title)}</a></li>
-  `).join("");
-
-  const blogPages = `
-    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Blog &amp; Guides</h2>
-      </div>
-      <ul class="space-y-2.5 text-sm">
-        <li><a href="/blog/" class="font-semibold text-gray-800 hover:text-violet-600 transition-colors">Blog Index</a></li>
-        ${blogCats}
-        <li class="pt-2 font-semibold text-gray-800 border-t border-gray-50 mt-2">Latest Articles:</li>
-        ${blogArts}
-      </ul>
-    </div>
-  `;
-
-  const sectorLinks = Object.entries(SECTORS).map(([slug, sector]) => `
-    <li><a href="/quotes/${slug}/" class="text-gray-600 hover:text-violet-600 transition-colors">${esc(sector.label)}</a></li>
-  `).join("");
-
-  const professionsIndex = `
-    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3 mb-5 pb-3 border-b border-gray-50">
-        <h2 class="text-lg font-bold text-gray-900">Trades &amp; Services</h2>
-      </div>
-      <ul class="space-y-2.5 text-sm">
-        ${sectorLinks}
-      </ul>
-    </div>
-  `;
-
-  const citiesByRegion = new Map<string, typeof CITIES>();
-  for (const city of ACTIVE_CITIES) {
-    const list = citiesByRegion.get(city.region) || [];
-    list.push(city);
-    citiesByRegion.set(city.region, list);
-  }
-
-  const sortedRegions = Array.from(citiesByRegion.keys()).sort();
-
-  const regionBlocks = sortedRegions.map((region) => {
-    const regionCities = citiesByRegion.get(region) || [];
-    const cityItems = regionCities.map((city) => {
-      const sectorLinksForCity = CITY_SECTORS.map((sectorSlug) => {
-        const s = SECTORS[sectorSlug];
-        if (!s) return "";
-        return `<a href="/quotes/${sectorSlug}/${city.slug}/" class="text-gray-500 hover:text-violet-600 transition-colors truncate" title="${esc(s.label)} quote in ${esc(city.name)}">${esc(s.label)}</a>`;
-      }).join("\n");
-
-      return `
-        <div class="flex flex-col gap-1">
-          <span class="font-bold text-gray-900 border-b border-gray-50 pb-0.5 mb-1">${esc(city.name)}</span>
-          <div class="flex flex-col gap-1.5 pl-1">
-            ${sectorLinksForCity}
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    return `
-      <div class="border-b border-gray-50 pb-8 last:border-0 last:pb-0">
-        <h3 class="text-sm font-semibold uppercase tracking-wider text-violet-700 mb-4">${esc(region)}</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-4 gap-x-2 text-xs">
-          ${cityItems}
-        </div>
-      </div>
-    `;
-  }).join("\n");
-
-  const citiesDirectory = `
-    <div class="mt-12 bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-      <div class="flex items-center gap-3 mb-8 pb-4 border-b border-gray-100">
-        <div>
-          <h2 class="text-2xl font-bold text-gray-900">Local Quotes by City</h2>
-          <p class="text-sm text-gray-500 mt-1">Select a trade and your city to see local pricing and information.</p>
-        </div>
-      </div>
-      <div class="space-y-10">
-        ${regionBlocks}
-      </div>
-    </div>
-  `;
-
-  return wrapInPublicLayout(`
-    <div class="flex flex-col min-h-screen bg-white">
-      ${breadcrumb}
-      <section class="relative overflow-hidden bg-white pt-20 pb-12 border-b border-gray-100">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-3xl">
-          <h1 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">Site Map</h1>
-          <p class="text-lg text-gray-600">Browse the full index of quoteai.ca. Find quoting tools by trade, guides, and every local page by region.</p>
-        </div>
-      </section>
-      <section class="py-16 bg-gray-50/50">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div class="grid md:grid-cols-3 gap-8">
-            ${mainPages}
-            ${blogPages}
-            ${professionsIndex}
-          </div>
-          ${citiesDirectory}
-        </div>
-      </section>
-    </div>
-  `);
-}
-
-function buildStaticPageHtml(opts: {
+async function buildStaticPageHtml(opts: {
   slug: string;
   title: string;
   description: string;
@@ -2322,7 +2222,7 @@ function buildStaticPageHtml(opts: {
   jsonLd: object[];
   bodyHtml: string;
   ogImagePath?: string;
-}): void {
+}): Promise<void> {
   const headBlock = buildHeadBlock({
     title: opts.title,
     description: opts.description,
@@ -2330,7 +2230,7 @@ function buildStaticPageHtml(opts: {
     ogImagePath: opts.ogImagePath ?? "/opengraph.jpg",
     jsonLd: opts.jsonLd,
   });
-  const html = injectBody(injectHead(template, headBlock), opts.bodyHtml);
+  const html = injectAppPreload(injectBody(injectHead(template, headBlock), opts.bodyHtml));
   writeRoute(opts.slug, html);
   count++;
 }
@@ -2352,59 +2252,13 @@ const chiSiamoOrgJsonLd = {
     availableLanguage: "en",
   },
 };
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "chi-siamo",
   title: "About Us | quoteai — AI Quoting Software for Contractors",
   description: "quoteai exists to free Canadian tradespeople from paperwork. Learn our mission: professional quotes in 30 seconds thanks to AI.",
   path: "/chi-siamo/",
   jsonLd: [chiSiamoOrgJsonLd, buildBreadcrumbJsonLd("About Us", "/chi-siamo/")],
-  bodyHtml: wrapInPublicLayout(`<section class="relative overflow-hidden bg-white pt-24 pb-20">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
-    <div class="inline-flex items-center gap-2 rounded-full bg-violet-50 border border-violet-100 px-4 py-1.5 text-sm font-medium text-violet-700 mb-8">Built for Canadian trades</div>
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-6">We're quoteai. <span style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">We free tradespeople from paperwork.</span></h1>
-    <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">Canada has hundreds of thousands of contractors, tradespeople and small trade businesses. Most of them lose several hours a week writing quotes by hand. We built quoteai to give that time back.</p>
-  </div>
-</section>
-<section class="py-20 bg-gray-50">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-3xl font-bold text-gray-900 mb-6">How it started</h2>
-    <div class="space-y-5 text-gray-600 leading-relaxed text-lg">
-      <p>It started with a real frustration: a painter who, every evening after a full day on site, still had to sit down and update a spreadsheet to send quotes to customers. A $200 job often took an hour and a half just to quote.</p>
-      <p>We thought: AI already knows how a professional quote is put together. Why not let a tradesperson <em>describe the job the way they'd explain it out loud</em>, and get a document ready to send back in 30 seconds?</p>
-      <p>That's how quoteai came to be. Software built specifically for the Canadian trades market, with the terminology contractors actually use, prices that reflect the Canadian market, and everything a quote needs: your logo, business details, tax calculated correctly, customizable terms, a professional PDF.</p>
-    </div>
-  </div>
-</section>
-<section class="py-20 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-    <div class="text-center mb-14"><h2 class="text-3xl font-bold text-gray-900 mb-4">Our values</h2><p class="text-gray-500 text-lg max-w-xl mx-auto">Every decision we make starts from three principles.</p></div>
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="bg-gray-50 rounded-2xl p-8 text-center"><h3 class="text-lg font-bold text-gray-900 mb-3">Real speed</h3><p class="text-gray-500 text-sm leading-relaxed">30 seconds isn't a slogan. It's how long it takes to generate a complete, professional quote. Your time is worth something.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-8 text-center"><h3 class="text-lg font-bold text-gray-900 mb-3">Built for Canada</h3><p class="text-gray-500 text-sm leading-relaxed">Not a generic tool with the words swapped out. Built from the ground up for the Canadian trades market: job categories, pricing, tax rules, language.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-8 text-center"><h3 class="text-lg font-bold text-gray-900 mb-3">Simplicity first</h3><p class="text-gray-500 text-sm leading-relaxed">No courses or tutorials needed. If you can write a text message, you can use quoteai. The technology should disappear — only the result should stay.</p></div>
-    </div>
-  </div>
-</section>
-<section class="py-20 bg-gray-50">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-3xl font-bold text-gray-900 mb-6">Who quoteai is for</h2>
-    <div class="space-y-4 text-gray-600 leading-relaxed text-lg">
-      <p>quoteai is built for <strong>contractors, tradespeople, technicians and independent professionals across Canada</strong> who work project to project and need to send quotes to their customers.</p>
-      <p>Painters, electricians, plumbers, masons, carpenters, home inspectors, tile setters, landscapers, window and door installers, HVAC technicians, air conditioning installers — and many more. If your job means telling a customer what a job will cost before you do it, quoteai is for you.</p>
-      <p>We're already used by tradespeople across Canada — from Vancouver to Halifax, from Toronto to Montreal.</p>
-    </div>
-  </div>
-</section>
-<section class="py-20 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl text-center">
-    <h2 class="text-3xl font-bold text-gray-900 mb-5">Try quoteai for free</h2>
-    <p class="text-gray-500 text-lg mb-8">Create your first quote in 30 seconds. No credit card required.</p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/sign-up/" class="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white" style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%)">Get started free</a>
-      <a href="/contatti/" class="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-gray-700 border border-gray-200">Contact us</a>
-    </div>
-  </div>
-</section>`),
+  bodyHtml: stripHoistedHead(await renderPage("/chi-siamo", "en")),
 });
 
 // /contatti/
@@ -2425,194 +2279,53 @@ const contattiJsonLd = {
     ],
   },
 };
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "contatti",
   title: "Contact | quoteai — Help and Support",
   description: "Have questions about quoteai? Contact us by email or WhatsApp. We're here to help you generate professional quotes faster.",
   path: "/contatti/",
   jsonLd: [contattiJsonLd, buildBreadcrumbJsonLd("Contact", "/contatti/")],
-  bodyHtml: wrapInPublicLayout(`<section class="relative overflow-hidden bg-white pt-24 pb-16">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl text-center">
-    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5">How can we <span style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent">help?</span></h1>
-    <p class="text-xl text-gray-600 leading-relaxed">The quoteai team responds within a few hours on business days. Pick the channel you prefer.</p>
-  </div>
-</section>
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-    <div class="grid md:grid-cols-3 gap-6">
-      <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-2">Product support</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Technical issues, questions about using the app, feature requests.</p>
-        <a href="mailto:info@quoteai.ca" class="text-violet-600 font-semibold text-sm">info@quoteai.ca →</a>
-      </div>
-      <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-2">WhatsApp</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Want to try the service over WhatsApp or have a quick question? Message us directly.</p>
-        <a href="/whatsapp/" class="text-green-600 font-semibold text-sm">See quoteai on WhatsApp →</a>
-      </div>
-      <div class="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900 mb-2">Privacy &amp; legal</h2>
-        <p class="text-gray-500 text-sm leading-relaxed mb-4">Privacy requests, exercising your rights, legal or contractual questions.</p>
-        <a href="mailto:privacy@quoteai.ca" class="text-gray-600 font-semibold text-sm">privacy@quoteai.ca →</a>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <div class="bg-violet-50 border border-violet-100 rounded-2xl p-6">
-      <h3 class="font-bold text-gray-900 mb-1">Response times</h3>
-      <p class="text-gray-600 text-sm leading-relaxed">We reply to all emails within <strong>4-8 hours on business days</strong> (Monday–Friday, 9:00 AM–6:00 PM Eastern Time). Requests sent over the weekend are answered Monday morning.</p>
-    </div>
-  </div>
-</section>
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-    <h2 class="text-2xl font-bold text-gray-900 mb-8">Frequently asked questions</h2>
-    <div class="space-y-5">
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Can I cancel my subscription at any time?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. You can cancel your subscription at any time from your account settings, with no penalties or extra fees. You'll keep access until the end of the period you already paid for.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Do you offer a discount for agencies or teams?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. For multi-user or high-volume use, contact us at info@quoteai.ca and we'll find the right solution.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Is my data and my quotes safe?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. All data is encrypted in transit (TLS) and at rest. We don't share your data with third parties. See our Privacy Policy for details.</p></div>
-      <div class="bg-white rounded-2xl p-6 border border-gray-100"><h3 class="font-semibold text-gray-900 mb-2">Can I import my own price list?</h3><p class="text-gray-500 text-sm leading-relaxed">Yes. From Settings → Price List you can enter your own custom prices, which the AI will use as a reference for your quotes.</p></div>
-    </div>
-  </div>
-</section>
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-xl text-center">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">Don't have an account yet?</h2>
-    <p class="text-gray-500 mb-6">Try quoteai for free — no credit card required.</p>
-    <a href="/sign-up/" class="inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-semibold text-white" style="background:linear-gradient(135deg,#7C3AED 0%,#A855F7 100%)">Create a free account</a>
-  </div>
-</section>`),
+  bodyHtml: stripHoistedHead(await renderPage("/contatti", "en")),
 });
 
 // /privacy-policy/ — mirrors src/pages/privacy-policy.tsx (the real live route)
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "privacy-policy",
   title: "Privacy Policy | QuoteAI",
   description: "QuoteAI's privacy policy — how we collect, use, and protect your personal information.",
   path: "/privacy-policy/",
   jsonLd: [buildWebPageJsonLd("Privacy Policy", "QuoteAI's privacy policy — how we collect, use, and protect your personal information.", "/privacy-policy/"), buildBreadcrumbJsonLd("Privacy Policy", "/privacy-policy/")],
-  bodyHtml: wrapInPublicLayout(`<div class="container mx-auto px-4 py-16 max-w-3xl">
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-  <p class="text-sm text-gray-500 mb-10">Last updated: May 6, 2025</p>
-  <div class="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Who we are</h2><p>This Privacy Policy is issued by <strong>QuoteAI</strong> (referred to as "the Company", "we", or "us"), a business operating from Ontario, Canada, reachable at <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. We are committed to protecting your personal information in accordance with the Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable provincial privacy legislation.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Information we collect</h2><p>We collect the following categories of personal information:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Account information:</strong> first name, last name, and email address, provided when you create an account.</li><li><strong>Business profile information:</strong> company name, Business Number / GST-HST number, address, phone number, business email, and company logo.</li><li><strong>Quote data:</strong> job descriptions, client (customer) information, amounts, and line items on quotes you generate.</li><li><strong>Payment information:</strong> handled directly by Stripe Inc. — we never access your full credit card details.</li><li><strong>Authentication credentials:</strong> your password is stored as a salted hash on our own servers; we do not send it to any third-party identity provider.</li><li><strong>Technical information:</strong> IP address, browser type, pages visited, and session duration (via system logs).</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. Purposes and grounds for collection</h2><div class="space-y-3"><div><p class="font-medium">a) Providing the service</p><p class="mt-1">Processing necessary to create your account, generate quotes using AI, and manage subscriptions and payments.</p></div><div><p class="font-medium">b) Legal and tax obligations</p><p class="mt-1">Retention of billing records to meet obligations under the Income Tax Act and applicable GST/HST legislation.</p></div><div><p class="font-medium">c) Legitimate business interests</p><p class="mt-1">Aggregate analysis to improve the service, fraud prevention, and platform security.</p></div><div><p class="font-medium">d) Consent</p><p class="mt-1">Sending promotional communications and newsletters, only after your explicit opt-in.</p></div></div></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Data retention</h2><p>We retain personal information only for as long as necessary for the purposes described above:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Account data: until account deletion, then 30 additional days for security purposes.</li><li>Quote data: 7 years from issuance, in line with Canada Revenue Agency (CRA) record-keeping requirements.</li><li>Billing records: 7 years, per CRA requirements for GST/HST and income tax records.</li><li>Technical logs: 90 days.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Who we share information with</h2><p>Personal information may be shared with the following categories of recipients:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Stripe Inc.</strong> — payment processing.</li><li><strong>OpenAI, LLC</strong> — AI-generated quotes. Only the job description text is sent.</li><li><strong>Cloud hosting providers</strong> — infrastructure and hosting.</li><li><strong>Resend Inc.</strong> — transactional email delivery.</li></ul><p class="mt-3">We do not sell personal information to third parties. Where information is processed or stored outside Canada (including in the United States), we take reasonable steps to ensure a comparable level of protection through contractual safeguards, consistent with PIPEDA principle 4.1.3 (accountability for information transferred to third parties).</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Your rights</h2><p>Under PIPEDA and applicable provincial privacy laws, you have the right to:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li><strong>Access</strong> — request a copy of the personal information we hold about you.</li><li><strong>Correction</strong> — request correction of inaccurate or incomplete information.</li><li><strong>Withdrawal of consent</strong> — withdraw consent at any time, subject to legal or contractual restrictions.</li><li><strong>Deletion</strong> — request deletion of your information, subject to legal retention obligations.</li><li><strong>Complaint</strong> — file a complaint about how we handle your information.</li></ul><p class="mt-3">To exercise these rights, contact us at <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a>. We will respond within 30 days. You also have the right to file a complaint with the <a href="https://www.priv.gc.ca" target="_blank" rel="noopener noreferrer" class="text-violet-600">Office of the Privacy Commissioner of Canada</a>, or with your provincial privacy regulator where applicable.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Cookies and tracking technologies</h2><p>We use only strictly necessary cookies required for the service to function (authentication, session management). We do not use profiling or third-party advertising cookies.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Security</h2><p>We use appropriate technical and organizational safeguards to protect personal information against unauthorized access, loss, or alteration: encrypted connections (TLS/HTTPS), access controls, and hashed credential storage on our own infrastructure.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Changes to this policy</h2><p>We may update this Privacy Policy from time to time. Material changes will be communicated by email or via an in-platform notice at least 14 days in advance.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Contact us</h2><p>For any questions about this Privacy Policy: <a href="mailto:privacy@quoteai.ca" class="text-violet-600">privacy@quoteai.ca</a></p></section>
-  </div>
-</div>`),
+  bodyHtml: stripHoistedHead(await renderPage("/privacy-policy", "en")),
 });
 
 // /terms/ — mirrors src/pages/terms.tsx (the real live route)
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "terms",
   title: "Terms of Service | QuoteAI",
   description: "Terms and conditions for using the QuoteAI platform to generate AI-powered quotes.",
   path: "/terms/",
   jsonLd: [buildWebPageJsonLd("Terms of Service", "Terms and conditions for using the QuoteAI platform to generate AI-powered quotes.", "/terms/"), buildBreadcrumbJsonLd("Terms of Service", "/terms/")],
-  bodyHtml: wrapInPublicLayout(`<div class="container mx-auto px-4 py-16 max-w-3xl">
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">Terms of Service</h1>
-  <p class="text-sm text-gray-500 mb-10">Last updated: May 6, 2025</p>
-  <div class="prose prose-gray max-w-none space-y-8 text-sm leading-relaxed text-gray-700">
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">1. Acceptance of terms</h2><p>By using the <strong>QuoteAI</strong> platform (the "Service"), available at <strong>quoteai.ca</strong>, you agree to be bound by these Terms of Service in full. If you do not agree to these terms, you may not use the Service.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">2. Description of the service</h2><p>QuoteAI is a SaaS platform that helps tradespeople, contractors, and businesses generate professional quotes using artificial intelligence. The Service includes:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>AI-generated quotes from a text description of the work.</li><li>Creation and download of professional PDF documents.</li><li>Business profile management and quote storage.</li><li>Monthly subscription plans and one-time purchases.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">3. User accounts</h2><p>To access the Service you must create an account and provide accurate, up-to-date information. You are responsible for keeping your credentials confidential and for all activity that occurs under your account. If you become aware of any unauthorized access, notify us immediately at <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a>.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">4. Plans and payment</h2><div class="space-y-3"><div><p class="font-medium">4.1 Available plans</p><ul class="list-disc pl-5 mt-1 space-y-1"><li><strong>Starter:</strong> a monthly quote allowance, PDFs with the QuoteAI watermark.</li><li><strong>Pro:</strong> a higher monthly quote allowance, PDFs without a watermark, custom branding.</li><li><strong>Elite:</strong> unlimited quotes, no watermark, custom branding, priority AI generation.</li><li><strong>Single quote:</strong> the option to buy one quote with no subscription at all.</li></ul></div><div><p class="font-medium">4.2 Billing</p><p class="mt-1">Monthly plans renew automatically each month. Payments are processed by Stripe Inc. and are subject to Stripe's own terms of service. Prices are listed in Canadian dollars (CAD) and are exclusive of applicable GST/HST, which is added at checkout based on your billing location.</p></div><div><p class="font-medium">4.3 Refunds and cancellation</p><p class="mt-1">Digital content that has been delivered immediately upon purchase (such as a completed PDF quote) is generally non-refundable once downloaded, consistent with standard practice for digital goods. For monthly plans, you may cancel at any time; the Service remains active until the end of the period already paid for. No pro-rated refunds are provided for unused portions of a billing period. Nothing in this section limits any non-waivable rights you may have under applicable provincial consumer protection legislation.</p></div></div></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">5. Acceptable use</h2><p>You may not use the Service to:</p><ul class="list-disc pl-5 mt-2 space-y-1"><li>Generate false, fraudulent, or misleading documents.</li><li>Infringe the rights of third parties, violate applicable law, or violate this policy.</li><li>Attempt to access other users' data or compromise the security of the platform.</li><li>Engage in large-scale automated use (scraping, bots) without written authorization.</li><li>Resell or sublicense access to the Service to third parties.</li></ul></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">6. Intellectual property</h2><p>QuoteAI and its associated logos, trademarks, interfaces, and source code are the exclusive property of the Company. Quotes generated through the Service belong to the user who created them. The user grants QuoteAI a limited, non-exclusive licence to process submitted data solely for the purpose of providing the Service.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">7. Limitation of liability</h2><p>Quotes generated by the AI are estimates based on statistical data. <strong>QuoteAI does not guarantee the accuracy, completeness, or suitability of quotes for any specific contractual context.</strong> You are responsible for reviewing and validating all content before presenting it to your own clients. To the extent permitted by applicable law, QuoteAI is not liable for indirect damages, data loss, lost profits, or damages arising from errors in AI output.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">8. Suspension and termination</h2><p>QuoteAI reserves the right to suspend or terminate access to the Service in the event of a breach of these Terms, with notice by email except in cases of serious violations. You may cancel your account at any time from the Settings page or by contacting <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a>.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">9. Changes to these terms</h2><p>We reserve the right to modify these Terms with at least 14 days' notice by email. Continued use of the Service after the effective date of any changes constitutes acceptance of the new Terms.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">10. Governing law and jurisdiction</h2><p>These Terms are governed by the laws of the Province of Ontario and the federal laws of Canada applicable therein. Any dispute arising from these Terms is subject to the exclusive jurisdiction of the courts of Ontario, except where the user is a consumer under applicable provincial consumer protection legislation, in which case any mandatory statutory consumer protections will apply.</p></section>
-    <section><h2 class="text-lg font-semibold text-gray-900 mb-3">11. Contact us</h2><p>For any questions about these Terms: <a href="mailto:support@quoteai.ca" class="text-violet-600">support@quoteai.ca</a></p></section>
-  </div>
-</div>`),
+  bodyHtml: stripHoistedHead(await renderPage("/terms", "en")),
 });
 
 // /whatsapp/
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "whatsapp",
   title: "Quotes on WhatsApp – quoteai | AI-Powered Quoting",
   description: "Describe the job by voice, text, or photo on WhatsApp. quoteai generates a professional quote with a PDF in 60 seconds.",
   path: "/whatsapp/",
   jsonLd: [buildWebPageJsonLd("Quotes on WhatsApp", "Describe the job by voice, text, or photo on WhatsApp. quoteai generates a professional quote with a PDF in 60 seconds.", "/whatsapp/"), buildBreadcrumbJsonLd("WhatsApp", "/whatsapp/")],
-  bodyHtml: wrapInPublicLayout(`<div class="flex flex-col bg-white">
-<section class="relative overflow-hidden bg-gray-950 pt-20 pb-24">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl">
-    <div class="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-bold px-3 py-1.5 rounded-full mb-6">NEW</div>
-    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1] mb-5">Your quotes, <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">right on WhatsApp</span></h1>
-    <p class="text-lg text-gray-400 leading-relaxed mb-4 max-w-2xl mx-auto">Send a voice note from the job site. QuoteAI generates the professional quote, shows you a preview, and sends you the PDF — no app to open.</p>
-    <p class="text-sm text-gray-600 mb-10 font-medium">While your competitors are still opening Excel, your customers already have the quote.</p>
-    <div class="flex flex-col sm:flex-row justify-center gap-3">
-      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Activate the WhatsApp Bot</a>
-      <a href="#demo" class="inline-flex h-12 items-center justify-center gap-2 px-7 rounded-xl text-sm font-semibold text-gray-300 border border-gray-700">Watch the demo</a>
-    </div>
-    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-gray-500">
-      <span>Available on Pro and Elite plans</span><span class="hidden sm:block text-gray-700">·</span>
-      <span>Instant activation</span><span class="hidden sm:block text-gray-700">·</span>
-      <span>Works with any smartphone</span>
-    </div>
-  </div>
-</section>
-<section id="demo" class="py-20 bg-gray-50">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-    <span class="inline-block text-violet-600 text-xs font-bold uppercase tracking-wider mb-3">How it works</span>
-    <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6 leading-snug">From voice note to PDF <span class="text-violet-600">without touching a computer</span></h2>
-    <div class="space-y-5 max-w-2xl">
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">1</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Send a voice note, text, or photo</p><p class="text-sm text-gray-500 leading-relaxed">Right on WhatsApp. Describe the job the way you'd talk to a customer.</p></div></div>
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">2</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">The AI generates a preview</p><p class="text-sm text-gray-500 leading-relaxed">Line items, prices, and tax in 60 seconds. You can correct or approve it right away.</p></div></div>
-      <div class="flex gap-4"><div class="w-8 h-8 rounded-xl text-sm font-bold shrink-0 flex items-center justify-center text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">3</div><div><p class="font-semibold text-gray-900 text-sm mb-0.5">Get the PDF in chat</p><p class="text-sm text-gray-500 leading-relaxed">Forward it to the customer with a tap. The quote is also saved on quoteai.ca.</p></div></div>
-    </div>
-    <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3"><p class="text-sm font-semibold text-amber-900">Coming soon: automatic invoices and reminders</p><p class="text-xs text-amber-700 mt-0.5">Still on WhatsApp. Stay ahead of the curve.</p></div>
-  </div>
-</section>
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-    <div class="text-center mb-10"><h2 class="text-2xl font-bold tracking-tight text-gray-900">Everything you need, in your pocket</h2><p class="text-gray-500 mt-2 text-sm">The full power of quoteai.ca, available on WhatsApp anytime.</p></div>
-    <div class="grid sm:grid-cols-3 gap-6">
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Voice, text, or photo</h3><p class="text-gray-500 text-xs leading-relaxed">Send a voice note from the truck, type from the job site, or photograph your notes. The AI understands it all and generates the quote.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">Quote in 60 seconds</h3><p class="text-gray-500 text-xs leading-relaxed">Line items, prices, tax and totals calculated instantly. Zero formulas, zero Excel.</p></div>
-      <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100"><h3 class="font-semibold text-gray-900 text-sm mb-1.5">PDF delivered in chat</h3><p class="text-gray-500 text-xs leading-relaxed">The professional document arrives right on WhatsApp. Forward it to the customer with a tap.</p></div>
-    </div>
-  </div>
-</section>
-<section class="py-16 bg-gray-950">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl text-center">
-    <p class="text-gray-500 text-sm mb-4 uppercase tracking-wider font-semibold">The reality of the market</p>
-    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-6 leading-snug">Your competitors take <span class="line-through text-gray-600">30-40 minutes</span> to put together a quote. <span class="text-transparent bg-clip-text" style="background-image:linear-gradient(135deg,#a78bfa,#34d399)">You take 60 seconds.</span></h2>
-    <p class="text-gray-400 text-sm mb-10 leading-relaxed">A contractor who responds within an hour is <strong class="text-white">3× more likely</strong> to win the job. With the WhatsApp bot, you respond before you're even back home.</p>
-  </div>
-</section>
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-xl">
-    <h2 class="text-2xl font-bold tracking-tight text-gray-900 mb-3">Start today. Zero setup.</h2>
-    <p class="text-gray-500 text-sm mb-7 leading-relaxed">Connect your WhatsApp number from settings in under 2 minutes. The bot is active immediately.</p>
-    <div class="flex flex-col sm:flex-row justify-center gap-3">
-      <a href="/sign-up/?plan=monthly_pro" class="inline-flex h-11 items-center justify-center gap-2 px-7 rounded-xl text-sm font-bold text-white" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Try Free for 7 Days</a>
-      <a href="/#prezzi" class="inline-flex h-11 items-center justify-center px-7 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200">Compare plans</a>
-    </div>
-    <p class="text-xs text-gray-400 mt-4">7 days free · No credit card required · Cancel anytime</p>
-  </div>
-</section>
-</div>`),
+  bodyHtml: stripHoistedHead(await renderPage("/whatsapp", "en")),
 });
 
 // /mappa-sito/
-buildStaticPageHtml({
+await buildStaticPageHtml({
   slug: "mappa-sito",
   title: "Site Map | quoteai — Full Page Index",
   description: "The complete site map for quoteai. Find every static page, blog article, and guide for contractors and tradespeople across Canadian cities.",
   path: "/mappa-sito/",
   jsonLd: [buildWebPageJsonLd("Site Map", "The complete site map for quoteai.ca. Find every static page, blog article, and guide for contractors and tradespeople across Canadian cities.", "/mappa-sito/"), buildBreadcrumbJsonLd("Site Map", "/mappa-sito/")],
-  bodyHtml: buildMappaSitoBodyHtml(),
+  bodyHtml: stripHoistedHead(await renderPage("/mappa-sito", "en")),
 });
 
 console.log(`  ✓ 6 SPA pages prerendered (chi-siamo, contatti, privacy-policy, terms, whatsapp, mappa-sito)`);

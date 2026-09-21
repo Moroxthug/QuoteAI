@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath } from "@/data/seo-render-engine";
+import { getLanguageCounterpartPath } from "@/data/seo-slugs";
 
 const ChevRight = () => (
   <svg className="chev" viewBox="0 0 16 16" fill="none"><path d="M5.5 3l5 5-5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>

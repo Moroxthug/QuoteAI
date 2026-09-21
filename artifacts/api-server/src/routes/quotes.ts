@@ -314,16 +314,58 @@ router.get("/quotes/stats", requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/quotes
+// GET /api/quotes — summaries only (Phase 68). The list pages read a dozen
+// scalar fields; shipping every quote's chapters, line items, raw input and
+// company snapshot made a 500-quote account wait 1.7 s for 1.5 MB. Detail
+// views fetch /api/quotes/:id. `lineItemCount` is computed in SQL so the
+// JSON columns never leave Postgres.
 router.get("/quotes", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
-    const quotes = await db
-      .select()
+    const rows = await db
+      .select({
+        id: quotesTable.id,
+        clientId: quotesTable.clientId,
+        province: quotesTable.province,
+        clientData: quotesTable.clientData,
+        descrizioneGenerale: quotesTable.descrizioneGenerale,
+        lineItemCount: sql<number>`coalesce(jsonb_array_length(${quotesTable.items}), 0)::int`,
+        subtotale: quotesTable.subtotale,
+        ivaValore: quotesTable.ivaValore,
+        totale: quotesTable.totale,
+        status: quotesTable.status,
+        acceptedAt: quotesTable.acceptedAt,
+        pdfUrl: quotesTable.pdfUrl,
+        capitolatoPro: quotesTable.capitolatoPro,
+        templateId: quotesTable.templateId,
+        createdAt: quotesTable.createdAt,
+        updatedAt: quotesTable.updatedAt,
+        archivedAt: quotesTable.archivedAt,
+      })
       .from(quotesTable)
       .where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt)))
       .orderBy(desc(quotesTable.createdAt));
-    res.json(quotes.map(q => serializeQuote(q)));
+    res.json(
+      rows.map((q) => ({
+        id: q.id,
+        clientId: q.clientId ?? null,
+        province: normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null,
+        clientData: q.clientData,
+        descrizioneGenerale: q.descrizioneGenerale,
+        lineItemCount: q.lineItemCount,
+        subtotale: Number(q.subtotale),
+        ivaValore: Number(q.ivaValore),
+        totale: Number(q.totale),
+        status: q.status,
+        acceptedAt: q.acceptedAt?.toISOString() ?? null,
+        pdfUrl: q.pdfUrl ?? null,
+        capitolatoPro: q.capitolatoPro ?? false,
+        templateId: q.templateId ?? "standard",
+        createdAt: q.createdAt.toISOString(),
+        updatedAt: q.updatedAt.toISOString(),
+        archivedAt: q.archivedAt?.toISOString() ?? null,
+      })),
+    );
   } catch (err) {
     req.log.error({ err }, "Error fetching quotes");
     res.status(500).json({ error: "Internal server error" });

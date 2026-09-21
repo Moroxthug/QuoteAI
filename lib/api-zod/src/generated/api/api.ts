@@ -20,7 +20,8 @@ export const HealthCheckResponse = zod.object({
  */
 export const ListQuotesResponseItem = zod.object({
   "id": zod.string(),
-  "userId": zod.string(),
+  "clientId": zod.string().nullish(),
+  "province": zod.string().nullish(),
   "clientData": zod.object({
   "nome": zod.string(),
   "indirizzo": zod.string(),
@@ -33,103 +34,15 @@ export const ListQuotesResponseItem = zod.object({
   "province": zod.string().optional()
 }),
   "descrizioneGenerale": zod.string(),
-  "items": zod.array(zod.object({
-  "descrizione": zod.string(),
-  "quantita": zod.number(),
-  "unita": zod.string(),
-  "prezzoUnitario": zod.number(),
-  "totale": zod.number()
-})),
-  "capitoli": zod.array(zod.object({
-  "lettera": zod.string(),
-  "titolo": zod.string(),
-  "voci": zod.array(zod.object({
-  "descrizione": zod.string(),
-  "um": zod.string(),
-  "quantita": zod.number(),
-  "prezzoUnitario": zod.number(),
-  "totale": zod.number()
-})),
+  "lineItemCount": zod.number().int(),
   "subtotale": zod.number(),
-  "osservazione": zod.string().optional()
-})),
-  "sconto": zod.union([zod.object({
-  "percentuale": zod.number(),
-  "importoScontato": zod.number()
-}),zod.null()]).optional(),
-  "condizioniPagamento": zod.array(zod.string()),
-  "titoloPreventivoRiga1": zod.string().nullish(),
-  "titoloPreventivoRiga2": zod.string().nullish(),
-  "numeroPreventivoData": zod.string().nullish(),
-  "companySnapshot": zod.union([zod.object({
-  "companyName": zod.string(),
-  "vatNumber": zod.string().optional(),
-  "address": zod.string().optional(),
-  "phone": zod.string().optional(),
-  "email": zod.string().optional(),
-  "logoUrl": zod.string().optional()
-}),zod.null()]).optional(),
-  "subtotale": zod.number(),
-  "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
   "totale": zod.number(),
-  "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
-  "acceptedByName": zod.string().nullish(),
-  "acceptedAt": zod.coerce.date().nullish(),
+  "acceptedAt": zod.string().nullish(),
   "pdfUrl": zod.string().nullish(),
-  "rawInput": zod.string(),
-  "pdfDownloadedAt": zod.string().nullish(),
   "capitolatoPro": zod.boolean(),
-  "capitolatoPdfUrl": zod.string().nullish(),
-  "templateId": zod.enum(['standard', 'arosio', 'mariagrazia']).nullish(),
-  "attachments": zod.array(zod.object({
-  "id": zod.string(),
-  "fileName": zod.string(),
-  "mimeType": zod.string(),
-  "fileUrl": zod.string(),
-  "fileSize": zod.number().nullish(),
-  "createdAt": zod.string()
-})).optional(),
-  "acceptedVariantId": zod.string().nullish(),
-  "variants": zod.array(zod.object({
-  "id": zod.string(),
-  "quoteId": zod.string(),
-  "label": zod.string(),
-  "description": zod.string().optional(),
-  "position": zod.number().optional(),
-  "items": zod.array(zod.object({
-  "descrizione": zod.string(),
-  "quantita": zod.number(),
-  "unita": zod.string(),
-  "prezzoUnitario": zod.number(),
-  "totale": zod.number()
-})),
-  "capitoli": zod.array(zod.object({
-  "lettera": zod.string(),
-  "titolo": zod.string(),
-  "voci": zod.array(zod.object({
-  "descrizione": zod.string(),
-  "um": zod.string(),
-  "quantita": zod.number(),
-  "prezzoUnitario": zod.number(),
-  "totale": zod.number()
-})),
-  "subtotale": zod.number(),
-  "osservazione": zod.string().optional()
-})),
-  "sconto": zod.union([zod.object({
-  "percentuale": zod.number(),
-  "importoScontato": zod.number()
-}),zod.null()]).optional(),
-  "condizioniPagamento": zod.array(zod.string()),
-  "subtotale": zod.number(),
-  "ivaPercentuale": zod.number(),
-  "ivaValore": zod.number(),
-  "totale": zod.number(),
-  "createdAt": zod.string(),
-  "updatedAt": zod.string()
-})).optional(),
+  "templateId": zod.string(),
   "createdAt": zod.string(),
   "updatedAt": zod.string(),
   "archivedAt": zod.string().nullish()

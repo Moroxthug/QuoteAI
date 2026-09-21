@@ -167,7 +167,7 @@ export const invoicePaymentsTable = pgTable(
     creditNoteId: uuid("credit_note_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index("invoice_payments_invoice_idx").on(t.invoiceId, t.date)],
+  (t) => [index("invoice_payments_invoice_idx").on(t.invoiceId, t.date), index("invoice_payments_user_date_idx").on(t.userId, t.date)],
 );
 
 export const invoiceEventsTable = pgTable(

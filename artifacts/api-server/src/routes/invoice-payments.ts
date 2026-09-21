@@ -3,6 +3,7 @@ import { db, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspac
 import { eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { getConnectAccount, createOnboardingLink } from "../invoices/stripeConnect.js";
 import { confirmEtransferReceived, rejectEtransferReport } from "../invoices/service.js";
@@ -27,9 +28,11 @@ router.get("/invoice-payments/connect/status", requireAuth, requirePermission("i
   try {
     const userId = getUserId(res);
     const conn = await getConnectAccount(userId);
-    if (!conn) { res.json({ connected: false }); return; }
+    const available = isIntegrationConfigured("stripe");
+    if (!conn) { res.json({ connected: false, available }); return; }
     res.json({
       connected: true,
+      available,
       chargesEnabled: conn.chargesEnabled,
       payoutsEnabled: conn.payoutsEnabled,
       detailsSubmitted: conn.detailsSubmitted,
@@ -47,6 +50,7 @@ router.post("/invoice-payments/connect/onboard", requireAuth, requirePermission(
     const userId = getUserId(res);
     const gate = await requireCardPaymentsFeature(userId);
     if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Online card payments require the Elite plan" }); return; }
+    if (refuseIfNotConfigured(res, "stripe", "Online card payments")) return;
     const url = await createOnboardingLink(userId);
     res.json({ url });
   } catch (err) {

@@ -83,12 +83,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 58 | GET | `/api/calendar/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 78 | GET | `/api/calendar/:provider/connect` | session | integrations:full | — | zod | hasFeature(calendar_sync) | predicate | — | — | — |
-| 99 | GET | `/api/calendar/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
-| 120 | DELETE | `/api/calendar/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 133 | PATCH | `/api/calendar/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 151 | GET | `/api/calendar/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 59 | GET | `/api/calendar/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 80 | GET | `/api/calendar/:provider/connect` | session | integrations:full | — | zod | hasFeature(calendar_sync) | predicate | — | — | — |
+| 102 | GET | `/api/calendar/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
+| 123 | DELETE | `/api/calendar/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 136 | PATCH | `/api/calendar/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 154 | GET | `/api/calendar/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/catalog.ts
 
@@ -191,49 +191,49 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 57 | GET | `/api/email-connections/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 78 | GET | `/api/email-connections/:provider/connect` | session | integrations:full | — | zod | hasFeature(gmail_send) | predicate | — | — | — |
-| 98 | GET | `/api/email-connections/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
-| 119 | DELETE | `/api/email-connections/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 132 | PATCH | `/api/email-connections/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 58 | GET | `/api/email-connections/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 80 | GET | `/api/email-connections/:provider/connect` | session | integrations:full | — | zod | hasFeature(gmail_send) | predicate | — | — | — |
+| 101 | GET | `/api/email-connections/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
+| 122 | DELETE | `/api/email-connections/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 135 | PATCH | `/api/email-connections/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
 
 ## artifacts/api-server/src/routes/financeit.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 23 | GET | `/api/financeit/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 47 | PUT | `/api/financeit/dealer` | session | integrations:full | — | zod | hasFeature(financeit) | n/a | — | — | — |
-| 69 | PATCH | `/api/financeit/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 86 | DELETE | `/api/financeit/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 24 | GET | `/api/financeit/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 50 | PUT | `/api/financeit/dealer` | session | integrations:full | — | zod | hasFeature(financeit) | n/a | — | — | — |
+| 73 | PATCH | `/api/financeit/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 90 | DELETE | `/api/financeit/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/flinks.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 30 | GET | `/api/flinks/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 54 | GET | `/api/flinks/connect-url` | session | integrations:full | — | none | hasFeature(flinks_bank_feed) | n/a | — | — | — |
-| 71 | POST | `/api/flinks/connect` | session | integrations:full | — | zod | hasFeature(flinks_bank_feed) | n/a | — | — | — |
-| 93 | GET | `/api/flinks/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 105 | PUT | `/api/flinks/account` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 124 | PATCH | `/api/flinks/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 141 | DELETE | `/api/flinks/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 153 | POST | `/api/flinks/sync` | session | integrations:full | — | none | hasFeature(flinks_bank_feed) | n/a | — | — | — |
-| 167 | GET | `/api/flinks/transactions` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 194 | GET | `/api/flinks/transactions/:id/candidates` | session | integrations:view | — | none | — | predicate | — | — | — |
-| 219 | POST | `/api/flinks/transactions/:id/match` | session | integrations:full | — | zod | — | predicate | — | — | — |
-| 244 | POST | `/api/flinks/transactions/:id/unmatch` | session | integrations:full | — | none | — | helper | — | — | — |
-| 259 | POST | `/api/flinks/transactions/:id/ignore` | session | integrations:full | — | none | — | helper | — | — | — |
+| 31 | GET | `/api/flinks/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 57 | GET | `/api/flinks/connect-url` | session | integrations:full | — | none | hasFeature(flinks_bank_feed) | n/a | — | — | — |
+| 75 | POST | `/api/flinks/connect` | session | integrations:full | — | zod | hasFeature(flinks_bank_feed) | n/a | — | — | — |
+| 97 | GET | `/api/flinks/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 109 | PUT | `/api/flinks/account` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 128 | PATCH | `/api/flinks/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 145 | DELETE | `/api/flinks/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 157 | POST | `/api/flinks/sync` | session | integrations:full | — | none | hasFeature(flinks_bank_feed) | n/a | — | — | — |
+| 171 | GET | `/api/flinks/transactions` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 198 | GET | `/api/flinks/transactions/:id/candidates` | session | integrations:view | — | none | — | predicate | — | — | — |
+| 223 | POST | `/api/flinks/transactions/:id/match` | session | integrations:full | — | zod | — | predicate | — | — | — |
+| 248 | POST | `/api/flinks/transactions/:id/unmatch` | session | integrations:full | — | none | — | helper | — | — | — |
+| 263 | POST | `/api/flinks/transactions/:id/ignore` | session | integrations:full | — | none | — | helper | — | — | — |
 
 ## artifacts/api-server/src/routes/google-lsa.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 64 | GET | `/api/google-lsa/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 87 | GET | `/api/google-lsa/connect` | session | integrations:full | — | none | hasFeature(google_lsa) | n/a | — | — | — |
-| 111 | GET | `/api/google-lsa/callback` | session | — | — | none | — | n/a | — | — | — |
-| 132 | DELETE | `/api/google-lsa/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 144 | PATCH | `/api/google-lsa/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
-| 161 | GET | `/api/google-lsa/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 65 | GET | `/api/google-lsa/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 90 | GET | `/api/google-lsa/connect` | session | integrations:full | — | none | hasFeature(google_lsa) | n/a | — | — | — |
+| 115 | GET | `/api/google-lsa/callback` | session | — | — | none | — | n/a | — | — | — |
+| 136 | DELETE | `/api/google-lsa/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 148 | PATCH | `/api/google-lsa/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
+| 165 | GET | `/api/google-lsa/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/health.ts
 
@@ -261,12 +261,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 26 | GET | `/api/invoice-payments/connect/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 45 | POST | `/api/invoice-payments/connect/onboard` | session | integrations:full | — | none | hasFeature(invoice_card_payments) | n/a | — | — | — |
-| 59 | GET | `/api/invoice-payments/connect/refresh` | session | — | — | none | — | n/a | — | — | — |
-| 71 | GET | `/api/invoice-payments/connect/return` | session | — | — | none | — | n/a | — | — | — |
-| 87 | POST | `/api/invoices/:id/confirm-etransfer` | session | invoicing:edit | — | none | — | helper | — | — | — |
-| 101 | POST | `/api/invoices/:id/reject-etransfer` | session | invoicing:edit | — | none | — | helper | — | — | — |
+| 27 | GET | `/api/invoice-payments/connect/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 48 | POST | `/api/invoice-payments/connect/onboard` | session | integrations:full | — | none | hasFeature(invoice_card_payments) | n/a | — | — | — |
+| 63 | GET | `/api/invoice-payments/connect/refresh` | session | — | — | none | — | n/a | — | — | — |
+| 75 | GET | `/api/invoice-payments/connect/return` | session | — | — | none | — | n/a | — | — | — |
+| 91 | POST | `/api/invoices/:id/confirm-etransfer` | session | invoicing:edit | — | none | — | helper | — | — | — |
+| 105 | POST | `/api/invoices/:id/reject-etransfer` | session | invoicing:edit | — | none | — | helper | — | — | — |
 
 ## artifacts/api-server/src/routes/invoices.ts
 
@@ -335,14 +335,14 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 68 | GET | `/api/meta-lead-ads/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 90 | GET | `/api/meta-lead-ads/connect` | session | integrations:full | — | none | hasFeature(meta_lead_ads) | n/a | — | — | — |
-| 109 | GET | `/api/meta-lead-ads/callback` | session | — | — | none | — | n/a | — | — | — |
-| 129 | DELETE | `/api/meta-lead-ads/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 141 | PATCH | `/api/meta-lead-ads/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
-| 158 | GET | `/api/meta-lead-ads/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 184 | GET | `/api/meta-lead-ads/webhook` | none | — | — | none | — | n/a | — | — | — |
-| 215 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | NONE |
+| 69 | GET | `/api/meta-lead-ads/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 93 | GET | `/api/meta-lead-ads/connect` | session | integrations:full | — | none | hasFeature(meta_lead_ads) | n/a | — | — | — |
+| 113 | GET | `/api/meta-lead-ads/callback` | session | — | — | none | — | n/a | — | — | — |
+| 133 | DELETE | `/api/meta-lead-ads/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 145 | PATCH | `/api/meta-lead-ads/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
+| 162 | GET | `/api/meta-lead-ads/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 188 | GET | `/api/meta-lead-ads/webhook` | none | — | — | none | — | n/a | — | — | — |
+| 219 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | NONE |
 
 ## artifacts/api-server/src/routes/notifications.ts
 
@@ -440,15 +440,15 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 75 | GET | `/api/quickbooks/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 101 | GET | `/api/quickbooks/connect` | session | integrations:full | — | none | hasFeature(quickbooks_sync) | n/a | — | — | — |
-| 121 | GET | `/api/quickbooks/callback` | session | — | — | none | — | n/a | — | — | — |
-| 142 | DELETE | `/api/quickbooks/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 154 | PATCH | `/api/quickbooks/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 171 | GET | `/api/quickbooks/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 194 | PUT | `/api/quickbooks/mapping` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 227 | GET | `/api/quickbooks/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 254 | POST | `/api/quickbooks/sync-log/retry` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 76 | GET | `/api/quickbooks/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 104 | GET | `/api/quickbooks/connect` | session | integrations:full | — | none | hasFeature(quickbooks_sync) | n/a | — | — | — |
+| 125 | GET | `/api/quickbooks/callback` | session | — | — | none | — | n/a | — | — | — |
+| 146 | DELETE | `/api/quickbooks/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 158 | PATCH | `/api/quickbooks/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 175 | GET | `/api/quickbooks/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 198 | PUT | `/api/quickbooks/mapping` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 231 | GET | `/api/quickbooks/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 258 | POST | `/api/quickbooks/sync-log/retry` | session | integrations:full | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/quotes.ts
 
@@ -569,28 +569,28 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 76 | GET | `/api/wave/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 103 | GET | `/api/wave/connect` | session | integrations:full | — | none | hasFeature(wave_sync) | n/a | — | — | — |
-| 123 | GET | `/api/wave/callback` | session | — | — | none | — | n/a | — | — | — |
-| 143 | DELETE | `/api/wave/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 155 | PATCH | `/api/wave/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 172 | GET | `/api/wave/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 197 | PUT | `/api/wave/mapping` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 232 | GET | `/api/wave/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 259 | POST | `/api/wave/sync-log/retry` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 77 | GET | `/api/wave/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 106 | GET | `/api/wave/connect` | session | integrations:full | — | none | hasFeature(wave_sync) | n/a | — | — | — |
+| 127 | GET | `/api/wave/callback` | session | — | — | none | — | n/a | — | — | — |
+| 147 | DELETE | `/api/wave/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 159 | PATCH | `/api/wave/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 176 | GET | `/api/wave/accounts` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 201 | PUT | `/api/wave/mapping` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 236 | GET | `/api/wave/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 263 | POST | `/api/wave/sync-log/retry` | session | integrations:full | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/whatsapp.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 1184 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
-| 1198 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
-| 1366 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
-| 1378 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
-| 1403 | POST | `/api/whatsapp/connect` | session | integrations:full | — | manual | — | n/a | — | — | — |
-| 1438 | POST | `/api/whatsapp/verify` | session | integrations:full | — | manual | — | n/a | — | — | — |
-| 1466 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 1477 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
+| 1185 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
+| 1199 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
+| 1367 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
+| 1379 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
+| 1404 | POST | `/api/whatsapp/connect` | session | integrations:full | — | manual | — | n/a | — | — | — |
+| 1439 | POST | `/api/whatsapp/verify` | session | integrations:full | — | manual | — | n/a | — | — | — |
+| 1467 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 1478 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | manual | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/worker-time.ts
 

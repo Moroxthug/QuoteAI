@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { buildGmailAuthUrl } from "../lib/gmailSendClient.js";
 import { listEmailConnections, connectEmailAccount, disconnectEmailAccount, setEmailConnectionEnabled } from "../emailConnections/service.js";
 
@@ -59,6 +60,7 @@ router.get("/email-connections/status", requireAuth, requirePermission("integrat
     const userId = getUserId(res);
     const connections = await listEmailConnections(userId);
     res.json({
+      available: { google: isIntegrationConfigured("gmail_send") },
       connections: connections.map((c) => ({
         provider: c.provider,
         accountEmail: c.accountEmail,
@@ -84,6 +86,7 @@ router.get("/email-connections/:provider/connect", requireAuth, requirePermissio
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Connected email sending requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, "gmail_send", "Gmail sending")) return;
     const url = buildGmailAuthUrl(signState(userId, provider));
     res.json({ url });
   } catch (err) {

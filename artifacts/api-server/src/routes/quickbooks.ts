@@ -13,6 +13,7 @@ import {
 import { eq, desc } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { retryAutomationNow } from "../lib/automation.js";
@@ -76,12 +77,14 @@ router.get("/quickbooks/status", requireAuth, requirePermission("integrations", 
   try {
     const userId = getUserId(res);
     const conn = await getQuickbooksConnection(userId);
+    const available = isIntegrationConfigured("quickbooks");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       companyName: conn.companyName,
       environment: conn.environment,
       isEnabled: conn.isEnabled,
@@ -106,6 +109,7 @@ router.get("/quickbooks/connect", requireAuth, requirePermission("integrations",
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "QuickBooks sync requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, "quickbooks", "QuickBooks")) return;
     res.json({ url: buildAuthUrl(signState(userId)) });
   } catch (err) {
     req.log.error({ err }, "Error building QuickBooks auth URL");

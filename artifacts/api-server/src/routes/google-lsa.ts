@@ -4,6 +4,7 @@ import { db, businessProfilesTable, googleLsaImportLogTable, hasFeature, minimum
 import { eq, desc } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { buildAuthUrl } from "../lib/googleLsaClient.js";
@@ -65,12 +66,14 @@ router.get("/google-lsa/status", requireAuth, requirePermission("integrations", 
   try {
     const userId = getUserId(res);
     const conn = await getGoogleLsaConnection(userId);
+    const available = isIntegrationConfigured("google_lsa");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       lsaCustomerId: conn.lsaCustomerId,
       isEnabled: conn.isEnabled,
       connectedAt: conn.connectedAt.toISOString(),
@@ -97,6 +100,7 @@ router.get("/google-lsa/connect", requireAuth, requirePermission("integrations",
       res.status(400).json({ error: "lsaCustomerId is required (your 10-digit Google Ads/LSA account id, no dashes)" });
       return;
     }
+    if (refuseIfNotConfigured(res, "google_lsa", "Google Local Services Ads")) return;
     res.json({ url: buildAuthUrl(signState(userId, lsaCustomerId)) });
   } catch (err) {
     req.log.error({ err }, "Error building Google LSA auth URL");

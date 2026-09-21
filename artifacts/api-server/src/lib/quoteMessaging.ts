@@ -2,7 +2,8 @@ import { Resend } from "resend";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import { sanitizeForFromHeader } from "./emailUtils.js";
-import type { BusinessProfile, Quote, QuoteClientData, QuoteCompanySnapshot } from "@workspace/db";
+import { db, clientsTable, type BusinessProfile, type Quote, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 // ── Phase 21: quote-sent follow-up reminders ────────────────────────────────
 // A quote gets emailed to a customer and, if they never accept, nothing
@@ -101,6 +102,15 @@ export type QuoteFollowupResult =
   | { ok: true }
   | { ok: false; reason: string };
 
+async function quoteFollowupLanguage(quote: Quote, profile: BusinessProfile): Promise<"en" | "fr"> {
+  if (quote.clientId) {
+    const [client] = await db.select({ preferredLanguage: clientsTable.preferredLanguage }).from(clientsTable).where(eq(clientsTable.id, quote.clientId));
+    if (client?.preferredLanguage === "fr" || client?.preferredLanguage === "en") return client.preferredLanguage;
+  }
+  const province = (quote.province ?? (quote.clientData as QuoteClientData | null)?.province ?? profile.province ?? "").toUpperCase();
+  return province === "QC" ? "fr" : "en";
+}
+
 /**
  * Sends the follow-up for the given stage to the quote's client email.
  * Never sends to an unsubscribed quote — callers must still check
@@ -119,10 +129,13 @@ export async function sendQuoteFollowup(params: {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, reason: "resend_not_configured" };
 
-  const lang: "en" | "fr" = "en";
+  // Same rule as contract drafting (contracts/service.ts): the client's stored
+  // preference wins, otherwise a Quebec quote is French. Phase 65 found this
+  // hard-wired to "en" while the French copy above sat unused.
+  const lang = await quoteFollowupLanguage(quote, profile);
   const companyName = (quote.companySnapshot as QuoteCompanySnapshot | null)?.companyName || profile.companyName || "Your company";
   const quoteNumber = quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()}`;
-  const totale = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(Number(quote.totale));
+  const totale = new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(Number(quote.totale));
   const publicUrl = `${getBaseUrl()}/p/${quote.id}`;
   const { subject } = followupCopy(stage, lang, quoteNumber, totale);
 

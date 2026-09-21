@@ -21,6 +21,15 @@ process.env.LOG_LEVEL ??= "warn";
 process.env.STRIPE_SECRET_KEY ??= "sk_test_e2e_not_a_real_key";
 process.env.STRIPE_WEBHOOK_SECRET ??= "whsec_e2e_platform_secret";
 process.env.STRIPE_CONNECT_WEBHOOK_SECRET ??= "whsec_e2e_connect_secret";
+// Phase 65: the WhatsApp client reads these at import time; with them set the
+// template/OTP sends actually hit graph.facebook.com — which integrations.e2e
+// answers from a stub (src/e2e/vendorStub.ts). Real values from .env.staging win.
+process.env.WHATSAPP_ACCESS_TOKEN ??= "e2e-whatsapp-token";
+process.env.WHATSAPP_PHONE_NUMBER_ID ??= "e2e-phone-id";
+process.env.WHATSAPP_REVIEW_REQUEST_TEMPLATE ??= "quoteai_review_request";
+process.env.WHATSAPP_LEAD_FOLLOWUP_TEMPLATE ??= "quoteai_lead_followup";
+process.env.WHATSAPP_PHOTO_SHARE_TEMPLATE ??= "quoteai_photo_share";
+process.env.QUICKBOOKS_ENVIRONMENT ??= "sandbox";
 process.env.WHATSAPP_APP_SECRET ??= "e2e-whatsapp-app-secret";
 process.env.META_APP_SECRET ??= "e2e-meta-app-secret";
 process.env.FINANCEIT_WEBHOOK_SECRET ??= "e2e-financeit-webhook-secret";
@@ -55,3 +64,31 @@ vi.mock("resend", async () => {
   }
   return { Resend };
 });
+
+// Phase 65: no request may leave the suite toward a vendor API. Every known
+// vendor host is answered by src/e2e/vendorStub.ts — by default with a 599
+// that the clients treat as a failure — and integrations.e2e.test.ts swaps in
+// scripted answers per test. Our own server and Supabase pass through.
+{
+  const { installVendorStubs, stubHost, json } = await import("./src/e2e/vendorStub.ts");
+  installVendorStubs();
+  for (const host of [
+    "https://graph.facebook.com/",
+    "https://gmail.googleapis.com/",
+    "https://www.googleapis.com/",
+    "https://oauth2.googleapis.com/",
+    "https://graph.microsoft.com/",
+    "https://login.microsoftonline.com/",
+    "https://sandbox-quickbooks.api.intuit.com/",
+    "https://quickbooks.api.intuit.com/",
+    "https://oauth.platform.intuit.com/",
+    "https://developer.api.intuit.com/",
+    "https://api.waveapps.com/",
+    "https://gql.waveapps.com/",
+    "https://googleads.googleapis.com/",
+    "https://sandbox.financeit.ca/",
+    "https://financeit.ca/",
+  ]) {
+    stubHost(host, (req) => json(599, { error: "e2e: unscripted vendor call", url: req.url }));
+  }
+}

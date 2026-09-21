@@ -15,6 +15,7 @@ import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { retryAutomationNow } from "../lib/automation.js";
 import { buildAuthUrl, listExpenseAccounts, listIncomeAccounts, listPaymentAccounts } from "../lib/waveClient.js";
 import {
@@ -77,12 +78,14 @@ router.get("/wave/status", requireAuth, requirePermission("integrations", "view"
   try {
     const userId = getUserId(res);
     const conn = await getWaveConnection(userId);
+    const available = isIntegrationConfigured("wave");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       businessName: conn.businessName,
       isEnabled: conn.isEnabled,
       connectedAt: conn.connectedAt.toISOString(),
@@ -108,6 +111,7 @@ router.get("/wave/connect", requireAuth, requirePermission("integrations", "full
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Wave sync requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, "wave", "Wave")) return;
     res.json({ url: buildAuthUrl(signState(userId)) });
   } catch (err) {
     req.log.error({ err }, "Error building Wave auth URL");

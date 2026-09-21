@@ -429,6 +429,8 @@ export interface ImportCatalogResult {
 
 export interface WhatsappStatus {
   connected: boolean;
+  /** False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button. */
+  available?: boolean;
   phoneNumber?: string | null;
   isEnabled?: boolean | null;
   businessNumber?: string | null;
@@ -466,6 +468,8 @@ export type QuickbooksStatusCategoryMap = {[key: string]: string | null} | null;
 
 export interface QuickbooksStatus {
   connected: boolean;
+  /** False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button. */
+  available?: boolean;
   companyName?: string | null;
   environment?: string | null;
   isEnabled?: boolean | null;
@@ -532,6 +536,8 @@ export type WaveStatusCategoryMap = {[key: string]: string | null} | null;
 
 export interface WaveStatus {
   connected: boolean;
+  /** False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button. */
+  available?: boolean;
   businessName?: string | null;
   isEnabled?: boolean | null;
   connectedAt?: string | null;
@@ -613,7 +619,17 @@ export interface CalendarConnectionStatus {
   lastSyncedAt?: string | null;
 }
 
+/**
+ * Per-provider app-registration presence (Phase 65).
+ */
+export type CalendarStatusAvailable = {
+  google: boolean;
+  outlook: boolean;
+};
+
 export interface CalendarStatus {
+  /** Per-provider app-registration presence (Phase 65). */
+  available?: CalendarStatusAvailable;
   connections: CalendarConnectionStatus[];
 }
 
@@ -654,7 +670,16 @@ export interface EmailConnectionStatus {
   lastSendError?: string | null;
 }
 
+/**
+ * Per-provider app-registration presence (Phase 65).
+ */
+export type EmailConnectionsStatusAvailable = {
+  google: boolean;
+};
+
 export interface EmailConnectionsStatus {
+  /** Per-provider app-registration presence (Phase 65). */
+  available?: EmailConnectionsStatusAvailable;
   connections: EmailConnectionStatus[];
 }
 

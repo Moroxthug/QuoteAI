@@ -4,6 +4,7 @@ import { db, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspac
 import { eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import {
   getFinanceitConnection,
   setFinanceitDealerId,
@@ -24,12 +25,14 @@ router.get("/financeit/status", requireAuth, requirePermission("integrations", "
   try {
     const userId = getUserId(res);
     const conn = await getFinanceitConnection(userId);
+    const available = isIntegrationConfigured("financeit");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       dealerId: conn.dealerId,
       isEnabled: conn.isEnabled,
       connectedAt: conn.connectedAt.toISOString(),
@@ -57,6 +60,7 @@ router.put("/financeit/dealer", requireAuth, requirePermission("integrations", "
       res.status(400).json({ error: "Enter a valid Financeit dealer ID" });
       return;
     }
+    if (refuseIfNotConfigured(res, "financeit", "Financeit")) return;
     const conn = await setFinanceitDealerId(userId, body.data.dealerId);
     res.json({ connected: true, dealerId: conn.dealerId, isEnabled: conn.isEnabled });
   } catch (err) {

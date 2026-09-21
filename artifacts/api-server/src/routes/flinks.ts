@@ -4,6 +4,7 @@ import { db, businessProfilesTable, costEntriesTable, flinksTransactionsTable, h
 import { and, desc, eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { buildConnectUrl } from "../lib/flinksClient.js";
 import {
   getFlinksConnection,
@@ -31,12 +32,14 @@ router.get("/flinks/status", requireAuth, requirePermission("integrations", "vie
   try {
     const userId = getUserId(res);
     const conn = await getFlinksConnection(userId);
+    const available = isIntegrationConfigured("flinks");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       institutionName: conn.institutionName,
       selectedAccount: conn.selectedAccount,
       isEnabled: conn.isEnabled,
@@ -59,6 +62,7 @@ router.get("/flinks/connect-url", requireAuth, requirePermission("integrations",
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Bank feed reconciliation requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, "flinks", "Flinks bank feed")) return;
     res.json({ url: buildConnectUrl() });
   } catch (err) {
     req.log.error({ err }, "Error building Flinks connect URL");

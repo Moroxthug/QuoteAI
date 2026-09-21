@@ -2232,6 +2232,9 @@ components:
       properties:
         connected:
           type: boolean
+        available:
+          type: boolean
+          description: False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.
         phoneNumber:
           type: string
           nullable: true
@@ -2309,6 +2312,9 @@ components:
       properties:
         connected:
           type: boolean
+        available:
+          type: boolean
+          description: False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.
         companyName:
           type: string
           nullable: true
@@ -2448,6 +2454,9 @@ components:
       properties:
         connected:
           type: boolean
+        available:
+          type: boolean
+          description: False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.
         businessName:
           type: string
           nullable: true
@@ -2621,6 +2630,15 @@ components:
     CalendarStatus:
       type: object
       properties:
+        available:
+          type: object
+          description: Per-provider app-registration presence (Phase 65).
+          properties:
+            google:
+              type: boolean
+            outlook:
+              type: boolean
+          required: [google, outlook]
         connections:
           type: array
           items:
@@ -2707,6 +2725,13 @@ components:
     EmailConnectionsStatus:
       type: object
       properties:
+        available:
+          type: object
+          description: Per-provider app-registration presence (Phase 65).
+          properties:
+            google:
+              type: boolean
+          required: [google]
         connections:
           type: array
           items:

@@ -115,14 +115,14 @@ export const invoicesApi = {
   pdfUrl: (id: string, download = false) => `/api/invoices/${id}/pdf${download ? "?download=1" : ""}`,
 };
 
-export type StripeConnectStatusDto = { connected: boolean; chargesEnabled?: boolean; payoutsEnabled?: boolean; detailsSubmitted?: boolean; connectedAt?: string };
+export type StripeConnectStatusDto = { connected: boolean; available?: boolean; chargesEnabled?: boolean; payoutsEnabled?: boolean; detailsSubmitted?: boolean; connectedAt?: string };
 
 export const stripeConnectApi = {
   status: () => req<StripeConnectStatusDto>("/api/invoice-payments/connect/status"),
   onboard: () => req<{ url: string }>("/api/invoice-payments/connect/onboard", { method: "POST", body: "{}" }),
 };
 
-export type FinanceitStatusDto = { connected: boolean; dealerId?: string; isEnabled?: boolean; connectedAt?: string; lastAppliedAt?: string | null };
+export type FinanceitStatusDto = { connected: boolean; available?: boolean; dealerId?: string; isEnabled?: boolean; connectedAt?: string; lastAppliedAt?: string | null };
 
 export const financeitApi = {
   status: () => req<FinanceitStatusDto>("/api/financeit/status"),
@@ -135,6 +135,8 @@ export const financeitApi = {
 export type FlinksAccountDto = { id: string; name: string; institution: string; last4: string | null };
 export type FlinksStatusDto = {
   connected: boolean;
+  /** False when the server-side app registration is missing (Phase 65). */
+  available?: boolean;
   institutionName?: string;
   selectedAccount?: FlinksAccountDto | null;
   isEnabled?: boolean;
@@ -172,6 +174,8 @@ export const flinksApi = {
 // Phase 28: Meta (Facebook/Instagram) Lead Ads capture
 export type MetaLeadAdsStatusDto = {
   connected: boolean;
+  /** False when the server-side app registration is missing (Phase 65). */
+  available?: boolean;
   pageName?: string;
   isEnabled?: boolean;
   connectedAt?: string;
@@ -198,6 +202,8 @@ export const metaLeadAdsApi = {
 // developer-token approval + manager account setup (see docs/EDGE-FEATURES-PLAN.md §15).
 export type GoogleLsaStatusDto = {
   connected: boolean;
+  /** False when the server-side app registration is missing (Phase 65). */
+  available?: boolean;
   lsaCustomerId?: string;
   isEnabled?: boolean;
   connectedAt?: string;

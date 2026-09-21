@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "route-matrix": "node scripts/route-matrix.ts --write",
+    "email-dns-check": "node scripts/email-dns-check.ts",
     "csp-hashes": "tsx scripts/csp-hashes.ts",
     "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },

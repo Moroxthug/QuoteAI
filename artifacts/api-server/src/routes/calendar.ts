@@ -6,6 +6,7 @@ import { eq, desc } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { buildGoogleAuthUrl } from "../lib/googleCalendarClient.js";
 import { buildOutlookAuthUrl } from "../lib/outlookCalendarClient.js";
 import { listCalendarConnections, connectCalendar, disconnectCalendar, setCalendarEnabled } from "../calendar/service.js";
@@ -60,6 +61,7 @@ router.get("/calendar/status", requireAuth, requirePermission("integrations", "v
     const userId = getUserId(res);
     const connections = await listCalendarConnections(userId);
     res.json({
+      available: { google: isIntegrationConfigured("google_calendar"), outlook: isIntegrationConfigured("outlook_calendar") },
       connections: connections.map((c) => ({
         provider: c.provider,
         accountEmail: c.accountEmail,
@@ -84,6 +86,7 @@ router.get("/calendar/:provider/connect", requireAuth, requirePermission("integr
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Calendar sync requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, provider === "google" ? "google_calendar" : "outlook_calendar", provider === "google" ? "Google Calendar" : "Outlook Calendar")) return;
     const url = provider === "google" ? buildGoogleAuthUrl(signState(userId, provider)) : buildOutlookAuthUrl(signState(userId, provider));
     res.json({ url });
   } catch (err) {

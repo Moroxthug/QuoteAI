@@ -130,7 +130,8 @@ export const ListQuotesResponseItem = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 export const ListQuotesResponse = zod.array(ListQuotesResponseItem)
 
@@ -263,7 +264,8 @@ export const CreateQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -391,7 +393,8 @@ export const GetQuoteStatsResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 }))
 })
 
@@ -553,7 +556,8 @@ export const CreateManualQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -689,7 +693,8 @@ export const GetQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -861,7 +866,8 @@ export const UpdateQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -873,6 +879,254 @@ export const DeleteQuoteParams = zod.object({
 })
 
 export const DeleteQuoteResponse = zod.void()
+
+
+/**
+ * @summary Soft-archive a quote (moves it to the Archive view)
+ */
+export const ArchiveQuoteParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ArchiveQuoteResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "clientData": zod.object({
+  "nome": zod.string(),
+  "indirizzo": zod.string(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "businessNumber": zod.string().optional(),
+  "partitaIva": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postalCode": zod.string().optional(),
+  "province": zod.string().optional()
+}),
+  "descrizioneGenerale": zod.string(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "titoloPreventivoRiga1": zod.string().nullish(),
+  "titoloPreventivoRiga2": zod.string().nullish(),
+  "numeroPreventivoData": zod.string().nullish(),
+  "companySnapshot": zod.union([zod.object({
+  "companyName": zod.string(),
+  "vatNumber": zod.string().optional(),
+  "address": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "logoUrl": zod.string().optional()
+}),zod.null()]).optional(),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "note": zod.string(),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "rawInput": zod.string(),
+  "pdfDownloadedAt": zod.string().nullish(),
+  "capitolatoPro": zod.boolean(),
+  "capitolatoPdfUrl": zod.string().nullish(),
+  "templateId": zod.enum(['standard', 'arosio', 'mariagrazia']).nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileUrl": zod.string(),
+  "fileSize": zod.number().nullish(),
+  "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Restore an archived quote
+ */
+export const RestoreQuoteParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const RestoreQuoteResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "clientData": zod.object({
+  "nome": zod.string(),
+  "indirizzo": zod.string(),
+  "email": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "businessNumber": zod.string().optional(),
+  "partitaIva": zod.string().optional(),
+  "city": zod.string().optional(),
+  "postalCode": zod.string().optional(),
+  "province": zod.string().optional()
+}),
+  "descrizioneGenerale": zod.string(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "titoloPreventivoRiga1": zod.string().nullish(),
+  "titoloPreventivoRiga2": zod.string().nullish(),
+  "numeroPreventivoData": zod.string().nullish(),
+  "companySnapshot": zod.union([zod.object({
+  "companyName": zod.string(),
+  "vatNumber": zod.string().optional(),
+  "address": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "email": zod.string().optional(),
+  "logoUrl": zod.string().optional()
+}),zod.null()]).optional(),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "note": zod.string(),
+  "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
+  "acceptedByName": zod.string().nullish(),
+  "pdfUrl": zod.string().nullish(),
+  "rawInput": zod.string(),
+  "pdfDownloadedAt": zod.string().nullish(),
+  "capitolatoPro": zod.boolean(),
+  "capitolatoPdfUrl": zod.string().nullish(),
+  "templateId": zod.enum(['standard', 'arosio', 'mariagrazia']).nullish(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string(),
+  "fileName": zod.string(),
+  "mimeType": zod.string(),
+  "fileUrl": zod.string(),
+  "fileSize": zod.number().nullish(),
+  "createdAt": zod.string()
+})).optional(),
+  "acceptedVariantId": zod.string().nullish(),
+  "variants": zod.array(zod.object({
+  "id": zod.string(),
+  "quoteId": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().optional(),
+  "position": zod.number().optional(),
+  "items": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "quantita": zod.number(),
+  "unita": zod.string(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "capitoli": zod.array(zod.object({
+  "lettera": zod.string(),
+  "titolo": zod.string(),
+  "voci": zod.array(zod.object({
+  "descrizione": zod.string(),
+  "um": zod.string(),
+  "quantita": zod.number(),
+  "prezzoUnitario": zod.number(),
+  "totale": zod.number()
+})),
+  "subtotale": zod.number(),
+  "osservazione": zod.string().optional()
+})),
+  "sconto": zod.union([zod.object({
+  "percentuale": zod.number(),
+  "importoScontato": zod.number()
+}),zod.null()]).optional(),
+  "condizioniPagamento": zod.array(zod.string()),
+  "subtotale": zod.number(),
+  "ivaPercentuale": zod.number(),
+  "ivaValore": zod.number(),
+  "totale": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})).optional(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
+})
 
 
 /**
@@ -1024,7 +1278,8 @@ export const DuplicateQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -1347,7 +1602,8 @@ export const RegenerateQuoteResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -1470,7 +1726,8 @@ export const UpgradeToCapitolatoProResponse = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 
 
@@ -1728,6 +1985,7 @@ export const BulkCreateCatalogItemsResponse = zod.array(BulkCreateCatalogItemsRe
  */
 export const GetWhatsappStatusResponse = zod.object({
   "connected": zod.boolean(),
+  "available": zod.boolean().optional().describe('False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.'),
   "phoneNumber": zod.string().nullish(),
   "isEnabled": zod.boolean().nullish(),
   "businessNumber": zod.string().nullish()
@@ -1795,6 +2053,7 @@ export const ToggleWhatsappResponse = zod.object({
  */
 export const GetQuickbooksStatusResponse = zod.object({
   "connected": zod.boolean(),
+  "available": zod.boolean().optional().describe('False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.'),
   "companyName": zod.string().nullish(),
   "environment": zod.string().nullish(),
   "isEnabled": zod.boolean().nullish(),
@@ -1902,6 +2161,7 @@ export const RetryQuickbooksSyncResponse = zod.object({
  */
 export const GetWaveStatusResponse = zod.object({
   "connected": zod.boolean(),
+  "available": zod.boolean().optional().describe('False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button.'),
   "businessName": zod.string().nullish(),
   "isEnabled": zod.boolean().nullish(),
   "connectedAt": zod.string().nullish(),
@@ -2017,6 +2277,10 @@ export const RetryWaveSyncResponse = zod.object({
  * @summary Get the calendar sync connection status for every provider the company has connected
  */
 export const GetCalendarStatusResponse = zod.object({
+  "available": zod.object({
+  "google": zod.boolean(),
+  "outlook": zod.boolean()
+}).optional().describe('Per-provider app-registration presence (Phase 65).'),
   "connections": zod.array(zod.object({
   "provider": zod.enum(['google', 'outlook']),
   "accountEmail": zod.string(),
@@ -2086,6 +2350,9 @@ export const GetCalendarSyncLogResponse = zod.object({
  * @summary Get the connected-email-sending status for every provider the company has connected
  */
 export const GetEmailConnectionsStatusResponse = zod.object({
+  "available": zod.object({
+  "google": zod.boolean()
+}).optional().describe('Per-provider app-registration presence (Phase 65).'),
   "connections": zod.array(zod.object({
   "provider": zod.enum(['google']),
   "accountEmail": zod.string(),
@@ -2452,7 +2719,8 @@ export const ListClientQuotesResponseItem = zod.object({
   "updatedAt": zod.string()
 })).optional(),
   "createdAt": zod.string(),
-  "updatedAt": zod.string()
+  "updatedAt": zod.string(),
+  "archivedAt": zod.string().nullish()
 })
 export const ListClientQuotesResponse = zod.array(ListClientQuotesResponseItem)
 

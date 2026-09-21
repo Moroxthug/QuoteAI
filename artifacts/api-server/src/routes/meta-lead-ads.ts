@@ -4,6 +4,7 @@ import { db, businessProfilesTable, metaLeadAdsImportLogTable, hasFeature, minim
 import { eq, desc } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { buildAuthUrl } from "../lib/metaLeadAdsClient.js";
@@ -69,12 +70,14 @@ router.get("/meta-lead-ads/status", requireAuth, requirePermission("integrations
   try {
     const userId = getUserId(res);
     const conn = await getMetaLeadAdsConnection(userId);
+    const available = isIntegrationConfigured("meta_lead_ads");
     if (!conn) {
-      res.json({ connected: false });
+      res.json({ connected: false, available });
       return;
     }
     res.json({
       connected: true,
+      available,
       pageName: conn.pageName,
       isEnabled: conn.isEnabled,
       connectedAt: conn.connectedAt.toISOString(),
@@ -95,6 +98,7 @@ router.get("/meta-lead-ads/connect", requireAuth, requirePermission("integration
       res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "Meta Lead Ads capture requires the Elite plan" });
       return;
     }
+    if (refuseIfNotConfigured(res, "meta_lead_ads", "Meta Lead Ads")) return;
     res.json({ url: buildAuthUrl(signState(userId)) });
   } catch (err) {
     req.log.error({ err }, "Error building Meta Lead Ads auth URL");

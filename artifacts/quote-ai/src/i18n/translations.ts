@@ -2327,6 +2327,8 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     "dashboard.settings.stripeConnect.title": "Get paid online",
     "dashboard.settings.stripeConnect.desc": "Let customers pay their invoices by card, straight into your own bank account — QuoteAI never touches the money.",
+    "dashboard.settings.integrations.notAvailableTitle": "Not available yet",
+    "dashboard.settings.integrations.notAvailableDesc": "This integration is waiting on its app approval with the provider. It will switch on here automatically once that is in place — nothing to do on your side.",
     "dashboard.settings.stripeConnect.connectCta": "Connect with Stripe",
     "dashboard.settings.stripeConnect.manage": "Manage account",
     "dashboard.settings.stripeConnect.finishOnboarding": "Finish setup",
@@ -5424,6 +5426,8 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     "dashboard.settings.stripeConnect.title": "Être payé en ligne",
     "dashboard.settings.stripeConnect.desc": "Permettez à vos clients de payer leurs factures par carte, directement dans votre propre compte bancaire — QuoteAI ne touche jamais l'argent.",
+    "dashboard.settings.integrations.notAvailableTitle": "Pas encore disponible",
+    "dashboard.settings.integrations.notAvailableDesc": "Cette intégration attend l'approbation de son application auprès du fournisseur. Elle s'activera ici automatiquement dès que ce sera en place — rien à faire de votre côté.",
     "dashboard.settings.stripeConnect.connectCta": "Connecter avec Stripe",
     "dashboard.settings.stripeConnect.manage": "Gérer le compte",
     "dashboard.settings.stripeConnect.finishOnboarding": "Terminer la configuration",

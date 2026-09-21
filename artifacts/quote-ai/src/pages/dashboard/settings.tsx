@@ -54,6 +54,22 @@ type ProfileFormValues = z.infer<ReturnType<typeof useProfileSchema>>;
 const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
 
+// Phase 65: an integration whose server-side app registration is missing
+// reports `available: false` on its status endpoint. Rendered in place of the
+// Connect button so nobody is bounced to a vendor error page.
+function NotAvailableNote() {
+  const { t } = useLanguage();
+  return (
+    <div className="flex items-start gap-2 text-xs text-muted-foreground" data-testid="integration-not-available">
+      <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+      <div>
+        <p className="font-medium text-foreground">{t("dashboard.settings.integrations.notAvailableTitle")}</p>
+        <p className="mt-0.5">{t("dashboard.settings.integrations.notAvailableDesc")}</p>
+      </div>
+    </div>
+  );
+}
+
 function AccountTab() {
   const { t } = useLanguage();
   const profileSchema = useProfileSchema();
@@ -944,15 +960,16 @@ function WhatsappTab() {
                 onChange={(e) => setPhoneInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && phoneInput.trim()) handleConnect(); }}
                 className="flex-1"
+                disabled={status?.available === false}
               />
               <button onClick={handleConnect}
-                disabled={!phoneInput.trim() || connectWa.isPending}
+                disabled={!phoneInput.trim() || connectWa.isPending || status?.available === false}
                 className="btn btn-navy gap-2 btn-gradient">
                 {connectWa.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {t("dashboard.settings.whatsapp.connectButton")}
               </button>
             </div>
-            <p className="text-xs text-muted-foreground">{t("dashboard.settings.whatsapp.formatHint")}</p>
+            {status?.available === false ? <NotAvailableNote /> : <p className="text-xs text-muted-foreground">{t("dashboard.settings.whatsapp.formatHint")}</p>}
           </div>
         </div>
       </div>
@@ -1200,10 +1217,12 @@ function QuickbooksTab() {
           </div>
         </div>
         <div className="card-foot">
-          <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
-            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-            {t("dashboard.settings.quickbooks.connectCta")}
-          </button>
+          {status?.available === false ? <NotAvailableNote /> : (
+            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
+              {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+              {t("dashboard.settings.quickbooks.connectCta")}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -1511,10 +1530,12 @@ function WaveTab() {
           </div>
         </div>
         <div className="card-foot">
-          <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
-            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-            {t("dashboard.settings.wave.connectCta")}
-          </button>
+          {status?.available === false ? <NotAvailableNote /> : (
+            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
+              {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+              {t("dashboard.settings.wave.connectCta")}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -1600,10 +1621,12 @@ function StripeConnectTab() {
         )}
       </div>
       <div className="card-foot">
-        <button onClick={() => onboard.mutate()} disabled={onboard.isPending} className="btn btn-navy gap-2">
-          {onboard.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-          {connected ? (chargesEnabled ? t("dashboard.settings.stripeConnect.manage") : t("dashboard.settings.stripeConnect.finishOnboarding")) : t("dashboard.settings.stripeConnect.connectCta")}
-        </button>
+        {status?.available === false ? <NotAvailableNote /> : (
+          <button onClick={() => onboard.mutate()} disabled={onboard.isPending} className="btn btn-navy gap-2">
+            {onboard.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+            {connected ? (chargesEnabled ? t("dashboard.settings.stripeConnect.manage") : t("dashboard.settings.stripeConnect.finishOnboarding")) : t("dashboard.settings.stripeConnect.connectCta")}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -1688,6 +1711,8 @@ function FinanceitTab() {
               {t("dashboard.settings.financeit.disconnect")}
             </button>
           </>
+        ) : status?.available === false ? (
+          <NotAvailableNote />
         ) : (
           <button onClick={() => saveDealer.mutate()} disabled={!dealerId.trim() || saveDealer.isPending} className="btn btn-navy gap-2">
             {saveDealer.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
@@ -1959,10 +1984,12 @@ function FlinksTab() {
         </div>
         <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <button onClick={() => setShowConnect(true)} className="btn btn-navy gap-2">
-              <Plug className="h-4 w-4" />
-              {t("dashboard.settings.flinks.connectCta")}
-            </button>
+            status?.available === false ? <NotAvailableNote /> : (
+              <button onClick={() => setShowConnect(true)} className="btn btn-navy gap-2">
+                <Plug className="h-4 w-4" />
+                {t("dashboard.settings.flinks.connectCta")}
+              </button>
+            )
           ) : (
             <>
               {hasAccount && (
@@ -2090,10 +2117,12 @@ function MetaLeadAdsTab() {
         </div>
         <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
-              {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-              {t("dashboard.settings.metaLeadAds.connectCta")}
-            </button>
+            status?.available === false ? <NotAvailableNote /> : (
+              <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-navy gap-2">
+                {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+                {t("dashboard.settings.metaLeadAds.connectCta")}
+              </button>
+            )
           ) : (
             <>
               <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
@@ -2217,10 +2246,12 @@ function GoogleLsaTab() {
         </div>
         <div className="card-foot gap-2 flex-wrap">
           {!connected ? (
-            <button onClick={() => connect.mutate(lsaCustomerId)} disabled={connect.isPending || !lsaCustomerId.trim()} className="btn btn-navy gap-2">
-              {connect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-              {t("dashboard.settings.googleLsa.connectCta")}
-            </button>
+            status?.available === false ? <NotAvailableNote /> : (
+              <button onClick={() => connect.mutate(lsaCustomerId)} disabled={connect.isPending || !lsaCustomerId.trim()} className="btn btn-navy gap-2">
+                {connect.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+                {t("dashboard.settings.googleLsa.connectCta")}
+              </button>
+            )
           ) : (
             <>
               <button onClick={() => toggle.mutate(!isEnabled)} disabled={toggle.isPending} className="btn btn-outline-navy btn-sm gap-2">
@@ -2460,10 +2491,12 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
           </div>
         </div>
         <div className="card-foot">
-          <button onClick={handleConnect} disabled={getConnectUrl.isFetching}   className="btn btn-outline-navy btn-sm gap-2">
-            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-            {t("dashboard.settings.calendar.connectCta")}
-          </button>
+          {status?.available?.[provider] === false ? <NotAvailableNote /> : (
+            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-outline-navy btn-sm gap-2">
+              {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+              {t("dashboard.settings.calendar.connectCta")}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -2576,10 +2609,12 @@ function EmailConnectionCard() {
           </div>
         </div>
         <div className="card-foot">
-          <button onClick={handleConnect} disabled={getConnectUrl.isFetching}   className="btn btn-outline-navy btn-sm gap-2">
-            {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
-            {t("dashboard.settings.emailSend.connectCta")}
-          </button>
+          {status?.available?.google === false ? <NotAvailableNote /> : (
+            <button onClick={handleConnect} disabled={getConnectUrl.isFetching} className="btn btn-outline-navy btn-sm gap-2">
+              {getConnectUrl.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plug className="h-4 w-4" />}
+              {t("dashboard.settings.emailSend.connectCta")}
+            </button>
+          )}
         </div>
       </div>
     );

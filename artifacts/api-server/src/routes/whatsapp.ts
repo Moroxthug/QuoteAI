@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
 import {
   db,
   whatsappConnectionsTable,
@@ -1368,7 +1369,7 @@ router.get("/whatsapp/status", requireAuth, async (req, res) => {
     const userId = getUserId(res);
     const [connection] = await db.select().from(whatsappConnectionsTable).where(eq(whatsappConnectionsTable.userId, userId));
     const businessNumber = process.env.WHATSAPP_BUSINESS_NUMBER ?? null;
-    res.json({ connected: !!connection, phoneNumber: connection?.phoneNumber ?? null, isEnabled: connection?.isEnabled ?? null, businessNumber });
+    res.json({ connected: !!connection, available: isIntegrationConfigured("whatsapp"), phoneNumber: connection?.phoneNumber ?? null, isEnabled: connection?.isEnabled ?? null, businessNumber });
   } catch (err) {
     req.log.error({ err }, "WhatsApp status error");
     res.status(500).json({ error: "Internal server error" });
@@ -1421,12 +1422,12 @@ router.post("/whatsapp/connect", requireAuth, requirePermission("integrations", 
       return;
     }
 
+    if (refuseIfNotConfigured(res, "whatsapp", "WhatsApp")) return;
     const otp = generateOtp();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
     await db.insert(whatsappOtpTable).values({ phoneNumber: normalized, otp, userId, expiresAt })
       .onConflictDoUpdate({ target: whatsappOtpTable.phoneNumber, set: { otp, userId, expiresAt } });
 
-    if (!WA_TOKEN || !WA_PHONE_ID) { res.status(503).json({ error: "WhatsApp integration is not configured yet." }); return; }
     await sendWhatsappText(normalized, `🔐 *QuoteAI verification code*\n\nYour code is: *${otp}*\n\nEnter it on the Settings page. Valid for 15 minutes.`);
     res.json({ sent: true, phoneNumber: normalized });
   } catch (err) {

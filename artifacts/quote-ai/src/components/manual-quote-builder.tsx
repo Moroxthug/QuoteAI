@@ -4,7 +4,9 @@ import {
   GripVertical, X, CheckCircle2, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCreateManualQuote, useSuggestItemDescription, useListCatalogItems } from "@workspace/api-client-react";
+import { useCreateManualQuote, useSuggestItemDescription, useListCatalogItems, useListTaxProfiles } from "@workspace/api-client-react";
+import { CANADIAN_PROVINCES } from "@/lib/payment-schedule";
+import { profileSummary, previewTaxLines, taxLineLabel } from "@/lib/tax-display";
 import type { CreateManualQuoteBody } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
@@ -29,7 +31,8 @@ function getDefaultCondizioni(t: (key: string) => string) {
   ];
 }
 
-const IVA_OPTIONS = [0, 4, 5, 10, 13];
+// Phase 71: taxes come from the province (GET /api/tax-profiles), not a fixed list.
+const TAX_EXEMPT = "EXEMPT";
 
 interface VoceState {
   id: string;
@@ -66,6 +69,7 @@ interface ManualQuoteBuilderProps {
     phone?: string | null;
     email?: string | null;
     logoUrl?: string | null;
+    province?: string | null;
   };
 }
 
@@ -159,7 +163,7 @@ function AISuggestButton({
 }
 
 export default function ManualQuoteBuilder({ clientData, profileData }: ManualQuoteBuilderProps) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const TEMPLATES = getTemplates(t);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -171,14 +175,19 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
   const [titoloRiga1, setTitoloRiga1] = useState(t("manualQuote.defaultDocTitle"));
   const [titoloRiga2, setTitoloRiga2] = useState("");
   const [descrizione, setDescrizione] = useState("");
-  const [ivaPercentuale, setIvaPercentuale] = useState(13);
+  // Phase 71: the province decides the tax components; "EXEMPT" = 0 %.
+  const [taxProvince, setTaxProvince] = useState<string>(() => (clientData?.province || profileData?.province || "ON").toUpperCase());
+  const { data: taxProfilesData } = useListTaxProfiles();
+  const taxProfile = taxProvince === TAX_EXEMPT ? null : (taxProfilesData?.profiles.find((p) => p.province === taxProvince) ?? null);
+  const ivaPercentuale = taxProfile?.totalRate ?? 0;
   const [condizioni, setCondizioni] = useState<string[]>(() => getDefaultCondizioni(t));
   const [newCondizione, setNewCondizione] = useState("");
   const [note, setNote] = useState(t("manualQuote.defaultNote"));
 
   const [chapters, setChapters] = useState<ChapterState[]>([mkChapter(0, t)]);
 
-  const { subtotale, ivaValore, totale } = computeTotals(chapters, ivaPercentuale);
+  const { subtotale, totale } = computeTotals(chapters, ivaPercentuale);
+  const taxLinesPreview = previewTaxLines(subtotale, taxProfile);
 
   const updateChapter = useCallback((chId: string, patch: Partial<ChapterState>) => {
     setChapters(prev => prev.map(c => c.id === chId ? { ...c, ...patch } : c));
@@ -274,6 +283,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       titoloPreventivoRiga2: titoloRiga2 || undefined,
       descrizioneGenerale: descrizione || undefined,
       ivaPercentuale,
+      province: taxProvince === TAX_EXEMPT ? undefined : taxProvince,
       condizioniPagamento: condizioni,
       note: note || undefined,
     };
@@ -562,28 +572,35 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
       <section className="card">
         <div className="card-head"><div><h2>{t("manualQuote.financialSummary")}</h2></div></div>
 
-        {/* Tax rate selector */}
+        {/* Phase 71: province → statutory components; the picker is the same
+            province list the contract template uses. */}
         <div className="tax-row">
-          <span>{t("manualQuote.taxRate")}</span>
-          <div className="pills">
-            {IVA_OPTIONS.map(iva => (
-              <button
-                key={iva}
-                type="button"
-                onClick={() => setIvaPercentuale(iva)}
-                className={cn("pill sm", ivaPercentuale === iva && "on")}
-                disabled={isSubmitting}
-              >
-                {iva === 0 ? t("manualQuote.taxExempt") : `${iva}%`}
-              </button>
-            ))}
+          <label htmlFor="manual-quote-tax-province">{t("manualQuote.taxProvince")}</label>
+          <div className="pills" style={{ alignItems: "center", gap: 8 }}>
+            <select
+              id="manual-quote-tax-province"
+              className="inp-sm"
+              value={taxProvince}
+              onChange={(e) => setTaxProvince(e.target.value)}
+              disabled={isSubmitting}
+            >
+              {CANADIAN_PROVINCES.map((p) => {
+                const prof = taxProfilesData?.profiles.find((x) => x.province === p.code);
+                return <option key={p.code} value={p.code}>{p[lang]}{prof ? ` — ${profileSummary(prof, lang)}` : ""}</option>;
+              })}
+              <option value={TAX_EXEMPT}>{t("manualQuote.taxExemptOption")}</option>
+            </select>
           </div>
         </div>
 
         {/* Totals breakdown */}
         <div className="kv-list">
           <div className="kv"><span>{t("manualQuote.taxableAmount")}</span><b>$ {fmt(subtotale)}</b></div>
-          <div className="kv"><span>{t("manualQuote.taxLabel")} {ivaPercentuale === 0 ? t("manualQuote.taxExempt") : `${ivaPercentuale}%`}</span><b>$ {fmt(ivaValore)}</b></div>
+          {taxLinesPreview.length === 0 ? (
+            <div className="kv"><span>{t("manualQuote.taxLabel")} — {t("manualQuote.taxExempt")}</span><b>$ {fmt(0)}</b></div>
+          ) : taxLinesPreview.map((line) => (
+            <div className="kv" key={line.code}><span>{taxLineLabel(line, lang, t("manualQuote.taxLabel"))}</span><b>$ {fmt(line.amount)}</b></div>
+          ))}
           <div className="kv total"><span>{t("manualQuote.total")}</span><b>$ {fmt(totale)}</b></div>
         </div>
       </section>

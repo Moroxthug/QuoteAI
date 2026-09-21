@@ -68,6 +68,37 @@ export interface QuoteAttachment {
   createdAt: string;
 }
 
+export type QuoteTaxLineCode = typeof QuoteTaxLineCode[keyof typeof QuoteTaxLineCode];
+
+
+export const QuoteTaxLineCode = {
+  GST: 'GST',
+  HST: 'HST',
+  PST: 'PST',
+  QST: 'QST',
+  RST: 'RST',
+  TAX: 'TAX',
+} as const;
+
+export interface QuoteTaxLine {
+  code: QuoteTaxLineCode;
+  label: string;
+  rate: number;
+  amount: number;
+}
+
+export type TaxProfileComponentsItem = {
+  code: string;
+  label: string;
+  rate: number;
+};
+
+export interface TaxProfile {
+  province: string;
+  totalRate: number;
+  components: TaxProfileComponentsItem[];
+}
+
 export interface QuoteVariant {
   id: string;
   quoteId: string;
@@ -81,6 +112,8 @@ export interface QuoteVariant {
   subtotale: number;
   ivaPercentuale: number;
   ivaValore: number;
+  /** Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore. */
+  taxLines?: QuoteTaxLine[];
   totale: number;
   createdAt: string;
   updatedAt: string;
@@ -105,6 +138,17 @@ export interface UpdateQuoteVariantBody {
   ivaValore?: number;
   totale?: number;
 }
+
+/**
+ * Language of the customer-facing documents (client preference, else French in Québec).
+ */
+export type QuoteDocumentLanguage = typeof QuoteDocumentLanguage[keyof typeof QuoteDocumentLanguage];
+
+
+export const QuoteDocumentLanguage = {
+  en: 'en',
+  fr: 'fr',
+} as const;
 
 export type QuoteStatus = typeof QuoteStatus[keyof typeof QuoteStatus];
 
@@ -141,6 +185,10 @@ export interface Quote {
   subtotale: number;
   ivaPercentuale: number;
   ivaValore: number;
+  /** Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore. */
+  taxLines?: QuoteTaxLine[];
+  /** Language of the customer-facing documents (client preference, else French in Québec). */
+  documentLanguage?: QuoteDocumentLanguage;
   totale: number;
   note: string;
   status: QuoteStatus;
@@ -391,6 +439,8 @@ export interface CreateManualQuoteBody {
   titoloPreventivoRiga2?: string;
   descrizioneGenerale?: string;
   ivaPercentuale?: number;
+  /** Province the work is performed in; drives the tax components. Defaults to the client's, then the company's. */
+  province?: string | null;
   condizioniPagamento?: string[];
   note?: string;
 }
@@ -839,6 +889,10 @@ export interface Client {
   businessNumber?: string | null;
   postalCode?: string | null;
 }
+
+export type ListTaxProfiles200 = {
+  profiles: TaxProfile[];
+};
 
 export type SendQuotePdfEmail200 = {
   success?: boolean;

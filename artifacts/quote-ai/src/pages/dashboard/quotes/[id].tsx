@@ -11,6 +11,7 @@ import { enCA, frCA } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { taxLineLabel } from "@/lib/tax-display";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleCard } from "@/components/payment-schedule-card";
 import { QuoteContractCard } from "@/components/quote-contract-card";
@@ -154,7 +155,7 @@ export default function QuoteDetail() {
   const [editNote, setEditNote] = useState("");
   const [editDescrizioneGenerale, setEditDescrizioneGenerale] = useState("");
   const [editScontoPerc, setEditScontoPerc] = useState(0);
-  const [editIvaPerc, setEditIvaPerc] = useState(22);
+  const [editIvaPerc, setEditIvaPerc] = useState(0);
   const [editCapitoli, setEditCapitoli] = useState<EditCapitolo[]>([]);
   const [editCondizioniPagamento, setEditCondizioniPagamento] = useState<string[]>([]);
   const [editClientNome, setEditClientNome] = useState("");
@@ -423,7 +424,7 @@ export default function QuoteDetail() {
     setEditNote(quote.note || "");
     setEditDescrizioneGenerale(quote.descrizioneGenerale || "");
     setEditScontoPerc(quote.sconto?.percentuale ?? 0);
-    setEditIvaPerc(quote.ivaPercentuale ?? 22);
+    setEditIvaPerc(quote.ivaPercentuale ?? 0);
     setEditCapitoli(
       (quote.capitoli ?? []).map(cap => ({
         lettera: cap.lettera,
@@ -1254,7 +1255,11 @@ export default function QuoteDetail() {
                           <div className="kv"><span>{t("dashboard.quoteDetail.taxableAfterDiscount")}</span><b>{formatCurrency(sconto.importoScontato)}</b></div>
                         </>
                       )}
-                      <div className="kv"><span>{t("dashboard.quoteDetail.taxLabelPrefix")} ({quote.ivaPercentuale}%):</span><b>{formatCurrency(quote.ivaValore)}</b></div>
+                      {(quote.taxLines ?? []).length === 0 ? (
+                        <div className="kv"><span>{t("dashboard.quoteDetail.taxLabelPrefix")} ({quote.ivaPercentuale}%):</span><b>{formatCurrency(quote.ivaValore)}</b></div>
+                      ) : quote.taxLines!.map((line) => (
+                        <div className="kv" key={line.code}><span>{taxLineLabel(line, lang, t("dashboard.quoteDetail.taxLabelPrefix"))}:</span><b>{formatCurrency(line.amount)}</b></div>
+                      ))}
                       <div className="kv grand"><span>{t("dashboard.quoteDetail.total")}</span><b>{formatCurrency(quote.totale)}</b></div>
                     </>
                   )}

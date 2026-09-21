@@ -7,7 +7,7 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable } from "@workspace/db";
+import { db, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
 import { raiseAutomation } from "../lib/automation.js";
@@ -82,8 +82,11 @@ async function seedLongQuote(userId: string, province: "ON" | "QC") {
       condizioniPagamento: ["30% deposit upon signing", "40% at start of work", "30% upon completion"],
       sconto: { percentuale: 5, importoScontato: Math.round(subtotale * 0.95 * 100) / 100 },
       subtotale: String(subtotale),
-      ivaPercentuale: "0",
-      totale: String(Math.round(subtotale * 0.95 * 100) / 100),
+      // Phase 71: real province taxes on the long quote so the PDF matrix shows
+      // the GST + QST split (and the discount as the taxable base).
+      ivaPercentuale: String(getTaxProfile(province).totalRate),
+      ivaValore: String(Math.round(Math.round(subtotale * 0.95 * 100) / 100 * getTaxProfile(province).totalRate) / 100),
+      totale: String(Math.round((Math.round(subtotale * 0.95 * 100) / 100) * (1 + getTaxProfile(province).totalRate / 100) * 100) / 100),
       status: "unlocked",
     })
     .returning();

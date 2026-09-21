@@ -140,6 +140,7 @@ export function normalizeReceipt(raw: unknown, opts: { model: string; candidateI
       const profile = getTaxProfile(code);
       for (const c of profile.components) {
         const key = c.code === "RST" ? "PST" : c.code;
+        if (key === "TAX") continue; // never in a provincial profile
         taxes[key] = Math.round(((taxSum * c.rate) / profile.totalRate) * 100) / 100;
       }
     } else {

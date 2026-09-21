@@ -6,6 +6,9 @@ import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Logo } from "@/components/logo";
 import { useDocumentTitle } from "@/hooks/use-document-title";
+import { taxLineLabel } from "@/lib/tax-display";
+
+type PublicTaxLine = { code: string; label: string; rate: number; amount: number };
 
 interface PublicQuoteChapterItem {
   descrizione: string;
@@ -33,6 +36,7 @@ interface PublicQuoteVariant {
   subtotale: string;
   ivaPercentuale: string;
   ivaValore: string;
+  taxLines?: PublicTaxLine[];
   totale: string;
 }
 
@@ -49,6 +53,8 @@ interface PublicQuote {
   subtotale: string;
   ivaPercentuale: string;
   ivaValore: string;
+  taxLines?: PublicTaxLine[];
+  province?: string | null;
   totale: string;
   note: string;
   pdfUrl: string | null;
@@ -59,8 +65,8 @@ interface PublicQuote {
   variants: PublicQuoteVariant[];
 }
 
-function euro(value: string | number) {
-  return Number(value).toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+function euro(value: string | number, lang: "en" | "fr" = "en") {
+  return Number(value).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" });
 }
 
 type FinanceitEstimate = { monthlyPayment: number; termMonths: number; apr: number };
@@ -77,7 +83,7 @@ const FINANCEIT_STATUS_KEYS: Record<string, string> = {
 // Only rendered once we've confirmed the contractor behind this quote has
 // financing enabled — most quotes never call the Financeit APIs at all.
 function FinancingWidget({ quoteId }: { quoteId: string }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [checked, setChecked] = useState(false);
   const [available, setAvailable] = useState(false);
   const [application, setApplication] = useState<FinanceitApplicationStatusDto | null>(null);
@@ -161,7 +167,7 @@ function FinancingWidget({ quoteId }: { quoteId: string }) {
           <div className="space-y-3">
             {estimate ? (
               <div className="text-sm" style={{ color: "var(--ink)" }}>
-                <span className="text-lg font-bold">{euro(estimate.monthlyPayment)}</span>
+                <span className="text-lg font-bold">{euro(estimate.monthlyPayment, lang)}</span>
                 <span style={{ color: "var(--muted-mk)" }}>{t("publicQuote.financing.perMonth")}</span>
                 <span className="text-xs ml-2" style={{ color: "var(--faint)" }}>({estimate.termMonths} {t("publicQuote.financing.termMonths")})</span>
               </div>
@@ -377,6 +383,7 @@ export default function PublicQuotePage() {
   const displaySconto = activeVariant ? activeVariant.sconto : quote.sconto;
   const displayIvaPercentuale = activeVariant ? activeVariant.ivaPercentuale : quote.ivaPercentuale;
   const displayIvaValore = activeVariant ? activeVariant.ivaValore : quote.ivaValore;
+  const displayTaxLines = (activeVariant ? activeVariant.taxLines : quote.taxLines) ?? [];
   const displayTotale = activeVariant ? activeVariant.totale : quote.totale;
 
   const companyName = quote.companySnapshot?.companyName || t("publicQuote.quoteFallback");
@@ -433,7 +440,7 @@ export default function PublicQuotePage() {
                   {isWinner && <CheckCircle2 className="h-4 w-4" style={{ color: "var(--green-dark)" }} />}
                 </div>
                 {tier.description && <p className="text-xs mt-0.5" style={{ color: "var(--muted-mk)" }}>{tier.description}</p>}
-                <p className="text-lg font-extrabold mt-2" style={{ color: "var(--navy)" }}>{euro(tier.totale)}</p>
+                <p className="text-lg font-extrabold mt-2" style={{ color: "var(--navy)" }}>{euro(tier.totale, lang)}</p>
               </button>
             );
           })}
@@ -459,13 +466,13 @@ export default function PublicQuotePage() {
               <div key={cap.lettera}>
                 <div className="flex items-center justify-between text-sm font-semibold mb-1.5" style={{ color: "var(--ink)" }}>
                   <span>{cap.lettera}. {cap.titolo}</span>
-                  <span>{euro(cap.subtotale)}</span>
+                  <span>{euro(cap.subtotale, lang)}</span>
                 </div>
                 <div className="space-y-1">
                   {cap.voci.map((v, i) => (
                     <div key={i} className="flex items-center justify-between text-xs" style={{ color: "var(--muted-mk)" }}>
                       <span className="pr-3">{v.descrizione} ({v.quantita} {v.um})</span>
-                      <span className="shrink-0">{euro(v.totale)}</span>
+                      <span className="shrink-0">{euro(v.totale, lang)}</span>
                     </div>
                   ))}
                 </div>
@@ -476,7 +483,7 @@ export default function PublicQuotePage() {
           <div className="mt-5 pt-4 space-y-1" style={{ borderTop: "1px solid var(--soft)" }}>
             <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
               <span>{t("publicQuote.subtotal")}</span>
-              <span>{euro(displaySubtotale)}</span>
+              <span>{euro(displaySubtotale, lang)}</span>
             </div>
             {displaySconto && displaySconto.percentuale > 0 && (
               <>
@@ -486,17 +493,24 @@ export default function PublicQuotePage() {
                 </div>
                 <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
                   <span>{t("publicQuote.discountedSubtotal")}</span>
-                  <span>{euro(displaySconto.importoScontato)}</span>
+                  <span>{euro(displaySconto.importoScontato, lang)}</span>
                 </div>
               </>
             )}
-            <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
-              <span>{t("publicQuote.tax")} ({displayIvaPercentuale}%)</span>
-              <span>{euro(displayIvaValore)}</span>
-            </div>
+            {displayTaxLines.length === 0 ? (
+              <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
+                <span>{t("publicQuote.tax")} ({displayIvaPercentuale}%)</span>
+                <span>{euro(displayIvaValore, lang)}</span>
+              </div>
+            ) : displayTaxLines.map((line) => (
+              <div key={line.code} className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
+                <span>{taxLineLabel(line, lang, t("publicQuote.tax"))}</span>
+                <span>{euro(line.amount, lang)}</span>
+              </div>
+            ))}
             <div className="flex justify-between text-base font-bold pt-1" style={{ color: "var(--navy)" }}>
               <span>{t("publicQuote.total")}</span>
-              <span>{euro(displayTotale)}</span>
+              <span>{euro(displayTotale, lang)}</span>
             </div>
           </div>
 

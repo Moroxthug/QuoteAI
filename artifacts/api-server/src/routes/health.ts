@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { HealthCheckResponse } from "@workspace/api-zod";
-import { pool } from "@workspace/db";
+import { pool, TAX_PROFILES } from "@workspace/db";
 import { opsHealth } from "../lib/ops.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 
@@ -38,4 +38,12 @@ router.get("/healthz/ops", opsLimiter, async (_req, res) => {
   }
 });
 
+
+// Phase 71: static, public — the dashboard's manual-quote builder needs every
+// province's components to show "GST 5 % + QST 9.975 %" as the user picks a
+// province, and the rates live in lib/db so no client-side copy can drift.
+router.get("/tax-profiles", (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  res.json({ profiles: Object.values(TAX_PROFILES) });
+});
 export default router;

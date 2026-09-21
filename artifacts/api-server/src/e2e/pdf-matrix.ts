@@ -25,7 +25,7 @@ const { db, businessProfilesTable, invoicesTable, quotesTable, contractsTable } 
 const { eq, and } = await import("drizzle-orm");
 const { startServer, stopServer, createOrg, cleanupAll } = await import("./harness.js");
 const { seedShowcase, setSignTokenCapture, loadShowcaseRows } = await import("./fixtures.js");
-const { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } = await import("../routes/quotes.js");
+const { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } = await import("../quotes/pdf.js");
 const { generateQuoteWhatsappPdfBuffer } = await import("../lib/generateQuoteWhatsappPdfBuffer.js");
 const { contractPdfBuffer, createContractFromQuote } = await import("../contracts/service.js");
 const { invoicePdfBuffer, buildInvoiceContext, createInvoice } = await import("../invoices/service.js");

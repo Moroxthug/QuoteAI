@@ -306,7 +306,39 @@ export async function sendSubscriptionEmail(params: {
   }
 }
 
+const QUOTE_EMAIL_COPY = {
+  en: {
+    view: "View &amp; accept online",
+    viewHint: "You can review the full quote in your browser and accept it in one click.",
+    title: (c: string) => `Quote from ${c}`,
+    ready: "Your quote is ready",
+    sent: (c: string) => `${c} has sent you a professional quote`,
+    greeting: (n: string, c: string) => `Hi ${n || "there"},<br/><br/>attached you'll find the quote from <strong>${c}</strong>. If you have any questions, feel free to reach out.`,
+    quote: "Quote",
+    total: "Total amount",
+    generated: "Document generated with",
+    footer: "You received this email because you were listed as the recipient of this quote.",
+    subject: (n: string, c: string) => `Quote ${n} – ${c}`,
+    money: (t: string) => `$ ${t}`,
+  },
+  fr: {
+    view: "Consulter et accepter en ligne",
+    viewHint: "Vous pouvez consulter la soumission complète dans votre navigateur et l'accepter en un clic.",
+    title: (c: string) => `Soumission de ${c}`,
+    ready: "Votre soumission est prête",
+    sent: (c: string) => `${c} vous a envoyé une soumission professionnelle`,
+    greeting: (n: string, c: string) => `Bonjour ${n || ""},<br/><br/>vous trouverez ci-joint la soumission de <strong>${c}</strong>. N'hésitez pas à nous écrire pour toute question.`,
+    quote: "Soumission",
+    total: "Montant total",
+    generated: "Document généré avec",
+    footer: "Vous recevez ce courriel parce que vous êtes le destinataire de cette soumission.",
+    subject: (n: string, c: string) => `Soumission ${n} – ${c}`,
+    money: (t: string) => `${t} $`,
+  },
+} as const;
+
 function buildQuoteEmailHtml(params: {
+  lang?: "en" | "fr";
   companyName: string;
   clientName: string;
   quoteNumber: string;
@@ -317,17 +349,18 @@ function buildQuoteEmailHtml(params: {
   const companyName = escapeHtml(params.companyName);
   const clientName = escapeHtml(params.clientName);
   const { quoteNumber, totale, publicUrl } = params;
+  const c = QUOTE_EMAIL_COPY[params.lang ?? "en"];
   const logoUrl = params.logoUrl || LOGO_URL;
   const ctaHtml = publicUrl
-    ? `<div class="cta"><a class="btn" href="${publicUrl}">View &amp; accept online</a></div>
-    <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:-12px;">You can review the full quote in your browser and accept it in one click.</p>`
+    ? `<div class="cta"><a class="btn" href="${publicUrl}">${c.view}</a></div>
+    <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:-12px;">${c.viewHint}</p>`
     : "";
   return `<!DOCTYPE html>
-<html lang="en-CA">
+<html lang="${params.lang === "fr" ? "fr-CA" : "en-CA"}">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Quote from ${companyName}</title>
+<title>${c.title(companyName)}</title>
 <style>
   body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
   .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }
@@ -350,29 +383,29 @@ function buildQuoteEmailHtml(params: {
 <div class="wrapper">
   <div class="header">
     <img src="${logoUrl}" alt="${companyName}" />
-    <h1>Your quote is ready</h1>
-    <p>${companyName} has sent you a professional quote</p>
+    <h1>${c.ready}</h1>
+    <p>${c.sent(companyName)}</p>
   </div>
   <div class="body">
-    <p class="greeting">Hi ${clientName || "there"},<br/><br/>attached you'll find the quote from <strong>${companyName}</strong>. If you have any questions, feel free to reach out.</p>
+    <p class="greeting">${c.greeting(clientName, companyName)}</p>
 
     <div class="quote-box">
       <div class="quote-row">
-        <span class="quote-label">Quote</span>
+        <span class="quote-label">${c.quote}</span>
         <span><strong>${quoteNumber}</strong></span>
       </div>
       <div class="quote-row">
-        <span class="quote-label">Total amount</span>
-        <span>$ ${totale}</span>
+        <span class="quote-label">${c.total}</span>
+        <span>${c.money(totale)}</span>
       </div>
     </div>
     ${ctaHtml}
 
-    <p style="font-size:13px;color:#6b7280;text-align:center;">Document generated with <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a></p>
+    <p style="font-size:13px;color:#6b7280;text-align:center;">${c.generated} <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a></p>
   </div>
   <div class="footer">
     ${companyName}<br/>
-    You received this email because you were listed as the recipient of this quote.
+    ${c.footer}
   </div>
 </div>
 </body>
@@ -490,6 +523,7 @@ export async function sendQuotePdfEmail(params: {
   publicUrl?: string | null;
   companyLogoUrl?: string | null;
   replyTo?: string | null;
+  lang?: "en" | "fr";
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -502,8 +536,9 @@ export async function sendQuotePdfEmail(params: {
       toEmail: params.toEmail,
       fromDisplayName: params.companyName,
       replyTo: params.replyTo,
-      subject: `Quote ${params.quoteNumber} – ${params.companyName}`,
+      subject: QUOTE_EMAIL_COPY[params.lang ?? "en"].subject(params.quoteNumber, params.companyName),
       html: buildQuoteEmailHtml({
+        lang: params.lang,
         companyName: params.companyName,
         clientName: params.clientName,
         quoteNumber: params.quoteNumber,

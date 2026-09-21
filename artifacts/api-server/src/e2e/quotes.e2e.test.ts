@@ -184,3 +184,65 @@ describe("quotes: unlock + send lifecycle (Phase 66)", () => {
     expect((await org.api("/api/payments/unlock-quote", { method: "POST", body: { quoteId: draft.id } })).body.status).toBe("unlocked");
   });
 });
+
+// Phase 71 — Québec quotes: the province decides the tax components and the
+// document language; the customer email follows the PDF.
+describe("quotes: province taxes + bilingual documents (Phase 71)", () => {
+  beforeAll(startServer);
+  afterAll(async () => {
+    await cleanupAll();
+    await stopServer();
+  });
+
+  test("a QC manual quote gets GST + QST, French documents and a French email", async () => {
+    const org = await createOrg({ province: "QC" });
+    const created = await org.api("/api/quotes/manual", {
+      body: {
+        capitoli: [{ lettera: "A", titolo: "Peinture", voci: [{ descrizione: "Peinture salon", um: "m2", quantita: 100, prezzoUnitario: 12.3456, totale: 0 }], subtotale: 0 }],
+        clientData: { nome: "Marie Tremblay", indirizzo: "12 rue Principale", city: "Québec", province: "QC" },
+      },
+    });
+    expect(created.status, JSON.stringify(created.body)).toBe(201);
+    const quote = created.body;
+    expect(quote.province).toBe("QC");
+    expect(quote.ivaPercentuale).toBeCloseTo(14.975, 3);
+    expect(quote.documentLanguage).toBe("fr");
+    expect(quote.taxLines.map((l: { code: string }) => l.code)).toEqual(["GST", "QST"]);
+    const taxSum = quote.taxLines.reduce((s: number, l: { amount: number }) => s + l.amount, 0);
+    expect(taxSum).toBeCloseTo(quote.ivaValore, 2);
+    expect(quote.totale).toBeCloseTo(quote.subtotale + quote.ivaValore, 2);
+
+    // The emailed PDF and the email itself are French.
+    sentEmails.length = 0;
+    const sent = await org.api(`/api/quotes/${quote.id}/send-pdf-email`, { method: "POST", body: { toEmail: "marie@example.invalid", clientName: "Marie" } });
+    expect(sent.status, JSON.stringify(sent.body)).toBe(200);
+    const mail = sentEmails.find((m) => m.to.includes("marie@example.invalid"));
+    expect(mail?.subject.startsWith("Soumission ")).toBe(true);
+    expect(mail?.html).toContain("Votre soumission est prête");
+
+    // Sending unlocked it: the public page carries the same split.
+    const pub = await org.api(`/api/public/quotes/${quote.id}`);
+    expect(pub.status).toBe(200);
+    expect(pub.body.quote.taxLines.map((l: { code: string }) => l.code)).toEqual(["GST", "QST"]);
+  });
+
+  test("tax-exempt and Ontario quotes keep working; an explicit odd rate shows as one generic line", async () => {
+    const org = await createOrg({ province: "ON" });
+    const cap = [{ lettera: "A", titolo: "Work", voci: [{ descrizione: "Item", um: "ea", quantita: 1, prezzoUnitario: 1000, totale: 0 }], subtotale: 0 }];
+    const on = await org.api("/api/quotes/manual", { body: { capitoli: cap } });
+    expect(on.status).toBe(201);
+    expect(on.body.taxLines).toEqual([{ code: "HST", label: "HST", rate: 13, amount: 130 }]);
+    expect(on.body.documentLanguage).toBe("en");
+
+    const exempt = await org.api("/api/quotes/manual", { body: { capitoli: cap, ivaPercentuale: 0 } });
+    expect(exempt.body.taxLines).toEqual([]);
+    expect(exempt.body.totale).toBe(1000);
+
+    const odd = await org.api("/api/quotes/manual", { body: { capitoli: cap, ivaPercentuale: 7 } });
+    expect(odd.body.taxLines).toEqual([{ code: "TAX", label: "Tax", rate: 7, amount: 70 }]);
+
+    const profiles = await org.api("/api/tax-profiles");
+    expect(profiles.status).toBe(200);
+    expect(profiles.body.profiles.find((p: { province: string }) => p.province === "QC").components.map((c: { code: string }) => c.code)).toEqual(["GST", "QST"]);
+  });
+});

@@ -25,6 +25,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^POST \/api\/(payments\/(connect-)?webhook|webhooks\/(financeit|resend)|whatsapp\/webhook|meta-lead-ads\/webhook)$/, reason: "inbound provider webhook — signature verified (Rule 7)" },
   { match: /^GET \/api\/(whatsapp|meta-lead-ads)\/webhook$/, reason: "Meta hub.challenge verification handshake (hub.verify_token checked)" },
   { match: /^GET \/api\/healthz(\/db|\/ops)?$/, reason: "liveness/readiness/ops probes (Phase 69: /ops is rate limited and reveals counts + timestamps only)" },
+  { match: /^GET \/api\/tax-profiles$/, reason: "Phase 71: static Canadian sales-tax table for the quote builder; no data, cache-control 1 day" },
   { match: /^GET \/api\/settings\/registration$/, reason: "public 'is sign-up open' flag read by the auth pages" },
   { match: /^GET \/api\/payments\/plans$/, reason: "public pricing table" },
   { match: /^GET \/api\/cron\/tick$/, reason: "Vercel cron — handler checks `Authorization: Bearer $CRON_SECRET` itself" },

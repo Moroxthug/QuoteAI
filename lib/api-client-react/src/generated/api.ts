@@ -42,6 +42,7 @@ import type {
   HealthStatus,
   ImportCatalogResult,
   ListQuoteVariants200,
+  ListTaxProfiles200,
   LogoUploadResult,
   PaymentVerifyResult,
   PdfResult,
@@ -120,6 +121,83 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListTaxProfilesUrl = () => {
+
+
+
+
+  return `/api/tax-profiles`
+}
+
+/**
+ * @summary Canadian sales-tax profiles by province (static, public)
+ */
+export const listTaxProfiles = async ( options?: Parameters<typeof customFetch>[1]): Promise<ListTaxProfiles200> => {
+
+  return customFetch<ListTaxProfiles200>(getListTaxProfilesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTaxProfilesQueryKey = () => {
+    return [
+    `/api/tax-profiles`
+    ] as const;
+    }
+
+
+export const getListTaxProfilesQueryOptions = <TData = Awaited<ReturnType<typeof listTaxProfiles>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTaxProfiles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTaxProfilesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTaxProfiles>>> = ({ signal }) => listTaxProfiles({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTaxProfiles>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTaxProfilesQueryResult = NonNullable<Awaited<ReturnType<typeof listTaxProfiles>>>
+export type ListTaxProfilesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Canadian sales-tax profiles by province (static, public)
+ */
+
+export function useListTaxProfiles<TData = Awaited<ReturnType<typeof listTaxProfiles>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTaxProfiles>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTaxProfilesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getHealthCheckUrl = () => {
 

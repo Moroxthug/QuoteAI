@@ -129,3 +129,24 @@ On your phone (iPhone Safari and an Android if you can borrow one): sign up → 
 ## 3. Build log
 
 *(one entry per phase: date, commit, built, found, deferred)*
+
+### Phase 71 — Québec quotes: province-derived taxes + bilingual quote documents (2026-09-21)
+
+**Built**
+- **Tax model** — `lib/db/src/schema/tax.ts`: `splitTaxRate(rate, province)` maps a quote's stored total rate back to the statutory components (QC 14.975 → GST 5 + QST 9.975, BC 12 → GST + PST, ON 13 → HST; 0 = exempt; anything else = one generic "Tax" line), `quoteTaxLines(taxable, rate, taxTotal, province)` computes the amounts with the last line absorbing rounding so they always sum to the stored `ivaValore`. Migration `0036_phase71_quote_tax_rate_scale.sql` (applied): `iva_percentuale` numeric(5,2) → numeric(6,3) on `quotes` and `quote_variants` — 14.975 was being stored as 14.98, a few cents off on every QC quote; all writers now `toFixed(3)`.
+- **Manual quotes** — `quotes/manualCreate.ts` (internal route + public API): new `province` input; the tax rate defaults to that province's statutory total (client's province → company's), 0 = exempt; the Italian `?? 22` fallback and Italian default payment terms are gone. Builder UI (`manual-quote-builder.tsx`): the Exempt/4/5/10/13 % pills are replaced by a province select showing each province's components (from the new public `GET /api/tax-profiles`, cache 1 day, on the route-matrix allowlist) plus a "Tax exempt" option; the totals preview lists the component lines live.
+- **Every quote surface shows the split** — `serializeQuote` / `serializeQuoteVariant` / `toPublicQuote` / `toPublicVariant` return `taxLines[]` (+ `documentLanguage` on the quote); `/dashboard/quotes/:id` and `/p/:id` render them (TPS/TVQ labels and fr-CA numbers when the page is in French); OpenAPI + orval client regenerated.
+- **Documents in the customer's language** — `quotes/i18n.ts`: `resolveQuoteLanguage` = client `preferredLanguage`, else French in Québec (the rule contracts and invoices already use); a 45-key EN/FR string table; `fmtMoney` ("$ 1,234.56" / "1 234,50 $"), `fmtRate`, `fmtQuoteDate`. `quotes/pdf.ts` now holds `generateQuotePdfBuffer` + `generateCapitolatoPdfBuffer` (extracted from `routes/quotes.ts`, every label localised, tax rows per component, the English default title localised); `lib/generateQuoteWhatsappPdfBuffer.ts` is a 10-line wrapper over it instead of a 330-line drifted copy. The quote email (`lib/email.ts` `buildQuoteEmailHtml` / `sendQuotePdfEmail`) has an FR copy set (subject "Soumission …", filename `Soumission N.pdf`). Clients auto-created from a QC quote default to `preferredLanguage: "fr"` (`lib/clients.ts`) — previously they defaulted to English and would have received French PDFs with English emails.
+- **Removed** — ~900 lines of dead HTML quote generators (`generateQuoteHtml`, `generateHtmlStandard/Professionale/Elegante`, exported but never called) and the duplicated WhatsApp layout; `routes/quotes.ts` 4 227 → 2 600 lines.
+- Tests: `quotes/i18n.test.ts` (10: split, rounding, discount base, FR labels, language rule); e2e `quotes.e2e.test.ts` +2 (QC manual quote → 14.975 %, GST+QST lines summing to `ivaValore`, `documentLanguage: fr`, French email subject/body, public page split; ON/exempt/odd-rate + `/api/tax-profiles`). `e2e/fixtures.ts` long quote now carries real province taxes so the PDF matrix exercises the split; `pdf-matrix.ts` imports from `quotes/pdf.ts`.
+
+**Found**
+1. `ops.e2e.test.ts` failed on committed code after the reboot: cron ticks are stamped by the database clock, which was 0.7 s *behind* this machine, so a tick written inside a warm-started server sorted before the test's `new Date()`. The window now starts 10 s early (still scoped to the run).
+2. Quote PDFs printed the DB-default English title even on French documents; a title equal to the English default is now localised, a company-typed title is kept.
+
+**Not done / deferred**
+- Browser check of the manual builder and `/p` was not possible this session (the 5 dev-server slots belong to other chats; no API reachable); the e2e cases cover the payloads and the PDF matrix the documents. Do a manual pass when a slot is free.
+- AI-generated quotes already derive the rate from the province (`resolveQuoteTaxRate`); an AI-provided explicit rate still wins and shows as a generic line if it matches no profile — by design.
+- Invoices/contracts untouched (already bilingual with the split).
+
+**Verification**: `pnpm typecheck` · `pnpm lint` 0 errors · `pnpm knip` (new files clean) · `i18n-audit` clean · unit 13 files / 65 tests · e2e 8 files / 65 tests green against `quoteai` · both apps built (428 pages prerendered) · `qa:pdf` 44 PDFs, QC quote text: "SOUS-TOTAL 28 970,00 $ · RABAIS (5 %) · TPS 5 % 1 376,08 $ · TVQ 9,975 % 2 745,26 $ · TOTAL TAXES INCLUSES 31 642,84 $" · migration 0036 applied · `docs/ROUTE-MATRIX.md` regenerated (347 routes).

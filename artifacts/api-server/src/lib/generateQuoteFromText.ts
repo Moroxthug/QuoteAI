@@ -219,7 +219,7 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
       "15% final balance upon completion and client walkthrough",
     ],
     subtotale: calculatedSubtotale.toFixed(2),
-    ivaPercentuale: ivaPercentualeVal.toFixed(2),
+    ivaPercentuale: ivaPercentualeVal.toFixed(3),
     ivaValore: ivaValoreVal.toFixed(2),
     totale: totaleVal.toFixed(2),
     note: aiData.note ?? "Quote valid for 30 days from the issue date. Excludes permits, unforeseen conditions behind existing walls/floors, and any work not explicitly listed above.",

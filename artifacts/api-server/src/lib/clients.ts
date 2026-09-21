@@ -45,6 +45,9 @@ export async function ensureClientForQuote(userId: string, clientData: QuoteClie
       userId,
       name,
       type: incoming.businessNumber ? "business" : "individual",
+      // Phase 71: a client in Québec defaults to French documents (contracts,
+      // invoices and now quotes all read this); editable on the client record.
+      preferredLanguage: incoming.province === "QC" ? "fr" : "en",
       dedupKey,
       ...incoming,
     })

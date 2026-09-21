@@ -24,7 +24,8 @@ export const PROVINCE_NAMES: Record<ProvinceCode, { en: string; fr: string }> = 
 };
 
 export type TaxComponent = {
-  code: "GST" | "HST" | "PST" | "QST" | "RST";
+  /** "TAX" only for a hand-entered rate that matches no provincial profile (quotes, Phase 71). */
+  code: "GST" | "HST" | "PST" | "QST" | "RST" | "TAX";
   label: string;
   /** Percent, e.g. 13 for 13%. */
   rate: number;
@@ -106,4 +107,36 @@ export function computeTax(subtotal: number, province: string | null | undefined
   }));
   const total = Math.round(lines.reduce((s, l) => s + l.amount, 0) * 100) / 100;
   return { profile, lines, total };
+}
+
+/**
+ * Phase 71 — quotes store one total rate (`ivaPercentuale`) plus a province.
+ * When that rate is the province's statutory total, the document shows the
+ * statutory components (GST 5 % + QST 9.975 % in Québec, GST + PST in BC,
+ * HST in Ontario); a hand-entered rate that matches no profile is shown as a
+ * single generic "Tax" line, and 0 means tax-exempt (no lines at all).
+ */
+export function splitTaxRate(rate: number, province: string | null | undefined): TaxComponent[] {
+  if (!(rate > 0)) return [];
+  const code = normalizeProvince(province);
+  if (code && Math.abs(TAX_PROFILES[code].totalRate - rate) < 0.01) return TAX_PROFILES[code].components;
+  // The rate may be another province's total (client site elsewhere).
+  const match = (Object.values(TAX_PROFILES) as TaxProfile[]).find((p) => Math.abs(p.totalRate - rate) < 0.01);
+  if (match && match.components.length === 1) return match.components;
+  return [{ code: "TAX", label: "Tax", rate }];
+}
+
+/**
+ * Tax lines for a quote: component amounts sum exactly to `taxTotal` (the
+ * stored `ivaValore`), so the PDF, the public page and the total never
+ * disagree by a cent — the last line absorbs rounding.
+ */
+export function quoteTaxLines(taxable: number, rate: number, taxTotal: number, province: string | null | undefined): TaxBreakdownLine[] {
+  const components = splitTaxRate(rate, province);
+  if (components.length === 0) return [];
+  const lines = components.map((c) => ({ ...c, amount: Math.round(taxable * c.rate) / 100 }));
+  const sum = lines.reduce((s, l) => s + l.amount, 0);
+  const drift = Math.round((taxTotal - sum) * 100) / 100;
+  if (drift !== 0) lines[lines.length - 1].amount = Math.round((lines[lines.length - 1].amount + drift) * 100) / 100;
+  return lines;
 }

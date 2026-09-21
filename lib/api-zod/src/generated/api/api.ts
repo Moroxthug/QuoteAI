@@ -8,6 +8,22 @@
 import * as zod from 'zod';
 
 /**
+ * @summary Canadian sales-tax profiles by province (static, public)
+ */
+export const ListTaxProfilesResponse = zod.object({
+  "profiles": zod.array(zod.object({
+  "province": zod.string(),
+  "totalRate": zod.number(),
+  "components": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "rate": zod.number()
+}))
+}))
+})
+
+
+/**
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -120,6 +136,13 @@ export const CreateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -174,6 +197,12 @@ export const CreateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -251,6 +280,13 @@ export const GetQuoteStatsResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -305,6 +341,12 @@ export const GetQuoteStatsResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -357,6 +399,7 @@ export const CreateManualQuoteBody = zod.object({
   "titoloPreventivoRiga2": zod.string().optional(),
   "descrizioneGenerale": zod.string().optional(),
   "ivaPercentuale": zod.number().optional(),
+  "province": zod.string().nullish().describe('Province the work is performed in; drives the tax components. Defaults to the client\'s, then the company\'s.'),
   "condizioniPagamento": zod.array(zod.string()).optional(),
   "note": zod.string().optional()
 })
@@ -415,6 +458,13 @@ export const CreateManualQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -469,6 +519,12 @@ export const CreateManualQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -553,6 +609,13 @@ export const GetQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -607,6 +670,12 @@ export const GetQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -727,6 +796,13 @@ export const UpdateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -781,6 +857,12 @@ export const UpdateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -862,6 +944,13 @@ export const ArchiveQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -916,6 +1005,12 @@ export const ArchiveQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -987,6 +1082,13 @@ export const RestoreQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -1041,6 +1143,12 @@ export const RestoreQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1142,6 +1250,13 @@ export const DuplicateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -1196,6 +1311,12 @@ export const DuplicateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1248,6 +1369,12 @@ export const ListQuoteVariantsResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1302,6 +1429,12 @@ export const CreateQuoteVariantResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1384,6 +1517,12 @@ export const UpdateQuoteVariantResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1467,6 +1606,13 @@ export const RegenerateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -1521,6 +1667,12 @@ export const RegenerateQuoteResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -1592,6 +1744,13 @@ export const UpgradeToCapitolatoProResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -1646,6 +1805,12 @@ export const UpgradeToCapitolatoProResponse = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
@@ -2586,6 +2751,13 @@ export const ListClientQuotesResponseItem = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
+  "documentLanguage": zod.enum(['en', 'fr']).optional().describe('Language of the customer-facing documents (client preference, else French in Québec).'),
   "totale": zod.number(),
   "note": zod.string(),
   "status": zod.enum(['draft', 'unlocked', 'pending_payment', 'accepted']),
@@ -2640,6 +2812,12 @@ export const ListClientQuotesResponseItem = zod.object({
   "subtotale": zod.number(),
   "ivaPercentuale": zod.number(),
   "ivaValore": zod.number(),
+  "taxLines": zod.array(zod.object({
+  "code": zod.enum(['GST', 'HST', 'PST', 'QST', 'RST', 'TAX']),
+  "label": zod.string(),
+  "rate": zod.number(),
+  "amount": zod.number()
+})).optional().describe('Phase 71 — statutory components (GST/QST, GST/PST, HST) or one generic "Tax" line; amounts sum to ivaValore.'),
   "totale": zod.number(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable } from "@workspace/db";
+import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable, normalizeProvince, quoteTaxLines } from "@workspace/db";
 import { eq, or, isNull } from "drizzle-orm";
 import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { logger } from "../lib/logger.js";
-import type { QuoteChapter, QuoteClientData } from "@workspace/db";
+import type { QuoteChapter, QuoteClientData, QuoteDiscount } from "@workspace/db";
 import { sendWidgetLeadNotification, sendWidgetClientConfirmationEmail } from "../lib/email.js";
 import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
 import { raiseAutomation } from "../lib/automation.js";
@@ -79,7 +79,7 @@ const financeitApplyLimiter = ipRateLimiter({
 // Public projection of the quote: always excludes userId, Stripe billing
 // data, and internal AI metadata (costs/tokens) — this endpoint is not
 // authenticated, the only "secret" is the quote's UUID itself.
-function toPublicVariant(v: typeof quoteVariantsTable.$inferSelect) {
+function toPublicVariant(v: typeof quoteVariantsTable.$inferSelect, province: string | null) {
   return {
     id: v.id,
     label: v.label,
@@ -91,11 +91,14 @@ function toPublicVariant(v: typeof quoteVariantsTable.$inferSelect) {
     subtotale: v.subtotale,
     ivaPercentuale: v.ivaPercentuale,
     ivaValore: v.ivaValore,
+    taxLines: quoteTaxLines((v.sconto as QuoteDiscount | null)?.importoScontato ?? Number(v.subtotale), Number(v.ivaPercentuale), Number(v.ivaValore), province),
     totale: v.totale,
   };
 }
 
 function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeof quoteVariantsTable.$inferSelect)[]) {
+  // Phase 71: the public page shows the same statutory tax split as the PDF.
+  const province = normalizeProvince(quote.province) ?? normalizeProvince((quote.clientData as QuoteClientData | null)?.province) ?? null;
   return {
     id: quote.id,
     numeroPreventivoData: quote.numeroPreventivoData,
@@ -110,6 +113,8 @@ function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeo
     subtotale: quote.subtotale,
     ivaPercentuale: quote.ivaPercentuale,
     ivaValore: quote.ivaValore,
+    taxLines: quoteTaxLines((quote.sconto as QuoteDiscount | null)?.importoScontato ?? Number(quote.subtotale), Number(quote.ivaPercentuale), Number(quote.ivaValore), province),
+    province,
     totale: quote.totale,
     note: quote.note,
     pdfUrl: quote.pdfUrl,
@@ -117,7 +122,7 @@ function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeo
     acceptedAt: quote.acceptedAt,
     acceptedByName: quote.acceptedByName,
     acceptedVariantId: quote.acceptedVariantId ?? null,
-    variants: variants?.map(toPublicVariant) ?? [],
+    variants: variants?.map((v) => toPublicVariant(v, province)) ?? [],
   };
 }
 
@@ -446,7 +451,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
         titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
         numeroPreventivoData,
         subtotale: subtotale.toFixed(2),
-        ivaPercentuale: ivaPercentuale.toFixed(2),
+        ivaPercentuale: ivaPercentuale.toFixed(3),
         ivaValore: ivaValore.toFixed(2),
         totale: totale.toFixed(2),
         note: aiData.note ?? "Quote generated via Widget",

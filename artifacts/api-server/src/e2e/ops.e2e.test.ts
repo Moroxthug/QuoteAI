@@ -17,7 +17,11 @@ import "../automations/index.js";
 import { startServer, stopServer, createOrg, cleanupAll, api, seedQuote } from "./harness.js";
 import { emailsTo } from "./mailbox.js";
 
-const startedAt = new Date();
+// Ticks are stamped by the database clock (`defaultNow()`), which was measured
+// ~0.7 s behind this machine after a reboot — enough for a tick written inside
+// a warm-started server to sort *before* a `new Date()` taken here. A 10 s
+// margin keeps the window tied to this run without trusting two clocks to agree.
+const startedAt = new Date(Date.now() - 10_000);
 const savedEnv = { OPS_ALERT_EMAIL: process.env.OPS_ALERT_EMAIL, ADMIN_EMAIL: process.env.ADMIN_EMAIL };
 
 describe("ops", () => {

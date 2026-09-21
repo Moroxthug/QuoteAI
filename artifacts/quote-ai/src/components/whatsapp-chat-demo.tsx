@@ -212,7 +212,7 @@ function ChatBubble({ msg, previewData, t }: { msg: ChatMsg; previewData: Return
           <div className="text-[#075e54]">
             <Waveform />
           </div>
-          <span className="text-[8px] font-mono text-gray-500 shrink-0">{msg.text}</span>
+          <span className="text-[8px] font-mono text-gray-700 shrink-0">{msg.text}</span>
         </div>
         {msg.time && <p className="text-[7px] text-gray-400 mt-0.5 mr-1">{msg.time}</p>}
       </div>
@@ -291,7 +291,8 @@ export function WhatsAppChatDemo() {
   return (
     <>
       <style>{`@keyframes wa-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}`}</style>
-      <div className="relative mx-auto" style={{ width: 280 }}>
+      {/* A scripted, decorative phone mock-up — hidden from assistive tech; the copy beside it carries the meaning. */}
+      <div className="relative mx-auto" style={{ width: 280 }} aria-hidden="true">
         <div className="relative bg-gray-900 rounded-[36px] p-[10px] shadow-2xl border border-gray-700">
           <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-16 h-4 bg-gray-900 rounded-b-xl z-20 flex items-center justify-center">
             <div className="w-10 h-2 bg-black rounded-full" />
@@ -304,7 +305,7 @@ export function WhatsAppChatDemo() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-semibold text-[12px] leading-tight">QuoteAI</p>
-                <p className="text-white/60 text-[9px]">{t("waDemo.botOnline")}</p>
+                <p className="text-white/80 text-[9px]">{t("waDemo.botOnline")}</p>
               </div>
               <div className="flex gap-3">
                 <div className="w-1 h-1 rounded-full bg-white/40" />
@@ -328,7 +329,7 @@ export function WhatsAppChatDemo() {
             </div>
 
             <div className="bg-[#f0f2f5] px-2 py-1.5 flex items-center gap-1.5 border-t border-gray-200">
-              <div className="flex-1 bg-white rounded-full px-2.5 py-1.5 text-[9px] text-gray-400">
+              <div className="flex-1 bg-white rounded-full px-2.5 py-1.5 text-[9px] text-gray-500">
                 {t("waDemo.typeMessage")}
               </div>
               <div className="w-6 h-6 rounded-full bg-[#075e54] flex items-center justify-center shrink-0">

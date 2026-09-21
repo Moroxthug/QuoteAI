@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, AlertTriangle, Download, CheckCircle2, Banknote, Mail, Copy, CreditCard, MailCheck, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { publicInvoiceApi } from "@/lib/invoices-api";
 import { Logo } from "@/components/logo";
 
@@ -31,6 +32,7 @@ export default function PublicInvoicePage() {
     onError: () => toast({ title: t("publicInvoice.payError"), variant: "destructive" }),
   });
 
+  useDocumentTitle(data ? `${data.invoice.type === "credit_note" ? t("invoices.type.credit_note") : t("publicInvoice.invoice")} ${data.invoice.number} · ${data.invoice.companyName}` : null);
   useEffect(() => {
     if (data?.invoice.language) setLang(data.invoice.language);
   }, [data?.invoice.language, setLang]);
@@ -122,7 +124,7 @@ export default function PublicInvoicePage() {
                     <Mail className="h-4 w-4" style={{ color: "var(--faint)" }} />
                     <span style={{ color: "var(--ink)" }}>{t("publicInvoice.etransferTo")}</span>
                     <code className="rounded px-2 py-0.5 font-semibold" style={{ background: "var(--soft-2)", color: "var(--navy)" }}>{pi.etransferEmail}</code>
-                    <button style={{ color: "var(--navy)" }} onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
+                    <button type="button" aria-label={t("a11y.copyEmail")} style={{ color: "var(--navy)" }} onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
                   </div>
                 )}
                 {pi.chequePayableTo && <div style={{ color: "var(--ink)" }}>{t("publicInvoice.chequeTo")} <strong>{pi.chequePayableTo}</strong></div>}

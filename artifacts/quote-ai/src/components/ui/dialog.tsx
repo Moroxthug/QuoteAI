@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/i18n/LanguageContext"
 
 /**
  * Radix Dialog wrapped in the locked `.modal*` vocabulary
@@ -47,7 +48,9 @@ const DialogContent = React.forwardRef<
     /** Drop the corner close button (e.g. the command palette). */
     hideClose?: boolean
   }
->(({ className, children, size = "md", tall, hideClose, ...props }, ref) => (
+>(({ className, children, size = "md", tall, hideClose, ...props }, ref) => {
+  const { t } = useLanguage()
+  return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -57,13 +60,14 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {!hideClose && (
-        <DialogPrimitive.Close className="ic-btn modal-x" aria-label="Close">
+        <DialogPrimitive.Close className="ic-btn modal-x" aria-label={t("a11y.close")}>
           <X />
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 const DialogHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

@@ -119,9 +119,9 @@ export default function InvoiceDetailPage() {
               <div className="card-head"><div><h2>{t("invoices.publicLink")}</h2><p className="sub">{t("invoices.publicLinkHint")}</p></div></div>
               <div className="act-body">
                 <div className="field inline">
-                  <input readOnly value={data.publicUrl} className="flex-1 min-w-0 text-xs" />
-                  <button type="button" className="ic-btn" title={t("invoices.copied")} onClick={() => { navigator.clipboard.writeText(data.publicUrl!); toast({ title: t("invoices.copied") }); }}><Copy /></button>
-                  <a href={data.publicUrl} target="_blank" rel="noreferrer" className="ic-btn"><ExternalLink /></a>
+                  <input readOnly value={data.publicUrl} aria-label={t("a11y.publicLink")} className="flex-1 min-w-0 text-xs" />
+                  <button type="button" className="ic-btn" aria-label={t("a11y.copyLink")} onClick={() => { navigator.clipboard.writeText(data.publicUrl!); toast({ title: t("invoices.copied") }); }}><Copy /></button>
+                  <a href={data.publicUrl} target="_blank" rel="noreferrer" className="ic-btn" aria-label={t("a11y.openInNewTab")}><ExternalLink /></a>
                 </div>
               </div>
             </section>

@@ -1013,7 +1013,11 @@ Write all output text in English.`
 
     const scontoRaw = aiData.sconto;
     const scontoPercentuale = scontoRaw ? Number(scontoRaw.percentuale ?? 0) : 0;
-    const importoScontato = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
+    // Phase 67: `importoScontato` is the *discounted subtotal* everywhere the
+    // quote is rendered (PDFs, HTML, dashboard editor) — not the discount
+    // amount. Storing the amount here made a 10 % discount print as "−$9,000".
+    const discountAmount = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
+    const importoScontato = Number((calculatedSubtotale - discountAmount).toFixed(2));
     const sconto: QuoteDiscount | null =
       scontoPercentuale > 0 ? { percentuale: scontoPercentuale, importoScontato } : null;
 
@@ -1026,7 +1030,7 @@ Write all output text in English.`
 
     const subtotale = calculatedSubtotale;
     const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, profile?.province);
-    const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
+    const imponibile = importoScontato;
     const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
     const totale = Number((imponibile + ivaValore).toFixed(2));
 
@@ -1947,14 +1951,18 @@ When you use a price-list item, apply the exact unit price or a very close one. 
 
     const scontoRaw = aiData.sconto;
     const scontoPercentuale = scontoRaw ? Number(scontoRaw.percentuale ?? 0) : 0;
-    const importoScontato = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
+    // Phase 67: `importoScontato` is the *discounted subtotal* everywhere the
+    // quote is rendered (PDFs, HTML, dashboard editor) — not the discount
+    // amount. Storing the amount here made a 10 % discount print as "−$9,000".
+    const discountAmount = scontoPercentuale > 0 ? Number((calculatedSubtotale * scontoPercentuale / 100).toFixed(2)) : 0;
+    const importoScontato = Number((calculatedSubtotale - discountAmount).toFixed(2));
     const sconto: QuoteDiscount | null =
       scontoPercentuale > 0 ? { percentuale: scontoPercentuale, importoScontato } : null;
 
     const condizioniPagamento = aiData.condizioni_pagamento ?? quote.condizioniPagamento ?? [];
     const subtotale = calculatedSubtotale;
     const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, quote.province ?? (quote.clientData as QuoteClientData | null)?.province);
-    const imponibile = Number((calculatedSubtotale - importoScontato).toFixed(2));
+    const imponibile = importoScontato;
     const ivaValore = Number((imponibile * ivaPercentuale / 100).toFixed(2));
     const totale = Number((imponibile + ivaValore).toFixed(2));
 

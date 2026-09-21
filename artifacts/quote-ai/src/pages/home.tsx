@@ -330,7 +330,7 @@ export default function Home() {
                 : "Trades buy on one question: does it save me the 30 minutes of paperwork? Here is how quoteai compares to the alternatives you already know."}
             </p>
           </div>
-          <div className="card cmp-wrap">
+          <div className="card cmp-wrap" tabIndex={0}>
             <table className="cmp">
               <thead>
                 <tr>

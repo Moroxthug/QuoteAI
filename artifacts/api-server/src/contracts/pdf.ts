@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import type { ContractDocument, ContractVariables, ContractSigner, ContractEvent } from "@workspace/db";
 import { paymentTermAmount } from "@workspace/db";
 import { parseBlocks, type Run, fmtMoney, fmtDate, tr, dueLabel, eventLabel } from "./render.js";
+import { taxLabel } from "../invoices/render.js";
 import type { Lang } from "./templates.js";
 import { isWellFormedPngDataUrl } from "../lib/pngDataUrl.js";
 
@@ -72,7 +73,7 @@ function priceTable(v: ContractVariables, lang: Lang): Content {
   const rows: TableCell[][] = v.priceLines.map((l) => [cell(l.label), cell(fmtMoney(l.amount, lang), { align: "right" })]);
   if (v.discount) rows.push([cell(`${tr("discount", lang)} (${v.discount.percent}%)`), cell(`- ${fmtMoney(v.discount.amount, lang)}`, { align: "right" })]);
   rows.push([cell(tr("subtotal", lang), { bold: true }), cell(fmtMoney(v.subtotal, lang), { bold: true, align: "right" })]);
-  for (const t of v.taxLines) rows.push([cell(`${t.label} (${t.rate}%)`), cell(fmtMoney(t.amount, lang), { align: "right" })]);
+  for (const t of v.taxLines) rows.push([cell(`${taxLabel(t.label, lang)} (${t.rate}%)`), cell(fmtMoney(t.amount, lang), { align: "right" })]);
   rows.push([cell(tr("total", lang), { bold: true, fill: "#f9fafb" }), cell(fmtMoney(v.total, lang), { bold: true, align: "right", fill: "#f9fafb" })]);
   return gridTable([tr("description", lang), tr("amount", lang)], rows, ["*", 110], [1]);
 }

@@ -46,9 +46,13 @@ const quoteApiKeyLimiter = apiKeyRateLimiter({
   message: "Hourly quote limit reached for this account. Try again later.",
 });
 
+// Phase 67: every page view hits three of these endpoints (quote, Financeit
+// status, incentives), so 30/min was ten views a minute per IP — an office or
+// a family behind one router tripped it, and the page renders a 429 as
+// "Quote not available".
 const quoteViewLimiter = ipRateLimiter({
   windowMs: 60 * 1000,
-  max: 30,
+  max: 120,
   message: "Too many requests. Try again shortly.",
 });
 
@@ -438,7 +442,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
         capitoli,
         sconto: null,
         condizioniPagamento: aiData.condizioni_pagamento ?? [],
-        titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Analisi Economica e Computo Metrico Prezzato",
+        titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
         titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
         numeroPreventivoData,
         subtotale: subtotale.toFixed(2),

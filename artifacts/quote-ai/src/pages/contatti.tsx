@@ -63,7 +63,7 @@ export default function ContattiPage() {
       {/* Canali di contatto */}
       <section className="sec soft">
         <div className="wrap" style={{ maxWidth: 900 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
             {/* Email supporto */}
             <div className="card" style={{ padding: 28 }}>
               <span className="fi p" style={{ marginBottom: 16 }}><Mail className="h-5 w-5" /></span>

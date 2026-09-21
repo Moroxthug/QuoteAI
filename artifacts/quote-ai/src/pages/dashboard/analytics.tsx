@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
           <p className="sub">{t("analytics.subtitle")}</p>
         </div>
         <div className="head-actions">
-          <div className="seg" data-period={PERIOD_SEG[months]} role="group" aria-label="Reporting period">
+          <div className="seg" data-period={PERIOD_SEG[months]} role="group" aria-label={t("a11y.reportingPeriod")}>
             {PERIODS.map((p) => (
               <button key={p} type="button" className="seg-b" onClick={() => setMonths(p)}>{p} {t("analytics.monthsShort")}</button>
             ))}
@@ -69,7 +69,7 @@ function GateCard() {
 
 function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDto | undefined; isLoading: boolean; locale: typeof enCA }) {
   const { t } = useLanguage();
-  if (isLoading || !data) return <div className="stat-grid" style={{ gridTemplateColumns: "repeat(6, 1fr)" }}>{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}</div>;
+  if (isLoading || !data) return <div className="stat-grid six">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}</div>;
   const tot = data.totals;
   const monthLabel = (m: string) => format(new Date(`${m}-01T00:00:00`), "MMM", { locale });
   const monthRows = data.months.map((m) => ({ ...m, label: monthLabel(m.month) }));
@@ -86,7 +86,7 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
 
   return (
     <div>
-      <div className="stat-grid" style={{ gridTemplateColumns: "repeat(6, 1fr)" }}>
+      <div className="stat-grid six">
         <Tile label={t("analytics.invoiced")} value={formatCents(tot.invoicedCents)} sub={t("analytics.inPeriod")} />
         <Tile label={t("analytics.collected")} value={formatCents(tot.collectedCents)} sub={t("analytics.inPeriod")} tone="text-emerald-600" />
         <Tile label={t("analytics.costs")} value={formatCents(tot.costCents)} sub={t("analytics.confirmedOnly")} />
@@ -111,9 +111,9 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
                   <Line type="monotone" dataKey="collectedCents" name={t("analytics.collected")} stroke={SERIES.collected} strokeWidth={2} dot={{ r: 3, strokeWidth: 0, fill: SERIES.collected }} isAnimationActive={false} />
                 </ComposedChart>
               </ResponsiveContainer>
-              <div className="overflow-x-auto mt-2">
+              <div className="overflow-x-auto mt-2" tabIndex={0}>
                 <table className="w-full text-xs">
-                  <thead><tr className="text-slate-400"><th className="text-left font-medium py-1">{t("analytics.month")}</th><th className="text-right font-medium">{t("analytics.invoiced")}</th><th className="text-right font-medium">{t("analytics.costs")}</th><th className="text-right font-medium">{t("analytics.margin")}</th></tr></thead>
+                  <thead><tr className="text-slate-500"><th className="text-left font-medium py-1">{t("analytics.month")}</th><th className="text-right font-medium">{t("analytics.invoiced")}</th><th className="text-right font-medium">{t("analytics.costs")}</th><th className="text-right font-medium">{t("analytics.margin")}</th></tr></thead>
                   <tbody>
                     {monthRows.map((m) => (
                       <tr key={m.month} className="border-t border-slate-100"><td className="py-1 text-slate-600">{m.label}</td><td className="text-right text-slate-800">{formatCents(m.invoicedCents)}</td><td className="text-right text-slate-800">{formatCents(m.costCents)}</td><td className={cn("text-right font-medium", m.marginPercent === null ? "text-slate-400" : m.marginPercent < 15 ? "text-rose-600" : "text-emerald-700")}>{m.marginPercent === null ? "—" : `${m.marginPercent}%`}</td></tr>
@@ -294,14 +294,17 @@ function QuotesSection({ months, locale }: { months: number; locale: typeof enCA
           {isLoading ? <Skeleton className="h-48 w-full" /> : statusData.length === 0 ? <Empty text={t("analytics.noData")} /> : (
             <>
               <LegendRow items={statusData.map((s) => ({ color: QUOTE_STATUS_COLORS[s.key] ?? SERIES.neutral, label: `${s.name} (${s.value})` }))} />
+              {/* recharts hard-codes role="img" on every sector, so each one gets its own name. */}
+              <div>
               <ResponsiveContainer width="100%" height={170}>
-                <PieChart>
+                <PieChart accessibilityLayer={false}>
                   <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={48} outerRadius={72} paddingAngle={3} stroke="#fff" strokeWidth={2}>
-                    {statusData.map((entry) => <Cell key={entry.key} fill={QUOTE_STATUS_COLORS[entry.key] ?? SERIES.neutral} />)}
+                    {statusData.map((entry) => <Cell key={entry.key} fill={QUOTE_STATUS_COLORS[entry.key] ?? SERIES.neutral} aria-label={`${entry.name}: ${entry.value}`} />)}
                   </Pie>
                   <Tooltip formatter={(v: number, name: string) => [v, name]} contentStyle={TOOLTIP_STYLE} />
                 </PieChart>
               </ResponsiveContainer>
+              </div>
             </>
           )}
         </ChartCard>
@@ -311,8 +314,8 @@ function QuotesSection({ months, locale }: { months: number; locale: typeof enCA
         <ChartCard title={t("analytics.recentQuotes")}>
           <div style={{ margin: "-20px -22px -18px" }}>
             {stats.recentQuotes.map((q) => {
-              const chip = q.status === "unlocked" ? "chip-green" : q.status === "pending_payment" ? "chip-yellow" : "chip-grey";
-              const chipLabel = q.status === "unlocked" ? t("analytics.quoteStatus.unlocked") : q.status === "pending_payment" ? t("analytics.quoteStatus.pending") : t("analytics.quoteStatus.draft");
+              const chip = q.status === "unlocked" || q.status === "accepted" ? "chip-green" : q.status === "pending_payment" ? "chip-yellow" : "chip-grey";
+              const chipLabel = q.status === "accepted" ? t("analytics.quoteStatus.accepted") : q.status === "unlocked" ? t("analytics.quoteStatus.unlocked") : q.status === "pending_payment" ? t("analytics.quoteStatus.pending") : t("analytics.quoteStatus.draft");
               return (
                 <Link key={q.id} href={`/dashboard/quotes/${q.id}`} className="q-row">
                   <span className="q-ic"><FileText className="h-4 w-4" /></span>

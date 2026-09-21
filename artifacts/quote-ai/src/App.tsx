@@ -229,7 +229,7 @@ function Router() {
       <Route path="/team-invite/:token" component={() => <Suspense fallback={null}><TeamInvitePage /></Suspense>} />
 
       {/* Pagina pubblica: il cliente finale visualizza e accetta il preventivo (link condiviso via WhatsApp/email) */}
-      <Route path="/p/:id" component={() => <PublicLayout><Suspense fallback={null}><PublicQuotePage /></Suspense></PublicLayout>} />
+      <Route path="/p/:id" component={() => <Suspense fallback={null}><PublicQuotePage /></Suspense>} />
 
       {/* SEO landing pages — dynamic, driven by SECTORS / CITIES data */}
       <Route path="/quotes/:type/:city" component={() => <PublicLayout><Suspense fallback={null}><SeoCityLanding /></Suspense></PublicLayout>} />

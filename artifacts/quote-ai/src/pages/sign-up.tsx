@@ -4,6 +4,7 @@ import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, AlertCircle, Lock, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
   if (!raw) return fallback;
@@ -16,6 +17,7 @@ function safeLocalPath(raw: string | null, fallback: string): string {
 
 export default function SignUpPage() {
   const { t } = useLanguage();
+  useDocumentTitle(`${t("signUp.title")} · QuoteAI`);
   const search = useSearch();
   const nextPath = safeLocalPath(new URLSearchParams(search).get("next"), "/onboarding");
   const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(null);
@@ -148,7 +150,7 @@ export default function SignUpPage() {
                     autoComplete="name"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    placeholder="Jane Smith"
+                    placeholder={t("signUp.fullNamePlaceholder")}
                   />
                 </div>
                 <div className="auth-field">
@@ -176,7 +178,7 @@ export default function SignUpPage() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder={t("signUp.passwordPlaceholder")}
                     />
-                    <button type="button" onClick={() => setShowPassword(v => !v)} className="auth-pw-toggle">
+                    <button type="button" onClick={() => setShowPassword(v => !v)} className="auth-pw-toggle" aria-label={showPassword ? t("a11y.hidePassword") : t("a11y.showPassword")} aria-pressed={showPassword}>
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>

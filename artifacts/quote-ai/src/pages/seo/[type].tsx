@@ -60,7 +60,7 @@ function ExcelWordComparisonBlock({ tool }: { tool: "Excel" | "Word" }) {
           </h2>
           <p className="lead" style={{ margin: "0 auto" }}>{t("seo.compare.subtitle").replace("{tool}", tool)}</p>
         </div>
-        <div className="card cmp-wrap">
+        <div className="card cmp-wrap" tabIndex={0}>
           <table className="cmp">
             <thead>
               <tr>

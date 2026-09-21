@@ -6,6 +6,7 @@ import { enCA, frCA } from "date-fns/locale";
 import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { workerApi } from "@/lib/team-api";
 import { Logo } from "@/components/logo";
 
@@ -53,6 +54,7 @@ export default function WorkerTimePage() {
   const [locationOff, setLocationOff] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { if (data && !projectId && data.jobs.length === 1) setProjectId(data.jobs[0]!.id); }, [data, projectId]);
+  useDocumentTitle(`${t("worker.clockInOut")} · ${data?.companyName ?? "QuoteAI"}`);
   useEffect(() => {
     if (!data?.activeEntry) return;
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -157,8 +159,8 @@ export default function WorkerTimePage() {
 
               {job && job.milestones.length > 0 && (
                 <div className="field">
-                  <label>{t("worker.phase")}</label>
-                  <select value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)}>
+                  <label htmlFor="worker-phase">{t("worker.phase")}</label>
+                  <select id="worker-phase" value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)}>
                     <option value="">{t("worker.anyPhase")}</option>
                     {job.milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
                   </select>
@@ -179,15 +181,15 @@ export default function WorkerTimePage() {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="field">
-              <label>{t("worker.date")}</label>
-              <input type="date" value={date} max={isoDay(new Date())} onChange={(e) => setDate(e.target.value)} />
+              <label htmlFor="worker-date">{t("worker.date")}</label>
+              <input id="worker-date" type="date" value={date} max={isoDay(new Date())} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-medium" style={{ color: "var(--muted-mk)" }}>{t("worker.hours")}</label>
               <div className="flex items-center rounded-xl h-11 overflow-hidden" style={{ border: "1px solid var(--line)", background: "#fff" }}>
-                <button className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.max(0.5, Math.round((h - 0.5) * 2) / 2))}><Minus className="h-4 w-4" /></button>
-                <input type="number" step="0.5" min="0.5" max="24" value={hours} onChange={(e) => setHours(Math.min(24, Math.max(0.5, Number(e.target.value) || 0.5)))} className="flex-1 min-w-0 text-center font-bold text-lg outline-none" style={{ color: "var(--navy)" }} />
-                <button className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.min(24, Math.round((h + 0.5) * 2) / 2))}><Plus className="h-4 w-4" /></button>
+                <button type="button" aria-label={t("a11y.decrease")} className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.max(0.5, Math.round((h - 0.5) * 2) / 2))}><Minus className="h-4 w-4" /></button>
+                <input type="number" step="0.5" min="0.5" max="24" aria-label={t("worker.hours")} value={hours} onChange={(e) => setHours(Math.min(24, Math.max(0.5, Number(e.target.value) || 0.5)))} className="flex-1 min-w-0 text-center font-bold text-lg outline-none" style={{ color: "var(--navy)" }} />
+                <button type="button" aria-label={t("a11y.increase")} className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.min(24, Math.round((h + 0.5) * 2) / 2))}><Plus className="h-4 w-4" /></button>
               </div>
             </div>
           </div>

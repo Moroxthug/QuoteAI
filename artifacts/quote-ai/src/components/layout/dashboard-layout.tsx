@@ -184,7 +184,7 @@ function QuickSearch({ navItems }: { navItems: NavItem[] }) {
       <button type="button" onClick={() => setOpen(true)} className="search">
         <Search className="ic" style={{ width: 17, height: 17 }} />
         <span className="flex-1 text-left truncate">{t("dashboard.search.placeholder")}</span>
-        <kbd className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[var(--soft-2)] text-[var(--faint)] shrink-0">
+        <kbd className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[var(--soft-2)] text-[var(--muted-mk)] shrink-0">
           {isMac ? "⌘K" : "Ctrl K"}
         </kbd>
       </button>

@@ -523,8 +523,8 @@ export default function CatalogPage() {
                       <td className="t-amt" style={{ textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</td>
                       <td>
                         <div className="row-act">
-                          <button type="button" className="ic-btn" onClick={() => setEditingItem(item)}><Pencil /></button>
-                          <button type="button" className="ic-btn danger" onClick={() => setDeletingId(item.id)}><Trash2 /></button>
+                          <button type="button" className="ic-btn" aria-label={t("a11y.edit")} onClick={() => setEditingItem(item)}><Pencil /></button>
+                          <button type="button" className="ic-btn danger" aria-label={t("a11y.delete")} onClick={() => setDeletingId(item.id)}><Trash2 /></button>
                         </div>
                       </td>
                     </tr>

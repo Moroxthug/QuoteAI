@@ -775,7 +775,7 @@ export default function QuoteDetail() {
               {/* Company header */}
               <div className="paper-head">
                 <div>
-                  {companyLogoUrl && <img src={companyLogoUrl} alt="Logo" />}
+                  {companyLogoUrl && <img src={companyLogoUrl} alt={t("a11y.companyLogo")} />}
                   <h2>{companyName}</h2>
                   {companyVat && <small>{t("dashboard.quoteDetail.taxIdLabel")} {companyVat}</small>}
                   {companyAddress && <small>{companyAddress}</small>}
@@ -836,13 +836,13 @@ export default function QuoteDetail() {
                     )}
                     <input value={editClientNome} onChange={e => setEditClientNome(e.target.value)} placeholder={t("dashboard.quoteDetail.nameBusinessNamePlaceholder")} className="inp-sm full" aria-label={t("dashboard.quoteDetail.nameBusinessNamePlaceholder")} />
                     <input value={editClientIndirizzo} onChange={e => setEditClientIndirizzo(e.target.value)} placeholder={t("dashboard.quoteDetail.streetPlaceholder")} className="inp-sm full" aria-label={t("dashboard.quoteDetail.streetPlaceholder")} />
-                    <input value={editClientCity} onChange={e => setEditClientCity(e.target.value)} placeholder="City" className="inp-sm" aria-label="City" />
+                    <input value={editClientCity} onChange={e => setEditClientCity(e.target.value)} placeholder={t("dashboard.new.client.city")} className="inp-sm" aria-label={t("dashboard.new.client.city")} />
                     <div className="two">
-                      <input value={editClientProvince} onChange={e => setEditClientProvince(e.target.value.toUpperCase())} placeholder="Prov" maxLength={2} className="inp-sm" aria-label="Province" />
-                      <input value={editClientPostalCode} onChange={e => setEditClientPostalCode(e.target.value.toUpperCase())} placeholder="Postal Code" maxLength={7} className="inp-sm" aria-label="Postal Code" />
+                      <input value={editClientProvince} onChange={e => setEditClientProvince(e.target.value.toUpperCase())} placeholder={t("a11y.provincePlaceholder")} maxLength={2} className="inp-sm" aria-label={t("contracts.detail.province")} />
+                      <input value={editClientPostalCode} onChange={e => setEditClientPostalCode(e.target.value.toUpperCase())} placeholder={t("dashboard.new.client.postalCode")} maxLength={7} className="inp-sm" aria-label={t("dashboard.new.client.postalCode")} />
                     </div>
-                    <input value={editClientBusinessNumber} onChange={e => setEditClientBusinessNumber(e.target.value.toUpperCase())} placeholder="Business Number" maxLength={16} className="inp-sm" aria-label="Business Number" />
-                    <input value={editClientPIVA} onChange={e => setEditClientPIVA(e.target.value)} placeholder="GST/HST Number" maxLength={15} className="inp-sm" aria-label="GST/HST Number" />
+                    <input value={editClientBusinessNumber} onChange={e => setEditClientBusinessNumber(e.target.value.toUpperCase())} placeholder={t("dashboard.new.client.businessNumber")} maxLength={16} className="inp-sm" aria-label={t("dashboard.new.client.businessNumber")} />
+                    <input value={editClientPIVA} onChange={e => setEditClientPIVA(e.target.value)} placeholder={t("admin.gstHstNumber")} maxLength={15} className="inp-sm" aria-label={t("admin.gstHstNumber")} />
                   </div>
                 ) : isEditingClient ? (
                   <div className="paper-box">
@@ -919,7 +919,7 @@ export default function QuoteDetail() {
               {localTemplateId === "standard" && (isEditMode ? editCapitoli.length > 0 : hasCapitoli) && (
                 <div className="paper-sec">
                   <span className="eyebrow">{t("dashboard.quoteDetail.summaryOverview")}</span>
-                  <div className="paper-tw">
+                  <div className="paper-tw" tabIndex={0}>
                     <table className="ptbl">
                       <thead>
                         <tr>
@@ -951,7 +951,7 @@ export default function QuoteDetail() {
               {isEditMode && localTemplateId === "arosio" ? (
                 /* ── AROSIO EDITOR: numbered sections, navy headers, subtotals ── */
                 <div className="paper-sec">
-                  <div className="paper-tw">
+                  <div className="paper-tw" tabIndex={0}>
                     <table className="ptbl">
                       <thead>{editHeadCells(true)}</thead>
                       <tbody>
@@ -988,7 +988,7 @@ export default function QuoteDetail() {
               ) : isEditMode && localTemplateId === "mariagrazia" ? (
                 /* ── MARIAGRAZIA EDITOR: grouped by chapter, flat numbering ── */
                 <div className="paper-sec">
-                  <div className="paper-tw">
+                  <div className="paper-tw" tabIndex={0}>
                     <table className="ptbl">
                       <thead>{editHeadCells(true)}</thead>
                       <tbody>
@@ -1157,7 +1157,7 @@ export default function QuoteDetail() {
                             {isExpanded ? <ChevronDown className="chev" /> : <ChevronRight className="chev" />}
                           </button>
                           {isExpanded && (
-                            <div className="paper-tw">
+                            <div className="paper-tw" tabIndex={0}>
                               <table className="ptbl soft" style={{ minWidth: 480 }}>
                                 <thead>
                                   <tr>

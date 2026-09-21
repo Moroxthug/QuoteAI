@@ -105,7 +105,7 @@ export function SignaturePad({ value, onChange, defaultName }: { value: Signatur
             onPointerLeave={end}
             onPointerCancel={end}
           />
-          {!value && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-slate-400">{t("signature.drawHint")}</div>}
+          {!value && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-slate-500">{t("signature.drawHint")}</div>}
           <button type="button" onClick={clear} className="absolute top-2 right-2 text-xs text-slate-500 hover:text-slate-800 bg-card/80 rounded-md px-2 py-1 flex items-center gap-1">
             <Eraser className="h-3 w-3" /> {t("signature.clear")}
           </button>

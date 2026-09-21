@@ -47,7 +47,7 @@ export function TestimonialsSection() {
         <div className="rev-grid">
           {TESTIMONIALS.map((item) => (
             <article key={item.name} className="card rev-card">
-              <span className="stars" aria-label={t("testimonials.starRatingLabel").replace("{rating}", String(item.rating))}>
+              <span className="stars" role="img" aria-label={t("testimonials.starRatingLabel").replace("{rating}", String(item.rating))}>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} fill="currentColor" stroke="none" />
                 ))}

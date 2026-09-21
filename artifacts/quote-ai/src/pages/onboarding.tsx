@@ -9,6 +9,7 @@ import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
 import { markOnboardingSkipped, markOnboardingDone } from "@/lib/onboarding-state";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
 import { CANADIAN_PROVINCES, type PaymentSchedule } from "@/lib/payment-schedule";
 
@@ -29,6 +30,7 @@ const DEFAULT_SCHEDULE: PaymentSchedule = {
 
 export default function OnboardingPage() {
   const { t, lang } = useLanguage();
+  useDocumentTitle(`${t("onboarding.title")} · QuoteAI`);
   const { isLoaded, isSignedIn, userId } = useAuth();
   const [, setLocation] = useLocation();
   const updateProfile = useUpdateBusinessProfile();
@@ -170,7 +172,7 @@ export default function OnboardingPage() {
               <div className="card">
                 <div className="logo-drop">
                   <div className="logo-tile">
-                    {logoPreview ? <img src={logoPreview} alt="Logo" /> : <ImageIcon className="h-6 w-6" />}
+                    {logoPreview ? <img src={logoPreview} alt={t("a11y.companyLogo")} /> : <ImageIcon className="h-6 w-6" />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <b style={{ fontSize: 14.5, color: "var(--navy)", display: "block" }}>

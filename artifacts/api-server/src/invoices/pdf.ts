@@ -2,7 +2,7 @@ import { getPdfmake } from "../lib/pdfmake.js";
 import type { TDocumentDefinitions, Content, TableCell } from "pdfmake/interfaces";
 import { createHash } from "node:crypto";
 import type { Invoice, InvoicePayment, InvoiceParty } from "@workspace/db";
-import { ti, fmtCents, fmtDay, fmtQty, dueText, invoiceTitle, isCreditNote, partyLines, watermark, type Lang, type IKey } from "./render.js";
+import { ti, fmtCents, fmtDay, fmtQty, dueText, invoiceTitle, isCreditNote, partyLines, watermark, taxLabel, type Lang, type IKey } from "./render.js";
 
 // ── Invoice PDF ──────────────────────────────────────────────────────────────
 // Letter size, sans-serif, same colour system as the contract PDF. The PDF
@@ -78,7 +78,7 @@ export async function buildInvoicePdf(inv: Invoice, payments: InvoicePayment[] =
     totals.push([cell(ti("taxable", lang), { color: MUTED }), cell(fmtCents(inv.taxableCents, lang), { align: "right", color: MUTED })]);
   }
   for (const t of inv.taxLines) {
-    totals.push([cell(`${t.label} ${t.rate}%${t.registrationNumber ? `  (${t.registrationNumber})` : ""}`), cell(fmtCents(t.amountCents, lang), { align: "right" })]);
+    totals.push([cell(`${taxLabel(t.label, lang)} ${t.rate}%${t.registrationNumber ? `  (${t.registrationNumber})` : ""}`), cell(fmtCents(t.amountCents, lang), { align: "right" })]);
   }
   totals.push([cell(credit ? ti("creditTotal", lang) : ti("total", lang), { bold: true, fill: "#f9fafb", size: 11 }), cell(fmtCents(inv.totalCents, lang), { bold: true, align: "right", fill: "#f9fafb", size: 11 })]);
   if (!credit && inv.paidCents > 0 && inv.status !== "void") {

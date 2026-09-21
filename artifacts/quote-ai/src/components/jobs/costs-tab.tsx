@@ -99,7 +99,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
             <div><h2>{t("jobs.costs.entries")}</h2></div>
             <div className="flex items-center gap-2 flex-wrap">
               <div className="field">
-                <select value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} style={{ padding: "8px 12px", fontSize: 13.5 }}>
+                <select aria-label={t("jobs.costs.category")} value={filter} onChange={(e) => setFilter(e.target.value as CostCategory | "all")} style={{ padding: "8px 12px", fontSize: 13.5 }}>
                   <option value="all">{t("jobs.costs.allCategories")}</option>
                   {COST_CATEGORY_KEYS.map((c) => <option key={c} value={c}>{t(`jobs.cost.${c}`)}</option>)}
                 </select>

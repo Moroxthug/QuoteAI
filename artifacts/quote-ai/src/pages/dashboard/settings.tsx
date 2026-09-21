@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon, FileText, Mic, Camera } from "lucide-react";
 import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
@@ -633,12 +633,12 @@ function WhatsappUpsellCard() {
         <div className="p-5 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { icon: "📝", label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsappUpsell.text.desc") },
-              { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsappUpsell.voice.desc") },
-              { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
+              { Icon: FileText, label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsappUpsell.text.desc") },
+              { Icon: Mic, label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsappUpsell.voice.desc") },
+              { Icon: Camera, label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
               <div key={item.label} className="bg-card/70 rounded-[var(--radius)] p-3 text-center border border-navy-100">
-                <div className="text-2xl mb-1">{item.icon}</div>
+                <item.Icon className="h-6 w-6 mx-auto mb-1" style={{ color: "var(--navy)" }} aria-hidden="true" />
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
               </div>
@@ -916,12 +916,12 @@ function WhatsappTab() {
         <div className="p-5 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
-              { icon: "📝", label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsapp.connect.text.desc") },
-              { icon: "🎙️", label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsapp.connect.voice.desc") },
-              { icon: "📷", label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
+              { Icon: FileText, label: t("dashboard.settings.whatsappUpsell.text.label"), desc: t("dashboard.settings.whatsapp.connect.text.desc") },
+              { Icon: Mic, label: t("dashboard.settings.whatsappUpsell.voice.label"), desc: t("dashboard.settings.whatsapp.connect.voice.desc") },
+              { Icon: Camera, label: t("dashboard.settings.whatsappUpsell.photo.label"), desc: t("dashboard.settings.whatsappUpsell.photo.desc") },
             ].map(item => (
               <div key={item.label} className="bg-muted rounded-[var(--radius)] p-3 text-center">
-                <div className="text-2xl mb-1">{item.icon}</div>
+                <item.Icon className="h-6 w-6 mx-auto mb-1" style={{ color: "var(--navy)" }} aria-hidden="true" />
                 <div className="text-sm font-medium">{item.label}</div>
                 <div className="text-xs text-muted-foreground mt-0.5">{item.desc}</div>
               </div>
@@ -2769,6 +2769,7 @@ function WidgetTab() {
                 </button>
                 <button onClick={handleGenerateKey}
                   disabled={generating}
+                  aria-label={t("dashboard.settings.widget.generateKeyButton")}
                   className="btn btn-outline-navy text-muted-foreground hover:text-foreground shrink-0">
                   {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                 </button>

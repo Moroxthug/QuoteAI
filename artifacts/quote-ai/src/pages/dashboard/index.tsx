@@ -477,12 +477,12 @@ function DashboardComposer() {
       <div className="comp-row">
         <div className="group relative shrink-0">
           {photoAllowed ? (
-            <button type="button" className="comp-ic" onClick={() => fileInputRef.current?.click()}
+            <button type="button" className="comp-ic" aria-label={t("a11y.attachPhoto")} onClick={() => fileInputRef.current?.click()}
               disabled={isSubmitting || photos.length + docs.length >= MAX_ATTACHMENTS}>
               <ImagePlus className="h-4 w-4" />
             </button>
           ) : (
-            <button type="button" className="comp-ic" disabled>
+            <button type="button" className="comp-ic" disabled aria-label={t("a11y.attachPhoto")}>
               <Lock className="h-4 w-4" />
             </button>
           )}
@@ -508,7 +508,7 @@ function DashboardComposer() {
           onTranscribed={text => setInput(prev => (prev.trim() ? `${prev.trim()} ${text}` : text))}
         />
 
-        <button onClick={handleSubmit} disabled={!canSubmit} aria-label="Generate quote" className="comp-send">
+        <button onClick={handleSubmit} disabled={!canSubmit} aria-label={t("a11y.generateQuote")} className="comp-send">
           {isSubmitting
             ? <Loader2 className="chev animate-spin" />
             : <ArrowRight className="chev" />
@@ -747,7 +747,7 @@ export default function DashboardHome() {
           </p>
         </div>
         <div className="head-actions">
-          <div className="seg" data-period={period} role="group" aria-label="Reporting period">
+          <div className="seg" data-period={period} role="group" aria-label={t("a11y.reportingPeriod")}>
             <button type="button" className="seg-b" onClick={() => setPeriod("m")}>{t("dashboard.index.period.month")}</button>
             <button type="button" className="seg-b" onClick={() => setPeriod("q")}>{t("dashboard.index.period.quarter")}</button>
             <button type="button" className="seg-b" onClick={() => setPeriod("y")}>{t("dashboard.index.period.year")}</button>

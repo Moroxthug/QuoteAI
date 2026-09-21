@@ -42,7 +42,7 @@ export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id
   const compact = range.weeks.length > 10;
 
   return (
-    <div className="gantt">
+    <div className="gantt" tabIndex={0}>
       <div className="gantt-in">
         {/* Week header */}
         <div className="gantt-head">

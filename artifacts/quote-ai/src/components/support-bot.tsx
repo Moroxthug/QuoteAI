@@ -323,6 +323,8 @@ export default function SupportBot() {
           transform: `translate(${dragPos.x}px, ${dragPos.y}px)`,
           touchAction: "none",
         }}
+        aria-label={t("a11y.supportChat")}
+        aria-expanded={isOpen}
         className={`fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-tr from-navy-600 to-navy-600 text-white shadow-xl hover:shadow-navy-500/30 transition-all duration-300 z-[9999] hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 ${
           isOpen ? "rotate-90 bg-slate-800" : ""
         }`}

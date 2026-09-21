@@ -60,7 +60,7 @@ export function NotificationsBell({ variant = "topbar", side = "bottom", align =
   }
 
   const trigger = (
-    <button type="button" className="bell" aria-label={t("notifications.title")}>
+    <button type="button" className="bell bell-wrap" aria-label={t("notifications.title")}>
       <Bell className="ic" />
       {unread > 0 && <span className="dot" />}
     </button>
@@ -68,7 +68,7 @@ export function NotificationsBell({ variant = "topbar", side = "bottom", align =
 
   return (
     <Popover>
-      <PopoverTrigger asChild><span className="bell-wrap">{trigger}</span></PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent side={side} align={align} sideOffset={10} className="pop p-0 border-0 shadow-none">
         <div className="flex items-center justify-between">
           <h3 className="!border-0 !pb-2 flex-1">{t("notifications.title")}</h3>

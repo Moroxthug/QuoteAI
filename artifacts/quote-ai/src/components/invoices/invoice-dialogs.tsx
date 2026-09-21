@@ -175,7 +175,7 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
                 {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{t(`invoices.method.${m}`)}</option>)}
               </select>
             </div>
-            <div className="field"><label>{t("invoices.payment.reference")}</label><input value={reference} onChange={(e) => setReference(e.target.value)} placeholder="e-Transfer #…" /></div>
+            <div className="field"><label>{t("invoices.payment.reference")}</label><input value={reference} onChange={(e) => setReference(e.target.value)} placeholder={t("invoices.payment.referencePlaceholder")} /></div>
           </div>
           <label className={invoice.customer.email ? "chk-row" : "chk-row disabled"}><input type="checkbox" checked={receipt} disabled={!invoice.customer.email} onChange={(e) => setReceipt(e.target.checked)} /> {t("invoices.payment.sendReceipt")}</label>
           {cents > invoice.balanceCents && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.payment.overpay")}</span></div>}

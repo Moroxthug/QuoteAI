@@ -80,7 +80,9 @@ export type TestUser = {
 };
 
 const created = new Set<string>();
-let purgedThisProcess = false;
+// E2E_NO_PURGE=1 lets two QA scripts share the database at once (the purge would
+// otherwise delete the other process's live fixtures).
+let purgedThisProcess = process.env.E2E_NO_PURGE === "1";
 
 export async function createUser(opts: { name?: string; email?: string } = {}): Promise<TestUser> {
   if (!purgedThisProcess) {

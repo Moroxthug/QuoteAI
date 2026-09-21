@@ -145,6 +145,7 @@ function Kpi({ label, value, sub, tone, progress }: { label: string; value: stri
 }
 
 function EditableName({ id, name }: { id: string; name: string }) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(name);
   const queryClient = useQueryClient();
@@ -152,7 +153,7 @@ function EditableName({ id, name }: { id: string; name: string }) {
     mutationFn: () => jobsApi.update(id, { name: value.trim() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["job", id] }); queryClient.invalidateQueries({ queryKey: ["jobs"] }); setEditing(false); },
   });
-  if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0"><span className="truncate">{name}</span><button type="button" className="ic-btn opacity-0 group-hover:opacity-100" onClick={() => { setValue(name); setEditing(true); }}><Pencil /></button></span>;
+  if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0"><span className="truncate">{name}</span><button type="button" className="ic-btn opacity-0 group-hover:opacity-100 focus-visible:opacity-100" aria-label={t("a11y.rename")} onClick={() => { setValue(name); setEditing(true); }}><Pencil /></button></span>;
   return (
     <span className="field inline">
       <input value={value} onChange={(e) => setValue(e.target.value)} style={{ width: 288, fontSize: 18, fontWeight: 700 }} autoFocus onKeyDown={(e) => { if (e.key === "Enter") save.mutate(); if (e.key === "Escape") setEditing(false); }} />

@@ -1,6 +1,7 @@
 import type { ContractDocument, ContractVariables, ContractSigner, ContractEvent } from "@workspace/db";
 import { paymentTermAmount } from "@workspace/db";
 import type { Lang } from "./templates.js";
+import { taxLabel } from "../invoices/render.js";
 
 // ── Markdown-lite parser (shared by HTML and PDF renderers) ─────────────────
 // Supported: paragraphs separated by blank lines, "- " bullets, **bold**,
@@ -179,7 +180,7 @@ export function partiesHtml(v: ContractVariables, lang: Lang): string {
 export function priceTableHtml(v: ContractVariables, lang: Lang): string {
   const rows = v.priceLines.map((l) => `<tr><td>${esc(l.label)}</td><td class="num">${fmtMoney(l.amount, lang)}</td></tr>`).join("");
   const discount = v.discount ? `<tr><td>${tr("discount", lang)} (${v.discount.percent}%)</td><td class="num">− ${fmtMoney(v.discount.amount, lang)}</td></tr>` : "";
-  const taxes = v.taxLines.map((t) => `<tr><td>${esc(t.label)} (${t.rate}%)</td><td class="num">${fmtMoney(t.amount, lang)}</td></tr>`).join("");
+  const taxes = v.taxLines.map((t) => `<tr><td>${esc(taxLabel(t.label, lang))} (${t.rate}%)</td><td class="num">${fmtMoney(t.amount, lang)}</td></tr>`).join("");
   return `<div class="table-wrap"><table class="grid"><thead><tr><th>${tr("description", lang)}</th><th class="num">${tr("amount", lang)}</th></tr></thead><tbody>${rows}${discount}<tr class="sub"><td>${tr("subtotal", lang)}</td><td class="num">${fmtMoney(v.subtotal, lang)}</td></tr>${taxes}<tr class="total"><td>${tr("total", lang)}</td><td class="num">${fmtMoney(v.total, lang)}</td></tr></tbody></table></div>`;
 }
 
@@ -218,7 +219,7 @@ export const CONTRACT_CSS = `
 .contract .party { border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
 .contract .party-label { font-family: system-ui,sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:#6b7280; }
 .contract .party-name { font-weight:700; margin:2px 0 4px; }
-.contract .party-line { font-size:12.5px; color:#374151; }
+.contract .party-line { font-size:12.5px; color:#374151; overflow-wrap:anywhere; }
 .contract table.kv { width:100%; border-collapse:collapse; font-size:13px; margin-bottom:8px; }
 .contract table.kv th { text-align:left; color:#6b7280; font-weight:600; width:30%; padding:4px 0; font-family: system-ui,sans-serif; font-size:12px; }
 .contract table.kv td { padding:4px 0; }
@@ -231,11 +232,12 @@ export const CONTRACT_CSS = `
 .contract .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .contract .signatures { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:16px; }
 @media (max-width: 480px) {
+  .contract .parties { grid-template-columns:1fr; }
   .contract .signatures { grid-template-columns:1fr; gap:16px; }
   .contract table.grid th, .contract table.grid td { padding:6px 4px; font-size:12px; }
 }
 .contract .sig-block { border-top:1px solid #9ca3af; padding-top:8px; min-height:110px; }
-.contract .sig-empty { color:#9ca3af; font-style:italic; margin-top:28px; font-size:12px; }
+.contract .sig-empty { color:#6b7280; font-style:italic; margin-top:28px; font-size:12px; }
 .contract .sig-img { max-height:70px; max-width:240px; display:block; margin:6px 0; }
 .contract .sig-typed { font-family: "Brush Script MT", "Segoe Script", cursive; font-size:28px; margin:8px 0; }
 .contract .sig-meta { font-family: system-ui,sans-serif; font-size:11px; color:#6b7280; }

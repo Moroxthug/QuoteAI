@@ -147,7 +147,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center">
             <Logo />
           </Link>
-          <nav aria-label="Primary" className="nav">
+          <nav aria-label={t("a11y.primaryNav")} className="nav">
             <ProductsMegaMenu />
             <Link href="/#trades" className="nav-link">{t("nav.trades")}</Link>
             <Link href="/#whatsapp" className="nav-link">

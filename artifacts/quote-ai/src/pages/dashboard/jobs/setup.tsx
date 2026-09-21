@@ -172,7 +172,7 @@ export default function JobSetupPage() {
           <h2>{t("jobs.setup.milestones")}</h2>
           <div className="shift-start">
             <span className="lbl-xs" style={{ marginBottom: 0 }}>{t("jobs.setup.shiftStart")}</span>
-            <input type="date" className="inp-sm" value={plannedStart ?? ""} onChange={(e) => shiftAll(e.target.value)} />
+            <input type="date" className="inp-sm" aria-label={t("jobs.setup.shiftStart")} value={plannedStart ?? ""} onChange={(e) => shiftAll(e.target.value)} />
           </div>
         </div>
 
@@ -184,8 +184,8 @@ export default function JobSetupPage() {
           {milestones.map((m, i) => (
             <div key={m.id ?? `new-${i}`} className="ms-edit">
               <div className="order">
-                <button type="button" className="ic-btn" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up"><ChevronUp /></button>
-                <button type="button" className="ic-btn" onClick={() => move(i, 1)} disabled={i === milestones.length - 1} aria-label="Move down"><ChevronDown /></button>
+                <button type="button" className="ic-btn" onClick={() => move(i, -1)} disabled={i === 0} aria-label={t("a11y.moveUp")}><ChevronUp /></button>
+                <button type="button" className="ic-btn" onClick={() => move(i, 1)} disabled={i === milestones.length - 1} aria-label={t("a11y.moveDown")}><ChevronDown /></button>
               </div>
               <div className="desc">
                 <input className="inp-sm" value={m.title} onChange={(e) => updateMs(i, { title: e.target.value })} placeholder={t("jobs.milestone.titlePlaceholder")} />
@@ -195,10 +195,11 @@ export default function JobSetupPage() {
                 </span>
               </div>
               <div className="dates">
-                <input type="date" className="inp-sm" value={m.plannedStart} onChange={(e) => updateMs(i, { plannedStart: e.target.value, plannedEnd: m.plannedEnd && e.target.value > m.plannedEnd ? e.target.value : m.plannedEnd })} />
-                <input type="date" className="inp-sm" value={m.plannedEnd} min={m.plannedStart || undefined} onChange={(e) => updateMs(i, { plannedEnd: e.target.value })} />
+                <input type="date" className="inp-sm" aria-label={t("a11y.startDate")} value={m.plannedStart} onChange={(e) => updateMs(i, { plannedStart: e.target.value, plannedEnd: m.plannedEnd && e.target.value > m.plannedEnd ? e.target.value : m.plannedEnd })} />
+                <input type="date" className="inp-sm" aria-label={t("a11y.endDate")} value={m.plannedEnd} min={m.plannedStart || undefined} onChange={(e) => updateMs(i, { plannedEnd: e.target.value })} />
               </div>
               <select
+                aria-label={t("a11y.linkedPayment")}
                 value={m.paymentTermId ?? ""}
                 onChange={(e) => updateMs(i, { paymentTermId: e.target.value || null })}
                 className={cn("inp-sm pay", m.paymentTermId && "linked")}

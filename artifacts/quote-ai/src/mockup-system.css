@@ -24,25 +24,25 @@
   --navy-hover: #24244a;
   --ink: #393a3d;
   --muted-mk: #6b6c72;
-  --faint: #8f9198;
+  --faint: #6d6f76; /* Phase 67: was #8f9198 (3.1:1) — 4.6:1 on --soft, 5.3:1 on white */
   --line: #dfe1e6;
   --soft: #f4f5f7;
   --soft-2: #eceef2;
   --white: #ffffff;
 
-  --green: #2ca01c;
-  --green-dark: #1f7d12;
+  --green: #227a15; /* Phase 67: was #2ca01c — white text on it was 3.4:1; now 5.4:1 */
+  --green-dark: #196010;
   --green-t: #e9f6e6;
   --purple: #6c2bd9;
   --purple-dark: #5a21bd;
   --purple-t: #eeecfc;
-  --teal: #0f97a2;
-  --teal-dark: #0b7c86;
+  --teal: #0a7580; /* Phase 67: was #0f97a2 — light text on it was 3.2:1; now 5:1 */
+  --teal-dark: #0a6f78; /* Phase 67: was #0b7c86 (4.4:1 on --teal-t) */
   --teal-t: #e3f5f4;
   --yellow: #ffe01b;
   --yellow-t: #fdf6c9;
   --yellow-dark: #7a5c00;
-  --red: #d9480f;
+  --red: #bf3d09; /* Phase 67: was #d9480f (3.8:1 on --red-t) */
   --red-t: #fdeee5;
 
   --radius-mk: 18px;
@@ -92,7 +92,7 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .chip-grey { background: var(--soft-2); color: var(--muted-mk); }
 .chip-red { background: var(--red-t); color: var(--red); }
 .chip-purple { background: var(--purple-t); color: var(--purple); }
-.chip-new { background: var(--green); color: #fff; }
+.chip-new { background: var(--green-dark); color: #fff; } /* Phase 67: --green gave 3.4:1 */
 
 /* ==========================================================
    DASHBOARD APP SHELL — sidebar + topbar
@@ -110,7 +110,7 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .sb-collapse:hover { background: rgba(255, 255, 255, .12); }
 .sb-collapse .chev { width: 12px; height: 12px; }
 .sb-new { margin: 6px 14px 14px; }
-.sb-group { margin: 16px 26px 6px; font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: #6f7191; }
+.sb-group { margin: 16px 26px 6px; font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: #9294ad; } /* Phase 67: was #6f7191 (3.9:1 on navy) */
 .sb-link { display: flex; align-items: center; gap: 12px; margin: 2px 12px; padding: 10px 12px; border-radius: 10px; font-size: 14.5px; font-weight: 600; color: #b7b9cc; transition: background .2s, color .2s; }
 .sb-link svg.ic { opacity: .9; width: 19px; height: 19px; flex: none; }
 .sb-link:hover { background: rgba(255, 255, 255, .08); color: #fff; }
@@ -173,7 +173,7 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .n-row p { font-size: 13.5px; color: var(--muted-mk); margin-top: 2px; }
 .n-row .n-time { margin-left: auto; flex: none; font-size: 12.5px; color: var(--faint); font-weight: 600; white-space: nowrap; }
 
-.content { padding: clamp(20px, 3vw, 34px); max-width: 1460px; width: 100%; margin-inline: auto; }
+.content { padding: clamp(20px, 3vw, 34px); max-width: 1460px; width: 100%; min-width: 0; margin-inline: auto; } /* Phase 67: min-width 0 — as a flex item its min-content width (a nowrap pill row, a wide table) used to push the whole page wider */
 
 @media (max-width: 980px) {
   .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); transition: transform .35s var(--ease-mk); width: 280px !important; }
@@ -201,7 +201,7 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .page-head .sub { color: var(--muted-mk); font-size: 14.5px; font-weight: 600; margin-top: 5px; }
 .head-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-.card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-mk); }
+.card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-mk); min-width: 0; } /* Phase 67: min-width 0 so a .tbl-wrap inside a grid column scrolls instead of widening the page */
 .card + .card, .card + .stack, .stack + .card { margin-top: 16px; }
 .stack { display: flex; flex-direction: column; gap: 16px; }
 .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--soft); flex-wrap: wrap; }
@@ -212,7 +212,11 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .stat-grid + * { margin-top: 16px; }
-.stat-card { padding: 20px 22px; }
+.stat-card { padding: 20px 22px; min-width: 0; }
+/* Phase 67: the analytics KPI row (6 tiles) — was an inline repeat(6, 1fr) that no media query could override, so it overflowed at every width. */
+.stat-grid.six { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 1400px) { .stat-grid.six { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.stat-card .val { overflow-wrap: anywhere; }
 .stat-card .lbl { font-size: 13px; font-weight: 600; color: var(--muted-mk); }
 .stat-card .val { font-size: clamp(1.5rem, 2.2vw, 1.9rem); font-weight: 800; letter-spacing: -.02em; color: var(--navy); margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
 .stat-card .delta { font-size: 12.5px; font-weight: 700; color: var(--green-dark); }
@@ -287,12 +291,13 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .qa .chev { margin-left: auto; width: 13px; height: 13px; color: var(--faint); }
 
 @media (max-width: 980px) {
-  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-grid, .stat-grid.six { grid-template-columns: repeat(2, 1fr); }
   .mid-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .qa-grid { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: 1fr; }
+  .stat-grid.six { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* ==========================================================
@@ -444,7 +449,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 .tgl.on { background: var(--green); }
 .tgl.on::after { transform: translateX(17px); }
 .tgl:disabled { opacity: .5; cursor: not-allowed; }
-.logo-drop { display: flex; align-items: center; gap: 16px; padding: 22px; }
+.logo-drop { display: flex; align-items: center; gap: 16px; padding: 22px; flex-wrap: wrap; } /* Phase 67: wraps the buttons under the tile on phones */
 .logo-tile { width: 64px; height: 64px; border-radius: 14px; background: var(--navy); color: #fff; font-weight: 800; font-size: 26px; display: grid; place-items: center; letter-spacing: -.03em; flex: none; overflow: hidden; }
 .logo-tile img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -626,7 +631,7 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .rav.g { background: var(--green-t); color: var(--green-dark); }
 .rav.t { background: var(--teal-t); color: var(--teal-dark); }
 .rev-who b { display: block; font-size: 14.5px; color: var(--navy); }
-.rev-who span { font-size: 12.5px; color: var(--faint); font-weight: 600; }
+.rev-who span { font-size: 12.5px; color: var(--muted-mk); font-weight: 600; }
 .rev-who .chip { margin-left: auto; }
 
 /* trades marquee */
@@ -861,7 +866,7 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .notice.danger { background: var(--red-t); border-color: var(--red-t); color: var(--red); }
 .notice.info { background: var(--soft); border-color: var(--soft); }
 .notice.teal { background: var(--teal-t); border-color: var(--teal-t); color: var(--teal-dark); }
-.notice small { display: block; font-size: 12.5px; font-weight: 600; opacity: .85; margin-top: 2px; }
+.notice small { display: block; font-size: 12.5px; font-weight: 600; margin-top: 2px; }
 .card + .notice, .notice + .card, .notice + .notice, .stat-grid + .notice, .notice + .stack { margin-top: 16px; }
 
 .kv { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 9px 22px; border-top: 1px solid var(--soft); font-size: 14px; }
@@ -1593,3 +1598,24 @@ button.chap-head:hover { background: var(--soft-2); }
 /* Milestone card: the expand toggle is a real button holding the number + title (Phase 66). */
 .ms-toggle { display: flex; align-items: center; gap: 12px; min-width: 0; text-align: left; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
 .ms-toggle:focus-visible { outline: 2px solid var(--navy); outline-offset: 4px; border-radius: 8px; }
+
+/* ==========================================================
+   REDUCED MOTION (Phase 67) — the modal / bottom-sheet enter-exit
+   animations, the sidebar drawer slide, the marquee and every tw-animate
+   `animate-in/out` surface (toasts, menus, popovers, selects) collapse to
+   an instant swap when the OS asks for less motion. The scrim keeps its
+   fade: without it a full-screen overlay pops in harshly.
+   ========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .modal[data-state="open"], .modal[data-state="closed"] { animation-duration: 1ms !important; }
+  .modal-scrim[data-state="open"], .modal-scrim[data-state="closed"] { animation-duration: 1ms !important; }
+  .sidebar, .sb-collapse { transition-duration: 1ms !important; }
+  .animate-in, .animate-out { animation-duration: 1ms !important; }
+  .transition-all { transition-duration: 1ms !important; }
+}
+
+/* Phase 67: .btn is nowrap by design, but on phones a long label (FR "Activer
+   le widget et générer une clé API") ran past the viewport. Let it wrap. */
+@media (max-width: 640px) {
+  .btn { white-space: normal; max-width: 100%; text-align: center; }
+}

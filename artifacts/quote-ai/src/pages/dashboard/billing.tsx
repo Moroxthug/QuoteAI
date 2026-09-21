@@ -230,11 +230,11 @@ export default function BillingPage() {
                       <CheckCircle2 className="h-3.5 w-3.5 text-navy-400 shrink-0" />
                       {t("dashboard.billing.compare.professionalPdf")}
                     </li>
-                    <li className="flex items-center gap-2 text-muted-foreground line-through opacity-50">
+                    <li className="flex items-center gap-2 text-[var(--muted-mk)] line-through">
                       <XCircle className="h-3.5 w-3.5 shrink-0" />
                       {t("dashboard.billing.compare.customLogo")}
                     </li>
-                    <li className="flex items-center gap-2 text-muted-foreground line-through opacity-50">
+                    <li className="flex items-center gap-2 text-[var(--muted-mk)] line-through">
                       <XCircle className="h-3.5 w-3.5 shrink-0" />
                       {t("dashboard.billing.compare.noWatermarkPdf")}
                     </li>
@@ -283,7 +283,7 @@ export default function BillingPage() {
 
 function PlanFeature({ text, ok }: { text: string; ok: boolean }) {
   return (
-    <li className={`flex items-center gap-2 text-sm ${ok ? "text-foreground" : "text-muted-foreground line-through opacity-50"}`}>
+    <li className={`flex items-center gap-2 text-sm ${ok ? "text-foreground" : "text-[var(--muted-mk)] line-through"}`}>
       {ok ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" /> : <XCircle className="h-3.5 w-3.5 shrink-0" />}
       {text}
     </li>

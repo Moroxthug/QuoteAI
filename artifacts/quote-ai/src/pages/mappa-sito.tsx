@@ -48,7 +48,7 @@ export default function MappaSitoPage() {
       {/* Main Directory */}
       <section className="sec soft">
         <div className="wrap" style={{ maxWidth: 1080 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
 
             {/* Section 1: Main Pages */}
             <div className="card" style={{ padding: 24 }}>
@@ -155,7 +155,7 @@ export default function MappaSitoPage() {
                 return (
                   <div key={region} style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 28 }}>
                     <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)", marginBottom: 16 }}>{region}</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", rowGap: 16, columnGap: 8, fontSize: 12.5 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", rowGap: 16, columnGap: 8, fontSize: 12.5 }}>
                       {regionCities.map((city) => (
                         <div key={city.slug} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <span style={{ fontWeight: 700, color: "var(--navy)", borderBottom: "1px solid var(--soft)", paddingBottom: 2, marginBottom: 2 }}>{city.name}</span>

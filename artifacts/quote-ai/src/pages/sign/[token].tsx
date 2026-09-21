@@ -5,6 +5,7 @@ import { FileSignature, ShieldCheck, Download, CheckCircle2, Loader2, AlertTrian
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { signApi } from "@/lib/contracts-api";
 import { SignaturePad, type SignatureValue } from "@/components/signature-pad";
 import { Logo } from "@/components/logo";
@@ -37,6 +38,7 @@ export default function SignPage() {
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
   const docRef = useRef<HTMLDivElement>(null);
 
+  useDocumentTitle(data ? `${data.contract.title} · ${data.contract.companyName}` : null);
   // The page follows the contract's language, not the visitor's stored preference.
   useEffect(() => {
     if (data?.contract.language) setLang(data.contract.language);
@@ -216,6 +218,8 @@ export default function SignPage() {
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                   placeholder="000000"
+                  aria-label={t("a11y.otpCode")}
+                  aria-invalid={otpError ? true : undefined}
                   className="text-center text-2xl tracking-[0.5em] font-bold h-14 w-full rounded-xl"
                   style={{ border: "1px solid var(--line)", color: "var(--ink)" }}
                 />
@@ -237,8 +241,8 @@ export default function SignPage() {
                   </div>
                 </div>
                 <div className="field">
-                  <label>{t("sign.fullName")}</label>
-                  <input value={name} onChange={(e) => setName(e.target.value)} />
+                  <label htmlFor="sign-full-name">{t("sign.fullName")}</label>
+                  <input id="sign-full-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
                 <SignaturePad value={signature} onChange={setSignature} defaultName={name} />
                 <label className="flex items-start gap-3 rounded-lg p-3 text-sm cursor-pointer" style={{ border: "1px solid var(--line)", color: "var(--ink)" }}>

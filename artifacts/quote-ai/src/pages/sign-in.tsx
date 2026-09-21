@@ -4,6 +4,7 @@ import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, AlertCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
   if (!raw) return fallback;
@@ -13,6 +14,7 @@ function safeLocalPath(raw: string | null, fallback: string): string {
 
 export default function SignInPage() {
   const { t } = useLanguage();
+  useDocumentTitle(`${t("signIn.title")} · QuoteAI`);
   const [, navigate] = useLocation();
   const search = useSearch();
   const nextPath = safeLocalPath(new URLSearchParams(search).get("next"), "/dashboard");
@@ -188,7 +190,7 @@ export default function SignInPage() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
                     />
-                    <button type="button" onClick={() => setShowPassword(v => !v)} className="auth-pw-toggle">
+                    <button type="button" onClick={() => setShowPassword(v => !v)} className="auth-pw-toggle" aria-label={showPassword ? t("a11y.hidePassword") : t("a11y.showPassword")} aria-pressed={showPassword}>
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>

@@ -179,7 +179,7 @@ function Aging({ aging }: { aging: AgingDto }) {
         {BUCKETS.map((b) => (
           <div key={b.key} className="min-w-0">
             <div className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate"><span className="h-2 w-2 rounded-full shrink-0" style={{ background: b.color }} /> {t(`invoices.aging.${b.key}`)}</div>
-            <div className={cn("text-sm font-semibold tabular-nums", aging[b.key] > 0 ? "text-slate-900" : "text-slate-300")}>{formatCents(aging[b.key])}</div>
+            <div className={cn("text-sm font-semibold tabular-nums", aging[b.key] > 0 ? "text-slate-900" : "text-slate-500")}>{formatCents(aging[b.key])}</div>
           </div>
         ))}
       </div>

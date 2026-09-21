@@ -1,4 +1,5 @@
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useParams, Link } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
@@ -19,6 +20,7 @@ export default function TeamInvitePage() {
   const { token } = useParams<{ token: string }>();
   const { isLoaded, isSignedIn, user } = useAuth();
   const { data: preview, isLoading, error } = useQuery({ queryKey: ["team-invite", token], queryFn: () => teamInviteApi.preview(token), retry: false });
+  useDocumentTitle(preview ? t("invite.title").replace("{company}", preview.companyName || t("invite.yourTeam")) : null);
   const accept = useMutation({ mutationFn: () => teamInviteApi.accept(token) });
 
   const err = error as (Error & { code?: string }) | null;

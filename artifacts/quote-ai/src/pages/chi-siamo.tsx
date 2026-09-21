@@ -72,7 +72,7 @@ export default function ChiSiamoPage() {
             <h2 className="h2" style={{ fontSize: "clamp(1.5rem, 2.4vw, 2rem)" }}>{t("about.valuesTitle")}</h2>
             <p className="lead" style={{ margin: "12px auto 0" }}>{t("about.valuesSubtitle")}</p>
           </div>
-          <div className="dd-feats" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+          <div className="dd-feats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
             {[
               { title: t("about.value1Title"), body: t("about.value1Body") },
               { title: t("about.value2Title"), body: t("about.value2Body") },

@@ -92,16 +92,16 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           </div>
           <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_80px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
             <div className="field col-span-2 xl:col-span-1">
-              <select value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} style={tight}>
+              <select aria-label={t("jobs.team.pickWorker")} value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} style={tight}>
                 <option value="">{t("jobs.team.pickWorker")}</option>
                 {timeWorkers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
             </div>
-            <div className="field"><input type="date" value={time.date} onChange={(e) => setTime({ ...time, date: e.target.value })} style={tight} /></div>
-            <div className="field"><input type="number" step="0.25" min="0.25" max="24" value={time.hours} onChange={(e) => setTime({ ...time, hours: e.target.value })} placeholder="h" style={tight} /></div>
+            <div className="field"><input type="date" aria-label={t("a11y.date")} value={time.date} onChange={(e) => setTime({ ...time, date: e.target.value })} style={tight} /></div>
+            <div className="field"><input type="number" step="0.25" min="0.25" max="24" aria-label={t("worker.hours")} value={time.hours} onChange={(e) => setTime({ ...time, hours: e.target.value })} placeholder="h" style={tight} /></div>
             {milestones.length > 0 ? (
               <div className="field">
-                <select value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} style={tight}>
+                <select aria-label={t("worker.phase")} value={time.milestoneId} onChange={(e) => setTime({ ...time, milestoneId: e.target.value })} style={tight}>
                   <option value="">{t("jobs.costs.wholeJob")}</option>
                   {milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
                 </select>
@@ -151,13 +151,13 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           ) : (
             <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_90px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: equipmentUsage.length ? "1px solid var(--soft)" : undefined }} onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
               <div className="field col-span-2 xl:col-span-1">
-                <select value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} style={tight}>
+                <select aria-label={t("jobs.team.pickEquipment")} value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} style={tight}>
                   <option value="">{t("jobs.team.pickEquipment")}</option>
                   {activeEquipment.map((eq) => <option key={eq.id} value={eq.id}>{eq.name} · {formatCents(eq.usageRateCents)}/{t(`team.unit.${eq.usageUnit}`)}</option>)}
                 </select>
               </div>
-              <div className="field"><input type="date" value={usage.date} onChange={(e) => setUsage({ ...usage, date: e.target.value })} style={tight} /></div>
-              <div className="field"><input type="number" step="0.5" min="0.25" value={usage.quantity} onChange={(e) => setUsage({ ...usage, quantity: e.target.value })} placeholder={selectedEquipment ? t(`team.unit.${selectedEquipment.usageUnit}`) : "#"} style={tight} /></div>
+              <div className="field"><input type="date" aria-label={t("a11y.date")} value={usage.date} onChange={(e) => setUsage({ ...usage, date: e.target.value })} style={tight} /></div>
+              <div className="field"><input type="number" step="0.5" min="0.25" aria-label={t("jobs.team.pickEquipment")} value={usage.quantity} onChange={(e) => setUsage({ ...usage, quantity: e.target.value })} placeholder={selectedEquipment ? t(`team.unit.${selectedEquipment.usageUnit}`) : "#"} style={tight} /></div>
               <div className="field"><input value={usage.note} onChange={(e) => setUsage({ ...usage, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} style={tight} /></div>
               <button type="submit" className="btn btn-sm btn-navy col-span-2 xl:col-span-1" disabled={!usage.equipmentId || !usage.quantity || addUsage.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logUsage")}</button>
             </form>
@@ -198,7 +198,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           {available.length > 0 && (
             <div className="flex gap-2 px-[22px] py-4" style={{ borderTop: "1px solid var(--soft)" }}>
               <div className="field flex-1">
-                <select value={pick} onChange={(e) => setPick(e.target.value)} style={tight}>
+                <select aria-label={t("jobs.team.pick")} value={pick} onChange={(e) => setPick(e.target.value)} style={tight}>
                   <option value="">{t("jobs.team.pick")}</option>
                   {available.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -211,7 +211,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
               <label>{t("jobs.team.newWorker")}</label>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.team.namePlaceholder")} style={tight} />
             </div>
-            <div className="field"><input type="number" step="0.01" value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} style={tight} /></div>
+            <div className="field"><input type="number" step="0.01" aria-label={t("jobs.team.ratePlaceholder")} value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} style={tight} /></div>
             <button type="submit" className="btn btn-sm btn-outline-navy w-full" disabled={!name.trim() || addWorker.isPending}>{t("jobs.team.addAndAssign")}</button>
             <p className="field-hint">{t("jobs.team.assignHint")}</p>
           </form>

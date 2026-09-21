@@ -75,3 +75,6 @@ gen-lang-client-*.json
 # Supabase CLI link state
 supabase/.temp/
 .walkthrough-mailbox.json
+
+# Phase 67 QA artefacts (screenshots, PDFs, reports)
+artifacts/api-server/.qa/

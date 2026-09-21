@@ -81,6 +81,12 @@ export function ti(key: IKey, lang: Lang): string {
   return I[key][lang];
 }
 
+/** Tax component labels are stored in English ("GST", "QST"); French documents say TPS / TVQ. Phase 67. */
+const TAX_LABEL_FR: Record<string, string> = { GST: "TPS", HST: "TVH", QST: "TVQ", PST: "TVP", RST: "TVD" };
+export function taxLabel(label: string, lang: Lang): string {
+  return lang === "fr" ? (TAX_LABEL_FR[label.toUpperCase()] ?? label) : label;
+}
+
 export function fmtCents(cents: number, lang: Lang): string {
   return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(cents / 100);
 }
@@ -170,7 +176,7 @@ export const INVOICE_CSS = `
 .inv table.totals tr.balance td { font-weight:700; color:#047857; }
 .inv .box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:10px; padding:12px 16px; margin:20px 0 8px; font-size:13px; }
 .inv .box h3 { margin:0 0 6px; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:#5b21b6; }
-.inv .note { font-size:12px; color:#6b7280; margin-top:8px; }
+.inv .note { font-size:12px; color:#5b5f6b; margin-top:8px; }
 .inv .thanks { margin-top:18px; color:#374151; font-size:13px; }
 .inv .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
 @media (max-width: 480px) {
@@ -210,7 +216,7 @@ export function renderInvoiceHtml(inv: Invoice, payments: InvoicePayment[] = [])
     totals.push(`<tr class="muted"><td>${ti("taxable", lang)}</td><td class="num">${fmtCents(inv.taxableCents, lang)}</td></tr>`);
   }
   for (const t of inv.taxLines) {
-    totals.push(`<tr><td>${esc(t.label)} ${t.rate}%${t.registrationNumber ? ` <span style="color:#6b7280">(${esc(t.registrationNumber)})</span>` : ""}</td><td class="num">${fmtCents(t.amountCents, lang)}</td></tr>`);
+    totals.push(`<tr><td>${esc(taxLabel(t.label, lang))} ${t.rate}%${t.registrationNumber ? ` <span style="color:#6b7280">(${esc(t.registrationNumber)})</span>` : ""}</td><td class="num">${fmtCents(t.amountCents, lang)}</td></tr>`);
   }
   totals.push(`<tr class="total"><td>${credit ? ti("creditTotal", lang) : ti("total", lang)}</td><td class="num">${fmtCents(inv.totalCents, lang)}</td></tr>`);
   if (!credit && inv.paidCents > 0 && inv.status !== "void") {

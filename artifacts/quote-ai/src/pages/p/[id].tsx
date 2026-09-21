@@ -4,6 +4,8 @@ import { CheckCircle2, Loader2, FileX, Hammer, Landmark, Gift, ExternalLink } fr
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Logo } from "@/components/logo";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 interface PublicQuoteChapterItem {
   descrizione: string;
@@ -27,6 +29,7 @@ interface PublicQuoteVariant {
   description: string;
   position: number;
   capitoli: PublicQuoteChapter[] | null;
+  sconto: { percentuale: number; importoScontato: number } | null;
   subtotale: string;
   ivaPercentuale: string;
   ivaValore: string;
@@ -42,6 +45,7 @@ interface PublicQuote {
   clientData: { nome: string; indirizzo: string } | null;
   companySnapshot: { companyName: string; address?: string; phone?: string; email?: string } | null;
   capitoli: PublicQuoteChapter[] | null;
+  sconto: { percentuale: number; importoScontato: number } | null;
   subtotale: string;
   ivaPercentuale: string;
   ivaValore: string;
@@ -278,7 +282,7 @@ function RebatesWidget({ quoteId }: { quoteId: string }) {
 }
 
 export default function PublicQuotePage() {
-  const { t, lang } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
   const { id } = useParams();
   const [quote, setQuote] = useState<PublicQuote | null>(null);
   const [loading, setLoading] = useState(true);
@@ -287,6 +291,7 @@ export default function PublicQuotePage() {
   const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  useDocumentTitle(quote ? `${t("publicQuote.quoteFallback")}${quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""} · ${quote.companySnapshot?.companyName || "QuoteAI"}` : notFound ? t("publicQuote.notAvailableTitle") : null);
 
   useEffect(() => {
     if (!id) return;
@@ -345,7 +350,7 @@ export default function PublicQuotePage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center">
+      <div className="doc-shell min-h-[70vh] flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--navy)" }} />
       </div>
     );
@@ -353,7 +358,7 @@ export default function PublicQuotePage() {
 
   if (notFound || !quote) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
+      <div className="doc-shell min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
         <FileX className="h-10 w-10 mb-4" style={{ color: "var(--line)" }} />
         <h1 className="text-lg font-semibold" style={{ color: "var(--navy)" }}>{t("publicQuote.notAvailableTitle")}</h1>
         <p className="text-sm mt-1 max-w-sm" style={{ color: "var(--muted-mk)" }}>
@@ -369,11 +374,28 @@ export default function PublicQuotePage() {
   const activeVariant = hasTiers ? (tiers.find((v) => v.id === selectedVariantId) ?? tiers[0]) : null;
   const displayCapitoli = activeVariant ? activeVariant.capitoli : quote.capitoli;
   const displaySubtotale = activeVariant ? activeVariant.subtotale : quote.subtotale;
+  const displaySconto = activeVariant ? activeVariant.sconto : quote.sconto;
   const displayIvaPercentuale = activeVariant ? activeVariant.ivaPercentuale : quote.ivaPercentuale;
   const displayIvaValore = activeVariant ? activeVariant.ivaValore : quote.ivaValore;
   const displayTotale = activeVariant ? activeVariant.totale : quote.totale;
 
+  const companyName = quote.companySnapshot?.companyName || t("publicQuote.quoteFallback");
   return (
+    <div className="doc-shell pb-16">
+      {/* Phase 67: a customer document, not a marketing page — the same sticky
+          doc header the invoice and signing pages use, no site nav or footer. */}
+      <header className="doc-head">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{t("publicInvoice.from")} <strong style={{ color: "var(--ink)" }}>{companyName}</strong></div>
+            <div className="text-sm font-semibold truncate" style={{ color: "var(--navy)" }}>{t("publicQuote.quoteFallback")}{quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""}</div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")} aria-label={lang === "fr" ? "English" : "Français"}>{lang === "fr" ? "EN" : "FR"}</button>
+            <Logo className="h-6" />
+          </div>
+        </div>
+      </header>
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-2xl">
       <div className="text-center mb-8">
         <div className="eyebrow mb-2">
@@ -456,6 +478,18 @@ export default function PublicQuotePage() {
               <span>{t("publicQuote.subtotal")}</span>
               <span>{euro(displaySubtotale)}</span>
             </div>
+            {displaySconto && displaySconto.percentuale > 0 && (
+              <>
+                <div className="flex justify-between text-sm" style={{ color: "var(--green-dark)" }}>
+                  <span>{t("publicQuote.discount")} ({displaySconto.percentuale}%)</span>
+                  <span>−{euro(Number(displaySubtotale) - displaySconto.importoScontato)}</span>
+                </div>
+                <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
+                  <span>{t("publicQuote.discountedSubtotal")}</span>
+                  <span>{euro(displaySconto.importoScontato)}</span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
               <span>{t("publicQuote.tax")} ({displayIvaPercentuale}%)</span>
               <span>{euro(displayIvaValore)}</span>
@@ -523,9 +557,10 @@ export default function PublicQuotePage() {
         </div>
       )}
 
-      <p className="text-center text-[11px] mt-8" style={{ color: "var(--line)" }}>
-        {t("publicQuote.generatedWith")}
+      <p className="text-center text-xs mt-8" style={{ color: "var(--muted-mk)" }}>
+        <a href="https://quoteai.ca" className="underline">{t("publicQuote.generatedWith")}</a>
       </p>
+    </div>
     </div>
   );
 }

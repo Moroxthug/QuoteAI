@@ -9,6 +9,7 @@ import { db, quotesTable, clientsTable, quoteImportCandidatesTable } from "@work
 import { eq } from "drizzle-orm";
 import "../automations/index.js";
 import { startServer, stopServer, createOrg, createUser, seedQuote, cleanupAll, api } from "./harness.js";
+import { sentEmails } from "./mailbox.js";
 
 describe("quotes: archive, variants, import", () => {
   beforeAll(startServer);
@@ -124,5 +125,62 @@ describe("quotes: archive, variants, import", () => {
     // Another org cannot touch this queue.
     const stranger = await createUser();
     expect((await stranger.api(`/api/imports/candidates/${withClient.id}/reject`, { method: "POST" })).status).not.toBe(200);
+  });
+});
+
+// Phase 66 — bugs found in the functional walkthrough, pinned here.
+describe("quotes: unlock + send lifecycle (Phase 66)", () => {
+  beforeAll(startServer);
+  afterAll(async () => {
+    await cleanupAll();
+    await stopServer();
+  });
+
+  test("a trial user can email a draft: it unlocks, spends a trial download and remembers the client email", async () => {
+    const org = await createOrg({ plan: "free", profile: { trialStartedAt: new Date() } });
+    const quote = await seedQuote(org.userId, { status: "draft" });
+    // The quote forms never collect an email — mirror that.
+    const { email: _dropped, ...clientNoEmail } = quote.clientData!;
+    await db.update(quotesTable).set({ clientData: clientNoEmail }).where(eq(quotesTable.id, quote.id));
+    const before = sentEmails.length;
+
+    const sent = await org.api(`/api/quotes/${quote.id}/send-pdf-email`, { method: "POST", body: { toEmail: "walkthrough.client@example.invalid", clientName: "Jordan" } });
+    expect(sent.status, JSON.stringify(sent.body)).toBe(200);
+    expect(sentEmails.length).toBe(before + 1);
+    expect(sentEmails.at(-1)!.html).toContain(`/p/${quote.id}`); // the public link is in the email
+
+    const [row] = await db.select().from(quotesTable).where(eq(quotesTable.id, quote.id));
+    expect(row!.status).toBe("unlocked");
+    expect(row!.unlockedWithPlan).toBe("trial");
+    expect(row!.clientData?.email).toBe("walkthrough.client@example.invalid");
+    expect(row!.nextFollowUpAt).not.toBeNull();
+    expect((await org.api("/api/payments/trial-status")).body.trialDownloadsUsed).toBe(1);
+    // The CRM client got the address too.
+    const [client] = await db.select().from(clientsTable).where(eq(clientsTable.id, row!.clientId!));
+    expect(client!.email).toBe("walkthrough.client@example.invalid");
+  });
+
+  test("a subscriber's unlock-quote never reverts an accepted quote, and stats count accepted as unlocked", async () => {
+    const org = await createOrg({ plan: "monthly_pro" });
+    const quote = await seedQuote(org.userId, { status: "unlocked" });
+    const accepted = await api(`/api/public/quotes/${quote.id}/accept`, { method: "POST", body: { nomeConferma: "Jordan Client" } });
+    expect(accepted.status, JSON.stringify(accepted.body)).toBe(200);
+
+    // The quote page calls this on open for every subscriber.
+    const unlock = await org.api("/api/payments/unlock-quote", { method: "POST", body: { quoteId: quote.id } });
+    expect(unlock.status).toBe(200);
+    expect(unlock.body.status).toBe("accepted");
+    const detail = await org.api(`/api/quotes/${quote.id}`);
+    expect(detail.body.status).toBe("accepted");
+    expect(detail.body.acceptedByName).toBe("Jordan Client");
+
+    const stats = await org.api("/api/quotes/stats");
+    expect(stats.body.unlocked).toBe(1);
+    expect(stats.body.accepted).toBe(1);
+    expect(stats.body.unlockedRevenue).toBe(10000);
+
+    // A draft is unlocked with the plan, exactly once.
+    const draft = await seedQuote(org.userId, { status: "draft" });
+    expect((await org.api("/api/payments/unlock-quote", { method: "POST", body: { quoteId: draft.id } })).body.status).toBe("unlocked");
   });
 });

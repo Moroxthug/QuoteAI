@@ -71,6 +71,31 @@ const imageUpload = multer({
 
 const router = Router();
 
+/**
+ * A draft quote of a non-subscriber is unlocked by the trial — once — the
+ * first time it leaves the account (PDF download or email send). Each unlock
+ * consumes one trial download. Returns false when the trial is over, so the
+ * caller can answer 402. (Phase 66: email send used to require the quote to
+ * be unlocked already, so trial users could not send before downloading.)
+ */
+async function tryTrialUnlock(
+  quote: typeof quotesTable.$inferSelect,
+  profile: typeof businessProfilesTable.$inferSelect | null,
+  log: { info: (obj: object, msg: string) => void }
+): Promise<boolean> {
+  const trial = getTrialStatus(profile);
+  if (!trial.isTrialActive) return false;
+  await Promise.all([
+    db.update(quotesTable).set({ status: "unlocked", unlockedWithPlan: "trial" }).where(eq(quotesTable.id, quote.id)),
+    db
+      .update(businessProfilesTable)
+      .set({ trialDownloadsUsed: (profile?.trialDownloadsUsed ?? 0) + 1 })
+      .where(eq(businessProfilesTable.userId, quote.userId)),
+  ]);
+  log.info({ quoteId: quote.id, userId: quote.userId }, "Quote auto-unlocked via trial");
+  return true;
+}
+
 const AI_PROMPT = `You are an expert consultant for professional quotes/estimates in the Canadian market (tradespeople, construction, building systems, technical services).
 
 You must turn a free-text description into a professional ITEMIZED COST ANALYSIS AND ESTIMATE, structured into chapters/sections, consistent with the owner's price catalog and with realistic 2026 Canadian market rates. Write ALL text content (descriptions, titles, notes) in English.
@@ -201,6 +226,8 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     prezzoMassimo: Math.round(tot * 1.25 * 100) / 100,
     note: q.note,
     status: q.status,
+    acceptedByName: q.acceptedByName ?? null,
+    acceptedAt: q.acceptedAt?.toISOString() ?? null,
     pdfUrl: q.pdfUrl ?? null,
     rawInput: q.rawInput,
     pdfDownloadedAt: q.pdfDownloadedAt?.toISOString() ?? null,
@@ -252,7 +279,10 @@ router.get("/quotes/stats", requireAuth, async (req, res) => {
         .where(eq(quotesTable.userId, userId)),
     ]);
 
-    const allStatusCounts = { draft: 0, unlocked: 0, pending_payment: 0 };
+    // "unlocked" on the dashboard means "sent to the client" — an accepted
+    // quote is still unlocked (Phase 66: accepted quotes vanished from the
+    // unlocked count and revenue the moment the client said yes).
+    const allStatusCounts = { draft: 0, unlocked: 0, pending_payment: 0, accepted: 0 };
     let thisMonth = 0;
     let unlockedRevenue = 0;
     for (const q of allForStats) {
@@ -260,7 +290,7 @@ router.get("/quotes/stats", requireAuth, async (req, res) => {
         allStatusCounts[q.status as keyof typeof allStatusCounts]++;
       }
       if (q.createdAt >= thisMonthStart) thisMonth++;
-      if (q.status === "unlocked") unlockedRevenue += Number(q.totale ?? 0);
+      if (q.status === "unlocked" || q.status === "accepted") unlockedRevenue += Number(q.totale ?? 0);
     }
 
     const total = Number(statsResult[0]?.total ?? 0);
@@ -269,7 +299,8 @@ router.get("/quotes/stats", requireAuth, async (req, res) => {
     res.json({
       total,
       draft: allStatusCounts.draft,
-      unlocked: allStatusCounts.unlocked,
+      unlocked: allStatusCounts.unlocked + allStatusCounts.accepted,
+      accepted: allStatusCounts.accepted,
       pendingPayment: allStatusCounts.pending_payment,
       totalRevenue: Number(statsResult[0]?.totalRevenue ?? 0),
       unlockedRevenue,
@@ -1552,21 +1583,8 @@ router.post("/quotes/:id/generate-pdf", requireAuth, requirePermission("quotes",
     // Trial auto-unlock
     let effectiveStatus = quote.status;
     if (quote.status === "draft" && profile?.subscriptionStatus !== "active") {
-      const trial = getTrialStatus(profile ?? null);
-      if (trial.isTrialActive) {
+      if (await tryTrialUnlock(quote, profile ?? null, req.log)) {
         effectiveStatus = "unlocked";
-        const updates: Partial<typeof businessProfilesTable.$inferSelect> = {
-          trialDownloadsUsed: (profile?.trialDownloadsUsed ?? 0) + 1,
-        };
-        await Promise.all([
-          db.update(quotesTable)
-            .set({ status: "unlocked", unlockedWithPlan: "trial" })
-            .where(eq(quotesTable.id, id)),
-          db.update(businessProfilesTable)
-            .set(updates)
-            .where(eq(businessProfilesTable.userId, userId)),
-        ]);
-        req.log.info({ quoteId: id, userId }, "Quote auto-unlocked via trial");
       } else {
         res.status(402).json({ error: "Payment required", code: "trial_expired" });
         return;
@@ -1629,10 +1647,24 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
 
     const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
 
-    // Only allow email for unlocked quotes or Pro/Elite users
-    const isProOrElite = profile?.subscriptionStatus === "active" &&
-      (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite");
-    if (quote.status !== "unlocked" && !isProOrElite) {
+    // Sending is what makes a quote leave the account, so it unlocks the
+    // quote exactly like a PDF download does: subscribers unlock with their
+    // plan, trial users spend one trial download, everyone else must pay.
+    // Only a draft is ever touched — an accepted quote stays accepted.
+    if (quote.status === "draft" || quote.status === "pending_payment") {
+      if (profile?.subscriptionStatus === "active") {
+        await db
+          .update(quotesTable)
+          .set({ status: "unlocked", unlockedWithPlan: profile.subscriptionPlan ?? null })
+          .where(eq(quotesTable.id, id));
+        quote.status = "unlocked";
+      } else if (await tryTrialUnlock(quote, profile ?? null, req.log)) {
+        quote.status = "unlocked";
+      } else {
+        res.status(402).json({ error: "Unlock the quote to send it via email", code: "PAYMENT_REQUIRED" });
+        return;
+      }
+    } else if (quote.status !== "unlocked" && quote.status !== "accepted") {
       res.status(402).json({ error: "Unlock the quote to send it via email", code: "PAYMENT_REQUIRED" });
       return;
     }
@@ -1663,14 +1695,22 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
     // Phase 21: start the follow-up reminder sequence, unless the quote is
     // already accepted or the client has unsubscribed from reminders.
     if (quote.status !== "accepted" && !quote.unsubscribedAt) {
+      // The follow-ups go to clientData.email, which the quote forms never
+      // collect — remember the address the contractor just typed, or the
+      // whole sequence dies with `no_email` (Phase 66).
+      const existingClient = (quote.clientData as QuoteClientData | null) ?? null;
+      const clientData =
+        existingClient && !existingClient.email ? { ...existingClient, email: toEmail.trim() } : existingClient;
       await db
         .update(quotesTable)
         .set({
           sentAt: quote.sentAt ?? new Date(),
           followUpStage: 0,
           nextFollowUpAt: new Date(Date.now() + QUOTE_FOLLOWUP_CADENCE_DAYS[0] * 86_400_000),
+          ...(clientData && clientData !== existingClient ? { clientData } : {}),
         })
         .where(eq(quotesTable.id, quote.id));
+      if (clientData !== existingClient) await linkQuoteToClient({ ...quote, clientData }, profile?.province ?? null, { applyDefaultTerms: false });
     }
 
     res.json({ success: true });

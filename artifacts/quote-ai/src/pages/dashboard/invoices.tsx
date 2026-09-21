@@ -1,4 +1,5 @@
 ﻿import { useMemo, useState } from "react";
+import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -134,7 +135,7 @@ function InvoiceTableRow({ inv, locale }: { inv: InvoiceDto; locale: typeof enCA
   const { t } = useLanguage();
   const [, navigate] = useLocation();
   return (
-    <tr onClick={() => navigate(`/dashboard/invoices/${inv.id}`)} className="cursor-pointer">
+    <tr {...rowLink(() => navigate(`/dashboard/invoices/${inv.id}`))}>
       <td className="t-strong">{inv.number}</td>
       <td>{inv.clientName}{inv.projectName ? <span className="t-sub">{inv.projectName}</span> : null}</td>
       <td>{format(new Date(inv.issueDate), "PP", { locale })}</td>

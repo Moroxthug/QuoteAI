@@ -208,8 +208,8 @@ export default function BillingPage() {
           </div>
         )}
 
-        {/* Compare plans — only shown to non-Pro */}
-        {!isPro && (
+        {/* Compare plans — only shown below Pro (Elite already has everything) */}
+        {!isPro && !isElite && (
           <div className="card">
             <div className="card-head">
               <div><h2>{t("dashboard.billing.comparePlansTitle")}</h2><p className="sub">{t("dashboard.billing.comparePlansDesc")}</p></div>

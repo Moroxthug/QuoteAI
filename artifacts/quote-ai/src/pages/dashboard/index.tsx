@@ -629,7 +629,7 @@ function DashboardComposer() {
                     disabled={isSubmitting} className="h-8 text-sm" maxLength={2} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-muted-foreground">Postal Code</Label>
+                  <Label className="text-xs font-medium text-muted-foreground">{t("dashboard.new.client.postalCode")}</Label>
                   <Input placeholder="M5H 2N2" value={clientForm.postalCode}
                     onChange={e => setClientForm(f => ({ ...f, postalCode: e.target.value.toUpperCase() }))}
                     disabled={isSubmitting} className="h-8 text-sm" maxLength={7} />

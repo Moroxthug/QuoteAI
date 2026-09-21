@@ -1,3 +1,4 @@
+import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
 import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -89,7 +90,7 @@ export default function QuoteDetail() {
   useEffect(() => {
     if (
       subscription?.isActive &&
-      quote?.status !== "unlocked" &&
+      (quote?.status === "draft" || quote?.status === "pending_payment") &&
       id &&
       !subUnlockDone
     ) {
@@ -257,6 +258,9 @@ export default function QuoteDetail() {
       onSuccess: () => {
         setIsEmailDialogOpen(false);
         setEmailTo("");
+        // Sending unlocks a draft (trial or subscription) — refresh status + trial counter.
+        queryClient.invalidateQueries({ queryKey: getGetQuoteQueryKey(id) });
+        queryClient.invalidateQueries({ queryKey: getGetTrialStatusQueryKey() });
         toast({ title: t("dashboard.quoteDetail.emailSent"), description: fmt(t("dashboard.quoteDetail.emailSentDesc"), { email: emailTo.trim() }) });
       },
       onError: (err: unknown) => {
@@ -329,7 +333,7 @@ export default function QuoteDetail() {
       const res = await jobsApi.create({
         name: `${quote.titoloPreventivoRiga2 || t("dashboard.quoteDetail.projectNamePrefix")} – ${clientName}`.slice(0, 200),
         quoteId: id,
-        plannedStart: new Date().toISOString().split("T")[0],
+        plannedStart: localDay(),
       });
       toast({ title: res.created ? t("dashboard.quoteDetail.projectStarted") : t("dashboard.quoteDetail.projectAlreadyStarted"), description: res.created ? t("dashboard.quoteDetail.projectStartedDesc") : t("dashboard.quoteDetail.projectAlreadyStartedDesc") });
       navigate(`/dashboard/jobs/${res.job.id}`);
@@ -567,7 +571,8 @@ export default function QuoteDetail() {
   // Pro/Elite subscribers and active trial users can always download
   const isLocked = quote.status !== "unlocked" && !isPro && !isTrialActive;
   // Editing is permanently locked once the PDF has been downloaded
-  const isEditLocked = !!quote.pdfDownloadedAt;
+  // …and once the client has accepted: the accepted amount is what the contract is built on.
+  const isEditLocked = !!quote.pdfDownloadedAt || quote.status === "accepted";
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
 
@@ -703,7 +708,7 @@ export default function QuoteDetail() {
             {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
             {t("dashboard.quoteDetail.downloadPdf")}
           </button>
-          {!isLocked && quote?.status === "unlocked" && (
+          {!isLocked && (
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
               {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               {t("dashboard.quoteDetail.sendByEmail")}
@@ -1328,7 +1333,7 @@ export default function QuoteDetail() {
                 {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
                 {t("dashboard.quoteDetail.downloadPdf")}
               </button>
-              {!isLocked && quote?.status === "unlocked" && (
+              {!isLocked && (
                 <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
                   {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
                   {t("dashboard.quoteDetail.sendByEmail")}
@@ -1368,7 +1373,7 @@ export default function QuoteDetail() {
               {isEditLocked && (
                 <div className="notice warn">
                   <AlertTriangle />
-                  <span className="grow">{t("dashboard.quoteDetail.downloadedWarning")}</span>
+                  <span className="grow">{t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.downloadedWarning")}</span>
                 </div>
               )}
             </div>
@@ -1475,7 +1480,7 @@ export default function QuoteDetail() {
             <div className="card-head">
               <div>
                 <h2 className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("dashboard.quoteDetail.pdfTemplateTitle")}</h2>
-                <p className="sub">{isEditLocked ? t("dashboard.quoteDetail.lockedAfterDownload") : t("dashboard.quoteDetail.chooseYourPdfLayout")}</p>
+                <p className="sub">{isEditLocked ? t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.lockedAfterDownload") : t("dashboard.quoteDetail.chooseYourPdfLayout")}</p>
               </div>
             </div>
             <div className="src-list">

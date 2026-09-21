@@ -282,7 +282,10 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/payments/unlock-quote", requireAuth, requirePermission("settings", "full"), async (req, res) => {
+// Phase 66: any member who can edit quotes may unlock one with the org's
+// subscription (the quote page calls this on open — `settings:full` made it
+// 403 for every non-owner and left their quotes un-sendable).
+router.post("/payments/unlock-quote", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const { quoteId } = req.body as { quoteId: string };
@@ -312,15 +315,20 @@ router.post("/payments/unlock-quote", requireAuth, requirePermission("settings",
       return;
     }
 
-    if (quote.status !== "unlocked") {
+    // Only a draft (or an abandoned one-shot checkout) is unlocked. This used
+    // to be `!== "unlocked"`, which silently reverted every *accepted* quote
+    // to "unlocked" the moment a subscriber opened it (Phase 66).
+    if (quote.status === "draft" || quote.status === "pending_payment") {
       await db
         .update(quotesTable)
         .set({ status: "unlocked", unlockedWithPlan: profile.subscriptionPlan ?? null })
         .where(eq(quotesTable.id, quoteId));
       logger.info({ quoteId, userId, plan: profile.subscriptionPlan }, "Quote unlocked via subscription");
+      res.json({ status: "unlocked" });
+      return;
     }
 
-    res.json({ status: "unlocked" });
+    res.json({ status: quote.status });
   } catch (err) {
     logger.error({ err }, "Error unlocking quote with subscription");
     res.status(500).json({ error: "Internal server error" });

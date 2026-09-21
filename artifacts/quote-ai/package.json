@@ -16,7 +16,8 @@
     "validate-sitemap": "tsx ./scripts/validate-sitemap.ts",
     "submit-to-google": "tsx ./scripts/submit-to-google.ts",
     "ga-traffic-report": "tsx ./scripts/ga-traffic-report.ts",
-    "gsc-inspect": "tsx ./scripts/gsc-inspect-urls.ts"
+    "gsc-inspect": "tsx ./scripts/gsc-inspect-urls.ts",
+    "i18n-audit": "tsx ./scripts/i18n-audit.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

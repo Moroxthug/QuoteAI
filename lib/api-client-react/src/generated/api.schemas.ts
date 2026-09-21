@@ -145,6 +145,7 @@ export interface Quote {
   note: string;
   status: QuoteStatus;
   acceptedByName?: string | null;
+  acceptedAt?: string | null;
   pdfUrl?: string | null;
   rawInput: string;
   pdfDownloadedAt?: string | null;
@@ -164,6 +165,7 @@ export interface QuoteStats {
   total: number;
   draft: number;
   unlocked: number;
+  accepted?: number;
   pendingPayment: number;
   totalRevenue: number;
   unlockedRevenue: number;

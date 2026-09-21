@@ -1,4 +1,5 @@
 import { useListQuotes, useDeleteQuote, useDuplicateQuote, useArchiveQuote, getListQuotesQueryKey } from "@workspace/api-client-react";
+import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -162,7 +163,7 @@ export default function QuotesList() {
                 {filteredQuotes.map(quote => {
                   const chip = statusChip(quote.status, t);
                   return (
-                    <tr key={quote.id} onClick={() => navigate(`/dashboard/quotes/${quote.id}`)} className="cursor-pointer">
+                    <tr key={quote.id} {...rowLink(() => navigate(`/dashboard/quotes/${quote.id}`))}>
                       <td>
                         <span className="cell-flex">
                           <span className="cell-ic"><FileText className="h-4 w-4" /></span>

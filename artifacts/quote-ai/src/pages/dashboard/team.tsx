@@ -1,3 +1,4 @@
+import { localDay } from "@/lib/local-day";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,7 +19,7 @@ const TABS = ["workers", "time", "equipment", "members"] as const;
 type Tab = (typeof TABS)[number];
 const TAB_ICONS: Record<Tab, typeof Users> = { workers: Users, time: Clock, equipment: Wrench, members: UserPlus };
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
-const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+const isoDay = (d: Date) => localDay(d);
 
 /**
  * /dashboard/team — worker register (rates, burden, magic links), the

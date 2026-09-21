@@ -3,21 +3,24 @@ import { useListClientQuotes, getListClientQuotesQueryKey } from "@workspace/api
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, ArrowRight, FileText, Mail, Phone, MapPin } from "lucide-react";
 import { format } from "date-fns";
-import { enCA } from "date-fns/locale";
+import { enCA, frCA } from "date-fns/locale";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
+const formatCurrency = (v: number, lang: string) =>
+  new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
 
-function quoteChip(status: string): { cls: string; label: string } {
-  if (status === "unlocked") return { cls: "chip-green", label: "Unlocked" };
-  if (status === "pending_payment") return { cls: "chip-yellow", label: "Pending" };
-  return { cls: "chip-grey", label: "Draft" };
+function quoteChip(status: string, t: (k: string) => string): { cls: string; label: string } {
+  if (status === "accepted") return { cls: "chip-green", label: t("clients.detail.quoteAccepted") };
+  if (status === "unlocked") return { cls: "chip-green", label: t("dashboard.quotesList.statusUnlocked") };
+  if (status === "pending_payment") return { cls: "chip-yellow", label: t("dashboard.quotesList.statusPending") };
+  return { cls: "chip-grey", label: t("dashboard.quotesList.statusDraft") };
 }
 
 export default function ClientDetailPage() {
   const params = useParams<{ id: string }>();
   const clientId = params.id ?? "";
+  const { t, lang } = useLanguage();
 
   const { data: quotes, isLoading } = useListClientQuotes(
     clientId,
@@ -39,15 +42,15 @@ export default function ClientDetailPage() {
   const businessNumber = latestQuote?.clientData?.businessNumber;
 
   const stats = [
-    { label: "Quotes", value: String(quotes?.length ?? 0) },
-    { label: "Accepted", value: String(unlockedCount), cls: "ok" },
-    { label: "Total value", value: formatCurrency(totalValue) },
-    { label: "Unlocked", value: formatCurrency(unlockedValue), cls: "teal" },
+    { label: t("clients.col.quotes"), value: String(quotes?.length ?? 0) },
+    { label: t("clients.detail.accepted"), value: String(unlockedCount), cls: "ok" },
+    { label: t("clients.detail.totalValue"), value: formatCurrency(totalValue, lang) },
+    { label: t("clients.detail.unlockedValue"), value: formatCurrency(unlockedValue, lang), cls: "teal" },
   ];
 
   return (
     <div className="animate-in fade-in duration-500">
-      <Link href="/dashboard/clients" className="back-link"><ArrowLeft /> All clients</Link>
+      <Link href="/dashboard/clients" className="back-link"><ArrowLeft /> {t("clients.detail.back")}</Link>
       <div className="page-head">
         <div className="min-w-0">
           {isLoading ? (
@@ -55,7 +58,7 @@ export default function ClientDetailPage() {
           ) : (
             <div className="title-row">
               <span className="avat" style={{ width: 40, height: 40, fontSize: 14 }}>{clientName.slice(0, 2) || "??"}</span>
-              <h1 className="truncate">{clientName || "Client"}</h1>
+              <h1 className="truncate">{clientName || t("clients.col.client")}</h1>
             </div>
           )}
           {!isLoading && (email || phone || city || indirizzo) && (
@@ -85,9 +88,9 @@ export default function ClientDetailPage() {
       {/* Fiscal details */}
       {!isLoading && (partitaIva || businessNumber || (indirizzo && !city)) && (
         <div className="card">
-          {partitaIva && <div className="kv"><span>GST/HST No.</span><b>{partitaIva}</b></div>}
-          {businessNumber && <div className="kv"><span>Business Number</span><b>{businessNumber}</b></div>}
-          {indirizzo && <div className="kv"><span>Address</span><b>{indirizzo}{city ? `, ${city}` : ""}</b></div>}
+          {partitaIva && <div className="kv"><span>{t("clients.detail.gstNumber")}</span><b>{partitaIva}</b></div>}
+          {businessNumber && <div className="kv"><span>{t("clients.detail.businessNumber")}</span><b>{businessNumber}</b></div>}
+          {indirizzo && <div className="kv"><span>{t("clients.detail.address")}</span><b>{indirizzo}{city ? `, ${city}` : ""}</b></div>}
         </div>
       )}
 
@@ -95,7 +98,7 @@ export default function ClientDetailPage() {
       <div className="card">
         <div className="card-head">
           <div>
-            <h2>Quotes</h2>
+            <h2>{t("clients.col.quotes")}</h2>
             {!isLoading && <p className="sub">{quotes?.length ?? 0} in total</p>}
           </div>
         </div>
@@ -109,25 +112,25 @@ export default function ClientDetailPage() {
             ))}
           </div>
         ) : !quotes || quotes.length === 0 ? (
-          <div className="card-empty">No quotes found for this client.</div>
+          <div className="card-empty">{t("clients.detail.noQuotes")}</div>
         ) : (
           <div>
             {quotes.map((q) => {
-              const chip = quoteChip(q.status);
+              const chip = quoteChip(q.status, t);
               return (
                 <Link key={q.id} href={`/dashboard/quotes/${q.id}`} className="q-row">
                   <span className="q-ic"><FileText className="h-4 w-4" /></span>
                   <div className="q-body">
-                    <p className="q-title">{q.titoloPreventivoRiga2 || q.descrizioneGenerale || "Quote"}</p>
+                    <p className="q-title">{q.titoloPreventivoRiga2 || q.descrizioneGenerale || t("clients.detail.quote")}</p>
                     <div className="q-meta">
                       <span className={cn("chip", chip.cls)}>{chip.label}</span>
                       <span className="q-date">
-                        {format(new Date(q.createdAt), "dd MMM yyyy", { locale: enCA })}
+                        {format(new Date(q.createdAt), "dd MMM yyyy", { locale: lang === "fr" ? frCA : enCA })}
                         {q.numeroPreventivoData ? ` — ${q.numeroPreventivoData}` : ""}
                       </span>
                     </div>
                   </div>
-                  <span className="q-amt">{formatCurrency(q.totale)}</span>
+                  <span className="q-amt">{formatCurrency(q.totale, lang)}</span>
                   <ArrowRight className="chev" />
                 </Link>
               );

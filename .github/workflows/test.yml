@@ -27,6 +27,8 @@ jobs:
         run: pnpm run lint
       - name: Dead code (knip)
         run: pnpm run knip
+      - name: i18n audit (EN/FR key parity, unknown t() keys)
+        run: pnpm --filter @workspace/quote-ai i18n-audit
       - name: Unit tests
         run: pnpm run test
       - name: Build

@@ -10,10 +10,12 @@ export type AuthUser = {
 };
 
 export function useAuth() {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending, error } = authClient.useSession();
 
   return {
     isLoaded: !isPending,
+    /** The session check itself failed (API unreachable / 5xx) — not the same as "signed out". */
+    isError: !!error,
     isSignedIn: !!session?.user,
     userId: session?.user?.id ?? null,
     user: (session?.user as AuthUser | null | undefined) ?? null,
@@ -22,14 +24,15 @@ export function useAuth() {
 }
 
 export function useRequireAuth() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, isError } = useAuth();
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    if (isLoaded && !isSignedIn) {
+    // A failed session check is not a sign-out — don't bounce to /sign-in on an outage.
+    if (isLoaded && !isSignedIn && !isError) {
       navigate("/sign-in");
     }
-  }, [isLoaded, isSignedIn, navigate]);
+  }, [isLoaded, isSignedIn, isError, navigate]);
 
   return { isLoaded, isSignedIn };
 }

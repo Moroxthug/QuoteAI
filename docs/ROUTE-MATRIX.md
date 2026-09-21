@@ -359,10 +359,10 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 143 | GET | `/api/payments/trial-status` | session | — | — | none | — | n/a | — | — | — |
 | 157 | POST | `/api/payments/checkout` | session | settings:full | — | manual | — | n/a | — | — | — |
 | 233 | GET | `/api/payments/subscription` | session | — | — | none | quota-check | n/a | — | — | — |
-| 285 | POST | `/api/payments/unlock-quote` | session | settings:full | — | manual | — | n/a | — | — | — |
-| 330 | POST | `/api/payments/portal` | session | settings:full | — | none | — | n/a | — | — | — |
-| 358 | POST | `/api/payments/sync-subscription` | session | settings:full | — | none | — | n/a | — | — | — |
-| 458 | GET | `/api/payments/verify/:quoteId` | session | — | — | none | — | post-check | — | — | — |
+| 288 | POST | `/api/payments/unlock-quote` | session | quotes:edit | — | manual | — | n/a | — | — | — |
+| 338 | POST | `/api/payments/portal` | session | settings:full | — | none | — | n/a | — | — | — |
+| 366 | POST | `/api/payments/sync-subscription` | session | settings:full | — | none | — | n/a | — | — | — |
+| 466 | GET | `/api/payments/verify/:quoteId` | session | — | — | none | — | post-check | — | — | — |
 
 ## artifacts/api-server/src/routes/public-invoices.ts
 
@@ -454,26 +454,26 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 227 | GET | `/api/quotes/stats` | session | — | — | none | — | n/a | — | — | — |
-| 287 | GET | `/api/quotes` | session | — | — | none | — | n/a | quotes:ok | — | — |
-| 370 | POST | `/api/quotes` | session | quotes:edit | aiCallLimiter | zod | plan-check | n/a | — | — | — |
-| 1120 | GET | `/api/quotes/:id` | session | — | — | none | — | post-check | — | — | — |
-| 1152 | GET | `/api/quotes/:id/variants` | session | — | — | none | — | post-check | — | — | — |
-| 1181 | POST | `/api/quotes/:id/variants` | session | quotes:edit | — | manual | — | post-check | — | — | — |
-| 1241 | PUT | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | manual | — | post-check | — | — | — |
-| 1292 | DELETE | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | none | — | post-check | — | — | — |
-| 1338 | PUT | `/api/quotes/:id` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
-| 1456 | DELETE | `/api/quotes/:id` | session | quotes:full | — | none | — | post-check | — | — | — |
-| 1484 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | none | — | post-check | — | — | — |
-| 1504 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | none | — | post-check | — | — | — |
-| 1524 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
-| 1615 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | manual | plan-check | predicate | — | — | — |
-| 1685 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
-| 1747 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | manual | — | predicate | — | — | — |
-| 1960 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | none | plan-check | predicate | — | — | — |
-| 2103 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
-| 3786 | POST | `/api/quotes/manual` | session | quotes:edit | — | manual | — | n/a | — | — | — |
-| 3802 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | manual | — | n/a | — | — | — |
+| 254 | GET | `/api/quotes/stats` | session | — | — | none | — | n/a | — | — | — |
+| 318 | GET | `/api/quotes` | session | — | — | none | — | n/a | quotes:ok | — | — |
+| 401 | POST | `/api/quotes` | session | quotes:edit | aiCallLimiter | zod | plan-check | n/a | — | — | — |
+| 1151 | GET | `/api/quotes/:id` | session | — | — | none | — | post-check | — | — | — |
+| 1183 | GET | `/api/quotes/:id/variants` | session | — | — | none | — | post-check | — | — | — |
+| 1212 | POST | `/api/quotes/:id/variants` | session | quotes:edit | — | manual | — | post-check | — | — | — |
+| 1272 | PUT | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | manual | — | post-check | — | — | — |
+| 1323 | DELETE | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | none | — | post-check | — | — | — |
+| 1369 | PUT | `/api/quotes/:id` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
+| 1487 | DELETE | `/api/quotes/:id` | session | quotes:full | — | none | — | post-check | — | — | — |
+| 1515 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | none | — | post-check | — | — | — |
+| 1535 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | none | — | post-check | — | — | — |
+| 1555 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
+| 1633 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | manual | — | predicate | — | — | — |
+| 1725 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
+| 1787 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | manual | — | predicate | — | — | — |
+| 2000 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | none | plan-check | predicate | — | — | — |
+| 2143 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
+| 3826 | POST | `/api/quotes/manual` | session | quotes:edit | — | manual | — | n/a | — | — | — |
+| 3842 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | manual | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/security.ts
 

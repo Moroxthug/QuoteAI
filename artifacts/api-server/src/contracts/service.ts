@@ -132,7 +132,9 @@ export function buildVariablesFromQuote(params: {
 
   return {
     contractNumber: params.contractNumber,
-    quoteNumber: quote.numeroPreventivoData || `No. ${quote.id.slice(0, 4).toUpperCase()}`,
+    // numeroPreventivoData is "No. 3.2026 - 2026-09-20"; the templates add their
+    // own "Quote No." / "n°" label, so strip the prefix (Phase 66: "Quote No. No. 3").
+    quoteNumber: (quote.numeroPreventivoData || quote.id.slice(0, 4).toUpperCase()).replace(/^(No\.|N°|n°)\s*/i, ""),
     contractor: {
       name: snap?.companyName || profile?.companyName || "",
       address: snap?.address || profile?.address || undefined,
@@ -352,9 +354,25 @@ export async function contractPdfBuffer(contractId: string): Promise<{ buffer: B
 
 // ── Send ─────────────────────────────────────────────────────────────────────
 
-export async function sendContractToCustomer(params: { contractId: string; userId: string; message?: string; ip?: string | null; userAgent?: string | null }): Promise<{ contract: Contract }> {
-  const loaded = await loadContract(params.contractId);
+export async function sendContractToCustomer(params: { contractId: string; userId: string; message?: string; toEmail?: string; ip?: string | null; userAgent?: string | null }): Promise<{ contract: Contract }> {
+  let loaded = await loadContract(params.contractId);
   if (!loaded || loaded.contract.userId !== params.userId) throw new Error("Contract not found");
+  // Phase 66: the quote forms never collect the customer's email, so the send
+  // dialog may supply it here. It goes into the contract variables before the
+  // PDF is frozen, and onto the quote's client data so the CRM and the
+  // follow-up sequence know it too.
+  const suppliedEmail = params.toEmail?.trim();
+  if (suppliedEmail && suppliedEmail.includes("@") && !loaded.contract.variables.customer.email) {
+    const variables: ContractVariables = { ...loaded.contract.variables, customer: { ...loaded.contract.variables.customer, email: suppliedEmail } };
+    await db.update(contractsTable).set({ variables }).where(eq(contractsTable.id, loaded.contract.id));
+    if (loaded.contract.quoteId) {
+      const [quote] = await db.select({ clientData: quotesTable.clientData }).from(quotesTable).where(eq(quotesTable.id, loaded.contract.quoteId));
+      if (quote?.clientData && !quote.clientData.email) {
+        await db.update(quotesTable).set({ clientData: { ...quote.clientData, email: suppliedEmail } }).where(eq(quotesTable.id, loaded.contract.quoteId));
+      }
+    }
+    loaded = (await loadContract(params.contractId))!;
+  }
   const { contract, signers } = loaded;
   if (contract.status !== "draft" && contract.status !== "sent" && contract.status !== "viewed") throw new Error(`Cannot send a contract in status ${contract.status}`);
 

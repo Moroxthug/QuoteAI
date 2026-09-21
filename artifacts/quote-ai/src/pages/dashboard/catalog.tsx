@@ -320,7 +320,8 @@ export default function CatalogPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isOcrOpen, setIsOcrOpen] = useState(false);
 
-  const isPro = subscription?.isActive && subscription?.plan === "monthly_pro";
+  // Elite includes everything Pro does (Phase 66: Elite accounts were shown the "Upgrade to Pro" wall).
+  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getListCatalogItemsQueryKey() });
 

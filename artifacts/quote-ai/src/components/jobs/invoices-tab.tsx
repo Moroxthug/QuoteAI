@@ -44,7 +44,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
   return (
     <div>
       <section className="stat-grid">
-        <Kpi label={t("invoices.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={invoiceTotals.draftCount ? `${invoiceTotals.draftCount} ${t("invoices.kpi.drafts")}` : undefined} />
+        <Kpi label={t("invoices.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={invoiceTotals.draftCount ? `${invoiceTotals.draftCount} ${t(invoiceTotals.draftCount === 1 ? "invoices.kpi.draftsOne" : "invoices.kpi.drafts")}` : undefined} />
         <Kpi label={t("invoices.kpi.collected")} value={formatCents(invoiceTotals.collectedCents)} tone="ok" />
         <Kpi label={t("invoices.kpi.outstanding")} value={formatCents(invoiceTotals.outstandingCents)} tone="teal" sub={invoiceTotals.overdueCents ? `${formatCents(invoiceTotals.overdueCents)} ${t("invoices.kpi.overdue")}` : undefined} />
         <Kpi label={t("invoices.kpi.remaining")} value={formatCents(remainingCents)} sub={t("invoices.kpi.remainingSub")} />

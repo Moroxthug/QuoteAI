@@ -1714,6 +1714,10 @@ components:
         acceptedByName:
           type: string
           nullable: true
+        acceptedAt:
+          type: string
+          format: date-time
+          nullable: true
         pdfUrl:
           type: string
           nullable: true
@@ -1775,6 +1779,8 @@ components:
         draft:
           type: number
         unlocked:
+          type: number
+        accepted:
           type: number
         pendingPayment:
           type: number

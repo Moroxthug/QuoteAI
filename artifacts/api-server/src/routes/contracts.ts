@@ -326,8 +326,8 @@ router.post("/contracts/:id/sign", requireAuth, requirePermission("contracts", "
 router.post("/contracts/:id/send", requireAuth, requirePermission("contracts", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const body = z.object({ message: z.string().max(1000).optional() }).safeParse(req.body ?? {});
-    const { contract } = await sendContractToCustomer({ contractId: req.params.id as string, userId, message: body.success ? body.data.message : undefined, ip: req.ip, userAgent: req.headers["user-agent"] });
+    const body = z.object({ message: z.string().max(1000).optional(), toEmail: z.string().email().max(254).optional() }).safeParse(req.body ?? {});
+    const { contract } = await sendContractToCustomer({ contractId: req.params.id as string, userId, message: body.success ? body.data.message : undefined, toEmail: body.success ? body.data.toEmail : undefined, ip: req.ip, userAgent: req.headers["user-agent"] });
     const fresh = await loadContract(contract.id);
     res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events) });
   } catch (err) {

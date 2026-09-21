@@ -1,3 +1,4 @@
+import { localDay } from "@/lib/local-day";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -139,10 +140,10 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<Exclude<PaymentMethod, "credit_note">>("etransfer");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(localDay());
   const [reference, setReference] = useState("");
   const [receipt, setReceipt] = useState(true);
-  useEffect(() => { if (open) { setAmount((invoice.balanceCents / 100).toFixed(2)); setMethod("etransfer"); setDate(new Date().toISOString().slice(0, 10)); setReference(""); setReceipt(!!invoice.customer.email); } }, [open, invoice]);
+  useEffect(() => { if (open) { setAmount((invoice.balanceCents / 100).toFixed(2)); setMethod("etransfer"); setDate(localDay()); setReference(""); setReceipt(!!invoice.customer.email); } }, [open, invoice]);
 
   const cents = Math.round((Number(amount) || 0) * 100);
   const record = useMutation({

@@ -12,7 +12,9 @@
     "route-matrix": "node scripts/route-matrix.ts --write",
     "email-dns-check": "node scripts/email-dns-check.ts",
     "csp-hashes": "tsx scripts/csp-hashes.ts",
-    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "walkthrough": "tsx src/e2e/walkthrough.ts",
+    "walkthrough:cleanup": "tsx src/e2e/walkthrough-cleanup.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

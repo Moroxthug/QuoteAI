@@ -13,7 +13,7 @@ import {
 import { and, asc, desc, eq, gte, inArray, isNull, isNotNull } from "drizzle-orm";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 import { hashToken } from "../contracts/service.js";
-import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
+import { parseIsoDate, toIsoDate, localDayFor } from "../jobs/dates.js";
 import { createNotification } from "../lib/notifications.js";
 import { distanceMeters } from "../lib/geo.js";
 
@@ -37,7 +37,7 @@ async function resolveWorker(rawToken: string) {
   const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, worker.userId));
   // The company must still be on a plan with time tracking.
   if (!hasFeature(profile, "team_time")) return { expired: true as const, worker };
-  return { expired: false as const, worker, companyName: profile?.companyName ?? "", language: profile?.province === "QC" ? "fr" : "en" };
+  return { expired: false as const, worker, companyName: profile?.companyName ?? "", language: profile?.province === "QC" ? "fr" : "en", province: profile?.province ?? null };
 }
 
 /** Jobs the worker may log time on: assigned ones, else every open job of the company. */
@@ -104,7 +104,7 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
     const jobs = await workerJobs(r.worker);
     const [openEntry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), isNotNull(timeEntriesTable.clockInAt), isNull(timeEntriesTable.clockOutAt)));
     const activeEntry = openEntry ? serializeOwnEntry(openEntry, jobs.find((j) => j.id === openEntry.projectId)?.name ?? null, null) : null;
-    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(new Date()) });
+    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)) });
   } catch (err) {
     req.log.error({ err }, "Error loading worker page");
     res.status(500).json({ error: "Internal server error" });
@@ -149,7 +149,7 @@ router.post("/t/:token/entries", writeLimiter, async (req, res) => {
       .returning();
     await db.update(collaboratorsTable).set({ lastTimeEntryAt: new Date() }).where(eq(collaboratorsTable.id, r.worker.id));
     // One notification per worker per day keeps the bell useful.
-    const dayKey = toIsoDate(new Date());
+    const dayKey = toIsoDate(localDayFor(new Date(), r.province));
     const already = await db.select({ id: timeEntriesTable.id }).from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), eq(timeEntriesTable.enteredBy, "worker"), gte(timeEntriesTable.createdAt, new Date(`${dayKey}T00:00:00Z`)))).limit(2);
     if (already.length <= 1) {
       await createNotification({ userId: r.worker.userId, type: "time_entry_submitted", title: r.language === "fr" ? `${r.worker.name} a saisi des heures` : `${r.worker.name} logged hours`, body: r.language === "fr" ? `${d.hours} h sur ${job.name} — à approuver dans Équipe.` : `${d.hours} h on ${job.name} — approve them under Team.`, link: "/dashboard/team?tab=time", entityType: "time_entry", entityId: entry!.id });
@@ -197,7 +197,7 @@ router.post("/t/:token/clock-in", writeLimiter, async (req, res) => {
         workerId: r.worker.id,
         projectId: job.id,
         milestoneId,
-        date: now,
+        date: localDayFor(now, r.province),
         hours: "0.00",
         rateCentsSnapshot: r.worker.hourlyRate,
         burdenPercentSnapshot: String(Number(r.worker.burdenPercent)),
@@ -259,7 +259,7 @@ router.post("/t/:token/entries/:tid/clock-out", writeLimiter, async (req, res) =
       .where(eq(timeEntriesTable.id, entry.id))
       .returning();
     await db.update(collaboratorsTable).set({ lastTimeEntryAt: now }).where(eq(collaboratorsTable.id, r.worker.id));
-    const dayKey = toIsoDate(new Date());
+    const dayKey = toIsoDate(localDayFor(new Date(), r.province));
     const already = await db.select({ id: timeEntriesTable.id }).from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), eq(timeEntriesTable.enteredBy, "worker"), gte(timeEntriesTable.createdAt, new Date(`${dayKey}T00:00:00Z`)))).limit(2);
     if (already.length <= 1) {
       await createNotification({ userId: r.worker.userId, type: "time_entry_submitted", title: r.language === "fr" ? `${r.worker.name} a saisi des heures` : `${r.worker.name} logged hours`, body: r.language === "fr" ? `${hours.toFixed(2)} h sur ${job?.name ?? ""} — à approuver dans Équipe.` : `${hours.toFixed(2)} h on ${job?.name ?? ""} — approve them under Team.`, link: "/dashboard/team?tab=time", entityType: "time_entry", entityId: updated!.id });

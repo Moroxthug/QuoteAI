@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -80,7 +81,7 @@ export default function JobsListPage() {
                       ? `${format(new Date(`${j.plannedStart}T00:00:00`), "MMM d", { locale })} – ${format(new Date(`${j.plannedEnd}T00:00:00`), "MMM d", { locale })}`
                       : "—";
                   return (
-                    <tr key={j.id} onClick={() => navigate(href)} className="cursor-pointer">
+                    <tr key={j.id} {...rowLink(() => navigate(href))}>
                       <td>
                         <span className="t-strong">{j.name}</span>
                         {j.address && <span className="t-sub">{j.address}</span>}

@@ -1589,3 +1589,7 @@ button.chap-head:hover { background: var(--soft-2); }
   .modal .li-head.cols-5, .modal .li-row.cols-5 { grid-template-columns: 1fr 72px 100px 96px 30px; }
   .modal .li-row .tot { display: block; }
 }
+
+/* Milestone card: the expand toggle is a real button holding the number + title (Phase 66). */
+.ms-toggle { display: flex; align-items: center; gap: 12px; min-width: 0; text-align: left; background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.ms-toggle:focus-visible { outline: 2px solid var(--navy); outline-offset: 4px; border-radius: 8px; }

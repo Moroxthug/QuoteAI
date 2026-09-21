@@ -1,3 +1,4 @@
+import { localDay } from "@/lib/local-day";
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sparkles, ExternalLink, AlertTriangle } from "lucide-react";
@@ -44,7 +45,7 @@ export function CostEntryDialog({
   const [category, setCategory] = useState<CostCategory>(entry?.category ?? "materials");
   const [vendor, setVendor] = useState(entry?.vendor ?? "");
   const [description, setDescription] = useState(entry?.description ?? "");
-  const [date, setDate] = useState(entry?.date ?? new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(entry?.date ?? localDay());
   const [milestoneId, setMilestoneId] = useState<string>(entry?.milestoneId ?? "");
   const [subtotal, setSubtotal] = useState(toDollars(entry?.subtotalCents));
   const [taxes, setTaxes] = useState<Record<(typeof TAX_KEYS)[number], string>>({ GST: toDollars(entry?.taxBreakdown.GST), HST: toDollars(entry?.taxBreakdown.HST), PST: toDollars(entry?.taxBreakdown.PST), QST: toDollars(entry?.taxBreakdown.QST) });
@@ -56,7 +57,7 @@ export function CostEntryDialog({
     setCategory(entry?.category ?? "materials");
     setVendor(entry?.vendor ?? "");
     setDescription(entry?.description ?? "");
-    setDate(entry?.date ?? new Date().toISOString().slice(0, 10));
+    setDate(entry?.date ?? localDay());
     setMilestoneId(entry?.milestoneId ?? "");
     setSubtotal(toDollars(entry?.subtotalCents));
     setTaxes({ GST: toDollars(entry?.taxBreakdown.GST), HST: toDollars(entry?.taxBreakdown.HST), PST: toDollars(entry?.taxBreakdown.PST), QST: toDollars(entry?.taxBreakdown.QST) });

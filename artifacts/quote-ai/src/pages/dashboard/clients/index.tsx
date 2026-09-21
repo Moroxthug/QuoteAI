@@ -1,17 +1,20 @@
 import { useListClients } from "@workspace/api-client-react";
+import { rowLink } from "@/lib/row-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useLocation } from "wouter";
 import { Users, Search, Plus, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useLanguage } from "@/i18n/LanguageContext";
 
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
+const formatCurrency = (v: number, lang: string) =>
+  new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
 
 export default function ClientsPage() {
   const { data: clients, isLoading } = useListClients();
   const [search, setSearch] = useState("");
   const [, navigate] = useLocation();
+  const { t, lang } = useLanguage();
 
   const filtered = (clients ?? []).filter(c => {
     if (!search) return true;
@@ -25,13 +28,13 @@ export default function ClientsPage() {
     <div className="animate-in fade-in duration-500">
       <div className="page-head">
         <div>
-          <h1>Clients</h1>
-          <p className="sub">All clients extracted from your quotes.</p>
+          <h1>{t("clients.title")}</h1>
+          <p className="sub">{t("clients.subtitle")}</p>
         </div>
         <div className="head-actions">
           <Link href="/dashboard/new" className="btn btn-navy">
             <Plus className="h-4 w-4" />
-            Add client
+            {t("clients.add")}
           </Link>
         </div>
       </div>
@@ -44,8 +47,8 @@ export default function ClientsPage() {
               type="search"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search clients"
-              aria-label="Search clients"
+              placeholder={t("clients.search")}
+              aria-label={t("clients.search")}
             />
           </label>
         </div>
@@ -57,32 +60,32 @@ export default function ClientsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-14 px-5">
             <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
-            <p className="font-semibold text-foreground">No clients yet</p>
+            <p className="font-semibold text-foreground">{t("clients.empty.title")}</p>
             <p className="text-sm text-muted-foreground mt-1 mb-3">
-              Clients will show up here as soon as you create quotes with a client name.
+              {t("clients.empty.desc")}
             </p>
-            <Link href="/dashboard/new" className="btn btn-navy btn-sm">Create your first quote</Link>
+            <Link href="/dashboard/new" className="btn btn-navy btn-sm">{t("clients.empty.cta")}</Link>
           </div>
         ) : (
           <div className="tbl-wrap">
             <table className="tbl">
               <thead>
                 <tr>
-                  <th>Client</th>
-                  <th>Contact</th>
-                  <th>Quotes</th>
-                  <th>Lifetime value</th>
-                  <th>Status</th>
-                  <th>Last activity</th>
+                  <th>{t("clients.col.client")}</th>
+                  <th>{t("clients.col.contact")}</th>
+                  <th>{t("clients.col.quotes")}</th>
+                  <th>{t("clients.col.lifetime")}</th>
+                  <th>{t("clients.col.status")}</th>
+                  <th>{t("clients.col.lastActivity")}</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(client => {
                   const status = client.unlockedCount > 0
-                    ? { cls: "chip-green", label: "Active" }
-                    : { cls: "chip-teal", label: "Prospect" };
+                    ? { cls: "chip-green", label: t("clients.status.active") }
+                    : { cls: "chip-teal", label: t("clients.status.prospect") };
                   return (
-                    <tr key={client.id} onClick={() => navigate(`/dashboard/clients/${client.id}`)} className="cursor-pointer">
+                    <tr key={client.id} {...rowLink(() => navigate(`/dashboard/clients/${client.id}`))}>
                       <td>
                         <span className="cell-flex">
                           <span className="avat">{client.clientName.slice(0, 2)}</span>
@@ -96,11 +99,11 @@ export default function ClientsPage() {
                       </td>
                       <td>{client.email || client.phone || "—"}</td>
                       <td>{client.quoteCount}</td>
-                      <td className="t-amt">{formatCurrency(client.totalValue)}</td>
+                      <td className="t-amt">{formatCurrency(client.totalValue, lang)}</td>
                       <td><span className={cn("chip", status.cls)}>{status.label}</span></td>
                       <td>
                         <span className="flex items-center gap-2 justify-between">
-                          {new Date(client.lastQuoteDate).toLocaleDateString("en-CA")}
+                          {new Date(client.lastQuoteDate).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA")}
                           <ChevronRight className="chev" style={{ color: "var(--faint)" }} />
                         </span>
                       </td>
@@ -115,7 +118,7 @@ export default function ClientsPage() {
         {!isLoading && filtered.length > 0 && (
           <div className="card-foot">
             <span className="foot-note">
-              {filtered.length} client{filtered.length === 1 ? "" : "s"} · {totalQuotes} quotes all-time
+              {t("clients.foot").replace("{clients}", filtered.length === 1 ? t("clients.count.one") : t("clients.count.many").replace("{n}", String(filtered.length))).replace("{quotes}", String(totalQuotes))}
             </span>
           </div>
         )}

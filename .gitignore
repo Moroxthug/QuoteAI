@@ -74,3 +74,4 @@ gen-lang-client-*.json
 
 # Supabase CLI link state
 supabase/.temp/
+.walkthrough-mailbox.json

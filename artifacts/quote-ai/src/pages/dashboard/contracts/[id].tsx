@@ -52,6 +52,8 @@ export default function ContractDetailPage() {
   const [consent, setConsent] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
   const [sendMessage, setSendMessage] = useState("");
+  // Phase 66: the quote forms never collect the customer email — let the send dialog add it.
+  const [sendEmail, setSendEmail] = useState("");
   const [voidOpen, setVoidOpen] = useState(false);
   const [voidReason, setVoidReason] = useState("");
 
@@ -123,11 +125,12 @@ export default function ContractDetailPage() {
   });
 
   const send = useMutation({
-    mutationFn: async () => contractsApi.send(contract!.id, { message: sendMessage.trim() || undefined }),
+    mutationFn: async () => contractsApi.send(contract!.id, { message: sendMessage.trim() || undefined, toEmail: contract!.variables.customer.email ? undefined : sendEmail.trim() || undefined }),
     onSuccess: (res) => {
       refresh(res);
       setSendOpen(false);
       setSendMessage("");
+      setSendEmail("");
       toast({ title: t("contracts.sentToast"), description: t("contracts.sentToastDesc").replace("{email}", res.contract.variables.customer.email ?? "") });
     },
     onError: (e: Error & { code?: string }) => toast({ title: e.code === "SIGN_FIRST" ? t("contracts.signFirst") : e.code === "CUSTOMER_EMAIL_MISSING" ? t("contracts.emailMissing") : t("contracts.sendError"), description: e.message, variant: "destructive" }),
@@ -442,10 +445,16 @@ export default function ContractDetailPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{contract.sentAt ? t("contracts.resend") : t("contracts.sendToCustomer")}</DialogTitle>
-            <DialogDescription>{t("contracts.sendDialogDesc").replace("{email}", contract.variables.customer.email ?? "—")}</DialogDescription>
+            <DialogDescription>{t("contracts.sendDialogDesc").replace("{email}", contract.variables.customer.email || sendEmail.trim() || "—")}</DialogDescription>
           </DialogHeader>
           <DialogBody>
-            {!contract.variables.customer.email && <div className="notice warn"><AlertTriangle /><span className="grow">{t("contracts.emailMissing")}</span></div>}
+            {!contract.variables.customer.email && (
+              <div className="field">
+                <label htmlFor="contract-send-email">{t("contracts.customerEmailLabel")}</label>
+                <input id="contract-send-email" type="email" value={sendEmail} onChange={(e) => setSendEmail(e.target.value)} placeholder="client@example.com" autoFocus />
+                <p className="field-hint">{t("contracts.customerEmailHint")}</p>
+              </div>
+            )}
             <div className="field">
               <label>{t("contracts.sendMessage")}</label>
               <textarea value={sendMessage} onChange={(e) => setSendMessage(e.target.value)} rows={3} placeholder={t("contracts.sendMessagePlaceholder")} />
@@ -453,7 +462,7 @@ export default function ContractDetailPage() {
           </DialogBody>
           <DialogFooter>
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setSendOpen(false)}>{t("contracts.cancel")}</button>
-            <button type="button" className="btn btn-sm btn-navy" onClick={() => send.mutate()} disabled={send.isPending || !contract.variables.customer.email}>
+            <button type="button" className="btn btn-sm btn-navy" onClick={() => send.mutate()} disabled={send.isPending || !(contract.variables.customer.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sendEmail.trim()))}>
               {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {t("contracts.sendConfirm")}
             </button>
           </DialogFooter>

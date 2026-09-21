@@ -1,3 +1,4 @@
+import { localDay } from "@/lib/local-day";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +12,7 @@ import { jobsApi, formatCents, type JobDetailDto, type TimeEntryDto, type UsageU
 import { teamApi } from "@/lib/team-api";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => localDay();
 
 export function TimeStatusBadge({ status }: { status: TimeEntryDto["status"] }) {
   const { t } = useLanguage();

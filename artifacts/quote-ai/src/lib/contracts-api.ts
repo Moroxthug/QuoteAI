@@ -75,7 +75,7 @@ export const contractsApi = {
     req<{ contract: ContractDto; html: string }>(`/api/contracts/${id}`, { method: "PUT", body: JSON.stringify(body) }),
   sign: (id: string, body: { signatureType: "drawn" | "typed"; signatureData: string; name: string; consent: true }) =>
     req<{ contract: ContractDto }>(`/api/contracts/${id}/sign`, { method: "POST", body: JSON.stringify(body) }),
-  send: (id: string, body: { message?: string } = {}) => req<{ contract: ContractDto }>(`/api/contracts/${id}/send`, { method: "POST", body: JSON.stringify(body) }),
+  send: (id: string, body: { message?: string; toEmail?: string } = {}) => req<{ contract: ContractDto }>(`/api/contracts/${id}/send`, { method: "POST", body: JSON.stringify(body) }),
   void: (id: string, reason?: string) => req<{ contract: ContractDto }>(`/api/contracts/${id}/void`, { method: "POST", body: JSON.stringify({ reason }) }),
   archive: (id: string) => req<ContractDto>(`/api/contracts/${id}/archive`, { method: "POST", body: "{}" }),
   restore: (id: string) => req<ContractDto>(`/api/contracts/${id}/restore`, { method: "POST", body: "{}" }),

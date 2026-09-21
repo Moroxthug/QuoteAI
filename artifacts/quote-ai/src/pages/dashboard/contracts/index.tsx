@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -85,7 +86,7 @@ export default function ContractsListPage() {
                 {items.map((c) => {
                   const chip = statusChip(c.status, t);
                   return (
-                    <tr key={c.id} onClick={() => navigate(`/dashboard/contracts/${c.id}`)} className="cursor-pointer">
+                    <tr key={c.id} {...rowLink(() => navigate(`/dashboard/contracts/${c.id}`))}>
                       <td>
                         <span className="t-strong">{c.contractNumber}</span>
                         <span className="t-sub">{c.variables.projectTitle}</span>

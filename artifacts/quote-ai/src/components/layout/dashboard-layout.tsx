@@ -215,7 +215,7 @@ function QuickSearch({ navItems }: { navItems: NavItem[] }) {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
-  const { isLoaded, isSignedIn, user } = useAuth();
+  const { isLoaded, isSignedIn, isError, user } = useAuth();
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
@@ -228,6 +228,21 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
   // Hooks must run on every render — keep this above the early returns below.
   const allNavItems = useNavItems();
+
+  // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
+  // name the tab after the section the user is in.
+  const navLabelsKey = allNavItems.map((item) => item.label).join("|"); // useNavItems returns a fresh array each render
+  useEffect(() => {
+    const section = allNavItems
+      .filter((item) => (item.exact ? location === item.href : location.startsWith(item.href)))
+      .sort((a, b) => b.href.length - a.href.length)[0];
+    const previous = document.title;
+    document.title = section ? `${section.label} · QuoteAI` : "QuoteAI";
+    return () => {
+      document.title = previous;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location, navLabelsKey]);
 
   useEffect(() => {
     try { localStorage.setItem("sidebar-collapsed", String(isCollapsed)); } catch {}
@@ -244,6 +259,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-background">
         <div className="w-7 h-7 rounded-full border-[3px] border-navy-400 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  // A failed session check (API down, cold 502) is not a sign-out: bouncing the
+  // user to /sign-in loses their place and their unsaved work (Phase 66).
+  if (!isSignedIn && isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: "var(--bg)" }}>
+        <div className="card" style={{ maxWidth: 420, padding: 28, textAlign: "center" }}>
+          <h1 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)" }}>{t("dashboard.offline.title")}</h1>
+          <p className="sub" style={{ marginTop: 8 }}>{t("dashboard.offline.body")}</p>
+          <button type="button" className="btn btn-navy" style={{ marginTop: 18 }} onClick={() => window.location.reload()}>{t("dashboard.offline.retry")}</button>
+        </div>
       </div>
     );
   }

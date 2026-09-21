@@ -296,7 +296,9 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
           const doneTasks = m.tasks.filter((x) => x.status === "done").length;
           return (
             <div key={m.id} className={cn("card", m.status === "in_progress" && "ms-on", m.status === "completed" && "ms-done")} style={{ marginTop: 0 }}>
-              <div role="button" tabIndex={0} className="item-row cursor-pointer" style={{ borderTop: "none" }} onClick={() => setOpen(expanded ? null : m.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(expanded ? null : m.id); } }}>
+              {/* The expand toggle is its own button — a role="button" row around Start/Complete nested interactive controls (Phase 66). */}
+              <div className="item-row" style={{ borderTop: "none" }}>
+                <button type="button" className="ms-toggle grow" aria-expanded={expanded} aria-controls={`ms-panel-${m.id}`} onClick={() => setOpen(expanded ? null : m.id)}>
                 <span className={cn("ms-num", m.status === "completed" && "done", m.status === "in_progress" && "on")}>
                   {m.status === "completed" ? <Check /> : idx + 1}
                 </span>
@@ -311,14 +313,15 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
                     {m.tasks.length ? ` · ${doneTasks}/${m.tasks.length} ${t("jobs.tasksShort")}` : ""}
                   </span>
                 </div>
-                <div className="flex gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                </button>
+                <div className="flex gap-2 shrink-0">
                   {m.status === "planned" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</button>}
                   {(m.status === "planned" || m.status === "in_progress") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setMs.mutate({ mid: m.id, status: "completed" })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</button>}
                   {m.status === "completed" && <button type="button" className="text-link" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}>{t("jobs.milestone.reopen")}</button>}
                 </div>
               </div>
               {expanded && (
-                <div className="ms-body">
+                <div className="ms-body" id={`ms-panel-${m.id}`}>
                   {m.description && <p>{m.description}</p>}
                   {m.paymentTermLabel && <p>{t("jobs.milestone.linkedPayment")}: <b>{m.paymentTermLabel}</b></p>}
                   <TaskList tasks={m.tasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />

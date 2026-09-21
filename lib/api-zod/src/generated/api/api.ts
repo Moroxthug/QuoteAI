@@ -1912,7 +1912,8 @@ export const RequestUploadUrlResponse = zod.object({
  */
 export const CreateCheckoutSessionBody = zod.object({
   "quoteId": zod.string().optional(),
-  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite', 'oneshot_watermark', 'oneshot_clean'])
+  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite', 'oneshot_watermark', 'oneshot_clean']),
+  "interval": zod.enum(['month', 'year']).optional().describe('Billing cadence for subscription plans (Phase 73). Defaults to month.')
 })
 
 export const CreateCheckoutSessionResponse = zod.object({
@@ -1950,7 +1951,9 @@ export const GetPlansResponseItem = zod.object({
   "interval": zod.string().nullish(),
   "features": zod.array(zod.string()),
   "hasWatermark": zod.boolean(),
-  "quotaPerMonth": zod.number().nullish()
+  "quotaPerMonth": zod.number().nullish(),
+  "yearlyPrice": zod.number().nullish().describe('Annual price (10 × monthly) for subscription plans (Phase 73)'),
+  "yearlyAvailable": zod.boolean().optional()
 })
 export const GetPlansResponse = zod.array(GetPlansResponseItem)
 
@@ -1961,6 +1964,8 @@ export const GetPlansResponse = zod.array(GetPlansResponseItem)
 export const GetSubscriptionResponse = zod.object({
   "plan": zod.string().nullish(),
   "status": zod.string().nullish(),
+  "interval": zod.string().nullish().describe('month | year while active (Phase 73)'),
+  "annualAvailable": zod.boolean().optional(),
   "periodEnd": zod.string().nullish(),
   "isActive": zod.boolean(),
   "quotaUsed": zod.number().nullish(),
@@ -1992,6 +1997,23 @@ export const GetTrialStatusResponse = zod.object({
   "trialDownloadsLimit": zod.number(),
   "trialDaysLeft": zod.number().nullish(),
   "trialExpiresAt": zod.string().nullish()
+})
+
+
+/**
+ * @summary Switch subscription tier and/or billing cadence with proration (Phase 73)
+ */
+export const ChangePlanBody = zod.object({
+  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite']),
+  "interval": zod.enum(['month', 'year'])
+})
+
+export const ChangePlanResponse = zod.object({
+  "mode": zod.enum(['checkout', 'updated', 'unchanged']),
+  "url": zod.string().nullish(),
+  "plan": zod.string().nullish(),
+  "interval": zod.string().nullish(),
+  "periodEnd": zod.string().nullish()
 })
 
 

@@ -640,6 +640,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/TrialStatus"
 
+  /payments/change-plan:
+    post:
+      operationId: changePlan
+      tags: [payments]
+      summary: Switch subscription tier and/or billing cadence with proration (Phase 73)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePlanBody"
+      responses:
+        "200":
+          description: Either a Checkout URL (no live subscription) or the updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChangePlanResult"
+
   /payments/portal:
     post:
       operationId: createCustomerPortalSession
@@ -2080,6 +2099,12 @@ components:
         status:
           type: string
           nullable: true
+        interval:
+          type: string
+          nullable: true
+          description: month | year while active (Phase 73)
+        annualAvailable:
+          type: boolean
         periodEnd:
           type: string
           nullable: true
@@ -2116,8 +2141,46 @@ components:
         planType:
           type: string
           enum: [monthly_starter, monthly_pro, monthly_elite, oneshot_watermark, oneshot_clean]
+        interval:
+          type: string
+          enum: [month, year]
+          description: Billing cadence for subscription plans (Phase 73). Defaults to month.
       required:
         - planType
+
+    ChangePlanBody:
+      type: object
+      properties:
+        planType:
+          type: string
+          enum: [monthly_starter, monthly_pro, monthly_elite]
+        interval:
+          type: string
+          enum: [month, year]
+      required:
+        - planType
+        - interval
+
+    ChangePlanResult:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum: [checkout, updated, unchanged]
+        url:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          nullable: true
+        interval:
+          type: string
+          nullable: true
+        periodEnd:
+          type: string
+          nullable: true
+      required:
+        - mode
 
     PaymentVerifyResult:
       type: object
@@ -2162,6 +2225,12 @@ components:
         quotaPerMonth:
           type: number
           nullable: true
+        yearlyPrice:
+          type: number
+          nullable: true
+          description: Annual price (10 × monthly) for subscription plans (Phase 73)
+        yearlyAvailable:
+          type: boolean
       required:
         - id
         - name

@@ -37,6 +37,8 @@ import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
+import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
+import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
 import { stripeConnectApi, financeitApi, developerApi, flinksApi, metaLeadAdsApi, googleLsaApi, type AutomationEventName, type FlinksAccountDto } from "@/lib/invoices-api";
 
 function useProfileSchema() {
@@ -389,14 +391,12 @@ function PlanFeature({ text, ok }: { text: string; ok: boolean }) {
 }
 
 function BillingTab() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { data: sub, isLoading } = useGetSubscription();
   const { data: plans } = useGetPlans();
   const createPortal = useCreateCustomerPortalSession();
-  const createCheckout = useCreateCheckoutSession();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [loadingPlanId, setLoadingPlanId] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleManage = () => {
@@ -406,20 +406,6 @@ function BillingTab() {
         toast({ title: t("dashboard.settings.billing.portalUnavailableTitle"), description: t("dashboard.settings.billing.portalUnavailableDesc"), variant: "destructive" });
       },
     });
-  };
-
-  const handleCheckout = (planId: string) => {
-    setLoadingPlanId(planId);
-    createCheckout.mutate(
-      { data: { planType: planId as "monthly_starter" | "monthly_pro" | "monthly_elite" | "oneshot_watermark" | "oneshot_clean" } },
-      {
-        onSuccess: (r) => { window.location.href = r.url; },
-        onError: () => {
-          setLoadingPlanId(null);
-          toast({ title: t("dashboard.settings.billing.errorStartPayment"), variant: "destructive" });
-        },
-      }
-    );
   };
 
   const handleSync = async () => {
@@ -449,10 +435,10 @@ function BillingTab() {
   const isElite = sub?.plan === "monthly_elite";
   const isActive = sub?.isActive ?? false;
   const planLabel = isElite ? "Elite" : isPro ? "Pro" : isStarter ? "Starter" : null;
-  const planPrice = isElite ? t("dashboard.billing.priceElite") : isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : null;
+  const planPrice = currentPlanPriceLabel(sub, Array.isArray(plans) ? plans : undefined, t, lang)
+    ?? (isElite ? t("dashboard.billing.priceElite") : isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : null);
   const renewalDate = sub?.periodEnd ? new Date(sub.periodEnd).toLocaleDateString("en-CA", { day: "2-digit", month: "long", year: "numeric" }) : null;
   const resetDate = sub?.quotaResetDate ? new Date(sub.quotaResetDate).toLocaleDateString("en-CA", { day: "2-digit", month: "long" }) : null;
-  const subscriptionPlans = Array.isArray(plans) ? plans.filter((p) => !!p.interval) : [];
 
   return (
     <div className="space-y-6">
@@ -514,7 +500,10 @@ function BillingTab() {
                 <ArrowUpRight className="h-4 w-4" />{t("dashboard.billing.manageSubscription")}
               </button>
             </div>
-            <p className="text-xs text-muted-foreground">{t("dashboard.settings.billing.managedByStripeShort")}</p>
+            <p className="text-xs text-muted-foreground">
+              {t("dashboard.settings.billing.managedByStripeShort")}
+              {isLegalEntityConfigured() && <> {t("dashboard.billing.receiptsIssuedBy").replace("{entity}", LEGAL_ENTITY.legalName)}</>}
+            </p>
           </div>
         </div>
       ) : (
@@ -534,44 +523,15 @@ function BillingTab() {
             </div>
           </div>
 
-          {subscriptionPlans.length > 0 && (
-            <div className="grid sm:grid-cols-3 gap-4">
-              {subscriptionPlans.map((plan) => {
-                const isPlanPro = plan.id === "monthly_pro";
-                const isPlanElite = plan.id === "monthly_elite";
-                return (
-                  <div key={plan.id} className={cn("card", `flex flex-col ${isPlanPro ? "border-2 border-navy-300 shadow-lg" : isPlanElite ? "border-2 border-amber-300" : ""}`)}>
-                    <div className="card-head pb-2">
-                      {isPlanPro && <span className="text-[10px] font-bold text-navy-600 uppercase tracking-wider">{t("dashboard.settings.billing.mostPopular")}</span>}
-                      {isPlanElite && <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">{t("dashboard.settings.billing.unlimited")}</span>}
-                      <h2 className="text-lg">{plan.name}</h2>
-                      <p className="text-2xl font-extrabold">${plan.price}<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                    </div>
-                    <div className="p-5 flex-1 pb-0">
-                      <ul className="space-y-1.5 mb-4">
-                        {plan.features.map((f: string, i: number) => (
-                          <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                            <CheckCircle2 className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${isPlanPro ? "text-navy-500" : isPlanElite ? "text-amber-500" : "text-muted-foreground"}`} />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="card-foot pt-3">
-                      <button className={cn("btn btn-navy", `w-full gap-2 ${isPlanPro ? "btn-gradient" : isPlanElite ? "bg-amber-500 hover:bg-amber-600 text-white border-0" : ""}`)}
-                        
-                        onClick={() => handleCheckout(plan.id)}
-                        disabled={loadingPlanId === plan.id}>
-                        {loadingPlanId === plan.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
-                        {loadingPlanId === plan.id ? t("dashboard.settings.billing.pleaseWait") : t("dashboard.settings.billing.choosePlan").replace("{name}", plan.name)}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <PlanPicker compact />
         </>
+      )}
+
+      {isActive && (
+        <div className="card">
+          <div className="card-head"><div><h2>{t("dashboard.billing.comparePlansTitle")}</h2><p className="sub">{t("dashboard.billing.comparePlansDesc")}</p></div></div>
+          <div className="p-5"><PlanPicker compact /></div>
+        </div>
       )}
 
       {isActive && (isStarter || isPro) && (
@@ -1613,11 +1573,19 @@ function StripeConnectTab() {
           </div>
         </div>
       </div>
-      <div className="p-5">
+      <div className="p-5 space-y-3">
         {connected && (
           <span className={cn("chip", chargesEnabled ? "chip-green" : "chip-yellow")}>
             {chargesEnabled ? <><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.active")}</> : <><AlertCircle className="h-3 w-3 mr-1" /> {t("dashboard.settings.stripeConnect.onboardingIncomplete")}</>}
           </span>
+        )}
+        {/* Phase 73: the platform fee is disclosed up front, before connecting. */}
+        {status && (
+          <p className="text-xs text-muted-foreground">
+            {(status.applicationFeeBps ?? 0) > 0
+              ? t("dashboard.settings.stripeConnect.fee").replace("{pct}", status.applicationFeePercent ?? "0")
+              : t("dashboard.settings.stripeConnect.feeNone")}
+          </p>
         )}
       </div>
       <div className="card-foot">

@@ -8,8 +8,12 @@
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
+import { LEGAL_ENTITY, isLegalEntityConfigured, addressLine, provinceName } from "@workspace/legal-entity";
 
 export default function PrivacyPage() {
+  // Phase 73: the registered entity comes from lib/legal-entity (owner track O5).
+  const entityConfigured = isLegalEntityConfigured();
+  const provinceLabel = provinceName(LEGAL_ENTITY.province, "en");
   return (
     <PublicLayout>
       <SeoHead
@@ -38,8 +42,16 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Who we are</h2>
             <p>
-              This Privacy Policy is issued by <strong>QuoteAI</strong> (referred to as "the Company", "we", or "us"),
-              a business operating from Ontario, Canada, reachable at <a href="mailto:privacy@quoteai.ca" className="text-navy-600 hover:underline">privacy@quoteai.ca</a>.
+              This Privacy Policy is issued by{" "}
+              {entityConfigured ? (
+                <><strong>{LEGAL_ENTITY.legalName}</strong>, operating as QuoteAI (referred to as "the Company", "we", or "us"),
+                a business registered in {provinceLabel}, Canada, with its mailing address at {addressLine()},</>
+              ) : (
+                <><strong>QuoteAI</strong> (referred to as "the Company", "we", or "us"),
+                a business operating from {provinceLabel}, Canada,</>
+              )}{" "}
+              reachable at <a href="mailto:privacy@quoteai.ca" className="text-navy-600 hover:underline">privacy@quoteai.ca</a>.
+              The person in charge of the protection of personal information (Québec Law 25) can be reached at the same address.
               We are committed to protecting your personal information in accordance with the
               Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable
               provincial privacy legislation.
@@ -172,6 +184,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">10. Contact us</h2>
             <p>
               For any questions about this Privacy Policy: <a href="mailto:privacy@quoteai.ca" className="text-navy-600 hover:underline">privacy@quoteai.ca</a>
+              {entityConfigured && <><br />{LEGAL_ENTITY.legalName}, {addressLine()}</>}
             </p>
           </section>
 

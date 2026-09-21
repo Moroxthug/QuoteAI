@@ -8,8 +8,12 @@
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
+import { LEGAL_ENTITY, isLegalEntityConfigured, addressLine, provinceName, taxNumbersLine } from "@workspace/legal-entity";
 
 export default function TermsPage() {
+  // Phase 73: the registered entity comes from lib/legal-entity (owner track O5).
+  const entityConfigured = isLegalEntityConfigured();
+  const provinceLabel = provinceName(LEGAL_ENTITY.province, "en");
   return (
     <PublicLayout>
       <SeoHead
@@ -29,7 +33,7 @@ export default function TermsPage() {
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
           Terms of Service
         </h1>
-        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 17, 2026</p>
+        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 21, 2026</p>
       </header>
 
       <div className="wrap" style={{ maxWidth: 780, paddingBottom: "clamp(48px, 6vw, 80px)" }}>
@@ -42,6 +46,17 @@ export default function TermsPage() {
               you agree to be bound by these Terms of Service in full. If you do not agree to these terms,
               you may not use the Service.
             </p>
+            {entityConfigured ? (
+              <p className="mt-2">
+                The Service is operated by <strong>{LEGAL_ENTITY.legalName}</strong> ("QuoteAI", "the Company", "we"),
+                a business registered in {provinceLabel}, Canada, with its mailing address at {addressLine()}.
+                {taxNumbersLine("en") ? <> Tax registration: {taxNumbersLine("en")}.</> : null}
+              </p>
+            ) : (
+              <p className="mt-2">
+                The Service is operated by <strong>QuoteAI</strong> ("the Company", "we"), a business operating from {provinceLabel}, Canada.
+              </p>
+            )}
           </section>
 
           <section>
@@ -74,9 +89,9 @@ export default function TermsPage() {
               <div>
                 <p className="font-medium">4.1 Available plans</p>
                 <ul className="list-disc pl-5 mt-1 space-y-1">
-                  <li><strong>Starter ($29 CAD/month):</strong> up to 10 quotes per month, PDFs with the QuoteAI watermark.</li>
-                  <li><strong>Pro ($69 CAD/month):</strong> up to 60 quotes per month, PDFs without a watermark, custom branding.</li>
-                  <li><strong>Elite ($79 CAD/month):</strong> unlimited quotes, no watermark, custom branding, priority AI generation.</li>
+                  <li><strong>Starter ($19 CAD/month or $190 CAD/year):</strong> up to 10 quotes per month, PDFs with the QuoteAI watermark.</li>
+                  <li><strong>Pro ($49 CAD/month or $490 CAD/year):</strong> up to 60 quotes per month, PDFs without a watermark, custom branding, contracts, job sites, costs and invoicing.</li>
+                  <li><strong>Elite ($59 CAD/month or $590 CAD/year):</strong> unlimited quotes, everything in Pro, team time tracking, the AI assistant, advanced analytics and integrations (online card payments, accounting sync, public API).</li>
                   <li><strong>Single with Watermark ($5 CAD):</strong> one PDF quote with the QuoteAI watermark.</li>
                   <li><strong>Single Clean ($13 CAD):</strong> one PDF quote without a watermark.</li>
                 </ul>
@@ -84,9 +99,13 @@ export default function TermsPage() {
               <div>
                 <p className="font-medium">4.2 Billing</p>
                 <p className="mt-1">
-                  Monthly plans renew automatically each month. Payments are processed by Stripe Inc. and are
-                  subject to Stripe's own terms of service. Prices are listed in Canadian dollars (CAD) and are
-                  exclusive of applicable GST/HST, which is added at checkout based on your billing location.
+                  Monthly plans renew automatically each month; annual plans renew automatically each year and are
+                  billed once, up front, at ten times the monthly price (two months free). Payments are processed by
+                  Stripe Inc. and are subject to Stripe's own terms of service. Prices are listed in Canadian dollars
+                  (CAD) and are exclusive of applicable GST/HST (and QST in Québec), which is added at checkout based
+                  on your billing address. You may switch tier or billing cadence at any time from Settings → Billing;
+                  the change takes effect immediately and the unused portion of the current period is prorated —
+                  charged or credited on the same receipt.
                 </p>
               </div>
               <div>
@@ -94,8 +113,9 @@ export default function TermsPage() {
                 <p className="mt-1">
                   Digital content that has been delivered immediately upon purchase (such as a completed PDF quote)
                   is generally non-refundable once downloaded, consistent with standard practice for digital goods.
-                  For monthly plans, you may cancel at any time; the Service remains active until the end of the
-                  period already paid for. No pro-rated refunds are provided for unused portions of a billing period.
+                  For monthly and annual plans, you may cancel at any time; the Service remains active until the end of
+                  the period already paid for. No pro-rated refunds are provided for unused portions of a billing period
+                  on cancellation (proration applies only when switching between plans, as described in 4.2).
                   Nothing in this section limits any non-waivable rights you may have under applicable provincial
                   consumer protection legislation.
                 </p>
@@ -168,6 +188,7 @@ export default function TermsPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">11. Contact us</h2>
             <p>
               For any questions about these Terms: <a href="mailto:support@quoteai.ca" className="text-navy-600 hover:underline">support@quoteai.ca</a>
+              {entityConfigured && <><br />{LEGAL_ENTITY.legalName}, {addressLine()}</>}
             </p>
           </section>
 

@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import type { BusinessProfile, Client } from "@workspace/db";
@@ -75,7 +75,7 @@ async function sendEmail(params: { to: string; profile: BusinessProfile; subject
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, reason: "resend_not_configured" };
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: `${sanitizeForFromHeader(params.profile.companyName || "QuoteAI")} via QuoteAI <no-reply@quoteai.ca>`,
       to: [params.to],

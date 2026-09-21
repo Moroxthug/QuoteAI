@@ -3,7 +3,7 @@
 
 import { db, automationRunsTable, cronTicksTable } from "@workspace/db";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
-import { Resend } from "resend";
+import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
 import { captureMessage } from "./errorTracking";
 
@@ -104,7 +104,7 @@ export async function sendOpsAlert(subject: string, lines: string[]): Promise<vo
     return;
   }
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: "QuoteAI Ops <no-reply@quoteai.ca>",
       to: to.split(",").map((a) => a.trim()).filter(Boolean),

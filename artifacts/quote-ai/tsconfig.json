@@ -22,6 +22,9 @@
       "path": "../../lib/error-reporting"
     },
     {
+      "path": "../../lib/legal-entity"
+    },
+    {
       "path": "../../lib/integrations-openai-ai-react"
     }
   ]

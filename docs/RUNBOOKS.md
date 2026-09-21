@@ -209,3 +209,18 @@ Exit 1 = a variable the code reads is unclassified, or a required one is missing
 | A purge failed | `select id, user_id, error from account_deletions where purged_at is null and scheduled_for < now()` — the next tick retries; the usual cause is storage listing (Supabase key) |
 | Regulator / CRA asks for a deleted company's invoices | `select * from account_deletions where company_name ilike '…'` → contracts/invoices where `user_id = 'tombstone:<id>'`; PDFs at `contracts|invoices/<user_id>/…` |
 | Prove an address was deleted | `email_hash` = sha256(lower(email)) stays on the row after purge; `email` itself is nulled |
+
+## 10. Billing: annual plans, plan switches, Connect fee, legal identity (Phase 73)
+
+**Where**: `artifacts/api-server/src/lib/billing.ts` (config + maths), `src/routes/payments.ts` (`/payments/plans`, `/payments/change-plan`), `src/invoices/stripeConnect.ts` (application fee), `lib/legal-entity/src/index.ts` (registered entity), `src/lib/legalFooter.ts` (email footer, applied in `emailUtils.brandedResend`).
+
+**How it fits** — the tier stays in `business_profiles.subscription_plan` (`monthly_starter|monthly_pro|monthly_elite`); the cadence is `subscription_interval` (`month|year`). A yearly Stripe price id maps back to the same tier with interval `year` (`resolvePrice`), so features/allowances never look at the cadence. Yearly = 10 × monthly. Switching (`POST /api/payments/change-plan`) updates the live Stripe subscription with `proration_behavior: "always_invoice"` (and re-anchors the cycle to now when moving to annual), so the customer is charged/credited the difference on the spot and gets the plan-change email.
+
+| Ask | Do |
+|---|---|
+| Annual toggle greyed out ("coming soon") | `STRIPE_PRICE_YEARLY_*` not all set for that environment — `pnpm --filter @workspace/scripts stripe-annual-prices` with the matching key, paste the three ids into Vercel, redeploy |
+| Customer says the DB plan does not match Stripe | Settings → Billing → "Verify subscription" (`POST /api/payments/sync-subscription`) re-reads the active subscription and now records the cadence too; or the `customer.subscription.updated` webhook replays from the Stripe dashboard |
+| Change the platform fee | `STRIPE_CONNECT_FEE_BPS` (basis points, default 50, `0` disables, capped at 500) → redeploy; the "Get paid online" card reads it live from `/api/invoice-payments/connect/status`. Existing Checkout sessions keep the fee they were created with (`metadata.applicationFeeBps`) |
+| Where did a fee go? | Stripe → Connect → the connected account's payment → "Application fee"; the platform balance receives it as `application_fee` objects |
+| Registered entity changes (new address, GST number) | edit `LEGAL_ENTITY` in `lib/legal-entity/src/index.ts`, push; also update Stripe → Settings → Business details by hand |
+| An email went out without the footer | it did not go through `brandedResend` — grep for `new Resend(` outside `emailUtils.ts` (there should be none) |

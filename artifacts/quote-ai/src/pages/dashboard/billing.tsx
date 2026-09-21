@@ -1,4 +1,6 @@
-import { useGetSubscription, useCreateCustomerPortalSession } from "@workspace/api-client-react";
+import { useGetSubscription, useCreateCustomerPortalSession, useGetPlans } from "@workspace/api-client-react";
+import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
+import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -37,8 +39,9 @@ function QuotaBar({ used, limit }: { used: number; limit: number }) {
 }
 
 export default function BillingPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { data: sub, isLoading } = useGetSubscription();
+  const { data: plans } = useGetPlans();
   const createPortal = useCreateCustomerPortalSession();
   const { toast } = useToast();
 
@@ -65,7 +68,9 @@ export default function BillingPage() {
 
   const isElite = sub?.plan === "monthly_elite";
   const planLabel = isPro ? "Pro" : isStarter ? "Starter" : isElite ? "Elite" : null;
-  const planPrice = isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : isElite ? t("dashboard.billing.priceElite") : null;
+  // Phase 73: the label follows the live cadence ("$490/year" on annual).
+  const planPrice = currentPlanPriceLabel(sub, Array.isArray(plans) ? plans : undefined, t, lang)
+    ?? (isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : isElite ? t("dashboard.billing.priceElite") : null);
 
   const renewalDate = sub?.periodEnd
     ? new Date(sub.periodEnd).toLocaleDateString("en-CA", { day: "2-digit", month: "long", year: "numeric" })
@@ -74,13 +79,6 @@ export default function BillingPage() {
   const resetDate = sub?.quotaResetDate
     ? new Date(sub.quotaResetDate).toLocaleDateString("en-CA", { day: "2-digit", month: "long" })
     : null;
-
-  const handleChoosePlan = () => {
-    createPortal.mutate(undefined, {
-      onSuccess: (r) => { window.open(r.url, "_blank"); },
-      onError: () => { window.location.href = "/#pricing"; },
-    });
-  };
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -140,22 +138,20 @@ export default function BillingPage() {
               <div className="p-4 rounded-[14px]" style={{ background: "var(--soft)", border: "1px solid var(--line)" }}>
                 <div className="text-sm font-semibold mb-3">{t("dashboard.billing.includedInPlan")}</div>
                 <ul className="space-y-2">
-                  {isPro ? (
-                    <>
-                      <PlanFeature text={t("dashboard.billing.feature.unlimitedQuotes")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.noWatermark")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.ownLogo")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.customBranding")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.aiPriority")} ok />
-                    </>
-                  ) : (
-                    <>
-                      <PlanFeature text={t("dashboard.billing.feature.upToQuotes").replace("{count}", String(sub?.quotaLimit ?? 20))} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.downloadablePdf")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.emailSupport")} ok />
-                      <PlanFeature text={t("dashboard.billing.feature.noWatermark")} ok={false} />
-                      <PlanFeature text={t("dashboard.billing.feature.customLogo")} ok={false} />
-                    </>
+                  {/* Phase 73: the live plan list is the source of truth (the old hard-coded list showed Starter's features to Elite). */}
+                  {(Array.isArray(plans) ? plans.find((p) => p.id === sub?.plan)?.features : undefined)?.map((f) => <PlanFeature key={f} text={f} ok />) ?? (
+                    isPro ? (
+                      <>
+                        <PlanFeature text={t("dashboard.billing.feature.unlimitedQuotes")} ok />
+                        <PlanFeature text={t("dashboard.billing.feature.noWatermark")} ok />
+                        <PlanFeature text={t("dashboard.billing.feature.ownLogo")} ok />
+                      </>
+                    ) : (
+                      <>
+                        <PlanFeature text={t("dashboard.billing.feature.upToQuotes").replace("{count}", String(sub?.quotaLimit ?? 20))} ok />
+                        <PlanFeature text={t("dashboard.billing.feature.downloadablePdf")} ok />
+                      </>
+                    )
                   )}
                 </ul>
               </div>
@@ -180,7 +176,10 @@ export default function BillingPage() {
                 </button>
               </div>
 
-              <p className="text-xs text-muted-foreground">{t("dashboard.billing.managedByStripe")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("dashboard.billing.managedByStripe")}
+                {isLegalEntityConfigured() && <> {t("dashboard.billing.receiptsIssuedBy").replace("{entity}", LEGAL_ENTITY.legalName)}</>}
+              </p>
             </div>
           </div>
         ) : (
@@ -195,87 +194,18 @@ export default function BillingPage() {
                 </div>
               </div>
             </div>
-            <div className="p-5">
-              <button
-                onClick={handleChoosePlan}
-                disabled={createPortal.isPending}
-                className="btn btn-navy"
-              >
-                {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
-                {t("dashboard.billing.choosePlan")}
-              </button>
-            </div>
           </div>
         )}
 
-        {/* Compare plans — only shown below Pro (Elite already has everything) */}
-        {!isPro && !isElite && (
-          <div className="card">
-            <div className="card-head">
-              <div><h2>{t("dashboard.billing.comparePlansTitle")}</h2><p className="sub">{t("dashboard.billing.comparePlansDesc")}</p></div>
-            </div>
-            <div className="p-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 font-semibold text-sm">
-                    <Zap className="h-4 w-4 text-navy-500" />
-                    {t("dashboard.billing.starterPlanLabel")}
-                  </div>
-                  <ul className="space-y-1.5 text-sm">
-                    <li className="flex items-center gap-2 text-muted-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-navy-400 shrink-0" />
-                      {t("dashboard.billing.compare.starterQuotes")}
-                    </li>
-                    <li className="flex items-center gap-2 text-muted-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-navy-400 shrink-0" />
-                      {t("dashboard.billing.compare.professionalPdf")}
-                    </li>
-                    <li className="flex items-center gap-2 text-[var(--muted-mk)] line-through">
-                      <XCircle className="h-3.5 w-3.5 shrink-0" />
-                      {t("dashboard.billing.compare.customLogo")}
-                    </li>
-                    <li className="flex items-center gap-2 text-[var(--muted-mk)] line-through">
-                      <XCircle className="h-3.5 w-3.5 shrink-0" />
-                      {t("dashboard.billing.compare.noWatermarkPdf")}
-                    </li>
-                  </ul>
-                </div>
-                <div className="space-y-2 border-l pl-4">
-                  <div className="flex items-center gap-2 font-semibold text-sm">
-                    <Crown className="h-4 w-4 text-amber-500" />
-                    {t("dashboard.billing.proPlanLabel")}
-                  </div>
-                  <ul className="space-y-1.5 text-sm">
-                    <li className="flex items-center gap-2 text-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                      {t("dashboard.billing.compare.unlimitedQuotes")}
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                      {t("dashboard.billing.compare.premiumPdf")}
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                      {t("dashboard.billing.compare.ownLogo")}
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                      {t("dashboard.billing.compare.noWatermark")}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              {isStarter && (
-                <div className="mt-5 pt-4 border-t flex justify-end">
-                  <button className="btn btn-navy btn-sm" onClick={handleManage} disabled={createPortal.isPending}>
-                    {createPortal.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Crown className="h-3.5 w-3.5" />}
-                    {t("dashboard.billing.upgradeToProArrow")}
-                  </button>
-                </div>
-              )}
-            </div>
+        {/* Phase 73: monthly / annual picker with in-place switching */}
+        <div className="card">
+          <div className="card-head">
+            <div><h2>{t("dashboard.billing.comparePlansTitle")}</h2><p className="sub">{t("dashboard.billing.comparePlansDesc")}</p></div>
           </div>
-        )}
+          <div className="p-5">
+            <PlanPicker />
+          </div>
+        </div>
       </div>
     </div>
   );

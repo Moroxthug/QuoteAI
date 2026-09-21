@@ -190,6 +190,9 @@ importers:
       '@workspace/integrations-openai-ai-server':
         specifier: workspace:*
         version: link:../../lib/integrations-openai-ai-server
+      '@workspace/legal-entity':
+        specifier: workspace:*
+        version: link:../../lib/legal-entity
       better-auth:
         specifier: ^1.6.9
         version: 1.7.3(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(kysely@0.28.17)(pg@8.23.0))(pg@8.23.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vitest@5.0.0(@opentelemetry/api@1.9.1)(@types/node@25.3.5)(vite@7.3.6(@types/node@25.3.5)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.9.0)))
@@ -393,6 +396,9 @@ importers:
       '@workspace/error-reporting':
         specifier: workspace:*
         version: link:../../lib/error-reporting
+      '@workspace/legal-entity':
+        specifier: workspace:*
+        version: link:../../lib/legal-entity
       chrome-launcher:
         specifier: ^1.2.1
         version: 1.2.1
@@ -526,6 +532,8 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 25.3.5
+
+  lib/legal-entity: {}
 
   scripts:
     devDependencies:

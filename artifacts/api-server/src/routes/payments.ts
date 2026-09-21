@@ -7,6 +7,8 @@ import { eq, sql } from "drizzle-orm";
 import { CreateCheckoutSessionBody } from "@workspace/api-zod";
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
+import { annualBillingAvailable, isBillingInterval, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
 const TRIAL_DOWNLOAD_LIMIT = 3;
@@ -136,8 +138,21 @@ export const PRICE_TO_PLAN = PLANS.reduce<Record<string, string>>((acc, plan) =>
   return acc;
 }, {});
 
+const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ["monthly_starter", "monthly_pro", "monthly_elite"];
+const isSubscriptionTier = (id: string): id is SubscriptionTier => (SUBSCRIPTION_TIERS as readonly string[]).includes(id);
+
+/** Phase 73: the public plan list carries the annual price (10 × monthly) and whether annual checkout is configured. */
+export function publicPlans() {
+  const yearly = annualBillingAvailable();
+  return PLANS.map(({ stripePriceId: _priceId, ...plan }) => ({
+    ...plan,
+    yearlyPrice: plan.interval ? yearlyPriceFor(plan.price) : null,
+    yearlyAvailable: !!plan.interval && yearly,
+  }));
+}
+
 router.get("/payments/plans", (_req, res) => {
-  res.json(PLANS);
+  res.json(publicPlans());
 });
 
 router.get("/payments/trial-status", requireAuth, async (req, res) => {
@@ -169,6 +184,17 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
       res.status(400).json({ error: "Invalid plan type" });
       return;
     }
+    // Phase 73: annual cadence picks the yearly price for the same tier.
+    const interval: BillingInterval = parsed.data.interval ?? "month";
+    let priceId = plan.stripePriceId;
+    if (interval === "year") {
+      const yearlyId = isSubscriptionTier(plan.id) ? yearlyPriceIdFor(plan.id) : null;
+      if (!yearlyId) {
+        res.status(400).json({ error: "ANNUAL_BILLING_UNAVAILABLE", message: "Annual billing is not configured for this plan" });
+        return;
+      }
+      priceId = yearlyId;
+    }
 
     const stripe = await getUncachableStripeClient();
 
@@ -193,7 +219,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
 
     const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       payment_method_types: ["card"],
-      line_items: [{ price: plan.stripePriceId, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: plan.interval ? "subscription" : "payment",
       allow_promotion_codes: true,
       success_url: successUrl,
@@ -202,6 +228,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
         userId,
         quoteId: quoteId ?? "",
         planType,
+        interval: plan.interval ? interval : "",
         hasWatermark: String(plan.hasWatermark),
       },
     };
@@ -269,6 +296,8 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
     res.json({
       plan: profile?.subscriptionPlan ?? null,
       status: profile?.subscriptionStatus ?? null,
+      interval: isActive ? (profile?.subscriptionInterval ?? "month") : null,
+      annualAvailable: annualBillingAvailable(),
       periodEnd: profile?.subscriptionPeriodEnd?.toISOString() ?? null,
       isActive,
       quotaUsed,
@@ -422,9 +451,10 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
 
     const sub = subscriptions.data[0];
     const priceId = sub.items.data[0]?.price?.id;
-    const planType = priceId ? PRICE_TO_PLAN[priceId] : null;
+    const resolved = resolvePrice(priceId, PRICE_TO_PLAN);
+    const planType = resolved?.tier ?? null;
 
-    if (!planType) {
+    if (!planType || !resolved) {
       res.json({ synced: false, message: `Unknown price ID: ${priceId ?? "N/A"}` });
       return;
     }
@@ -443,6 +473,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
         stripeCustomerId: customerId,
         subscriptionPlan: planType,
         subscriptionStatus: "active",
+        subscriptionInterval: resolved.interval,
         subscriptionPeriodEnd: periodEnd,
       })
       .onConflictDoUpdate({
@@ -451,6 +482,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
           stripeCustomerId: customerId,
           subscriptionPlan: planType,
           subscriptionStatus: "active",
+          subscriptionInterval: resolved.interval,
           subscriptionPeriodEnd: periodEnd,
         },
       });
@@ -459,6 +491,100 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
     res.json({ synced: true, active: true, plan: planType });
   } catch (err) {
     logger.error({ err }, "Error syncing subscription");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Phase 73: switch tier and/or cadence in place. An active Stripe subscription
+// is updated with proration (charged or credited immediately); without one the
+// caller gets a Checkout URL instead. Owner-only like /payments/checkout.
+router.post("/payments/change-plan", requireAuth, requirePermission("settings", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const body = (req.body ?? {}) as { planType?: unknown; interval?: unknown };
+    const planType = typeof body.planType === "string" ? body.planType : "";
+    const interval: BillingInterval = isBillingInterval(body.interval) ? body.interval : "month";
+    if (!isSubscriptionTier(planType)) {
+      res.status(400).json({ error: "Invalid plan type" });
+      return;
+    }
+    const plan = PLANS.find((p) => p.id === planType)!;
+    const priceId = interval === "year" ? yearlyPriceIdFor(planType) : plan.stripePriceId;
+    if (!priceId) {
+      res.status(400).json({ error: "ANNUAL_BILLING_UNAVAILABLE", message: "Annual billing is not configured for this plan" });
+      return;
+    }
+
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    const stripe = await getUncachableStripeClient();
+
+    let current: { id: string; itemId: string; priceId: string | undefined } | null = null;
+    if (profile?.stripeCustomerId) {
+      const subs = await stripe.subscriptions.list({ customer: profile.stripeCustomerId, status: "active", limit: 1 });
+      const sub = subs.data[0];
+      const item = sub?.items.data[0];
+      if (sub && item) current = { id: sub.id, itemId: item.id, priceId: item.price?.id };
+    }
+
+    if (!current) {
+      // No live subscription → same path as a first purchase.
+      const baseUrl = getBaseUrl();
+      const [authUser] = await db.select({ email: authUsersTable.email }).from(authUsersTable).where(eq(authUsersTable.id, userId));
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "subscription",
+        allow_promotion_codes: true,
+        success_url: `${baseUrl}/dashboard/billing?payment=success`,
+        cancel_url: `${baseUrl}/dashboard/billing?payment=cancelled`,
+        metadata: { userId, quoteId: "", planType, interval, hasWatermark: String(plan.hasWatermark) },
+        ...(profile?.stripeCustomerId ? { customer: profile.stripeCustomerId } : authUser?.email ? { customer_email: authUser.email } : {}),
+      });
+      res.json({ mode: "checkout", url: session.url });
+      return;
+    }
+
+    if (current.priceId === priceId) {
+      res.json({ mode: "unchanged", plan: planType, interval });
+      return;
+    }
+
+    const updated = await stripe.subscriptions.update(current.id, {
+      items: [{ id: current.itemId, price: priceId }],
+      proration_behavior: "always_invoice",
+      ...(interval === "year" ? { billing_cycle_anchor: "now" } : {}),
+      metadata: { userId, planType, interval },
+    });
+    const periodEndSec = updated.items.data[0]?.current_period_end;
+    await db
+      .update(businessProfilesTable)
+      .set({
+        subscriptionPlan: planType,
+        subscriptionStatus: updated.status === "active" || updated.status === "trialing" ? "active" : profile?.subscriptionStatus ?? null,
+        subscriptionInterval: interval,
+        subscriptionPeriodEnd: periodEndSec ? new Date(periodEndSec * 1000) : profile?.subscriptionPeriodEnd ?? null,
+      })
+      .where(eq(businessProfilesTable.userId, userId));
+    logger.info({ userId, planType, interval, from: current.priceId }, "Subscription plan changed with proration");
+
+    try {
+      const [authUser] = await db.select({ email: authUsersTable.email, name: authUsersTable.name }).from(authUsersTable).where(eq(authUsersTable.id, userId));
+      if (authUser?.email) {
+        await sendSubscriptionEmail({
+          toEmail: authUser.email,
+          toName: authUser.name || "Customer",
+          planName: plan.name,
+          planPrice: interval === "year" ? yearlyPriceFor(plan.price) : plan.price,
+          planInterval: interval,
+        });
+      }
+    } catch (emailErr) {
+      logger.error({ err: emailErr }, "Failed to send plan-change email (non-fatal)");
+    }
+
+    res.json({ mode: "updated", plan: planType, interval, periodEnd: periodEndSec ? new Date(periodEndSec * 1000).toISOString() : null });
+  } catch (err) {
+    logger.error({ err }, "Error changing plan");
     res.status(500).json({ error: "Internal server error" });
   }
 });

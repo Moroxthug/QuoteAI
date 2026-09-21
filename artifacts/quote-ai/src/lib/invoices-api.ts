@@ -115,7 +115,7 @@ export const invoicesApi = {
   pdfUrl: (id: string, download = false) => `/api/invoices/${id}/pdf${download ? "?download=1" : ""}`,
 };
 
-export type StripeConnectStatusDto = { connected: boolean; available?: boolean; chargesEnabled?: boolean; payoutsEnabled?: boolean; detailsSubmitted?: boolean; connectedAt?: string };
+export type StripeConnectStatusDto = { connected: boolean; available?: boolean; chargesEnabled?: boolean; payoutsEnabled?: boolean; detailsSubmitted?: boolean; connectedAt?: string; applicationFeeBps?: number; applicationFeePercent?: string };
 
 export const stripeConnectApi = {
   status: () => req<StripeConnectStatusDto>("/api/invoice-payments/connect/status"),

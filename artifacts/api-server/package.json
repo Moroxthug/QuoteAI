@@ -28,6 +28,7 @@
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/error-reporting": "workspace:*",
+    "@workspace/legal-entity": "workspace:*",
     "@workspace/integrations-openai-ai-server": "workspace:*",
     "better-auth": "^1.6.9",
     "cors": "^2",

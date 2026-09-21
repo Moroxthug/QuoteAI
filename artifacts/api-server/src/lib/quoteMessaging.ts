@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import { sanitizeForFromHeader } from "./emailUtils.js";
@@ -140,7 +140,7 @@ export async function sendQuoteFollowup(params: {
   const { subject } = followupCopy(stage, lang, quoteNumber, totale);
 
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: `${sanitizeForFromHeader(companyName)} via QuoteAI <no-reply@quoteai.ca>`,
       to: [email],

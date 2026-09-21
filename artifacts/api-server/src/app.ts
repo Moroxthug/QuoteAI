@@ -6,7 +6,8 @@ import multer from "multer";
 import { db, quotesTable, businessProfilesTable, authUsersTable, emailEventsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { auth, getTrustedOrigins } from "./lib/auth";
-import { PRICE_TO_PLAN } from "./routes/payments.js";
+import { PRICE_TO_PLAN, PLANS } from "./routes/payments.js";
+import { isBillingInterval, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
 import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
 import "./automations";
@@ -180,8 +181,10 @@ app.post(
 
     // Shared helper: upsert subscription in DB, resolving user by customerId or email
     async function syncSubscription(customerId: string, priceId: string | undefined, status: string) {
-      const planType = priceId ? PRICE_TO_PLAN[priceId] : undefined;
-      if (!planType) {
+      // Phase 73: yearly price ids resolve to the same tier with interval "year".
+      const resolved = resolvePrice(priceId, PRICE_TO_PLAN);
+      const planType = resolved?.tier;
+      if (!planType || !resolved) {
         logger.warn({ customerId, priceId }, "Unknown price ID in subscription sync — skipping");
         return null;
       }
@@ -225,6 +228,7 @@ app.post(
           stripeCustomerId: customerId,
           subscriptionPlan: isActive ? planType : null,
           subscriptionStatus: isActive ? "active" : "cancelled",
+          subscriptionInterval: isActive ? resolved.interval : null,
         })
         .onConflictDoUpdate({
           target: businessProfilesTable.userId,
@@ -232,6 +236,7 @@ app.post(
             stripeCustomerId: customerId,
             subscriptionPlan: isActive ? planType : null,
             subscriptionStatus: isActive ? "active" : "cancelled",
+            subscriptionInterval: isActive ? resolved.interval : null,
           },
         });
 
@@ -256,6 +261,7 @@ app.post(
 
         if (userId && session.customer && session.mode === "subscription" && planType) {
           const customerId = session.customer as string;
+          const interval = isBillingInterval(session.metadata?.interval) ? session.metadata.interval : "month";
           await db
             .insert(businessProfilesTable)
             .values({
@@ -263,6 +269,7 @@ app.post(
               stripeCustomerId: customerId,
               subscriptionPlan: planType,
               subscriptionStatus: "active",
+              subscriptionInterval: interval,
             })
             .onConflictDoUpdate({
               target: businessProfilesTable.userId,
@@ -270,6 +277,7 @@ app.post(
                 stripeCustomerId: customerId,
                 subscriptionPlan: planType,
                 subscriptionStatus: "active",
+                subscriptionInterval: interval,
               },
             });
           logger.info({ userId, planType }, "Subscription activated via checkout webhook");
@@ -284,19 +292,14 @@ app.post(
             const name = authUser?.name || "Customer";
 
             if (email) {
-              const planInfo: Record<string, { name: string; price: number; interval: string | null }> = {
-                monthly_starter: { name: "Starter", price: 19, interval: "month" },
-                monthly_pro: { name: "Pro", price: 49, interval: "month" },
-                monthly_elite: { name: "Elite", price: 59, interval: "month" },
-              };
-              const info = planInfo[planType];
+              const info = PLANS.find((p) => p.id === planType && p.interval);
               if (info) {
                 await sendSubscriptionEmail({
                   toEmail: email,
                   toName: name,
                   planName: info.name,
-                  planPrice: info.price,
-                  planInterval: info.interval,
+                  planPrice: interval === "year" ? yearlyPriceFor(info.price) : info.price,
+                  planInterval: interval,
                 });
               }
             }
@@ -322,7 +325,7 @@ app.post(
         if (sub.customer) {
           await db
             .update(businessProfilesTable)
-            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null })
+            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null })
             .where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
           logger.info({ customer: sub.customer }, "Subscription cancelled via webhook");
         }

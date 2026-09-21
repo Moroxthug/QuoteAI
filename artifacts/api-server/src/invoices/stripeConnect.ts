@@ -4,11 +4,15 @@ import { getUncachableStripeClient } from "../stripeClient.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { publicInvoiceUrl, invoiceToken } from "./service.js";
 import { balanceCents } from "./math.js";
+import { applicationFeeCents, connectFeeBps } from "../lib/billing.js";
 
 // ── Phase 15: Stripe Connect for invoice card payments ──────────────────────
 // One Express account per company. Checkout Sessions run directly against the
 // connected account (the `stripeAccount` request option / "direct charge"),
-// so the money never passes through QuoteAI's own Stripe balance.
+// so the money never passes through QuoteAI's own Stripe balance. Phase 73:
+// QuoteAI takes a small application fee on each card payment
+// (STRIPE_CONNECT_FEE_BPS, default 0.5 %), deducted by Stripe from the
+// contractor's payout and shown on their "Get paid online" card.
 
 export async function getConnectAccount(userId: string): Promise<StripeConnectAccount | null> {
   const [row] = await db.select().from(stripeConnectAccountsTable).where(eq(stripeConnectAccountsTable.userId, userId));
@@ -80,7 +84,8 @@ export async function createInvoiceCheckoutSession(inv: Invoice): Promise<{ url:
       line_items: [{ price_data: { currency: "cad", unit_amount: amount, product_data: { name: `Invoice ${inv.number}` } }, quantity: 1 }],
       success_url: `${returnUrl}?payment=success`,
       cancel_url: `${returnUrl}?payment=cancelled`,
-      metadata: { invoiceId: inv.id },
+      metadata: { invoiceId: inv.id, applicationFeeBps: String(connectFeeBps()) },
+      ...(applicationFeeCents(amount) > 0 ? { payment_intent_data: { application_fee_amount: applicationFeeCents(amount) } } : {}),
     },
     { stripeAccount: conn.stripeAccountId },
   );

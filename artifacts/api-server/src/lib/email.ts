@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
 import { getBaseUrl } from "./baseUrl";
 import { sendCustomerEmail } from "./connectedEmailSend.js";
@@ -256,7 +256,7 @@ export async function sendWelcomeEmail(params: {
     return;
   }
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: "QuoteAI <no-reply@quoteai.ca>",
       to: [params.toEmail],
@@ -288,7 +288,7 @@ export async function sendSubscriptionEmail(params: {
     : `🎉 ${params.planName} plan activated – Welcome to QuoteAI!`;
 
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: "QuoteAI <no-reply@quoteai.ca>",
       to: [params.toEmail],
@@ -582,7 +582,7 @@ export async function sendWidgetLeadNotification(params: {
   const safeClientPhone = escapeHtml(clientPhone);
   const safeRawInput = escapeHtml(rawInput);
   try {
-    const resend = new Resend(apiKey);
+    const resend = brandedResend(apiKey);
     await resend.emails.send({
       from: "QuoteAI <no-reply@quoteai.ca>",
       to: [toEmail],
@@ -732,7 +732,7 @@ export async function sendQuoteAcceptedEmail(params: {
     logger.warn("RESEND_API_KEY not set — skipping quote-accepted email");
     return;
   }
-  const resend = new Resend(apiKey);
+  const resend = brandedResend(apiKey);
   await resend.emails.send({
     from: "QuoteAI <no-reply@quoteai.ca>",
     to: [params.toEmail],

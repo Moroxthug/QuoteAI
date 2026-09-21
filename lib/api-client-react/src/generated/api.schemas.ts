@@ -353,6 +353,9 @@ export interface UpdateBusinessProfileBody {
 export interface SubscriptionInfo {
   plan?: string | null;
   status?: string | null;
+  /** month | year while active (Phase 73) */
+  interval?: string | null;
+  annualAvailable?: boolean;
   periodEnd?: string | null;
   isActive: boolean;
   quotaUsed?: number | null;
@@ -376,9 +379,61 @@ export const CreateCheckoutBodyPlanType = {
   oneshot_clean: 'oneshot_clean',
 } as const;
 
+/**
+ * Billing cadence for subscription plans (Phase 73). Defaults to month.
+ */
+export type CreateCheckoutBodyInterval = typeof CreateCheckoutBodyInterval[keyof typeof CreateCheckoutBodyInterval];
+
+
+export const CreateCheckoutBodyInterval = {
+  month: 'month',
+  year: 'year',
+} as const;
+
 export interface CreateCheckoutBody {
   quoteId?: string;
   planType: CreateCheckoutBodyPlanType;
+  /** Billing cadence for subscription plans (Phase 73). Defaults to month. */
+  interval?: CreateCheckoutBodyInterval;
+}
+
+export type ChangePlanBodyPlanType = typeof ChangePlanBodyPlanType[keyof typeof ChangePlanBodyPlanType];
+
+
+export const ChangePlanBodyPlanType = {
+  monthly_starter: 'monthly_starter',
+  monthly_pro: 'monthly_pro',
+  monthly_elite: 'monthly_elite',
+} as const;
+
+export type ChangePlanBodyInterval = typeof ChangePlanBodyInterval[keyof typeof ChangePlanBodyInterval];
+
+
+export const ChangePlanBodyInterval = {
+  month: 'month',
+  year: 'year',
+} as const;
+
+export interface ChangePlanBody {
+  planType: ChangePlanBodyPlanType;
+  interval: ChangePlanBodyInterval;
+}
+
+export type ChangePlanResultMode = typeof ChangePlanResultMode[keyof typeof ChangePlanResultMode];
+
+
+export const ChangePlanResultMode = {
+  checkout: 'checkout',
+  updated: 'updated',
+  unchanged: 'unchanged',
+} as const;
+
+export interface ChangePlanResult {
+  mode: ChangePlanResultMode;
+  url?: string | null;
+  plan?: string | null;
+  interval?: string | null;
+  periodEnd?: string | null;
 }
 
 export type PaymentVerifyResultStatus = typeof PaymentVerifyResultStatus[keyof typeof PaymentVerifyResultStatus];
@@ -409,6 +464,9 @@ export interface Plan {
   features: string[];
   hasWatermark: boolean;
   quotaPerMonth?: number | null;
+  /** Annual price (10 × monthly) for subscription plans (Phase 73) */
+  yearlyPrice?: number | null;
+  yearlyAvailable?: boolean;
 }
 
 export interface CapitolatoPdfResult {

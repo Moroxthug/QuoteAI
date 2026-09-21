@@ -49,6 +49,7 @@ export const businessProfilesTable = pgTable("business_profiles", {
   stripeCustomerId: text("stripe_customer_id"),
   subscriptionPlan: text("subscription_plan"),
   subscriptionStatus: text("subscription_status"),
+  subscriptionInterval: text("subscription_interval"), // Phase 73: "month" | "year" — the tier stays in subscription_plan
   subscriptionPeriodEnd: timestamp("subscription_period_end", { withTimezone: true }),
   trialStartedAt: timestamp("trial_started_at", { withTimezone: true }),
   trialDownloadsUsed: integer("trial_downloads_used").notNull().default(0),

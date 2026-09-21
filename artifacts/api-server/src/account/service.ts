@@ -255,7 +255,7 @@ async function cancelStripeSubscription(userId: string): Promise<boolean> {
     await stripe.subscriptions.cancel(sub.id, { prorate: false });
     cancelled = true;
   }
-  if (cancelled) await db.update(businessProfilesTable).set({ subscriptionStatus: "cancelled", subscriptionPlan: null }).where(eq(businessProfilesTable.userId, userId));
+  if (cancelled) await db.update(businessProfilesTable).set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null }).where(eq(businessProfilesTable.userId, userId));
   return cancelled;
 }
 

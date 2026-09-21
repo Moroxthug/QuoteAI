@@ -4,7 +4,7 @@ import { bearer, twoFactor } from "better-auth/plugins";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable, accountDeletionsTable } from "@workspace/db";
 import { and, asc, eq, isNull } from "drizzle-orm";
-import { Resend } from "resend";
+import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
 import { sendWelcomeEmail, escapeHtml } from "./email";
 import { getBaseUrl } from "./baseUrl";
@@ -37,7 +37,7 @@ async function findPendingDeletionLocal(userId: string) {
 }
 
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resend = process.env.RESEND_API_KEY ? brandedResend(process.env.RESEND_API_KEY) : null;
 
 // Gmail and most webmail clients strip data: URI images from HTML emails,
 // so the logo must be a real hosted URL rather than an inline base64 SVG.

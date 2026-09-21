@@ -8,6 +8,7 @@ import { getBaseUrl } from "../lib/baseUrl.js";
 import { getConnectAccount, createOnboardingLink } from "../invoices/stripeConnect.js";
 import { confirmEtransferReceived, rejectEtransferReport } from "../invoices/service.js";
 import { serializeInvoice } from "./invoices.js";
+import { connectFeeBps, connectFeePercentLabel } from "../lib/billing.js";
 
 // Phase 15: the company side of invoice payment collection — Stripe Connect
 // onboarding/status for the card rail, and the contractor's confirm/reject
@@ -29,10 +30,13 @@ router.get("/invoice-payments/connect/status", requireAuth, requirePermission("i
     const userId = getUserId(res);
     const conn = await getConnectAccount(userId);
     const available = isIntegrationConfigured("stripe");
-    if (!conn) { res.json({ connected: false, available }); return; }
+    // Phase 73: the platform fee is disclosed before the contractor connects, not after.
+    const fee = { applicationFeeBps: connectFeeBps(), applicationFeePercent: connectFeePercentLabel() };
+    if (!conn) { res.json({ connected: false, available, ...fee }); return; }
     res.json({
       connected: true,
       available,
+      ...fee,
       chargesEnabled: conn.chargesEnabled,
       payoutsEnabled: conn.payoutsEnabled,
       detailsSubmitted: conn.detailsSubmitted,

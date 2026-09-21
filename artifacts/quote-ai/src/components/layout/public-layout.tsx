@@ -9,6 +9,7 @@ import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
 import { getLanguageCounterpartPath } from "@/data/seo-slugs";
+import { legalIdentityLines } from "@workspace/legal-entity";
 
 const ChevRight = () => (
   <svg className="chev" viewBox="0 0 16 16" fill="none"><path d="M5.5 3l5 5-5 5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -267,6 +268,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="wrap"><p className="ft-fine">{t("footer.fine")}</p></div>
+        {/* Phase 73: registered entity (lib/legal-entity) — one line per part, blank until O5 */}
+        <div className="wrap"><p className="ft-fine">{legalIdentityLines(lang).join(" · ")}</p></div>
         <div className="wrap ft-bottom">
           <span>&copy; {new Date().getFullYear()} quoteai. {t("footer.rights")}</span>
           <div className="ft-legal">

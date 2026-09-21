@@ -230,6 +230,12 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .seg[data-period="q"] .seg-thumb { transform: translateX(100%); }
 .seg[data-period="y"] .seg-thumb { transform: translateX(200%); }
 .seg[data-period="m"] .seg-b:nth-child(1), .seg[data-period="q"] .seg-b:nth-child(2), .seg[data-period="y"] .seg-b:nth-child(3) { color: #fff; }
+/* Phase 73: two-way variant (monthly / annual). Children: thumb, then two buttons. */
+.seg-2 .seg-thumb { width: calc(50% - 4px); }
+.seg-2[data-period="y"] .seg-thumb { transform: translateX(100%); }
+.seg-2[data-period="m"] .seg-b:nth-child(2), .seg-2[data-period="y"] .seg-b:nth-child(3) { color: #fff; }
+.seg-2[data-period="y"] .seg-b:nth-child(2) { color: var(--muted-mk); }
+.seg-2 .seg-b:disabled { opacity: .45; cursor: not-allowed; }
 
 /* AI composer */
 .composer { overflow: hidden; }

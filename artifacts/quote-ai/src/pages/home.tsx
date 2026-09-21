@@ -545,8 +545,8 @@ export default function Home() {
               <h3>{lang === "fr" ? "Combien ça coûte pour commencer" : "What it costs to get started"}</h3>
               <p>
                 {lang === "fr"
-                  ? "L'inscription est gratuite, et votre première soumission est générée sans carte de crédit. Ensuite : payez à l'unité (5 $ à 13 $), ou démarrez un abonnement mensuel (Starter 19 $ avec 10 soumissions, Pro 49 $ avec 60 soumissions, Elite 59 $ illimité). Modifiez ou annulez votre forfait à tout moment."
-                  : "Signing up is free, and your first quote is generated without entering a credit card. From there you can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited). You can change or cancel your plan at any time from your account."}
+                  ? "L'inscription est gratuite, et votre première soumission est générée sans carte de crédit. Ensuite : payez à l'unité (5 $ à 13 $), ou démarrez un abonnement mensuel (Starter 19 $ avec 10 soumissions, Pro 49 $ avec 60 soumissions, Elite 59 $ illimité) — ou payez à l'année et obtenez deux mois gratuits. Modifiez ou annulez votre forfait à tout moment."
+                  : "Signing up is free, and your first quote is generated without entering a credit card. From there you can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited) — or pay yearly and get two months free. You can change or cancel your plan at any time from your account."}
               </p>
             </div>
           </div>

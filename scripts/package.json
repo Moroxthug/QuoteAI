@@ -7,6 +7,7 @@
     "hello": "tsx ./src/hello.ts",
     "env-inventory": "tsx ./src/env-inventory.ts",
     "apply-clerk-email-templates": "tsx ./src/apply-clerk-email-templates.ts",
+    "stripe-annual-prices": "tsx ./src/stripe-annual-prices.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

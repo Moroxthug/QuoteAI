@@ -191,3 +191,21 @@ Exit 1 = a variable the code reads is unclassified, or a required one is missing
 | Database "too many connections" | pooler session mode, `max: 3` per function instance; Free plan pooler cap 200 | Supabase → Database → connection stats; scale down concurrency or move to transaction pooler port 6543 (needs `prepare: false`) |
 | Everything 500 after a deploy | function boot log → missing env var at import | §7 |
 | Vercel flags `readable-secret` on a var | `STRIPE_CONNECT_WEBHOOK_SECRET`, `GOOGLE_CALENDAR_CLIENT_SECRET`, `QUICKBOOKS_CLIENT_SECRET` were added as plain Encrypted, not Sensitive | recreate them as Sensitive (the code does not care) |
+
+---
+
+## 9. Account export / deletion (Phase 72, PIPEDA / Law 25)
+
+**Where**: `artifacts/api-server/src/account/service.ts`; tables `account_exports`, `account_deletions`; routes in `src/routes/account.ts`; the daily tick runs `runAccountDeletionMaintenance` + `expireAccountExports`.
+
+**Export** — `POST /api/account/export` (owner only, 1 per 24 h). The ZIP is built inline by the `account.export_requested` automation and lands in the private bucket at `account-exports/<userId>/<exportId>.zip`; a 7-day signed link is emailed. A failed build shows in the admin automations table like any other run — retry it there. Rows and ZIPs older than 7 days are dropped by the cron.
+
+**Deletion** — `DELETE /api/account` (password + 2FA re-auth). Immediately: sessions revoked, Stripe subscription cancelled, integrations disconnected (provider tokens revoked where the provider supports it), sign-in refused with the scheduled date. **7 days later** the cron purges every row and file except signed contracts and issued invoices, which are re-keyed to `tombstone:<deletion id>` (their PDFs stay under `contracts|invoices/<original userId>/…`) and removed 7 years later (`retain_until`).
+
+| Ask | Do |
+|---|---|
+| "I deleted by mistake" inside the grace period | they have the cancel link in the email; or `update account_deletions set cancelled_at = now(), cancel_token_hash = null where user_id = '<id>' and purged_at is null` |
+| Same, after the purge | it is gone — restore from a backup (§5) only if the request is within the 30-day backup window and the person consents in writing; note it in the audit log |
+| A purge failed | `select id, user_id, error from account_deletions where purged_at is null and scheduled_for < now()` — the next tick retries; the usual cause is storage listing (Supabase key) |
+| Regulator / CRA asks for a deleted company's invoices | `select * from account_deletions where company_name ilike '…'` → contracts/invoices where `user_id = 'tombstone:<id>'`; PDFs at `contracts|invoices/<user_id>/…` |
+| Prove an address was deleted | `email_hash` = sha256(lower(email)) stays on the row after purge; `email` itself is nulled |

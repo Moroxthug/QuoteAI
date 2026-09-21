@@ -10,6 +10,7 @@ import { db, authUsersTable, authSessionsTable, businessProfilesTable, quotesTab
 import { eq, sql } from "drizzle-orm";
 import { createClient } from "@supabase/supabase-js";
 import app from "../app.js";
+import { ObjectStorageService } from "../lib/objectStorage.js";
 
 // ── Server ───────────────────────────────────────────────────────────────────
 
@@ -234,24 +235,18 @@ export async function cleanupAll(): Promise<void> {
   await cleanupUsers([...created]);
 }
 
-// Signed contracts and invoice PDFs land in the private bucket under
-// `<kind>/<userId>/…` (contracts/service.ts, invoices/service.ts), so one
-// prefix listing per kind per user finds everything a run uploaded.
-const STORAGE_KINDS = ["contracts", "invoices"];
+// Every tenant file lands in the private bucket under `<kind>/<userId>/…`
+// (the subPath builders across routes/ and services); Phase 72 added the
+// export ZIPs and the recursive lister, so one walk per kind per user finds
+// everything a run uploaded, however deep.
+const STORAGE_KINDS = ["contracts", "invoices", "quote-pdfs", "capitolato-pdfs", "quote_attachments", "documents", "receipts", "job-photos", "imports", "logos", "account-exports"];
 
 async function deleteStorageForUsers(userIds: string[]): Promise<void> {
-  const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-  const bucket = supabase.storage.from(process.env.SUPABASE_PRIVATE_BUCKET ?? "private-assets");
+  const storage = new ObjectStorageService();
   for (const userId of userIds) {
     for (const kind of STORAGE_KINDS) {
-      const prefix = `${kind}/${userId}`;
-      const { data: entities } = await bucket.list(prefix, { limit: 1000 });
-      const paths: string[] = [];
-      for (const entity of entities ?? []) {
-        const { data: files } = await bucket.list(`${prefix}/${entity.name}`, { limit: 1000 });
-        for (const f of files ?? []) paths.push(`${prefix}/${entity.name}/${f.name}`);
-      }
-      if (paths.length) await bucket.remove(paths);
+      const paths = (await storage.listPrivateObjects(`${kind}/${userId}`)).map((o) => o.path);
+      await storage.removePrivateObjects(paths);
     }
   }
 }

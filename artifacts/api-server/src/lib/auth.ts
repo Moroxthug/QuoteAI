@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, twoFactor } from "better-auth/plugins";
-import { createAuthMiddleware } from "better-auth/api";
-import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable } from "@workspace/db";
-import { and, asc, eq } from "drizzle-orm";
+import { createAuthMiddleware, APIError } from "better-auth/api";
+import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable, accountDeletionsTable } from "@workspace/db";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { Resend } from "resend";
 import { logger } from "./logger";
 import { sendWelcomeEmail, escapeHtml } from "./email";
@@ -25,6 +25,17 @@ async function resolveOrgForAudit(actorId: string): Promise<string> {
     .limit(1);
   return membership?.ownerId ?? actorId;
 }
+// Phase 72: same "keep it local" rule — the account service imports half the
+// app, so the grace-period check the sign-in hook needs is one query here.
+async function findPendingDeletionLocal(userId: string) {
+  const [row] = await db
+    .select({ scheduledFor: accountDeletionsTable.scheduledFor, language: accountDeletionsTable.language })
+    .from(accountDeletionsTable)
+    .where(and(eq(accountDeletionsTable.userId, userId), isNull(accountDeletionsTable.cancelledAt), isNull(accountDeletionsTable.purgedAt)))
+    .limit(1);
+  return row ?? null;
+}
+
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -85,8 +96,29 @@ export const auth = betterAuth({
     // correct login into "invalid credentials" for the user. Never let
     // anything in here escape; log and swallow instead.
     after: createAuthMiddleware(async (ctx) => {
+      // Phase 72: an account inside its deletion grace period cannot sign in
+      // (or be signed in by email verification / a password reset). The
+      // session was already created — drop it and replace the response.
+      // Checked here rather than in a `before` hook so an unknown password
+      // still gets the generic "invalid credentials", not a deletion notice.
+      const newSession = ctx.context.newSession;
+      if (newSession) {
+        const pending = await findPendingDeletionLocal(newSession.user.id).catch(() => null);
+        if (pending) {
+          await db.delete(authSessionsTable).where(eq(authSessionsTable.token, newSession.session.token)).catch(() => undefined);
+          // The session cookie / bearer token are already on the response; don't hand out a dead token.
+          ctx.context.responseHeaders?.delete("set-cookie");
+          ctx.context.responseHeaders?.delete("set-auth-token");
+          const when = pending.scheduledFor.toLocaleDateString(pending.language === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "America/Toronto" });
+          throw new APIError("FORBIDDEN", {
+            code: "ACCOUNT_DELETION_PENDING",
+            message: pending.language === "fr"
+              ? `Ce compte sera supprimé le ${when}. Pour annuler, utilisez le lien du courriel de confirmation.`
+              : `This account is scheduled for deletion on ${when}. To cancel, use the link in the confirmation email.`,
+          });
+        }
+      }
       try {
-        const newSession = ctx.context.newSession;
         if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
           const orgId = await resolveOrgForAudit(newSession.user.id);
           await recordSecurityAuditEvent({

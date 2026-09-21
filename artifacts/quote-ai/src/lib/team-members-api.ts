@@ -26,6 +26,8 @@ export const teamMembersApi = {
 
   orgs: () => req<{ items: OrgDto[]; activeOrgId: string }>("/api/team/orgs"),
   switchOrg: (orgId: string) => req<{ orgId: string; role: string }>("/api/team/switch", { method: "POST", body: json({ orgId }) }),
+  /** Phase 72: remove yourself from a company you were invited to. */
+  leave: (orgId: string) => req<{ success: true }>("/api/team/members/leave", { method: "POST", body: json({ orgId }) }),
 };
 
 export type InvitePreviewDto = { companyName: string; email: string; role: TeamMemberRole };

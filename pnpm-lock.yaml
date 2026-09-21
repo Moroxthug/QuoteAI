@@ -205,6 +205,9 @@ importers:
       express-rate-limit:
         specifier: ^7
         version: 7.5.1(express@5.2.1)
+      fflate:
+        specifier: ^0.8.3
+        version: 0.8.3
       kysely:
         specifier: ^0.28.17
         version: 0.28.17
@@ -3394,6 +3397,9 @@ packages:
 
   fflate@0.4.9:
     resolution: {integrity: sha512-zdxgIEddhfsyCaWpJ2SdXEP8ZMrKJ6+5jl4OupODcywU0IhRk6gdXuVGcPICyfx2H97hVK7xmJtRLPjkxAX8Vw==}
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   figures@6.1.0:
     resolution: {integrity: sha512-d+l3qxjSesT4V7v2fh+QnmFnUWv9lSpjarhShNTgBOfA0ttejbQUAlHLitbjkoRiDulW0OPoQPYIGhIC8ohejg==}
@@ -7941,6 +7947,8 @@ snapshots:
       web-streams-polyfill: 3.3.3
 
   fflate@0.4.9: {}
+
+  fflate@0.8.3: {}
 
   figures@6.1.0:
     dependencies:

@@ -45,6 +45,7 @@ import googleLsaRouter from "./google-lsa";
 import developerApiRouter from "./developer-api";
 import publicV1Router from "./public-v1";
 import archiveRouter from "./archive";
+import accountRouter from "./account";
 
 const router: IRouter = Router();
 
@@ -93,6 +94,7 @@ router.use(metaLeadAdsRouter);
 router.use(googleLsaRouter);
 router.use(developerApiRouter);
 router.use(archiveRouter);
+router.use(accountRouter);
 router.use("/v1/public", publicV1Router);
 
 export default router;

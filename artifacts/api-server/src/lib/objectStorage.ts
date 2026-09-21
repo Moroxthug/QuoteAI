@@ -98,6 +98,48 @@ export class ObjectStorageService {
     await supabase.storage.from(PRIVATE_BUCKET).remove([subPath]);
   }
 
+  // Phase 72: whole-tenant listing and removal for the data export and the
+  // account purge. Supabase list() is one level deep, so walk folders; every
+  // tenant file lives under `<kind>/<userId>/…`, so a prefix per kind covers it.
+  async listPrivateObjects(prefix: string): Promise<{ path: string; size: number }[]> {
+    const supabase = getSupabaseClient();
+    const out: { path: string; size: number }[] = [];
+    const walk = async (folder: string): Promise<void> => {
+      let offset = 0;
+      for (;;) {
+        const { data, error } = await supabase.storage.from(PRIVATE_BUCKET).list(folder, { limit: 1000, offset });
+        if (error) throw new Error(`List failed for ${folder}: ${error.message}`);
+        if (!data || data.length === 0) return;
+        for (const entry of data) {
+          const full = folder ? `${folder}/${entry.name}` : entry.name;
+          // Folders come back without an id; files carry metadata.
+          if (entry.id === null || entry.id === undefined) await walk(full);
+          else out.push({ path: full, size: Number((entry.metadata as { size?: number } | null)?.size ?? 0) });
+        }
+        if (data.length < 1000) return;
+        offset += data.length;
+      }
+    };
+    await walk(prefix.replace(/\/$/, ""));
+    return out;
+  }
+
+  async removePrivateObjects(paths: string[]): Promise<void> {
+    if (paths.length === 0) return;
+    const supabase = getSupabaseClient();
+    for (let i = 0; i < paths.length; i += 100) {
+      const { error } = await supabase.storage.from(PRIVATE_BUCKET).remove(paths.slice(i, i + 100));
+      if (error) throw new Error(`Remove failed: ${error.message}`);
+    }
+  }
+
+  async downloadPrivateObjectBuffer(subPath: string): Promise<Buffer> {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase.storage.from(PRIVATE_BUCKET).download(subPath);
+    if (error || !data) throw new ObjectNotFoundError();
+    return Buffer.from(await data.arrayBuffer());
+  }
+
   async getPresignedGetURL(subPath: string, ttlSec: number): Promise<string> {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase.storage

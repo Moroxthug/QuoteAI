@@ -346,4 +346,30 @@ router.post("/team/switch", requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/team/members/leave — { orgId } — Phase 72: a member removes
+// themself from a company they were invited to (the owner-only DELETE above
+// is for removing others). Clears the active-org cookie if it pointed there.
+router.post("/team/members/leave", requireAuth, async (req, res) => {
+  try {
+    const actorId = getActorUserId(res);
+    const body = z.object({ orgId: z.string().min(1) }).safeParse(req.body);
+    if (!body.success || body.data.orgId === actorId) {
+      res.status(400).json({ error: "Invalid parameters" });
+      return;
+    }
+    const [member] = await db.select().from(organizationMembersTable).where(and(eq(organizationMembersTable.ownerId, body.data.orgId), eq(organizationMembersTable.userId, actorId)));
+    if (!member) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    await db.delete(organizationMembersTable).where(eq(organizationMembersTable.id, member.id));
+    await writeAudit({ userId: body.data.orgId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "left", diff: { email: member.invitedEmail } });
+    if (getUserId(res) === body.data.orgId) res.clearCookie(ACTIVE_ORG_COOKIE, cookieOpts());
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error leaving team");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;

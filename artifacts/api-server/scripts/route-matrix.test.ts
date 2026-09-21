@@ -35,6 +35,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^GET \/api\/team\/invite\/:token$/, reason: "invite preview — hashed token lookup, rate limited" },
   { match: /^(GET|POST|DELETE) \/api\/(i|sign|t)\/:token/, reason: "customer/worker magic links — hashed token lookup, rate limited (Rule 6)" },
   { match: /^(GET|POST) \/api\/public\//, reason: "public quote widget + unsubscribe links — rate limited (Rule 6)" },
+  { match: /^GET \/api\/account\/deletion\/cancel\/:token$/, reason: "Phase 72: cancel-deletion link from the confirmation email — the person is signed out by then; hashed single-use token, IP rate limited" },
 ];
 
 // ── Rule 2: every mutating session route names a permission ──────────────────
@@ -44,6 +45,8 @@ const PERMISSIONLESS_MUTATIONS: Allow[] = [
   { match: /^POST \/api\/storage\/uploads\/request-url$/, reason: "signed upload URL scoped to the acting org; the consuming route enforces its own permission" },
   { match: /^POST \/api\/team\/invite\/:token\/accept$/, reason: "the invitee is joining — has no role in the org yet" },
   { match: /^POST \/api\/team\/switch$/, reason: "switches the actor's own active org" },
+  { match: /^POST \/api\/team\/members\/leave$/, reason: "Phase 72: the actor removes their own membership — no role needed" },
+  { match: /^(POST|DELETE) \/api\/account(\/export)?$/, reason: "Phase 72: acts on the actor's own account (owner check inline for the export); password re-auth on DELETE" },
 ];
 
 // ── Rule 3: feature entry points check the plan flag ─────────────────────────

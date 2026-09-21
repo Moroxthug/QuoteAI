@@ -29,7 +29,7 @@ export default function PrivacyPage() {
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
           Privacy Policy
         </h1>
-        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 20, 2026</p>
+        <p style={{ fontSize: 13, color: "var(--faint)" }}>Last updated: September 21, 2026</p>
       </header>
 
       <div className="wrap" style={{ maxWidth: 780, paddingBottom: "clamp(48px, 6vw, 80px)" }}>
@@ -85,10 +85,21 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">4. Data retention</h2>
             <p>We retain personal information only for as long as necessary for the purposes described above:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li>Account data: until account deletion, then 30 additional days for security purposes.</li>
-              <li>Quote data: 7 years from issuance, in line with Canada Revenue Agency (CRA) record-keeping requirements.</li>
-              <li>Billing records: 7 years, per CRA requirements for GST/HST and income tax records.</li>
-              <li>Technical logs: 90 days.</li>
+              <li>
+                <strong>Account data</strong> — until you delete your account. Deletion is self-serve (Settings → Security → Delete account)
+                and takes effect after a 7-day grace period during which you can cancel from the confirmation email; your login is
+                blocked, your subscription cancelled and connected services disconnected as soon as you request it. At the end of the
+                grace period every quote, client, job, cost, photo, document and setting is permanently erased, including files in storage.
+              </li>
+              <li>
+                <strong>Signed contracts and issued invoices</strong> — kept for 7 years after deletion, as required by the Income Tax Act,
+                the Excise Tax Act (GST/HST) and Revenu Québec for books and records. They are unlinked from the deleted profile and held
+                under an anonymous record that keeps only the business name and tax registration numbers needed to identify them;
+                they are then deleted automatically.
+              </li>
+              <li><strong>Subscription billing records</strong> — 7 years, per CRA requirements for GST/HST and income tax records (held by Stripe and in our accounting).</li>
+              <li><strong>Data exports</strong> — the ZIP file you request from Settings → Security is deleted 7 days after it is produced.</li>
+              <li><strong>Technical logs</strong> — 90 days. <strong>Encrypted database backups</strong> — 30 days, so deleted data can persist in a backup for up to 30 days after the purge.</li>
             </ul>
           </section>
 
@@ -118,10 +129,10 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">6. Your rights</h2>
             <p>Under PIPEDA and applicable provincial privacy laws, you have the right to:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li><strong>Access</strong> — request a copy of the personal information we hold about you.</li>
+              <li><strong>Access</strong> — request a copy of the personal information we hold about you. Account owners can download everything at once from Settings → Security → Export my data (one export per day, link valid 7 days).</li>
               <li><strong>Correction</strong> — request correction of inaccurate or incomplete information.</li>
               <li><strong>Withdrawal of consent</strong> — withdraw consent at any time, subject to legal or contractual restrictions.</li>
-              <li><strong>Deletion</strong> — request deletion of your information, subject to legal retention obligations.</li>
+              <li><strong>Deletion</strong> — delete your account yourself from Settings → Security → Delete account, subject to the legal retention obligations in section 4.</li>
               <li><strong>Complaint</strong> — file a complaint about how we handle your information.</li>
             </ul>
             <p className="mt-3">

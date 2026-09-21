@@ -739,6 +739,7 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .auth-link-muted { font-size: 13px; color: var(--faint); font-weight: 600; }
 .auth-link-muted:hover { color: var(--muted-mk); }
 .auth-error { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--red); background: var(--red-t); border: 1px solid var(--red-t); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; }
+.auth-notice { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--green); background: var(--green-t); border: 1px solid var(--green-t); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; }
 .auth-fine { font-size: 11.5px; color: var(--faint); text-align: center; line-height: 1.6; margin-top: 18px; }
 .auth-fine a { color: var(--faint); text-decoration: underline; text-underline-offset: 2px; }
 .auth-fine a:hover { color: var(--muted-mk); }

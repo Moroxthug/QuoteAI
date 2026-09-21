@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ShieldCheck, ShieldOff, Loader2, Monitor, LogOut, Copy, Check } from "lucide-react";
+import { ShieldCheck, ShieldOff, Loader2, Monitor, LogOut, Copy, Check, Download, Trash2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { securityApi } from "@/lib/security-api";
+import { accountApi, type AccountApiError, type AccountStatusDto } from "@/lib/account-api";
+import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const AUDIT_ACTION_LABELS: Record<string, string> = {
   login: "Signed in",
@@ -14,6 +16,9 @@ const AUDIT_ACTION_LABELS: Record<string, string> = {
   "two_factor.disabled": "Two-factor authentication disabled",
   "session.revoked": "Signed out of a session",
   "session.revoked_all": "Signed out of all other sessions",
+  "account.export_requested": "Data export requested",
+  "account.deletion_requested": "Account deletion requested",
+  "account.deletion_cancelled": "Account deletion cancelled",
 };
 
 function TwoFactorCard() {
@@ -279,12 +284,209 @@ function AuditLogCard() {
   );
 }
 
+
+// ── Phase 72: data export + account deletion (PIPEDA / Law 25) ──────────────
+
+function fmtBytes(bytes: number | null): string {
+  if (!bytes) return "";
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function DataExportCard({ status, refetch }: { status: AccountStatusDto; refetch: () => Promise<unknown> }) {
+  const { t, lang } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const locale = lang === "fr" ? "fr-CA" : "en-CA";
+  const exportMutation = useMutation({
+    mutationFn: () => accountApi.requestExport(lang === "fr" ? "fr" : "en"),
+    onSuccess: async (r) => {
+      toast({ title: t("dashboard.settings.account.exportStarted"), description: t("dashboard.settings.account.exportStartedDesc").replace("{email}", r.email) });
+      await refetch();
+      void queryClient.invalidateQueries({ queryKey: ["security-audit-log"] });
+    },
+    onError: (err: unknown) => {
+      const e = err as AccountApiError;
+      toast({ title: e.code === "EXPORT_RATE_LIMITED" ? t("dashboard.settings.account.exportRateLimited") : t("dashboard.settings.security.error"), description: e.code === "EXPORT_RATE_LIMITED" ? undefined : e.message, variant: "destructive" });
+    },
+  });
+  const latest = status.exports[0];
+
+  return (
+    <div className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="flex items-center gap-2"><Download className="h-5 w-5" />{t("dashboard.settings.account.exportTitle")}</h2>
+          <p className="sub">{t("dashboard.settings.account.exportDescription")}</p>
+        </div>
+      </div>
+      <div className="p-5 space-y-4">
+        <p className="text-sm text-muted-foreground">{t("dashboard.settings.account.exportExplain")}</p>
+        {!status.canExport ? (
+          <p className="text-sm text-muted-foreground">{t("dashboard.settings.account.ownerOnly")}</p>
+        ) : (
+          <button className="btn btn-navy" disabled={exportMutation.isPending || latest?.status === "pending"} onClick={() => exportMutation.mutate()}>
+            {exportMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("dashboard.settings.account.exportButton")}
+          </button>
+        )}
+        {status.exports.length > 0 && (
+          <div>
+            {status.exports.map((e) => (
+              <div key={e.id} className="set-row" style={{ padding: "12px 0" }}>
+                <div className="txt">
+                  <b>
+                    {e.status === "ready" ? t("dashboard.settings.account.exportReady") : e.status === "failed" ? t("dashboard.settings.account.exportFailed") : t("dashboard.settings.account.exportPending")}
+                    {e.status === "ready" && e.sizeBytes ? ` · ${fmtBytes(e.sizeBytes)}` : ""}
+                  </b>
+                  <span>
+                    {new Date(e.createdAt).toLocaleString(locale)}
+                    {e.status === "ready" && e.expiresAt ? ` · ${t("dashboard.settings.account.exportExpires").replace("{date}", new Date(e.expiresAt).toLocaleDateString(locale))}` : ""}
+                    {e.status === "failed" && e.error ? ` · ${e.error}` : ""}
+                  </span>
+                </div>
+                {e.status === "ready" && e.downloadUrl && (
+                  <a className="btn btn-outline-navy btn-sm" href={e.downloadUrl} rel="noopener">
+                    <Download className="h-4 w-4" /> {t("dashboard.settings.account.download")}
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DeleteAccountCard({ status }: { status: AccountStatusDto }) {
+  const { t, lang } = useLanguage();
+  const { toast } = useToast();
+  const { data: session } = authClient.useSession();
+  const twoFactorEnabled = Boolean((session?.user as { twoFactorEnabled?: boolean } | undefined)?.twoFactorEnabled);
+  const [open, setOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [confirmText, setConfirmText] = useState("");
+  const [done, setDone] = useState<{ scheduledFor: string } | null>(null);
+  const confirmWord = t("dashboard.settings.account.deleteConfirmWord");
+  const locale = lang === "fr" ? "fr-CA" : "en-CA";
+  const confirmed = confirmText.trim().toUpperCase() === confirmWord.toUpperCase();
+
+  const deleteMutation = useMutation({
+    mutationFn: () => accountApi.requestDeletion({ password, code: twoFactorEnabled ? code : undefined, language: lang === "fr" ? "fr" : "en" }),
+    onSuccess: (r) => setDone({ scheduledFor: r.scheduledFor }),
+    onError: (err: unknown) => {
+      const e = err as AccountApiError;
+      const title =
+        e.code === "INVALID_PASSWORD" ? t("dashboard.settings.account.wrongPassword")
+        : e.code === "INVALID_TWO_FACTOR" || e.code === "TWO_FACTOR_REQUIRED" ? t("dashboard.settings.security.invalidCode")
+        : t("dashboard.settings.security.error");
+      toast({ title, description: e.code ? undefined : e.message, variant: "destructive" });
+    },
+  });
+
+  const head = (sub: string) => (
+    <div className="card-head">
+      <div>
+        <h2 className="flex items-center gap-2"><Trash2 className="h-5 w-5" style={{ color: "var(--red)" }} />{t("dashboard.settings.account.deleteTitle")}</h2>
+        <p className="sub">{sub}</p>
+      </div>
+    </div>
+  );
+
+  if (status.pendingDeletion) {
+    return (
+      <div className="card" style={{ borderColor: "var(--red-t)" }}>
+        {head(t("dashboard.settings.account.deletePendingSub").replace("{date}", new Date(status.pendingDeletion.scheduledFor).toLocaleDateString(locale)))}
+        <div className="p-5"><p className="text-sm text-muted-foreground">{t("dashboard.settings.account.deletePendingBody")}</p></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card" style={{ borderColor: "var(--red-t)" }}>
+      {head(t("dashboard.settings.account.deleteDescription"))}
+      <div className="p-5 space-y-4">
+        <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+          <li>{t("dashboard.settings.account.deletePoint1").replace("{days}", String(status.graceDays))}</li>
+          <li>{status.ownsProfile ? t("dashboard.settings.account.deletePoint2Owner") : t("dashboard.settings.account.deletePoint2Member")}</li>
+          {status.ownsProfile && <li>{t("dashboard.settings.account.deletePoint3").replace("{years}", String(status.retentionYears))}</li>}
+          <li>{t("dashboard.settings.account.deletePoint4")}</li>
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          {t("dashboard.settings.account.deletePolicy")}{" "}
+          <a href="/privacy-policy/" target="_blank" rel="noopener" className="underline">{t("dashboard.settings.account.privacyPolicy")}</a>
+        </p>
+        <button className="btn btn-navy" style={{ background: "var(--red)", borderColor: "var(--red)" }} onClick={() => setOpen(true)}>
+          {t("dashboard.settings.account.deleteButton")}
+        </button>
+      </div>
+
+      <Dialog open={open} onOpenChange={(v) => { if (!deleteMutation.isPending && !done) setOpen(v); }}>
+        <DialogContent size="md">
+          {done ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t("dashboard.settings.account.deleteScheduledTitle")}</DialogTitle>
+                <DialogDescription>{t("dashboard.settings.account.deleteScheduledBody").replace("{date}", new Date(done.scheduledFor).toLocaleDateString(locale))}</DialogDescription>
+              </DialogHeader>
+              <DialogBody>
+                <button className="btn btn-navy" onClick={() => { window.location.href = "/"; }}>{t("dashboard.settings.security.done")}</button>
+              </DialogBody>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t("dashboard.settings.account.deleteDialogTitle")}</DialogTitle>
+                <DialogDescription>{t("dashboard.settings.account.deleteDialogDesc")}</DialogDescription>
+              </DialogHeader>
+              <DialogBody>
+                <form
+                  className="space-y-3"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (confirmed) deleteMutation.mutate();
+                  }}
+                >
+                  <Input type="password" required autoFocus autoComplete="current-password" placeholder={t("dashboard.settings.security.passwordPlaceholder")} value={password} onChange={(e) => setPassword(e.target.value)} />
+                  {twoFactorEnabled && (
+                    <Input required inputMode="numeric" placeholder={t("dashboard.settings.account.twoFactorPlaceholder")} value={code} onChange={(e) => setCode(e.target.value)} />
+                  )}
+                  <Input required placeholder={t("dashboard.settings.account.deleteTypeToConfirm").replace("{word}", confirmWord)} value={confirmText} onChange={(e) => setConfirmText(e.target.value)} />
+                  <div className="flex gap-2">
+                    <button type="submit" disabled={deleteMutation.isPending || !confirmed} className="btn btn-navy" style={{ background: "var(--red)", borderColor: "var(--red)" }}>
+                      {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("dashboard.settings.account.deleteConfirmButton")}
+                    </button>
+                    <button type="button" className="btn btn-outline-navy" onClick={() => setOpen(false)}>{t("dashboard.settings.security.cancel")}</button>
+                  </div>
+                </form>
+              </DialogBody>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function AccountCards() {
+  const { data, isLoading, refetch } = useQuery({ queryKey: ["account-status"], queryFn: accountApi.status });
+  if (isLoading || !data) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
+  return (
+    <>
+      {data.ownsProfile && <DataExportCard status={data} refetch={refetch} />}
+      <DeleteAccountCard status={data} />
+    </>
+  );
+}
+
 export function SecurityTab() {
   return (
     <div className="stack">
       <TwoFactorCard />
       <SessionsCard />
       <AuditLogCard />
+      <AccountCards />
     </div>
   );
 }

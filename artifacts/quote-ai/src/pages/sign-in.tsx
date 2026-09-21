@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
-import { Eye, EyeOff, AlertCircle, Mail } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, Mail, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 
@@ -18,6 +18,8 @@ export default function SignInPage() {
   const [, navigate] = useLocation();
   const search = useSearch();
   const nextPath = safeLocalPath(new URLSearchParams(search).get("next"), "/dashboard");
+  // Phase 72: landing from the "cancel deletion" link in the confirmation email.
+  const deletionOutcome = new URLSearchParams(search).get("deletion");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -157,6 +159,19 @@ export default function SignInPage() {
             <>
               <h1 className="auth-title">{t("signIn.title")}</h1>
               <p className="auth-sub">{t("signIn.subtitle")}</p>
+
+              {deletionOutcome === "cancelled" && (
+                <div className="auth-notice" role="status">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+                  <span>{t("signIn.deletionCancelled")}</span>
+                </div>
+              )}
+              {deletionOutcome === "invalid" && (
+                <div className="auth-error" role="alert">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{t("signIn.deletionLinkInvalid")}</span>
+                </div>
+              )}
 
               {error && (
                 <div className="auth-error">

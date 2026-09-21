@@ -82,6 +82,10 @@ function MembersTab() {
   const resend = useMutation({ mutationFn: (id: string) => teamMembersApi.resend(id), onSuccess: (r) => { refresh(); setInvite(r); }, onError });
   const setStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: "active" | "suspended" }) => teamMembersApi.update(id, { status }), onSuccess: refresh, onError });
   const remove = useMutation({ mutationFn: (id: string) => teamMembersApi.remove(id), onSuccess: refresh, onError });
+  // Phase 72: a member (not the owner) can take themself off this company.
+  const { data: orgs } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
+  const activeOrg = orgs?.items.find((o) => o.orgId === orgs.activeOrgId);
+  const leave = useMutation({ mutationFn: (orgId: string) => teamMembersApi.leave(orgId), onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard"; }, onError });
 
   const members = data?.items ?? [];
   const seats = data?.seats;
@@ -92,6 +96,11 @@ function MembersTab() {
         <p className="foot-note m-0">{t("team.members.intro")}</p>
         <div className="grow flex items-center gap-2">
           {seats && <span className="foot-note">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
+          {activeOrg && !activeOrg.isOwn && (
+            <button type="button" className="btn btn-outline-navy btn-sm" disabled={leave.isPending} onClick={() => { if (confirm(t("team.members.leaveConfirm").replace("{company}", activeOrg.companyName))) leave.mutate(activeOrg.orgId); }}>
+              <UserX className="h-4 w-4" /> {t("team.members.leave")}
+            </button>
+          )}
           <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>
         </div>
       </div>

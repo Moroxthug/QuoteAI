@@ -8,7 +8,7 @@ import { sendCustomerEmail } from "./connectedEmailSend.js";
 const LOGO_URL = `${getBaseUrl()}/quoteai-logo.png`;
 
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -206,7 +206,7 @@ function buildWelcomeEmail(name: string): string {
     <p>Your account is ready — start creating quotes right away</p>
   </div>
   <div class="body">
-    <p class="greeting">Hi ${firstName},<br/><br/>you're now registered on <strong>QuoteAI</strong>, the tool that turns a job description into a professional quote in seconds. We're glad to have you with us!</p>
+    <p class="greeting">Hi ${escapeHtml(firstName)},<br/><br/>you're now registered on <strong>QuoteAI</strong>, the tool that turns a job description into a professional quote in seconds. We're glad to have you with us!</p>
 
     <div class="trial-box">
       <h2>🎁 Your free trial includes:</h2>

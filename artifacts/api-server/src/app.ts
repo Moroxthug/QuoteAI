@@ -34,13 +34,32 @@ const passwordResetRateLimiter = ipRateLimiter({
   max: 10,
   message: "Too many password reset requests. Please wait a few minutes and try again.",
 });
+// Anything that sends an email on request (sign-up welcome/verification,
+// re-send verification, 2FA email OTP) is an email-bombing vector as well as
+// an enumeration one, so it gets the same tight budget as password reset.
+const emailSendingRateLimiter = ipRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: "Too many requests. Please wait a few minutes and try again.",
+});
+// Phase 64: better-auth's own limiter only runs in production (per instance);
+// these are ours and run everywhere, keyed on the exact paths the client
+// calls. `/forget-password` was renamed `/request-password-reset` upstream —
+// the frontend calls the new name, so the old key alone protected nothing.
 const AUTH_RATE_LIMITERS: Record<string, ReturnType<typeof ipRateLimiter>> = {
   "/api/auth/sign-in/email": signInRateLimiter,
+  "/api/auth/sign-up/email": emailSendingRateLimiter,
+  "/api/auth/send-verification-email": emailSendingRateLimiter,
+  "/api/auth/two-factor/send-otp": emailSendingRateLimiter,
   "/api/auth/two-factor/verify-totp": twoFactorRateLimiter,
   "/api/auth/two-factor/verify-backup-code": twoFactorRateLimiter,
   "/api/auth/two-factor/verify-otp": twoFactorRateLimiter,
+  "/api/auth/two-factor/enable": twoFactorRateLimiter,
+  "/api/auth/two-factor/disable": twoFactorRateLimiter,
   "/api/auth/forget-password": passwordResetRateLimiter,
+  "/api/auth/request-password-reset": passwordResetRateLimiter,
   "/api/auth/reset-password": passwordResetRateLimiter,
+  "/api/auth/change-password": passwordResetRateLimiter,
 };
 
 const app: Express = express();
@@ -49,6 +68,23 @@ const app: Express = express();
 // to Vercel's edge IP for every request, breaking both IP-based rate limiting
 // and abuse-investigation logging (all visitors would look identical).
 app.set("trust proxy", 1);
+
+// ── Security headers (Phase 64) ──────────────────────────────────────────────
+// The static frontend gets its headers (incl. the page CSP) from vercel.json;
+// this covers every /api response, which Vercel serves from the function and
+// never touches. A JSON/PDF API needs no page CSP — it needs to never be
+// framed, never be sniffed into another type, and never leak a token link
+// (/api/i/:token, /api/sign/:token) through Referer.
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Content-Security-Policy", "frame-ancestors 'none'");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+  res.setHeader("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  next();
+});
 
 app.use(
   pinoHttp({
@@ -613,7 +649,11 @@ app.use(
       return;
     }
     const origin = req.headers.origin;
-    if (!origin || trustedOrigins.has(origin) || /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+    // Any-port localhost is a dev convenience only: in production it would let a
+    // page served by some local program on the user's machine call the API with
+    // their cookies.
+    const devLocalhost = process.env.NODE_ENV !== "production" && !!origin && /^https?:\/\/localhost(:\d+)?$/.test(origin);
+    if (!origin || trustedOrigins.has(origin) || devLocalhost) {
       callback(null, { origin: true, credentials: true });
     } else {
       callback(null, { origin: false, credentials: true });

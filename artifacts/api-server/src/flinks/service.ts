@@ -118,16 +118,22 @@ export async function manuallyMatch(userId: string, transactionId: string, costE
     .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)));
 }
 
-export async function ignoreTransaction(userId: string, transactionId: string): Promise<void> {
-  await db
+/** false when the transaction is not this org's (or does not exist). */
+export async function ignoreTransaction(userId: string, transactionId: string): Promise<boolean> {
+  const rows = await db
     .update(flinksTransactionsTable)
     .set({ matchStatus: "ignored", matchedCostEntryId: null })
-    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)));
+    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)))
+    .returning({ id: flinksTransactionsTable.id });
+  return rows.length > 0;
 }
 
-export async function unmatch(userId: string, transactionId: string): Promise<void> {
-  await db
+/** false when the transaction is not this org's (or does not exist). */
+export async function unmatch(userId: string, transactionId: string): Promise<boolean> {
+  const rows = await db
     .update(flinksTransactionsTable)
     .set({ matchStatus: "unmatched", matchedCostEntryId: null, autoMatched: false })
-    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)));
+    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)))
+    .returning({ id: flinksTransactionsTable.id });
+  return rows.length > 0;
 }

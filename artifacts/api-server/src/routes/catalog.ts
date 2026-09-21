@@ -355,6 +355,10 @@ router.put("/catalog/:id", requireAuth, requirePermission("quotes", "edit"), asy
     if (um !== undefined) updates.um = um.trim();
     if (prezzoUnitario !== undefined) updates.prezzoUnitario = String(prezzoUnitario);
     if (note !== undefined) updates.note = note?.trim() || null;
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: "Nothing to update" }); // drizzle throws on an empty set()
+      return;
+    }
 
     const [updated] = await db
       .update(priceCatalogItemsTable)

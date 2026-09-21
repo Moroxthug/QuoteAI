@@ -6,7 +6,7 @@ import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificat
 import { and, asc, eq } from "drizzle-orm";
 import { Resend } from "resend";
 import { logger } from "./logger";
-import { sendWelcomeEmail } from "./email";
+import { sendWelcomeEmail, escapeHtml } from "./email";
 import { getBaseUrl } from "./baseUrl";
 import { recordSecurityAuditEvent } from "./auditLog";
 
@@ -121,6 +121,10 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    // Phase 64: a reset is how a user takes an account back — every session
+    // that existed before it (including an attacker's) must die with it.
+    // better-auth defaults this to false.
+    revokeSessionsOnPasswordReset: true,
     async sendResetPassword({ user, url }) {
       if (!resend) {
         logger.warn("RESEND_API_KEY not set — skipping password reset email");
@@ -180,7 +184,7 @@ function buildResetPasswordEmail(name: string, url: string): string {
 </td></tr>
 <tr><td style="background:#fff;padding:32px 40px">
   <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e">Reset your password</h1>
-  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${name},<br/>you requested to reset the password for your QuoteAI account. Click the button below:</p>
+  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${escapeHtml(name)},<br/>you requested to reset the password for your QuoteAI account. Click the button below:</p>
   <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
     <tr><td align="center" style="border-radius:10px;background:linear-gradient(135deg,#7c3aed,#06b6d4)">
       <a href="${url}" style="display:inline-block;color:#fff;font-size:15px;font-weight:600;padding:13px 32px;border-radius:10px;text-decoration:none">Reset password →</a>
@@ -211,7 +215,7 @@ function buildVerificationEmail(name: string, url: string): string {
 </td></tr>
 <tr><td style="background:#fff;padding:32px 40px">
   <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e">Verify your email address</h1>
-  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${name},<br/>click the button below to verify your email address on QuoteAI.</p>
+  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${escapeHtml(name)},<br/>click the button below to verify your email address on QuoteAI.</p>
   <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
     <tr><td align="center" style="border-radius:10px;background:linear-gradient(135deg,#7c3aed,#06b6d4)">
       <a href="${url}" style="display:inline-block;color:#fff;font-size:15px;font-weight:600;padding:13px 32px;border-radius:10px;text-decoration:none">Verify email →</a>

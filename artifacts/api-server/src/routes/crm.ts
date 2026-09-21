@@ -99,6 +99,10 @@ router.put("/crm/projects/:id", requireAuth, requirePermission("jobs", "edit"), 
     if (parsed.data.startDate !== undefined) updates.startDate = parsed.data.startDate ? new Date(parsed.data.startDate) : null;
     if (parsed.data.endDate !== undefined) updates.endDate = parsed.data.endDate ? new Date(parsed.data.endDate) : null;
     if (parsed.data.budget !== undefined) updates.budget = parsed.data.budget;
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: "Nothing to update" }); // drizzle throws on an empty set()
+      return;
+    }
 
     const [updated] = await db
       .update(projectsTable)

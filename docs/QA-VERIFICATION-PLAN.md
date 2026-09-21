@@ -31,7 +31,7 @@ So "what's left" is not features — it is proving that ~60 phases shipped back-
 - Three WhatsApp templates never submitted to Meta (lead follow-up, review request, photo share) → silently fall back to email.
 - Partner-gated integrations with no real credentials: Wave (25), Financeit (16), Flinks (27), Google LSA (29). Meta Lead Ads (28) works once `META_APP_ID` is set.
 - No monitoring/alerting on `automation_runs` failures; no error tracker (no Sentry or equivalent anywhere in `src/`).
-- Legal review of contract templates; help-centre content; a real pentest.
+- Legal review of contract templates; help-centre content; a real pentest (Phase 64 closed 2026-09-20 — the pentest can now be procured).
 
 **Deliberate v1 scope cuts (not bugs, just record them in the launch notes)**
 - Hardcoded lead-follow-up cadence and review-request delay (no editor UI); no SMS channel.
@@ -206,5 +206,45 @@ For each: connect from Settings → Integrations, trigger the real event, confir
 **Deferred**
 - **A real staging project.** Once one exists (delete the unused July project or upgrade), set the three `E2E_*` GitHub secrets and the CI `e2e` job runs on every push. Until then the suite is local-only against `quoteai` — acceptable while production holds one user, **not** after launch. → `deferred-work`.
 - `/api/cron/tick` itself is not exercised end-to-end (it has no clock parameter; a future-clock tick would sweep other tenants). The maintenance functions it calls are. Phase 65 runs the real tick on staging.
-- Not covered by e2e yet: change orders, job photos, QuickBooks/Calendar/Gmail side effects (need sandboxes → Phase 65), assistant tool-calling (Phase 5), 2FA/password-reset flows (Phase 64), public-API-key routes.
+- Not covered by e2e yet: change orders, job photos, QuickBooks/Calendar/Gmail side effects (need sandboxes → Phase 65), assistant tool-calling (Phase 5). ~~2FA/password-reset flows, public-API-key routes~~ → Phase 64's `security.e2e.test.ts`.
 - `.env.staging` stays local; never commit it.
+
+### Phase 64 — Security pass (2026-09-20)
+
+**Method** — static review of `app.ts`, `lib/auth.ts`, every webhook, every OAuth callback, every token store and the storage routes; then a sixth e2e file, `src/e2e/security.e2e.test.ts` (21 tests, ~45 s, part of `test:e2e`), that asks the same questions of the running app. Plus `pnpm audit`, a regex sweep of the full git history for key shapes (`sk_live_`, `whsec_`, `re_`, `AKIA`, JWTs, `postgres://user:pass@`, private-key PEM blocks…), and the CSP exercised in the Browser pane against the built site served with the `vercel.json` headers (`/`, `/fr/`, `/sign-in/` — zero violations; gtag and the canonical/theme inline scripts ran).
+
+**Findings** (severity → fix)
+
+| # | Sev | Finding | Fix |
+|---|---|---|---|
+| 1 | **High** | `xlsx@0.18.5` parses user-uploaded spreadsheets (`imports/parseSpreadsheet.ts`, `documents.ts`, `extractDocument.ts`) and has two open advisories: prototype pollution (GHSA-4r6h-8v6p-xvw6) and ReDoS (GHSA-5pgg-2g8v-p4x9). npm stops at 0.18.5; the patched line only ships from SheetJS's own CDN. | Dependency is now the `https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz` tarball. `pnpm audit --prod`: 0 high (1 low left: esbuild dev-server, dev-only). `dependency-audit.yml` is now **blocking** at `--audit-level=high`. |
+| 2 | **High** | **A password reset did not revoke existing sessions** (`revokeSessionsOnPasswordReset` is off by default in better-auth): an attacker holding a session kept it through the victim's reset. | Enabled. Test: the pre-reset bearer token resolves to `null` after the reset. |
+| 3 | **Medium** | **The password-reset rate limiter never fired.** `AUTH_RATE_LIMITERS` keyed `/api/auth/forget-password`, but better-auth ≥ 1.3 (we run 1.7.3) and the frontend use `/request-password-reset`. Only better-auth's own in-memory production limiter (3/min per instance) stood between the reset mailer and a flood. | Keyed on the real paths; added budgets for `sign-up/email`, `send-verification-email`, `two-factor/send-otp` (email-bombing vectors, 10 / 15 min), `two-factor/enable|disable`, `change-password`. Test: 12 reset requests → 429 appears, zero extra emails. |
+| 4 | **Medium** | **No security headers anywhere**: the static site had none (Vercel adds none), the API set none, no CSP. | `vercel.json` `headers`: CSP with a **hash-based** `script-src` for the three inline scripts in `index.html` (no `'unsafe-inline'` for scripts), `object-src 'none'`, `base-uri 'self'`, `frame-ancestors 'self'`, `frame-src` only Flinks Connect, `connect-src` self + PostHog + GA; HSTS 2 y preload; nosniff; `X-Frame-Options SAMEORIGIN`; `Referrer-Policy strict-origin-when-cross-origin`; `Permissions-Policy` delegating camera/microphone/geolocation to self (clock-in geofence, voice notes and photos need them); immutable cache on `/assets/*`. API (`app.ts`): nosniff, `X-Frame-Options DENY`, CSP `frame-ancestors 'none'`, `Referrer-Policy no-referrer` (token links must never leak through Referer), HSTS, COOP. Guard: `scripts/security-headers.test.ts` recomputes the inline-script hashes from `index.html` (and from every prerendered page when `dist/` exists) and fails CI when `vercel.json` is stale — regenerate with `pnpm --filter @workspace/api-server csp-hashes`. |
+| 5 | **Medium** | CORS allowed **any-port `localhost` with credentials in production** — a page served by any local program on a user's machine could call the API with their cookies. | Gated on `NODE_ENV !== "production"`. |
+| 6 | Low | `POST /flinks/transactions/:id/unmatch` and `/ignore` answered `200 {success:true}` for a foreign id (the `UPDATE … WHERE user_id` matched nothing — no data change, but a client would believe it worked). | Services return the affected count; routes 404. |
+| 7 | Low | `PUT /catalog/:id` and `PUT /crm/projects/:id` **500'd on an empty body** (drizzle throws on `set({})`). Scoping was intact; robustness only. | 400 "Nothing to update". |
+| 8 | Low | Cron bearer compared with `!==`. | `timingSafeEqual`. |
+| 9 | Low | User-controlled `name` interpolated unescaped into the verification / reset / welcome emails (self-XSS in the user's own mailbox). | `escapeHtml` (test asserts `<b>` arrives as `&lt;b&gt;`). |
+
+**Verified clean** (no change needed)
+- **IDOR at runtime**: org B (its own Elite org, valid session, its own API key) hit all **134 `:param` routes** under session / API-key auth from the committed route matrix with org A's ids — one seeded row of every kind: quote, contract, job, milestone, deposit invoice, payment, cost, receipt document, catalog item, task, worker, equipment, assignment, equipment usage, time entry, change order, photo, variant, lead, conversation, proposal, API key, webhook, import batch + candidate, Flinks transaction, price alert, invited member, virtual client. **114 → 403/404, 9 → 400 (body validated before the lookup), 0 → 2xx, 0 → 5xx** (after #6/#7). Two legitimate 200-with-empty answers are allowlisted (`/clients/:id/quotes` — the id is an md5 of client fields; `/contracts/by-quote/:quoteId` → `{contract:null}`). A `qai_active_org` cookie pointed at A's org without a membership does nothing. Admin routes: 403 for owners and for anonymous callers.
+- **Private storage**: `/api/storage/objects/contracts/<A>/…` → A 200, B 404, anonymous 401 (the owner check is on the path's second segment, not on guessability).
+- **Webhooks** (all six): missing header → 400; bad signature → 400/403/401; Stripe replay 1 h old → 400 (tolerance); correct signature → 2xx. Stripe ×2 (`constructEvent`), WhatsApp + Meta Lead Ads (`x-hub-signature-256` HMAC over the raw body, before `express.json`), Resend (svix `id.ts.body`), Financeit (shared token, `timingSafeEqual`). Cron: wrong bearer → 401.
+- **OAuth callbacks** (QuickBooks, Wave, Google Calendar, Outlook, Gmail, Meta, Google LSA): `state` is an HMAC-signed `userId.iat.nonce` bound to the *session's* user, 5-minute TTL, `timingSafeEqual`. Flinks has no OAuth (Connect iframe → LoginId).
+- **Token encryption**: every stored third-party credential is AES-256-GCM via `lib/crypto.ts` — QuickBooks, Wave, Google Calendar/Outlook (`calendar`), Gmail (`email-connections`), Meta page token, Google LSA refresh token, Flinks LoginId. Public-API keys and invite / sign / invoice tokens are stored as SHA-256 hashes; outbound webhook secrets are stored plain by necessity (needed to sign each delivery, never re-displayed). WhatsApp uses the platform token from env, nothing per tenant.
+- **Auth flows at runtime**: sign-up → sign-in is **403 until the emailed verification link is used** → 200 with a 7-day session (default `expiresIn`, refreshed daily); the reset token is **single-use**; **2FA**: after enable + one TOTP, a correct password alone returns `twoFactorRedirect` and the echoed token does not resolve to a session, a wrong TOTP is refused, the right one mints exactly one session; `revoke-sessions` empties the table; `change-email` is not enabled (the endpoint refuses). Invite links: 410 once expired (preview and accept), 404 for an unknown token, single-use (Phase 63).
+- **Rate limits bite**: invite preview 30/min → 429 with `RateLimit-*` headers; sign OTP 8 / 15 min → 429; password reset → 429 (#3).
+- **Secrets in history**: none. The only `BEGIN PRIVATE KEY` hits are `jose`'s own source inside a source map that was once committed under `dist/` (no longer tracked). No `.env*` was ever committed; only `.env.example` is tracked.
+- `requireAdmin` is an email allowlist (`ADMIN_EMAIL`) checked against the live session — fine for one operator.
+
+**Policy / notes**
+- Rate limiters (ours and better-auth's) are **in-memory per function instance**. On Fluid Compute that still bites (instances are few and long-lived) but is not a hard global cap; a shared store (Upstash/Redis through `express-rate-limit`'s store API + better-auth `secondaryStorage`) is the upgrade if abuse ever shows in the logs. → deferred work.
+- The CSP is enforced (not report-only) and has no report endpoint. The dashboard was **not** browser-checked under it (same bundle, same policy) — Phase 66's staging walkthrough should keep DevTools open for violations on its first pass.
+- `revokeSessionsOnPasswordReset` means a user resetting their password on their phone is logged out on their laptop — intended.
+
+**Deferred / for other phases**
+- **Account deletion does not exist** (no `deleteUser`, no data export). Phase 66's scripted journey lists "delete account" as a step that cannot be performed; PIPEDA right-to-erasure → `deferred-work`.
+- **`/widget.js` does not exist in the repo** — the embed snippet in Settings points at it, and Vercel's SPA rewrite would serve `index.html` as JavaScript on the contractor's site. Phase 66 bug list (functional, not security).
+- Distributed rate-limit store (above).
+- The external pentest (Phase 70, user-procured) — this phase was its prerequisite and is now closed.

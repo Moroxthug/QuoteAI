@@ -14,12 +14,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 93 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 303 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 373 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
-| 425 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 467 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 509 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
+| 129 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 339 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 409 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
+| 461 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 503 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 545 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
 
 ## artifacts/api-server/src/routes/admin.ts
 
@@ -100,7 +100,7 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 169 | POST | `/api/catalog/import-from-quotes` | session | quotes:edit | — | none | — | n/a | — | — | — |
 | 243 | POST | `/api/catalog/import-ocr` | session | quotes:edit | catalogOcrLimiter | none | — | n/a | — | — | — |
 | 340 | PUT | `/api/catalog/:id` | session | quotes:edit | — | manual | — | predicate | — | — | — |
-| 377 | DELETE | `/api/catalog/:id` | session | quotes:edit | — | none | — | predicate | — | — | — |
+| 381 | DELETE | `/api/catalog/:id` | session | quotes:edit | — | none | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/clients.ts
 
@@ -144,23 +144,23 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 19 | GET | `/api/crm/projects` | session | — | — | none | — | n/a | — | — | — |
 | 33 | POST | `/api/crm/projects` | session | jobs:edit | — | zod | — | n/a | — | — | — |
 | 75 | PUT | `/api/crm/projects/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 121 | DELETE | `/api/crm/projects/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 144 | GET | `/api/crm/projects/:projectId/tasks` | session | — | — | none | — | predicate | — | — | — |
-| 172 | POST | `/api/crm/projects/:projectId/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 218 | PATCH | `/api/crm/projects/:projectId/tasks/:taskId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 262 | GET | `/api/crm/projects/:projectId/assignments` | session | — | — | none | — | predicate | — | — | — |
-| 299 | POST | `/api/crm/projects/:projectId/assignments` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 351 | DELETE | `/api/crm/projects/:projectId/assignments/:assignmentId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 384 | GET | `/api/crm/collaborators` | session | — | — | none | — | n/a | — | — | — |
-| 398 | POST | `/api/crm/collaborators` | session | jobs:edit | — | zod | — | n/a | — | — | — |
-| 435 | GET | `/api/crm/suppliers` | session | — | — | none | — | n/a | — | — | — |
-| 449 | POST | `/api/crm/suppliers` | session | jobs:edit | — | zod | — | n/a | — | — | — |
+| 125 | DELETE | `/api/crm/projects/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 148 | GET | `/api/crm/projects/:projectId/tasks` | session | — | — | none | — | predicate | — | — | — |
+| 176 | POST | `/api/crm/projects/:projectId/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 222 | PATCH | `/api/crm/projects/:projectId/tasks/:taskId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 266 | GET | `/api/crm/projects/:projectId/assignments` | session | — | — | none | — | predicate | — | — | — |
+| 303 | POST | `/api/crm/projects/:projectId/assignments` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 355 | DELETE | `/api/crm/projects/:projectId/assignments/:assignmentId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 388 | GET | `/api/crm/collaborators` | session | — | — | none | — | n/a | — | — | — |
+| 402 | POST | `/api/crm/collaborators` | session | jobs:edit | — | zod | — | n/a | — | — | — |
+| 439 | GET | `/api/crm/suppliers` | session | — | — | none | — | n/a | — | — | — |
+| 453 | POST | `/api/crm/suppliers` | session | jobs:edit | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/cron.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 19 | GET | `/api/cron/tick` | none | — | — | none | — | n/a | — | — | — |
+| 20 | GET | `/api/cron/tick` | none | — | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/developer-api.ts
 
@@ -222,7 +222,7 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 194 | GET | `/api/flinks/transactions/:id/candidates` | session | integrations:view | — | none | — | predicate | — | — | — |
 | 219 | POST | `/api/flinks/transactions/:id/match` | session | integrations:full | — | zod | — | predicate | — | — | — |
 | 244 | POST | `/api/flinks/transactions/:id/unmatch` | session | integrations:full | — | none | — | helper | — | — | — |
-| 256 | POST | `/api/flinks/transactions/:id/ignore` | session | integrations:full | — | none | — | helper | — | — | — |
+| 259 | POST | `/api/flinks/transactions/:id/ignore` | session | integrations:full | — | none | — | helper | — | — | — |
 
 ## artifacts/api-server/src/routes/google-lsa.ts
 

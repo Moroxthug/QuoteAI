@@ -244,7 +244,10 @@ router.post("/flinks/transactions/:id/match", requireAuth, requirePermission("in
 router.post("/flinks/transactions/:id/unmatch", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    await unmatch(userId, req.params.id as string);
+    if (!(await unmatch(userId, req.params.id as string))) {
+      res.status(404).json({ error: "Transaction not found" });
+      return;
+    }
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error unmatching Flinks transaction");
@@ -256,7 +259,10 @@ router.post("/flinks/transactions/:id/unmatch", requireAuth, requirePermission("
 router.post("/flinks/transactions/:id/ignore", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    await ignoreTransaction(userId, req.params.id as string);
+    if (!(await ignoreTransaction(userId, req.params.id as string))) {
+      res.status(404).json({ error: "Transaction not found" });
+      return;
+    }
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error ignoring Flinks transaction");

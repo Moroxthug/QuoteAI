@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { timingSafeEqual } from "node:crypto";
 import { retryDueAutomations } from "../lib/automation";
 import { runContractMaintenance } from "../contracts/maintenance.js";
 import { runInvoiceMaintenance } from "../invoices/maintenance.js";
@@ -23,7 +24,9 @@ router.get("/cron/tick", async (req, res) => {
     return;
   }
   const header = req.headers.authorization ?? "";
-  if (header !== `Bearer ${secret}`) {
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const provided = Buffer.from(header);
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }

@@ -15,6 +15,17 @@ process.env.TOKEN_ENCRYPTION_KEY ??= "0".repeat(64);
 process.env.CRON_SECRET ??= "e2e-cron-secret";
 process.env.LOG_LEVEL ??= "warn";
 
+// Phase 64: the inbound-webhook tests sign requests with these. Real values
+// from .env.staging win (`??=`); the tests read process.env, so either works.
+// The Stripe key only has to exist — constructEvent is local HMAC math.
+process.env.STRIPE_SECRET_KEY ??= "sk_test_e2e_not_a_real_key";
+process.env.STRIPE_WEBHOOK_SECRET ??= "whsec_e2e_platform_secret";
+process.env.STRIPE_CONNECT_WEBHOOK_SECRET ??= "whsec_e2e_connect_secret";
+process.env.WHATSAPP_APP_SECRET ??= "e2e-whatsapp-app-secret";
+process.env.META_APP_SECRET ??= "e2e-meta-app-secret";
+process.env.FINANCEIT_WEBHOOK_SECRET ??= "e2e-financeit-webhook-secret";
+process.env.RESEND_WEBHOOK_SECRET ??= "whsec_" + Buffer.from("e2e-resend-webhook-secret-bytes").toString("base64");
+
 // Deterministic by default: every AI call path has a fallback on error, and
 // we want to exercise the fallback, not pay for (and wait on) real models.
 // The client is built at import time and refuses to exist without a key, so
@@ -36,8 +47,8 @@ vi.mock("resend", async () => {
   const { sentEmails } = await import("./src/e2e/mailbox.ts");
   class Resend {
     emails = {
-      send: async (msg: { to: string | string[]; subject: string; from: string }) => {
-        sentEmails.push({ to: Array.isArray(msg.to) ? msg.to : [msg.to], subject: msg.subject, from: msg.from });
+      send: async (msg: { to: string | string[]; subject: string; from: string; html?: string }) => {
+        sentEmails.push({ to: Array.isArray(msg.to) ? msg.to : [msg.to], subject: msg.subject, from: msg.from, html: msg.html ?? "" });
         return { data: { id: `e2e-${sentEmails.length}` }, error: null };
       },
     };

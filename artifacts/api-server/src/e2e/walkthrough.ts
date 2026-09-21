@@ -46,6 +46,21 @@ for (const host of [
   stubHost(host, (req) => json(599, { error: "walkthrough: vendor call blocked", url: req.url }));
 }
 
+// Phase 74: Twilio is "configured" with fake credentials and every send is
+// accepted and printed, so Settings → SMS and the job page's "On my way" can be
+// clicked through. Set the real TWILIO_* in .env.staging to text a real phone.
+process.env.TWILIO_ACCOUNT_SID ??= "ACwalkthrough00000000000000000000";
+process.env.TWILIO_AUTH_TOKEN ??= "walkthrough-twilio-token";
+process.env.TWILIO_FROM_NUMBER ??= "+18005550199";
+if (process.env.TWILIO_ACCOUNT_SID.startsWith("ACwalkthrough")) {
+  stubHost("https://api.twilio.com/", (req) => {
+    const form = new URLSearchParams(req.body ?? "");
+    console.log(`
+[sms] to=${form.get("To")} ${JSON.stringify(form.get("Body"))}`);
+    return json(201, { sid: `SM${Date.now()}`, status: "queued" });
+  });
+}
+
 const MAILBOX_PATH = resolve(import.meta.dirname, "../../.walkthrough-mailbox.json");
 const mailbox = await captureResend((mail) => {
   writeFileSync(MAILBOX_PATH, JSON.stringify(mailbox, null, 2));

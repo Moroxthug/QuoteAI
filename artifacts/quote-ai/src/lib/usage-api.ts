@@ -5,6 +5,7 @@ export type UsageSummaryDto = {
   plan: string;
   receiptScans: { used: number; allowance: number | null };
   whatsappMessages: { used: number; allowance: number | null };
+  smsMessages: { used: number; allowance: number | null };
   aiTokens: { used: number };
   estimatedCostCents: number;
 };

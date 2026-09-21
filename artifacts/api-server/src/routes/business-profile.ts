@@ -65,6 +65,8 @@ const ProfileExtrasBody = z.object({
       autoSendInvoices: z.boolean().optional(),
       invoiceAutoSendAfterHours: z.number().int().min(0).max(168).optional(),
       invoiceReminders: z.boolean().optional(),
+      smsEnabled: z.boolean().optional(),
+      smsReminders: z.boolean().optional(),
     })
     .optional(),
 });

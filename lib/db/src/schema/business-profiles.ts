@@ -28,6 +28,14 @@ export type AutomationSettings = {
   invoiceAutoSendAfterHours: number;
   /** Phase 4: email overdue reminders to the customer (3 / 7 / 14 days past due). */
   invoiceReminders: boolean;
+  /**
+   * Phase 74: send automated lead follow-ups by SMS to leads whose preferred
+   * channel is SMS (email otherwise). Manual sends ("on my way", test) do not
+   * depend on this — they are explicit actions by the contractor.
+   */
+  smsEnabled: boolean;
+  /** Phase 74: also text quote / contract / invoice reminders (with the link) when the customer's phone is known. */
+  smsReminders: boolean;
 };
 
 export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
@@ -36,6 +44,8 @@ export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
   autoSendInvoices: false,
   invoiceAutoSendAfterHours: 0,
   invoiceReminders: true,
+  smsEnabled: false,
+  smsReminders: false,
 };
 
 export const businessProfilesTable = pgTable("business_profiles", {

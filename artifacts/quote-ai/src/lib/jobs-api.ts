@@ -228,12 +228,13 @@ export type SetupEdits = { name?: string; plannedStart?: string | null; mileston
 
 async function req<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { credentials: "include", headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) }, ...init });
-  const body = (await res.json().catch(() => ({}))) as T & { error?: string; message?: string; requiredPlan?: string };
+  const body = (await res.json().catch(() => ({}))) as T & { error?: string; message?: string; requiredPlan?: string; reason?: string };
   if (!res.ok) {
-    const err = new Error(body.message || body.error || `Request failed (${res.status})`) as Error & { code?: string; status?: number; requiredPlan?: string };
+    const err = new Error(body.message || body.error || `Request failed (${res.status})`) as Error & { code?: string; status?: number; requiredPlan?: string; reason?: string };
     err.code = body.error;
     err.status = res.status;
     err.requiredPlan = body.requiredPlan;
+    err.reason = body.reason;
     throw err;
   }
   return body;
@@ -316,6 +317,8 @@ export const jobsApi = {
     req<{ photo: JobPhotoDto }>(`/api/jobs/${id}/photos/${photoId}`, { method: "PUT", body: json(body) }),
   deletePhoto: (id: string, photoId: string) => req<{ success: true }>(`/api/jobs/${id}/photos/${photoId}`, { method: "DELETE" }),
   sharePhotos: (id: string, photoIds: string[]) => req<{ success: true; channel: "email" | "whatsapp"; count: number }>(`/api/jobs/${id}/photos/share`, { method: "POST", body: json({ photoIds }) }),
+  /** Phase 74: one-off "on my way" text to the job's client. */
+  onMyWay: (id: string, body: { etaMinutes?: number }) => req<{ success: true; body: string; segments: number }>(`/api/jobs/${id}/sms/on-my-way`, { method: "POST", body: json(body) }),
   photoFileUrl: (id: string, photoId: string) => `/api/jobs/${id}/photos/${photoId}/file`,
 };
 

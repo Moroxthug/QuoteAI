@@ -43,6 +43,7 @@ import { serializeInvoice } from "./invoices.js";
 import { Readable } from "node:stream";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
 import { sendJobPhotoShare } from "../lib/jobMessaging.js";
+import { sendSms } from "../lib/sms.js";
 import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
 import { logger } from "../lib/logger.js";
 
@@ -1198,6 +1199,61 @@ router.post("/jobs/:id/photos/share", requireAuth, requirePermission("jobs", "ed
     res.json({ success: true, channel: result.channel, count: photos.length });
   } catch (err) {
     req.log.error({ err }, "Error sharing job photos");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 74: "On my way" text from the job page ────────────────────────────
+// A transactional heads-up to the job's client ("Sam from Acme is on the way,
+// arriving in about 30 minutes"). Manual and one-off: it does not depend on
+// the smsEnabled automation toggle, only on the customer not having opted out
+// and the plan's allowance. `marketingUnsubscribedAt` gates automated
+// reachout only — an appointment heads-up is service, not marketing — but a
+// STOP reply (sms_opt_outs) blocks it like everything else.
+router.post("/jobs/:id/sms/on-my-way", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const body = z.object({ etaMinutes: z.number().int().min(5).max(240).optional(), lang: z.enum(["en", "fr"]).optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    if (!project.clientId) {
+      res.status(409).json({ error: "NO_CLIENT", message: "This job has no client to text." });
+      return;
+    }
+    const [client] = await db.select().from(clientsTable).where(eq(clientsTable.id, project.clientId));
+    if (!client?.phone) {
+      res.status(409).json({ error: "NO_PHONE", message: "This client has no phone number on file." });
+      return;
+    }
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    if (!profile) {
+      res.status(500).json({ error: "Business profile not found" });
+      return;
+    }
+    const lang = body.data.lang ?? (client.preferredLanguage === "fr" ? "fr" : "en");
+    const who = (getUserName(res) || profile.companyName || "Your contractor").trim();
+    const where = project.address ? (lang === "fr" ? ` à ${project.address}` : ` to ${project.address}`) : "";
+    const eta = body.data.etaMinutes;
+    const text = lang === "fr"
+      ? `${who} est en route${where}${eta ? `, arrivée prévue dans environ ${eta} minutes` : ""}.`
+      : `${who} is on the way${where}${eta ? `, arriving in about ${eta} minutes` : ""}.`;
+    const result = await sendSms({ profile, to: client.phone, body: text, lang, purpose: "on_my_way", relatedEntityType: "project", relatedEntityId: project.id });
+    if (!result.ok) {
+      const status = result.reason === "not_configured" ? 503 : result.reason === "allowance_exceeded" ? 402 : result.reason === "opted_out" || result.reason === "invalid_phone" ? 409 : 502;
+      res.status(status).json({ error: "SEND_FAILED", reason: result.reason });
+      return;
+    }
+    await writeAudit({ userId, actorType: "user", entityType: "project", entityId: project.id, action: "on_my_way_sent", diff: { etaMinutes: eta ?? null, phone: client.phone } });
+    res.json({ success: true, body: result.body, segments: result.segments });
+  } catch (err) {
+    req.log.error({ err }, "Error sending on-my-way text");
     res.status(500).json({ error: "Internal server error" });
   }
 });

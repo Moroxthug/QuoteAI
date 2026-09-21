@@ -1,9 +1,12 @@
-import { db, contractsTable, contractSignersTable, businessProfilesTable } from "@workspace/db";
+import { db, contractsTable, contractSignersTable, businessProfilesTable, DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile } from "@workspace/db";
 import { and, eq, inArray, isNotNull, lt, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { sendContractReminderEmail } from "../lib/emailContracts.js";
 import { hashToken, newRawToken, logContractEvent } from "./service.js";
+import { sendSms } from "../lib/sms.js";
+
+const automationSettings = (profile: BusinessProfile) => ({ ...DEFAULT_AUTOMATION_SETTINGS, ...(profile.automationSettings ?? {}) });
 
 const REMINDER_AFTER_DAYS = [3, 7, 14];
 const MAX_REMINDERS = REMINDER_AFTER_DAYS.length;
@@ -44,14 +47,29 @@ export async function runContractMaintenance(): Promise<{ expired: number; remin
     try {
       const raw = newRawToken();
       await db.update(contractSignersTable).set({ tokenHash: hashToken(raw), tokenExpiresAt: c.expiresAt }).where(eq(contractSignersTable.id, signer.id));
-      const [senderProfile] = await db.select({ logoUrl: businessProfilesTable.logoUrl, email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, c.userId));
+      const [senderProfile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, c.userId));
+      const signUrl = `${getBaseUrl()}/sign/${raw}`;
+      // Phase 74: with text reminders on, the customer is also texted the (fresh) signing link.
+      const customerPhone = c.variables.customer?.phone;
+      if (senderProfile && automationSettings(senderProfile).smsReminders && customerPhone) {
+        const lang = c.language === "fr" ? "fr" : "en";
+        await sendSms({
+          profile: senderProfile,
+          to: customerPhone,
+          body: lang === "fr" ? `Rappel : le contrat ${c.contractNumber} attend votre signature. ${signUrl}` : `Reminder: contract ${c.contractNumber} is waiting for your signature. ${signUrl}`,
+          lang,
+          purpose: "contract_reminder",
+          relatedEntityType: "contract",
+          relatedEntityId: c.id,
+        });
+      }
       await sendContractReminderEmail({
         toEmail: signer.email,
         userId: c.userId,
         customerName: signer.name,
         companyName: c.variables.contractor.name,
         contractNumber: c.contractNumber,
-        signUrl: `${getBaseUrl()}/sign/${raw}`,
+        signUrl,
         expiresAt: c.expiresAt ?? new Date(now.getTime() + 7 * 86_400_000),
         language: c.language as "en" | "fr",
         companyLogoUrl: senderProfile?.logoUrl ?? null,

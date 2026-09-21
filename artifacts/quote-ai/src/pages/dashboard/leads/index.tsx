@@ -8,7 +8,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { leadsApi, type LeadDto, type LeadStatus } from "@/lib/leads-api";
+import { leadsApi, type LeadChannel, type LeadDto, type LeadStatus } from "@/lib/leads-api";
 
 const COLUMNS: LeadStatus[] = ["new", "contacted", "quoted", "won", "lost", "unsubscribed"];
 
@@ -22,7 +22,7 @@ export default function LeadsListPage() {
   const { data, isLoading } = useQuery({ queryKey: ["leads"], queryFn: () => leadsApi.list() });
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "", preferredChannel: "email" as LeadChannel });
   const [dragOverCol, setDragOverCol] = useState<LeadStatus | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
@@ -42,17 +42,24 @@ export default function LeadsListPage() {
   }, [items]);
 
   const createMutation = useMutation({
-    mutationFn: () => leadsApi.create({ name: form.name, email: form.email || undefined, phone: form.phone || undefined, notes: form.notes || undefined }),
+    mutationFn: () => leadsApi.create({ name: form.name, email: form.email || undefined, phone: form.phone || undefined, notes: form.notes || undefined, preferredChannel: form.phone ? form.preferredChannel : "email" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
       setCreateOpen(false);
-      setForm({ name: "", email: "", phone: "", notes: "" });
+      setForm({ name: "", email: "", phone: "", notes: "", preferredChannel: "email" });
     },
     onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
   });
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: LeadStatus }) => leadsApi.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
+    onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
+  });
+
+  // Phase 74: flip a lead between email and text follow-ups (needs a phone; records the SMS consent basis server-side).
+  const channelMutation = useMutation({
+    mutationFn: ({ id, preferredChannel }: { id: string; preferredChannel: LeadChannel }) => leadsApi.update(id, { preferredChannel }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
     onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
   });
@@ -145,9 +152,17 @@ export default function LeadsListPage() {
                           </p>
                         )}
                         <div className="kan-foot">
-                          <span className="flex items-center gap-1 text-xs text-[var(--faint)]">
+                          <button
+                            type="button"
+                            className="flex items-center gap-1 text-xs text-[var(--faint)] hover:text-foreground disabled:cursor-default"
+                            title={t(lead.preferredChannel === "sms" ? "leads.channel.switchToEmail" : "leads.channel.switchToSms")}
+                            aria-label={t(`leads.channel.${lead.preferredChannel}`)}
+                            disabled={!lead.phone || lead.preferredChannel === "whatsapp" || channelMutation.isPending}
+                            onClick={() => channelMutation.mutate({ id: lead.id, preferredChannel: lead.preferredChannel === "sms" ? "email" : "sms" })}
+                          >
                             <ChannelIcon className="h-3 w-3" />
-                          </span>
+                            <span>{t(`leads.channel.${lead.preferredChannel}`)}</span>
+                          </button>
                           <button
                             type="button"
                             className="btn btn-sm btn-outline-navy"
@@ -193,6 +208,14 @@ export default function LeadsListPage() {
                 <label>{t("leads.field.phone")}</label>
                 <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
               </div>
+            </div>
+            <div className="field">
+              <label>{t("leads.field.channel")}</label>
+              <select value={form.phone ? form.preferredChannel : "email"} disabled={!form.phone} onChange={(e) => setForm((f) => ({ ...f, preferredChannel: e.target.value as LeadChannel }))}>
+                <option value="email">{t("leads.channel.email")}</option>
+                <option value="sms">{t("leads.channel.sms")}</option>
+              </select>
+              <span className="text-xs text-muted-foreground mt-1 block">{t("leads.field.channelHint")}</span>
             </div>
             <div className="field">
               <label>{t("leads.field.notes")}</label>

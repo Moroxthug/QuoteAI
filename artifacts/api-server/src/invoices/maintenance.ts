@@ -7,6 +7,7 @@ import { sendInvoiceReminderEmail } from "../lib/emailInvoices.js";
 import { REMINDER_AFTER_DAYS, balanceCents } from "./math.js";
 import { automationSettings, invoiceToken, logInvoiceEvent, publicInvoiceUrl, sendInvoice, invoicePdfBuffer } from "./service.js";
 import { ti, type Lang, type IKey } from "./render.js";
+import { sendSms } from "../lib/sms.js";
 
 // ── Daily invoice maintenance (cron) ─────────────────────────────────────────
 // 1. Open invoices past due → overdue (+ one in-app notification via the
@@ -55,25 +56,46 @@ export async function runInvoiceMaintenance(now = new Date()): Promise<{ overdue
     const threshold = REMINDER_AFTER_DAYS[inv.reminderCount];
     if (threshold === undefined || daysOverdue < threshold) continue;
     const toEmail = (inv.customer.email ?? "").trim();
-    if (!toEmail.includes("@")) continue;
+    const hasEmail = toEmail.includes("@");
+    const smsTo = settings.smsReminders ? inv.customer.phone : null;
+    if (!hasEmail && !smsTo) continue;
     try {
-      const { buffer } = await invoicePdfBuffer(inv.id);
-      await sendInvoiceReminderEmail({
-        toEmail,
-        userId: inv.userId,
-        customerName: inv.customer.name,
-        companyName: inv.contractor.name,
-        number: inv.number,
-        totalCents: inv.totalCents,
-        balanceCents: balanceCents(inv),
-        dueDate: inv.dueDate,
-        publicUrl: publicInvoiceUrl(invoiceToken(inv)),
-        language: inv.language as Lang,
-        etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
-        daysOverdue,
-        pdfBuffer: buffer,
-        replyTo: profiles.get(inv.userId)?.email ?? null,
-      });
+      if (hasEmail) {
+        const { buffer } = await invoicePdfBuffer(inv.id);
+        await sendInvoiceReminderEmail({
+          toEmail,
+          userId: inv.userId,
+          customerName: inv.customer.name,
+          companyName: inv.contractor.name,
+          number: inv.number,
+          totalCents: inv.totalCents,
+          balanceCents: balanceCents(inv),
+          dueDate: inv.dueDate,
+          publicUrl: publicInvoiceUrl(invoiceToken(inv)),
+          language: inv.language as Lang,
+          etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
+          daysOverdue,
+          pdfBuffer: buffer,
+          replyTo: profiles.get(inv.userId)?.email ?? null,
+        });
+      }
+      // Phase 74: with text reminders on, the customer is also texted the balance + link (or only texted, when there is no email).
+      const senderProfile = profiles.get(inv.userId);
+      if (senderProfile && smsTo) {
+        const lang = inv.language === "fr" ? "fr" : "en";
+        const balance = cad(balanceCents(inv));
+        await sendSms({
+          profile: senderProfile,
+          to: smsTo,
+          body: lang === "fr"
+            ? `Rappel : la facture ${inv.number} (${balance}) est en retard de ${daysOverdue} jour${daysOverdue > 1 ? "s" : ""}. ${publicInvoiceUrl(invoiceToken(inv))}`
+            : `Reminder: invoice ${inv.number} (${balance}) is ${daysOverdue} day${daysOverdue > 1 ? "s" : ""} overdue. ${publicInvoiceUrl(invoiceToken(inv))}`,
+          lang,
+          purpose: "invoice_reminder",
+          relatedEntityType: "invoice",
+          relatedEntityId: inv.id,
+        });
+      }
       await db.update(invoicesTable).set({ reminderCount: sql`${invoicesTable.reminderCount} + 1`, lastReminderAt: now }).where(eq(invoicesTable.id, inv.id));
       await logInvoiceEvent({ invoiceId: inv.id, type: "reminder_sent", actor: "system", detail: { number: inv.reminderCount + 1, daysOverdue } });
       reminded++;

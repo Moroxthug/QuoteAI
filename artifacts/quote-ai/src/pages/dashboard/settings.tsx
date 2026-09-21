@@ -35,6 +35,7 @@ import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
+import { SmsTab } from "./settings-sms-tab";
 import { usageApi } from "@/lib/usage-api";
 import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
 import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
@@ -2813,6 +2814,7 @@ function UsageTab() {
       <div className="p-5 space-y-5">
         <UsageMeter label={t("dashboard.settings.usage.receiptScans")} used={data.receiptScans.used} allowance={data.receiptScans.allowance} />
         <UsageMeter label={t("dashboard.settings.usage.whatsappMessages")} used={data.whatsappMessages.used} allowance={data.whatsappMessages.allowance} />
+        <UsageMeter label={t("dashboard.settings.usage.smsMessages")} used={data.smsMessages?.used ?? 0} allowance={data.smsMessages?.allowance ?? null} />
         <p className="text-xs text-muted-foreground pt-2 border-t">{t("dashboard.settings.usage.resetNote")}</p>
       </div>
     </div>
@@ -2828,14 +2830,16 @@ export default function SettingsPage() {
   const { data: subscription } = useGetSubscription();
   const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
   const isElite = subscription?.isActive && subscription?.plan === "monthly_elite";
-  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : tabFromParam === "security" ? "security" : "billing";
-  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "widget" | "usage" | "integrations" | "security">(defaultTab as any);
+  const isPaid = !!subscription?.isActive && !!subscription?.plan && subscription.plan !== "free";
+  const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "sms" ? "sms" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : tabFromParam === "security" ? "security" : "billing";
+  const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "sms" | "widget" | "usage" | "integrations" | "security">(defaultTab as any);
 
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
     { id: "business" as const, label: t("dashboard.settings.tabs.business") },
     { id: "billing" as const, label: t("dashboard.settings.tabs.billing") },
     ...(isProOrElite ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
+    ...(isPaid ? [{ id: "sms" as const, label: t("dashboard.settings.tabs.sms") }] : []),
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
     { id: "usage" as const, label: t("dashboard.settings.tabs.usage") },
     ...(isElite ? [{ id: "integrations" as const, label: t("dashboard.settings.tabs.integrations") }] : []),
@@ -2870,6 +2874,8 @@ export default function SettingsPage() {
         <BusinessTab />
       ) : activeTab === "whatsapp" ? (
         <WhatsappTab />
+      ) : activeTab === "sms" ? (
+        <SmsTab />
       ) : activeTab === "widget" ? (
         <WidgetTab />
       ) : activeTab === "usage" ? (

@@ -30,6 +30,12 @@ process.env.WHATSAPP_REVIEW_REQUEST_TEMPLATE ??= "quoteai_review_request";
 process.env.WHATSAPP_LEAD_FOLLOWUP_TEMPLATE ??= "quoteai_lead_followup";
 process.env.WHATSAPP_PHOTO_SHARE_TEMPLATE ??= "quoteai_photo_share";
 process.env.QUICKBOOKS_ENVIRONMENT ??= "sandbox";
+// Phase 74: the SMS client reads these live; sms.e2e answers api.twilio.com from the stub. The webhook URL is
+// what the signature is computed over, so the test signs with the same fixed value.
+process.env.TWILIO_ACCOUNT_SID ??= "ACe2e0000000000000000000000000000";
+process.env.TWILIO_AUTH_TOKEN ??= "e2e-twilio-auth-token";
+process.env.TWILIO_FROM_NUMBER ??= "+18005550199";
+process.env.TWILIO_WEBHOOK_URL ??= "https://e2e.quoteai.test/api/sms/webhook";
 process.env.WHATSAPP_APP_SECRET ??= "e2e-whatsapp-app-secret";
 process.env.META_APP_SECRET ??= "e2e-meta-app-secret";
 process.env.FINANCEIT_WEBHOOK_SECRET ??= "e2e-financeit-webhook-secret";
@@ -88,6 +94,7 @@ vi.mock("resend", async () => {
     "https://googleads.googleapis.com/",
     "https://sandbox.financeit.ca/",
     "https://financeit.ca/",
+    "https://api.twilio.com/",
   ]) {
     stubHost(host, (req) => json(599, { error: "e2e: unscripted vendor call", url: req.url }));
   }

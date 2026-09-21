@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
+  ArrowLeft, Briefcase, MapPin, MessageSquareText, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ import { invoicesApi } from "@/lib/invoices-api";
 import { Gantt } from "@/components/jobs/gantt";
 import { JobStatusBadge, MilestoneStatusBadge, ChangeOrderStatusBadge } from "@/components/jobs/badges";
 import { ChangeOrderDialog } from "@/components/jobs/change-order-dialog";
+import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CostsTab } from "@/components/jobs/costs-tab";
 import { TeamTab } from "@/components/jobs/team-tab";
 import { InvoicesTab } from "@/components/jobs/invoices-tab";
@@ -82,6 +83,7 @@ export default function JobDetailPage() {
           </div>
         </div>
         <div className="head-actions">
+          {job.client?.phone && job.status !== "completed" && <OnMyWayButton jobId={job.id} clientName={job.client.name} />}
           <Link href={`/dashboard/jobs/${job.id}/setup`} className="btn btn-sm btn-outline-navy"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Link>
           {job.status === "planning" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</button>}
           {job.status === "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("suspended")}>{t("jobs.action.suspend")}</button>}
@@ -143,6 +145,51 @@ function Kpi({ label, value, sub, tone, progress }: { label: string; value: stri
     </div>
   );
 }
+
+/** Phase 74: one-off "on my way" text to the job's client, with an optional ETA. */
+function OnMyWayButton({ jobId, clientName }: { jobId: string; clientName: string }) {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [eta, setEta] = useState<string>("30");
+  const send = useMutation({
+    mutationFn: () => jobsApi.onMyWay(jobId, eta === "" ? {} : { etaMinutes: Number(eta) }),
+    onSuccess: (r) => { setOpen(false); toast({ title: t("jobs.onMyWay.sent").replace("{name}", clientName), description: r.body }); },
+    onError: (e: Error & { status?: number; reason?: string }) => {
+      const reason = e.reason;
+      const key = e.status === 503 ? "jobs.onMyWay.notAvailable" : e.status === 402 ? "jobs.onMyWay.allowance" : reason === "opted_out" ? "jobs.onMyWay.optedOut" : "jobs.onMyWay.failed";
+      toast({ title: t(key), description: e.status === 503 || e.status === 402 ? undefined : e.message, variant: "destructive" });
+    },
+  });
+  return (
+    <>
+      <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setOpen(true)}><MessageSquareText className="h-4 w-4" /> {t("jobs.onMyWay.button")}</button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("jobs.onMyWay.title")}</DialogTitle>
+            <DialogDescription>{t("jobs.onMyWay.desc").replace("{name}", clientName)}</DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            <div className="field">
+              <label>{t("jobs.onMyWay.eta")}</label>
+              <select value={eta} onChange={(e) => setEta(e.target.value)}>
+                <option value="">{t("jobs.onMyWay.etaNone")}</option>
+                {["15", "30", "45", "60", "90", "120"].map((m) => <option key={m} value={m}>{t("jobs.onMyWay.etaMinutes").replace("{n}", m)}</option>)}
+              </select>
+              <span className="text-xs text-muted-foreground mt-1 block">{t("jobs.onMyWay.hint")}</span>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setOpen(false)}>{t("jobs.cancel")}</button>
+            <button type="button" className="btn btn-sm btn-navy" disabled={send.isPending} onClick={() => send.mutate()}>{send.isPending ? "…" : t("jobs.onMyWay.send")}</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 
 function EditableName({ id, name }: { id: string; name: string }) {
   const { t } = useLanguage();

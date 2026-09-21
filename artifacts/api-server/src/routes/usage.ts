@@ -46,6 +46,7 @@ router.get("/usage/summary", requireAuth, async (req, res) => {
       plan,
       receiptScans: { used: eventCountByKind("ai_vision"), allowance: allowance.receiptScans },
       whatsappMessages: { used: eventCountByKind("whatsapp_message"), allowance: allowance.whatsappMessages },
+      smsMessages: { used: Math.round(totals.sms.quantity), allowance: allowance.smsMessages },
       aiTokens: { used: totals.ai_text.quantity + totals.ai_vision.quantity },
       estimatedCostCents: Object.values(totals).reduce((s, t) => s + t.costCents, 0),
     });

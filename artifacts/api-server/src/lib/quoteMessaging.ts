@@ -2,8 +2,11 @@ import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import { sanitizeForFromHeader } from "./emailUtils.js";
-import { db, clientsTable, type BusinessProfile, type Quote, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { db, clientsTable, DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile, type Quote, type QuoteClientData, type QuoteCompanySnapshot } from "@workspace/db";
+import { sendSms } from "./sms.js";
 import { eq } from "drizzle-orm";
+
+const automationSettings = (profile: BusinessProfile) => ({ ...DEFAULT_AUTOMATION_SETTINGS, ...(profile.automationSettings ?? {}) });
 
 // ── Phase 21: quote-sent follow-up reminders ────────────────────────────────
 // A quote gets emailed to a customer and, if they never accept, nothing
@@ -99,7 +102,7 @@ function buildFollowupEmailHtml(params: {
 }
 
 export type QuoteFollowupResult =
-  | { ok: true }
+  | { ok: true; channels: ("email" | "sms")[] }
   | { ok: false; reason: string };
 
 async function quoteFollowupLanguage(quote: Quote, profile: BusinessProfile): Promise<"en" | "fr"> {
@@ -124,10 +127,14 @@ export async function sendQuoteFollowup(params: {
   const { quote, profile, stage } = params;
   const clientData = quote.clientData as QuoteClientData;
   const email = clientData?.email;
-  if (!email) return { ok: false, reason: "no_email" };
+  // Phase 74: with "text reminders" on, the customer also gets a short SMS
+  // with the link when a phone is known — and the SMS alone counts as a
+  // successful reminder when there is no email to send.
+  const smsTo = automationSettings(profile).smsReminders ? clientData?.phone : null;
+  if (!email && !smsTo) return { ok: false, reason: "no_email" };
 
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return { ok: false, reason: "resend_not_configured" };
+  if (!apiKey && !smsTo) return { ok: false, reason: "resend_not_configured" };
 
   // Same rule as contract drafting (contracts/service.ts): the client's stored
   // preference wins, otherwise a Quebec quote is French. Phase 65 found this
@@ -138,6 +145,14 @@ export async function sendQuoteFollowup(params: {
   const totale = new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(Number(quote.totale));
   const publicUrl = `${getBaseUrl()}/p/${quote.id}`;
   const { subject } = followupCopy(stage, lang, quoteNumber, totale);
+
+  const channels: ("email" | "sms")[] = [];
+  if (smsTo) {
+    const sms = await sendSms({ profile, to: smsTo, body: `${subject} ${publicUrl}`, lang, purpose: "quote_followup", relatedEntityType: "quote", relatedEntityId: quote.id });
+    if (sms.ok) channels.push("sms");
+    else logger.warn({ quoteId: quote.id, reason: sms.reason }, "Quote follow-up SMS not sent");
+  }
+  if (!email || !apiKey) return channels.length ? { ok: true, channels } : { ok: false, reason: email ? "resend_not_configured" : "no_email" };
 
   try {
     const resend = brandedResend(apiKey);
@@ -158,9 +173,11 @@ export async function sendQuoteFollowup(params: {
       headers: { "List-Unsubscribe": `<${quoteUnsubscribeUrl(quote.unsubscribeToken)}>` },
       ...(profile.email ? { replyTo: profile.email } : {}),
     });
-    return { ok: true };
+    channels.push("email");
+    return { ok: true, channels };
   } catch (err) {
     logger.error({ err, quoteId: quote.id }, "Quote follow-up email failed");
+    if (channels.length) return { ok: true, channels };
     return { ok: false, reason: err instanceof Error ? err.message : "send_failed" };
   }
 }

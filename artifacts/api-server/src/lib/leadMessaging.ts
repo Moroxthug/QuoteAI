@@ -1,8 +1,11 @@
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
-import type { BusinessProfile, Lead } from "@workspace/db";
+import { DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile, type Lead } from "@workspace/db";
 import { sendWhatsappTemplate } from "../routes/whatsapp.js";
+import { sendSms } from "./sms.js";
+
+const automationSettings = (profile: BusinessProfile) => ({ ...DEFAULT_AUTOMATION_SETTINGS, ...(profile.automationSettings ?? {}) });
 
 // ── Phase 9: CASL-compliant lead follow-up messaging ────────────────────────
 // Every automated message (email or WhatsApp) sent to a lead must carry:
@@ -90,12 +93,12 @@ function buildFollowupEmailHtml(params: { clientName: string; profile: BusinessP
 }
 
 export type LeadFollowupResult =
-  | { ok: true; channel: "email" | "whatsapp" }
+  | { ok: true; channel: "email" | "whatsapp" | "sms" }
   | { ok: false; reason: string };
 
 /**
  * Sends the follow-up for the given stage over the lead's preferred channel,
- * falling back to email when WhatsApp isn't available. Never sends to an
+ * falling back to email when WhatsApp/SMS isn't available. Never sends to an
  * unsubscribed lead — callers must still check `lead.unsubscribedAt` before
  * calling this (defense in depth, not the only gate).
  */
@@ -107,6 +110,16 @@ export async function sendLeadFollowup(params: {
 }): Promise<LeadFollowupResult> {
   const { lead, profile, stage } = params;
   const lang = lead.preferredLanguage === "fr" ? "fr" : "en";
+
+  // Phase 74: a lead who asked for texts gets the same copy by SMS (the
+  // identity line and STOP footer are added by sendSms). Only when the
+  // company turned SMS follow-ups on; any non-send falls back to email.
+  if (lead.preferredChannel === "sms" && lead.phone && automationSettings(profile).smsEnabled) {
+    const { subject, body } = followupCopy(stage, lang);
+    const sent = await sendSms({ profile, to: lead.phone, body: `${subject} ${body}`, lang, purpose: "lead_followup", relatedEntityType: "lead", relatedEntityId: lead.id });
+    if (sent.ok) return { ok: true, channel: "sms" };
+    logger.warn({ leadId: lead.id, reason: sent.reason }, "SMS follow-up not sent, falling back to email");
+  }
 
   if (lead.preferredChannel === "whatsapp" && lead.phone && params.whatsappTemplateName) {
     const { subject } = followupCopy(stage, lang);

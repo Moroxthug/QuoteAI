@@ -63,6 +63,8 @@ router.post("/leads", requireAuth, requirePermission("leads", "edit"), async (re
       .returning();
     await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "manual" } });
     await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "consent_recorded", payload: { consentSource: "manual_entry" } });
+    // Phase 74: texting needs its own recorded basis — the channel the lead asked for, on the consent already captured.
+    if (lead!.preferredChannel === "sms") await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "consent_recorded", channel: "sms", payload: { consentSource: "manual_entry", channel: "sms" } });
     res.status(201).json({ lead });
   } catch (err) {
     req.log.error({ err }, "Error creating lead");
@@ -125,6 +127,9 @@ router.patch("/leads/:id", requireAuth, requirePermission("leads", "edit"), asyn
       .returning();
     if (d.status && d.status !== existing.status) {
       await db.insert(leadEventsTable).values({ leadId: existing.id, userId, type: "status_changed", payload: { from: existing.status, to: d.status } });
+    }
+    if (d.preferredChannel === "sms" && existing.preferredChannel !== "sms") {
+      await db.insert(leadEventsTable).values({ leadId: existing.id, userId, type: "consent_recorded", channel: "sms", payload: { consentSource: existing.consentSource, channel: "sms", actorUserId: getActorUserId(res) } });
     }
     res.json({ lead });
   } catch (err) {

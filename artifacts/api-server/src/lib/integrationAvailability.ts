@@ -24,6 +24,7 @@ export const INTEGRATION_ENV: Record<IntegrationName, readonly string[]> = {
   google_lsa: ["GOOGLE_LSA_CLIENT_ID", "GOOGLE_LSA_CLIENT_SECRET", "GOOGLE_LSA_REDIRECT_URI", "GOOGLE_ADS_DEVELOPER_TOKEN"],
   flinks: ["FLINKS_CUSTOMER_ID", "FLINKS_INSTANCE"],
   financeit: ["FINANCEIT_APP_ID", "FINANCEIT_APP_SECRET"],
+  twilio: ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_FROM_NUMBER"],
 };
 
 export type IntegrationName =
@@ -37,7 +38,8 @@ export type IntegrationName =
   | "meta_lead_ads"
   | "google_lsa"
   | "flinks"
-  | "financeit";
+  | "financeit"
+  | "twilio";
 
 /** True when every env var the integration's client reads is non-empty. Read live (not cached) so tests can flip it. */
 export function isIntegrationConfigured(name: IntegrationName): boolean {

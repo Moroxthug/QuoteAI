@@ -224,3 +224,21 @@ Exit 1 = a variable the code reads is unclassified, or a required one is missing
 | Where did a fee go? | Stripe → Connect → the connected account's payment → "Application fee"; the platform balance receives it as `application_fee` objects |
 | Registered entity changes (new address, GST number) | edit `LEGAL_ENTITY` in `lib/legal-entity/src/index.ts`, push; also update Stripe → Settings → Business details by hand |
 | An email went out without the footer | it did not go through `brandedResend` — grep for `new Resend(` outside `emailUtils.ts` (there should be none) |
+
+## 11. SMS channel (Twilio, Phase 74)
+
+**Where**: `artifacts/api-server/src/lib/sms.ts` (compose + gates + send + inbound), `src/routes/sms.ts` (Settings API + Twilio webhook), `src/routes/jobs.ts` (`POST /jobs/:id/sms/on-my-way`), tables `sms_messages` and `sms_opt_outs`.
+
+**How it fits** — one platform number (`TWILIO_FROM_NUMBER`) texts on behalf of every contractor. `sendSms()` is the only sender: it prepends `Company (phone):` and appends `Reply STOP to opt out.` (FR equivalent), then checks, in order, Twilio configured → phone normalises to E.164 → not in `sms_opt_outs` → plan allowance (`MONTHLY_USAGE_ALLOWANCE.smsMessages`, counted in segments from `usage_events kind=sms`). Every outcome — sent, failed, skipped with a reason — is a row in `sms_messages`, which is what Settings → SMS shows. Automated sends need the contractor's toggles (`automationSettings.smsEnabled` for lead follow-ups to leads whose `preferredChannel = "sms"`, `smsReminders` for quote/contract/invoice reminders); the job page's "On my way" and the Settings test send are manual and only need allowance + no opt-out.
+
+Inbound (`POST /api/sms/webhook`, Twilio "A message comes in"): signature = HMAC-SHA1(auth token, exact URL + sorted form fields), base64 — anything else is 403. STOP/ARRÊT/UNSUBSCRIBE… → `sms_opt_outs` row for the phone **and** every lead/client carrying that number flips to unsubscribed on all channels, with a notification to the contractor who last texted it. START/OUI → opt-out removed. Anything else → stored as a `reply` and surfaced as a notification (`sms_reply`).
+
+| Ask | Do |
+|---|---|
+| Settings → SMS says "not available yet" | one of `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_FROM_NUMBER` is unset for that environment (O9 step). Sends are logged as `skipped / not_configured` meanwhile — nothing is lost, nothing is queued |
+| Webhook returns 403 in the Twilio debugger | the URL Twilio calls differs from what we sign (`TWILIO_WEBHOOK_URL` or `<base>/api/sms/webhook`, scheme + host + path + query must match exactly); set `TWILIO_WEBHOOK_URL` to the URL as configured in the console |
+| Customer says they still get texts after STOP | check `sms_opt_outs` for the E.164 number; Twilio also blocks at its edge (Messaging → Opt-out management). A manual opt-out: `POST /api/sms/opt-out { phone }` |
+| Customer wants texts again | they reply START/UNSTOP/OUI; or delete their `sms_opt_outs` row (Twilio's own block clears on START only) |
+| A text went out without the identity line | it did not go through `sendSms` — grep for `api.twilio.com` outside `lib/sms.ts` (there should be none) |
+| Allowance too small for a pilot customer | `featureFlags` do not cover allowances; bump `MONTHLY_USAGE_ALLOWANCE` in `lib/db/src/schema/plans.ts` or move them up a plan |
+| Cost check | Twilio Console → Monitor → Usage; our estimate is `usage_events.unit_cost_cents` (0.8 ¢/segment) in `/api/admin/margin` |

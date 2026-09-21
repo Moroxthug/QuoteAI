@@ -245,7 +245,7 @@ const INBOUND_WEBHOOK_PATH = /webhook$|\/webhooks\/\w+$/;
 
 function classifyWebhook(reach: string, method: string, routePath: string): string | null {
   if (method !== "post" || !INBOUND_WEBHOOK_PATH.test(routePath)) return null;
-  const hits = ["constructEvent", "timingSafeEqual", "createHmac", "x-hub-signature", "verifySignature", "svix", "hub.verify_token"].filter((k) => reach.includes(k));
+  const hits = ["constructEvent", "timingSafeEqual", "createHmac", "x-hub-signature", "verifySignature", "svix", "hub.verify_token", "x-twilio-signature"].filter((k) => reach.includes(k));
   return hits.length ? hits.join(", ") : "NONE";
 }
 

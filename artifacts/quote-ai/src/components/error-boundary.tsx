@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from "react";
 import { type Lang } from "@/i18n/translations";
 import { lookup } from "@/i18n/registry";
+import { reportError } from "@/lib/error-tracking";
 
 // Class components can't use hooks, so read the persisted language choice
 // directly (mirrors LanguageContext's detection logic) instead of useLanguage().
@@ -40,6 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: unknown, info: { componentStack: string }) {
     console.error("Unhandled error in component tree", error, info.componentStack);
+    reportError(error, { mechanism: "react-error-boundary", handled: false, extra: { componentStack: info.componentStack.slice(0, 4000) } });
   }
 
   render() {

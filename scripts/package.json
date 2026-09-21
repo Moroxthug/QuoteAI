@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "env-inventory": "tsx ./src/env-inventory.ts",
     "apply-clerk-email-templates": "tsx ./src/apply-clerk-email-templates.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

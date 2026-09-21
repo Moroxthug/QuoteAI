@@ -56,8 +56,8 @@ vi.mock("resend", async () => {
   const { sentEmails } = await import("./src/e2e/mailbox.ts");
   class Resend {
     emails = {
-      send: async (msg: { to: string | string[]; subject: string; from: string; html?: string }) => {
-        sentEmails.push({ to: Array.isArray(msg.to) ? msg.to : [msg.to], subject: msg.subject, from: msg.from, html: msg.html ?? "" });
+      send: async (msg: { to: string | string[]; subject: string; from: string; html?: string; text?: string }) => {
+        sentEmails.push({ to: Array.isArray(msg.to) ? msg.to : [msg.to], subject: msg.subject, from: msg.from, html: msg.html ?? msg.text ?? "" });
         return { data: { id: `e2e-${sentEmails.length}` }, error: null };
       },
     };

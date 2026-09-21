@@ -12,6 +12,11 @@ import router from "./routes";
 import "./automations";
 import { logger } from "./lib/logger";
 import { ipRateLimiter } from "./lib/rateLimit";
+import { captureException, flush, installProcessHandlers, requestContext } from "./lib/errorTracking";
+
+// Phase 69: report unhandled rejections / uncaught exceptions before the
+// process (or the Vercel instance) goes down with them.
+installProcessHandlers();
 
 // Brute-force protection on credential-guessing endpoints. Keyed by IP (pre-auth,
 // there's no user identity yet). Each action gets its OWN budget — sharing one
@@ -665,7 +670,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+app.use(async (err: unknown, req: Request, res: Response, _next: NextFunction) => {
   if (err instanceof multer.MulterError) {
     const messages: Record<string, string> = {
       LIMIT_FILE_SIZE: "File too large: maximum 5MB per image.",
@@ -680,6 +685,17 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
     return;
   }
   logger.error(err, "Unhandled error");
+  // Phase 69: every 500 reaches error tracking with the request (no body,
+  // no cookies) and the actor; awaited so the function cannot end first.
+  const actorUserId = res.locals.actorUserId as string | undefined;
+  await captureException(err, {
+    mechanism: "express",
+    handled: false,
+    request: requestContext(req),
+    user: actorUserId ? { id: actorUserId } : undefined,
+    tags: { route: `${req.method} ${req.route?.path ?? req.path}` },
+  });
+  await flush(1500);
   res.status(500).json({ error: "Internal server error" });
 });
 

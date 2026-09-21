@@ -1,6 +1,7 @@
 import { db, automationRunsTable, type AutomationEvent, type AutomationRun } from "@workspace/db";
 import { and, eq, lte, or, isNull, sql } from "drizzle-orm";
 import { logger } from "./logger";
+import { captureException } from "./errorTracking";
 
 // ── Automation runner ────────────────────────────────────────────────────────
 // Vercel gives us no queue, so every side effect of a domain event is
@@ -112,6 +113,15 @@ async function executeRun(run: AutomationRun): Promise<void> {
       })
       .where(eq(automationRunsTable.id, run.id));
     logger.error({ err, event: run.event, runId: run.id, attempts: claimed.attempts, exhausted }, "Automation failed");
+    // Phase 69: every failed attempt is an issue in error tracking (grouped by
+    // event + error); a dead run is fatal because nothing will retry it.
+    await captureException(err, {
+      level: exhausted ? "fatal" : "error",
+      mechanism: "automation",
+      tags: { automation_event: run.event, automation_status: exhausted ? "dead" : "failed", attempt: claimed.attempts },
+      extra: { runId: run.id, idempotencyKey: run.idempotencyKey, entityType: run.entityType, entityId: run.entityId },
+      user: { id: run.userId },
+    });
   }
 }
 

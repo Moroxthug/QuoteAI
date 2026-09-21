@@ -4,7 +4,9 @@ import { HelmetProvider } from "react-helmet-async";
 import { SeoNavShell } from "./components/seo-header.tsx";
 import "./index.css";
 import { initAnalytics } from "./lib/analytics.ts";
+import { initErrorTracking } from "./lib/error-tracking.ts";
 
+initErrorTracking();
 initAnalytics();
 
 // Statically prerendered pages (hand-built bodies in scripts/prerender-seo.ts):

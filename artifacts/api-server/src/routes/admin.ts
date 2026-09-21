@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth";
-import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable, incentivesCatalogTable, insertIncentivesCatalogSchema } from "@workspace/db";
+import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable, incentivesCatalogTable, insertIncentivesCatalogSchema, cronTicksTable, automationRunsTable } from "@workspace/db";
 import { eq, sql, desc, count, inArray } from "drizzle-orm";
 import { logger } from "../lib/logger";
 import { getUncachableStripeClient } from "../stripeClient";
@@ -10,6 +10,8 @@ import { readFileSync, existsSync } from "fs";
 import path from "path";
 
 import { PRICE_TO_PLAN } from "./payments.js";
+import { opsHealth } from "../lib/ops.js";
+import { retryAutomationNow } from "../lib/automation.js";
 
 const router = Router();
 
@@ -1119,3 +1121,56 @@ router.delete("/admin/incentives/:id", async (req, res) => {
 });
 
 export default router;
+
+// ── Ops (Phase 69) ───────────────────────────────────────────────────────────
+// What the on-call needs without a database client: is the scheduler alive,
+// what did the last ticks do, which automation runs are stuck, retry one.
+// Unauthenticated summary of the same health lives at GET /api/healthz/ops
+// for the external uptime monitor.
+
+router.get("/admin/ops", async (_req, res) => {
+  try {
+    const health = await opsHealth();
+    const ticks = await db.select().from(cronTicksTable).orderBy(desc(cronTicksTable.startedAt)).limit(30);
+    res.json({ ...health, ticks });
+  } catch (err) {
+    logger.error({ err }, "Error building ops report");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/admin/automations", async (req, res) => {
+  try {
+    const status = typeof req.query.status === "string" ? req.query.status.split(",") : ["failed", "dead"];
+    const limit = Math.min(Number(req.query.limit) || 100, 500);
+    const runs = await db
+      .select()
+      .from(automationRunsTable)
+      .where(inArray(automationRunsTable.status, status as ("pending" | "running" | "succeeded" | "failed" | "dead")[]))
+      .orderBy(desc(automationRunsTable.updatedAt))
+      .limit(limit);
+    res.json({ count: runs.length, runs });
+  } catch (err) {
+    logger.error({ err }, "Error listing automation runs");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// One manual attempt right now, backoff and (for dead runs) the attempt cap
+// bypassed. The handler is idempotent by contract, so retrying a run whose
+// previous attempt half-succeeded is safe.
+router.post("/admin/automations/:id/retry", async (req, res) => {
+  try {
+    const [run] = await db.select({ idempotencyKey: automationRunsTable.idempotencyKey }).from(automationRunsTable).where(eq(automationRunsTable.id, req.params.id));
+    if (!run) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const result = await retryAutomationNow(run.idempotencyKey);
+    const [after] = await db.select().from(automationRunsTable).where(eq(automationRunsTable.id, req.params.id));
+    res.json({ ...result, run: after });
+  } catch (err) {
+    logger.error({ err }, "Error retrying automation run");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});

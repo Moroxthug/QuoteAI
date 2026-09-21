@@ -1,0 +1,69 @@
+# Phase 69 (docs/QA-VERIFICATION-PLAN.md): nightly logical backup of the
+# production database + Storage, kept as an encrypted workflow artifact.
+#
+# The Supabase Free plan has no automatic backups; until the project is on
+# Pro this is the only backup, and afterwards the only one outside Supabase.
+#
+# Secrets (repo Settings → Secrets → Actions):
+#   BACKUP_DATABASE_URL                 session-pooler connection string (the runner is IPv4-only, like every laptop)
+#   BACKUP_SUPABASE_URL                 https://<ref>.supabase.co
+#   BACKUP_SUPABASE_SERVICE_ROLE_KEY    Storage read
+#   BACKUP_PASSPHRASE                   AES-256-GCM passphrase — keep it in the password manager; a lost
+#                                       passphrase makes every artifact unreadable
+# Without BACKUP_DATABASE_URL the job skips green. Restore procedure:
+# docs/RUNBOOKS.md → "Restore from backup".
+
+name: Backup
+
+on:
+  schedule:
+    - cron: "17 7 * * *" # 07:17 UTC ≈ 03:17 Toronto, after the 12:00 UTC cron tick's day has settled
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    env:
+      HAS_BACKUP_SECRETS: ${{ secrets.BACKUP_DATABASE_URL != '' }}
+    steps:
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        uses: actions/checkout@v4
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        uses: pnpm/action-setup@v4
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        run: pnpm install --frozen-lockfile
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        name: Refuse to store an unencrypted copy of customer data
+        run: test -n "$BACKUP_PASSPHRASE" || { echo "::error::BACKUP_PASSPHRASE secret not set"; exit 1; }
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        name: Backup (database + Storage, encrypted)
+        run: pnpm --filter @workspace/api-server ops:backup --out backup
+        env:
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          SUPABASE_URL: ${{ secrets.BACKUP_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BACKUP_SUPABASE_SERVICE_ROLE_KEY }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        name: Verify the backup is readable (decrypt, gunzip, hashes, row counts)
+        run: pnpm --filter @workspace/api-server ops:restore --verify --from backup
+        env:
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      - if: env.HAS_BACKUP_SECRETS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quoteai-backup-${{ github.run_id }}
+          path: backup
+          retention-days: 30
+          if-no-files-found: error
+      - if: env.HAS_BACKUP_SECRETS != 'true'
+        run: echo "BACKUP_DATABASE_URL secret not set — backup skipped (docs/RUNBOOKS.md → Backups)"

@@ -79,3 +79,4 @@ supabase/.temp/
 # Phase 67 QA artefacts (screenshots, PDFs, reports)
 artifacts/api-server/.qa/
 artifacts/quote-ai/.qa/
+.backups/

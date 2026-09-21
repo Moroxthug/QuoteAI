@@ -5,8 +5,18 @@ import path from "path";
 const port = Number(process.env.PORT ?? "5173");
 const basePath = process.env.BASE_PATH ?? "/";
 
+// Phase 69: the commit becomes the Sentry release (VERCEL_GIT_COMMIT_SHA is
+// set at build time on Vercel), and source maps are emitted only when a
+// SENTRY_AUTH_TOKEN is present to upload them — scripts/sentry-sourcemaps.mjs
+// deletes them from dist/public after the upload so they are never served.
+const release = process.env.SENTRY_RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "";
+const emitSourcemaps = Boolean(process.env.SENTRY_AUTH_TOKEN);
+
 export default defineConfig(({ isSsrBuild }) => ({
   base: basePath,
+  define: {
+    "import.meta.env.VITE_RELEASE": JSON.stringify(release),
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -27,6 +37,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     chunkSizeWarningLimit: 500,
+    sourcemap: emitSourcemaps && !isSsrBuild ? "hidden" : false,
     rollupOptions: {
       output: {
         // Not for the SSR build of entry-server.tsx (one Node file; Rollup rejects manual chunks there).

@@ -10,6 +10,7 @@
     "lint": "eslint . --max-warnings=1000",
     "lint:strict": "eslint . --max-warnings=0",
     "knip": "knip --no-progress",
+    "env:inventory": "pnpm --filter @workspace/scripts env-inventory",
     "spell": "cspell --no-progress artifacts/quote-ai/src/i18n/*.ts artifacts/quote-ai/src/data/*.ts artifacts/quote-ai/src/pages/*.tsx artifacts/api-server/src/lib/email*.ts artifacts/api-server/src/lib/*Messaging.ts"
   },
   "private": true,

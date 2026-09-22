@@ -1,12 +1,15 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import { z } from "zod";
-import { db, projectsTable, businessProfilesTable, hasFeature, minimumPlanFor, type AssistantMessage, type AssistantProposal } from "@workspace/db";
+import multer from "multer";
+import { db, projectsTable, businessProfilesTable, hasFeature, minimumPlanFor, type AssistantMessage, type AssistantProposal, type Project } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { openai, toFile } from "@workspace/integrations-openai-ai-server";
+import { requireAuth, getUserId, getActorRole, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 import { getOrCreateConversation, loadConversation, clearConversation, runAssistantTurn, type Lang } from "../assistant/service.js";
 import { confirmProposal, dismissProposal, ProposalError } from "../assistant/apply.js";
+import { photoUpload, serializePhoto, storeJobPhoto } from "../jobs/photos.js";
 
 // ── Phase 5: job assistant ───────────────────────────────────────────────────
 // Gate: "assistant" (Elite). Reads are free-form; writes only happen when
@@ -89,7 +92,7 @@ router.delete("/assistant/conversations/:id", requireAuth, requirePermission("jo
 // POST /api/assistant/proposals/:id/confirm
 router.post("/assistant/proposals/:id/confirm", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
-    const out = await confirmProposal({ userId: getUserId(res), proposalId: req.params.id as string, ip: req.ip });
+    const out = await confirmProposal({ userId: getUserId(res), proposalId: req.params.id as string, ip: req.ip, actorRole: getActorRole(res), actorName: getUserName(res) });
     res.json({ proposal: serializeProposal(out.proposal), link: out.link });
   } catch (err) {
     if (err instanceof ProposalError) { res.status(err.status).json({ error: err.code, message: err.message }); return; }
@@ -106,6 +109,126 @@ router.post("/assistant/proposals/:id/dismiss", requireAuth, requirePermission("
   } catch (err) {
     if (err instanceof ProposalError) { res.status(err.status).json({ error: err.code, message: err.message }); return; }
     req.log.error({ err }, "Error dismissing proposal");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 78: voice-first job actions ────────────────────────────────────────
+// One tap on the job page: dictation (or a photo) → transcript → the same
+// tool-calling turn as the chat, in "on-site" mode → proposal cards. Reuses
+// the job's conversation so the Assistant tab shows what happened.
+
+const actionLimiter = userRateLimiter({ windowMs: 60 * 60 * 1000, max: 60, message: "You have reached the hourly limit for on-site actions. Please try again later." });
+
+const AUDIO_MIMES = ["audio/webm", "audio/ogg", "audio/wav", "audio/x-wav", "audio/mp4", "audio/mpeg", "audio/mp3", "audio/x-m4a", "audio/aac"];
+const audioUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 15 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    // Browsers append codec parameters ("audio/webm;codecs=opus"); match on the type only.
+    if (AUDIO_MIMES.includes(file.mimetype.split(";")[0]!.trim())) cb(null, true);
+    else cb(new Error(`Unsupported audio format: ${file.mimetype}`));
+  },
+});
+
+function single(upload: multer.Multer, field: string) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    upload.single(field)(req, res, (err) => {
+      if (err instanceof multer.MulterError || err instanceof Error) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      next(err);
+    });
+  };
+}
+
+async function ownedJob(userId: string, projectId: string): Promise<Project | null> {
+  const [p] = await db.select().from(projectsTable).where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+  return p ?? null;
+}
+
+/** Shared tail of the three action routes: gate → job → conversation → on-site turn. */
+async function runAction(req: Request, res: Response, params: { projectId: string; content: string; source: "voice" | "photo"; imageDataUrl?: string | null; photoId?: string | null; extra?: Record<string, unknown> }) {
+  const userId = getUserId(res);
+  const gate = await requireAssistant(userId);
+  if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "On-site actions use the assistant, which requires the Elite plan" }); return; }
+  const job = await ownedJob(userId, params.projectId);
+  if (!job) { res.status(404).json({ error: "Not found" }); return; }
+  const conv = await getOrCreateConversation(userId, job.id);
+  try {
+    const result = await runAssistantTurn({ conversation: conv, userId, content: params.content, language: langOf(req), source: params.source, imageDataUrl: params.imageDataUrl ?? null, photoId: params.photoId ?? null });
+    res.json({ conversationId: conv.id, ...(params.extra ?? {}), messages: result.messages.map(serializeMessage), proposals: result.proposals.map(serializeProposal) });
+  } catch (err) {
+    req.log.error({ err }, "On-site assistant turn failed");
+    res.status(502).json({ error: "ASSISTANT_FAILED", message: "The assistant could not work on that right now. Try again in a moment.", ...(params.extra ?? {}) });
+  }
+}
+
+// POST /api/assistant/actions { projectId, text, language? } — a typed (or edited) on-site instruction
+router.post("/assistant/actions", requireAuth, requirePermission("jobs", "edit"), actionLimiter, async (req, res) => {
+  try {
+    const body = z.object({ projectId: z.string().uuid(), text: z.string().trim().min(1).max(4000), language: z.enum(["en", "fr"]).optional() }).safeParse(req.body);
+    if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
+    await runAction(req, res, { projectId: body.data.projectId, content: body.data.text, source: "voice" });
+  } catch (err) {
+    req.log.error({ err }, "Error running on-site action");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/assistant/voice multipart { audio, projectId, language? } — dictation → transcript → proposals
+router.post("/assistant/voice", requireAuth, requirePermission("jobs", "edit"), actionLimiter, single(audioUpload, "audio"), async (req, res) => {
+  try {
+    const fields = z.object({ projectId: z.string().uuid(), language: z.enum(["en", "fr"]).optional() }).safeParse(req.body ?? {});
+    if (!fields.success) { res.status(400).json({ error: "Invalid parameters", details: fields.error }); return; }
+    const file = req.file;
+    if (!file) { res.status(400).json({ error: "No audio file provided" }); return; }
+    const language = langOf(req);
+    let transcript = "";
+    try {
+      const uploadable = await toFile(file.buffer, file.originalname || "recording.webm", { type: file.mimetype });
+      const out = await openai.audio.transcriptions.create({ file: uploadable, model: "whisper-large-v3-turbo", language, response_format: "json" }, { timeout: 30_000 });
+      transcript = (out.text ?? "").trim();
+    } catch (err) {
+      req.log.error({ err }, "On-site transcription failed");
+      res.status(502).json({ error: "TRANSCRIPTION_FAILED", message: "Could not transcribe that. Try again or type it." });
+      return;
+    }
+    if (!transcript) { res.status(422).json({ error: "EMPTY_TRANSCRIPT", message: "Didn't catch that — try speaking more clearly." }); return; }
+    await runAction(req, res, { projectId: fields.data.projectId, content: transcript, source: "voice", extra: { transcript } });
+  } catch (err) {
+    req.log.error({ err }, "Error running voice action");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/assistant/photo multipart { photo, projectId, note?, milestoneId?, language? } — photo saved to the gallery, then looked at
+router.post("/assistant/photo", requireAuth, requirePermission("jobs", "edit"), actionLimiter, single(photoUpload, "photo"), async (req, res) => {
+  try {
+    const fields = z.object({ projectId: z.string().uuid(), note: z.string().trim().max(2000).optional(), milestoneId: z.string().uuid().optional(), language: z.enum(["en", "fr"]).optional() }).safeParse(req.body ?? {});
+    if (!fields.success) { res.status(400).json({ error: "Invalid parameters", details: fields.error }); return; }
+    const file = req.file;
+    if (!file) { res.status(400).json({ error: "No photo provided" }); return; }
+    const userId = getUserId(res);
+    const gate = await requireAssistant(userId);
+    if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "On-site actions use the assistant, which requires the Elite plan" }); return; }
+    const job = await ownedJob(userId, fields.data.projectId);
+    if (!job) { res.status(404).json({ error: "Not found" }); return; }
+    if (file.mimetype === "image/heic") { res.status(415).json({ error: "UNSUPPORTED_FOR_VISION", message: "HEIC photos can be added to the gallery but not read by the assistant — take the photo as JPG (most phones: Settings → Camera → Formats → Most compatible)." }); return; }
+    const note = fields.data.note ?? "";
+    let stored: Awaited<ReturnType<typeof storeJobPhoto>>;
+    try {
+      stored = await storeJobPhoto({ userId, projectId: job.id, file, caption: note, milestoneId: fields.data.milestoneId ?? null });
+    } catch (err) {
+      if ((err as Error).message === "Milestone not found") { res.status(404).json({ error: "Milestone not found" }); return; }
+      throw err;
+    }
+    const imageDataUrl = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
+    const content = note ? `[Photo] ${note}` : "[Photo] What do you see, and does it change the job?";
+    await runAction(req, res, { projectId: job.id, content, source: "photo", imageDataUrl, photoId: stored.photo.id, extra: { photo: serializePhoto(stored.photo) } });
+  } catch (err) {
+    req.log.error({ err }, "Error running photo action");
     res.status(500).json({ error: "Internal server error" });
   }
 });

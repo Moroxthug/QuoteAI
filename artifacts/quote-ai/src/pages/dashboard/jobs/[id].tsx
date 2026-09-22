@@ -25,6 +25,8 @@ import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { PhotosTab } from "@/components/jobs/photos-tab";
 import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
 import { ClientThreadCard } from "@/components/clients/client-thread";
+import { VoiceActions } from "@/components/jobs/voice-actions";
+import { NotesCard } from "@/components/jobs/notes-card";
 import { ClientPortalCard } from "@/components/clients/client-portal-card";
 import { clientPortalApi } from "@/lib/portal-api";
 
@@ -90,6 +92,7 @@ export default function JobDetailPage() {
           </div>
         </div>
         <div className="head-actions">
+          {job.status !== "completed" && <VoiceActions jobId={job.id} />}
           {job.client?.phone && job.status !== "completed" && <OnMyWayButton jobId={job.id} clientName={job.client.name} />}
           <Link href={`/dashboard/jobs/${job.id}/setup`} className="btn btn-sm btn-outline-navy"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Link>
           {job.status === "planning" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</button>}
@@ -265,6 +268,8 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
               </div>
             </section>
           )}
+
+          <NotesCard jobId={job.id} milestoneTitles={new Map(milestones.map((m) => [m.id, m.title]))} />
         </div>
 
         <div className="stack">

@@ -78,6 +78,16 @@ Be concise: short paragraphs or bullet lists, no headings, no filler. When you s
   return { prompt, province };
 }
 
+// Phase 78 — appended when the message was dictated or photographed on site:
+// the user is holding a phone with one thumb free, so act instead of chatting.
+const ACTION_MODE_PROMPT = `
+ON-SITE MODE. This message was dictated (or photographed) on the job site. The user wants an action, not a conversation:
+- Map it straight to one or more propose_* tools in a single round: "log $340 at Home Depot for drywall" → propose_cost_entry (category materials, vendor Home Depot, description drywall, amount 340, tax included); "add a change order: extra outlet in the garage, 250 dollars" → propose_change_order (one line, 250 before tax); "note: client wants the trim white" → propose_job_note; "done with the framing" → propose_milestone_update completed (look the milestone up first with get_job_summary if you need the id).
+- Spoken numbers are messy ("three forty", "two fifty bucks", "340 dollars and 12 cents"): interpret them the way a contractor would. Only ask a question when a figure or the target is genuinely missing; ask exactly one short question.
+- Never split one dictation into a note plus the real action; the note is only for things that are not another action.
+- Your final reply is one short sentence that names what the card(s) will do — no bullets, no summary of the job.
+- With a photo: describe what you see in one sentence (materials, condition, hazards such as knob-and-tube wiring, water damage, mould, asbestos-era materials); if it implies extra work, propose a change order with a realistic placeholder price and say the price is an estimate to edit; otherwise propose a note.`;
+
 // ── History → OpenAI messages ────────────────────────────────────────────────
 
 function toOpenAiMessages(rows: AssistantMessage[]): OpenAI.Chat.Completions.ChatCompletionMessageParam[] {
@@ -98,9 +108,24 @@ function toOpenAiMessages(rows: AssistantMessage[]): OpenAI.Chat.Completions.Cha
 
 export type TurnResult = { messages: AssistantMessage[]; proposals: AssistantProposal[] };
 
-export async function runAssistantTurn(params: { conversation: AssistantConversation; userId: string; content: string; language: Lang; now?: Date }): Promise<TurnResult> {
+export type TurnSource = "assistant" | "voice" | "photo";
+
+export async function runAssistantTurn(params: {
+  conversation: AssistantConversation;
+  userId: string;
+  content: string;
+  language: Lang;
+  now?: Date;
+  /** Phase 78: "voice" / "photo" switch the prompt to on-site mode (act, don't chat) and stamp proposed notes. */
+  source?: TurnSource;
+  /** Phase 78: a data: URL of the photo sent with this turn — shown to the model once, never stored in the thread. */
+  imageDataUrl?: string | null;
+  /** Phase 78: the gallery row the photo was saved as, linked from a proposed note. */
+  photoId?: string | null;
+}): Promise<TurnResult> {
   const now = params.now ?? new Date();
   const conv = params.conversation;
+  const source: TurnSource = params.source ?? "assistant";
   const newMessages: AssistantMessage[] = [];
   const newProposals: AssistantProposal[] = [];
 
@@ -114,9 +139,15 @@ export async function runAssistantTurn(params: { conversation: AssistantConversa
   if (!conv.title) await db.update(assistantConversationsTable).set({ title: params.content.slice(0, 80) }).where(eq(assistantConversationsTable.id, conv.id));
 
   const { prompt, province } = await buildSystemPrompt({ userId: params.userId, projectId: conv.projectId, language: params.language, now });
-  const ctx: ToolContext = { userId: params.userId, projectId: conv.projectId, province, now };
+  const ctx: ToolContext = { userId: params.userId, projectId: conv.projectId, province, now, source, photoId: params.photoId ?? null };
   const history = await db.select().from(assistantMessagesTable).where(eq(assistantMessagesTable.conversationId, conv.id)).orderBy(desc(assistantMessagesTable.createdAt)).limit(HISTORY_LIMIT);
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [{ role: "system", content: prompt }, ...toOpenAiMessages(history.reverse())];
+  const system = source === "assistant" ? prompt : prompt + ACTION_MODE_PROMPT;
+  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [{ role: "system", content: system }, ...toOpenAiMessages(history.reverse())];
+  // The photo rides along on this turn's user message only (the stored row keeps the text).
+  if (params.imageDataUrl) {
+    const last = messages[messages.length - 1];
+    if (last && last.role === "user") last.content = [{ type: "text", text: params.content }, { type: "image_url", image_url: { url: params.imageDataUrl, detail: "low" } }];
+  }
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     const lastRound = round === MAX_ROUNDS - 1;

@@ -78,6 +78,15 @@ if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
   }
 }
 
+// Phase 78: without a real AI key the assistant is answered by a keyword
+// model (src/e2e/onSiteModelStub.ts) so the job page's Dictate / Photo sheet
+// produces real proposal cards; every other AI feature keeps its fallback.
+if (process.env.AI_INTEGRATIONS_OPENAI_BASE_URL?.startsWith("http://127.0.0.1:9")) {
+  const { installOnSiteModelStub } = await import("./onSiteModelStub.js");
+  installOnSiteModelStub(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL);
+  console.log("[walkthrough] no AI key — the job assistant runs on the keyword model stub");
+}
+
 const MAILBOX_PATH = resolve(import.meta.dirname, "../../.walkthrough-mailbox.json");
 const mailbox = await captureResend((mail) => {
   writeFileSync(MAILBOX_PATH, JSON.stringify(mailbox, null, 2));

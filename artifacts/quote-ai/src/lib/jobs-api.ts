@@ -200,6 +200,9 @@ export type JobDetailDto = {
   invoiceTotals: import("./invoices-api").InvoiceTotalsDto;
 };
 
+export type JobNoteSource = "manual" | "voice" | "photo" | "assistant";
+export type JobNoteDto = { id: string; projectId: string; milestoneId: string | null; photoId: string | null; body: string; source: JobNoteSource; authorName: string; createdAt: string };
+
 export type JobPhotoDto = {
   id: string;
   projectId: string;
@@ -326,6 +329,11 @@ export const jobsApi = {
   /** Phase 74: one-off "on my way" text to the job's client. */
   onMyWay: (id: string, body: { etaMinutes?: number }) => req<{ success: true; body: string; segments: number }>(`/api/jobs/${id}/sms/on-my-way`, { method: "POST", body: json(body) }),
   photoFileUrl: (id: string, photoId: string) => `/api/jobs/${id}/photos/${photoId}/file`,
+
+  // Notes (Phase 78)
+  listNotes: (id: string) => req<{ notes: JobNoteDto[] }>(`/api/jobs/${id}/notes`),
+  addNote: (id: string, body: { body: string; milestoneId?: string | null }) => req<{ note: JobNoteDto }>(`/api/jobs/${id}/notes`, { method: "POST", body: json(body) }),
+  deleteNote: (id: string, noteId: string) => req<{ success: true }>(`/api/jobs/${id}/notes/${noteId}`, { method: "DELETE" }),
 };
 
 export { req as apiRequest, json as apiJson };

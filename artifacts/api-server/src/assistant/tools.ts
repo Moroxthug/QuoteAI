@@ -13,6 +13,7 @@ import {
   timeEntriesTable,
   collaboratorsTable,
   clientsTable,
+  contractsTable,
   COST_CATEGORIES,
   PAYMENT_METHODS,
   computeTax,
@@ -23,8 +24,18 @@ import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { balanceCents } from "../invoices/math.js";
 import { toIsoDate } from "../jobs/dates.js";
 import { companyAnalytics, jobAnalytics } from "../analytics/service.js";
+import { changeOrderTotals } from "../jobs/changeOrders.js";
 
-export type ToolContext = { userId: string; projectId: string | null; province: string | null; now: Date };
+export type ToolContext = {
+  userId: string;
+  projectId: string | null;
+  province: string | null;
+  now: Date;
+  /** Phase 78: where this turn came from — stamped on job notes the assistant proposes. */
+  source?: "assistant" | "voice" | "photo";
+  /** Phase 78: the job photo the user just sent, linked from a proposed note. */
+  photoId?: string | null;
+};
 
 const dollars = (cents: number) => Math.round(cents) / 100;
 const dateRe = /^\d{4}-\d{2}-\d{2}$/;
@@ -85,6 +96,33 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       parameters: { type: "object", properties: { invoice_id: { type: "string" }, amount: { type: "number", description: "CAD dollars; defaults to the balance" }, method: { type: "string", enum: PAYMENT_METHODS.filter((m) => m !== "credit_note") }, date: { type: "string", description: "YYYY-MM-DD" }, reference: { type: "string" } }, required: ["invoice_id"], additionalProperties: false },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "propose_change_order",
+      description: "Phase 78: propose a change order (extra work the customer must approve and sign: 'extra outlet in the garage, 250 dollars'). Needs a signed contract behind the job; the draft is created for the user to review, sign and send. The user must confirm.",
+      parameters: {
+        type: "object",
+        properties: {
+          ...jobIdProp,
+          title: { type: "string", description: "Short title, e.g. 'Extra outlet in the garage'" },
+          description: { type: "string", description: "What changes and why, 1-3 sentences" },
+          items: { type: "array", description: "Priced lines, before tax", items: { type: "object", properties: { description: { type: "string" }, quantity: { type: "number", description: "default 1" }, unit: { type: "string", description: "e.g. ea, h, sq ft, lot" }, unit_price: { type: "number", description: "CAD before tax; negative for a credit" } }, required: ["description", "unit_price"], additionalProperties: false } },
+          schedule_delta_days: { type: "integer", description: "Calendar days added to (or removed from) the schedule, default 0" },
+        },
+        required: ["title", "items"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "propose_job_note",
+      description: "Phase 78: propose saving a note on the job ('client wants the trim white', an observation from a site photo). Use it for anything worth remembering that is not a cost, task, milestone or change order. The user must confirm.",
+      parameters: { type: "object", properties: { ...jobIdProp, body: { type: "string", description: "The note, in the user's words" }, milestone_id: { type: "string" } }, required: ["body"], additionalProperties: false },
+    },
+  },
 ];
 
 export const PROPOSAL_TOOLS: Record<string, ProposalKind> = {
@@ -94,6 +132,8 @@ export const PROPOSAL_TOOLS: Record<string, ProposalKind> = {
   propose_invoice: "invoice",
   propose_send_invoice: "send_invoice",
   propose_record_payment: "record_payment",
+  propose_change_order: "change_order",
+  propose_job_note: "job_note",
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -248,6 +288,14 @@ const ProposeArgs = {
   propose_invoice: z.object({ job_id: z.string().optional(), kind: z.enum(["deposit", "term", "final", "holdback_release"]), milestone_id: z.string().optional() }),
   propose_send_invoice: z.object({ invoice_id: z.string(), message: z.string().max(2000).optional() }),
   propose_record_payment: z.object({ invoice_id: z.string(), amount: z.number().positive().optional(), method: z.enum(PAYMENT_METHODS.filter((m) => m !== "credit_note") as [string, ...string[]]).optional(), date: z.string().regex(dateRe).optional(), reference: z.string().max(200).optional() }),
+  propose_change_order: z.object({
+    job_id: z.string().optional(),
+    title: z.string().trim().min(1).max(200),
+    description: z.string().max(6000).optional(),
+    items: z.array(z.object({ description: z.string().trim().min(1).max(500), quantity: z.number().finite().optional(), unit: z.string().max(20).optional(), unit_price: z.number().finite().min(-10_000_000).max(10_000_000) })).min(1).max(50),
+    schedule_delta_days: z.number().int().min(-365).max(365).optional(),
+  }),
+  propose_job_note: z.object({ job_id: z.string().optional(), body: z.string().trim().min(1).max(4000), milestone_id: z.string().optional() }),
 };
 
 const money = (cents: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(cents / 100);
@@ -345,6 +393,38 @@ export async function validateProposal(name: string, rawArgs: unknown, ctx: Tool
         const amountCents = a.amount ? Math.round(a.amount * 100) : balance;
         if (amountCents <= 0) return { ok: false, error: `Invoice ${inv.number} has no balance.` };
         return { ok: true, proposal: { kind: "record_payment", projectId: inv.projectId, summary: `Record ${money(amountCents)} ${a.method ?? "etransfer"} on ${inv.number}${amountCents < balance ? ` (partial, balance ${money(balance)})` : ""}`, payload: { invoiceId: inv.id, amountCents, method: a.method ?? "etransfer", date: a.date ?? toIsoDate(ctx.now), reference: a.reference ?? "" } } };
+      }
+      case "propose_change_order": {
+        const a = ProposeArgs.propose_change_order.parse(rawArgs);
+        const p = await resolveProject(ctx, a.job_id);
+        if (!p) return { ok: false, error: "Job not found — pass job_id." };
+        const parent = p.contractId ? (await db.select({ status: contractsTable.status, province: contractsTable.province }).from(contractsTable).where(eq(contractsTable.id, p.contractId)))[0] : null;
+        if (!parent || parent.status !== "signed") return { ok: false, error: "This job has no signed contract, so a change order cannot be drafted. Propose a job note with the same details instead so nothing is lost, and tell the user why." };
+        const items = a.items.map((i) => {
+          const quantita = i.quantity ?? 1;
+          const totale = Math.round(quantita * i.unit_price * 100) / 100;
+          return { descrizione: i.description, um: i.unit ?? "", quantita, prezzoUnitario: i.unit_price, totale };
+        });
+        const totals = changeOrderTotals(items, p.province ?? parent.province);
+        const subtotalCents = Math.round(totals.subtotal * 100);
+        const taxCents = Math.round(totals.tax * 100);
+        const totalCents = Math.round(totals.total * 100);
+        if (subtotalCents === 0) return { ok: false, error: "The change order total is zero — give each line a price." };
+        const scheduleDeltaDays = a.schedule_delta_days ?? 0;
+        const payload = { projectId: p.id, title: a.title, description: a.description ?? "", items, scheduleDeltaDays, subtotalCents, taxCents, totalCents };
+        return { ok: true, proposal: { kind: "change_order", projectId: p.id, summary: `Change order "${a.title}" — ${money(totalCents)} incl. tax${scheduleDeltaDays ? ` (${scheduleDeltaDays > 0 ? "+" : ""}${scheduleDeltaDays} days)` : ""} on ${p.name}`, payload } };
+      }
+      case "propose_job_note": {
+        const a = ProposeArgs.propose_job_note.parse(rawArgs);
+        const p = await resolveProject(ctx, a.job_id);
+        if (!p) return { ok: false, error: "Job not found — pass job_id." };
+        let milestoneId: string | null = null;
+        if (a.milestone_id) {
+          const [m] = await db.select({ id: milestonesTable.id }).from(milestonesTable).where(and(eq(milestonesTable.id, a.milestone_id), eq(milestonesTable.projectId, p.id)));
+          milestoneId = m?.id ?? null;
+        }
+        const short = a.body.length > 90 ? `${a.body.slice(0, 87)}…` : a.body;
+        return { ok: true, proposal: { kind: "job_note", projectId: p.id, summary: `Note on ${p.name}: "${short}"`, payload: { projectId: p.id, body: a.body, milestoneId, source: ctx.source ?? "assistant", photoId: ctx.photoId ?? null } } };
       }
       default:
         return { ok: false, error: `Unknown tool ${name}` };

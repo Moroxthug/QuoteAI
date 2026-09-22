@@ -25,6 +25,7 @@ export * from "./organization-members";
 export * from "./usage";
 export * from "./leads";
 export * from "./job-photos";
+export * from "./job-notes";
 export * from "./quickbooks";
 export * from "./calendar";
 export * from "./email-connections";

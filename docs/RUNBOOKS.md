@@ -293,3 +293,20 @@ Reminders: `runScheduleReminderMaintenance(now)` runs from **`GET /api/cron/even
 | Push never arrives | in order: `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` set in Vercel (the notifications page says "not set up on this server yet" otherwise) → the browser granted permission (page says "blocked") → iOS needs the app on the home screen first → `push_subscriptions` has a row for that member (`member_user_id`) with `failed_at` null → "Send a test" on the notifications page returns `sent: 1`. The log line "Push delivery failed" carries the push service's status |
 | Rotating the VAPID keys | every subscribed browser stops receiving (the push service rejects the new signature) and is dropped after five failures; people re-enable from the notifications page. Do it only if the private key leaked |
 | Someone else's data on a shared phone | the API cache is per origin, not per user; sign-out clears it (`CLEAR_API_CACHE` + `caches.delete("qai-api")`). The worker `/t` page has no sign-out — revoking the link (Team page) makes the cached page 404 on the next online load and the cache entry is dropped |
+
+## 15. On-site actions: dictation, photo → change order / note, job notes (Phase 78)
+
+**Where**: `artifacts/quote-ai/src/components/jobs/voice-actions.tsx` (the Dictate / Photo buttons and the sheet), `components/jobs/notes-card.tsx`, `components/assistant/proposal-card.tsx` (shared cards). Server: `api-server/src/routes/assistant.ts` (`/api/assistant/actions`, `/voice`, `/photo`), `assistant/service.ts` (`ACTION_MODE_PROMPT`, image part), `assistant/tools.ts` (`propose_change_order`, `propose_job_note`), `assistant/apply.ts`, `jobs/photos.ts` (`storeJobPhoto`), table `job_notes` (migration 0043), notes routes in `routes/jobs.ts`.
+
+**How it fits** — the sheet posts the recording (MediaRecorder, webm/mp4/ogg) to `/api/assistant/voice`; the server transcribes it with Whisper (`whisper-large-v3-turbo`, the user's language) and runs the *same* assistant turn as the chat on the job's conversation, with the on-site block appended to the system prompt. Nothing is written until the user confirms a card. Photos are saved to the gallery first (so nothing is lost if the model is down), then shown to the model once as a `data:` URL — never stored in `assistant_messages`. Gate: Elite (the assistant); role `jobs:edit` to propose, `jobs:full` to confirm a change order; 60 actions/hour per user.
+
+| Ask | Do |
+|---|---|
+| "The mic does nothing" | the browser refused the microphone (toast "Couldn't access the microphone"); on iOS the site must be https and the permission granted in Settings → Safari. The typed line under the mic always works |
+| "Didn't catch that" (422) | Whisper returned an empty transcript — background noise or a 1-second tap. Nothing was sent to the model |
+| 502 `ASSISTANT_FAILED` / `TRANSCRIPTION_FAILED` | the AI provider (`GROQ_API_KEY` / `OPENAI_API_KEY`) is down or unset; the transcript (if any) is already in the job's Assistant thread, nothing else was touched. Locally the walkthrough server uses the keyword stub (`e2e/onSiteModelStub.ts`) when no key is set |
+| "It made a note instead of a change order" | the job has no *signed* contract (`projects.contract_id` → `contracts.status = signed`); the tool refuses and the model keeps the words as a note. Sign the agreement, then dictate again |
+| A photo was refused (415) | HEIC: the vision model cannot read it. iPhone → Settings → Camera → Formats → Most compatible; the gallery upload (Photos tab) still accepts HEIC |
+| Where did the on-site action go? | the job's Assistant tab (same conversation): the transcript is the user message, the cards follow. `assistant_proposals.kind` is `change_order` / `job_note` / `cost_entry` …; `audit_log` rows `created_via_assistant` with `actor_type = ai` and the proposal id |
+| Delete a note | Overview → Notes → trash (`DELETE /api/jobs/:id/notes/:noteId`, owner/admin/office/foreman). Notes from photos keep `photo_id`; deleting the photo nulls it |
+

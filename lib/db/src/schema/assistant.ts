@@ -9,7 +9,7 @@ import { projectsTable } from "./crm";
 export const ASSISTANT_ROLES = ["user", "assistant", "tool"] as const;
 export type AssistantRole = (typeof ASSISTANT_ROLES)[number];
 
-export const PROPOSAL_KINDS = ["cost_entry", "milestone_update", "task", "invoice", "record_payment", "send_invoice"] as const;
+export const PROPOSAL_KINDS = ["cost_entry", "milestone_update", "task", "invoice", "record_payment", "send_invoice", "change_order", "job_note"] as const;
 export type ProposalKind = (typeof PROPOSAL_KINDS)[number];
 
 export const PROPOSAL_STATUSES = ["pending", "confirmed", "dismissed", "failed"] as const;

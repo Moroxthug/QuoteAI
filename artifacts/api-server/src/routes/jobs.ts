@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
 import multer from "multer";
-import { randomUUID } from "node:crypto";
 import {
   db,
   projectsTable,
@@ -20,6 +19,7 @@ import {
   businessProfilesTable,
   whatsappConnectionsTable,
   jobPhotosTable,
+  jobNotesTable,
   hasFeature,
   minimumPlanFor,
   PROJECT_STATUSES,
@@ -42,6 +42,7 @@ import { invoicesForProject, projectInvoiceTotals } from "../invoices/service.js
 import { serializeInvoice } from "./invoices.js";
 import { Readable } from "node:stream";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
+import { photoUpload, serializePhoto, storeJobPhoto } from "../jobs/photos.js";
 import { sendJobPhotoShare } from "../lib/jobMessaging.js";
 import { sendSms } from "../lib/sms.js";
 import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
@@ -50,15 +51,6 @@ import { logger } from "../lib/logger.js";
 const router = Router();
 const objectStorage = new ObjectStorageService();
 
-const PHOTO_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic"];
-const photoUpload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024, files: 1 },
-  fileFilter: (_req, file, cb) => {
-    if (PHOTO_MIME_TYPES.includes(file.mimetype)) cb(null, true);
-    else cb(new Error(`Unsupported file type: ${file.mimetype}. Use a JPG, PNG, WEBP or HEIC photo.`));
-  },
-});
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -969,20 +961,6 @@ router.delete("/jobs/:id/change-orders/:coId", requireAuth, requirePermission("j
 // "share" send emails/WhatsApps time-limited signed links to the customer —
 // it doesn't change where the file lives or make it public.
 
-function serializePhoto(p: typeof jobPhotosTable.$inferSelect) {
-  return {
-    id: p.id,
-    projectId: p.projectId,
-    milestoneId: p.milestoneId,
-    fileName: p.fileName,
-    fileSize: p.fileSize,
-    mimeType: p.mimeType,
-    caption: p.caption,
-    sortOrder: p.sortOrder,
-    sharedAt: p.sharedAt ? p.sharedAt.toISOString() : null,
-    createdAt: p.createdAt.toISOString(),
-  };
-}
 
 router.get("/jobs/:id/photos", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
   try {
@@ -1027,43 +1005,21 @@ router.post(
         return;
       }
       // Phase 77: the offline outbox re-posts the same photo until it gets an answer — same clientRef, same row.
-      const clientRef = typeof req.body?.clientRef === "string" && /^[0-9a-f-]{36}$/i.test(req.body.clientRef) ? req.body.clientRef : null;
-      if (clientRef) {
-        const [replayed] = await db.select().from(jobPhotosTable).where(and(eq(jobPhotosTable.userId, userId), eq(jobPhotosTable.clientRef, clientRef)));
-        if (replayed) {
-          res.json({ photo: serializePhoto(replayed), replayed: true });
-          return;
-        }
-      }
-      const milestoneIdRaw = typeof req.body?.milestoneId === "string" && req.body.milestoneId ? req.body.milestoneId : null;
-      if (milestoneIdRaw) {
-        const [m] = await db.select().from(milestonesTable).where(and(eq(milestonesTable.id, milestoneIdRaw), eq(milestonesTable.projectId, project.id)));
-        if (!m) {
+      let stored: Awaited<ReturnType<typeof storeJobPhoto>>;
+      try {
+        stored = await storeJobPhoto({ userId, projectId: project.id, file, caption: typeof req.body?.caption === "string" ? req.body.caption : "", milestoneId: typeof req.body?.milestoneId === "string" ? req.body.milestoneId : null, clientRef: typeof req.body?.clientRef === "string" ? req.body.clientRef : null });
+      } catch (err) {
+        if ((err as Error).message === "Milestone not found") {
           res.status(404).json({ error: "Milestone not found" });
           return;
         }
+        throw err;
       }
-      const caption = typeof req.body?.caption === "string" ? req.body.caption.slice(0, 500) : "";
-      const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic" }[file.mimetype] ?? "bin";
-      const subPath = `job-photos/${userId}/${project.id}/${randomUUID()}.${ext}`;
-      const fileUrl = await objectStorage.uploadObjectBuffer({ subPath, buffer: file.buffer, contentType: file.mimetype });
-      const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(jobPhotosTable).where(eq(jobPhotosTable.projectId, project.id));
-      const [photo] = await db
-        .insert(jobPhotosTable)
-        .values({
-          userId,
-          projectId: project.id,
-          milestoneId: milestoneIdRaw,
-          fileName: file.originalname,
-          fileSize: file.size,
-          mimeType: file.mimetype,
-          fileUrl,
-          caption,
-          sortOrder: Number(count ?? 0),
-          clientRef,
-        })
-        .returning();
-      res.status(201).json({ photo: serializePhoto(photo!) });
+      if (stored.replayed) {
+        res.json({ photo: serializePhoto(stored.photo), replayed: true });
+        return;
+      }
+      res.status(201).json({ photo: serializePhoto(stored.photo) });
     } catch (err) {
       req.log.error({ err }, "Error uploading job photo");
       res.status(500).json({ error: "Internal server error" });
@@ -1209,6 +1165,76 @@ router.post("/jobs/:id/photos/share", requireAuth, requirePermission("jobs", "ed
     res.json({ success: true, channel: result.channel, count: photos.length });
   } catch (err) {
     req.log.error({ err }, "Error sharing job photos");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 78: job notes ──────────────────────────────────────────────────────
+
+function serializeNote(n: typeof jobNotesTable.$inferSelect) {
+  return { id: n.id, projectId: n.projectId, milestoneId: n.milestoneId, photoId: n.photoId, body: n.body, source: n.source, authorName: n.authorName, createdAt: n.createdAt.toISOString() };
+}
+
+router.get("/jobs/:id/notes", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
+  try {
+    const project = await ownedProject(getUserId(res), req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const notes = await db.select().from(jobNotesTable).where(eq(jobNotesTable.projectId, project.id)).orderBy(desc(jobNotesTable.createdAt)).limit(200);
+    res.json({ notes: notes.map(serializeNote) });
+  } catch (err) {
+    req.log.error({ err }, "Error listing job notes");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+const NoteBody = z.object({ body: z.string().trim().min(1).max(4000), milestoneId: z.string().uuid().nullable().optional() });
+
+router.post("/jobs/:id/notes", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const project = await ownedProject(userId, req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const body = NoteBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    if (body.data.milestoneId) {
+      const [m] = await db.select({ id: milestonesTable.id }).from(milestonesTable).where(and(eq(milestonesTable.id, body.data.milestoneId), eq(milestonesTable.projectId, project.id)));
+      if (!m) {
+        res.status(404).json({ error: "Milestone not found" });
+        return;
+      }
+    }
+    const [note] = await db.insert(jobNotesTable).values({ userId, projectId: project.id, milestoneId: body.data.milestoneId ?? null, body: body.data.body, source: "manual", authorName: getUserName(res) }).returning();
+    res.status(201).json({ note: serializeNote(note!) });
+  } catch (err) {
+    req.log.error({ err }, "Error creating job note");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/jobs/:id/notes/:noteId", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
+  try {
+    const project = await ownedProject(getUserId(res), req.params.id as string);
+    if (!project) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const deleted = await db.delete(jobNotesTable).where(and(eq(jobNotesTable.id, req.params.noteId as string), eq(jobNotesTable.projectId, project.id))).returning({ id: jobNotesTable.id });
+    if (!deleted.length) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error deleting job note");
     res.status(500).json({ error: "Internal server error" });
   }
 });

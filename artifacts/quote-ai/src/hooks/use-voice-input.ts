@@ -14,9 +14,11 @@ function pickMimeType(): string {
 interface UseVoiceInputOptions {
   onTranscribed: (text: string) => void;
   onError?: (message: string) => void;
+  /** Phase 78: take the raw recording instead of transcribing it here (the on-site sheet posts it to /api/assistant/voice). */
+  onRecorded?: (blob: Blob) => void | Promise<void>;
 }
 
-export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) {
+export function useVoiceInput({ onTranscribed, onError, onRecorded }: UseVoiceInputOptions) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -81,7 +83,8 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
         const blob = new Blob(chunksRef.current, { type: mimeType || "audio/webm" });
         chunksRef.current = [];
         if (blob.size > 0) {
-          void transcribe(blob);
+          if (onRecorded) void onRecorded(blob);
+          else void transcribe(blob);
         }
       };
 
@@ -91,7 +94,7 @@ export function useVoiceInput({ onTranscribed, onError }: UseVoiceInputOptions) 
       onError?.("Couldn't access the microphone. Check your browser permissions.");
       cleanupStream();
     }
-  }, [isRecording, cleanupStream, transcribe, onError]);
+  }, [isRecording, cleanupStream, transcribe, onError, onRecorded]);
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {

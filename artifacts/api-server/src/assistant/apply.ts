@@ -8,19 +8,25 @@ import {
   projectTasksTable,
   costEntriesTable,
   businessProfilesTable,
+  jobNotesTable,
   hasFeature,
   type AssistantProposal,
+  type ChangeOrderItem,
   type CostCategory,
+  type JobNoteSource,
   type MilestoneStatus,
   type PaymentMethod,
   type ProductFeature,
   type TaxBreakdown,
+  type TeamMemberRole,
 } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { raiseAutomation } from "../lib/automation.js";
 import { writeAudit } from "../lib/notifications.js";
 import { recomputeProgress } from "../jobs/setup.js";
 import { parseIsoDate } from "../jobs/dates.js";
+import { createChangeOrder } from "../jobs/changeOrders.js";
+import { roleCan, type PermissionAction, type PermissionArea } from "../middlewares/requirePermission.js";
 import { draftDepositInvoice, draftFinalInvoice, draftHoldbackReleaseInvoice, draftMilestoneInvoice, buildInvoiceContext, sendInvoice, recordPayment } from "../invoices/service.js";
 
 const FEATURE_FOR: Record<AssistantProposal["kind"], ProductFeature> = {
@@ -30,6 +36,16 @@ const FEATURE_FOR: Record<AssistantProposal["kind"], ProductFeature> = {
   invoice: "invoicing",
   send_invoice: "invoicing",
   record_payment: "invoicing",
+  change_order: "jobs",
+  job_note: "jobs",
+};
+
+/** Phase 78: the confirm route only checks jobs/edit; kinds whose manual route asks for more check it here. */
+const PERMISSION_FOR: Partial<Record<AssistantProposal["kind"], [PermissionArea, PermissionAction]>> = {
+  change_order: ["jobs", "full"],
+  invoice: ["invoicing", "edit"],
+  send_invoice: ["invoicing", "edit"],
+  record_payment: ["invoicing", "edit"],
 };
 
 export class ProposalError extends Error {
@@ -38,15 +54,17 @@ export class ProposalError extends Error {
 
 export type ApplyResult = { proposal: AssistantProposal; entityType: string; entityId: string; link: string | null };
 
-export async function confirmProposal(params: { userId: string; proposalId: string; ip?: string | null }): Promise<ApplyResult> {
+export async function confirmProposal(params: { userId: string; proposalId: string; ip?: string | null; actorRole?: TeamMemberRole; actorName?: string }): Promise<ApplyResult> {
   const [proposal] = await db.select().from(assistantProposalsTable).where(and(eq(assistantProposalsTable.id, params.proposalId), eq(assistantProposalsTable.userId, params.userId)));
   if (!proposal) throw new ProposalError("Proposal not found", "NOT_FOUND", 404);
   if (proposal.status !== "pending") throw new ProposalError(`Proposal already ${proposal.status}`, "ALREADY_RESOLVED", 409);
   const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, params.userId));
   if (!hasFeature(profile, FEATURE_FOR[proposal.kind])) throw new ProposalError("Your plan does not include this action", "PLAN_REQUIRED", 403);
+  const needs = PERMISSION_FOR[proposal.kind];
+  if (needs && params.actorRole && !roleCan(params.actorRole, needs[0], needs[1])) throw new ProposalError(`Your role (${params.actorRole}) doesn't have ${needs[1]} access to ${needs[0]}.`, "FORBIDDEN", 403);
 
   try {
-    const out = await execute(proposal, params.userId, params.ip ?? null);
+    const out = await execute(proposal, params.userId, params.ip ?? null, params.actorName ?? "");
     const [updated] = await db.update(assistantProposalsTable).set({ status: "confirmed", resultEntityType: out.entityType, resultEntityId: out.entityId, resolvedAt: new Date() }).where(eq(assistantProposalsTable.id, proposal.id)).returning();
     return { proposal: updated!, ...out };
   } catch (err) {
@@ -70,9 +88,30 @@ async function ownedProject(userId: string, id: string) {
   return p;
 }
 
-async function execute(proposal: AssistantProposal, userId: string, ip: string | null): Promise<{ entityType: string; entityId: string; link: string | null }> {
+async function execute(proposal: AssistantProposal, userId: string, ip: string | null, actorName: string): Promise<{ entityType: string; entityId: string; link: string | null }> {
   const p = proposal.payload as Record<string, unknown>;
   switch (proposal.kind) {
+    case "change_order": {
+      const project = await ownedProject(userId, String(p.projectId));
+      let out: Awaited<ReturnType<typeof createChangeOrder>>;
+      try {
+        out = await createChangeOrder({ userId, projectId: project.id, title: String(p.title), description: String(p.description ?? ""), items: (p.items as ChangeOrderItem[]) ?? [], scheduleDeltaDays: Number(p.scheduleDeltaDays ?? 0) });
+      } catch (err) {
+        if ((err as Error).message === "NO_CONTRACT") throw new ProposalError("Change orders need a signed contract behind the job.", "NO_CONTRACT", 409);
+        throw err;
+      }
+      await writeAudit({ userId, actorType: "ai", actorId: proposal.id, entityType: "change_order", entityId: out.changeOrder.id, action: "created_via_assistant", ip });
+      return { entityType: "change_order", entityId: out.changeOrder.id, link: `/dashboard/jobs/${project.id}?tab=changes` };
+    }
+    case "job_note": {
+      const project = await ownedProject(userId, String(p.projectId));
+      const [note] = await db
+        .insert(jobNotesTable)
+        .values({ userId, projectId: project.id, milestoneId: (p.milestoneId as string | null) ?? null, photoId: (p.photoId as string | null) ?? null, body: String(p.body), source: (p.source as JobNoteSource) ?? "assistant", authorName: actorName })
+        .returning();
+      await writeAudit({ userId, actorType: "ai", actorId: proposal.id, entityType: "job_note", entityId: note!.id, action: "created_via_assistant", ip });
+      return { entityType: "job_note", entityId: note!.id, link: `/dashboard/jobs/${project.id}?tab=overview` };
+    }
     case "cost_entry": {
       const project = await ownedProject(userId, String(p.projectId));
       const [entry] = await db

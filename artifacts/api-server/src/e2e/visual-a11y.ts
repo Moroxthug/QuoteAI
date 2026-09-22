@@ -73,6 +73,10 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026"),
     pub("/quotes/painter"), pub("/quotes/painter/toronto"), pub("/fr/soumissions/peintre"), pub("/fr/soumissions/peintre/montreal"),
     pub("/chi-siamo"), pub("/contatti"), pub("/privacy-policy"), pub("/terms"), pub("/mappa-sito"),
+    // Phase 82: the pages Phases 70/81 added were never in this sweep.
+    pub("/pricing"), pub("/fr/tarifs"), pub("/pilot"), pub("/fr/pilote"),
+    pub("/provinces/british-columbia"), pub("/provinces/quebec"), pub("/fr/provinces/quebec"),
+    pub("/help"), pub("/help/getting-started"),
     pub("/sign-in"), pub("/sign-up"), pub("/this-route-does-not-exist"),
     pub(`/p/${s.longQuoteId}`), pub(`/i/${s.invoiceToken}`),
     ...(s.signToken ? [pub(`/sign/${s.signToken}`)] : []),
@@ -138,6 +142,7 @@ type PageResult = {
   lang: string; width: number; path: string; auth: boolean;
   title: string; screenshot: string;
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
+  gutter: { clientWidth: number; offenders: string[] } | null;
   axe: Array<{ id: string; impact: string; help: string; count: number; targets: string[]; detail: string[] }>;
   consoleErrors: string[]; failedRequests: string[]; boundary: string | null; rawKeys: string[]; error?: string;
 };
@@ -160,6 +165,15 @@ async function overflow(page: Page) {
       if (r.width === 0 || r.right <= cw + 1) continue;
       const cs = getComputedStyle(el);
       if (cs.position === "fixed" || cs.visibility === "hidden") continue;
+      // Phase 82: an element inside a deliberate sideways scroller (a wide
+      // comparison table in its .cmp-wrap) sticks out of the viewport without
+      // widening the page — and, being the widest thing on the page, it used
+      // to fill the whole offender list and hide whatever actually did.
+      let clipped = false;
+      for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+        if (getComputedStyle(p).overflowX !== "visible" && p.getBoundingClientRect().right <= cw + 1) { clipped = true; break; }
+      }
+      if (clipped) continue;
       const id = el.id ? `#${el.id}` : "";
       const cls = typeof el.className === "string" && el.className ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".") : "";
       offenders.push([r.right - cw, `${el.tagName.toLowerCase()}${id}${cls}`]);
@@ -167,6 +181,72 @@ async function overflow(page: Page) {
     offenders.sort((a, b) => b[0] - a[0]);
     return { scrollWidth: doc.scrollWidth, clientWidth: cw, offenders: offenders.slice(0, 4).map(([px, sel]) => `${sel} (+${Math.round(px)}px)`) };
   });
+}
+
+// Phase 82 — the phone gutter. `.wrap` gives every public page a
+// clamp(20px, 4vw, 40px) side gutter, but any later rule using the `padding`
+// shorthand with a `0` horizontal component on the same element silently wins
+// and the copy ends up flush against the glass. Nothing else here sees it: the
+// page does not overflow, axe does not care, and a full-page screenshot at
+// 375 px looks plausible until you hold a phone. So below GUTTER_WIDTH every
+// element with its own visible text must keep GUTTER_MIN px from both edges.
+// Opt out with `data-bleed` on the element or an ancestor (marquees and other
+// deliberately full-bleed strips).
+const GUTTER_WIDTH = 640;
+const GUTTER_MIN = 12;
+
+async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> {
+  if (width > GUTTER_WIDTH) return null;
+  return page.evaluate((min) => {
+    const cw = document.documentElement.clientWidth;
+    const offenders: Array<[number, string]> = [];
+    const range = document.createRange();
+    for (const el of Array.from(document.body.querySelectorAll<HTMLElement>("*"))) {
+      const own = Array.from(el.childNodes).filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent ?? "").join("").trim();
+      if (!own) continue;
+      if (el.closest("[data-bleed]")) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === "hidden" || cs.position === "fixed" || Number(cs.opacity) === 0) continue;
+      // Measure the glyphs, not the box: a full-bleed band whose text is inset
+      // by its own padding is exactly what we want, and the box says otherwise.
+      let left = Infinity;
+      let right = -Infinity;
+      let top = Infinity;
+      for (const n of Array.from(el.childNodes)) {
+        if (n.nodeType !== Node.TEXT_NODE || !(n.textContent ?? "").trim()) continue;
+        range.selectNodeContents(n);
+        for (const rect of Array.from(range.getClientRects())) {
+          if (rect.width === 0 || rect.height === 0) continue;
+          left = Math.min(left, rect.left);
+          right = Math.max(right, rect.right);
+          top = Math.min(top, rect.top + window.scrollY);
+        }
+      }
+      if (left === Infinity) continue;
+      if (top < -1000) continue; // recharts' hidden measurement span and friends
+      // …and only where it is actually painted: the element itself or an
+      // ancestor that clips or scrolls sideways (a `truncate` row, a wide
+      // table, a chip rail) hides the overhang, so intersect with every such
+      // box — starting with the element's own, which is what puts the ellipsis
+      // on a long job name.
+      for (let p: HTMLElement | null = el; p && p !== document.body; p = p.parentElement) {
+        if (getComputedStyle(p).overflowX === "visible") continue;
+        const pr = p.getBoundingClientRect();
+        left = Math.max(left, pr.left);
+        right = Math.min(right, pr.right);
+      }
+      if (right - left <= 0) continue; // clipped away entirely
+      if (right <= 0 || left >= cw) continue; // off-canvas drawer, closed menu
+      const worst = Math.min(left, cw - right);
+      if (worst >= min) continue;
+      const id = el.id ? `#${el.id}` : "";
+      const cls = typeof el.className === "string" && el.className ? "." + el.className.trim().split(/\s+/).slice(0, 3).join(".") : "";
+      offenders.push([worst, `${el.tagName.toLowerCase()}${id}${cls} ${Math.round(worst)}px — ${JSON.stringify(own.slice(0, 40))}`]);
+    }
+    if (!offenders.length) return null;
+    offenders.sort((a, b) => a[0] - b[0]);
+    return { clientWidth: cw, offenders: offenders.slice(0, 5).map(([, sel]) => sel) };
+  }, GUTTER_MIN);
 }
 
 async function runAxe(page: Page): Promise<PageResult["axe"]> {
@@ -200,7 +280,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
   const file = resolve(dir, `${slug(r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, axe: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
+  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, gutter: null, axe: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -213,6 +293,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
     const tokens: string[] = await page.evaluate(() => Array.from(new Set((document.body.innerText.match(/\b[a-z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9_-]+){1,6}\b/g) ?? []))));
     result.rawKeys = tokens.filter((t) => TRANSLATION_KEYS.has(t));
     result.overflow = await overflow(page);
+    result.gutter = await gutter(page, width);
     if (SCREENSHOTS) await page.screenshot({ path: file, fullPage: true });
     if (RUN_AXE) result.axe = await runAxe(page);
   } catch (e) {
@@ -231,14 +312,15 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
   const byPath = new Map<string, PageResult[]>();
   for (const r of results) byPath.set(r.path, [...(byPath.get(r.path) ?? []), r]);
 
-  lines.push("## Summary", "", "| route | overflow (lang@width) | axe serious/critical | console errors | failed /api | boundary/error |", "|---|---|---|---|---|---|");
+  lines.push("## Summary", "", "| route | overflow (lang@width) | gutter | axe serious/critical | console errors | failed /api | boundary/error |", "|---|---|---|---|---|---|---|");
   for (const [path, rs] of byPath) {
     const ov = rs.filter((r) => r.overflow).map((r) => `${r.lang}@${r.width}`).join(", ") || "—";
+    const gu = rs.filter((r) => r.gutter).map((r) => `${r.lang}@${r.width}`).join(", ") || "—";
     const ax = rs.reduce((s, r) => s + sev(r), 0);
     const ce = rs.reduce((s, r) => s + r.consoleErrors.length, 0);
     const fr = rs.reduce((s, r) => s + r.failedRequests.length, 0);
     const be = rs.filter((r) => r.boundary || r.error).map((r) => `${r.lang}@${r.width}: ${r.boundary ?? r.error}`).join("; ") || "—";
-    lines.push(`| \`${path}\` | ${ov} | ${ax || "—"} | ${ce || "—"} | ${fr || "—"} | ${be} |`);
+    lines.push(`| \`${path}\` | ${ov} | ${gu} | ${ax || "—"} | ${ce || "—"} | ${fr || "—"} | ${be} |`);
   }
 
   lines.push("", "## axe violations (moderate+), by rule", "");
@@ -257,6 +339,8 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
 
   lines.push("## Overflow details", "");
   for (const r of results) if (r.overflow) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.overflow.scrollWidth}/${r.overflow.clientWidth} — ${r.overflow.offenders.join(", ")}`);
+  lines.push("", `## Phone gutter (< ${GUTTER_MIN}px from an edge at ≤ ${GUTTER_WIDTH}px)`, "");
+  for (const r of results) if (r.gutter) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.gutter.offenders.join(" · ")}`);
   lines.push("", "## Raw translation keys on the page", "");
   for (const r of results) if (r.rawKeys.length) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.rawKeys.join(", ")}`);
   lines.push("", "## Console errors / failed requests", "");
@@ -317,7 +401,7 @@ try {
         for (const r of rs) {
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
-          const flags = [res.overflow && "OVERFLOW", res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
+          const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
           console.log(`${lang}@${String(width).padStart(4)} ${r.path.padEnd(60)} ${flags.join(" ") || "ok"}`);
         }
       }
@@ -327,8 +411,9 @@ try {
   writeReport(results, { langs: LANGS, widthsEn: WIDTHS_EN, widthsFr: WIDTHS_FR, province: PROVINCE, routes: all.length, pages: results.length, seconds: Math.round((Date.now() - t0) / 1000) });
   const serious = results.reduce((s, r) => s + r.axe.filter((a) => a.impact !== "moderate").reduce((x, a) => x + a.count, 0), 0);
   const overflows = results.filter((r) => r.overflow).length;
+  const gutters = results.filter((r) => r.gutter).length;
   const rawKeyPages = results.filter((r) => r.rawKeys.length).length;
-  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, axe serious/critical nodes ${serious}, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
+  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
   if (KEEP) {
     console.log(`[qa-visual] --keep: account ${org.email} left in place; bearer ${org.token}; frontend ${frontend} (API ${apiBase}). Ctrl-C to stop.`);
     await new Promise(() => {});

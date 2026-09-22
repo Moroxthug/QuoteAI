@@ -364,3 +364,25 @@ Reminders: `runScheduleReminderMaintenance(now)` runs from **`GET /api/cron/even
 | A marketing image slot renders a product mockup instead of a photo | that slot's `src` is still `null`. `slotsAwaitingPhotography()` lists the ones still waiting |
 | A French page shows an English city name | `CityData.frName` / `frRegion` in `src/data/seo-data.ts`; `localizeCity(city, lang)` applies them. Slugs never change — `/fr/soumissions/peintre/montreal/` stays put |
 | The language toggle does not switch a page's URL | only pages with a real French twin navigate; the list is `LOCALE_PAGE_PAIRS` + `PROVINCE_SLUG_PAIRS` + the sector/city rules in `src/data/seo-slugs.ts`. Everything else flips the chrome language in place. Add a new French page → add the pair there, add the route in `App.tsx`, the prerender entry in `data/prerender-routes.ts` and the sitemap entry in `scripts/generate-sitemap.ts` |
+
+
+## 19. Pilot preflight + the phone gutter check (Phase 82)
+
+**Where**: `api-server/scripts/preflight.ts` (`pnpm --filter @workspace/api-server ops:preflight`); the gutter check in `api-server/src/e2e/visual-a11y.ts` (`pnpm --filter @workspace/api-server qa:visual`).
+
+**How it fits** — `docs/LAUNCH-GO-NO-GO.md` §1 is a table a person ticks. `ops:preflight` asks the *running deployment* the same questions and answers them from what it actually does, so the morning of a launch is not a memory exercise. It is read-only: GETs against the public surface, plus three counting queries and a `schema-drift` run when a `--db` is given. Nothing is written, nothing is sent, no secret is printed. Exit 1 on any FAIL (a launch blocker); WARNs are things to know about (annual prices absent, no pilot code). It is the *deployment* half — `pnpm env:inventory` is the environment half, and the two together are §1.
+
+```bash
+pnpm --filter @workspace/api-server ops:preflight -- --url https://quoteai.ca --db "$DATABASE_URL"
+```
+
+| Ask | Do |
+|---|---|
+| "Scheduler ran…" FAILs | same signal as `GET /api/healthz/ops` returning 503 — see §2. The detail line is the `problems[]` array |
+| "No test fixtures in the target database" FAILs | the e2e suite has been run against this database (it creates `e2e_*` users with `@example.invalid` emails). Until the staging project exists (owner track O3) that is production, and every run also purges leftovers at start-up. Clean with `pnpm --filter @workspace/api-server walkthrough:cleanup` |
+| "Database schema matches the code" FAILs | a migration in `lib/db/drizzle/` was never applied to that database. Apply it (`supabase db query --linked < lib/db/drizzle/00xx_….sql`) and re-run; `pnpm --filter @workspace/db schema-drift` prints the full diff |
+| "Registered legal identity" FAILs | expected until owner track O5: `LEGAL_ENTITY` in `lib/legal-entity/src/index.ts` is blank, so policies, footers and emails say plain "QuoteAI". This check reads the *checkout*, not the deployment — it tells you what the next deploy will say |
+| Preflight passes but the site is still wrong | it checks the API, not the pages. `pnpm --filter @workspace/api-server qa:visual` is the page-level sweep |
+| A phone shows copy flush against the glass | that is the GUTTER flag in the `qa:visual` report. At ≤ 640 px every element with its own visible text must keep 12 px from both edges, measured on the *glyphs* (`Range.getClientRects`) and clipped by any scrolling or hidden-overflow ancestor, so a full-bleed band with inner padding is fine and an ellipsised row is fine. Opt a deliberately full-bleed strip out with `data-bleed` (the trade marquee on the homepage is the only one) |
+| A `.wrap` element has no side padding on a phone | something later in `mockup-system.css` set the `padding` *shorthand* with a `0` horizontal component on the same element and silently won. Use `padding-block`. This is how `.hero-grid`, `.cta-in` and `.ft-bottom` lost the gutter |
+| A page scrolls sideways on a phone and nothing visible overflows | look for an absolutely positioned descendant (typically `.sr-only`) inside a sideways scroller that is itself `position: static` — it takes its containing block from further up, escapes the clip and widens the document. Every scroller in `mockup-system.css` now carries `position: relative`; a new one must too |

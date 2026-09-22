@@ -21,7 +21,8 @@
     "qa:perf": "tsx src/e2e/api-perf.ts",
     "ops:backup": "tsx scripts/backup.ts",
     "ops:restore": "tsx scripts/restore.ts",
-    "ops:rotate-token-key": "tsx scripts/rotate-token-key.ts"
+    "ops:rotate-token-key": "tsx scripts/rotate-token-key.ts",
+    "ops:preflight": "tsx scripts/preflight.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

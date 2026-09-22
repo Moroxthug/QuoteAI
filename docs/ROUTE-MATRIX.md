@@ -122,10 +122,10 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 25 | GET | `/api/clients/:id/portal` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 49 | POST | `/api/clients/:id/portal/invite` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 80 | GET | `/api/clients/:id/messages` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 98 | POST | `/api/clients/:id/messages` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 68 | GET | `/api/clients/:id/portal` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 92 | POST | `/api/clients/:id/portal/invite` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 123 | GET | `/api/clients/:id/messages` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 141 | POST | `/api/clients/:id/messages` | session | jobs:edit | — | zod | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/clients.ts
 

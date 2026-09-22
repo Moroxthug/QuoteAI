@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db, clientsTable, projectsTable, businessProfilesTable } from "@workspace/db";
-import { and, eq } from "drizzle-orm";
+import { db, clientsTable, projectsTable, businessProfilesTable, quotesTable } from "@workspace/db";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { sendPortalInviteEmail } from "../lib/emailPortal.js";
+import { ensureClientForQuote } from "../lib/clients.js";
 import { ensurePortalLink, unreadClientMessageCount } from "../portal/service.js";
 import { listThread, markClientMessagesRead, postClientMessage, MAX_MESSAGE_LENGTH } from "../portal/messages.js";
 
@@ -16,9 +17,51 @@ import { listThread, markClientMessagesRead, postClientMessage, MAX_MESSAGE_LENG
 
 const router = Router();
 
+// Phase 82: `/dashboard/clients` is grouped out of the quotes table, so the id
+// in the URL of a client page is `md5(dedupKey)` — never the `clients.id`
+// UUID these routes were written for. Every portal card and message thread on
+// a client page therefore 404'd. Accept either: the UUID, or the md5 of the
+// dedup key that identifies the same person.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MD5_RE = /^[0-9a-f]{32}$/i;
+
 async function ownedClient(userId: string, id: string) {
-  const [client] = await db.select().from(clientsTable).where(and(eq(clientsTable.id, id), eq(clientsTable.userId, userId)));
-  return client ?? null;
+  if (UUID_RE.test(id)) {
+    const [client] = await db.select().from(clientsTable).where(and(eq(clientsTable.id, id), eq(clientsTable.userId, userId)));
+    return client ?? null;
+  }
+  if (!MD5_RE.test(id)) return null;
+  const md5 = id.toLowerCase();
+  const [client] = await db
+    .select()
+    .from(clientsTable)
+    .where(and(eq(clientsTable.userId, userId), sql`md5(${clientsTable.dedupKey}) = ${md5}`));
+  if (client) return client;
+
+  // No row yet: the client page is a grouping of quotes, and a quote written
+  // before `linkQuoteToClient` existed never created one. Find the group in
+  // the quotes table and materialise the client from it — the same call the
+  // quote routes make, so the dedup key (and therefore this md5) matches.
+  const [quote] = await db
+    .select({ clientData: quotesTable.clientData })
+    .from(quotesTable)
+    .where(
+      and(
+        eq(quotesTable.userId, userId),
+        sql`md5(concat_ws('|',
+          lower(trim(${quotesTable.clientData}->>'nome')),
+          coalesce(lower(trim(${quotesTable.clientData}->>'email')), ''),
+          coalesce(lower(trim(${quotesTable.clientData}->>'phone')), '')
+        )) = ${md5}`,
+      ),
+    )
+    .orderBy(desc(quotesTable.createdAt))
+    .limit(1);
+  if (!quote) return null;
+  const createdId = await ensureClientForQuote(userId, quote.clientData);
+  if (!createdId) return null;
+  const [created] = await db.select().from(clientsTable).where(eq(clientsTable.id, createdId));
+  return created ?? null;
 }
 
 // GET /api/clients/:id/portal — link, invite/visit stamps, unread replies

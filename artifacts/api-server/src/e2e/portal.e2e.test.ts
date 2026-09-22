@@ -6,6 +6,7 @@
 // the /i, /sign and /p payloads, and the tenant/visibility boundaries.
 
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
+import { createHash } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { db, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, invoicesTable, clientsTable, jobPhotosTable, notificationsTable, auditLogTable, clientMessagesTable } from "@workspace/db";
 import "../automations/index.js";
@@ -108,6 +109,41 @@ describe("Client portal (Phase 76)", () => {
     expect(mail, "invite email").toBeTruthy();
     expect(mail!.html).toContain(status.body.url);
     expect((await org.api(`/api/clients/${chain.client.id}/portal`)).body.invitedAt).not.toBeNull();
+  });
+
+  // Phase 82: /dashboard/clients groups the quotes table, so the id the client
+  // page carries is md5(dedupKey), not clients.id — the portal card and the
+  // message thread on that page used to 404 on every client.
+  test("contractor: the client page's md5 id reaches the same client", async () => {
+    const [row] = await db.select({ dedupKey: clientsTable.dedupKey }).from(clientsTable).where(eq(clientsTable.id, chain.client.id));
+    const md5 = createHash("md5").update(row!.dedupKey).digest("hex");
+    const listed = await org.api("/api/clients");
+    expect(listed.status).toBe(200);
+    expect((listed.body as Array<{ id: string }>).map((c) => c.id)).toContain(md5);
+
+    const byMd5 = await org.api(`/api/clients/${md5}/portal`);
+    expect(byMd5.status, JSON.stringify(byMd5.body)).toBe(200);
+    expect(byMd5.body.email).toBe(CLIENT_EMAIL);
+    expect((await org.api(`/api/clients/${md5}/messages`)).status).toBe(200);
+    // Still scoped to the org, and a made-up id of either shape is a 404.
+    expect((await other.api(`/api/clients/${md5}/portal`)).status).toBe(404);
+    expect((await org.api(`/api/clients/${"0".repeat(32)}/portal`)).status).toBe(404);
+    expect((await org.api("/api/clients/not-an-id/portal")).status).toBe(404);
+  });
+
+  // A quote written before `linkQuoteToClient` existed has no clients row at
+  // all, so its client page would still have nothing to issue a portal from.
+  test("contractor: a client group with no clients row is materialised on read", async () => {
+    const legacy = await seedQuote(org.userId, { clientName: "Legacy Only", clientEmail: "legacy-only@e2e-test.invalid" });
+    const md5 = createHash("md5").update("legacy only|legacy-only@e2e-test.invalid|6135550100").digest("hex");
+    expect((await db.select().from(clientsTable).where(and(eq(clientsTable.userId, org.userId), eq(clientsTable.dedupKey, "legacy only|legacy-only@e2e-test.invalid|6135550100")))).length).toBe(0);
+
+    const portal = await org.api(`/api/clients/${md5}/portal`);
+    expect(portal.status, JSON.stringify(portal.body)).toBe(200);
+    expect(portal.body.email).toBe("legacy-only@e2e-test.invalid");
+    const [row] = await db.select().from(clientsTable).where(and(eq(clientsTable.userId, org.userId), eq(clientsTable.dedupKey, "legacy only|legacy-only@e2e-test.invalid|6135550100")));
+    expect(row?.name).toBe("Legacy Only");
+    expect(legacy.id).toBeTruthy();
   });
 
   test("gate: the token alone shows only the company + masked email; a session needs the emailed code", async () => {

@@ -465,7 +465,8 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="marquee">
+        {/* Full-bleed by design: the track scrolls past both edges under a mask. */}
+        <div className="marquee" data-bleed>
           <div className="mq-track">
             {[...TRADE_SLUGS, ...TRADE_SLUGS].map((slug, i) => (
               <Link key={`${slug}-${i}`} href={localizedPath(`/quotes/${slug}/`, lang)} className="wm">{tradeLabel(slug)}</Link>

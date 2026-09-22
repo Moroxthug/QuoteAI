@@ -135,7 +135,7 @@ export default function PricingPage() {
             {annualAvailable ? (
               <span className="chip chip-green"><Sparkles className="h-3 w-3 mr-1" />{t("pricing.twoMonthsFree")}</span>
             ) : (
-              <span className="chip chip-grey">{t("pricing.annualSoon")}</span>
+              <span className="chip chip-grey chip-wrap">{t("pricing.annualSoon")}</span>
             )}
           </div>
 

@@ -1,4 +1,5 @@
 import { useParams, useLocation, Link } from "wouter";
+import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Building2, BookOpen, X, MapPin } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
@@ -621,7 +622,7 @@ export default function SeoLanding() {
       {/* ── Final CTA ────────────────────────────────────── */}
       <section className="cta on-dark">
         <div className="cta-bg">
-          <img src={`https://picsum.photos/seed/quoteai-seo-${s.slug}/1800/900`} alt="" aria-hidden="true" loading="lazy" />
+          <MarketingImage slot="cta-sector" />
         </div>
         <div className="wrap cta-in">
           <span className="eyebrow on-dark" style={{ display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>

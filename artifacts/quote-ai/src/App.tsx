@@ -11,6 +11,10 @@ import Home from "@/pages/home";
 // LCP-critical route and these pages — auth, onboarding, legal, contact,
 // WhatsApp, sitemap — were ~55 kB of the bundle it had to load first.
 const WhatsappPage = lazy(() => import("@/pages/whatsapp"));
+// Phase 81 — the marketing pages built for the BC/ON/QC pilot.
+const PricingPage = lazy(() => import("@/pages/pricing"));
+const PilotPage = lazy(() => import("@/pages/pilot"));
+const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const SignUpPage = lazy(() => import("@/pages/sign-up"));
 const OnboardingPage = lazy(() => import("@/pages/onboarding"));
@@ -135,6 +139,13 @@ function Router() {
       <Route path={PATHS.HOME} component={() => <PublicLayout><Home /></PublicLayout>} />
       {/* French homepage — same component, detects lang from the /fr prefix */}
       <Route path="/fr" component={() => <PublicLayout><Home /></PublicLayout>} />
+      {/* Phase 81 — pricing, pilot and province pages, each with a real French URL */}
+      <Route path={PATHS.PRICING} component={() => <PublicLayout><Suspense fallback={null}><PricingPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/tarifs" component={() => <PublicLayout><Suspense fallback={null}><PricingPage /></Suspense></PublicLayout>} />
+      <Route path={PATHS.PILOT} component={() => <PublicLayout><Suspense fallback={null}><PilotPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/pilote" component={() => <PublicLayout><Suspense fallback={null}><PilotPage /></Suspense></PublicLayout>} />
+      <Route path="/provinces/:slug" component={() => <PublicLayout><Suspense fallback={null}><ProvincePage /></Suspense></PublicLayout>} />
+      <Route path="/fr/provinces/:slug" component={() => <PublicLayout><Suspense fallback={null}><ProvincePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.WHATSAPP} component={() => <PublicLayout><Suspense fallback={null}><WhatsappPage /></Suspense></PublicLayout>} />
       <Route path={PATHS.CHI_SIAMO} component={() => <Suspense fallback={null}><ChiSiamoPage /></Suspense>} />
       <Route path={PATHS.CONTATTI} component={() => <Suspense fallback={null}><ContattiPage /></Suspense>} />

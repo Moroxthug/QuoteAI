@@ -595,6 +595,19 @@ paths:
                 items:
                   $ref: "#/components/schemas/Plan"
 
+  /payments/pilot:
+    get:
+      operationId: getPilotOffer
+      tags: [payments]
+      summary: The pilot-programme promo offer, if this deployment has one (Phase 81)
+      responses:
+        "200":
+          description: Pilot offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PilotOffer"
+
   /payments/subscription:
     get:
       operationId: getSubscription
@@ -2145,6 +2158,9 @@ components:
           type: string
           enum: [month, year]
           description: Billing cadence for subscription plans (Phase 73). Defaults to month.
+        promoCode:
+          type: string
+          description: Pilot-programme promo code (Phase 81). Applied to Checkout only when it matches the server's configured code; anything else is ignored.
       required:
         - planType
 
@@ -2157,9 +2173,29 @@ components:
         interval:
           type: string
           enum: [month, year]
+        promoCode:
+          type: string
+          description: Pilot-programme promo code (Phase 81) — only honoured on the Checkout path, for a company with no live subscription.
       required:
         - planType
         - interval
+
+    PilotOffer:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        code:
+          type: string
+          nullable: true
+        provinces:
+          type: array
+          items:
+            type: string
+      required:
+        - enabled
+        - code
+        - provinces
 
     ChangePlanResult:
       type: object

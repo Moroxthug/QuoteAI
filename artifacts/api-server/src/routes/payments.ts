@@ -7,7 +7,7 @@ import { eq, sql } from "drizzle-orm";
 import { CreateCheckoutSessionBody } from "@workspace/api-zod";
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { annualBillingAvailable, isBillingInterval, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { annualBillingAvailable, isBillingInterval, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -155,6 +155,44 @@ router.get("/payments/plans", (_req, res) => {
   res.json(publicPlans());
 });
 
+/**
+ * Phase 81 — the BC/ON/QC pilot offer, read by the public /pilot page.
+ * `enabled: false` (no PILOT_PROMO_CODE on this deployment) is a real answer:
+ * the page then says the pilot intake is not open rather than showing a code
+ * that would bounce at checkout.
+ */
+router.get("/payments/pilot", (_req, res) => {
+  const code = pilotPromoCode();
+  res.set("Cache-Control", "public, max-age=300");
+  res.json({ enabled: code !== null, code, provinces: ["BC", "ON", "QC"] });
+});
+
+/**
+ * Turns the customer-facing pilot code into the `promo_…` id Checkout wants.
+ * Only the configured code is ever looked up, and a code that Stripe does not
+ * recognise (typo, expired, redemption limit reached) resolves to null so the
+ * session is created without a discount instead of failing — the visitor still
+ * gets to Checkout, where Stripe's own promo box is waiting.
+ */
+async function pilotDiscount(
+  stripe: Awaited<ReturnType<typeof getUncachableStripeClient>>,
+  submitted: unknown,
+): Promise<{ promotion_code: string }[] | null> {
+  if (!isPilotPromoCode(submitted)) return null;
+  try {
+    const found = await stripe.promotionCodes.list({ code: pilotPromoCode()!, active: true, limit: 1 });
+    const promo = found.data[0];
+    if (!promo) {
+      logger.warn({ code: pilotPromoCode() }, "PILOT_PROMO_CODE is set but Stripe has no active promotion code with that code");
+      return null;
+    }
+    return [{ promotion_code: promo.id }];
+  } catch (err) {
+    logger.error({ err }, "Could not resolve the pilot promotion code — continuing without a discount");
+    return null;
+  }
+}
+
 router.get("/payments/trial-status", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
@@ -217,11 +255,16 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
       .from(authUsersTable)
       .where(eq(authUsersTable.id, userId));
 
+    // Phase 81: Stripe refuses `allow_promotion_codes` together with an
+    // applied discount, so the pilot code replaces the coupon box rather than
+    // sitting next to it.
+    const discounts = await pilotDiscount(stripe, parsed.data.promoCode);
+
     const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: plan.interval ? "subscription" : "payment",
-      allow_promotion_codes: true,
+      ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
@@ -230,6 +273,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
         planType,
         interval: plan.interval ? interval : "",
         hasWatermark: String(plan.hasWatermark),
+        ...(discounts ? { pilotPromo: pilotPromoCode()! } : {}),
       },
     };
 
@@ -501,7 +545,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
 router.post("/payments/change-plan", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const body = (req.body ?? {}) as { planType?: unknown; interval?: unknown };
+    const body = (req.body ?? {}) as { planType?: unknown; interval?: unknown; promoCode?: unknown };
     const planType = typeof body.planType === "string" ? body.planType : "";
     const interval: BillingInterval = isBillingInterval(body.interval) ? body.interval : "month";
     if (!isSubscriptionTier(planType)) {
@@ -530,14 +574,15 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
       // No live subscription → same path as a first purchase.
       const baseUrl = getBaseUrl();
       const [authUser] = await db.select({ email: authUsersTable.email }).from(authUsersTable).where(eq(authUsersTable.id, userId));
+      const discounts = await pilotDiscount(stripe, body.promoCode);
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [{ price: priceId, quantity: 1 }],
         mode: "subscription",
-        allow_promotion_codes: true,
+        ...(discounts ? { discounts } : { allow_promotion_codes: true }),
         success_url: `${baseUrl}/dashboard/billing?payment=success`,
         cancel_url: `${baseUrl}/dashboard/billing?payment=cancelled`,
-        metadata: { userId, quoteId: "", planType, interval, hasWatermark: String(plan.hasWatermark) },
+        metadata: { userId, quoteId: "", planType, interval, hasWatermark: String(plan.hasWatermark), ...(discounts ? { pilotPromo: pilotPromoCode()! } : {}) },
         ...(profile?.stripeCustomerId ? { customer: profile.stripeCustomerId } : authUser?.email ? { customer_email: authUser.email } : {}),
       });
       res.json({ mode: "checkout", url: session.url });

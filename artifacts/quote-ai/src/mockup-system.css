@@ -709,7 +709,7 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 
 /* footer */
 .footer { background: var(--navy); color: #b7b9cc; padding: clamp(56px, 7vw, 80px) 0 0; font-size: 14.5px; }
-.ft-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 1fr; gap: 34px; padding-bottom: 52px; }
+.ft-grid { display: grid; grid-template-columns: 1.5fr repeat(6, minmax(0, 1fr)); gap: 30px; padding-bottom: 52px; }
 .ft-brand .logo-invert { filter: brightness(0) invert(1); }
 .ft-brand p { margin: 16px 0 0; max-width: 270px; font-size: 14px; color: #8f91a6; }
 .ft-col h4 { color: #fff; font-size: 12.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; }
@@ -748,6 +748,94 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 }
 @media (prefers-reduced-motion: reduce) {
   .mq-track { animation: none; flex-wrap: wrap; }
+}
+
+/* ==========================================================
+   MARKETING IMAGE SLOTS (Phase 81)
+   One shape per slot so the page does not move when the owner's
+   photograph replaces the fallback (components/marketing-image.tsx).
+   ========================================================== */
+.mk-img { width: 100%; display: block; }
+.mk-img.split-img { border-radius: var(--radius-mk); aspect-ratio: 10 / 7; object-fit: cover; box-shadow: var(--shadow-card); }
+.mk-img.card-img { aspect-ratio: 16 / 10; object-fit: cover; transition: transform .7s var(--ease-mk); }
+.news-card:hover .mk-img.card-img { transform: scale(1.045); }
+.mk-img.band-img { height: 100%; object-fit: cover; }
+
+/* Product mockups standing in for the story photographs. */
+.mk-art { aspect-ratio: 10 / 7; display: grid; place-items: center; border-radius: var(--radius-mk); background: linear-gradient(150deg, var(--soft), #eef0f6); border: 1px solid var(--line); padding: clamp(18px, 3vw, 34px); overflow: hidden; }
+.mk-art .doc-mock { width: 100%; max-width: 420px; }
+.mk-art .dm-body { padding: 16px 18px; }
+.mk-art .dm-row { padding: 8px 0; font-size: 13px; }
+.mk-art .dm-grand b { font-size: 20px; }
+.mk-tasks { display: flex; flex-direction: column; gap: 9px; margin-bottom: 4px; }
+.mk-task { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--muted-mk); }
+.mk-task .mk-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--line); }
+.mk-task.is-done { color: var(--faint); text-decoration: line-through; }
+.mk-task.is-done .mk-dot { background: var(--green); }
+.mk-task.is-now { color: var(--navy); font-weight: 800; }
+.mk-task.is-now .mk-dot { background: var(--teal); }
+.mk-bar { height: 7px; border-radius: 999px; background: var(--soft-2); overflow: hidden; margin-top: 10px; }
+.mk-bar i { display: block; height: 100%; border-radius: 999px; background: var(--navy); }
+
+/* Phone thread standing in for the WhatsApp photograph. */
+.mk-phone { width: 100%; max-width: 300px; background: #fff; border-radius: 22px; box-shadow: var(--shadow-lift); overflow: hidden; }
+.mk-phone-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--navy); color: #fff; font-size: 13px; }
+.mk-phone-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #f3f4f8; }
+.mk-bubble { font-size: 12.5px; font-weight: 600; line-height: 1.45; border-radius: 14px; padding: 9px 12px; max-width: 86%; }
+.mk-bubble.out { align-self: flex-end; background: var(--green-t); color: var(--green-dark); }
+.mk-bubble.in { align-self: flex-start; background: #fff; color: var(--ink); border: 1px solid var(--line); }
+.mk-bubble.voice { display: inline-flex; align-items: center; gap: 6px; }
+.mk-bubble.file { font-weight: 800; color: var(--navy); }
+
+/* Flat brand cover for a card thumbnail — no photograph implied. */
+.mk-cover { aspect-ratio: 16 / 10; display: grid; place-items: center; }
+.mk-cover svg { width: 34%; height: auto; opacity: .38; stroke-width: 1.1; }
+.mk-cover-green { background: var(--green-t); color: var(--green-dark); }
+.mk-cover-teal { background: var(--teal-t); color: var(--teal-dark); }
+.mk-cover-purple { background: var(--purple-t); color: var(--purple); }
+.mk-cover-yellow { background: var(--yellow-t); color: var(--yellow-dark); }
+
+/* Decorative band behind a dark CTA (the .cta-bg::after navy scrim sits on top). */
+.mk-mesh { position: absolute; inset: 0; background:
+  radial-gradient(60% 80% at 15% 20%, rgba(80, 200, 140, .30), transparent 62%),
+  radial-gradient(55% 75% at 85% 30%, rgba(90, 140, 255, .28), transparent 60%),
+  radial-gradient(70% 90% at 50% 100%, rgba(150, 110, 255, .24), transparent 66%),
+  var(--navy); }
+
+/* ==========================================================
+   PRICING / PROVINCE / PILOT PAGES (Phase 81)
+   ========================================================== */
+.price-switch { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: clamp(28px, 4vw, 44px); }
+.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+.price-card { display: flex; flex-direction: column; padding: 28px 26px; }
+.price-card.is-popular { border: 2px solid var(--navy); box-shadow: var(--shadow-card); }
+.price-head { border-bottom: 1px solid var(--soft); padding-bottom: 18px; margin-bottom: 18px; }
+.price-name { display: flex; align-items: center; gap: 9px; color: var(--navy); }
+.price-name h2, .price-name h3 { font-size: 19px; font-weight: 800; color: var(--navy); }
+.price-name .chip { margin-left: auto; }
+.price-amount { font-size: clamp(2rem, 3.2vw, 2.6rem); font-weight: 800; letter-spacing: -.02em; color: var(--navy); margin-top: 10px; font-variant-numeric: tabular-nums; }
+.price-amount span { font-size: 15px; font-weight: 600; color: var(--muted-mk); letter-spacing: 0; }
+.price-sub { font-size: 13px; color: var(--muted-mk); font-weight: 600; margin-top: 4px; }
+.price-feats { display: flex; flex-direction: column; gap: 9px; flex: 1; }
+.price-feats li { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.price-feats li svg { flex: none; margin-top: 2px; color: var(--green-dark); }
+.price-feats li.off { color: var(--faint); }
+.price-feats li.off svg { color: var(--faint); }
+.price-foot { padding-top: 20px; }
+.price-note { font-size: 13px; color: var(--muted-mk); text-align: center; margin-top: 24px; }
+.cmp td svg { display: inline-block; vertical-align: -3px; color: var(--green-dark); }
+
+.prov-notes { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.prov-notes li { display: flex; gap: 10px; font-size: 14px; color: var(--muted-mk); line-height: 1.55; }
+.prov-notes li svg { margin-top: 3px; color: var(--green-dark); }
+.prov-fine { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--soft); font-size: 12.5px; color: var(--faint); line-height: 1.6; }
+
+.pilot-code { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 26px 0 4px; }
+.pilot-code-tag { display: inline-flex; align-items: center; gap: 8px; border: 1px dashed rgba(255, 255, 255, .5); border-radius: 12px; padding: 10px 18px; font-size: 17px; font-weight: 800; letter-spacing: .12em; color: #fff; font-variant-numeric: tabular-nums; }
+.pilot-code-note { font-size: 13.5px; font-weight: 600; color: #b7b9cc; max-width: 420px; text-align: left; }
+
+@media (max-width: 1080px) {
+  .price-grid { grid-template-columns: 1fr; max-width: 560px; margin-inline: auto; }
 }
 
 /* ==========================================================

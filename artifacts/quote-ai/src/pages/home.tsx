@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight, Receipt, Shield, Zap } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import { RevealHeading } from "@/components/reveal-heading";
@@ -8,7 +9,8 @@ import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BLOG_INDEX } from "@/data/blog-index";
-import { sectorLabel } from "@/data/seo-slugs";
+import { sectorLabel, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
+import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { homepageJsonLd } from "@/data/json-ld";
 
 function ScrollSection({
@@ -103,7 +105,7 @@ export default function Home() {
               <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
                 {lang === "fr" ? "Commencer gratuitement" : "Start for free"}
               </button>
-              <Link href="/#deep-dive" className="btn btn-outline-light">
+              <Link href={lang === "fr" ? "/fr/tarifs/" : "/pricing/"} className="btn btn-outline-light">
                 {lang === "fr" ? "Voir les forfaits" : "See plans"}
               </Link>
             </div>
@@ -224,7 +226,7 @@ export default function Home() {
         <div className="wrap">
           <div className="split" id="story-quotes">
             <div className="split-media">
-              <img src="https://picsum.photos/seed/quoteai-contractor-onsite/980/686" alt={lang === "fr" ? "Un entrepreneur consultant une soumission sur le chantier" : "A contractor reviewing a quote on site"} loading="lazy" />
+              <MarketingImage slot="home-quotes" />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</span>
@@ -241,7 +243,7 @@ export default function Home() {
           </div>
           <div className="split rev" id="story-jobs">
             <div className="split-media">
-              <img src="https://picsum.photos/seed/quoteai-team-jobsite/980/686" alt={lang === "fr" ? "Une équipe qui travaille sur un chantier" : "A crew working on a job site"} loading="lazy" />
+              <MarketingImage slot="home-jobs" />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "Chantiers" : "Job Sites"}</span>
@@ -258,7 +260,7 @@ export default function Home() {
           </div>
           <div className="split" id="story-invoicing">
             <div className="split-media">
-              <img src="https://picsum.photos/seed/quoteai-cafe-owner/980/686" alt={lang === "fr" ? "Une propriétaire d'entreprise consultant une facture" : "A business owner reviewing an invoice"} loading="lazy" />
+              <MarketingImage slot="home-invoicing" />
             </div>
             <div className="split-body">
               <span className="eyebrow">{lang === "fr" ? "Facturation et paiements" : "Invoicing & Payments"}</span>
@@ -294,7 +296,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="split-media">
-              <img src="https://picsum.photos/seed/quoteai-whatsapp-phone/980/686" alt={lang === "fr" ? "Un artisan envoyant une note vocale depuis son téléphone" : "A tradesperson sending a voice note from a phone"} loading="lazy" />
+              <MarketingImage slot="home-whatsapp" />
             </div>
           </div>
           <div className="steps3">
@@ -389,10 +391,10 @@ export default function Home() {
             <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all news"} <ArrowRight className="chev h-4 w-4" /></Link>
           </div>
           <div className="news-grid">
-            {[...BLOG_INDEX].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article, i) => (
+            {[...BLOG_INDEX].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                 <div className="news-media">
-                  <img src={`https://picsum.photos/seed/quoteai-blog-${i}/840/525`} alt="" loading="lazy" />
+                  <MarketingImage slot="news-card" seed={article.slug} />
                 </div>
                 <div className="news-body">
                   <p className="news-meta">
@@ -434,9 +436,9 @@ export default function Home() {
               { slug: "word-template", chip: "chip-teal", badge: "vs Word", title: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", seed: "quoteai-guide-word" },
               { slug: "how-to-quote", chip: "chip-purple", badge: "Guide", title: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", seed: "quoteai-guide-howto" },
             ]).map((g) => (
-              <Link key={g.slug} href={`/quotes/${g.slug}/`} className="card news-card">
+              <Link key={g.slug} href={localizedPath(`/quotes/${g.slug}/`, lang)} className="card news-card">
                 <div className="news-media">
-                  <img src={`https://picsum.photos/seed/${g.seed}/840/525`} alt="" loading="lazy" />
+                  <MarketingImage slot="guide-card" seed={g.seed} />
                 </div>
                 <div className="news-body">
                   <p><span className={`chip ${g.chip}`}>{g.badge}</span></p>
@@ -466,7 +468,7 @@ export default function Home() {
         <div className="marquee">
           <div className="mq-track">
             {[...TRADE_SLUGS, ...TRADE_SLUGS].map((slug, i) => (
-              <Link key={`${slug}-${i}`} href={`/quotes/${slug}/`} className="wm">{tradeLabel(slug)}</Link>
+              <Link key={`${slug}-${i}`} href={localizedPath(`/quotes/${slug}/`, lang)} className="wm">{tradeLabel(slug)}</Link>
             ))}
           </div>
         </div>
@@ -476,6 +478,14 @@ export default function Home() {
             <span className="chip chip-teal">{lang === "fr" ? "15+ villes canadiennes" : "15+ Canadian cities"}</span>
             <span className="chip chip-grey">{lang === "fr" ? "Bilingue FR / EN" : "Bilingual FR / EN"}</span>
             <span className="chip chip-grey">{lang === "fr" ? "TPS/TVH par province" : "GST/HST by province"}</span>
+          </div>
+          {/* Phase 81 — the three pilot provinces, each with its own page. */}
+          <div className="cov-note" style={{ marginTop: 14 }}>
+            {PROVINCE_SLUG_PAIRS.map((p) => (
+              <Link key={p.code} href={lang === "fr" ? `/fr/provinces/${p.fr}/` : `/provinces/${p.en}/`} className="wm">
+                {PROVINCE_NAMES[p.code][lang]}
+              </Link>
+            ))}
           </div>
         </div>
       </ScrollSection>
@@ -549,6 +559,9 @@ export default function Home() {
                   ? "L'inscription est gratuite, et votre première soumission est générée sans carte de crédit. Ensuite : payez à l'unité (5 $ à 13 $), ou démarrez un abonnement mensuel (Starter 19 $ avec 10 soumissions, Pro 49 $ avec 60 soumissions, Elite 59 $ illimité) — ou payez à l'année et obtenez deux mois gratuits. Modifiez ou annulez votre forfait à tout moment."
                   : "Signing up is free, and your first quote is generated without entering a credit card. From there you can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited) — or pay yearly and get two months free. You can change or cancel your plan at any time from your account."}
               </p>
+              <Link href={lang === "fr" ? "/fr/tarifs/" : "/pricing/"} className="cta-link" style={{ marginTop: 14 }}>
+                {lang === "fr" ? "Voir la page des tarifs" : "See the full pricing page"} <ArrowRight className="chev h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>
@@ -557,7 +570,7 @@ export default function Home() {
       {/* ── CTA ────────────────────────────────────────────── */}
       <ScrollSection className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-team-celebration/1800/900" alt="" aria-hidden="true" loading="lazy" />
+          <MarketingImage slot="cta-home" />
         </div>
         <div className="wrap cta-in">
           <span className="eyebrow on-dark">{lang === "fr" ? "Commencer" : "Get started"}</span>
@@ -571,7 +584,7 @@ export default function Home() {
             <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">
               {lang === "fr" ? "Créez votre compte gratuit" : "Create your free account"}
             </button>
-            <Link href="/#plans" className="btn btn-outline-light">
+            <Link href={lang === "fr" ? "/fr/tarifs/" : "/pricing/"} className="btn btn-outline-light">
               {lang === "fr" ? "Voir les forfaits" : "See plans"}
             </Link>
           </div>

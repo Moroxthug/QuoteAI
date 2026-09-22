@@ -10,9 +10,21 @@ export function isFrenchPath(pathname: string): boolean {
   return pathname === "/fr" || pathname.startsWith("/fr/");
 }
 
-/** English-locale routes: "/" and the English SEO pages have French twins under /fr, so the URL decides. */
+/**
+ * English-locale routes: pages that have a French twin under /fr, so the URL
+ * decides the language rather than a stored preference. Phase 81 added the
+ * pricing, pilot and province pages to the list — without it, a visitor whose
+ * last visit was French would hydrate the English /pricing in French and
+ * React would tear the prerendered markup.
+ */
 function isEnglishLocalePath(pathname: string): boolean {
-  return pathname === "/" || pathname.startsWith("/quotes/");
+  return (
+    pathname === "/" ||
+    pathname.startsWith("/quotes/") ||
+    pathname.startsWith("/provinces/") ||
+    pathname === "/pricing" || pathname === "/pricing/" ||
+    pathname === "/pilot" || pathname === "/pilot/"
+  );
 }
 
 function detectInitialLang(): Lang {

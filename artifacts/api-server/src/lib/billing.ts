@@ -55,6 +55,29 @@ export function isBillingInterval(v: unknown): v is BillingInterval {
   return v === "month" || v === "year";
 }
 
+// ── Pilot programme promo code (Phase 81) ────────────────────────────────────
+// The BC/ON/QC pilot is sold with one Stripe promotion code, created by the
+// owner in the Stripe dashboard and named here. The marketing page shows it,
+// and Checkout applies it automatically when the visitor arrived through that
+// page, so nobody has to remember to paste it into the coupon box.
+//
+// Unset = there is no pilot offer on this deployment: /pilot says so and
+// Checkout falls back to Stripe's own "have a promo code?" field. The server
+// only ever honours *this* code — a code sent by a client that does not match
+// it is ignored rather than looked up, so the endpoint cannot be used to
+// enumerate an account's coupons.
+
+export function pilotPromoCode(): string | null {
+  const v = process.env.PILOT_PROMO_CODE?.trim();
+  return v && v.length > 0 ? v : null;
+}
+
+export function isPilotPromoCode(submitted: unknown): boolean {
+  const configured = pilotPromoCode();
+  if (!configured || typeof submitted !== "string") return false;
+  return submitted.trim().toUpperCase() === configured.toUpperCase();
+}
+
 // ── Stripe Connect application fee ───────────────────────────────────────────
 // Charged on every card payment collected through a contractor's connected
 // account, in basis points. 50 = 0.5 %. Shown on the contractor's "Get paid

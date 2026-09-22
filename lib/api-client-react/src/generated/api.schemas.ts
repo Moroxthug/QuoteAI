@@ -395,6 +395,8 @@ export interface CreateCheckoutBody {
   planType: CreateCheckoutBodyPlanType;
   /** Billing cadence for subscription plans (Phase 73). Defaults to month. */
   interval?: CreateCheckoutBodyInterval;
+  /** Pilot-programme promo code (Phase 81). Applied to Checkout only when it matches the server's configured code; anything else is ignored. */
+  promoCode?: string;
 }
 
 export type ChangePlanBodyPlanType = typeof ChangePlanBodyPlanType[keyof typeof ChangePlanBodyPlanType];
@@ -417,6 +419,14 @@ export const ChangePlanBodyInterval = {
 export interface ChangePlanBody {
   planType: ChangePlanBodyPlanType;
   interval: ChangePlanBodyInterval;
+  /** Pilot-programme promo code (Phase 81) — only honoured on the Checkout path, for a company with no live subscription. */
+  promoCode?: string;
+}
+
+export interface PilotOffer {
+  enabled: boolean;
+  code: string | null;
+  provinces: string[];
 }
 
 export type ChangePlanResultMode = typeof ChangePlanResultMode[keyof typeof ChangePlanResultMode];

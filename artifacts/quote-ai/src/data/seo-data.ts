@@ -1717,6 +1717,15 @@ export interface CityData {
   region: string;
   regionSlug: string;
   nearbySlug: string[];
+  /**
+   * Phase 81 — the city's own French name, when it differs. The French Québec
+   * pages were saying "Montreal" and "Quebec City" to a French reader, in
+   * copy that was otherwise entirely in French. The slug never changes:
+   * /fr/soumissions/peintre/montreal/ stays where Google already found it.
+   */
+  frName?: string;
+  /** The province's French name, when it differs (Colombie-Britannique, Nouvelle-Écosse, …). */
+  frRegion?: string;
 }
 
 /**
@@ -1737,25 +1746,40 @@ export const CITIES: CityData[] = [
   { name: "Mississauga", slug: "mississauga", region: "Ontario", regionSlug: "ontario", nearbySlug: ["toronto", "hamilton", "ottawa", "vancouver", "calgary"] },
   { name: "Hamilton", slug: "hamilton", region: "Ontario", regionSlug: "ontario", nearbySlug: ["toronto", "mississauga", "ottawa", "vancouver", "calgary"] },
   // British Columbia
-  { name: "Vancouver", slug: "vancouver", region: "British Columbia", regionSlug: "british-columbia", nearbySlug: ["surrey", "victoria", "calgary", "edmonton", "toronto"] },
-  { name: "Surrey", slug: "surrey", region: "British Columbia", regionSlug: "british-columbia", nearbySlug: ["vancouver", "victoria", "calgary", "edmonton", "toronto"] },
-  { name: "Victoria", slug: "victoria", region: "British Columbia", regionSlug: "british-columbia", nearbySlug: ["vancouver", "surrey", "calgary", "edmonton", "toronto"] },
+  { name: "Vancouver", slug: "vancouver", region: "British Columbia", regionSlug: "british-columbia", frRegion: "Colombie-Britannique", nearbySlug: ["surrey", "victoria", "calgary", "edmonton", "toronto"] },
+  { name: "Surrey", slug: "surrey", region: "British Columbia", regionSlug: "british-columbia", frRegion: "Colombie-Britannique", nearbySlug: ["vancouver", "victoria", "calgary", "edmonton", "toronto"] },
+  { name: "Victoria", slug: "victoria", region: "British Columbia", regionSlug: "british-columbia", frRegion: "Colombie-Britannique", nearbySlug: ["vancouver", "surrey", "calgary", "edmonton", "toronto"] },
   // Alberta
   { name: "Calgary", slug: "calgary", region: "Alberta", regionSlug: "alberta", nearbySlug: ["edmonton", "vancouver", "winnipeg", "surrey", "toronto"] },
   { name: "Edmonton", slug: "edmonton", region: "Alberta", regionSlug: "alberta", nearbySlug: ["calgary", "vancouver", "winnipeg", "surrey", "toronto"] },
   // Manitoba
   { name: "Winnipeg", slug: "winnipeg", region: "Manitoba", regionSlug: "manitoba", nearbySlug: ["calgary", "edmonton", "toronto", "ottawa", "vancouver"] },
   // Quebec (French-primary markets)
-  { name: "Montreal", slug: "montreal", region: "Quebec", regionSlug: "quebec", nearbySlug: ["laval", "gatineau", "quebec-city", "ottawa", "toronto"] },
-  { name: "Quebec City", slug: "quebec-city", region: "Quebec", regionSlug: "quebec", nearbySlug: ["montreal", "laval", "gatineau", "ottawa", "toronto"] },
-  { name: "Gatineau", slug: "gatineau", region: "Quebec", regionSlug: "quebec", nearbySlug: ["ottawa", "montreal", "laval", "quebec-city", "toronto"] },
-  { name: "Laval", slug: "laval", region: "Quebec", regionSlug: "quebec", nearbySlug: ["montreal", "gatineau", "quebec-city", "ottawa", "toronto"] },
+  { name: "Montreal", slug: "montreal", region: "Quebec", regionSlug: "quebec", frName: "Montréal", frRegion: "Québec", nearbySlug: ["laval", "gatineau", "quebec-city", "ottawa", "toronto"] },
+  { name: "Quebec City", slug: "quebec-city", region: "Quebec", regionSlug: "quebec", frName: "Québec", frRegion: "Québec", nearbySlug: ["montreal", "laval", "gatineau", "ottawa", "toronto"] },
+  { name: "Gatineau", slug: "gatineau", region: "Quebec", regionSlug: "quebec", frRegion: "Québec", nearbySlug: ["ottawa", "montreal", "laval", "quebec-city", "toronto"] },
+  { name: "Laval", slug: "laval", region: "Quebec", regionSlug: "quebec", frRegion: "Québec", nearbySlug: ["montreal", "gatineau", "quebec-city", "ottawa", "toronto"] },
   // Nova Scotia
-  { name: "Halifax", slug: "halifax", region: "Nova Scotia", regionSlug: "nova-scotia", nearbySlug: ["ottawa", "montreal", "toronto", "quebec-city", "gatineau"] },
+  { name: "Halifax", slug: "halifax", region: "Nova Scotia", regionSlug: "nova-scotia", frRegion: "Nouvelle-Écosse", nearbySlug: ["ottawa", "montreal", "toronto", "quebec-city", "gatineau"] },
 ];
 
 /** Quebec cities where French is the primary/default language once locale routing exists. */
 export const FRENCH_PRIMARY_CITY_SLUGS: readonly string[] = ["montreal", "quebec-city", "gatineau", "laval"];
+
+/**
+ * Phase 81 — the city and province names to *show* in a given language.
+ * Everything else about a city (slug, nearby list, intelligence) is
+ * language-independent, so this is the only localisation a city needs.
+ */
+export function localizeCity(city: CityData, lang: "en-CA" | "fr-CA"): CityData {
+  if (lang !== "fr-CA") return city;
+  if (!city.frName && !city.frRegion) return city;
+  return { ...city, name: city.frName ?? city.name, region: city.frRegion ?? city.region };
+}
+
+export function cityDisplayName(city: CityData, lang: "en" | "fr"): string {
+  return lang === "fr" ? (city.frName ?? city.name) : city.name;
+}
 
 export const CITIES_BY_SLUG: Record<string, CityData> = Object.fromEntries(
   CITIES.map((c) => [c.slug, c])

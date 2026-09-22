@@ -1,4 +1,5 @@
 import { useParams, Link } from "wouter";
+import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight } from "lucide-react";
 import {
   BLOG_CATEGORIES,
@@ -114,10 +115,10 @@ export default function BlogCategoryPage() {
             </div>
           ) : (
             <div className="news-grid">
-              {articles.map((article, i) => (
+              {articles.map((article) => (
                 <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                   <div className="news-media">
-                    <img src={`https://picsum.photos/seed/quoteai-blog-cat-${category.slug}-${i}/840/525`} alt="" loading="lazy" />
+                    <MarketingImage slot="blog-card" seed={article.slug} />
                   </div>
                   <div className="news-body">
                     <p className="news-meta">
@@ -156,7 +157,7 @@ export default function BlogCategoryPage() {
 
       <section className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-blog-category-cta/1800/900" alt="" aria-hidden="true" loading="lazy" />
+          <MarketingImage slot="cta-blog-category" />
         </div>
         <div className="wrap cta-in">
           <h2>

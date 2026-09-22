@@ -25,7 +25,9 @@ export interface PublicRoute {
  *     (those are generated from SECTORS, CITIES, BLOG_ARTICLES, BLOG_CATEGORIES data files)
  */
 const _PUBLIC_ROUTES = [
-  { name: "HOME",       path: "/",           priority: "1.0", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "HOME",       path: "/",           priority: "1.0", changefreq: "weekly",  lastmod: "2026-09-22" },
+  { name: "PRICING",    path: "/pricing",    priority: "0.9", changefreq: "monthly", lastmod: "2026-09-22" },
+  { name: "PILOT",      path: "/pilot",      priority: "0.8", changefreq: "monthly", lastmod: "2026-09-22" },
   { name: "WHATSAPP",   path: "/whatsapp",   priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
   { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
   { name: "HELP",       path: "/help",       priority: "0.8", changefreq: "monthly", lastmod: "2026-09-21" },

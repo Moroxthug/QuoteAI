@@ -8,7 +8,8 @@ import { useAuth } from "@/hooks/use-auth";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath } from "@/data/seo-slugs";
+import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
+import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { legalIdentityLines } from "@workspace/legal-entity";
 
 const ChevRight = () => (
@@ -150,7 +151,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </Link>
           <nav aria-label={t("a11y.primaryNav")} className="nav">
             <ProductsMegaMenu />
-            <Link href="/#trades" className="nav-link">{t("nav.trades")}</Link>
+            <Link href={localizedPath("/pricing/", lang)} className="nav-link">{t("nav.pricing")}</Link>
+            <Link href={localizedPath("/#trades", lang)} className="nav-link">{t("nav.trades")}</Link>
             <Link href="/#whatsapp" className="nav-link">
               {t("nav.whatsapp")}
               <span className="chip chip-new">{t("nav.new")}</span>
@@ -195,7 +197,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </div>
             <nav className="flex flex-col px-4 py-2 flex-1 overflow-y-auto">
               <button className="mnav-link" onClick={() => handleMobileNav("/#products")}>{t("nav.products")}</button>
-              <button className="mnav-link" onClick={() => handleMobileNav("/#trades")}>{t("nav.trades")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/pricing/", lang))}>{t("nav.pricing")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/#trades", lang))}>{t("nav.trades")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/pilot/", lang))}>{t("nav.pilot")}</button>
               <button className="mnav-link" onClick={() => handleMobileNav("/#whatsapp")}>{t("nav.whatsapp")}</button>
               <button className="mnav-link" onClick={() => handleMobileNav("/#guides")}>{t("nav.guides")}</button>
               <button className="mnav-link" onClick={() => handleMobileNav("/#comparison")}>{t("nav.compare")}</button>
@@ -230,9 +234,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="ft-col">
             <h4>{t("footer.trades")}</h4>
             {Object.entries(TRADE_LABELS[lang]).slice(0, 7).map(([slug, label]) => (
-              <Link key={slug} href={`/quotes/${slug}/`}>{label}</Link>
+              <Link key={slug} href={localizedPath(`/quotes/${slug}/`, lang)}>{label}</Link>
             ))}
-            <Link href="/#trades">{t("footer.allTrades")}</Link>
+            <Link href={localizedPath("/#trades", lang)}>{t("footer.allTrades")}</Link>
           </div>
           <div className="ft-col">
             <h4>{t("footer.features")}</h4>
@@ -246,10 +250,21 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="ft-col">
             <h4>{t("footer.guides")}</h4>
             <Link href="/blog/">{t("footer.blog")}</Link>
-            <Link href="/quotes/excel-template/">{t("footer.excelTemplate")}</Link>
-            <Link href="/quotes/word-template/">{t("footer.wordTemplate")}</Link>
-            <Link href="/quotes/how-to-quote/">{t("footer.howToQuote")}</Link>
-            <Link href="/quotes/free-quote/">{t("footer.freeQuotes")}</Link>
+            <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
+            <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
+            <Link href={localizedPath("/quotes/how-to-quote/", lang)}>{t("footer.howToQuote")}</Link>
+            <Link href={localizedPath("/quotes/free-quote/", lang)}>{t("footer.freeQuotes")}</Link>
+          </div>
+          <div className="ft-col">
+            {/* Phase 81 — the pilot marketing pages, both languages */}
+            <h4>{t("footer.pilotProgram")}</h4>
+            <Link href={localizedPath("/pricing/", lang)}>{t("nav.pricing")}</Link>
+            <Link href={localizedPath("/pilot/", lang)}>{t("nav.pilot")}</Link>
+            {PROVINCE_SLUG_PAIRS.map((p) => (
+              <Link key={p.code} href={lang === "fr" ? `/fr/provinces/${p.fr}/` : `/provinces/${p.en}/`}>
+                {PROVINCE_NAMES[p.code][lang]}
+              </Link>
+            ))}
           </div>
           <div className="ft-col">
             <h4>{t("footer.company")}</h4>

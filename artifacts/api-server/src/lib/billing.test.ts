@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { annualBillingAvailable, applicationFeeCents, connectFeeBps, connectFeePercentLabel, resolvePrice, yearlyPriceFor } from "./billing.js";
+import { annualBillingAvailable, applicationFeeCents, connectFeeBps, connectFeePercentLabel, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor } from "./billing.js";
 
 const MONTHLY = { price_m_starter: "monthly_starter", price_m_pro: "monthly_pro", price_m_elite: "monthly_elite" };
 
@@ -30,6 +30,33 @@ describe("annual billing config", () => {
     expect(resolvePrice("price_y_pro", MONTHLY)).toEqual({ tier: "monthly_pro", interval: "year" });
     expect(resolvePrice("price_unknown", MONTHLY)).toBeNull();
     expect(resolvePrice(undefined, MONTHLY)).toBeNull();
+  });
+});
+
+describe("pilot promo code (Phase 81)", () => {
+  it("is absent until PILOT_PROMO_CODE is set, and blank counts as absent", () => {
+    vi.stubEnv("PILOT_PROMO_CODE", "");
+    expect(pilotPromoCode()).toBeNull();
+    vi.stubEnv("PILOT_PROMO_CODE", "   ");
+    expect(pilotPromoCode()).toBeNull();
+    vi.stubEnv("PILOT_PROMO_CODE", " PILOT2026 ");
+    expect(pilotPromoCode()).toBe("PILOT2026");
+  });
+
+  it("only ever matches the configured code, ignoring case and surrounding space", () => {
+    vi.stubEnv("PILOT_PROMO_CODE", "PILOT2026");
+    expect(isPilotPromoCode("PILOT2026")).toBe(true);
+    expect(isPilotPromoCode(" pilot2026 ")).toBe(true);
+    expect(isPilotPromoCode("SOMETHINGELSE")).toBe(false);
+    expect(isPilotPromoCode("")).toBe(false);
+    expect(isPilotPromoCode(undefined)).toBe(false);
+    expect(isPilotPromoCode(42)).toBe(false);
+  });
+
+  it("matches nothing at all when no pilot code is configured", () => {
+    vi.stubEnv("PILOT_PROMO_CODE", "");
+    expect(isPilotPromoCode("PILOT2026")).toBe(false);
+    expect(isPilotPromoCode("")).toBe(false);
   });
 });
 

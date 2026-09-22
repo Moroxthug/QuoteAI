@@ -48,6 +48,7 @@ import type {
   LogoUploadResult,
   PaymentVerifyResult,
   PdfResult,
+  PilotOffer,
   Plan,
   PortalSessionResult,
   PriceAlert,
@@ -2529,6 +2530,83 @@ export function useGetPlans<TData = Awaited<ReturnType<typeof getPlans>>, TError
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetPlansQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPilotOfferUrl = () => {
+
+
+
+
+  return `/api/payments/pilot`
+}
+
+/**
+ * @summary The pilot-programme promo offer, if this deployment has one (Phase 81)
+ */
+export const getPilotOffer = async ( options?: Parameters<typeof customFetch>[1]): Promise<PilotOffer> => {
+
+  return customFetch<PilotOffer>(getGetPilotOfferUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPilotOfferQueryKey = () => {
+    return [
+    `/api/payments/pilot`
+    ] as const;
+    }
+
+
+export const getGetPilotOfferQueryOptions = <TData = Awaited<ReturnType<typeof getPilotOffer>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPilotOffer>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPilotOfferQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPilotOffer>>> = ({ signal }) => getPilotOffer({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPilotOffer>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPilotOfferQueryResult = NonNullable<Awaited<ReturnType<typeof getPilotOffer>>>
+export type GetPilotOfferQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary The pilot-programme promo offer, if this deployment has one (Phase 81)
+ */
+
+export function useGetPilotOffer<TData = Awaited<ReturnType<typeof getPilotOffer>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPilotOffer>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPilotOfferQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

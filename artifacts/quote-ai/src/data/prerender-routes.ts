@@ -6,6 +6,7 @@ import type { Lang } from "@/i18n/translations";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from "./seo-data";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
+import { PILOT_PROVINCES } from "./province-data";
 
 interface PrerenderRoute {
   /** Route path without the trailing slash ("/" for the homepage). */
@@ -17,6 +18,15 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
   const routes: PrerenderRoute[] = [
     { path: "/", lang: "en" },
     { path: "/fr", lang: "fr" },
+    // Phase 81: the marketing pages built for the pilot, both languages.
+    { path: "/pricing", lang: "en" },
+    { path: "/fr/tarifs", lang: "fr" },
+    { path: "/pilot", lang: "en" },
+    { path: "/fr/pilote", lang: "fr" },
+    ...PILOT_PROVINCES.flatMap((p) => [
+      { path: `/provinces/${p.slug}`, lang: "en" as const },
+      { path: `/fr/provinces/${p.frSlug}`, lang: "fr" as const },
+    ]),
     { path: "/whatsapp", lang: "en" },
     { path: "/chi-siamo", lang: "en" },
     { path: "/contatti", lang: "en" },

@@ -3,6 +3,7 @@
 // <SeoHead> — the build-time render (entry-server.tsx) serialises exactly what
 // the hydrated page renders, so crawler and browser always agree.
 import { TESTIMONIALS, AGGREGATE_RATING } from "@/components/testimonials-section";
+import { MARKETING_PLANS, ONE_SHOT_OPTIONS } from "@/data/pricing";
 import { translations } from "@/i18n/translations";
 
 export const BASE_URL = "https://quoteai.ca";
@@ -31,6 +32,49 @@ export function webPageJsonLd(name: string, description: string, path: string, t
     url: `${BASE_URL}${path}`,
     inLanguage: lang,
     isPartOf: { "@type": "WebSite", name: "quoteai", url: `${BASE_URL}/` },
+  };
+}
+
+/** FAQPage for a page that answers a list of questions (Phase 81: /pricing). */
+export function faqJsonLd(items: Array<{ q: string; a: string }>): JsonLdSchema {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  };
+}
+
+/**
+ * Phase 81 — the pricing page's Product/Offer block. `lowPrice` is the
+ * cheapest way to get one quote out of the product ($5 pay-per-quote), not a
+ * subscription tier, so the range is honest about what a contractor can
+ * actually spend.
+ */
+export function pricingJsonLd(lang: "en" | "fr"): JsonLdSchema {
+  const monthly = MARKETING_PLANS.map((p) => p.monthly);
+  const oneShot = ONE_SHOT_OPTIONS.map((o) => o.price);
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "quoteai",
+    description:
+      lang === "fr"
+        ? "Logiciel de soumission par IA pour les entrepreneurs canadiens — forfaits mensuels ou annuels, ou paiement à la soumission."
+        : "AI quoting software for Canadian contractors — monthly or annual plans, or pay per quote.",
+    url: lang === "fr" ? `${BASE_URL}/fr/tarifs/` : `${BASE_URL}/pricing/`,
+    brand: { "@type": "Brand", name: "quoteai" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "CAD",
+      lowPrice: String(Math.min(...oneShot)),
+      highPrice: String(Math.max(...monthly)),
+      offerCount: String(MARKETING_PLANS.length + ONE_SHOT_OPTIONS.length),
+      availability: "https://schema.org/InStock",
+    },
   };
 }
 

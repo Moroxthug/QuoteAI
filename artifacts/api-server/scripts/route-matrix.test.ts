@@ -28,6 +28,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^GET \/api\/tax-profiles$/, reason: "Phase 71: static Canadian sales-tax table for the quote builder; no data, cache-control 1 day" },
   { match: /^GET \/api\/settings\/registration$/, reason: "public 'is sign-up open' flag read by the auth pages" },
   { match: /^GET \/api\/payments\/plans$/, reason: "public pricing table" },
+  { match: /^GET \/api\/payments\/pilot$/, reason: "Phase 81: the pilot promo offer read by the public /pilot page — config only (a code the owner published), no data, cached 5 min" },
   { match: /^GET \/api\/cron\/(tick|evening)$/, reason: "Vercel cron — handler checks `Authorization: Bearer $CRON_SECRET` itself (cronAuthorized)" },
   { match: /^GET \/api\/storage\/public-objects\/\*filePath$/, reason: "public bucket (logos etc.) by design" },
   { match: /^GET \/api\/support\/admin-status$/, reason: "widget reads whether a human is online; no data" },

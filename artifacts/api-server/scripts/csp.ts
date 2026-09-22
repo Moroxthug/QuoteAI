@@ -12,7 +12,13 @@ export function inlineScriptHashes(html: string): string[] {
     const attrs = m[1] ?? "";
     if (/\bsrc=/.test(attrs)) continue;
     if (/type=["']application\/ld\+json["']/.test(attrs)) continue;
-    out.push(`'sha256-${createHash("sha256").update(m[2]!).digest("base64")}'`);
+    // Phase 81: hash the LF form. The repo stores index.html with LF and
+    // Vercel builds from that checkout, but a Windows working copy has CRLF
+    // (core.autocrlf), which hashes differently — so without this the guard
+    // failed locally and "fixing" it would have written hashes that no
+    // browser could ever match in production.
+    const body = m[2]!.split("\r\n").join("\n");
+    out.push(`'sha256-${createHash("sha256").update(body).digest("base64")}'`);
   }
   return out;
 }

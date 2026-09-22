@@ -70,7 +70,7 @@ One folder, one meeting. Everything is in the repo; the assistant can export the
 Carried from `deferred-work-post-launch` — re-audited 2026-09-21. None of these should stop a launch to ON/BC/AB contractors on Starter/Pro.
 
 - No account deletion / data export (PIPEDA / Law 25 erasure + portability) — must exist before the first deletion request; ~1 phase.
-- ~~233 hand-built static SEO/blog bodies are the pre-redesign layout~~ — closed Phase 80 (every public page renders through `entry-server.tsx`, head included, critical CSS inlined). Still open: 14 `picsum.photos` placeholders on public pages (real photography is content, Phase 81).
+- ~~233 hand-built static SEO/blog bodies are the pre-redesign layout~~ — closed Phase 80 (every public page renders through `entry-server.tsx`, head included, critical CSS inlined). ~~Still open: 14 `picsum.photos` placeholders on public pages~~ — closed Phase 81: the third-party host is gone and every slot draws an owned product mockup or brand cover until a photograph is named in `src/data/marketing-images.ts`. Real photography is still owed (owner track O12) — the four homepage story slots are the ones that matter.
 - ~~Invoice/contract PDFs lack the company logo; quote PDF chapter orphans~~ — closed Phase 80.
 - ~~Job "Mark complete"/"Archive" lack a confirm and final-invoice/holdback prompt~~ — closed Phase 80.
 - ~~Lead follow-up cadence and review-request delay are constants~~ — closed Phase 80 (Settings → Business → Follow-up cadence / review delay).

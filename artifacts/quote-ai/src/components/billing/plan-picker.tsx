@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetPlans, useGetSubscription, useChangePlan, getGetSubscriptionQueryKey, type Plan, type SubscriptionInfo } from "@workspace/api-client-react";
-import { CheckCircle2, Crown, Zap, Loader2, Sparkles, Info } from "lucide-react";
+import { CheckCircle2, Crown, Zap, Loader2, Sparkles, Info, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { forgetPilotPromo, pilotPromo } from "@/lib/pilot-promo";
 import { cn } from "@/lib/utils";
 
 // Phase 73: the one plan grid used by /dashboard/billing and Settings →
@@ -39,14 +40,21 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
   const effectiveInterval: Interval = interval === "year" && annualAvailable ? "year" : "month";
   const isCurrent = (tier: Tier) => !!sub?.isActive && sub.plan === tier && currentInterval === effectiveInterval;
 
+  // Phase 81: the code the visitor picked up on /pilot. The server ignores
+  // anything that is not its own configured pilot code, so this is a
+  // convenience, not a grant — and it only reaches Checkout, which is the
+  // only path that can apply a discount.
+  const promoCode = sub?.isActive ? undefined : pilotPromo();
+
   const run = (tier: Tier) => {
     setPending(tier);
     setConfirming(null);
     changePlan.mutate(
-      { data: { planType: tier, interval: effectiveInterval } },
+      { data: { planType: tier, interval: effectiveInterval, ...(promoCode ? { promoCode } : {}) } },
       {
         onSuccess: async (r) => {
           if (r.mode === "checkout" && r.url) { window.location.href = r.url; return; }
+          forgetPilotPromo();
           setPending(null);
           await queryClient.invalidateQueries({ queryKey: getGetSubscriptionQueryKey() });
           toast({ title: t("billing.picker.switched"), description: t("billing.picker.switchedDesc") });
@@ -75,6 +83,13 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
           <span className="text-xs text-muted-foreground flex items-center gap-1"><Info className="h-3.5 w-3.5" />{t("billing.picker.annualUnavailable")}</span>
         )}
       </div>
+
+      {promoCode && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <Tag className="h-3.5 w-3.5 shrink-0" />
+          {t("billing.picker.promoApplied").replace("{code}", promoCode)}
+        </p>
+      )}
 
       <div className={cn("grid gap-4", compact ? "sm:grid-cols-3" : "md:grid-cols-3")}>
         {tiers.map((plan) => {

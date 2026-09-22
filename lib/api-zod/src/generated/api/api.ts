@@ -1913,7 +1913,8 @@ export const RequestUploadUrlResponse = zod.object({
 export const CreateCheckoutSessionBody = zod.object({
   "quoteId": zod.string().optional(),
   "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite', 'oneshot_watermark', 'oneshot_clean']),
-  "interval": zod.enum(['month', 'year']).optional().describe('Billing cadence for subscription plans (Phase 73). Defaults to month.')
+  "interval": zod.enum(['month', 'year']).optional().describe('Billing cadence for subscription plans (Phase 73). Defaults to month.'),
+  "promoCode": zod.string().optional().describe('Pilot-programme promo code (Phase 81). Applied to Checkout only when it matches the server\'s configured code; anything else is ignored.')
 })
 
 export const CreateCheckoutSessionResponse = zod.object({
@@ -1956,6 +1957,16 @@ export const GetPlansResponseItem = zod.object({
   "yearlyAvailable": zod.boolean().optional()
 })
 export const GetPlansResponse = zod.array(GetPlansResponseItem)
+
+
+/**
+ * @summary The pilot-programme promo offer, if this deployment has one (Phase 81)
+ */
+export const GetPilotOfferResponse = zod.object({
+  "enabled": zod.boolean(),
+  "code": zod.string().nullable(),
+  "provinces": zod.array(zod.string())
+})
 
 
 /**
@@ -2005,7 +2016,8 @@ export const GetTrialStatusResponse = zod.object({
  */
 export const ChangePlanBody = zod.object({
   "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite']),
-  "interval": zod.enum(['month', 'year'])
+  "interval": zod.enum(['month', 'year']),
+  "promoCode": zod.string().optional().describe('Pilot-programme promo code (Phase 81) — only honoured on the Checkout path, for a company with no live subscription.')
 })
 
 export const ChangePlanResponse = zod.object({

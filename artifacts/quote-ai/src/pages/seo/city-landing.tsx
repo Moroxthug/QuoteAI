@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
-import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc, localizeCity } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import {
   getCityIntro,
@@ -42,7 +42,11 @@ export default function SeoCityLanding() {
 
   const s = SECTORS[sectorSlug] ?? DEFAULT_SECTOR;
   const sSlugForLang = isFr ? s.frSlug : s.slug;
-  const city = CITIES_BY_SLUG[citySlug];
+  // Phase 81: on a French page the city and province carry their French
+  // names (Montréal, Québec, Colombie-Britannique) — everything downstream,
+  // the render engine included, reads them from this one localized object.
+  const rawCity = CITIES_BY_SLUG[citySlug];
+  const city = rawCity ? localizeCity(rawCity, engineLang) : undefined;
   const cityName = city?.name ?? citySlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const regionName = city?.region ?? "Canada";
 

@@ -1,4 +1,5 @@
 import { useParams, Link } from "wouter";
+import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight } from "lucide-react";
 import { BLOG_ARTICLES } from "@/data/blog-data";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
@@ -204,7 +205,7 @@ export default function BlogArticlePage() {
 
       <section className="cta on-dark" id="trial">
         <div className="cta-bg">
-          <img src="https://picsum.photos/seed/quoteai-blog-article-cta/1800/900" alt="" aria-hidden="true" loading="lazy" />
+          <MarketingImage slot="cta-blog-article" />
         </div>
         <div className="wrap cta-in">
           <h2>

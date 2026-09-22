@@ -8,6 +8,7 @@ import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
+import { PILOT_PROVINCES } from "../src/data/province-data.js";
 
 const BASE_URL = "https://quoteai.ca";
 
@@ -37,6 +38,16 @@ for (const route of PUBLIC_ROUTES) {
 }
 // French homepage
 entries.push(url(`${BASE_URL}/fr/`, "1.0", "weekly", PUBLIC_ROUTES.find((r) => r.path === "/")!.lastmod));
+
+// Phase 81 — the French twins of the pilot marketing pages, plus one province
+// page per pilot province in each language.
+const frOf = (path: string) => PUBLIC_ROUTES.find((r) => r.path === path)!;
+entries.push(url(`${BASE_URL}/fr/tarifs/`, frOf("/pricing").priority, frOf("/pricing").changefreq, frOf("/pricing").lastmod));
+entries.push(url(`${BASE_URL}/fr/pilote/`, frOf("/pilot").priority, frOf("/pilot").changefreq, frOf("/pilot").lastmod));
+for (const province of PILOT_PROVINCES) {
+  entries.push(url(`${BASE_URL}/provinces/${province.slug}/`, "0.8", "monthly", "2026-09-22"));
+  entries.push(url(`${BASE_URL}/fr/provinces/${province.frSlug}/`, "0.8", "monthly", "2026-09-22"));
+}
 
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {

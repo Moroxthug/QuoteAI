@@ -14,14 +14,13 @@
 
 import type { SectorData, CityData } from "./seo-data.js";
 import {
-  getCityTitle,
-  getCityDesc,
   CITIES_BY_SLUG,
   RELATED_SECTORS,
   CITY_CONTEXT,
   ACTIVE_CITY_SLUGS,
   CITY_SECTORS,
   SECTORS,
+  localizeCity,
 } from "./seo-data.js";
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
 import type { CityIntelligence } from "./seo-intelligence.js";
@@ -76,6 +75,8 @@ export function getOgImagePath(sectorSlug: string): string {
 // seo-data.ts already anticipates this (see CityContextEntry).
 
 export function getCityIntro(sector: SectorData, city: CityData, lang: Lang = "en-CA"): string {
+  // Phase 81: French pages show the city's and province's French names.
+  city = localizeCity(city, lang);
   const isService = sector.sectorType === "service";
   if (lang === "fr-CA") {
     const { label, labelPlural } = sectorLabel(sector, lang);
@@ -126,6 +127,8 @@ const DEMAND_TEXT_FR: Record<CityIntelligence["demandLevel"], string> = {
 };
 
 export function getCityFaqItems(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityFaqItem[] {
+  // Phase 81: French pages show the city's and province's French names.
+  city = localizeCity(city, lang);
   const intel = CITY_INTELLIGENCE[city.slug];
   const pricePct = intel ? Math.round(Math.abs(intel.priceIndex - 1.0) * 100) : 0;
 
@@ -325,10 +328,12 @@ export interface NearbyAnchor {
 }
 
 export function getNearbyAnchors(sector: SectorData, city: CityData, lang: Lang = "en-CA"): NearbyAnchor[] {
+  // Phase 81: French pages show the city's and province's French names.
+  city = localizeCity(city, lang);
   const { label } = sectorLabel(sector, lang);
   return city.nearbySlug
     .map((slug): NearbyAnchor | null => {
-      const nearbyCity = CITIES_BY_SLUG[slug];
+      const nearbyCity = CITIES_BY_SLUG[slug] ? localizeCity(CITIES_BY_SLUG[slug]!, lang) : undefined;
       if (!nearbyCity) return null;
       // Don't link toward cities outside the active set — those pages
       // aren't prerendered/indexable right now (see ACTIVE_CITY_SLUGS).
@@ -447,6 +452,8 @@ export function getSameCityOtherSectors(
 export type JsonLdSchema = { "@context": string; "@type": string; [key: string]: unknown };
 
 export function buildCityJsonLd(sector: SectorData, city: CityData, lang: Lang = "en-CA"): JsonLdSchema[] {
+  // Phase 81: French pages show the city's and province's French names.
+  city = localizeCity(city, lang);
   const base = cityBasePath(lang);
   const sSlug = sectorPathSlug(sector, lang);
   const canonical = `${BASE_URL}${base}/${sSlug}/${city.slug}/`;
@@ -729,6 +736,8 @@ export interface CityCostCopy {
  * were derived from a string hash, not from data — those are gone.
  */
 export function getCityCostCopy(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityCostCopy {
+  // Phase 81: French pages show the city's and province's French names.
+  city = localizeCity(city, lang);
   const intel = CITY_INTELLIGENCE[city.slug];
   const pricePct = intel ? Math.round((intel.priceIndex - 1.0) * 100) : 0;
   const cityName = city.name;

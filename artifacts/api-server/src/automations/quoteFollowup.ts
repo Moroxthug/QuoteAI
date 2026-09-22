@@ -1,7 +1,8 @@
 import { db, quotesTable, businessProfilesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { registerAutomation } from "../lib/automation.js";
-import { sendQuoteFollowup, QUOTE_FOLLOWUP_CADENCE_DAYS } from "../lib/quoteMessaging.js";
+import { sendQuoteFollowup } from "../lib/quoteMessaging.js";
+import { quoteFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { logger } from "../lib/logger.js";
 
 // quote.followup_due → send the next reminder and schedule the one after it,
@@ -30,8 +31,7 @@ registerAutomation("quote.followup_due", async (run) => {
   }
 
   const nextStage = quote.followUpStage + 1;
-  const nextDelayDays = QUOTE_FOLLOWUP_CADENCE_DAYS[nextStage];
-  const nextFollowUpAt = nextDelayDays !== undefined ? new Date(Date.now() + nextDelayDays * 86_400_000) : null;
+  const nextFollowUpAt = stageDueAt(quoteFollowupDays(profile.automationSettings), nextStage);
 
   await db
     .update(quotesTable)

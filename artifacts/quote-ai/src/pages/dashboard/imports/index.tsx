@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { importsApi, type ImportCandidateDto, type ImportedQuoteExtraction } from "@/lib/imports-api";
 
 const BATCH_BADGE: Record<string, string> = {
@@ -15,6 +16,7 @@ const BATCH_BADGE: Record<string, string> = {
 
 function CandidateCard({ candidate }: { candidate: ImportCandidateDto }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<ImportedQuoteExtraction>(candidate.extraction);
@@ -88,7 +90,7 @@ function CandidateCard({ candidate }: { candidate: ImportCandidateDto }) {
         <span className={cn("chip", candidate.matchedClientId ? "chip-green" : draft.clientName ? "chip-teal" : "chip-yellow")}>
           {matchLabel}
         </span>
-        <div className="flex gap-2">
+        {can("imports", "edit") && <div className="flex gap-2">
           <button type="button" className="btn btn-outline-navy btn-sm gap-1.5" disabled={busy} onClick={() => reject.mutate()}>
             {reject.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
             {t("imports.reject")}
@@ -97,7 +99,7 @@ function CandidateCard({ candidate }: { candidate: ImportCandidateDto }) {
             {confirm.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
             {t("imports.confirm")}
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );
@@ -105,6 +107,7 @@ function CandidateCard({ candidate }: { candidate: ImportCandidateDto }) {
 
 export default function ImportsPage() {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const onError = (e: Error) => toast({ title: "Error", description: e.message, variant: "destructive" });
@@ -277,13 +280,13 @@ export default function ImportsPage() {
                   <span className={cn("chip", BATCH_BADGE[b.status])}>{t(`imports.batch.${b.status}`)}</span>
                   <span style={{ fontSize: 13, color: "var(--faint)" }}>{b.totalRows} {b.kind === "pdf" ? t("imports.files") : t("imports.rows")}</span>
                 </div>
-                {b.status === "done" && (
+                {b.status === "done" && can("imports", "edit") && (
                   <button type="button" className="btn btn-outline-navy btn-sm gap-1.5" disabled={confirmAll.isPending} onClick={() => confirmAll.mutate(b.id)}>
                     {confirmAll.isPending && confirmAll.variables === b.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCheck className="h-3.5 w-3.5" />}
                     {t("imports.confirmAll")}
                   </button>
                 )}
-                <button
+                {can("imports", "full") && <button
                   type="button"
                   className="btn btn-outline-navy btn-sm"
                   style={{ color: "var(--red)", borderColor: "var(--red)" }}
@@ -291,7 +294,7 @@ export default function ImportsPage() {
                   onClick={() => deleteBatch.mutate(b.id)}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                </button>}
               </div>
             ))}
           </div>

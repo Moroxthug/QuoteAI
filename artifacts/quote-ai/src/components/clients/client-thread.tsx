@@ -5,6 +5,7 @@ import { Loader2, MessageSquare, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { clientPortalApi, type PortalMessageDto } from "@/lib/portal-api";
 
 /**
@@ -15,6 +16,7 @@ import { clientPortalApi, type PortalMessageDto } from "@/lib/portal-api";
  */
 export function ClientThreadCard({ clientId, jobId, jobName }: { clientId: string; jobId?: string; jobName?: string }) {
   const { t, lang } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
@@ -61,7 +63,7 @@ export function ClientThreadCard({ clientId, jobId, jobName }: { clientId: strin
             ))}
           </ol>
         )}
-        <div className="space-y-2">
+        {can("jobs", "edit") && <div className="space-y-2">
           <div className="field">
             <label htmlFor={`thread-body-${clientId}`}>{jobName ? t("thread.composeAbout").replace("{job}", jobName) : t("thread.compose")}</label>
             <textarea id={`thread-body-${clientId}`} rows={3} value={body} onChange={(e) => setBody(e.target.value)} maxLength={4000} placeholder={t("thread.placeholder")} />
@@ -72,7 +74,7 @@ export function ClientThreadCard({ clientId, jobId, jobName }: { clientId: strin
               {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {t("thread.send")}
             </button>
           </div>
-        </div>
+        </div>}
       </div>
     </section>
   );

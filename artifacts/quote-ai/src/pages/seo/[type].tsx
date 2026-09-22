@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Bu
 import { SeoHead } from "@/components/seo-head";
 import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
-import { getOgImagePath, getSectorFrContent, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
+import { getOgImagePath, getSectorFrContent, getSectorDeepDive, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
 import { useLanguage, isFrenchPath } from "@/i18n/LanguageContext";
 
@@ -272,9 +272,11 @@ export default function SeoLanding() {
   const faq = frContent?.faq ?? s.faq;
   const labelPlural = isFr ? s.fr.labelPlural : s.labelPlural;
   const label = isFr ? s.fr.label : s.label;
+  const deepDive = getSectorDeepDive(s, engineLang);
 
   const canonical = `https://quoteai.ca${base}/${sSlugForLang}/`;
-  const frCanonical = `https://quoteai.ca/fr/soumissions/${s.frSlug}/`;
+  // Every sector has a page in both languages.
+  const altCanonical = isFr ? `https://quoteai.ca/quotes/${s.slug}/` : `https://quoteai.ca/fr/soumissions/${s.frSlug}/`;
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -319,7 +321,7 @@ export default function SeoLanding() {
         jsonLd={jsonLd}
         ogImage={getOgImagePath(s.slug)}
         lang={engineLang}
-        frCanonical={frCanonical}
+        altCanonical={altCanonical}
       />
 
       <div className="wrap">
@@ -332,7 +334,7 @@ export default function SeoLanding() {
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="hero on-dark" id="hero">
-        <div className="wrap hero-grid" style={{ padding: "clamp(36px, 5vw, 64px) 0 clamp(64px, 8vw, 96px)" }}>
+        <div className="wrap hero-grid" style={{ paddingTop: "clamp(36px, 5vw, 64px)", paddingBottom: "clamp(64px, 8vw, 96px)" }}>
           <div>
             <p className="eyebrow on-dark" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8 }}>
               <Star className="h-3.5 w-3.5" style={{ fill: "currentColor" }} />
@@ -448,6 +450,32 @@ export default function SeoLanding() {
                 <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{t("seo.marketSection.lexiconBody")}</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Long-form (Phase 80: from the retired static bodies) ── */}
+      <section className="sec" aria-label={deepDive.heading}>
+        <div className="wrap" style={{ maxWidth: 760 }}>
+          <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+            <h2 className="h2">{deepDive.heading}</h2>
+          </div>
+          <div className="prose blog-prose max-w-none">
+            {deepDive.paragraphs.map((p, i) =>
+              p.kind === "h3" ? (
+                <h3 key={i}>{p.text}</h3>
+              ) : p.kind === "benefits" ? (
+                <p key={i}>
+                  {benefits.map((b) => (
+                    <span key={b.title}>
+                      <strong>{b.title}.</strong> {b.desc}{" "}
+                    </span>
+                  ))}
+                </p>
+              ) : (
+                <p key={i}>{p.text}</p>
+              ),
+            )}
           </div>
         </div>
       </section>

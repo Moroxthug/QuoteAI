@@ -26,6 +26,8 @@ import { PhotosTab } from "@/components/jobs/photos-tab";
 import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
 import { ClientThreadCard } from "@/components/clients/client-thread";
 import { VoiceActions } from "@/components/jobs/voice-actions";
+import { useCan } from "@/hooks/use-role";
+import { CompleteJobDialog, ArchiveJobDialog, completionPreview } from "@/components/jobs/lifecycle-dialogs";
 import { NotesCard } from "@/components/jobs/notes-card";
 import { ClientPortalCard } from "@/components/clients/client-portal-card";
 import { clientPortalApi } from "@/lib/portal-api";
@@ -39,6 +41,7 @@ const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,6 +50,9 @@ export default function JobDetailPage() {
   const initialTab = (new URLSearchParams(search).get("tab") as Tab | null) ?? "overview";
   const [tab, setTab] = useState<Tab>(TABS.includes(initialTab) ? initialTab : "overview");
   const [coOpen, setCoOpen] = useState(false);
+  // Phase 80: complete / archive ask first (see lifecycle-dialogs.tsx).
+  const [completeOpen, setCompleteOpen] = useState(false);
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
   // Phase 76: unread client replies drive the Messages tab badge.
@@ -64,7 +70,22 @@ export default function JobDetailPage() {
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
 
   const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
+  // The job.completed automation runs before the PUT answers, so the final
+  // invoice draft (when there was an unbilled balance) is already there.
+  const complete = useMutation({
+    mutationFn: () => jobsApi.update(id!, { status: "completed" }),
+    onSuccess: () => {
+      refresh();
+      setCompleteOpen(false);
+      const drafted = data ? completionPreview(data).unbilledCents > 0 : false;
+      toast({ title: t(drafted ? "jobs.complete.doneToastInvoice" : "jobs.complete.doneToast") });
+      if (drafted) setTab("invoices");
+    },
+    onError,
+  });
   const archive = useMutation({ mutationFn: () => jobsApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["jobs"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/jobs"); }, onError });
+  const canEditJob = can("jobs", "edit");
+  const canFullJob = can("jobs", "full");
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
   if (error || !data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
@@ -92,15 +113,17 @@ export default function JobDetailPage() {
           </div>
         </div>
         <div className="head-actions">
-          {job.status !== "completed" && <VoiceActions jobId={job.id} />}
-          {job.client?.phone && job.status !== "completed" && <OnMyWayButton jobId={job.id} clientName={job.client.name} />}
-          <Link href={`/dashboard/jobs/${job.id}/setup`} className="btn btn-sm btn-outline-navy"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Link>
-          {job.status === "planning" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</button>}
-          {job.status === "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("suspended")}>{t("jobs.action.suspend")}</button>}
-          {job.status === "suspended" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.resume")}</button>}
-          {job.status !== "completed" && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={setStatus.isPending} onClick={() => setStatus.mutate("completed")}><CheckCircle2 className="h-4 w-4" /> {t("jobs.action.complete")}</button>}
-          {job.status === "completed" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.reopen")}</button>}
-          {job.status === "completed" && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
+          {job.status !== "completed" && canEditJob && <VoiceActions jobId={job.id} />}
+          {job.client?.phone && job.status !== "completed" && canEditJob && <OnMyWayButton jobId={job.id} clientName={job.client.name} />}
+          {canEditJob && <Link href={`/dashboard/jobs/${job.id}/setup`} className="btn btn-sm btn-outline-navy"><Sparkles className="h-4 w-4" /> {t("jobs.editSetup")}</Link>}
+          {canEditJob && job.status === "planning" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}><PlayCircle className="h-4 w-4" /> {t("jobs.action.start")}</button>}
+          {canEditJob && job.status === "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("suspended")}>{t("jobs.action.suspend")}</button>}
+          {canEditJob && job.status === "suspended" && <button type="button" className="btn btn-sm btn-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.resume")}</button>}
+          {canEditJob && job.status !== "completed" && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={complete.isPending} onClick={() => setCompleteOpen(true)}><CheckCircle2 className="h-4 w-4" /> {t("jobs.action.complete")}</button>}
+          {canEditJob && job.status === "completed" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setStatus.mutate("active")}>{t("jobs.action.reopen")}</button>}
+          {canFullJob && job.status === "completed" && <button type="button" className="text-link" onClick={() => setArchiveOpen(true)} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
+          <CompleteJobDialog data={data} open={completeOpen} onOpenChange={setCompleteOpen} onConfirm={() => complete.mutate()} busy={complete.isPending} />
+          <ArchiveJobDialog open={archiveOpen} onOpenChange={setArchiveOpen} onConfirm={() => archive.mutate()} busy={archive.isPending} />
         </div>
       </div>
 
@@ -213,6 +236,7 @@ function OnMyWayButton({ jobId, clientName }: { jobId: string; clientName: strin
 
 function EditableName({ id, name }: { id: string; name: string }) {
   const { t } = useLanguage();
+const can = useCan();
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(name);
   const queryClient = useQueryClient();
@@ -220,7 +244,7 @@ function EditableName({ id, name }: { id: string; name: string }) {
     mutationFn: () => jobsApi.update(id, { name: value.trim() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["job", id] }); queryClient.invalidateQueries({ queryKey: ["jobs"] }); setEditing(false); },
   });
-  if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0"><span className="truncate">{name}</span><button type="button" className="ic-btn opacity-0 group-hover:opacity-100 focus-visible:opacity-100" aria-label={t("a11y.rename")} onClick={() => { setValue(name); setEditing(true); }}><Pencil /></button></span>;
+  if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0"><span className="truncate">{name}</span>{can("jobs", "edit") && <button type="button" className="ic-btn opacity-0 group-hover:opacity-100 focus-visible:opacity-100" aria-label={t("a11y.rename")} onClick={() => { setValue(name); setEditing(true); }}><Pencil /></button>}</span>;
   return (
     <span className="field inline">
       <input value={value} onChange={(e) => setValue(e.target.value)} style={{ width: 288, fontSize: 18, fontWeight: 700 }} autoFocus onKeyDown={(e) => { if (e.key === "Enter") save.mutate(); if (e.key === "Escape") setEditing(false); }} />
@@ -335,6 +359,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
 
 function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { job, milestones, unassignedTasks } = data;
@@ -386,18 +411,18 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
                   </span>
                 </div>
                 </button>
-                <div className="flex gap-2 shrink-0">
+                {can("jobs", "edit") && <div className="flex gap-2 shrink-0">
                   {m.status === "planned" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</button>}
                   {(m.status === "planned" || m.status === "in_progress") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setMs.mutate({ mid: m.id, status: "completed" })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</button>}
                   {m.status === "completed" && <button type="button" className="text-link" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}>{t("jobs.milestone.reopen")}</button>}
-                </div>
+                </div>}
               </div>
               {expanded && (
                 <div className="ms-body" id={`ms-panel-${m.id}`}>
                   {m.description && <p>{m.description}</p>}
                   {m.paymentTermLabel && <p>{t("jobs.milestone.linkedPayment")}: <b>{m.paymentTermLabel}</b></p>}
-                  <TaskList tasks={m.tasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
-                  {newTask?.milestoneId === m.id ? (
+                  <TaskList tasks={m.tasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} readOnly={!can("jobs", "edit")} />
+                  {!can("jobs", "edit") ? null : newTask?.milestoneId === m.id ? (
                     <form className="field inline mt-2" onSubmit={(e) => { e.preventDefault(); if (newTask.title.trim()) { addTask.mutate({ title: newTask.title.trim(), milestoneId: m.id }); setNewTask(null); } }}>
                       <input autoFocus className="flex-1" value={newTask.title} onChange={(e) => setNewTask({ milestoneId: m.id, title: e.target.value })} placeholder={t("jobs.task.placeholder")} style={{ padding: "8px 12px", fontSize: 13.5 }} />
                       <button type="submit" className="btn btn-sm btn-navy">{t("jobs.task.add")}</button>
@@ -422,7 +447,7 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
         <section className="card">
           <div className="card-head"><div><h2>{t("jobs.schedule.otherTasks")}</h2></div></div>
           <div className="act-body">
-            <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} />
+            <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} readOnly={!can("jobs", "edit")} />
           </div>
         </section>
       )}
@@ -430,15 +455,15 @@ function ScheduleTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA
   );
 }
 
-function TaskList({ tasks, onToggle, onDelete }: { tasks: TaskDto[]; onToggle: (t: TaskDto) => void; onDelete: (id: string) => void }) {
+function TaskList({ tasks, onToggle, onDelete, readOnly }: { tasks: TaskDto[]; onToggle: (t: TaskDto) => void; onDelete: (id: string) => void; readOnly?: boolean }) {
   if (tasks.length === 0) return null;
   return (
     <div>
       {tasks.map((x) => (
         <div key={x.id} className={cn("task-row", x.status === "done" && "done")}>
-          <button type="button" onClick={() => onToggle(x)} className={cn("chk", x.status === "done" && "on")}>{x.status === "done" && <Check />}</button>
+          <button type="button" onClick={() => onToggle(x)} disabled={readOnly} className={cn("chk", x.status === "done" && "on")}>{x.status === "done" && <Check />}</button>
           <span className="grow">{x.title}</span>
-          <button type="button" className="ic-btn danger" onClick={() => onDelete(x.id)}><Trash2 /></button>
+          {!readOnly && <button type="button" className="ic-btn danger" onClick={() => onDelete(x.id)}><Trash2 /></button>}
         </div>
       ))}
     </div>
@@ -447,6 +472,7 @@ function TaskList({ tasks, onToggle, onDelete }: { tasks: TaskDto[]; onToggle: (
 
 function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeof enCA; onNew: () => void }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { job, changeOrders } = data;
@@ -458,7 +484,7 @@ function ChangesTab({ data, locale, onNew }: { data: JobDetailDto; locale: typeo
       <section className="card">
         <div className="card-head">
           <div><h2>{t("jobs.tab.changes")}</h2><p className="sub">{t("jobs.co.intro")}</p></div>
-          <button type="button" className="btn btn-sm btn-navy" onClick={onNew} disabled={!job.contract || job.contract.status !== "signed"}><Plus className="h-4 w-4" /> {t("jobs.co.new")}</button>
+          {can("jobs", "full") && <button type="button" className="btn btn-sm btn-navy" onClick={onNew} disabled={!job.contract || job.contract.status !== "signed"}><Plus className="h-4 w-4" /> {t("jobs.co.new")}</button>}
         </div>
         {changeOrders.length === 0 ? (
           <div className="card-empty">{t("jobs.co.empty")}</div>

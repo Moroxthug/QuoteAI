@@ -12,6 +12,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { contractsApi, type ContractDto } from "@/lib/contracts-api";
 import { SignaturePad, type SignatureValue } from "@/components/signature-pad";
 
@@ -36,6 +37,7 @@ export function ContractStatusBadge({ status }: { status: ContractDto["status"] 
 export default function ContractDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
+  const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const locale = lang === "fr" ? frCA : enCA;
@@ -208,10 +210,10 @@ export default function ContractDetailPage() {
           <a href={contractsApi.pdfUrl(contract.id, true)} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-navy">
             <Download className="h-4 w-4" /> {contract.hasSignedPdf ? t("contracts.downloadSigned") : t("contracts.downloadPdf")}
           </a>
-          {isOpen && !editing && (
+          {isOpen && !editing && can("contracts", "full") && (
             <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("contracts.void")}</button>
           )}
-          {!isOpen && !isDraft && (
+          {!isOpen && !isDraft && can("contracts", "full") && (
             <button type="button" className="text-link" onClick={() => archiveContract.mutate()} disabled={archiveContract.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>
           )}
         </div>
@@ -249,9 +251,9 @@ export default function ContractDetailPage() {
                     <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(false)} disabled={save.isPending}><X className="h-4 w-4" /> {t("contracts.cancel")}</button>
                     <button type="button" className="btn btn-sm btn-navy" onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {t("contracts.save")}</button>
                   </>
-                ) : (
+                ) : can("contracts", "edit") ? (
                   <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("contracts.edit")}</button>
-                )}
+                ) : null}
               </div>
             </div>
           )}
@@ -345,7 +347,7 @@ export default function ContractDetailPage() {
                 </div>
               ) : !isOpen ? (
                 <p className="foot-note">{t("contracts.closedHint")}</p>
-              ) : contractorSigner?.status !== "signed" ? (
+              ) : !can("contracts", "edit") ? null : contractorSigner?.status !== "signed" ? (
                 <button type="button" className="btn btn-navy w-full" onClick={() => setSignOpen(true)} disabled={editing}><FileSignature className="h-4 w-4" /> {t("contracts.signAsCompany")}</button>
               ) : !contract.sentAt ? (
                 <button type="button" className="btn btn-navy w-full" onClick={() => setSendOpen(true)} disabled={!canSend || editing}><Send className="h-4 w-4" /> {t("contracts.sendToCustomer")}</button>

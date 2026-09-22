@@ -37,6 +37,16 @@ export type AutomationSettings = {
   /** Phase 74: also text quote / contract / invoice reminders (with the link) when the customer's phone is known. */
   smsReminders: boolean;
   /**
+   * Phase 80: the lead follow-up sequence — days after the previous touch for
+   * each message (stage 0 counts from lead creation). Empty = no automatic
+   * follow-ups. Was the constant [1, 3, 7] before.
+   */
+  leadFollowupDays: number[];
+  /** Phase 80: same for quotes that were sent and not answered (was [2, 5, 10]). */
+  quoteFollowupDays: number[];
+  /** Phase 80: days after a job is completed before the review request goes out (was 3). */
+  reviewRequestDelayDays: number;
+  /**
    * Phase 75: text (or email, when the worker has no phone) each crew member
    * the evening before a scheduled block — "Tomorrow 8:00–16:00: Basement
    * finish, 45 Rue Laurier". Turn off for boards kept purely for the office.
@@ -53,6 +63,9 @@ export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
   smsEnabled: false,
   smsReminders: false,
   scheduleReminders: true,
+  leadFollowupDays: [1, 3, 7],
+  quoteFollowupDays: [2, 5, 10],
+  reviewRequestDelayDays: 3,
 };
 
 export const businessProfilesTable = pgTable("business_profiles", {

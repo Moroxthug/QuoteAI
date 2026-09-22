@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -29,6 +30,7 @@ const MAX_SIZE_MB = 2;
 
 export default function ProfileSettings() {
   const { t } = useLanguage();
+const can = useCan();
   const profileSchema = useProfileSchema();
   const { data: profile, isLoading } = useGetBusinessProfile();
   const updateProfile = useUpdateBusinessProfile();
@@ -250,7 +252,7 @@ export default function ProfileSettings() {
               </div>
             </div>
             <div className="card-foot" style={{ justifyContent: "flex-end" }}>
-              <button type="submit" className="btn btn-navy btn-sm" disabled={updateProfile.isPending}>
+              <button type="submit" className="btn btn-navy btn-sm" disabled={updateProfile.isPending || !can("settings", "edit")} title={can("settings", "edit") ? undefined : t("roles.readOnly")}>
                 {updateProfile.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
                 {t("dashboard.profile.businessData.saveButton")}
               </button>

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { Mic, FileText, Zap, Check, X } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
+import { breadcrumbJsonLd, webPageJsonLd } from "@/data/json-ld";
 import { useAuth } from "@/hooks/use-auth";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { WhatsAppChatDemo } from "@/components/whatsapp-chat-demo";
@@ -49,11 +50,15 @@ export default function WhatsappPage() {
         title={t("whatsapp.seoTitle")}
         description={t("whatsapp.seoDescription")}
         canonical="https://quoteai.ca/whatsapp/"
+        jsonLd={[
+          webPageJsonLd(t("whatsapp.seoTitle"), t("whatsapp.seoDescription"), "/whatsapp/"),
+          breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "WhatsApp", path: "/whatsapp/" }]),
+        ]}
       />
 
       {/* ── HERO ───────────────────────────────────────────── */}
       <section className="hero on-dark" id="hero">
-        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", padding: "clamp(64px, 8vw, 110px) 0" }}>
+        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", paddingBlock: "clamp(64px, 8vw, 110px)" }}>
           <p className="eyebrow on-dark" style={{ marginBottom: 22, justifyContent: "center", display: "flex" }}>
             {t("whatsapp.badgeNew")}
           </p>

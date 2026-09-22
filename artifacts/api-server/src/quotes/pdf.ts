@@ -6,10 +6,9 @@ import { getPdfmake } from "../lib/pdfmake.js";
 import type { TDocumentDefinitions, Content } from "pdfmake/interfaces";
 import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData } from "@workspace/db";
 import { quotesTable, businessProfilesTable, normalizeProvince } from "@workspace/db";
-import { ObjectStorageService } from "../lib/objectStorage.js";
+import { fetchLogoDataUri } from "../lib/companyLogo.js";
 import { quoteLanguageFor, quoteTaxLinesFor, qt, fmtMoney, fmtQuoteDate, fmtRate, fmtQty } from "./i18n.js";
 
-const objectStorage = new ObjectStorageService();
 
 export type QuoteRow = typeof quotesTable.$inferSelect;
 export type ProfileRow = typeof businessProfilesTable.$inferSelect | null;
@@ -31,40 +30,6 @@ function formatDescriptionPdf(descrizione: string, bg: string | null): any {
   };
 }
 
-
-/**
- * Attempt to load a logo image from object storage and encode as base64 data URI for pdfmake.
- *
- * Supported URL formats:
- *   - `/api/storage/public-objects/<subPath>`  (logo uploads — public GCS objects)
- *   - `/objects/<subPath>`                     (private GCS objects, fallback)
- */
-async function fetchLogoDataUri(logoUrl: string | null | undefined): Promise<string | null> {
-  if (!logoUrl) return null;
-  try {
-    let response: Response | null = null;
-
-    if (logoUrl.startsWith("/api/storage/public-objects/")) {
-      // Public logo: extract subPath and search across PUBLIC_OBJECT_SEARCH_PATHS
-      const subPath = logoUrl.replace(/^\/api\/storage\/public-objects\//, "");
-      const file = await objectStorage.searchPublicObject(subPath).catch(() => null);
-      if (!file) return null;
-      response = await objectStorage.downloadObject(file, { isPublic: true, cacheTtlSec: 3600 }).catch(() => null);
-    } else if (logoUrl.startsWith("/objects/")) {
-      // Private object (legacy path)
-      const subPath = logoUrl.replace(/^\/objects\//, "");
-      response = await objectStorage.downloadPrivateObject(subPath).catch(() => null);
-    }
-
-    if (!response || !response.ok) return null;
-    const buf = Buffer.from(await response.arrayBuffer());
-    const ct = response.headers.get("content-type") ?? "image/png";
-    return `data:${ct};base64,${buf.toString("base64")}`;
-  } catch {
-    // Best-effort: if logo fetch fails, proceed without logo
-    return null;
-  }
-}
 
 export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: ProfileRow): Promise<Buffer> {
   const lang = await quoteLanguageFor(quote);
@@ -137,7 +102,16 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
 
   // Chapter detail tables — includes No. column
   const chaptersContent: Content[] = capitoli.flatMap(cap => {
+    // Phase 80: the chapter title is the first (header) row of its table and
+    // `keepWithHeaderRows` keeps at least one line item with it, so a title can
+    // no longer sit alone at the foot of a page while its lines start on the
+    // next; the two header rows repeat on every page the chapter spans and
+    // `dontBreakRows` stops a single line item from splitting across pages.
     const bodyRows: Content[][] = [
+      [
+        { text: `${cap.lettera}. ${cap.titolo}`, colSpan: 6, fontSize: 10, bold: true, color: DARK, margin: [0, 6, 0, 2] } as Content,
+        {} as Content, {} as Content, {} as Content, {} as Content, {} as Content,
+      ],
       [
         { text: qt("no", lang), style: "tableHeaderCenter" },
         { text: qt("description", lang), style: "tableHeader" },
@@ -166,28 +140,24 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
 
     return [
       {
-        text: `${cap.lettera}. ${cap.titolo}`,
-        fontSize: 10,
-        bold: true,
-        color: DARK,
-        margin: [0, 10, 0, 4],
-      } as Content,
-      {
         table: {
-          headerRows: 1,
+          headerRows: 2,
+          keepWithHeaderRows: 1,
+          dontBreakRows: true,
           widths: [18, "*", 32, 32, 60, 60],
           body: bodyRows,
         },
         layout: {
-          hLineWidth: () => 0.5,
+          hLineWidth: (i: number) => (i <= 1 ? 0 : 0.5),
           vLineWidth: () => 0,
           hLineColor: () => "#dddddd",
           paddingLeft: () => 5,
           paddingRight: () => 5,
-          paddingTop: () => 4,
-          paddingBottom: () => 4,
+          paddingTop: (i: number) => (i === 0 ? 0 : 4),
+          paddingBottom: (i: number) => (i === 0 ? 0 : 4),
           fillColor: (rowIndex: number) => {
-            if (rowIndex === 0) return DARK;
+            if (rowIndex === 0) return null;
+            if (rowIndex === 1) return DARK;
             if (rowIndex === bodyRows.length - 1) return "#edf0f5";
             return null;
           },
@@ -523,7 +493,16 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
   ];
 
   const chaptersContent: Content[] = capitoli.flatMap(cap => {
+    // Phase 80: the chapter title is the first (header) row of its table and
+    // `keepWithHeaderRows` keeps at least one line item with it, so a title can
+    // no longer sit alone at the foot of a page while its lines start on the
+    // next; the two header rows repeat on every page the chapter spans and
+    // `dontBreakRows` stops a single line item from splitting across pages.
     const bodyRows: Content[][] = [
+      [
+        { text: `${cap.lettera}. ${cap.titolo}`, colSpan: 6, fontSize: 10, bold: true, color: DARK, margin: [0, 6, 0, 2] } as Content,
+        {} as Content, {} as Content, {} as Content, {} as Content, {} as Content,
+      ],
       [
         { text: qt("no", lang), style: "tableHeaderCenter" },
         { text: qt("description", lang), style: "tableHeader" },
@@ -552,28 +531,24 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
 
     return [
       {
-        text: `${cap.lettera}. ${cap.titolo}`,
-        fontSize: 10,
-        bold: true,
-        color: DARK,
-        margin: [0, 10, 0, 4],
-      } as Content,
-      {
         table: {
-          headerRows: 1,
+          headerRows: 2,
+          keepWithHeaderRows: 1,
+          dontBreakRows: true,
           widths: [18, "*", 32, 32, 60, 60],
           body: bodyRows,
         },
         layout: {
-          hLineWidth: () => 0.5,
+          hLineWidth: (i: number) => (i <= 1 ? 0 : 0.5),
           vLineWidth: () => 0,
           hLineColor: () => "#dddddd",
           paddingLeft: () => 5,
           paddingRight: () => 5,
-          paddingTop: () => 4,
-          paddingBottom: () => 4,
+          paddingTop: (i: number) => (i === 0 ? 0 : 4),
+          paddingBottom: (i: number) => (i === 0 ? 0 : 4),
           fillColor: (rowIndex: number) => {
-            if (rowIndex === 0) return DARK;
+            if (rowIndex === 0) return null;
+            if (rowIndex === 1) return DARK;
             if (rowIndex === bodyRows.length - 1) return "#edf0f5";
             return null;
           },

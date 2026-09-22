@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { scheduleApi, type ScheduleBlockDto, type ScheduleJobDto, type ScheduleMilestoneDto } from "@/lib/schedule-api";
 import { BlockDialog, type BlockDraft } from "@/components/schedule/block-dialog";
@@ -54,6 +55,7 @@ function milestoneOnDay(m: ScheduleMilestoneDto, day: Date): boolean {
 
 export default function SchedulePage() {
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -98,7 +100,9 @@ export default function SchedulePage() {
   }, [data, blocks, t]);
 
   /** Drop a dragged block onto (lane, day[, minutes]) — keeps duration and, in week view, the time of day. */
+  const canEdit = can("jobs", "edit");
   const dropBlock = useCallback((blockId: string, laneId: string, day: Date, minutes?: number) => {
+    if (!canEdit) return;
     const b = blocks.find((x) => x.id === blockId) ?? data?.blocks.find((x) => x.id === blockId);
     if (!b) return;
     const s = new Date(b.startsAt);
@@ -114,10 +118,10 @@ export default function SchedulePage() {
     const collaboratorId = laneId === UNASSIGNED ? null : laneId;
     if (startsAt.getTime() === s.getTime() && collaboratorId === b.collaboratorId) return;
     move.mutate({ id: b.id, startsAt, endsAt: new Date(startsAt.getTime() + dur), collaboratorId });
-  }, [blocks, data, move]);
+  }, [blocks, data, move, canEdit]);
 
   const openDraft = (laneId: string, from: Date, to: Date, allDay: boolean) =>
-    setDialog({ block: null, draft: { collaboratorId: laneId === UNASSIGNED ? null : laneId, projectId: jobFilter, startsAt: from, endsAt: to, allDay } });
+    canEdit && setDialog({ block: null, draft: { collaboratorId: laneId === UNASSIGNED ? null : laneId, projectId: jobFilter, startsAt: from, endsAt: to, allDay } });
 
   const shift = (n: number) => setAnchor((a) => addDays(a, view === "week" ? 7 * n : n));
   const rangeLabel = view === "week"
@@ -143,9 +147,9 @@ export default function SchedulePage() {
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setAnchor(new Date())}>{t("schedule.today")}</button>
             <button type="button" className="ic-btn" aria-label={t("schedule.next")} onClick={() => shift(1)}><ChevronRight /></button>
           </div>
-          <button type="button" className="btn btn-navy" onClick={() => { const d = startOfLocalDay(view === "day" ? anchor : new Date()); openDraft(UNASSIGNED, new Date(d.getTime() + 8 * 3_600_000), new Date(d.getTime() + 16 * 3_600_000), false); }}>
+          {canEdit && <button type="button" className="btn btn-navy" onClick={() => { const d = startOfLocalDay(view === "day" ? anchor : new Date()); openDraft(UNASSIGNED, new Date(d.getTime() + 8 * 3_600_000), new Date(d.getTime() + 16 * 3_600_000), false); }}>
             <Plus className="h-4 w-4" /> {t("schedule.addBlock")}
-          </button>
+          </button>}
         </div>
       </div>
 

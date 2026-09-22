@@ -25,8 +25,16 @@ type ProfileExtras = {
   homeStarsProfileUrl: string | null;
   sendReviewRequests: boolean;
   defaultPaymentSchedule: PaymentSchedule | null;
-  automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean; invoiceAutoSendAfterHours: number; invoiceReminders: boolean };
+  automationSettings: { notifyOnQuoteAccepted: boolean; autoDraftContract: boolean; autoSendInvoices: boolean; invoiceAutoSendAfterHours: number; invoiceReminders: boolean; leadFollowupDays?: number[]; quoteFollowupDays?: number[]; reviewRequestDelayDays?: number };
 };
+
+// Phase 80: "1, 3, 7" ⇄ [1, 3, 7] — days after the previous touch, at most 5, each 1–90.
+function parseCadence(text: string): number[] | null {
+  const parts = text.split(/[,\s]+/).filter(Boolean);
+  if (parts.length > 5) return null;
+  const days = parts.map((p) => Number(p));
+  return days.every((d) => Number.isInteger(d) && d >= 1 && d <= 90) ? days : null;
+}
 
 const DEFAULT_SCHEDULE: PaymentSchedule = {
   currency: "CAD",
@@ -65,6 +73,9 @@ export function BusinessTab() {
   const [autoSendInvoices, setAutoSendInvoices] = useState(false);
   const [invoiceAutoSendAfterHours, setInvoiceAutoSendAfterHours] = useState(0);
   const [invoiceReminders, setInvoiceReminders] = useState(true);
+  const [leadCadence, setLeadCadence] = useState("1, 3, 7");
+  const [quoteCadence, setQuoteCadence] = useState("2, 5, 10");
+  const [reviewDelayDays, setReviewDelayDays] = useState(3);
   const [schedule, setSchedule] = useState<PaymentSchedule>(DEFAULT_SCHEDULE);
   const [saving, setSaving] = useState(false);
 
@@ -83,6 +94,9 @@ export function BusinessTab() {
     setAutoSendInvoices(profile.automationSettings?.autoSendInvoices ?? false);
     setInvoiceAutoSendAfterHours(profile.automationSettings?.invoiceAutoSendAfterHours ?? 0);
     setInvoiceReminders(profile.automationSettings?.invoiceReminders ?? true);
+    setLeadCadence((profile.automationSettings?.leadFollowupDays ?? [1, 3, 7]).join(", "));
+    setQuoteCadence((profile.automationSettings?.quoteFollowupDays ?? [2, 5, 10]).join(", "));
+    setReviewDelayDays(profile.automationSettings?.reviewRequestDelayDays ?? 3);
     setSchedule(profile.defaultPaymentSchedule ?? DEFAULT_SCHEDULE);
   }, [profile]);
 
@@ -113,7 +127,7 @@ export function BusinessTab() {
           googleReviewUrl: googleReviewUrl || null,
           homeStarsProfileUrl: homeStarsProfileUrl || null,
           sendReviewRequests,
-          automationSettings: { notifyOnQuoteAccepted, autoSendInvoices, invoiceAutoSendAfterHours, invoiceReminders },
+          automationSettings: { notifyOnQuoteAccepted, autoSendInvoices, invoiceAutoSendAfterHours, invoiceReminders, leadFollowupDays: parseCadence(leadCadence) ?? undefined, quoteFollowupDays: parseCadence(quoteCadence) ?? undefined, reviewRequestDelayDays: reviewDelayDays },
           defaultPaymentSchedule: schedule,
         }),
       });
@@ -245,6 +259,48 @@ export function BusinessTab() {
             label={t("dashboard.settings.business.sendReviewRequests")}
           />
         </div>
+        {sendReviewRequests && (
+          <div className="set-row">
+            <div className="txt">
+              <b>{t("dashboard.settings.business.reviewDelay")}</b>
+              <span>{t("dashboard.settings.business.reviewDelayHint")}</span>
+            </div>
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={reviewDelayDays}
+              onChange={(e) => setReviewDelayDays(Number(e.target.value))}
+              aria-label={t("dashboard.settings.business.reviewDelay")}
+            >
+              {[0, 1, 2, 3, 5, 7, 10, 14].map((d) => <option key={d} value={d}>{d === 0 ? t("dashboard.settings.business.reviewDelaySameDay") : d === 1 ? t("dashboard.settings.business.reviewDelayDay") : t("dashboard.settings.business.reviewDelayDays").replace("{n}", String(d))}</option>)}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Phase 80: follow-up cadences used to be fixed at 1/3/7 (leads) and 2/5/10 (quotes) days. */}
+      <div className="card">
+        <div className="card-head">
+          <div>
+            <b>{t("dashboard.settings.business.followupCadence")}</b>
+            <span>{t("dashboard.settings.business.followupCadenceHint")}</span>
+          </div>
+        </div>
+        <div className="form-grid">
+          <div className="field">
+            <Label htmlFor="leadCadence">{t("dashboard.settings.business.leadCadence")}</Label>
+            <Input id="leadCadence" value={leadCadence} onChange={(e) => setLeadCadence(e.target.value)} placeholder="1, 3, 7" aria-invalid={parseCadence(leadCadence) === null} />
+            <span className="text-xs mt-1 block" style={{ color: parseCadence(leadCadence) === null ? "var(--red)" : "var(--muted-mk)" }}>
+              {parseCadence(leadCadence) === null ? t("dashboard.settings.business.cadenceInvalid") : parseCadence(leadCadence)!.length === 0 ? t("dashboard.settings.business.cadenceOff") : t("dashboard.settings.business.leadCadenceHint")}
+            </span>
+          </div>
+          <div className="field">
+            <Label htmlFor="quoteCadence">{t("dashboard.settings.business.quoteCadence")}</Label>
+            <Input id="quoteCadence" value={quoteCadence} onChange={(e) => setQuoteCadence(e.target.value)} placeholder="2, 5, 10" aria-invalid={parseCadence(quoteCadence) === null} />
+            <span className="text-xs mt-1 block" style={{ color: parseCadence(quoteCadence) === null ? "var(--red)" : "var(--muted-mk)" }}>
+              {parseCadence(quoteCadence) === null ? t("dashboard.settings.business.cadenceInvalid") : parseCadence(quoteCadence)!.length === 0 ? t("dashboard.settings.business.cadenceOff") : t("dashboard.settings.business.quoteCadenceHint")}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="card">
@@ -316,7 +372,7 @@ export function BusinessTab() {
       </div>
 
       <div className="flex justify-end">
-        <button onClick={save} disabled={saving} className="btn btn-navy gap-2">
+        <button onClick={save} disabled={saving || parseCadence(leadCadence) === null || parseCadence(quoteCadence) === null} className="btn btn-navy gap-2">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {t("dashboard.settings.business.save")}
         </button>

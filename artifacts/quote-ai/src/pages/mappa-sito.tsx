@@ -41,7 +41,7 @@ export default function MappaSitoPage() {
       />
 
       {/* Header */}
-      <header className="wrap" style={{ maxWidth: 700, padding: "clamp(48px, 7vw, 80px) 0 clamp(20px, 3vw, 32px)", textAlign: "center" }}>
+      <header className="wrap" style={{ maxWidth: 700, paddingTop: "clamp(48px, 7vw, 80px)", paddingBottom: "clamp(20px, 3vw, 32px)", textAlign: "center" }}>
         <h1 className="h2" style={{ marginBottom: 14 }}>{t("sitemap.heading")}</h1>
         <p className="lead" style={{ margin: "0 auto" }}>{t("sitemap.subheading")}</p>
       </header>

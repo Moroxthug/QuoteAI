@@ -68,6 +68,10 @@ const ProfileExtrasBody = z.object({
       smsEnabled: z.boolean().optional(),
       smsReminders: z.boolean().optional(),
       scheduleReminders: z.boolean().optional(),
+      // Phase 80: up to 5 touches, each 1–90 days after the previous one; an empty list switches the sequence off.
+      leadFollowupDays: z.array(z.number().int().min(1).max(90)).max(5).optional(),
+      quoteFollowupDays: z.array(z.number().int().min(1).max(90)).max(5).optional(),
+      reviewRequestDelayDays: z.number().int().min(0).max(90).optional(),
     })
     .optional(),
 });

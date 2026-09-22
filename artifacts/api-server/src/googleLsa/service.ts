@@ -9,7 +9,7 @@ import {
 import { eq } from "drizzle-orm";
 import { encryptSecret, decryptSecret } from "../lib/crypto.js";
 import { exchangeCode, refreshAccessToken, queryNewLeads, type GoogleLsaLeadRow } from "../lib/googleLsaClient.js";
-import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { automationSettingsFor, leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { logger } from "../lib/logger.js";
 
 export async function getGoogleLsaConnection(userId: string): Promise<GoogleLsaConnection | null> {
@@ -114,7 +114,7 @@ async function importOneLead(conn: GoogleLsaConnection, row: GoogleLsaLeadRow): 
         googleLsaLeadId: leadId,
         googleLsaLeadType: lead.leadType ?? null,
         googleLsaCategory: lead.category ?? null,
-        nextFollowUpAt: new Date(Date.now() + FOLLOWUP_CADENCE_DAYS[0]! * 86_400_000),
+        nextFollowUpAt: stageDueAt(leadFollowupDays(await automationSettingsFor(conn.userId)), 0),
       })
       .returning();
 

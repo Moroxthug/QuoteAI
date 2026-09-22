@@ -145,6 +145,7 @@ const MANIFEST: Record<string, Entry> = {
   VERCEL_REGION: { kind: "platform", note: "" },
   VERCEL_SKIP_TYPECHECK: { kind: "platform", note: "vercel.json" },
   PORT: { kind: "local", note: "local server only" },
+  VITE_ENABLE_SW: { kind: "local", note: "Phase 77: =1 registers the service worker on the Vite dev server (production always does)" },
   RESTORE_DATABASE_URL: { kind: "local", note: "restore rehearsal target (scripts/restore.ts) — never the production URL" },
   RESTORE_SUPABASE_URL: { kind: "local", note: "restore rehearsal target project" },
   RESTORE_SUPABASE_SERVICE_ROLE_KEY: { kind: "local", note: "restore rehearsal target service key" },

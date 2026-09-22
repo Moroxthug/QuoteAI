@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { ArrowRight, ClipboardList, Gift, BarChart3, FileText } from "lucide-react";
 import { BLOG_INDEX, BLOG_CATEGORIES, BLOG_LIST_TITLE, BLOG_LIST_DESCRIPTION, GUIDE_CARDS } from "@/data/blog-index";
 import { SeoHead } from "@/components/seo-head";
+import { BASE_URL, breadcrumbJsonLd } from "@/data/json-ld";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 
@@ -43,8 +44,6 @@ const GUIDE_ICONS: Record<string, typeof ClipboardList> = {
   "word-template": FileText,
 };
 
-const BASE_URL = "https://quoteai.ca";
-
 export default function BlogPage() {
   const { t, lang } = useLanguage();
 
@@ -54,6 +53,23 @@ export default function BlogPage() {
         title={BLOG_LIST_TITLE}
         description={BLOG_LIST_DESCRIPTION}
         canonical={`${BASE_URL}/blog/`}
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Blog",
+            name: BLOG_LIST_TITLE,
+            description: BLOG_LIST_DESCRIPTION,
+            url: `${BASE_URL}/blog/`,
+            inLanguage: "en",
+            publisher: {
+              "@type": "Organization",
+              name: "quoteai",
+              url: BASE_URL,
+              logo: { "@type": "ImageObject", url: `${BASE_URL}/icon-192.png`, width: 192, height: 192 },
+            },
+          },
+          breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog/" }]),
+        ]}
       />
 
       <div className="wrap">
@@ -65,7 +81,7 @@ export default function BlogPage() {
       </div>
 
       <section className="hero on-dark" id="hero">
-        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", padding: "clamp(48px, 6vw, 84px) 0" }}>
+        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", paddingBlock: "clamp(48px, 6vw, 84px)" }}>
           <p className="eyebrow on-dark" style={{ marginBottom: 22, justifyContent: "center", display: "flex" }}>
             {t("blog.heroBadge")}
           </p>

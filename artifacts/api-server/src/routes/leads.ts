@@ -4,7 +4,8 @@ import { db, leadsTable, leadEventsTable, businessProfilesTable, whatsappConnect
 import { and, desc, eq } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
-import { sendLeadFollowup, FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { sendLeadFollowup } from "../lib/leadMessaging.js";
+import { automationSettingsFor, leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 
 const router = Router();
 
@@ -58,7 +59,7 @@ router.post("/leads", requireAuth, requirePermission("leads", "edit"), async (re
         status: "new",
         consentSource: "manual_entry",
         notes: d.notes ?? "",
-        nextFollowUpAt: new Date(Date.now() + FOLLOWUP_CADENCE_DAYS[0]! * 86_400_000),
+        nextFollowUpAt: stageDueAt(leadFollowupDays(await automationSettingsFor(userId)), 0),
       })
       .returning();
     await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "manual" } });
@@ -171,13 +172,12 @@ router.post("/leads/:id/send", requireAuth, requirePermission("leads", "edit"), 
 
     await db.insert(leadEventsTable).values({ leadId: lead.id, userId, type: "message_sent", channel: result.channel, payload: { stage: lead.followUpStage, manual: true, actorUserId: getActorUserId(res) } });
     const nextStage = lead.followUpStage + 1;
-    const nextDelayDays = FOLLOWUP_CADENCE_DAYS[nextStage];
     const [updated] = await db
       .update(leadsTable)
       .set({
         followUpStage: nextStage,
         lastContactedAt: new Date(),
-        nextFollowUpAt: nextDelayDays !== undefined ? new Date(Date.now() + nextDelayDays * 86_400_000) : null,
+        nextFollowUpAt: stageDueAt(leadFollowupDays(profile.automationSettings), nextStage),
         status: lead.status === "new" ? "contacted" : lead.status,
       })
       .where(eq(leadsTable.id, lead.id))

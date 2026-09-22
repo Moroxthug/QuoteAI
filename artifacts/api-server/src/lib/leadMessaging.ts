@@ -16,7 +16,8 @@ const automationSettings = (profile: BusinessProfile) => ({ ...DEFAULT_AUTOMATIO
 // place that assembles that block so no future template can ship without it.
 
 /** Default follow-up cadence in days-after-previous-stage. Stage 0 fires this many days after the lead is created. */
-export const FOLLOWUP_CADENCE_DAYS = [1, 3, 7] as const;
+/** Default cadence — per-company values live in automation_settings.leadFollowupDays (Phase 80, lib/followupCadence.ts). */
+export const FOLLOWUP_CADENCE_DAYS = DEFAULT_AUTOMATION_SETTINGS.leadFollowupDays;
 
 function escapeHtml(value: string): string {
   return value

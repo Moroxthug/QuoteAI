@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { UploadedDocument } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 
 const fmt = (s: string, vars: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 
@@ -53,6 +54,7 @@ function StatusChip({ status }: { status: UploadedDocument["status"] }) {
 
 function DocumentRow({ doc }: { doc: UploadedDocument }) {
   const { t } = useLanguage();
+const can = useCan();
   const qc = useQueryClient();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
@@ -148,7 +150,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
         )}
       </div>
 
-      <div className="flex items-center gap-1 shrink-0">
+      {can("quotes", "edit") && <div className="flex items-center gap-1 shrink-0">
         {(doc.status === "pending" || doc.status === "error") && (
           <button
             type="button"
@@ -171,7 +173,7 @@ function DocumentRow({ doc }: { doc: UploadedDocument }) {
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
-      </div>
+      </div>}
     </div>
   );
 }

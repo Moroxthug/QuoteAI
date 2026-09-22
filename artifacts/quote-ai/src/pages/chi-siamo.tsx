@@ -42,7 +42,7 @@ export default function ChiSiamoPage() {
       />
 
       {/* Header */}
-      <header className="wrap" style={{ maxWidth: 780, padding: "clamp(48px, 7vw, 88px) 0 clamp(20px, 3vw, 32px)", textAlign: "center" }}>
+      <header className="wrap" style={{ maxWidth: 780, paddingTop: "clamp(48px, 7vw, 88px)", paddingBottom: "clamp(20px, 3vw, 32px)", textAlign: "center" }}>
         <p className="eyebrow" style={{ justifyContent: "center", display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
           <Heart className="h-3.5 w-3.5" style={{ color: "var(--green)" }} />
           {t("about.madeIn")}

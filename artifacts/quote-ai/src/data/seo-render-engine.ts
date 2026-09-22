@@ -26,7 +26,6 @@ import {
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
 import type { CityIntelligence } from "./seo-intelligence.js";
 
-export { getCityTitle, getCityDesc };
 export type { CityIntelligence, SectorData, CityData };
 
 const BASE_URL = "https://quoteai.ca";
@@ -52,7 +51,7 @@ function sectorPathSlug(sector: SectorData, lang: Lang): string {
 
 // ─── Deterministic hash ────────────────────────────────────────────────────
 
-export function strHash(s: string): number {
+function strHash(s: string): number {
   return s.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
 }
 
@@ -119,7 +118,7 @@ export interface CityFaqItem {
   a: string;
 }
 
-export const DEMAND_TEXT_FR: Record<CityIntelligence["demandLevel"], string> = {
+const DEMAND_TEXT_FR: Record<CityIntelligence["demandLevel"], string> = {
   LOW: "modérée",
   MEDIUM: "moyenne",
   HIGH: "élevée",
@@ -661,5 +660,115 @@ export function getSectorFrContent(sector: SectorData): SectorFrContent {
         a: "L'IA suggère des prix typiques du marché canadien, que vous pouvez ajuster librement. Vous pouvez aussi enregistrer votre propre liste de prix dans les paramètres.",
       },
     ],
+  };
+}
+
+// ─── Phase 80: long-form copy that only the hand-built static bodies used to carry ───
+// (scripts/prerender-seo.ts rendered the sector/city pages from its own HTML
+// templates until Phase 80; these two blocks were the text that the React
+// pages did not have, so they moved here and the React pages render them.)
+
+export interface DeepDiveCopy {
+  heading: string;
+  paragraphs: Array<{ kind: "p"; text: string } | { kind: "h3"; text: string } | { kind: "benefits" }>;
+}
+
+/** The sector page's long-form section ("Everything a modern painter needs to quote fast"). */
+export function getSectorDeepDive(sector: SectorData, lang: Lang = "en-CA"): DeepDiveCopy {
+  if (lang === "fr-CA") {
+    const labelL = sector.fr.label.toLowerCase();
+    const labelPL = sector.fr.labelPlural;
+    const useCasesText = sector.fr.useCases.slice(0, 6).map((u) => u.toLowerCase()).join(", ");
+    return {
+      heading: `Tout ce qu'un ${labelL} moderne doit avoir pour soumissionner vite`,
+      paragraphs: [
+        { kind: "p", text: `Pour un ${labelL} au Canada, préparer une soumission professionnelle est souvent un deuxième emploi : des heures loin du chantier, des prix repris de vieilles listes de fournisseurs, les mêmes calculs refaits dans un chiffrier rafistolé depuis des années. Le résultat est souvent un document approximatif et mal présenté qui perd le contrat au profit d'un concurrent avec une estimation plus claire. quoteai existe pour combler cet écart : décrivez les travaux en français courant, en quelques phrases, et en trente secondes vous avez une soumission complète prête à envoyer par texto, courriel ou WhatsApp.` },
+        { kind: "p", text: `Le logiciel est construit autour de la façon dont les ${labelPL} travaillent vraiment. La plupart des soumissions commencent sur place ou au téléphone avec le client, rarement à un bureau. C'est pourquoi quoteai fonctionne entièrement depuis le navigateur d'un téléphone : rien à installer, rien à synchroniser, rien à configurer. Ouvrez la page, décrivez les travaux pendant la visite, et le PDF est prêt avant même que vous soyez de retour dans le camion. Soumissionner dans l'heure plutôt que deux jours plus tard fait souvent la différence entre gagner et perdre le contrat.` },
+        { kind: "p", text: `Les travaux que nos utilisateurs soumissionnent chaque jour incluent ${useCasesText}. Pour chacun, l'IA de quoteai connaît déjà les postes typiques, les unités que les entrepreneurs utilisent vraiment — pieds carrés, pieds linéaires, heures de main-d'œuvre, forfaits — et des prix alignés sur le marché canadien. Vous pouvez toujours modifier les lignes, utiliser votre propre liste de prix et ajouter ou retirer des sections, mais vous ne partez jamais d'une page blanche.` },
+        { kind: "h3", text: "Des avantages concrets pour ceux qui soumissionnent tous les jours" },
+        { kind: "benefits" },
+        { kind: "h3", text: "Conçu pour la façon dont les métiers canadiens facturent" },
+        { kind: "p", text: `Contrairement aux outils génériques, quoteai est pensé pour les détails pratiques qu'un ${labelL} gère sur chaque contrat au Canada : TPS/TVH (et TVQ ou TVP selon la province) calculées correctement pour la province où les travaux ont lieu, séparation claire entre matériaux et main-d'œuvre, et des totaux qui correspondent à ce que les clients s'attendent à voir avant de signer. Vos informations d'entreprise — nom, numéro de licence ou d'enregistrement, logo et coordonnées — sont enregistrées une seule fois et appliquées à chaque soumission.` },
+        { kind: "h3", text: "De la soumission au contrat signé" },
+        { kind: "p", text: `Une bonne soumission n'est pas qu'un document de prix : c'est un outil de vente. Une mise en page soignée, des lignes claires, votre logo et vos coordonnées disent au client qu'il a affaire à un professionnel sérieux. Chaque soumission générée avec quoteai inclut un en-tête personnalisé, des sections par phase de travaux, une description pour chaque ligne, les prix unitaires et sous-totaux, les taxes affichées clairement, un total final, ainsi que les conditions de paiement et la date de validité. Le client reçoit un PDF net qui tient la comparaison avec les soumissions d'autres ${labelPL}.` },
+        { kind: "p", text: `Commencer est gratuit : pas de carte de crédit, pas de configuration compliquée. Créez un compte en trente secondes, générez votre première soumission gratuitement, et décidez ensuite si un abonnement (pour ceux qui soumissionnent chaque jour) ou une soumission à l'unité vous convient mieux. Des entrepreneurs et petites entreprises partout au Canada utilisent déjà quoteai chaque semaine.` },
+      ],
+    };
+  }
+  const labelL = sector.label.toLowerCase();
+  const labelPL = sector.labelPlural;
+  const useCasesText = sector.useCases.slice(0, 6).map((u) => u.toLowerCase()).join(", ");
+  return {
+    heading: `Everything a modern ${labelL} needs to quote fast`,
+    paragraphs: [
+      { kind: "p", text: `For a ${labelL} in Canada, putting together a professional quote is often a second job: hours pulled away from the job site, prices looked up from old supplier lists, the same calculations redone on a spreadsheet that's been patched together for years. The result is usually a rough, inconsistently formatted document that loses jobs to a competitor with a clearer, better-presented estimate. quoteai exists to close that gap: describe the job in plain English (or French), in a few sentences, and in thirty seconds you have a complete, professional quote ready to send by text, email or WhatsApp.` },
+      { kind: "p", text: `The software is built around how ${labelPL} actually work day to day. Most quotes start on site or on the phone with the customer, rarely at a desk. That's why quoteai works entirely from a phone browser: no install, no syncing, nothing to configure. Open the page, describe the job while you're still walking the site, and by the time you're back in the truck the PDF is ready to send. The difference between quoting within the hour and quoting two days later is often the difference between winning the job and losing it to whoever answered first.` },
+      { kind: "p", text: `Common jobs our users quote every day include ${useCasesText}. For each of these, quoteai's AI already knows the typical line items, the units contractors actually use — square feet, linear feet, labour hours, per-job flat rates — and prices that are in line with the Canadian market. You can always edit line items, swap in your own price list, and add or remove sections, but you never start from a blank page: you start from a quote that's already structured, saving most of the time a quote normally takes.` },
+      { kind: "h3", text: "Real advantages for people who quote every day" },
+      { kind: "benefits" },
+      { kind: "h3", text: "Built for how Canadian trades actually invoice" },
+      { kind: "p", text: `Unlike generic international tools, quoteai is designed around the practical details a ${labelL} deals with on every job in Canada: GST/HST (and PST or QST where it applies) calculated correctly for the province the work is done in, clear separation between materials and labour, and totals that match what customers expect to see on an estimate before signing off. Your business details — company name, licence or registration number, logo and contact info — are saved once and applied to every quote automatically, so every document looks consistent whether the customer is a homeowner, a property manager or a small business.` },
+      { kind: "h3", text: "From quote to signed job" },
+      { kind: "p", text: `A well-made quote isn't just a pricing document — it's a sales tool. Clean formatting, clear line items, your logo and contact information tell the customer they're dealing with a serious professional. Every quote generated with quoteai includes a custom header, sections by phase of work, a technical description for each line item, unit prices and subtotals, tax shown clearly, a final total, and payment terms and validity dates. The customer gets a tidy PDF — one page where possible — that holds up next to quotes from other ${labelPL} they're comparing, and in most cases the job goes to whoever presented the more professional estimate, even at a similar price.` },
+      { kind: "p", text: `Getting started is free: no credit card, no complicated setup. Create an account in thirty seconds, generate your first quote for free, and only decide afterward whether a subscription plan (for anyone quoting daily) or a one-off quote makes more sense. Contractors, tradespeople and small businesses across Canada already use quoteai every week. Try it and see why nobody goes back to the old spreadsheet.` },
+    ],
+  };
+}
+
+export interface CityCostCopy {
+  heading: string;
+  subtitle: string;
+  paragraphs: string[];
+  footnote: string;
+}
+
+/**
+ * The city page's "What does a painter cost in Toronto" section. It reads
+ * the same hand-authored price index / demand level as the observatory card.
+ * The static body this replaces also listed four per-job price ranges that
+ * were derived from a string hash, not from data — those are gone.
+ */
+export function getCityCostCopy(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityCostCopy {
+  const intel = CITY_INTELLIGENCE[city.slug];
+  const pricePct = intel ? Math.round((intel.priceIndex - 1.0) * 100) : 0;
+  const cityName = city.name;
+  const regionName = city.region;
+  if (lang === "fr-CA") {
+    const sectorLabel = sector.fr.label.toLowerCase();
+    const priceNote = !intel
+      ? "conforme à la moyenne nationale"
+      : pricePct > 5
+        ? `en moyenne ${pricePct} % plus élevé que la moyenne nationale`
+        : pricePct < -5
+          ? `en moyenne ${Math.abs(pricePct)} % plus bas que la moyenne nationale`
+          : "conforme à la moyenne nationale (variation limitée à ±5 %)";
+    const demandText = intel ? DEMAND_TEXT_FR[intel.demandLevel].toLowerCase() : "stable";
+    return {
+      heading: `Combien coûte un ${sectorLabel} à ${cityName}`,
+      subtitle: "Ce qui fait varier le prix d'une soumission",
+      paragraphs: [
+        `À ${cityName}, le coût moyen pour des travaux de ${sectorLabel} est ${priceNote}. La demande au ${regionName} est actuellement ${demandText}, ce qui influence la rapidité de réponse des entrepreneurs et la marge de négociation sur le prix final.`,
+        `Chaque soumission dépend de facteurs propres au travail : l'ampleur exacte des travaux, la qualité des matériaux demandés, l'accessibilité du site, l'urgence et les conditions particulières convenues avec le client. C'est pourquoi nous recommandons toujours une visite ou une description détaillée : avec quoteai, vous pouvez le faire en 30 secondes en décrivant le travail en langage naturel, et obtenir un document professionnel et modifiable, prêt à envoyer au client par WhatsApp ou courriel.`,
+      ],
+      footnote: `Indice de prix et niveau de demande : estimations rédigées pour ${cityName}. Taxes non incluses. Les prix réels varient selon les particularités du travail.`,
+    };
+  }
+  const sectorLabel = sector.label.toLowerCase();
+  const priceNote = !intel
+    ? "in line with the national average"
+    : pricePct > 5
+      ? `on average ${pricePct}% higher than the national average`
+      : pricePct < -5
+        ? `on average ${Math.abs(pricePct)}% lower than the national average`
+        : "in line with the national average (a modest variation within ±5%)";
+  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "steady";
+  return {
+    heading: `What does a ${sectorLabel} cost in ${cityName}`,
+    subtitle: "What moves the price of a quote",
+    paragraphs: [
+      `In ${cityName}, the average cost for ${sectorLabel} work is ${priceNote}. Demand in ${regionName} is currently ${demandText}, which affects how quickly contractors respond and how much room there is to negotiate the final price.`,
+      `Every quote depends on job-specific factors: the exact scope of work, the quality of materials requested, site accessibility, how urgent the job is, and any custom terms agreed with the client. That's why we always recommend a proper walkthrough or a detailed description: with quoteai you can do that in 30 seconds by describing the job in plain language, and get a professional, editable document ready to send to the client by WhatsApp or email.`,
+    ],
+    footnote: `Price index and demand level are editorial estimates for ${cityName}. Taxes not included. Real prices vary with the specifics of the job.`,
   };
 }

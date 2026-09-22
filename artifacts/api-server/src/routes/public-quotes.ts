@@ -12,7 +12,7 @@ import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { linkQuoteToClient } from "../lib/clients.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
-import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { portalLinkForClient } from "../portal/service.js";
 import { calculateEstimate, sendDirectInvite } from "../lib/financeitClient.js";
 import {
@@ -485,7 +485,7 @@ Use these exact measurements to mathematically calculate the quantities.`;
           source: "widget",
           status: "new",
           consentSource: "widget_form",
-          nextFollowUpAt: new Date(Date.now() + FOLLOWUP_CADENCE_DAYS[0]! * 86_400_000),
+          nextFollowUpAt: stageDueAt(leadFollowupDays(profile.automationSettings), 0),
         })
         .returning();
       await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "widget", quoteId: quote!.id } });

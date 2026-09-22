@@ -27,3 +27,19 @@ for (const size of [192, 512]) {
   writeFileSync(out, png);
   console.log(`wrote ${out} (${png.length} bytes)`);
 }
+
+// Phase 80: the notification badge. Android draws the badge as a white mask
+// from the image's alpha channel, so the colour icon came out as a blurry
+// white disc. This is the same silhouette in solid white on transparency at
+// the 96 px the platform asks for (a colour matrix keeps alpha, whitens RGB).
+{
+  const size = 96;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <filter id="white"><feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"/></filter>
+  <image width="${size}" height="${size}" filter="url(#white)" href="data:image/png;base64,${source}"/>
+</svg>`;
+  const png = new Resvg(svg, { fitTo: { mode: "width", value: size } }).render().asPng();
+  const out = resolve(publicDir, "badge-96.png");
+  writeFileSync(out, png);
+  console.log(`wrote ${out} (${png.length} bytes)`);
+}

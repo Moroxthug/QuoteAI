@@ -10,6 +10,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { formatCents, type TimeEntryDto, type TimeEntryStatus, type UsageUnit } from "@/lib/jobs-api";
 import { teamApi, type EquipmentDto, type EquipmentEdit, type EquipmentOwnership, type WorkerDto, type WorkerEdit, type WorkerType } from "@/lib/team-api";
 import { teamMembersApi, type TeamMemberDto, type TeamMemberRole } from "@/lib/team-members-api";
@@ -71,6 +72,7 @@ const ROLE_OPTIONS: TeamMemberRole[] = ["admin", "office", "foreman", "viewer"];
 
 function MembersTab() {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["team-members"] });
@@ -101,7 +103,7 @@ function MembersTab() {
               <UserX className="h-4 w-4" /> {t("team.members.leave")}
             </button>
           )}
-          <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>
+          {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>}
         </div>
       </div>
 
@@ -141,6 +143,7 @@ function MembersTab() {
 
 function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemberDto; onResend: () => void; onSuspend: () => void; onRemove: () => void }) {
   const { t } = useLanguage();
+const can = useCan();
   const statusLabel = member.status === "active" ? t("team.members.statusActive") : member.status === "suspended" ? t("team.members.statusSuspended") : t("team.members.statusInvited");
   const statusChip = member.status === "active" ? "chip-green" : member.status === "suspended" ? "chip-grey" : "chip-yellow";
   return (
@@ -154,7 +157,7 @@ function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemb
       <td><span className="chip chip-purple">{t(`team.members.role.${member.role}`)}</span></td>
       <td><span className={cn("chip", statusChip)}>{statusLabel}</span></td>
       <td onClick={(e) => e.stopPropagation()}>
-        <div className="row-act">
+        {can("team", "full") && <div className="row-act">
           {member.status !== "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</button>}
           {member.status !== "invited" && (
             <button type="button" className="ic-btn" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
@@ -162,7 +165,7 @@ function MemberRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemb
             </button>
           )}
           <button type="button" className="ic-btn danger" title={t("team.members.remove")} onClick={onRemove}><Trash2 /></button>
-        </div>
+        </div>}
       </td>
     </tr>
   );
@@ -225,6 +228,7 @@ function MemberInviteLinkDialog({ invite, onClose }: { invite: { url: string; em
 
 function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["workers"] });
@@ -247,7 +251,7 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
         <p className="foot-note m-0">{t("team.workers.intro")}</p>
         <div className="grow flex items-center gap-2">
           {inactiveCount > 0 && <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => setShowInactive((v) => !v)}>{showInactive ? t("team.workers.hideInactive") : `${t("team.workers.showInactive")} (${inactiveCount})`}</button>}
-          <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, worker: null })}><Plus className="h-4 w-4" /> {t("team.workers.add")}</button>
+          {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, worker: null })}><Plus className="h-4 w-4" /> {t("team.workers.add")}</button>}
         </div>
       </div>
       {list.length === 0 ? (
@@ -285,7 +289,7 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
                     {w.pendingCount > 0 && <span className="chip chip-yellow" style={{ marginLeft: 8 }}>{w.pendingCount} {t("team.workers.toApprove")}</span>}
                   </td>
                   <td onClick={(e) => e.stopPropagation()}>
-                    <div className="row-act">
+                    {can("team", "full") && <div className="row-act">
                       {w.active && (
                         w.hasInvite ? (
                           <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => issue.mutate(w)} disabled={issue.isPending} title={`${t("team.workers.linkActiveUntil")} ${w.inviteExpiresAt ? format(new Date(w.inviteExpiresAt), "PP", { locale }) : ""}`}><Link2 className="h-3.5 w-3.5" style={{ color: "var(--green-dark)" }} /> {t("team.workers.newLink")}</button>
@@ -297,7 +301,7 @@ function WorkersTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof 
                       <button type="button" className="ic-btn" title={t("team.workers.edit")} onClick={() => setEditing({ open: true, worker: w })}><Pencil /></button>
                       <button type="button" className="ic-btn" title={w.active ? t("team.workers.deactivate") : t("team.workers.reactivate")} onClick={() => toggleActive.mutate(w)}>{w.active ? <UserX /> : <UserCheck />}</button>
                       <button type="button" className="ic-btn danger" title={t("team.workers.delete")} onClick={() => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); }}><Trash2 /></button>
-                    </div>
+                    </div>}
                   </td>
                 </tr>
               ))}
@@ -380,6 +384,7 @@ function InviteDialog({ invite, onClose }: { invite: { worker: WorkerDto; url: s
 
 function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const now = new Date();
@@ -434,7 +439,7 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
           </div>
         </div>
 
-        {status === "submitted" && submittedIds.length > 0 && (
+        {status === "submitted" && submittedIds.length > 0 && can("jobs", "full") && (
           <div className="bulk-row" style={{ margin: "0 18px 14px" }}>
             <button type="button" className="text-link" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
             <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</button>
@@ -463,12 +468,12 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
                   {e.geofenceFlagged && <span className="flag" title={t("team.time.geofenceFlag")}><MapPin /></span>}
                   <TimeStatusBadge status={e.status} />
                   <span className="amt" style={{ width: 80, textAlign: "right" }}>{formatCents(e.costCents)}</span>
-                  <div className={e.status === "submitted" ? "flex gap-1 shrink-0" : "hover-act"}>
+                  {can("jobs", "edit") && <div className={e.status === "submitted" ? "flex gap-1 shrink-0" : "hover-act"}>
                     {e.status === "submitted" && <button type="button" className="ic-btn ok" title={t("team.time.filter.approved")} onClick={() => setOne.mutate({ id: e.id, status: "approved" })}><Check /></button>}
                     {e.status === "submitted" && <button type="button" className="ic-btn bad" title={t("team.time.filter.rejected")} onClick={() => setOne.mutate({ id: e.id, status: "rejected" })}><X /></button>}
                     {e.status !== "submitted" && <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => setOne.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
                     <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>
-                  </div>
+                  </div>}
                 </div>
               ))}
             </section>
@@ -485,6 +490,7 @@ function TimeTab({ workers, locale }: { workers: WorkerDto[]; locale: typeof enC
 
 function EquipmentTab() {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["equipment"], queryFn: teamApi.equipment });
@@ -501,7 +507,7 @@ function EquipmentTab() {
       <div className="toolbar">
         <p className="foot-note m-0">{t("team.equipment.intro")}</p>
         <div className="grow">
-          <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</button>
+          {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</button>}
         </div>
       </div>
       {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /></div> : items.length === 0 ? (
@@ -539,11 +545,11 @@ function EquipmentTab() {
                   <td className="t-amt">{formatCents(e.usageRateCents)}/{t(`team.unit.${e.usageUnit}`)}</td>
                   <td>{formatCents(e.usageCentsThisMonth)}</td>
                   <td onClick={(ev) => ev.stopPropagation()}>
-                    <div className="row-act">
+                    {can("team", "full") && <div className="row-act">
                       <button type="button" className="ic-btn" title={t("team.equipment.edit")} onClick={() => setEditing({ open: true, item: e })}><Pencil /></button>
                       <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => toggle.mutate(e)}>{e.active ? t("team.workers.deactivate") : t("team.workers.reactivate")}</button>
                       <button type="button" className="ic-btn danger" title={t("team.equipment.deleteConfirm")} onClick={() => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); }}><Trash2 /></button>
-                    </div>
+                    </div>}
                   </td>
                 </tr>
               ))}

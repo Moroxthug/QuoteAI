@@ -70,12 +70,11 @@ One folder, one meeting. Everything is in the repo; the assistant can export the
 Carried from `deferred-work-post-launch` — re-audited 2026-09-21. None of these should stop a launch to ON/BC/AB contractors on Starter/Pro.
 
 - No account deletion / data export (PIPEDA / Law 25 erasure + portability) — must exist before the first deletion request; ~1 phase.
-- 233 hand-built static SEO/blog bodies are the pre-redesign layout (crawlers vs. hydrated site differ) — P2.
-- Homepage prerendered head vs `SeoHead` mismatch; critical-CSS inlining; 14 `picsum.photos` placeholders on public pages (real photography is content).
-- Invoice/contract PDFs lack the company logo; quote PDF chapter orphans — P3.
-- Job "Mark complete"/"Archive" lack a confirm and final-invoice/holdback prompt — P2.
-- Lead follow-up cadence and review-request delay are constants, not per-company settings.
-- Frontend is only partly role-aware (viewers may still see some 403-ing buttons).
+- ~~233 hand-built static SEO/blog bodies are the pre-redesign layout~~ — closed Phase 80 (every public page renders through `entry-server.tsx`, head included, critical CSS inlined). Still open: 14 `picsum.photos` placeholders on public pages (real photography is content, Phase 81).
+- ~~Invoice/contract PDFs lack the company logo; quote PDF chapter orphans~~ — closed Phase 80.
+- ~~Job "Mark complete"/"Archive" lack a confirm and final-invoice/holdback prompt~~ — closed Phase 80.
+- ~~Lead follow-up cadence and review-request delay are constants~~ — closed Phase 80 (Settings → Business → Follow-up cadence / review delay).
+- Frontend role-awareness: Phase 80 hid or disabled the write controls on every dashboard page for foreman/viewer (`useCan`, shared matrix in `lib/permissions`); a few deep dialogs (quote editor internals, imports upload) still rely on the server's 403.
 - Rate limiters are per-instance memory; move to a shared store if abuse appears.
 - Company analytics O(P×N) in JS — fine to a few hundred jobs.
 - Optional integrations log at `error` level when unconfigured (log noise only).

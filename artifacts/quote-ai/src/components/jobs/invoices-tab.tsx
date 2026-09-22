@@ -6,6 +6,7 @@ import { Plus, Receipt, CheckCircle2, Circle, Loader2, Lock } from "lucide-react
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { formatCents, type JobDetailDto } from "@/lib/jobs-api";
 import { invoicesApi } from "@/lib/invoices-api";
 import { InvoiceRow } from "@/pages/dashboard/invoices";
@@ -19,6 +20,7 @@ import { NewInvoiceDialog } from "@/components/invoices/invoice-dialogs";
  */
 export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -73,7 +75,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
                   <span className="amt">{formatCents(inv?.totalCents ?? amount)}</span>
                   {inv ? (
                     <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${inv.id}`)}>{t("invoices.plan.open")}</button>
-                  ) : (
+                  ) : can("invoicing", "edit") && (
                     <button type="button" className={cn("btn btn-sm", released ? "btn-navy" : "btn-outline-navy")} disabled={create.isPending} onClick={() => create.mutate({ kind, paymentTermId: term.id, milestoneId: ms?.id })}>
                       {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} {t("invoices.plan.create")}
                     </button>
@@ -91,7 +93,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
                 <span className="amt">{formatCents(live.filter((i) => i.type !== "holdback_release").reduce((s, i) => s + i.holdbackCents, 0))}</span>
                 {live.some((i) => i.type === "holdback_release") ? (
                   <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${live.find((i) => i.type === "holdback_release")!.id}`)}>{t("invoices.plan.open")}</button>
-                ) : (
+                ) : can("invoicing", "edit") && (
                   <button type="button" className="btn btn-sm btn-outline-navy" disabled={create.isPending || job.status !== "completed"} onClick={() => create.mutate({ kind: "holdback_release" })}><Plus className="h-3.5 w-3.5" /> {t("invoices.plan.create")}</button>
                 )}
               </div>
@@ -103,7 +105,7 @@ export function InvoicesTab({ data, locale }: { data: JobDetailDto; locale: type
       <section className="card">
         <div className="card-head">
           <div><h2>{t("invoices.title")}</h2></div>
-          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setManualOpen(true)}><Plus className="h-4 w-4" /> {t("invoices.manual")}</button>
+          {can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setManualOpen(true)}><Plus className="h-4 w-4" /> {t("invoices.manual")}</button>}
         </div>
         {invoices.length === 0 ? (
           <div className="card-empty">

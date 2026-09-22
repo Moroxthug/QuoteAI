@@ -31,6 +31,7 @@ import {
 import { and, asc, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
+import { companyLogoDataUri } from "../lib/companyLogo.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { writeAudit, createNotification } from "../lib/notifications.js";
 import { sendInvoiceEmail, sendPaymentReceiptEmail } from "../lib/emailInvoices.js";
@@ -454,7 +455,7 @@ export async function applyAutoSendPolicy(invoice: Invoice, profile: BusinessPro
 // ── PDF & storage ────────────────────────────────────────────────────────────
 
 async function renderAndStore(loaded: LoadedInvoice): Promise<{ url: string; sha256: string; buffer: Buffer }> {
-  const { buffer, sha256 } = await buildInvoicePdf(loaded.invoice, loaded.payments);
+  const { buffer, sha256 } = await buildInvoicePdf(loaded.invoice, loaded.payments, { logo: await companyLogoDataUri(loaded.invoice.userId) });
   const url = await storage.uploadObjectBuffer({
     subPath: `invoices/${loaded.invoice.userId}/${loaded.invoice.id}/${loaded.invoice.number}-${sha256.slice(0, 12)}.pdf`,
     buffer,
@@ -467,7 +468,7 @@ async function renderAndStore(loaded: LoadedInvoice): Promise<{ url: string; sha
 export async function invoicePdfBuffer(invoiceId: string): Promise<{ buffer: Buffer; filename: string }> {
   const loaded = await loadInvoice(invoiceId);
   if (!loaded) throw new Error("Invoice not found");
-  const { buffer } = await buildInvoicePdf(loaded.invoice, loaded.payments);
+  const { buffer } = await buildInvoicePdf(loaded.invoice, loaded.payments, { logo: await companyLogoDataUri(loaded.invoice.userId) });
   return { buffer, filename: `${loaded.invoice.number}${loaded.invoice.status === "draft" ? "-draft" : ""}.pdf` };
 }
 

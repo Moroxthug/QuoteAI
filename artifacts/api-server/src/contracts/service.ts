@@ -32,6 +32,7 @@ import { writeAudit } from "../lib/notifications.js";
 import { sendContractSigningEmail, sendContractSignedEmail } from "../lib/emailContracts.js";
 import { buildContractDocument, fallbackScope, fallbackSchedule, templateKeyForProvince, refreshLockedSections, type Lang, type TemplateKey } from "./templates.js";
 import { buildContractPdf } from "./pdf.js";
+import { companyLogoDataUri } from "../lib/companyLogo.js";
 
 const storage = new ObjectStorageService();
 
@@ -322,6 +323,7 @@ async function renderAndStore(contractId: string, kind: "unsigned" | "signed", w
     createdAt: contract.createdAt,
     unsignedPdfHash: contract.unsignedPdfHash,
     withAudit,
+    logo: await companyLogoDataUri(contract.userId),
   });
   const url = await storage.uploadObjectBuffer({
     subPath: `contracts/${contract.userId}/${contract.id}/${kind}-${sha256.slice(0, 12)}.pdf`,
@@ -348,6 +350,7 @@ export async function contractPdfBuffer(contractId: string): Promise<{ buffer: B
     createdAt: contract.createdAt,
     unsignedPdfHash: contract.unsignedPdfHash,
     withAudit: false,
+    logo: await companyLogoDataUri(contract.userId),
   });
   return { buffer, filename: `${contract.contractNumber}${contract.status === "draft" ? "-draft" : ""}.pdf` };
 }

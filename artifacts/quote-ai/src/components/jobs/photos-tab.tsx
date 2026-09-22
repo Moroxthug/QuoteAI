@@ -4,6 +4,7 @@ import { Upload, Loader2, Trash2, Share2, Check, ImageOff, CloudUpload } from "l
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, type JobDetailDto, type JobPhotoDto } from "@/lib/jobs-api";
 import { runOrQueue, useOutbox, discard } from "@/lib/offline/outbox";
 
@@ -14,6 +15,7 @@ import { runOrQueue, useOutbox, discard } from "@/lib/offline/outbox";
  */
 export function PhotosTab({ data }: { data: JobDetailDto }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { job, milestones } = data;
@@ -65,7 +67,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
           <h2>{t("jobs.photos.title")}</h2>
           <p className="sub">{t("jobs.photos.desc")}</p>
         </div>
-        {selected.size > 0 && (
+        {selected.size > 0 && can("jobs", "edit") && (
           <div className="flex items-center gap-3">
             <span className="foot-note">{selected.size} {t("jobs.photos.selected")}</span>
             <button type="button" className="btn btn-sm btn-navy" disabled={share.isPending} onClick={() => share.mutate([...selected])}>
@@ -77,7 +79,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
       </div>
 
       <div className="act-body stack">
-        <div
+        {can("jobs", "edit") && <div
           className={cn("dropzone flush", dragging && "on")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
@@ -87,7 +89,7 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
           <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/heic" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
           <div className="dz-ic">{upload.isPending ? <Loader2 className="animate-spin" /> : <Upload />}</div>
           <b>{upload.isPending ? t("jobs.photos.uploading") : t("jobs.photos.upload")}</b>
-        </div>
+        </div>}
 
         {isLoading ? (
           <div className="card-empty">…</div>
@@ -118,14 +120,14 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
                   <button type="button" className={cn("chk", isSelected && "on")} onClick={() => toggle(p.id)} aria-pressed={isSelected}>
                     {isSelected && <Check />}
                   </button>
-                  <button
+                  {can("jobs", "edit") && <button
                     type="button"
                     className="photo-del"
                     onClick={(e) => { e.stopPropagation(); if (confirm(t("jobs.photos.deleteConfirm"))) del.mutate(p.id); }}
                     title={t("jobs.photos.delete")}
                   >
                     <Trash2 />
-                  </button>
+                  </button>}
                   {(ms || p.caption || p.sharedAt) && (
                     <div className="photo-meta">
                       {ms && <b>{ms}</b>}

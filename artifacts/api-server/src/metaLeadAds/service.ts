@@ -16,7 +16,7 @@ import {
   getLeadData,
   extractContactFields,
 } from "../lib/metaLeadAdsClient.js";
-import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { automationSettingsFor, leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { logger } from "../lib/logger.js";
 
 const USER_TOKEN_LIFETIME_MS = 60 * 24 * 60 * 60 * 1000; // Meta long-lived user tokens last ~60 days
@@ -125,7 +125,7 @@ export async function importLeadFromWebhook(pageId: string, leadgenId: string): 
         metaCampaignId: leadData.campaign_id ?? null,
         metaCampaignName: leadData.campaign_name ?? null,
         metaAdId: leadData.ad_id ?? null,
-        nextFollowUpAt: new Date(Date.now() + FOLLOWUP_CADENCE_DAYS[0]! * 86_400_000),
+        nextFollowUpAt: stageDueAt(leadFollowupDays(await automationSettingsFor(conn.userId)), 0),
       })
       .returning();
 

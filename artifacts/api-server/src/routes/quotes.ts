@@ -40,7 +40,7 @@ const aiCallLimiter = userRateLimiter({
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";
-import { QUOTE_FOLLOWUP_CADENCE_DAYS } from "../lib/quoteMessaging.js";
+import { quoteFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
 import { createManualQuote, type ManualQuoteInput } from "../quotes/manualCreate.js";
 import { loadPriceReferences, priceCheckChapters, repriceChapters } from "../quotes/priceCheck.js";
@@ -1832,7 +1832,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
         .set({
           sentAt: quote.sentAt ?? new Date(),
           followUpStage: 0,
-          nextFollowUpAt: new Date(Date.now() + QUOTE_FOLLOWUP_CADENCE_DAYS[0] * 86_400_000),
+          nextFollowUpAt: stageDueAt(quoteFollowupDays(profile?.automationSettings), 0),
           ...(clientData && clientData !== existingClient ? { clientData } : {}),
         })
         .where(eq(quotesTable.id, quote.id));

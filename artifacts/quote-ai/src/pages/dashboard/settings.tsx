@@ -33,6 +33,7 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
 import { SmsTab } from "./settings-sms-tab";
@@ -2823,6 +2824,7 @@ function UsageTab() {
 
 export default function SettingsPage() {
   const { t } = useLanguage();
+const can = useCan();
   const search = useSearch();
   const params = new URLSearchParams(search);
   const isAccountPath = typeof window !== "undefined" && window.location.pathname.includes("/account");
@@ -2834,17 +2836,22 @@ export default function SettingsPage() {
   const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "sms" ? "sms" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : tabFromParam === "security" ? "security" : "billing";
   const [activeTab, setActiveTab] = useState<"account" | "business" | "billing" | "whatsapp" | "sms" | "widget" | "usage" | "integrations" | "security">(defaultTab as any);
 
+  // Phase 80: company-level tabs follow the permission matrix (business/SMS =
+  // settings:edit, billing = settings:full, WhatsApp/integrations = integrations:full);
+  // team members see their own account, usage and security only.
   const TABS = [
     { id: "account" as const, label: t("dashboard.settings.tabs.account") },
-    { id: "business" as const, label: t("dashboard.settings.tabs.business") },
-    { id: "billing" as const, label: t("dashboard.settings.tabs.billing") },
-    ...(isProOrElite ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
-    ...(isPaid ? [{ id: "sms" as const, label: t("dashboard.settings.tabs.sms") }] : []),
+    ...(can("settings", "edit") ? [{ id: "business" as const, label: t("dashboard.settings.tabs.business") }] : []),
+    ...(can("settings", "full") ? [{ id: "billing" as const, label: t("dashboard.settings.tabs.billing") }] : []),
+    ...(isProOrElite && can("integrations", "full") ? [{ id: "whatsapp" as const, label: t("dashboard.settings.tabs.whatsapp") }] : []),
+    ...(isPaid && can("settings", "edit") ? [{ id: "sms" as const, label: t("dashboard.settings.tabs.sms") }] : []),
     { id: "widget" as const, label: t("dashboard.settings.tabs.widget") },
     { id: "usage" as const, label: t("dashboard.settings.tabs.usage") },
-    ...(isElite ? [{ id: "integrations" as const, label: t("dashboard.settings.tabs.integrations") }] : []),
+    ...(isElite && can("integrations", "full") ? [{ id: "integrations" as const, label: t("dashboard.settings.tabs.integrations") }] : []),
     { id: "security" as const, label: t("dashboard.settings.tabs.security") },
   ];
+  // A tab the role cannot see (e.g. the default "billing" for a team member) falls back to the account tab.
+  const shownTab = TABS.some((x) => x.id === activeTab) ? activeTab : "account";
 
   return (
     <div className="max-w-2xl mx-auto animate-in fade-in duration-500">
@@ -2861,26 +2868,26 @@ export default function SettingsPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={cn("pill", activeTab === tab.id && "on")}
+            className={cn("pill", shownTab === tab.id && "on")}
           >
             {tab.label}
           </button>
         ))}
       </div>
 
-      {activeTab === "account" ? (
+      {shownTab === "account" ? (
         <AccountTab />
-      ) : activeTab === "business" ? (
+      ) : shownTab === "business" ? (
         <BusinessTab />
-      ) : activeTab === "whatsapp" ? (
+      ) : shownTab === "whatsapp" ? (
         <WhatsappTab />
-      ) : activeTab === "sms" ? (
+      ) : shownTab === "sms" ? (
         <SmsTab />
-      ) : activeTab === "widget" ? (
+      ) : shownTab === "widget" ? (
         <WidgetTab />
-      ) : activeTab === "usage" ? (
+      ) : shownTab === "usage" ? (
         <UsageTab />
-      ) : activeTab === "integrations" ? (
+      ) : shownTab === "integrations" ? (
         <div className="space-y-6">
           <StripeConnectTab />
           <FinanceitTab />
@@ -2893,7 +2900,7 @@ export default function SettingsPage() {
           <EmailSendTab />
           <DeveloperApiTab />
         </div>
-      ) : activeTab === "security" ? (
+      ) : shownTab === "security" ? (
         <SecurityTab />
       ) : (
         <BillingTab />

@@ -7,6 +7,7 @@
 */}
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
+import { breadcrumbJsonLd, webPageJsonLd } from "@/data/json-ld";
 import { Link } from "wouter";
 import { LEGAL_ENTITY, isLegalEntityConfigured, addressLine, provinceName, taxNumbersLine } from "@workspace/legal-entity";
 
@@ -20,6 +21,10 @@ export default function TermsPage() {
         title="Terms of Service | QuoteAI"
         description="Terms and conditions for using the QuoteAI platform to generate AI-powered quotes."
         canonical="https://quoteai.ca/terms/"
+        jsonLd={[
+          webPageJsonLd("Terms of Service", "Terms and conditions for using the QuoteAI platform to generate AI-powered quotes.", "/terms/"),
+          breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Terms of Service", path: "/terms/" }]),
+        ]}
       />
       <div className="wrap">
         <nav aria-label="Breadcrumb" className="crumbs">
@@ -29,7 +34,7 @@ export default function TermsPage() {
         </nav>
       </div>
 
-      <header className="wrap" style={{ maxWidth: 780, padding: "clamp(12px, 2vw, 24px) 0 clamp(24px, 3vw, 36px)" }}>
+      <header className="wrap" style={{ maxWidth: 780, paddingTop: "clamp(12px, 2vw, 24px)", paddingBottom: "clamp(24px, 3vw, 36px)" }}>
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.5rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 10 }}>
           Terms of Service
         </h1>

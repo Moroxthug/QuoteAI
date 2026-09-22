@@ -57,7 +57,7 @@ export default function HelpIndexPage() {
         </nav>
       </div>
 
-      <header className="wrap" style={{ maxWidth: 780, padding: "clamp(12px, 2vw, 24px) 0 clamp(28px, 3.5vw, 44px)" }}>
+      <header className="wrap" style={{ maxWidth: 780, paddingTop: "clamp(12px, 2vw, 24px)", paddingBottom: "clamp(28px, 3.5vw, 44px)" }}>
         <p className="eyebrow grey" style={{ marginBottom: 14 }}>{t("help.eyebrow")}</p>
         <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.6rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 14 }}>
           {t("help.heading")}

@@ -7,6 +7,7 @@ import { Plus, Trash2, Upload, Loader2, Sparkles, Receipt, Clock, Wrench, Pencil
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, type CostCategory, type CostEntryDto, type JobDetailDto } from "@/lib/jobs-api";
 import { CostEntryDialog, COST_CATEGORY_KEYS } from "./cost-entry-dialog";
 
@@ -19,6 +20,7 @@ const SOURCE_ICON: Record<CostEntryDto["source"], typeof Receipt> = { receipt: R
  */
 export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { job, budget, budgetTotalCents, costs, milestones } = data;
@@ -58,7 +60,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 stack">
         {/* Dropzone */}
-        <div
+        {can("costs", "edit") && <div
           className={cn("dropzone flush", dragging && "on")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
@@ -69,7 +71,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
           <div className="dz-ic">{scan.isPending ? <Loader2 className="animate-spin" /> : <Upload />}</div>
           <b>{scan.isPending ? t("jobs.costs.scanning") : t("jobs.costs.dropTitle")}</b>
           <p>{t("jobs.costs.dropDesc")}</p>
-        </div>
+        </div>}
 
         {/* Review queue */}
         {pending.length > 0 && (
@@ -85,8 +87,8 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
                     <span className="sub">{e.date ? format(day(e.date)!, "PP", { locale }) : "—"} · {t(`jobs.cost.${e.category}`)}{e.aiExtraction ? ` · ${t(`jobs.costs.confidence.${e.aiExtraction.confidence}`)}` : ""}</span>
                   </button>
                   <span className="amt">{formatCents(e.totalCents)}</span>
-                  <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>
-                  <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={confirm.isPending || !e.totalCents} onClick={() => confirm.mutate(e.id)}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.costs.confirm")}</button>
+                  {can("costs", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>}
+                  {can("costs", "edit") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={confirm.isPending || !e.totalCents} onClick={() => confirm.mutate(e.id)}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.costs.confirm")}</button>}
                 </div>
               ))}
             </div>
@@ -104,7 +106,7 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
                   {COST_CATEGORY_KEYS.map((c) => <option key={c} value={c}>{t(`jobs.cost.${c}`)}</option>)}
                 </select>
               </div>
-              <button type="button" className="btn btn-sm btn-navy" onClick={() => setDialog({ open: true, entry: null })}><Plus className="h-4 w-4" /> {t("jobs.costs.add")}</button>
+              {can("costs", "edit") && <button type="button" className="btn btn-sm btn-navy" onClick={() => setDialog({ open: true, entry: null })}><Plus className="h-4 w-4" /> {t("jobs.costs.add")}</button>}
             </div>
           </div>
           {confirmed.length === 0 ? <div className="card-empty">{t("jobs.costs.empty")}</div> : (
@@ -121,10 +123,10 @@ export function CostsTab({ data, locale }: { data: JobDetailDto; locale: typeof 
                       <span className="sub">{t(`jobs.cost.${e.category}`)}{e.milestoneTitle ? ` · ${e.milestoneTitle}` : ""}{e.taxCents ? ` · ${t("jobs.costs.tax")} ${formatCents(e.taxCents)}` : ""}</span>
                     </div>
                     <span className="amt">{formatCents(e.totalCents)}</span>
-                    {!derived && (
+                    {!derived && can("costs", "edit") && (
                       <div className="hover-act">
                         <button type="button" className="ic-btn" onClick={() => setDialog({ open: true, entry: e })}><Pencil /></button>
-                        <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>
+                        {can("costs", "full") && <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>}
                       </div>
                     )}
                   </div>

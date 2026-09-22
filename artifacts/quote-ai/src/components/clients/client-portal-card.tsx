@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, ExternalLink, Loader2, Mail, UserRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { clientPortalApi } from "@/lib/portal-api";
 
 /**
@@ -11,6 +12,7 @@ import { clientPortalApi } from "@/lib/portal-api";
  */
 export function ClientPortalCard({ clientId }: { clientId: string }) {
   const { t, lang } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: ["client-portal", clientId], queryFn: () => clientPortalApi.status(clientId) });
@@ -40,9 +42,9 @@ export function ClientPortalCard({ clientId }: { clientId: string }) {
               <code className="text-xs rounded px-2 py-1 truncate max-w-full" style={{ background: "var(--soft)", color: "var(--navy)" }}>{data.url}</code>
               <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => { navigator.clipboard.writeText(data.url!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /> {t("portalCard.copy")}</button>
               <a href={data.url} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-navy" aria-label={t("portalCard.open")}><ExternalLink className="h-4 w-4" /></a>
-              <button type="button" className="btn btn-sm btn-navy" onClick={() => invite.mutate()} disabled={invite.isPending}>
+              {can("jobs", "edit") && <button type="button" className="btn btn-sm btn-navy" onClick={() => invite.mutate()} disabled={invite.isPending}>
                 {invite.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />} {data.invitedAt ? t("portalCard.resend") : t("portalCard.send")}
-              </button>
+              </button>}
             </div>
             <p className="foot-note m-0">
               {data.invitedAt ? `${t("portalCard.invitedAt")} ${when(data.invitedAt)}` : t("portalCard.notInvited")}

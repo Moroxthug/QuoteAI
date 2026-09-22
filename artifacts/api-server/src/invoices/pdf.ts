@@ -34,14 +34,16 @@ const cell = (t: string, opts: Partial<{ bold: boolean; align: "right" | "left";
   color: opts.color,
 });
 
-export async function buildInvoicePdf(inv: Invoice, payments: InvoicePayment[] = []): Promise<{ buffer: Buffer; sha256: string }> {
+export async function buildInvoicePdf(inv: Invoice, payments: InvoicePayment[] = [], opts: { logo?: string | null } = {}): Promise<{ buffer: Buffer; sha256: string }> {
   const lang = inv.language as Lang;
   const credit = isCreditNote(inv);
   const content: Content[] = [];
   const wm = watermark(inv);
 
+  // Phase 80: the company logo (business profile) leads the header, as on the quote PDF.
   content.push({
     columns: [
+      ...(opts.logo ? [{ image: opts.logo, fit: [110, 44] as [number, number], width: 120, margin: [0, 0, 12, 0] as [number, number, number, number] }] : []),
       { stack: [{ text: invoiceTitle(inv, lang), fontSize: 20, bold: true }, { text: `${credit ? ti("creditNoteNo", lang) : ti("invoiceNo", lang)} ${inv.number}`, fontSize: 10, color: MUTED, margin: [0, 2, 0, 0] }] },
       wm ? { text: ti(wm, lang), alignment: "right", fontSize: 11, bold: true, color: WM_COLOR[wm], characterSpacing: 1.2, margin: [0, 6, 0, 0] } : { text: "" },
     ],

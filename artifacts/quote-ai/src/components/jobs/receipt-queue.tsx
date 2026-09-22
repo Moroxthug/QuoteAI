@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Receipt, Upload, Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, type CostEntryDto, type JobSummaryDto } from "@/lib/jobs-api";
 import { CostEntryDialog } from "./cost-entry-dialog";
 
@@ -13,6 +14,7 @@ import { CostEntryDialog } from "./cost-entry-dialog";
  */
 export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: ["costs-review"], queryFn: jobsApi.reviewQueue });
@@ -35,7 +37,7 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
           <b className="ttl">{entries.length ? `${entries.length} ${t("jobs.receipts.toReview")}` : t("jobs.receipts.title")}</b>
           <span className="sub">{t("jobs.receipts.desc")}</span>
         </div>
-        <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>{scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}</button>
+        {can("costs", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>{scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}</button>}
       </div>
       {entries.length > 0 && (
         <div>
@@ -47,7 +49,7 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
                 <span className="sub">{e.projectName ?? <span style={{ color: "var(--yellow-dark)" }}>{t("jobs.receipts.noJob")}</span>} · {t(`jobs.cost.${e.category}`)}</span>
               </button>
               <span className="amt">{formatCents(e.totalCents)}</span>
-              <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>
+              {can("costs", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setDialog({ open: true, entry: e })}>{t("jobs.costs.review")}</button>}
             </div>
           ))}
         </div>

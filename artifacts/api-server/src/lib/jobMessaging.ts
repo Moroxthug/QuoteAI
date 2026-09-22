@@ -1,7 +1,7 @@
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
-import type { BusinessProfile, Client } from "@workspace/db";
+import { DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile, type Client } from "@workspace/db";
 import { sendWhatsappTemplate } from "../routes/whatsapp.js";
 
 // ── Phase 10: review requests + shared job photos ───────────────────────────
@@ -11,7 +11,8 @@ import { sendWhatsappTemplate } from "../routes/whatsapp.js";
 // (identification block + working opt-out), reused in shape but kept in this
 // module since the recipient type and opt-out token live on `clients`.
 
-export const REVIEW_REQUEST_DELAY_DAYS = 3;
+/** Default delay — per-company values live in automation_settings.reviewRequestDelayDays (Phase 80). */
+export const REVIEW_REQUEST_DELAY_DAYS = DEFAULT_AUTOMATION_SETTINGS.reviewRequestDelayDays;
 
 function escapeHtml(value: string): string {
   return value

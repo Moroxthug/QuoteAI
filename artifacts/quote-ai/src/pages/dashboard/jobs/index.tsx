@@ -10,6 +10,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, type JobSummaryDto } from "@/lib/jobs-api";
 import { ReceiptQueue } from "@/components/jobs/receipt-queue";
 
@@ -23,6 +24,7 @@ function statusChip(j: JobSummaryDto, t: (key: string) => string): { cls: string
 
 export default function JobsListPage() {
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const [, navigate] = useLocation();
   const { data, isLoading } = useQuery({ queryKey: ["jobs"], queryFn: jobsApi.list });
@@ -36,11 +38,13 @@ export default function JobsListPage() {
           <h1>{t("jobs.title")}</h1>
           <p className="sub">{t("jobs.subtitle")}</p>
         </div>
-        <div className="head-actions">
-          <button type="button" className="btn btn-navy" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" /> {t("jobs.newJob")}
-          </button>
-        </div>
+        {can("jobs", "edit") && (
+          <div className="head-actions">
+            <button type="button" className="btn btn-navy" onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" /> {t("jobs.newJob")}
+            </button>
+          </div>
+        )}
       </div>
 
       <ReceiptQueue jobs={items} />

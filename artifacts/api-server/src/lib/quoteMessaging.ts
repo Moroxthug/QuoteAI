@@ -16,7 +16,6 @@ const automationSettings = (profile: BusinessProfile) => ({ ...DEFAULT_AUTOMATIO
 // unsubscribeToken since a quote isn't always linked to a clients row.
 
 /** Default follow-up cadence in days-after-sentAt. Stage 0 fires this many days after the quote is sent. */
-export const QUOTE_FOLLOWUP_CADENCE_DAYS = [2, 5, 10] as const;
 
 function escapeHtml(value: string): string {
   return value

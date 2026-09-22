@@ -8,6 +8,7 @@ import { Receipt, Search, ChevronRight, Plus, AlertTriangle, Clock } from "lucid
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { useGetBusinessProfile } from "@workspace/api-client-react";
 import { hasFeature } from "@/lib/plans";
 import { formatCents } from "@/lib/jobs-api";
@@ -28,6 +29,7 @@ function statusChip(status: InvoiceStatus): string {
 
 export default function InvoicesPage() {
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { data: profile } = useGetBusinessProfile();
   const gated = profile ? !hasFeature(profile as never, "invoicing") : false;
@@ -56,9 +58,11 @@ export default function InvoicesPage() {
           <h1>{t("invoices.title")}</h1>
           <p className="sub">{t("invoices.subtitle")}</p>
         </div>
-        <div className="head-actions">
-          <button type="button" className="btn btn-navy" onClick={() => setNewOpen(true)} disabled={gated}><Plus className="h-4 w-4" /> {t("invoices.new")}</button>
-        </div>
+        {can("invoicing", "edit") && (
+          <div className="head-actions">
+            <button type="button" className="btn btn-navy" onClick={() => setNewOpen(true)} disabled={gated}><Plus className="h-4 w-4" /> {t("invoices.new")}</button>
+          </div>
+        )}
       </div>
 
       {gated || (error as Error & { code?: string } | null)?.code === "PLAN_REQUIRED" ? (

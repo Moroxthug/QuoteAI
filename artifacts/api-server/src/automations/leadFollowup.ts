@@ -1,7 +1,8 @@
 import { db, leadsTable, leadEventsTable, businessProfilesTable, whatsappConnectionsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { registerAutomation } from "../lib/automation.js";
-import { sendLeadFollowup, FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { sendLeadFollowup } from "../lib/leadMessaging.js";
+import { leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { logger } from "../lib/logger.js";
 
 // lead.followup_due → send the next sequence message and schedule the one
@@ -37,8 +38,7 @@ registerAutomation("lead.followup_due", async (run) => {
   await db.insert(leadEventsTable).values({ leadId: lead.id, userId: lead.userId, type: "message_sent", channel: result.channel, payload: { stage: lead.followUpStage } });
 
   const nextStage = lead.followUpStage + 1;
-  const nextDelayDays = FOLLOWUP_CADENCE_DAYS[nextStage];
-  const nextFollowUpAt = nextDelayDays !== undefined ? new Date(Date.now() + nextDelayDays * 86_400_000) : null;
+  const nextFollowUpAt = stageDueAt(leadFollowupDays(profile.automationSettings), nextStage);
 
   await db
     .update(leadsTable)

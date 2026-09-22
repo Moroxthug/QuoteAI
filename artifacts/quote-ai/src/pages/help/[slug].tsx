@@ -48,7 +48,7 @@ export default function HelpArticlePage() {
 
   if (!article) {
     return (
-      <div className="wrap" style={{ textAlign: "center", padding: "clamp(80px, 10vw, 140px) 0" }}>
+      <div className="wrap" style={{ textAlign: "center", paddingBlock: "clamp(80px, 10vw, 140px)" }}>
         <h1 className="h2">{t("help.notFoundTitle")}</h1>
         <p className="lead" style={{ margin: "16px auto 32px" }}>{t("help.notFoundBody")}</p>
         <Link href="/help/" className="btn btn-navy">{t("help.backToHelp")}</Link>
@@ -99,7 +99,7 @@ export default function HelpArticlePage() {
       </div>
 
       <article className="flex-1">
-        <header className="wrap" style={{ maxWidth: 780, padding: "clamp(12px, 2vw, 24px) 0 clamp(28px, 3.5vw, 44px)" }}>
+        <header className="wrap" style={{ maxWidth: 780, paddingTop: "clamp(12px, 2vw, 24px)", paddingBottom: "clamp(28px, 3.5vw, 44px)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginBottom: 18 }}>
             <span className="chip chip-teal">{HELP_CATEGORIES[article.category][lang]}</span>
             <span style={{ fontSize: 13, color: "var(--faint)" }}>{article.readingTimeMin} {t("blog.readingTimeSuffix")}</span>

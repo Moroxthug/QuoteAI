@@ -32,7 +32,7 @@ export default function BlogCategoryPage() {
 
   if (!category) {
     return (
-      <div className="wrap" style={{ textAlign: "center", padding: "clamp(80px, 10vw, 140px) 0" }}>
+      <div className="wrap" style={{ textAlign: "center", paddingBlock: "clamp(80px, 10vw, 140px)" }}>
         <h1 className="h2">{t("blog.categoryNotFoundTitle")}</h1>
         <p className="lead" style={{ margin: "16px auto 32px" }}>{t("blog.categoryNotFoundBody")}</p>
         <Link href="/blog/" className="btn btn-navy">
@@ -87,7 +87,7 @@ export default function BlogCategoryPage() {
       </div>
 
       <section className="hero on-dark" id="hero">
-        <div className="wrap" style={{ textAlign: "center", maxWidth: 720, margin: "0 auto", padding: "clamp(40px, 5vw, 72px) 0" }}>
+        <div className="wrap" style={{ textAlign: "center", maxWidth: 720, margin: "0 auto", paddingBlock: "clamp(40px, 5vw, 72px)" }}>
           <span className={`chip ${CATEGORY_CHIPS[category.name] ?? "chip-grey"}`} style={{ marginBottom: 20 }}>
             {category.name}
           </span>

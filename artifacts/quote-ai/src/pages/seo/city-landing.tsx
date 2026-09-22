@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
-import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, getCityTitle, getCityDesc } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import {
   getCityIntro,
@@ -13,6 +13,7 @@ import {
   getNearbyAnchors,
   getOsservatorioData,
   getCityContextText,
+  getCityCostCopy,
   getCityRelatedSectors,
   getSameCityOtherSectors,
   buildCityJsonLd,
@@ -59,7 +60,15 @@ export default function SeoCityLanding() {
   const titleTag = getCityTitle(s, cityName, citySlug, engineLang);
   const metaDesc = getCityDesc(s, cityName, citySlug, regionName, engineLang);
   const canonical = `https://quoteai.ca${base}/${sSlugForLang}/${citySlug}/`;
-  const frCanonical = `https://quoteai.ca/fr/soumissions/${s.frSlug}/${citySlug}/`;
+  // French city pages only exist for the French-primary Québec cities (see
+  // FRENCH_PRIMARY_CITY_SLUGS); the other cities are English-only and must
+  // not advertise a fr-CA alternate that is never built.
+  const hasFrenchTwin = FRENCH_PRIMARY_CITY_SLUGS.includes(citySlug);
+  const altCanonical = isFr
+    ? `https://quoteai.ca/quotes/${s.slug}/${citySlug}/`
+    : hasFrenchTwin
+      ? `https://quoteai.ca/fr/soumissions/${s.frSlug}/${citySlug}/`
+      : undefined;
 
   const intro = city ? getCityIntro(s, city, engineLang) : "";
   const faqItems = city ? getCityFaqItems(s, city, engineLang) : [];
@@ -70,6 +79,7 @@ export default function SeoCityLanding() {
   const nearbyAnchors = city ? getNearbyAnchors(s, city, engineLang) : [];
   const osservatorio = city ? getOsservatorioData(city.slug) : null;
   const contextText = city ? getCityContextText(city.slug, engineLang) : null;
+  const cost = city ? getCityCostCopy(s, city, engineLang) : null;
   const relatedSectorKeys = getCityRelatedSectors(s.slug);
   const relatedSectors = relatedSectorKeys.map((r) => ({
     slug: r.slug,
@@ -186,7 +196,7 @@ export default function SeoCityLanding() {
         jsonLd={jsonLd}
         ogImage={getOgImagePath(s.slug)}
         lang={engineLang}
-        frCanonical={frCanonical}
+        altCanonical={altCanonical}
       />
 
       {/* ── Breadcrumb ───────────────────────────────────────── */}
@@ -203,7 +213,7 @@ export default function SeoCityLanding() {
       {/* ── Hero (lightweight — no per-page media, this route is the
           highest page count on the site: every trade × every city) ── */}
       <section className="hero on-dark" id="hero">
-        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", padding: "clamp(48px, 6vw, 84px) 0" }}>
+        <div className="wrap" style={{ textAlign: "center", maxWidth: 760, margin: "0 auto", paddingBlock: "clamp(48px, 6vw, 84px)" }}>
           <p className="eyebrow on-dark" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
             <MapPin className="h-3.5 w-3.5" />
             {regionName}
@@ -276,6 +286,22 @@ export default function SeoCityLanding() {
 
       {/* ── Main sections (layout-variant order) ─────────────── */}
       {mainSections}
+
+      {/* ── What it costs (Phase 80: from the retired static bodies) ── */}
+      {cost && (
+        <section className="sec" aria-label={cost.heading}>
+          <div className="wrap" style={{ maxWidth: 760 }}>
+            <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
+              <h2 className="h2" style={{ fontSize: 26 }}>{cost.heading}</h2>
+              <p className="lead" style={{ margin: "0 auto" }}>{cost.subtitle}</p>
+            </div>
+            <div className="prose blog-prose max-w-none">
+              {cost.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+            </div>
+            <p style={{ fontSize: 12.5, color: "var(--faint)", marginTop: 18, textAlign: "center" }}>{cost.footnote}</p>
+          </div>
+        </section>
+      )}
 
       {/* ── City context ─────────────────────────────────────── */}
       {contextText && (

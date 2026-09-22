@@ -3,6 +3,7 @@ import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight, Archive } from "lucide-react";
@@ -23,6 +24,7 @@ function statusChip(status: string, t: (key: string) => string): { cls: string; 
 
 export default function QuotesList() {
   const { t } = useLanguage();
+const can = useCan();
   const FILTERS: StatusFilter[] = ["all", "draft", "unlocked", "pending_payment"];
   const FILTER_LABELS: Record<StatusFilter, string> = {
     all: t("dashboard.quotesList.statusAll"),
@@ -91,12 +93,14 @@ export default function QuotesList() {
           <h1>{t("dashboard.quotesList.title")}</h1>
           <p className="sub">{t("dashboard.quotesList.subtitle")}</p>
         </div>
-        <div className="head-actions">
-          <Link href="/dashboard/new" className="btn btn-navy">
-            <Plus className="h-4 w-4" />
-            {t("dashboard.quotesList.createFirstQuote")}
-          </Link>
-        </div>
+        {can("quotes", "edit") && (
+          <div className="head-actions">
+            <Link href="/dashboard/new" className="btn btn-navy">
+              <Plus className="h-4 w-4" />
+              {t("dashboard.quotesList.createFirstQuote")}
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className="card">
@@ -140,11 +144,11 @@ export default function QuotesList() {
                   {t("dashboard.quotesList.clearFilters")}
                 </button>
               </div>
-            ) : (
+            ) : can("quotes", "edit") ? (
               <Link href="/dashboard/new" className="btn btn-navy btn-sm">
                 {t("dashboard.quotesList.createFirstQuote")}
               </Link>
-            )}
+            ) : null}
           </div>
         ) : (
           <div className="tbl-wrap">
@@ -197,26 +201,34 @@ export default function QuotesList() {
                                   <Eye className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.view")}
                                 </Link>
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDuplicate(quote.id)}
-                                disabled={duplicatingId === quote.id}
-                                className="cursor-pointer text-sm"
-                              >
-                                <Copy className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.duplicate")}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleArchive(quote.id)}
-                                className="cursor-pointer text-sm"
-                              >
-                                <Archive className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.archive")}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(quote.id)}
-                                className="text-destructive focus:text-destructive cursor-pointer text-sm"
-                              >
-                                <Trash2 className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.delete")}
-                              </DropdownMenuItem>
+                              {can("quotes", "edit") && (
+                                <DropdownMenuItem
+                                  onClick={() => handleDuplicate(quote.id)}
+                                  disabled={duplicatingId === quote.id}
+                                  className="cursor-pointer text-sm"
+                                >
+                                  <Copy className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.duplicate")}
+                                </DropdownMenuItem>
+                              )}
+                              {can("quotes", "full") && (
+                                <DropdownMenuItem
+                                  onClick={() => handleArchive(quote.id)}
+                                  className="cursor-pointer text-sm"
+                                >
+                                  <Archive className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.archive")}
+                                </DropdownMenuItem>
+                              )}
+                              {can("quotes", "full") && (
+                                <>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => handleDelete(quote.id)}
+                                    className="text-destructive focus:text-destructive cursor-pointer text-sm"
+                                  >
+                                    <Trash2 className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.delete")}
+                                  </DropdownMenuItem>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                           <ChevronRight className="chev" style={{ color: "var(--faint)" }} />

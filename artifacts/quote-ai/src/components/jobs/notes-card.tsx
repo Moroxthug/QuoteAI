@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, type JobNoteDto } from "@/lib/jobs-api";
 
 /**
@@ -16,6 +17,7 @@ import { jobsApi, type JobNoteDto } from "@/lib/jobs-api";
  */
 export function NotesCard({ jobId, milestoneTitles }: { jobId: string; milestoneTitles: Map<string, string> }) {
   const { t, lang } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
@@ -62,12 +64,12 @@ export function NotesCard({ jobId, milestoneTitles }: { jobId: string; milestone
                     <span>{formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale })}</span>
                   </div>
                 </div>
-                <button type="button" className="ic-btn danger" onClick={() => remove.mutate(n.id)} disabled={remove.isPending} aria-label={t("notes.delete")}><Trash2 /></button>
+                {can("jobs", "edit") && <button type="button" className="ic-btn danger" onClick={() => remove.mutate(n.id)} disabled={remove.isPending} aria-label={t("notes.delete")}><Trash2 /></button>}
               </div>
             ))}
           </div>
         )}
-        <div className="note-add">
+        {can("jobs", "edit") && <div className="note-add">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -80,7 +82,7 @@ export function NotesCard({ jobId, milestoneTitles }: { jobId: string; milestone
           <button type="button" className="btn btn-sm btn-navy" onClick={submit} disabled={!draft.trim() || add.isPending}>
             {add.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} {t("notes.add")}
           </button>
-        </div>
+        </div>}
       </div>
     </section>
   );

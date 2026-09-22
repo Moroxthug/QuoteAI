@@ -15,7 +15,7 @@ export default function NotFound() {
         noIndex={true}
       />
 
-      <div className="wrap" style={{ maxWidth: 620, padding: "clamp(64px, 10vw, 120px) 0", textAlign: "center" }}>
+      <div className="wrap" style={{ maxWidth: 620, paddingBlock: "clamp(64px, 10vw, 120px)", textAlign: "center" }}>
         <div
           style={{
             width: 64,

@@ -90,10 +90,10 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 75 | GET | `/api/business-profile` | session | — | — | none | — | n/a | — | — | — |
-| 114 | PUT | `/api/business-profile` | session | settings:edit | — | zod | — | n/a | — | — | — |
-| 211 | POST | `/api/business-profile/logo` | session | settings:edit | — | none | — | n/a | — | — | — |
-| 276 | POST | `/api/business-profile/apikey` | session | settings:edit | — | none | — | n/a | — | — | — |
+| 79 | GET | `/api/business-profile` | session | — | — | none | — | n/a | — | — | — |
+| 118 | PUT | `/api/business-profile` | session | settings:edit | — | zod | — | n/a | — | — | — |
+| 215 | POST | `/api/business-profile/logo` | session | settings:edit | — | none | — | n/a | — | — | — |
+| 280 | POST | `/api/business-profile/apikey` | session | settings:edit | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/calendar.ts
 
@@ -357,11 +357,11 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 12 | GET | `/api/leads` | session | leads:view | — | zod | — | n/a | — | — | — |
-| 30 | POST | `/api/leads` | session | leads:edit | — | zod | — | n/a | — | — | — |
-| 76 | GET | `/api/leads/:id` | session | leads:view | — | none | — | predicate | — | — | — |
-| 94 | PATCH | `/api/leads/:id` | session | leads:edit | — | zod | — | predicate | — | — | — |
-| 145 | POST | `/api/leads/:id/send` | session | leads:edit | — | none | — | predicate | — | — | — |
+| 13 | GET | `/api/leads` | session | leads:view | — | zod | — | n/a | — | — | — |
+| 31 | POST | `/api/leads` | session | leads:edit | — | zod | — | n/a | — | — | — |
+| 77 | GET | `/api/leads/:id` | session | leads:view | — | none | — | predicate | — | — | — |
+| 95 | PATCH | `/api/leads/:id` | session | leads:edit | — | zod | — | predicate | — | — | — |
+| 146 | POST | `/api/leads/:id/send` | session | leads:edit | — | none | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/meta-lead-ads.ts
 

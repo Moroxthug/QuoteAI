@@ -43,6 +43,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { leadsApi, type LeadDto } from "@/lib/leads-api";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
@@ -178,6 +179,7 @@ function StarterUpgradeCard() {
 /* ─── OnboardingView ─────────────────────────────────────────────────────── */
 function OnboardingView() {
   const { t } = useLanguage();
+const can = useCan();
   const steps = [
     { icon: Building2, num: "1", title: t("dashboard.index.onboarding.step1.title"), desc: t("dashboard.index.onboarding.step1.desc"), href: "/dashboard/profile", cta: t("dashboard.index.onboarding.step1.cta") },
     { icon: MessageSquare, num: "2", title: t("dashboard.index.onboarding.step2.title"), desc: t("dashboard.index.onboarding.step2.desc"), href: "/dashboard/new", cta: t("dashboard.index.onboarding.step2.cta") },
@@ -207,10 +209,12 @@ function OnboardingView() {
               </div>
             ))}
           </div>
-          <Link href="/dashboard/new" className="btn btn-navy">
-            <Plus className="h-3.5 w-3.5" />
-            {t("dashboard.index.onboarding.ctaButton")}
-          </Link>
+          {can("quotes", "edit") && (
+            <Link href="/dashboard/new" className="btn btn-navy">
+              <Plus className="h-3.5 w-3.5" />
+              {t("dashboard.index.onboarding.ctaButton")}
+            </Link>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -222,10 +226,12 @@ function OnboardingView() {
           <div className="h-7 w-7 rounded-lg bg-amber-100 flex items-center justify-center"><Crown className="h-3.5 w-3.5 text-amber-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-amber-700">{t("dashboard.index.onboarding.plansPricing")}</span>
         </Link>
-        <Link href="/dashboard/new" className="card p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group">
-          <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
-          <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.onboarding.createQuote")}</span>
-        </Link>
+        {can("quotes", "edit") && (
+          <Link href="/dashboard/new" className="card p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group">
+            <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
+            <span className="text-sm font-medium text-foreground group-hover:text-emerald-700">{t("dashboard.index.onboarding.createQuote")}</span>
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -234,6 +240,7 @@ function OnboardingView() {
 /* ─── TrialBanner ────────────────────────────────────────────────────────── */
 function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUsed: number; downloadsLimit: number; daysLeft: number | null | undefined }) {
   const { t } = useLanguage();
+const can = useCan();
   const remaining = downloadsLimit - downloadsUsed;
   return (
     <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-200 rounded-[var(--radius)] p-3.5 flex items-center justify-between gap-3">
@@ -259,7 +266,7 @@ function TrialBanner({ downloadsUsed, downloadsLimit, daysLeft }: { downloadsUse
           </div>
         </div>
       </div>
-      {remaining > 0 ? (
+      {remaining > 0 && can("quotes", "edit") ? (
         <Link href="/dashboard/new" className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold gap-1">
           <Sparkles className="h-3 w-3" />
           {t("dashboard.index.trial.createNow")}
@@ -672,6 +679,7 @@ function DashboardComposer() {
 /* ─── DashboardHome (default export) ────────────────────────────────────── */
 export default function DashboardHome() {
   const { t } = useLanguage();
+const can = useCan();
   const { data: stats, isLoading: isLoadingStats } = useGetQuoteStats();
   const { data: subscription } = useGetSubscription();
   const { data: trialStatus } = useGetTrialStatus();
@@ -755,14 +763,16 @@ export default function DashboardHome() {
             <button type="button" className="seg-b" onClick={() => setPeriod("y")}>{t("dashboard.index.period.year")}</button>
             <span className="seg-thumb" />
           </div>
-          <Link href="/dashboard/new" className="btn btn-navy">
-            <Plus className="h-4 w-4" />
-            {t("dashboard.index.quickActions.newQuote")}
-          </Link>
+          {can("quotes", "edit") && (
+            <Link href="/dashboard/new" className="btn btn-navy">
+              <Plus className="h-4 w-4" />
+              {t("dashboard.index.quickActions.newQuote")}
+            </Link>
+          )}
         </div>
       </div>
 
-      <DashboardComposer />
+      {can("quotes", "edit") && <DashboardComposer />}
 
       <InstallPrompt className="mt-4" />
 
@@ -915,11 +925,13 @@ export default function DashboardHome() {
           </section>
 
           <section className="qa-grid">
-            <Link href="/dashboard/new" className="card qa">
-              <span className="qa-ic green"><Plus className="h-4 w-4" /></span>
-              <span><b>{t("dashboard.index.quickActions.newQuote")}</b><span>{t("dashboard.index.qa.newQuote.desc")}</span></span>
-              <ArrowRight className="chev" />
-            </Link>
+            {can("quotes", "edit") && (
+              <Link href="/dashboard/new" className="card qa">
+                <span className="qa-ic green"><Plus className="h-4 w-4" /></span>
+                <span><b>{t("dashboard.index.quickActions.newQuote")}</b><span>{t("dashboard.index.qa.newQuote.desc")}</span></span>
+                <ArrowRight className="chev" />
+              </Link>
+            )}
             <Link href="/dashboard/quotes" className="card qa">
               <span className="qa-ic navy"><FileText className="h-4 w-4" /></span>
               <span><b>{t("dashboard.index.quickActions.allQuotes")}</b><span>{t("dashboard.index.qa.allQuotes.desc")}</span></span>

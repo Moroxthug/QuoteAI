@@ -53,7 +53,7 @@ export default function ContattiPage() {
       />
 
       {/* Header */}
-      <header className="wrap" style={{ maxWidth: 700, padding: "clamp(48px, 7vw, 88px) 0 clamp(20px, 3vw, 32px)", textAlign: "center" }}>
+      <header className="wrap" style={{ maxWidth: 700, paddingTop: "clamp(48px, 7vw, 88px)", paddingBottom: "clamp(20px, 3vw, 32px)", textAlign: "center" }}>
         <h1 className="h2" style={{ marginBottom: 16 }}>
           {t("contact.heroTitlePrefix")} <span style={{ color: "var(--green)" }}>{t("contact.heroTitleHighlight")}</span>
         </h1>

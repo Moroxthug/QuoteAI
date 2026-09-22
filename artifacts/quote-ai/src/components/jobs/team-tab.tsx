@@ -8,6 +8,7 @@ import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loa
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { runOrQueue } from "@/lib/offline/outbox";
 import { jobsApi, formatCents, type JobDetailDto, type TimeEntryDto, type UsageUnit } from "@/lib/jobs-api";
 import { teamApi } from "@/lib/team-api";
@@ -31,6 +32,7 @@ const tight = { padding: "8px 12px", fontSize: 13.5 } as const;
  */
 export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof enCA }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { job, assignments, timeEntries, equipmentUsage, milestones } = data;
@@ -96,7 +98,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
               <p className="sub">{approvedHours.toFixed(1)} h {t("jobs.team.approved")} · {formatCents(approvedCents)}{pendingHours.length ? <span style={{ color: "var(--yellow-dark)" }}> · {pendingHours.length} {t("jobs.team.pending")}</span> : null}</p>
             </div>
           </div>
-          <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_80px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
+          {can("jobs", "edit") && <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_80px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (time.workerId && time.hours) addTime.mutate({ workerId: time.workerId, date: time.date, hours: Number(time.hours), milestoneId: time.milestoneId || null, note: time.note.trim() }); }}>
             <div className="field col-span-2 xl:col-span-1">
               <select aria-label={t("jobs.team.pickWorker")} value={time.workerId} onChange={(e) => setTime({ ...time, workerId: e.target.value })} style={tight}>
                 <option value="">{t("jobs.team.pickWorker")}</option>
@@ -116,7 +118,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
               <div className="field"><input value={time.note} onChange={(e) => setTime({ ...time, note: e.target.value })} placeholder={t("jobs.team.notePlaceholder")} style={tight} /></div>
             )}
             <button type="submit" className="btn btn-sm btn-navy col-span-2 xl:col-span-1" disabled={!time.workerId || !time.hours || addTime.isPending}><Plus className="h-4 w-4" /> {t("jobs.team.logHours")}</button>
-          </form>
+          </form>}
           {activeWorkers.length === 0 && <p className="field-hint px-[22px] pt-3">{t("jobs.team.noWorkersHint")} <Link href="/dashboard/team" className="text-link">{t("jobs.team.openTeam")}</Link></p>}
           {timeEntries.length === 0 ? <div className="card-empty">{t("jobs.team.noHours")}</div> : (
             <div>
@@ -130,14 +132,14 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
                   {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--yellow-dark)" }} /></span>}
                   <TimeStatusBadge status={e.status} />
                   <span className={cn("amt w-20 text-right", e.status !== "approved" && "faint")}>{formatCents(e.costCents)}</span>
-                  <div className="flex gap-1 shrink-0 items-center">
+                  {can("jobs", "edit") && <div className="flex gap-1 shrink-0 items-center">
                     {e.status === "submitted" && <button type="button" title={t("jobs.team.approve")} className="ic-btn ok" onClick={() => setStatus.mutate({ id: e.id, status: "approved" })}><Check /></button>}
                     {e.status === "submitted" && <button type="button" title={t("jobs.team.reject")} className="ic-btn bad" onClick={() => setStatus.mutate({ id: e.id, status: "rejected" })}><X /></button>}
                     <div className="hover-act">
                       {e.status !== "submitted" && <button type="button" title={t("jobs.team.reopen")} className="text-link" style={{ fontSize: 12 }} onClick={() => setStatus.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
                       <button type="button" className="ic-btn danger" onClick={() => delTime.mutate(e.id)}><Trash2 /></button>
                     </div>
-                  </div>
+                  </div>}
                 </div>
               ))}
             </div>
@@ -154,7 +156,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
           </div>
           {activeEquipment.length === 0 ? (
             <p className="field-hint px-[22px] py-4">{t("jobs.team.noEquipmentHint")} <Link href="/dashboard/team?tab=equipment" className="text-link">{t("jobs.team.openTeam")}</Link></p>
-          ) : (
+          ) : can("jobs", "edit") && (
             <form className="grid grid-cols-2 xl:grid-cols-[1fr_140px_90px_1fr_auto] gap-2 px-[22px] py-4" style={{ borderBottom: equipmentUsage.length ? "1px solid var(--soft)" : undefined }} onSubmit={(e) => { e.preventDefault(); if (usage.equipmentId && usage.quantity && selectedEquipment) addUsage.mutate({ equipmentId: usage.equipmentId, date: usage.date, quantity: Number(usage.quantity), unit: selectedEquipment.usageUnit, note: usage.note.trim() }); }}>
               <div className="field col-span-2 xl:col-span-1">
                 <select aria-label={t("jobs.team.pickEquipment")} value={usage.equipmentId} onChange={(e) => setUsage({ ...usage, equipmentId: e.target.value })} style={tight}>
@@ -175,7 +177,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
                   <span className="date">{u.date ? format(day(u.date)!, "d MMM yy", { locale }) : "—"}</span>
                   <div className="grow"><span className="ttl"><b>{u.equipmentName}</b> <span style={{ color: "var(--muted-mk)" }}>· {u.quantity} {t(`team.unit.${u.unit}`)}</span>{u.note ? <span style={{ color: "var(--faint)" }}> · {u.note}</span> : null}</span></div>
                   <span className="amt">{formatCents(u.costCents)}</span>
-                  <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => delUsage.mutate(u.id)}><Trash2 /></button></div>
+                  {can("jobs", "edit") && <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => delUsage.mutate(u.id)}><Trash2 /></button></div>}
                 </div>
               ))}
             </div>
@@ -196,12 +198,12 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
                 <div key={a.id} className="item-row">
                   <span className="avat">{a.collaboratorName.slice(0, 2)}</span>
                   <div className="grow"><b className="ttl">{a.collaboratorName}</b><span className="sub">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</span></div>
-                  <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => unassign.mutate(a.id)}><Trash2 /></button></div>
+                  {can("jobs", "edit") && <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => unassign.mutate(a.id)}><Trash2 /></button></div>}
                 </div>
               ))}
             </div>
           )}
-          {available.length > 0 && (
+          {available.length > 0 && can("jobs", "edit") && (
             <div className="flex gap-2 px-[22px] py-4" style={{ borderTop: "1px solid var(--soft)" }}>
               <div className="field flex-1">
                 <select aria-label={t("jobs.team.pick")} value={pick} onChange={(e) => setPick(e.target.value)} style={tight}>
@@ -212,7 +214,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
               <button type="button" className="btn btn-sm btn-navy" disabled={!pick || assign.isPending} onClick={() => { assign.mutate(pick); setPick(""); }}>{t("jobs.team.assign")}</button>
             </div>
           )}
-          <form className="stack px-[22px] py-4" style={{ gap: 8, borderTop: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (name.trim()) addWorker.mutate({ name: name.trim(), hourlyRateCents: rate ? Math.round(Number(rate) * 100) : undefined }); }}>
+          {can("team", "full") && <form className="stack px-[22px] py-4" style={{ gap: 8, borderTop: "1px solid var(--soft)" }} onSubmit={(e) => { e.preventDefault(); if (name.trim()) addWorker.mutate({ name: name.trim(), hourlyRateCents: rate ? Math.round(Number(rate) * 100) : undefined }); }}>
             <div className="field">
               <label>{t("jobs.team.newWorker")}</label>
               <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("jobs.team.namePlaceholder")} style={tight} />
@@ -220,7 +222,7 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
             <div className="field"><input type="number" step="0.01" aria-label={t("jobs.team.ratePlaceholder")} value={rate} onChange={(e) => setRate(e.target.value)} placeholder={t("jobs.team.ratePlaceholder")} style={tight} /></div>
             <button type="submit" className="btn btn-sm btn-outline-navy w-full" disabled={!name.trim() || addWorker.isPending}>{t("jobs.team.addAndAssign")}</button>
             <p className="field-hint">{t("jobs.team.assignHint")}</p>
-          </form>
+          </form>}
         </section>
 
         {/* Geofence */}
@@ -232,13 +234,13 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
             </div>
           </div>
           <div className="act-body stack" style={{ gap: 12 }}>
-            <button type="button" className="btn btn-sm btn-outline-navy w-full" disabled={locating} onClick={useMyLocation}>
+            {can("jobs", "edit") && <button type="button" className="btn btn-sm btn-outline-navy w-full" disabled={locating} onClick={useMyLocation}>
               {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <MapPin className="h-4 w-4" />} {job.latitude ? t("jobs.team.updateLocation") : t("jobs.team.useMyLocation")}
-            </button>
+            </button>}
             {job.latitude && job.longitude && (
               <div className="field">
                 <label>{t("jobs.team.radiusLabel")}</label>
-                <select value={job.geofenceRadiusMeters ?? ""} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} style={tight}>
+                <select value={job.geofenceRadiusMeters ?? ""} disabled={!can("jobs", "edit")} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} style={tight}>
                   <option value="">{t("jobs.team.radiusOff")}</option>
                   {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
                 </select>

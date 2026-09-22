@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BLOG_INDEX } from "@/data/blog-index";
 import { sectorLabel } from "@/data/seo-slugs";
+import { homepageJsonLd } from "@/data/json-ld";
 
 function ScrollSection({
   children,
@@ -48,9 +49,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      {/* WebSite + SoftwareApplication JSON-LD for "/" is already baked into
-          the prerendered shell by scripts/prerender-seo.ts — don't duplicate
-          it here via Helmet, or crawlers see two WebSite schemas. */}
+      {/* Phase 80: this head IS the prerendered head — entry-server.tsx
+          serialises it at build time, so crawler and hydrated page agree. */}
       <SeoHead
         title={
           lang === "fr"
@@ -64,7 +64,8 @@ export default function Home() {
         }
         canonical={lang === "fr" ? "https://quoteai.ca/fr/" : "https://quoteai.ca/"}
         lang={lang === "fr" ? "fr-CA" : "en-CA"}
-        frCanonical="https://quoteai.ca/fr/"
+        altCanonical={lang === "fr" ? "https://quoteai.ca/" : "https://quoteai.ca/fr/"}
+        jsonLd={homepageJsonLd(lang)}
       />
 
       {/* ── HERO ───────────────────────────────────────────── */}

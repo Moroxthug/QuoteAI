@@ -32,6 +32,7 @@ import {
 } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import type { CatalogItem } from "@workspace/api-client-react";
 
 const UM_OPTIONS = ["mq", "ml", "mc", "cad", "ore", "kg", "a.c.", "pezzi", "kw", "lt", "t", "m", "%"];
@@ -304,6 +305,7 @@ function OcrImportDialog({
 
 export default function CatalogPage() {
   const { t } = useLanguage();
+const can = useCan();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -436,7 +438,7 @@ export default function CatalogPage() {
           <h1>{t("dashboard.nav.catalog")}</h1>
           <p className="sub">{t("dashboard.catalog.header.subtitle")}</p>
         </div>
-        <div className="head-actions">
+        {can("quotes", "edit") && <div className="head-actions">
           <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleImport} disabled={importFromQuotes.isPending}>
             {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             {t("dashboard.catalog.importFromQuotes")}
@@ -449,7 +451,7 @@ export default function CatalogPage() {
             <Plus className="h-4 w-4" />
             {t("dashboard.catalog.addItem")}
           </button>
-        </div>
+        </div>}
       </div>
 
       {isLoading ? (
@@ -461,7 +463,7 @@ export default function CatalogPage() {
           <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
           <p className="font-medium text-foreground">{t("dashboard.catalog.empty.title")}</p>
           <p className="text-sm text-muted-foreground mt-1 mb-4">{t("dashboard.catalog.empty.desc")}</p>
-          <div className="flex gap-2 justify-center flex-wrap">
+          {can("quotes", "edit") && <div className="flex gap-2 justify-center flex-wrap">
             <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleImport} disabled={importFromQuotes.isPending}>
               {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
               {t("dashboard.catalog.importFromQuotes")}
@@ -474,7 +476,7 @@ export default function CatalogPage() {
               <Plus className="h-4 w-4" />
               {t("dashboard.catalog.addItem")}
             </button>
-          </div>
+          </div>}
         </div>
       ) : (
         <>
@@ -522,10 +524,10 @@ export default function CatalogPage() {
                       <td>{item.um}</td>
                       <td className="t-amt" style={{ textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</td>
                       <td>
-                        <div className="row-act">
+                        {can("quotes", "edit") && <div className="row-act">
                           <button type="button" className="ic-btn" aria-label={t("a11y.edit")} onClick={() => setEditingItem(item)}><Pencil /></button>
                           <button type="button" className="ic-btn danger" aria-label={t("a11y.delete")} onClick={() => setDeletingId(item.id)}><Trash2 /></button>
-                        </div>
+                        </div>}
                       </td>
                     </tr>
                   ))}

@@ -4,6 +4,7 @@ import { BLOG_ARTICLES } from "@/data/blog-data";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
 import { extractToc, injectHeadingIds } from "@/data/blog-toc";
 import { SeoHead } from "@/components/seo-head";
+import { BASE_URL } from "@/data/json-ld";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 function formatDate(iso: string, lang: "en" | "fr"): string {
@@ -20,8 +21,6 @@ const CATEGORY_CHIPS: Record<string, string> = {
   Business: "chip-red",
 };
 
-const BASE_URL = "https://quoteai.ca";
-
 export default function BlogArticlePage() {
   const { t, lang } = useLanguage();
   const params = useParams<{ slug: string }>();
@@ -30,7 +29,7 @@ export default function BlogArticlePage() {
 
   if (!article) {
     return (
-      <div className="wrap" style={{ textAlign: "center", padding: "clamp(80px, 10vw, 140px) 0" }}>
+      <div className="wrap" style={{ textAlign: "center", paddingBlock: "clamp(80px, 10vw, 140px)" }}>
         <h1 className="h2">{t("blog.articleNotFoundTitle")}</h1>
         <p className="lead" style={{ margin: "16px auto 32px" }}>{t("blog.articleNotFoundBody")}</p>
         <Link href="/blog/" className="btn btn-navy">
@@ -41,6 +40,8 @@ export default function BlogArticlePage() {
   }
 
   const canonical = `${BASE_URL}/blog/${article.slug}/`;
+  // Generated at build time by scripts/generate-blog-og-images.ts.
+  const ogImage = `/og/blog/${article.slug}.png`;
   const toc = extractToc(article.contentHtml);
   const bodyHtml = injectHeadingIds(article.contentHtml);
 
@@ -63,7 +64,9 @@ export default function BlogArticlePage() {
       "@type": "Article" as const,
       headline: article.title,
       description: article.metaDescription,
+      image: [`${BASE_URL}${ogImage}`],
       url: canonical,
+      mainEntityOfPage: { "@type": "WebPage" as const, "@id": canonical },
       datePublished: article.publishedAt,
       dateModified: article.updatedAt ?? article.publishedAt,
       inLanguage: "en",
@@ -92,6 +95,7 @@ export default function BlogArticlePage() {
         title={`${article.seoTitle ?? article.title} | quoteai`}
         description={article.metaDescription}
         canonical={canonical}
+        ogImage={ogImage}
         ogType="article"
         jsonLd={jsonLd}
       />
@@ -107,7 +111,7 @@ export default function BlogArticlePage() {
       </div>
 
       <article className="flex-1">
-        <header className="wrap" style={{ maxWidth: 780, padding: "clamp(12px, 2vw, 24px) 0 clamp(32px, 4vw, 48px)" }}>
+        <header className="wrap" style={{ maxWidth: 780, paddingTop: "clamp(12px, 2vw, 24px)", paddingBottom: "clamp(32px, 4vw, 48px)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
             <span className={`chip ${CATEGORY_CHIPS[article.category] ?? "chip-grey"}`}>{article.category}</span>
             <span style={{ fontSize: 13, color: "var(--faint)" }}>{article.readingTimeMin} {t("blog.readingTimeSuffix")}</span>

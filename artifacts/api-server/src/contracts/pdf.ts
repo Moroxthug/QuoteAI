@@ -157,6 +157,8 @@ export async function buildContractPdf(params: {
   unsignedPdfHash: string | null;
   /** When true the audit certificate page is appended (executed contracts only). */
   withAudit: boolean;
+  /** Phase 80: the company logo as a data URI (lib/companyLogo.ts), when there is one. */
+  logo?: string | null;
 }): Promise<{ buffer: Buffer; sha256: string }> {
   const { document: doc, variables: v, signers } = params;
   const lang = doc.language;
@@ -172,6 +174,7 @@ export async function buildContractPdf(params: {
   if (params.status === "draft") {
     content.push({ text: tr("draft", lang), alignment: "center", fontSize: 9, bold: true, color: "#92400e", font: "Roboto", margin: [0, 0, 0, 10] });
   }
+  if (params.logo) content.push({ image: params.logo, fit: [120, 48], margin: [0, 0, 0, 10] });
   content.push({ text: doc.title, fontSize: 18, bold: true, font: "Roboto", margin: [0, 0, 0, 2] });
   content.push({ text: `${tr("contractNo", lang)} ${v.contractNumber}   ·   ${tr("date", lang)}: ${fmtDate(params.createdAt, lang)}`, fontSize: 9, color: MUTED, font: "Roboto", margin: [0, 0, 0, 16] });
 

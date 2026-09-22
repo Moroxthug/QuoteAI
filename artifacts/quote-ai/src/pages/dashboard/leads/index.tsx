@@ -8,6 +8,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { leadsApi, type LeadChannel, type LeadDto, type LeadStatus } from "@/lib/leads-api";
 
 const COLUMNS: LeadStatus[] = ["new", "contacted", "quoted", "won", "lost", "unsubscribed"];
@@ -16,6 +17,7 @@ const CHANNEL_ICON = { email: Mail, sms: Phone, whatsapp: MessageCircle };
 
 export default function LeadsListPage() {
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -96,9 +98,11 @@ export default function LeadsListPage() {
             <Search className="h-4 w-4" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("leads.search")} aria-label={t("leads.search")} />
           </label>
-          <button type="button" className="btn btn-navy" onClick={() => setCreateOpen(true)}>
-            <Plus className="h-4 w-4" /> {t("leads.newLead")}
-          </button>
+          {can("leads", "edit") && (
+            <button type="button" className="btn btn-navy" onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" /> {t("leads.newLead")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -133,7 +137,7 @@ export default function LeadsListPage() {
                     return (
                       <div
                         key={lead.id}
-                        draggable
+                        draggable={can("leads", "edit")}
                         onDragStart={(e) => {
                           e.dataTransfer.setData("text/lead-id", lead.id);
                           e.dataTransfer.effectAllowed = "move";
@@ -157,7 +161,7 @@ export default function LeadsListPage() {
                             className="flex items-center gap-1 text-xs text-[var(--faint)] hover:text-foreground disabled:cursor-default"
                             title={t(lead.preferredChannel === "sms" ? "leads.channel.switchToEmail" : "leads.channel.switchToSms")}
                             aria-label={t(`leads.channel.${lead.preferredChannel}`)}
-                            disabled={!lead.phone || lead.preferredChannel === "whatsapp" || channelMutation.isPending}
+                            disabled={!lead.phone || lead.preferredChannel === "whatsapp" || channelMutation.isPending || !can("leads", "edit")}
                             onClick={() => channelMutation.mutate({ id: lead.id, preferredChannel: lead.preferredChannel === "sms" ? "email" : "sms" })}
                           >
                             <ChannelIcon className="h-3 w-3" />
@@ -167,7 +171,7 @@ export default function LeadsListPage() {
                             type="button"
                             className="btn btn-sm btn-outline-navy"
                             style={{ padding: "6px 12px", fontSize: 12.5 }}
-                            disabled={!canSend || sendMutation.isPending}
+                            disabled={!canSend || sendMutation.isPending || !can("leads", "edit")}
                             onClick={() => sendMutation.mutate(lead.id)}
                           >
                             {sendMutation.isPending && sendMutation.variables === lead.id ? (

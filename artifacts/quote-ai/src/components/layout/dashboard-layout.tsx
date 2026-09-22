@@ -12,6 +12,7 @@ import { useGetSubscription } from "@workspace/api-client-react";
 import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
@@ -123,6 +124,7 @@ function OrgSwitcherItems() {
 /** Renders the sb-user block; the dropdown itself carries account/org actions. */
 function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
   const { t } = useLanguage();
+  const can = useCan();
 
   async function handleSignOut() {
     await authClient.signOut();
@@ -141,11 +143,13 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
             <Building2 className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.companyProfile")}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings?tab=billing" className="cursor-pointer flex items-center gap-2">
-            <CreditCard className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.planBilling")}
-          </Link>
-        </DropdownMenuItem>
+        {can("settings", "full") && (
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/settings?tab=billing" className="cursor-pointer flex items-center gap-2">
+              <CreditCard className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.planBilling")}
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/dashboard/settings" className="cursor-pointer flex items-center gap-2">
             <Settings className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.settings")}
@@ -163,7 +167,7 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
 type NavItem = ReturnType<typeof useNavItems>[number];
 
 /** Cmd/Ctrl+K palette for jumping to a nav page or firing a quick action; styled as the mockup's `.search` pill. */
-function QuickSearch({ navItems }: { navItems: NavItem[] }) {
+function QuickSearch({ navItems, canNewQuote }: { navItems: NavItem[]; canNewQuote: boolean }) {
   const { t } = useLanguage();
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
@@ -198,12 +202,14 @@ function QuickSearch({ navItems }: { navItems: NavItem[] }) {
         <CommandInput placeholder={t("dashboard.search.placeholder")} />
         <CommandList>
           <CommandEmpty>{t("dashboard.search.empty")}</CommandEmpty>
-          <CommandGroup heading={t("dashboard.search.groupActions")}>
-            <CommandItem value={t("dashboard.nav.newQuote")} onSelect={() => go("/dashboard/new")}>
-              <Plus className="text-[var(--navy)]" />
-              {t("dashboard.nav.newQuote")}
-            </CommandItem>
-          </CommandGroup>
+          {canNewQuote && (
+            <CommandGroup heading={t("dashboard.search.groupActions")}>
+              <CommandItem value={t("dashboard.nav.newQuote")} onSelect={() => go("/dashboard/new")}>
+                <Plus className="text-[var(--navy)]" />
+                {t("dashboard.nav.newQuote")}
+              </CommandItem>
+            </CommandGroup>
+          )}
           <CommandGroup heading={t("dashboard.search.groupPages")}>
             {navItems.map((item) => (
               <CommandItem key={item.href} value={`${item.label} ${item.groupLabel}`} onSelect={() => go(item.href)}>
@@ -221,6 +227,7 @@ function QuickSearch({ navItems }: { navItems: NavItem[] }) {
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { t } = useLanguage();
+  const can = useCan();
   const { isLoaded, isSignedIn, isError, user } = useAuth();
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -289,6 +296,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   const NAV_ITEMS = allNavItems.filter(item => !item.proOnly || isPro);
+  // Phase 80: roles below quotes:edit (foreman, viewer) never see the New quote entry points.
+  const canNewQuote = can("quotes", "edit");
   const name = user?.name || user?.email?.split("@")[0] || "Account";
   const email = user?.email ?? "";
   const initials = name.slice(0, 2).toUpperCase();
@@ -343,10 +352,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <Link href="/dashboard/new" onClick={closeMenu} className="btn btn-white sb-new">
-          <Plus className="ic" style={{ width: 16, height: 16 }} />
-          <span className="btn-txt">{t("dashboard.nav.newQuote")}</span>
-        </Link>
+        {canNewQuote && (
+          <Link href="/dashboard/new" onClick={closeMenu} className="btn btn-white sb-new">
+            <Plus className="ic" style={{ width: 16, height: 16 }} />
+            <span className="btn-txt">{t("dashboard.nav.newQuote")}</span>
+          </Link>
+        )}
 
         <NavLinks />
 
@@ -375,7 +386,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <button type="button" className="tb-menu" onClick={() => setIsMobileMenuOpen(true)} aria-label={t("dashboard.nav.toggleMenu")}>
             <Menu className="ic" style={{ width: 22, height: 22 }} />
           </button>
-          <QuickSearch navItems={NAV_ITEMS} />
+          <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
           <div className="tb-right">
             <NotificationsBell variant="topbar" side="bottom" align="end" />
             <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{initials || <User className="h-3.5 w-3.5" />}</button>} />

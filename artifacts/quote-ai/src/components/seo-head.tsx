@@ -18,18 +18,16 @@ interface SeoHeadProps {
   twitterCard?: "summary" | "summary_large_image" | "app" | "player";
   jsonLd?: JsonLdSchema[];
   noIndex?: boolean;
-  /**
-   * Locale of THIS page's content, e.g. "en-CA" (default) or "fr-CA".
-   * NOTE: there is currently no locale-prefixed routing (no /fr/ path segment) —
-   * every URL only ever serves English content today. This prop and the
-   * hreflang/og:locale output below exist so the follow-up i18n pass can wire
-   * up real fr-CA routes (e.g. /fr/quotes/...) without having to touch
-   * every call site again: once French routes exist, pass canonical +
-   * frCanonical here and the alternate tags will be correct immediately.
-   */
+  /** Locale of THIS page's content, e.g. "en-CA" (default) or "fr-CA". */
   lang?: "en-CA" | "fr-CA";
-  /** Canonical URL of the fr-CA version of this page, once it exists. */
-  frCanonical?: string;
+  /**
+   * Canonical URL of the other language's version of this page, when one
+   * exists: the fr-CA page for an English page, the en-CA page for a French
+   * one (Phase 80 — a French page used to advertise itself as its own en-CA
+   * alternate, and every English page claimed a French twin whether or not
+   * one was built). Omit it and only this page's own locale is declared.
+   */
+  altCanonical?: string;
 }
 
 const OG_LOCALE: Record<"en-CA" | "fr-CA", string> = {
@@ -50,8 +48,12 @@ export function SeoHead({
   twitterCard = "summary_large_image",
   jsonLd = [],
   lang = "en-CA",
-  frCanonical,
+  altCanonical,
 }: SeoHeadProps) {
+  // English is the site's default locale: x-default always points at the
+  // English page (this one, or its English alternate).
+  const enUrl = lang === "en-CA" ? canonical : altCanonical;
+  const frUrl = lang === "fr-CA" ? canonical : altCanonical;
   const resolvedOgImage = ogImage.startsWith("http") ? ogImage : `https://quoteai.ca${ogImage}`;
   const resolvedOgTitle = ogTitle ?? title;
   const resolvedOgDescription = ogDescription ?? description;
@@ -64,14 +66,9 @@ export function SeoHead({
       {canonical && <link rel="canonical" href={canonical} />}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
-      {/* hreflang alternates — see `lang`/`frCanonical` doc above for the
-          current single-locale limitation. Until fr-CA routes exist, both
-          tags point at the same (English) canonical so we advertise the
-          country/language pairing without claiming a French page we don't
-          serve yet. */}
-      {canonical && <link rel="alternate" hrefLang="en-CA" href={canonical} />}
-      {canonical && <link rel="alternate" hrefLang="fr-CA" href={frCanonical ?? canonical} />}
-      {canonical && <link rel="alternate" hrefLang="x-default" href={canonical} />}
+      {enUrl && <link rel="alternate" hrefLang="en-CA" href={enUrl} />}
+      {frUrl && <link rel="alternate" hrefLang="fr-CA" href={frUrl} />}
+      {canonical && <link rel="alternate" hrefLang="x-default" href={enUrl ?? canonical} />}
 
       <meta property="og:title" content={resolvedOgTitle} />
       <meta property="og:description" content={resolvedOgDescription} />
@@ -81,7 +78,7 @@ export function SeoHead({
       <meta property="og:image:height" content="630" />
       <meta property="og:type" content={ogType} />
       <meta property="og:locale" content={OG_LOCALE[lang]} />
-      <meta property="og:locale:alternate" content={lang === "fr-CA" ? "en_CA" : "fr_CA"} />
+      {altCanonical && <meta property="og:locale:alternate" content={lang === "fr-CA" ? "en_CA" : "fr_CA"} />}
       <meta property="og:site_name" content="quoteai" />
 
       <meta name="twitter:card" content={twitterCard} />

@@ -9,6 +9,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { formatCents } from "@/lib/jobs-api";
 import { invoicesApi, isOpenInvoice, type InvoiceDetailDto, type InvoiceDto, type InvoiceEventDto } from "@/lib/invoices-api";
 import { InvoiceStatusBadge, InvoiceTypeBadge } from "@/components/jobs/badges";
@@ -17,6 +18,7 @@ import { LineEditor, RecordPaymentDialog, CreditNoteDialog, rowsFromLines, toLin
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
+const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -67,14 +69,14 @@ export default function InvoiceDetailPage() {
         </div>
         <div className="head-actions">
           <a href={invoicesApi.pdfUrl(inv.id, true)} className="btn btn-sm btn-outline-navy"><Download className="h-4 w-4" /> PDF</a>
-          {isDraft && !editing && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("invoices.edit")}</button>}
-          {isDraft && <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => remove.mutate()} disabled={remove.isPending}><Trash2 className="h-4 w-4" /> {t("invoices.deleteDraft")}</button>}
-          {(isDraft || open) && !isCredit && <button type="button" className="btn btn-sm btn-navy" onClick={() => setSendOpen(true)}><Send className="h-4 w-4" /> {isDraft ? t("invoices.send") : t("invoices.resend")}</button>}
-          {open && !isCredit && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setPayOpen(true)}><Banknote className="h-4 w-4" /> {t("invoices.recordPayment")}</button>}
-          {open && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</button>}
-          {(open || inv.status === "paid") && !isCredit && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</button>}
-          {inv.status !== "void" && !isDraft && <button type="button" className="text-link" onClick={() => setVoidOpen(true)}><Ban /> {t("invoices.void")}</button>}
-          {(inv.status === "paid" || inv.status === "void") && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
+          {isDraft && !editing && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("invoices.edit")}</button>}
+          {isDraft && can("invoicing", "full") && <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => remove.mutate()} disabled={remove.isPending}><Trash2 className="h-4 w-4" /> {t("invoices.deleteDraft")}</button>}
+          {(isDraft || open) && !isCredit && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-navy" onClick={() => setSendOpen(true)}><Send className="h-4 w-4" /> {isDraft ? t("invoices.send") : t("invoices.resend")}</button>}
+          {open && !isCredit && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setPayOpen(true)}><Banknote className="h-4 w-4" /> {t("invoices.recordPayment")}</button>}
+          {open && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</button>}
+          {(open || inv.status === "paid") && !isCredit && can("invoicing", "full") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</button>}
+          {inv.status !== "void" && !isDraft && can("invoicing", "full") && <button type="button" className="text-link" onClick={() => setVoidOpen(true)}><Ban /> {t("invoices.void")}</button>}
+          {(inv.status === "paid" || inv.status === "void") && can("invoicing", "full") && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
         </div>
       </div>
 
@@ -131,7 +133,7 @@ export default function InvoiceDetailPage() {
             <section className="card">
               <div className="card-head">
                 <div><h2>{t("invoices.payments")}</h2></div>
-                {open && <button type="button" className="text-link" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
+                {open && can("invoicing", "edit") && <button type="button" className="text-link" onClick={() => setPayOpen(true)}>{t("invoices.recordPayment")}</button>}
               </div>
               {data.payments.length === 0 ? <div className="card-empty">{t("invoices.noPayments")}</div> : (
                 <div>
@@ -142,7 +144,7 @@ export default function InvoiceDetailPage() {
                         {(p.reference || p.creditNoteId) && <span className="sub">{p.creditNoteId ? <Link href={`/dashboard/invoices/${p.creditNoteId}`} className="hover:underline">{p.reference}</Link> : p.reference}</span>}
                       </div>
                       <span className="amt" style={{ color: "var(--green-dark)" }}>{formatCents(p.amountCents)}</span>
-                      {!p.creditNoteId && inv.status !== "void" && <RemovePayment invoiceId={inv.id} paymentId={p.id} onDone={refresh} />}
+                      {!p.creditNoteId && inv.status !== "void" && can("invoicing", "full") && <RemovePayment invoiceId={inv.id} paymentId={p.id} onDone={refresh} />}
                     </div>
                   ))}
                 </div>
@@ -182,6 +184,7 @@ function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: 
 
 function PendingConfirmationBanner({ invoice, onDone }: { invoice: InvoiceDto; onDone: () => void }) {
   const { t } = useLanguage();
+const can = useCan();
   const { toast } = useToast();
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
   const confirm = useMutation({ mutationFn: () => invoicesApi.confirmEtransfer(invoice.id), onSuccess: () => { onDone(); toast({ title: t("invoices.etransferConfirmed") }); }, onError });
@@ -191,8 +194,8 @@ function PendingConfirmationBanner({ invoice, onDone }: { invoice: InvoiceDto; o
       <MailQuestion />
       <span className="grow">{t("invoices.pendingConfirmationHint")} <strong>{formatCents(invoice.balanceCents)}</strong>.</span>
       <div className="actions">
-        <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => reject.mutate()} disabled={reject.isPending || confirm.isPending}>{reject.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />} {t("invoices.notReceived")}</button>
-        <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => confirm.mutate()} disabled={confirm.isPending || reject.isPending}>{confirm.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("invoices.confirmReceived")}</button>
+        {can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => reject.mutate()} disabled={reject.isPending || confirm.isPending}>{reject.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />} {t("invoices.notReceived")}</button>}
+        {can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => confirm.mutate()} disabled={confirm.isPending || reject.isPending}>{confirm.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />} {t("invoices.confirmReceived")}</button>}
       </div>
     </div>
   );

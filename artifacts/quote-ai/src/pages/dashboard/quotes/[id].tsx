@@ -13,6 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { taxLineLabel } from "@/lib/tax-display";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { PaymentScheduleCard } from "@/components/payment-schedule-card";
 import { QuoteContractCard } from "@/components/quote-contract-card";
 import { PriceCheckCard } from "@/components/quotes/price-check-card";
@@ -40,6 +41,7 @@ type EditCapitolo = {
 
 export default function QuoteDetail() {
   const { t, lang } = useLanguage();
+const can = useCan();
   const dateLocale = lang === "fr" ? frCA : enCA;
   const { id } = useParams();
   const search = useSearch();
@@ -574,7 +576,8 @@ export default function QuoteDetail() {
   const isLocked = quote.status !== "unlocked" && !isPro && !isTrialActive;
   // Editing is permanently locked once the PDF has been downloaded
   // …and once the client has accepted: the accepted amount is what the contract is built on.
-  const isEditLocked = !!quote.pdfDownloadedAt || quote.status === "accepted";
+  // Phase 80: foreman/viewer (quotes:view) get the read-only page; the server refuses their edits anyway.
+  const isEditLocked = !!quote.pdfDownloadedAt || quote.status === "accepted" || !can("quotes", "edit");
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
 
@@ -710,7 +713,7 @@ export default function QuoteDetail() {
             {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
             {t("dashboard.quoteDetail.downloadPdf")}
           </button>
-          {!isLocked && (
+          {!isLocked && can("quotes", "edit") && (
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
               {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               {t("dashboard.quoteDetail.sendByEmail")}
@@ -721,13 +724,13 @@ export default function QuoteDetail() {
               <Copy className="h-4 w-4" /> {t("dashboard.quoteDetail.copyClientLink")}
             </button>
           )}
-          {!isLocked && quote?.status === "unlocked" && (
+          {!isLocked && quote?.status === "unlocked" && can("jobs", "edit") && (
             <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={handleAvviaCantiere} disabled={avviandoCantiere}>
               {avviandoCantiere ? <Loader2 className="h-4 w-4 animate-spin" /> : <Hammer className="h-4 w-4" />}
               {t("dashboard.quoteDetail.startCrmProject")}
             </button>
           )}
-          {!quote.capitolatoPro && (
+          {!quote.capitolatoPro && can("quotes", "edit") && (
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={handleUpgradeToCapitolato} disabled={upgradeToCapitolato.isPending}>
               {upgradeToCapitolato.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
               {isPro ? t("dashboard.quoteDetail.upgradeToProSpec") : t("dashboard.quoteDetail.proSpec")}
@@ -1339,7 +1342,7 @@ export default function QuoteDetail() {
                 {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
                 {t("dashboard.quoteDetail.downloadPdf")}
               </button>
-              {!isLocked && (
+              {!isLocked && can("quotes", "edit") && (
                 <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
                   {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
                   {t("dashboard.quoteDetail.sendByEmail")}
@@ -1357,7 +1360,7 @@ export default function QuoteDetail() {
                   </button>
                 </>
               )}
-              <button
+              {can("quotes", "edit") && <button
                 type="button"
                 className="btn btn-sm btn-outline-navy"
                 disabled={duplicateQuote.isPending}
@@ -1375,8 +1378,8 @@ export default function QuoteDetail() {
               >
                 {duplicateQuote.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
                 {t("dashboard.quoteDetail.duplicateQuote")}
-              </button>
-              {isEditLocked && (
+              </button>}
+              {isEditLocked && can("quotes", "edit") && (
                 <div className="notice warn">
                   <AlertTriangle />
                   <span className="grow">{t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.downloadedWarning")}</span>

@@ -75,8 +75,10 @@ function validateHtml(filePath: string, html: string): string[] {
   }
 
   // 2. meta description must be present and non-empty
-  const descMatch = html.match(/<meta\s+name="description"\s+content="([^"]*)"\s*\/?>/i)
-    ?? html.match(/<meta\s+content="([^"]*)"\s+name="description"\s*\/?>/i);
+  // Phase 80: the head is Helmet output (`<meta data-rh="true" name=… content=…/>`), so attribute order is not fixed.
+  const metaTags = [...html.matchAll(/<meta\b[^>]*>/gi)].map((m) => m[0]);
+  const descTag = metaTags.find((tag) => /\bname="description"/i.test(tag));
+  const descMatch = descTag ? /\bcontent="([^"]*)"/i.exec(descTag) : null;
   if (!descMatch) {
     errors.push('Missing <meta name="description"> tag');
   } else {
@@ -87,13 +89,13 @@ function validateHtml(filePath: string, html: string): string[] {
   }
 
   // 3. JSON-LD script must be present
-  const hasJsonLd = /<script\s+type="application\/ld\+json">/i.test(html);
+  const hasJsonLd = /<script\b[^>]*type="application\/ld\+json"[^>]*>/i.test(html);
   if (!hasJsonLd) {
     errors.push('Missing <script type="application/ld+json"> tag');
   }
 
   // 4. #root must not be an empty skeleton
-  const rootMatch = html.match(/<div\s+id="root">([\s\S]*?)<\/div>/i);
+  const rootMatch = html.match(/<div\s+id="root"(?:\s+data-ssr="[^"]*")?>([\s\S]*?)<\/div>/i);
   if (!rootMatch) {
     errors.push('Missing <div id="root"> element');
   } else {
@@ -112,11 +114,28 @@ function validateHtml(filePath: string, html: string): string[] {
   const expectedCanonical = `https://quoteai.ca/${rel}`;
   const titles = html.match(/<title>/gi) ?? [];
   if (titles.length !== 1) errors.push(`Expected exactly one <title>, found ${titles.length}`);
-  const canonicals = [...html.matchAll(/<link\s+rel="canonical"\s+href="([^"]*)"/gi)].map((m) => m[1]);
+  const linkTags = [...html.matchAll(/<link\b[^>]*>/gi)].map((m) => m[0]);
+  const canonicals = linkTags.filter((tag) => /\brel="canonical"/i.test(tag)).map((tag) => /\bhref="([^"]*)"/i.exec(tag)?.[1] ?? "");
   if (canonicals.length !== 1) errors.push(`Expected exactly one canonical, found ${canonicals.length}`);
   else if (canonicals[0] !== expectedCanonical) errors.push(`Canonical ${canonicals[0]} ≠ ${expectedCanonical}`);
-  if (!/<link\s+rel="alternate"\s+hreflang="x-default"/i.test(html)) errors.push("Missing hreflang x-default");
-  const og = html.match(/<meta\s+property="og:image"\s+content="https:\/\/quoteai\.ca(\/[^"]+)"/i);
+  if (!linkTags.some((tag) => /\bhreflang="x-default"/i.test(tag))) errors.push("Missing hreflang x-default");
+  // Phase 80: a page must only advertise language alternates that are built.
+  for (const tag of linkTags.filter((t) => /\bhreflang="(?:en-CA|fr-CA)"/i.test(t))) {
+    const href = /\bhref="https:\/\/quoteai\.ca(\/[^"]*)"/i.exec(tag)?.[1];
+    if (!href) { errors.push(`hreflang tag without an absolute quoteai.ca href: ${tag}`); continue; }
+    if (!existsSync(join(distDir, href.replace(/\/$/, ""), "index.html"))) errors.push(`hreflang alternate ${href} is not a prerendered page`);
+  }
+  // Phase 80: the hydration marker must name this route.
+  const ssrMarker = html.match(/<div\s+id="root"\s+data-ssr="([^"]*)"/)?.[1];
+  const expectedMarker = rel === "" ? "/" : `/${rel.replace(/\/$/, "")}`;
+  if (ssrMarker !== expectedMarker) errors.push(`data-ssr "${ssrMarker}" ≠ "${expectedMarker}"`);
+  // Phase 80: critical CSS inlined, full stylesheet deferred to the end of <body>, nothing the CSP blocks.
+  if (!/<style[^>]*>[^<]*:root/i.test(html)) errors.push("No inlined critical CSS (<style> with :root tokens)");
+  if (/\son(?:load|error)=/i.test(html)) errors.push("Inline event handler in the page (blocked by the CSP)");
+  const bodyHtml = html.slice(html.indexOf("<body"));
+  if (!/<link\b[^>]*rel="stylesheet"[^>]*href="\/assets\/index-[^"]+\.css"/i.test(bodyHtml)) errors.push("Full stylesheet <link> is not in <body>");
+  const ogTag = metaTags.find((tag) => /\bproperty="og:image"/i.test(tag));
+  const og = ogTag ? /\bcontent="https:\/\/quoteai\.ca(\/[^"]+)"/i.exec(ogTag) : null;
   if (!og) errors.push("Missing og:image");
   else if (!existsSync(join(distDir, og[1]!))) errors.push(`og:image ${og[1]} does not exist in dist/public`);
   const head = html.slice(html.indexOf("<head>"), html.indexOf("</head>"));
@@ -139,9 +158,8 @@ if (!existsSync(distDir)) {
 
 console.log(`\nScanning HTML files in ${distDir}…`);
 
-// dist/index.html and dist/fr/index.html are the SPA shell (SEO head only, empty #root by design — see prerender-seo.ts)
-const SPA_SHELLS = new Set([join(distDir, "index.html"), join(distDir, "fr", "index.html")]);
-const allFiles = collectHtmlFiles(distDir).filter((f) => !SPA_SHELLS.has(f));
+// Phase 80: every index.html under dist/public is a prerendered page, the homepage included.
+const allFiles = collectHtmlFiles(distDir);
 if (allFiles.length === 0) {
   console.error("✗ No index.html files found in dist/public");
   process.exit(1);

@@ -28,6 +28,9 @@ const PUSH_NOTIFICATION_TYPES = new Set([
   "client_message",
   "sms_reply",
   "time_entry_submitted",
+  // Phase 79: money — a job crossing 90 % / 100 % of its cost budget
+  "budget_alert",
+  "budget_exceeded",
   "job_setup_ready",
 ]);
 

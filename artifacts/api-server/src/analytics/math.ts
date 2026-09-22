@@ -182,24 +182,37 @@ export function earnedValue(params: { subtotalCents: number; progressPercent: nu
 export type OpenInvoiceLike = { balanceCents: number; dueDate: Date; status: string };
 export type UpcomingTermLike = { amountCents: number; expectedDate: Date | null };
 export type RemainingBudgetLike = { remainingCents: number; from: Date; to: Date | null };
-export type CashWeek = { week: string; dueCents: number; overdueCents: number; expectedCents: number; outflowCents: number; netCents: number; cumulativeCents: number };
+/** Phase 79: a draft waiting for its send date (holdback release or review-then-auto-send) — cash expected at send + payment terms. */
+export type ScheduledInvoiceLike = { totalCents: number; sendAt: Date; termDays: number };
+/** Phase 79: payroll — the last four weeks' approved labour as a weekly run-rate, plus hours approved/submitted but not yet in a payroll export. */
+export type PayrollLike = { weeklyRunRateCents: number; pendingCents: number; untilWeek: number | null };
+export type CashWeek = { week: string; dueCents: number; overdueCents: number; scheduledCents: number; expectedCents: number; outflowCents: number; payrollCents: number; netCents: number; cumulativeCents: number };
 
 /**
  * Next `weeks` weeks: invoices falling due (overdue balances land in week 0),
- * expected billings from upcoming milestone payment terms, and planned spend
- * from remaining job budgets spread evenly over each job's remaining schedule.
+ * scheduled drafts (expected at their send date + terms), expected billings
+ * from upcoming milestone payment terms, planned spend from remaining job
+ * budgets spread evenly over each job's remaining schedule, and the payroll
+ * run-rate (Phase 79). Callers that pass `payroll` should leave the labour
+ * category out of `remainingBudgets` so wages are not counted twice.
  */
-export function cashFlowForecast(params: { openInvoices: OpenInvoiceLike[]; upcomingTerms: UpcomingTermLike[]; remainingBudgets: RemainingBudgetLike[]; weeks?: number; now?: Date }): CashWeek[] {
+export function cashFlowForecast(params: { openInvoices: OpenInvoiceLike[]; upcomingTerms: UpcomingTermLike[]; remainingBudgets: RemainingBudgetLike[]; scheduledInvoices?: ScheduledInvoiceLike[]; payroll?: PayrollLike | null; weeks?: number; now?: Date }): CashWeek[] {
   const now = params.now ?? new Date();
   const weeks = params.weeks ?? 8;
   const w0 = startOfWeekUtc(now);
-  const rows: CashWeek[] = Array.from({ length: weeks }, (_, i) => ({ week: isoDay(addDaysUtc(w0, i * 7)), dueCents: 0, overdueCents: 0, expectedCents: 0, outflowCents: 0, netCents: 0, cumulativeCents: 0 }));
+  const rows: CashWeek[] = Array.from({ length: weeks }, (_, i) => ({ week: isoDay(addDaysUtc(w0, i * 7)), dueCents: 0, overdueCents: 0, scheduledCents: 0, expectedCents: 0, outflowCents: 0, payrollCents: 0, netCents: 0, cumulativeCents: 0 }));
   const bucket = (d: Date) => Math.floor(daysBetween(w0, startOfWeekUtc(d)) / 7);
   for (const inv of params.openInvoices) {
     if (inv.balanceCents <= 0) continue;
     const b = bucket(inv.dueDate);
     if (b < 0) rows[0]!.overdueCents += inv.balanceCents;
     else if (b < weeks) rows[b]!.dueCents += inv.balanceCents;
+  }
+  for (const s of params.scheduledInvoices ?? []) {
+    if (s.totalCents <= 0) continue;
+    const expected = addDaysUtc(s.sendAt, Math.max(0, s.termDays));
+    const b = Math.max(0, bucket(expected));
+    if (b < weeks) rows[b]!.scheduledCents += s.totalCents;
   }
   for (const t of params.upcomingTerms) {
     if (!t.expectedDate || t.amountCents <= 0) continue;
@@ -214,13 +227,33 @@ export function cashFlowForecast(params: { openInvoices: OpenInvoiceLike[]; upco
     const per = Math.round(rb.remainingCents / span);
     for (let b = from; b <= to && b < weeks; b++) rows[b]!.outflowCents += per;
   }
+  if (params.payroll) {
+    const p = params.payroll;
+    if (p.pendingCents > 0) rows[0]!.payrollCents += p.pendingCents;
+    if (p.weeklyRunRateCents > 0) {
+      const last = p.untilWeek === null ? weeks - 1 : Math.min(weeks - 1, Math.max(0, p.untilWeek));
+      for (let b = 0; b <= last; b++) rows[b]!.payrollCents += p.weeklyRunRateCents;
+    }
+  }
   let cum = 0;
   for (const r of rows) {
-    r.netCents = r.dueCents + r.overdueCents + r.expectedCents - r.outflowCents;
+    r.netCents = r.dueCents + r.overdueCents + r.scheduledCents + r.expectedCents - r.outflowCents - r.payrollCents;
     cum += r.netCents;
     r.cumulativeCents = cum;
   }
   return rows;
+}
+
+// ── Job: budget alert level (Phase 79) ───────────────────────────────────────
+
+export type BudgetAlertLevel = 0 | 90 | 100;
+
+/** 100 once confirmed costs reach the budget, 90 from 90 % of it, else 0. A job with no budget never alerts. */
+export function budgetAlertLevel(costCents: number, budgetCents: number): BudgetAlertLevel {
+  if (budgetCents <= 0 || costCents <= 0) return 0;
+  if (costCents >= budgetCents) return 100;
+  if (costCents >= Math.ceil(budgetCents * 0.9)) return 90;
+  return 0;
 }
 
 // ── Company: job risk flags ──────────────────────────────────────────────────

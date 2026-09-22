@@ -18,6 +18,7 @@ import {
 } from "@workspace/db";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { toIsoDate } from "../jobs/dates.js";
+import { checkJobBudget } from "../jobs/budgetAlerts.js";
 
 // ── Cost entries: serializers + the two materialisations ────────────────────
 // Labour and equipment costs are never typed: approving a time entry or
@@ -197,6 +198,7 @@ export async function syncLabourCost(entry: TimeEntry, worker: Pick<Collaborator
   }
   const [created] = await db.insert(costEntriesTable).values(values).returning({ id: costEntriesTable.id });
   await db.update(timeEntriesTable).set({ costEntryId: created!.id }).where(eq(timeEntriesTable.id, entry.id));
+  void checkJobBudget(entry.projectId);
   return created!.id;
 }
 
@@ -228,6 +230,7 @@ export async function syncEquipmentCost(usage: EquipmentUsage, equipment: Pick<E
   }
   const [created] = await db.insert(costEntriesTable).values(values).returning({ id: costEntriesTable.id });
   await db.update(equipmentUsageTable).set({ costEntryId: created!.id }).where(eq(equipmentUsageTable.id, usage.id));
+  void checkJobBudget(usage.projectId);
   return created!.id;
 }
 

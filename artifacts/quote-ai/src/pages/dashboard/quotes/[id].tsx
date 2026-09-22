@@ -15,6 +15,7 @@ import { taxLineLabel } from "@/lib/tax-display";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleCard } from "@/components/payment-schedule-card";
 import { QuoteContractCard } from "@/components/quote-contract-card";
+import { PriceCheckCard } from "@/components/quotes/price-check-card";
 import { jobsApi } from "@/lib/jobs-api";
 import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
@@ -1383,6 +1384,9 @@ export default function QuoteDetail() {
               )}
             </div>
           </section>
+
+          {/* Phase 79: catalog / receipt prices that moved since this quote was priced */}
+          {!isEditLocked && !!id && <PriceCheckCard quoteId={id} enabled={hasCapitoli} />}
 
           {/* Phase 22: Good/Better/Best tiered quotes */}
           {!isEditLocked && quote?.status !== "accepted" && (

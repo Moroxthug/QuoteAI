@@ -13,6 +13,7 @@ import { runFlinksSyncCheck } from "../flinks/maintenance.js";
 import { runGoogleLsaPollCheck } from "../googleLsa/maintenance.js";
 import { runAccountDeletionMaintenance, expireAccountExports } from "../account/service.js";
 import { runScheduleReminderMaintenance } from "../schedule/maintenance.js";
+import { runBudgetAlertSweep } from "../jobs/budgetAlerts.js";
 import { db, cronTicksTable } from "@workspace/db";
 import { eq, lt } from "drizzle-orm";
 import { automationBacklog, pingHeartbeat, recentAutomationFailures, sendOpsAlert } from "../lib/ops.js";
@@ -65,10 +66,12 @@ router.get("/cron/tick", async (req, res) => {
     const accountExports = await expireAccountExports();
     // Phase 75: same-day catch-up for crew reminders (the evening-before pass is /cron/evening).
     const scheduleReminders = await runScheduleReminderMaintenance();
+    // Phase 79: jobs whose confirmed costs crossed 90 % / 100 % of budget since the live checks (budget edits, deletions).
+    const budgetAlerts = await runBudgetAlertSweep();
     // Roll up yesterday's (and today's, in case cron shifted) usage_events into the daily summary.
     const usage = await rollUpUsageForDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
     await rollUpUsageForDate(new Date());
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, usage };
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, usage };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));

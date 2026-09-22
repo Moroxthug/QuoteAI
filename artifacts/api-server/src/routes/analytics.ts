@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, projectsTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
-import { companyAnalytics, jobAnalytics } from "../analytics/service.js";
+import { cashFlowOutlook, companyAnalytics, jobAnalytics } from "../analytics/service.js";
 
 // ── Phase 5: dashboards ──────────────────────────────────────────────────────
 // Job charts ride on the "jobs" feature (Pro); the company margin / AR /
@@ -36,6 +36,22 @@ router.get("/analytics/company", requireAuth, async (req, res) => {
     res.json(await companyAnalytics(userId, { months: Number.isFinite(months) ? months : 6 }));
   } catch (err) {
     req.log.error({ err }, "Error computing company analytics");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/analytics/cash-flow — Phase 79: the 60-day outlook on the dashboard (same Elite gate as the analytics page).
+router.get("/analytics/cash-flow", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    if (!hasFeature(profile, "analytics_pro")) {
+      res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: minimumPlanFor("analytics_pro"), message: "The cash-flow outlook requires the Elite plan" });
+      return;
+    }
+    res.json(await cashFlowOutlook(userId));
+  } catch (err) {
+    req.log.error({ err }, "Error computing cash-flow outlook");
     res.status(500).json({ error: "Internal server error" });
   }
 });

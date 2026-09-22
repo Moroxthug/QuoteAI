@@ -45,6 +45,7 @@ import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { leadsApi, type LeadDto } from "@/lib/leads-api";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -821,6 +822,9 @@ export default function DashboardHome() {
           {subscription?.isActive && subscription?.plan === "monthly_starter" && (
             <div style={{ marginTop: 16 }}><StarterUpgradeCard /></div>
           )}
+
+          {/* Phase 79: 60-day cash-flow outlook (Elite) */}
+          <CashFlowCard plan={subscription?.plan} isActive={subscription?.isActive} />
 
           <section className="mid-grid">
             <div className="card">

@@ -1,6 +1,6 @@
 // vitest suite (Phase 61): the assertions below were a plain node:assert script; now run by `pnpm test`.
 import assert from "node:assert/strict";
-import { lastMonths, monthlySeries, budgetVsActual, costCurve, scheduleVariance, earnedValue, cashFlowForecast, jobRisks, startOfWeekUtc } from "./math.js";
+import { lastMonths, monthlySeries, budgetVsActual, costCurve, scheduleVariance, earnedValue, cashFlowForecast, jobRisks, startOfWeekUtc, budgetAlertLevel } from "./math.js";
 import { test } from "vitest";
 
 test("analytics/math", () => {
@@ -115,4 +115,48 @@ test("analytics/math", () => {
   assert.equal(byId["5"], undefined);
   assert.equal(byId["6"], undefined);
   assert.equal(risks[0]!.id, "3"); // highest score first (30 + 25)
+});
+
+test("analytics/math — Phase 79: scheduled invoices, payroll and budget alert levels", () => {
+  const now = new Date("2026-09-13T15:00:00Z"); // Sunday → week 0 starts Mon 2026-09-07
+  const d = (s: string) => new Date(`${s}T12:00:00Z`);
+
+  const cf = cashFlowForecast({
+    openInvoices: [{ balanceCents: 10_000, dueDate: d("2026-09-22"), status: "sent" }],
+    // Holdback release sending on the 20th with 30-day terms → expected in the week of Oct 19 (week 6).
+    scheduledInvoices: [
+      { totalCents: 50_000, sendAt: d("2026-09-20"), termDays: 30 },
+      { totalCents: 7_000, sendAt: d("2026-09-01"), termDays: 0 }, // already past its send date → lands in week 0
+      { totalCents: 99_999, sendAt: d("2026-12-01"), termDays: 0 }, // beyond the window
+    ],
+    upcomingTerms: [],
+    remainingBudgets: [],
+    payroll: { weeklyRunRateCents: 2_000, pendingCents: 3_500, untilWeek: 2 },
+    weeks: 9,
+    now,
+  });
+  assert.equal(cf.length, 9);
+  assert.deepEqual(cf.map((w) => w.scheduledCents), [7_000, 0, 0, 0, 0, 0, 50_000, 0, 0]);
+  // Pending payroll in week 0 on top of the run-rate; the run-rate stops after the last planned end.
+  assert.deepEqual(cf.map((w) => w.payrollCents), [5_500, 2_000, 2_000, 0, 0, 0, 0, 0, 0]);
+  assert.equal(cf[0]!.netCents, 7_000 - 5_500);
+  assert.equal(cf[2]!.dueCents, 10_000);
+  assert.equal(cf[8]!.cumulativeCents, 7_000 + 10_000 + 50_000 - 5_500 - 4_000);
+
+  // Run-rate with no planned end covers the whole window; no payroll → nothing.
+  const open = cashFlowForecast({ openInvoices: [], upcomingTerms: [], remainingBudgets: [], payroll: { weeklyRunRateCents: 100, pendingCents: 0, untilWeek: null }, weeks: 3, now });
+  assert.deepEqual(open.map((w) => w.payrollCents), [100, 100, 100]);
+  const none = cashFlowForecast({ openInvoices: [], upcomingTerms: [], remainingBudgets: [], weeks: 2, now });
+  assert.deepEqual(none.map((w) => [w.payrollCents, w.scheduledCents, w.netCents]), [[0, 0, 0], [0, 0, 0]]);
+
+  // Budget alert level: 90 from 90 % (ceil), 100 at or over, never without a budget.
+  assert.equal(budgetAlertLevel(0, 100_000), 0);
+  assert.equal(budgetAlertLevel(89_999, 100_000), 0);
+  assert.equal(budgetAlertLevel(90_000, 100_000), 90);
+  assert.equal(budgetAlertLevel(99_999, 100_000), 90);
+  assert.equal(budgetAlertLevel(100_000, 100_000), 100);
+  assert.equal(budgetAlertLevel(150_000, 100_000), 100);
+  assert.equal(budgetAlertLevel(150_000, 0), 0);
+  assert.equal(budgetAlertLevel(9, 10), 90); // ceil(9) = 9
+  assert.equal(budgetAlertLevel(4, 5), 0); // ceil(4.5) = 5 → not yet
 });

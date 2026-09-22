@@ -64,6 +64,9 @@ export const projectsTable = pgTable("projects", {
   longitude: numeric("longitude", { precision: 9, scale: 6 }),
   /** Phase 23: optional, off by default. When set, a worker clock-in/out beyond this radius just flags the entry — never blocks it. */
   geofenceRadiusMeters: integer("geofence_radius_meters"),
+  /** Phase 79: when confirmed costs last crossed 90 % / 100 % of the cost budget (one alert per crossing; cleared when costs drop back under). */
+  budgetAlert90At: timestamp("budget_alert_90_at", { withTimezone: true }),
+  budgetAlert100At: timestamp("budget_alert_100_at", { withTimezone: true }),
   /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
   archivedAt: timestamp("archived_at", { withTimezone: true }),
   archivedByName: text("archived_by_name"),

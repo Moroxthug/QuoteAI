@@ -12,13 +12,16 @@ import {
   contractsTable,
   clientsTable,
   COST_CATEGORIES,
+  timeEntriesTable,
+  labourCostCents,
   type Project,
 } from "@workspace/db";
-import { and, asc, desc, eq, inArray, gte } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, gte, isNull } from "drizzle-orm";
 import { arAging, balanceCents } from "../invoices/math.js";
 import { projectInvoiceTotals } from "../invoices/service.js";
 import { toIsoDate } from "../jobs/dates.js";
 import {
+  budgetAlertLevel,
   budgetVsActual,
   cashFlowForecast,
   costCurve,
@@ -26,6 +29,8 @@ import {
   jobRisks,
   monthlySeries,
   scheduleVariance,
+  startOfWeekUtc,
+  daysBetween,
   type CashWeek,
   type CategoryPoint,
   type CurvePoint,
@@ -215,3 +220,109 @@ export async function companyAnalytics(userId: string, opts: { months?: number; 
   };
 }
 
+
+// ── Phase 79: 60-day cash-flow outlook (dashboard card) ─────────────────────
+// Same engine as the analytics page chart, wider window and two more sources:
+// scheduled drafts (holdback releases waiting for the lien period, drafts in
+// the review-then-auto-send window) and payroll. Payroll = the last four
+// weeks of approved labour as a weekly run-rate while jobs are active, plus
+// what is approved/submitted but not yet in a payroll export (lands in week 0).
+// The labour category is left out of the budget spread when a run-rate
+// exists so wages are not counted twice.
+
+const OUTLOOK_DAYS = 60;
+// Day 60 counted from the start of the current week falls in week index 8 → nine week buckets.
+const OUTLOOK_WEEKS = Math.floor(OUTLOOK_DAYS / 7) + 1;
+
+export type CashFlowOutlook = {
+  days: number;
+  weeks: CashWeek[];
+  totals: { inCents: number; outCents: number; netCents: number; lowestCumulativeCents: number; lowestWeek: string | null };
+  sources: { openInvoices: number; overdueInvoices: number; scheduledInvoices: number; upcomingTerms: number; activeJobs: number; payrollWeeklyCents: number; payrollPendingCents: number };
+  /** Open jobs at or past 90 % of their cost budget (the same rule as the margin alerts). */
+  budgetAlerts: { id: string; name: string; pct: number; level: 90 | 100 }[];
+};
+
+export async function cashFlowOutlook(userId: string, now = new Date()): Promise<CashFlowOutlook> {
+  const fourWeeksAgo = new Date(now.getTime() - 28 * 86_400_000);
+  const [projects, invoices, payrollRows] = await Promise.all([
+    db.select().from(projectsTable).where(and(eq(projectsTable.userId, userId), inArray(projectsTable.status, ["planning", "active"]), isNull(projectsTable.archivedAt))).limit(500),
+    db.select().from(invoicesTable).where(and(eq(invoicesTable.userId, userId), isNull(invoicesTable.archivedAt), inArray(invoicesTable.status, [...OPEN_INVOICE, "draft"]))).limit(2000),
+    db
+      .select({ hours: timeEntriesTable.hours, rate: timeEntriesTable.rateCentsSnapshot, burden: timeEntriesTable.burdenPercentSnapshot, status: timeEntriesTable.status, date: timeEntriesTable.date })
+      .from(timeEntriesTable)
+      .where(and(eq(timeEntriesTable.userId, userId), inArray(timeEntriesTable.status, ["approved", "submitted"]), gte(timeEntriesTable.date, fourWeeksAgo))),
+  ]);
+  const projectIds = projects.map((p) => p.id);
+  const [milestones, budgetLines, costs] = await Promise.all([
+    projectIds.length ? db.select().from(milestonesTable).where(inArray(milestonesTable.projectId, projectIds)) : Promise.resolve([] as (typeof milestonesTable.$inferSelect)[]),
+    projectIds.length ? db.select().from(costBudgetLinesTable).where(inArray(costBudgetLinesTable.projectId, projectIds)) : Promise.resolve([] as (typeof costBudgetLinesTable.$inferSelect)[]),
+    projectIds.length ? db.select({ projectId: costEntriesTable.projectId, category: costEntriesTable.category, totalCents: costEntriesTable.totalCents }).from(costEntriesTable).where(and(inArray(costEntriesTable.projectId, projectIds), eq(costEntriesTable.status, "confirmed"))) : Promise.resolve([] as { projectId: string | null; category: string; totalCents: number }[]),
+  ]);
+
+  // Payroll: approved labour in the last 28 days → weekly run-rate; submitted (not yet approved) hours are owed now.
+  let approvedCents = 0;
+  let pendingCents = 0;
+  for (const r of payrollRows) {
+    const cents = labourCostCents(Number(r.hours), r.rate, Number(r.burden));
+    if (r.status === "approved") approvedCents += cents;
+    else pendingCents += cents;
+  }
+  const weeklyRunRateCents = Math.round(approvedCents / 4);
+  const hasPayroll = weeklyRunRateCents > 0;
+  const w0 = startOfWeekUtc(now);
+  const weekOf = (d: Date) => Math.floor(daysBetween(w0, startOfWeekUtc(d)) / 7);
+  // Wages keep flowing while a job is scheduled to run; without a planned end assume the whole window.
+  let untilWeek: number | null = null;
+  for (const p of projects) {
+    if (!p.plannedEnd) { untilWeek = null; break; }
+    const w = weekOf(p.plannedEnd);
+    untilWeek = untilWeek === null ? w : Math.max(untilWeek, w);
+  }
+  if (projects.length === 0) untilWeek = -1;
+
+  const open = invoices.filter((i) => (OPEN_INVOICE as readonly string[]).includes(i.status));
+  const scheduled = invoices.filter((i) => i.status === "draft" && i.type !== "credit_note" && (i.scheduledFor || i.autoSendAt));
+  const upcomingTerms: UpcomingTermLike[] = [];
+  const remainingBudgets: RemainingBudgetLike[] = [];
+  const budgetAlerts: CashFlowOutlook["budgetAlerts"] = [];
+  for (const p of projects) {
+    const fullBudget = budgetLines.filter((b) => b.projectId === p.id).reduce((s, b) => s + b.plannedCents, 0);
+    const fullCost = costs.filter((c) => c.projectId === p.id).reduce((s, c) => s + c.totalCents, 0);
+    const level = budgetAlertLevel(fullCost, fullBudget);
+    if (level) budgetAlerts.push({ id: p.id, name: p.name, pct: Math.round((fullCost / fullBudget) * 100), level });
+    const ms = milestones.filter((m) => m.projectId === p.id);
+    const sched = scheduleVariance(ms, now);
+    for (const m of ms) {
+      if (m.status === "completed" || m.status === "skipped" || !m.paymentAmountCents) continue;
+      if (invoices.some((i) => i.milestoneId === m.id && i.status !== "void")) continue;
+      upcomingTerms.push({ amountCents: m.paymentAmountCents, expectedDate: m.plannedEnd ? new Date(m.plannedEnd.getTime() + sched.daysBehind * 86_400_000) : null });
+    }
+    const lines = budgetLines.filter((b) => b.projectId === p.id && !(hasPayroll && b.category === "labour"));
+    const budgetCents = lines.reduce((s, b) => s + b.plannedCents, 0);
+    const spent = costs.filter((c) => c.projectId === p.id && !(hasPayroll && c.category === "labour")).reduce((s, c) => s + c.totalCents, 0);
+    const remaining = budgetCents - spent;
+    if (remaining > 0) remainingBudgets.push({ remainingCents: remaining, from: now, to: p.plannedEnd && p.plannedEnd > now ? p.plannedEnd : null });
+  }
+
+  const weeks = cashFlowForecast({
+    openInvoices: open.map((i) => ({ balanceCents: balanceCents(i), dueDate: i.dueDate, status: i.status })),
+    scheduledInvoices: scheduled.map((i) => ({ totalCents: i.totalCents, sendAt: (i.scheduledFor ?? i.autoSendAt)!, termDays: Math.max(0, Math.round((i.dueDate.getTime() - i.issueDate.getTime()) / 86_400_000)) })),
+    upcomingTerms,
+    remainingBudgets,
+    payroll: hasPayroll || pendingCents > 0 ? { weeklyRunRateCents, pendingCents, untilWeek } : null,
+    weeks: OUTLOOK_WEEKS,
+    now,
+  });
+  const inCents = weeks.reduce((s, w) => s + w.dueCents + w.overdueCents + w.scheduledCents + w.expectedCents, 0);
+  const outCents = weeks.reduce((s, w) => s + w.outflowCents + w.payrollCents, 0);
+  let lowest = weeks[0] ?? null;
+  for (const w of weeks) if (lowest && w.cumulativeCents < lowest.cumulativeCents) lowest = w;
+  return {
+    days: OUTLOOK_DAYS,
+    weeks,
+    totals: { inCents, outCents, netCents: inCents - outCents, lowestCumulativeCents: lowest?.cumulativeCents ?? 0, lowestWeek: lowest?.week ?? null },
+    sources: { openInvoices: open.length, overdueInvoices: open.filter((i) => i.status === "overdue").length, scheduledInvoices: scheduled.length, upcomingTerms: upcomingTerms.length, activeJobs: projects.length, payrollWeeklyCents: weeklyRunRateCents, payrollPendingCents: pendingCents },
+    budgetAlerts: budgetAlerts.sort((a, b) => b.pct - a.pct),
+  };
+}

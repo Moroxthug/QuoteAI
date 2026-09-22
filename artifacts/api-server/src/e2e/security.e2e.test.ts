@@ -43,6 +43,8 @@ import {
   quoteImportCandidatesTable,
   flinksTransactionsTable,
   jobPhotosTable,
+  jobNotesTable,
+  scheduleBlocksTable,
   quoteVariantsTable,
   uploadedDocumentsTable,
   priceIntelligenceAlertsTable,
@@ -137,6 +139,8 @@ async function seedOrgA(): Promise<Fixtures> {
   f.candidate = await ins(db.insert(quoteImportCandidatesTable).values({ batchId: f.batch, userId, extraction: {} } as typeof quoteImportCandidatesTable.$inferInsert).returning());
   f.flinksTx = await ins(db.insert(flinksTransactionsTable).values({ userId, flinksTransactionId: `e2e-${randomUUID()}`, date: new Date(), amountCents: -5000 } as typeof flinksTransactionsTable.$inferInsert).returning());
   f.photo = await ins(db.insert(jobPhotosTable).values({ userId, projectId: project.id, fileName: "before.png", fileSize: 100, mimeType: "image/png", fileUrl: `/objects/job-photos/${userId}/before.png` } as typeof jobPhotosTable.$inferInsert).returning());
+  f.note = await ins(db.insert(jobNotesTable).values({ userId, projectId: project.id, body: "gate code 4471" } as typeof jobNotesTable.$inferInsert).returning());
+  f.block = await ins(db.insert(scheduleBlocksTable).values({ userId, projectId: project.id, startsAt: new Date(), endsAt: new Date(Date.now() + 3_600_000) } as typeof scheduleBlocksTable.$inferInsert).returning());
   f.variant = await ins(db.insert(quoteVariantsTable).values({ quoteId: quote.id, userId } as typeof quoteVariantsTable.$inferInsert).returning());
   f.doc = await ins(db.insert(uploadedDocumentsTable).values({ userId, fileName: "receipt.pdf", mimeType: "application/pdf", fileUrl: `/objects/receipts/${userId}/receipt.pdf` } as typeof uploadedDocumentsTable.$inferInsert).returning());
   f.alert = await ins(db.insert(priceIntelligenceAlertsTable).values({ userId, workType: "drywall", previousAvgPrice: "10", currentAvgPrice: "12", percentChange: "20", direction: "up" } as typeof priceIntelligenceAlertsTable.$inferInsert).returning());
@@ -171,7 +175,7 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
           ["/api/documents", "doc"], ["/api/leads", "lead"], ["/api/assistant/conversations", "conversation"], ["/api/assistant/proposals", "proposal"],
           ["/api/developer/api-keys", "apiKey"], ["/api/developer/webhooks", "webhook"], ["/api/imports/batches", "batch"], ["/api/imports/candidates", "candidate"],
           ["/api/flinks/transactions", "flinksTx"], ["/api/team/members", "member"], ["/api/v1/public/quotes", "quote"], ["/api/v1/public/jobs", "project"],
-          ["/api/v1/public/invoices", "invoice"], ["/api/v1/public/clients", "client"],
+          ["/api/v1/public/invoices", "invoice"], ["/api/v1/public/clients", "client"], ["/api/schedule/blocks", "block"],
         ];
         id = byPrefix.find(([p]) => prefix === p)?.[1];
         break;
@@ -185,6 +189,7 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
       case "coId": id = "changeOrder"; break;
       case "mid": id = "milestone"; break;
       case "photoId": id = "photo"; break;
+      case "noteId": id = "note"; break;
       case "tid": id = route.path.includes("/tasks/") ? "task" : "timeEntry"; break;
       case "taskId": id = "task"; break;
       case "uid": id = "usage"; break;

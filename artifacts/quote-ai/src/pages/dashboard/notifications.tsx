@@ -28,7 +28,7 @@ async function fetchNotifications(): Promise<{ items: NotificationItem[]; unread
 function dotColor(type: string): "green" | "teal" | "yellow" | "grey" {
   if (/accepted|signed|paid$/.test(type)) return "green";
   if (/invoice|payment/.test(type)) return "teal";
-  if (/due|overdue|reminder/.test(type)) return "yellow";
+  if (/due|overdue|reminder|budget/.test(type)) return "yellow";
   return "grey";
 }
 

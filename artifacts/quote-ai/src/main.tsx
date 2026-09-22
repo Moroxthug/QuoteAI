@@ -5,9 +5,13 @@ import { SeoNavShell } from "./components/seo-header.tsx";
 import "./index.css";
 import { initAnalytics } from "./lib/analytics.ts";
 import { initErrorTracking } from "./lib/error-tracking.ts";
+import { initPwa } from "./lib/pwa.ts";
 
 initErrorTracking();
 initAnalytics();
+// Phase 77: service worker + install prompt capture (before React, so the
+// early beforeinstallprompt event is not missed). The outbox starts with the App.
+initPwa();
 
 // Statically prerendered pages (hand-built bodies in scripts/prerender-seo.ts):
 // English + French sector/city landing pages and the blog.

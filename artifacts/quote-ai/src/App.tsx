@@ -2,6 +2,7 @@ import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wo
 import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 
@@ -71,7 +72,15 @@ import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace
 import { useAuth } from "@/hooks/use-auth";
 import { isOnboardingSkipped } from "@/lib/onboarding-state";
 
-const queryClient = new QueryClient();
+// Phase 77: TanStack pauses queries and mutations while navigator.onLine is
+// false ("online" network mode). Offline is a first-class state here — the
+// service worker answers cached reads and the outbox owns writes — so both run
+// regardless and fail fast (with the SW's OFFLINE stand-in) when there is
+// really nothing to talk to.
+const queryClient = new QueryClient({ defaultOptions: { queries: { networkMode: "always" }, mutations: { networkMode: "always" } } });
+// Phase 77: the offline outbox refreshes the affected queries after a replay.
+setOutboxQueryClient(queryClient);
+startOutbox();
 
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
   const { userId, isLoaded } = useAuth();

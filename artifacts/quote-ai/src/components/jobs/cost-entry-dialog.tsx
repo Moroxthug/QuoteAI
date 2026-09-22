@@ -6,6 +6,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type CostCategory, type CostEntryDto, type CostEntryEdit, type MilestoneDto } from "@/lib/jobs-api";
+import { runOrQueue } from "@/lib/offline/outbox";
 
 export const COST_CATEGORY_KEYS: CostCategory[] = ["materials", "labour", "subcontractor", "permits_fees", "equipment", "misc"];
 const TAX_KEYS = ["GST", "HST", "PST", "QST"] as const;
@@ -89,11 +90,17 @@ export function CostEntryDialog({
   const onError = (e: Error & { code?: string }) => toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("jobs.error"), description: e.message, variant: "destructive" });
 
   const save = useMutation({
-    mutationFn: (confirm: boolean) => {
-      if (isNew) return jobsApi.addCost(targetJob, { ...body(), category, totalCents: toCents(total) });
-      return jobsApi.updateCost(entry.projectId ?? targetJob, entry.id, { ...body(), ...(confirm ? { status: "confirmed" as const } : {}) });
+    mutationFn: async (confirm: boolean) => {
+      if (isNew) {
+        // Phase 77: a new cost typed on site goes through the outbox when there is no signal.
+        const b = { ...body(), category, totalCents: toCents(total) };
+        const r = await runOrQueue({ kind: "job.addCost", jobId: targetJob, body: b }, { scope: targetJob, label: `${formatCents(b.totalCents)} · ${b.vendor || b.description || t("jobs.costs.newEntry")}` }, (clientRef) => jobsApi.addCost(targetJob, { ...b, clientRef }));
+        return r.queued;
+      }
+      await jobsApi.updateCost(entry.projectId ?? targetJob, entry.id, { ...body(), ...(confirm ? { status: "confirmed" as const } : {}) });
+      return false;
     },
-    onSuccess: (_r, confirm) => { refresh(); onOpenChange(false); if (confirm) toast({ title: t("jobs.costs.confirmedToast") }); },
+    onSuccess: (queued, confirm) => { refresh(); onOpenChange(false); if (queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); else if (confirm) toast({ title: t("jobs.costs.confirmedToast") }); },
     onError,
   });
 

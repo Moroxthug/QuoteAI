@@ -77,10 +77,14 @@ export type WorkerPageDto = {
 type WorkerScheduleBlockDto = { id: string; projectId: string | null; label: string; address: string | null; milestoneTitle: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string };
 export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; clockInAt: string | null; clockOutAt: string | null; geofenceFlagged: boolean; createdAt: string };
 
+// Phase 77: every write carries `clientRef` (the outbox op id) and, for the
+// clock, `at` (when the tap happened) so an offline replay is idempotent and
+// keeps the real time — see src/lib/offline/outbox.ts.
 export const workerApi = {
   get: (token: string) => req<WorkerPageDto>(`/api/t/${token}`),
-  add: (token: string, body: { projectId: string; date: string; hours: number; milestoneId?: string | null; note?: string }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/entries`, { method: "POST", body: json(body) }),
+  add: (token: string, body: { projectId: string; date: string; hours: number; milestoneId?: string | null; note?: string; clientRef?: string }) => req<{ entry: WorkerEntryDto; replayed?: boolean }>(`/api/t/${token}/entries`, { method: "POST", body: json(body) }),
   remove: (token: string, id: string) => req<{ success: true }>(`/api/t/${token}/entries/${id}`, { method: "DELETE" }),
-  clockIn: (token: string, body: { projectId: string; milestoneId?: string | null; lat?: number; lng?: number }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/clock-in`, { method: "POST", body: json(body) }),
-  clockOut: (token: string, entryId: string, body: { lat?: number; lng?: number }) => req<{ entry: WorkerEntryDto }>(`/api/t/${token}/entries/${entryId}/clock-out`, { method: "POST", body: json(body) }),
+  clockIn: (token: string, body: { projectId: string; milestoneId?: string | null; lat?: number; lng?: number; at?: string; clientRef?: string }) => req<{ entry: WorkerEntryDto; replayed?: boolean }>(`/api/t/${token}/clock-in`, { method: "POST", body: json(body) }),
+  /** Closes the open clock-in by server id, by the clock-in's clientRef (made offline), or whichever is open. */
+  clockOut: (token: string, body: { entryId?: string; entryClientRef?: string; lat?: number; lng?: number; at?: string }) => req<{ entry: WorkerEntryDto; replayed?: boolean }>(`/api/t/${token}/clock-out`, { method: "POST", body: json(body) }),
 };

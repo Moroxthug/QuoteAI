@@ -13,6 +13,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { OfflineBar } from "@/components/pwa/offline-bar";
+import { clearOfflineCaches } from "@/lib/pwa";
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -124,6 +126,8 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
 
   async function handleSignOut() {
     await authClient.signOut();
+    // Phase 77: the service worker keeps API reads for offline use — not for the next person on this browser.
+    await clearOfflineCaches();
     window.location.href = "/";
   }
 
@@ -378,7 +382,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="content">{children}</main>
+        <main className="content"><OfflineBar />{children}</main>
       </div>
     </div>
   );

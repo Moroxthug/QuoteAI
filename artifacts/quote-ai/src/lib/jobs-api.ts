@@ -274,7 +274,7 @@ export const jobsApi = {
   deleteChangeOrder: (id: string, coId: string) => req<{ success: true }>(`/api/jobs/${id}/change-orders/${coId}`, { method: "DELETE" }),
 
   // Costs (Phase 3)
-  addCost: (id: string, body: CostEntryEdit & { category: CostCategory; totalCents: number }) => req<{ entry: CostEntryDto }>(`/api/jobs/${id}/costs`, { method: "POST", body: json(body) }),
+  addCost: (id: string, body: CostEntryEdit & { category: CostCategory; totalCents: number; clientRef?: string }) => req<{ entry: CostEntryDto; replayed?: boolean }>(`/api/jobs/${id}/costs`, { method: "POST", body: json(body) }),
   updateCost: (id: string, cid: string, body: CostEntryEdit) => req<{ entry: CostEntryDto }>(`/api/jobs/${id}/costs/${cid}`, { method: "PUT", body: json(body) }),
   deleteCost: (id: string, cid: string) => req<{ success: true }>(`/api/jobs/${id}/costs/${cid}`, { method: "DELETE" }),
   reviewQueue: () => req<{ entries: CostEntryDto[] }>("/api/costs/review"),
@@ -297,20 +297,26 @@ export const jobsApi = {
   // Team & time on a job (Phase 3)
   assign: (id: string, body: { workerId: string; roleInProject?: string }) => req<{ assignment: { id: string } }>(`/api/jobs/${id}/assignments`, { method: "POST", body: json(body) }),
   unassign: (id: string, assignmentId: string) => req<{ success: true }>(`/api/jobs/${id}/assignments/${assignmentId}`, { method: "DELETE" }),
-  addTimeEntry: (id: string, body: { workerId: string; date: string; hours: number; milestoneId?: string | null; note?: string; approve?: boolean }) => req<{ entry: TimeEntryDto }>(`/api/jobs/${id}/time-entries`, { method: "POST", body: json(body) }),
+  addTimeEntry: (id: string, body: { workerId: string; date: string; hours: number; milestoneId?: string | null; note?: string; approve?: boolean; clientRef?: string }) => req<{ entry: TimeEntryDto; replayed?: boolean }>(`/api/jobs/${id}/time-entries`, { method: "POST", body: json(body) }),
   addEquipmentUsage: (id: string, body: { equipmentId: string; date: string; quantity: number; unit?: UsageUnit; milestoneId?: string | null; note?: string }) => req<{ usage: EquipmentUsageDto }>(`/api/jobs/${id}/equipment-usage`, { method: "POST", body: json(body) }),
   deleteEquipmentUsage: (id: string, uid: string) => req<{ success: true }>(`/api/jobs/${id}/equipment-usage/${uid}`, { method: "DELETE" }),
 
   // Photos (Phase 10)
   listPhotos: (id: string) => req<{ photos: JobPhotoDto[] }>(`/api/jobs/${id}/photos`),
-  uploadPhoto: async (id: string, file: File, opts?: { milestoneId?: string | null; caption?: string }) => {
+  uploadPhoto: async (id: string, file: Blob, opts?: { milestoneId?: string | null; caption?: string; fileName?: string; clientRef?: string }) => {
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", file, opts?.fileName ?? (file instanceof File ? file.name : "photo.jpg"));
     if (opts?.milestoneId) fd.append("milestoneId", opts.milestoneId);
     if (opts?.caption) fd.append("caption", opts.caption);
+    if (opts?.clientRef) fd.append("clientRef", opts.clientRef);
     const res = await fetch(`/api/jobs/${id}/photos`, { method: "POST", credentials: "include", body: fd });
-    const body = (await res.json().catch(() => ({}))) as { photo: JobPhotoDto; error?: string; message?: string };
-    if (!res.ok) throw new Error(body.message || body.error || `Request failed (${res.status})`);
+    const body = (await res.json().catch(() => ({}))) as { photo: JobPhotoDto; replayed?: boolean; error?: string; message?: string };
+    if (!res.ok) {
+      const err = new Error(body.message || body.error || `Request failed (${res.status})`) as Error & { code?: string; status?: number };
+      err.code = body.error;
+      err.status = res.status;
+      throw err;
+    }
     return body;
   },
   updatePhoto: (id: string, photoId: string, body: { caption?: string; milestoneId?: string | null; sortOrder?: number }) =>

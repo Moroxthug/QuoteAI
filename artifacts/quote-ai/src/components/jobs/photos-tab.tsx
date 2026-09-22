@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Upload, Loader2, Trash2, Share2, Check, ImageOff } from "lucide-react";
+import { Upload, Loader2, Trash2, Share2, Check, ImageOff, CloudUpload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, type JobDetailDto, type JobPhotoDto } from "@/lib/jobs-api";
+import { runOrQueue, useOutbox, discard } from "@/lib/offline/outbox";
 
 /**
  * Photos tab (Phase 10): upload progress photos tied to the job (optionally
@@ -27,10 +28,16 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
 
   const upload = useMutation({
-    mutationFn: (file: File) => jobsApi.uploadPhoto(job.id, file),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey }),
+    // Phase 77: with no signal the file is kept on the device (IndexedDB) and uploaded on reconnect.
+    mutationFn: (file: File) => runOrQueue({ kind: "job.uploadPhoto", jobId: job.id, file, fileName: file.name }, { scope: job.id, label: `${t("jobs.photos.title")} · ${file.name}` }, (clientRef) => jobsApi.uploadPhoto(job.id, file, { clientRef })),
+    onSuccess: (r) => { queryClient.invalidateQueries({ queryKey }); if (r.queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); },
     onError: (e: Error) => toast({ title: t("jobs.photos.uploadError"), description: e.message, variant: "destructive" }),
   });
+  const outbox = useOutbox(job.id);
+  const pendingPhotos = useMemo(() => outbox.rows.filter((r) => r.op.kind === "job.uploadPhoto"), [outbox.rows]);
+  // Object URLs for the queued files, revoked when they leave the queue.
+  const previews = useMemo(() => new Map(pendingPhotos.map((r) => [r.id, URL.createObjectURL((r.op as { file: Blob }).file)])), [pendingPhotos]);
+  useEffect(() => () => { for (const url of previews.values()) URL.revokeObjectURL(url); }, [previews]);
   const del = useMutation({
     mutationFn: (photoId: string) => jobsApi.deletePhoto(job.id, photoId),
     onSuccess: (_r, photoId) => { queryClient.invalidateQueries({ queryKey }); setSelected((s) => { const n = new Set(s); n.delete(photoId); return n; }); },
@@ -84,13 +91,22 @@ export function PhotosTab({ data }: { data: JobDetailDto }) {
 
         {isLoading ? (
           <div className="card-empty">…</div>
-        ) : photos.length === 0 ? (
+        ) : photos.length === 0 && pendingPhotos.length === 0 ? (
           <div className="card-empty">
             <ImageOff />
             {t("jobs.photos.empty")}
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {pendingPhotos.map((r) => (
+              <div key={r.id} className="photo" style={{ outline: "1px dashed var(--navy)", outlineOffset: -1 }}>
+                <div className="photo-img"><img src={previews.get(r.id)} alt={(r.op as { fileName: string }).fileName} style={{ opacity: 0.7 }} /></div>
+                <button type="button" className="photo-del" onClick={() => void discard(r.id)} title={t("offline.discard")}><Trash2 /></button>
+                <div className="photo-meta">
+                  <b className="inline-flex items-center gap-1" style={{ color: r.status === "failed" ? "var(--red)" : undefined }}><CloudUpload className="h-3 w-3" /> {r.status === "failed" ? (r.error ?? t("offline.refused")) : t("offline.pendingItem")}</b>
+                </div>
+              </div>
+            ))}
             {photos.map((p: JobPhotoDto) => {
               const isSelected = selected.has(p.id);
               const ms = milestoneTitle(p.milestoneId);

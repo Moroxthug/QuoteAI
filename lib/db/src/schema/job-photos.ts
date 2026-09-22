@@ -1,4 +1,5 @@
-import { pgTable, text, uuid, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, integer, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -25,10 +26,12 @@ export const jobPhotosTable = pgTable(
     caption: text("caption").notNull().default(""),
     sortOrder: integer("sort_order").notNull().default(0),
     sharedAt: timestamp("shared_at", { withTimezone: true }),
+    /** Phase 77: id of the offline outbox op that uploaded the photo — a replay returns the existing row. */
+    clientRef: text("client_ref"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
-  (t) => [index("job_photos_project_idx").on(t.projectId, t.sortOrder)],
+  (t) => [index("job_photos_project_idx").on(t.projectId, t.sortOrder), uniqueIndex("job_photos_client_ref_idx").on(t.userId, t.clientRef).where(sql`client_ref is not null`)],
 );
 
 export const insertJobPhotoSchema = createInsertSchema(jobPhotosTable).omit({

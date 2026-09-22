@@ -44,6 +44,7 @@ import { cn } from "@/lib/utils";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { leadsApi, type LeadDto } from "@/lib/leads-api";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -761,6 +762,8 @@ export default function DashboardHome() {
       </div>
 
       <DashboardComposer />
+
+      <InstallPrompt className="mt-4" />
 
       {trialStatus?.isTrialActive && !subscription?.isActive && (
         <div style={{ marginTop: 16 }}>

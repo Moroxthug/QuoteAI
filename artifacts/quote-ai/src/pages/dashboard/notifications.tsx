@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { PushToggle } from "@/components/pwa/push-toggle";
 
 type NotificationItem = {
   id: string;
@@ -69,6 +70,8 @@ export default function NotificationsPage() {
           </div>
         )}
       </div>
+
+      <PushToggle />
 
       <div className="card">
         {isLoading ? (

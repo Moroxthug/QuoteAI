@@ -8,6 +8,7 @@ import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loa
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { runOrQueue } from "@/lib/offline/outbox";
 import { jobsApi, formatCents, type JobDetailDto, type TimeEntryDto, type UsageUnit } from "@/lib/jobs-api";
 import { teamApi } from "@/lib/team-api";
 
@@ -43,7 +44,12 @@ export function TeamTab({ data, locale }: { data: JobDetailDto; locale: typeof e
   const addWorker = useMutation({ mutationFn: (v: { name: string; hourlyRateCents?: number }) => teamApi.addWorker(v), onSuccess: async (r) => { await assign.mutateAsync(r.worker.id); setName(""); setRate(""); }, onError });
   const setStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: TimeEntryDto["status"] }) => teamApi.updateTimeEntry(id, { status }), onSuccess: refresh, onError });
   const delTime = useMutation({ mutationFn: (id: string) => teamApi.deleteTimeEntry(id), onSuccess: refresh, onError });
-  const addTime = useMutation({ mutationFn: (v: { workerId: string; date: string; hours: number; milestoneId: string | null; note: string }) => jobsApi.addTimeEntry(job.id, v), onSuccess: () => { refresh(); setTime({ ...time, hours: "", note: "" }); }, onError });
+  const addTime = useMutation({
+    // Phase 77: queued in the outbox when there is no signal.
+    mutationFn: (v: { workerId: string; date: string; hours: number; milestoneId: string | null; note: string }) => runOrQueue({ kind: "job.addTimeEntry", jobId: job.id, body: v }, { scope: job.id, label: `${v.hours} h · ${workers?.items.find((w) => w.id === v.workerId)?.name ?? ""}` }, (clientRef) => jobsApi.addTimeEntry(job.id, { ...v, clientRef })),
+    onSuccess: (r) => { refresh(); setTime({ ...time, hours: "", note: "" }); if (r.queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); },
+    onError,
+  });
   const addUsage = useMutation({ mutationFn: (v: { equipmentId: string; date: string; quantity: number; unit: UsageUnit; note: string }) => jobsApi.addEquipmentUsage(job.id, v), onSuccess: () => { refresh(); setUsage({ ...usage, quantity: "", note: "" }); }, onError });
   const delUsage = useMutation({ mutationFn: (uid: string) => jobsApi.deleteEquipmentUsage(job.id, uid), onSuccess: refresh, onError });
   const [locating, setLocating] = useState(false);

@@ -61,6 +61,23 @@ if (process.env.TWILIO_ACCOUNT_SID.startsWith("ACwalkthrough")) {
   });
 }
 
+// Phase 77: push is "configured" with a throwaway VAPID pair unless real keys
+// are in .env.staging; with the throwaway pair the push services are stubbed
+// and every delivery is printed, so the notifications page's toggle and
+// "Send a test" can be clicked through without a real push reaching anything.
+if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+  const { generateVapidKeys } = await import("../lib/webPush.js");
+  const keys = generateVapidKeys();
+  process.env.VAPID_PUBLIC_KEY = keys.publicKey;
+  process.env.VAPID_PRIVATE_KEY = keys.privateKey;
+  for (const host of ["https://fcm.googleapis.com/", "https://updates.push.services.mozilla.com/", "https://web.push.apple.com/"]) {
+    stubHost(host, (req) => {
+      console.log(`\n[push] ${req.url.slice(0, 70)}… encoding=${req.headers["content-encoding"]} topic=${req.headers.topic ?? "-"}`);
+      return new Response(null, { status: 201 });
+    });
+  }
+}
+
 const MAILBOX_PATH = resolve(import.meta.dirname, "../../.walkthrough-mailbox.json");
 const mailbox = await captureResend((mail) => {
   writeFileSync(MAILBOX_PATH, JSON.stringify(mailbox, null, 2));

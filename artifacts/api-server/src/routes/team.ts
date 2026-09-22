@@ -260,6 +260,8 @@ const TimeEntryBody = z.object({
   note: z.string().max(500).optional(),
   /** Company-entered hours can be approved in the same step. */
   approve: z.boolean().optional(),
+  /** Phase 77: id of the offline outbox op — a replay returns the entry it already created. */
+  clientRef: z.string().uuid().optional(),
 });
 
 async function loadTimeEntries(userId: string, where: ReturnType<typeof and>) {
@@ -313,6 +315,13 @@ router.post("/jobs/:id/time-entries", requireAuth, requirePermission("jobs", "ed
       return;
     }
     const approve = d.approve ?? true;
+    if (d.clientRef) {
+      const [replayed] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, worker.id), eq(timeEntriesTable.clientRef, d.clientRef)));
+      if (replayed) {
+        res.json({ entry: serializeTimeEntry(replayed, { workerName: worker.name, projectName: project.name }), replayed: true });
+        return;
+      }
+    }
     const [entry] = await db
       .insert(timeEntriesTable)
       .values({
@@ -320,6 +329,7 @@ router.post("/jobs/:id/time-entries", requireAuth, requirePermission("jobs", "ed
         workerId: worker.id,
         projectId: project.id,
         milestoneId: await milestoneBelongs(project.id, d.milestoneId),
+        clientRef: d.clientRef ?? null,
         date: parseIsoDate(d.date)!,
         hours: d.hours.toFixed(2),
         rateCentsSnapshot: worker.hourlyRate,

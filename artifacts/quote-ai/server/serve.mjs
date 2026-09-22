@@ -79,6 +79,12 @@ app.use(
       const rel = path.relative(PUBLIC_DIR, filePath).replace(/\\/g, "/");
       const ext = path.extname(filePath).toLowerCase();
 
+      // Phase 77: the service worker must never come from a long-lived cache.
+      if (rel === "sw.js") {
+        res.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate");
+        return;
+      }
+
       if (rel.startsWith("assets/")) {
         res.setHeader(
           "Cache-Control",

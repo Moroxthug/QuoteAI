@@ -1,0 +1,25 @@
+{
+  "name": "QuoteAI",
+  "short_name": "QuoteAI",
+  "description": "Quotes, contracts, invoices and jobs for Canadian contractors.",
+  "id": "/dashboard/",
+  "start_url": "/dashboard/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#7C3AED",
+  "lang": "en-CA",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New quote", "url": "/dashboard/new/?source=pwa", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Jobs", "url": "/dashboard/jobs/?source=pwa", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Schedule", "url": "/dashboard/schedule/?source=pwa", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

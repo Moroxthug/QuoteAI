@@ -36,6 +36,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Phase 77: scripts/build-sw.ts reads the chunk graph to precache the app shell.
+    manifest: !isSsrBuild,
     chunkSizeWarningLimit: 500,
     sourcemap: emitSourcemaps && !isSsrBuild ? "hidden" : false,
     rollupOptions: {

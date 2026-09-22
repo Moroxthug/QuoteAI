@@ -3,12 +3,15 @@ import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square, CalendarDays } from "lucide-react";
+import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square, CalendarDays, CloudUpload, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { workerApi } from "@/lib/team-api";
 import { Logo } from "@/components/logo";
+import { OfflineBar } from "@/components/pwa/offline-bar";
+import { InstallPrompt } from "@/components/pwa/install-prompt";
+import { runOrQueue, enqueue, useOutbox } from "@/lib/offline/outbox";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -35,6 +38,11 @@ function elapsedLabel(sinceIso: string, now: number) {
 /**
  * Public worker time-entry page. No login: the magic-link token identifies
  * the worker. Built for a phone on site — pick the job, tap the hours, done.
+ *
+ * Phase 77: works with no signal. Clock in/out and hours go through the
+ * offline outbox (src/lib/offline/outbox.ts) — a tap is saved on the phone
+ * with its real time and replayed on reconnect; a clock-in that has not
+ * synced yet still shows its running timer here and can be clocked out.
  */
 export default function WorkerTimePage() {
   const { token } = useParams<{ token: string }>();
@@ -49,7 +57,7 @@ export default function WorkerTimePage() {
   const [date, setDate] = useState(isoDay(new Date()));
   const [hours, setHours] = useState(8);
   const [note, setNote] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useState<false | "online" | "offline">(false);
   const [locating, setLocating] = useState(false);
   const [locationOff, setLocationOff] = useState(false);
   const [now, setNow] = useState(() => Date.now());
@@ -62,9 +70,26 @@ export default function WorkerTimePage() {
   }, [data?.activeEntry]);
 
   const job = data?.jobs.find((j) => j.id === projectId);
+  const jobName = (id: string) => data?.jobs.find((j) => j.id === id)?.name ?? "";
+  const outbox = useOutbox(token);
+  // A clock-in saved on this phone that the server has not seen yet (and no queued clock-out for it).
+  const pendingClockIn = useMemo(() => {
+    const rows = outbox.rows.filter((r) => r.status === "pending");
+    return rows.find((r) => r.op.kind === "worker.clockIn" && !rows.some((o) => o.op.kind === "worker.clockOut" && o.op.entryClientRef === r.id)) ?? null;
+  }, [outbox.rows]);
+  const pendingEntries = useMemo(() => outbox.rows.filter((r) => r.op.kind === "worker.addEntry"), [outbox.rows]);
+  useEffect(() => {
+    if (!pendingClockIn) return;
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, [pendingClockIn]);
+
   const add = useMutation({
-    mutationFn: () => workerApi.add(token!, { projectId, date, hours, milestoneId: milestoneId || null, note: note.trim() || undefined }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["worker", token] }); setNote(""); setSaved(true); setTimeout(() => setSaved(false), 2500); },
+    mutationFn: () => {
+      const body = { projectId, date, hours, milestoneId: milestoneId || null, note: note.trim() || undefined };
+      return runOrQueue({ kind: "worker.addEntry", token: token!, ...body }, { scope: token!, label: `${hours} h · ${jobName(projectId)}` }, (clientRef) => workerApi.add(token!, { ...body, clientRef }));
+    },
+    onSuccess: (r) => { queryClient.invalidateQueries({ queryKey: ["worker", token] }); setNote(""); setSaved(r.queued ? "offline" : "online"); setTimeout(() => setSaved(false), 3000); },
   });
   const remove = useMutation({ mutationFn: (id: string) => workerApi.remove(token!, id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }) });
 
@@ -74,16 +99,22 @@ export default function WorkerTimePage() {
       const loc = await getLocation();
       setLocating(false);
       setLocationOff(!loc);
-      return workerApi.clockIn(token!, { projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng });
+      const at = new Date().toISOString();
+      const op = { kind: "worker.clockIn" as const, token: token!, projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at };
+      return runOrQueue(op, { scope: token!, label: `${t("worker.clockIn")} · ${jobName(projectId)}` }, (clientRef) => workerApi.clockIn(token!, { projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at, clientRef }));
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }),
   });
   const clockOut = useMutation({
-    mutationFn: async (entryId: string) => {
+    mutationFn: async (target: { entryId: string } | { entryClientRef: string }) => {
       setLocating(true);
       const loc = await getLocation();
       setLocating(false);
-      return workerApi.clockOut(token!, entryId, { lat: loc?.lat, lng: loc?.lng });
+      const at = new Date().toISOString();
+      const label = `${t("worker.clockOut")} · ${"entryId" in target ? (data?.activeEntry?.projectName ?? "") : jobName((pendingClockIn?.op as { projectId?: string })?.projectId ?? "")}`;
+      // The clock-in itself is still queued: the clock-out must follow it in the same queue.
+      if ("entryClientRef" in target) return { queued: true as const, row: await enqueue({ kind: "worker.clockOut", token: token!, entryClientRef: target.entryClientRef, lat: loc?.lat, lng: loc?.lng, at }, { scope: token!, label }) };
+      return runOrQueue({ kind: "worker.clockOut", token: token!, entryId: target.entryId, lat: loc?.lat, lng: loc?.lng, at }, { scope: token!, label }, () => workerApi.clockOut(token!, { entryId: target.entryId, lat: loc?.lat, lng: loc?.lng, at }));
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }),
   });
@@ -99,16 +130,20 @@ export default function WorkerTimePage() {
   if (isLoading) return <div className="doc-shell flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--navy)" }} /></div>;
   if (error || !data) {
     const code = (error as Error & { code?: string })?.code;
+    const offline = code === "OFFLINE" || error instanceof TypeError;
     return (
       <div className="doc-shell flex items-center justify-center p-6">
         <div className="max-w-sm text-center space-y-3">
-          <AlertTriangle className="h-10 w-10 mx-auto" style={{ color: "var(--yellow-dark)" }} />
-          <h1 className="text-lg font-bold" style={{ color: "var(--navy)" }}>{code === "EXPIRED" ? t("worker.expiredTitle") : t("worker.invalidTitle")}</h1>
-          <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{code === "EXPIRED" ? t("worker.expiredBody") : t("worker.invalidBody")}</p>
+          {offline ? <WifiOff className="h-10 w-10 mx-auto" style={{ color: "var(--muted-mk)" }} /> : <AlertTriangle className="h-10 w-10 mx-auto" style={{ color: "var(--yellow-dark)" }} />}
+          <h1 className="text-lg font-bold" style={{ color: "var(--navy)" }}>{offline ? t("worker.offlineTitle") : code === "EXPIRED" ? t("worker.expiredTitle") : t("worker.invalidTitle")}</h1>
+          <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{offline ? t("worker.offlineBody") : code === "EXPIRED" ? t("worker.expiredBody") : t("worker.invalidBody")}</p>
+          {offline && <button type="button" className="btn btn-navy" onClick={() => window.location.reload()}>{t("offline.retry")}</button>}
         </div>
       </div>
     );
   }
+
+  const pendingOp = pendingClockIn?.op.kind === "worker.clockIn" ? pendingClockIn.op : null;
 
   return (
     <div className="doc-shell pb-16">
@@ -123,6 +158,7 @@ export default function WorkerTimePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        <OfflineBar scope={token} />
         {data.schedule.length > 0 && (
           <section className="card p-4 space-y-2">
             <h2 className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.schedule")}</h2>
@@ -149,13 +185,24 @@ export default function WorkerTimePage() {
         <section className="card p-4 space-y-4">
           <h1 className="text-base font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Clock className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("worker.clockInOut")}</h1>
 
-          {data.activeEntry ? (
+          {pendingOp ? (
+            <div className="rounded-xl p-4 space-y-3 text-center" style={{ border: "1px dashed var(--navy)", background: "var(--soft)" }}>
+              <div className="text-sm" style={{ color: "var(--ink)" }}>{jobName(pendingOp.projectId)}{pendingOp.milestoneId ? ` · ${data.jobs.find((j) => j.id === pendingOp.projectId)?.milestones.find((m) => m.id === pendingOp.milestoneId)?.title ?? ""}` : ""}</div>
+              <div className="text-3xl font-bold tabular-nums" style={{ color: "var(--navy)" }}>{elapsedLabel(pendingOp.at, now)}</div>
+              <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.clockedInSince")} {format(new Date(pendingOp.at), "HH:mm")}</div>
+              <div className="text-[11px] inline-flex items-center gap-1 justify-center" style={{ color: "var(--teal-dark)" }}><CloudUpload className="h-3 w-3" /> {t("worker.pendingSync")}</div>
+              {clockOut.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(clockOut.error as Error).message}</p>}
+              <button className="btn btn-navy w-full text-base" disabled={clockOut.isPending} onClick={() => clockOut.mutate({ entryClientRef: pendingClockIn!.id })}>
+                {clockOut.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Square className="h-4 w-4 fill-current" />} {locating && clockOut.isPending ? t("worker.locating") : t("worker.clockOut")}
+              </button>
+            </div>
+          ) : data.activeEntry ? (
             <div className="rounded-xl p-4 space-y-3 text-center" style={{ border: "1px solid var(--line)", background: "var(--soft)" }}>
               <div className="text-sm" style={{ color: "var(--ink)" }}>{data.activeEntry.projectName}{data.activeEntry.milestoneTitle ? ` · ${data.activeEntry.milestoneTitle}` : ""}</div>
               <div className="text-3xl font-bold tabular-nums" style={{ color: "var(--navy)" }}>{elapsedLabel(data.activeEntry.clockInAt!, now)}</div>
               <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.clockedInSince")} {format(new Date(data.activeEntry.clockInAt!), "HH:mm")}</div>
               {clockOut.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(clockOut.error as Error).message}</p>}
-              <button className="btn btn-navy w-full text-base" disabled={clockOut.isPending} onClick={() => clockOut.mutate(data.activeEntry!.id)}>
+              <button className="btn btn-navy w-full text-base" disabled={clockOut.isPending} onClick={() => clockOut.mutate({ entryId: data.activeEntry!.id })}>
                 {clockOut.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Square className="h-4 w-4 fill-current" />} {locating && clockOut.isPending ? t("worker.locating") : t("worker.clockOut")}
               </button>
             </div>
@@ -234,16 +281,28 @@ export default function WorkerTimePage() {
           </div>
 
           {add.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(add.error as Error).message}</p>}
-          <button className="btn w-full text-base" style={saved ? { background: "var(--green-dark)", color: "#fff" } : { background: "var(--navy)", color: "#fff" }} disabled={!projectId || add.isPending} onClick={() => add.mutate()}>
-            {add.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : saved ? <CheckCircle2 className="h-5 w-5" /> : null} {saved ? t("worker.saved") : t("worker.submit")}
+          <button className="btn w-full text-base" style={saved ? { background: saved === "offline" ? "var(--teal-dark)" : "var(--green-dark)", color: "#fff" } : { background: "var(--navy)", color: "#fff" }} disabled={!projectId || add.isPending} onClick={() => add.mutate()}>
+            {add.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : saved === "offline" ? <CloudUpload className="h-5 w-5" /> : saved ? <CheckCircle2 className="h-5 w-5" /> : null} {saved === "offline" ? t("worker.savedOffline") : saved ? t("worker.saved") : t("worker.submit")}
           </button>
           <p className="text-[11px] text-center" style={{ color: "var(--faint)" }}>{t("worker.approvalHint")}</p>
         </section>
 
         <section className="card p-4 space-y-2">
           <div className="flex items-center justify-between"><h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("worker.recent")}</h2><span className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.thisWeek")}: <span className="font-semibold" style={{ color: "var(--ink)" }}>{weekTotal} h</span></span></div>
-          {closedEntries.length === 0 ? <p className="text-sm py-3 text-center" style={{ color: "var(--faint)" }}>{t("worker.noEntries")}</p> : (
+          {closedEntries.length === 0 && pendingEntries.length === 0 ? <p className="text-sm py-3 text-center" style={{ color: "var(--faint)" }}>{t("worker.noEntries")}</p> : (
             <ul className="divide-y" style={{ borderColor: "var(--soft)" }}>
+              {pendingEntries.map((r) => {
+                const op = r.op as Extract<typeof r.op, { kind: "worker.addEntry" }>;
+                return (
+                  <li key={r.id} className="flex items-center gap-3 py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate"><span className="font-medium" style={{ color: "var(--ink)" }}>{op.hours} h</span> <span style={{ color: "var(--muted-mk)" }}>· {jobName(op.projectId)}</span></div>
+                      <div className="text-[11px]" style={{ color: "var(--faint)" }}>{format(day(op.date)!, "EEE d MMM", { locale })}{op.note ? ` · ${op.note}` : ""}</div>
+                    </div>
+                    <span className={cn("doc-status", r.status === "failed" ? "danger" : "warn")}>{r.status === "failed" ? t("worker.status.failed") : t("worker.status.pending")}</span>
+                  </li>
+                );
+              })}
               {closedEntries.map((e) => (
                 <li key={e.id} className="flex items-center gap-3 py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
                   <div className="flex-1 min-w-0">
@@ -258,6 +317,8 @@ export default function WorkerTimePage() {
             </ul>
           )}
         </section>
+
+        <InstallPrompt compact />
       </main>
     </div>
   );

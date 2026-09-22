@@ -1,4 +1,5 @@
 import { db, notificationsTable, auditLogTable } from "@workspace/db";
+import { pushForNotification } from "./push";
 
 export async function createNotification(params: {
   userId: string;
@@ -18,6 +19,8 @@ export async function createNotification(params: {
     entityType: params.entityType ?? null,
     entityId: params.entityId ?? null,
   });
+  // Phase 77: the phone gets the ones worth interrupting for (lib/push.ts decides). Never blocks or fails the caller.
+  void pushForNotification(params);
 }
 
 export async function writeAudit(params: {

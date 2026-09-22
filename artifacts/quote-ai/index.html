@@ -72,6 +72,13 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 
+    <!-- PWA (Phase 77): installable shell; the service worker is registered from src/lib/pwa.ts. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="QuoteAI" />
+
     <!-- Google tag (gtag.js) — loaded on the first user interaction or after
          5 s, whichever comes first, so the 170 kB tag never competes with the
          page's own JS on mobile (Phase 68). Events queued in dataLayer before

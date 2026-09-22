@@ -50,6 +50,7 @@ import smsRouter from "./sms";
 import scheduleRouter from "./schedule";
 import portalRouter from "./portal";
 import clientPortalRouter from "./client-portal";
+import pushRouter from "./push";
 
 const router: IRouter = Router();
 
@@ -103,6 +104,7 @@ router.use(smsRouter);
 router.use(scheduleRouter);
 router.use(portalRouter);
 router.use(clientPortalRouter);
+router.use(pushRouter);
 router.use("/v1/public", publicV1Router);
 
 export default router;

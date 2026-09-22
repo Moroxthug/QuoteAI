@@ -1026,6 +1026,15 @@ router.post(
         res.status(400).json({ error: "No file provided" });
         return;
       }
+      // Phase 77: the offline outbox re-posts the same photo until it gets an answer — same clientRef, same row.
+      const clientRef = typeof req.body?.clientRef === "string" && /^[0-9a-f-]{36}$/i.test(req.body.clientRef) ? req.body.clientRef : null;
+      if (clientRef) {
+        const [replayed] = await db.select().from(jobPhotosTable).where(and(eq(jobPhotosTable.userId, userId), eq(jobPhotosTable.clientRef, clientRef)));
+        if (replayed) {
+          res.json({ photo: serializePhoto(replayed), replayed: true });
+          return;
+        }
+      }
       const milestoneIdRaw = typeof req.body?.milestoneId === "string" && req.body.milestoneId ? req.body.milestoneId : null;
       if (milestoneIdRaw) {
         const [m] = await db.select().from(milestonesTable).where(and(eq(milestonesTable.id, milestoneIdRaw), eq(milestonesTable.projectId, project.id)));
@@ -1051,6 +1060,7 @@ router.post(
           fileUrl,
           caption,
           sortOrder: Number(count ?? 0),
+          clientRef,
         })
         .returning();
       res.status(201).json({ photo: serializePhoto(photo!) });

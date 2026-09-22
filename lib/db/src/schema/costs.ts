@@ -8,7 +8,9 @@ import {
   numeric,
   boolean,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { projectsTable, collaboratorsTable, suppliersTable } from "./crm";
 import { milestonesTable, COST_CATEGORIES } from "./jobs";
 import { uploadedDocumentsTable } from "./documents";
@@ -71,12 +73,15 @@ export const costEntriesTable = pgTable(
     equipmentUsageId: uuid("equipment_usage_id"),
     aiExtraction: jsonb("ai_extraction").$type<ReceiptExtraction | null>(),
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+    /** Phase 77: id of the offline outbox op that created the row — a replayed request returns the existing entry instead of inserting twice. */
+    clientRef: text("client_ref"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
   (t) => [
     index("cost_entries_project_idx").on(t.projectId, t.date),
     index("cost_entries_user_status_idx").on(t.userId, t.status),
+    uniqueIndex("cost_entries_client_ref_idx").on(t.userId, t.clientRef).where(sql`client_ref is not null`),
   ],
 );
 
@@ -117,6 +122,8 @@ export const timeEntriesTable = pgTable(
     clockOutLng: numeric("clock_out_lng", { precision: 9, scale: 6 }),
     /** Set when a clock-in/out location falls outside the job's geofence radius. Never blocks — flags for review only. */
     geofenceFlagged: boolean("geofence_flagged").notNull().default(false),
+    /** Phase 77: id of the offline outbox op that created the row (worker page or dashboard) — a replay finds the entry instead of inserting twice. */
+    clientRef: text("client_ref"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -124,6 +131,7 @@ export const timeEntriesTable = pgTable(
     index("time_entries_project_idx").on(t.projectId, t.date),
     index("time_entries_worker_idx").on(t.workerId, t.date),
     index("time_entries_user_status_idx").on(t.userId, t.status),
+    uniqueIndex("time_entries_client_ref_idx").on(t.workerId, t.clientRef).where(sql`client_ref is not null`),
   ],
 );
 

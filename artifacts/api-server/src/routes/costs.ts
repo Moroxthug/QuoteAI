@@ -70,6 +70,8 @@ const CostBody = z.object({
   taxCents: z.number().int().min(0).optional(),
   taxBreakdown: TaxBreakdownBody.optional(),
   totalCents: z.number().int(),
+  /** Phase 77: id of the offline outbox op — a replay returns the entry it already created. */
+  clientRef: z.string().uuid().optional(),
 });
 
 function amounts(d: { subtotalCents?: number; taxCents?: number; taxBreakdown?: z.infer<typeof TaxBreakdownBody>; totalCents: number }) {
@@ -125,12 +127,20 @@ router.post("/jobs/:id/costs", requireAuth, requirePermission("costs", "edit"), 
       return;
     }
     const d = body.data;
+    if (d.clientRef) {
+      const [replayed] = await db.select().from(costEntriesTable).where(and(eq(costEntriesTable.userId, userId), eq(costEntriesTable.clientRef, d.clientRef)));
+      if (replayed) {
+        res.json({ entry: serializeCostEntry(replayed), replayed: true });
+        return;
+      }
+    }
     const [entry] = await db
       .insert(costEntriesTable)
       .values({
         userId,
         projectId: project.id,
         milestoneId: await milestoneBelongs(project.id, d.milestoneId),
+        clientRef: d.clientRef ?? null,
         category: d.category,
         vendor: d.vendor ?? "",
         description: d.description ?? "",

@@ -48,6 +48,7 @@ const PERMISSIONLESS_MUTATIONS: Allow[] = [
   { match: /^POST \/api\/team\/switch$/, reason: "switches the actor's own active org" },
   { match: /^POST \/api\/team\/members\/leave$/, reason: "Phase 72: the actor removes their own membership — no role needed" },
   { match: /^(POST|DELETE) \/api\/account(\/export)?$/, reason: "Phase 72: acts on the actor's own account (owner check inline for the export); password re-auth on DELETE" },
+  { match: /^(POST|DELETE) \/api\/push\/(subscriptions|test)$/, reason: "Phase 77: the actor's own browser subscription (rows keyed by memberUserId); any role may receive push" },
 ];
 
 // ── Rule 3: feature entry points check the plan flag ─────────────────────────

@@ -34,6 +34,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^(GET|POST) \/api\/support\/conversations(\/:id\/(messages|request-human|close))?$/, reason: "anonymous support widget — per-conversation token via requireConversationAccess, IP rate limited" },
   { match: /^GET \/api\/team\/invite\/:token$/, reason: "invite preview — hashed token lookup, rate limited" },
   { match: /^(GET|POST|DELETE) \/api\/(i|sign|t)\/:token/, reason: "customer/worker magic links — hashed token lookup, rate limited (Rule 6)" },
+  { match: /^(GET|POST) \/api\/portal\/:token/, reason: "Phase 76: client portal — hashed link token, IP rate limited; everything past the header needs the X-Portal-Session header issued by the email-OTP verify step (Rule 6)" },
   { match: /^(GET|POST) \/api\/public\//, reason: "public quote widget + unsubscribe links — rate limited (Rule 6)" },
   { match: /^GET \/api\/account\/deletion\/cancel\/:token$/, reason: "Phase 72: cancel-deletion link from the confirmation email — the person is signed out by then; hashed single-use token, IP rate limited" },
 ];

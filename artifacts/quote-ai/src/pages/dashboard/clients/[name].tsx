@@ -6,6 +6,8 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
+import { ClientThreadCard } from "@/components/clients/client-thread";
+import { ClientPortalCard } from "@/components/clients/client-portal-card";
 
 const formatCurrency = (v: number, lang: string) =>
   new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
@@ -91,6 +93,14 @@ export default function ClientDetailPage() {
           {partitaIva && <div className="kv"><span>{t("clients.detail.gstNumber")}</span><b>{partitaIva}</b></div>}
           {businessNumber && <div className="kv"><span>{t("clients.detail.businessNumber")}</span><b>{businessNumber}</b></div>}
           {indirizzo && <div className="kv"><span>{t("clients.detail.address")}</span><b>{indirizzo}{city ? `, ${city}` : ""}</b></div>}
+        </div>
+      )}
+
+      {/* Phase 76: portal link + message thread */}
+      {clientId && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4" style={{ marginBottom: 16 }}>
+          <div className="lg:col-span-2"><ClientThreadCard clientId={clientId} /></div>
+          <div><ClientPortalCard clientId={clientId} /></div>
         </div>
       )}
 

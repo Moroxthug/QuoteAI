@@ -7,6 +7,7 @@ import { buildInvoicePdf } from "../invoices/pdf.js";
 import { renderInvoiceHtml, INVOICE_CSS } from "../invoices/render.js";
 import { balanceCents } from "../invoices/math.js";
 import { getConnectAccount, createInvoiceCheckoutSession } from "../invoices/stripeConnect.js";
+import { portalLinkForClient } from "../portal/service.js";
 
 // Public, token-addressed invoice view (/i/:token). Read-only for the
 // customer: see the invoice, the balance, payment instructions, download the
@@ -39,6 +40,8 @@ router.get("/i/:token", viewLimiter, async (req, res) => {
     const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, inv.userId));
     const conn = await getConnectAccount(inv.userId);
     const canPayByCard = hasFeature(profile, "invoice_card_payments") && !!conn?.chargesEnabled;
+    // Phase 76: "see everything" — the client portal, when the invoice has a client with an email.
+    const portalUrl = await portalLinkForClient(inv.clientId);
     res.json({
       invoice: {
         id: inv.id,
@@ -60,6 +63,7 @@ router.get("/i/:token", viewLimiter, async (req, res) => {
         paymentInstructions: inv.paymentInstructions,
         paidAt: inv.paidAt ? inv.paidAt.toISOString() : null,
         canPayByCard,
+        portalUrl,
       },
       html: renderInvoiceHtml(inv, payments),
       css: INVOICE_CSS,

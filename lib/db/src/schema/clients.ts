@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, timestamp, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, integer, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { randomUUID } from "crypto";
@@ -31,6 +31,20 @@ export const clientsTable = pgTable(
     /** Phase 47: soft-archive. Set when moved to the Archive view; excluded from list endpoints while set. */
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     archivedByName: text("archived_by_name"),
+    // ── Phase 76: client portal (/portal/:token) ──
+    // The link token is deterministic (HMAC of the client id, like invoice
+    // links) so every document page can rebuild it; only its hash is stored
+    // and it is null until the first link is issued. The token alone shows
+    // nothing — the client proves the mailbox with a 6-digit code (same OTP
+    // shape as contract signing) and gets a session (client_portal_sessions).
+    portalTokenHash: text("portal_token_hash"),
+    portalOtpHash: text("portal_otp_hash"),
+    portalOtpExpiresAt: timestamp("portal_otp_expires_at", { withTimezone: true }),
+    portalOtpAttempts: integer("portal_otp_attempts").notNull().default(0),
+    /** When the contractor last emailed the portal invitation. */
+    portalInvitedAt: timestamp("portal_invited_at", { withTimezone: true }),
+    /** Last authenticated portal request. */
+    portalLastSeenAt: timestamp("portal_last_seen_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -39,6 +53,7 @@ export const clientsTable = pgTable(
     uniqueIndex("clients_user_dedup_idx").on(t.userId, t.dedupKey),
     uniqueIndex("clients_marketing_unsubscribe_token_idx").on(t.marketingUnsubscribeToken),
     index("clients_archived_idx").on(t.userId, t.archivedAt),
+    uniqueIndex("clients_portal_token_idx").on(t.portalTokenHash),
   ],
 );
 

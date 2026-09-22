@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
-import { CheckCircle2, Loader2, FileX, Hammer, Landmark, Gift, ExternalLink } from "lucide-react";
+import { CheckCircle2, Loader2, FileX, Hammer, Landmark, Gift, ExternalLink, LayoutDashboard } from "lucide-react";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -291,6 +291,8 @@ export default function PublicQuotePage() {
   const { t, lang, setLang } = useLanguage();
   const { id } = useParams();
   const [quote, setQuote] = useState<PublicQuote | null>(null);
+  /** Phase 76: the client portal link, when the quote is linked to a client with an email. */
+  const [portalUrl, setPortalUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [nomeConferma, setNomeConferma] = useState("");
@@ -312,6 +314,7 @@ export default function PublicQuotePage() {
         const data = await res.json();
         if (!cancelled) {
           setQuote(data.quote);
+          setPortalUrl(typeof data.portalUrl === "string" ? data.portalUrl : null);
           const variants: PublicQuoteVariant[] = data.quote?.variants ?? [];
           if (variants.length > 1) {
             setSelectedVariantId(data.quote.acceptedVariantId || variants[0]?.id || null);
@@ -569,6 +572,14 @@ export default function PublicQuotePage() {
             </div>
           </div>
         </div>
+      )}
+
+      {portalUrl && (
+        <a href={portalUrl} className="card p-4 mt-6 flex items-center gap-3 text-sm no-underline" style={{ boxShadow: "var(--shadow-card)" }}>
+          <LayoutDashboard className="h-5 w-5 shrink-0" style={{ color: "var(--navy)" }} />
+          <span className="grow" style={{ color: "var(--ink)" }}><b style={{ color: "var(--navy)" }}>{t("portalLink.title").replace("{company}", quote.companySnapshot?.companyName || "")}</b><span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("portalLink.desc")}</span></span>
+          <span className="btn btn-sm btn-outline-navy">{t("portalLink.open")}</span>
+        </a>
       )}
 
       <p className="text-center text-xs mt-8" style={{ color: "var(--muted-mk)" }}>

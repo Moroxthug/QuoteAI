@@ -98,6 +98,8 @@ export type PublicSignPayload = {
     expiresAt: string | null;
     signedAt: string | null;
     contractorSignedAt: string | null;
+    /** Phase 76: the client portal, when the contract has a client with an email. */
+    portalUrl: string | null;
   };
   signer: { name: string; emailMasked: string; status: string; otpVerified: boolean; signedAt: string | null };
   html: string;

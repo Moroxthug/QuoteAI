@@ -40,3 +40,4 @@ export * from "./cron-ticks";
 export * from "./account";
 export * from "./sms";
 export * from "./schedule";
+export * from "./portal";

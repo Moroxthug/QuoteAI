@@ -48,6 +48,8 @@ import archiveRouter from "./archive";
 import accountRouter from "./account";
 import smsRouter from "./sms";
 import scheduleRouter from "./schedule";
+import portalRouter from "./portal";
+import clientPortalRouter from "./client-portal";
 
 const router: IRouter = Router();
 
@@ -99,6 +101,8 @@ router.use(archiveRouter);
 router.use(accountRouter);
 router.use(smsRouter);
 router.use(scheduleRouter);
+router.use(portalRouter);
+router.use(clientPortalRouter);
 router.use("/v1/public", publicV1Router);
 
 export default router;

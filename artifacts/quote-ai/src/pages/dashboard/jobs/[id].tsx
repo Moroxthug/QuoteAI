@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, Briefcase, MapPin, MessageSquareText, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
+  ArrowLeft, Briefcase, MapPin, MessageSquareText, MessageSquare, FileSignature, Sparkles, Plus, Trash2, CheckCircle2, Circle, PlayCircle, Receipt, Wallet, Users, FolderOpen, CalendarDays, LayoutDashboard, GitBranch, ExternalLink, Download, Pencil, Check, X, Camera, Archive,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -24,10 +24,13 @@ import { OverviewCharts } from "@/components/jobs/overview-charts";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { PhotosTab } from "@/components/jobs/photos-tab";
 import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
+import { ClientThreadCard } from "@/components/clients/client-thread";
+import { ClientPortalCard } from "@/components/clients/client-portal-card";
+import { clientPortalApi } from "@/lib/portal-api";
 
-const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "photos", "documents", "assistant"] as const;
+const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "photos", "messages", "documents", "assistant"] as const;
 type Tab = (typeof TABS)[number];
-const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, photos: Camera, documents: FolderOpen, assistant: Sparkles };
+const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, photos: Camera, messages: MessageSquare, documents: FolderOpen, assistant: Sparkles };
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 
@@ -44,6 +47,9 @@ export default function JobDetailPage() {
   const [coOpen, setCoOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
+  // Phase 76: unread client replies drive the Messages tab badge.
+  const clientId = data?.job.client?.id;
+  const { data: portalStatus } = useQuery({ queryKey: ["client-portal", clientId], queryFn: () => clientPortalApi.status(clientId!), enabled: !!clientId });
 
   useEffect(() => {
     if (data && data.job.setupStatus === "pending_review") navigate(`/dashboard/jobs/${id}/setup`, { replace: true });
@@ -108,7 +114,7 @@ export default function JobDetailPage() {
       <div className="pills scroll" style={{ marginBottom: 16 }}>
         {TABS.map((k) => {
           const Icon = TAB_ICONS[k];
-          const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "invoices" ? invoiceTotals.draftCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : undefined;
+          const count = k === "changes" ? changeOrders.length : k === "costs" ? costs.pendingCount : k === "invoices" ? invoiceTotals.draftCount : k === "team" ? data.timeEntries.filter((e) => e.status === "submitted").length : k === "messages" ? portalStatus?.unread : undefined;
           return (
             <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
               <Icon /> {t(`jobs.tab.${k}`)}{count ? <span className="cnt">{count}</span> : null}
@@ -126,6 +132,16 @@ export default function JobDetailPage() {
       {tab === "invoices" && <InvoicesTab data={data} locale={locale} />}
       {tab === "team" && <TeamTab data={data} locale={locale} />}
       {tab === "photos" && <PhotosTab data={data} />}
+      {tab === "messages" && (
+        job.client ? (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2"><ClientThreadCard clientId={job.client.id} jobId={job.id} jobName={job.name} /></div>
+            <div><ClientPortalCard clientId={job.client.id} /></div>
+          </div>
+        ) : (
+          <div className="card card-empty">{t("thread.noClient")}</div>
+        )
+      )}
       {tab === "documents" && <DocumentsTab data={data} locale={locale} />}
       {tab === "assistant" && <AssistantPanel projectId={job.id} />}
 

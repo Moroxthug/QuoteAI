@@ -266,6 +266,8 @@ export type PublicInvoiceDto = {
     paymentInstructions: { etransferEmail?: string | null; chequePayableTo?: string | null; note?: string | null };
     paidAt: string | null;
     canPayByCard: boolean;
+    /** Phase 76: the client portal, when the invoice has a client with an email. */
+    portalUrl: string | null;
   };
   html: string;
   css: string;

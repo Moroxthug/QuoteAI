@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, AlertTriangle, Download, CheckCircle2, Banknote, Mail, Copy, CreditCard, MailCheck, Clock } from "lucide-react";
+import { Loader2, AlertTriangle, Download, CheckCircle2, Banknote, Mail, Copy, CreditCard, MailCheck, Clock, LayoutDashboard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -153,6 +153,14 @@ export default function PublicInvoicePage() {
           <style dangerouslySetInnerHTML={{ __html: data.css }} />
           <div dangerouslySetInnerHTML={{ __html: data.html }} />
         </div>
+
+        {invoice.portalUrl && (
+          <a href={invoice.portalUrl} className="card p-4 flex items-center gap-3 text-sm no-underline" style={{ boxShadow: "var(--shadow-card)" }}>
+            <LayoutDashboard className="h-5 w-5 shrink-0" style={{ color: "var(--navy)" }} />
+            <span className="grow" style={{ color: "var(--ink)" }}><b style={{ color: "var(--navy)" }}>{t("portalLink.title").replace("{company}", invoice.companyName)}</b><span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("portalLink.desc")}</span></span>
+            <span className="btn btn-sm btn-outline-navy">{t("portalLink.open")}</span>
+          </a>
+        )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm" style={{ color: "var(--muted-mk)" }}>
           <a href={publicInvoiceApi.pdfUrl(token!, true)} className="inline-flex items-center gap-2 font-medium hover:underline" style={{ color: "var(--navy)" }}><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>

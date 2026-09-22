@@ -259,3 +259,20 @@ Reminders: `runScheduleReminderMaintenance(now)` runs from **`GET /api/cron/even
 | Worker says the block is missing on their page | `/t/:token` lists blocks from the start of *today* (company-local) for 15 days, assigned to that `collaborator_id`; unassigned blocks never show there |
 | "Double-booked" but the times do not overlap | overlap is computed on instants — check both blocks' `starts_at`/`ends_at` in UTC; an all-day block covers the whole local day |
 | Hobby cron cap | Vercel Hobby allows two cron jobs, once a day each — `tick` and `evening` use both. A third schedule needs O7 (Pro) |
+
+## 13. Client portal + message thread (Phase 76)
+
+**Where**: `artifacts/api-server/src/routes/portal.ts` (public `/api/portal/:token/*`), `src/routes/client-portal.ts` (dashboard: link, invite, thread), `src/portal/service.ts` (token, OTP, sessions, overview — pure parts unit-tested), `src/portal/messages.ts` (the one writer for both directions), `src/lib/emailPortal.ts` (code, invitation, message copies), tables `client_portal_sessions`, `client_messages`, columns `clients.portal_*`.
+
+**How it fits** — the link `/portal/<token>` is an HMAC of the client id with `INVOICE_LINK_SECRET` (fallback `BETTER_AUTH_SECRET`), same as invoice links; the DB stores its hash (`clients.portal_token_hash`), written the first time anything asks for the link (dashboard card, `/i`, `/sign`, `/p` payloads, a contractor message). The token alone reveals the company name and a masked email. Opening the portal emails a 6-digit code to `clients.email`; a correct code creates a `client_portal_sessions` row (30 days) whose raw token the browser keeps in `localStorage` and sends as `X-Portal-Session`. Everything the client sees follows the public pages' visibility rules (no drafts). Messages are one thread per client; a contractor message is emailed to the client with the portal link, a client reply raises a `client_message` notification and an email to the company.
+
+| Ask | Do |
+|---|---|
+| "The portal link says it's not valid" | The client row is archived, has no email, or the hash was never issued — open the job/client page once (the card's read re-stores the hash) and resend the invitation. A changed `INVOICE_LINK_SECRET` / `BETTER_AUTH_SECRET` invalidates every old link the same way (also every invoice link) — the next dashboard read re-issues portal links, invoices must be re-sent |
+| Client never gets the code | `RESEND_API_KEY` unset (503-style log "Email service not configured"), or the client's email is wrong on the record; the code is only ever sent to `clients.email`. 8 requests / 15 min per IP, 5 wrong attempts per code, 10-minute expiry |
+| Client says they signed in but sees nothing | Quotes show only `unlocked`/`accepted`, contracts only once sent, invoices only once sent, jobs only with a confirmed setup — and all keyed on `client_id`. A quote/contract/invoice with `client_id` null (legacy rows, unlinked manual quotes) is not in the portal |
+| "Pay by card" missing | needs the company's `invoice_card_payments` feature **and** a Connect account with charges enabled — same rule as `/i` |
+| "Sign now" gave a new link and the emailed one stopped working | by design: one live signing token per signer; the portal-minted link is marked OTP-verified because the portal session already proved the mailbox (`contract_events` shows `otp_verified` with `via: portal`) |
+| Contractor did not get a reply | the notification always exists (`notifications.type = client_message`); the email goes to the business profile email, else the owner's login email — `client_messages.emailed_at` null means no email went out (check the log line "Client reply email not sent") |
+| Revoke a client's access | `update client_portal_sessions set revoked_at = now() where client_id = …`; archiving the client also closes the portal (404) and drops the "See everything" links |
+| Unread badge stuck | the count is `client_messages` with `sender = client and read_at is null`; opening the thread (job Messages tab or client page) marks them read |

@@ -13,6 +13,7 @@ import { raiseAutomation } from "../lib/automation.js";
 import { linkQuoteToClient } from "../lib/clients.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { FOLLOWUP_CADENCE_DAYS } from "../lib/leadMessaging.js";
+import { portalLinkForClient } from "../portal/service.js";
 import { calculateEstimate, sendDirectInvite } from "../lib/financeitClient.js";
 import {
   getFinanceitConnection,
@@ -570,7 +571,9 @@ router.get("/public/quotes/:id", quoteViewLimiter, async (req, res) => {
       .where(eq(quoteVariantsTable.quoteId, id))
       .orderBy(quoteVariantsTable.position);
 
-    res.json({ success: true, quote: toPublicQuote(quote, variants) });
+    // Phase 76: "see everything" — the client portal, when the quote is linked to a client with an email.
+    const portalUrl = await portalLinkForClient(quote.clientId);
+    res.json({ success: true, quote: toPublicQuote(quote, variants), portalUrl });
   } catch (err) {
     logger.error({ err }, "Error fetching public quote view");
     res.status(500).json({ error: "Internal server error" });

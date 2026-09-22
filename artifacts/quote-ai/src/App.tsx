@@ -59,6 +59,7 @@ const BlogPage = lazy(() => import("@/pages/blog/index"));
 const ContractsListPage = lazy(() => import("@/pages/dashboard/contracts/index"));
 const ContractDetailPage = lazy(() => import("@/pages/dashboard/contracts/[id]"));
 const SignPage = lazy(() => import("@/pages/sign/[token]"));
+const PortalPage = lazy(() => import("@/pages/portal/[token]"));
 const BlogArticlePage = lazy(() => import("@/pages/blog/[slug]"));
 const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
 
@@ -234,6 +235,7 @@ function Router() {
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}
       <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />
+      <Route path="/portal/:token" component={() => <Suspense fallback={null}><PortalPage /></Suspense>} />
       {/* Public invoice page: the customer sees the balance + payment instructions from the emailed link */}
       <Route path="/i/:token" component={() => <Suspense fallback={null}><PublicInvoicePage /></Suspense>} />
       {/* Public worker time-entry page (magic link from the Team page) */}

@@ -11,6 +11,7 @@ import { sendContractOtpEmail, sendContractDeclinedEmail } from "../lib/emailCon
 import { raiseAutomation } from "../lib/automation.js";
 import { writeAudit } from "../lib/notifications.js";
 import { isWellFormedPngDataUrl } from "../lib/pngDataUrl.js";
+import { portalLinkForClient } from "../portal/service.js";
 
 // Public, token-addressed signing flow. Every endpoint is keyed by the raw
 // token from the emailed link (hashed before lookup) and rate-limited by IP.
@@ -44,7 +45,7 @@ async function resolveToken(rawToken: string): Promise<{ loaded: Loaded; signer:
   return { loaded, signer: loaded.signers.find((s) => s.id === signer.id)! };
 }
 
-function publicPayload(loaded: Loaded, signer: Loaded["signers"][number]) {
+function publicPayload(loaded: Loaded, signer: Loaded["signers"][number], portalUrl: string | null = null) {
   const { contract, signers } = loaded;
   const contractor = signers.find((s) => s.role === "contractor");
   return {
@@ -63,6 +64,8 @@ function publicPayload(loaded: Loaded, signer: Loaded["signers"][number]) {
       expiresAt: contract.expiresAt?.toISOString() ?? null,
       signedAt: contract.signedAt?.toISOString() ?? null,
       contractorSignedAt: contractor?.signedAt?.toISOString() ?? null,
+      /** Phase 76: the client portal ("see everything"), when the contract has a client with an email. */
+      portalUrl,
     },
     signer: {
       name: signer.name,
@@ -85,15 +88,16 @@ router.get("/sign/:token", viewLimiter, async (req, res) => {
       return;
     }
     const { loaded, signer } = r;
+    const portalUrl = await portalLinkForClient(loaded.contract.clientId);
     if (!signer.viewedAt) {
       await db.update(contractSignersTable).set({ viewedAt: new Date(), status: signer.status === "pending" ? "viewed" : signer.status, ip: req.ip ?? null, userAgent: req.headers["user-agent"] ?? null }).where(eq(contractSignersTable.id, signer.id));
       if (loaded.contract.status === "sent") await db.update(contractsTable).set({ status: "viewed" }).where(eq(contractsTable.id, loaded.contract.id));
       await logContractEvent({ contractId: loaded.contract.id, type: "viewed", actor: "customer", signerId: signer.id, ip: req.ip, userAgent: req.headers["user-agent"] });
       const fresh = await loadContract(loaded.contract.id);
-      res.json(publicPayload(fresh!, fresh!.signers.find((s) => s.id === signer.id)!));
+      res.json(publicPayload(fresh!, fresh!.signers.find((s) => s.id === signer.id)!, portalUrl));
       return;
     }
-    res.json(publicPayload(loaded, signer));
+    res.json(publicPayload(loaded, signer, portalUrl));
   } catch (err) {
     req.log.error({ err }, "Error loading signing page");
     res.status(500).json({ error: "Internal server error" });

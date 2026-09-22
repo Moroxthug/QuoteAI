@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { FileSignature, ShieldCheck, Download, CheckCircle2, Loader2, AlertTriangle, Mail, XCircle, ChevronDown } from "lucide-react";
+import { FileSignature, ShieldCheck, Download, CheckCircle2, Loader2, AlertTriangle, Mail, XCircle, ChevronDown, LayoutDashboard } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -267,6 +267,14 @@ export default function SignPage() {
               <button className="btn btn-sm" style={{ background: "var(--red)", color: "#fff" }} onClick={decline} disabled={submitting}>{t("sign.declineConfirm")}</button>
             </div>
           </div>
+        )}
+
+        {contract.portalUrl && (
+          <a href={contract.portalUrl} className="card p-4 flex items-center gap-3 text-sm no-underline" style={{ boxShadow: "var(--shadow-card)" }}>
+            <LayoutDashboard className="h-5 w-5 shrink-0" style={{ color: "var(--navy)" }} />
+            <span className="grow" style={{ color: "var(--ink)" }}><b style={{ color: "var(--navy)" }}>{t("portalLink.title").replace("{company}", contract.companyName)}</b><span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("portalLink.desc")}</span></span>
+            <span className="btn btn-sm btn-outline-navy">{t("portalLink.open")}</span>
+          </a>
         )}
 
         {(step === "review" || step === "otp" || step === "sign") && (

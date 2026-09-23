@@ -106,3 +106,42 @@ export async function deleteGoogleEvent(accessToken: string, calendarId: string,
     logger.warn({ err, eventId }, "Google Calendar event delete failed (ignoring)");
   }
 }
+
+// ── Phase 85: reading the other way ──────────────────────────────────────────
+
+export type GoogleListedEvent = {
+  id: string;
+  status?: string;
+  summary?: string;
+  location?: string;
+  htmlLink?: string;
+  transparency?: string;
+  start?: { date?: string; dateTime?: string };
+  end?: { date?: string; dateTime?: string };
+};
+
+/**
+ * Events overlapping [timeMin, timeMax). `singleEvents` expands recurrences
+ * server-side, which is why nothing here has to understand RRULE — the ICS
+ * path (calendar/ics.ts) is the one that does.
+ */
+export async function listGoogleEvents(
+  accessToken: string,
+  calendarId: string,
+  timeMin: Date,
+  timeMax: Date,
+  maxResults = 250,
+): Promise<GoogleListedEvent[]> {
+  const params = new URLSearchParams({
+    timeMin: timeMin.toISOString(),
+    timeMax: timeMax.toISOString(),
+    singleEvents: "true",
+    orderBy: "startTime",
+    maxResults: String(maxResults),
+  });
+  const res = await calendarRequest<{ items?: GoogleListedEvent[] }>(
+    accessToken,
+    `/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`,
+  );
+  return res.items ?? [];
+}

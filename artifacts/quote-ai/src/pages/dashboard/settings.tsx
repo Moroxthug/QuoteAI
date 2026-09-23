@@ -33,6 +33,7 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { CalendarFeedsCard } from "@/components/dashboard/calendar-feeds-card";
 import { useCan } from "@/hooks/use-role";
 import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
@@ -2313,7 +2314,7 @@ function DeveloperApiTab() {
       <div className="p-5 space-y-6">
         {/* API keys */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-foreground">{t("dashboard.settings.developerApi.apiKeys")}</h4>
+          <h3 className="text-sm font-semibold text-foreground">{t("dashboard.settings.developerApi.apiKeys")}</h3>
           {revealedKey && (
             <div className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.keyRevealWarning")}</p>
@@ -2352,7 +2353,7 @@ function DeveloperApiTab() {
 
         {/* Webhooks */}
         <div className="space-y-3 border-t pt-4">
-          <h4 className="text-sm font-semibold text-foreground flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h4>
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5"><Webhook className="h-4 w-4" /> {t("dashboard.settings.developerApi.webhooks")}</h3>
           {revealedSecret && (
             <div className="rounded-[var(--radius-sm)] border border-amber-200 bg-amber-50 p-3 space-y-2">
               <p className="text-xs text-amber-800">{t("dashboard.settings.developerApi.secretRevealWarning")}</p>
@@ -2525,6 +2526,9 @@ function CalendarSyncTab() {
         <CalendarProviderCard provider="google" />
         <CalendarProviderCard provider="outlook" />
       </div>
+      {/* Phase 85: the half that needs no OAuth app — subscribe to any .ics
+          feed, and publish our own schedule as one. */}
+      <CalendarFeedsCard />
     </div>
   );
 }

@@ -422,3 +422,27 @@ pnpm --filter @workspace/api-server ops:preflight -- --url https://quoteai.ca --
 | An anchor overshoots on the homepage | its sections reveal as they scroll into view, so the target moves for a few hundred ms after the first landing. The anchor case re-evaluates for 900 ms (`keepCorrecting`); everything else stops as soon as it arrives |
 | The page fights the user after a click | it should not: any `wheel`, `touchstart`, `keydown` or `mousedown` cancels the correction loop immediately. If that regresses, check those listeners are still attached in `applyRepeatedly` |
 | A filter or tab should *not* scroll to the top | it will, if it changes the URL. Keep that state in React (which is what every list page here does) or, if it must be in the URL, give `ScrollManager` an opt-out |
+
+
+## 22. The dashboard calendar: inbound sync, .ics in and out (Phase 85)
+
+**Where**: `api-server/src/calendar/` — `agenda.ts` (the merge), `inbound.ts` (pulling Google/Outlook/.ics in), `ics.ts` (parse + publish), routes in `routes/calendar.ts`; the widget in `quote-ai/src/components/dashboard/calendar-card.tsx`, the Settings half in `calendar-feeds-card.tsx`.
+
+**How it fits** — before this, the calendar integration only ever *pushed*: a schedule block became an event in someone's Google Calendar and nothing was ever read back. Phase 85 adds the other direction and the surface that makes it worth having. Four moving parts:
+
+1. **`GET /api/calendar/agenda?from=&to=`** merges schedule blocks, job milestones, invoices due, quote follow-ups and (Elite, if connected) mirrored personal events into one sorted list. Read-only and derived — no new source of truth. The window is capped at 120 days.
+2. **Inbound sync** mirrors a connected account (Google `events.list` / Graph `/me/calendarView`, both expanding recurrences server-side) and every subscribed `.ics` feed into `calendar_external_events`, for a window of 14 days back and 92 forward. It runs on the cron tick and from the widget's refresh button. The mirror is **replaced**, not merged: the source is the truth, so an event cancelled there disappears here. Events QuoteAI itself pushed come back flagged `is_ours` and are hidden, so one block is never two rows.
+3. **Subscribed feeds** are the honest answer to "and Calendly, and Apple, and…": every one of them publishes `.ics`. `calendar/ics.ts` is a small parser — unfold, VEVENT, the handful of properties that matter, and an RRULE expander for DAILY/WEEKLY/MONTHLY/YEARLY with INTERVAL, COUNT, UNTIL and BYDAY.
+4. **The published feed** is the reverse: `POST /api/calendar/publish` mints a token (only its sha256 is stored) and `GET /api/calendar/feed/:token.ics` serves the company's blocks and milestones to any calendar app. It is on the route-matrix public allowlist for the reason stated there — Apple Calendar cannot send a session.
+
+| Ask | Do |
+|---|---|
+| The widget is empty for a Pro account | check `scheduleEnabled` in the agenda response. `false` means the account is Starter/free — the schedule is a Pro feature and the card says so in one line instead of showing an empty month |
+| Connected Google/Outlook events do not appear | they are Elite (`calendar_sync`) *and* need a connection: `externalEnabled` in the agenda response tells you which is missing. Then check `calendar_connections.last_inbound_sync_at` — if it is null the pull has never succeeded; the widget's refresh button (or `POST /api/calendar/refresh`) returns the per-provider error |
+| A subscribed feed says it failed | the message on the feed row is what the server actually got: a non-200, a body that is not iCalendar, a timeout, or a body over 4 MB. Paste the URL into a browser — most "feeds" that fail are an HTML page behind a login |
+| A feed URL is refused when adding it | https only, no embedded credentials, no loopback or private address. That URL is fetched *by the server*, so it is an SSRF surface; the refusals are deliberate and the codes are in `normaliseFeedUrl` |
+| A recurring event from an .ics feed shows once, or on the wrong days | the expander covers the common rules; `BYSETPOS`, `BYMONTHDAY` lists and the rarer shapes fall back to the first occurrence rather than inventing dates. Google and Outlook are unaffected — both expand server-side |
+| An event from a feed is an hour out | a `TZID` on a floating time is read as-is rather than converted, because carrying real IANA offsets would mean shipping a tz database for read-only context. UTC (`…Z`) values, which is what most feeds emit, are exact |
+| Someone published the schedule and wants it un-published | Settings → Integrations → Revoke, or `DELETE /api/calendar/publish`. Every subscriber breaks immediately; "Replace the link" does the same and issues a new one |
+| Who may publish? | `integrations:full` — the same permission as connecting a calendar, not `jobs:edit`. It mints a URL that serves the whole company schedule to anyone holding it, so a foreman may move a block but may not publish the board |
+| The cron tick is slow | `syncInboundForAllCompanies` is bounded to 50 companies per tick, and the rest are picked up next tick. Raise it only after checking how long the pull actually takes |

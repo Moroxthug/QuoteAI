@@ -47,6 +47,7 @@ import { useCan } from "@/hooks/use-role";
 import { leadsApi, type LeadDto } from "@/lib/leads-api";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
+import { CalendarCard } from "@/components/dashboard/calendar-card";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -832,6 +833,9 @@ const can = useCan();
           {subscription?.isActive && subscription?.plan === "monthly_starter" && (
             <div style={{ marginTop: 16 }}><StarterUpgradeCard /></div>
           )}
+
+          {/* Phase 85: the month, and what is on it */}
+          <CalendarCard />
 
           {/* Phase 79: 60-day cash-flow outlook (Elite) */}
           <CashFlowCard plan={subscription?.plan} isActive={subscription?.isActive} />

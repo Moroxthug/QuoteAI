@@ -38,6 +38,7 @@ const PUBLIC_ROUTES: Allow[] = [
   { match: /^(GET|POST) \/api\/portal\/:token/, reason: "Phase 76: client portal — hashed link token, IP rate limited; everything past the header needs the X-Portal-Session header issued by the email-OTP verify step (Rule 6)" },
   { match: /^(GET|POST) \/api\/public\//, reason: "public quote widget + unsubscribe links — rate limited (Rule 6)" },
   { match: /^GET \/api\/account\/deletion\/cancel\/:token$/, reason: "Phase 72: cancel-deletion link from the confirmation email — the person is signed out by then; hashed single-use token, IP rate limited" },
+  { match: /^GET \/api\/calendar\/feed\/:token\.ics$/, reason: "Phase 85: the published .ics a calendar app subscribes to — no session is possible (Apple Calendar sends none); sha256-hashed token lookup, IP rate limited, read-only, schedule blocks and milestones only, revocable from Settings (Rule 6)" },
 ];
 
 // ── Rule 2: every mutating session route names a permission ──────────────────

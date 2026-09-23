@@ -90,7 +90,11 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     ...(s.teamInviteToken ? [pub(`/team-invite/${s.teamInviteToken}`)] : []),
     dash("/onboarding"),
     dash("/dashboard"), dash("/dashboard/new"), dash("/dashboard/quotes"), dash(`/dashboard/quotes/${s.longQuoteId}`), dash(`/dashboard/quotes/${s.quoteId}`),
-    dash("/dashboard/analytics"), dash("/dashboard/settings"), dash("/dashboard/settings/account"), dash("/dashboard/profile"), dash("/dashboard/billing"),
+    dash("/dashboard/analytics"), dash("/dashboard/settings"), dash("/dashboard/settings/account"),
+    // Phase 85: the integrations tab is where the calendar connections, the
+    // .ics subscriptions and the published feed live — a real page state with
+    // its own forms, never swept before.
+    dash("/dashboard/settings?tab=integrations"), dash("/dashboard/profile"), dash("/dashboard/billing"),
     dash("/dashboard/catalog"), dash("/dashboard/clients"), ...(s.clientId ? [dash(`/dashboard/clients/${s.clientId}`)] : []),
     dash("/dashboard/leads"), dash("/dashboard/imports"),
     dash("/dashboard/contracts"), dash(`/dashboard/contracts/${s.contractId}`), dash(`/dashboard/contracts/${s.pendingContractId}`),

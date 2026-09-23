@@ -282,6 +282,48 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .prog i { display: block; height: 100%; background: var(--green); transition: width .3s; }
 .comp-status { padding: 0 20px 14px; font-size: 13px; font-weight: 600; color: var(--muted-mk); }
 
+/* ---------- Dashboard calendar (Phase 85) ----------
+   Month grid on the left, the selected day's agenda on the right; one column
+   on a phone, with the agenda first because that is the answer being looked
+   for. The five kinds (block, milestone, invoice, follow-up, external) each
+   get a colour, used by the dots, the row icons and nothing else. */
+.cal-card .card-head h2 { display: inline-flex; align-items: center; gap: 8px; }
+.cal-nav { display: flex; align-items: center; gap: 6px; flex: none; }
+.cal-grid-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; padding: 18px 22px 20px; }
+.cal-month { font-size: 13.5px; font-weight: 800; color: var(--navy); text-transform: capitalize; margin: 0 0 10px; }
+.cal-week-head, .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.cal-week-head { margin-bottom: 4px; }
+.cal-week-head span { text-align: center; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.cal-day { position: relative; aspect-ratio: 1 / 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 13px; font-weight: 600; color: var(--ink); background: transparent; border: 1px solid transparent; transition: background .15s, border-color .15s; }
+.cal-day:hover { background: var(--soft); }
+.cal-day.muted { color: var(--faint); }
+.cal-day.today .n { color: var(--teal-dark); font-weight: 800; }
+.cal-day.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.cal-day.on .n { color: #fff; }
+.cal-day .dots { display: flex; gap: 3px; height: 5px; align-items: center; }
+.cal-day .dot { width: 5px; height: 5px; border-radius: 50%; display: block; }
+.cal-agenda { min-width: 0; border-left: 1px solid var(--soft); padding-left: 20px; }
+.cal-agenda-head { font-size: 13.5px; font-weight: 800; color: var(--navy); text-transform: capitalize; margin: 0 0 8px; }
+.cal-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.cal-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; font-size: 13px; color: var(--ink); transition: background .15s; }
+a.cal-row:hover { background: var(--soft); }
+.cal-row b { font-size: 13px; font-weight: 700; color: var(--navy); }
+.cal-sub { font-size: 11.5px; color: var(--muted-mk); }
+.cal-ic { width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; flex: none; }
+.cal-amt { font-size: 12.5px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; flex: none; }
+.cal-amt.late { color: var(--red); }
+.cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--soft); }
+.dot.cal-block, .cal-ic.cal-block { background: var(--navy); color: #fff; }
+.dot.cal-milestone, .cal-ic.cal-milestone { background: var(--teal-dark); color: #fff; }
+.dot.cal-invoice, .cal-ic.cal-invoice { background: var(--green-dark); color: #fff; }
+.dot.cal-followup, .cal-ic.cal-followup { background: var(--yellow-dark); color: #fff; }
+.dot.cal-external, .cal-ic.cal-external { background: #8b8da3; color: #fff; }
+.cal-day.on .dot.cal-block { background: #fff; }
+@media (max-width: 900px) {
+  .cal-grid-wrap { grid-template-columns: 1fr; gap: 16px; }
+  .cal-agenda { border-left: none; border-top: 1px solid var(--soft); padding-left: 0; padding-top: 14px; }
+}
+
 /* mid grid: recent quotes + revenue bars + follow-ups */
 .mid-grid { display: grid; grid-template-columns: 1.85fr 1fr; gap: 16px; margin-top: 16px; }
 .q-row { display: flex; align-items: center; gap: 14px; padding: 15px 22px; border-top: 1px solid var(--soft); transition: background .2s; cursor: pointer; }

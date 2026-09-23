@@ -15,10 +15,9 @@ import {
 } from "@workspace/db";
 import { roleCan } from "@workspace/permissions";
 import { and, eq, gte, inArray, isNotNull, lt } from "drizzle-orm";
-import type Stripe from "stripe";
 import { companyAnalytics, type CompanyAnalytics } from "../analytics/service.js";
-import { groupCompanyPriceIdFor, isBillingInterval, type BillingInterval } from "../lib/billing.js";
-import { getUncachableStripeClient } from "../stripeClient.js";
+import { addonPriceIdFor, isBillingInterval, type BillingInterval } from "../lib/billing.js";
+import { AddonError, setAddonQuantity } from "../lib/subscriptionAddons.js";
 import { logger } from "../lib/logger.js";
 import { paySettingsFor } from "../pay/service.js";
 import { addDays, overtimeWindow } from "../pay/rules.js";
@@ -107,37 +106,6 @@ export async function catalogOwnerIds(orgId: string): Promise<string[]> {
 
 // ── One bill ─────────────────────────────────────────────────────────────────
 
-/**
- * Sets the number of extra companies on the billing company's subscription.
- * Replaceable in tests (the e2e suite has no Stripe account).
- */
-type GroupBillingDriver = { setQuantity(billing: { stripeCustomerId: string | null; interval: BillingInterval }, quantity: number): Promise<void> };
-
-const stripeDriver: GroupBillingDriver = {
-  async setQuantity(billing, quantity) {
-    const priceId = groupCompanyPriceIdFor(billing.interval);
-    if (!priceId) throw new GroupError(409, "GROUP_BILLING_UNAVAILABLE", "One bill for a group is not set up yet.");
-    if (!billing.stripeCustomerId) throw new GroupError(409, "NO_SUBSCRIPTION", "The paying company has no active subscription.");
-    const stripe: Stripe = await getUncachableStripeClient();
-    const subs = await stripe.subscriptions.list({ customer: billing.stripeCustomerId, status: "active", limit: 1 });
-    const sub = subs.data[0];
-    if (!sub) throw new GroupError(409, "NO_SUBSCRIPTION", "The paying company has no active subscription.");
-    const item = sub.items.data.find((i) => i.price?.id === priceId);
-    if (quantity <= 0) {
-      if (item) await stripe.subscriptionItems.del(item.id, { proration_behavior: "create_prorations" });
-      return;
-    }
-    if (item) await stripe.subscriptionItems.update(item.id, { quantity, proration_behavior: "create_prorations" });
-    else await stripe.subscriptionItems.create({ subscription: sub.id, price: priceId, quantity, proration_behavior: "create_prorations" });
-  },
-};
-
-let billingDriver: GroupBillingDriver = stripeDriver;
-
-export function setGroupBillingDriverForTests(driver: GroupBillingDriver | null): void {
-  billingDriver = driver ?? stripeDriver;
-}
-
 async function loadProfile(orgId: string) {
   const [p] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, orgId));
   return p ?? null;
@@ -149,7 +117,7 @@ export async function billingStatus(billingOrgId: string | null): Promise<{ avai
   const p = await loadProfile(billingOrgId);
   const interval: BillingInterval = isBillingInterval(p?.subscriptionInterval) ? p!.subscriptionInterval as BillingInterval : "month";
   const plan = effectivePlan(p);
-  if (!groupCompanyPriceIdFor(interval)) return { available: false, reason: "GROUP_BILLING_UNAVAILABLE", plan, interval };
+  if (!addonPriceIdFor("group_company", interval)) return { available: false, reason: "GROUP_BILLING_UNAVAILABLE", plan, interval };
   if (!p || p.planCoveredBy || plan === "free" || !p.stripeCustomerId) return { available: false, reason: "NO_SUBSCRIPTION", plan, interval };
   return { available: true, reason: null, plan, interval };
 }
@@ -196,7 +164,12 @@ async function coveredCount(groupId: string, billingOrgId: string): Promise<numb
 export async function chargeFor(groupId: string, billingOrgId: string, quantity: number): Promise<void> {
   const p = await loadProfile(billingOrgId);
   const interval: BillingInterval = isBillingInterval(p?.subscriptionInterval) ? p!.subscriptionInterval as BillingInterval : "month";
-  await billingDriver.setQuantity({ stripeCustomerId: p?.stripeCustomerId ?? null, interval }, quantity);
+  try {
+    await setAddonQuantity({ stripeCustomerId: p?.stripeCustomerId ?? null, interval }, "group_company", quantity);
+  } catch (err) {
+    if (err instanceof AddonError) throw new GroupError(err.status, err.code, err.message);
+    throw err;
+  }
   logger.info({ groupId, billingOrgId, quantity }, "Group billing quantity set");
 }
 

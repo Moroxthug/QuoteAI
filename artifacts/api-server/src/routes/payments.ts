@@ -7,7 +7,7 @@ import { eq, sql } from "drizzle-orm";
 import { CreateCheckoutSessionBody } from "@workspace/api-zod";
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { annualBillingAvailable, isBillingInterval, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { addonPriceIdFor, annualBillingAvailable, isBillingInterval, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -260,9 +260,14 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
     // sitting next to it.
     const discounts = await pilotDiscount(stripe, parsed.data.promoCode);
 
+    // Phase 91: seats beyond the plan's, chosen at sign-up, ride on the same checkout as their own line.
+    const requestedSeats = Number.isInteger((req.body as { extraSeats?: unknown })?.extraSeats) ? Math.min(200, Math.max(0, (req.body as { extraSeats: number }).extraSeats)) : 0;
+    const seatPriceId = plan.interval && requestedSeats > 0 ? addonPriceIdFor("extra_seat", interval) : null;
+    const extraSeats = seatPriceId ? requestedSeats : 0;
+
     const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       payment_method_types: ["card"],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }, ...(seatPriceId ? [{ price: seatPriceId, quantity: extraSeats }] : [])],
       mode: plan.interval ? "subscription" : "payment",
       ...(discounts ? { discounts } : { allow_promotion_codes: true }),
       success_url: successUrl,
@@ -273,6 +278,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
         planType,
         interval: plan.interval ? interval : "",
         hasWatermark: String(plan.hasWatermark),
+        extraSeats: String(extraSeats),
         ...(discounts ? { pilotPromo: pilotPromoCode()! } : {}),
       },
     };

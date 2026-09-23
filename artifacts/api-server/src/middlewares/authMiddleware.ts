@@ -3,6 +3,7 @@ import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth";
 import { db, businessProfilesTable, organizationMembersTable, type TeamMemberRole } from "@workspace/db";
 import { and, asc, eq } from "drizzle-orm";
+import { runWithActor } from "../lib/requestContext.js";
 
 declare global {
   namespace Express {
@@ -84,7 +85,8 @@ export async function requireAuth<P = Record<string, string>>(req: Request<P>, r
     res.locals.actorRole = role;
     res.locals.userEmail = session.user.email;
     res.locals.userName = session.user.name;
-    next();
+    // Phase 91: the rest of the request knows who is acting (created_by, audit rows).
+    runWithActor({ actorUserId: session.user.id, orgId }, () => next());
   } catch {
     res.status(401).json({ error: "Unauthorized" });
   }

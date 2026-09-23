@@ -70,6 +70,20 @@ export const DEFAULT_AUTOMATION_SETTINGS: AutomationSettings = {
   reviewRequestDelayDays: 3,
 };
 
+/** Phase 91: the sign-up answers — used to tailor the product, never to gate it. */
+export const COMPANY_TRADES = ["general", "renovation", "painting", "electrical", "plumbing", "hvac", "roofing", "carpentry", "flooring", "drywall", "masonry", "landscaping", "concrete", "cleaning", "other"] as const;
+export type CompanyTrade = (typeof COMPANY_TRADES)[number];
+export type CompanySetup = {
+  trades?: CompanyTrade[];
+  /** People who work in the company, office and field together. */
+  teamSize?: number;
+  /** Logins the company expects to need (office, estimators, foremen). */
+  seatsWanted?: number;
+  /** Whether crews work on site (the crew app, time tracking). */
+  fieldCrew?: boolean;
+  completedAt?: string;
+};
+
 export const businessProfilesTable = pgTable("business_profiles", {
   userId: text("user_id").primaryKey(),
   companyName: text("company_name").notNull().default(""),
@@ -106,6 +120,10 @@ export const businessProfilesTable = pgTable("business_profiles", {
   complianceSettings: jsonb("compliance_settings").$type<ComplianceSettings>().notNull().default({}),
   // ── Phase 89: pay periods, overtime and holiday rules, allowance rates, export format ──
   paySettings: jsonb("pay_settings").$type<PaySettings>().notNull().default({}),
+  /** Phase 91: paid seats beyond the plan's included ones — follows the subscription's extra-seat item. */
+  extraSeats: integer("extra_seats").notNull().default(0),
+  /** Phase 91: what the company told us at sign-up. */
+  companySetup: jsonb("company_setup").$type<CompanySetup>().notNull().default({}),
   featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

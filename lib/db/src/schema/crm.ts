@@ -33,6 +33,8 @@ export type ProjectSetupProposal = {
 export const projectsTable = pgTable("projects", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id").notNull(),
+  /** Phase 91: the person (auth user) who made it — null for rows made before, by the public API, or by automation. */
+  createdByUserId: text("created_by_user_id"),
   quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
   name: text("name").notNull(),
   description: text("description").notNull().default(""),

@@ -8,6 +8,7 @@ import { trackEvent } from "./telemetry.js";
 import { linkQuoteToClient } from "./clients.js";
 import { resolveQuoteTaxRate } from "./tax.js";
 import { recordAiUsage } from "./usage.js";
+import { currentActorId } from "./requestContext.js";
 
 export const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
 
@@ -538,6 +539,7 @@ export async function saveQuoteToDb({
 
     const [q] = await tx.insert(quotesTable).values({
       userId,
+      createdByUserId: currentActorId(),
       rawInput: data.rawInput,
       clientData: data.clientData,
       companySnapshot: data.companySnapshot,

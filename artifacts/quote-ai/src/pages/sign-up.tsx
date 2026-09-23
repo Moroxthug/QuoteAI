@@ -19,7 +19,10 @@ export default function SignUpPage() {
   const { t } = useLanguage();
   useDocumentTitle(`${t("signUp.title")} · QuoteAI`);
   const search = useSearch();
-  const nextPath = safeLocalPath(new URLSearchParams(search).get("next"), "/onboarding");
+  // Phase 91: a plan picked on the pricing page rides through sign-up to the end of onboarding (checkout with the seats chosen there).
+  const params = new URLSearchParams(search);
+  const plan = params.get("plan");
+  const nextPath = safeLocalPath(params.get("next"), plan && /^monthly_(starter|pro|elite)$/.test(plan) ? `/onboarding?plan=${plan}` : "/onboarding");
   const [registrationOpen, setRegistrationOpen] = useState<boolean | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

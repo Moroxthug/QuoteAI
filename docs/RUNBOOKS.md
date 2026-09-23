@@ -588,3 +588,24 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | One bill button disabled | Env price ids not set (owner track), or the paying company has no active subscription of its own |
 | A covered company lost its plan | The payer's subscription was cancelled or is past due, or the company left the group. It can subscribe on its own |
 | Test runs | e2e uses `setGroupBillingDriverForTests` in place of Stripe; the IDOR sweep seeds `:orgId` with A's own company |
+
+## 29. Seats, sign-up answers, access codes, and every person's page (Phase 91)
+
+**Where**: `routes/seats.ts` (`/api/seats`, `/api/company-setup`), `routes/team-codes.ts` (`/api/team/members/codes`, `/api/team/code/:code[/redeem]`), `routes/people.ts` (`/api/me*`, `/api/team/people/:userId`), `people/service.ts`, `team/seats.ts`, `lib/subscriptionAddons.ts` (the one Stripe add-on driver, also used by Phase 90's group bill), `lib/requestContext.ts`. Pages: `/onboarding` (4 steps), `/join`, `/dashboard/me`, `/dashboard/people/:userId`, Team → Team members. Migration `0053`.
+
+**How it fits**:
+- **Sign-up** asks, after the company: trades, people in the company, logins wanted, crews on site (`business_profiles.company_setup`; tailors, never gates). A plan picked on the pricing page (`/sign-up?plan=`) rides through to the last step, which sends it to Stripe Checkout with the extra logins as their own line item. A company that already has team accounts invites people there instead (email rows or access codes).
+- **Seats** = plan's included seats (Pro 2, Elite 5) + `extra_seats` (paid). Used = owner + members not suspended + open invitations; an expired, unused access code gives its seat back. Extra seats are the quantity of the `STRIPE_PRICE_EXTRA_SEAT` item on the company's own subscription (prorated). The webhook keeps `extra_seats` equal to that item's quantity, so a change in the Stripe portal lands here too. It can't go below the seats in use; a company whose plan a group pays for has no subscription of its own to add them to.
+- **Access codes**: `XXXXX-XXXXX` (Crockford base32, 50 bits), hashed like tokens, 14 days, one role each. A code is an ordinary `organization_members` invitation whose email is a placeholder (`…@access-code.invalid`) until someone signs in and redeems it at `/join`. The preview and redeem share a limit of 20 attempts per 15 minutes per IP. The hash stays after use so the same code says "already used".
+- **A person's page**: name and photo live on `auth_user` (`image`), the rest on `user_profiles` — the same across companies. Numbers and history are per company: quotes, invoices, jobs and contracts now carry `created_by_user_id` (stamped from the request context — no actor outside a signed-in request: cron, webhooks, WhatsApp, public API). Audit rows that used to name the company as actor now name the person when there is one. Hours come from the crew record in that company with the same email. Attribution starts on 2026-09-23 and the page says so. First login after an invite or a code lands on `/dashboard/me?welcome=1` (the setup form).
+
+**Owner track**: run `STRIPE_SECRET_KEY=sk_test_… pnpm --filter @workspace/scripts stripe-addon-prices` and again with `sk_live_…`; paste the four printed `STRIPE_PRICE_GROUP_COMPANY(_YEARLY)` / `STRIPE_PRICE_EXTRA_SEAT(_YEARLY)` lines into Vercel (Production + Preview, matching mode). Amounts are in the script (group company $29/month, extra seat $15/month, yearly 10×); change them before the first run. The display amounts in `lib/billing.ts` `ADDON_MONTHLY_CENTS` must match.
+
+| Ask | Do |
+|---|---|
+| "I can't add logins" | The Logins button only shows when the seat price is set, the company pays for its own plan, and you're the owner |
+| "It won't let me go down to N logins" | Members and open invitations use seats; revoke an invitation or remove someone first |
+| A code "doesn't match any company" | Typos are forgiven (case, dashes, O/0, I/L/1); otherwise it was revoked. Make a new one |
+| Someone joined with the wrong role | Change it on Team → Team members like any member |
+| "My numbers are zero" | Only what was made from 2026-09-23 on, signed in as that person, counts. Automatic invoices and quotes from WhatsApp belong to the company |
+| The photo doesn't change | Each upload has a new file name; a hard refresh shows it if the browser held the old one |

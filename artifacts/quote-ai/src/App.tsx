@@ -56,6 +56,9 @@ const CompliancePage = lazy(() => import("@/pages/dashboard/compliance"));
 const BooksPage = lazy(() => import("@/pages/dashboard/books"));
 const PayPage = lazy(() => import("@/pages/dashboard/pay"));
 const GroupPage = lazy(() => import("@/pages/dashboard/group"));
+const MePage = lazy(() => import("@/pages/dashboard/me"));
+const TeammatePage = lazy(() => import("@/pages/dashboard/me").then((m) => ({ default: m.TeammatePage })));
+const JoinPage = lazy(() => import("@/pages/join"));
 const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
@@ -252,6 +255,12 @@ function Router() {
       <Route path="/dashboard/books" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><BooksPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      <Route path="/dashboard/me" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><MePage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/people/:userId" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><TeammatePage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
       <Route path="/dashboard/group" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><GroupPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
@@ -280,6 +289,7 @@ function Router() {
       <Route path="/t/:token" component={() => <Suspense fallback={null}><WorkerTimePage /></Suspense>} />
       {/* Team member invite accept page (emailed link, Phase 7) */}
       <Route path="/team-invite/:token" component={() => <Suspense fallback={null}><TeamInvitePage /></Suspense>} />
+      <Route path="/join" component={() => <Suspense fallback={null}><JoinPage /></Suspense>} />
 
       {/* Pagina pubblica: il cliente finale visualizza e accetta il preventivo (link condiviso via WhatsApp/email) */}
       <Route path="/p/:id" component={() => <Suspense fallback={null}><PublicQuotePage /></Suspense>} />

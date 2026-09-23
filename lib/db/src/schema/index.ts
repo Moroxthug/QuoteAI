@@ -48,3 +48,4 @@ export * from "./compliance";
 export * from "./books";
 export * from "./pay";
 export * from "./groups";
+export * from "./people";

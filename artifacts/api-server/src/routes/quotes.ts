@@ -49,6 +49,7 @@ import { writeAudit } from "../lib/notifications.js";
 import { z } from "zod";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 const objectStorage = new ObjectStorageService();
 
@@ -1125,6 +1126,7 @@ Write all output text in English.`
         .insert(quotesTable)
         .values({
           userId,
+          createdByUserId: currentActorId(),
           rawInput,
           clientData: resolvedClientData,
           companySnapshot: resolvedSnapshot,
@@ -1887,6 +1889,7 @@ router.post("/quotes/:id/duplicate", requireAuth, requirePermission("quotes", "e
         .insert(quotesTable)
         .values({
           userId,
+          createdByUserId: currentActorId(),
           rawInput: original.rawInput,
           descrizioneGenerale: original.descrizioneGenerale,
           companySnapshot: (original.companySnapshot as QuoteCompanySnapshot | null) ?? null,

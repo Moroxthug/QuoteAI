@@ -1,4 +1,5 @@
 import { db, notificationsTable, auditLogTable } from "@workspace/db";
+import { currentActorId } from "./requestContext.js";
 import { pushForNotification } from "./push";
 
 export async function createNotification(params: {
@@ -37,7 +38,8 @@ export async function writeAudit(params: {
   await db.insert(auditLogTable).values({
     userId: params.userId,
     actorType: params.actorType,
-    actorId: params.actorId ?? null,
+    // Phase 91: many callers pass the company id as the actor (all they had); inside a signed-in request the real person is known.
+    actorId: params.actorType === "user" && (!params.actorId || params.actorId === params.userId) ? (currentActorId() ?? params.actorId ?? null) : (params.actorId ?? null),
     entityType: params.entityType,
     entityId: params.entityId,
     action: params.action,

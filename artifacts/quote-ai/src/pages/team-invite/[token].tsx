@@ -70,7 +70,8 @@ export default function TeamInvitePage() {
           <div className="space-y-3">
             <CheckCircle2 className="h-10 w-10 mx-auto" style={{ color: "var(--green-dark)" }} />
             <p className="font-medium" style={{ color: "var(--ink)" }}>{fmt(t("invite.done"), { company: preview?.companyName })}</p>
-            <Link href="/dashboard" className="btn btn-navy">{t("invite.goToDashboard")}</Link>
+            {/* Phase 91: the first stop after joining is the person's own profile. */}
+            <a href="/dashboard/me?welcome=1" className="btn btn-navy">{t("invite.setupProfile")}</a>
           </div>
         )}
       </div>

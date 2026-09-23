@@ -43,6 +43,7 @@ import { getLink, putLink } from "../books/links.js";
 import { computeInvoiceAmounts, termSubtotalCents, finalInvoiceSubtotalCents, lienPeriodDays, addDays, statusAfterPayment, balanceCents, lineFrom } from "./math.js";
 import { buildInvoicePdf } from "./pdf.js";
 import { ti, invoiceTitle, type Lang, type IKey } from "./render.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 const storage = new ObjectStorageService();
 
@@ -217,6 +218,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<Invoice>
     .insert(invoicesTable)
     .values({
       userId: input.userId,
+      createdByUserId: currentActorId(),
       projectId: ctx.project?.id ?? null,
       clientId: ctx.client?.id ?? null,
       contractId: ctx.contract?.id ?? null,

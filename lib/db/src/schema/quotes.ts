@@ -84,6 +84,8 @@ export const quotesTable = pgTable("quotes", {
   unsubscribeToken: text("unsubscribe_token").notNull().$defaultFn(() => randomUUID()),
   unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
   userId: text("user_id").notNull(),
+  /** Phase 91: the person (auth user) who made it — null for rows made before, by the public API, or by automation. */
+  createdByUserId: text("created_by_user_id"),
   /** Linked client record (Phase 0). Null only for legacy rows that could not be matched. */
   clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
   /** Province the work is performed in (drives tax + contract template). */

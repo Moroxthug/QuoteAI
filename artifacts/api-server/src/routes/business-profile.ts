@@ -38,6 +38,8 @@ function serializeProfileExtras(profile: BusinessProfile | undefined) {
     licenceNumber: profile?.licenceNumber ?? null,
     etransferEmail: profile?.etransferEmail ?? null,
     defaultPaymentSchedule: profile?.defaultPaymentSchedule ?? null,
+    // Phase 91: the sign-up answers.
+    companySetup: profile?.companySetup ?? {},
     googleReviewUrl: profile?.googleReviewUrl ?? null,
     homeStarsProfileUrl: profile?.homeStarsProfileUrl ?? null,
     sendReviewRequests: profile?.sendReviewRequests ?? true,

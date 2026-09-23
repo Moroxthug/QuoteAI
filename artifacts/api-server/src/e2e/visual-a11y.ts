@@ -94,6 +94,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     ...(s.signToken ? [pub(`/sign/${s.signToken}`)] : []),
     ...(s.workerToken ? [pub(`/t/${s.workerToken}`)] : []),
     ...(s.teamInviteToken ? [pub(`/team-invite/${s.teamInviteToken}`)] : []),
+    // Phase 91: the access-code page, empty and with a code filled in.
+    pub("/join"), ...(s.joinCode ? [pub(`/join?code=${s.joinCode}`)] : []),
     dash("/onboarding"),
     dash("/dashboard"), dash("/dashboard/new"), dash("/dashboard/quotes"), dash(`/dashboard/quotes/${s.longQuoteId}`), dash(`/dashboard/quotes/${s.quoteId}`),
     dash("/dashboard/analytics"), dash("/dashboard/settings"), dash("/dashboard/settings/account"),
@@ -115,6 +117,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/pay"), dash("/dashboard/pay?tab=jobs"), dash("/dashboard/pay?tab=settings"),
     // Phase 90: the three tabs of Group (the showcase owner also administers a sister company).
     dash("/dashboard/group"), dash("/dashboard/group?tab=companies"), dash("/dashboard/group?tab=crew"),
+    // Phase 91: the person's own page (owner and a foreman, whose first visit is the setup form), and the members tab with seats and codes.
+    dash("/dashboard/me"), dash("/dashboard/team?tab=members"), foreman("/dashboard/me"),
     foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"), foreman("/dashboard/books"), foreman("/dashboard/pay"), foreman("/dashboard/group"),
   ];
   // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`

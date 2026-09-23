@@ -19,6 +19,7 @@ import { TEMPLATE_VERSION } from "../contracts/templates.js";
 import { fmtDate, fmtMoney } from "../contracts/render.js";
 import { createNotification, writeAudit } from "../lib/notifications.js";
 import { addCalendarDays } from "./dates.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 // ── Change orders ────────────────────────────────────────────────────────────
 // The signable document is a `contracts` row (kind = change_order) so the
@@ -145,6 +146,7 @@ export async function createChangeOrder(params: {
       .insert(contractsTable)
       .values({
         userId: params.userId,
+        createdByUserId: currentActorId(),
         quoteId: null,
         clientId: parent.clientId,
         projectId: project.id,

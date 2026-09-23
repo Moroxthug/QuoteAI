@@ -7,7 +7,15 @@ export type TeamMemberStatus = "invited" | "active" | "suspended";
 
 export type TeamMemberDto = {
   id: string;
-  email: string;
+  /** Phase 91: the person once joined (null while only invited). */
+  userId: string | null;
+  /** Null for an access code nobody has used yet. */
+  email: string | null;
+  kind: "email" | "code";
+  /** The code's last four characters, to tell codes apart. */
+  codeHint: string | null;
+  name: string | null;
+  image: string | null;
   role: TeamMemberRole;
   status: TeamMemberStatus;
   invitedAt: string;
@@ -18,7 +26,7 @@ export type TeamMemberDto = {
 export type OrgDto = { orgId: string; companyName: string; role: "owner" | TeamMemberRole; isOwn: boolean };
 
 export const teamMembersApi = {
-  list: () => req<{ items: TeamMemberDto[]; seats: { used: number; included: number } }>("/api/team/members"),
+  list: () => req<{ items: TeamMemberDto[]; seats: { used: number; limit: number; included: number; extra: number } }>("/api/team/members"),
   invite: (email: string, role: TeamMemberRole, send = true) => req<{ url: string; expiresAt: string; emailed: boolean }>("/api/team/members/invite", { method: "POST", body: json({ email, role, send }) }),
   resend: (id: string) => req<{ url: string; expiresAt: string; emailed: boolean }>(`/api/team/members/${id}/resend`, { method: "POST" }),
   update: (id: string, body: { role?: TeamMemberRole; status?: "active" | "suspended" }) => req<{ member: TeamMemberDto }>(`/api/team/members/${id}`, { method: "PUT", body: json(body) }),

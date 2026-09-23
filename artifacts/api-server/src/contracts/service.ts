@@ -33,6 +33,7 @@ import { sendContractSigningEmail, sendContractSignedEmail } from "../lib/emailC
 import { buildContractDocument, fallbackScope, fallbackSchedule, templateKeyForProvince, refreshLockedSections, type Lang, type TemplateKey } from "./templates.js";
 import { buildContractPdf } from "./pdf.js";
 import { companyLogoDataUri } from "../lib/companyLogo.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 const storage = new ObjectStorageService();
 
@@ -264,6 +265,7 @@ export async function createContractFromQuote(params: {
     .insert(contractsTable)
     .values({
       userId: params.userId,
+      createdByUserId: currentActorId(),
       quoteId: quote.id,
       clientId: quote.clientId ?? null,
       contractNumber,

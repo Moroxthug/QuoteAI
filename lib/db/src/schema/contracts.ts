@@ -98,6 +98,8 @@ export const contractsTable = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull(),
+    /** Phase 91: the person (auth user) who made it — null for rows made before, by the public API, or by automation. */
+    createdByUserId: text("created_by_user_id"),
     quoteId: uuid("quote_id").references(() => quotesTable.id, { onDelete: "set null" }),
     clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
     /** Set in Phase 2 once the job is created. Plain uuid (no FK) to avoid a schema cycle with crm.ts. */

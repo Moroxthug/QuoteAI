@@ -174,6 +174,8 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
     }
     const name = s.slice(1);
     if (name === "token" || name === "provider" || name === "userId") return null; // public token routes, per-user OAuth providers, admin
+    // Phase 91: an access code is a secret meant to be used from outside the company (that is how someone joins); phase91.e2e covers it.
+    if (name === "code") return null;
     const prefix = segs.slice(0, i).join("/");
     let id: string | undefined;
     switch (name) {

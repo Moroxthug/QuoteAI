@@ -7,6 +7,7 @@ import { eq, sql } from "drizzle-orm";
 import { PLANS } from "../routes/payments.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { linkQuoteToClient } from "../lib/clients.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 export type ManualQuoteInput = {
   capitoli?: unknown;
@@ -113,6 +114,7 @@ export async function createManualQuote(userId: string, input: ManualQuoteInput)
       .insert(quotesTable)
       .values({
         userId,
+        createdByUserId: currentActorId(),
         rawInput: `[Manual quote] ${input.titoloPreventivoRiga2 ?? input.descrizioneGenerale ?? ""}`.trim(),
         capitoli: recalcCapitoli,
         clientData: clientDataInput ?? { nome: "", indirizzo: "" },

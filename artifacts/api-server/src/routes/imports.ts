@@ -22,6 +22,7 @@ import { ensureClientForQuote } from "../lib/clients.js";
 import { logger } from "../lib/logger.js";
 import { parseSpreadsheet } from "../imports/parseSpreadsheet.js";
 import { readImportedQuotePdf } from "../imports/quoteImportAi.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 // ── Phase 14: data migration / import ────────────────────────────────────────
 // A company uploads a CSV/Excel of past quotes, or PDFs of old quotes. Every
@@ -80,6 +81,7 @@ async function createQuoteFromCandidate(userId: string, candidate: typeof quoteI
     .insert(quotesTable)
     .values({
       userId,
+      createdByUserId: currentActorId(),
       clientData,
       descrizioneGenerale: extraction.notes ?? "Imported historical quote",
       items: items.map((it) => ({ descrizione: it.description, quantita: it.quantity ?? 1, unita: "pz", prezzoUnitario: it.unitPrice ?? (it.total ?? 0), totale: it.total ?? 0 })),

@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
+import { peopleApi } from "@/lib/people-api";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -146,6 +147,11 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
       <DropdownMenuContent align="end" side="top" className="w-48 mb-1">
         <OrgSwitcherItems />
         <DropdownMenuItem asChild>
+          <Link href="/dashboard/me" className="cursor-pointer flex items-center gap-2">
+            <User className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.myProfile")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href="/dashboard/settings?tab=account" className="cursor-pointer flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.companyProfile")}
           </Link>
@@ -256,6 +262,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Hooks must run on every render — keep this above the early returns below.
   const allNavItems = useNavItems();
   const { data: orgsData } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
+  // Phase 91: the person's own name and photo (the session copy goes stale after they change it).
+  const { data: meData } = useQuery({ queryKey: ["me"], queryFn: peopleApi.me, staleTime: 5 * 60_000, enabled: !!isSignedIn });
 
   // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
   // name the tab after the section the user is in.
@@ -317,8 +325,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const NAV_ITEMS = allNavItems.filter(item => (!item.proOnly || isPro) && (item.href !== "/dashboard/books" || can("invoicing", "full")) && (item.href !== "/dashboard/pay" || can("costs", "full")) && (item.href !== "/dashboard/group" || hasGroupEntry));
   // Phase 80: roles below quotes:edit (foreman, viewer) never see the New quote entry points.
   const canNewQuote = can("quotes", "edit");
-  const name = user?.name || user?.email?.split("@")[0] || "Account";
+  const name = meData?.person.name || user?.name || user?.email?.split("@")[0] || "Account";
+  const photo = meData?.person.image ?? user?.image ?? null;
   const email = user?.email ?? "";
+  // The account button is named by `name`: its visible initials stay the name's first letters so they are part of that name (label-in-name).
   const initials = name.slice(0, 2).toUpperCase();
 
   const NavLinks = () => (
@@ -399,7 +409,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <AccountMenu
             trigger={
               <button className="sb-user" type="button">
-                <span className="sb-avatar">{initials || <User className="h-3.5 w-3.5" />}</span>
+                <span className="sb-avatar">{photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />}</span>
                 <span className="sb-userinfo">
                   <b>{name}</b>
                   <span>{email}</span>
@@ -422,7 +432,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
           <div className="tb-right">
             <NotificationsBell variant="topbar" side="bottom" align="end" />
-            <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{initials || <User className="h-3.5 w-3.5" />}</button>} />
+            <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />}</button>} />
           </div>
         </header>
 

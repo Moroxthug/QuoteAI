@@ -1,10 +1,12 @@
-import { useState, useRef } from "react";
-import { useLocation } from "wouter";
+// Phase 91: the last steps use team, seat and access-code strings from the dashboard dictionary.
+import "@/i18n/dashboard";
+import { useState, useRef, useEffect } from "react";
+import { useLocation, useSearch } from "wouter";
 import { useUpdateBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Building2, Upload, X, ImageIcon, ArrowRight, ArrowLeft, Sparkles, MapPin, Landmark, CalendarClock } from "lucide-react";
+import { Loader2, Building2, Upload, X, ImageIcon, ArrowRight, ArrowLeft, Sparkles, MapPin, Landmark, CalendarClock, Hammer, Users } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
 import { markOnboardingSkipped, markOnboardingDone } from "@/lib/onboarding-state";
@@ -12,6 +14,10 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
 import { CANADIAN_PROVINCES, type PaymentSchedule } from "@/lib/payment-schedule";
+import { WorkStepFields } from "@/components/onboarding/work-step";
+import { TeamStep } from "@/components/onboarding/team-step";
+import { peopleApi, type CompanySetup, type CompanyTrade } from "@/lib/people-api";
+import { teamMembersApi } from "@/lib/team-members-api";
 
 const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
@@ -37,7 +43,15 @@ export default function OnboardingPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const [step, setStep] = useState<1 | 2>(1);
+  // Phase 91: company → your work (trades, size, seats) → province and payments → your team.
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const plan = new URLSearchParams(useSearch()).get("plan");
+  const [setup, setSetup] = useState<CompanySetup & { trades: CompanyTrade[] }>({ trades: [] });
+  // Someone who joined a company (invite or access code) and owns none has no company to set up.
+  const { data: orgs } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, enabled: !!isSignedIn });
+  useEffect(() => {
+    if (orgs && orgs.items.length > 0 && !orgs.items.some((o) => o.isOwn)) setLocation("/dashboard");
+  }, [orgs, setLocation]);
 
   const [companyName, setCompanyName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
@@ -99,6 +113,7 @@ export default function OnboardingPage() {
     if (!companyName.trim()) return;
     setStep(2);
   };
+  const StepCount = () => <p className="text-xs font-semibold mb-2" style={{ color: "var(--faint)" }}>{t("setup.stepOf").replace("{n}", String(step)).replace("{total}", "4")}</p>;
 
   const finish = async (includeStep2: boolean) => {
     setIsSaving(true);
@@ -131,9 +146,11 @@ export default function OnboardingPage() {
         ...(saved && typeof saved === "object" ? saved : {}),
         companyName: companyName.trim(),
       }));
+      // Phase 91: the answers from "your work" (never blocking: a failure here doesn't stop onboarding).
+      if (setup.trades.length || setup.teamSize || setup.seatsWanted || setup.fieldCrew !== undefined) await peopleApi.saveSetup(setup).catch(() => undefined);
       await queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey() });
       if (userId) markOnboardingDone(userId);
-      setLocation("/dashboard/new");
+      setStep(4);
     } catch {
       toast({ title: t("onboarding.saveError"), variant: "destructive" });
     } finally {
@@ -163,6 +180,7 @@ export default function OnboardingPage() {
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Building2 className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
+                <StepCount />
                 <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>{t("onboarding.title")}</h1>
                 <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted-mk)" }}>
                   {t("onboarding.subtitle")}
@@ -241,14 +259,53 @@ export default function OnboardingPage() {
                 </div>
               </div>
             </>
+          ) : step === 2 ? (
+            <>
+              <div className="text-center mb-8">
+                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
+                  <Hammer className="h-8 w-8" style={{ color: "var(--navy)" }} />
+                </div>
+                <StepCount />
+                <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>{t("setup.workTitle")}</h1>
+                <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted-mk)" }}>{t("setup.workSubtitle")}</p>
+              </div>
+              <div className="card">
+                <WorkStepFields value={setup} onChange={setSetup} />
+                <div className="card-foot" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setStep(1)} className="h-11 gap-2 text-sm">
+                      <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}
+                    </Button>
+                    <button type="button" onClick={() => setStep(3)} className="btn btn-navy flex-1 gap-2">
+                      {t("onboarding.continueButton")} <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : step === 4 ? (
+            <>
+              <div className="text-center mb-8">
+                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
+                  <Users className="h-8 w-8" style={{ color: "var(--navy)" }} />
+                </div>
+                <StepCount />
+                <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>{t("setup.teamTitle")}</h1>
+                <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted-mk)" }}>{t("setup.teamSubtitle")}</p>
+              </div>
+              <TeamStep plan={plan} seatsWanted={setup.seatsWanted} fieldCrew={setup.fieldCrew} onDone={() => setLocation("/dashboard/new")} />
+            </>
           ) : (
             <>
-              {/* Step 2 header */}
+              {/* Step 3 header (province, licence, payments) */}
               <div className="text-center mb-8">
                 <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <MapPin className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
+                <StepCount />
                 <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>{t("onboarding.step2Title")}</h1>
                 <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted-mk)" }}>
                   {t("onboarding.step2Subtitle")}
@@ -292,7 +349,7 @@ export default function OnboardingPage() {
 
                 <div className="card-foot" style={{ flexDirection: "column", alignItems: "stretch", gap: 10 }}>
                   <div className="flex gap-2">
-                    <Button type="button" variant="outline" onClick={() => setStep(1)} disabled={isSaving} className="h-11 gap-2 text-sm">
+                    <Button type="button" variant="outline" onClick={() => setStep(2)} disabled={isSaving} className="h-11 gap-2 text-sm">
                       <ArrowLeft className="h-4 w-4" /> {t("onboarding.back")}
                     </Button>
                     <button

@@ -77,6 +77,8 @@ export const invoicesTable = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: text("user_id").notNull(),
+    /** Phase 91: the person (auth user) who made it — null for rows made before, by the public API, or by automation. */
+    createdByUserId: text("created_by_user_id"),
     projectId: uuid("project_id").references(() => projectsTable.id, { onDelete: "set null" }),
     clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
     /** Plain uuids (no drizzle FK) to avoid schema cycles; FKs live in SQL. */

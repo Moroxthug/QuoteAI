@@ -19,6 +19,7 @@ import { logger } from "../lib/logger.js";
 import { writeAudit } from "../lib/notifications.js";
 import { layoutSequential } from "./dates.js";
 import { buildFallbackPlan, budgetFromSplit, DEFAULT_COST_RATIO, DEFAULT_SPLIT, type SetupPlan } from "./plan.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 // ── Job setup from a signed contract ─────────────────────────────────────────
 // The company never fills a form to create the job: this module turns the
@@ -166,7 +167,7 @@ export async function setupJobFromContract(contract: Contract): Promise<{ projec
       id = legacy.id;
       await tx.update(projectsTable).set({ ...values, name: legacy.name || values.name }).where(eq(projectsTable.id, id));
     } else {
-      const [row] = await tx.insert(projectsTable).values(values).returning({ id: projectsTable.id });
+      const [row] = await tx.insert(projectsTable).values({ ...values, createdByUserId: currentActorId() }).returning({ id: projectsTable.id });
       id = row!.id;
     }
 

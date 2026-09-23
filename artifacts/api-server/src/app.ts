@@ -7,7 +7,7 @@ import { db, quotesTable, businessProfilesTable, authUsersTable, emailEventsTabl
 import { eq } from "drizzle-orm";
 import { auth, getTrustedOrigins } from "./lib/auth";
 import { PRICE_TO_PLAN, PLANS } from "./routes/payments.js";
-import { isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
+import { addonQuantityOf, isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
 import { subscriptionChanged } from "./groups/service.js";
 import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
@@ -284,7 +284,8 @@ app.post(
               },
             });
           logger.info({ userId, planType }, "Subscription activated via checkout webhook");
-          await db.update(businessProfilesTable).set({ planCoveredBy: null }).where(eq(businessProfilesTable.userId, userId));
+          const extraSeats = Number.parseInt(session.metadata?.extraSeats ?? "0", 10);
+          await db.update(businessProfilesTable).set({ planCoveredBy: null, extraSeats: Number.isFinite(extraSeats) && extraSeats > 0 ? extraSeats : 0 }).where(eq(businessProfilesTable.userId, userId));
           await subscriptionChanged(userId, true);
 
           try {
@@ -322,6 +323,8 @@ app.post(
         const status = sub.status ?? "";
         if (customerId) {
           await syncSubscription(customerId, priceId, status);
+          // Phase 91: extra seats follow the subscription's seat item (changed in the portal or here).
+          await db.update(businessProfilesTable).set({ extraSeats: addonQuantityOf(sub.items?.data ?? [], "extra_seat") }).where(eq(businessProfilesTable.stripeCustomerId, customerId));
         }
       }
 
@@ -330,7 +333,7 @@ app.post(
         if (sub.customer) {
           await db
             .update(businessProfilesTable)
-            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null })
+            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null, extraSeats: 0 })
             .where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
           const [cancelled] = await db.select({ userId: businessProfilesTable.userId }).from(businessProfilesTable).where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
           if (cancelled) await subscriptionChanged(cancelled.userId, false, { ended: true });

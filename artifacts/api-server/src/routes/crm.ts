@@ -12,6 +12,7 @@ import {
 } from "@workspace/db";
 import { z } from "zod";
 import { permitCompletionBlock } from "../compliance/service.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 
 const router = Router();
@@ -56,6 +57,7 @@ router.post("/crm/projects", requireAuth, requirePermission("jobs", "edit"), asy
       .insert(projectsTable)
       .values({
         userId,
+        createdByUserId: currentActorId(),
         name,
         description: description ?? "",
         quoteId: quoteId ?? null,

@@ -39,6 +39,8 @@ export type Showcase = {
   /** Team member invite — `/team-invite/:token`. */
   teamInviteToken: string | null;
   clientId: string | null;
+  /** Phase 91: an unused access code — `/join?code=…`. */
+  joinCode: string | null;
 };
 
 function need<T>(v: T | null | undefined, what: string): T {
@@ -227,6 +229,12 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   await seedBooks(userId, project.id, language);
   await seedGroup(org, project.id, worker.status === 201 ? String(worker.body.worker.id) : null, language);
 
+  // Phase 91: the owner's own profile, the sign-up answers, and an access code waiting to be used.
+  await org.api("/api/me", { method: "PUT", body: { jobTitle: language === "fr" ? "Propriétaire" : "Owner", phone: "613-555-0142", bio: language === "fr" ? "Rénovations résidentielles depuis 2011." : "Residential renovations since 2011.", complete: true } });
+  await org.api("/api/company-setup", { method: "PUT", body: { trades: ["renovation", "painting"], teamSize: 9, seatsWanted: 4, fieldCrew: true } });
+  const codes = await org.api("/api/team/members/codes", { body: { count: 1, role: "office" } });
+  const joinCode: string | null = codes.status === 201 ? String(codes.body.codes[0].code) : null;
+
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });
   if (member.status === 201) teamInviteToken = String(member.body.url).split("/team-invite/")[1] ?? null;
@@ -239,7 +247,7 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     quoteId: quote.id, longQuoteId: longQuote.id, pendingQuoteId: pending.id,
     contractId: contract.id, pendingContractId: pendingContract.id,
     jobId: project.id, invoiceId: sent.id, invoiceToken: invoiceToken(manualSent),
-    signToken, workerToken, teamInviteToken, clientId,
+    signToken, workerToken, teamInviteToken, clientId, joinCode,
   };
 }
 

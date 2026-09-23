@@ -48,6 +48,7 @@ import { sendSms } from "../lib/sms.js";
 import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
 import { logger } from "../lib/logger.js";
 import { permitCompletionBlock } from "../compliance/service.js";
+import { currentActorId } from "../lib/requestContext.js";
 
 const router = Router();
 const objectStorage = new ObjectStorageService();
@@ -217,6 +218,7 @@ router.post("/jobs", requireAuth, requirePermission("jobs", "edit"), async (req,
       .insert(projectsTable)
       .values({
         userId,
+        createdByUserId: currentActorId(),
         name: d.name,
         description: d.description ?? "",
         quoteId: quote?.id ?? null,

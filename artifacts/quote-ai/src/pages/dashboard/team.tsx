@@ -4,7 +4,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin, Wallet } from "lucide-react";
+import { Users, Clock, Wrench, Plus, KeyRound, Armchair, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin, Wallet } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,10 @@ import { formatCents, type TimeEntryDto, type TimeEntryStatus, type UsageUnit } 
 import { teamApi, type EquipmentDto, type EquipmentEdit, type EquipmentOwnership, type WorkerDto, type WorkerEdit, type WorkerType } from "@/lib/team-api";
 import { teamMembersApi, type TeamMemberDto, type TeamMemberRole } from "@/lib/team-members-api";
 import { TimeStatusBadge } from "@/components/jobs/team-tab";
+import { PersonAvatar } from "@/components/people/avatar";
+import { AccessCodesDialog } from "@/components/team/access-codes";
+import { SeatsDialog } from "@/components/team/seats-dialog";
+import { peopleApi } from "@/lib/people-api";
 
 const TABS = ["workers", "time", "equipment", "members"] as const;
 type Tab = (typeof TABS)[number];
@@ -80,6 +84,11 @@ const can = useCan();
   const { data, isLoading } = useQuery({ queryKey: ["team-members"], queryFn: teamMembersApi.list });
   const [inviteOpen, setInviteOpen] = useState(false);
   const [invite, setInvite] = useState<{ url: string; emailed: boolean } | null>(null);
+  // Phase 91: access codes, paid seats, and the people's own pages.
+  const [codesOpen, setCodesOpen] = useState(false);
+  const [seatsOpen, setSeatsOpen] = useState(false);
+  const { data: seatInfo } = useQuery({ queryKey: ["seats"], queryFn: peopleApi.seats, staleTime: 30_000 });
+  const { data: me } = useQuery({ queryKey: ["me"], queryFn: peopleApi.me, staleTime: 60_000 });
 
   const resend = useMutation({ mutationFn: (id: string) => teamMembersApi.resend(id), onSuccess: (r) => { refresh(); setInvite(r); }, onError });
   const setStatus = useMutation({ mutationFn: ({ id, status }: { id: string; status: "active" | "suspended" }) => teamMembersApi.update(id, { status }), onSuccess: refresh, onError });
@@ -97,7 +106,9 @@ const can = useCan();
       <div className="toolbar">
         <p className="foot-note m-0">{t("team.members.intro")}</p>
         <div className="grow flex items-center gap-2">
-          {seats && <span className="foot-note">{seats.used}/{seats.included} {t("team.members.seatsUsed")}</span>}
+          {seats && <span className="foot-note">{seats.used}/{seats.limit} {t("team.members.seatsUsed")}</span>}
+          {can("settings", "full") && seatInfo?.canBuy && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setSeatsOpen(true)}><Armchair className="h-4 w-4" /> {t("seats.button")}</button>}
+          {can("team", "full") && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setCodesOpen(true)}><KeyRound className="h-4 w-4" /> {t("codes.button")}</button>}
           {activeOrg && !activeOrg.isOwn && (
             <button type="button" className="btn btn-outline-navy btn-sm" disabled={leave.isPending} onClick={() => { if (confirm(t("team.members.leaveConfirm").replace("{company}", activeOrg.companyName))) leave.mutate(activeOrg.orgId); }}>
               <UserX className="h-4 w-4" /> {t("team.members.leave")}
@@ -122,13 +133,13 @@ const can = useCan();
             </thead>
             <tbody>
               <tr>
-                <td><span className="cell-flex"><span className="avat" style={{ background: "var(--navy)", color: "#fff" }}>YOU</span><span className="t-strong">{t("team.members.you")}</span></span></td>
-                <td><span className="chip chip-purple">{t("team.members.role.admin")}</span></td>
+                <td><Link href="/dashboard/me" className="cell-flex"><PersonAvatar name={me?.person.name} image={me?.person.image} /><span className="min-w-0"><span className="t-strong block">{me?.person.name ?? t("team.members.you")}</span><span className="t-sub">{t("team.members.you")}</span></span></Link></td>
+                <td><span className="chip chip-purple">{me ? t(`group.role.${me.current.role}`) : "—"}</span></td>
                 <td><span className="chip chip-green">{t("team.members.statusActive")}</span></td>
                 <td></td>
               </tr>
               {members.map((m) => (
-                <MemberRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
+                m.userId && m.userId === me?.person.id ? null : <MemberRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
               ))}
             </tbody>
           </table>
@@ -137,6 +148,8 @@ const can = useCan();
 
       <InviteMemberDialog open={inviteOpen} onOpenChange={setInviteOpen} onInvited={(r) => { refresh(); setInvite(r); }} onError={onError} />
       <MemberInviteLinkDialog invite={invite} onClose={() => setInvite(null)} />
+      <AccessCodesDialog open={codesOpen} onOpenChange={setCodesOpen} available={seats ? seats.limit - seats.used : 0} onMade={() => { refresh(); void queryClient.invalidateQueries({ queryKey: ["seats"] }); }} onError={onError} />
+      {seatInfo && <SeatsDialog seats={seatInfo} open={seatsOpen} onOpenChange={setSeatsOpen} onError={onError} />}
     </div>
   );
 }
@@ -149,16 +162,23 @@ const can = useCan();
   return (
     <tr>
       <td>
-        <span className="cell-flex">
-          <span className="avat">{member.email.slice(0, 2).toUpperCase()}</span>
-          <span className="t-strong">{member.email}</span>
-        </span>
+        {member.status === "active" && member.userId ? (
+          <Link href={`/dashboard/people/${member.userId}`} className="cell-flex">
+            <PersonAvatar name={member.name ?? member.email} image={member.image} />
+            <span className="min-w-0"><span className="t-strong block">{member.name ?? member.email}</span>{member.name && member.email && <span className="t-sub">{member.email}</span>}</span>
+          </Link>
+        ) : (
+          <span className="cell-flex">
+            <PersonAvatar name={member.kind === "code" ? "#" : member.email} />
+            <span className="t-strong">{member.kind === "code" && !member.email ? t("codes.pendingRow").replace("{hint}", member.codeHint ?? "") : member.email}</span>
+          </span>
+        )}
       </td>
       <td><span className="chip chip-purple">{t(`team.members.role.${member.role}`)}</span></td>
       <td><span className={cn("chip", statusChip)}>{statusLabel}</span></td>
       <td onClick={(e) => e.stopPropagation()}>
         {can("team", "full") && <div className="row-act">
-          {member.status !== "active" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</button>}
+          {member.status !== "active" && member.kind === "email" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={onResend}><RotateCw className="h-3.5 w-3.5" /> {t("team.members.resend")}</button>}
           {member.status !== "invited" && (
             <button type="button" className="ic-btn" title={member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend")} onClick={onSuspend}>
               {member.status === "suspended" ? <UserCheck /> : <UserX />}

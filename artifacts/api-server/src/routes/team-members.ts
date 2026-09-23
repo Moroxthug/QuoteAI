@@ -4,15 +4,15 @@ import {
   db,
   businessProfilesTable,
   organizationMembersTable,
+  authUsersTable,
   companyGroupMembersTable,
   hasFeature,
   minimumPlanFor,
-  effectivePlan,
-  seatsIncluded,
   TEAM_MEMBER_ROLES,
   type TeamMemberRole,
 } from "@workspace/db";
-import { and, asc, eq, ne } from "drizzle-orm";
+import { and, asc, eq, inArray, ne } from "drizzle-orm";
+import { seatCount } from "../team/seats.js";
 import { requireAuth, getUserId, getUserEmail, getActorUserId, ACTIVE_ORG_COOKIE, resolveActingOrg } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
@@ -33,14 +33,24 @@ const ORG_COOKIE_MAX_AGE_MS = 400 * 24 * 60 * 60 * 1000; // ~400 days, matches c
 
 const INVITABLE_ROLES = TEAM_MEMBER_ROLES.filter((r) => r !== "owner") as Exclude<TeamMemberRole, "owner">[];
 
-function cookieOpts(): { httpOnly: true; sameSite: "lax"; secure: boolean; path: "/"; maxAge: number } {
+export function cookieOpts(): { httpOnly: true; sameSite: "lax"; secure: boolean; path: "/"; maxAge: number } {
   return { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: ORG_COOKIE_MAX_AGE_MS };
 }
 
-function serializeMember(m: typeof organizationMembersTable.$inferSelect) {
+/** Phase 91: an access-code invitation has no email until someone redeems it. */
+export const CODE_EMAIL_DOMAIN = "@access-code.invalid";
+
+function serializeMember(m: typeof organizationMembersTable.$inferSelect, person?: { name: string; image: string | null }) {
+  const placeholder = m.invitedEmail.endsWith(CODE_EMAIL_DOMAIN);
+  const isCode = placeholder || !!m.accessCodeHash;
   return {
     id: m.id,
-    email: m.invitedEmail,
+    userId: m.userId,
+    email: placeholder ? null : m.invitedEmail,
+    kind: isCode ? ("code" as const) : ("email" as const),
+    codeHint: m.accessCodeHint,
+    name: person?.name ?? null,
+    image: person?.image ?? null,
     role: m.role,
     status: m.status,
     invitedAt: m.invitedAt.toISOString(),
@@ -59,11 +69,16 @@ router.get("/team/members", requireAuth, requirePermission("team", "view"), asyn
   try {
     const orgId = getUserId(res);
     const members = await db.select().from(organizationMembersTable).where(eq(organizationMembersTable.ownerId, orgId)).orderBy(asc(organizationMembersTable.invitedAt));
-    const profile = await loadProfile(orgId);
-    const plan = effectivePlan(profile);
+    // Phase 91: names and photos for the people who joined; seats count paid extras and give back expired codes.
+    const ids = members.map((m) => m.userId).filter((x): x is string => !!x);
+    const people = ids.length ? await db.select({ id: authUsersTable.id, name: authUsersTable.name, image: authUsersTable.image }).from(authUsersTable).where(inArray(authUsersTable.id, ids)) : [];
+    const byId = new Map(people.map((p) => [p.id, p]));
+    const now = Date.now();
     res.json({
-      items: members.map(serializeMember),
-      seats: { used: members.filter((m) => m.status !== "suspended").length + 1, included: seatsIncluded(plan) },
+      items: members
+        .filter((m) => !(m.status === "invited" && m.accessCodeHash && m.inviteTokenExpiresAt && m.inviteTokenExpiresAt.getTime() < now))
+        .map((m) => serializeMember(m, m.userId ? byId.get(m.userId) : undefined)),
+      seats: await seatCount(orgId),
     });
   } catch (err) {
     req.log.error({ err }, "Error listing team members");
@@ -94,10 +109,6 @@ router.post("/team/members/invite", requireAuth, requirePermission("team", "full
     }
     const email = body.data.email.toLowerCase().trim();
 
-    const existingActive = await db
-      .select({ n: organizationMembersTable.id })
-      .from(organizationMembersTable)
-      .where(and(eq(organizationMembersTable.ownerId, orgId), ne(organizationMembersTable.status, "suspended")));
     const [existingRow] = await db
       .select()
       .from(organizationMembersTable)
@@ -107,11 +118,10 @@ router.post("/team/members/invite", requireAuth, requirePermission("team", "full
       return;
     }
 
-    const plan = effectivePlan(profile);
-    const seatsUsed = existingActive.length + 1; // +1 for the owner
+    const seats = await seatCount(orgId);
     const willAddSeat = !existingRow; // reissuing an invite/suspended row doesn't add a new seat
-    if (willAddSeat && seatsUsed >= seatsIncluded(plan)) {
-      res.status(403).json({ error: "SEAT_LIMIT", message: `Your plan includes ${seatsIncluded(plan)} seat(s). Upgrade or remove a member to invite someone new.`, seatsIncluded: seatsIncluded(plan) });
+    if (willAddSeat && seats.used >= seats.limit) {
+      res.status(403).json({ error: "SEAT_LIMIT", message: `Your plan gives you ${seats.limit} seat(s). Add seats or remove a member to invite someone new.`, seatsIncluded: seats.limit });
       return;
     }
 
@@ -157,6 +167,10 @@ router.post("/team/members/:id/resend", requireAuth, requirePermission("team", "
     const orgId = getUserId(res);
     const actorId = getActorUserId(res);
     const [member] = await db.select().from(organizationMembersTable).where(and(eq(organizationMembersTable.id, req.params.id as string), eq(organizationMembersTable.ownerId, orgId)));
+    if (member?.invitedEmail.endsWith(CODE_EMAIL_DOMAIN)) {
+      res.status(409).json({ error: "CODE_INVITE", message: "An access code has no email to resend to. Revoke it and make a new code." });
+      return;
+    }
     if (!member || member.status === "active") {
       res.status(404).json({ error: "Not found" });
       return;

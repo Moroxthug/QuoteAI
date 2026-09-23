@@ -28,6 +28,10 @@ export const organizationMembersTable = pgTable(
     invitedByUserId: text("invited_by_user_id").notNull(),
     inviteTokenHash: text("invite_token_hash"),
     inviteTokenExpiresAt: timestamp("invite_token_expires_at", { withTimezone: true }),
+    /** Phase 91: SHA-256 of a short access code typed at /join (instead of an emailed link); expiry shares invite_token_expires_at. */
+    accessCodeHash: text("access_code_hash"),
+    /** The code's last characters, so the team page can tell codes apart without storing them. */
+    accessCodeHint: text("access_code_hint"),
     /** Rare per-member exceptions to the role's default permission matrix. */
     permissions: jsonb("permissions").$type<Record<string, boolean>>().notNull().default({}),
     invitedAt: timestamp("invited_at", { withTimezone: true }).notNull().defaultNow(),

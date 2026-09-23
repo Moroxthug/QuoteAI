@@ -100,3 +100,8 @@ export function minimumPlanFor(feature: ProductFeature): PlanId {
   for (const plan of PLAN_IDS) if (PLAN_FEATURES[plan].has(feature)) return plan;
   return "monthly_elite";
 }
+
+/** Phase 91: the seats a company may fill — its plan's included seats plus the extra seats it pays for. */
+export function seatLimit(profile: (PlanLike & { extraSeats?: number | null }) | null | undefined): number {
+  return seatsIncluded(effectivePlan(profile)) + Math.max(0, profile?.extraSeats ?? 0);
+}

@@ -51,27 +51,45 @@ export function resolvePrice(
   return null;
 }
 
-// ── Phase 90: one bill for a group of companies ─────────────────────────────
-// Each extra company a group's billing company pays for is one unit of this
-// price on its existing subscription. Created once in the Stripe dashboard
-// (owner track) at the price the business decides; one per interval, because
-// a subscription cannot mix monthly and yearly items. Missing = "one bill" is
-// honestly unavailable and every company keeps paying its own.
+// ── Phase 90/91: subscription add-ons ───────────────────────────────────────
+// Two add-ons ride on a company's own subscription as extra items:
+//  - group_company: each company a group's paying company covers (Phase 90)
+//  - extra_seat: each login beyond the plan's included seats (Phase 91)
+// Prices are created once per Stripe mode by `pnpm --filter @workspace/scripts
+// stripe-addon-prices` (owner track), one per interval because a subscription
+// cannot mix monthly and yearly items. Missing = the add-on is honestly
+// unavailable in the UI instead of a broken checkout.
 
-export function groupCompanyPriceIdFor(interval: BillingInterval): string | null {
-  const v = (interval === "year" ? process.env.STRIPE_PRICE_GROUP_COMPANY_YEARLY : process.env.STRIPE_PRICE_GROUP_COMPANY)?.trim();
+export type AddonKind = "group_company" | "extra_seat";
+
+/** What the add-ons cost per month (CAD cents) — for display only; must match scripts/src/stripe-addon-prices.ts. */
+export const ADDON_MONTHLY_CENTS: Record<AddonKind, number> = { group_company: 2900, extra_seat: 1500 };
+// Spelled out (not built from a prefix) so env:inventory can see every variable read.
+const ADDON_PRICE_ENV: Record<AddonKind, Record<BillingInterval, () => string | undefined>> = {
+  group_company: { month: () => process.env.STRIPE_PRICE_GROUP_COMPANY, year: () => process.env.STRIPE_PRICE_GROUP_COMPANY_YEARLY },
+  extra_seat: { month: () => process.env.STRIPE_PRICE_EXTRA_SEAT, year: () => process.env.STRIPE_PRICE_EXTRA_SEAT_YEARLY },
+};
+
+export function addonPriceIdFor(kind: AddonKind, interval: BillingInterval): string | null {
+  const v = ADDON_PRICE_ENV[kind][interval]()?.trim();
   return v && v.length > 0 ? v : null;
 }
 
-/** Every configured group-company price id — so plan code can skip those items when it looks for "the plan". */
-function groupCompanyPriceIds(): string[] {
-  return [groupCompanyPriceIdFor("month"), groupCompanyPriceIdFor("year")].filter((x): x is string => !!x);
+function addonPriceIds(kind?: AddonKind): string[] {
+  const kinds: AddonKind[] = kind ? [kind] : ["group_company", "extra_seat"];
+  return kinds.flatMap((k) => [addonPriceIdFor(k, "month"), addonPriceIdFor(k, "year")]).filter((x): x is string => !!x);
 }
 
-/** The subscription item that carries the plan (not a group-company add-on). */
+/** The subscription item that carries the plan (not an add-on). */
 export function planItemOf<T extends { price?: { id?: string } | null }>(items: readonly T[]): T | undefined {
-  const extra = new Set(groupCompanyPriceIds());
+  const extra = new Set(addonPriceIds());
   return items.find((i) => !extra.has(i.price?.id ?? "")) ?? items[0];
+}
+
+/** How many units of an add-on a subscription carries. */
+export function addonQuantityOf(items: readonly { price?: { id?: string } | null; quantity?: number | null }[], kind: AddonKind): number {
+  const ids = new Set(addonPriceIds(kind));
+  return items.filter((i) => ids.has(i.price?.id ?? "")).reduce((n, i) => n + (i.quantity ?? 1), 0);
 }
 
 export function isBillingInterval(v: unknown): v is BillingInterval {

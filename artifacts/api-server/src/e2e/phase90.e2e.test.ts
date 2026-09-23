@@ -16,7 +16,7 @@ import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { eq } from "drizzle-orm";
 import { db, businessProfilesTable, collaboratorsTable, costEntriesTable, invoicesTable, priceCatalogItemsTable, projectsTable } from "@workspace/db";
 import { startServer, stopServer, createOrg, createUser, cleanupAll, api, type ApiResponse, type TestUser } from "./harness.js";
-import { setGroupBillingDriverForTests } from "../groups/service.js";
+import { setAddonDriverForTests } from "../lib/subscriptionAddons.js";
 
 async function member(owner: TestUser, as: TestUser | null, role: "admin" | "foreman" | "viewer"): Promise<TestUser> {
   const email = as?.email ?? `e2e-p90-${role}-${owner.userId}@example.invalid`;
@@ -74,11 +74,11 @@ describe("Phase 90 — company groups", () => {
     await db.update(businessProfilesTable).set({ subscriptionPlan: null, subscriptionStatus: null }).where(eq(businessProfilesTable.userId, b.userId));
     foremanA = await member(a, null, "foreman");
     asB = actingAs(a, b.userId);
-    setGroupBillingDriverForTests({ async setQuantity(_billing, q) { quantities.push(q); } });
+    setAddonDriverForTests({ async setQuantity(_billing, _kind, q) { quantities.push(q); } });
   });
 
   afterAll(async () => {
-    setGroupBillingDriverForTests(null);
+    setAddonDriverForTests(null);
     delete process.env.STRIPE_PRICE_GROUP_COMPANY;
     await cleanupAll();
     await stopServer();

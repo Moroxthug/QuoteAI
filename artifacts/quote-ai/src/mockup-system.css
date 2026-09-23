@@ -1037,6 +1037,7 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .doc-status.ok { background: var(--green-t); color: var(--green-dark); }
 .doc-status.warn { background: var(--yellow-t); color: var(--yellow-dark); }
 .doc-status.danger { background: var(--red-t); color: var(--red); }
+.doc-status.info { background: var(--soft); color: var(--navy); }
 
 /* ==========================================================
    DASHBOARD DETAIL PAGES

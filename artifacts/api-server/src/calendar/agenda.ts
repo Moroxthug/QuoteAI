@@ -22,8 +22,7 @@ import {
   scheduleBlocksTable,
 } from "@workspace/db";
 
-const AGENDA_KINDS = ["block", "milestone", "invoice", "followup", "external"] as const;
-type AgendaKind = (typeof AGENDA_KINDS)[number];
+type AgendaKind = "block" | "milestone" | "invoice" | "followup" | "external";
 
 export type AgendaEntry = {
   id: string;

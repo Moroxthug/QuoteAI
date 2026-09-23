@@ -439,7 +439,7 @@ const can = useCan();
           </div>
         </div>
 
-        {status === "submitted" && submittedIds.length > 0 && can("jobs", "full") && (
+        {status === "submitted" && submittedIds.length > 0 && can("jobs", "edit") && (
           <div className="bulk-row" style={{ margin: "0 18px 14px" }}>
             <button type="button" className="text-link" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
             <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</button>

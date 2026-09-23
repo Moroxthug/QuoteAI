@@ -14,7 +14,7 @@ import { raiseAutomation } from "../lib/automation.js";
 import { logContractEvent, finalizeContract, sendContractToCustomer } from "../contracts/service.js";
 import { buildInvoiceContext, createInvoice, sendInvoice, recordPayment, invoiceToken } from "../invoices/service.js";
 import { TINY_PNG_DATA_URL } from "../lib/pngDataUrl.js";
-import { seedQuote, type TestUser } from "./harness.js";
+import { api, seedQuote, type TestUser } from "./harness.js";
 
 export type Showcase = {
   province: "ON" | "QC";
@@ -168,6 +168,22 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   if (worker.status === 201) {
     const invite = await org.api(`/api/team/workers/${worker.body.worker.id}/invite`, { body: {} });
     if (invite.status === 200) workerToken = String(invite.body.url).split("/t/")[1] ?? null;
+    // Phase 86: booked on the showcase job today, with a task and two reports
+    // from the field, so the sweep renders the worker's day, the job's "From
+    // the field" card and the crew card on the dashboard rather than their
+    // empty states.
+    const now = Date.now();
+    await org.api("/api/schedule/blocks", { body: { projectId: project.id, collaboratorId: worker.body.worker.id, startsAt: new Date(now - 3_600_000).toISOString(), endsAt: new Date(now + 4 * 3_600_000).toISOString(), notes: language === "fr" ? "Code de la barrière 4471" : "Gate code 4471" } });
+    await org.api(`/api/jobs/${project.id}/tasks`, { body: { title: language === "fr" ? "Retirer les anciennes armoires" : "Strip the old cabinets" } });
+    if (workerToken) {
+      for (const [kind, body] of [["blocker", language === "fr" ? "Pas de courant sur le chantier" : "No power on site"], ["note", language === "fr" ? "Dégât d'eau derrière l'évier" : "Water damage behind the sink"]] as const) {
+        const fd = new FormData();
+        fd.append("projectId", project.id);
+        fd.append("kind", kind);
+        fd.append("body", body);
+        await api(`/api/t/${workerToken}/reports`, { method: "POST", form: fd });
+      }
+    }
   }
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });

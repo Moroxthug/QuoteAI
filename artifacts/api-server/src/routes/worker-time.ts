@@ -18,6 +18,10 @@ import { parseIsoDate, toIsoDate, localDayFor } from "../jobs/dates.js";
 import { createNotification, writeAudit } from "../lib/notifications.js";
 import { distanceMeters } from "../lib/geo.js";
 import { blockLabel } from "../schedule/service.js";
+import multer from "multer";
+import { FIELD_REPORT_KINDS, fieldReportsTable, projectTasksTable } from "@workspace/db";
+import { photoUpload } from "../jobs/photos.js";
+import { blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
 
 /** A clock-in session longer than this is auto-capped at clock-out — a forgotten clock-out shouldn't silently log a 30h day. */
 const MAX_SESSION_HOURS = 16;
@@ -80,11 +84,22 @@ async function resolveWorker(rawToken: string) {
   return { expired: false as const, worker, companyName: profile?.companyName ?? "", language: profile?.province === "QC" ? "fr" : "en", province: profile?.province ?? null };
 }
 
-/** Jobs the worker may log time on: assigned ones, else every open job of the company. */
+/**
+ * Jobs the worker may log time on: assigned ones, else every open job of the company.
+ * Phase 86: a job they are *booked* on (a schedule block from two weeks back
+ * to two weeks ahead) counts as assigned — before this, a foreman who put a
+ * labourer on Thursday's board without also adding them to the job's team
+ * produced a worker who could see Thursday and could not clock in on it.
+ */
 async function workerJobs(worker: { id: string; userId: string }) {
   const assigned = await db.select({ projectId: projectAssignmentsTable.projectId }).from(projectAssignmentsTable).where(eq(projectAssignmentsTable.collaboratorId, worker.id));
+  const booked = await db
+    .select({ projectId: scheduleBlocksTable.projectId })
+    .from(scheduleBlocksTable)
+    .where(and(eq(scheduleBlocksTable.collaboratorId, worker.id), isNotNull(scheduleBlocksTable.projectId), gte(scheduleBlocksTable.endsAt, new Date(Date.now() - 14 * 86_400_000)), lt(scheduleBlocksTable.startsAt, new Date(Date.now() + 15 * 86_400_000))));
+  const ids = [...new Set([...assigned.map((a) => a.projectId), ...booked.map((b) => b.projectId!)])];
   const conds = [eq(projectsTable.userId, worker.userId), inArray(projectsTable.status, ["planning", "active"])];
-  if (assigned.length) conds.push(inArray(projectsTable.id, assigned.map((a) => a.projectId)));
+  if (ids.length) conds.push(inArray(projectsTable.id, ids));
   const jobs = await db
     .select({ id: projectsTable.id, name: projectsTable.name, address: projectsTable.address, latitude: projectsTable.latitude, longitude: projectsTable.longitude, geofenceRadiusMeters: projectsTable.geofenceRadiusMeters })
     .from(projectsTable)
@@ -161,6 +176,40 @@ async function workerSchedule(worker: { id: string }, province: string | null, l
   });
 }
 
+/**
+ * Phase 86: the worker's day. The jobs they are booked on today (or clocked in
+ * on), each with its open tasks, the site address and the person on site to
+ * call. Built from their own blocks only — a worker never sees another crew's
+ * day or anything with a price on it.
+ */
+async function workerToday(worker: { id: string; userId: string }, province: string | null, activeProjectId: string | null) {
+  const day = localToday(province);
+  const blocks = await blocksOnDay(eq(scheduleBlocksTable.collaboratorId, worker.id), day, province);
+  const ids = [...new Set([...blocks.map((b) => b.projectId).filter((x): x is string => !!x), ...(activeProjectId ? [activeProjectId] : [])])];
+  if (!ids.length) return [];
+  const projects = await db.select({ id: projectsTable.id, name: projectsTable.name, address: projectsTable.address }).from(projectsTable).where(and(eq(projectsTable.userId, worker.userId), inArray(projectsTable.id, ids)));
+  const contacts = await siteContacts(projects.map((p) => p.id));
+  const tasks = await tasksForJobs(projects.map((p) => p.id), new Date(`${day}T00:00:00Z`));
+  return projects
+    .map((p) => {
+      const own = blocks.filter((b) => b.projectId === p.id);
+      return {
+        id: p.id,
+        name: p.name,
+        address: p.address || null,
+        contact: contacts.get(p.id) ?? null,
+        blocks: own.map((b) => ({ id: b.id, startsAt: b.startsAt.toISOString(), endsAt: b.endsAt.toISOString(), allDay: b.allDay, notes: b.notes })),
+        tasks: tasks.get(p.id) ?? [],
+      };
+    })
+    .sort((a, b) => (a.blocks[0]?.startsAt ?? "~").localeCompare(b.blocks[0]?.startsAt ?? "~"));
+}
+
+async function ownReports(worker: { id: string }) {
+  const rows = await db.select().from(fieldReportsTable).where(and(eq(fieldReportsTable.workerId, worker.id), gte(fieldReportsTable.createdAt, new Date(Date.now() - 14 * 86_400_000)))).orderBy(desc(fieldReportsTable.createdAt)).limit(20);
+  return serializeReports(rows);
+}
+
 // GET /api/t/:token
 router.get("/t/:token", viewLimiter, async (req, res) => {
   try {
@@ -176,7 +225,7 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
     const jobs = await workerJobs(r.worker);
     const [openEntry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), isNotNull(timeEntriesTable.clockInAt), isNull(timeEntriesTable.clockOutAt)));
     const activeEntry = openEntry ? serializeOwnEntry(openEntry, jobs.find((j) => j.id === openEntry.projectId)?.name ?? null, null) : null;
-    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)), schedule: await workerSchedule(r.worker, r.province, r.language === "fr" ? "fr" : "en") });
+    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)), schedule: await workerSchedule(r.worker, r.province, r.language === "fr" ? "fr" : "en"), todayJobs: await workerToday(r.worker, r.province, openEntry?.projectId ?? null), reports: await ownReports(r.worker) });
   } catch (err) {
     req.log.error({ err }, "Error loading worker page");
     res.status(500).json({ error: "Internal server error" });
@@ -419,6 +468,105 @@ router.post("/t/:token/clock-out", writeLimiter, async (req, res) => {
     res.status(out.status).json(out.body);
   } catch (err) {
     req.log.error({ err }, "Error clocking out");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 86: reporting from the field ──────────────────────────────────────
+
+const reportBodySchema = z.object({
+  projectId: z.string().uuid(),
+  kind: z.enum(FIELD_REPORT_KINDS),
+  body: z.string().max(1000).optional().default(""),
+  milestoneId: z.string().uuid().optional().or(z.literal("")),
+  /** What it cost, in cents. Multipart sends strings. */
+  materialsCents: z.coerce.number().int().min(0).max(10_000_000).optional(),
+  clientRef: z.string().uuid().optional(),
+});
+
+// POST /api/t/:token/reports — multipart: optional `file` (a photo) + the fields above.
+router.post(
+  "/t/:token/reports",
+  writeLimiter,
+  (req, res, next) => {
+    photoUpload.single("file")(req, res, (err) => {
+      if (err instanceof multer.MulterError || err instanceof Error) {
+        res.status(400).json({ error: "BAD_FILE", message: err.message });
+        return;
+      }
+      next(err);
+    });
+  },
+  async (req, res) => {
+    try {
+      const r = await resolveWorker(req.params.token as string);
+      if (!r || r.expired) {
+        res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+        return;
+      }
+      const body = reportBodySchema.safeParse(req.body ?? {});
+      if (!body.success) {
+        res.status(400).json({ error: "Invalid parameters", details: body.error });
+        return;
+      }
+      const d = body.data;
+      const job = (await workerJobs(r.worker)).find((j) => j.id === d.projectId);
+      if (!job) {
+        res.status(400).json({ error: "Invalid job" });
+        return;
+      }
+      const out = await createFieldReport({
+        worker: r.worker,
+        job,
+        kind: d.kind,
+        body: d.body,
+        milestoneId: d.milestoneId || null,
+        materialsCents: d.materialsCents ?? null,
+        file: req.file ?? null,
+        clientRef: d.clientRef ?? null,
+        language: r.language === "fr" ? "fr" : "en",
+      });
+      const [report] = await serializeReports([out.report]);
+      res.status(out.replayed ? 200 : 201).json({ report, replayed: out.replayed || undefined });
+    } catch (err) {
+      if (err instanceof FieldReportError) {
+        res.status(err.status).json({ error: err.code, message: err.message });
+        return;
+      }
+      req.log.error({ err }, "Error saving field report");
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
+);
+
+// POST /api/t/:token/tasks/:taskId — { status } — tick a task from the field.
+router.post("/t/:token/tasks/:taskId", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) {
+      res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+      return;
+    }
+    const body = z.object({ status: z.enum(["todo", "in_progress", "done"]) }).safeParse(req.body);
+    const taskId = z.string().uuid().safeParse(req.params.taskId);
+    if (!body.success || !taskId.success) {
+      res.status(400).json({ error: "Invalid parameters" });
+      return;
+    }
+    const [task] = await db.select().from(projectTasksTable).where(eq(projectTasksTable.id, taskId.data));
+    // Only tasks on a job this worker can see: assigned, booked, or (with no assignments) any open job of their company.
+    const jobs = task ? await workerJobs(r.worker) : [];
+    if (!task || !jobs.some((j) => j.id === task.projectId)) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (task.status !== body.data.status) {
+      await db.update(projectTasksTable).set({ status: body.data.status }).where(eq(projectTasksTable.id, task.id));
+      await writeAudit({ userId: r.worker.userId, actorType: "user", actorId: null, entityType: "project_task", entityId: task.id, action: "task_status_from_field", diff: { workerId: r.worker.id, workerName: r.worker.name, from: task.status, to: body.data.status }, ip: req.ip ?? null, userAgent: req.get("user-agent")?.slice(0, 300) ?? null });
+    }
+    res.json({ task: { id: task.id, status: body.data.status } });
+  } catch (err) {
+    req.log.error({ err }, "Error updating task from the field");
     res.status(500).json({ error: "Internal server error" });
   }
 });

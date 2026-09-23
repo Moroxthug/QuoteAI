@@ -73,6 +73,10 @@ export type WorkerPageDto = {
   today: string;
   /** Phase 75: the worker's upcoming schedule blocks (today → two weeks). */
   schedule: WorkerScheduleBlockDto[];
+  /** Phase 86: the jobs they are booked on today, with tasks, address and site contact. */
+  todayJobs: WorkerTodayJobDto[];
+  /** Phase 86: what they sent from the field in the last two weeks. */
+  reports: FieldReportDto[];
 };
 type WorkerScheduleBlockDto = { id: string; projectId: string | null; label: string; address: string | null; milestoneTitle: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string };
 export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; clockInAt: string | null; clockOutAt: string | null; geofenceFlagged: boolean; createdAt: string };
@@ -87,4 +91,77 @@ export const workerApi = {
   clockIn: (token: string, body: { projectId: string; milestoneId?: string | null; lat?: number; lng?: number; at?: string; clientRef?: string }) => req<{ entry: WorkerEntryDto; replayed?: boolean }>(`/api/t/${token}/clock-in`, { method: "POST", body: json(body) }),
   /** Closes the open clock-in by server id, by the clock-in's clientRef (made offline), or whichever is open. */
   clockOut: (token: string, body: { entryId?: string; entryClientRef?: string; lat?: number; lng?: number; at?: string }) => req<{ entry: WorkerEntryDto; replayed?: boolean }>(`/api/t/${token}/clock-out`, { method: "POST", body: json(body) }),
+  /** Phase 86: tick a task from the field. */
+  setTask: (token: string, taskId: string, status: CrewTaskStatus) => req<{ task: { id: string; status: CrewTaskStatus } }>(`/api/t/${token}/tasks/${taskId}`, { method: "POST", body: json({ status }) }),
+  /** Phase 86: a photo, a note, a blocker or materials — multipart, so it cannot go through `req`. */
+  report: async (token: string, body: FieldReportInput & { clientRef?: string }) => {
+    const fd = new FormData();
+    fd.append("projectId", body.projectId);
+    fd.append("kind", body.kind);
+    if (body.body) fd.append("body", body.body);
+    if (body.milestoneId) fd.append("milestoneId", body.milestoneId);
+    if (body.materialsCents != null) fd.append("materialsCents", String(body.materialsCents));
+    if (body.clientRef) fd.append("clientRef", body.clientRef);
+    if (body.file) fd.append("file", body.file, body.fileName ?? "photo.jpg");
+    const res = await fetch(`/api/t/${token}/reports`, { method: "POST", body: fd });
+    const out = (await res.json().catch(() => ({}))) as { report: FieldReportDto; replayed?: boolean; error?: string; message?: string };
+    if (!res.ok) {
+      const err = new Error(out.message || out.error || `Request failed (${res.status})`) as Error & { code?: string; status?: number };
+      err.code = out.error;
+      err.status = res.status;
+      throw err;
+    }
+    return out;
+  },
+};
+
+// ── Phase 86: the crew's app ─────────────────────────────────────────────────
+
+export type CrewTaskStatus = "todo" | "in_progress" | "done";
+type CrewTaskDto = { id: string; title: string; status: CrewTaskStatus; milestoneTitle: string | null; dueDate: string | null };
+export type FieldReportKind = "note" | "blocker" | "materials";
+export type FieldReportInput = { projectId: string; kind: FieldReportKind; body?: string; milestoneId?: string | null; materialsCents?: number | null; file?: Blob | null; fileName?: string };
+export type FieldReportDto = {
+  id: string;
+  projectId: string;
+  projectName: string | null;
+  milestoneId: string | null;
+  workerId: string | null;
+  authorName: string;
+  kind: FieldReportKind;
+  body: string;
+  photoId: string | null;
+  materialsCents: number | null;
+  costEntryId: string | null;
+  resolvedAt: string | null;
+  resolvedByName: string | null;
+  resolutionNote: string | null;
+  createdAt: string;
+};
+export type WorkerTodayJobDto = {
+  id: string;
+  name: string;
+  address: string | null;
+  contact: { name: string; phone: string | null } | null;
+  blocks: { id: string; startsAt: string; endsAt: string; allDay: boolean; notes: string }[];
+  tasks: CrewTaskDto[];
+};
+
+export type CrewTodayDto =
+  | { enabled: false; requiredPlan: string }
+  | {
+      enabled: true;
+      day: string;
+      jobs: { jobId: string | null; jobName: string | null; address: string | null; crew: { blockId: string; workerId: string | null; workerName: string | null; startsAt: string; endsAt: string; allDay: boolean; title: string; clockedInAt: string | null; clockedInElsewhere: boolean }[] }[];
+      clockedIn: { entryId: string; workerId: string; workerName: string | null; projectId: string; projectName: string | null; since: string; geofenceFlagged: boolean }[];
+      awaitingApproval: { id: string; workerId: string; workerName: string | null; projectId: string; projectName: string | null; date: string | null; hours: number; note: string; geofenceFlagged: boolean; clocked: boolean }[];
+      blockers: FieldReportDto[];
+      recentReports: FieldReportDto[];
+    };
+
+export const crewApi = {
+  today: () => req<CrewTodayDto>("/api/crew/today"),
+  jobReports: (jobId: string) => req<{ reports: FieldReportDto[] }>(`/api/jobs/${jobId}/field-reports`),
+  resolve: (id: string, note?: string) => req<{ report: FieldReportDto }>(`/api/field-reports/${id}/resolve`, { method: "POST", body: json({ note }) }),
+  photoUrl: (jobId: string, photoId: string) => `/api/jobs/${jobId}/photos/${photoId}/file`,
 };

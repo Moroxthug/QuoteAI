@@ -446,3 +446,24 @@ pnpm --filter @workspace/api-server ops:preflight -- --url https://quoteai.ca --
 | Someone published the schedule and wants it un-published | Settings → Integrations → Revoke, or `DELETE /api/calendar/publish`. Every subscriber breaks immediately; "Replace the link" does the same and issues a new one |
 | Who may publish? | `integrations:full` — the same permission as connecting a calendar, not `jobs:edit`. It mints a URL that serves the whole company schedule to anyone holding it, so a foreman may move a block but may not publish the board |
 | The cron tick is slow | `syncInboundForAllCompanies` is bounded to 50 companies per tick, and the rest are picked up next tick. Raise it only after checking how long the pull actually takes |
+
+
+## 23. The crew's app: the worker's day, reports from the field, the foreman's page (Phase 86)
+
+**Where**: `api-server/src/crew/service.ts` (today's blocks, tasks, site contacts, storing a report, the foreman's day), worker endpoints in `routes/worker-time.ts`, office endpoints in `routes/crew.ts`; `field_reports` (migration `0046`); the UI in `quote-ai/src/components/crew/` — `worker-today.tsx` and `field-report.tsx` on `/t/:token`, `field-reports-card.tsx` on the job's Overview, `crew-today-card.tsx` + `foreman-home.tsx` on `/dashboard`.
+
+**How it fits** — the worker still has no account. The magic link now also shows **today**: every job they are booked on (a schedule block on the company's local day), its open tasks (tickable, audited as `task_status_from_field`), a maps link for the address and a call button for the client on the job. **Report from site** sends a photo and/or a note, a *blocked* flag, or materials used. The photo goes into the job gallery (`job_photos`), materials become a **pending-review** cost entry (they count against the budget only once someone confirms them), and the report row ties it to who sent it. A blocker is a `field_blocker` notification, which is on the push list. Everything goes through the offline outbox (`worker.report`, `worker.task`) with its `clientRef`, so a retry returns the same row, photo and cost.
+
+A **foreman** now lands on the crew's day instead of the owner's sales dashboard: who is booked where and whether they have clocked in, open blockers, hours waiting for approval (approvable in place), and the latest reports. The owner's dashboard shows the same card only when a crew is out or something is waiting.
+
+| Ask | Do |
+|---|---|
+| A worker says "today" is empty | "today" is built from *their* schedule blocks on the company's local date (the province's zone, not UTC or the phone's). No block today means no Today card. Their upcoming shifts are still listed under it |
+| A worker can see a job on the board but cannot clock in on it | fixed in this phase: a job they are booked on within ±2 weeks now counts as assigned. If it still happens, check that the job's status is `planning` or `active`. Completed and on-hold jobs are not clockable |
+| No "Call" button | the job has no client, or the client has no phone. The worker only ever gets the client's name and phone, never their email |
+| Materials from the field do not show in the job margin | by design. They land in the cost review queue as `pending_review`. Confirm them there (ideally against the receipt) |
+| A photo from the field is huge or fails on bad signal | the page re-encodes anything larger than ~1.2 MB or 2000 px to JPEG before sending (`lib/image-shrink.ts`). HEIC that the browser cannot decode is sent as-is, and the server limit is 8 MB |
+| The office did not get a push for a blocker | `field_blocker` is in `PUSH_NOTIFICATION_TYPES`. Check that the person has push enabled; the bell always has it |
+| A blocker is sorted | "Answer" on the job's *From the field* card or on the crew card: an optional note, then "Mark sorted". The worker sees the answer and who gave it under "What you sent" |
+| A foreman cannot approve hours | the bulk approve is `jobs:edit` since this phase (it was `jobs:full`, while approving one row through PUT was already `jobs:edit`). A viewer still gets 403 |
+| The crew card says it is locked | crews, clocks and approvals are `team_time` (Elite). The card says so instead of showing an empty day |

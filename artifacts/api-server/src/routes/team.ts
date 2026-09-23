@@ -414,7 +414,10 @@ router.put("/team/time-entries/:tid", requireAuth, requirePermission("jobs", "ed
 });
 
 // POST /api/team/time-entries/approve — bulk approve
-router.post("/team/time-entries/approve", requireAuth, requirePermission("jobs", "full"), async (req, res) => {
+// Phase 86: `jobs:edit`, the same bar as approving one entry through PUT above —
+// it was `jobs:full`, so a foreman could approve a week of hours one row at a
+// time but not with the "approve all" button next to them.
+router.post("/team/time-entries/approve", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);

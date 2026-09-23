@@ -2,7 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { idbSupported, idbGetAll, idbPut, idbDelete, OUTBOX_STORE } from "./db";
 import { jobsApi, type CostCategory, type CostEntryEdit } from "../jobs-api";
-import { workerApi } from "../team-api";
+import { workerApi, type CrewTaskStatus, type FieldReportKind } from "../team-api";
 
 // Phase 77 (docs/PILOT-LAUNCH-PLAN.md): the offline outbox.
 //
@@ -25,7 +25,10 @@ export type OutboxOp =
   | { kind: "worker.addEntry"; token: string; projectId: string; date: string; hours: number; milestoneId: string | null; note?: string }
   | { kind: "job.addCost"; jobId: string; body: CostEntryEdit & { category: CostCategory; totalCents: number } }
   | { kind: "job.addTimeEntry"; jobId: string; body: { workerId: string; date: string; hours: number; milestoneId?: string | null; note?: string; approve?: boolean } }
-  | { kind: "job.uploadPhoto"; jobId: string; file: Blob; fileName: string; milestoneId?: string | null; caption?: string };
+  | { kind: "job.uploadPhoto"; jobId: string; file: Blob; fileName: string; milestoneId?: string | null; caption?: string }
+  // Phase 86: what a crew member sends from the field, and a task ticked on site.
+  | { kind: "worker.report"; token: string; projectId: string; reportKind: FieldReportKind; body?: string; milestoneId?: string | null; materialsCents?: number | null; file?: Blob | null; fileName?: string }
+  | { kind: "worker.task"; token: string; taskId: string; status: CrewTaskStatus };
 
 type OutboxStatus = "pending" | "failed";
 
@@ -142,6 +145,12 @@ async function execute(row: OutboxRow): Promise<void> {
       return;
     case "worker.addEntry":
       await workerApi.add(op.token, { projectId: op.projectId, date: op.date, hours: op.hours, milestoneId: op.milestoneId, note: op.note, clientRef: row.id });
+      return;
+    case "worker.report":
+      await workerApi.report(op.token, { projectId: op.projectId, kind: op.reportKind, body: op.body, milestoneId: op.milestoneId, materialsCents: op.materialsCents, file: op.file, fileName: op.fileName, clientRef: row.id });
+      return;
+    case "worker.task":
+      await workerApi.setTask(op.token, op.taskId, op.status);
       return;
     case "job.addCost":
       await jobsApi.addCost(op.jobId, { ...op.body, clientRef: row.id });

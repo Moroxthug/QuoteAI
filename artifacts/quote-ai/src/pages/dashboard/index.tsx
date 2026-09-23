@@ -43,11 +43,13 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCan } from "@/hooks/use-role";
+import { useCan, useRole } from "@/hooks/use-role";
 import { leadsApi, type LeadDto } from "@/lib/leads-api";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
 import { CalendarCard } from "@/components/dashboard/calendar-card";
+import { CrewTodayCard } from "@/components/crew/crew-today-card";
+import { ForemanHome } from "@/components/crew/foreman-home";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -678,7 +680,13 @@ function DashboardComposer() {
 }
 
 /* ─── DashboardHome (default export) ────────────────────────────────────── */
+/** Phase 86: a foreman lands on the crew's day, not on the owner's sales dashboard with parts hidden. */
 export default function DashboardHome() {
+  const { role } = useRole();
+  return role === "foreman" ? <ForemanHome /> : <OwnerHome />;
+}
+
+function OwnerHome() {
   const { t } = useLanguage();
 const can = useCan();
   const { data: stats, isLoading: isLoadingStats } = useGetQuoteStats();
@@ -833,6 +841,9 @@ const can = useCan();
           {subscription?.isActive && subscription?.plan === "monthly_starter" && (
             <div style={{ marginTop: 16 }}><StarterUpgradeCard /></div>
           )}
+
+          {/* Phase 86: the crew's day — only when a crew is out or something waits on the office */}
+          <CrewTodayCard variant="owner" />
 
           {/* Phase 85: the month, and what is on it */}
           <CalendarCard />

@@ -12,7 +12,7 @@ import { teamMembersApi } from "@/lib/team-members-api";
 // the role is `owner`: most people are the owner, so assuming it avoids a
 // flash of missing buttons on every page load, and a viewer sees the buttons
 // vanish within the one round trip rather than never.
-function useRole(): { role: TeamMemberRole; loaded: boolean; isOwnCompany: boolean } {
+export function useRole(): { role: TeamMemberRole; loaded: boolean; isOwnCompany: boolean } {
   const { data, isSuccess } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
   const active = data?.items.find((o) => o.orgId === data.activeOrgId);
   return { role: active?.role ?? "owner", loaded: isSuccess, isOwnCompany: active?.isOwn ?? true };

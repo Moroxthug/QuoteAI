@@ -43,3 +43,4 @@ export * from "./sms";
 export * from "./schedule";
 export * from "./portal";
 export * from "./push";
+export * from "./field-reports";

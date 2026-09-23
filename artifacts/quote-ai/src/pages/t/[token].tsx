@@ -12,6 +12,8 @@ import { Logo } from "@/components/logo";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { runOrQueue, enqueue, useOutbox } from "@/lib/offline/outbox";
+import { WorkerToday } from "@/components/crew/worker-today";
+import { FieldReportCard } from "@/components/crew/field-report";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -43,6 +45,10 @@ function elapsedLabel(sinceIso: string, now: number) {
  * offline outbox (src/lib/offline/outbox.ts) — a tap is saved on the phone
  * with its real time and replayed on reconnect; a clock-in that has not
  * synced yet still shows its running timer here and can be clocked out.
+ *
+ * Phase 86: the crew's app. Today's jobs come first (tasks, a maps link, the
+ * person on site to call), then the schedule and the clock, then "report from
+ * site" — a photo, a blocker, materials used — which also queues offline.
  */
 export default function WorkerTimePage() {
   const { token } = useParams<{ token: string }>();
@@ -159,6 +165,7 @@ export default function WorkerTimePage() {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <OfflineBar scope={token} />
+        <WorkerToday token={token!} jobs={data.todayJobs} />
         {data.schedule.length > 0 && (
           <section className="card p-4 space-y-2">
             <h2 className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.schedule")}</h2>
@@ -245,6 +252,8 @@ export default function WorkerTimePage() {
             </>
           )}
         </section>
+
+        <FieldReportCard token={token!} jobs={data.jobs} defaultJobId={data.activeEntry?.projectId ?? data.todayJobs[0]?.id ?? (data.jobs.length === 1 ? data.jobs[0]!.id : null)} reports={data.reports} />
 
         <section className="card p-4 space-y-4">
           <h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("worker.orManual")}</h2>

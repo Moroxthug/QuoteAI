@@ -273,8 +273,10 @@ export async function screenReaderAudit(page: Page, opts: { width: number }): Pr
 
     // ── route-announcer ──────────────────────────────────────────────────────
     const announcer = document.querySelector("[data-route-announcer]");
-    if (!announcer) add("route-announcer", "body", "no polite live region announcing the page after a client-side navigation");
-    else if (announcer.getAttribute("aria-live") !== "polite") {
+    // Only the SPA navigates client-side; a static page (Phase 92: /widget-test.html) reloads, and the browser announces that.
+    if (!announcer) {
+      if (document.getElementById("root")) add("route-announcer", "body", "no polite live region announcing the page after a client-side navigation");
+    } else if (announcer.getAttribute("aria-live") !== "polite") {
       add("route-announcer", "[data-route-announcer]", `aria-live="${announcer.getAttribute("aria-live")}" (expected polite)`);
     }
 

@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon, FileText, Mic, Camera } from "lucide-react";
+import { Loader2, Save, Upload, X, ImageIcon, Crown, Zap, CheckCircle2, XCircle, CalendarDays, BarChart3, AlertCircle, RefreshCw, ArrowUpRight, MessageCircle, Phone, Link2Off, Plug, Building2, CreditCard, Landmark, KeyRound, Webhook, Copy, Trash2, Mail, Banknote, Megaphone, Search, Settings as SettingsIcon, FileText, Mic, Camera, ExternalLink } from "lucide-react";
 import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
@@ -313,9 +313,11 @@ function AccountTab() {
           {profile?.apiKey ? (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <FormLabel className="text-xs font-bold text-muted-foreground block uppercase tracking-wider">{t("dashboard.settings.account.widgetCard.activeApiKeyLabel")}</FormLabel>
+                {/* Phase 92: plain labels — FormLabel needs a react-hook-form context, and this card sits outside the form (it crashed the page for every account with a key). */}
+                <label htmlFor="account-widget-key" className="text-xs font-bold text-muted-foreground block uppercase tracking-wider">{t("dashboard.settings.account.widgetCard.activeApiKeyLabel")}</label>
                 <div className="flex gap-2">
                   <Input
+                    id="account-widget-key"
                     readOnly
                     value={profile.apiKey}
                     className="font-mono text-xs bg-muted/30 text-center"
@@ -331,10 +333,10 @@ function AccountTab() {
               </div>
 
               <div className="space-y-2">
-                <FormLabel className="text-xs font-bold text-muted-foreground block uppercase tracking-wider">{t("dashboard.settings.account.widgetCard.embedCodeLabel")}</FormLabel>
+                <p className="text-xs font-bold text-muted-foreground block uppercase tracking-wider">{t("dashboard.settings.account.widgetCard.embedCodeLabel")}</p>
                 <p className="text-xs text-muted-foreground">{t("dashboard.settings.account.widgetCard.embedCodeDesc")}</p>
                 <div className="relative">
-                  <pre className="p-4 bg-slate-950 text-slate-200 rounded-[var(--radius)] overflow-x-auto font-mono text-[10px] leading-relaxed max-h-40 whitespace-pre-wrap select-all border border-slate-800">
+                  <pre tabIndex={0} aria-label={t("dashboard.settings.account.widgetCard.embedCodeLabel")} className="p-4 bg-slate-950 text-slate-200 rounded-[var(--radius)] overflow-x-auto font-mono text-[10px] leading-relaxed max-h-40 whitespace-pre-wrap select-all border border-slate-800">
 {`<!-- QuoteAI Widget Funnel -->
 <div id="quoteai-widget">
   <a href="https://quoteai.ca" rel="noopener">${t("dashboard.settings.account.widgetCard.embedAnchorText")}</a>
@@ -355,6 +357,7 @@ function AccountTab() {
                   </button>
                 </div>
               </div>
+              <WidgetTestLink apiKey={profile.apiKey} />
             </div>
           ) : (
             <div className="text-center py-6 border border-dashed rounded-[var(--radius)] bg-muted/10 space-y-3">
@@ -2686,6 +2689,26 @@ function EmailSendTab() {
   );
 }
 
+// Phase 92: opens /widget-test.html, a sample "contractor site" that adds the widget exactly as the snippet does.
+function WidgetTestLink({ apiKey }: { apiKey: string }) {
+  const { t, lang } = useLanguage();
+  return (
+    <div className="space-y-1.5">
+      <a
+        href={`/widget-test.html?key=${encodeURIComponent(apiKey)}&lang=${lang}`}
+        target="_blank"
+        rel="noopener"
+        className="btn btn-outline-navy btn-sm gap-1.5 inline-flex"
+      >
+        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+        {t("dashboard.settings.widget.testLink")}
+      </a>
+      <p className="text-xs text-muted-foreground">{t("dashboard.settings.widget.testLinkDesc")}</p>
+      <p className="text-xs text-muted-foreground">{t("dashboard.settings.widget.langHint")}</p>
+    </div>
+  );
+}
+
 function WidgetTab() {
   const { t } = useLanguage();
   const { data: profile, isLoading } = useGetBusinessProfile();
@@ -2768,6 +2791,7 @@ function WidgetTab() {
               <div className="flex items-center gap-2">
                 <Input
                   readOnly
+                  aria-label={t("dashboard.settings.widget.step1Title")}
                   value={apiKey}
                   className="font-mono text-sm bg-muted flex-1"
                 />
@@ -2802,7 +2826,7 @@ function WidgetTab() {
                 {t("dashboard.settings.widget.step2Desc")}
               </p>
               <div className="relative">
-                <pre className="p-4 bg-gray-900 text-gray-100 rounded-[var(--radius)] overflow-x-auto font-mono text-xs leading-relaxed max-h-48 whitespace-pre-wrap">
+                <pre tabIndex={0} aria-label={t("dashboard.settings.widget.step2Title")} className="p-4 bg-gray-900 text-gray-100 rounded-[var(--radius)] overflow-x-auto font-mono text-xs leading-relaxed max-h-48 whitespace-pre-wrap">
                   {embedCode}
                 </pre>
                 <button onClick={() => copyToClipboard(embedCode, "code")}
@@ -2810,6 +2834,7 @@ function WidgetTab() {
                   {copied === "code" ? t("dashboard.settings.widget.copied") : t("dashboard.settings.widget.copyCode")}
                 </button>
               </div>
+              <WidgetTestLink apiKey={apiKey} />
             </div>
           )}
         </div>

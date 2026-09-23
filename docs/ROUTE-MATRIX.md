@@ -539,13 +539,13 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 229 | GET | `/api/public/config` | none | — | configLimiter | none | — | n/a | — | — | — |
-| 278 | POST | `/api/public/quotes` | none | — | quoteIpLimiter, quoteApiKeyLimiter | manual | — | n/a | — | — | — |
-| 553 | GET | `/api/public/quotes/:id` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
-| 588 | POST | `/api/public/quotes/:id/accept` | none | — | quoteAcceptLimiter | manual | — | n/a | — | db-lookup | — |
-| 684 | GET | `/api/public/quotes/:id/financeit/status` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
-| 706 | POST | `/api/public/quotes/:id/financeit/estimate` | none | — | financeitEstimateLimiter | none | — | n/a | — | db-lookup | — |
-| 730 | POST | `/api/public/quotes/:id/financeit/apply` | none | — | financeitApplyLimiter | none | — | n/a | — | db-lookup | — |
-| 771 | GET | `/api/public/quotes/:id/incentives` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
+| 278 | POST | `/api/public/quotes` | none | — | quoteIpLimiter, quoteApiKeyLimiter | manual | — | n/a | — | db-lookup | — |
+| 605 | GET | `/api/public/quotes/:id` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
+| 640 | POST | `/api/public/quotes/:id/accept` | none | — | quoteAcceptLimiter | manual | — | n/a | — | db-lookup | — |
+| 736 | GET | `/api/public/quotes/:id/financeit/status` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
+| 758 | POST | `/api/public/quotes/:id/financeit/estimate` | none | — | financeitEstimateLimiter | none | — | n/a | — | db-lookup | — |
+| 782 | POST | `/api/public/quotes/:id/financeit/apply` | none | — | financeitApplyLimiter | none | — | n/a | — | db-lookup | — |
+| 823 | GET | `/api/public/quotes/:id/incentives` | none | — | quoteViewLimiter | none | — | n/a | — | db-lookup | — |
 
 ## artifacts/api-server/src/routes/public-reviews.ts
 

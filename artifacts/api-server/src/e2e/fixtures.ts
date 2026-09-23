@@ -41,6 +41,8 @@ export type Showcase = {
   clientId: string | null;
   /** Phase 91: an unused access code — `/join?code=…`. */
   joinCode: string | null;
+  /** Phase 92: the widget key — `/widget-test.html?key=…`. */
+  widgetKey: string | null;
 };
 
 function need<T>(v: T | null | undefined, what: string): T {
@@ -234,6 +236,8 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   await org.api("/api/company-setup", { method: "PUT", body: { trades: ["renovation", "painting"], teamSize: 9, seatsWanted: 4, fieldCrew: true } });
   const codes = await org.api("/api/team/members/codes", { body: { count: 1, role: "office" } });
   const joinCode: string | null = codes.status === 201 ? String(codes.body.codes[0].code) : null;
+  const widget = await org.api("/api/business-profile/apikey", { method: "POST" });
+  const widgetKey: string | null = widget.status === 200 ? String(widget.body.apiKey) : null;
 
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });
@@ -247,7 +251,7 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     quoteId: quote.id, longQuoteId: longQuote.id, pendingQuoteId: pending.id,
     contractId: contract.id, pendingContractId: pendingContract.id,
     jobId: project.id, invoiceId: sent.id, invoiceToken: invoiceToken(manualSent),
-    signToken, workerToken, teamInviteToken, clientId, joinCode,
+    signToken, workerToken, teamInviteToken, clientId, joinCode, widgetKey,
   };
 }
 

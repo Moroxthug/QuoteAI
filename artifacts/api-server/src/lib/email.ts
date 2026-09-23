@@ -412,60 +412,100 @@ function buildQuoteEmailHtml(params: {
 </html>`;
 }
 
+// Phase 92: the widget speaks the visitor's language, so the receipt does too.
+const WIDGET_CONFIRMATION_COPY = {
+  en: {
+    htmlLang: "en-CA",
+    subject: (company: string) => `Your request to ${company} has been received`,
+    title: (company: string) => `Your request has been received – ${company}`,
+    heading: "Request received",
+    subheading: (company: string) => `${company} has received your quote request`,
+    greeting: (client: string, company: string) =>
+      `Hi ${client},<br/><br/>thanks for requesting an estimate from <strong>${company}</strong>. Their team will get back to you shortly to schedule a site visit and finalize the quote.`,
+    rangeLabel: "Estimated range (taxes included)",
+    rangeNote: "This is an automatic estimate and may change after an on-site visit.",
+    noRangeNote: "They will review your description and send you a quote.",
+    contact: (company: string, line: string) => ` For any questions you can contact ${company} directly: ${line}.`,
+    footer: (company: string) => `You received this email because you requested a quote through ${company}'s website.`,
+    poweredBy: "Estimate calculated with",
+    technology: "technology",
+    fmt: (n: string) => `$${Number(n).toLocaleString("en-CA", { maximumFractionDigits: 0 })}`,
+  },
+  fr: {
+    htmlLang: "fr-CA",
+    subject: (company: string) => `${company} a bien reçu votre demande`,
+    title: (company: string) => `Votre demande a été reçue – ${company}`,
+    heading: "Demande reçue",
+    subheading: (company: string) => `${company} a bien reçu votre demande de soumission`,
+    greeting: (client: string, company: string) =>
+      `Bonjour ${client},<br/><br/>merci d'avoir demandé une estimation à <strong>${company}</strong>. L'équipe vous recontactera sous peu pour planifier une visite et finaliser la soumission.`,
+    rangeLabel: "Fourchette estimée (taxes incluses)",
+    rangeNote: "Cette estimation est automatique et peut changer après une visite sur place.",
+    noRangeNote: "L'équipe étudiera votre description et vous enverra une soumission.",
+    contact: (company: string, line: string) => ` Pour toute question, vous pouvez joindre ${company} directement : ${line}.`,
+    footer: (company: string) => `Vous recevez ce courriel parce que vous avez demandé une soumission sur le site de ${company}.`,
+    poweredBy: "Estimation calculée avec la technologie",
+    technology: "",
+    fmt: (n: string) => `${Number(n).toLocaleString("fr-CA", { maximumFractionDigits: 0 })} $`,
+  },
+} as const;
+
 function buildWidgetClientConfirmationEmail(params: {
+  lang: "en" | "fr";
   clientName: string;
   companyName: string;
   companyPhone: string | null;
   companyEmail: string | null;
-  prezzoMinimo: string;
-  prezzoMassimo: string;
+  prezzoMinimo: string | null;
+  prezzoMassimo: string | null;
   logoUrl?: string | null;
 }): string {
-  const { clientName, companyName, companyPhone, companyEmail, prezzoMinimo, prezzoMassimo } = params;
+  const { clientName, companyName, prezzoMinimo, prezzoMassimo } = params;
+  const c = WIDGET_CONFIRMATION_COPY[params.lang];
   const logoUrl = params.logoUrl || LOGO_URL;
-  const contactLine = [companyPhone, companyEmail].filter(Boolean).join(" · ");
+  const contactLine = [params.companyPhone, params.companyEmail].filter(Boolean).map((v) => escapeHtml(String(v))).join(" · ");
+  const hasRange = prezzoMinimo !== null && prezzoMassimo !== null;
   return `<!DOCTYPE html>
-<html lang="en-CA">
+<html lang="${c.htmlLang}">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Your request has been received – ${companyName}</title>
+<title>${c.title(companyName)}</title>
 <style>
-  body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
-  .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }
-  .header { background:linear-gradient(135deg,#7c3aed,#06b6d4); padding:32px 40px; text-align:center; }
+  body { margin:0; padding:0; background:#f4f5f7; font-family:system-ui,-apple-system,sans-serif; }
+  .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:12px; overflow:hidden; border:1px solid #e4e7ec; }
+  .header { background:#101031; padding:32px 40px; text-align:center; }
   .header img { height:36px; }
   .header h1 { color:white; font-size:20px; font-weight:700; margin:16px 0 4px; }
   .header p { color:rgba(255,255,255,0.85); font-size:14px; margin:0; }
   .body { padding:32px 40px; }
   .greeting { font-size:16px; color:#1a1a2e; margin-bottom:20px; line-height:1.6; }
-  .price-box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:20px 24px; margin:24px 0; text-align:center; }
+  .price-box { background:#f4f6fa; border:1px solid #e4e7ec; border-radius:10px; padding:20px 24px; margin:24px 0; text-align:center; }
   .price-box .label { font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:0.05em; }
-  .price-box .range { font-size:22px; font-weight:700; color:#7c3aed; margin-top:6px; }
-  .incentives-box { background:#ecfdf5; border:1px solid #d1fae5; border-radius:12px; padding:16px 20px; margin:20px 0; font-size:13px; color:#065f46; line-height:1.6; }
-  .footer { background:#f9fafb; padding:20px 40px; text-align:center; font-size:12px; color:#9ca3af; border-top:1px solid #f3f4f6; }
+  .price-box .range { font-size:22px; font-weight:700; color:#101031; margin-top:6px; }
+  .footer { background:#f9fafb; padding:20px 40px; text-align:center; font-size:12px; color:#6b7280; border-top:1px solid #f3f4f6; }
 </style>
 </head>
 <body>
 <div class="wrapper">
   <div class="header">
-    <img src="${logoUrl}" alt="${escapeHtml(companyName)}" />
-    <h1>Request received ✓</h1>
-    <p>${companyName} has received your quote request</p>
+    <img src="${logoUrl}" alt="${companyName}" />
+    <h1>${c.heading}</h1>
+    <p>${c.subheading(companyName)}</p>
   </div>
   <div class="body">
-    <p class="greeting">Hi ${clientName},<br/><br/>thanks for requesting an estimate from <strong>${companyName}</strong>. Their team will get back to you shortly to schedule a site visit and finalize the quote.</p>
-
+    <p class="greeting">${c.greeting(clientName, companyName)}</p>
+${hasRange ? `
     <div class="price-box">
-      <div class="label">Estimated range</div>
-      <div class="range">${prezzoMinimo} – ${prezzoMassimo} CAD</div>
+      <div class="label">${c.rangeLabel}</div>
+      <div class="range">${c.fmt(prezzoMinimo)} – ${c.fmt(prezzoMassimo)}</div>
     </div>
-
-    <p style="font-size:13px;color:#6b7280;text-align:center;">This is an automatic AI-generated estimate and may change after an on-site visit.${contactLine ? ` For any questions you can contact ${companyName} directly: ${contactLine}.` : ""}</p>
+` : ""}
+    <p style="font-size:13px;color:#6b7280;text-align:center;">${hasRange ? c.rangeNote : c.noRangeNote}${contactLine ? c.contact(companyName, contactLine) : ""}</p>
   </div>
   <div class="footer">
-    Estimate calculated with <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a> technology<br/>
-    You received this email because you requested a quote through ${companyName}'s website.
+    ${c.poweredBy} <a href="https://quoteai.ca" style="color:#101031;">QuoteAI</a>${c.technology ? ` ${c.technology}` : ""}<br/>
+    ${c.footer(companyName)}
   </div>
 </div>
 </body>
@@ -475,12 +515,14 @@ function buildWidgetClientConfirmationEmail(params: {
 export async function sendWidgetClientConfirmationEmail(params: {
   toEmail: string;
   userId: string;
+  lang?: "en" | "fr";
   clientName: string;
   companyName: string;
   companyPhone: string | null;
   companyEmail: string | null;
-  prezzoMinimo: string;
-  prezzoMassimo: string;
+  /** Null when the AI gave no estimate (Phase 92): the email then says a quote will follow. */
+  prezzoMinimo: string | null;
+  prezzoMassimo: string | null;
   companyLogoUrl?: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -488,14 +530,16 @@ export async function sendWidgetClientConfirmationEmail(params: {
     logger.warn("RESEND_API_KEY not set — skipping widget client confirmation email");
     return;
   }
+  const lang = params.lang ?? "en";
   try {
     await sendCustomerEmail({
       userId: params.userId,
       toEmail: params.toEmail,
       fromDisplayName: params.companyName,
       replyTo: params.companyEmail,
-      subject: `Your request to ${params.companyName} has been received`,
+      subject: WIDGET_CONFIRMATION_COPY[lang].subject(params.companyName),
       html: buildWidgetClientConfirmationEmail({
+        lang,
         clientName: escapeHtml(params.clientName),
         companyName: escapeHtml(params.companyName),
         companyPhone: params.companyPhone,
@@ -567,9 +611,10 @@ export async function sendWidgetLeadNotification(params: {
   clientEmail: string;
   clientPhone: string;
   rawInput: string;
-  totale: string;
-  prezzoMinimo: string;
-  prezzoMassimo: string;
+  /** Null when the AI gave no estimate (Phase 92): the lead still arrives, without the price box. */
+  totale: string | null;
+  prezzoMinimo: string | null;
+  prezzoMassimo: string | null;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -586,7 +631,7 @@ export async function sendWidgetLeadNotification(params: {
     await resend.emails.send({
       from: "QuoteAI <no-reply@quoteai.ca>",
       to: [toEmail],
-      subject: `⚡ New Lead Converted from Widget — ${clientName}`,
+      subject: `New website lead — ${clientName}`,
       html: `<!DOCTYPE html>
 <html lang="en-CA">
 <head>
@@ -595,7 +640,7 @@ export async function sendWidgetLeadNotification(params: {
 <style>
   body { margin:0; padding:0; background:#f4f4f5; font-family:system-ui,-apple-system,sans-serif; }
   .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.06); border:1px solid #e4e4e7; }
-  .header { background:linear-gradient(135deg,#7c3aed,#4f46e5); padding:28px 32px; text-align:center; color:white; }
+  .header { background:#101031; padding:28px 32px; text-align:center; color:white; }
   .header h1 { font-size:20px; font-weight:700; margin:0; }
   .header p { font-size:13px; color:rgba(255,255,255,0.85); margin:6px 0 0; }
   .body { padding:32px; }
@@ -612,7 +657,7 @@ export async function sendWidgetLeadNotification(params: {
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>⚡ New Lead Converted</h1>
+    <h1>New website lead</h1>
     <p>A visitor just completed the quote tool on your website</p>
   </div>
   <div class="body">
@@ -636,13 +681,17 @@ export async function sendWidgetLeadNotification(params: {
       <div class="val" style="white-space:pre-wrap; font-size:13px; color:#3f3f46; line-height:1.5;">${safeRawInput}</div>
     </div>
 
+${prezzoMinimo !== null && prezzoMassimo !== null ? `
     <div class="price-box">
       <div class="price-row">
-        <span>AI-Generated Estimate:</span>
+        <span>Estimate shown to the visitor:</span>
         <span style="font-size:16px;">${prezzoMinimo} – ${prezzoMassimo} CAD</span>
       </div>
-      <div style="font-size:11px; color:#71717a; font-weight:normal; margin-top:4px; text-align:right;">Calculated quote total: ${totale} CAD</div>
-    </div>
+      <div style="font-size:11px; color:#71717a; font-weight:normal; margin-top:4px; text-align:right;">Draft quote total: ${totale} CAD (in your quotes as a draft)</div>
+    </div>` : `
+    <div class="price-box">
+      <div style="font-size:13px; color:#3f3f46;">No automatic estimate this time; the visitor was told you would send a quote. The request is in your leads.</div>
+    </div>`}
 
     <p style="font-size:13px; color:#71717a; line-height:1.5; text-align:center; margin-top:24px;">
       We recommend following up with the client within 24 hours to schedule a site visit and improve your conversion rate.

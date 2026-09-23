@@ -13,7 +13,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 
 | Phase | Title | Who | State |
 |---|---|---|---|
-| 92 | The embed widget that doesn't exist | assistant | not started |
+| 92 | The embed widget that doesn't exist | assistant | **done** 2026-09-23 |
 | 93 | Sign-up, walked for real | assistant | not started |
 | 94 | Job and quote rough edges | assistant | not started |
 | 95 | French legal pages + who did what | assistant | not started |
@@ -138,3 +138,26 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 ## Build log
 
 *(one entry per phase: date, built, found, deferred, verification)*
+
+### Phase 92 — The embed widget (2026-09-23)
+
+**Built**
+- **`/widget.js`**: `src/widget/widget.ts`, one file with no imports and no React, compiled on its own to an IIFE by a small Vite plugin (served live in dev, emitted as `dist/public/widget.js` in the build: 18 KB, 7 KB gzipped). Shadow root, styles through `adoptedStyleSheets`, text only (no `innerHTML`), EN/FR from `data-lang` or the page's `<html lang>`, optional `data-target` and `data-color`. Two steps (the work, then who to contact, with consent), then the range or "a quote will follow". Labels, errors tied to their fields, focus on the heading at each step and on the error after a failed send, 44 px targets, reduced motion. Fires `quoteai:submitted` for the contractor's analytics.
+- **Server**: `POST /api/public/quotes` keeps the lead when the AI fails (40 s, no retries; unreadable JSON; nothing priced): client filed, the visitor's words on the lead event, contractor told "no automatic estimate", visitor told a quote will follow. It used to answer 500 and store nothing. A `website` honeypot (201, nothing stored). `estimate: { min, max }` in the response (the old flat fields stay). The visitor's receipt email is in the widget's language; both widget emails lost their emojis and purple gradient for the product's navy, and the price box when there is no price.
+- **`/widget-test.html`** (noindex): a plain sample "contractor site" that adds the widget exactly as the snippet does. Settings → Widget and Settings → Account have a **Test your widget** link and a line on `data-lang`.
+- `vercel.json`: `/widget.js` 1 h cache + 1 day stale-while-revalidate (a versioned query string can't work: the snippet is pasted once and never edited), CORS `*`, CORP cross-origin; the test page `X-Robots-Tag: noindex`. Static files are served before the SPA rewrite, so neither is swallowed by it.
+- Runbook §30. qa:visual now sweeps `/widget-test.html` and Settings → Widget; the showcase account has a widget key.
+
+**Found**
+1. **Settings → Account crashed ("Something went wrong") for every account that has a widget key**: the widget card used the form library's `FormLabel` outside a form. No sweep had shown it because the showcase account had no key. Plain labels now.
+2. On those pages, rendered with a key for the first time: the two scrollable snippet boxes weren't reachable by keyboard and the Widget tab's key field had no label (axe). Fixed.
+3. An AI failure answered the visitor with a 500 and stored nothing, and the model call ran with the SDK default (minutes, with retries) inside a 60 s function. Both fixed as above.
+4. The screen-reader check's route-announcer rule would have thrown on a page without the SPA root; it now applies to SPA pages only.
+5. The test page's HTML comment contained the text of a script tag, which the CSP guard read as an inline script. Reworded.
+
+**Not done / deferred**
+- Widget analytics beyond the DOM event (views, drop-off per step): nothing is counted server-side.
+- The host site's CSP belongs to the host: a contractor whose site restricts `connect-src` must add quoteai.ca (runbook §30).
+- The contractor's lead notification is still English only (the visitor's receipt follows the widget's language).
+
+**Verification**: `pnpm typecheck` (in `pnpm build`) · `pnpm lint` **0 errors** (69 warnings, pre-existing) · `pnpm knip` clean · `i18n-audit` **4656 = 4656**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **478** (regenerated: the widget POST now reads the client back) · unit **28 files / 191 tests** · e2e **phase92 4/4** (a visitor on a cross-site page gets `$2,848 – $3,955`; the host's hostile CSS doesn't reach the form; errors in place with focus; consent required; draft quote + lead + client + both emails. French page with the AI down: French form, lead without a quote with the words kept, French receipt with no price box. Missing, wrong and regenerated keys show only the neutral box. Honeypot stores nothing. No uncaught page errors) · regression **security (IDOR + CORS), followups, quotes, public-tokens** green · `pnpm build` ✓ (`dist/public/widget.js` present) · `qa:visual` on `/widget-test.html`, Settings → Account and Settings → Widget, EN+FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · every widget state (step 1 and step 2 with errors, estimate, no estimate at 375 FR, not available) checked by eye.

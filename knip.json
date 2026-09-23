@@ -3,7 +3,8 @@
   "ignore": [
     "lib/integrations/**",
     "lib/integrations-openai-ai-react/src/audio/audio-playback-worklet.js",
-    "artifacts/quote-ai/public/sw.js"
+    "artifacts/quote-ai/public/sw.js",
+    "artifacts/quote-ai/public/widget-test.js"
   ],
   "ignoreDependencies": [
     "prettier",
@@ -52,7 +53,8 @@
         "scripts/*.ts",
         "server/*.mjs",
         "vite.config.ts",
-        "src/entry-server.tsx"
+        "src/entry-server.tsx",
+        "src/widget/widget.ts"
       ]
     },
     "lib/*": {

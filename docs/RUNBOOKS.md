@@ -609,3 +609,25 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | Someone joined with the wrong role | Change it on Team → Team members like any member |
 | "My numbers are zero" | Only what was made from 2026-09-23 on, signed in as that person, counts. Automatic invoices and quotes from WhatsApp belong to the company |
 | The photo doesn't change | Each upload has a new file name; a hard refresh shows it if the browser held the old one |
+
+## 30. The website widget (Phase 92)
+
+**Where**: `artifacts/quote-ai/src/widget/widget.ts` (one self-contained file, no imports) is compiled by the `quoteai-widget` plugin in `vite.config.ts`: served live at `/widget.js` in dev, emitted as `dist/public/widget.js` in the build (~18 KB, 7 KB gzipped). It calls `GET /api/public/config` and `POST /api/public/quotes` (`routes/public-quotes.ts`) on the origin it was loaded from. Test page: `/widget-test.html?key=…&lang=…` (`public/widget-test.html` + `widget-test.js`, noindex), opened from Settings → Widget → "Test your widget". Headers for both in `vercel.json` (widget: 1 h cache + 1 day stale-while-revalidate, CORS `*`; test page: `X-Robots-Tag: noindex`).
+
+**How it fits**:
+- The snippet contractors paste is unchanged (`<div id="quoteai-widget">` + `<script src=…/widget.js data-api-key=… async>`). Optional attributes: `data-lang="fr|en"` (default: the page's `<html lang>`), `data-target="#id"`, `data-color="#hex"`.
+- The form draws inside a shadow root on the container, so the host site's CSS can't reach it (the e2e page throws `!important` Comic Sans and hotpink at it). Styles go in through `adoptedStyleSheets`, so a strict host CSP on `style-src` doesn't break it. A host CSP whose `connect-src` leaves out quoteai.ca does: the form then shows "not available".
+- Two steps (the work: description, type of work if the catalog has categories, area, city, province, postal code; then name, email or phone, consent), then the result: the range (90 %–125 % of the quote total, taxes included) or, with no estimate, "they will send you a quote".
+- **A request is never lost to the AI**: the model call has 40 s and no retries. If it fails, returns JSON that can't be read, or prices nothing, the lead is still recorded (no quote; the visitor's words in the lead's `created` event), the client filed, the contractor emailed ("No automatic estimate this time"), and the visitor told a quote will follow.
+- The visitor's receipt email is in the widget's language. A hidden `website` field is a honeypot: when filled it's a bot, answered 201 with nothing stored. Rate limits are the existing ones (20 requests per IP per hour, 60 per key per hour).
+- A missing, wrong or revoked key (Regenerate in Settings revokes the old one at once) shows "Online quotes are not available right now." and nothing else.
+- After a successful request the container fires `quoteai:submitted` (`detail: { quoteId, estimate }`) for the contractor's own analytics.
+
+| Ask | Do |
+|---|---|
+| "The widget doesn't show on my site" | Open `/widget-test.html` from Settings. If it works there, the site is the cause: the snippet pasted into a text block instead of an HTML block, or the site's CSP `script-src` / `connect-src` blocks quoteai.ca |
+| "It says quotes are not available" | The key on the site isn't the current one (regenerated since). Copy the snippet again |
+| "It's in English on my French site" | Their page's `<html lang>` isn't `fr`; add `data-lang="fr"` to the script tag |
+| A lead with no quote | The AI didn't answer in time or priced nothing; the request text is on the lead. Make the quote by hand |
+| "I changed nothing and it looks different" | `/widget.js` is cached up to an hour (a day while revalidating); every site has a new version within a day |
+| Test runs | `phase92.e2e` serves the widget from one local origin and the "contractor site" from another, and drives Chrome; screenshots of every state land in `artifacts/api-server/.qa/phase92/` |

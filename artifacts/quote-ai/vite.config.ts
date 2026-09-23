@@ -1,7 +1,36 @@
-import { defineConfig } from "vite";
+import { defineConfig, transformWithEsbuild, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { readFile } from "node:fs/promises";
+
+// Phase 92: /widget.js, the snippet contractors paste on their own sites.
+// One self-contained file compiled on its own to an IIFE — no React, no
+// chunks, nothing shared with the app bundle — served live in dev and
+// emitted at the root of dist/public in the client build.
+const WIDGET_SRC = path.resolve(import.meta.dirname, "src/widget/widget.ts");
+async function compileWidget(minify: boolean): Promise<string> {
+  const source = await readFile(WIDGET_SRC, "utf8");
+  const out = await transformWithEsbuild(source, WIDGET_SRC, { loader: "ts", format: "iife", target: "es2019", minify, legalComments: "none" });
+  return out.code;
+}
+function widgetPlugin(): Plugin {
+  return {
+    name: "quoteai-widget",
+    configureServer(server) {
+      server.middlewares.use("/widget.js", (_req, res, next) => {
+        compileWidget(false).then((code) => {
+          res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+          res.setHeader("Cache-Control", "no-cache");
+          res.end(code);
+        }, next);
+      });
+    },
+    async generateBundle() {
+      this.emitFile({ type: "asset", fileName: "widget.js", source: await compileWidget(true) });
+    },
+  };
+}
 const port = Number(process.env.PORT ?? "5173");
 const basePath = process.env.BASE_PATH ?? "/";
 
@@ -20,6 +49,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     react(),
     tailwindcss(),
+    ...(isSsrBuild ? [] : [widgetPlugin()]),
   ],
   resolve: {
     alias: {

@@ -11,7 +11,7 @@ import type { QuoteChapter, QuoteClientData, QuoteDiscount } from "@workspace/db
 import { sendWidgetLeadNotification, sendWidgetClientConfirmationEmail } from "../lib/email.js";
 import { ipRateLimiter, apiKeyRateLimiter } from "../lib/rateLimit.js";
 import { raiseAutomation } from "../lib/automation.js";
-import { linkQuoteToClient } from "../lib/clients.js";
+import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { portalLinkForClient } from "../portal/service.js";
@@ -298,11 +298,22 @@ router.post("/public/quotes", quoteIpLimiter, quoteApiKeyLimiter, async (req, re
 
     const userId = profile.userId;
 
-    const { rawInput, clientData, misure } = req.body as {
+    const { rawInput, clientData, misure, lang: rawLang, website } = req.body as {
       rawInput?: string;
       clientData?: { nome: string; email?: string; phone?: string; indirizzo?: string; city?: string; postalCode?: string; province?: string };
       misure?: Record<string, string | number>;
+      lang?: string;
+      /** Phase 92: honeypot — a field the widget hides from people; only form-filling bots type in it. */
+      website?: string;
     };
+    const lang: "en" | "fr" = rawLang === "fr" ? "fr" : "en";
+
+    // Answer a bot like a success so it has nothing to retry against, and store nothing.
+    if (typeof website === "string" && website.trim() !== "") {
+      logger.warn({ userId }, "Widget honeypot filled — request dropped");
+      res.status(201).json({ success: true, quoteId: null, estimate: null });
+      return;
+    }
 
     if (!rawInput || !rawInput.trim()) {
       res.status(400).json({ error: "The rawInput parameter is required." });
@@ -343,50 +354,61 @@ Use these exact measurements to mathematically calculate the quantities.`;
       ? `JOB SITE LOCATION: ${[clientData?.city, clientData?.province ? `(${clientData.province})` : ""].filter(Boolean).join(" ")}`
       : "";
 
-    // Call OpenAI
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      max_completion_tokens: 4096,
-      temperature: 0.3,
-      messages: [
-        { role: "system", content: AI_PROMPT },
-        { role: "system", content: REGIONAL_PRICING_GUIDANCE },
-        { role: "system", content: DESCRIPTION_QUALITY_GUIDANCE },
-        ...(catalogContext ? [{ role: "system" as const, content: catalogContext }] : []),
-        ...(misureContext ? [{ role: "system" as const, content: misureContext }] : []),
-        ...(locationContext ? [{ role: "system" as const, content: locationContext }] : []),
-        { role: "user", content: rawInput },
-      ],
-    });
+    // Phase 92: a visitor who filled in the widget is a lead whether or not
+    // the model answers. When the AI call fails (outage, timeout, JSON it
+    // cannot structure, no priced items) the request is still recorded and
+    // the contractor still notified — just without an estimate — instead of
+    // a 500 that loses the visitor's words.
+    const ai = await (async () => {
+      try {
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          max_completion_tokens: 4096,
+          temperature: 0.3,
+          messages: [
+            { role: "system", content: AI_PROMPT },
+            { role: "system", content: REGIONAL_PRICING_GUIDANCE },
+            { role: "system", content: DESCRIPTION_QUALITY_GUIDANCE },
+            ...(catalogContext ? [{ role: "system" as const, content: catalogContext }] : []),
+            ...(misureContext ? [{ role: "system" as const, content: misureContext }] : []),
+            ...(locationContext ? [{ role: "system" as const, content: locationContext }] : []),
+            { role: "user", content: rawInput },
+          ],
+        }, {
+          // The function has 60 s (vercel.json); a slow model must fall through to the no-estimate path
+          // with time to spare, not be killed mid-request and lose the visitor.
+          timeout: 40_000,
+          maxRetries: 0,
+        });
+        const content = completion.choices[0]?.message?.content ?? "{}";
+        try {
+          const cleaned = content.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
+          return { completion, data: JSON.parse(cleaned) as any };
+        } catch {
+          logger.error({ content }, "Failed to parse public API quote JSON");
+          return null;
+        }
+      } catch (err) {
+        logger.error({ err }, "Widget AI estimate failed — recording the request without an estimate");
+        return null;
+      }
+    })();
 
-    const usage = completion.usage;
-    const promptTokens = usage?.prompt_tokens ?? 0;
-    const completionTokens = usage?.completion_tokens ?? 0;
-    const totalTokens = usage?.total_tokens ?? 0;
-    const modelUsed = completion.model || "gpt-4o-mini";
-
-    const isMini = modelUsed.includes("mini");
-    const isGpt4 = modelUsed.includes("gpt-4o") && !isMini;
-    const pCostRate = isMini ? 0.00000015 : isGpt4 ? 0.000005 : 0.00000059;
-    const cCostRate = isMini ? 0.00000060 : isGpt4 ? 0.000015 : 0.00000079;
-    const apiCost = ((promptTokens * pCostRate) + (completionTokens * cCostRate)).toFixed(6);
-
-    const content = completion.choices[0]?.message?.content ?? "{}";
-    let aiData: any = {};
-    try {
-      const cleaned = content.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-      aiData = JSON.parse(cleaned);
-    } catch {
-      logger.error({ content }, "Failed to parse public API quote JSON");
-      res.status(422).json({ error: "The AI could not structure the quote. Try again with a different description." });
-      return;
-    }
+    const resolvedClientData: QuoteClientData = {
+      nome: clientData?.nome || ai?.data?.cliente?.nome || "Lead Widget",
+      indirizzo: clientData?.indirizzo || ai?.data?.cliente?.indirizzo || "",
+      email: clientData?.email,
+      phone: clientData?.phone,
+      city: clientData?.city,
+      postalCode: clientData?.postalCode,
+      province: clientData?.province,
+    };
 
     // Chapters/totals are recomputed from quantita * prezzoUnitario rather than
     // trusted from the AI's own top-level fields, which can echo the prompt's
     // placeholder "0" values even when the per-item numbers are correct.
     let calculatedSubtotale = 0;
-    const capitoli: QuoteChapter[] = (aiData.capitoli ?? []).map((cap: any) => {
+    const capitoli: QuoteChapter[] = (ai?.data?.capitoli ?? []).map((cap: any) => {
       let capSubtotale = 0;
       const voci = (cap.voci ?? []).map((v: any) => {
         const quantita = Number(v.quantita ?? 0);
@@ -412,62 +434,81 @@ Use these exact measurements to mathematically calculate the quantities.`;
     });
 
     const subtotale = Number(calculatedSubtotale.toFixed(2));
-    const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, profile.province);
-    const ivaValore = Number((subtotale * ivaPercentuale / 100).toFixed(2));
-    const totale = Number((subtotale + ivaValore).toFixed(2));
+    // An answer with nothing priced is no estimate: "$0 – $0" in front of a homeowner is worse than none.
+    const priced = ai !== null && Number.isFinite(subtotale) && subtotale > 0;
 
-    const resolvedClientData: QuoteClientData = {
-      nome: clientData?.nome || aiData.cliente?.nome || "Lead Widget",
-      indirizzo: clientData?.indirizzo || aiData.cliente?.indirizzo || "",
-      email: clientData?.email,
-      phone: clientData?.phone,
-      city: clientData?.city,
-      postalCode: clientData?.postalCode,
-      province: clientData?.province,
-    };
+    let quote: typeof quotesTable.$inferSelect | null = null;
+    let totale = 0;
+    if (ai && priced) {
+      const aiData = ai.data;
+      const usage = ai.completion.usage;
+      const promptTokens = usage?.prompt_tokens ?? 0;
+      const completionTokens = usage?.completion_tokens ?? 0;
+      const totalTokens = usage?.total_tokens ?? 0;
+      const modelUsed = ai.completion.model || "gpt-4o-mini";
 
-    // Generate the quote number
-    const numeroPreventivoData = await generateNumeroPreventivo(userId);
+      const isMini = modelUsed.includes("mini");
+      const isGpt4 = modelUsed.includes("gpt-4o") && !isMini;
+      const pCostRate = isMini ? 0.00000015 : isGpt4 ? 0.000005 : 0.00000059;
+      const cCostRate = isMini ? 0.00000060 : isGpt4 ? 0.000015 : 0.00000079;
+      const apiCost = ((promptTokens * pCostRate) + (completionTokens * cCostRate)).toFixed(6);
 
-    // Insert the quote (implicitly capturing the CRM lead)
-    const [quote] = await db
-      .insert(quotesTable)
-      .values({
-        userId,
-        rawInput,
-        clientData: resolvedClientData,
-        companySnapshot: {
-          companyName: profile.companyName,
-          vatNumber: profile.vatNumber ?? undefined,
-          address: profile.address ?? undefined,
-          phone: profile.phone ?? undefined,
-          email: profile.email ?? undefined,
-          logoUrl: profile.logoUrl ?? undefined,
-        },
-        descrizioneGenerale: aiData.descrizione_generale ?? "",
-        items: [],
-        capitoli,
-        sconto: null,
-        condizioniPagamento: aiData.condizioni_pagamento ?? [],
-        titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
-        titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
-        numeroPreventivoData,
-        subtotale: subtotale.toFixed(2),
-        ivaPercentuale: ivaPercentuale.toFixed(3),
-        ivaValore: ivaValore.toFixed(2),
-        totale: totale.toFixed(2),
-        note: aiData.note ?? "Quote generated via Widget",
-        status: "draft",
-        source: "widget", // Flag that it came from the widget
-        promptTokens,
-        completionTokens,
-        totalTokens,
-        modelUsed,
-        apiCost,
-      })
-      .returning();
+      const ivaPercentuale = resolveQuoteTaxRate(aiData.iva_percentuale, profile.province);
+      const ivaValore = Number((subtotale * ivaPercentuale / 100).toFixed(2));
+      totale = Number((subtotale + ivaValore).toFixed(2));
 
-    await linkQuoteToClient(quote!, profile.province);
+      // Generate the quote number
+      const numeroPreventivoData = await generateNumeroPreventivo(userId);
+
+      // Insert the quote (implicitly capturing the CRM lead)
+      const [inserted] = await db
+        .insert(quotesTable)
+        .values({
+          userId,
+          rawInput,
+          clientData: resolvedClientData,
+          companySnapshot: {
+            companyName: profile.companyName,
+            vatNumber: profile.vatNumber ?? undefined,
+            address: profile.address ?? undefined,
+            phone: profile.phone ?? undefined,
+            email: profile.email ?? undefined,
+            logoUrl: profile.logoUrl ?? undefined,
+          },
+          descrizioneGenerale: aiData.descrizione_generale ?? "",
+          items: [],
+          capitoli,
+          sconto: null,
+          condizioniPagamento: aiData.condizioni_pagamento ?? [],
+          titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
+          titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
+          numeroPreventivoData,
+          subtotale: subtotale.toFixed(2),
+          ivaPercentuale: ivaPercentuale.toFixed(3),
+          ivaValore: ivaValore.toFixed(2),
+          totale: totale.toFixed(2),
+          note: aiData.note ?? "Quote generated via Widget",
+          status: "draft",
+          source: "widget", // Flag that it came from the widget
+          promptTokens,
+          completionTokens,
+          totalTokens,
+          modelUsed,
+          apiCost,
+        })
+        .returning();
+      quote = inserted!;
+
+      await linkQuoteToClient(quote, profile.province);
+    }
+
+    // Without a quote there is nothing for linkQuoteToClient to hang the client on; file it directly.
+    const clientId = quote
+      ? (await db.select({ clientId: quotesTable.clientId }).from(quotesTable).where(eq(quotesTable.id, quote.id)))[0]?.clientId ?? null
+      : await ensureClientForQuote(userId, resolvedClientData).catch((err: unknown) => {
+          logger.error({ err }, "Failed to file the widget client (non-fatal)");
+          return null;
+        });
 
     // Phase 9: the widget submission is a lead first — record consent and
     // schedule the first follow-up here so a quote that's never accepted
@@ -477,8 +518,8 @@ Use these exact measurements to mathematically calculate the quantities.`;
         .insert(leadsTable)
         .values({
           userId,
-          clientId: quote!.clientId,
-          quoteId: quote!.id,
+          clientId,
+          quoteId: quote?.id ?? null,
           name: resolvedClientData.nome,
           email: resolvedClientData.email || null,
           phone: resolvedClientData.phone || null,
@@ -489,20 +530,30 @@ Use these exact measurements to mathematically calculate the quantities.`;
           nextFollowUpAt: stageDueAt(leadFollowupDays(profile.automationSettings), 0),
         })
         .returning();
-      await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "widget", quoteId: quote!.id } });
+      // Without a quote, the event payload is where the visitor's own words live.
+      await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "created", payload: { source: "widget", quoteId: quote?.id ?? null, ...(quote ? {} : { request: rawInput.slice(0, 2000) }) } });
       await db.insert(leadEventsTable).values({ leadId: lead!.id, userId, type: "consent_recorded", payload: { consentSource: "widget_form" } });
     } catch (leadErr) {
-      logger.error({ err: leadErr, quoteId: quote!.id }, "Failed to record widget lead (non-fatal)");
+      logger.error({ err: leadErr, quoteId: quote?.id }, "Failed to record widget lead (non-fatal)");
+      // With no quote either, the lead row was the only record of the request: say so rather than pretend.
+      if (!quote) {
+        res.status(500).json({ error: "Internal server error" });
+        return;
+      }
     }
 
-    // Return the range estimate for the widget
+    const range = quote
+      ? { min: Math.round(totale * 0.9 * 100) / 100, max: Math.round(totale * 1.25 * 100) / 100 }
+      : null;
+
+    // `estimate` is what the widget reads; the flat fields stay for API callers built before Phase 92.
     res.status(201).json({
       success: true,
-      quoteId: quote.id,
-      totale,
-      prezzoMinimo: Math.round(totale * 0.9 * 100) / 100,
-      prezzoMassimo: Math.round(totale * 1.25 * 100) / 100,
-      descrizioneGenerale: quote.descrizioneGenerale,
+      quoteId: quote?.id ?? null,
+      estimate: range ? { min: range.min, max: range.max, taxIncluded: true, currency: "CAD" } : null,
+      ...(quote && range
+        ? { totale, prezzoMinimo: range.min, prezzoMassimo: range.max, descrizioneGenerale: quote.descrizioneGenerale }
+        : {}),
     });
 
     // Send an async lead-notification email to the contractor
@@ -515,9 +566,9 @@ Use these exact measurements to mathematically calculate the quantities.`;
         clientEmail: resolvedClientData.email || "No email provided",
         clientPhone: resolvedClientData.phone || "No phone provided",
         rawInput: rawInput || "",
-        totale: totale.toFixed(2),
-        prezzoMinimo: (totale * 0.9).toFixed(2),
-        prezzoMassimo: (totale * 1.25).toFixed(2),
+        totale: quote ? totale.toFixed(2) : null,
+        prezzoMinimo: range ? range.min.toFixed(2) : null,
+        prezzoMassimo: range ? range.max.toFixed(2) : null,
       }).catch(emailErr => {
         logger.error({ err: emailErr }, "Failed to send lead email notification asynchronously");
       });
@@ -529,12 +580,13 @@ Use these exact measurements to mathematically calculate the quantities.`;
       sendWidgetClientConfirmationEmail({
         toEmail: clientEmail,
         userId,
+        lang,
         clientName: resolvedClientData.nome,
         companyName: profile.companyName,
         companyPhone: profile.phone ?? null,
         companyEmail: profile.email ?? null,
-        prezzoMinimo: (totale * 0.9).toFixed(2),
-        prezzoMassimo: (totale * 1.25).toFixed(2),
+        prezzoMinimo: range ? range.min.toFixed(2) : null,
+        prezzoMassimo: range ? range.max.toFixed(2) : null,
         companyLogoUrl: profile.logoUrl ?? null,
       }).catch(emailErr => {
         logger.error({ err: emailErr }, "Failed to send client confirmation email asynchronously");

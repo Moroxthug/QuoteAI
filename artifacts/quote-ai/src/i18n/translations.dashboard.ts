@@ -1913,6 +1913,9 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.widget.embedAnchorText": "Calculate your quote with QuoteAI",
     "dashboard.settings.widget.embedKeyPlaceholder": "ENTER_YOUR_API_KEY_HERE",
     "dashboard.settings.widget.copyCode": "Copy Code",
+    "dashboard.settings.widget.testLink": "Test your widget",
+    "dashboard.settings.widget.testLinkDesc": "Opens a sample web page with your widget on it, as your visitors will see it. A request sent from there arrives in your leads.",
+    "dashboard.settings.widget.langHint": "The widget follows your page's language. To always show it in French, add data-lang=\"fr\" to the script tag.",
 
     "dashboard.settings.stripeConnect.title": "Get paid online",
     "dashboard.settings.stripeConnect.desc": "Let customers pay their invoices by card, paid out straight to your own bank account — QuoteAI never holds the money.",
@@ -5452,6 +5455,9 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "dashboard.settings.widget.embedAnchorText": "Calculez votre soumission avec QuoteAI",
     "dashboard.settings.widget.embedKeyPlaceholder": "ENTREZ_VOTRE_CLÉ_API_ICI",
     "dashboard.settings.widget.copyCode": "Copier le code",
+    "dashboard.settings.widget.testLink": "Tester votre widget",
+    "dashboard.settings.widget.testLinkDesc": "Ouvre une page Web d'exemple avec votre widget, tel que vos visiteurs le verront. Une demande envoyée de là arrive dans vos prospects.",
+    "dashboard.settings.widget.langHint": "Le widget suit la langue de votre page. Pour l'afficher toujours en français, ajoutez data-lang=\"fr\" à la balise script.",
 
     "dashboard.settings.stripeConnect.title": "Être payé en ligne",
     "dashboard.settings.stripeConnect.desc": "Permettez à vos clients de payer leurs factures par carte, versées directement dans votre propre compte bancaire — QuoteAI ne détient jamais l'argent.",

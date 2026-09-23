@@ -17,7 +17,7 @@ import {
   type PaySettings,
   type TimeEntry,
 } from "@workspace/db";
-import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
+import { parseIsoDate, timeZoneForProvince, toIsoDate } from "../jobs/dates.js";
 import { todayFor } from "../compliance/service.js";
 import { syncLabourCost } from "../costs/service.js";
 import { checkJobBudget } from "../jobs/budgetAlerts.js";
@@ -25,9 +25,13 @@ import {
   addDays,
   daysBetween,
   effectivePaySettings,
+  holidayBaseCents,
   holidayLookbackDays,
   holidayPay,
+  holidayPercentOf,
   holidaysBetween,
+  holidaysCountForSplit,
+  hoursAfterMidnight,
   overtimeWindow,
   periodContaining,
   previousPeriod,
@@ -67,24 +71,40 @@ export async function recomputeWorkerDays(userId: string, workerId: string, days
   const [worker] = await db.select().from(collaboratorsTable).where(and(eq(collaboratorsTable.id, workerId), eq(collaboratorsTable.userId, userId)));
   if (!worker) return 0;
   const { effective, raw } = ctx ? { effective: ctx.settings, raw: ctx.raw } : await paySettingsFor(userId);
+  const tz = timeZoneForProvince(effective.province);
+  const tailOf = (r: TimeEntry) => hoursAfterMidnight(toIsoDate(r.date)!, Number(r.hours), r.clockInAt, r.clockOutAt, tz);
   const windows = new Map<string, Period>();
   for (const d of uniq) {
-    const w = overtimeWindow(d, effective);
-    windows.set(w.start, w);
+    // A shift on the window's last day can run past midnight into the next
+    // window's first day, whose threshold then starts from that tail.
+    for (const day of [d, addDays(d, 1)]) {
+      const w = overtimeWindow(day, effective);
+      windows.set(w.start, w);
+    }
   }
   let changed = 0;
   for (const w of windows.values()) {
     const rows = await db
       .select()
       .from(timeEntriesTable)
-      .where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.workerId, workerId), gte(timeEntriesTable.date, dayDate(w.start)), lte(timeEntriesTable.date, dayDate(w.end))));
-    const approved = rows.filter((r) => r.status === "approved").sort((a, b) => a.date.getTime() - b.date.getTime() || workOrder(a) - workOrder(b));
-    const holidays = new Set(holidaysBetween(effective.province, w.start, w.end, raw).map((h) => h.date));
+      .where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.workerId, workerId), gte(timeEntriesTable.date, dayDate(addDays(w.start, -1))), lte(timeEntriesTable.date, dayDate(w.end))));
+    const inWindow = rows.filter((r) => toIsoDate(r.date)! >= w.start);
+    const approved = inWindow.filter((r) => r.status === "approved").sort((a, b) => a.date.getTime() - b.date.getTime() || workOrder(a) - workOrder(b));
+    const holidays = holidaysCountForSplit(effective) ? new Set(holidaysBetween(effective.province, w.start, addDays(w.end, 1), raw).map((h) => h.date)) : new Set<string>();
+    const prior = new Map<string, number>();
+    for (const r of rows) if (r.status === "approved" && toIsoDate(r.date)! < w.start) prior.set(w.start, (prior.get(w.start) ?? 0) + tailOf(r));
     const split =
       worker.workerType === "employee"
-        ? splitWindow(approved.map((r) => ({ id: r.id, day: toIsoDate(r.date)!, hours: Number(r.hours), rateCents: r.rateCentsSnapshot })), effective.overtime, holidays, effective.holidays.workedMultiplier, effective.averaging?.weeks ?? 1)
+        ? splitWindow(
+            approved.map((r) => ({ id: r.id, day: toIsoDate(r.date)!, hours: Number(r.hours), rateCents: r.rateCentsSnapshot, nextDayHours: tailOf(r) })),
+            effective.overtime,
+            holidays,
+            effective.holidays.workedMultiplier,
+            effective.averaging?.weeks ?? 1,
+            prior,
+          )
         : new Map();
-    for (const r of rows) {
+    for (const r of inWindow) {
       const s = split.get(r.id) ?? { overtimeHours: 0, doubleHours: 0, holidayHours: 0, premiumCents: 0 };
       if (Number(r.overtimeHours) === s.overtimeHours && Number(r.doubleHours) === s.doubleHours && Number(r.holidayHours) === s.holidayHours && r.premiumCents === s.premiumCents) continue;
       const [updated] = await db
@@ -150,6 +170,19 @@ export async function syncAllowanceCost(a: PayAllowance, workerName: string): Pr
   void checkJobBudget(a.projectId);
 }
 
+/** Phase 89b: a line the crew sent is paid and costed once the office approves it; rejected, it stays for the crew to see why. */
+export async function reviewAllowance(a: PayAllowance, decision: "approved" | "rejected", reviewerName: string | null, reason: string | null): Promise<PayAllowance> {
+  const [updated] = await db
+    .update(payAllowancesTable)
+    .set({ status: decision, reviewedAt: new Date(), reviewedByName: reviewerName, rejectedReason: decision === "rejected" ? reason || null : null })
+    .where(eq(payAllowancesTable.id, a.id))
+    .returning();
+  const [worker] = await db.select({ name: collaboratorsTable.name }).from(collaboratorsTable).where(eq(collaboratorsTable.id, a.workerId));
+  if (decision === "approved") await syncAllowanceCost(updated!, worker?.name ?? "");
+  else await syncAllowanceCost({ ...updated!, projectId: null }, worker?.name ?? "");
+  return updated!;
+}
+
 export async function deleteAllowance(a: PayAllowance): Promise<void> {
   await db.transaction(async (tx) => {
     if (a.costEntryId) await tx.delete(costEntriesTable).where(eq(costEntriesTable.id, a.costEntryId));
@@ -183,6 +216,8 @@ export type PayPeriodReport = {
   jobs: { projectId: string | null; name: string | null; hours: number; overtimeHours: number; straightCents: number; premiumCents: number; burdenCents: number; allowanceCents: number; totalCents: number }[];
   totals: { hours: number; overtimeHours: number; grossCents: number; holidayCents: number; allowanceCents: number; premiumCents: number };
   pending: { count: number; hours: number };
+  /** Phase 89b: travel and per diem the crew sent that the office has not looked at yet. */
+  pendingAllowances: { id: string; workerId: string; workerName: string; date: string; kind: string; quantity: number; rateCents: number; amountCents: number; note: string; projectId: string | null; projectName: string | null }[];
   warnings: { missingPayrollId: string[]; zeroRate: string[] };
   exports: { id: string; format: PayExportFormat; exportedAt: string; exportedByName: string | null }[];
   changedSinceExport: string[];
@@ -219,8 +254,10 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
     ? await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.status, "approved"), gte(timeEntriesTable.date, from), lte(timeEntriesTable.date, to)))
     : approved;
 
-  const allowances = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.userId, userId), gte(payAllowancesTable.date, period.start), lte(payAllowancesTable.date, period.end))).orderBy(asc(payAllowancesTable.date));
-  const projectIds = [...new Set([...entries.map((e) => e.projectId), ...allowances.map((a) => a.projectId).filter((x): x is string => !!x)])];
+  const allAllowances = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.userId, userId), gte(payAllowancesTable.date, period.start), lte(payAllowancesTable.date, period.end))).orderBy(asc(payAllowancesTable.date));
+  const allowances = allAllowances.filter((a) => a.status === "approved");
+  const submittedAllowances = allAllowances.filter((a) => a.status === "submitted");
+  const projectIds = [...new Set([...entries.map((e) => e.projectId), ...allAllowances.map((a) => a.projectId).filter((x): x is string => !!x)])];
   const projects = projectIds.length ? await db.select({ id: projectsTable.id, name: projectsTable.name }).from(projectsTable).where(inArray(projectsTable.id, projectIds)) : [];
   const projectName = new Map(projects.map((p) => [p.id, p.name]));
 
@@ -258,10 +295,17 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
     return j;
   };
 
+  const hr = effective.holidays;
+  const overtimeWages = (hoursOt: number, hoursDbl: number, rate: number) => hoursOt * rate * ot.multiplier + hoursDbl * rate * ot.doubleMultiplier;
+  // ON construction's 7.7 %: the base builds up over the period's own hours.
+  const pctBase = new Map<string, number>();
   for (const e of entries) {
     const w = byId.get(e.workerId);
     if (!w) continue;
     const hours = Number(e.hours), otH = Number(e.overtimeHours), dblH = Number(e.doubleHours), holH = Number(e.holidayHours);
+    if (hr.method === "pct_of_wages" && w.workerType === "employee") {
+      pctBase.set(w.id, (pctBase.get(w.id) ?? 0) + holidayBaseCents(hr, effective.vacationPayPercent, { straightCents: (hours - otH - dblH) * e.rateCentsSnapshot, overtimeCents: overtimeWages(otH, dblH, e.rateCentsSnapshot) }));
+    }
     const rate = e.rateCentsSnapshot;
     const straightCents = Math.round(hours * rate);
     const total = labourCostCents(hours, rate, Number(e.burdenPercentSnapshot), e.premiumCents);
@@ -290,8 +334,13 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
     if (holH) addLine(p, { kind: "holiday_worked", code: codes.holiday_worked, hours: holH, quantity: null, rateCents: Math.round(rate * effective.holidays.workedMultiplier), amountCents: Math.round(holH * rate * effective.holidays.workedMultiplier), taxable: true });
   }
 
+  for (const [wid, base] of pctBase) {
+    const cents = holidayPercentOf(hr, base);
+    if (cents) addLine(emp(byId.get(wid)!), { kind: "holiday", code: codes.holiday, hours: null, quantity: null, rateCents: 0, amountCents: cents, taxable: true, note: `${hr.percent}%` });
+  }
+
   // Statutory holiday pay: every employee who worked in the lookback before each holiday, with the reason when they don't qualify.
-  if (holidays.length) {
+  if (holidays.length && hr.method !== "pct_of_wages") {
     const lookback = holidayLookbackDays(effective.holidays.method);
     const earliest = addDays(holidays[0]!.date, -lookback);
     const before = await db
@@ -314,9 +363,10 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
       for (const e of window) {
         const w = byId.get(e.workerId);
         if (!w || w.workerType !== "employee") continue;
-        const straightHours = Number(e.hours) - Number(e.overtimeHours) - Number(e.doubleHours);
+        const otH = Number(e.overtimeHours), dblH = Number(e.doubleHours);
+        const straightHours = Number(e.hours) - otH - dblH;
         const agg = perWorker.get(w.id) ?? { cents: 0, hours: 0, days: new Set<string>() };
-        agg.cents += Math.round(straightHours * e.rateCentsSnapshot);
+        agg.cents += Math.round(holidayBaseCents(hr, effective.vacationPayPercent, { straightCents: straightHours * e.rateCentsSnapshot, overtimeCents: overtimeWages(otH, dblH, e.rateCentsSnapshot) }));
         agg.hours += straightHours;
         agg.days.add(toIsoDate(e.date)!);
         perWorker.set(w.id, agg);
@@ -324,7 +374,7 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
       for (const [wid, agg] of perWorker) {
         const w = byId.get(wid)!;
         const first = firstDay.get(wid);
-        const r = holidayPay(effective.holidays, { straightCents: agg.cents, straightHours: agg.hours, daysWorked: agg.days.size, firstWorkedDaysAgo: first ? daysBetween(first, h.date) : null });
+        const r = holidayPay(hr, { wagesCents: agg.cents, straightHours: agg.hours, daysWorked: agg.days.size, firstWorkedDaysAgo: first ? daysBetween(first, h.date) : null });
         const p = emp(w);
         if (r.cents == null) {
           p.holidays.push({ date: h.date, key: h.key, name: h.name, cents: null, hours: null, reason: r.reason });
@@ -373,6 +423,19 @@ export async function payPeriodReport(userId: string, day: string): Promise<PayP
       premiumCents: entries.reduce((n, e) => n + e.premiumCents, 0),
     },
     pending: { count: pendingRows.length, hours: round2(pendingRows.reduce((n, e) => n + Number(e.hours), 0)) },
+    pendingAllowances: submittedAllowances.map((a) => ({
+      id: a.id,
+      workerId: a.workerId,
+      workerName: byId.get(a.workerId)?.name ?? "",
+      date: a.date,
+      kind: a.kind,
+      quantity: Number(a.quantity),
+      rateCents: a.rateCents,
+      amountCents: a.amountCents,
+      note: a.note,
+      projectId: a.projectId,
+      projectName: a.projectId ? (projectName.get(a.projectId) ?? null) : null,
+    })),
     warnings: {
       missingPayrollId: list.filter((p) => !p.payrollId).map((p) => p.name),
       zeroRate: list.filter((p) => p.lines.some((l) => l.kind === "regular" && l.rateCents === 0)).map((p) => p.name),

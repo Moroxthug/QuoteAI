@@ -3,18 +3,19 @@
 import { apiRequest as req, apiJson as json } from "@/lib/jobs-api";
 
 export type PayFrequency = "weekly" | "biweekly" | "semimonthly" | "monthly";
-export type HolidayPayMethod = "div20_4w" | "avg_day_30d" | "avg_day_28d" | "none";
+export type HolidayPayMethod = "div20_4w" | "avg_day_30d" | "avg_day_28d" | "pct_of_wages" | "none";
 export type PayExportFormat = "generic" | "wagepoint" | "payworks" | "qbo_payroll";
 export type EarningKind = "regular" | "overtime" | "double" | "holiday" | "holiday_worked" | "mileage" | "per_diem" | "other";
 export type AllowanceKind = "mileage" | "per_diem" | "other";
 
 export const PAY_FREQUENCIES: PayFrequency[] = ["weekly", "biweekly", "semimonthly", "monthly"];
-export const HOLIDAY_PAY_METHODS: HolidayPayMethod[] = ["div20_4w", "avg_day_30d", "avg_day_28d", "none"];
+export const HOLIDAY_PAY_METHODS: HolidayPayMethod[] = ["div20_4w", "avg_day_30d", "avg_day_28d", "pct_of_wages", "none"];
 export const PAY_EXPORT_FORMATS: PayExportFormat[] = ["generic", "wagepoint", "payworks", "qbo_payroll"];
 export const EARNING_KINDS: EarningKind[] = ["regular", "overtime", "double", "holiday", "holiday_worked", "mileage", "per_diem", "other"];
 
 type OvertimeRules = { dailyHours: number | null; dailyDoubleHours: number | null; weeklyHours: number | null; multiplier: number; doubleMultiplier: number };
-type HolidayRules = { method: HolidayPayMethod; workedMultiplier: number; minDaysWorked: number; minEmployedDays: number };
+type HolidayRules = { method: HolidayPayMethod; workedMultiplier: number; minDaysWorked: number; minEmployedDays: number; percent: number; includeOvertime: boolean; includeVacationPay: boolean; substituteWeekend: boolean };
+
 
 export type PaySettings = {
   frequency?: PayFrequency;
@@ -26,6 +27,8 @@ export type PaySettings = {
   allowances?: { kmRateCents?: number; perDiemCents?: number };
   exportFormat?: PayExportFormat;
   earningCodes?: Partial<Record<EarningKind, string>>;
+  vacationPayPercent?: number | null;
+  preset?: string | null;
 };
 
 type EffectivePaySettings = {
@@ -40,9 +43,13 @@ type EffectivePaySettings = {
   allowances: { kmRateCents: number; perDiemCents: number };
   exportFormat: PayExportFormat;
   earningCodes: Record<EarningKind, string>;
+  vacationPayPercent: number | null;
+  preset: string | null;
 };
 
-export type HolidayDto = { date: string; key: string | null; name: string | null; custom: boolean };
+/** observedFrom: the real date, when a weekend holiday is taken on a weekday (Phase 89b). */
+export type HolidayDto = { date: string; key: string | null; name: string | null; custom: boolean; observedFrom: string | null };
+type PayPresetDto = { key: string; overtime: OvertimeRules; holidays: HolidayRules };
 
 export type PaySettingsDto =
   | { enabled: false; requiredPlan: string }
@@ -51,6 +58,7 @@ export type PaySettingsDto =
       settings: PaySettings;
       effective: EffectivePaySettings;
       provinceDefaults: { overtime: OvertimeRules; holidays: HolidayRules; earningCodes: Record<EarningKind, string> };
+      presets: PayPresetDto[];
       holidays: HolidayDto[];
       provinceHolidays: HolidayDto[];
       today: string;
@@ -84,6 +92,7 @@ export type PayPeriodDto = {
   jobs: { projectId: string | null; name: string | null; hours: number; overtimeHours: number; straightCents: number; premiumCents: number; burdenCents: number; allowanceCents: number; totalCents: number }[];
   totals: { hours: number; overtimeHours: number; grossCents: number; holidayCents: number; allowanceCents: number; premiumCents: number };
   pending: { count: number; hours: number };
+  pendingAllowances: { id: string; workerId: string; workerName: string; date: string; kind: AllowanceKind; quantity: number; rateCents: number; amountCents: number; note: string; projectId: string | null; projectName: string | null }[];
   warnings: { missingPayrollId: string[]; zeroRate: string[] };
   exports: { id: string; format: PayExportFormat; exportedAt: string; exportedByName: string | null }[];
   changedSinceExport: string[];
@@ -101,4 +110,6 @@ export const payApi = {
   addAllowance: (body: { workerId: string; date: string; kind: AllowanceKind; quantity: number; rateCents?: number; projectId?: string | null; taxable?: boolean; note?: string }) =>
     req<{ allowance: { id: string; amountCents: number } }>("/api/pay/allowances", { method: "POST", body: json(body) }),
   deleteAllowance: (id: string) => req<{ success: true }>(`/api/pay/allowances/${id}`, { method: "DELETE" }),
+  /** Phase 89b: a line the crew sent from the site. */
+  reviewAllowance: (id: string, decision: "approved" | "rejected", reason?: string) => req<{ allowance: { id: string; status: string } }>(`/api/pay/allowances/${id}/review`, { method: "POST", body: json({ decision, reason }) }),
 };

@@ -120,6 +120,29 @@ Switching companies works. What does not exist is a *group*: consolidated report
 
 **Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors** (69 warnings, all pre-existing; the one pre-existing error fixed) · `pnpm knip` no new unused exports · `i18n-audit` **3767 = 3767** keys (+61), 0 missing, 0 one-sided · `env:inventory` **no problems** (no new variables) · migration `0046` applied, `schema-drift` **0 missing in DB** · `docs/ROUTE-MATRIX.md` regenerated, **411 routes** (+5), rules test green · unit **23 files / 133 tests** (+4: the local-day rule across BC/ON/QC/NS and midnight edges) · e2e **phase86 13/13** (the worker's day and that it carries no prices, booked-counts-as-assigned, task ticks and their tenant boundary, photo report idempotent on replay, empty reports refused, materials as pending review, blocker notification, the job's list, the foreman's day, bulk approve for a foreman and not a viewer, answering a blocker with the answer visible to the worker, the locked state) + the neighbouring suites (offline/push, schedule, team, security incl. the IDOR sweep, public tokens, phase83) **all green** · `qa:visual` on the changed pages (`/t/:token`, `/dashboard`, the job page and its setup, EN+FR × 1280/375, 16 pages) with the showcase seed now booking its worker today with a task, a blocker and a note: 0 overflow, 0 phone-gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · screenshots of the worker page at 375 and the dashboard crew card at 1280 reviewed by eye.
 
+### Phase 89b — The pay leftovers (2026-09-23)
+
+What Phase 89's "Not done" list could close without a provider account.
+
+**Built**
+- **Travel and per diem from the site.** An employee logs km or per-diem days on the magic link (offline too — a `worker.allowance` outbox op, idempotent by `client_ref`). Only the kinds the company has a rate for are offered, and no amount ever reaches the crew page. The line waits: *Pay → From the crew* approves it (paid, and a labour cost on the job) or rejects it with a reason the crew sees; until then the crew can take it back. Subcontractors are refused.
+- **Shifts across midnight.** The hours of a clocked shift after local midnight count toward the next day's daily threshold and holiday, as a share of the recorded hours. A tail into the next week's first day opens that day's count. A 22:00–08:00 BC shift is 2 + 8, not 10 on one day.
+- **The holiday pay base.** Overtime wages and vacation pay (when it is paid on each cheque) can count in the base; vacation pay counts by default in ON, AB and BC.
+- **Substitute days.** Optionally, a weekend statutory holiday is taken on the next weekday that is not a holiday (Christmas and Boxing Day 2027 → Monday and Tuesday); the worksheet shows the real date.
+- **Trade presets**: ON construction, sewer and watermain, road building (7.7 % of wages in lieu, overtime past 44 / 50 / 55 h — holiday hours become ordinary hours) and QC residential construction under R-20 (8 h / 40 h, holiday indemnity through the CCQ). A new holiday method `pct_of_wages`.
+- Migration `0051` (applied). Route matrix 448 → 451. 46 EN/FR strings. Runbook §27.
+
+**Found**
+1. My e2e draft expected only 2027's Christmas and Boxing Day to move; Boxing Day 2026 is a Saturday too, and the engine moved it to Monday the 28th. The engine was right.
+
+**Not done / deferred**
+- Provider layouts are still unverified against live accounts (owner track, as in Phase 89).
+- BC averaging agreements' own daily limits; the R-20 preset covers overtime only (worked-holiday rates and the other terms stay with the sector agreement).
+- Substitute days are company-wide: they don't know which weekdays each employee normally works.
+- The crew can't log an "other" allowance, and can't edit a line (delete and log again).
+
+**Verification**: `pnpm typecheck` (libs + both apps) · `pnpm lint` **0 errors** (69 warnings, pre-existing) · `pnpm knip` no new unused exports · `i18n-audit` **4340 = 4340** (+46), 0 missing · migration `0051` applied, `schema-drift` **0 missing, 0 mismatched** (98 tables) · route matrix **451** · unit **27 files / 186 tests** (+9: substitute days, local midnight across DST and in Newfoundland, the midnight split, a tail from the previous week, the vacation/overtime base, 7.7 %, presets) · e2e **phase89b 9/9** (crew km: submitted → approved → paid and costed, replay, NO_RATE, DATE_RANGE, rejected with a reason, delete while waiting, foreman 403, other company 404, subcontractor 403; BC night shift 2 + 8 and the next morning's overtime, which goes away with the shift; ON vacation pay 8000 → 8320; weekend holidays moved; the ON construction preset's 15 400 in lieu with Labour Day as an ordinary day; back to the general rules) · regression **phase89, security (incl. the IDOR sweep), phase86, phase86b, offline-push, team, money, phase88, phase87, schedule — 96/96** · `qa:visual` on Pay (3 tabs + foreman) and the worker page, EN+FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys; the period at 375 (From the crew), Rules at 1280 and the worker page at 375 checked by eye.
+
 ### Phase 89 — Time to pay, no payroll engine (2026-09-23)
 
 **Built**

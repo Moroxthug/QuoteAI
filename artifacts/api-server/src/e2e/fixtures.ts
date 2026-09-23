@@ -202,6 +202,12 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
         await org.api(`/api/jobs/${project.id}/time-entries`, { body: { workerId: worker.body.worker.id, date, hours: 10, approve: true } });
       }
       await org.api("/api/pay/allowances", { body: { workerId: worker.body.worker.id, date: start, kind: "mileage", quantity: 84, projectId: project.id } });
+      // Phase 89b: km the crew logged from the site, still waiting — so the
+      // period shows "From the crew" and the worker page its travel list.
+      if (workerToken) {
+        const date = new Date(Date.parse(`${start}T00:00:00Z`) + 2 * 86_400_000).toISOString().slice(0, 10);
+        await api(`/api/t/${workerToken}/allowances`, { body: { kind: "mileage", quantity: 36, date, projectId: project.id, note: language === "fr" ? "Entrepôt au chantier" : "Yard to site" } });
+      }
     }
   }
   // Phase 87: a filing setup, a reminder and two permits (one with an

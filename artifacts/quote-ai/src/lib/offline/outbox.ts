@@ -29,7 +29,9 @@ export type OutboxOp =
   // Phase 86: what a crew member sends from the field, and a task ticked on site.
   | { kind: "worker.report"; token: string; projectId: string; reportKind: FieldReportKind; body?: string; milestoneId?: string | null; materialsCents?: number | null; file?: Blob | null; fileName?: string }
   | { kind: "worker.task"; token: string; taskId: string; status: CrewTaskStatus }
-  | { kind: "worker.addTask"; token: string; projectId: string; title: string };
+  | { kind: "worker.addTask"; token: string; projectId: string; title: string }
+  // Phase 89b: km or per diem logged on site.
+  | { kind: "worker.allowance"; token: string; allowanceKind: "mileage" | "per_diem"; quantity: number; date: string; projectId: string | null; note?: string };
 
 type OutboxStatus = "pending" | "failed";
 
@@ -155,6 +157,9 @@ async function execute(row: OutboxRow): Promise<void> {
       return;
     case "worker.addTask":
       await workerApi.addTask(op.token, op.projectId, { title: op.title, clientRef: row.id });
+      return;
+    case "worker.allowance":
+      await workerApi.addAllowance(op.token, { kind: op.allowanceKind, quantity: op.quantity, date: op.date, projectId: op.projectId, note: op.note, clientRef: row.id });
       return;
     case "job.addCost":
       await jobsApi.addCost(op.jobId, { ...op.body, clientRef: row.id });

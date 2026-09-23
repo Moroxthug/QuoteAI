@@ -67,8 +67,14 @@ export const teamApi = {
 
 // ── Public worker page (/t/:token) ───────────────────────────────────────────
 
+/** Phase 89b: travel and per diem the worker logged (no amounts — the crew page shows none). */
+export type WorkerAllowanceDto = { id: string; date: string; kind: "mileage" | "per_diem" | "other"; quantity: number; note: string; projectName: string | null; status: "submitted" | "approved" | "rejected"; rejectedReason: string | null; enteredBy: "office" | "worker" };
+
 export type WorkerPageDto = {
   worker: { name: string; role: string; canAddTasks: boolean };
+  /** Phase 89b: null for a subcontractor; otherwise which kinds the office has a rate for. */
+  travel: { km: boolean; perDiem: boolean } | null;
+  allowances: WorkerAllowanceDto[];
   companyName: string;
   language: "en" | "fr";
   jobs: { id: string; name: string; address: string; milestones: { id: string; title: string; status: string }[] }[];
@@ -103,6 +109,10 @@ export const workerApi = {
   setTask: (token: string, taskId: string, status: CrewTaskStatus) => req<{ task: { id: string; status: CrewTaskStatus } }>(`/api/t/${token}/tasks/${taskId}`, { method: "POST", body: json({ status }) }),
   /** Phase 86b: add a task from the site (only for a worker the office allowed to). */
   addTask: (token: string, projectId: string, body: { title: string; milestoneId?: string | null; clientRef?: string }) => req<{ task: CrewTaskDto; replayed?: boolean }>(`/api/t/${token}/jobs/${projectId}/tasks`, { method: "POST", body: json(body) }),
+  /** Phase 89b: km or per-diem days from the site; the office approves them under Pay. */
+  addAllowance: (token: string, body: { kind: "mileage" | "per_diem"; quantity: number; date: string; projectId?: string | null; note?: string; clientRef?: string }) =>
+    req<{ allowance: { id: string; status: string }; replayed?: boolean }>(`/api/t/${token}/allowances`, { method: "POST", body: json(body) }),
+  removeAllowance: (token: string, id: string) => req<{ success: true }>(`/api/t/${token}/allowances/${id}`, { method: "DELETE" }),
   /** Phase 86b: "Got it" on the changes list. */
   markSeen: (token: string, upTo: string) => req<{ success: true }>(`/api/t/${token}/seen`, { method: "POST", body: json({ upTo }) }),
   /** Phase 86: a photo, a note, a blocker or materials — multipart, so it cannot go through `req`. */

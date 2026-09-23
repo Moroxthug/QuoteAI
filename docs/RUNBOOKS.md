@@ -546,3 +546,23 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | The provider's import rejects the file | Check the earning codes match that account's codes (Rules and export) and every employee has a payroll number. If the layout itself is refused, send us the provider's template — the layouts were built from their vocabulary, not a live account |
 | A foreman can't open Pay / the payroll CSV | By design since Phase 89: wages are `costs:full` (owner, admin, office) |
 | Test runs | `recomputeWorkerDays` is scoped per worker; the settings save re-splits only that company |
+
+## 27. Pay leftovers: crew travel, shifts across midnight, the holiday pay base, trade presets (Phase 89b)
+
+**Where**: the same files as §26, plus `routes/worker-time.ts` (`POST/DELETE /api/t/:token/allowances`), `POST /api/pay/allowances/:id/review`, `components/crew/travel-card.tsx` and the `worker.allowance` outbox op. Migration `0051` (`pay_allowances.status / entered_by / client_ref / rejected_reason / reviewed_at / reviewed_by_name`); everything else is in `pay_settings`.
+
+**How it fits**:
+- **Crew travel**: an *employee* logs km or per-diem days from the magic link (only the kinds the company has a rate for; the crew page never shows an amount). The line is `submitted`: not in the worksheet, no job cost. Pay → *From the crew* approves it (then paid and costed like an office line) or rejects it with a reason the crew sees. The crew can delete a line until it is reviewed. Office-entered lines are `approved` as entered. `client_ref` makes an offline replay return the same row.
+- **Across midnight**: a clocked shift that runs past local midnight (the province's time zone) counts its hours after midnight toward the *next* day's daily threshold and holiday; the share is of the recorded hours, so an edited break shrinks both parts. The whole shift counts toward the week it *started* in; a tail into the next week's first day is carried as that day's opening hours. Manual entries have no clock times and stay on their day.
+- **Holiday pay base**: `holidays.includeOvertime` (default off everywhere) and `includeVacationPay` (default on for ON, AB, BC) — the latter only matters with `vacationPayPercent` set (vacation pay paid on each cheque). Vacation pay itself is still the provider's.
+- **Substitute days** (`holidays.substituteWeekend`, off by default): a statutory holiday on a Saturday or Sunday is taken on the next weekday that is not a holiday; `observedFrom` keeps the real date. Removing a holiday is by its real date.
+- **Presets** (`PAY_PRESETS`): ON construction / sewer and watermain / road building (7.7 % of wages in lieu, overtime counted in; 44 / 50 / 55 h weeks) and QC residential construction R-20 (8 h / 40 h; holiday indemnity through the CCQ, so none in the pay run). A preset fills fields; everything stays editable. With `pct_of_wages`, hours on a holiday are ordinary hours (they count toward overtime) and each employee gets one holiday line per period.
+
+| Ask | Do |
+|---|---|
+| A crew member can't log travel | Subcontractors can't (they invoice it). Per diem only appears once Rules has a per-diem rate |
+| Crew km isn't in the pay | It is waiting under Pay → From the crew until someone approves it |
+| A night shift's overtime looks wrong | Check the clock times: the part after midnight counts toward the next day. A shift with hours typed in by hand has no clock times and counts on its own day |
+| Holiday pay went up after setting vacation pay | Expected in ON, AB and BC. Untick "Count vacation pay in the holiday pay base" if the company's agreement says otherwise |
+| A preset is wrong for our agreement | Change the fields; the preset is only a starting point. The QC R-20 preset covers overtime only |
+

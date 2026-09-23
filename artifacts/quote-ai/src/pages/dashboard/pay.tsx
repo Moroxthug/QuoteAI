@@ -3,7 +3,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { AlertTriangle, ArrowRight, Briefcase, ChevronLeft, ChevronRight, CircleCheck, Download, Info, Loader2, Lock, Plus, Settings2, Trash2, Wallet } from "lucide-react";
+import { AlertTriangle, ArrowRight, Briefcase, Check, ChevronLeft, ChevronRight, CircleCheck, Download, Info, Loader2, Lock, Plus, Settings2, Trash2, Wallet, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -108,6 +108,17 @@ function useHolidayName() {
   return (h: { key: string | null; name: string | null }) => (h.key ? t(`pay.holiday.${h.key}`) : (h.name ?? "—"));
 }
 
+/** "Christmas Day (Mon 27 Dec, for Sat 25 Dec)" when a weekend holiday is taken on a weekday. */
+function useHolidayLabel() {
+  const { t, lang } = useLanguage();
+  const locale = lang === "fr" ? frCA : enCA;
+  const name = useHolidayName();
+  return (h: HolidayDto, pattern = "d MMM") =>
+    h.observedFrom
+      ? `${name(h)} (${t("pay.observed").replace("{date}", format(day(h.date), `EEE ${pattern}`, { locale })).replace("{real}", format(day(h.observedFrom), `EEE ${pattern}`, { locale }))})`
+      : `${name(h)} (${format(day(h.date), pattern, { locale })})`;
+}
+
 /** The period being looked at, shared by the worksheet and the jobs tab (the URL keeps it across tabs). */
 function usePeriod() {
   const [date, setDate] = useState<string | undefined>(() => new URLSearchParams(window.location.search).get("date") ?? undefined);
@@ -141,7 +152,7 @@ function PeriodTab({ settings, onSettings }: { settings: Enabled; onSettings: ()
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
   const queryClient = useQueryClient();
-  const holidayName = useHolidayName();
+  const holidayLabel = useHolidayLabel();
   const { data, isLoading, error, go } = usePeriod();
   const [fmt, setFmt] = useState<PayExportFormat>(settings.effective.exportFormat);
   const [adding, setAdding] = useState<EmployeePayDto | null | "new">(null);
@@ -185,8 +196,9 @@ function PeriodTab({ settings, onSettings }: { settings: Enabled; onSettings: ()
             <div className="notice warn"><AlertTriangle /><span className="grow">{t("pay.zeroRate").replace("{names}", data.warnings.zeroRate.join(", "))}</span></div>
           )}
           {data.holidays.length > 0 && (
-            <div className="notice info"><Info /><span className="grow">{t("pay.holidaysInPeriod").replace("{list}", data.holidays.map((h) => `${holidayName(h)} (${format(day(h.date), "d MMM", { locale })})`).join(", "))}</span></div>
+            <div className="notice info"><Info /><span className="grow">{(data.settings.holidays.method === "pct_of_wages" ? t("pay.holidaysInPeriodPct").replace("{pct}", String(data.settings.holidays.percent)) : t("pay.holidaysInPeriod")).replace("{list}", data.holidays.map((h) => holidayLabel(h)).join(", "))}</span></div>
           )}
+          {data.pendingAllowances.length > 0 && <CrewAllowances items={data.pendingAllowances} />}
           {fmt === "qbo_payroll" && <div className="notice info"><Info /><span className="grow">{t("pay.qboNote")}</span></div>}
 
           <section className="stat-grid">
@@ -246,7 +258,8 @@ function EmployeeCard({ p, onAdd }: { p: EmployeePayDto; onAdd: () => void }) {
   const missed = p.holidays.filter((h) => h.cents == null);
   // On a phone the table would push the amount off to the right; each line stacks instead.
   const phone = useMediaQuery("(max-width: 640px)");
-  const qty = (l: EmployeePayDto["lines"][number]) => (l.hours != null ? `${hrs(l.hours)} h` : l.kind === "mileage" ? `${hrs(l.quantity)} km` : hrs(l.quantity));
+  const qty = (l: EmployeePayDto["lines"][number]) => (l.hours != null ? `${hrs(l.hours)} h` : l.kind === "mileage" ? `${hrs(l.quantity)} km` : l.quantity == null && l.note ? l.note : hrs(l.quantity));
+  const rate = (l: EmployeePayDto["lines"][number]) => (l.rateCents === 0 && l.note ? "—" : formatCents(l.rateCents));
   return (
     <section className="card">
       <div className="card-head">
@@ -265,7 +278,7 @@ function EmployeeCard({ p, onAdd }: { p: EmployeePayDto; onAdd: () => void }) {
             <li key={`${l.kind}-${l.rateCents}-${i}`} className="flex items-start gap-3" style={{ borderTop: "1px solid var(--soft)", padding: "10px 16px" }}>
               <div className="grow min-w-0">
                 <p className="t-strong" style={{ margin: 0 }}>{t(`pay.earning.${l.kind}`)} <code className="text-xs">{l.code}</code></p>
-                <p className="t-sub" style={{ margin: 0 }}>{qty(l)} × {formatCents(l.rateCents)}{!l.taxable ? ` · ${t("pay.nonTaxable")}` : ""}</p>
+                <p className="t-sub" style={{ margin: 0 }}>{l.rateCents === 0 && l.note ? qty(l) : `${qty(l)} × ${formatCents(l.rateCents)}`}{!l.taxable ? ` · ${t("pay.nonTaxable")}` : ""}</p>
               </div>
               <span className="t-amt" style={{ whiteSpace: "nowrap" }}>{formatCents(l.amountCents)}</span>
             </li>
@@ -281,7 +294,7 @@ function EmployeeCard({ p, onAdd }: { p: EmployeePayDto; onAdd: () => void }) {
                 <td>{t(`pay.earning.${l.kind}`)}{!l.taxable && <span className="t-sub">{t("pay.nonTaxable")}</span>}</td>
                 <td><code>{l.code}</code></td>
                 <td className="t-amt">{qty(l)}</td>
-                <td className="t-amt">{formatCents(l.rateCents)}</td>
+                <td className="t-amt">{rate(l)}</td>
                 <td className="t-amt">{formatCents(l.amountCents)}</td>
               </tr>
             ))}
@@ -308,6 +321,49 @@ function EmployeeCard({ p, onAdd }: { p: EmployeePayDto; onAdd: () => void }) {
           )}
         </div>
       )}
+    </section>
+  );
+}
+
+/** Phase 89b: km and per diem the crew logged from the site, waiting for the office. */
+function CrewAllowances({ items }: { items: PayPeriodDto["pendingAllowances"] }) {
+  const { t, lang } = useLanguage();
+  const locale = lang === "fr" ? frCA : enCA;
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [rejecting, setRejecting] = useState<string | null>(null);
+  const [reason, setReason] = useState("");
+  const review = useMutation({
+    mutationFn: (v: { id: string; decision: "approved" | "rejected"; reason?: string }) => payApi.reviewAllowance(v.id, v.decision, v.reason),
+    onSuccess: () => { setRejecting(null); setReason(""); queryClient.invalidateQueries({ queryKey: ["pay-period"] }); },
+    onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
+  });
+  return (
+    <section className="card">
+      <div className="card-head"><div><h2>{t("pay.crew.title")}</h2><p className="sub">{t("pay.crew.sub")}</p></div></div>
+      <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+        {items.map((a) => (
+          <li key={a.id} style={{ borderTop: "1px solid var(--soft)", padding: "10px 16px" }}>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <div className="grow min-w-0" style={{ flexBasis: 220 }}>
+                <p className="t-strong" style={{ margin: 0 }}>{a.workerName} · {t(`pay.earning.${a.kind}`)}{a.kind === "mileage" ? ` · ${a.quantity} km` : a.kind === "per_diem" ? ` · ${a.quantity} ×` : ""}</p>
+                <p className="t-sub" style={{ margin: 0 }}>{format(day(a.date), "EEE d MMM", { locale })}{a.projectName ? ` · ${a.projectName}` : ` · ${t("pay.jobs.noJob")}`}{a.note ? ` · ${a.note}` : ""}</p>
+              </div>
+              <span className="t-amt" style={{ whiteSpace: "nowrap" }}>{formatCents(a.amountCents)}</span>
+              <div className="flex items-center gap-2">
+                <button type="button" className="btn btn-sm btn-navy" disabled={review.isPending} aria-label={t("pay.crew.approveFor").replace("{name}", a.workerName)} onClick={() => review.mutate({ id: a.id, decision: "approved" })}><Check className="h-4 w-4" /> {t("pay.crew.approve")}</button>
+                <button type="button" className="btn btn-sm btn-outline-navy" disabled={review.isPending} aria-label={t("pay.crew.rejectFor").replace("{name}", a.workerName)} aria-expanded={rejecting === a.id} onClick={() => { setRejecting(rejecting === a.id ? null : a.id); setReason(""); }}><X className="h-4 w-4" /> {t("pay.crew.reject")}</button>
+              </div>
+            </div>
+            {rejecting === a.id && (
+              <div className="flex flex-wrap items-end gap-2" style={{ marginTop: 8 }}>
+                <div className="field grow" style={{ margin: 0, minWidth: 200 }}><label htmlFor={`rej-${a.id}`}>{t("pay.crew.reason")}</label><input id={`rej-${a.id}`} maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} /></div>
+                <button type="button" className="btn btn-sm btn-outline-navy" disabled={review.isPending} onClick={() => review.mutate({ id: a.id, decision: "rejected", reason: reason.trim() || undefined })}>{t("pay.crew.confirmReject")}</button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -446,13 +502,46 @@ function SettingsTab({ data }: { data: Enabled }) {
       ...(Number(form.workedMultiplier) !== data.provinceDefaults.holidays.workedMultiplier ? { workedMultiplier: Number(form.workedMultiplier) } : {}),
       ...(Number(form.minDaysWorked) !== data.provinceDefaults.holidays.minDaysWorked ? { minDaysWorked: Number(form.minDaysWorked) } : {}),
       ...(Number(form.minEmployedDays) !== data.provinceDefaults.holidays.minEmployedDays ? { minEmployedDays: Number(form.minEmployedDays) } : {}),
+      ...(form.method === "pct_of_wages" ? { percent: Number(form.percent) || 0 } : {}),
+      ...(form.includeOvertime !== data.provinceDefaults.holidays.includeOvertime ? { includeOvertime: form.includeOvertime } : {}),
+      ...(form.includeVacationPay !== data.provinceDefaults.holidays.includeVacationPay ? { includeVacationPay: form.includeVacationPay } : {}),
+      ...(form.substituteWeekend ? { substituteWeekend: true } : {}),
       added: form.added,
       removed: form.removed,
     },
     allowances: { kmRateCents: toCents(form.km), perDiemCents: toCents(form.perDiem) },
     exportFormat: form.exportFormat,
     earningCodes: Object.fromEntries(EARNING_KINDS.filter((k) => form.codes[k] && form.codes[k] !== data.provinceDefaults.earningCodes[k]).map((k) => [k, form.codes[k]])),
+    vacationPayPercent: Number(form.vacationPct) > 0 ? Number(form.vacationPct) : null,
+    preset: form.preset || null,
   });
+
+  // A trade preset fills the overtime and holiday fields; everything stays editable.
+  const applyPreset = (key: string) => {
+    const pr = data.presets.find((x) => x.key === key);
+    if (!pr) {
+      const h = data.provinceDefaults.holidays;
+      set({ preset: "", ownOvertime: false, method: h.method, workedMultiplier: String(h.workedMultiplier), minDaysWorked: String(h.minDaysWorked), minEmployedDays: String(h.minEmployedDays), percent: String(h.percent || 7.7), includeOvertime: h.includeOvertime, includeVacationPay: h.includeVacationPay });
+      return;
+    }
+    const o = pr.overtime, h = pr.holidays;
+    set({
+      preset: key,
+      ownOvertime: true,
+      daily: str(o.dailyHours),
+      double: str(o.dailyDoubleHours),
+      weekly: str(o.weeklyHours),
+      multiplier: String(o.multiplier),
+      doubleMultiplier: String(o.doubleMultiplier),
+      method: h.method,
+      workedMultiplier: String(h.workedMultiplier),
+      minDaysWorked: String(h.minDaysWorked),
+      minEmployedDays: String(h.minEmployedDays),
+      percent: String(h.percent || 7.7),
+      includeOvertime: h.includeOvertime,
+      includeVacationPay: h.includeVacationPay,
+    });
+  };
 
   const save = useMutation({
     mutationFn: () => payApi.saveSettings(body()),
@@ -496,6 +585,16 @@ function SettingsTab({ data }: { data: Enabled }) {
       <section className="card">
         <div className="card-head"><div><h2>{t("pay.settings.overtime")}</h2><p className="sub">{t("pay.settings.provinceRule").replace("{province}", e.province).replace("{rule}", describe(d))}</p></div></div>
         <div className="p-5 stack" style={{ gap: 12 }}>
+          {data.presets.length > 0 && (
+            <div className="field" style={{ margin: 0, maxWidth: 420 }}>
+              <label htmlFor="ps-preset">{t("pay.settings.preset")}</label>
+              <select id="ps-preset" value={form.preset} onChange={(ev) => applyPreset(ev.target.value)}>
+                <option value="">{t("pay.preset.none").replace("{province}", e.province)}</option>
+                {data.presets.map((pr) => <option key={pr.key} value={pr.key}>{t(`pay.preset.${pr.key}`)}</option>)}
+              </select>
+              {form.preset && <span className="block text-xs" style={{ color: "var(--muted-mk)", marginTop: 4 }}>{t(`pay.preset.${form.preset}.hint`)}</span>}
+            </div>
+          )}
           <label className="chk-row"><input type="checkbox" checked={!form.ownOvertime} onChange={(ev) => set({ ownOvertime: !ev.target.checked })} /><span>{t("pay.settings.useProvince").replace("{province}", e.province)}</span></label>
           {form.ownOvertime && (
             <div className="form-grid" style={{ padding: 0 }}>
@@ -525,16 +624,23 @@ function SettingsTab({ data }: { data: Enabled }) {
                 {HOLIDAY_PAY_METHODS.map((m) => <option key={m} value={m}>{t(`pay.method.${m}`)}</option>)}
               </select>
             </div>
+            {form.method === "pct_of_wages" && (
+              <div className="field"><label htmlFor="ps-pct">{t("pay.settings.percent")}</label><input id="ps-pct" type="number" min="0" max="20" step="0.1" value={form.percent} onChange={(ev) => set({ percent: ev.target.value })} /></div>
+            )}
             <div className="field"><label htmlFor="ps-wm">{t("pay.settings.workedMultiplier")}</label><input id="ps-wm" type="number" min="1" step="0.25" value={form.workedMultiplier} onChange={(ev) => set({ workedMultiplier: ev.target.value })} /></div>
             <div className="field"><label htmlFor="ps-mdw">{t("pay.settings.minDaysWorked")}</label><input id="ps-mdw" type="number" min="0" max="30" value={form.minDaysWorked} onChange={(ev) => set({ minDaysWorked: ev.target.value })} /></div>
             <div className="field"><label htmlFor="ps-med">{t("pay.settings.minEmployedDays")}</label><input id="ps-med" type="number" min="0" max="365" value={form.minEmployedDays} onChange={(ev) => set({ minEmployedDays: ev.target.value })} /></div>
+            <div className="field"><label htmlFor="ps-vac">{t("pay.settings.vacationPct")}</label><input id="ps-vac" type="number" min="0" max="20" step="0.5" value={form.vacationPct} placeholder={t("pay.settings.vacationNone")} onChange={(ev) => set({ vacationPct: ev.target.value })} /></div>
           </div>
+          <label className="chk-row"><input type="checkbox" checked={form.includeOvertime} onChange={(ev) => set({ includeOvertime: ev.target.checked })} /><span>{t("pay.settings.includeOvertime")}</span></label>
+          <label className="chk-row"><input type="checkbox" checked={form.includeVacationPay} onChange={(ev) => set({ includeVacationPay: ev.target.checked })} /><span>{t("pay.settings.includeVacationPay")}<span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{form.vacationPct && Number(form.vacationPct) > 0 ? t("pay.settings.includeVacationPayHint").replace("{pct}", form.vacationPct) : t("pay.settings.includeVacationPayNeeds")}</span></span></label>
+          <label className="chk-row"><input type="checkbox" checked={form.substituteWeekend} onChange={(ev) => set({ substituteWeekend: ev.target.checked })} /><span>{t("pay.settings.substituteWeekend")}<span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("pay.settings.substituteWeekendHint")}</span></span></label>
           <fieldset style={{ border: 0, margin: 0, padding: 0 }}>
             <legend className="t-strong" style={{ marginBottom: 6 }}>{t("pay.settings.holidayList")}</legend>
             <ul style={{ margin: 0, padding: 0, listStyle: "none", columns: "260px 2" }}>
               {provinceDates.map((h: HolidayDto) => (
                 <li key={h.date} style={{ breakInside: "avoid" }}>
-                  <label className="chk-row"><input type="checkbox" checked={!form.removed.includes(h.date)} onChange={(ev) => set({ removed: ev.target.checked ? form.removed.filter((x) => x !== h.date) : [...form.removed, h.date] })} /><span>{format(day(h.date), "EEE d MMM yyyy", { locale })} — {holidayName(h)}</span></label>
+                  <label className="chk-row"><input type="checkbox" checked={!form.removed.includes(h.date)} onChange={(ev) => set({ removed: ev.target.checked ? form.removed.filter((x) => x !== h.date) : [...form.removed, h.date] })} /><span>{format(day(h.date), "EEE d MMM yyyy", { locale })} — {holidayName(h)}{form.substituteWeekend && (day(h.date).getDay() === 0 || day(h.date).getDay() === 6) ? <span className="t-sub">{t("pay.settings.movesToWeekday")}</span> : null}</span></label>
                 </li>
               ))}
               {form.added.map((h) => (
@@ -577,8 +683,8 @@ function SettingsTab({ data }: { data: Enabled }) {
 
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" className="btn btn-sm btn-navy" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("pay.settings.save")}</button>
-        {(form.ownOvertime || form.averaging || form.method !== data.provinceDefaults.holidays.method) && (
-          <button type="button" className="text-link" onClick={() => { const h = data.provinceDefaults.holidays; set({ ownOvertime: false, averaging: false, method: h.method, workedMultiplier: String(h.workedMultiplier), minDaysWorked: String(h.minDaysWorked), minEmployedDays: String(h.minEmployedDays) }); }}>{t("pay.settings.resetRules")}</button>
+        {(form.ownOvertime || form.averaging || form.preset || form.method !== data.provinceDefaults.holidays.method) && (
+          <button type="button" className="text-link" onClick={() => { applyPreset(""); set({ averaging: false, substituteWeekend: false }); }}>{t("pay.settings.resetRules")}</button>
         )}
         <p className="foot-note m-0 grow">{t("pay.settings.saveHint")}</p>
       </div>
@@ -609,6 +715,12 @@ function formFrom(data: Enabled) {
     workedMultiplier: String(e.holidays.workedMultiplier),
     minDaysWorked: String(e.holidays.minDaysWorked),
     minEmployedDays: String(e.holidays.minEmployedDays),
+    percent: String(e.holidays.percent || 7.7),
+    includeOvertime: e.holidays.includeOvertime,
+    includeVacationPay: e.holidays.includeVacationPay,
+    substituteWeekend: e.holidays.substituteWeekend,
+    vacationPct: e.vacationPayPercent ? String(e.vacationPayPercent) : "",
+    preset: e.preset ?? "",
     added: s.holidays?.added ?? [],
     removed: s.holidays?.removed ?? [],
     km: dollars(e.allowances.kmRateCents),

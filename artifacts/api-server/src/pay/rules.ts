@@ -41,15 +41,30 @@ export const PROVINCE_OVERTIME: Record<string, OvertimeRules> = {
   NU: ot(8, 40),
 };
 
-const hol = (method: HolidayRules["method"], minDaysWorked = 1, minEmployedDays = 0, workedMultiplier = 1.5): HolidayRules => ({ method, workedMultiplier, minDaysWorked, minEmployedDays });
+const hol = (method: HolidayRules["method"], minDaysWorked = 1, minEmployedDays = 0, workedMultiplier = 1.5, includeVacationPay = false): HolidayRules => ({
+  method,
+  workedMultiplier,
+  minDaysWorked,
+  minEmployedDays,
+  percent: 0,
+  includeOvertime: false,
+  includeVacationPay,
+  substituteWeekend: false,
+});
 
-/** How a statutory holiday is paid, by province (general rules; QC pays the indemnity on top of the day's wages instead of a premium). */
+/**
+ * How a statutory holiday is paid, by province (general rules; QC pays the
+ * indemnity on top of the day's wages instead of a premium). Overtime is left
+ * out of the base everywhere; vacation pay is counted in ON ("regular wages
+ * and vacation pay payable"), AB (the "average daily wage") and BC (vacation
+ * pay paid or payable in the 30 days) — when the company pays it on each cheque.
+ */
 export const PROVINCE_HOLIDAY_RULES: Record<string, HolidayRules> = {
-  BC: hol("avg_day_30d", 15, 30),
-  AB: hol("avg_day_28d", 1, 30),
+  BC: hol("avg_day_30d", 15, 30, 1.5, true),
+  AB: hol("avg_day_28d", 1, 30, 1.5, true),
   SK: hol("div20_4w"),
   MB: hol("div20_4w"),
-  ON: hol("div20_4w"),
+  ON: hol("div20_4w", 1, 0, 1.5, true),
   QC: hol("div20_4w", 1, 0, 1),
   NB: hol("avg_day_28d"),
   NS: hol("avg_day_28d", 15),
@@ -58,6 +73,27 @@ export const PROVINCE_HOLIDAY_RULES: Record<string, HolidayRules> = {
   YT: hol("avg_day_28d"),
   NT: hol("avg_day_28d"),
   NU: hol("avg_day_28d"),
+};
+
+// ── Trade presets ────────────────────────────────────────────────────────────
+
+/**
+ * Phase 89b: sector rules that differ from the general ones, as a starting
+ * point the company checks against its own agreement. A preset only fills the
+ * overtime and holiday fields; everything stays editable.
+ * - ON construction employees (O. Reg. 285/01): no public holidays, 7.7 % of
+ *   wages for time worked in lieu; overtime past 44 h a week — 50 h on sewer
+ *   and watermain work, 55 h on road building.
+ * - QC residential construction (R-20 sector agreement): overtime past 8 h a
+ *   day and 40 h a week; the holiday indemnity goes through the CCQ, not the
+ *   pay run.
+ */
+const onConstructionHolidays: Partial<HolidayRules> = { method: "pct_of_wages", percent: 7.7, includeOvertime: true, includeVacationPay: false, workedMultiplier: 1, minDaysWorked: 0, minEmployedDays: 0 };
+export const PAY_PRESETS: Record<string, { province: string; overtime: OvertimeRules; holidays: Partial<HolidayRules> }> = {
+  on_construction: { province: "ON", overtime: ot(null, 44), holidays: onConstructionHolidays },
+  on_sewer_watermain: { province: "ON", overtime: ot(null, 50), holidays: onConstructionHolidays },
+  on_road_building: { province: "ON", overtime: ot(null, 55), holidays: onConstructionHolidays },
+  qc_construction_residential: { province: "QC", overtime: ot(8, 40), holidays: { method: "none", workedMultiplier: 1, includeOvertime: false, includeVacationPay: false } },
 };
 
 // ── Statutory holidays ───────────────────────────────────────────────────────
@@ -126,22 +162,47 @@ const HOLIDAYS: { key: HolidayKey; provinces: string[]; date: (y: number) => str
   { key: "boxing_day", provinces: ["ON"], date: (y) => ymd(y, 12, 26) },
 ];
 
-export type Holiday = { date: string; key: HolidayKey | null; name: string | null; custom: boolean };
+/** `observedFrom`: the real date, when a weekend holiday is taken on a weekday instead (Phase 89b). */
+export type Holiday = { date: string; key: HolidayKey | null; name: string | null; custom: boolean; observedFrom: string | null };
 
-/** The province's statutory holidays in [from, to], plus the company's own additions, minus its removals. */
+/**
+ * The province's statutory holidays in [from, to], plus the company's own
+ * additions, minus its removals (by their real date). With
+ * `holidays.substituteWeekend`, a statutory holiday on a Saturday or Sunday is
+ * taken on the next weekday that is not a holiday itself — Christmas on a
+ * Saturday and Boxing Day on a Sunday become Monday and Tuesday.
+ */
 export function holidaysBetween(province: string | null | undefined, from: string, to: string, settings: PaySettings = {}): Holiday[] {
   const p: string = normalizeProvince(province) ?? DEFAULT_PROVINCE;
   const removed = new Set(settings.holidays?.removed ?? []);
-  const out = new Map<string, Holiday>();
-  for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) {
+  const substitute = !!settings.holidays?.substituteWeekend;
+  // A weekend holiday up to a few days before `from` can land inside it.
+  const scanFrom = substitute ? addDays(from, -4) : from;
+  const statutory: Holiday[] = [];
+  for (let y = Number(scanFrom.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) {
     for (const h of HOLIDAYS) {
       if (!h.provinces.includes(p)) continue;
       let date = h.date(y);
       if (p === "QC" && h.key === "canada_day" && weekday(date) === 0) date = addDays(date, 1);
-      if (date >= from && date <= to && !removed.has(date)) out.set(date, { date, key: h.key, name: null, custom: false });
+      if (date >= scanFrom && date <= to && !removed.has(date)) statutory.push({ date, key: h.key, name: null, custom: false, observedFrom: null });
     }
   }
-  for (const a of settings.holidays?.added ?? []) if (a.date >= from && a.date <= to && !removed.has(a.date)) out.set(a.date, { date: a.date, key: null, name: a.name, custom: true });
+  statutory.sort((a, b) => a.date.localeCompare(b.date));
+  if (substitute) {
+    const isWeekend = (d: string) => weekday(d) === 0 || weekday(d) === 6;
+    const taken = new Set(statutory.filter((h) => !isWeekend(h.date)).map((h) => h.date));
+    for (const h of statutory) {
+      if (!isWeekend(h.date)) continue;
+      let d = addDays(h.date, 1);
+      while (isWeekend(d) || taken.has(d)) d = addDays(d, 1);
+      taken.add(d);
+      h.observedFrom = h.date;
+      h.date = d;
+    }
+  }
+  const out = new Map<string, Holiday>();
+  for (const h of statutory) if (h.date >= from && h.date <= to) out.set(h.date, h);
+  for (const a of settings.holidays?.added ?? []) if (a.date >= from && a.date <= to && !removed.has(a.date)) out.set(a.date, { date: a.date, key: null, name: a.name, custom: true, observedFrom: null });
   return [...out.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -170,6 +231,8 @@ export type EffectivePaySettings = {
   allowances: { kmRateCents: number; perDiemCents: number };
   exportFormat: PayExportFormat;
   earningCodes: Record<EarningKind, string>;
+  vacationPayPercent: number | null;
+  preset: string | null;
 };
 
 /** A Sunday — weekly and biweekly periods count from here until the company picks its own first day. */
@@ -187,12 +250,29 @@ export function effectivePaySettings(province: string | null | undefined, s: Pay
     overtime: s.overtime ?? PROVINCE_OVERTIME[p]!,
     overtimeIsDefault: !s.overtime,
     averaging: s.averaging && s.averaging.weeks > 1 ? s.averaging : null,
-    holidays: { ...PROVINCE_HOLIDAY_RULES[p]!, ...stripUndefined({ method: s.holidays?.method, workedMultiplier: s.holidays?.workedMultiplier, minDaysWorked: s.holidays?.minDaysWorked, minEmployedDays: s.holidays?.minEmployedDays }) },
+    holidays: {
+      ...PROVINCE_HOLIDAY_RULES[p]!,
+      ...stripUndefined({
+        method: s.holidays?.method,
+        workedMultiplier: s.holidays?.workedMultiplier,
+        minDaysWorked: s.holidays?.minDaysWorked,
+        minEmployedDays: s.holidays?.minEmployedDays,
+        percent: s.holidays?.percent,
+        includeOvertime: s.holidays?.includeOvertime,
+        includeVacationPay: s.holidays?.includeVacationPay,
+        substituteWeekend: s.holidays?.substituteWeekend,
+      }),
+    },
     allowances: { kmRateCents: s.allowances?.kmRateCents ?? 72, perDiemCents: s.allowances?.perDiemCents ?? 0 },
     exportFormat: s.exportFormat ?? "generic",
     earningCodes: { ...DEFAULT_EARNING_CODES, ...stripUndefined(s.earningCodes ?? {}) },
+    vacationPayPercent: s.vacationPayPercent && s.vacationPayPercent > 0 ? s.vacationPayPercent : null,
+    preset: s.preset && PAY_PRESETS[s.preset] ? s.preset : null,
   };
 }
+
+/** Hours worked on a statutory holiday are paid as such — unless the holiday is paid as a percentage in lieu (ON construction), when they are ordinary hours. */
+export const holidaysCountForSplit = (s: Pick<EffectivePaySettings, "holidays">) => s.holidays.method !== "pct_of_wages";
 
 function stripUndefined<T extends object>(o: T): Partial<T> {
   return Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined && v !== "")) as Partial<T>;
@@ -228,7 +308,8 @@ export function overtimeWindow(day: string, s: Pick<EffectivePaySettings, "weekS
 
 // ── Splitting a window of hours ──────────────────────────────────────────────
 
-export type WindowEntry = { id: string; day: string; hours: number; rateCents: number };
+/** `nextDayHours`: the part of the entry worked after midnight (Phase 89b) — it counts toward the next day's daily threshold and holiday. */
+export type WindowEntry = { id: string; day: string; hours: number; rateCents: number; nextDayHours?: number };
 export type EntrySplit = { overtimeHours: number; doubleHours: number; holidayHours: number; premiumCents: number };
 
 /**
@@ -238,26 +319,39 @@ export type EntrySplit = { overtimeHours: number; doubleHours: number; holidayHo
  * overtime, past the double threshold double time. Hours on a statutory
  * holiday are paid at the holiday multiplier and count toward neither.
  * Works in hundredths of an hour so 7.25 + 0.75 is exactly 8.
+ *
+ * Phase 89b: a shift that crosses midnight is two pieces — the hours after
+ * midnight count toward the next day's daily threshold (and are holiday hours
+ * if that day is one). Both pieces count toward the window the shift started
+ * in. `priorDayHours` carries hours already worked on a day by a shift that
+ * started in the previous window (its tail), so that day's threshold is not
+ * counted from zero.
  */
-export function splitWindow(entries: WindowEntry[], rules: OvertimeRules, holidays: Set<string>, holidayMultiplier: number, weeks = 1): Map<string, EntrySplit> {
+export function splitWindow(entries: WindowEntry[], rules: OvertimeRules, holidays: Set<string>, holidayMultiplier: number, weeks = 1, priorDayHours: Map<string, number> = new Map()): Map<string, EntrySplit> {
   const cap = (h: number | null) => (h == null ? Number.POSITIVE_INFINITY : Math.round(h * 100));
   const dailyCap = cap(rules.dailyHours);
   const doubleCap = cap(rules.dailyDoubleHours);
   const windowCap = rules.weeklyHours == null ? Number.POSITIVE_INFINITY : Math.round(rules.weeklyHours * 100 * weeks);
-  const dayTotals = new Map<string, number>();
+  const dayTotals = new Map<string, number>([...priorDayHours].map(([d, h]) => [d, Math.round(h * 100)]));
   let straightSoFar = 0;
   const out = new Map<string, EntrySplit>();
   for (const e of entries) {
     const h = Math.max(0, Math.round(e.hours * 100));
+    const tail = Math.min(h, Math.max(0, Math.round((e.nextDayHours ?? 0) * 100)));
     let overtime = 0, double = 0, holiday = 0;
-    if (holidays.has(e.day)) {
-      holiday = h;
-    } else {
-      const before = dayTotals.get(e.day) ?? 0;
-      dayTotals.set(e.day, before + h);
-      const dailyStraight = Math.min(h, Math.max(0, dailyCap - before));
-      double = Math.min(h - dailyStraight, Math.max(0, before + h - Math.max(doubleCap, before)));
-      overtime = h - dailyStraight - double;
+    const pieces: [string, number][] = tail ? [[e.day, h - tail], [addDays(e.day, 1), tail]] : [[e.day, h]];
+    for (const [day, ph] of pieces) {
+      if (!ph) continue;
+      if (holidays.has(day)) {
+        holiday += ph;
+        continue;
+      }
+      const before = dayTotals.get(day) ?? 0;
+      dayTotals.set(day, before + ph);
+      const dailyStraight = Math.min(ph, Math.max(0, dailyCap - before));
+      const pieceDouble = Math.min(ph - dailyStraight, Math.max(0, before + ph - Math.max(doubleCap, before)));
+      double += pieceDouble;
+      overtime += ph - dailyStraight - pieceDouble;
       const weeklyOver = Math.max(0, dailyStraight - Math.max(0, windowCap - straightSoFar));
       overtime += weeklyOver;
       straightSoFar += dailyStraight - weeklyOver;
@@ -268,22 +362,63 @@ export function splitWindow(entries: WindowEntry[], rules: OvertimeRules, holida
   return out;
 }
 
-// ── Holiday pay ──────────────────────────────────────────────────────────────
+// ── Across midnight ──────────────────────────────────────────────────────────
 
-export type HolidayPayInput = { straightCents: number; straightHours: number; daysWorked: number; firstWorkedDaysAgo: number | null };
+/** The instant a local calendar day starts in a time zone. */
+export function zonedMidnight(isoDay: string, timeZone: string): Date {
+  const guess = toDate(isoDay).getTime();
+  const offsetAt = (t: number) => {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(new Date(t));
+    const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+    return Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second")) - t;
+  };
+  // Two passes settle the offset even when midnight sits next to a DST change.
+  let t = guess - offsetAt(guess);
+  t = guess - offsetAt(t);
+  return new Date(t);
+}
 
 /**
- * The holiday pay one employee is owed for one holiday, from their straight-time
- * wages before it (overtime premiums, allowances and earlier holiday pay left
- * out). Null when they don't qualify, with the reason.
+ * The part of a clocked shift worked after local midnight of the day it is
+ * dated. Hours may have been edited (a break taken off), so the tail is that
+ * share of the recorded hours, not the raw clock time. 0 for manual entries.
+ */
+export function hoursAfterMidnight(entryDay: string, hours: number, clockInAt: Date | null, clockOutAt: Date | null, timeZone: string): number {
+  if (!clockInAt || !clockOutAt || !(hours > 0)) return 0;
+  const span = clockOutAt.getTime() - clockInAt.getTime();
+  if (span <= 0) return 0;
+  const after = clockOutAt.getTime() - Math.max(zonedMidnight(addDays(entryDay, 1), timeZone).getTime(), clockInAt.getTime());
+  if (after <= 0) return 0;
+  return round2(Math.min(hours, (hours * after) / span));
+}
+
+// ── Holiday pay ──────────────────────────────────────────────────────────────
+
+/** `wagesCents`: the base the province counts (straight time, plus overtime and vacation pay where the rules say so). */
+export type HolidayPayInput = { wagesCents: number; straightHours: number; daysWorked: number; firstWorkedDaysAgo: number | null };
+
+/**
+ * The holiday pay one employee is owed for one holiday, from their wages
+ * before it (allowances and earlier holiday pay left out; overtime and
+ * vacation pay only when the rules count them). Null when they don't qualify,
+ * with the reason. A percentage in lieu is not per holiday — see holidayPercentOf.
  */
 export function holidayPay(rules: HolidayRules, input: HolidayPayInput): { cents: number; hours: number } | { cents: null; reason: "method_none" | "not_employed_long_enough" | "too_few_days" } {
-  if (rules.method === "none") return { cents: null, reason: "method_none" };
+  if (rules.method === "none" || rules.method === "pct_of_wages") return { cents: null, reason: "method_none" };
   if (input.firstWorkedDaysAgo == null || input.firstWorkedDaysAgo < rules.minEmployedDays) return { cents: null, reason: "not_employed_long_enough" };
   if (input.daysWorked < Math.max(1, rules.minDaysWorked)) return { cents: null, reason: "too_few_days" };
-  if (rules.method === "div20_4w") return { cents: Math.round(input.straightCents / 20), hours: round2(input.straightHours / 20) };
-  return { cents: Math.round(input.straightCents / input.daysWorked), hours: round2(input.straightHours / input.daysWorked) };
+  if (rules.method === "div20_4w") return { cents: Math.round(input.wagesCents / 20), hours: round2(input.straightHours / 20) };
+  return { cents: Math.round(input.wagesCents / input.daysWorked), hours: round2(input.straightHours / input.daysWorked) };
 }
+
+/** The base holiday pay is worked out from, for some wages. */
+export function holidayBaseCents(rules: HolidayRules, vacationPayPercent: number | null, e: { straightCents: number; overtimeCents: number }): number {
+  const wages = e.straightCents + (rules.includeOvertime ? e.overtimeCents : 0);
+  return rules.includeVacationPay && vacationPayPercent ? wages * (1 + vacationPayPercent / 100) : wages;
+}
+
+/** ON construction's 7.7 %: holiday pay as a share of the period's wages. */
+export const holidayPercentOf = (rules: HolidayRules, baseCents: number) => (rules.method === "pct_of_wages" && rules.percent > 0 ? Math.round((baseCents * rules.percent) / 100) : 0);
 
 /** Days before the holiday the wages are counted over. */
 export const holidayLookbackDays = (method: HolidayRules["method"]) => (method === "avg_day_30d" ? 30 : 28);

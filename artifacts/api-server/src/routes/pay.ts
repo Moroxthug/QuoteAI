@@ -21,8 +21,8 @@ import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddlewa
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { todayFor } from "../compliance/service.js";
-import { addDays, holidaysBetween, periodContaining, PROVINCE_HOLIDAY_RULES, PROVINCE_OVERTIME, DEFAULT_EARNING_CODES } from "../pay/rules.js";
-import { buildExport, defaultPeriod, deleteAllowance, payPeriodReport, paySettingsFor, recomputeHorizon, recomputeSince, recordExport, syncAllowanceCost } from "../pay/service.js";
+import { addDays, holidaysBetween, periodContaining, PAY_PRESETS, PROVINCE_HOLIDAY_RULES, PROVINCE_OVERTIME, DEFAULT_EARNING_CODES } from "../pay/rules.js";
+import { buildExport, defaultPeriod, deleteAllowance, payPeriodReport, paySettingsFor, recomputeHorizon, recomputeSince, recordExport, reviewAllowance, syncAllowanceCost } from "../pay/service.js";
 
 // ── Phase 89: /dashboard/pay ─────────────────────────────────────────────────
 // The pay period worksheet (straight time, overtime, holiday pay, travel and
@@ -55,6 +55,10 @@ async function settingsPayload(userId: string) {
     settings: raw,
     effective,
     provinceDefaults: { overtime: PROVINCE_OVERTIME[effective.province], holidays: PROVINCE_HOLIDAY_RULES[effective.province], earningCodes: DEFAULT_EARNING_CODES },
+    // Phase 89b: the trade presets for this province.
+    presets: Object.entries(PAY_PRESETS)
+      .filter(([, p]) => p.province === effective.province)
+      .map(([key, p]) => ({ key, overtime: p.overtime, holidays: { ...PROVINCE_HOLIDAY_RULES[effective.province]!, ...p.holidays } })),
     // This year's and next year's, with the company's own changes applied — the settings list them to add or remove.
     holidays: holidaysBetween(effective.province, `${year}-01-01`, `${Number(year) + 1}-12-31`, raw),
     provinceHolidays: holidaysBetween(effective.province, `${year}-01-01`, `${Number(year) + 1}-12-31`),
@@ -94,6 +98,10 @@ const SettingsBody = z.object({
       workedMultiplier: z.number().min(1).max(3).optional(),
       minDaysWorked: z.number().int().min(0).max(30).optional(),
       minEmployedDays: z.number().int().min(0).max(365).optional(),
+      percent: z.number().min(0).max(20).optional(),
+      includeOvertime: z.boolean().optional(),
+      includeVacationPay: z.boolean().optional(),
+      substituteWeekend: z.boolean().optional(),
       added: z.array(z.object({ date: z.string().regex(dateRe), name: z.string().trim().min(1).max(80) })).max(30).optional(),
       removed: z.array(z.string().regex(dateRe)).max(60).optional(),
     })
@@ -101,6 +109,8 @@ const SettingsBody = z.object({
   allowances: z.object({ kmRateCents: z.number().int().min(0).max(1000).optional(), perDiemCents: z.number().int().min(0).max(100_000).optional() }).optional(),
   exportFormat: z.enum(PAY_EXPORT_FORMATS).optional(),
   earningCodes: z.record(z.enum(EARNING_KINDS), z.string().trim().max(30)).optional(),
+  vacationPayPercent: z.number().min(0).max(20).nullable().optional(),
+  preset: z.enum(Object.keys(PAY_PRESETS) as [string, ...string[]]).nullable().optional(),
 });
 
 // PUT /api/pay/settings — replaces the settings; hours from the pay period before the current one on are re-split under the new rules.
@@ -229,12 +239,41 @@ router.post("/pay/allowances", requireAuth, requirePermission("costs", "full"), 
         taxable: d.taxable ?? d.kind === "other",
         note: d.note ?? "",
         createdByUserId: userId,
+        status: "approved",
+        enteredBy: "office",
       })
       .returning();
     await syncAllowanceCost(a!, worker.name);
     res.status(201).json({ allowance: { id: a!.id, amountCents: a!.amountCents } });
   } catch (err) {
     fail(res, err, req.log, "Error adding an allowance");
+  }
+});
+
+// POST /api/pay/allowances/:id/review — { decision: approved | rejected, reason? } — a line the crew sent from the site
+router.post("/pay/allowances/:id/review", requireAuth, requirePermission("costs", "full"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    if (!(await requirePay(userId, res))) return;
+    const body = z.object({ decision: z.enum(["approved", "rejected"]), reason: z.string().trim().max(300).optional() }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters" });
+      return;
+    }
+    const [a] = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.id, req.params.id as string), eq(payAllowancesTable.userId, userId)));
+    if (!a) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (a.status !== "submitted") {
+      res.status(409).json({ error: "ALREADY_REVIEWED", message: "This line has already been reviewed." });
+      return;
+    }
+    const updated = await reviewAllowance(a, body.data.decision, getUserName(res) || null, body.data.reason ?? null);
+    await writeAudit({ userId, actorType: "user", actorId: userId, entityType: "pay_allowance", entityId: a.id, action: body.data.decision, diff: { workerId: a.workerId, kind: a.kind, quantity: Number(a.quantity), amountCents: a.amountCents } });
+    res.json({ allowance: { id: updated.id, status: updated.status } });
+  } catch (err) {
+    fail(res, err, req.log, "Error reviewing an allowance");
   }
 });
 

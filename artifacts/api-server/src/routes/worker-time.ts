@@ -9,6 +9,7 @@ import {
   timeEntriesTable,
   scheduleBlocksTable,
   businessProfilesTable,
+  payAllowancesTable,
   hasFeature,
 } from "@workspace/db";
 import { and, asc, desc, eq, gte, inArray, isNull, isNotNull, lt } from "drizzle-orm";
@@ -23,6 +24,7 @@ import { FIELD_REPORT_KINDS, fieldReportsTable, projectTasksTable } from "@works
 import { photoUpload } from "../jobs/photos.js";
 import { addFieldTask, blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
 import { workerChanges } from "../crew/changes.js";
+import { paySettingsFor } from "../pay/service.js";
 
 /** A clock-in session longer than this is auto-capped at clock-out — a forgotten clock-out shouldn't silently log a 30h day. */
 const MAX_SESSION_HOURS = 16;
@@ -206,6 +208,24 @@ async function workerToday(worker: { id: string; userId: string }, province: str
     .sort((a, b) => (a.blocks[0]?.startsAt ?? "~").localeCompare(b.blocks[0]?.startsAt ?? "~"));
 }
 
+// ── Phase 89b: travel and per diem from the site ─────────────────────────────
+// An employee logs km or per-diem days; the line waits for the office (Pay),
+// priced at the company's rate — which the crew page never shows.
+
+async function travelOptions(worker: { userId: string; workerType: string }) {
+  if (worker.workerType !== "employee") return null;
+  const { effective } = await paySettingsFor(worker.userId);
+  return { km: effective.allowances.kmRateCents > 0, perDiem: effective.allowances.perDiemCents > 0 };
+}
+
+async function ownAllowances(worker: { id: string }) {
+  const since = toIsoDate(new Date(Date.now() - 30 * 86_400_000))!;
+  const rows = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.workerId, worker.id), gte(payAllowancesTable.date, since))).orderBy(desc(payAllowancesTable.date), desc(payAllowancesTable.createdAt)).limit(40);
+  const pids = [...new Set(rows.map((r) => r.projectId).filter((x): x is string => !!x))];
+  const names = new Map(pids.length ? (await db.select({ id: projectsTable.id, name: projectsTable.name }).from(projectsTable).where(inArray(projectsTable.id, pids))).map((p) => [p.id, p.name] as const) : []);
+  return rows.map((a) => ({ id: a.id, date: a.date, kind: a.kind, quantity: Number(a.quantity), note: a.note, projectName: a.projectId ? (names.get(a.projectId) ?? null) : null, status: a.status, rejectedReason: a.rejectedReason, enteredBy: a.enteredBy }));
+}
+
 async function ownReports(worker: { id: string }) {
   const rows = await db.select().from(fieldReportsTable).where(and(eq(fieldReportsTable.workerId, worker.id), gte(fieldReportsTable.createdAt, new Date(Date.now() - 14 * 86_400_000)))).orderBy(desc(fieldReportsTable.createdAt)).limit(20);
   return serializeReports(rows);
@@ -234,6 +254,8 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
     const changes = r.worker.crewSeenAt ? await workerChanges(r.worker, r.worker.crewSeenAt, lang, now) : [];
     res.json({
       worker: { name: r.worker.name, role: r.worker.role, canAddTasks: r.worker.canAddTasks },
+      travel: await travelOptions(r.worker),
+      allowances: await ownAllowances(r.worker),
       companyName: r.companyName,
       language: r.language,
       jobs,
@@ -653,6 +675,101 @@ router.post("/t/:token/seen", writeLimiter, async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error marking the worker's changes seen");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/t/:token/allowances — { kind: mileage | per_diem, quantity, date, projectId?, note?, clientRef? }
+router.post("/t/:token/allowances", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) {
+      res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+      return;
+    }
+    const body = z
+      .object({ kind: z.enum(["mileage", "per_diem"]), quantity: z.number().positive().max(2000), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), projectId: z.string().uuid().nullable().optional(), note: z.string().max(300).optional(), clientRef: clientRefSchema })
+      .safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const d = body.data;
+    if (d.clientRef) {
+      const [replayed] = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.workerId, r.worker.id), eq(payAllowancesTable.clientRef, d.clientRef)));
+      if (replayed) {
+        res.json({ allowance: { id: replayed.id, status: replayed.status }, replayed: true });
+        return;
+      }
+    }
+    if (r.worker.workerType !== "employee") {
+      res.status(403).json({ error: "NOT_AN_EMPLOYEE", message: "Subcontractors bill travel on their own invoice." });
+      return;
+    }
+    const date = parseIsoDate(d.date)!;
+    if (date.getTime() > Date.now() + 86_400_000 || date.getTime() < Date.now() - 45 * 86_400_000) {
+      res.status(400).json({ error: "DATE_RANGE", message: "Travel can be logged for the last 45 days only." });
+      return;
+    }
+    let projectId: string | null = null;
+    if (d.projectId) {
+      const job = (await workerJobs(r.worker)).find((j) => j.id === d.projectId);
+      if (!job) {
+        res.status(400).json({ error: "Invalid job" });
+        return;
+      }
+      projectId = job.id;
+    }
+    const { effective } = await paySettingsFor(r.worker.userId);
+    const rate = d.kind === "mileage" ? effective.allowances.kmRateCents : effective.allowances.perDiemCents;
+    if (!rate) {
+      res.status(400).json({ error: "NO_RATE", message: "The office has not set a rate for this yet." });
+      return;
+    }
+    const quantity = d.kind === "per_diem" ? Math.min(d.quantity, 31) : d.quantity;
+    const [a] = await db
+      .insert(payAllowancesTable)
+      .values({ userId: r.worker.userId, workerId: r.worker.id, projectId, date: d.date, kind: d.kind, quantity: quantity.toFixed(2), rateCents: rate, amountCents: Math.round(quantity * rate), taxable: false, note: d.note ?? "", status: "submitted", enteredBy: "worker", clientRef: d.clientRef ?? null })
+      .onConflictDoNothing()
+      .returning();
+    if (!a) {
+      // Two deliveries of one offline op raced; the other one made the row.
+      const [existing] = await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.workerId, r.worker.id), eq(payAllowancesTable.clientRef, d.clientRef!)));
+      res.json({ allowance: { id: existing!.id, status: existing!.status }, replayed: true });
+      return;
+    }
+    const fr = r.language === "fr";
+    const what = d.kind === "mileage" ? `${quantity} km` : fr ? `${quantity} jour(s) d'indemnité` : `${quantity} day(s) per diem`;
+    await createNotification({ userId: r.worker.userId, type: "time_entry_submitted", title: fr ? `${r.worker.name} a saisi des frais de déplacement` : `${r.worker.name} logged travel`, body: fr ? `${what} — à approuver dans Paie.` : `${what} — approve it under Pay.`, link: "/dashboard/pay", entityType: "pay_allowance", entityId: a.id });
+    res.status(201).json({ allowance: { id: a.id, status: a.status } });
+  } catch (err) {
+    req.log.error({ err }, "Error saving worker travel");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// DELETE /api/t/:token/allowances/:allowanceId — only while the office has not looked at it
+router.delete("/t/:token/allowances/:allowanceId", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) {
+      res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+      return;
+    }
+    const id = z.string().uuid().safeParse(req.params.allowanceId);
+    const [a] = id.success ? await db.select().from(payAllowancesTable).where(and(eq(payAllowancesTable.id, id.data), eq(payAllowancesTable.workerId, r.worker.id))) : [];
+    if (!a) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    if (a.status !== "submitted") {
+      res.status(409).json({ error: "LOCKED", message: "The office has already reviewed this." });
+      return;
+    }
+    await db.delete(payAllowancesTable).where(eq(payAllowancesTable.id, a.id));
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error deleting worker travel");
     res.status(500).json({ error: "Internal server error" });
   }
 });

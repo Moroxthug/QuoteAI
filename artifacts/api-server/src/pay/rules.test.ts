@@ -1,5 +1,20 @@
 import { describe, expect, test } from "vitest";
-import { effectivePaySettings, holidayPay, holidaysBetween, overtimeWindow, periodContaining, splitWindow, PROVINCE_HOLIDAY_RULES, PROVINCE_OVERTIME, type WindowEntry } from "./rules.js";
+import {
+  effectivePaySettings,
+  holidayBaseCents,
+  holidayPay,
+  holidayPercentOf,
+  holidaysBetween,
+  hoursAfterMidnight,
+  overtimeWindow,
+  periodContaining,
+  splitWindow,
+  zonedMidnight,
+  PAY_PRESETS,
+  PROVINCE_HOLIDAY_RULES,
+  PROVINCE_OVERTIME,
+  type WindowEntry,
+} from "./rules.js";
 
 const e = (id: string, day: string, hours: number, rateCents = 4000): WindowEntry => ({ id, day, hours, rateCents });
 const none = new Set<string>();
@@ -34,6 +49,18 @@ describe("statutory holidays", () => {
     const days = holidaysBetween("ON", "2026-08-01", "2026-12-31", s);
     expect(days.find((h) => h.date === "2026-08-03")).toMatchObject({ custom: true, name: "Civic Holiday" });
     expect(days.some((h) => h.date === "2026-12-26")).toBe(false);
+  });
+  test("substitute days: a weekend holiday is taken on the next weekday that is free", () => {
+    const sub = { holidays: { substituteWeekend: true } };
+    // 2027: Christmas is a Saturday, Boxing Day a Sunday.
+    expect(holidaysBetween("ON", "2027-12-20", "2027-12-31").map((h) => h.date)).toEqual(["2027-12-25", "2027-12-26"]);
+    const moved = holidaysBetween("ON", "2027-12-20", "2027-12-31", sub);
+    expect(moved.map((h) => [h.key, h.date, h.observedFrom])).toEqual([["christmas", "2027-12-27", "2027-12-25"], ["boxing_day", "2027-12-28", "2027-12-26"]]);
+    // A holiday moved in from just before the range is found; removing the real date removes it.
+    expect(holidaysBetween("ON", "2028-07-03", "2028-07-03", sub).map((h) => h.key)).toEqual(["canada_day"]);
+    expect(holidaysBetween("ON", "2028-07-03", "2028-07-03", { holidays: { substituteWeekend: true, removed: ["2028-07-01"] } })).toEqual([]);
+    // A weekday holiday stays put.
+    expect(holidaysBetween("ON", "2026-09-07", "2026-09-07", sub)[0]).toMatchObject({ date: "2026-09-07", observedFrom: null });
   });
 });
 
@@ -106,8 +133,40 @@ describe("splitting a week", () => {
   });
 });
 
+describe("across midnight", () => {
+  test("local midnight, including the night the clocks change", () => {
+    expect(zonedMidnight("2026-09-22", "America/Toronto").toISOString()).toBe("2026-09-22T04:00:00.000Z");
+    expect(zonedMidnight("2026-03-08", "America/Toronto").toISOString()).toBe("2026-03-08T05:00:00.000Z");
+    expect(zonedMidnight("2026-03-09", "America/Toronto").toISOString()).toBe("2026-03-09T04:00:00.000Z");
+    expect(zonedMidnight("2026-09-22", "America/St_Johns").toISOString()).toBe("2026-09-22T02:30:00.000Z");
+  });
+  test("the part of a shift after midnight, as a share of the recorded hours", () => {
+    const inAt = new Date("2026-09-22T02:00:00Z"); // 22:00 on the 21st in Toronto
+    const outAt = new Date("2026-09-22T10:00:00Z"); // 06:00 on the 22nd
+    expect(hoursAfterMidnight("2026-09-21", 8, inAt, outAt, "America/Toronto")).toBe(6);
+    expect(hoursAfterMidnight("2026-09-21", 7, inAt, outAt, "America/Toronto")).toBe(5.25);
+    expect(hoursAfterMidnight("2026-09-21", 8, null, null, "America/Toronto")).toBe(0);
+    expect(hoursAfterMidnight("2026-09-21", 4, new Date("2026-09-21T12:00:00Z"), new Date("2026-09-21T16:00:00Z"), "America/Toronto")).toBe(0);
+  });
+  test("BC: a 22:00–08:00 shift is 2 + 8, not 10 on one day", () => {
+    const night = { ...e("n", "2026-09-21", 10), nextDayHours: 8 };
+    expect(splitWindow([night], PROVINCE_OVERTIME.BC!, none, 1.5).get("n")!.overtimeHours).toBe(0);
+    // Four more hours on the 22nd make it a 12-hour day there.
+    const s = splitWindow([night, e("d", "2026-09-22", 4)], PROVINCE_OVERTIME.BC!, none, 1.5);
+    expect(s.get("d")!.overtimeHours).toBe(4);
+  });
+  test("the hours after midnight on a holiday are holiday hours", () => {
+    const s = splitWindow([{ ...e("n", "2026-09-06", 8), nextDayHours: 3 }], PROVINCE_OVERTIME.BC!, new Set(["2026-09-07"]), 1.5);
+    expect(s.get("n")).toMatchObject({ holidayHours: 3, overtimeHours: 0, premiumCents: 3 * 2000 });
+  });
+  test("a tail from the previous week counts toward that day's threshold", () => {
+    const s = splitWindow([e("m", "2026-09-20", 6)], PROVINCE_OVERTIME.BC!, none, 1.5, 1, new Map([["2026-09-20", 4]]));
+    expect(s.get("m")!.overtimeHours).toBe(2);
+  });
+});
+
 describe("holiday pay", () => {
-  const input = { straightCents: 4 * 5 * 8 * 4000, straightHours: 160, daysWorked: 20, firstWorkedDaysAgo: 400 };
+  const input = { wagesCents: 4 * 5 * 8 * 4000, straightHours: 160, daysWorked: 20, firstWorkedDaysAgo: 400 };
   test("Ontario: four weeks of wages over 20", () => {
     expect(holidayPay(PROVINCE_HOLIDAY_RULES.ON!, input)).toEqual({ cents: 32_000, hours: 8 });
   });
@@ -117,8 +176,22 @@ describe("holiday pay", () => {
     expect(holidayPay(PROVINCE_HOLIDAY_RULES.BC!, input)).toEqual({ cents: 32_000, hours: 8 });
   });
   test("nobody who hasn't worked, and nothing when the company pays another way", () => {
-    expect(holidayPay(PROVINCE_HOLIDAY_RULES.ON!, { ...input, daysWorked: 0, straightCents: 0, straightHours: 0 })).toMatchObject({ cents: null });
+    expect(holidayPay(PROVINCE_HOLIDAY_RULES.ON!, { ...input, daysWorked: 0, wagesCents: 0, straightHours: 0 })).toMatchObject({ cents: null });
     expect(holidayPay({ ...PROVINCE_HOLIDAY_RULES.ON!, method: "none" }, input)).toMatchObject({ cents: null, reason: "method_none" });
+    expect(holidayPay({ ...PROVINCE_HOLIDAY_RULES.ON!, method: "pct_of_wages", percent: 7.7 }, input)).toMatchObject({ cents: null, reason: "method_none" });
+  });
+  test("the base: vacation pay on the cheque counts in ON, AB and BC; overtime only when the rules say", () => {
+    const wages = { straightCents: 100_000, overtimeCents: 30_000 };
+    expect(holidayBaseCents(PROVINCE_HOLIDAY_RULES.ON!, 4, wages)).toBe(104_000);
+    expect(holidayBaseCents(PROVINCE_HOLIDAY_RULES.ON!, null, wages)).toBe(100_000);
+    expect(holidayBaseCents(PROVINCE_HOLIDAY_RULES.QC!, 4, wages)).toBe(100_000);
+    expect(holidayBaseCents({ ...PROVINCE_HOLIDAY_RULES.QC!, includeOvertime: true }, null, wages)).toBe(130_000);
+    expect(PROVINCE_HOLIDAY_RULES.AB!.includeVacationPay && PROVINCE_HOLIDAY_RULES.BC!.includeVacationPay).toBe(true);
+  });
+  test("ON construction: 7.7 % of wages in lieu", () => {
+    const rules = { ...PROVINCE_HOLIDAY_RULES.ON!, ...PAY_PRESETS.on_construction!.holidays };
+    expect(holidayPercentOf(rules, 100_000)).toBe(7_700);
+    expect(holidayPercentOf(PROVINCE_HOLIDAY_RULES.ON!, 100_000)).toBe(0);
   });
 });
 
@@ -131,5 +204,11 @@ describe("effective settings", () => {
     const o = effectivePaySettings("ON", { holidays: { method: "none" }, earningCodes: { regular: "1", overtime: "" } });
     expect(o.holidays).toMatchObject({ method: "none", workedMultiplier: 1.5 });
     expect(o.earningCodes).toMatchObject({ regular: "1", overtime: "OT" });
+  });
+  test("presets and vacation pay", () => {
+    expect(effectivePaySettings("ON", { preset: "on_road_building", vacationPayPercent: 4 })).toMatchObject({ preset: "on_road_building", vacationPayPercent: 4 });
+    expect(effectivePaySettings("ON", { preset: "nope", vacationPayPercent: 0 })).toMatchObject({ preset: null, vacationPayPercent: null });
+    expect(PAY_PRESETS.on_road_building!.overtime.weeklyHours).toBe(55);
+    expect(PAY_PRESETS.qc_construction_residential!.overtime).toMatchObject({ dailyHours: 8, weeklyHours: 40 });
   });
 });

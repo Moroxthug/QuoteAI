@@ -1,4 +1,5 @@
-import { pgTable, text, uuid, timestamp, jsonb, index, integer, numeric, boolean, date } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, text, uuid, timestamp, jsonb, index, uniqueIndex, integer, numeric, boolean, date } from "drizzle-orm/pg-core";
 import { collaboratorsTable, projectsTable } from "./crm";
 import { costEntriesTable, timeEntriesTable } from "./costs";
 
@@ -28,9 +29,11 @@ export type OvertimeRules = {
  * - div20_4w: wages in the four weeks before ÷ 20 (ON, QC, SK, MB's 5 %)
  * - avg_day_30d: wages in the 30 days before ÷ days worked (BC)
  * - avg_day_28d: wages in the four weeks before ÷ days worked (AB; the "regular day's pay" elsewhere)
- * - none: the company pays it another way (ON construction's 7.7 % in lieu, a collective agreement…)
+ * - pct_of_wages: a percentage of each pay period's wages in lieu of holiday pay (ON construction's 7.7 %);
+ *   hours worked on a holiday are then ordinary hours
+ * - none: the company pays it another way (a collective agreement, the CCQ indemnity…)
  */
-export const HOLIDAY_PAY_METHODS = ["div20_4w", "avg_day_30d", "avg_day_28d", "none"] as const;
+export const HOLIDAY_PAY_METHODS = ["div20_4w", "avg_day_30d", "avg_day_28d", "pct_of_wages", "none"] as const;
 export type HolidayPayMethod = (typeof HOLIDAY_PAY_METHODS)[number];
 
 export type HolidayRules = {
@@ -41,6 +44,14 @@ export type HolidayRules = {
   minDaysWorked: number;
   /** Days since the first recorded day of work to qualify (AB, BC: 30). */
   minEmployedDays: number;
+  /** Phase 89b — pct_of_wages only: the percentage (7.7 for ON construction). */
+  percent: number;
+  /** Phase 89b — overtime wages count in the base holiday pay is worked out from. */
+  includeOvertime: boolean;
+  /** Phase 89b — vacation pay paid on each cheque counts in that base (ON, AB, BC). Needs vacationPayPercent. */
+  includeVacationPay: boolean;
+  /** Phase 89b — a holiday on a Saturday or Sunday is taken on the next weekday that is not already one. */
+  substituteWeekend: boolean;
 };
 
 export const PAY_EXPORT_FORMATS = ["generic", "wagepoint", "payworks", "qbo_payroll"] as const;
@@ -63,10 +74,18 @@ export type PaySettings = {
   allowances?: { kmRateCents?: number; perDiemCents?: number };
   exportFormat?: PayExportFormat;
   earningCodes?: Partial<Record<EarningKind, string>>;
+  /** Phase 89b — vacation pay paid out on every cheque, in % (4, 6, 10…). Null = taken as time off. Only feeds the holiday pay base: vacation pay itself stays the provider's. */
+  vacationPayPercent?: number | null;
+  /** Phase 89b — the trade preset the rules were filled from, if any (the page says when they were changed since). */
+  preset?: string | null;
 };
 
 export const ALLOWANCE_KINDS = ["mileage", "per_diem", "other"] as const;
 export type AllowanceKind = (typeof ALLOWANCE_KINDS)[number];
+
+/** Phase 89b: the office's lines are approved as entered; the crew's wait for the office. */
+export const ALLOWANCE_STATUSES = ["submitted", "approved", "rejected"] as const;
+export type AllowanceStatus = (typeof ALLOWANCE_STATUSES)[number];
 
 /** Travel and per-diem lines — paid with the hours, charged to the job when there is one. */
 export const payAllowancesTable = pgTable(
@@ -88,9 +107,21 @@ export const payAllowancesTable = pgTable(
     note: text("note").notNull().default(""),
     costEntryId: uuid("cost_entry_id").references(() => costEntriesTable.id, { onDelete: "set null" }),
     createdByUserId: text("created_by_user_id"),
+    status: text("status", { enum: ALLOWANCE_STATUSES }).notNull().default("approved"),
+    enteredBy: text("entered_by", { enum: ["office", "worker"] }).notNull().default("office"),
+    /** The crew page's offline outbox op id — a replay returns the row it made. */
+    clientRef: uuid("client_ref"),
+    rejectedReason: text("rejected_reason"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedByName: text("reviewed_by_name"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index("pay_allowances_user_date_idx").on(t.userId, t.date), index("pay_allowances_worker_idx").on(t.workerId, t.date)],
+  (t) => [
+    index("pay_allowances_user_date_idx").on(t.userId, t.date),
+    index("pay_allowances_worker_idx").on(t.workerId, t.date),
+    index("pay_allowances_pending_idx").on(t.userId, t.status).where(sql`status = 'submitted'`),
+    uniqueIndex("pay_allowances_client_ref_idx").on(t.workerId, t.clientRef).where(sql`client_ref is not null`),
+  ],
 );
 
 export type PayAllowance = typeof payAllowancesTable.$inferSelect;

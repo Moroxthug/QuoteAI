@@ -15,6 +15,7 @@ import { runOrQueue, enqueue, useOutbox } from "@/lib/offline/outbox";
 import { WorkerToday } from "@/components/crew/worker-today";
 import { WorkerChanges } from "@/components/crew/worker-changes";
 import { FieldReportCard } from "@/components/crew/field-report";
+import { TravelCard } from "@/components/crew/travel-card";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -256,6 +257,8 @@ export default function WorkerTimePage() {
         </section>
 
         <FieldReportCard token={token!} jobs={data.jobs} defaultJobId={data.activeEntry?.projectId ?? data.todayJobs[0]?.id ?? (data.jobs.length === 1 ? data.jobs[0]!.id : null)} reports={data.reports} />
+
+        {data.travel && <TravelCard token={token!} jobs={data.jobs} today={data.today} defaultJobId={data.activeEntry?.projectId ?? data.todayJobs[0]?.id ?? (data.jobs.length === 1 ? data.jobs[0]!.id : null)} travel={data.travel} allowances={data.allowances} />}
 
         <section className="card p-4 space-y-4">
           <h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("worker.orManual")}</h2>

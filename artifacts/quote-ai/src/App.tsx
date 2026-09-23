@@ -2,6 +2,7 @@ import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wo
 import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { RouteAnnouncer } from "@/components/a11y";
 import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -321,6 +322,7 @@ function App({ ssr }: { ssr?: { path: string; lang: Lang } } = {}) {
               <Router />
             </ErrorBoundary>
             <Toaster />
+            <RouteAnnouncer />
           </TooltipProvider>
         </LanguageProvider>
       </WouterRouter>

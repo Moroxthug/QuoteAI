@@ -14,6 +14,7 @@ import ManualQuoteBuilder from "@/components/manual-quote-builder";
 import { PriceCatalogSection } from "@/components/price-catalog-section";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -162,6 +163,7 @@ function ClientSelector({
 // ─── Main page ───────────────────────────────────────────────────────────────
 export default function NewQuote() {
   const { t } = useLanguage();
+  const can = useCan();
   const EXAMPLES = getExamples(t);
   const [activeTab, setActiveTab] = useState<"ai" | "manual" | "listino">("ai");
 
@@ -349,6 +351,30 @@ export default function NewQuote() {
   const clientData = getClientData();
 
   const attachmentsFull = photos.length + docs.length >= MAX_ATTACHMENTS;
+
+  // Phase 83: every tab on this page writes a quote. The sidebar and ⌘K
+  // stopped offering it to a foreman or a viewer in Phase 80, but the route
+  // itself still rendered the whole composer, the manual builder and the
+  // price catalog editor — each one a 403 waiting to happen.
+  if (!can("quotes", "edit")) {
+    return (
+      <div className="animate-in fade-in duration-300" style={{ maxWidth: 760, marginInline: "auto" }}>
+        <div className="page-head">
+          <div>
+            <h1>{t("dashboard.new.title")}</h1>
+            <p className="sub">{t("dashboard.new.subtitle")}</p>
+          </div>
+        </div>
+        <div className="card" style={{ padding: 32, textAlign: "center" }}>
+          <Lock className="h-8 w-8 mx-auto mb-3" style={{ color: "var(--faint)" }} />
+          <p className="sub" style={{ marginBottom: 16 }}>{t("roles.readOnly")}</p>
+          <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setLocation("/dashboard/quotes")}>
+            {t("dashboard.nav.quotes")}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in duration-300" style={{ maxWidth: 760, marginInline: "auto" }}>

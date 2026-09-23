@@ -468,9 +468,17 @@ export default function Home() {
         {/* Full-bleed by design: the track scrolls past both edges under a mask. */}
         <div className="marquee" data-bleed>
           <div className="mq-track">
-            {[...TRADE_SLUGS, ...TRADE_SLUGS].map((slug, i) => (
-              <Link key={`${slug}-${i}`} href={localizedPath(`/quotes/${slug}/`, lang)} className="wm">{tradeLabel(slug)}</Link>
+            {TRADE_SLUGS.map((slug) => (
+              <Link key={slug} href={localizedPath(`/quotes/${slug}/`, lang)} className="wm">{tradeLabel(slug)}</Link>
             ))}
+            {/* The same eighteen links again — what makes the loop seamless.
+                A screen reader was reading the whole trade list twice and a
+                keyboard tabbed through it twice (Phase 83). */}
+            <div className="mq-copy" aria-hidden="true">
+              {TRADE_SLUGS.map((slug) => (
+                <Link key={`copy-${slug}`} href={localizedPath(`/quotes/${slug}/`, lang)} className="wm" tabIndex={-1}>{tradeLabel(slug)}</Link>
+              ))}
+            </div>
           </div>
         </div>
         <div className="wrap">

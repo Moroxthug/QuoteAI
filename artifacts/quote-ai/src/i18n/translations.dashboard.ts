@@ -1045,6 +1045,7 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
 
     "notifications.title": "Notifications",
     "notifications.markAllRead": "Mark all read",
+    "notifications.unreadCount": "{count} unread",
     "notifications.empty": "Nothing yet. You'll see quote acceptances and contract updates here.",
     "notifications.page.subtitle": "Everything that happened while you were on the tools.",
     "notifications.page.markAllRead": "Mark all as read",
@@ -3677,6 +3678,7 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
 
     "notifications.title": "Notifications",
     "notifications.markAllRead": "Tout marquer comme lu",
+    "notifications.unreadCount": "{count} non lues",
     "notifications.empty": "Rien pour l'instant. Les acceptations de soumissions et les mises à jour de contrats apparaîtront ici.",
     "notifications.page.subtitle": "Tout ce qui s'est passé pendant que vous étiez sur les outils.",
     "notifications.page.markAllRead": "Tout marquer comme lu",

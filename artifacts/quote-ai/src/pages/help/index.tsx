@@ -65,7 +65,9 @@ export default function HelpIndexPage() {
         <p className="lead" style={{ maxWidth: "none" }}>{t("help.subheading")}</p>
       </header>
 
-      <main className="flex-1 wrap" style={{ paddingBottom: "clamp(48px, 6vw, 80px)" }}>
+      {/* Phase 83: PublicLayout already provides the <main> landmark — a
+          second one leaves a screen reader two "main" regions to choose from. */}
+      <div className="flex-1 wrap" style={{ paddingBottom: "clamp(48px, 6vw, 80px)" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "clamp(28px, 3.5vw, 44px)" }}>
           {CATEGORY_ORDER.map((cat) => {
             const articles = HELP_ARTICLES.filter((a) => a.category === cat);
@@ -101,7 +103,7 @@ export default function HelpIndexPage() {
           </div>
           <Link href="/contatti/" className="btn btn-navy btn-sm">{t("help.contactUs")}</Link>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

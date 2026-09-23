@@ -183,7 +183,7 @@ router.get("/contracts/:id", requireAuth, async (req, res) => {
     }
     res.json({
       contract: serializeContract(loaded.contract, loaded.signers, loaded.events),
-      html: renderContractHtml({ document: loaded.contract.document, variables: loaded.contract.variables, signers: loaded.signers, status: loaded.contract.status, createdAt: loaded.contract.createdAt }),
+      html: renderContractHtml({ document: loaded.contract.document, variables: loaded.contract.variables, signers: loaded.signers, status: loaded.contract.status, createdAt: loaded.contract.createdAt, embedded: true }),
       css: CONTRACT_CSS,
     });
   } catch (err) {
@@ -260,7 +260,7 @@ router.put("/contracts/:id", requireAuth, requirePermission("contracts", "edit")
     const fresh = await loadContract(loaded.contract.id);
     res.json({
       contract: serializeContract(updated!, fresh?.signers, fresh?.events),
-      html: renderContractHtml({ document: updated!.document, variables: updated!.variables, signers: fresh?.signers ?? [], status: updated!.status, createdAt: updated!.createdAt }),
+      html: renderContractHtml({ document: updated!.document, variables: updated!.variables, signers: fresh?.signers ?? [], status: updated!.status, createdAt: updated!.createdAt, embedded: true }),
     });
   } catch (err) {
     req.log.error({ err }, "Error updating contract");

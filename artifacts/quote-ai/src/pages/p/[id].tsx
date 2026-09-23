@@ -391,7 +391,9 @@ export default function PublicQuotePage() {
 
   const companyName = quote.companySnapshot?.companyName || t("publicQuote.quoteFallback");
   return (
-    <div className="doc-shell pb-16">
+    // Phase 83: the page an outsider is most likely to meet with a screen
+    // reader had no landmark at all to jump into.
+    <main id="main" className="doc-shell pb-16">
       {/* Phase 67: a customer document, not a marketing page — the same sticky
           doc header the invoice and signing pages use, no site nav or footer. */}
       <header className="doc-head">
@@ -586,6 +588,6 @@ export default function PublicQuotePage() {
         <a href="https://quoteai.ca" className="underline">{t("publicQuote.generatedWith")}</a>
       </p>
     </div>
-    </div>
+    </main>
   );
 }

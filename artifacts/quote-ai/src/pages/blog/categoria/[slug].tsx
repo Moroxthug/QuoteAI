@@ -115,6 +115,10 @@ export default function BlogCategoryPage() {
             </div>
           ) : (
             <div className="news-grid">
+              {/* Phase 83: the card titles are <h3> under the page's <h1> —
+                  a level skipped, and a screen reader jumping by heading
+                  lands nowhere in between. The list gets its own heading. */}
+              <h2 className="sr-only">{t("blog.articlesAbout")} {category.name}</h2>
               {articles.map((article) => (
                 <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                   <div className="news-media">

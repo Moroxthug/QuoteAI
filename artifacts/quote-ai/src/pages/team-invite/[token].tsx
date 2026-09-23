@@ -27,7 +27,7 @@ export default function TeamInvitePage() {
   const returnTo = encodeURIComponent(`/team-invite/${token}`);
 
   return (
-    <div className="doc-shell flex items-center justify-center p-4">
+    <main id="main" className="doc-shell flex items-center justify-center p-4">
       <div className="card w-full max-w-md p-8 text-center space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
         <Logo style={{ height: 28, margin: "0 auto" }} />
 
@@ -74,6 +74,6 @@ export default function TeamInvitePage() {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

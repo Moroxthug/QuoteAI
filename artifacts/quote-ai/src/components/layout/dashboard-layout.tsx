@@ -13,6 +13,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { useModalTrap } from "@/hooks/use-modal-trap";
+import { SkipLink } from "@/components/a11y";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
@@ -233,6 +236,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
   const swipeRef = useSwipeToClose(isMobileMenuOpen, closeMenu);
+  // Below this width the sidebar stops being a column and becomes a drawer
+  // parked off-canvas (mockup-system.css `@media (max-width: 980px)`), which
+  // is a visual state only: its 20 links stay in the tab order and in the
+  // accessibility tree until something says otherwise (Phase 83).
+  const sidebarIsDrawer = useMediaQuery("(max-width: 980px)");
+  const drawerOpen = sidebarIsDrawer && isMobileMenuOpen;
+  useModalTrap(drawerOpen, swipeRef, closeMenu);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try { return localStorage.getItem("sidebar-collapsed") === "true"; } catch { return false; }
   });
@@ -319,6 +329,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               onClick={closeMenu}
               className={cn("sb-link", active && "active")}
               title={item.label}
+              // The `active` class is a colour; this is the part a screen
+              // reader can hear.
+              aria-current={active ? "page" : undefined}
             >
               <item.icon className="ic" />
               <span className="sb-txt">{item.label}</span>
@@ -335,8 +348,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={cn("app", isCollapsed && "rail")}>
+      <SkipLink />
       {/* Sidebar (desktop: rail-collapsible; mobile: slide-in drawer) */}
-      <aside ref={swipeRef} className={cn("sidebar", isMobileMenuOpen && "open")} aria-label={t("dashboard.nav.navMenu")}>
+      <aside
+        ref={swipeRef}
+        className={cn("sidebar", isMobileMenuOpen && "open")}
+        aria-label={t("dashboard.nav.navMenu")}
+        // Off-canvas and closed: gone for the keyboard and the screen reader
+        // too, not just for the eye.
+        inert={sidebarIsDrawer && !isMobileMenuOpen ? true : undefined}
+        {...(drawerOpen ? { role: "dialog" as const, "aria-modal": true } : {})}
+      >
         <div className="sb-top">
           <span className="sb-mark">q</span>
           <Link href="/dashboard" className="sb-logo" onClick={closeMenu}>
@@ -353,13 +375,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {canNewQuote && (
-          <Link href="/dashboard/new" onClick={closeMenu} className="btn btn-white sb-new">
+          <Link href="/dashboard/new" onClick={closeMenu} className="btn btn-white sb-new" aria-current={location === "/dashboard/new" ? "page" : undefined}>
             <Plus className="ic" style={{ width: 16, height: 16 }} />
             <span className="btn-txt">{t("dashboard.nav.newQuote")}</span>
           </Link>
         )}
 
-        <NavLinks />
+        {/* `display: contents` — the landmark a screen reader navigates by,
+            with the flex column of links exactly as it was. */}
+        <nav className="sb-nav"><NavLinks /></nav>
 
         <div className="sb-bottom">
           <NotificationsBell variant="sidebar" side="right" />
@@ -378,7 +402,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {isMobileMenuOpen && <div className="scrim show" onClick={closeMenu} />}
+      {isMobileMenuOpen && <div className="scrim show" data-modal-scrim="" onClick={closeMenu} />}
 
       {/* Main column */}
       <div className="main">
@@ -393,7 +417,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="content"><OfflineBar />{children}</main>
+        <main id="main" className="content"><OfflineBar />{children}</main>
       </div>
     </div>
   );

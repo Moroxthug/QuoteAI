@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { FileSignature, Sparkles, Loader2, ArrowRight, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { contractsApi } from "@/lib/contracts-api";
 import { ContractStatusBadge } from "@/pages/dashboard/contracts/[id]";
 
@@ -13,6 +14,7 @@ import { ContractStatusBadge } from "@/pages/dashboard/contracts/[id]";
  */
 export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }: { quoteId: string; quoteStatus: string; hasContractsFeature: boolean }) {
   const { t } = useLanguage();
+  const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
@@ -30,7 +32,9 @@ export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }:
       toast({ title: e.code === "PLAN_REQUIRED" ? t("contracts.planRequired") : t("contracts.draftError"), description: e.message, variant: "destructive" }),
   });
 
-  const canDraft = quoteStatus === "unlocked" || quoteStatus === "accepted";
+  // Phase 83: POST /contracts/from-quote is contracts:edit on the server, and
+  // this button asked nothing — a foreman got an AI-drafting spinner and a 403.
+  const canDraft = (quoteStatus === "unlocked" || quoteStatus === "accepted") && can("contracts", "edit");
   const closed = contract && ["voided", "declined", "expired"].includes(contract.status);
 
   return (

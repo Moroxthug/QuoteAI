@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, type JobDetailDto, type MilestoneDto, type BudgetLineDto, type CostCategory, type SetupEdits } from "@/lib/jobs-api";
 import { Gantt } from "@/components/jobs/gantt";
 
@@ -26,6 +27,7 @@ function toDrafts(d: JobDetailDto): { milestones: MilestoneDraft[]; budget: Budg
 }
 
 export default function JobSetupPage() {
+  const can = useCan();
   const { id } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
@@ -110,6 +112,16 @@ export default function JobSetupPage() {
 
   const { job } = data;
   const confirmed = job.setupStatus === "confirmed";
+
+  // Phase 83: the whole page is an editor (milestones, tasks, budget, then
+  // Confirm) and every one of its three routes is jobs:edit on the server.
+  if (!can("jobs", "edit")) {
+    return (
+      <div className="card card-empty">
+        {t("roles.readOnly")} <Link href={`/dashboard/jobs/${job.id}`} className="text-link">{t("jobs.backToJob")}</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in duration-300">

@@ -31,6 +31,7 @@ import { mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
+import { screenReaderAudit, modalAudit, SR_BLOCKING, type SrFinding } from "./screen-reader.js";
 
 const require = createRequire(import.meta.url);
 const AXE_PATH = require.resolve("axe-core/axe.min.js");
@@ -56,6 +57,11 @@ const WIDTHS_EN = (args.get("widths") ?? "1280,980,768,640,375").split(",").map(
 const WIDTHS_FR = args.has("widths") ? WIDTHS_EN : [1280, 375];
 const ROUTE_FILTER = (args.get("routes") ?? "").split(",").filter(Boolean);
 const RUN_AXE = args.get("axe") !== "false";
+// Phase 83: the behavioural half (tab order, focus rings, "you are here",
+// off-canvas drawers, the modal trap). Static per page, so it runs once per
+// route × language at each width that changes the layout answer — the drawer
+// checks only exist below the mobile breakpoint.
+const RUN_SR = args.get("sr") !== "false";
 const SCREENSHOTS = args.get("screenshots") !== "false";
 const KEEP = args.has("keep");
 const PROVINCE = (args.get("province") ?? "ON") as "ON" | "QC";
@@ -92,7 +98,9 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
     dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
   ];
-  return list.filter((r) => ROUTE_FILTER.length === 0 || ROUTE_FILTER.some((f) => r.path.includes(f)));
+  // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`
+  // pins an exact path (there is no substring that means the homepage alone).
+  return list.filter((r) => ROUTE_FILTER.length === 0 || ROUTE_FILTER.some((f) => (f.startsWith("=") ? r.path === f.slice(1) : r.path.includes(f))));
 }
 
 const slug = (path: string) => (path === "/" ? "home" : path.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "-").replace(/-+$/, "").slice(0, 60)) || "home";
@@ -144,6 +152,7 @@ type PageResult = {
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
   gutter: { clientWidth: number; offenders: string[] } | null;
   axe: Array<{ id: string; impact: string; help: string; count: number; targets: string[]; detail: string[] }>;
+  sr: SrFinding[];
   consoleErrors: string[]; failedRequests: string[]; boundary: string | null; rawKeys: string[]; error?: string;
 };
 
@@ -249,6 +258,12 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
   }, GUTTER_MIN);
 }
 
+// [route, trigger selector, label] — the overlays a keyboard user meets.
+const MODAL_TRIGGERS: Array<[string, string, string]> = [
+  ["/", ".menu-btn", "public mobile menu"],
+  ["/dashboard", ".tb-menu", "dashboard mobile sidebar"],
+];
+
 async function runAxe(page: Page): Promise<PageResult["axe"]> {
   await page.addScriptTag({ path: AXE_PATH });
   const res = await page.evaluate(async () => {
@@ -280,7 +295,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
   const file = resolve(dir, `${slug(r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, gutter: null, axe: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
+  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, gutter: null, axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -296,6 +311,18 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
     result.gutter = await gutter(page, width);
     if (SCREENSHOTS) await page.screenshot({ path: file, fullPage: true });
     if (RUN_AXE) result.axe = await runAxe(page);
+    if (RUN_SR) {
+      result.sr = await screenReaderAudit(page, { width });
+      // The two off-canvas menus are the same component on every page of their
+      // half of the app, and the check clicks — so ask once per half, on the
+      // narrow viewport where the drawer exists at all.
+      if (width <= GUTTER_WIDTH) {
+        for (const [route, trigger, label] of MODAL_TRIGGERS) {
+          if (r.path !== route) continue;
+          result.sr.push(...(await modalAudit(page, trigger, label)));
+        }
+      }
+    }
   } catch (e) {
     result.error = (e as Error).message.slice(0, 300);
   } finally {
@@ -312,7 +339,7 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
   const byPath = new Map<string, PageResult[]>();
   for (const r of results) byPath.set(r.path, [...(byPath.get(r.path) ?? []), r]);
 
-  lines.push("## Summary", "", "| route | overflow (lang@width) | gutter | axe serious/critical | console errors | failed /api | boundary/error |", "|---|---|---|---|---|---|---|");
+  lines.push("## Summary", "", "| route | overflow (lang@width) | gutter | axe serious/critical | screen reader | console errors | failed /api | boundary/error |", "|---|---|---|---|---|---|---|---|");
   for (const [path, rs] of byPath) {
     const ov = rs.filter((r) => r.overflow).map((r) => `${r.lang}@${r.width}`).join(", ") || "—";
     const gu = rs.filter((r) => r.gutter).map((r) => `${r.lang}@${r.width}`).join(", ") || "—";
@@ -320,7 +347,8 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
     const ce = rs.reduce((s, r) => s + r.consoleErrors.length, 0);
     const fr = rs.reduce((s, r) => s + r.failedRequests.length, 0);
     const be = rs.filter((r) => r.boundary || r.error).map((r) => `${r.lang}@${r.width}: ${r.boundary ?? r.error}`).join("; ") || "—";
-    lines.push(`| \`${path}\` | ${ov} | ${gu} | ${ax || "—"} | ${ce || "—"} | ${fr || "—"} | ${be} |`);
+    const srRules = [...new Set(rs.flatMap((r) => r.sr.map((f) => f.rule)))];
+    lines.push(`| \`${path}\` | ${ov} | ${gu} | ${ax || "—"} | ${srRules.join(", ") || "—"} | ${ce || "—"} | ${fr || "—"} | ${be} |`);
   }
 
   lines.push("", "## axe violations (moderate+), by rule", "");
@@ -334,6 +362,18 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
     lines.push(`### ${id} — ${e.impact} — ${e.help}`, "");
     for (const w of e.where.slice(0, 40)) lines.push(`- ${w}`);
     if (e.where.length > 40) lines.push(`- … ${e.where.length - 40} more`);
+    lines.push("");
+  }
+
+  lines.push("## Screen-reader / keyboard findings, by rule", "");
+  const bySrRule = new Map<string, string[]>();
+  for (const r of results) for (const f of r.sr) {
+    bySrRule.set(f.rule, [...(bySrRule.get(f.rule) ?? []), `${r.path} ${r.lang}@${r.width} — \`${f.target}\`: ${f.detail}`]);
+  }
+  for (const [rule, where] of [...bySrRule].sort((a, b) => b[1].length - a[1].length)) {
+    lines.push(`### ${rule} — ${SR_BLOCKING.has(rule as SrFinding["rule"]) ? "blocking" : "report"} — ${where.length} occurrence(s)`, "");
+    for (const w of where.slice(0, 30)) lines.push(`- ${w}`);
+    if (where.length > 30) lines.push(`- … ${where.length - 30} more`);
     lines.push("");
   }
 
@@ -401,7 +441,7 @@ try {
         for (const r of rs) {
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
-          const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
+          const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.sr.length && `SR:${[...new Set(res.sr.map((f) => f.rule))].join(",")}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
           console.log(`${lang}@${String(width).padStart(4)} ${r.path.padEnd(60)} ${flags.join(" ") || "ok"}`);
         }
       }
@@ -413,7 +453,9 @@ try {
   const overflows = results.filter((r) => r.overflow).length;
   const gutters = results.filter((r) => r.gutter).length;
   const rawKeyPages = results.filter((r) => r.rawKeys.length).length;
-  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
+  const srBlocking = results.reduce((s, r) => s + r.sr.filter((f) => SR_BLOCKING.has(f.rule)).length, 0);
+  const srOther = results.reduce((s, r) => s + r.sr.length, 0) - srBlocking;
+  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, screen-reader ${srBlocking} blocking + ${srOther} to read, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
   if (KEEP) {
     console.log(`[qa-visual] --keep: account ${org.email} left in place; bearer ${org.token}; frontend ${frontend} (API ${apiBase}). Ctrl-C to stop.`);
     await new Promise(() => {});

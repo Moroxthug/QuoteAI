@@ -4,6 +4,8 @@ import { enCA, frCA } from "date-fns/locale";
 import { Archive as ArchiveIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useCan } from "@/hooks/use-role";
+import type { PermissionArea } from "@workspace/permissions";
 import { useToast } from "@/hooks/use-toast";
 
 type ArchiveType = "quote" | "client" | "invoice" | "job" | "contract";
@@ -17,6 +19,16 @@ const RESTORE_PATH: Record<ArchiveType, string | null> = {
   client: null,
 };
 
+// Phase 83: each restore route is `<area>:full` on the server — the button
+// now asks the same question the API will.
+const RESTORE_AREA: Record<ArchiveType, PermissionArea | null> = {
+  quote: "quotes",
+  invoice: "invoicing",
+  job: "jobs",
+  contract: "contracts",
+  client: null,
+};
+
 const QUERY_KEY = ["archive"];
 
 async function fetchArchive(): Promise<{ items: ArchiveItem[] }> {
@@ -27,6 +39,7 @@ async function fetchArchive(): Promise<{ items: ArchiveItem[] }> {
 
 export default function ArchivePage() {
   const { t, lang } = useLanguage();
+  const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchArchive, staleTime: 15_000 });
@@ -47,6 +60,10 @@ export default function ArchivePage() {
   });
 
   const items = data?.items ?? [];
+  const canRestore = (type: ArchiveType) => {
+    const area = RESTORE_AREA[type];
+    return !!area && can(area, "full");
+  };
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -88,7 +105,7 @@ export default function ArchivePage() {
                       <td>{format(new Date(item.archivedAt), "yyyy-MM-dd", { locale })}</td>
                       <td>{item.archivedByName || "—"}</td>
                       <td>
-                        {RESTORE_PATH[item.type] && (
+                        {RESTORE_PATH[item.type] && canRestore(item.type) && (
                           <button
                             type="button"
                             className="cta-link"

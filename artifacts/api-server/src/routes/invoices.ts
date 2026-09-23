@@ -205,7 +205,7 @@ router.get("/invoices/:id", requireAuth, requirePermission("invoicing", "view"),
       invoice: serializeInvoice(inv, { projectName: inv.projectId ? names.projectName.get(inv.projectId) ?? null : null, clientName: inv.clientId ? names.clientName.get(inv.clientId) ?? null : null }),
       payments: loaded.payments.map(serializePayment),
       events: loaded.events.map(serializeEvent),
-      html: renderInvoiceHtml(inv, loaded.payments),
+      html: renderInvoiceHtml(inv, loaded.payments, { embedded: true }),
       css: INVOICE_CSS,
       publicUrl,
       reminderDays: REMINDER_AFTER_DAYS,
@@ -353,7 +353,7 @@ router.put("/invoices/:id", requireAuth, requirePermission("invoicing", "edit"),
     await logInvoiceEvent({ invoiceId: inv.id, type: "edited", actor: "contractor", detail: { fields: Object.keys(d) } });
     await writeAudit({ userId, actorType: "user", actorId: userId, entityType: "invoice", entityId: inv.id, action: "updated", diff: d });
     const fresh = (await loadInvoice(inv.id))!;
-    res.json({ invoice: serializeInvoice(updated!), html: renderInvoiceHtml(fresh.invoice, fresh.payments) });
+    res.json({ invoice: serializeInvoice(updated!), html: renderInvoiceHtml(fresh.invoice, fresh.payments, { embedded: true }) });
   } catch (err) {
     req.log.error({ err }, "Error updating invoice");
     fail(res, err, "Could not update the invoice");

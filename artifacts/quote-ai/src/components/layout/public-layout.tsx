@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Logo } from "@/components/logo";
 import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
 import { X, Send, CheckCircle2, Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useModalTrap } from "@/hooks/use-modal-trap";
+import { SkipLink } from "@/components/a11y";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
@@ -134,15 +136,26 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const scrolled = useScrolled(20);
   const [supportOpen, setSupportOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeDrawer = useCallback(() => setMobileMenuOpen(false), []);
+  useModalTrap(mobileMenuOpen, drawerRef, closeDrawer);
 
   function handleMobileNav(href: string) {
     setMobileMenuOpen(false);
     navigate(href);
   }
 
+  // "You are here" for a screen reader: the nav link whose path is this one.
+  const here = location.replace(/\/+$/, "") || "/";
+  const isHere = (href: string) => {
+    const path = href.split(/[?#]/)[0]!.replace(/\/+$/, "") || "/";
+    return !href.includes("#") && path === here;
+  };
+
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground">
+      <SkipLink />
       <AnnouncementBar />
       <header className={cn("site-head", scrolled && "scrolled")}>
         <div className="wrap hd">
@@ -151,7 +164,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </Link>
           <nav aria-label={t("a11y.primaryNav")} className="nav">
             <ProductsMegaMenu />
-            <Link href={localizedPath("/pricing/", lang)} className="nav-link">{t("nav.pricing")}</Link>
+            <Link href={localizedPath("/pricing/", lang)} className="nav-link" aria-current={isHere(localizedPath("/pricing/", lang)) ? "page" : undefined}>{t("nav.pricing")}</Link>
             <Link href={localizedPath("/#trades", lang)} className="nav-link">{t("nav.trades")}</Link>
             <Link href="/#whatsapp" className="nav-link">
               {t("nav.whatsapp")}
@@ -178,12 +191,15 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── Mobile drawer ─────────────────────────────────── */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-[60]" onClick={() => setMobileMenuOpen(false)}>
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="fixed inset-0 z-[60]">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" data-modal-scrim="" onClick={closeDrawer} />
           <div
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("a11y.menu")}
             className="absolute top-0 right-0 h-full w-72 bg-white shadow-2xl flex flex-col mnav open"
             style={{ padding: 0 }}
-            onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: "var(--line)" }}>
               <Logo />
@@ -221,7 +237,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <main className="flex-1 flex flex-col">{children}</main>
+      <main id="main" className="flex-1 flex flex-col">{children}</main>
 
       <footer className="footer">
         <div className="wrap ft-grid">
@@ -232,14 +248,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <p>{t("footer.tagline")}</p>
           </div>
           <div className="ft-col">
-            <h4>{t("footer.trades")}</h4>
+            <h2>{t("footer.trades")}</h2>
             {Object.entries(TRADE_LABELS[lang]).slice(0, 7).map(([slug, label]) => (
               <Link key={slug} href={localizedPath(`/quotes/${slug}/`, lang)}>{label}</Link>
             ))}
             <Link href={localizedPath("/#trades", lang)}>{t("footer.allTrades")}</Link>
           </div>
           <div className="ft-col">
-            <h4>{t("footer.features")}</h4>
+            <h2>{t("footer.features")}</h2>
             <Link href="/#whatsapp">{t("nav.whatsapp")}<span className="chip-new chip">{t("nav.new")}</span></Link>
             <Link href="/#story-jobs">{t("footer.jobSites")}</Link>
             <Link href="/#story-invoicing">{t("footer.contracts")}</Link>
@@ -248,7 +264,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <Link href="/#products">{t("footer.imports")}</Link>
           </div>
           <div className="ft-col">
-            <h4>{t("footer.guides")}</h4>
+            <h2>{t("footer.guides")}</h2>
             <Link href="/blog/">{t("footer.blog")}</Link>
             <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
             <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
@@ -257,7 +273,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </div>
           <div className="ft-col">
             {/* Phase 81 — the pilot marketing pages, both languages */}
-            <h4>{t("footer.pilotProgram")}</h4>
+            <h2>{t("footer.pilotProgram")}</h2>
             <Link href={localizedPath("/pricing/", lang)}>{t("nav.pricing")}</Link>
             <Link href={localizedPath("/pilot/", lang)}>{t("nav.pilot")}</Link>
             {PROVINCE_SLUG_PAIRS.map((p) => (
@@ -267,14 +283,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             ))}
           </div>
           <div className="ft-col">
-            <h4>{t("footer.company")}</h4>
+            <h2>{t("footer.company")}</h2>
             <Link href="/chi-siamo/">{t("footer.aboutUs")}</Link>
             <Link href="/contatti/">{t("footer.contact")}</Link>
             <Link href="/#newsroom">{t("footer.newsroom")}</Link>
             <Link href="/#reviews">{t("footer.reviews")}</Link>
           </div>
           <div className="ft-col">
-            <h4>{t("footer.support")}</h4>
+            <h2>{t("footer.support")}</h2>
             <Link href="/help/">{t("footer.helpCenter")}</Link>
             <button onClick={() => setSupportOpen(true)}>{t("support.contactSupport")}</button>
             <Link href="/privacy-policy/">{t("footer.privacyPolicy")}</Link>

@@ -1548,7 +1548,9 @@ const can = useCan();
             quoteId={quote.id}
             schedule={(quote as unknown as { paymentSchedule?: PaymentSchedule | null }).paymentSchedule ?? null}
             total={quote.totale}
-            locked={isEditMode}
+            // PATCH /quotes/:id is quotes:edit — Phase 83: "Edit schedule" was
+            // offered to a foreman, who could only get a 403 out of Save.
+            locked={isEditMode || !can("quotes", "edit")}
           />
 
           {/* Summary card */}

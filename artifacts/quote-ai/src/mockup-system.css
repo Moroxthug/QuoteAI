@@ -57,6 +57,18 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; border-radius: 4px; }
 .on-dark :focus-visible { outline-color: #fff; }
 
+/* ---------- Skip link (Phase 83) ----------
+   First tabbable element in both layouts; off-screen until it takes focus,
+   then a real button over the header. Never `display:none` — that would take
+   it out of the tab order, which is the one thing it exists for. White on
+   navy: it lands on top of the announcement bar, which is navy itself, so a
+   navy pill with the standard navy ring would be invisible exactly when it
+   matters. */
+.skip-link { position: fixed; top: 0; left: 50%; transform: translate(-50%, -140%); z-index: 200; background: #fff; color: var(--navy); font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 0 0 12px 12px; box-shadow: var(--shadow-lift); transition: transform .18s var(--ease-mk); }
+.skip-link:focus-visible, .skip-link:focus { transform: translate(-50%, 0); outline: 2px solid var(--navy); outline-offset: 2px; }
+/* The sidebar's <nav> landmark must not become a flex child — the links are. */
+.sb-nav { display: contents; }
+
 .wrap { max-width: 1240px; margin-inline: auto; padding-inline: clamp(20px, 4vw, 40px); }
 .eyebrow { font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-mk); }
 .on-dark .eyebrow { color: #b7b9cc; }
@@ -147,7 +159,10 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .tb-menu { display: none; width: 40px; height: 40px; place-items: center; border-radius: 10px; color: var(--navy); flex: none; }
 .tb-menu:hover { background: var(--soft); }
 .search { display: flex; align-items: center; gap: 10px; background: var(--soft); border: 1px solid transparent; border-radius: 999px; padding: 9px 16px; width: min(380px, 42vw); color: var(--faint); transition: background .25s, border-color .25s; }
-.search:focus-within { background: #fff; border-color: var(--line); color: var(--navy); }
+/* Phase 83: the hairline border change alone was the only sign a keyboard
+   user had landed in the search field — the input itself carries
+   `outline: none`. Same ring as everything else, drawn on the pill. */
+.search:focus-within { background: #fff; border-color: var(--line); color: var(--navy); outline: 2px solid var(--navy); outline-offset: 2px; }
 .search input { border: none; outline: none; background: transparent; flex: 1; font-size: 14.5px; color: var(--ink); min-width: 0; }
 .search input::placeholder { color: var(--faint); }
 .tb-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
@@ -246,6 +261,11 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
 .comp-row { display: flex; align-items: center; gap: 13px; padding: 16px 20px; }
 .comp-ic { width: 38px; height: 38px; border-radius: 10px; background: var(--soft); color: var(--navy); display: grid; place-items: center; flex: none; }
 .comp-row input { flex: 1; border: none; outline: none; font-size: 15.5px; color: var(--ink); min-width: 0; background: transparent; }
+/* Phase 83: `outline: none` on the field and nothing in its place — the one
+   input the whole dashboard is built around gave a keyboard user no sign at
+   all that it had focus. Inset so `.composer { overflow: hidden }` cannot
+   clip it. */
+.comp-row:focus-within { outline: 2px solid var(--navy); outline-offset: -3px; border-radius: 14px; }
 .comp-row input::placeholder { color: var(--faint); }
 .comp-mic { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: var(--muted-mk); flex: none; }
 .comp-mic:hover { background: var(--soft); color: var(--navy); }
@@ -687,7 +707,13 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 /* trades marquee */
 .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
 .mq-track { display: flex; gap: 12px; width: max-content; animation: mq 46s linear infinite; }
-.mq-track:hover { animation-play-state: paused; }
+/* Pause for a mouse, and for a keyboard: a focused link that keeps sliding
+   out of the viewport is a tab stop nobody can see (Phase 83). */
+.mq-track:hover, .mq-track:focus-within { animation-play-state: paused; }
+/* The second, duplicate copy of the rail: present for the seamless loop,
+   hidden from the tab order and the screen reader. `display: contents` keeps
+   the flex row exactly as it was. */
+.mq-copy { display: contents; }
 @keyframes mq { to { transform: translateX(-50%); } }
 .wm { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 20px; font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .cov-note { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
@@ -722,7 +748,9 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .ft-grid { display: grid; grid-template-columns: 1.5fr repeat(6, minmax(0, 1fr)); gap: 30px; padding-bottom: 52px; }
 .ft-brand .logo-invert { filter: brightness(0) invert(1); }
 .ft-brand p { margin: 16px 0 0; max-width: 270px; font-size: 14px; color: #8f91a6; }
-.ft-col h4 { color: #fff; font-size: 12.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; }
+/* Phase 83: these were <h4> under an <h2> page — axe heading-order, and a
+   screen reader jumping by heading fell two levels at the footer. */
+.ft-col h2 { color: #fff; font-size: 12.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; }
 .ft-col a, .ft-col button { display: block; color: #b7b9cc; padding: 5px 0; font-weight: 500; font-size: 13.5px; background: none; border: none; text-align: left; }
 .ft-col a:hover, .ft-col button:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .ft-col a .chip-new { margin-left: 6px; font-size: 10px; padding: 2px 7px; }
@@ -757,7 +785,14 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
   .signin, .hd-fr { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mq-track { animation: none; flex-wrap: wrap; }
+  /* Phase 83: stopping the animation left a static row `width: max-content`
+     wide inside `overflow: hidden` — `flex-wrap` can never wrap a track that
+     is allowed to be as wide as it likes, so most of the eighteen trades sat
+     permanently outside the viewport: invisible, unscrollable, and still in
+     the tab order. Let it wrap, and drop the duplicate copy the loop needed. */
+  .marquee { -webkit-mask-image: none; mask-image: none; }
+  .mq-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
+  .mq-copy { display: none; }
 }
 
 /* ==========================================================

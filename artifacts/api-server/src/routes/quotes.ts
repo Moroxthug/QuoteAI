@@ -1594,6 +1594,15 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
     if (body.totale !== undefined) updates.totale = String(body.totale);
     if (body.templateId !== undefined) updates.templateId = body.templateId;
 
+    // Phase 83: a body that names no known field left `updates` empty, and
+    // Drizzle throws on `.set({})` — the caller got a 500 for what is a bad
+    // request. (Found by the role suite sending `{ titolo }`, which this
+    // route has never accepted.)
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ error: "Invalid request", message: "No updatable fields in the request body" });
+      return;
+    }
+
     const [updated] = await db
       .update(quotesTable)
       .set(updates)

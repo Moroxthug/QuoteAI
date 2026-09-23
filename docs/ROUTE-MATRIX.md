@@ -525,17 +525,17 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 1409 | POST | `/api/quotes/:id/reprice` | session | quotes:edit | — | zod | — | post-check | — | — | — |
 | 1447 | DELETE | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | none | — | post-check | — | — | — |
 | 1493 | PUT | `/api/quotes/:id` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
-| 1611 | DELETE | `/api/quotes/:id` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1639 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1659 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1679 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
-| 1757 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | manual | — | predicate | — | — | — |
-| 1851 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
-| 1913 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | zod | — | predicate | — | — | — |
-| 2130 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | zod | plan-check | predicate | — | — | — |
-| 2273 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
-| 2324 | POST | `/api/quotes/manual` | session | quotes:edit | — | manual | — | n/a | — | — | — |
-| 2340 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | manual | — | n/a | — | — | — |
+| 1620 | DELETE | `/api/quotes/:id` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1648 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1668 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1688 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
+| 1766 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | manual | — | predicate | — | — | — |
+| 1860 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
+| 1922 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | zod | — | predicate | — | — | — |
+| 2139 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | zod | plan-check | predicate | — | — | — |
+| 2282 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
+| 2333 | POST | `/api/quotes/manual` | session | quotes:edit | — | manual | — | n/a | — | — | — |
+| 2349 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | manual | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/schedule.ts
 

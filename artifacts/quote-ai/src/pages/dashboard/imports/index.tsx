@@ -207,6 +207,11 @@ const can = useCan();
             <p className="sub">{t("imports.chooseSourceDesc")}</p>
           </div>
         </div>
+        {/* Phase 83: the review buttons below were role-gated in Phase 80, the
+            upload itself never was — a foreman could pick a file, drag a
+            spreadsheet in and get a 403 toast for their trouble. */}
+        {!can("imports", "edit") && <p className="foot-note" style={{ padding: "6px 0 2px" }}>{t("roles.readOnly")}</p>}
+        {can("imports", "edit") && (<>
         <div className="src-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
           <button type="button" className={cn("src", source === "csv" && "on")} onClick={() => setSource("csv")}>
             <b>{t("imports.uploadSpreadsheet")}</b>
@@ -258,6 +263,7 @@ const can = useCan();
             </button>
           </div>
         )}
+        </>)}
 
         <div className="card-foot">
           <span className="foot-note">

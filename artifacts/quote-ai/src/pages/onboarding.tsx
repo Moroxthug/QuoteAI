@@ -153,7 +153,7 @@ export default function OnboardingPage() {
         <Logo />
       </header>
 
-      <div className="flex-1 flex items-center justify-center p-4">
+      <main id="main" className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
           {step === 1 ? (
             <>
@@ -321,7 +321,7 @@ export default function OnboardingPage() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

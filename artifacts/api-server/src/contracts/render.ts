@@ -209,7 +209,7 @@ export function signaturesHtml(v: ContractVariables, signers: ContractSigner[], 
 
 export const CONTRACT_CSS = `
 .contract { font-family: Georgia, "Times New Roman", serif; color:#111827; line-height:1.55; font-size:14px; }
-.contract h1 { font-family: system-ui,-apple-system,sans-serif; font-size:22px; letter-spacing:-0.01em; margin:0 0 4px; }
+.contract h1, .contract h2.doc-title { font-family: system-ui,-apple-system,sans-serif; font-size:22px; letter-spacing:-0.01em; margin:0 0 4px; }
 .contract .meta { font-family: system-ui,-apple-system,sans-serif; color:#6b7280; font-size:12px; margin-bottom:24px; }
 .contract h2 { font-family: system-ui,-apple-system,sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:0.04em; color:#374151; margin:28px 0 8px; padding-bottom:4px; border-bottom:1px solid #e5e7eb; }
 .contract p { margin:0 0 10px; }
@@ -250,12 +250,17 @@ export function renderContractHtml(params: {
   signers: ContractSigner[];
   status: string;
   createdAt: Date;
+  /** Rendered inside a page that already has an <h1> (the dashboard contract
+   *  detail): the document title becomes an <h2> so the page keeps exactly one
+   *  first-level heading (Phase 83). The signing page and the PDF are the
+   *  document itself and keep their <h1>. */
+  embedded?: boolean;
 }): string {
   const { document: doc, variables: v, signers } = params;
   const lang = doc.language;
   const parts: string[] = [];
   if (params.status === "draft") parts.push(`<div class="draft-banner">${tr("draft", lang)}</div>`);
-  parts.push(`<h1>${esc(doc.title)}</h1><div class="meta">${tr("contractNo", lang)} ${esc(v.contractNumber)} · ${tr("date", lang)}: ${fmtDate(params.createdAt, lang)}</div>`);
+  parts.push(`<${params.embedded ? `h2 class="doc-title"` : "h1"}>${esc(doc.title)}</${params.embedded ? "h2" : "h1"}><div class="meta">${tr("contractNo", lang)} ${esc(v.contractNumber)} · ${tr("date", lang)}: ${fmtDate(params.createdAt, lang)}</div>`);
   for (const s of doc.sections) {
     parts.push(`<h2>${esc(s.heading)}</h2>`);
     if (s.key === "parties") parts.push(partiesHtml(v, lang));

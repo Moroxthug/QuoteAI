@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Bell, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
@@ -31,6 +31,7 @@ async function fetchNotifications(): Promise<{ items: NotificationItem[]; unread
  */
 export function NotificationsBell({ variant = "topbar", side = "bottom", align = "end" }: { variant?: "topbar" | "sidebar"; side?: "right" | "bottom"; align?: "start" | "end" }) {
   const { t, lang } = useLanguage();
+  const [path] = useLocation();
   const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchNotifications, refetchInterval: 60_000, staleTime: 30_000 });
   const markRead = useMutation({
@@ -51,16 +52,29 @@ export function NotificationsBell({ variant = "topbar", side = "bottom", align =
 
   if (variant === "sidebar") {
     return (
-      <Link href="/dashboard/notifications" className="sb-link" aria-label={t("notifications.title")}>
+      // No aria-label: it would replace the visible label *and* swallow the
+      // count chip (Phase 83 — WCAG 2.5.3). The chip itself is a bare number,
+      // so the words go next to it, for the screen reader only.
+      <Link href="/dashboard/notifications" className="sb-link" aria-current={path === "/dashboard/notifications" ? "page" : undefined}>
         <Bell className="ic" />
         <span className="sb-txt">{t("notifications.title")}</span>
-        {unread > 0 && <span className="count-chip">{unread > 99 ? "99+" : unread}</span>}
+        {unread > 0 && (
+          <>
+            <span className="count-chip" aria-hidden="true">{unread > 99 ? "99+" : unread}</span>
+            <span className="sr-only">{t("notifications.unreadCount").replace("{count}", String(unread))}</span>
+          </>
+        )}
       </Link>
     );
   }
 
   const trigger = (
-    <button type="button" className="bell bell-wrap" aria-label={t("notifications.title")}>
+    <button
+      type="button"
+      className="bell bell-wrap"
+      // The unread state is a 6px dot: say it out loud.
+      aria-label={unread > 0 ? `${t("notifications.title")} — ${t("notifications.unreadCount").replace("{count}", String(unread))}` : t("notifications.title")}
+    >
       <Bell className="ic" />
       {unread > 0 && <span className="dot" />}
     </button>

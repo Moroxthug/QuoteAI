@@ -90,7 +90,7 @@ function serializeMilestone(m: Milestone, tasks: (typeof projectTasksTable.$infe
 }
 
 function serializeTask(t: typeof projectTasksTable.$inferSelect) {
-  return { id: t.id, milestoneId: t.milestoneId, title: t.title, description: t.description, status: t.status, dueDate: toIsoDate(t.dueDate), sortOrder: t.sortOrder };
+  return { id: t.id, milestoneId: t.milestoneId, title: t.title, description: t.description, status: t.status, dueDate: toIsoDate(t.dueDate), sortOrder: t.sortOrder, addedFromFieldBy: t.createdByName };
 }
 
 function serializeBudgetLine(b: CostBudgetLine) {

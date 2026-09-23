@@ -149,3 +149,41 @@ Switching companies works. What does not exist is a *group*: consolidated report
 - **The materials-to-receipt link from Phase 86** stays with Phase 88.
 
 **Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors**, 71 warnings (none in the new files, one pre-existing `any` in `crm.ts` now reported on a shifted line) · `pnpm knip` no new unused exports · `i18n-audit` **3975 = 3975** keys (+208), 0 missing, 0 one-sided · `env:inventory` **no problems** (no new variables) · migration `0047` applied, `schema-drift` **0 missing, 0 mismatched** (94 tables) · `docs/ROUTE-MATRIX.md` regenerated, **428 routes** (+17), rules test green · unit **24 files / 149 tests** (+16: every deadline rule, the worksheet arithmetic and its refusals, the local-day rule, permit suggestions) · e2e **phase87 8/8** (no setup → no deadlines, setup permissions, the `configuredAt` cutoff, mark filed and undo, the worksheet against drafts/voids/credit notes/unsplit/pending, CSV, tenant isolation, T5018 grouping and threshold, reminders with a `javascript:` link refused and a foreign company 404'd, the sweep ringing once and then not again, permits blocking completion on both routes without leaking to another company, the inspection and deadline on the agenda, the Starter gate) + **security incl. the IDOR sweep** with permit and reminder fixtures + phase85, phase86, lifecycle, schedule, team, money **all green** · `pnpm build` 438 pages prerendered · `qa:visual` on `/dashboard`, the four Compliance tabs and the job pages, EN+FR × 1280/375 (28 pages): 0 overflow, 0 phone-gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · screenshots of the deadlines list, the worksheet, the dashboard calendar and the Permits card at 375 reviewed by eye.
+
+### Phase 86b — The crew's app, finished (2026-09-22)
+
+Phase 86 shipped with three things set aside: crews adding tasks, a per-worker "what changed", and a `qa:visual` sweep as a foreman. All three are done here.
+
+**Built**
+- **Tasks from the site, for the workers the office trusts.** `collaborators.can_add_tasks` is **off by default and set per worker** in the worker dialog on the Team page (`team:full`). This is the answer to the permission question Phase 86 left for a pilot foreman: a crew lead yes, every apprentice no. For such a worker, each of today's jobs on `/t/:token` gets a one-line "Another task…" form. It works offline as `worker.addTask`, and a replay returns the same row (`project_tasks.client_ref`). The task records who added it and goes to the end of the list, so the office's order stays the office's. The job page shows it as "From the site · name". The office gets one notification per worker per job per day, because work found on site is often a change order in waiting. The action is audited as `task_created_from_field`.
+- **"Since you last looked"** above *Today* on the worker page. It lists shifts the office added, moved or took away (including a shift handed to someone else), tasks added, changed or ticked on the jobs the worker follows, and answers to their blockers, newest first. The data comes from facts that already existed:
+  - shift changes come from the schedule's **audit rows**. A block's `updated_at` is useless here: the reminder cron touches it, and a deleted block leaves no row.
+  - task changes come from `updated_at`, minus the worker's own changes (new `field_updated_by/at`, both stamped from one instant).
+  - answers come from `field_reports.resolved_at`.
+
+  The marker (`collaborators.crew_seen_at`) starts on the first visit rather than listing the whole schedule. It moves only on **Got it**, to the moment the list was built, never backwards, so a reload on one bar of signal does not lose the list and a stale tab cannot bring it back. Created-then-deleted is nothing, handed away and back is "changed", past shifts are left out, and nothing older than 14 days counts.
+- **`qa:visual` signs in as a foreman.** Routes now carry a `session` (public / owner / foreman). The sweep adds a foreman member of the showcase company through a second invite (the seeded one must stay unaccepted for `/team-invite`) and sweeps `/dashboard`, the jobs list, the job, the schedule and three Team tabs as that person. `/dashboard/schedule` was never in the owner sweep either, and now is. The showcase worker is a crew lead who last looked an hour ago, so the new cards render with content.
+- Migration `0048` (applied): the two collaborator columns, the five task columns, a unique `(created_by_worker_id, client_ref)` index, and an `audit_log (user_id, entity_type, created_at)` index for the schedule half of the change list. Route matrix 428 → 430. 21 EN/FR strings. Runbook §23 (two rows).
+
+**Found**
+1. **The foreman sweep failed on its first run.** On `/dashboard/team` at 375 px, the Workers table scrolls sideways but held nothing a keyboard could reach, because the edit buttons are `team:full`. The owner sweep never saw it because the owner has the buttons (axe `scrollable-region-focusable`, serious). The Members, Workers and Equipment tables are now focusable, labelled regions, the same as on the Compliance page.
+2. **The Time tab's filters had no names** (axe `select-name`, critical). This affected every role; the tab had simply never been swept. The status and worker selects and the two date fields now have labels.
+3. A task the worker added and the office then ticked came back to them as "New task" instead of "Task done". The e2e suite caught it. A worker's own task is never "new" to them.
+4. At 375 px the add-task placeholder was cut off mid-word ("Found more work? Add i"). It was found in the screenshot and shortened to "Another task…".
+
+**Not done / deferred**
+- **Deleted tasks are not in the list.** `project_tasks` has no tombstone and the task routes do not audit deletes. A task that disappears simply disappears.
+- **The list is built from two clocks**: audit rows use the database's, and the marker and `$onUpdate` stamps use the API's. With NTP on both sides this is milliseconds. The e2e suite leaves a 1.5 s beat so it tests the rule, not the skew.
+- **Crews cannot edit or delete tasks**, only tick and add. Moving people between jobs is still the schedule board.
+- The materials-to-receipt link stays with Phase 88.
+
+**Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors** (69 warnings, all pre-existing) · `pnpm knip` no new unused exports (four new ones un-exported) · `i18n-audit` **3996 = 3996** keys, 0 missing, 0 one-sided · no new environment variables · migration `0048` applied, `schema-drift` **0 missing, 0 mismatched** (94 tables) · `docs/ROUTE-MATRIX.md` regenerated, **430 routes** (+2), rules test green · unit **25 files / 155 tests** (+6: every way a block's audit trail collapses for one worker) · e2e **phase86b 7/7**:
+  - adding a task is off until `team:full` turns it on
+  - an added task is marked, replay-safe and notified once
+  - empty titles and other companies' jobs are refused
+  - the first visit starts the marker
+  - the change list: added, changed and handed-away shifts; a created-then-deleted blip; another worker's shift; the office's task vs the worker's own add and tick; the answer; newest first
+  - reload keeps the list, Got it clears it, a stale "Got it" cannot bring it back, a bad timestamp is a 400
+  - an office tick on the worker's own task is news
+
+  phase86, offline/push, schedule, team, public tokens, phase83, phase85 and **security incl. the IDOR sweep** are all green · `qa:visual` on `/t/:token`, the owner's and the foreman's `/dashboard`, jobs, the job and its setup, schedule and Team tabs, EN+FR × 1280/375: 0 overflow, 0 phone-gutter, **0 axe serious/critical** after the two fixes above, 0 screen-reader findings, 0 raw keys · the worker page at 375 and the foreman's Team page reviewed by eye.

@@ -21,7 +21,8 @@ import { blockLabel } from "../schedule/service.js";
 import multer from "multer";
 import { FIELD_REPORT_KINDS, fieldReportsTable, projectTasksTable } from "@workspace/db";
 import { photoUpload } from "../jobs/photos.js";
-import { blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
+import { addFieldTask, blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
+import { workerChanges } from "../crew/changes.js";
 
 /** A clock-in session longer than this is auto-capped at clock-out — a forgotten clock-out shouldn't silently log a 30h day. */
 const MAX_SESSION_HOURS = 16;
@@ -222,10 +223,29 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
       res.status(410).json({ error: "EXPIRED", workerName: r.worker.name });
       return;
     }
+    const lang = r.language === "fr" ? "fr" : "en";
     const jobs = await workerJobs(r.worker);
     const [openEntry] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), isNotNull(timeEntriesTable.clockInAt), isNull(timeEntriesTable.clockOutAt)));
     const activeEntry = openEntry ? serializeOwnEntry(openEntry, jobs.find((j) => j.id === openEntry.projectId)?.name ?? null, null) : null;
-    res.json({ worker: { name: r.worker.name, role: r.worker.role }, companyName: r.companyName, language: r.language, jobs, entries: await ownEntries(r.worker, jobs), activeEntry, today: toIsoDate(localDayFor(new Date(), r.province)), schedule: await workerSchedule(r.worker, r.province, r.language === "fr" ? "fr" : "en"), todayJobs: await workerToday(r.worker, r.province, openEntry?.projectId ?? null), reports: await ownReports(r.worker) });
+    // Phase 86b: on the very first visit everything is new, so there is no
+    // "since" yet — start the marker now instead of listing the whole schedule.
+    const now = new Date();
+    if (!r.worker.crewSeenAt) await db.update(collaboratorsTable).set({ crewSeenAt: now }).where(eq(collaboratorsTable.id, r.worker.id));
+    const changes = r.worker.crewSeenAt ? await workerChanges(r.worker, r.worker.crewSeenAt, lang, now) : [];
+    res.json({
+      worker: { name: r.worker.name, role: r.worker.role, canAddTasks: r.worker.canAddTasks },
+      companyName: r.companyName,
+      language: r.language,
+      jobs,
+      entries: await ownEntries(r.worker, jobs),
+      activeEntry,
+      today: toIsoDate(localDayFor(now, r.province)),
+      schedule: await workerSchedule(r.worker, r.province, lang),
+      todayJobs: await workerToday(r.worker, r.province, openEntry?.projectId ?? null),
+      reports: await ownReports(r.worker),
+      changes,
+      changesUpTo: now.toISOString(),
+    });
   } catch (err) {
     req.log.error({ err }, "Error loading worker page");
     res.status(500).json({ error: "Internal server error" });
@@ -561,12 +581,78 @@ router.post("/t/:token/tasks/:taskId", writeLimiter, async (req, res) => {
       return;
     }
     if (task.status !== body.data.status) {
-      await db.update(projectTasksTable).set({ status: body.data.status }).where(eq(projectTasksTable.id, task.id));
+      // Both stamps from one instant: updated_at == field_updated_at is how "what changed" knows this one was the worker's own.
+      const at = new Date();
+      await db.update(projectTasksTable).set({ status: body.data.status, fieldUpdatedBy: r.worker.id, fieldUpdatedAt: at, updatedAt: at }).where(eq(projectTasksTable.id, task.id));
       await writeAudit({ userId: r.worker.userId, actorType: "user", actorId: null, entityType: "project_task", entityId: task.id, action: "task_status_from_field", diff: { workerId: r.worker.id, workerName: r.worker.name, from: task.status, to: body.data.status }, ip: req.ip ?? null, userAgent: req.get("user-agent")?.slice(0, 300) ?? null });
     }
     res.json({ task: { id: task.id, status: body.data.status } });
   } catch (err) {
     req.log.error({ err }, "Error updating task from the field");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 86b: adding tasks from the site, and "since you last looked" ──────
+
+// POST /api/t/:token/jobs/:projectId/tasks — { title, milestoneId?, clientRef? }
+// Only for a worker the office has allowed to (Team → worker → "Can add tasks").
+router.post("/t/:token/jobs/:projectId/tasks", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) {
+      res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+      return;
+    }
+    const projectId = z.string().uuid().safeParse(req.params.projectId);
+    const body = z.object({ title: z.string().max(300), milestoneId: z.string().uuid().nullable().optional(), clientRef: clientRefSchema }).safeParse(req.body);
+    if (!projectId.success || !body.success) {
+      res.status(400).json({ error: "Invalid parameters" });
+      return;
+    }
+    if (!r.worker.canAddTasks) {
+      res.status(403).json({ error: "NOT_ALLOWED", message: "Ask the office to let you add tasks." });
+      return;
+    }
+    const job = (await workerJobs(r.worker)).find((j) => j.id === projectId.data);
+    if (!job) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
+    const out = await addFieldTask({ worker: r.worker, job, title: body.data.title, milestoneId: body.data.milestoneId ?? null, clientRef: body.data.clientRef ?? null, language: r.language === "fr" ? "fr" : "en" });
+    if (!out.replayed) await writeAudit({ userId: r.worker.userId, actorType: "user", actorId: null, entityType: "project_task", entityId: out.task.id, action: "task_created_from_field", diff: { workerId: r.worker.id, workerName: r.worker.name, projectId: job.id, title: out.task.title }, ip: req.ip ?? null, userAgent: req.get("user-agent")?.slice(0, 300) ?? null });
+    const t = out.task;
+    res.status(out.replayed ? 200 : 201).json({ task: { id: t.id, title: t.title, status: t.status, milestoneTitle: null, dueDate: toIsoDate(t.dueDate), addedBy: t.createdByName }, replayed: out.replayed || undefined });
+  } catch (err) {
+    if (err instanceof FieldReportError) {
+      res.status(err.status).json({ error: err.code, message: err.message });
+      return;
+    }
+    req.log.error({ err }, "Error adding a task from the field");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/t/:token/seen — { upTo } — "Got it": moves the marker to the moment
+// the list was built (not to now, so a change that landed in between is kept).
+router.post("/t/:token/seen", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) {
+      res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" });
+      return;
+    }
+    const body = z.object({ upTo: z.string().datetime({ offset: true }) }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters" });
+      return;
+    }
+    const upTo = new Date(Math.min(new Date(body.data.upTo).getTime(), Date.now()));
+    // Never backwards: a stale tab's "Got it" must not resurrect what a newer one dismissed.
+    if (!r.worker.crewSeenAt || upTo > r.worker.crewSeenAt) await db.update(collaboratorsTable).set({ crewSeenAt: upTo }).where(eq(collaboratorsTable.id, r.worker.id));
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error marking the worker's changes seen");
     res.status(500).json({ error: "Internal server error" });
   }
 });

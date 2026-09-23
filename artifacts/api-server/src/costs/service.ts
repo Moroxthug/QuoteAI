@@ -94,6 +94,7 @@ export function serializeWorker(w: Collaborator, extra?: { hoursThisMonth?: numb
     workerType: w.workerType,
     burdenPercent: Number(w.burdenPercent),
     active: w.active,
+    canAddTasks: w.canAddTasks,
     hasInvite: extra?.hasInvite ?? (!!w.timeTokenHash && (!w.timeTokenExpiresAt || w.timeTokenExpiresAt > new Date())),
     inviteExpiresAt: iso(w.timeTokenExpiresAt),
     lastTimeEntryAt: iso(w.lastTimeEntryAt),

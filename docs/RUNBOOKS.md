@@ -467,6 +467,8 @@ A **foreman** now lands on the crew's day instead of the owner's sales dashboard
 | A blocker is sorted | "Answer" on the job's *From the field* card or on the crew card: an optional note, then "Mark sorted". The worker sees the answer and who gave it under "What you sent" |
 | A foreman cannot approve hours | the bulk approve is `jobs:edit` since this phase (it was `jobs:full`, while approving one row through PUT was already `jobs:edit`). A viewer still gets 403 |
 | The crew card says it is locked | crews, clocks and approvals are `team_time` (Elite). The card says so instead of showing an empty day |
+| A crew lead wants to add tasks from the site (Phase 86b) | Team → the worker → **Can add tasks from the site**. It is off by default and set per worker. Their tasks show "From the site · name" on the job, and the office gets one `field_report` notification per worker per job per day. Refusals are `403 NOT_ALLOWED`. Migration `0048` |
+| "Since you last looked" shows something odd, or nothing (Phase 86b) | It is built in `crew/changes.ts` from the schedule's **audit rows** (not `updated_at`, which the reminder cron touches), task `updated_at` minus the worker's own changes (`field_updated_by/at`), and their answered blockers. The marker is `collaborators.crew_seen_at`. It starts on the first visit and only moves when the worker taps **Got it**, never backwards. Past shifts, and changes older than 14 days, are left out. To replay the list for a worker, set `crew_seen_at` back |
 
 ## 24. Compliance: the filing calendar, the remittance worksheet, T5018, permits (Phase 87)
 

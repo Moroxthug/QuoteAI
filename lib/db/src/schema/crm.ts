@@ -84,6 +84,18 @@ export const projectTasksTable = pgTable("project_tasks", {
   /** Phase 2: tasks hang off a milestone (plain uuid; jobs.ts imports this file, so the FK lives in SQL). */
   milestoneId: uuid("milestone_id"),
   sortOrder: integer("sort_order").notNull().default(0),
+  /** Phase 86b: a task a crew member added from /t/:token (plain uuid; the FK to collaborators lives in SQL). */
+  createdByWorkerId: uuid("created_by_worker_id"),
+  createdByName: text("created_by_name"),
+  /**
+   * Phase 86b: the last change made from the field, and by whom. A task whose
+   * updated_at is later than field_updated_at was changed by the office since —
+   * that is what the worker's "since you last looked" list is made of.
+   */
+  fieldUpdatedBy: uuid("field_updated_by"),
+  fieldUpdatedAt: timestamp("field_updated_at", { withTimezone: true }),
+  /** Offline outbox op id of a task added from the field — a replay returns the same row. */
+  clientRef: text("client_ref"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
@@ -112,6 +124,10 @@ export const collaboratorsTable = pgTable("collaborators", {
   timeTokenHash: text("time_token_hash"),
   timeTokenExpiresAt: timestamp("time_token_expires_at", { withTimezone: true }),
   lastTimeEntryAt: timestamp("last_time_entry_at", { withTimezone: true }),
+  /** Phase 86b: may add tasks from the site. Opt-in per worker — the office decides whom it trusts with the list. */
+  canAddTasks: boolean("can_add_tasks").notNull().default(false),
+  /** Phase 86b: when the worker last dismissed "since you last looked" on /t/:token. Null until their first visit. */
+  crewSeenAt: timestamp("crew_seen_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

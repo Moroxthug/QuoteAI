@@ -7,7 +7,7 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile } from "@workspace/db";
+import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
 import { raiseAutomation } from "../lib/automation.js";
@@ -183,6 +183,11 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
         fd.append("body", body);
         await api(`/api/t/${workerToken}/reports`, { method: "POST", form: fd });
       }
+      // Phase 86b: a crew lead who may add tasks, who last looked an hour ago —
+      // so the sweep renders "Since you last looked" (today's shift and the new
+      // task land after that) and the add-a-task form, not their empty states.
+      await org.api(`/api/team/workers/${worker.body.worker.id}`, { method: "PUT", body: { canAddTasks: true } });
+      await db.update(collaboratorsTable).set({ crewSeenAt: new Date(now - 3_600_000) }).where(eq(collaboratorsTable.id, worker.body.worker.id));
     }
   }
   // Phase 87: a filing setup, a reminder and two permits (one with an

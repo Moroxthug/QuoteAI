@@ -37,7 +37,7 @@ export type JobSummaryDto = {
   crewCount: number;
 };
 
-export type TaskDto = { id: string; milestoneId: string | null; title: string; description: string; status: "todo" | "in_progress" | "done"; dueDate: string | null; sortOrder: number };
+export type TaskDto = { id: string; milestoneId: string | null; title: string; description: string; status: "todo" | "in_progress" | "done"; dueDate: string | null; sortOrder: number; /** Phase 86b: the crew member who added it from the site, if one did. */ addedFromFieldBy?: string | null };
 
 export type MilestoneDto = {
   id: string;

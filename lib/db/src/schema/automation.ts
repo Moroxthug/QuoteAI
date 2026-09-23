@@ -98,7 +98,11 @@ export const auditLogTable = pgTable(
     userAgent: text("user_agent"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index("audit_log_entity_idx").on(t.entityType, t.entityId, t.createdAt)],
+  (t) => [
+    index("audit_log_entity_idx").on(t.entityType, t.entityId, t.createdAt),
+    // Phase 86b: the worker's "what changed" reads schedule changes by tenant and type.
+    index("audit_log_user_type_created_idx").on(t.userId, t.entityType, t.createdAt),
+  ],
 );
 
 export type AutomationRun = typeof automationRunsTable.$inferSelect;

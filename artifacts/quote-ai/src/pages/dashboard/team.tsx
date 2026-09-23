@@ -110,7 +110,7 @@ const can = useCan();
       {isLoading ? (
         <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div>
       ) : (
-        <div className="tbl-wrap">
+        <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.members")}>
           <table className="tbl">
             <thead>
               <tr>
@@ -257,7 +257,7 @@ const can = useCan();
       {list.length === 0 ? (
         <div className="card-empty">{t("team.workers.empty")}</div>
       ) : (
-        <div className="tbl-wrap">
+        <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.workers")}>
           <table className="tbl">
             <thead>
               <tr>
@@ -321,12 +321,12 @@ function WorkerDialog({ worker, open, onOpenChange }: { worker: WorkerDto | null
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ name: "", role: "", email: "", phone: "", rate: "", type: "employee" as WorkerType, burden: "15" });
+  const [form, setForm] = useState({ name: "", role: "", email: "", phone: "", rate: "", type: "employee" as WorkerType, burden: "15", canAddTasks: false });
   useEffect(() => {
     if (!open) return;
-    setForm({ name: worker?.name ?? "", role: worker?.role === "worker" ? "" : (worker?.role ?? ""), email: worker?.email ?? "", phone: worker?.phone ?? "", rate: worker ? (worker.hourlyRateCents / 100).toFixed(2) : "", type: worker?.workerType ?? "employee", burden: worker ? String(worker.burdenPercent) : "15" });
+    setForm({ name: worker?.name ?? "", role: worker?.role === "worker" ? "" : (worker?.role ?? ""), email: worker?.email ?? "", phone: worker?.phone ?? "", rate: worker ? (worker.hourlyRateCents / 100).toFixed(2) : "", type: worker?.workerType ?? "employee", burden: worker ? String(worker.burdenPercent) : "15", canAddTasks: worker?.canAddTasks ?? false });
   }, [open, worker]);
-  const body = (): WorkerEdit & { name: string } => ({ name: form.name.trim(), role: form.role.trim() || "worker", email: form.email.trim() || null, phone: form.phone.trim() || null, hourlyRateCents: Math.round((Number(form.rate) || 0) * 100), workerType: form.type, burdenPercent: Number(form.burden) || 0 });
+  const body = (): WorkerEdit & { name: string } => ({ name: form.name.trim(), role: form.role.trim() || "worker", email: form.email.trim() || null, phone: form.phone.trim() || null, hourlyRateCents: Math.round((Number(form.rate) || 0) * 100), workerType: form.type, burdenPercent: Number(form.burden) || 0, canAddTasks: form.canAddTasks });
   const save = useMutation({
     mutationFn: () => (worker ? teamApi.updateWorker(worker.id, body()) : teamApi.addWorker(body())),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["workers"] }); onOpenChange(false); },
@@ -348,6 +348,11 @@ function WorkerDialog({ worker, open, onOpenChange }: { worker: WorkerDto | null
             <div className="field"><label>{t("team.workers.burdenPct")}</label><input type="number" step="0.5" value={form.burden} onChange={(e) => setForm({ ...form, burden: e.target.value })} disabled={form.type === "subcontractor"} /></div>
             <div className="field"><label>{t("team.workers.email")}</label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div className="field"><label>{t("team.workers.phone")}</label><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            {/* Phase 86b: opt-in per worker — a crew lead, not every apprentice. */}
+            <label className="chk-row full">
+              <input type="checkbox" checked={form.canAddTasks} onChange={(e) => setForm({ ...form, canAddTasks: e.target.checked })} />
+              <span>{t("team.workers.canAddTasks")}<span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("team.workers.canAddTasksHint")}</span></span>
+            </label>
           </div>
         </DialogBody>
         <DialogFooter>
@@ -417,21 +422,21 @@ const can = useCan();
       <div className="card">
         <div className="toolbar" style={{ borderBottom: "none" }}>
           <Filter className="h-4 w-4" style={{ color: "var(--faint)" }} />
-          <select value={status} onChange={(e) => setStatus(e.target.value as TimeEntryStatus | "all")} className="inp-sm" style={{ width: "auto" }}>
+          <select aria-label={t("team.time.filterStatus")} value={status} onChange={(e) => setStatus(e.target.value as TimeEntryStatus | "all")} className="inp-sm" style={{ width: "auto" }}>
             <option value="submitted">{t("team.time.filter.submitted")}</option>
             <option value="approved">{t("team.time.filter.approved")}</option>
             <option value="rejected">{t("team.time.filter.rejected")}</option>
             <option value="all">{t("team.time.filter.all")}</option>
           </select>
-          <select value={workerId} onChange={(e) => setWorkerId(e.target.value)} className="inp-sm" style={{ width: "auto" }}>
+          <select aria-label={t("team.time.filterWorker")} value={workerId} onChange={(e) => setWorkerId(e.target.value)} className="inp-sm" style={{ width: "auto" }}>
             <option value="">{t("team.time.allWorkers")}</option>
             {workers.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
           </select>
           {status !== "submitted" && (
             <>
-              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="inp-sm" style={{ width: 150 }} />
+              <input type="date" aria-label={t("team.time.filterFrom")} value={from} onChange={(e) => setFrom(e.target.value)} className="inp-sm" style={{ width: 150 }} />
               <span className="foot-note">→</span>
-              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="inp-sm" style={{ width: 150 }} />
+              <input type="date" aria-label={t("team.time.filterTo")} value={to} onChange={(e) => setTo(e.target.value)} className="inp-sm" style={{ width: 150 }} />
             </>
           )}
           <div className="grow">
@@ -513,7 +518,7 @@ const can = useCan();
       {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /></div> : items.length === 0 ? (
         <div className="card-empty">{t("team.equipment.empty")}</div>
       ) : (
-        <div className="tbl-wrap">
+        <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.equipment")}>
           <table className="tbl">
             <thead>
               <tr>

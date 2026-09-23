@@ -74,7 +74,7 @@ export async function siteContacts(projectIds: string[]): Promise<Map<string, Si
   return out;
 }
 
-export type CrewTask = { id: string; title: string; status: string; milestoneTitle: string | null; dueDate: string | null };
+export type CrewTask = { id: string; title: string; status: string; milestoneTitle: string | null; dueDate: string | null; addedBy: string | null };
 
 /** Open tasks per job (plus anything ticked done today, so a tick does not vanish under the worker's thumb). */
 export async function tasksForJobs(projectIds: string[], since: Date): Promise<Map<string, CrewTask[]>> {
@@ -91,7 +91,7 @@ export async function tasksForJobs(projectIds: string[], since: Date): Promise<M
   for (const r of rows) {
     const list = out.get(r.projectId) ?? [];
     if (list.length >= TASKS_PER_JOB) continue;
-    list.push({ id: r.id, title: r.title, status: r.status, milestoneTitle: r.milestoneId ? (titles.get(r.milestoneId) ?? null) : null, dueDate: toIsoDate(r.dueDate) });
+    list.push({ id: r.id, title: r.title, status: r.status, milestoneTitle: r.milestoneId ? (titles.get(r.milestoneId) ?? null) : null, dueDate: toIsoDate(r.dueDate), addedBy: r.createdByName });
     out.set(r.projectId, list);
   }
   return out;
@@ -230,6 +230,55 @@ export async function createFieldReport(params: {
     }
   }
   return { report: report!, replayed: false };
+}
+
+/**
+ * Phase 86b: a task added from the site by a worker the office allowed to
+ * (collaborators.can_add_tasks — the caller checks). It is marked as theirs,
+ * so the job page can say where it came from and the worker's own "what
+ * changed" list does not echo it back to them. A replay of the same outbox op
+ * returns the row it already made.
+ */
+export async function addFieldTask(params: {
+  worker: { id: string; userId: string; name: string };
+  job: { id: string; name: string; milestones: { id: string }[] };
+  title: string;
+  milestoneId: string | null;
+  clientRef: string | null;
+  language: "en" | "fr";
+}): Promise<{ task: typeof projectTasksTable.$inferSelect; replayed: boolean }> {
+  const { worker, job, clientRef } = params;
+  if (clientRef) {
+    const [existing] = await db.select().from(projectTasksTable).where(and(eq(projectTasksTable.createdByWorkerId, worker.id), eq(projectTasksTable.clientRef, clientRef)));
+    if (existing) return { task: existing, replayed: true };
+  }
+  const title = params.title.trim();
+  if (!title) throw new FieldReportError("EMPTY", "Say what the task is.");
+  const milestoneId = params.milestoneId && job.milestones.some((m) => m.id === params.milestoneId) ? params.milestoneId : null;
+  // Last in the list: the office's order stays the office's.
+  const [last] = await db.select({ sortOrder: projectTasksTable.sortOrder }).from(projectTasksTable).where(eq(projectTasksTable.projectId, job.id)).orderBy(desc(projectTasksTable.sortOrder)).limit(1);
+  const now = new Date();
+  const [task] = await db
+    .insert(projectTasksTable)
+    .values({ projectId: job.id, title: title.slice(0, 300), milestoneId, status: "todo", sortOrder: (last?.sortOrder ?? 0) + 1, createdByWorkerId: worker.id, createdByName: worker.name, fieldUpdatedBy: worker.id, fieldUpdatedAt: now, clientRef, createdAt: now, updatedAt: now })
+    .returning();
+
+  // Work found on site is often a change order in waiting, so the office hears
+  // about it — once per worker per job per day, like reports.
+  const recent = await db.select({ id: projectTasksTable.id }).from(projectTasksTable).where(and(eq(projectTasksTable.createdByWorkerId, worker.id), eq(projectTasksTable.projectId, job.id), gte(projectTasksTable.createdAt, new Date(now.getTime() - DAY_MS)))).limit(2);
+  if (recent.length <= 1) {
+    const fr = params.language === "fr";
+    await createNotification({
+      userId: worker.userId,
+      type: "field_report",
+      title: fr ? `${worker.name} a ajouté une tâche sur ${job.name}` : `${worker.name} added a task on ${job.name}`,
+      body: task!.title,
+      link: `/dashboard/jobs/${job.id}`,
+      entityType: "project_task",
+      entityId: task!.id,
+    });
+  }
+  return { task: task!, replayed: false };
 }
 
 /** Everything the foreman's landing page shows, for one company, for one local day. */

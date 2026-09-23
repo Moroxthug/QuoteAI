@@ -70,10 +70,16 @@ const VITE_PORT = Number(args.get("port") ?? 5197);
 const OUT = resolve(import.meta.dirname, "../../.qa", args.get("out") ?? "visual");
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-type RouteSpec = { path: string; auth: boolean; name?: string };
+/** `session`: who is signed in — nobody, the owner, or (Phase 86b) a foreman member of the same company. */
+type Session = "public" | "owner" | "foreman";
+type RouteSpec = { path: string; session: Session; name?: string };
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
-  const pub = (path: string): RouteSpec => ({ path, auth: false });
-  const dash = (path: string): RouteSpec => ({ path, auth: true });
+  const pub = (path: string): RouteSpec => ({ path, session: "public" });
+  const dash = (path: string): RouteSpec => ({ path, session: "owner" });
+  // Phase 86b: a foreman lands on a different /dashboard (the crew's day) and
+  // sees the job and team pages with the owner-only parts gone — layouts no
+  // owner sweep ever rendered.
+  const foreman = (path: string): RouteSpec => ({ path, session: "foreman", name: `${path} (foreman)` });
   const list: RouteSpec[] = [
     pub("/"), pub("/fr"), pub("/whatsapp"), pub("/blog"), pub("/blog/categoria/advice"),
     pub("/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026"),
@@ -100,9 +106,10 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/contracts"), dash(`/dashboard/contracts/${s.contractId}`), dash(`/dashboard/contracts/${s.pendingContractId}`),
     dash("/dashboard/invoices"), dash(`/dashboard/invoices/${s.invoiceId}`),
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
-    dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
+    dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
     // Phase 87: every tab of the Compliance page is its own page state.
     dash("/dashboard/compliance"), dash("/dashboard/compliance?tab=salesTax"), dash("/dashboard/compliance?tab=t5018"), dash("/dashboard/compliance?tab=reminders"),
+    foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"),
   ];
   // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`
   // pins an exact path (there is no substring that means the homepage alone).
@@ -153,7 +160,7 @@ async function stopVite(): Promise<void> {
 type AxeNode = { target: string[]; html: string; any: Array<{ data?: Record<string, unknown> }> };
 type AxeViolation = { id: string; impact: "minor" | "moderate" | "serious" | "critical" | null; help: string; helpUrl: string; nodes: AxeNode[] };
 type PageResult = {
-  lang: string; width: number; path: string; auth: boolean;
+  lang: string; width: number; path: string; session: Session;
   title: string; screenshot: string;
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
   gutter: { clientWidth: number; offenders: string[] } | null;
@@ -300,8 +307,8 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   await page.setViewportSize({ width, height: width <= 640 ? 812 : 800 });
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
-  const file = resolve(dir, `${slug(r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.path, auth: r.auth, title: "", screenshot: file, overflow: null, gutter: null, axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
+  const file = resolve(dir, `${slug(r.name ?? r.path)}.png`);
+  const result: PageResult = { lang, width, path: r.name ?? r.path, session: r.session, title: "", screenshot: file, overflow: null, gutter: null, axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -403,7 +410,7 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
 const mailbox = await captureResend();
 const { installVendorStubs } = await import("./vendorStub.js");
 installVendorStubs();
-const { startServer, stopServer, createOrg, cleanupAll } = await import("./harness.js");
+const { startServer, stopServer, createOrg, createUser, cleanupAll } = await import("./harness.js");
 const { seedShowcase, setSignTokenCapture } = await import("./fixtures.js");
 setSignTokenCapture(() => {
   for (let i = mailbox.length - 1; i >= 0; i--) {
@@ -423,6 +430,17 @@ try {
 
   const org = await createOrg({ province: PROVINCE, companyName: PROVINCE === "QC" ? "Rénovations Tremblay inc." : "Northside Renovations Ltd." });
   const showcase = await seedShowcase(org, { withLogo: true });
+  // Phase 86b: a foreman member of the showcase company (a second invite — the
+  // seeded one must stay unaccepted for the /team-invite page).
+  let foremanToken: string | null = null;
+  const foremanEmail = `foreman-sweep-${org.userId}@example.invalid`;
+  const foremanInvite = await org.api("/api/team/members/invite", { body: { email: foremanEmail, role: "foreman", send: false } });
+  if (foremanInvite.status === 201) {
+    const foremanUser = await createUser({ email: foremanEmail, name: "Jordan Foreman" });
+    const accepted = await foremanUser.api(`/api/team/invite/${String(foremanInvite.body.url).split("/team-invite/")[1]}/accept`, { method: "POST" });
+    if (accepted.status === 200) foremanToken = foremanUser.token;
+  }
+  if (!foremanToken) console.warn("[qa-visual] could not set up the foreman session — its routes are skipped");
   console.log(`[qa-visual] showcase seeded for ${org.email}:`, { ...showcase, invoiceToken: "…", signToken: showcase.signToken ? "…" : null, workerToken: showcase.workerToken ? "…" : null, teamInviteToken: showcase.teamInviteToken ? "…" : null });
 
   rmSync(OUT, { recursive: true, force: true });
@@ -433,12 +451,13 @@ try {
   const all = routes(showcase);
   for (const lang of LANGS) {
     const widths = lang === "fr" ? WIDTHS_FR : WIDTHS_EN;
-    for (const auth of [false, true]) {
-      const rs = all.filter((r) => r.auth === auth);
-      if (!rs.length) continue;
+    for (const session of ["public", "owner", "foreman"] as const) {
+      const rs = all.filter((r) => r.session === session);
+      const bearer = session === "owner" ? org.token : session === "foreman" ? foremanToken : null;
+      if (!rs.length || (session !== "public" && !bearer)) continue;
       const ctx = await browser.newContext({
         locale: lang === "fr" ? "fr-CA" : "en-CA",
-        extraHTTPHeaders: auth ? { authorization: `Bearer ${org.token}` } : {},
+        extraHTTPHeaders: bearer ? { authorization: `Bearer ${bearer}` } : {},
         reducedMotion: "reduce",
         deviceScaleFactor: 1,
       });
@@ -448,7 +467,7 @@ try {
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
           const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.sr.length && `SR:${[...new Set(res.sr.map((f) => f.rule))].join(",")}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
-          console.log(`${lang}@${String(width).padStart(4)} ${r.path.padEnd(60)} ${flags.join(" ") || "ok"}`);
+          console.log(`${lang}@${String(width).padStart(4)} ${(r.name ?? r.path).padEnd(60)} ${flags.join(" ") || "ok"}`);
         }
       }
       await ctx.close();

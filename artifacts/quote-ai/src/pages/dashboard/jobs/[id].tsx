@@ -462,13 +462,14 @@ const can = useCan();
 }
 
 function TaskList({ tasks, onToggle, onDelete, readOnly }: { tasks: TaskDto[]; onToggle: (t: TaskDto) => void; onDelete: (id: string) => void; readOnly?: boolean }) {
+  const { t } = useLanguage();
   if (tasks.length === 0) return null;
   return (
     <div>
       {tasks.map((x) => (
         <div key={x.id} className={cn("task-row", x.status === "done" && "done")}>
           <button type="button" onClick={() => onToggle(x)} disabled={readOnly} className={cn("chk", x.status === "done" && "on")}>{x.status === "done" && <Check />}</button>
-          <span className="grow">{x.title}</span>
+          <span className="grow">{x.title}{x.addedFromFieldBy && <span className="block text-[11px]" style={{ color: "var(--muted-mk)" }}>{t("jobs.task.fromField").replace("{name}", x.addedFromFieldBy)}</span>}</span>
           {!readOnly && <button type="button" className="ic-btn danger" onClick={() => onDelete(x.id)}><Trash2 /></button>}
         </div>
       ))}

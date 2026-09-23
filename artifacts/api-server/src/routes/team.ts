@@ -81,6 +81,8 @@ const WorkerBody = z.object({
   workerType: z.enum(WORKER_TYPES).optional(),
   burdenPercent: z.number().min(0).max(100).optional(),
   active: z.boolean().optional(),
+  /** Phase 86b: may add tasks from the site. */
+  canAddTasks: z.boolean().optional(),
 });
 
 // GET /api/team/workers
@@ -128,6 +130,7 @@ router.post("/team/workers", requireAuth, requirePermission("team", "full"), asy
         workerType: type,
         burdenPercent: String(d.burdenPercent ?? (type === "subcontractor" ? 0 : 15)),
         active: d.active ?? true,
+        canAddTasks: d.canAddTasks ?? false,
       })
       .returning();
     res.status(201).json({ worker: serializeWorker(w!) });
@@ -160,6 +163,7 @@ router.put("/team/workers/:wid", requireAuth, requirePermission("team", "full"),
     if (d.hourlyRateCents !== undefined) updates.hourlyRate = d.hourlyRateCents;
     if (d.workerType !== undefined) updates.workerType = d.workerType;
     if (d.burdenPercent !== undefined) updates.burdenPercent = String(d.burdenPercent);
+    if (d.canAddTasks !== undefined) updates.canAddTasks = d.canAddTasks;
     if (d.active !== undefined) {
       updates.active = d.active;
       if (!d.active) { updates.timeTokenHash = null; updates.timeTokenExpiresAt = null; }

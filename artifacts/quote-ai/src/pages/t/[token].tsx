@@ -13,6 +13,7 @@ import { OfflineBar } from "@/components/pwa/offline-bar";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { runOrQueue, enqueue, useOutbox } from "@/lib/offline/outbox";
 import { WorkerToday } from "@/components/crew/worker-today";
+import { WorkerChanges } from "@/components/crew/worker-changes";
 import { FieldReportCard } from "@/components/crew/field-report";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
@@ -165,7 +166,8 @@ export default function WorkerTimePage() {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <OfflineBar scope={token} />
-        <WorkerToday token={token!} jobs={data.todayJobs} />
+        <WorkerChanges token={token!} changes={data.changes} upTo={data.changesUpTo} />
+        <WorkerToday token={token!} jobs={data.todayJobs} canAddTasks={data.worker.canAddTasks} />
         {data.schedule.length > 0 && (
           <section className="card p-4 space-y-2">
             <h2 className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.schedule")}</h2>

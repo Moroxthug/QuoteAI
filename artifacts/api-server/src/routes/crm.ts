@@ -11,6 +11,7 @@ import {
   suppliersTable,
 } from "@workspace/db";
 import { z } from "zod";
+import { permitCompletionBlock } from "../compliance/service.js";
 
 
 const router = Router();
@@ -90,6 +91,16 @@ router.put("/crm/projects/:id", requireAuth, requirePermission("jobs", "edit"), 
     if (!parsed.success) {
       res.status(400).json({ error: "Invalid parameters", details: parsed.error });
       return;
+    }
+
+    // Phase 87: the same permit rule as PUT /api/jobs/:id — open permits keep a job from completing.
+    if (parsed.data.status === "completed") {
+      const [owned] = await db.select({ id: projectsTable.id, status: projectsTable.status }).from(projectsTable).where(and(eq(projectsTable.id, id as string), eq(projectsTable.userId, userId)));
+      const blocked = owned && owned.status !== "completed" ? await permitCompletionBlock(owned.id) : null;
+      if (blocked) {
+        res.status(409).json(blocked);
+        return;
+      }
     }
 
     const updates: Record<string, any> = {};

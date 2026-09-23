@@ -2,7 +2,7 @@
 // and the published feed. Same thin-fetch shape as the other clients here.
 import { apiRequest as req } from "@/lib/jobs-api";
 
-export type AgendaKind = "block" | "milestone" | "invoice" | "followup" | "external";
+export type AgendaKind = "block" | "milestone" | "invoice" | "followup" | "external" | "filing" | "permit";
 
 export type AgendaEntryDto = {
   id: string;
@@ -47,8 +47,8 @@ export type PublishStateDto = {
 };
 
 export const calendarApi = {
-  agenda: (from: Date, to: Date) =>
-    req<AgendaDto>(`/api/calendar/agenda?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`),
+  agenda: (from: Date, to: Date, lang?: "en" | "fr") =>
+    req<AgendaDto>(`/api/calendar/agenda?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}${lang ? `&lang=${lang}` : ""}`),
   refresh: () => req<{ events: number; errors: string[] }>("/api/calendar/refresh", { method: "POST" }),
   feeds: () => req<{ feeds: CalendarFeedDto[] }>("/api/calendar/feeds"),
   addFeed: (name: string, url: string) =>

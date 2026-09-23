@@ -47,6 +47,7 @@ import { sendJobPhotoShare } from "../lib/jobMessaging.js";
 import { sendSms } from "../lib/sms.js";
 import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
 import { logger } from "../lib/logger.js";
+import { permitCompletionBlock } from "../compliance/service.js";
 
 const router = Router();
 const objectStorage = new ObjectStorageService();
@@ -375,6 +376,14 @@ router.put("/jobs/:id", requireAuth, requirePermission("jobs", "edit"), async (r
       return;
     }
     const d = body.data;
+    // Phase 87: a job with a permit still open (needed, applied, issued without its final inspection) cannot be completed.
+    if (d.status === "completed" && project.status !== "completed") {
+      const blocked = await permitCompletionBlock(project.id);
+      if (blocked) {
+        res.status(409).json(blocked);
+        return;
+      }
+    }
     const updates: Partial<typeof projectsTable.$inferInsert> = {};
     if (d.name !== undefined) updates.name = d.name;
     if (d.description !== undefined) updates.description = d.description;

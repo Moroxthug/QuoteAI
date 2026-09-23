@@ -1,4 +1,7 @@
 import { Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { complianceApi } from "@/lib/compliance-api";
+import { PermitStatusChip } from "@/components/jobs/permits-card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +41,9 @@ export function completionPreview(data: JobDetailDto): { unbilledCents: number; 
 export function CompleteJobDialog({ data, open, onOpenChange, onConfirm, busy }: { data: JobDetailDto; open: boolean; onOpenChange: (o: boolean) => void; onConfirm: () => void; busy: boolean }) {
   const { t } = useLanguage();
   const preview = completionPreview(data);
+  // Phase 87: the server refuses to complete a job with a permit still open, so say which ones before the click.
+  const permits = useQuery({ queryKey: ["permits", data.job.id], queryFn: () => complianceApi.permits(data.job.id), enabled: open, retry: false });
+  const openPermits = (permits.data?.permits ?? []).filter((p) => p.open);
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -49,13 +55,23 @@ export function CompleteJobDialog({ data, open, onOpenChange, onConfirm, busy }:
               {preview.holdback && preview.holdback.withheldCents > 0 && (
                 <p>{t("jobs.complete.holdback").replace("{percent}", String(preview.holdback.percent)).replace("{amount}", formatCents(preview.holdback.withheldCents))}</p>
               )}
+              {openPermits.length > 0 && (
+                <div className="notice danger" role="alert" style={{ fontWeight: 500 }}>
+                  <div className="grow">
+                    <p className="m-0" style={{ fontWeight: 700 }}>{t("permits.blocksCompletion")}</p>
+                    <ul className="stack" style={{ gap: 4, marginTop: 6 }}>
+                      {openPermits.map((p) => <li key={p.id} className="flex items-center justify-between gap-2"><span>{p.title}</span><PermitStatusChip status={p.status} /></li>)}
+                    </ul>
+                  </div>
+                </div>
+              )}
               <p className="foot-note m-0">{t("jobs.complete.review")}</p>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={busy}>{t("jobs.cancel")}</AlertDialogCancel>
-          <AlertDialogAction onClick={(e) => { e.preventDefault(); onConfirm(); }} disabled={busy} style={{ background: "var(--green)" }}>
+          <AlertDialogAction onClick={(e) => { e.preventDefault(); onConfirm(); }} disabled={busy || openPermits.length > 0} style={{ background: "var(--green)" }}>
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {t("jobs.complete.confirm")}
           </AlertDialogAction>

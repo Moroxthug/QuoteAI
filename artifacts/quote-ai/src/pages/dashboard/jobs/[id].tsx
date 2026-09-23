@@ -24,6 +24,7 @@ import { OverviewCharts } from "@/components/jobs/overview-charts";
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { PhotosTab } from "@/components/jobs/photos-tab";
 import { FieldReportsCard } from "@/components/crew/field-reports-card";
+import { PermitsCard } from "@/components/jobs/permits-card";
 import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
 import { ClientThreadCard } from "@/components/clients/client-thread";
 import { VoiceActions } from "@/components/jobs/voice-actions";
@@ -295,6 +296,8 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
           )}
 
           <FieldReportsCard jobId={job.id} />
+
+          <PermitsCard jobId={job.id} />
 
           <NotesCard jobId={job.id} milestoneTitles={new Map(milestones.map((m) => [m.id, m.title]))} />
         </div>

@@ -467,3 +467,33 @@ A **foreman** now lands on the crew's day instead of the owner's sales dashboard
 | A blocker is sorted | "Answer" on the job's *From the field* card or on the crew card: an optional note, then "Mark sorted". The worker sees the answer and who gave it under "What you sent" |
 | A foreman cannot approve hours | the bulk approve is `jobs:edit` since this phase (it was `jobs:full`, while approving one row through PUT was already `jobs:edit`). A viewer still gets 403 |
 | The crew card says it is locked | crews, clocks and approvals are `team_time` (Elite). The card says so instead of showing an empty day |
+
+## 24. Compliance: the filing calendar, the remittance worksheet, T5018, permits (Phase 87)
+
+**Where**: `api-server/src/compliance/`: `deadlines.ts` (the rules, pure and unit-tested), `remittance.ts` (the worksheet and its CSV), `t5018.ts`, `catalog.ts` (permit suggestions + reminder presets), `service.ts` (overview, agenda entries, the daily sweep, the completion guard). Routes are in `routes/compliance.ts`. Tables: `compliance_filings`, `compliance_reminders`, `job_permits` and `business_profiles.compliance_settings` (migration `0047`). The UI is `/dashboard/compliance` (`pages/dashboard/compliance.tsx`) plus the Permits card on the job Overview (`components/jobs/permits-card.tsx`).
+
+**How it fits**: QuoteAI **prepares and reminds; it never files**. Nothing is sent to CRA, Revenu Québec or a province, and every screen says so. Sales-tax deadlines are **derived** from what the company told us in *Filing setup* (reporting period, year end, structure, instalments, PST period, T5018). With no setup there are **no** sales-tax deadlines, rather than plausible wrong ones. Rules, checked against CRA's "Reporting requirements and deadlines" page on 2026-09-22:
+- GST/HST monthly or quarterly: one month after the period ends. Quarters follow the fiscal year end.
+- Annual: three months after year end. A sole proprietor with a Dec 31 year end gets **two** rows: pay by Apr 30, file by Jun 15.
+- Instalments (annual filers whose net tax was $3,000 or more): one month after each fiscal quarter.
+- Québec: one GST/QST row with Revenu Québec.
+- BC PST: last day of the following month. SK PST and MB RST: the 20th. These appear only with a PST/RST number on file.
+- T5018: Jun 30 for the previous calendar year.
+
+The worksheet adds up tax on invoices **issued** in the period (sent/viewed/paid/partially paid/overdue/pending confirmation; drafts and voids excluded; credit notes subtract). It subtracts credits from **confirmed** costs whose tax is split into GST/HST/QST. Unsplit tax, costs awaiting review and a generic hand-entered "Tax" rate are **warnings, never credits**. Days are the company's local day: a timestamp at UTC midnight is taken as a date-only value, and anything else is read in the province's zone.
+
+Deadlines and the company's own reminders ring the bell (`compliance_due`, on the push list) from the daily tick: filings 10 days ahead, reminders `remind_days_before` ahead. Each occurrence rings once, remembered in `compliance_filings.notified_at` / `compliance_reminders.notified_for_due`. Both, plus permit inspections, show in the dashboard calendar (kinds `filing` and `permit`).
+
+A **permit** that is `needed`, `applied` or `issued` blocks completing the job: `PUT /api/jobs/:id` and the legacy `PUT /api/crm/projects/:id` answer **409 `PERMITS_OPEN`** with the list. The Complete dialog shows them and disables the button.
+
+| Ask | Do |
+|---|---|
+| "I see no GST deadlines" | Compliance → *Filing setup*. Nothing is derived until a reporting period is chosen |
+| A deadline date looks wrong | Check the setup (period, year end, structure) against the company's CRA/RQ account. The rules are in `compliance/deadlines.ts` with a test per rule. If CRA changed a rule, change the rule *and* its test |
+| The net tax does not match the bookkeeper's number | Look at the warnings first: receipts awaiting review, tax never split, generic "Tax" lines. Then compare the CSV row by row. Invoices count on **issue** date (void ones never count, even if voided after filing) and receipts on their **receipt** date |
+| A foreman cannot change the setup or mark something filed | By design: those are `invoicing:full` (owner, admin, office). Viewing is `invoicing:view`, T5018 is `costs:view` |
+| T5018 misses a subcontractor | Only **confirmed** costs in category *Subcontractor*, and approved hours of workers whose type is *Subcontractor*, are counted. It goes by entry date, not payment date, and holds no BN/SIN/address, which the slip needs |
+| "The job won't complete" | Open permits. Close them (final inspection passed) or mark them *Not required* on the job's Permits card |
+| Permit suggestions are wrong for a town | They are typical requirements, not bylaws. Electrical/gas authorities are hard-coded only for ON/BC/QC (`catalog.ts`); everything else is "the municipality" with a search link |
+| A reminder keeps coming back | *Done* moves a repeating reminder to its next date. Use *Once* for one-offs, or delete it |
+| Test runs and notifications | `runComplianceReminders(now, onlyUserIds)` takes a user list. The e2e suite always passes one, because the test database is shared and an unscoped sweep would notify real companies |

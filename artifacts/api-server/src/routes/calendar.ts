@@ -194,7 +194,7 @@ router.get("/calendar/agenda", requireAuth, requirePermission("jobs", "view"), a
   try {
     const userId = getUserId(res);
     const q = z
-      .object({ from: z.string().datetime(), to: z.string().datetime() })
+      .object({ from: z.string().datetime(), to: z.string().datetime(), lang: z.enum(["en", "fr"]).optional() })
       .safeParse(req.query);
     if (!q.success) {
       res.status(400).json({ error: "Invalid parameters", details: q.error });
@@ -217,7 +217,7 @@ router.get("/calendar/agenda", requireAuth, requirePermission("jobs", "view"), a
       return;
     }
 
-    const entries = await buildAgenda(userId, from, to, { includeExternal: canExternal });
+    const entries = await buildAgenda(userId, from, to, { includeExternal: canExternal, includeCompliance: true, lang: q.data.lang });
     res.json({ entries, scheduleEnabled: true, externalEnabled: canExternal, requiredPlan: null });
   } catch (err) {
     req.log.error({ err }, "Error building agenda");

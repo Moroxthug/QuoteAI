@@ -101,6 +101,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/invoices"), dash(`/dashboard/invoices/${s.invoiceId}`),
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
     dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
+    // Phase 87: every tab of the Compliance page is its own page state.
+    dash("/dashboard/compliance"), dash("/dashboard/compliance?tab=salesTax"), dash("/dashboard/compliance?tab=t5018"), dash("/dashboard/compliance?tab=reminders"),
   ];
   // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`
   // pins an exact path (there is no substring that means the homepage alone).

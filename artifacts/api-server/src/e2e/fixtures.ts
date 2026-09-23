@@ -185,6 +185,20 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
       }
     }
   }
+  // Phase 87: a filing setup, a reminder and two permits (one with an
+  // inspection this week) so the Compliance page, the job's Permits card and
+  // the calendar's new kinds render with content.
+  await org.api("/api/compliance/settings", { method: "PUT", body: { salesTaxFrequency: "quarterly", fiscalYearEnd: "12-31", t5018: true } });
+  await org.api("/api/compliance/reminders", { body: { kind: "licence", title: language === "fr" ? "Renouvellement de licence" : "Licence renewal", authority: province === "QC" ? "RBQ" : "HCRA", dueDate: new Date(Date.now() + 20 * 86_400_000).toISOString().slice(0, 10), recurrence: "annual" } });
+  await org.api(`/api/jobs/${project.id}/permits`, {
+    body: {
+      permits: [
+        { kind: "building", title: language === "fr" ? "Permis de construction" : "Building permit", authority: language === "fr" ? "Municipalité" : "Municipality", status: "issued", referenceNumber: "BP-2026-0412", inspectionAt: new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10) },
+        { kind: "electrical", title: language === "fr" ? "Permis d'électricité" : "Electrical permit", status: "needed" },
+      ],
+    },
+  });
+
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });
   if (member.status === 201) teamInviteToken = String(member.body.url).split("/team-invite/")[1] ?? null;

@@ -30,6 +30,8 @@ const PUSH_NOTIFICATION_TYPES = new Set([
   "time_entry_submitted",
   // Phase 86: a crew member who cannot go on
   "field_blocker",
+  // Phase 87: a filing deadline or a licence renewal coming up
+  "compliance_due",
   // Phase 79: money — a job crossing 90 % / 100 % of its cost budget
   "budget_alert",
   "budget_exceeded",

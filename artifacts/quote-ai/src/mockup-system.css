@@ -318,6 +318,8 @@ a.cal-row:hover { background: var(--soft); }
 .dot.cal-invoice, .cal-ic.cal-invoice { background: var(--green-dark); color: #fff; }
 .dot.cal-followup, .cal-ic.cal-followup { background: var(--yellow-dark); color: #fff; }
 .dot.cal-external, .cal-ic.cal-external { background: #8b8da3; color: #fff; }
+.dot.cal-filing, .cal-ic.cal-filing { background: var(--red); color: #fff; }
+.dot.cal-permit, .cal-ic.cal-permit { background: #6b5bd2; color: #fff; }
 .cal-day.on .dot.cal-block { background: #fff; }
 @media (max-width: 900px) {
   .cal-grid-wrap { grid-template-columns: 1fr; gap: 16px; }

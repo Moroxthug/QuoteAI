@@ -22,7 +22,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { ArrowRight, Briefcase, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, Flag, Lock, Receipt, RefreshCw, Send } from "lucide-react";
+import { ArrowRight, Briefcase, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, FileCheck2, Flag, Landmark, Lock, Receipt, RefreshCw, Send } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -35,6 +35,8 @@ const KIND_ICON: Record<AgendaKind, typeof Briefcase> = {
   invoice: Receipt,
   followup: Send,
   external: CalendarDays,
+  filing: Landmark,
+  permit: FileCheck2,
 };
 
 /** One class per kind, so the dots, the icons and the rows agree. */
@@ -44,6 +46,8 @@ const KIND_CLASS: Record<AgendaKind, string> = {
   invoice: "cal-invoice",
   followup: "cal-followup",
   external: "cal-external",
+  filing: "cal-filing",
+  permit: "cal-permit",
 };
 
 function dayKey(d: Date): string {
@@ -52,10 +56,16 @@ function dayKey(d: Date): string {
 
 /** An entry belongs to every day it touches (a three-day block shows on three). */
 function daysCovered(entry: AgendaEntryDto): string[] {
-  const start = startOfDay(new Date(entry.startsAt));
-  const rawEnd = new Date(entry.endsAt);
+  // All-day entries are calendar days stored as UTC midnights; read in local
+  // time they would slide to the previous evening everywhere in Canada (a
+  // Sep 30 milestone dotted on Sep 29). Their UTC date *is* the day.
+  const asDay = (iso: string, backOneMs = false) => {
+    const d = new Date(new Date(iso).getTime() - (backOneMs ? 1 : 0));
+    return entry.allDay ? new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) : startOfDay(d);
+  };
+  const start = asDay(entry.startsAt);
   // An all-day entry ends at the following midnight — that day is not covered.
-  const end = startOfDay(new Date(rawEnd.getTime() - (entry.allDay ? 1 : 0)));
+  const end = asDay(entry.endsAt, entry.allDay);
   const out: string[] = [];
   for (let d = start; d <= end && out.length < 60; d = new Date(d.getTime() + 86_400_000)) out.push(dayKey(d));
   return out.length ? out : [dayKey(start)];
@@ -72,8 +82,8 @@ export function CalendarCard() {
   const gridEnd = useMemo(() => endOfWeek(endOfMonth(month), { locale }), [month, locale]);
 
   const agenda = useQuery({
-    queryKey: ["agenda", gridStart.toISOString(), gridEnd.toISOString()],
-    queryFn: () => calendarApi.agenda(gridStart, gridEnd),
+    queryKey: ["agenda", gridStart.toISOString(), gridEnd.toISOString(), lang],
+    queryFn: () => calendarApi.agenda(gridStart, gridEnd, lang === "fr" ? "fr" : "en"),
     retry: false,
     staleTime: 30_000,
   });

@@ -15,6 +15,7 @@ import { runAccountDeletionMaintenance, expireAccountExports } from "../account/
 import { runScheduleReminderMaintenance } from "../schedule/maintenance.js";
 import { runBudgetAlertSweep } from "../jobs/budgetAlerts.js";
 import { syncInboundForAllCompanies, pruneExternalEvents } from "../calendar/inbound.js";
+import { runComplianceReminders } from "../compliance/service.js";
 import { db, cronTicksTable } from "@workspace/db";
 import { eq, lt } from "drizzle-orm";
 import { automationBacklog, pingHeartbeat, recentAutomationFailures, sendOpsAlert } from "../lib/ops.js";
@@ -73,10 +74,12 @@ router.get("/cron/tick", async (req, res) => {
     // local mirror the dashboard widget reads, and drop what has aged out.
     const calendarInbound = await syncInboundForAllCompanies();
     const calendarPruned = await pruneExternalEvents();
+    // Phase 87: filing deadlines and the company's own reminders, ahead of the day they are due.
+    const compliance = await runComplianceReminders();
     // Roll up yesterday's (and today's, in case cron shifted) usage_events into the daily summary.
     const usage = await rollUpUsageForDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
     await rollUpUsageForDate(new Date());
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, usage };
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, usage };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));

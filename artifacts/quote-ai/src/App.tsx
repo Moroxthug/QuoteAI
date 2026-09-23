@@ -52,6 +52,7 @@ const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
 const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
 const TeamPage = lazy(() => import("@/pages/dashboard/team"));
 const SchedulePage = lazy(() => import("@/pages/dashboard/schedule"));
+const CompliancePage = lazy(() => import("@/pages/dashboard/compliance"));
 const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
@@ -241,6 +242,9 @@ function Router() {
       )} />
       <Route path="/dashboard/schedule" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><SchedulePage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/compliance" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><CompliancePage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
       {/* The old CRM is retired (Phase 2): its working parts live in Jobs */}
       <Route path="/crm" component={() => <Redirect to="/dashboard/jobs" />} />

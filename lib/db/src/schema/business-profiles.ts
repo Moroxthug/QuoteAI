@@ -9,6 +9,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import type { PaymentSchedule } from "./payment-schedule";
+import type { ComplianceSettings } from "./compliance";
 
 export type FeatureFlags = Record<string, boolean>;
 
@@ -98,6 +99,8 @@ export const businessProfilesTable = pgTable("business_profiles", {
   homeStarsProfileUrl: text("homestars_profile_url"),
   sendReviewRequests: boolean("send_review_requests").notNull().default(true),
   automationSettings: jsonb("automation_settings").$type<Partial<AutomationSettings>>().notNull().default({}),
+  // ── Phase 87: how the company files (reporting periods, year end) — drives the filing calendar ──
+  complianceSettings: jsonb("compliance_settings").$type<ComplianceSettings>().notNull().default({}),
   featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),

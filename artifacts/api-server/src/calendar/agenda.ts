@@ -9,6 +9,7 @@
 // Everything here is read-only and derived — no new source of truth.
 
 import { and, asc, eq, gte, inArray, lte, ne, sql } from "drizzle-orm";
+import { complianceAgenda } from "../compliance/service.js";
 import {
   db,
   businessProfilesTable,
@@ -22,7 +23,7 @@ import {
   scheduleBlocksTable,
 } from "@workspace/db";
 
-type AgendaKind = "block" | "milestone" | "invoice" | "followup" | "external";
+type AgendaKind = "block" | "milestone" | "invoice" | "followup" | "external" | "filing" | "permit";
 
 export type AgendaEntry = {
   id: string;
@@ -54,6 +55,9 @@ const wholeDay = (d: Date): { start: Date; end: Date } => {
 export type AgendaOptions = {
   /** Include the mirrored personal-calendar events (Elite + connected). */
   includeExternal?: boolean;
+  /** Phase 87: filing deadlines, compliance reminders and permit inspections. */
+  includeCompliance?: boolean;
+  lang?: "en" | "fr";
   limit?: number;
 };
 
@@ -244,6 +248,13 @@ export async function buildAgenda(userId: string, from: Date, to: Date, opts: Ag
           source: e.source,
         });
       }
+    }
+  }
+
+  // ── Phase 87: what is owed to the government, and who is coming to inspect ──
+  if (opts.includeCompliance) {
+    for (const c of await complianceAgenda(userId, from, to, opts.lang)) {
+      entries.push({ id: c.id, kind: c.kind, title: c.title, subtitle: c.subtitle, startsAt: iso(c.startsAt), endsAt: iso(c.endsAt), allDay: c.allDay, href: c.href, state: c.state });
     }
   }
 

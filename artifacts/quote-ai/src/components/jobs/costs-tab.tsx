@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
-import { Plus, Trash2, Upload, Loader2, Sparkles, Receipt, Clock, Wrench, Pencil, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Upload, Loader2, Sparkles, Receipt, Clock, Wrench, Pencil, CheckCircle2, Landmark, Car } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -12,7 +12,7 @@ import { jobsApi, formatCents, type CostCategory, type CostEntryDto, type JobDet
 import { CostEntryDialog, COST_CATEGORY_KEYS } from "./cost-entry-dialog";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
-const SOURCE_ICON: Record<CostEntryDto["source"], typeof Receipt> = { receipt: Receipt, time_entry: Clock, equipment: Wrench, manual: Pencil, legacy: Pencil };
+const SOURCE_ICON: Record<CostEntryDto["source"], typeof Receipt> = { receipt: Receipt, time_entry: Clock, equipment: Wrench, manual: Pencil, legacy: Pencil, bank_feed: Landmark, allowance: Car };
 
 /**
  * Costs tab: receipt dropzone → AI review queue → confirmed entries, with
@@ -113,7 +113,7 @@ const can = useCan();
             <div>
               {confirmed.map((e) => {
                 const Icon = SOURCE_ICON[e.source];
-                const derived = e.source === "time_entry" || e.source === "equipment";
+                const derived = e.source === "time_entry" || e.source === "equipment" || e.source === "allowance";
                 return (
                   <div key={e.id} className="item-row">
                     <span className="ic" title={t(`jobs.costs.source.${e.source}`)}><Icon /></span>

@@ -80,7 +80,7 @@ export type ChangeOrderDto = {
 };
 
 export type CostEntryStatus = "pending_review" | "confirmed";
-export type CostEntrySource = "manual" | "receipt" | "time_entry" | "equipment" | "legacy";
+export type CostEntrySource = "manual" | "receipt" | "time_entry" | "equipment" | "legacy" | "bank_feed" | "allowance";
 export type TaxBreakdownDto = { GST?: number; HST?: number; PST?: number; QST?: number };
 export type ReceiptExtractionDto = {
   vendor: string | null;
@@ -136,6 +136,10 @@ export type TimeEntryDto = {
   rateCents: number;
   burdenPercent: number;
   costCents: number;
+  /** Phase 89: the part of these hours past an overtime threshold, and on a statutory holiday; premiumCents is what they cost above straight time. */
+  overtimeHours: number;
+  holidayHours: number;
+  premiumCents: number;
   note: string;
   status: TimeEntryStatus;
   enteredBy: "worker" | "company";

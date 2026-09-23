@@ -120,6 +120,44 @@ Switching companies works. What does not exist is a *group*: consolidated report
 
 **Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors** (69 warnings, all pre-existing; the one pre-existing error fixed) · `pnpm knip` no new unused exports · `i18n-audit` **3767 = 3767** keys (+61), 0 missing, 0 one-sided · `env:inventory` **no problems** (no new variables) · migration `0046` applied, `schema-drift` **0 missing in DB** · `docs/ROUTE-MATRIX.md` regenerated, **411 routes** (+5), rules test green · unit **23 files / 133 tests** (+4: the local-day rule across BC/ON/QC/NS and midnight edges) · e2e **phase86 13/13** (the worker's day and that it carries no prices, booked-counts-as-assigned, task ticks and their tenant boundary, photo report idempotent on replay, empty reports refused, materials as pending review, blocker notification, the job's list, the foreman's day, bulk approve for a foreman and not a viewer, answering a blocker with the answer visible to the worker, the locked state) + the neighbouring suites (offline/push, schedule, team, security incl. the IDOR sweep, public tokens, phase83) **all green** · `qa:visual` on the changed pages (`/t/:token`, `/dashboard`, the job page and its setup, EN+FR × 1280/375, 16 pages) with the showcase seed now booking its worker today with a task, a blocker and a note: 0 overflow, 0 phone-gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · screenshots of the worker page at 375 and the dashboard crew card at 1280 reviewed by eye.
 
+### Phase 89 — Time to pay, no payroll engine (2026-09-23)
+
+**Built**
+- **Overtime by province, on the job it was worked on.** Approved employee hours split into straight time, overtime and double time — BC 8/12 a day and 40 a week, AB 8/44, ON 44 a week, QC 40, NS and PE 48, and so on — plus hours worked on a statutory holiday. The split is stored on each entry with its premium, walked in the order the hours were worked, and re-done for the whole week whenever an entry in it is added, edited, moved, (un)approved or deleted. The job's labour cost is now `hours × rate + premium`, then burden, so **job margin carries the overtime** instead of assuming straight time.
+- **Statutory holidays by province** (Easter, the n-th-Monday holidays, Victoria Day, Quebec's July 2 rule, 21 holidays across 13 jurisdictions), with the company adding or removing days. **Holiday pay** by the province's method (four weeks ÷ 20, average day over 30 or 28 days) with its eligibility (BC's 15 of 30 days, 30 days on the payroll); an employee who doesn't qualify is shown with the reason.
+- **Averaging agreements** (the weekly threshold over 2–12 weeks) and every threshold and multiplier overridable; "whichever is greater" (AB) needs no switch because daily-then-weekly-on-straight-time is the same total.
+- **Travel and per diem**: km and per-diem lines at the company's rates (or any other amount), paid with the hours and, on a job, a labour cost on that job.
+- **/dashboard/pay**: the pay period (weekly, biweekly, semi-monthly, monthly) with each employee's earning lines, holidays, allowances and gross; subcontractors listed apart; *Labour by job* (straight, premium, burden, travel); *Rules and export* with payroll employee numbers in one table.
+- **Exports**: spreadsheet CSV, Wagepoint, Payworks (employee number + earning code) and QuickBooks Payroll timesheets (per day, job and pay item). Every download is logged; the period then names who changed since.
+- Migration `0050` (applied): `pay_allowances`, `pay_exports`, `business_profiles.pay_settings`, `collaborators.payroll_id`, four `time_entries` columns. Route matrix 441 → 448. 171 EN/FR strings. Runbook §26.
+
+**Found**
+1. **The payroll CSV answered anyone signed in to the company** — a viewer or foreman could download everyone's wages, and a Pro company without time tracking could too. It is now `costs:full` and `team_time`, and shows overtime, holiday hours and the premium.
+2. **The job Costs tab would crash on a confirmed bank-line cost** (Phase 88): the icon map had no `bank_feed`, so `<Icon/>` rendered `undefined`. `bank_feed` and the new `allowance` now have icons and labels, and allowance costs are protected from edit/delete like time-entry costs.
+3. My own first e2e draft assumed 8 + 4.5 h in BC is 4.5 h overtime; it is 4 + 0.5 double (past 12). The engine was right.
+4. The first cut re-split any period just by opening it, so looking at January after a rules change would have rewritten January's job costs. Opening re-splits only periods a rules change reaches (the previous one on); the e2e suite asserts January keeps its split.
+
+**Not done / deferred**
+- **Provider layouts are unverified against live accounts.** Wagepoint's and Payworks' import templates are per-account and behind a login (Wagepoint's help pages return 403); the files use each provider's vocabulary and the company's own earning codes. First pilot with a provider account should try an import (owner track).
+- **Vacation pay, deductions, remittances, T4s, ROEs** — the provider's, by design.
+- Holiday pay uses straight-time wages only; provinces that count overtime or prior holiday/vacation pay in (e.g. ON adds vacation pay) will be a little low — the provider or the company adjusts. Substitute days off for holidays that fall on a non-working day are not modelled.
+- Trade-specific rules (ON construction 7.7%, QC R-20, BC's averaging daily limits) are overrides the company sets, not presets.
+- A day that crosses midnight still lands on the clock-in day (Phase 23 behaviour), so its hours count toward that day's threshold.
+- Allowances are office-entered; the crew can't log km from `/t/:token` yet.
+
+**Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors** (69 warnings, all pre-existing) · `pnpm knip` no new unused exports · `i18n-audit` **4294 = 4294** (+171), 0 missing, 0 one-sided · `env:inventory` **no problems** · migration `0050` applied, `schema-drift` **0 missing, 0 mismatched** (98 tables) · `docs/ROUTE-MATRIX.md` regenerated, **448 routes** · unit **27 files / 177 tests** (+18: holidays per province and year, Easter and Monday rules, periods, the BC/AB/ON/averaging splits, holiday pay eligibility) · e2e **phase89 17/17**:
+  - two jobs in a day: the later entry carries the hours past 8 and the premium lands in that job's cost
+  - a 13-hour BC day is 4 overtime + 1 double; editing, moving and deleting an entry moves the week's overtime with it; a rejected entry loses its premium and cost
+  - BC Labour Day: no pay, with the reason, for someone a week on the payroll
+  - employee → subcontractor drops the overtime in the open periods, and back
+  - ON: 5 × 10 h is 44 + 6; the worksheet's lines, Labour Day pay from four weeks ÷ 20; the subcontractor apart; labour by job
+  - mileage on the job: a protected labour cost, in the worksheet and the job table; refused for a subcontractor
+  - generic, Payworks and QuickBooks files; exports logged; working the holiday flags the period as changed since export
+  - settings: province defaults, an override re-splits the open period and undoing it restores it, January keeps its split even when opened; added/removed holidays
+  - office 200, foreman 403 on the worksheet, the export, the settings and the old payroll CSV; Pro 403; other companies see nothing
+
+  security **incl. the IDOR sweep** (`/api/pay/allowances/:id` seeded), team, money, phase88, phase87, phase86, phase86b, offline-push, lifecycle, integrations, ops, account, schedule all green · `qa:visual` on the three Pay tabs (owner) and Pay + Team (foreman), EN+FR × 1280/375: 0 overflow, 0 phone-gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · the period at 375 (earning lines stack instead of hiding the amount) and Rules at 1280 reviewed by eye.
+
 ### Phase 88 — Accounting, both directions (2026-09-23)
 
 **Built**

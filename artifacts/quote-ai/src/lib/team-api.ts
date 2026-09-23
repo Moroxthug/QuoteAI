@@ -15,6 +15,8 @@ export type WorkerDto = {
   active: boolean;
   /** Phase 86b: may add tasks from the site. */
   canAddTasks: boolean;
+  /** Phase 89: employee number in the payroll provider. */
+  payrollId: string | null;
   hasInvite: boolean;
   inviteExpiresAt: string | null;
   lastTimeEntryAt: string | null;
@@ -22,7 +24,7 @@ export type WorkerDto = {
   pendingCount: number;
   createdAt: string;
 };
-export type WorkerEdit = { name?: string; role?: string; email?: string | null; phone?: string | null; hourlyRateCents?: number; workerType?: WorkerType; burdenPercent?: number; active?: boolean; canAddTasks?: boolean };
+export type WorkerEdit = { name?: string; role?: string; email?: string | null; phone?: string | null; hourlyRateCents?: number; workerType?: WorkerType; burdenPercent?: number; active?: boolean; canAddTasks?: boolean; payrollId?: string | null };
 
 export type EquipmentOwnership = "owned" | "rented" | "financed";
 export type EquipmentDto = {

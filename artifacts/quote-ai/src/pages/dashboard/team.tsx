@@ -4,7 +4,7 @@ import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin } from "lucide-react";
+import { Users, Clock, Wrench, Plus, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin, Wallet } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -321,12 +321,12 @@ function WorkerDialog({ worker, open, onOpenChange }: { worker: WorkerDto | null
   const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ name: "", role: "", email: "", phone: "", rate: "", type: "employee" as WorkerType, burden: "15", canAddTasks: false });
+  const [form, setForm] = useState({ name: "", role: "", email: "", phone: "", rate: "", type: "employee" as WorkerType, burden: "15", canAddTasks: false, payrollId: "" });
   useEffect(() => {
     if (!open) return;
-    setForm({ name: worker?.name ?? "", role: worker?.role === "worker" ? "" : (worker?.role ?? ""), email: worker?.email ?? "", phone: worker?.phone ?? "", rate: worker ? (worker.hourlyRateCents / 100).toFixed(2) : "", type: worker?.workerType ?? "employee", burden: worker ? String(worker.burdenPercent) : "15", canAddTasks: worker?.canAddTasks ?? false });
+    setForm({ name: worker?.name ?? "", role: worker?.role === "worker" ? "" : (worker?.role ?? ""), email: worker?.email ?? "", phone: worker?.phone ?? "", rate: worker ? (worker.hourlyRateCents / 100).toFixed(2) : "", type: worker?.workerType ?? "employee", burden: worker ? String(worker.burdenPercent) : "15", canAddTasks: worker?.canAddTasks ?? false, payrollId: worker?.payrollId ?? "" });
   }, [open, worker]);
-  const body = (): WorkerEdit & { name: string } => ({ name: form.name.trim(), role: form.role.trim() || "worker", email: form.email.trim() || null, phone: form.phone.trim() || null, hourlyRateCents: Math.round((Number(form.rate) || 0) * 100), workerType: form.type, burdenPercent: Number(form.burden) || 0, canAddTasks: form.canAddTasks });
+  const body = (): WorkerEdit & { name: string } => ({ name: form.name.trim(), role: form.role.trim() || "worker", email: form.email.trim() || null, phone: form.phone.trim() || null, hourlyRateCents: Math.round((Number(form.rate) || 0) * 100), workerType: form.type, burdenPercent: Number(form.burden) || 0, canAddTasks: form.canAddTasks, payrollId: form.type === "employee" ? form.payrollId.trim() || null : undefined });
   const save = useMutation({
     mutationFn: () => (worker ? teamApi.updateWorker(worker.id, body()) : teamApi.addWorker(body())),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["workers"] }); onOpenChange(false); },
@@ -348,6 +348,8 @@ function WorkerDialog({ worker, open, onOpenChange }: { worker: WorkerDto | null
             <div className="field"><label>{t("team.workers.burdenPct")}</label><input type="number" step="0.5" value={form.burden} onChange={(e) => setForm({ ...form, burden: e.target.value })} disabled={form.type === "subcontractor"} /></div>
             <div className="field"><label>{t("team.workers.email")}</label><input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div className="field"><label>{t("team.workers.phone")}</label><input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} /></div>
+            {/* Phase 89: the key the payroll provider's import matches on. */}
+            {form.type === "employee" && <div className="field"><label htmlFor="worker-payroll-id">{t("team.workers.payrollId")}</label><input id="worker-payroll-id" value={form.payrollId} maxLength={40} onChange={(e) => setForm({ ...form, payrollId: e.target.value })} placeholder={t("team.workers.payrollIdPlaceholder")} /></div>}
             {/* Phase 86b: opt-in per worker — a crew lead, not every apprentice. */}
             <label className="chk-row full">
               <input type="checkbox" checked={form.canAddTasks} onChange={(e) => setForm({ ...form, canAddTasks: e.target.checked })} />
@@ -439,9 +441,13 @@ const can = useCan();
               <input type="date" aria-label={t("team.time.filterTo")} value={to} onChange={(e) => setTo(e.target.value)} className="inp-sm" style={{ width: 150 }} />
             </>
           )}
-          <div className="grow">
-            <a href={teamApi.payrollCsvUrl(from, to)} className="text-link" title={t("team.time.exportHint")}><Download /> {t("team.time.export")} ({from} → {to})</a>
-          </div>
+          {/* Phase 89: wages are the office's (costs:full); the pay period itself lives on /dashboard/pay. */}
+          {can("costs", "full") && (
+            <div className="grow flex flex-wrap items-center gap-x-4 gap-y-1">
+              <a href={teamApi.payrollCsvUrl(from, to)} className="text-link" title={t("team.time.exportHint")}><Download /> {t("team.time.export")} ({from} → {to})</a>
+              <Link href="/dashboard/pay" className="text-link"><Wallet /> {t("team.time.payLink")}</Link>
+            </div>
+          )}
         </div>
 
         {status === "submitted" && submittedIds.length > 0 && can("jobs", "edit") && (
@@ -467,7 +473,7 @@ const can = useCan();
                   ) : <span className="spacer" />}
                   <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
                   <div className="grow">
-                    <span className="ttl"><Link href={`/dashboard/jobs/${e.projectId}?tab=team`}>{e.projectName}</Link> <span className="dim">· {e.hours} h</span>{e.milestoneTitle ? <span className="dim"> · {e.milestoneTitle}</span> : null}{e.enteredBy === "worker" ? <span className="by">({t("team.time.byWorker")})</span> : null}</span>
+                    <span className="ttl"><Link href={`/dashboard/jobs/${e.projectId}?tab=team`}>{e.projectName}</Link> <span className="dim">· {e.hours} h</span>{e.overtimeHours > 0 ? <span className="dim"> · {t("team.time.overtime").replace("{h}", String(e.overtimeHours))}</span> : null}{e.holidayHours > 0 ? <span className="dim"> · {t("team.time.onHoliday")}</span> : null}{e.milestoneTitle ? <span className="dim"> · {e.milestoneTitle}</span> : null}{e.enteredBy === "worker" ? <span className="by">({t("team.time.byWorker")})</span> : null}</span>
                     {e.note && <span className="sub">{e.note}</span>}
                   </div>
                   {e.geofenceFlagged && <span className="flag" title={t("team.time.geofenceFlag")}><MapPin /></span>}

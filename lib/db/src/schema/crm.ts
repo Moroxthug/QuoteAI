@@ -126,6 +126,8 @@ export const collaboratorsTable = pgTable("collaborators", {
   lastTimeEntryAt: timestamp("last_time_entry_at", { withTimezone: true }),
   /** Phase 86b: may add tasks from the site. Opt-in per worker — the office decides whom it trusts with the list. */
   canAddTasks: boolean("can_add_tasks").notNull().default(false),
+  /** Phase 89: the employee number in the payroll provider — the key its import matches on. */
+  payrollId: text("payroll_id"),
   /** Phase 86b: when the worker last dismissed "since you last looked" on /t/:token. Null until their first visit. */
   crewSeenAt: timestamp("crew_seen_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

@@ -24,7 +24,7 @@ import { uploadedDocumentsTable } from "./documents";
 export const COST_ENTRY_STATUSES = ["pending_review", "confirmed"] as const;
 export type CostEntryStatus = (typeof COST_ENTRY_STATUSES)[number];
 
-export const COST_ENTRY_SOURCES = ["manual", "receipt", "time_entry", "equipment", "legacy", "bank_feed"] as const;
+export const COST_ENTRY_SOURCES = ["manual", "receipt", "time_entry", "equipment", "legacy", "bank_feed", "allowance"] as const;
 export type CostEntrySource = (typeof COST_ENTRY_SOURCES)[number];
 
 /** GST/HST/PST/QST split in cents, as read from the receipt (or computed). */
@@ -124,6 +124,17 @@ export const timeEntriesTable = pgTable(
     geofenceFlagged: boolean("geofence_flagged").notNull().default(false),
     /** Phase 77: id of the offline outbox op that created the row (worker page or dashboard) — a replay finds the entry instead of inserting twice. */
     clientRef: text("client_ref"),
+    /**
+     * Phase 89: how the approved hours split under the company's overtime and
+     * holiday rules, recomputed for the whole week whenever an entry in it
+     * changes. The hours that went over a threshold carry the premium, so the
+     * job they were worked on is the one that pays it.
+     */
+    overtimeHours: numeric("overtime_hours", { precision: 6, scale: 2 }).notNull().default("0"),
+    doubleHours: numeric("double_hours", { precision: 6, scale: 2 }).notNull().default("0"),
+    holidayHours: numeric("holiday_hours", { precision: 6, scale: 2 }).notNull().default("0"),
+    /** What those hours cost above straight time, in cents (before burden). */
+    premiumCents: integer("premium_cents").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
   },
@@ -189,7 +200,7 @@ export type TimeEntry = typeof timeEntriesTable.$inferSelect;
 export type Equipment = typeof equipmentTable.$inferSelect;
 export type EquipmentUsage = typeof equipmentUsageTable.$inferSelect;
 
-/** Labour cost of a time entry in cents: hours × rate × (1 + burden %). */
-export function labourCostCents(hours: number, rateCents: number, burdenPercent: number): number {
-  return Math.round(hours * rateCents * (1 + burdenPercent / 100));
+/** Labour cost of a time entry in cents: (hours × rate + overtime/holiday premium) × (1 + burden %). */
+export function labourCostCents(hours: number, rateCents: number, burdenPercent: number, premiumCents = 0): number {
+  return Math.round((hours * rateCents + premiumCents) * (1 + burdenPercent / 100));
 }

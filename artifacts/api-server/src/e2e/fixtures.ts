@@ -190,6 +190,19 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
       await org.api(`/api/team/workers/${worker.body.worker.id}`, { method: "PUT", body: { canAddTasks: true } });
       await db.update(collaboratorsTable).set({ crewSeenAt: new Date(now - 3_600_000) }).where(eq(collaboratorsTable.id, worker.body.worker.id));
     }
+    // Phase 89: a long week in the last pay period (five 10-hour days — overtime
+    // past 44), a payroll number and a travel line, so the Pay page renders its
+    // lines, the job table and the export notices rather than empty states.
+    const period = await org.api("/api/pay/period");
+    if (period.status === 200) {
+      const start = String(period.body.period.start);
+      await org.api(`/api/team/workers/${worker.body.worker.id}`, { method: "PUT", body: { payrollId: "1042" } });
+      for (let i = 1; i <= 5; i++) {
+        const date = new Date(Date.parse(`${start}T00:00:00Z`) + i * 86_400_000).toISOString().slice(0, 10);
+        await org.api(`/api/jobs/${project.id}/time-entries`, { body: { workerId: worker.body.worker.id, date, hours: 10, approve: true } });
+      }
+      await org.api("/api/pay/allowances", { body: { workerId: worker.body.worker.id, date: start, kind: "mileage", quantity: 84, projectId: project.id } });
+    }
   }
   // Phase 87: a filing setup, a reminder and two permits (one with an
   // inspection this week) so the Compliance page, the job's Permits card and

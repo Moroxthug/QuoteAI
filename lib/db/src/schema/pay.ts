@@ -1,0 +1,117 @@
+import { pgTable, text, uuid, timestamp, jsonb, index, integer, numeric, boolean, date } from "drizzle-orm/pg-core";
+import { collaboratorsTable, projectsTable } from "./crm";
+import { costEntriesTable, timeEntriesTable } from "./costs";
+
+// ── Phase 89: time to pay (no payroll engine) ────────────────────────────────
+// Everything *before* payroll: overtime by province, statutory holiday pay,
+// travel and per-diem lines, and an export in the shape a payroll provider
+// takes. Source deductions, T4s and remittances stay with the provider.
+
+export const PAY_FREQUENCIES = ["weekly", "biweekly", "semimonthly", "monthly"] as const;
+export type PayFrequency = (typeof PAY_FREQUENCIES)[number];
+
+export type OvertimeRules = {
+  /** Hours in a day after which overtime starts; null = no daily overtime (ON, QC…). */
+  dailyHours: number | null;
+  /** Hours in a day after which double time starts; null = none. */
+  dailyDoubleHours: number | null;
+  /** Hours in a week after which overtime starts; null = none. */
+  weeklyHours: number | null;
+  multiplier: number;
+  doubleMultiplier: number;
+};
+// No "daily or weekly, whichever is greater" switch (AB): counting daily overtime
+// first and then weekly overtime on the straight-time hours left gives the same
+// total — daily + max(0, straight − weekly) = max(daily, total − weekly).
+
+/**
+ * - div20_4w: wages in the four weeks before ÷ 20 (ON, QC, SK, MB's 5 %)
+ * - avg_day_30d: wages in the 30 days before ÷ days worked (BC)
+ * - avg_day_28d: wages in the four weeks before ÷ days worked (AB; the "regular day's pay" elsewhere)
+ * - none: the company pays it another way (ON construction's 7.7 % in lieu, a collective agreement…)
+ */
+export const HOLIDAY_PAY_METHODS = ["div20_4w", "avg_day_30d", "avg_day_28d", "none"] as const;
+export type HolidayPayMethod = (typeof HOLIDAY_PAY_METHODS)[number];
+
+export type HolidayRules = {
+  method: HolidayPayMethod;
+  /** Multiplier on hours worked on the holiday itself (on top of the holiday pay). */
+  workedMultiplier: number;
+  /** Days worked in the 30 days before the holiday to qualify (BC, NS: 15). */
+  minDaysWorked: number;
+  /** Days since the first recorded day of work to qualify (AB, BC: 30). */
+  minEmployedDays: number;
+};
+
+export const PAY_EXPORT_FORMATS = ["generic", "wagepoint", "payworks", "qbo_payroll"] as const;
+export type PayExportFormat = (typeof PAY_EXPORT_FORMATS)[number];
+
+export const EARNING_KINDS = ["regular", "overtime", "double", "holiday", "holiday_worked", "mileage", "per_diem", "other"] as const;
+export type EarningKind = (typeof EARNING_KINDS)[number];
+
+export type PaySettings = {
+  frequency?: PayFrequency;
+  /** First day of any one pay period (weekly / biweekly count from it). YYYY-MM-DD. */
+  anchorDate?: string;
+  /** 0 = Sunday … 6 = Saturday — the start of the week overtime is counted over. */
+  weekStartsOn?: number;
+  /** Null/absent = the province's employment-standards default. */
+  overtime?: OvertimeRules | null;
+  /** An averaging agreement: the weekly threshold applies to the average over `weeks` weeks, blocks counted from `startDate`. */
+  averaging?: { weeks: number; startDate: string } | null;
+  holidays?: Partial<HolidayRules> & { added?: { date: string; name: string }[]; removed?: string[] };
+  allowances?: { kmRateCents?: number; perDiemCents?: number };
+  exportFormat?: PayExportFormat;
+  earningCodes?: Partial<Record<EarningKind, string>>;
+};
+
+export const ALLOWANCE_KINDS = ["mileage", "per_diem", "other"] as const;
+export type AllowanceKind = (typeof ALLOWANCE_KINDS)[number];
+
+/** Travel and per-diem lines — paid with the hours, charged to the job when there is one. */
+export const payAllowancesTable = pgTable(
+  "pay_allowances",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    workerId: uuid("worker_id").notNull().references(() => collaboratorsTable.id, { onDelete: "cascade" }),
+    projectId: uuid("project_id").references(() => projectsTable.id, { onDelete: "set null" }),
+    timeEntryId: uuid("time_entry_id").references(() => timeEntriesTable.id, { onDelete: "set null" }),
+    date: date("date").notNull(),
+    kind: text("kind", { enum: ALLOWANCE_KINDS }).notNull(),
+    /** km for mileage, days for per diem, 1 for other. */
+    quantity: numeric("quantity", { precision: 8, scale: 2 }).notNull(),
+    rateCents: integer("rate_cents").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    /** A reasonable per-km allowance is not income; a flat "other" line usually is. The provider decides — this only labels it. */
+    taxable: boolean("taxable").notNull().default(false),
+    note: text("note").notNull().default(""),
+    costEntryId: uuid("cost_entry_id").references(() => costEntriesTable.id, { onDelete: "set null" }),
+    createdByUserId: text("created_by_user_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("pay_allowances_user_date_idx").on(t.userId, t.date), index("pay_allowances_worker_idx").on(t.workerId, t.date)],
+);
+
+export type PayAllowance = typeof payAllowancesTable.$inferSelect;
+
+/** Per worker: gross by earning kind, so "changed since export" can say what moved. */
+export type PayExportSnapshot = Record<string, { name: string; grossCents: number; hours: number }>;
+
+/** A pay period someone exported. Nothing is locked — hours that change afterwards are flagged, not refused. */
+export const payExportsTable = pgTable(
+  "pay_exports",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    periodStart: date("period_start").notNull(),
+    periodEnd: date("period_end").notNull(),
+    format: text("format", { enum: PAY_EXPORT_FORMATS }).notNull(),
+    exportedByName: text("exported_by_name"),
+    exportedAt: timestamp("exported_at", { withTimezone: true }).notNull().defaultNow(),
+    snapshot: jsonb("snapshot").$type<PayExportSnapshot>().notNull().default({}),
+  },
+  (t) => [index("pay_exports_period_idx").on(t.userId, t.periodStart)],
+);
+
+export type PayExport = typeof payExportsTable.$inferSelect;

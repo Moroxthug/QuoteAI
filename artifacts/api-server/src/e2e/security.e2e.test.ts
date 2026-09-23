@@ -42,6 +42,7 @@ import {
   importBatchesTable,
   quoteImportCandidatesTable,
   flinksTransactionsTable,
+  payAllowancesTable,
   jobPhotosTable,
   jobNotesTable,
   fieldReportsTable,
@@ -141,6 +142,7 @@ async function seedOrgA(): Promise<Fixtures> {
   f.batch = await ins(db.insert(importBatchesTable).values({ userId, kind: "csv", fileName: "old-quotes.csv" } as typeof importBatchesTable.$inferInsert).returning());
   f.candidate = await ins(db.insert(quoteImportCandidatesTable).values({ batchId: f.batch, userId, extraction: {} } as typeof quoteImportCandidatesTable.$inferInsert).returning());
   f.flinksTx = await ins(db.insert(flinksTransactionsTable).values({ userId, flinksTransactionId: `e2e-${randomUUID()}`, date: new Date(), amountCents: -5000 } as typeof flinksTransactionsTable.$inferInsert).returning());
+  f.allowance = await ins(db.insert(payAllowancesTable).values({ userId, workerId: f.worker, date: "2026-09-01", kind: "mileage", quantity: "10", rateCents: 72, amountCents: 720 } as typeof payAllowancesTable.$inferInsert).returning());
   f.photo = await ins(db.insert(jobPhotosTable).values({ userId, projectId: project.id, fileName: "before.png", fileSize: 100, mimeType: "image/png", fileUrl: `/objects/job-photos/${userId}/before.png` } as typeof jobPhotosTable.$inferInsert).returning());
   f.note = await ins(db.insert(jobNotesTable).values({ userId, projectId: project.id, body: "gate code 4471" } as typeof jobNotesTable.$inferInsert).returning());
   f.fieldReport = await ins(db.insert(fieldReportsTable).values({ userId, projectId: project.id, kind: "blocker", body: "No power on site", authorName: "Sam Worker" } as typeof fieldReportsTable.$inferInsert).returning());
@@ -182,7 +184,7 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
           ["/api/developer/api-keys", "apiKey"], ["/api/developer/webhooks", "webhook"], ["/api/imports/batches", "batch"], ["/api/imports/candidates", "candidate"],
           ["/api/books/bank", "flinksTx"], ["/api/books/claims", "cost"], ["/api/team/members", "member"], ["/api/v1/public/quotes", "quote"], ["/api/v1/public/jobs", "project"],
           ["/api/v1/public/invoices", "invoice"], ["/api/v1/public/clients", "client"], ["/api/schedule/blocks", "block"],
-          ["/api/field-reports", "fieldReport"], ["/api/compliance/reminders", "reminder"],
+          ["/api/field-reports", "fieldReport"], ["/api/compliance/reminders", "reminder"], ["/api/pay/allowances", "allowance"],
         ];
         id = byPrefix.find(([p]) => prefix === p)?.[1];
         break;

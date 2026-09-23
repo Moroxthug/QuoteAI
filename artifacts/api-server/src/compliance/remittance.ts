@@ -166,7 +166,7 @@ export async function loadWorksheet(userId: string, province: string | null, fro
     })
     .from(costEntriesTable)
     // Labour and equipment usage carry no tax; only purchases can hold a credit.
-    .where(and(eq(costEntriesTable.userId, userId), ne(costEntriesTable.source, "time_entry"), ne(costEntriesTable.source, "equipment"), gte(costEntriesTable.date, lo), lt(costEntriesTable.date, hi)));
+    .where(and(eq(costEntriesTable.userId, userId), ne(costEntriesTable.source, "time_entry"), ne(costEntriesTable.source, "equipment"), ne(costEntriesTable.source, "allowance"), gte(costEntriesTable.date, lo), lt(costEntriesTable.date, hi)));
 
   const costs: WorksheetCost[] = costRows
     .map((r) => ({ id: r.id, day: dayOf(r.date, province), vendor: r.vendor, description: r.description, status: r.status, subtotalCents: r.subtotalCents, taxCents: r.taxCents, taxBreakdown: r.taxBreakdown ?? {} }))

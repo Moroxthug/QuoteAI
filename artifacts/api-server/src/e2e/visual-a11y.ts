@@ -111,7 +111,9 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/compliance"), dash("/dashboard/compliance?tab=salesTax"), dash("/dashboard/compliance?tab=t5018"), dash("/dashboard/compliance?tab=reminders"),
     // Phase 88: the three tabs of Books.
     dash("/dashboard/books"), dash("/dashboard/books?tab=bank"), dash("/dashboard/books?tab=claims"),
-    foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"), foreman("/dashboard/books"),
+    // Phase 89: the three tabs of Pay.
+    dash("/dashboard/pay"), dash("/dashboard/pay?tab=jobs"), dash("/dashboard/pay?tab=settings"),
+    foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"), foreman("/dashboard/books"), foreman("/dashboard/pay"),
   ];
   // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`
   // pins an exact path (there is no substring that means the homepage alone).

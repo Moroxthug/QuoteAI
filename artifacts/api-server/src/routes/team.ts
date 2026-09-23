@@ -30,6 +30,8 @@ import { sendWorkerInviteEmail } from "../lib/emailTeam.js";
 import { parseIsoDate, toIsoDate } from "../jobs/dates.js";
 import { serializeWorker, serializeEquipment, serializeTimeEntry, serializeUsage, syncLabourCost, syncEquipmentCost, nameMaps, approvedHoursByWorker } from "../costs/service.js";
 import { logger } from "../lib/logger.js";
+import { recomputeHorizon, recomputeSince, recomputeWorkerDays, paySettingsFor } from "../pay/service.js";
+import { todayFor } from "../compliance/service.js";
 
 // ── Phase 3: workers, time entries, equipment ────────────────────────────────
 // Workers are free on every plan (they existed as CRM collaborators); logging
@@ -83,6 +85,8 @@ const WorkerBody = z.object({
   active: z.boolean().optional(),
   /** Phase 86b: may add tasks from the site. */
   canAddTasks: z.boolean().optional(),
+  /** Phase 89: employee number in the payroll provider. */
+  payrollId: z.string().trim().max(40).nullable().optional(),
 });
 
 // GET /api/team/workers
@@ -131,6 +135,7 @@ router.post("/team/workers", requireAuth, requirePermission("team", "full"), asy
         burdenPercent: String(d.burdenPercent ?? (type === "subcontractor" ? 0 : 15)),
         active: d.active ?? true,
         canAddTasks: d.canAddTasks ?? false,
+        payrollId: d.payrollId || null,
       })
       .returning();
     res.status(201).json({ worker: serializeWorker(w!) });
@@ -164,11 +169,17 @@ router.put("/team/workers/:wid", requireAuth, requirePermission("team", "full"),
     if (d.workerType !== undefined) updates.workerType = d.workerType;
     if (d.burdenPercent !== undefined) updates.burdenPercent = String(d.burdenPercent);
     if (d.canAddTasks !== undefined) updates.canAddTasks = d.canAddTasks;
+    if (d.payrollId !== undefined) updates.payrollId = d.payrollId || null;
     if (d.active !== undefined) {
       updates.active = d.active;
       if (!d.active) { updates.timeTokenHash = null; updates.timeTokenExpiresAt = null; }
     }
     const [updated] = await db.update(collaboratorsTable).set(updates).where(eq(collaboratorsTable.id, w.id)).returning();
+    // Phase 89: an employee earns overtime, a subcontractor doesn't — the open pay periods follow the change.
+    if (d.workerType !== undefined && d.workerType !== w.workerType) {
+      const { effective, province } = await paySettingsFor(userId);
+      await recomputeSince(userId, recomputeHorizon(todayFor(province), effective));
+    }
     res.json({ worker: serializeWorker(updated!) });
   } catch (err) {
     req.log.error({ err }, "Error updating worker");
@@ -344,7 +355,10 @@ router.post("/jobs/:id/time-entries", requireAuth, requirePermission("jobs", "ed
         approvedAt: approve ? new Date() : null,
       })
       .returning();
-    if (approve) await syncLabourCost(entry!, worker);
+    if (approve) {
+      await syncLabourCost(entry!, worker);
+      await recomputeWorkerDays(userId, worker.id, [d.date]);
+    }
     await db.update(collaboratorsTable).set({ lastTimeEntryAt: new Date() }).where(eq(collaboratorsTable.id, worker.id));
     const [fresh] = await db.select().from(timeEntriesTable).where(eq(timeEntriesTable.id, entry!.id));
     res.status(201).json({ entry: serializeTimeEntry(fresh!, { workerName: worker.name, projectName: project.name }) });
@@ -376,6 +390,8 @@ async function applyTimeEntryUpdate(userId: string, entry: TimeEntry, d: { statu
   }
   const [updated] = await db.update(timeEntriesTable).set(updates).where(eq(timeEntriesTable.id, entry.id)).returning();
   await syncLabourCost(updated!, worker);
+  // Phase 89: the week's overtime moves with this entry — on the day it was, and the day it is now.
+  if (entry.status === "approved" || updated!.status === "approved") await recomputeWorkerDays(userId, worker.id, [toIsoDate(entry.date)!, toIsoDate(updated!.date)!]);
   if (d.status && d.status !== entry.status) await writeAudit({ userId, actorType: "user", actorId: userId, entityType: "time_entry", entityId: entry.id, action: d.status, diff: { hours: Number(updated!.hours) } });
   const [fresh] = await db.select().from(timeEntriesTable).where(eq(timeEntriesTable.id, entry.id));
   return { entry: fresh!, worker };
@@ -453,6 +469,7 @@ router.delete("/team/time-entries/:tid", requireAuth, requirePermission("jobs", 
       if (entry.costEntryId) await tx.delete(costEntriesTable).where(eq(costEntriesTable.id, entry.costEntryId));
       await tx.delete(timeEntriesTable).where(eq(timeEntriesTable.id, entry.id));
     });
+    if (entry.status === "approved") await recomputeWorkerDays(userId, entry.workerId, [toIsoDate(entry.date)!]);
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error deleting time entry");
@@ -460,10 +477,15 @@ router.delete("/team/time-entries/:tid", requireAuth, requirePermission("jobs", 
   }
 });
 
-// GET /api/team/payroll-summary.csv?from=&to= — approved hours per worker per job (no payroll math)
-router.get("/team/payroll-summary.csv", requireAuth, async (req, res) => {
+// GET /api/team/payroll-summary.csv?from=&to= — approved hours per worker per job, one line per entry.
+// Phase 89: wages, so the office's (costs:full) and the plan's (team_time) — it
+// answered anyone signed in to the company. Overtime and the premium now show;
+// the pay period's earnings file is /api/pay/export.csv.
+router.get("/team/payroll-summary.csv", requireAuth, requirePermission("costs", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    const gate = await requireTeamFeature(userId);
+    if (!gate.ok) { planRequired(res, gate.plan, "Payroll export"); return; }
     const q = z.object({ from: z.string().regex(dateRe), to: z.string().regex(dateRe) }).safeParse(req.query);
     if (!q.success) {
       res.status(400).json({ error: "from and to (YYYY-MM-DD) are required" });
@@ -477,21 +499,23 @@ router.get("/team/payroll-summary.csv", requireAuth, async (req, res) => {
     const wtype = new Map(workers.map((w) => [w.id, w.workerType]));
     const esc = (v: string | number) => (typeof v === "number" ? v.toString() : `"${v.replace(/"/g, '""')}"`);
     const money = (c: number) => (c / 100).toFixed(2);
-    const lines: string[] = [["Worker", "Type", "Job", "Date", "Hours", "Rate (CAD/h)", "Gross (CAD)", "Burden %", "Burden (CAD)", "Labour cost (CAD)", "Note"].map(esc).join(",")];
-    const totals = new Map<string, { hours: number; gross: number; burden: number; total: number }>();
+    const lines: string[] = [["Worker", "Type", "Job", "Date", "Hours", "Overtime h", "Holiday h", "Rate (CAD/h)", "Premium (CAD)", "Gross (CAD)", "Burden %", "Burden (CAD)", "Labour cost (CAD)", "Note"].map(esc).join(",")];
+    const totals = new Map<string, { hours: number; overtime: number; holiday: number; premium: number; gross: number; burden: number; total: number }>();
     for (const r of rows) {
       const hours = Number(r.hours);
-      const gross = Math.round(hours * r.rateCentsSnapshot);
-      const total = labourCostCents(hours, r.rateCentsSnapshot, Number(r.burdenPercentSnapshot));
+      const overtime = Number(r.overtimeHours) + Number(r.doubleHours);
+      const holiday = Number(r.holidayHours);
+      const gross = Math.round(hours * r.rateCentsSnapshot) + r.premiumCents;
+      const total = labourCostCents(hours, r.rateCentsSnapshot, Number(r.burdenPercentSnapshot), r.premiumCents);
       const burden = total - gross;
-      lines.push([names.worker.get(r.workerId) ?? "", wtype.get(r.workerId) ?? "", names.project.get(r.projectId) ?? "", toIsoDate(r.date) ?? "", hours.toFixed(2), money(r.rateCentsSnapshot), money(gross), Number(r.burdenPercentSnapshot).toFixed(2), money(burden), money(total), r.note].map(esc).join(","));
-      const t = totals.get(r.workerId) ?? { hours: 0, gross: 0, burden: 0, total: 0 };
-      t.hours += hours; t.gross += gross; t.burden += burden; t.total += total;
+      lines.push([names.worker.get(r.workerId) ?? "", wtype.get(r.workerId) ?? "", names.project.get(r.projectId) ?? "", toIsoDate(r.date) ?? "", hours.toFixed(2), overtime.toFixed(2), holiday.toFixed(2), money(r.rateCentsSnapshot), money(r.premiumCents), money(gross), Number(r.burdenPercentSnapshot).toFixed(2), money(burden), money(total), r.note].map(esc).join(","));
+      const t = totals.get(r.workerId) ?? { hours: 0, overtime: 0, holiday: 0, premium: 0, gross: 0, burden: 0, total: 0 };
+      t.hours += hours; t.overtime += overtime; t.holiday += holiday; t.premium += r.premiumCents; t.gross += gross; t.burden += burden; t.total += total;
       totals.set(r.workerId, t);
     }
     lines.push("");
-    lines.push(["Worker totals", "", "", "", "Hours", "", "Gross (CAD)", "", "Burden (CAD)", "Labour cost (CAD)", ""].map(esc).join(","));
-    for (const [wid, t] of totals) lines.push([names.worker.get(wid) ?? "", wtype.get(wid) ?? "", "", "", t.hours.toFixed(2), "", money(t.gross), "", money(t.burden), money(t.total), ""].map(esc).join(","));
+    lines.push(["Worker totals", "", "", "", "Hours", "Overtime h", "Holiday h", "", "Premium (CAD)", "Gross (CAD)", "", "Burden (CAD)", "Labour cost (CAD)", ""].map(esc).join(","));
+    for (const [wid, t] of totals) lines.push([names.worker.get(wid) ?? "", wtype.get(wid) ?? "", "", "", t.hours.toFixed(2), t.overtime.toFixed(2), t.holiday.toFixed(2), "", money(t.premium), money(t.gross), "", money(t.burden), money(t.total), ""].map(esc).join(","));
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="payroll-summary-${q.data.from}-${q.data.to}.csv"`);
     res.send(`\uFEFF${lines.join("\r\n")}`);

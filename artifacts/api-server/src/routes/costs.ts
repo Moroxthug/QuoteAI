@@ -174,8 +174,8 @@ router.put("/jobs/:id/costs/:cid", requireAuth, requirePermission("costs", "edit
       res.status(404).json({ error: "Not found" });
       return;
     }
-    if (entry.source === "time_entry" || entry.source === "equipment") {
-      res.status(409).json({ error: "DERIVED", message: "This cost comes from a time entry or equipment log — edit that instead." });
+    if (entry.source === "time_entry" || entry.source === "equipment" || entry.source === "allowance") {
+      res.status(409).json({ error: "DERIVED", message: "This cost comes from a time entry, equipment log or pay allowance — edit that instead." });
       return;
     }
     const body = CostBody.partial().extend({ status: z.enum(COST_ENTRY_STATUSES).optional(), projectId: z.string().uuid().optional() }).safeParse(req.body);
@@ -239,8 +239,8 @@ router.delete("/jobs/:id/costs/:cid", requireAuth, requirePermission("costs", "f
       res.status(404).json({ error: "Not found" });
       return;
     }
-    if (entry.source === "time_entry" || entry.source === "equipment") {
-      res.status(409).json({ error: "DERIVED", message: "Delete the time entry or equipment log instead." });
+    if (entry.source === "time_entry" || entry.source === "equipment" || entry.source === "allowance") {
+      res.status(409).json({ error: "DERIVED", message: "Delete the time entry, equipment log or pay allowance instead." });
       return;
     }
     await db.delete(costEntriesTable).where(eq(costEntriesTable.id, entry.id));

@@ -69,7 +69,10 @@ export function serializeTimeEntry(e: TimeEntry, extra?: { workerName?: string; 
     hours,
     rateCents: e.rateCentsSnapshot,
     burdenPercent: burden,
-    costCents: labourCostCents(hours, e.rateCentsSnapshot, burden),
+    costCents: labourCostCents(hours, e.rateCentsSnapshot, burden, e.premiumCents),
+    overtimeHours: Number(e.overtimeHours) + Number(e.doubleHours),
+    holidayHours: Number(e.holidayHours),
+    premiumCents: e.premiumCents,
     note: e.note,
     status: e.status,
     enteredBy: e.enteredBy,
@@ -92,6 +95,7 @@ export function serializeWorker(w: Collaborator, extra?: { hoursThisMonth?: numb
     phone: w.phone,
     hourlyRateCents: w.hourlyRate,
     workerType: w.workerType,
+    payrollId: w.payrollId,
     burdenPercent: Number(w.burdenPercent),
     active: w.active,
     canAddTasks: w.canAddTasks,
@@ -173,15 +177,19 @@ export async function syncLabourCost(entry: TimeEntry, worker: Pick<Collaborator
   }
   const hours = Number(entry.hours);
   const burden = Number(entry.burdenPercentSnapshot);
-  const base = Math.round(hours * entry.rateCentsSnapshot);
-  const total = labourCostCents(hours, entry.rateCentsSnapshot, burden);
+  // Phase 89: the overtime/holiday premium on these hours is part of what the job paid for them.
+  const base = Math.round(hours * entry.rateCentsSnapshot) + entry.premiumCents;
+  const total = labourCostCents(hours, entry.rateCentsSnapshot, burden, entry.premiumCents);
+  const over = Number(entry.overtimeHours) + Number(entry.doubleHours);
+  const onHoliday = Number(entry.holidayHours);
+  const split = over ? ` (${over.toFixed(2)} h overtime)` : onHoliday ? ` (on a statutory holiday)` : "";
   const values = {
     userId: entry.userId,
     projectId: entry.projectId,
     milestoneId: entry.milestoneId,
     category: "labour" as const,
     vendor: worker.name,
-    description: `${worker.name} — ${hours.toFixed(2)} h${entry.note ? ` · ${entry.note.slice(0, 120)}` : ""}`,
+    description: `${worker.name} — ${hours.toFixed(2)} h${split}${entry.note ? ` · ${entry.note.slice(0, 120)}` : ""}`,
     date: entry.date,
     subtotalCents: base,
     taxCents: 0,

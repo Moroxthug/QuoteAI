@@ -97,6 +97,7 @@ async function seedOrgA(): Promise<Fixtures> {
   // deposit invoice + signed PDF in storage. Same chain the lifecycle test runs.
   const quote = await seedQuote(userId, { province: "ON" });
   f.quote = quote.id;
+  f.org = userId;
   await db.update(quotesTable).set({ status: "accepted", acceptedAt: new Date(), acceptedByName: "Jordan Client" }).where(eq(quotesTable.id, quote.id));
   await raiseAutomation({ event: "quote.accepted", userId, entityType: "quote", entityId: quote.id, payload: { acceptedByName: "Jordan Client" } });
   const [contract] = await db.select().from(contractsTable).where(eq(contractsTable.quoteId, quote.id));
@@ -205,7 +206,9 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
       case "variantId": id = "variant"; break;
       case "permitId": id = "permit"; break;
       case "eid": id = "equipment"; break;
-      case "wid": id = "worker"; break;
+      case "wid": case "workerId": id = "worker"; break;
+      // Phase 90: a company id (the group routes) — A's own company.
+      case "orgId": id = "org"; break;
     }
     if (id && f[id]) out.push(f[id]!);
     else {

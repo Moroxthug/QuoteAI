@@ -514,23 +514,28 @@ const can = useCan();
                   </tr>
                 </thead>
                 <tbody>
-                  {visibleItems.map(item => (
+                  {visibleItems.map(item => {
+                    // Phase 90: an item from the group's catalog — read here, edited in its own company.
+                    const shared = item as CatalogItem & { shared?: boolean; sharedFrom?: string | null };
+                    return (
                     <tr key={item.id} className="group">
                       <td>
                         <span className="t-strong">{item.nome}</span>
+                        {shared.shared && <span className="chip chip-teal" style={{ marginLeft: 8 }}>{t("dashboard.catalog.shared").replace("{company}", shared.sharedFrom || "—")}</span>}
                         {item.note && <span className="t-sub">{item.note}</span>}
                       </td>
                       <td>{item.categoria || noCategoryLabel}</td>
                       <td>{item.um}</td>
                       <td className="t-amt" style={{ textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</td>
                       <td>
-                        {can("quotes", "edit") && <div className="row-act">
+                        {can("quotes", "edit") && !shared.shared && <div className="row-act">
                           <button type="button" className="ic-btn" aria-label={t("a11y.edit")} onClick={() => setEditingItem(item)}><Pencil /></button>
                           <button type="button" className="ic-btn danger" aria-label={t("a11y.delete")} onClick={() => setDeletingId(item.id)}><Trash2 /></button>
                         </div>}
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

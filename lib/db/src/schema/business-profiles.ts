@@ -83,6 +83,8 @@ export const businessProfilesTable = pgTable("business_profiles", {
   subscriptionStatus: text("subscription_status"),
   subscriptionInterval: text("subscription_interval"), // Phase 73: "month" | "year" — the tier stays in subscription_plan
   subscriptionPeriodEnd: timestamp("subscription_period_end", { withTimezone: true }),
+  /** Phase 90: set when the plan above is paid by this group company's subscription (one bill), not by this profile's own. */
+  planCoveredBy: text("plan_covered_by"),
   trialStartedAt: timestamp("trial_started_at", { withTimezone: true }),
   trialDownloadsUsed: integer("trial_downloads_used").notNull().default(0),
   apiKey: text("api_key"),

@@ -53,7 +53,11 @@ function elapsedLabel(sinceIso: string, now: number) {
  * site" — a photo, a blocker, materials used — which also queues offline.
  */
 export default function WorkerTimePage() {
-  const { token } = useParams<{ token: string }>();
+  const { token: linkToken } = useParams<{ token: string }>();
+  // Phase 90: the same person on another group company's crew — one link, a company switch.
+  // `<link>~<workerId>` is what the API reads; the choice survives a reload through ?as=.
+  const [asWorker, setAsWorker] = useState<string | null>(() => new URLSearchParams(window.location.search).get("as"));
+  const token = linkToken && asWorker ? `${linkToken}~${asWorker}` : linkToken;
   const { t, lang, setLang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
   const queryClient = useQueryClient();
@@ -70,6 +74,16 @@ export default function WorkerTimePage() {
   const [locationOff, setLocationOff] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { if (data && !projectId && data.jobs.length === 1) setProjectId(data.jobs[0]!.id); }, [data, projectId]);
+  const switchCompany = (c: { workerId: string; primary: boolean }) => {
+    const next = c.primary ? null : c.workerId;
+    setAsWorker(next);
+    setProjectId("");
+    setMilestoneId("");
+    const u = new URL(window.location.href);
+    if (next) u.searchParams.set("as", next);
+    else u.searchParams.delete("as");
+    window.history.replaceState(null, "", u.toString());
+  };
   useDocumentTitle(`${t("worker.clockInOut")} · ${data?.companyName ?? "QuoteAI"}`);
   useEffect(() => {
     if (!data?.activeEntry) return;
@@ -166,6 +180,16 @@ export default function WorkerTimePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {data.companies.length > 1 && (
+          <nav className="card p-3" aria-label={t("worker.companies")}>
+            <p className="text-xs mb-2" style={{ color: "var(--muted-mk)" }}>{t("worker.companies")}</p>
+            <div className="pills" style={{ flexWrap: "wrap" }}>
+              {data.companies.map((c) => (
+                <button key={c.workerId} type="button" className={c.current ? "pill on" : "pill"} aria-pressed={c.current} onClick={() => !c.current && switchCompany(c)}>{c.companyName}</button>
+              ))}
+            </div>
+          </nav>
+        )}
         <OfflineBar scope={token} />
         <WorkerChanges token={token!} changes={data.changes} upTo={data.changesUpTo} />
         <WorkerToday token={token!} jobs={data.todayJobs} canAddTasks={data.worker.canAddTasks} />

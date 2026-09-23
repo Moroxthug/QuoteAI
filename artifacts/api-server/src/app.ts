@@ -7,7 +7,8 @@ import { db, quotesTable, businessProfilesTable, authUsersTable, emailEventsTabl
 import { eq } from "drizzle-orm";
 import { auth, getTrustedOrigins } from "./lib/auth";
 import { PRICE_TO_PLAN, PLANS } from "./routes/payments.js";
-import { isBillingInterval, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
+import { isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
+import { subscriptionChanged } from "./groups/service.js";
 import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
 import "./automations";
@@ -241,6 +242,8 @@ app.post(
         });
 
       logger.info({ userId, customerId, planType, status }, "Subscription synced to DB");
+      // Phase 90: a paying group company's covered companies follow it; a covered company that now pays for itself leaves the group bill.
+      await subscriptionChanged(userId, isActive);
       return { userId, planType, isActive };
     }
 
@@ -281,6 +284,8 @@ app.post(
               },
             });
           logger.info({ userId, planType }, "Subscription activated via checkout webhook");
+          await db.update(businessProfilesTable).set({ planCoveredBy: null }).where(eq(businessProfilesTable.userId, userId));
+          await subscriptionChanged(userId, true);
 
           try {
             const [authUser] = await db
@@ -313,7 +318,7 @@ app.post(
       if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
         const sub = event.data.object;
         const customerId = sub.customer as string;
-        const priceId = sub.items?.data?.[0]?.price?.id;
+        const priceId = planItemOf(sub.items?.data ?? [])?.price?.id;
         const status = sub.status ?? "";
         if (customerId) {
           await syncSubscription(customerId, priceId, status);
@@ -327,6 +332,8 @@ app.post(
             .update(businessProfilesTable)
             .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null })
             .where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
+          const [cancelled] = await db.select({ userId: businessProfilesTable.userId }).from(businessProfilesTable).where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
+          if (cancelled) await subscriptionChanged(cancelled.userId, false, { ended: true });
           logger.info({ customer: sub.customer }, "Subscription cancelled via webhook");
         }
       }

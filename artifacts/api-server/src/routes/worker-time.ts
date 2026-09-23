@@ -25,6 +25,7 @@ import { photoUpload } from "../jobs/photos.js";
 import { addFieldTask, blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
 import { workerChanges } from "../crew/changes.js";
 import { paySettingsFor } from "../pay/service.js";
+import { linkedWorkers } from "../groups/service.js";
 
 /** A clock-in session longer than this is auto-capped at clock-out — a forgotten clock-out shouldn't silently log a 30h day. */
 const MAX_SESSION_HOURS = 16;
@@ -76,15 +77,41 @@ const router = Router();
 const viewLimiter = ipRateLimiter({ windowMs: 60_000, max: 60, message: "Too many requests" });
 const writeLimiter = ipRateLimiter({ windowMs: 15 * 60_000, max: 60, message: "Too many requests. Try again in a few minutes." });
 
-async function resolveWorker(rawToken: string) {
+/**
+ * Phase 90: `<token>~<workerId>` acts as the same person's record at another
+ * company in the group (one link, both payrolls). The token proves who they
+ * are; the suffix only picks among records already linked to that person.
+ */
+async function resolveWorker(tokenParam: string) {
+  const [rawToken = "", asWorkerId] = (tokenParam ?? "").split("~");
   if (!rawToken || rawToken.length < 20 || rawToken.length > 200) return null;
-  const [worker] = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.timeTokenHash, hashToken(rawToken)));
-  if (!worker || !worker.active) return null;
-  if (worker.timeTokenExpiresAt && worker.timeTokenExpiresAt < new Date()) return { expired: true as const, worker };
+  const [owner] = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.timeTokenHash, hashToken(rawToken)));
+  if (!owner || !owner.active) return null;
+  let worker = owner;
+  if (asWorkerId && asWorkerId !== owner.id) {
+    const other = (await linkedWorkers(owner)).find((w) => w.id === asWorkerId);
+    if (!other) return null;
+    // Expiry is the link's, not the other record's.
+    if (owner.timeTokenExpiresAt && owner.timeTokenExpiresAt < new Date()) return { expired: true as const, worker: owner };
+    worker = other;
+  }
+  if (worker === owner && worker.timeTokenExpiresAt && worker.timeTokenExpiresAt < new Date()) return { expired: true as const, worker };
   const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, worker.userId));
   // The company must still be on a plan with time tracking.
   if (!hasFeature(profile, "team_time")) return { expired: true as const, worker };
-  return { expired: false as const, worker, companyName: profile?.companyName ?? "", language: profile?.province === "QC" ? "fr" : "en", province: profile?.province ?? null };
+  return { expired: false as const, worker, owner, companyName: profile?.companyName ?? "", language: profile?.province === "QC" ? "fr" : "en", province: profile?.province ?? null };
+}
+
+/** Phase 90: the other group companies this person works for, to switch between on one link. */
+async function workerCompanies(owner: typeof collaboratorsTable.$inferSelect, currentId: string) {
+  const others = await linkedWorkers(owner);
+  if (!others.some((w) => w.id !== owner.id)) return [];
+  const all = [owner, ...others.filter((w) => w.id !== owner.id)];
+  const profiles = await db.select({ userId: businessProfilesTable.userId, companyName: businessProfilesTable.companyName, flags: businessProfilesTable.featureFlags, plan: businessProfilesTable.subscriptionPlan, status: businessProfilesTable.subscriptionStatus }).from(businessProfilesTable).where(inArray(businessProfilesTable.userId, all.map((w) => w.userId)));
+  const byId = new Map(profiles.map((p) => [p.userId, p]));
+  const reachable = all.filter((w) => hasFeature({ subscriptionPlan: byId.get(w.userId)?.plan, subscriptionStatus: byId.get(w.userId)?.status, featureFlags: byId.get(w.userId)?.flags }, "team_time"));
+  if (reachable.length < 2) return [];
+  return reachable.map((w) => ({ workerId: w.id, companyName: byId.get(w.userId)?.companyName || "", current: w.id === currentId, primary: w.id === owner.id }));
 }
 
 /**
@@ -267,6 +294,7 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
       reports: await ownReports(r.worker),
       changes,
       changesUpTo: now.toISOString(),
+      companies: await workerCompanies(r.owner, r.worker.id),
     });
   } catch (err) {
     req.log.error({ err }, "Error loading worker page");

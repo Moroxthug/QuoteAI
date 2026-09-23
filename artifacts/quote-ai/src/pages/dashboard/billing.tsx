@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { useGetSubscription, useCreateCustomerPortalSession, useGetPlans } from "@workspace/api-client-react";
 import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
 import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
@@ -15,6 +16,7 @@ import {
   RefreshCw,
   XCircle,
   Loader2,
+  Info,
 } from "lucide-react";
 
 function QuotaBar({ used, limit }: { used: number; limit: number }) {
@@ -41,6 +43,7 @@ function QuotaBar({ used, limit }: { used: number; limit: number }) {
 export default function BillingPage() {
   const { t, lang } = useLanguage();
   const { data: sub, isLoading } = useGetSubscription();
+  const coveredBy = (sub as { coveredBy?: { orgId: string; companyName: string | null } | null } | undefined)?.coveredBy ?? null;
   const { data: plans } = useGetPlans();
   const createPortal = useCreateCustomerPortalSession();
   const { toast } = useToast();
@@ -90,6 +93,10 @@ export default function BillingPage() {
       </div>
 
       <div className="stack">
+        {/* Phase 90: this company's plan is paid by another company in its group. */}
+        {coveredBy && (
+          <div className="notice teal"><Info /><span className="grow">{t("group.coveredBy").replace("{company}", coveredBy.companyName ?? "—")}</span><span className="actions"><Link href="/dashboard/group?tab=companies" className="btn btn-sm btn-outline-navy">{t("dashboard.nav.group")}</Link></span></div>
+        )}
         {/* Current plan */}
         {isActive ? (
           <div className="card">

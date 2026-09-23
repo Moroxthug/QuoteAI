@@ -7,7 +7,8 @@ import { getBaseUrl } from "../lib/baseUrl.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { quoteLanguageFor, qt, fmtQuoteDate, fmtQty } from "../quotes/i18n.js";
 import { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } from "../quotes/pdf.js";
-import { eq, desc, count, sum, sql, and, avg, isNull } from "drizzle-orm";
+import { eq, desc, count, sum, sql, and, avg, isNull, inArray } from "drizzle-orm";
+import { catalogOwnerIds } from "../groups/service.js";
 import { getTrialStatus, PLANS } from "./payments.js";
 import {
   UpdateQuoteBody,
@@ -624,7 +625,7 @@ The user has attached a document with a detailed itemized breakdown (bill of qua
         .limit(5),
       db.select()
         .from(priceCatalogItemsTable)
-        .where(eq(priceCatalogItemsTable.userId, userId))
+        .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId)))
         .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome),
       db.select({ cnt: count() })
         .from(uploadedDocumentsTable)
@@ -1968,7 +1969,7 @@ Job description: ${inputText}`;
         .limit(5),
       db.select()
         .from(priceCatalogItemsTable)
-        .where(eq(priceCatalogItemsTable.userId, userId))
+        .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId)))
         .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome),
     ]);
 

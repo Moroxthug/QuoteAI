@@ -29,13 +29,14 @@ export const PRODUCT_FEATURES = [
   "wave_sync", // Phase 25: one-way sync of paid invoices/confirmed costs to Wave accounting
   "flinks_bank_feed", // Phase 27: bank-feed reconciliation via Flinks (auto-match bank transactions to cost entries)
   "meta_lead_ads", // Phase 28: import Facebook/Instagram Lead Ads submissions straight into the leads pipeline
+  "multi_entity", // Phase 90: company groups — consolidated view, shared catalog, crew on both payrolls, one bill
   "google_lsa", // Phase 29: import Google Local Services Ads leads straight into the leads pipeline (engineering track, gated on Google developer-token approval)
 ] as const;
 export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api", "gmail_send", "wave_sync", "flinks_bank_feed", "meta_lead_ads", "google_lsa"];
+const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api", "gmail_send", "wave_sync", "flinks_bank_feed", "meta_lead_ads", "google_lsa", "multi_entity"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
 export const SEATS_INCLUDED: Record<PlanId, number> = {

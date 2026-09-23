@@ -17,11 +17,12 @@ export type ProductFeature =
   | "team_time"
   | "assistant"
   | "analytics_pro"
-  | "team_accounts";
+  | "team_accounts"
+  | "multi_entity";
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro"];
+const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "multi_entity"];
 
 export const SEATS_INCLUDED: Record<PlanId, number> = {
   free: 1,

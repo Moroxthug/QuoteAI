@@ -2,8 +2,9 @@ import { Router } from "express";
 import multer from "multer";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
-import { db, priceCatalogItemsTable, quotesTable } from "@workspace/db";
-import { eq, and } from "drizzle-orm";
+import { db, priceCatalogItemsTable, quotesTable, businessProfilesTable } from "@workspace/db";
+import { eq, and, inArray } from "drizzle-orm";
+import { catalogOwnerIds } from "../groups/service.js";
 import type { QuoteChapter } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
@@ -58,8 +59,10 @@ CORE RULES:
 OUTPUT: A valid JSON array ONLY, no extra text or markdown:
 [{ "nome": "...", "categoria": "...", "um": "...", "prezzoUnitario": 0, "note": "" }]`;
 
-function serializeItem(item: typeof priceCatalogItemsTable.$inferSelect) {
+function serializeItem(item: typeof priceCatalogItemsTable.$inferSelect, shared?: { companyName: string }) {
   return {
+    shared: !!shared,
+    sharedFrom: shared?.companyName ?? null,
     id: item.id,
     userId: item.userId,
     nome: item.nome,
@@ -75,12 +78,16 @@ function serializeItem(item: typeof priceCatalogItemsTable.$inferSelect) {
 router.get("/catalog", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
+    // Phase 90: a group company also reads the group's catalog (read-only here).
+    const owners = await catalogOwnerIds(userId);
     const items = await db
       .select()
       .from(priceCatalogItemsTable)
-      .where(eq(priceCatalogItemsTable.userId, userId))
+      .where(inArray(priceCatalogItemsTable.userId, owners))
       .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome);
-    res.json(items.map(serializeItem));
+    const others = owners.filter((o) => o !== userId);
+    const names = new Map(others.length ? (await db.select({ userId: businessProfilesTable.userId, companyName: businessProfilesTable.companyName }).from(businessProfilesTable).where(inArray(businessProfilesTable.userId, others))).map((p) => [p.userId, p.companyName]) : []);
+    res.json(items.map((i) => serializeItem(i, i.userId === userId ? undefined : { companyName: names.get(i.userId) || "" })));
   } catch (err) {
     req.log.error({ err }, "Error listing catalog items");
     res.status(500).json({ error: "Internal server error" });
@@ -155,7 +162,7 @@ router.post("/catalog/bulk", requireAuth, requirePermission("quotes", "edit"), a
       });
 
       const result = await db.insert(priceCatalogItemsTable).values(values).returning();
-      inserted.push(...result.map(serializeItem));
+      inserted.push(...result.map((i) => serializeItem(i)));
     }
 
     res.status(201).json(inserted);

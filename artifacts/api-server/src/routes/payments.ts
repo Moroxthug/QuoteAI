@@ -7,7 +7,7 @@ import { eq, sql } from "drizzle-orm";
 import { CreateCheckoutSessionBody } from "@workspace/api-zod";
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { annualBillingAvailable, isBillingInterval, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { annualBillingAvailable, isBillingInterval, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -348,6 +348,8 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
       quotaLimit,
       quotaRemaining,
       quotaResetDate,
+      // Phase 90: this plan is paid by another company in the group.
+      coveredBy: profile?.planCoveredBy ? { orgId: profile.planCoveredBy, companyName: (await db.select({ n: businessProfilesTable.companyName }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, profile.planCoveredBy)))[0]?.n ?? null } : null,
     });
   } catch (err) {
     logger.error({ err }, "Error getting subscription");
@@ -448,6 +450,12 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
 
     let customerId = profile?.stripeCustomerId ?? null;
 
+    // Phase 90: a plan the group pays for has nothing of its own to sync — and a "no subscription found" must not wipe it.
+    if (profile?.planCoveredBy && !customerId) {
+      res.json({ synced: true, active: true, coveredBy: profile.planCoveredBy });
+      return;
+    }
+
     if (!customerId) {
       const [authUser] = await db
         .select({ email: authUsersTable.email })
@@ -494,7 +502,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
     }
 
     const sub = subscriptions.data[0];
-    const priceId = sub.items.data[0]?.price?.id;
+    const priceId = planItemOf(sub.items.data)?.price?.id;
     const resolved = resolvePrice(priceId, PRICE_TO_PLAN);
     const planType = resolved?.tier ?? null;
 
@@ -507,7 +515,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
     // subscription item (no longer on the Subscription object): without this,
     // periodEnd always came out null and subscriptionPeriodEnd never got
     // synced correctly during a manual re-sync.
-    const currentPeriodEnd = sub.items.data[0]?.current_period_end;
+    const currentPeriodEnd = planItemOf(sub.items.data)?.current_period_end;
     const periodEnd = currentPeriodEnd ? new Date(currentPeriodEnd * 1000) : null;
 
     await db
@@ -566,7 +574,7 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
     if (profile?.stripeCustomerId) {
       const subs = await stripe.subscriptions.list({ customer: profile.stripeCustomerId, status: "active", limit: 1 });
       const sub = subs.data[0];
-      const item = sub?.items.data[0];
+      const item = sub ? planItemOf(sub.items.data) : undefined;
       if (sub && item) current = { id: sub.id, itemId: item.id, priceId: item.price?.id };
     }
 
@@ -600,7 +608,7 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
       ...(interval === "year" ? { billing_cycle_anchor: "now" } : {}),
       metadata: { userId, planType, interval },
     });
-    const periodEndSec = updated.items.data[0]?.current_period_end;
+    const periodEndSec = planItemOf(updated.items.data)?.current_period_end;
     await db
       .update(businessProfilesTable)
       .set({

@@ -55,6 +55,7 @@ const SchedulePage = lazy(() => import("@/pages/dashboard/schedule"));
 const CompliancePage = lazy(() => import("@/pages/dashboard/compliance"));
 const BooksPage = lazy(() => import("@/pages/dashboard/books"));
 const PayPage = lazy(() => import("@/pages/dashboard/pay"));
+const GroupPage = lazy(() => import("@/pages/dashboard/group"));
 const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
@@ -250,6 +251,9 @@ function Router() {
       )} />
       <Route path="/dashboard/books" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><BooksPage /></DashSuspense></DashboardLayout></OnboardingGuard>
+      )} />
+      <Route path="/dashboard/group" component={() => (
+        <OnboardingGuard><DashboardLayout><DashSuspense><GroupPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
       <Route path="/dashboard/pay" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><PayPage /></DashSuspense></DashboardLayout></OnboardingGuard>

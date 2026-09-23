@@ -51,6 +51,29 @@ export function resolvePrice(
   return null;
 }
 
+// ── Phase 90: one bill for a group of companies ─────────────────────────────
+// Each extra company a group's billing company pays for is one unit of this
+// price on its existing subscription. Created once in the Stripe dashboard
+// (owner track) at the price the business decides; one per interval, because
+// a subscription cannot mix monthly and yearly items. Missing = "one bill" is
+// honestly unavailable and every company keeps paying its own.
+
+export function groupCompanyPriceIdFor(interval: BillingInterval): string | null {
+  const v = (interval === "year" ? process.env.STRIPE_PRICE_GROUP_COMPANY_YEARLY : process.env.STRIPE_PRICE_GROUP_COMPANY)?.trim();
+  return v && v.length > 0 ? v : null;
+}
+
+/** Every configured group-company price id — so plan code can skip those items when it looks for "the plan". */
+function groupCompanyPriceIds(): string[] {
+  return [groupCompanyPriceIdFor("month"), groupCompanyPriceIdFor("year")].filter((x): x is string => !!x);
+}
+
+/** The subscription item that carries the plan (not a group-company add-on). */
+export function planItemOf<T extends { price?: { id?: string } | null }>(items: readonly T[]): T | undefined {
+  const extra = new Set(groupCompanyPriceIds());
+  return items.find((i) => !extra.has(i.price?.id ?? "")) ?? items[0];
+}
+
 export function isBillingInterval(v: unknown): v is BillingInterval {
   return v === "month" || v === "year";
 }

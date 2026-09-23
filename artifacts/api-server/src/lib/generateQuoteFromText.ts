@@ -1,5 +1,6 @@
 import { db, quotesTable, businessProfilesTable, priceCatalogItemsTable } from "@workspace/db";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, desc, count, sql, inArray } from "drizzle-orm";
+import { catalogOwnerIds } from "../groups/service.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import type { QuoteChapter, QuoteDiscount, QuoteCompanySnapshot, QuoteClientData } from "@workspace/db";
 import type { Logger } from "pino";
@@ -258,7 +259,7 @@ export async function buildQuoteFromAI({
       .limit(5),
     db.select()
       .from(priceCatalogItemsTable)
-      .where(eq(priceCatalogItemsTable.userId, userId))
+      .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId)))
       .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome),
   ]);
   const [profile] = profileRows;
@@ -383,7 +384,7 @@ export async function regenerateWithCorrection({
     db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId)),
     db.select()
       .from(priceCatalogItemsTable)
-      .where(eq(priceCatalogItemsTable.userId, userId))
+      .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId)))
       .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome),
   ]);
   const [profile] = profileRows;

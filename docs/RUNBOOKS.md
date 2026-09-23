@@ -566,3 +566,25 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | Holiday pay went up after setting vacation pay | Expected in ON, AB and BC. Untick "Count vacation pay in the holiday pay base" if the company's agreement says otherwise |
 | A preset is wrong for our agreement | Change the fields; the preset is only a starting point. The QC R-20 preset covers overtime only |
 
+## 28. Company groups: the consolidated view, one catalog, crew on two payrolls, one bill (Phase 90)
+
+**Where**: `groups/service.ts` (membership, coverage, catalog scope, overview, crew), `groups/intercompany.ts` (pure matching, unit-tested), `routes/groups.ts` (`/api/group*`), `pages/dashboard/group.tsx`. Migration `0052`: `company_groups`, `company_group_members`, `collaborators.group_person_id`, `business_profiles.plan_covered_by`. Plan feature `multi_entity` (Elite).
+
+**How it fits**:
+- A company is still one `business_profiles` row owned by one login. A group links companies; **nothing is merged**. A company is in at most one group. The company that created it manages it (name, catalog, invitations); it can only invite a company the person **owns or administers**, and the invited company joins only when **its own owner** accepts (`settings:full`, so owner only). The Group nav item shows when the person has a second company to switch to, or the acting company is in (or invited into) a group.
+- **Overview**: `companyAnalytics` per company, added up, only for companies where the person is **owner or admin** (`analytics:full` in that company); the others are listed as not included. Invoices to, and confirmed costs from, another group company (matched by the 9-digit business number, then email, then the company name without legal suffixes) are taken out of invoiced and costs and shown on their own line. Receivables are not eliminated: each company is still owed its own.
+- **One catalog**: `catalogOwnerIds(org)` returns the company plus the group's catalog company when `use_group_catalog` is on. Every catalog reader (catalog page, AI quote generation, public quote form, price check) uses it. Shared items are read-only outside their own company (`PUT/DELETE /catalog/:id` stay keyed on the company's own id, so they 404).
+- **Crew on two payrolls**: workers in different group companies share a `group_person_id` (linking needs `team:full` in each company). The magic link accepts `<token>~<workerId>`: the token proves who the person is; the suffix only picks among records linked to them, in companies still active in the same group with time tracking. The link's own expiry applies. The worker page shows a "You work for" switch (`?as=` keeps it across reloads). Each company pays its own hours under its own rules; the crew tab flags a week where the **combined** hours pass the lowest weekly overtime line while no company's hours do alone (related-employer rules, for the accountant).
+- **One bill**: one company (the one paying, its own choice) covers others. Covering a company (1) adds or updates a subscription item of `STRIPE_PRICE_GROUP_COMPANY` (`_YEARLY` for a yearly plan) with quantity = covered companies, prorated, and then (2) copies the payer's plan onto the covered profile with `plan_covered_by` set. It is refused while the company still pays for its own plan. Webhooks: the payer past due means covered companies pause and come back with it; the payer's subscription deleted means coverage ends; a covered company that starts its own subscription leaves the group bill (quantity lowered). Leaving the group or being removed ends coverage, catalog sharing and crew links.
+
+**Owner track**: create the "extra company" price(s) in Stripe at whatever price the business decides and set `STRIPE_PRICE_GROUP_COMPANY` (and `STRIPE_PRICE_GROUP_COMPANY_YEARLY` for annual payers). Until then the One bill card says it is not available, and every company keeps its own plan.
+
+| Ask | Do |
+|---|---|
+| "I can't add my other company" | They need to be its owner or an admin there first (Team, then Invite, from the other login), then invite it from Group, then accept from the other company's owner login |
+| The overview leaves a company out | They are not owner or admin there. It is listed under "Not included" |
+| Intercompany work isn't taken out | The invoice's customer or the cost's vendor didn't match: put the other company's GST/HST number on the invoice, or use its exact name as vendor |
+| A crew member sees only one company | Both records must be linked (Group, then Crew) and both companies need time tracking (Elite) |
+| One bill button disabled | Env price ids not set (owner track), or the paying company has no active subscription of its own |
+| A covered company lost its plan | The payer's subscription was cancelled or is past due, or the company left the group. It can subscribe on its own |
+| Test runs | e2e uses `setGroupBillingDriverForTests` in place of Stripe; the IDOR sweep seeds `:orgId` with A's own company |

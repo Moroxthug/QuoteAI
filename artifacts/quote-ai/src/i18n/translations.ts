@@ -1232,6 +1232,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pilot.step2Body": "Describe a job you are actually bidding, in your own words. The trial covers it: seven days, no card.",
     "pilot.step3Title": "Pick a plan",
     "pilot.step3Body": "When the trial ends, choose the plan that fits. If a pilot code is running, it is already on the checkout page.",
+    // Phase 90: company groups
+    "dashboard.nav.group": "Group",
+    "worker.companies": "You work for",
   },
   fr: {
 
@@ -2458,6 +2461,9 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pilot.step2Body": "Décrivez un chantier sur lequel vous soumissionnez pour de vrai, dans vos propres mots. L'essai couvre ça : sept jours, sans carte.",
     "pilot.step3Title": "Choisissez un forfait",
     "pilot.step3Body": "À la fin de l'essai, choisissez le forfait qui vous convient. Si un code pilote est actif, il est déjà appliqué à la page de paiement.",
+    // Phase 90: company groups
+    "dashboard.nav.group": "Groupe",
+    "worker.companies": "Vous travaillez pour",
   },
 };
 

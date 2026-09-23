@@ -1,6 +1,6 @@
 import "@/i18n/dashboard";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet } from "lucide-react";
+import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -41,6 +41,7 @@ function useNavItems() {
     { href: "/dashboard/books", labelKey: "dashboard.nav.books", icon: BookCheck, exact: false, proOnly: true, comingSoon: false, group: "delivery" },
     { href: "/dashboard/analytics", labelKey: "dashboard.nav.analytics", icon: BarChart3, exact: false, proOnly: false, comingSoon: false, group: "insights" },
     { href: "/dashboard/assistant", labelKey: "dashboard.nav.assistant", icon: Sparkles, exact: false, proOnly: true, comingSoon: false, group: "insights" },
+    { href: "/dashboard/group", labelKey: "dashboard.nav.group", icon: Network, exact: false, proOnly: false, comingSoon: false, group: "insights" },
     { href: "/dashboard/documents", labelKey: "dashboard.nav.documents", icon: FolderOpen, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
     { href: "/dashboard/archive", labelKey: "dashboard.nav.archive", icon: Archive, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
     { href: "/dashboard/imports", labelKey: "dashboard.nav.imports", icon: UploadCloud, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
@@ -254,6 +255,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
   // Hooks must run on every render — keep this above the early returns below.
   const allNavItems = useNavItems();
+  const { data: orgsData } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
 
   // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
   // name the tab after the section the user is in.
@@ -310,7 +312,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   // Phase 88: the books (the bank account, the month-end close) are the office's, not a foreman's.
   // Phase 89: so is pay (wages) — costs:full.
-  const NAV_ITEMS = allNavItems.filter(item => (!item.proOnly || isPro) && (item.href !== "/dashboard/books" || can("invoicing", "full")) && (item.href !== "/dashboard/pay" || can("costs", "full")));
+  // Phase 90: Group shows once there is something to group — a second company to switch to, or a group this one is in.
+  const hasGroupEntry = !!orgsData?.group || (orgsData?.items.length ?? 0) > 1;
+  const NAV_ITEMS = allNavItems.filter(item => (!item.proOnly || isPro) && (item.href !== "/dashboard/books" || can("invoicing", "full")) && (item.href !== "/dashboard/pay" || can("costs", "full")) && (item.href !== "/dashboard/group" || hasGroupEntry));
   // Phase 80: roles below quotes:edit (foreman, viewer) never see the New quote entry points.
   const canNewQuote = can("quotes", "edit");
   const name = user?.name || user?.email?.split("@")[0] || "Account";

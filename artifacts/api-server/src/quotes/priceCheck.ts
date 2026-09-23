@@ -7,7 +7,8 @@
 // contractor can apply the reference price in one click. Pure matching in
 // this file; the routes in routes/quotes.ts load the rows and write back.
 import { db, priceCatalogItemsTable, priceIntelligenceTable, type QuoteChapter } from "@workspace/db";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
+import { catalogOwnerIds } from "../groups/service.js";
 
 /** Lines are flagged once the reference price differs from the quoted one by at least this much. */
 const PRICE_CHECK_THRESHOLD_PCT = 5;
@@ -150,7 +151,7 @@ export function learnedReferences(rows: { workType: string; unitPrice: string | 
 /** The company's references: catalog items + learned prices (newest receipts first). */
 export async function loadPriceReferences(userId: string): Promise<PriceReference[]> {
   const [catalog, learned] = await Promise.all([
-    db.select({ id: priceCatalogItemsTable.id, nome: priceCatalogItemsTable.nome, um: priceCatalogItemsTable.um, prezzo: priceCatalogItemsTable.prezzoUnitario }).from(priceCatalogItemsTable).where(eq(priceCatalogItemsTable.userId, userId)),
+    db.select({ id: priceCatalogItemsTable.id, nome: priceCatalogItemsTable.nome, um: priceCatalogItemsTable.um, prezzo: priceCatalogItemsTable.prezzoUnitario }).from(priceCatalogItemsTable).where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId))),
     db
       .select({ workType: priceIntelligenceTable.workType, unitPrice: priceIntelligenceTable.unitPrice, unit: priceIntelligenceTable.unit, vendor: priceIntelligenceTable.vendor })
       .from(priceIntelligenceTable)

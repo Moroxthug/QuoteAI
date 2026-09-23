@@ -24,7 +24,7 @@ export const teamMembersApi = {
   update: (id: string, body: { role?: TeamMemberRole; status?: "active" | "suspended" }) => req<{ member: TeamMemberDto }>(`/api/team/members/${id}`, { method: "PUT", body: json(body) }),
   remove: (id: string) => req<{ success: true }>(`/api/team/members/${id}`, { method: "DELETE" }),
 
-  orgs: () => req<{ items: OrgDto[]; activeOrgId: string }>("/api/team/orgs"),
+  orgs: () => req<{ items: OrgDto[]; activeOrgId: string; group: { status: "pending" | "active" } | null }>("/api/team/orgs"),
   switchOrg: (orgId: string) => req<{ orgId: string; role: string }>("/api/team/switch", { method: "POST", body: json({ orgId }) }),
   /** Phase 72: remove yourself from a company you were invited to. */
   leave: (orgId: string) => req<{ success: true }>("/api/team/members/leave", { method: "POST", body: json({ orgId }) }),

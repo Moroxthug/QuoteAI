@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable, normalizeProvince, quoteTaxLines } from "@workspace/db";
-import { eq, or, isNull } from "drizzle-orm";
+import { eq, or, isNull, inArray } from "drizzle-orm";
+import { catalogOwnerIds } from "../groups/service.js";
 import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
@@ -249,7 +250,7 @@ router.get("/public/config", configLimiter, async (req, res) => {
     const catalogItems = await db
       .select()
       .from(priceCatalogItemsTable)
-      .where(eq(priceCatalogItemsTable.userId, profile.userId));
+      .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(profile.userId)));
 
     const categoriesSet = new Set<string>();
     for (const item of catalogItems) {
@@ -316,7 +317,7 @@ router.post("/public/quotes", quoteIpLimiter, quoteApiKeyLimiter, async (req, re
     const catalogItems = await db
       .select()
       .from(priceCatalogItemsTable)
-      .where(eq(priceCatalogItemsTable.userId, userId))
+      .where(inArray(priceCatalogItemsTable.userId, await catalogOwnerIds(userId)))
       .orderBy(priceCatalogItemsTable.categoria, priceCatalogItemsTable.nome);
 
     const relevantCatalogItems = findRelevantCatalogItems(rawInput, catalogItems, 20);

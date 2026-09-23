@@ -15,7 +15,7 @@ import { raiseAutomation } from "../lib/automation.js";
 import { logContractEvent, finalizeContract, sendContractToCustomer } from "../contracts/service.js";
 import { buildInvoiceContext, createInvoice, sendInvoice, recordPayment, invoiceToken } from "../invoices/service.js";
 import { TINY_PNG_DATA_URL } from "../lib/pngDataUrl.js";
-import { api, seedQuote, type TestUser } from "./harness.js";
+import { api, createOrg, seedQuote, type TestUser } from "./harness.js";
 
 export type Showcase = {
   province: "ON" | "QC";
@@ -225,6 +225,7 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   });
 
   await seedBooks(userId, project.id, language);
+  await seedGroup(org, project.id, worker.status === 201 ? String(worker.body.worker.id) : null, language);
 
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });
@@ -249,6 +250,62 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
  * the QuickBooks settings render with content, not their empty states. Seeded
  * last, so nothing earlier in the showcase is pushed to the stubbed books.
  */
+/**
+ * Phase 90: a sister company the showcase owner also administers, grouped with
+ * this one — the catalog shared from here, the same worker on both crews with
+ * last week split between them, and work billed between the two — so the
+ * Group page, the catalog's shared rows and the worker page's company switch
+ * render with content. Best effort: the sweep still runs if any of it fails.
+ */
+async function seedGroup(org: TestUser & { province: "ON" | "QC" }, projectId: string, workerId: string | null, language: "en" | "fr"): Promise<void> {
+  try {
+    const sisterName = language === "fr" ? "Rénovations Laval Inc." : "Northside Framing Ltd.";
+    const sister = await createOrg({ companyName: sisterName, province: org.province, profile: { gstHstNumber: "555666777RT0001" } });
+    const invite = await sister.api("/api/team/members/invite", { body: { email: org.email, role: "admin", send: false } });
+    const token = String(invite.body?.url ?? "").split("/team-invite/")[1];
+    if (!token || (await org.api(`/api/team/invite/${token}/accept`, { method: "POST" })).status !== 200) throw new Error("sister admin");
+    const created = await org.api("/api/group", { body: { name: language === "fr" ? "Groupe Showcase" : "Showcase group" } });
+    if (created.status !== 201) throw new Error(`group ${created.status}`);
+    await org.api("/api/group/companies", { body: { orgId: sister.userId } });
+    await sister.api("/api/group/accept", { method: "POST" });
+    await org.api("/api/group", { method: "PUT", body: { catalogOrgId: org.userId } });
+    await sister.api("/api/catalog", { body: { nome: language === "fr" ? "Charpente murale" : "Wall framing", categoria: language === "fr" ? "Charpente" : "Framing", um: "m", prezzoUnitario: 42 } });
+
+    const [me] = await db.select({ companyName: businessProfilesTable.companyName }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, org.userId));
+    const sisterJob = await sister.api("/api/jobs", { body: { name: language === "fr" ? "Agrandissement Laval" : "Garage addition", address: "88 Rue Principale" } });
+    const sisterProject = sisterJob.body?.job?.id as string | undefined;
+    if (sisterProject) await db.update(projectsTable).set({ status: "active" }).where(eq(projectsTable.id, sisterProject));
+    const day = (n: number) => new Date(Date.now() - n * 86_400_000);
+    const contractor = { name: me?.companyName ?? "" };
+    await db.insert(invoicesTable).values([
+      { userId: org.userId, projectId, number: "INV-GRP-0001", type: "manual", status: "sent", province: org.province, issueDate: day(6), dueDate: day(-24), contractor, customer: { name: sisterName, gstHstNumber: "555666777RT0001" }, lines: [], subtotalCents: 240_000, taxableCents: 240_000, taxCents: 31_200, totalCents: 271_200, sentAt: day(6) },
+      ...(sisterProject ? [{ userId: sister.userId, projectId: sisterProject, number: "INV-GRP-0002", type: "manual" as const, status: "sent" as const, province: org.province, issueDate: day(4), dueDate: day(-26), contractor: { name: sisterName }, customer: { name: "Morgan Client" }, lines: [], subtotalCents: 1_150_000, taxableCents: 1_150_000, taxCents: 149_500, totalCents: 1_299_500, sentAt: day(4) }] : []),
+    ]);
+    if (sisterProject) {
+      await db.insert(costEntriesTable).values([
+        { userId: sister.userId, projectId: sisterProject, category: "subcontractor", vendor: me?.companyName ?? "", description: language === "fr" ? "Équipe de finition" : "Finishing crew", date: day(5), subtotalCents: 240_000, taxCents: 31_200, totalCents: 271_200, status: "confirmed", source: "manual", createdBy: "user", confirmedAt: new Date() },
+        { userId: sister.userId, projectId: sisterProject, category: "materials", vendor: "Home Hardware", description: language === "fr" ? "Bois d'œuvre" : "Lumber", date: day(5), subtotalCents: 380_000, taxCents: 49_400, totalCents: 429_400, status: "confirmed", source: "manual", createdBy: "user", confirmedAt: new Date() },
+      ]);
+    }
+
+    if (workerId && sisterProject) {
+      const sisterWorker = await sister.api("/api/team/workers", { body: { name: "Pat Worker", hourlyRateCents: 3800, workerType: "employee" } });
+      if (sisterWorker.status === 201) {
+        await org.api("/api/group/crew/link", { body: { workerIds: [workerId, sisterWorker.body.worker.id] } });
+        // Two 9-hour days at the sister company this week, so the crew tab shows hours on both sides.
+        const monday = new Date();
+        monday.setUTCDate(monday.getUTCDate() - ((monday.getUTCDay() + 6) % 7));
+        for (let i = 0; i < 2 && monday.getTime() + i * 86_400_000 <= Date.now(); i++) {
+          const date = new Date(monday.getTime() + i * 86_400_000).toISOString().slice(0, 10);
+          await sister.api(`/api/jobs/${sisterProject}/time-entries`, { body: { workerId: sisterWorker.body.worker.id, date, hours: 9, approve: true } });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[showcase] group not seeded:", (err as Error).message);
+  }
+}
+
 async function seedBooks(userId: string, projectId: string, language: "en" | "fr"): Promise<void> {
   // Late last month, so the close (which opens on last month) has something on it.
   const now = new Date();

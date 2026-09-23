@@ -4,6 +4,7 @@ import {
   db,
   businessProfilesTable,
   organizationMembersTable,
+  companyGroupMembersTable,
   hasFeature,
   minimumPlanFor,
   effectivePlan,
@@ -317,7 +318,9 @@ router.get("/team/orgs", requireAuth, async (req, res) => {
       const p = await loadProfile(m.ownerId);
       orgs.push({ orgId: m.ownerId, companyName: p?.companyName || "Company", role: m.role, isOwn: false });
     }
-    res.json({ items: orgs, activeOrgId: currentOrgId });
+    // Phase 90: whether the acting company is in a group (or invited into one) — the sidebar shows Group when it is.
+    const [grouped] = await db.select({ status: companyGroupMembersTable.status }).from(companyGroupMembersTable).where(eq(companyGroupMembersTable.userId, currentOrgId));
+    res.json({ items: orgs, activeOrgId: currentOrgId, group: grouped ? { status: grouped.status } : null });
   } catch (err) {
     req.log.error({ err }, "Error listing orgs");
     res.status(500).json({ error: "Internal server error" });

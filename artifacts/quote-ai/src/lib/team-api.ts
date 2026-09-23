@@ -91,6 +91,8 @@ export type WorkerPageDto = {
   changes: CrewChangeDto[];
   /** When that list was built — what "Got it" moves the marker to. */
   changesUpTo: string;
+  /** Phase 90: the group companies this person works for (empty unless two or more). */
+  companies: { workerId: string; companyName: string; current: boolean; primary: boolean }[];
 };
 type WorkerScheduleBlockDto = { id: string; projectId: string | null; label: string; address: string | null; milestoneTitle: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string };
 export type WorkerEntryDto = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; milestoneTitle: string | null; date: string | null; hours: number; note: string; status: TimeEntryStatus; rejectedReason: string | null; clockInAt: string | null; clockOutAt: string | null; geofenceFlagged: boolean; createdAt: string };

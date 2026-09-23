@@ -130,6 +130,8 @@ export const collaboratorsTable = pgTable("collaborators", {
   payrollId: text("payroll_id"),
   /** Phase 86b: when the worker last dismissed "since you last looked" on /t/:token. Null until their first visit. */
   crewSeenAt: timestamp("crew_seen_at", { withTimezone: true }),
+  /** Phase 90: the same person on another group company's crew shares this id — one magic link reaches both. */
+  groupPersonId: uuid("group_person_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

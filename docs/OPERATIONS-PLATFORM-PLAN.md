@@ -62,7 +62,7 @@ Deliberately **not** a payroll engine: source deductions, T4s and remittances ar
 - Exports in the shapes payroll providers actually ingest (Wagepoint, Payworks, QuickBooks Payroll, plus a generic CSV), not the current hours-only dump.
 - Labour cost per job from the same approved hours, so job margin stops being an estimate.
 
-### Phase 90 — Multi-entity (held until someone needs it)
+### Phase 90 — Multi-entity (built 2026-09-23 on request, see the build log)
 Switching companies works. What does not exist is a *group*: consolidated reporting across two numbered companies, a shared price catalog, a crew member on both payrolls, one bill. **Held deliberately** — it is real work for a customer who does not exist yet. The trigger is a pilot contractor with a second company, and then it is a phase.
 
 ---
@@ -294,3 +294,30 @@ Phase 86 shipped with three things set aside: crews adding tasks, a per-worker "
   - an office tick on the worker's own task is news
 
   phase86, offline/push, schedule, team, public tokens, phase83, phase85 and **security incl. the IDOR sweep** are all green · `qa:visual` on `/t/:token`, the owner's and the foreman's `/dashboard`, jobs, the job and its setup, schedule and Team tabs, EN+FR × 1280/375: 0 overflow, 0 phone-gutter, **0 axe serious/critical** after the two fixes above, 0 screen-reader findings, 0 raw keys · the worker page at 375 and the foreman's Team page reviewed by eye.
+
+### Phase 90 — Multi-entity (2026-09-23)
+
+The user asked for it directly, so it was built before a pilot needed it.
+
+**Built**
+- **Company groups.** `company_groups` and `company_group_members`: one company creates the group and manages it; it can invite a company the person owns or administers; that company's own owner accepts or declines. Leaving or removal ends everything the group gave. A group without its managing company passes to the oldest remaining member, or ends.
+- **The consolidated view** (`GET /api/group/overview`): each included company's own analytics (only where the person is owner or admin, the rest named as not included), totals, aging, the month series and the cash-flow weeks added up, and **intercompany work taken out**: an invoice from one group company to another (matched by business number, then email, then name without legal suffixes) and the matching cost at the other, shown on their own line. Receivables stay as owed.
+- **One catalog.** The managing company picks whose catalog the group shares; every other company reads it next to its own (opt-out per company) in the catalog page, AI quote generation, the public quote form and the price check. Shared rows are read-only outside their own company.
+- **One person, two payrolls.** `collaborators.group_person_id` links the same person's records across companies; one magic link (`<token>~<workerId>`) reaches each company's page, with a company switch on the worker page. The crew tab shows each linked person's week at every company and flags hours that cross the overtime line only when added up.
+- **One bill.** A company can pay for the group: covering another company adds an "extra company" item to its Stripe subscription (prorated) and copies its plan onto the covered profile (`plan_covered_by`). Refused while the covered company pays for itself. Webhooks keep it in step (past due pauses, deleted ends, own subscription leaves). Billing shows "paid by …". Plan code now picks the plan item, not the add-on, everywhere it read `items.data[0]`.
+- `/dashboard/group` (Overview, Companies, Crew), a Group nav item when there is something to group. Migration `0052` (applied). Plan feature `multi_entity` (Elite). Route matrix 451 → 465. 136 EN/FR strings. Runbook §28. Env `STRIPE_PRICE_GROUP_COMPANY(_YEARLY)` classified.
+
+**Found**
+1. The worker page offered a company whose plan had lost time tracking. The link then answered 410 when the person picked it. The switch now lists only reachable companies, and none at all when fewer than two remain.
+2. `/payments/sync-subscription` would have wiped a covered plan ("no Stripe customer, no subscription"). It now leaves a group-paid plan alone. The same guard is in the webhook: a stale event about a covered company's old subscription restores the group plan instead of clearing it.
+3. The IDOR sweep flagged the new `:orgId` and `:workerId` params as unseeded. Both are seeded now (A's own company, A's worker).
+
+**Not done / deferred**
+- **One bill needs the Stripe price** (owner track): until `STRIPE_PRICE_GROUP_COMPANY` exists the card says so. The price itself is a business decision.
+- **One login still owns one company.** Grouping two companies takes both owner logins (one to invite, one to accept). Owning several companies from one login would change the tenant model everywhere and is not attempted.
+- Consolidation is **management reporting, not consolidated statements**: no eliminations of receivables/payables, no tax consolidation (each company files its own), CAD only.
+- Shared catalog is one source company; no merged or per-company price overrides.
+- Combined overtime is a flag for the accountant, not a pay rule. The pay worksheets stay per company.
+- Intercompany matching needs the business number, email or name on the document; a cost typed with a nickname for the sister company is not caught.
+
+**Verification**: `pnpm typecheck` (libs + both apps + scripts) · `pnpm lint` **0 errors** (69 warnings, pre-existing) · `pnpm knip` no new unused exports · `i18n-audit` **4474 = 4474** (+134), 0 missing · `env:inventory` **no problems** (2 new variables classified) · migration `0052` applied, `schema-drift` **0 missing, 0 mismatched** (100 tables) · route matrix **465**, rules test green · unit **+5** (name normalising, business numbers, the matching order and its refusals) · e2e **phase90 5/5** (Elite and owner-only creation, invitations only to companies you run, only the invited owner accepts, nothing visible while pending or to an outsider; the shared catalog read-only, opt-out; the overview with intercompany taken out, 10,000 + 3,000 + 5,000 invoiced → 15,000, costs 4,000 → 1,000, a foreman sees no company's money; one link reaching both crews, refused for a stranger's or an unlinked worker id, a 410 while the other company has no time tracking, a clock-in landing in the other company, 30 + 20 h flagged together; one bill: unavailable without the price, refused while paying its own, covered → Elite with `plan_covered_by`, leaving bills down to 0 and ends catalog and crew links) · regression **security (incl. the IDOR sweep), team, billing, quotes, phase86, phase86b, phase89, phase89b, offline-push, money, public-tokens — all green** · `pnpm build` 438 pages prerendered · `qa:visual` on Group (3 tabs + foreman), Catalog, Billing and the worker page, EN+FR × 1280/375, 28 pages: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys. Checked by eye: the overview at 1280, the companies tab at 1280, the crew tab at 375 and the worker page's company switch at 375 (FR).

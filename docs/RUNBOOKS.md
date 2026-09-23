@@ -407,3 +407,18 @@ pnpm --filter @workspace/api-server ops:preflight -- --url https://quoteai.ca --
 | `table-headers` | a data table of three rows or more with no `<th>`. The invoice totals table now uses `<th scope="row">` for each label, so a screen reader reads "Total — $31,642.84" instead of two unrelated cells |
 | The focus loop reports everything as ringless | the measurement is racing a CSS transition — a computed style read in the same tick as `.focus()` returns the value the transition starts *from*. The module injects `transition: none` for the duration of the loop; keep that if you touch it. It also presses Tab once first, because Chrome only paints `:focus-visible` for a programmatic focus when the last input modality was the keyboard |
 | A page evaluate dies with `__name is not defined` | esbuild's `keepNames` wraps named function expressions — including the helpers inside a `page.evaluate` callback — in a helper that exists in the bundle, never in the page. `installNameShim(page)` evaluates a *string* (never transformed) that defines the identity shim |
+
+
+## 21. Scroll position on navigation (Phase 84)
+
+**Where**: `quote-ai/src/components/scroll-manager.tsx`, mounted once in `App.tsx`.
+
+**How it fits** — a browser scrolls a new document to the top, remembers where you were on Back, and jumps to `#anchor`. All three are tied to a *document load*, and every link in this app is a `pushState`, so none of them happened: opening a quote from half-way down a list opened the quote half-way down, and `/#trades` from another page landed at the top of the homepage with the anchor ignored. `ScrollManager` listens to the same four window events wouter listens to (`pushState`, `replaceState`, `popstate`, `hashchange` — wouter patches the history methods to dispatch the first two), and decides: **hash** → that element, under the sticky header; **Back/Forward** → the offset that URL was left at; **anything else** → the top. `history.scrollRestoration` is `"manual"` while it is mounted, because the browser's own restore fires before a lazy route has rendered and lands against a page that is still short.
+
+| Ask | Do |
+|---|---|
+| A page still opens part-way down | the navigation did not go through the history API (a raw `window.location` assignment, or a link the router did not intercept). Use wouter's `<Link>` / `navigate()` |
+| An anchor lands under the sticky header | `stickyHeaderOffset()` measures `.site-head` / `.topbar` when their computed position is `sticky`, plus 24 px. A new sticky chrome element needs adding there |
+| An anchor overshoots on the homepage | its sections reveal as they scroll into view, so the target moves for a few hundred ms after the first landing. The anchor case re-evaluates for 900 ms (`keepCorrecting`); everything else stops as soon as it arrives |
+| The page fights the user after a click | it should not: any `wheel`, `touchstart`, `keydown` or `mousedown` cancels the correction loop immediately. If that regresses, check those listeners are still attached in `applyRepeatedly` |
+| A filter or tab should *not* scroll to the top | it will, if it changes the URL. Keep that state in React (which is what every list page here does) or, if it must be in the URL, give `ScrollManager` an opt-out |

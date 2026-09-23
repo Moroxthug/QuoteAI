@@ -3,6 +3,7 @@ import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { RouteAnnouncer } from "@/components/a11y";
+import { ScrollManager } from "@/components/scroll-manager";
 import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -323,6 +324,7 @@ function App({ ssr }: { ssr?: { path: string; lang: Lang } } = {}) {
             </ErrorBoundary>
             <Toaster />
             <RouteAnnouncer />
+            <ScrollManager />
           </TooltipProvider>
         </LanguageProvider>
       </WouterRouter>

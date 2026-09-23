@@ -88,6 +88,15 @@ export async function setPaymentAccount(userId: string, paymentAccount: Quickboo
   await db.update(quickbooksConnectionsTable).set({ paymentAccount }).where(eq(quickbooksConnectionsTable.userId, userId));
 }
 
+/** Phase 88: the rest of the mapping (income + deposit accounts, tax codes) and the payment-pull settings. */
+export async function updateQuickbooksConnection(
+  userId: string,
+  patch: Partial<Pick<QuickbooksConnection, "incomeAccount" | "depositAccount" | "taxCodeMap" | "pullPayments" | "paymentsCursor" | "paymentsPulledAt">>,
+): Promise<void> {
+  if (Object.keys(patch).length === 0) return;
+  await db.update(quickbooksConnectionsTable).set(patch).where(eq(quickbooksConnectionsTable.userId, userId));
+}
+
 export async function markSynced(userId: string): Promise<void> {
   await db.update(quickbooksConnectionsTable).set({ lastSyncedAt: new Date() }).where(eq(quickbooksConnectionsTable.userId, userId));
 }

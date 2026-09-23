@@ -616,6 +616,11 @@ export interface SuccessResult {
 
 export type QuickbooksStatusCategoryMap = {[key: string]: string | null} | null;
 
+/**
+ * Phase 88 — tax set ("HST 13%") → QBO tax code name.
+ */
+export type QuickbooksStatusTaxCodeMap = {[key: string]: string} | null;
+
 export interface QuickbooksStatus {
   connected: boolean;
   /** False when the server-side app registration for this integration is missing (Phase 65) — the UI shows "not available yet" instead of a Connect button. */
@@ -628,6 +633,16 @@ export interface QuickbooksStatus {
   hasPaymentAccount?: boolean | null;
   paymentAccountName?: string | null;
   categoryMap?: QuickbooksStatusCategoryMap;
+  /** Phase 88 — the income account invoice revenue is booked to. */
+  incomeAccountName?: string | null;
+  /** Phase 88 — where payments recorded in QuoteAI land (null = Undeposited Funds). */
+  depositAccountName?: string | null;
+  /** Phase 88 — tax set ("HST 13%") → QBO tax code name. */
+  taxCodeMap?: QuickbooksStatusTaxCodeMap;
+  /** Phase 88 — the tax sets this company's invoices actually carry. */
+  taxSets?: string[] | null;
+  pullPayments?: boolean | null;
+  paymentsPulledAt?: string | null;
 }
 
 export interface QuickbooksConnectUrl {
@@ -646,13 +661,35 @@ export interface QuickbooksAccount {
 export interface QuickbooksAccounts {
   expenseAccounts: QuickbooksAccount[];
   paymentAccounts: QuickbooksAccount[];
+  incomeAccounts: QuickbooksAccount[];
+  depositAccounts: QuickbooksAccount[];
+  taxCodes: QuickbooksAccount[];
 }
 
 export type QuickbooksMappingBodyCategoryMap = {[key: string]: QuickbooksAccount | null};
 
+export type QuickbooksMappingBodyTaxCodeMap = {[key: string]: QuickbooksAccount | null};
+
 export interface QuickbooksMappingBody {
   paymentAccount?: QuickbooksAccount | null;
   categoryMap?: QuickbooksMappingBodyCategoryMap;
+  incomeAccount?: QuickbooksAccount | null;
+  depositAccount?: QuickbooksAccount | null;
+  taxCodeMap?: QuickbooksMappingBodyTaxCodeMap;
+  pullPayments?: boolean;
+}
+
+export interface QuickbooksPullResult {
+  read: number;
+  recorded: number;
+  conflicts: number;
+  skipped: number;
+}
+
+export interface QuickbooksBackfillResult {
+  invoices: number;
+  payments: number;
+  failed: number;
 }
 
 export interface QuickbooksSyncLogEntry {
@@ -675,6 +712,7 @@ export type QuickbooksRetryBodyEntityType = typeof QuickbooksRetryBodyEntityType
 export const QuickbooksRetryBodyEntityType = {
   invoice: 'invoice',
   cost_entry: 'cost_entry',
+  invoice_payment: 'invoice_payment',
 } as const;
 
 export interface QuickbooksRetryBody {

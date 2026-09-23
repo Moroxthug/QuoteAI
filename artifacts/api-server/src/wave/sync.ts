@@ -1,6 +1,8 @@
 import { db, waveSyncLogTable, type Invoice, type CostEntry } from "@workspace/db";
 import { getValidAccessToken, markSynced, getWaveConnection } from "./service.js";
 import { createMoneyTransaction, getOrCreateCustomer } from "../lib/waveClient.js";
+import { getLink, putLink } from "../books/links.js";
+import { nameKey } from "../books/keys.js";
 
 // v1 scope: each synced invoice/cost lands as ONE money transaction in Wave
 // (the invoice/expense total, tax-inclusive) rather than a full line-by-line
@@ -40,7 +42,12 @@ export async function syncInvoiceToWave(invoice: Invoice, userId: string): Promi
     const token = await getValidAccessToken(userId);
     if (!token) throw new Error("Wave not connected or token refresh failed");
 
-    const customer = await getOrCreateCustomer(token.accessToken, token.businessId, invoice.customer.name);
+    // Phase 88: the Wave customer is remembered per client, so a renamed or re-typed customer is not created twice.
+    const linkType = invoice.clientId ? "client" : "customer_name";
+    const linkId = invoice.clientId ?? nameKey(invoice.customer.name || "customer");
+    const link = await getLink(userId, "wave", linkType, linkId);
+    const customer = link ? { id: link.externalId } : await getOrCreateCustomer(token.accessToken, token.businessId, invoice.customer.name);
+    if (!link) await putLink({ userId, provider: "wave", entityType: linkType, entityId: linkId, externalId: customer.id, externalType: "Customer" });
 
     const amount = (invoice.totalCents / 100).toFixed(2);
     const transaction = await createMoneyTransaction(token.accessToken, token.businessId, {

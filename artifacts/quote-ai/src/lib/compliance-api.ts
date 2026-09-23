@@ -94,7 +94,7 @@ export type T5018Dto = {
   year: number;
   thresholdCents: number;
   totalCents: number;
-  recipients: { key: string; name: string; source: "supplier" | "vendor" | "worker"; entryCount: number; subtotalCents: number; taxCents: number; totalCents: number; overThreshold: boolean }[];
+  recipients: { key: string; name: string; source: "supplier" | "vendor" | "worker"; entryCount: number; subtotalCents: number; taxCents: number; totalCents: number; overThreshold: boolean; bankDated: number }[];
 };
 
 export type PermitKind = "building" | "demolition" | "electrical" | "plumbing" | "gas" | "hvac" | "other";

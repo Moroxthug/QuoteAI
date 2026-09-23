@@ -11,7 +11,8 @@
 //     accepted → WhatsApp channel; Gmail connected send → the contractor's own
 //     address, and Gmail failure → platform sender + lastSendError; Google
 //     Calendar milestone → all-day event, date change → PATCH; QuickBooks
-//     invoice.paid → SalesReceipt and cost.confirmed → Purchase, both logged.
+//     sent invoice → Invoice, payment → Payment on it (Phase 88; was one
+//     SalesReceipt on paid), cost.confirmed → Purchase, all logged.
 //  4. Integrations with no app registration are honest: `available: false`
 //     on status, 503 NOT_CONFIGURED on connect, never a vendor bounce.
 //  5. Every transactional email captured during the run renders clean in the
@@ -509,7 +510,7 @@ describe("Phase 65 — integrations", () => {
   describe("QuickBooks (sandbox host)", () => {
     const QBO = "https://sandbox-quickbooks.api.intuit.com/";
 
-    test("invoice.paid posts one SalesReceipt for the total; cost.confirmed posts one Purchase from the mapped accounts; both land in the sync log", async () => {
+    test("a sent invoice posts one Invoice, its payment one Payment applied to it; cost.confirmed posts one Purchase from the mapped accounts; all land in the sync log", async () => {
       const org = await createOrg({ companyName: "Books Co" });
       const realmId = "9130000000000001";
       await db.insert(quickbooksConnectionsTable).values({
@@ -531,10 +532,12 @@ describe("Phase 65 — integrations", () => {
           const q = u.searchParams.get("query") ?? "";
           if (q.includes("from Customer")) return json(200, { QueryResponse: {} }); // not found → create
           if (q.includes("from Item")) return json(200, { QueryResponse: { Item: [{ Id: "17", Name: "QuoteAI Job Revenue" }] } });
+          if (q.includes("from Vendor")) return json(200, { QueryResponse: { Vendor: [{ Id: "V-9", DisplayName: "Home Depot" }] } });
           return json(200, { QueryResponse: {} });
         }
         if (u.pathname.endsWith("/customer")) return json(200, { Customer: { Id: "58", Name: (req.json as { DisplayName: string }).DisplayName } });
-        if (u.pathname.endsWith("/salesreceipt")) return json(200, { SalesReceipt: { Id: "SR-1001" } });
+        if (u.pathname.endsWith("/invoice")) return json(200, { Invoice: { Id: "INV-1001", SyncToken: "0", TotalAmt: (req.json as { Line: { Amount: number }[] }).Line[0]!.Amount, Balance: 0 } });
+        if (u.pathname.endsWith("/payment")) return json(200, { Payment: { Id: "PAY-3003" } });
         if (u.pathname.endsWith("/purchase")) return json(200, { Purchase: { Id: "P-2002" } });
         return json(404, { Fault: { Error: [{ Message: `unscripted ${u.pathname}` }] } });
       });
@@ -546,13 +549,19 @@ describe("Phase 65 — integrations", () => {
       const pay = await org.api(`/api/invoices/${inv.id}/payments`, { body: { amountCents: sent!.totalCents, method: "etransfer" } });
       expect(pay.status, JSON.stringify(pay.body)).toBe(201);
 
-      const receiptCall = requestsTo(QBO).find((r) => r.url.endsWith("/salesreceipt"))!;
-      expect(receiptCall, "SalesReceipt posted").toBeTruthy();
-      expect(receiptCall.json).toMatchObject({ CustomerRef: { value: "58" }, DocNumber: sent!.number, Line: [{ Amount: sent!.totalCents / 100, DetailType: "SalesItemLineDetail", SalesItemLineDetail: { ItemRef: { value: "17" } } }] });
-      expect(requestsTo(QBO).filter((r) => r.url.endsWith("/customer"))).toHaveLength(1);
+      const invoiceCall = requestsTo(QBO).find((r) => r.url.endsWith("/invoice"))!;
+      expect(invoiceCall, "Invoice posted").toBeTruthy();
+      // No tax code mapped: one tax-included line, as before Phase 88.
+      expect(invoiceCall.json).toMatchObject({ CustomerRef: { value: "58" }, DocNumber: sent!.number, GlobalTaxCalculation: "NotApplicable", Line: [{ Amount: sent!.totalCents / 100, DetailType: "SalesItemLineDetail", SalesItemLineDetail: { ItemRef: { value: "17" } } }] });
+      const paymentCall = requestsTo(QBO).find((r) => r.url.endsWith("/payment"))!;
+      expect(paymentCall.json).toMatchObject({ CustomerRef: { value: "58" }, TotalAmt: sent!.totalCents / 100, Line: [{ Amount: sent!.totalCents / 100, LinkedTxn: [{ TxnId: "INV-1001", TxnType: "Invoice" }] }] });
+      expect(requestsTo(QBO).filter((r) => r.url.endsWith("/customer")), "one customer, reused for the payment").toHaveLength(1);
+      expect(requestsTo(QBO).filter((r) => r.url.endsWith("/salesreceipt"))).toHaveLength(0);
       const invLog = await db.select().from(quickbooksSyncLogTable).where(and(eq(quickbooksSyncLogTable.userId, org.userId), eq(quickbooksSyncLogTable.entityId, inv.id)));
       expect(invLog).toHaveLength(1);
-      expect(invLog[0]).toMatchObject({ status: "synced", qboId: "SR-1001", qboType: "SalesReceipt" });
+      expect(invLog[0]).toMatchObject({ status: "synced", qboId: "INV-1001", qboType: "Invoice" });
+      const payLog = await db.select().from(quickbooksSyncLogTable).where(and(eq(quickbooksSyncLogTable.userId, org.userId), eq(quickbooksSyncLogTable.entityType, "invoice_payment")));
+      expect(payLog).toMatchObject([{ status: "synced", qboId: "PAY-3003", qboType: "Payment" }]);
 
       resetRecorded();
       const job = await org.api("/api/jobs", { body: { name: "Books job" } });
@@ -562,7 +571,7 @@ describe("Phase 65 — integrations", () => {
       expect(cost.status, JSON.stringify(cost.body)).toBe(201);
       const purchase = requestsTo(QBO).find((r) => r.url.endsWith("/purchase"))!;
       expect(purchase, "Purchase posted").toBeTruthy();
-      expect(purchase.json).toMatchObject({ PaymentType: "Cash", AccountRef: { value: "35" }, Line: [{ Amount: 543.21, DetailType: "AccountBasedExpenseLineDetail", AccountBasedExpenseLineDetail: { AccountRef: { value: "64" } } }] });
+      expect(purchase.json).toMatchObject({ PaymentType: "Cash", AccountRef: { value: "35" }, EntityRef: { value: "V-9", type: "Vendor" }, Line: [{ Amount: 543.21, DetailType: "AccountBasedExpenseLineDetail", AccountBasedExpenseLineDetail: { AccountRef: { value: "64" } } }] });
       const costLog = await db.select().from(quickbooksSyncLogTable).where(and(eq(quickbooksSyncLogTable.userId, org.userId), eq(quickbooksSyncLogTable.entityType, "cost_entry")));
       expect(costLog).toHaveLength(1);
       expect(costLog[0]).toMatchObject({ status: "synced", qboId: "P-2002", qboType: "Purchase" });

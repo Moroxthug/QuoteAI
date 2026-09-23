@@ -44,6 +44,8 @@ export const flinksTransactionsTable = pgTable(
     balanceCents: integer("balance_cents"),
     matchStatus: text("match_status", { enum: FLINKS_MATCH_STATUSES }).notNull().default("unmatched"),
     matchedCostEntryId: uuid("matched_cost_entry_id").references(() => costEntriesTable.id, { onDelete: "set null" }),
+    /** Phase 88: a deposit matched to the invoice payment it is (plain uuid; the SQL adds the FK). */
+    matchedInvoicePaymentId: uuid("matched_invoice_payment_id"),
     /** true when matchedCostEntryId was set by the auto-matcher rather than a manual click, for the review UI. */
     autoMatched: boolean("auto_matched").notNull().default(false),
     raw: jsonb("raw").$type<Record<string, unknown>>().notNull().default({}),

@@ -2185,7 +2185,13 @@ export const GetQuickbooksStatusResponse = zod.object({
   "lastSyncedAt": zod.string().nullish(),
   "hasPaymentAccount": zod.boolean().nullish(),
   "paymentAccountName": zod.string().nullish(),
-  "categoryMap": zod.record(zod.string(), zod.string().nullable()).nullish()
+  "categoryMap": zod.record(zod.string(), zod.string().nullable()).nullish(),
+  "incomeAccountName": zod.string().nullish().describe('Phase 88 — the income account invoice revenue is booked to.'),
+  "depositAccountName": zod.string().nullish().describe('Phase 88 — where payments recorded in QuoteAI land (null = Undeposited Funds).'),
+  "taxCodeMap": zod.record(zod.string(), zod.string()).nullish().describe('Phase 88 — tax set ("HST 13%") → QBO tax code name.'),
+  "taxSets": zod.array(zod.string()).nullish().describe('Phase 88 — the tax sets this company\'s invoices actually carry.'),
+  "pullPayments": zod.boolean().nullish(),
+  "paymentsPulledAt": zod.string().nullish()
 })
 
 
@@ -2228,6 +2234,18 @@ export const GetQuickbooksAccountsResponse = zod.object({
   "paymentAccounts": zod.array(zod.object({
   "id": zod.string(),
   "name": zod.string()
+})),
+  "incomeAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "depositAccounts": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+})),
+  "taxCodes": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string()
 }))
 })
 
@@ -2243,11 +2261,45 @@ export const UpdateQuickbooksMappingBody = zod.object({
   "categoryMap": zod.record(zod.string(), zod.union([zod.object({
   "id": zod.string(),
   "name": zod.string()
-}),zod.null()])).optional()
+}),zod.null()])).optional(),
+  "incomeAccount": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()]).optional(),
+  "depositAccount": zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()]).optional(),
+  "taxCodeMap": zod.record(zod.string(), zod.union([zod.object({
+  "id": zod.string(),
+  "name": zod.string()
+}),zod.null()])).optional(),
+  "pullPayments": zod.boolean().optional()
 })
 
 export const UpdateQuickbooksMappingResponse = zod.object({
   "success": zod.boolean()
+})
+
+
+/**
+ * @summary Bring payments recorded in QuickBooks back as invoice payments now (Phase 88)
+ */
+export const PullQuickbooksPaymentsResponse = zod.object({
+  "read": zod.number().int(),
+  "recorded": zod.number().int(),
+  "conflicts": zod.number().int(),
+  "skipped": zod.number().int()
+})
+
+
+/**
+ * @summary Send open invoices (and their payments) that were already out when QuickBooks was connected (Phase 88)
+ */
+export const BackfillQuickbooksInvoicesResponse = zod.object({
+  "invoices": zod.number().int(),
+  "payments": zod.number().int(),
+  "failed": zod.number().int()
 })
 
 
@@ -2271,7 +2323,7 @@ export const GetQuickbooksSyncLogResponse = zod.object({
  * @summary Manually re-run a failed sync for one invoice or cost entry
  */
 export const RetryQuickbooksSyncBody = zod.object({
-  "entityType": zod.enum(['invoice', 'cost_entry']),
+  "entityType": zod.enum(['invoice', 'cost_entry', 'invoice_payment']),
   "entityId": zod.string()
 })
 

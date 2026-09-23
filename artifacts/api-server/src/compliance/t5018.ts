@@ -6,11 +6,13 @@
 // It is a list to reconcile against what was actually paid, not a slip:
 // the slip needs each recipient's business number or SIN and address, which
 // QuoteAI does not hold, and the reporting threshold is judged on payments
-// made, which the bookkeeper has and we only approximate by entry date.
+// made. Phase 88: an entry matched to a bank line counts on the day the money
+// left the bank; the rest still count on their entry date.
 
 import { and, eq, gte, inArray, lt } from "drizzle-orm";
 import { db, collaboratorsTable, costEntriesTable, suppliersTable, timeEntriesTable } from "@workspace/db";
 import { dayOf } from "./remittance.js";
+import { bankDatesForCosts } from "../books/reconcile.js";
 
 /** CRA: slips are required for recipients paid $500 or more in the year. */
 const T5018_THRESHOLD_CENTS = 50_000;
@@ -24,10 +26,15 @@ export type T5018Recipient = {
   taxCents: number;
   totalCents: number;
   overThreshold: boolean;
+  /** Entries dated by the bank line they were matched to (Phase 88), rather than by entry date. */
+  bankDated: number;
 };
 
+/** A cheque written in December can clear in February. */
+const PAID_LAG_DAYS = 90;
+
 export async function loadT5018(userId: string, province: string | null, year: number) {
-  const lo = new Date(Date.UTC(year, 0, 1) - 86_400_000);
+  const lo = new Date(Date.UTC(year, 0, 1) - PAID_LAG_DAYS * 86_400_000);
   const hi = new Date(Date.UTC(year + 1, 0, 1) + 86_400_000);
   const inYear = (d: Date) => dayOf(d, province).startsWith(`${year}-`);
 
@@ -44,11 +51,15 @@ export async function loadT5018(userId: string, province: string | null, year: n
     .innerJoin(costEntriesTable, eq(timeEntriesTable.costEntryId, costEntriesTable.id))
     .where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.status, "approved"), eq(collaboratorsTable.workerType, "subcontractor"), inArray(costEntriesTable.status, ["confirmed"]), gte(timeEntriesTable.date, lo), lt(timeEntriesTable.date, hi)));
 
+  const paidOn = await bankDatesForCosts(userId, [...subs.map((c) => c.id), ...labour.map((l) => l.costEntryId).filter((x): x is string => !!x)]);
+  const when = (costId: string | null, entryDate: Date) => (costId && paidOn.get(costId)) || entryDate;
+
   const byKey = new Map<string, T5018Recipient>();
   const seenCost = new Set<string>();
-  const add = (key: string, name: string, source: T5018Recipient["source"], sub: number, tax: number, total: number) => {
-    const r = byKey.get(key) ?? { key, name, source, entryCount: 0, subtotalCents: 0, taxCents: 0, totalCents: 0, overThreshold: false };
+  const add = (key: string, name: string, source: T5018Recipient["source"], sub: number, tax: number, total: number, bankDated: boolean) => {
+    const r = byKey.get(key) ?? { key, name, source, entryCount: 0, subtotalCents: 0, taxCents: 0, totalCents: 0, overThreshold: false, bankDated: 0 };
     r.entryCount += 1;
+    if (bankDated) r.bankDated += 1;
     r.subtotalCents += sub;
     r.taxCents += tax;
     r.totalCents += total;
@@ -56,16 +67,18 @@ export async function loadT5018(userId: string, province: string | null, year: n
   };
 
   for (const l of labour) {
-    if (!inYear(l.date) || !l.costEntryId) continue;
+    if (!l.costEntryId) continue;
     seenCost.add(l.costEntryId);
-    add(`worker:${l.workerId}`, l.workerName, "worker", l.subtotalCents, l.taxCents, l.totalCents);
+    if (!inYear(when(l.costEntryId, l.date))) continue;
+    add(`worker:${l.workerId}`, l.workerName, "worker", l.subtotalCents, l.taxCents, l.totalCents, paidOn.has(l.costEntryId));
   }
   for (const c of subs) {
-    if (seenCost.has(c.id) || !inYear(c.date)) continue;
-    if (c.supplierId) add(`supplier:${c.supplierId}`, c.supplierName ?? c.vendor, "supplier", c.subtotalCents, c.taxCents, c.totalCents);
+    if (seenCost.has(c.id) || !inYear(when(c.id, c.date))) continue;
+    const bank = paidOn.has(c.id);
+    if (c.supplierId) add(`supplier:${c.supplierId}`, c.supplierName ?? c.vendor, "supplier", c.subtotalCents, c.taxCents, c.totalCents, bank);
     else {
       const name = c.vendor.trim() || "—";
-      add(`vendor:${name.toLowerCase().replace(/\s+/g, " ")}`, name, "vendor", c.subtotalCents, c.taxCents, c.totalCents);
+      add(`vendor:${name.toLowerCase().replace(/\s+/g, " ")}`, name, "vendor", c.subtotalCents, c.taxCents, c.totalCents, bank);
     }
   }
 
@@ -83,7 +96,7 @@ export async function loadT5018(userId: string, province: string | null, year: n
 export function t5018Csv(data: Awaited<ReturnType<typeof loadT5018>>): string {
   const cell = (v: string | number) => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
   const money = (c: number) => (c / 100).toFixed(2);
-  const rows: (string | number)[][] = [["recipient", "source", "entries", "pre_tax", "tax", "total", "500_or_more", "business_number_or_sin", "address"]];
-  for (const r of data.recipients) rows.push([r.name, r.source, r.entryCount, money(r.subtotalCents), money(r.taxCents), money(r.totalCents), r.overThreshold ? "yes" : "no", "", ""]);
+  const rows: (string | number)[][] = [["recipient", "source", "entries", "dated_by_bank", "pre_tax", "tax", "total", "500_or_more", "business_number_or_sin", "address"]];
+  for (const r of data.recipients) rows.push([r.name, r.source, r.entryCount, r.bankDated, money(r.subtotalCents), money(r.taxCents), money(r.totalCents), r.overThreshold ? "yes" : "no", "", ""]);
   return rows.map((r) => r.map(cell).join(",")).join("\r\n") + "\r\n";
 }

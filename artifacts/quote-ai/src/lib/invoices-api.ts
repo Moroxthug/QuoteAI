@@ -143,17 +143,6 @@ export type FlinksStatusDto = {
   connectedAt?: string;
   lastSyncedAt?: string | null;
 };
-export type FlinksTransactionDto = {
-  id: string;
-  date: string;
-  description: string;
-  amountCents: number;
-  matchStatus: "unmatched" | "matched" | "ignored";
-  matchedCostEntryId: string | null;
-  autoMatched: boolean;
-};
-export type FlinksCandidateDto = { id: string; vendor: string; description: string; date: string; totalCents: number };
-
 export const flinksApi = {
   status: () => req<FlinksStatusDto>("/api/flinks/status"),
   connectUrl: () => req<{ url: string }>("/api/flinks/connect-url"),
@@ -164,11 +153,6 @@ export const flinksApi = {
   toggle: (isEnabled: boolean) => req<{ success: true }>("/api/flinks/toggle", { method: "PATCH", body: json({ isEnabled }) }),
   disconnect: () => req<{ success: true }>("/api/flinks/disconnect", { method: "DELETE" }),
   sync: () => req<{ success: true; fetched: number; matched: number }>("/api/flinks/sync", { method: "POST" }),
-  transactions: () => req<{ transactions: FlinksTransactionDto[] }>("/api/flinks/transactions"),
-  candidates: (transactionId: string) => req<{ candidates: FlinksCandidateDto[] }>(`/api/flinks/transactions/${transactionId}/candidates`),
-  match: (transactionId: string, costEntryId: string) => req<{ success: true }>(`/api/flinks/transactions/${transactionId}/match`, { method: "POST", body: json({ costEntryId }) }),
-  unmatch: (transactionId: string) => req<{ success: true }>(`/api/flinks/transactions/${transactionId}/unmatch`, { method: "POST" }),
-  ignore: (transactionId: string) => req<{ success: true }>(`/api/flinks/transactions/${transactionId}/ignore`, { method: "POST" }),
 };
 
 // Phase 28: Meta (Facebook/Instagram) Lead Ads capture

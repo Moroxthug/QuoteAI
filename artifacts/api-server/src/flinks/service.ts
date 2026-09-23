@@ -1,5 +1,6 @@
-import { db, flinksConnectionsTable, flinksTransactionsTable, costEntriesTable, type FlinksConnection, type FlinksAccountRef } from "@workspace/db";
-import { and, eq, gte, lte } from "drizzle-orm";
+import { db, flinksConnectionsTable, flinksTransactionsTable, type FlinksConnection, type FlinksAccountRef } from "@workspace/db";
+import { and, eq } from "drizzle-orm";
+import { autoMatchLine } from "../books/reconcile.js";
 import { encryptSecret, decryptSecret } from "../lib/crypto.js";
 import { getAccountsDetail, type FlinksAccountDetail } from "../lib/flinksClient.js";
 import { logger } from "../lib/logger.js";
@@ -42,14 +43,11 @@ export async function disconnectFlinks(userId: string): Promise<void> {
   await db.delete(flinksConnectionsTable).where(eq(flinksConnectionsTable.userId, userId));
 }
 
-// A bank debit is matched to a cost entry with the same absolute total, within a
-// few days either side — receipts get entered a day or two off from the actual
-// charge date, so an exact-date match would miss most real matches. No AI call:
-// amount is the strong signal here, same "deterministic over AI" choice as the
-// incentives keyword matcher.
-const MATCH_WINDOW_DAYS = 4;
+// Phase 88: matching lives in books/reconcile.ts — debits to cost entries,
+// deposits to invoice payments, and only when exactly one unclaimed candidate
+// exists (Phase 27 took the first same-amount entry, even one another line had).
 
-/** Fetches recent transactions for the connected account, upserts them, and auto-matches debits to unmatched cost entries. */
+/** Fetches recent transactions for the connected account, stores the new ones, and auto-matches the unambiguous ones. */
 export async function syncFlinksTransactions(userId: string): Promise<{ fetched: number; matched: number }> {
   const conn = await getFlinksConnection(userId);
   if (!conn || !conn.isEnabled || !conn.selectedAccount) return { fetched: 0, matched: 0 };
@@ -66,31 +64,9 @@ export async function syncFlinksTransactions(userId: string): Promise<{ fetched:
       .where(and(eq(flinksTransactionsTable.userId, userId), eq(flinksTransactionsTable.flinksTransactionId, tx.id)));
     if (existing) continue;
 
-    let matchedCostEntryId: string | null = null;
-    let autoMatched = false;
-    if (tx.amountCents < 0) {
-      const target = Math.abs(tx.amountCents);
-      const txDate = new Date(tx.date);
-      const windowStart = new Date(txDate.getTime() - MATCH_WINDOW_DAYS * 86_400_000);
-      const windowEnd = new Date(txDate.getTime() + MATCH_WINDOW_DAYS * 86_400_000);
-      const candidates = await db
-        .select({ id: costEntriesTable.id, totalCents: costEntriesTable.totalCents })
-        .from(costEntriesTable)
-        .where(
-          and(
-            eq(costEntriesTable.userId, userId),
-            eq(costEntriesTable.totalCents, target),
-            gte(costEntriesTable.date, windowStart),
-            lte(costEntriesTable.date, windowEnd),
-          ),
-        )
-        .limit(1);
-      if (candidates[0]) {
-        matchedCostEntryId = candidates[0].id;
-        autoMatched = true;
-        matched++;
-      }
-    }
+    const { matchedCostEntryId, matchedInvoicePaymentId } = await autoMatchLine(userId, { amountCents: tx.amountCents, date: new Date(tx.date) });
+    const autoMatched = !!(matchedCostEntryId || matchedInvoicePaymentId);
+    if (autoMatched) matched++;
 
     await db.insert(flinksTransactionsTable).values({
       userId,
@@ -99,8 +75,9 @@ export async function syncFlinksTransactions(userId: string): Promise<{ fetched:
       description: tx.description,
       amountCents: tx.amountCents,
       balanceCents: tx.balanceCents,
-      matchStatus: matchedCostEntryId ? "matched" : "unmatched",
+      matchStatus: autoMatched ? "matched" : "unmatched",
       matchedCostEntryId,
+      matchedInvoicePaymentId,
       autoMatched,
       raw: tx as unknown as Record<string, unknown>,
     });
@@ -109,31 +86,4 @@ export async function syncFlinksTransactions(userId: string): Promise<{ fetched:
   await db.update(flinksConnectionsTable).set({ lastSyncedAt: new Date() }).where(eq(flinksConnectionsTable.userId, userId));
   logger.info({ userId, fetched: account.transactions.length, matched }, "Flinks transaction sync complete");
   return { fetched: account.transactions.length, matched };
-}
-
-export async function manuallyMatch(userId: string, transactionId: string, costEntryId: string): Promise<void> {
-  await db
-    .update(flinksTransactionsTable)
-    .set({ matchStatus: "matched", matchedCostEntryId: costEntryId, autoMatched: false })
-    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)));
-}
-
-/** false when the transaction is not this org's (or does not exist). */
-export async function ignoreTransaction(userId: string, transactionId: string): Promise<boolean> {
-  const rows = await db
-    .update(flinksTransactionsTable)
-    .set({ matchStatus: "ignored", matchedCostEntryId: null })
-    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)))
-    .returning({ id: flinksTransactionsTable.id });
-  return rows.length > 0;
-}
-
-/** false when the transaction is not this org's (or does not exist). */
-export async function unmatch(userId: string, transactionId: string): Promise<boolean> {
-  const rows = await db
-    .update(flinksTransactionsTable)
-    .set({ matchStatus: "unmatched", matchedCostEntryId: null, autoMatched: false })
-    .where(and(eq(flinksTransactionsTable.id, transactionId), eq(flinksTransactionsTable.userId, userId)))
-    .returning({ id: flinksTransactionsTable.id });
-  return rows.length > 0;
 }

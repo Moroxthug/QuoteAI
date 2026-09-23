@@ -55,8 +55,10 @@ import type {
   PriceComparisonResult,
   PriceSummary,
   QuickbooksAccounts,
+  QuickbooksBackfillResult,
   QuickbooksConnectUrl,
   QuickbooksMappingBody,
+  QuickbooksPullResult,
   QuickbooksRetryBody,
   QuickbooksStatus,
   QuickbooksSyncLog,
@@ -4247,6 +4249,154 @@ export const useUpdateQuickbooksMapping = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateQuickbooksMappingMutationOptions(options));
+    }
+
+export const getPullQuickbooksPaymentsUrl = () => {
+
+
+
+
+  return `/api/quickbooks/pull`
+}
+
+/**
+ * @summary Bring payments recorded in QuickBooks back as invoice payments now (Phase 88)
+ */
+export const pullQuickbooksPayments = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksPullResult> => {
+
+  return customFetch<QuickbooksPullResult>(getPullQuickbooksPaymentsUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPullQuickbooksPaymentsMutationKey = () => ['pullQuickbooksPayments'] as const;
+
+export const getPullQuickbooksPaymentsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pullQuickbooksPayments>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof pullQuickbooksPayments>>, TError,void, TContext> => {
+
+const mutationKey = getPullQuickbooksPaymentsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof pullQuickbooksPayments>>, void> = () => {
+
+
+          return  pullQuickbooksPayments(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PullQuickbooksPaymentsMutationResult = NonNullable<Awaited<ReturnType<typeof pullQuickbooksPayments>>>
+
+    export type PullQuickbooksPaymentsMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Bring payments recorded in QuickBooks back as invoice payments now (Phase 88)
+ */
+export const usePullQuickbooksPayments = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof pullQuickbooksPayments>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof pullQuickbooksPayments>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPullQuickbooksPaymentsMutationOptions(options));
+    }
+
+export const getBackfillQuickbooksInvoicesUrl = () => {
+
+
+
+
+  return `/api/quickbooks/backfill`
+}
+
+/**
+ * @summary Send open invoices (and their payments) that were already out when QuickBooks was connected (Phase 88)
+ */
+export const backfillQuickbooksInvoices = async ( options?: Parameters<typeof customFetch>[1]): Promise<QuickbooksBackfillResult> => {
+
+  return customFetch<QuickbooksBackfillResult>(getBackfillQuickbooksInvoicesUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getBackfillQuickbooksInvoicesMutationKey = () => ['backfillQuickbooksInvoices'] as const;
+
+export const getBackfillQuickbooksInvoicesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backfillQuickbooksInvoices>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof backfillQuickbooksInvoices>>, TError,void, TContext> => {
+
+const mutationKey = getBackfillQuickbooksInvoicesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof backfillQuickbooksInvoices>>, void> = () => {
+
+
+          return  backfillQuickbooksInvoices(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type BackfillQuickbooksInvoicesMutationResult = NonNullable<Awaited<ReturnType<typeof backfillQuickbooksInvoices>>>
+
+    export type BackfillQuickbooksInvoicesMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Send open invoices (and their payments) that were already out when QuickBooks was connected (Phase 88)
+ */
+export const useBackfillQuickbooksInvoices = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof backfillQuickbooksInvoices>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof backfillQuickbooksInvoices>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getBackfillQuickbooksInvoicesMutationOptions(options));
     }
 
 export const getGetQuickbooksSyncLogUrl = () => {

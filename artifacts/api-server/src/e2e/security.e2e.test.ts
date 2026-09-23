@@ -180,7 +180,7 @@ function resolveParams(route: MatrixRoute, f: Fixtures): { path: string; unseede
           ["/api/clients", "client"], ["/api/catalog", "catalog"], ["/api/crm/projects", "project"], ["/api/documents/price-alerts", "alert"],
           ["/api/documents", "doc"], ["/api/leads", "lead"], ["/api/assistant/conversations", "conversation"], ["/api/assistant/proposals", "proposal"],
           ["/api/developer/api-keys", "apiKey"], ["/api/developer/webhooks", "webhook"], ["/api/imports/batches", "batch"], ["/api/imports/candidates", "candidate"],
-          ["/api/flinks/transactions", "flinksTx"], ["/api/team/members", "member"], ["/api/v1/public/quotes", "quote"], ["/api/v1/public/jobs", "project"],
+          ["/api/books/bank", "flinksTx"], ["/api/books/claims", "cost"], ["/api/team/members", "member"], ["/api/v1/public/quotes", "quote"], ["/api/v1/public/jobs", "project"],
           ["/api/v1/public/invoices", "invoice"], ["/api/v1/public/clients", "client"], ["/api/schedule/blocks", "block"],
           ["/api/field-reports", "fieldReport"], ["/api/compliance/reminders", "reminder"],
         ];

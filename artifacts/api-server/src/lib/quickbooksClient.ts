@@ -74,6 +74,16 @@ export async function revokeToken(token: string): Promise<void> {
   }
 }
 
+/** Keeps the Fault body so a caller can tell "duplicate name" (6240) from a real failure. */
+class QboError extends Error {
+  constructor(readonly path: string, readonly status: number, readonly body: string) {
+    super(`QuickBooks API ${path.split("?")[0]} failed: ${status} ${body.slice(0, 500)}`);
+  }
+  get isDuplicateName(): boolean {
+    return this.body.includes("6240") || /duplicate name/i.test(this.body);
+  }
+}
+
 async function qboRequest<T>(realmId: string, accessToken: string, path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${apiBase()}/v3/company/${realmId}${path}`, {
     ...init,
@@ -84,7 +94,7 @@ async function qboRequest<T>(realmId: string, accessToken: string, path: string,
       ...(init?.headers ?? {}),
     },
   });
-  if (!res.ok) throw new Error(`QuickBooks API ${path} failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) throw new QboError(path, res.status, await res.text());
   return res.json() as Promise<T>;
 }
 
@@ -94,78 +104,162 @@ export async function getCompanyName(realmId: string, accessToken: string): Prom
 }
 
 type QbAccount = { Id: string; Name: string };
+type QbRef = { value: string; name?: string };
+
+/** QBO query strings quote with single quotes; a quote inside a value is backslash-escaped. */
+const q = (value: string) => `'${value.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
+
+async function query<T>(realmId: string, accessToken: string, entity: string, sql: string): Promise<T[]> {
+  const data = await qboRequest<{ QueryResponse: Record<string, T[] | undefined> }>(realmId, accessToken, `/query?query=${encodeURIComponent(sql)}`);
+  return data.QueryResponse[entity] ?? [];
+}
 
 async function queryAccounts(realmId: string, accessToken: string, accountTypeFilter: string): Promise<QbAccount[]> {
-  const query = `select Id, Name from Account where ${accountTypeFilter} and Active = true maxresults 200`;
-  const data = await qboRequest<{ QueryResponse: { Account?: QbAccount[] } }>(realmId, accessToken, `/query?query=${encodeURIComponent(query)}`);
-  return data.QueryResponse.Account ?? [];
+  return query<QbAccount>(realmId, accessToken, "Account", `select Id, Name from Account where ${accountTypeFilter} and Active = true maxresults 200`);
 }
 
 export function listExpenseAccounts(realmId: string, accessToken: string): Promise<QbAccount[]> {
-  return queryAccounts(realmId, accessToken, "AccountType = 'Expense'");
+  return queryAccounts(realmId, accessToken, "AccountType In ('Expense', 'Cost of Goods Sold', 'Other Expense')");
 }
 
 export function listPaymentAccounts(realmId: string, accessToken: string): Promise<QbAccount[]> {
   return queryAccounts(realmId, accessToken, "AccountType In ('Bank', 'Credit Card')");
 }
 
-async function findServiceItem(realmId: string, accessToken: string, name: string): Promise<QbAccount | null> {
-  const query = `select Id, Name from Item where Name = '${name.replace(/'/g, "\\'")}' maxresults 1`;
-  const data = await qboRequest<{ QueryResponse: { Item?: QbAccount[] } }>(realmId, accessToken, `/query?query=${encodeURIComponent(query)}`);
-  return data.QueryResponse.Item?.[0] ?? null;
+export function listIncomeAccounts(realmId: string, accessToken: string): Promise<QbAccount[]> {
+  return queryAccounts(realmId, accessToken, "AccountType In ('Income', 'Other Income')");
 }
 
-/** Finds (or creates) the generic "QuoteAI Job Revenue" service item every synced invoice line is booked against. */
-export async function getOrCreateRevenueItem(realmId: string, accessToken: string): Promise<QbAccount> {
-  const name = "QuoteAI Job Revenue";
-  const existing = await findServiceItem(realmId, accessToken, name);
+/** Deposit targets for payments: bank accounts plus Other Current Asset (where Undeposited Funds lives). */
+export function listDepositAccounts(realmId: string, accessToken: string): Promise<QbAccount[]> {
+  return queryAccounts(realmId, accessToken, "AccountType In ('Bank', 'Other Current Asset')");
+}
+
+/** Sales tax codes (HST ON, GST/QST QC, Exempt, Out of scope …) — every Canadian QBO company has its own list. */
+export async function listTaxCodes(realmId: string, accessToken: string): Promise<QbAccount[]> {
+  return query<QbAccount>(realmId, accessToken, "TaxCode", "select Id, Name from TaxCode where Active = true maxresults 200");
+}
+
+/**
+ * The service item every synced invoice line is booked against. One item per
+ * income account ("QuoteAI Job Revenue" when none was picked, as before Phase
+ * 88), so picking a different income account in the mapping takes effect.
+ */
+export async function getOrCreateRevenueItem(realmId: string, accessToken: string, incomeAccount: { id: string; name: string } | null): Promise<QbAccount> {
+  const name = incomeAccount ? `QuoteAI Job Revenue - ${incomeAccount.name}`.slice(0, 100) : "QuoteAI Job Revenue";
+  const [existing] = await query<QbAccount>(realmId, accessToken, "Item", `select Id, Name from Item where Name = ${q(name)} maxresults 1`);
   if (existing) return existing;
 
-  const incomeAccounts = await queryAccounts(realmId, accessToken, "AccountType = 'Income'");
-  const incomeAccount = incomeAccounts[0];
-  if (!incomeAccount) throw new Error("No QuickBooks income account found to attach the revenue item to");
+  let accountId = incomeAccount?.id;
+  if (!accountId) {
+    const incomeAccounts = await listIncomeAccounts(realmId, accessToken);
+    accountId = incomeAccounts[0]?.Id;
+  }
+  if (!accountId) throw new Error("No QuickBooks income account found to attach the revenue item to");
 
   const data = await qboRequest<{ Item: QbAccount }>(realmId, accessToken, "/item", {
     method: "POST",
-    body: JSON.stringify({
-      Name: name,
-      Type: "Service",
-      IncomeAccountRef: { value: incomeAccount.Id },
-    }),
+    body: JSON.stringify({ Name: name, Type: "Service", IncomeAccountRef: { value: accountId } }),
   });
   return data.Item;
 }
 
-async function findCustomer(realmId: string, accessToken: string, displayName: string): Promise<QbAccount | null> {
-  const query = `select Id, Name from Customer where DisplayName = '${displayName.replace(/'/g, "\\'")}' maxresults 1`;
-  const data = await qboRequest<{ QueryResponse: { Customer?: QbAccount[] } }>(realmId, accessToken, `/query?query=${encodeURIComponent(query)}`);
-  return data.QueryResponse.Customer?.[0] ?? null;
+type QbParty = { Id: string; DisplayName: string };
+
+/**
+ * Finds a customer or vendor without creating a twin: by email first (a name
+ * typed two ways is still one person), then by display name. QBO display
+ * names are unique across customers, vendors and employees, so a name already
+ * taken by the other kind gets the email (or a short id) added.
+ */
+export async function findOrCreateParty(
+  realmId: string,
+  accessToken: string,
+  kind: "Customer" | "Vendor",
+  party: { name: string; email?: string | null; suffix?: string },
+): Promise<{ id: string; created: boolean }> {
+  const name = (party.name.trim() || (kind === "Customer" ? "QuoteAI Customer" : "QuoteAI Vendor")).slice(0, 100);
+  const email = (party.email ?? "").trim();
+  if (email.includes("@")) {
+    const [byEmail] = await query<QbParty>(realmId, accessToken, kind, `select Id, DisplayName from ${kind} where PrimaryEmailAddr = ${q(email)} maxresults 1`);
+    if (byEmail) return { id: byEmail.Id, created: false };
+  }
+  const [byName] = await query<QbParty>(realmId, accessToken, kind, `select Id, DisplayName from ${kind} where DisplayName = ${q(name)} maxresults 1`);
+  if (byName) return { id: byName.Id, created: false };
+
+  const create = (displayName: string) =>
+    qboRequest<Record<string, QbParty>>(realmId, accessToken, `/${kind.toLowerCase()}`, {
+      method: "POST",
+      body: JSON.stringify({ DisplayName: displayName, ...(email.includes("@") ? { PrimaryEmailAddr: { Address: email } } : {}) }),
+    });
+  try {
+    const data = await create(name);
+    return { id: data[kind]!.Id, created: true };
+  } catch (err) {
+    if (!(err instanceof QboError) || !err.isDuplicateName) throw err;
+    const data = await create(`${name} (${email || party.suffix || kind.toLowerCase()})`.slice(0, 100));
+    return { id: data[kind]!.Id, created: true };
+  }
 }
 
-export async function getOrCreateCustomer(realmId: string, accessToken: string, displayName: string): Promise<QbAccount> {
-  const name = displayName.trim() || "QuoteAI Customer";
-  const existing = await findCustomer(realmId, accessToken, name);
-  if (existing) return existing;
+export type QbInvoice = { Id: string; SyncToken: string; TotalAmt: number; Balance: number; DocNumber?: string };
 
-  const data = await qboRequest<{ Customer: QbAccount }>(realmId, accessToken, "/customer", {
-    method: "POST",
-    body: JSON.stringify({ DisplayName: name }),
-  });
-  return data.Customer;
+export async function findInvoiceByDocNumber(realmId: string, accessToken: string, docNumber: string): Promise<QbInvoice | null> {
+  const [found] = await query<QbInvoice>(realmId, accessToken, "Invoice", `select Id, SyncToken, TotalAmt, Balance, DocNumber from Invoice where DocNumber = ${q(docNumber)} maxresults 1`);
+  return found ?? null;
 }
 
-export async function createSalesReceipt(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<{ Id: string }> {
-  const data = await qboRequest<{ SalesReceipt: { Id: string } }>(realmId, accessToken, "/salesreceipt", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-  return data.SalesReceipt;
+export async function createInvoice(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<QbInvoice> {
+  const data = await qboRequest<{ Invoice: QbInvoice }>(realmId, accessToken, "/invoice", { method: "POST", body: JSON.stringify(payload) });
+  return data.Invoice;
+}
+
+export async function getInvoice(realmId: string, accessToken: string, id: string): Promise<QbInvoice> {
+  const data = await qboRequest<{ Invoice: QbInvoice }>(realmId, accessToken, `/invoice/${encodeURIComponent(id)}`);
+  return data.Invoice;
+}
+
+/** QBO keeps a voided invoice (zeroed, marked Voided) rather than deleting it — the same rule QuoteAI follows. */
+export async function voidInvoice(realmId: string, accessToken: string, invoice: Pick<QbInvoice, "Id" | "SyncToken">): Promise<void> {
+  await qboRequest(realmId, accessToken, "/invoice?operation=void", { method: "POST", body: JSON.stringify({ Id: invoice.Id, SyncToken: invoice.SyncToken }) });
+}
+
+export async function createPayment(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<{ Id: string }> {
+  const data = await qboRequest<{ Payment: { Id: string } }>(realmId, accessToken, "/payment", { method: "POST", body: JSON.stringify(payload) });
+  return data.Payment;
+}
+
+/** Deleting needs the current SyncToken, so it is read first. A payment already gone counts as deleted. */
+export async function deletePayment(realmId: string, accessToken: string, id: string): Promise<void> {
+  let syncToken: string;
+  try {
+    const data = await qboRequest<{ Payment: { Id: string; SyncToken: string } }>(realmId, accessToken, `/payment/${encodeURIComponent(id)}`);
+    syncToken = data.Payment.SyncToken;
+  } catch (err) {
+    if (err instanceof QboError && (err.status === 404 || err.body.includes("610"))) return;
+    throw err;
+  }
+  await qboRequest(realmId, accessToken, "/payment?operation=delete", { method: "POST", body: JSON.stringify({ Id: id, SyncToken: syncToken }) });
 }
 
 export async function createExpense(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<{ Id: string }> {
-  const data = await qboRequest<{ Purchase: { Id: string } }>(realmId, accessToken, "/purchase", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  const data = await qboRequest<{ Purchase: { Id: string } }>(realmId, accessToken, "/purchase", { method: "POST", body: JSON.stringify(payload) });
   return data.Purchase;
 }
+
+export type QbPayment = {
+  Id: string;
+  TxnDate: string;
+  TotalAmt: number;
+  PaymentRefNum?: string;
+  CustomerRef?: QbRef;
+  Line?: { Amount: number; LinkedTxn?: { TxnId: string; TxnType: string }[] }[];
+  MetaData?: { CreateTime?: string; LastUpdatedTime?: string };
+};
+
+/** Payments created or changed after `since`, oldest first, one page — the caller advances its cursor and comes back. */
+export async function listPaymentsSince(realmId: string, accessToken: string, since: Date, max = 200): Promise<QbPayment[]> {
+  const iso = since.toISOString().replace(/\.\d{3}Z$/, "Z");
+  return query<QbPayment>(realmId, accessToken, "Payment", `select * from Payment where MetaData.LastUpdatedTime > ${q(iso)} orderby MetaData.LastUpdatedTime maxresults ${max}`);
+}
+

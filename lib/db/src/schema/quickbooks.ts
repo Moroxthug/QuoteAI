@@ -19,6 +19,13 @@ import { COST_CATEGORIES } from "./jobs";
 
 export type QuickbooksAccountRef = { id: string; name: string };
 export type QuickbooksCategoryMap = Partial<Record<(typeof COST_CATEGORIES)[number], QuickbooksAccountRef>>;
+/**
+ * Phase 88: the tax a QuoteAI invoice carries, as a set of codes ("HST",
+ * "GST+QST", "GST+PST", "none") → the QBO sales tax code that means the same
+ * thing in this company's QuickBooks. A mapped invoice goes over pre-tax and
+ * QuickBooks computes the tax; an unmapped one goes over tax-included, as before.
+ */
+export type QuickbooksTaxCodeMap = Record<string, QuickbooksAccountRef>;
 
 export const quickbooksConnectionsTable = pgTable("quickbooks_connections", {
   userId: text("user_id").primaryKey().references(() => authUsersTable.id, { onDelete: "cascade" }),
@@ -34,11 +41,22 @@ export const quickbooksConnectionsTable = pgTable("quickbooks_connections", {
   paymentAccount: jsonb("payment_account").$type<QuickbooksAccountRef | null>(),
   /** Cost category → QBO expense account, set per company in Settings → Integrations. */
   categoryMap: jsonb("category_map").$type<QuickbooksCategoryMap>().notNull().default({}),
+  /** Phase 88: the income account invoice revenue is booked to (was: the first income account QuickBooks listed). */
+  incomeAccount: jsonb("income_account").$type<QuickbooksAccountRef | null>(),
+  /** Phase 88: where payments recorded in QuoteAI are deposited (null = QuickBooks' Undeposited Funds). */
+  depositAccount: jsonb("deposit_account").$type<QuickbooksAccountRef | null>(),
+  taxCodeMap: jsonb("tax_code_map").$type<QuickbooksTaxCodeMap>().notNull().default({}),
+  /** Phase 88: bring payments recorded in QuickBooks back as invoice payments. */
+  pullPayments: boolean("pull_payments").notNull().default(true),
+  /** High-water mark of QBO Payment MetaData.LastUpdatedTime already read. */
+  paymentsCursor: timestamp("payments_cursor", { withTimezone: true }),
+  paymentsPulledAt: timestamp("payments_pulled_at", { withTimezone: true }),
   connectedAt: timestamp("connected_at", { withTimezone: true }).notNull().defaultNow(),
   lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
 });
 
-export const QUICKBOOKS_SYNC_ENTITY_TYPES = ["invoice", "cost_entry"] as const;
+// Phase 88 adds invoices sent as QBO Invoices, payments both ways, and voids.
+export const QUICKBOOKS_SYNC_ENTITY_TYPES = ["invoice", "cost_entry", "invoice_payment", "payment_pull"] as const;
 export type QuickbooksSyncEntityType = (typeof QUICKBOOKS_SYNC_ENTITY_TYPES)[number];
 
 /** Append-only log: every sync attempt, success or failure, so a failed sync is visible and retryable. */
@@ -50,7 +68,7 @@ export const quickbooksSyncLogTable = pgTable(
     entityType: text("entity_type", { enum: QUICKBOOKS_SYNC_ENTITY_TYPES }).notNull(),
     entityId: text("entity_id").notNull(),
     qboId: text("qbo_id"),
-    qboType: text("qbo_type"), // SalesReceipt | Purchase
+    qboType: text("qbo_type"), // SalesReceipt (before Phase 88) | Invoice | Payment | Purchase
     status: text("status", { enum: ["synced", "failed"] }).notNull(),
     error: text("error"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

@@ -927,6 +927,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/SuccessResult"
 
+  /quickbooks/pull:
+    post:
+      operationId: pullQuickbooksPayments
+      tags: [quickbooks]
+      summary: Bring payments recorded in QuickBooks back as invoice payments now (Phase 88)
+      responses:
+        "200":
+          description: Pull result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuickbooksPullResult"
+
+  /quickbooks/backfill:
+    post:
+      operationId: backfillQuickbooksInvoices
+      tags: [quickbooks]
+      summary: Send open invoices (and their payments) that were already out when QuickBooks was connected (Phase 88)
+      responses:
+        "200":
+          description: Backfill result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuickbooksBackfillResult"
+
   /quickbooks/sync-log:
     get:
       operationId: getQuickbooksSyncLog
@@ -2585,6 +2611,32 @@ components:
             type: string
             nullable: true
           nullable: true
+        incomeAccountName:
+          type: string
+          nullable: true
+          description: Phase 88 — the income account invoice revenue is booked to.
+        depositAccountName:
+          type: string
+          nullable: true
+          description: Phase 88 — where payments recorded in QuoteAI land (null = Undeposited Funds).
+        taxCodeMap:
+          type: object
+          additionalProperties:
+            type: string
+          nullable: true
+          description: Phase 88 — tax set ("HST 13%") → QBO tax code name.
+        taxSets:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Phase 88 — the tax sets this company's invoices actually carry.
+        pullPayments:
+          type: boolean
+          nullable: true
+        paymentsPulledAt:
+          type: string
+          nullable: true
       required:
         - connected
 
@@ -2626,9 +2678,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/QuickbooksAccount"
+        incomeAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuickbooksAccount"
+        depositAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuickbooksAccount"
+        taxCodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuickbooksAccount"
       required:
         - expenseAccounts
         - paymentAccounts
+        - incomeAccounts
+        - depositAccounts
+        - taxCodes
 
     QuickbooksMappingBody:
       type: object
@@ -2643,6 +2710,46 @@ components:
             anyOf:
               - $ref: "#/components/schemas/QuickbooksAccount"
               - type: "null"
+        incomeAccount:
+          anyOf:
+            - $ref: "#/components/schemas/QuickbooksAccount"
+            - type: "null"
+        depositAccount:
+          anyOf:
+            - $ref: "#/components/schemas/QuickbooksAccount"
+            - type: "null"
+        taxCodeMap:
+          type: object
+          additionalProperties:
+            anyOf:
+              - $ref: "#/components/schemas/QuickbooksAccount"
+              - type: "null"
+        pullPayments:
+          type: boolean
+
+    QuickbooksPullResult:
+      type: object
+      properties:
+        read:
+          type: integer
+        recorded:
+          type: integer
+        conflicts:
+          type: integer
+        skipped:
+          type: integer
+      required: [read, recorded, conflicts, skipped]
+
+    QuickbooksBackfillResult:
+      type: object
+      properties:
+        invoices:
+          type: integer
+        payments:
+          type: integer
+        failed:
+          type: integer
+      required: [invoices, payments, failed]
 
     QuickbooksSyncLogEntry:
       type: object
@@ -2685,7 +2792,7 @@ components:
       properties:
         entityType:
           type: string
-          enum: [invoice, cost_entry]
+          enum: [invoice, cost_entry, invoice_payment]
         entityId:
           type: string
       required:

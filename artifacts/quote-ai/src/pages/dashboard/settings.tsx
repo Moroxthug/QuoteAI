@@ -12,6 +12,7 @@ import {
   getGetQuickbooksConnectUrlQueryKey, useDisconnectQuickbooks, useToggleQuickbooks,
   useGetQuickbooksAccounts, getGetQuickbooksAccountsQueryKey, useUpdateQuickbooksMapping,
   useGetQuickbooksSyncLog, getGetQuickbooksSyncLogQueryKey, useRetryQuickbooksSync,
+  usePullQuickbooksPayments, useBackfillQuickbooksInvoices,
   useGetWaveStatus, getGetWaveStatusQueryKey, useGetWaveConnectUrl,
   getGetWaveConnectUrlQueryKey, useDisconnectWave, useToggleWave,
   useGetWaveAccounts, getGetWaveAccountsQueryKey, useUpdateWaveMapping,
@@ -31,7 +32,7 @@ import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDes
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import { useSearch } from "wouter";
+import { Link, useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { CalendarFeedsCard } from "@/components/dashboard/calendar-feeds-card";
 import { useCan } from "@/hooks/use-role";
@@ -993,8 +994,15 @@ function QuickbooksMappingCard() {
 
   const [paymentAccountId, setPaymentAccountId] = useState<string>("");
   const [categoryAccountIds, setCategoryAccountIds] = useState<Record<string, string>>({});
+  // Phase 88: the rest of the chart-of-accounts mapping, instead of fixed guesses.
+  const [incomeAccountId, setIncomeAccountId] = useState<string>("");
+  const [depositAccountId, setDepositAccountId] = useState<string>("");
+  const [taxCodeIds, setTaxCodeIds] = useState<Record<string, string>>({});
 
   const paymentAccount = accounts?.paymentAccounts.find(a => a.id === paymentAccountId);
+  const incomeAccount = accounts?.incomeAccounts.find(a => a.id === incomeAccountId);
+  const depositAccount = accounts?.depositAccounts.find(a => a.id === depositAccountId);
+  const taxSets = status?.taxSets ?? [];
 
   const handleSave = () => {
     const categoryMap: Record<string, { id: string; name: string } | null> = {};
@@ -1003,8 +1011,21 @@ function QuickbooksMappingCard() {
       const account = accounts?.expenseAccounts.find(a => a.id === id);
       categoryMap[c] = account ? { id: account.id, name: account.name } : null;
     }
+    const taxCodeMap: Record<string, { id: string; name: string } | null> = {};
+    for (const set of taxSets) {
+      const code = accounts?.taxCodes.find(a => a.id === taxCodeIds[set]);
+      if (code) taxCodeMap[set] = { id: code.id, name: code.name };
+    }
     updateMapping.mutate(
-      { data: { paymentAccount: paymentAccount ? { id: paymentAccount.id, name: paymentAccount.name } : undefined, categoryMap } },
+      {
+        data: {
+          paymentAccount: paymentAccount ? { id: paymentAccount.id, name: paymentAccount.name } : undefined,
+          categoryMap,
+          incomeAccount: incomeAccount ? { id: incomeAccount.id, name: incomeAccount.name } : undefined,
+          depositAccount: depositAccount ? { id: depositAccount.id, name: depositAccount.name } : undefined,
+          taxCodeMap,
+        },
+      },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetQuickbooksStatusQueryKey() });
@@ -1025,9 +1046,9 @@ function QuickbooksMappingCard() {
       </div>
       <div className="p-5 space-y-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.paymentAccount")}</label>
+          <label className="text-sm font-medium" id="qb-pay-label">{t("dashboard.settings.quickbooks.paymentAccount")}</label>
           <Select value={paymentAccountId} onValueChange={setPaymentAccountId}>
-            <SelectTrigger>
+            <SelectTrigger id="qb-pay" aria-labelledby="qb-pay-label qb-pay">
               <SelectValue placeholder={status?.paymentAccountName ?? t("dashboard.settings.quickbooks.selectAccount")} />
             </SelectTrigger>
             <SelectContent>
@@ -1037,16 +1058,61 @@ function QuickbooksMappingCard() {
             </SelectContent>
           </Select>
         </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" id="qb-income-label">{t("dashboard.settings.quickbooks.incomeAccount")}</label>
+            <Select value={incomeAccountId} onValueChange={setIncomeAccountId}>
+              <SelectTrigger id="qb-income" aria-labelledby="qb-income-label qb-income">
+                <SelectValue placeholder={status?.incomeAccountName ?? t("dashboard.settings.quickbooks.firstIncome")} />
+              </SelectTrigger>
+              <SelectContent>
+                {accounts?.incomeAccounts.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium" id="qb-deposit-label">{t("dashboard.settings.quickbooks.depositAccount")}</label>
+            <Select value={depositAccountId} onValueChange={setDepositAccountId}>
+              <SelectTrigger id="qb-deposit" aria-labelledby="qb-deposit-label qb-deposit">
+                <SelectValue placeholder={status?.depositAccountName ?? t("dashboard.settings.quickbooks.undeposited")} />
+              </SelectTrigger>
+              <SelectContent>
+                {accounts?.depositAccounts.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        {taxSets.length > 0 && (
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.taxCodes")}</label>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.quickbooks.taxCodesHelp")}</p>
+            </div>
+            {taxSets.map((set, i) => (
+              <div key={set} className="flex items-center gap-3">
+                <span className="text-sm text-muted-foreground w-32 shrink-0" id={`qb-tax-${i}-label`}>{set === "none" ? t("dashboard.settings.quickbooks.noTax") : set}</span>
+                <Select value={taxCodeIds[set] ?? ""} onValueChange={(v) => setTaxCodeIds(prev => ({ ...prev, [set]: v }))}>
+                  <SelectTrigger id={`qb-tax-${i}`} aria-labelledby={`qb-tax-${i}-label qb-tax-${i}`}>
+                    <SelectValue placeholder={status?.taxCodeMap?.[set] ?? t("dashboard.settings.quickbooks.taxIncluded")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts?.taxCodes.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="space-y-3">
           <label className="text-sm font-medium">{t("dashboard.settings.quickbooks.categoryMapping")}</label>
           {COST_CATEGORY_KEYS.map((c) => (
             <div key={c} className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground w-32 shrink-0">{t(`jobs.cost.${c}`)}</span>
+              <span className="text-sm text-muted-foreground w-32 shrink-0" id={`qb-cat-${c}-label`}>{t(`jobs.cost.${c}`)}</span>
               <Select
                 value={categoryAccountIds[c] ?? ""}
                 onValueChange={(v) => setCategoryAccountIds(prev => ({ ...prev, [c]: v }))}
               >
-                <SelectTrigger>
+                <SelectTrigger id={`qb-cat-${c}`} aria-labelledby={`qb-cat-${c}-label qb-cat-${c}`}>
                   <SelectValue placeholder={status?.categoryMap?.[c] ?? t("dashboard.settings.quickbooks.selectAccount")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -1069,6 +1135,72 @@ function QuickbooksMappingCard() {
   );
 }
 
+/** Phase 88: payments recorded in QuickBooks come back; invoices already out go over. */
+function QuickbooksTwoWayCard() {
+  const { t } = useLanguage();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { data: status } = useGetQuickbooksStatus();
+  const updateMapping = useUpdateQuickbooksMapping();
+  const pull = usePullQuickbooksPayments();
+  const backfill = useBackfillQuickbooksInvoices();
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: getGetQuickbooksStatusQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getGetQuickbooksSyncLogQueryKey() });
+  };
+  const onError = () => toast({ title: t("dashboard.settings.quickbooks.error"), variant: "destructive" });
+  const pullOn = status?.pullPayments ?? true;
+
+  return (
+    <div className="card">
+      <div className="card-head">
+        <h2 className="text-base">{t("dashboard.settings.quickbooks.twoWayTitle")}</h2>
+        <p className="sub">{t("dashboard.settings.quickbooks.twoWayDesc")}</p>
+      </div>
+      <div className="p-5 space-y-4">
+        <label className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={pullOn}
+            disabled={updateMapping.isPending}
+            onChange={(e) => updateMapping.mutate({ data: { pullPayments: e.target.checked } }, { onSuccess: refresh, onError })}
+          />
+          <span>
+            <span className="font-medium">{t("dashboard.settings.quickbooks.pullPayments")}</span>
+            <span className="block text-xs text-muted-foreground">
+              {status?.paymentsPulledAt ? `${t("dashboard.settings.quickbooks.lastPulled")} ${new Date(status.paymentsPulledAt).toLocaleString()}` : t("dashboard.settings.quickbooks.neverPulled")}
+            </span>
+          </span>
+        </label>
+        <div className="flex flex-wrap gap-3">
+          <button
+            className="btn btn-outline-navy btn-sm gap-2"
+            disabled={pull.isPending}
+            onClick={() => pull.mutate(undefined, {
+              onSuccess: (r) => { refresh(); toast({ title: t("dashboard.settings.quickbooks.pulled").replace("{n}", String(r.recorded)).replace("{c}", String(r.conflicts)) }); },
+              onError,
+            })}
+          >
+            {pull.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} {t("dashboard.settings.quickbooks.pullNow")}
+          </button>
+          <button
+            className="btn btn-outline-navy btn-sm gap-2"
+            disabled={backfill.isPending}
+            onClick={() => backfill.mutate(undefined, {
+              onSuccess: (r) => { refresh(); toast({ title: t("dashboard.settings.quickbooks.backfilled").replace("{n}", String(r.invoices)).replace("{p}", String(r.payments)) }); },
+              onError,
+            })}
+          >
+            {backfill.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {t("dashboard.settings.quickbooks.backfill")}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">{t("dashboard.settings.quickbooks.twoWayFoot")}</p>
+      </div>
+    </div>
+  );
+}
+
 function QuickbooksSyncLogCard() {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -1080,7 +1212,7 @@ function QuickbooksSyncLogCard() {
 
   const handleRetry = (entityType: string, entityId: string) => {
     retry.mutate(
-      { data: { entityType: entityType as "invoice" | "cost_entry", entityId } },
+      { data: { entityType: entityType as "invoice" | "cost_entry" | "invoice_payment", entityId } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetQuickbooksSyncLogQueryKey() });
@@ -1106,11 +1238,11 @@ function QuickbooksSyncLogCard() {
                 <XCircle className="h-4 w-4 text-red-500 shrink-0" />
               )}
               <div className="min-w-0">
-                <p className="font-medium truncate">{e.entityType === "invoice" ? t("dashboard.settings.quickbooks.invoice") : t("dashboard.settings.quickbooks.costEntry")}</p>
+                <p className="font-medium truncate">{t(`dashboard.settings.quickbooks.entity.${e.entityType}`)}</p>
                 {e.error && <p className="text-xs text-red-600 truncate">{e.error}</p>}
               </div>
             </div>
-            {e.status === "failed" && (
+            {e.status === "failed" && e.entityType !== "payment_pull" && (
               <button className="btn btn-outline-navy btn-sm gap-1.5 shrink-0" onClick={() => handleRetry(e.entityType, e.entityId)} disabled={retry.isPending}>
                 <RefreshCw className="h-3.5 w-3.5" /> {t("dashboard.settings.quickbooks.retry")}
               </button>
@@ -1227,6 +1359,7 @@ function QuickbooksTab() {
         </div>
       </div>
       <QuickbooksMappingCard />
+          <QuickbooksTwoWayCard />
       <QuickbooksSyncLogCard />
     </div>
   );
@@ -1761,113 +1894,14 @@ function FlinksAccountPicker({ accounts, onPick, isPending }: { accounts: Flinks
   );
 }
 
-function FlinksTransactionsCard() {
+/** Phase 88: reconciliation moved to Books, where bank lines match payments as well as costs. */
+function FlinksReconcileLink() {
   const { t } = useLanguage();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["flinks-transactions"], queryFn: flinksApi.transactions });
-  const [candidatesFor, setCandidatesFor] = useState<string | null>(null);
-  const { data: candidatesData } = useQuery({
-    queryKey: ["flinks-candidates", candidatesFor],
-    queryFn: () => flinksApi.candidates(candidatesFor!),
-    enabled: !!candidatesFor,
-  });
-
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["flinks-transactions"] });
-  const matchMutation = useMutation({
-    mutationFn: ({ id, costEntryId }: { id: string; costEntryId: string }) => flinksApi.match(id, costEntryId),
-    onSuccess: () => { invalidate(); setCandidatesFor(null); },
-    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
-  });
-  const ignoreMutation = useMutation({
-    mutationFn: (id: string) => flinksApi.ignore(id),
-    onSuccess: invalidate,
-    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
-  });
-  const unmatchMutation = useMutation({
-    mutationFn: (id: string) => flinksApi.unmatch(id),
-    onSuccess: invalidate,
-    onError: () => toast({ title: t("dashboard.settings.flinks.error"), variant: "destructive" }),
-  });
-
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
-  const transactions = data?.transactions ?? [];
-  if (transactions.length === 0) {
-    return (
-      <div className="card">
-        <div className="p-5 py-6 text-sm text-muted-foreground text-center">{t("dashboard.settings.flinks.noTransactions")}</div>
-      </div>
-    );
-  }
-
   return (
     <div className="card">
-      <div className="card-head pb-3">
-        <h2 className="text-base">{t("dashboard.settings.flinks.transactionsTitle")}</h2>
-      </div>
-      <div className="p-5 space-y-2">
-        {transactions.map((tx) => (
-          <div key={tx.id} className="border border-border rounded-[var(--radius-sm)] p-3 space-y-2">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div>
-                <p className="text-sm font-medium">{tx.description || t("dashboard.settings.flinks.unlabeledTransaction")}</p>
-                <p className="text-xs text-muted-foreground">{new Date(tx.date).toLocaleDateString()}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={cn("text-sm font-semibold", tx.amountCents < 0 ? "text-red-600" : "text-emerald-600")}>
-                  {(tx.amountCents / 100).toLocaleString(undefined, { style: "currency", currency: "CAD" })}
-                </span>
-                <span
-                  className={cn(
-                    "chip",
-                    tx.matchStatus === "matched" && "chip-green",
-                    tx.matchStatus === "ignored" && "chip-grey",
-                    tx.matchStatus === "unmatched" && "chip-yellow"
-                  )}
-                >
-                  {t(`dashboard.settings.flinks.status.${tx.matchStatus}`)}
-                </span>
-              </div>
-            </div>
-            {tx.matchStatus === "unmatched" && (
-              <div className="space-y-2">
-                <div className="flex gap-2">
-                  <button onClick={() => setCandidatesFor(candidatesFor === tx.id ? null : tx.id)} className="btn btn-outline-navy btn-sm gap-1.5">
-                    {t("dashboard.settings.flinks.findMatch")}
-                  </button>
-                  <button onClick={() => ignoreMutation.mutate(tx.id)} disabled={ignoreMutation.isPending} className="btn btn-outline-navy btn-sm text-muted-foreground">
-                    {t("dashboard.settings.flinks.ignore")}
-                  </button>
-                </div>
-                {candidatesFor === tx.id && (
-                  <div className="pl-2 border-l-2 border-amber-200 space-y-1.5">
-                    {(candidatesData?.candidates.length ?? 0) === 0 ? (
-                      <p className="text-xs text-muted-foreground">{t("dashboard.settings.flinks.noCandidates")}</p>
-                    ) : (
-                      candidatesData!.candidates.map((c) => (
-                        <button
-                          key={c.id}
-                          type="button"
-                          disabled={matchMutation.isPending}
-                          onClick={() => matchMutation.mutate({ id: tx.id, costEntryId: c.id })}
-                          className="w-full text-left px-2.5 py-1.5 rounded-md border border-border hover:border-amber-300 hover:bg-amber-50 text-xs flex items-center justify-between disabled:opacity-50"
-                        >
-                          <span>{c.vendor || c.description || t("dashboard.settings.flinks.unlabeledTransaction")}</span>
-                          <span className="text-muted-foreground">{new Date(c.date).toLocaleDateString()}</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-            {tx.matchStatus === "matched" && (
-              <button onClick={() => unmatchMutation.mutate(tx.id)} disabled={unmatchMutation.isPending} className="btn btn-outline-navy btn-sm text-muted-foreground h-7 px-2 text-xs">
-                {t("dashboard.settings.flinks.undoMatch")}
-              </button>
-            )}
-          </div>
-        ))}
+      <div className="card-foot" style={{ borderTop: "none" }}>
+        <span className="text-sm text-muted-foreground">{t("dashboard.settings.flinks.movedToBooks")}</span>
+        <Link href="/dashboard/books?tab=bank" className="btn btn-outline-navy btn-sm">{t("dashboard.settings.flinks.openBooks")}</Link>
       </div>
     </div>
   );
@@ -1981,7 +2015,7 @@ function FlinksTab() {
           )}
         </div>
       </div>
-      {connected && hasAccount && <FlinksTransactionsCard />}
+      {connected && hasAccount && <FlinksReconcileLink />}
       <FlinksConnectDialog
         open={showConnect}
         onOpenChange={setShowConnect}

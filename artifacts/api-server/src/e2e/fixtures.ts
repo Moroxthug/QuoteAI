@@ -7,7 +7,8 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile } from "@workspace/db";
+import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable } from "@workspace/db";
+import { encryptSecret } from "../lib/crypto.js";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
 import { raiseAutomation } from "../lib/automation.js";
@@ -204,6 +205,8 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     },
   });
 
+  await seedBooks(userId, project.id, language);
+
   let teamInviteToken: string | null = null;
   const member = await org.api("/api/team/members/invite", { body: { email: `member-${userId}@example.invalid`, role: "foreman", send: false } });
   if (member.status === 201) teamInviteToken = String(member.body.url).split("/team-invite/")[1] ?? null;
@@ -218,6 +221,60 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     jobId: project.id, invoiceId: sent.id, invoiceToken: invoiceToken(manualSent),
     signToken, workerToken, teamInviteToken, clientId,
   };
+}
+
+/**
+ * Phase 88: a bank feed with a matched, an unmatched and an ignored line and a
+ * deposit waiting for its invoice; a crew materials claim with a receipt that
+ * proves it; and a QuickBooks connection answered from a stub — so Books and
+ * the QuickBooks settings render with content, not their empty states. Seeded
+ * last, so nothing earlier in the showcase is pushed to the stubbed books.
+ */
+async function seedBooks(userId: string, projectId: string, language: "en" | "fr"): Promise<void> {
+  // Late last month, so the close (which opens on last month) has something on it.
+  const now = new Date();
+  const day = (n: number) => new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 15) - n * 86_400_000);
+  await db.insert(flinksConnectionsTable).values({ userId, loginIdEnc: encryptSecret("showcase-login"), institutionName: "Desjardins", selectedAccount: { id: "acc-1", name: language === "fr" ? "Compte courant" : "Chequing", institution: "Desjardins", last4: "4821" }, lastSyncedAt: new Date() });
+  const [acme] = await db.select({ id: costEntriesTable.id }).from(costEntriesTable).where(and(eq(costEntriesTable.userId, userId), eq(costEntriesTable.vendor, "ACME Supply")));
+  await db.insert(flinksTransactionsTable).values([
+    { userId, flinksTransactionId: "showcase-1", date: day(3), description: "ACME SUPPLY #0412", amountCents: -56_500, matchStatus: "matched", matchedCostEntryId: acme?.id ?? null, autoMatched: true },
+    { userId, flinksTransactionId: "showcase-2", date: day(5), description: "HOME DEPOT 7031 OTTAWA", amountCents: -21_437 },
+    { userId, flinksTransactionId: "showcase-3", date: day(6), description: language === "fr" ? "VIREMENT INTERAC J. CLIENT" : "E-TRANSFER J CLIENT", amountCents: 129_950 },
+    { userId, flinksTransactionId: "showcase-4", date: day(8), description: "MONTHLY ACCOUNT FEE", amountCents: -1_695, matchStatus: "ignored" },
+  ]);
+
+  const [claim] = await db.insert(costEntriesTable).values({ userId, projectId, category: "materials", description: language === "fr" ? "Vis à gypse, 2 boîtes (Pat Worker)" : "Drywall screws, 2 boxes (Pat Worker)", date: day(4), subtotalCents: 4_800, totalCents: 4_800, status: "pending_review", source: "manual", createdBy: "user" }).returning();
+  await db.insert(fieldReportsTable).values({ userId, projectId, authorName: "Pat Worker", kind: "materials", body: language === "fr" ? "Vis à gypse, 2 boîtes" : "Drywall screws, 2 boxes", materialsCents: 4_800, costEntryId: claim!.id });
+  const [doc] = await db.insert(uploadedDocumentsTable).values({ userId, fileName: "receipt-home-hardware.jpg", mimeType: "image/jpeg", fileUrl: `/objects/receipts/${userId}/showcase.jpg` } as typeof uploadedDocumentsTable.$inferInsert).returning();
+  await db.insert(costEntriesTable).values({ userId, projectId: null, category: "materials", vendor: "Home Hardware", description: "Drywall screws", date: day(4), subtotalCents: 4_420, taxCents: 575, taxBreakdown: { HST: 575 }, totalCents: 4_995, status: "confirmed", source: "receipt", createdBy: "ai", sourceDocumentId: doc!.id, confirmedAt: new Date() });
+
+  await db.insert(quickbooksConnectionsTable).values({
+    userId,
+    realmId: "9130000000000067",
+    environment: "sandbox",
+    companyName: "Northside Renovations (QuickBooks)",
+    accessTokenEnc: encryptSecret("showcase-qbo"),
+    refreshTokenEnc: encryptSecret("showcase-qbo-refresh"),
+    tokenExpiresAt: new Date(Date.now() + 30 * 86_400_000),
+    paymentAccount: { id: "35", name: "Chequing" },
+    categoryMap: { materials: { id: "64", name: "Job Materials" } },
+    incomeAccount: { id: "79", name: "Renovation revenue" },
+    taxCodeMap: { "HST 13%": { id: "7", name: "HST ON" } },
+    paymentsPulledAt: new Date(Date.now() - 6 * 3_600_000),
+  });
+  const { stubHost, json } = await import("./vendorStub.js");
+  const accounts = (names: [string, string][]) => names.map(([Id, Name]) => ({ Id, Name }));
+  const qbo = (req: { url: string }) => {
+    const q = new URL(req.url).searchParams.get("query") ?? "";
+    if (q.includes("from TaxCode")) return json(200, { QueryResponse: { TaxCode: accounts([["7", "HST ON"], ["3", "GST"], ["9", "Exempt"], ["10", "Out of scope"]]) } });
+    if (q.includes("'Income'")) return json(200, { QueryResponse: { Account: accounts([["79", "Renovation revenue"], ["80", "Service income"]]) } });
+    if (q.includes("'Other Current Asset'")) return json(200, { QueryResponse: { Account: accounts([["35", "Chequing"], ["4", "Undeposited Funds"]]) } });
+    if (q.includes("'Credit Card'")) return json(200, { QueryResponse: { Account: accounts([["35", "Chequing"], ["41", "Visa"]]) } });
+    if (q.includes("'Expense'")) return json(200, { QueryResponse: { Account: accounts([["64", "Job Materials"], ["65", "Subcontractors"], ["66", "Equipment rental"]]) } });
+    return json(200, { QueryResponse: {} });
+  };
+  stubHost("https://sandbox-quickbooks.api.intuit.com/", qbo);
+  stubHost("https://quickbooks.api.intuit.com/", qbo);
 }
 
 /**

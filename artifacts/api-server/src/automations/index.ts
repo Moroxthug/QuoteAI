@@ -6,7 +6,7 @@ import "./milestoneCompleted";
 import "./leadFollowup";
 import "./jobReviewRequest";
 import "./quoteFollowup";
-import "./invoicePaidQuickbooks";
+import "./accountingQuickbooks";
 import "./costConfirmedQuickbooks";
 import "./invoicePaidWave";
 import "./costConfirmedWave";

@@ -509,7 +509,7 @@ function T5018Tab({ settings }: { settings: ComplianceSettings }) {
               <tbody>
                 {data.recipients.map((r) => (
                   <tr key={r.key}>
-                    <td><span className="t-strong">{r.name}</span><span className="t-sub">{t(`compliance.source.${r.source}`)}</span></td>
+                    <td><span className="t-strong">{r.name}</span><span className="t-sub">{t(`compliance.source.${r.source}`)}{r.bankDated > 0 ? ` · ${t("compliance.bankDated").replace("{n}", String(r.bankDated))}` : ""}</span></td>
                     <td>{r.entryCount}</td>
                     <td className="t-amt">{formatCents(r.subtotalCents)}</td>
                     <td className="t-amt">{formatCents(r.taxCents)}</td>

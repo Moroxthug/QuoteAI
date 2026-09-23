@@ -1,4 +1,4 @@
-import { db, automationRunsTable, type AutomationEvent, type AutomationRun } from "@workspace/db";
+import { db, automationRunsTable, type AutomationEvent as PublicAutomationEvent, type InternalAutomationEvent, type AutomationRun } from "@workspace/db";
 import { and, eq, lte, or, isNull, sql } from "drizzle-orm";
 import { logger } from "./logger";
 import { captureException } from "./errorTracking";
@@ -9,6 +9,9 @@ import { captureException } from "./errorTracking";
 // inline, and retried by the cron tick if it fails. Handlers MUST be
 // idempotent: a retry may re-run a handler whose previous attempt partially
 // succeeded.
+
+/** Public events (also webhooks) plus Phase 88's internal accounting pushes. */
+type AutomationEvent = PublicAutomationEvent | InternalAutomationEvent;
 
 export type AutomationHandler = (run: AutomationRun) => Promise<Record<string, unknown> | void>;
 

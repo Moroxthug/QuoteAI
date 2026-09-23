@@ -10,6 +10,7 @@ import {
   clientsTable,
   changeOrdersTable,
   businessProfilesTable,
+  quickbooksConnectionsTable,
   normalizeProvince,
   getTaxProfile,
   DEFAULT_AUTOMATION_SETTINGS,
@@ -27,6 +28,8 @@ import {
   type AutomationSettings,
   type BusinessProfile,
   type Client,
+  type AccountingProvider,
+  type InternalAutomationEvent,
 } from "@workspace/db";
 import { and, asc, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
@@ -36,11 +39,23 @@ import { getBaseUrl } from "../lib/baseUrl.js";
 import { writeAudit, createNotification } from "../lib/notifications.js";
 import { sendInvoiceEmail, sendPaymentReceiptEmail } from "../lib/emailInvoices.js";
 import { raiseAutomation } from "../lib/automation.js";
+import { getLink, putLink } from "../books/links.js";
 import { computeInvoiceAmounts, termSubtotalCents, finalInvoiceSubtotalCents, lienPeriodDays, addDays, statusAfterPayment, balanceCents, lineFrom } from "./math.js";
 import { buildInvoicePdf } from "./pdf.js";
 import { ti, invoiceTitle, type Lang, type IKey } from "./render.js";
 
 const storage = new ObjectStorageService();
+
+/**
+ * Phase 88: queues a push to the connected accounting package (QuickBooks).
+ * Only raised for companies with an enabled connection, so the automation
+ * table is not filled with no-op rows for everyone else.
+ */
+async function raiseAccounting(event: InternalAutomationEvent, userId: string, entityType: string, entityId: string): Promise<void> {
+  const [conn] = await db.select({ isEnabled: quickbooksConnectionsTable.isEnabled }).from(quickbooksConnectionsTable).where(eq(quickbooksConnectionsTable.userId, userId));
+  if (!conn?.isEnabled) return;
+  await raiseAutomation({ event, userId, entityType, entityId });
+}
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -524,6 +539,7 @@ export async function sendInvoice(params: { invoiceId: string; userId?: string; 
 
   await logInvoiceEvent({ invoiceId: inv.id, type: params.actor === "system" ? "auto_sent" : resend ? "resent" : "sent", actor: params.actor, detail: { to: toEmail }, ip: params.ip, userAgent: params.userAgent });
   await writeAudit({ userId: inv.userId, actorType: params.actor === "system" ? "system" : "user", actorId: params.userId ?? null, entityType: "invoice", entityId: inv.id, action: resend ? "resent" : "sent", diff: { to: toEmail, pdfHash: stored.sha256 }, ip: params.ip, userAgent: params.userAgent });
+  if (!resend && inv.type !== "credit_note") await raiseAccounting("accounting.invoice_sent", inv.userId, "invoice", inv.id);
   return { invoice: updated!, resend };
 }
 
@@ -545,7 +561,23 @@ export async function refreshInvoiceStatus(invoiceId: string, now = new Date()):
   return updated!;
 }
 
-export async function recordPayment(params: { invoiceId: string; userId: string; amountCents: number; method: PaymentMethod; date?: Date; reference?: string; note?: string; sendReceipt?: boolean; ip?: string | null }): Promise<{ invoice: Invoice; payment: InvoicePayment }> {
+/**
+ * `external` (Phase 88): the payment was recorded in the accounting package
+ * and is being brought back — linked before anything else runs, so it is never
+ * pushed back to where it came from.
+ */
+export async function recordPayment(params: {
+  invoiceId: string;
+  userId: string;
+  amountCents: number;
+  method: PaymentMethod;
+  date?: Date;
+  reference?: string;
+  note?: string;
+  sendReceipt?: boolean;
+  ip?: string | null;
+  external?: { provider: AccountingProvider; externalType: string; externalId: string };
+}): Promise<{ invoice: Invoice; payment: InvoicePayment }> {
   const loaded = await loadInvoice(params.invoiceId);
   if (!loaded || loaded.invoice.userId !== params.userId) throw new Error("Invoice not found");
   const inv = loaded.invoice;
@@ -559,9 +591,12 @@ export async function recordPayment(params: { invoiceId: string; userId: string;
     .insert(invoicePaymentsTable)
     .values({ invoiceId: inv.id, userId: params.userId, date, amountCents: params.amountCents, method: params.method, reference: params.reference ?? "", note: params.note ?? "" })
     .returning();
-  await logInvoiceEvent({ invoiceId: inv.id, type: "payment_recorded", actor: "contractor", detail: { amountCents: params.amountCents, method: params.method, reference: params.reference ?? "" }, ip: params.ip });
+  const ext = params.external;
+  if (ext) await putLink({ userId: params.userId, provider: ext.provider, entityType: "invoice_payment", entityId: payment!.id, externalId: ext.externalId, externalType: ext.externalType, origin: "external" });
+  await logInvoiceEvent({ invoiceId: inv.id, type: "payment_recorded", actor: ext ? "system" : "contractor", detail: { amountCents: params.amountCents, method: params.method, reference: params.reference ?? "", ...(ext ? { from: ext.provider } : {}) }, ip: params.ip });
   const updated = await refreshInvoiceStatus(inv.id);
-  await writeAudit({ userId: params.userId, actorType: "user", actorId: params.userId, entityType: "invoice", entityId: inv.id, action: "payment_recorded", diff: { amountCents: params.amountCents, method: params.method }, ip: params.ip });
+  await writeAudit({ userId: params.userId, actorType: ext ? "system" : "user", actorId: ext ? null : params.userId, entityType: "invoice", entityId: inv.id, action: "payment_recorded", diff: { amountCents: params.amountCents, method: params.method, ...(ext ? { from: ext.provider } : {}) }, ip: params.ip });
+  if (!ext) await raiseAccounting("accounting.payment_recorded", params.userId, "invoice_payment", payment!.id);
 
   const toEmail = (inv.customer.email ?? "").trim();
   if (params.sendReceipt !== false && toEmail.includes("@") && inv.publicTokenHash) {
@@ -639,7 +674,13 @@ export async function removePayment(params: { invoiceId: string; paymentId: stri
   const [payment] = await db.select().from(invoicePaymentsTable).where(and(eq(invoicePaymentsTable.id, params.paymentId), eq(invoicePaymentsTable.invoiceId, params.invoiceId), eq(invoicePaymentsTable.userId, params.userId)));
   if (!payment) throw new Error("Payment not found");
   if (payment.creditNoteId) throw new Error("Void the credit note instead");
+  // Phase 88: a payment already in QuickBooks is deleted there too (its id travels in the payload — the row is gone by then).
+  const qbo = await getLink(params.userId, "quickbooks", "invoice_payment", payment.id);
   await db.delete(invoicePaymentsTable).where(eq(invoicePaymentsTable.id, payment.id));
+  if (qbo && qbo.origin === "quoteai") {
+    const [conn] = await db.select({ isEnabled: quickbooksConnectionsTable.isEnabled }).from(quickbooksConnectionsTable).where(eq(quickbooksConnectionsTable.userId, params.userId));
+    if (conn?.isEnabled) await raiseAutomation({ event: "accounting.payment_removed", userId: params.userId, entityType: "invoice_payment", entityId: payment.id, payload: { qboPaymentId: qbo.externalId } });
+  }
   await logInvoiceEvent({ invoiceId: params.invoiceId, type: "payment_removed", actor: "contractor", detail: { amountCents: payment.amountCents } });
   return refreshInvoiceStatus(params.invoiceId);
 }
@@ -660,6 +701,7 @@ export async function voidInvoice(params: { invoiceId: string; userId: string; r
   const [updated] = await db.update(invoicesTable).set({ status: "void", voidedAt: new Date(), voidReason: params.reason ?? null, autoSendAt: null }).where(eq(invoicesTable.id, inv.id)).returning();
   await logInvoiceEvent({ invoiceId: inv.id, type: "voided", actor: "contractor", detail: { reason: params.reason ?? null }, ip: params.ip });
   await writeAudit({ userId: params.userId, actorType: "user", actorId: params.userId, entityType: "invoice", entityId: inv.id, action: "voided", diff: { reason: params.reason ?? null }, ip: params.ip });
+  await raiseAccounting("accounting.invoice_voided", params.userId, "invoice", inv.id);
   return updated!;
 }
 

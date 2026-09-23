@@ -32,6 +32,15 @@ export const AUTOMATION_EVENTS = [
 ] as const;
 export type AutomationEvent = (typeof AUTOMATION_EVENTS)[number];
 
+/**
+ * Phase 88: events that run through the same retrying runner but are not
+ * part of the public webhook catalogue (webhookDispatch only fans out
+ * AUTOMATION_EVENTS). They push invoices, payments and voids to the
+ * connected accounting package.
+ */
+export const INTERNAL_AUTOMATION_EVENTS = ["accounting.invoice_sent", "accounting.payment_recorded", "accounting.payment_removed", "accounting.invoice_voided"] as const;
+export type InternalAutomationEvent = (typeof INTERNAL_AUTOMATION_EVENTS)[number];
+
 export const automationRunsTable = pgTable(
   "automation_runs",
   {

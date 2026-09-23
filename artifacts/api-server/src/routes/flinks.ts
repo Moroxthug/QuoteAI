@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db, businessProfilesTable, costEntriesTable, flinksTransactionsTable, hasFeature, minimumPlanFor } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { db, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
+import { eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
@@ -14,9 +14,6 @@ import {
   setFlinksEnabled,
   disconnectFlinks,
   syncFlinksTransactions,
-  manuallyMatch,
-  ignoreTransaction,
-  unmatch,
 } from "../flinks/service.js";
 
 const router = Router();
@@ -167,111 +164,7 @@ router.post("/flinks/sync", requireAuth, requirePermission("integrations", "full
   }
 });
 
-// GET /api/flinks/transactions — recent bank transactions with their reconciliation status
-router.get("/flinks/transactions", requireAuth, requirePermission("integrations", "view"), async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const rows = await db
-      .select()
-      .from(flinksTransactionsTable)
-      .where(eq(flinksTransactionsTable.userId, userId))
-      .orderBy(desc(flinksTransactionsTable.date))
-      .limit(100);
-    res.json({
-      transactions: rows.map((r) => ({
-        id: r.id,
-        date: r.date.toISOString(),
-        description: r.description,
-        amountCents: r.amountCents,
-        matchStatus: r.matchStatus,
-        matchedCostEntryId: r.matchedCostEntryId,
-        autoMatched: r.autoMatched,
-      })),
-    });
-  } catch (err) {
-    req.log.error({ err }, "Error fetching Flinks transactions");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// GET /api/flinks/transactions/:id/candidates — cost entries with the same total, for manual matching
-router.get("/flinks/transactions/:id/candidates", requireAuth, requirePermission("integrations", "view"), async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const [tx] = await db
-      .select()
-      .from(flinksTransactionsTable)
-      .where(and(eq(flinksTransactionsTable.id, req.params.id as string), eq(flinksTransactionsTable.userId, userId)));
-    if (!tx) {
-      res.status(404).json({ error: "Transaction not found" });
-      return;
-    }
-    const candidates = await db
-      .select({ id: costEntriesTable.id, vendor: costEntriesTable.vendor, description: costEntriesTable.description, date: costEntriesTable.date, totalCents: costEntriesTable.totalCents })
-      .from(costEntriesTable)
-      .where(and(eq(costEntriesTable.userId, userId), eq(costEntriesTable.totalCents, Math.abs(tx.amountCents))))
-      .orderBy(desc(costEntriesTable.date))
-      .limit(20);
-    res.json({ candidates: candidates.map((c) => ({ ...c, date: c.date.toISOString() })) });
-  } catch (err) {
-    req.log.error({ err }, "Error fetching Flinks match candidates");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// POST /api/flinks/transactions/:id/match — link a bank transaction to a cost entry by hand
-router.post("/flinks/transactions/:id/match", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    const body = z.object({ costEntryId: z.string().uuid() }).safeParse(req.body);
-    if (!body.success) {
-      res.status(400).json({ error: "Invalid parameters" });
-      return;
-    }
-    const [entry] = await db
-      .select({ id: costEntriesTable.id })
-      .from(costEntriesTable)
-      .where(and(eq(costEntriesTable.id, body.data.costEntryId), eq(costEntriesTable.userId, userId)));
-    if (!entry) {
-      res.status(404).json({ error: "Cost entry not found" });
-      return;
-    }
-    await manuallyMatch(userId, req.params.id as string, body.data.costEntryId);
-    res.json({ success: true });
-  } catch (err) {
-    req.log.error({ err }, "Error matching Flinks transaction");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// POST /api/flinks/transactions/:id/unmatch
-router.post("/flinks/transactions/:id/unmatch", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    if (!(await unmatch(userId, req.params.id as string))) {
-      res.status(404).json({ error: "Transaction not found" });
-      return;
-    }
-    res.json({ success: true });
-  } catch (err) {
-    req.log.error({ err }, "Error unmatching Flinks transaction");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-// POST /api/flinks/transactions/:id/ignore — not job-related (a personal transfer, a fee, etc.)
-router.post("/flinks/transactions/:id/ignore", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
-  try {
-    const userId = getUserId(res);
-    if (!(await ignoreTransaction(userId, req.params.id as string))) {
-      res.status(404).json({ error: "Transaction not found" });
-      return;
-    }
-    res.json({ success: true });
-  } catch (err) {
-    req.log.error({ err }, "Error ignoring Flinks transaction");
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+// Phase 88: the bank lines themselves (list, candidates, match, ignore) moved to
+// /api/books/bank — see routes/books.ts.
 
 export default router;

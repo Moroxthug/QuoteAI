@@ -2462,7 +2462,9 @@ export const GetCalendarStatusResponse = zod.object({
   "accountEmail": zod.string(),
   "isEnabled": zod.boolean(),
   "connectedAt": zod.string(),
-  "lastSyncedAt": zod.string().nullish()
+  "lastSyncedAt": zod.string().nullish(),
+  "calendarId": zod.string().describe('Phase 96 — the calendar events are written to ("primary" = the account\'s main one).'),
+  "calendarName": zod.string().nullish()
 }))
 })
 

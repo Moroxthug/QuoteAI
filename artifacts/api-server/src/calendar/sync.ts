@@ -1,8 +1,8 @@
-import { db, calendarConnectionsTable, calendarSyncedEventsTable, businessProfilesTable, hasFeature, type Milestone, type ScheduleBlock, type CalendarProvider, type CalendarConnection } from "@workspace/db";
-import { and, eq, inArray } from "drizzle-orm";
+import { db, calendarConnectionsTable, calendarSyncedEventsTable, businessProfilesTable, milestonesTable, projectsTable, scheduleBlocksTable, collaboratorsTable, hasFeature, type Milestone, type ScheduleBlock, type CalendarProvider, type CalendarConnection } from "@workspace/db";
+import { and, eq, gte, inArray, isNotNull } from "drizzle-orm";
 import { getValidCalendarAccessToken, markCalendarSynced } from "./service.js";
-import { createGoogleEvent, updateGoogleEvent, deleteGoogleEvent } from "../lib/googleCalendarClient.js";
-import { createOutlookEvent, updateOutlookEvent, deleteOutlookEvent } from "../lib/outlookCalendarClient.js";
+import { createGoogleEvent, updateGoogleEvent, deleteGoogleEvent, listGoogleCalendars, type ListedCalendar } from "../lib/googleCalendarClient.js";
+import { createOutlookEvent, updateOutlookEvent, deleteOutlookEvent, listOutlookCalendars } from "../lib/outlookCalendarClient.js";
 import { toIsoDate } from "../jobs/dates.js";
 import { logger } from "../lib/logger.js";
 
@@ -251,4 +251,101 @@ export async function removeBlockFromCalendar(userId: string, blockId: string): 
     }
   }
   // calendar_synced_events rows cascade-delete with the block itself.
+}
+
+// ── Phase 96: which calendar ─────────────────────────────────────────────────
+// Every write above goes to `conn.calendarId` ("primary" until someone picks
+// another). Picking a different one moves what is already there: the events
+// QuoteAI created are deleted from the old calendar, their rows dropped, and
+// the upcoming milestones and blocks pushed again into the new one. Past
+// items stay where they were — a calendar is for what is coming.
+
+/** How far back the re-push reaches; anything older stays in the old calendar's history. */
+const MOVE_LOOKBACK_MS = 30 * 86_400_000;
+/** The re-push is one HTTP call per item; more than this and the person should expect the rest on the next edit. */
+const MOVE_MAX_ITEMS = 200;
+
+/** The calendars the account can write to; `[]` when the connection is missing or its token is dead. */
+export async function listWritableCalendars(userId: string, provider: CalendarProvider): Promise<ListedCalendar[]> {
+  const accessToken = await getValidCalendarAccessToken(userId, provider);
+  if (!accessToken) return [];
+  const all = provider === "google" ? await listGoogleCalendars(accessToken) : await listOutlookCalendars(accessToken);
+  return all.filter((c) => c.canWrite);
+}
+
+export type MoveResult = { removed: number; pushed: number; failed: number };
+
+/**
+ * Points the connection at another calendar and moves the upcoming events
+ * there. Never throws for a vendor failure: a delete that fails is logged and
+ * skipped (the event stays on the old calendar), a push that fails leaves its
+ * usual "failed" row for the next edit to retry.
+ */
+export async function moveConnectionToCalendar(conn: CalendarConnection, calendarId: string, calendarName: string | null): Promise<MoveResult> {
+  const provider = conn.provider as CalendarProvider;
+  const result: MoveResult = { removed: 0, pushed: 0, failed: 0 };
+  const changed = calendarId !== conn.calendarId;
+
+  if (changed) {
+    const rows = await db
+      .select()
+      .from(calendarSyncedEventsTable)
+      .where(and(eq(calendarSyncedEventsTable.userId, conn.userId), eq(calendarSyncedEventsTable.provider, provider), isNotNull(calendarSyncedEventsTable.externalEventId)));
+    const accessToken = rows.length ? await getValidCalendarAccessToken(conn.userId, provider) : null;
+    for (const row of rows) {
+      if (!accessToken || !row.externalEventId) continue;
+      try {
+        if (provider === "google") await deleteGoogleEvent(accessToken, conn.calendarId, row.externalEventId);
+        else await deleteOutlookEvent(accessToken, row.externalEventId);
+        result.removed += 1;
+      } catch (err) {
+        logger.warn({ err, provider, eventId: row.externalEventId }, "Calendar move: delete from the old calendar failed (ignoring)");
+      }
+    }
+    if (rows.length) await db.delete(calendarSyncedEventsTable).where(inArray(calendarSyncedEventsTable.id, rows.map((r) => r.id)));
+  }
+
+  await db
+    .update(calendarConnectionsTable)
+    .set({ calendarId, calendarName: calendarId === "primary" ? null : calendarName })
+    .where(and(eq(calendarConnectionsTable.userId, conn.userId), eq(calendarConnectionsTable.provider, provider)));
+  if (!changed || !conn.isEnabled) return result;
+
+  const since = new Date(Date.now() - MOVE_LOOKBACK_MS);
+  const milestones = await db
+    .select({ milestone: milestonesTable, jobName: projectsTable.name })
+    .from(milestonesTable)
+    .innerJoin(projectsTable, eq(projectsTable.id, milestonesTable.projectId))
+    .where(and(eq(milestonesTable.userId, conn.userId), isNotNull(milestonesTable.plannedStart), gte(milestonesTable.plannedStart, since)))
+    .limit(MOVE_MAX_ITEMS);
+  const blocks = await db
+    .select({ block: scheduleBlocksTable, jobName: projectsTable.name, workerName: collaboratorsTable.name })
+    .from(scheduleBlocksTable)
+    .leftJoin(projectsTable, eq(projectsTable.id, scheduleBlocksTable.projectId))
+    .leftJoin(collaboratorsTable, eq(collaboratorsTable.id, scheduleBlocksTable.collaboratorId))
+    .where(and(eq(scheduleBlocksTable.userId, conn.userId), gte(scheduleBlocksTable.endsAt, since)))
+    .limit(MOVE_MAX_ITEMS);
+
+  // Only this provider's connection, pointed at the new calendar — the other
+  // provider (if any) keeps its events where they are.
+  const target: CalendarConnection = { ...conn, calendarId, calendarName };
+  for (const { milestone, jobName } of milestones) {
+    const { externalEventId, error } = await pushToConnection(target, milestone, jobName);
+    await db
+      .insert(calendarSyncedEventsTable)
+      .values({ userId: conn.userId, provider, milestoneId: milestone.id, externalEventId, status: error ? "failed" : "synced", error })
+      .onConflictDoUpdate({ target: [calendarSyncedEventsTable.milestoneId, calendarSyncedEventsTable.provider], set: { externalEventId, status: error ? "failed" : "synced", error } });
+    if (error) result.failed += 1;
+    else result.pushed += 1;
+  }
+  for (const { block, jobName, workerName } of blocks) {
+    const { externalEventId, error } = await pushBlockToConnection(target, block, jobName, workerName);
+    await db
+      .insert(calendarSyncedEventsTable)
+      .values({ userId: conn.userId, provider, scheduleBlockId: block.id, externalEventId, status: error ? "failed" : "synced", error })
+      .onConflictDoUpdate({ target: [calendarSyncedEventsTable.scheduleBlockId, calendarSyncedEventsTable.provider], set: { externalEventId, status: error ? "failed" : "synced", error } });
+    if (error) result.failed += 1;
+    else result.pushed += 1;
+  }
+  return result;
 }

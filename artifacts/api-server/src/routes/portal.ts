@@ -8,6 +8,7 @@ import { getBaseUrl } from "../lib/baseUrl.js";
 import { writeAudit } from "../lib/notifications.js";
 import { sendPortalOtpEmail } from "../lib/emailPortal.js";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
+import { thumbnailOrOriginal } from "../jobs/thumbnails.js";
 import { buildInvoicePdf } from "../invoices/pdf.js";
 import { reportEtransferSent } from "../invoices/service.js";
 import { createInvoiceCheckoutSession } from "../invoices/stripeConnect.js";
@@ -227,7 +228,8 @@ router.get("/portal/:token/photos/:photoId/file", viewLimiter, async (req, res) 
       res.status(404).json({ error: "not_found" });
       return;
     }
-    const file = await objectStorage.downloadPrivateObject(row.photo.fileUrl.replace(/^\/objects\//, ""));
+    // Phase 96: the portal grid asks for `?size=thumb`; a tap on a photo fetches the original.
+    const file = req.query.size === "thumb" ? (await thumbnailOrOriginal(row.photo)).body : await objectStorage.downloadPrivateObject(row.photo.fileUrl.replace(/^\/objects\//, ""));
     res.status(file.status);
     file.headers.forEach((v, k) => res.setHeader(k, v));
     if (file.body) Readable.fromWeb(file.body as unknown as import("node:stream/web").ReadableStream<Uint8Array>).pipe(res);

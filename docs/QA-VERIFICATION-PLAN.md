@@ -36,9 +36,9 @@ So "what's left" is not features — it is proving that ~60 phases shipped back-
 
 **Deliberate v1 scope cuts (not bugs, just record them in the launch notes)**
 - Hardcoded lead-follow-up cadence and review-request delay (no editor UI); no SMS channel.
-- QuickBooks/Wave: one line per invoice/cost, exact-name customer matching only.
-- Calendar sync: primary calendar only, milestones only.
-- No thumbnail generation for job photos.
+- ~~QuickBooks: one line per invoice/cost~~ (Phase 96: one line per item with the mapped tax code; Wave still one line), exact-name customer matching only.
+- ~~Calendar sync: primary calendar only~~ (Phase 96: any writable calendar can be picked), milestones and schedule blocks only.
+- ~~No thumbnail generation for job photos.~~ (Phase 96: ≤480 px JPEG on upload, lazily for older photos.)
 - `pages/admin.tsx` stays on shadcn.
 
 ---

@@ -5,6 +5,8 @@ import {
   invoicesTable,
   invoicePaymentsTable,
   suppliersTable,
+  projectsTable,
+  businessProfilesTable,
   OPEN_INVOICE_STATUSES,
   type Invoice,
   type CostEntry,
@@ -27,6 +29,7 @@ import {
 } from "../lib/quickbooksClient.js";
 import { deleteLink, findByExternal, getLink, putLink } from "../books/links.js";
 import { nameKey, taxSetKey } from "../books/keys.js";
+import { quickbooksInvoiceLines, costTaxSetKey } from "./lines.js";
 import { recordPayment } from "../invoices/service.js";
 import { logger } from "../lib/logger.js";
 
@@ -42,10 +45,13 @@ import { logger } from "../lib/logger.js";
 // accounting_links remembers every pair, so nothing is created twice and
 // nothing travels back to where it came from.
 //
-// Invoices still go over as ONE line (the invoice title). With the invoice's
-// tax set mapped to a QBO tax code the line is pre-tax and QuickBooks computes
-// the tax; unmapped, it is the tax-included total, as before (a Canadian
-// company's tax codes differ per company, which is why the mapping exists).
+// Phase 96: an invoice goes over line by line (quickbooks/lines.ts). With the
+// invoice's tax set mapped to a QBO tax code every line is pre-tax with that
+// code and QuickBooks computes the tax; unmapped, the lines are pre-tax and the
+// taxes ride along as lines of their own, so the total matches either way (a
+// Canadian company's tax codes differ per company, which is why the mapping
+// exists). A cost goes over as one line — QuoteAI has no items on a cost —
+// pre-tax with the code its receipt implies when that set is mapped.
 
 type Token = { accessToken: string; realmId: string };
 
@@ -141,7 +147,6 @@ export async function pushInvoiceToQuickbooks(invoice: Invoice, userId: string):
     const customerId = await customerFor(userId, token, invoice);
     const item = await getOrCreateRevenueItem(token.realmId, token.accessToken, connection.incomeAccount);
     const taxCode = connection.taxCodeMap[taxSetKey(invoice.taxLines)];
-    const amount = dollars(taxCode ? invoice.taxableCents : invoice.totalCents);
     const created = await createInvoice(token.realmId, token.accessToken, {
       CustomerRef: { value: customerId },
       DocNumber: docNumber,
@@ -150,14 +155,8 @@ export async function pushInvoiceToQuickbooks(invoice: Invoice, userId: string):
       PrivateNote: `Sent from QuoteAI — invoice ${invoice.number}`,
       GlobalTaxCalculation: taxCode ? "TaxExcluded" : "NotApplicable",
       ...((invoice.customer.email ?? "").includes("@") ? { BillEmail: { Address: invoice.customer.email } } : {}),
-      Line: [
-        {
-          Amount: amount,
-          DetailType: "SalesItemLineDetail",
-          Description: (invoice.title || `Invoice ${invoice.number}`).slice(0, 4000),
-          SalesItemLineDetail: { ItemRef: { value: item.Id }, Qty: 1, UnitPrice: amount, ...(taxCode ? { TaxCodeRef: { value: taxCode.id } } : {}) },
-        },
-      ],
+      // Phase 96: one line per item (+ the holdback, + the taxes when unmapped).
+      Line: quickbooksInvoiceLines(invoice, item.Id, taxCode?.id ?? null),
     });
     await putLink({ userId, provider: "quickbooks", entityType: "invoice", entityId: invoice.id, externalId: created.Id, externalType: "Invoice" });
     // QuickBooks computes tax itself on a mapped invoice; a cent of rounding is normal, more means the tax code does not match.
@@ -274,6 +273,16 @@ export async function backfillOpenInvoices(userId: string, limit = 50): Promise<
   return { invoices, payments, failed };
 }
 
+/** The province whose rates a cost's taxes follow: the job's when it has one, else the company's. */
+async function costProvince(userId: string, entry: CostEntry): Promise<string | null> {
+  if (entry.projectId) {
+    const [project] = await db.select({ province: projectsTable.province }).from(projectsTable).where(eq(projectsTable.id, entry.projectId));
+    if (project?.province) return project.province;
+  }
+  const [profile] = await db.select({ province: businessProfilesTable.province }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+  return profile?.province ?? null;
+}
+
 export async function syncCostEntryToQuickbooks(entry: CostEntry, userId: string): Promise<{ qboId: string }> {
   try {
     const connection = await getQuickbooksConnection(userId);
@@ -285,24 +294,33 @@ export async function syncCostEntryToQuickbooks(entry: CostEntry, userId: string
     const token = await tokenFor(userId);
     const vendorId = await vendorFor(userId, token, entry);
 
-    const amount = dollars(entry.totalCents);
+    // Phase 96: the receipt's taxes as a tax set (the job's province, else the company's), mapped like an invoice's.
+    const province = await costProvince(userId, entry);
+    const setKey = costTaxSetKey(entry, province);
+    const taxCode = connection.taxCodeMap[setKey];
+    const amount = dollars(taxCode ? entry.subtotalCents : entry.totalCents);
     const expense = await createExpense(token.realmId, token.accessToken, {
       PaymentType: "Cash",
       AccountRef: { value: connection.paymentAccount.id },
       TxnDate: day(entry.date),
       ...(vendorId ? { EntityRef: { value: vendorId, type: "Vendor" } } : {}),
       PrivateNote: `Synced from QuoteAI — ${entry.vendor || entry.description || "cost entry"}`,
+      GlobalTaxCalculation: taxCode ? "TaxExcluded" : "NotApplicable",
       Line: [
         {
           Amount: amount,
           DetailType: "AccountBasedExpenseLineDetail",
           Description: entry.description || entry.vendor || entry.category,
-          AccountBasedExpenseLineDetail: { AccountRef: { value: accountRef.id } },
+          AccountBasedExpenseLineDetail: { AccountRef: { value: accountRef.id }, ...(taxCode ? { TaxCodeRef: { value: taxCode.id } } : {}) },
         },
       ],
     });
 
-    await logSync({ userId, entityType: "cost_entry", entityId: entry.id, status: "synced", qboId: expense.Id, qboType: "Purchase" });
+    const drift = typeof expense.TotalAmt === "number" ? Math.round(expense.TotalAmt * 100) - entry.totalCents : 0;
+    const note = Math.abs(drift) > 1
+      ? `QuickBooks totals this cost at $${expense.TotalAmt!.toFixed(2)}; QuoteAI has $${(entry.totalCents / 100).toFixed(2)}. Check the tax code mapped for "${setKey}".`
+      : undefined;
+    await logSync({ userId, entityType: "cost_entry", entityId: entry.id, status: "synced", qboId: expense.Id, qboType: "Purchase", error: note });
     await markSynced(userId);
     return { qboId: expense.Id };
   } catch (err) {

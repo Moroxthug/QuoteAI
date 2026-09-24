@@ -17,7 +17,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 | 93 | Sign-up, walked for real | assistant | **done** 2026-09-23 |
 | 94 | Job and quote rough edges | assistant | **done** 2026-09-23 |
 | 95 | French legal pages + who did what | assistant | **done** 2026-09-23 |
-| 96 | Integrations, one level deeper | assistant | not started |
+| 96 | Integrations, one level deeper | assistant | **done** 2026-09-23 |
 | 97 | Test coverage where there is none | assistant | not started |
 | 98 | Owner handoff kit | assistant | not started |
 | 99 | Everything left to the owner | **owner** | open |
@@ -120,6 +120,7 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 | F-2 | **SMS toll-free verification** (O9) | Twilio → Regulatory compliance → toll-free verification (text is in PILOT-LAUNCH-PLAN O9). 1-7 days. Until approved, texts to Canadian numbers are skipped. |
 | F-3 | **Gmail sending** | Google Cloud OAuth app → 3 `GMAIL_SEND_*` vars. |
 | F-4 | **Outlook calendar** (Phase 85) | Microsoft Entra app registration → `OUTLOOK_CALENDAR_CLIENT_ID/SECRET`. |
+| F-4b | **Google Calendar scope** (Phase 96) | Google Cloud → the calendar OAuth app → add `https://www.googleapis.com/auth/calendar.calendarlist.readonly` to the consent screen scopes (the app already requests it). Anyone connected before Phase 96 reconnects once to pick a calendar. |
 | F-5 | **Meta Lead Ads, Search Console** | App registrations → 4 `META_*` vars, 2 Search Console vars. |
 | F-6 | **Partner access** | Wave, Financeit, Flinks, Google LSA — each needs the partner to approve an application; built and honest-disabled until then. |
 | F-7 | **Payroll file layouts** (Phases 89/89b) | Export a period and try importing it into a real Wagepoint / Payworks / QuickBooks Payroll account. **→ assistant** fixes the layout from their error or template. |
@@ -244,3 +245,24 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 - Showcase and older invoices have no maker or sender, so the leaderboard's "invoiced" starts at zero for everyone until new invoices go out.
 
 **Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` unchanged (100 exports / 34 types) · `i18n-audit` **4698 = 4698**, 0 missing, 0 split · route matrix **481** (regenerated: `GET /api/team/leaderboard`, team:full) · unit **29 files / 195 tests** · e2e **phase95 4/4** · regression **phase91, security, quotes, lifecycle, phase88, phase80** (54/54) · `pnpm build` ✓ (440 pages prerendered, `validate-prerender` and `validate-sitemap` 440/440; `/fr/confidentialite` is `lang="fr-CA"` with canonical + hreflang en/fr/x-default) · `qa:visual` on the four legal pages, sign-up, site map, `/dashboard/me` (owner and foreman), a teammate's page and Team → Members with the leaderboard: **70 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · French leaderboard, French "Mon profil" and the French privacy page at 375 checked by eye.
+
+### Phase 96 — Integrations, one level deeper (2026-09-23)
+
+**Built**
+- **QuickBooks, line by line** (`quickbooks/lines.ts`, unit-tested): a sent invoice is one QBO line per invoice line, pre-tax, quantity and unit price kept when they multiply to the amount. With the invoice's tax set mapped (the Phase 88 mapping), every line carries that `TaxCodeRef` and QuickBooks computes the tax; the holdback is a negative line with the same code so the tax base is what QuoteAI taxed. Unmapped, the taxes follow as lines of their own (`HST 13%`, `GST 5%`, `QST 9.975%`) so the total matches to the cent — the old "tax-included one line" is gone. A cost (no items in QuoteAI) goes over as one pre-tax line with the code for the set its receipt implies (`costTaxSetKey`: breakdown says which taxes, the job's province — else the company's — says the rates; same key spelling as the invoice mapping so one row covers both), tax-included as before when unmapped. Purchase drift check added (QuickBooks' total vs ours → note on the log row). Nothing backfilled; the mapping help text says so in both languages.
+- **Which calendar** (migration 0055 `calendar_name`, applied): `GET /api/calendar/:provider/calendars` lists the account's writable calendars (Google `calendarList` — the scope gained `calendar.calendarlist.readonly` — and Graph `/me/calendars`; the default one is "primary"); `PUT /api/calendar/:provider/calendar` picks one and **moves** what QuoteAI put in the old one: events deleted there, rows dropped, milestones and blocks from the last 30 days on pushed again (up to 200 each). Status returns `calendarId`/`calendarName`; the connected card in Settings → Integrations shows "Writes to: …" with Change → select → Use this calendar. A pre-96 Google connection gets 403 on the list → "Reconnect to choose", nothing else changes.
+- **Thumbnails** (migration 0055 `thumb_url`; `jobs/thumbnails.ts`): `sharp` makes a ≤480 px JPEG (EXIF-rotated, mozjpeg q78) next to each original on upload, and lazily the first time `…/file?size=thumb` is asked for a photo without one — so old photos catch up as they are viewed. Under 40 KB, HEIC, or any failure → the original is served, as before. The office gallery (`loading="lazy"`), the portal grid, the crew card and the share email (thumbnails inline, linking to the signed originals) all use it. Delete removes both objects. `build.mjs` copies sharp, its runtime deps and the build host's `@img/*` platform package into `dist/node_modules` (Vercel = linux-x64); if sharp can't load, one warning and no thumbnails.
+- Runbook §34; §25/§23 and the QA plan's v1 scope cuts updated; the showcase fixture now has a connected Google calendar (stubbed) so the sweep sees the picker.
+
+**Found (and fixed)**
+1. `ObjectStorageService.deleteObjectBuffer` swallowed Supabase errors; it now logs them. (Not a bug found in the wild — a download right after a remove can still answer from Supabase's cache, which is why the e2e checks deletion through the listing.)
+2. The bundled `sharp` needs `@img/colour`, `detect-libc` and `semver` next to it — the first copy step only took the platform package; the build now walks sharp's runtime dependencies.
+
+**Not done / deferred**
+- Tax is per invoice in QuoteAI, so every line gets the set's code; per-line exemptions (a zero-rated item on a taxable invoice) are not modelled.
+- Wave still sends one tax-included line (its comment says so); no Wave tax-code mapping exists.
+- No PDF embeds job photos today (the plan said "gallery and PDFs"): there is nothing to switch; the share *email* got the thumbnails instead.
+- HEIC has no thumbnail on the prebuilt libvips; the crew app already re-encodes on the phone, the office gallery does not.
+- Existing Google connections must reconnect once to list calendars (new scope). The Google OAuth app's consent screen needs the scope added (owner, with F-3-style app work).
+
+**Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` 99 exports / 35 types (was 100 / 34) · `i18n-audit` **4710 = 4710**, 0 missing, 0 split · route matrix **483** (+ `GET /api/calendar/:provider/calendars`, `PUT /api/calendar/:provider/calendar`, integrations:full) · schema drift **0 fatal** · unit **30 files / 205 tests** (+`quickbooks/lines.test.ts` 10) · e2e **phase96 5/5** · regression **phase88, integrations, security, schedule, phase85, offline-push, phase86, portal, voice-actions** (107/108 in one run: the one `offline-push` failure was a 401 on a time-entry approval, nothing of this phase in its path, and the file passes 6/6 alone) · `quote-ai build` ✓ (440 pages prerendered) · API bundle builds with sharp + `@img/sharp-win32-x64` copied and loading from `dist` · `qa:visual` on Settings → Integrations (closed and with the calendar picker open, Google stubbed with two writable calendars), the job page, its completion dialog and setup, and the foreman job page: **42 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys.

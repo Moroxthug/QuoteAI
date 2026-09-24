@@ -193,4 +193,6 @@ export const crewApi = {
   jobReports: (jobId: string) => req<{ reports: FieldReportDto[] }>(`/api/jobs/${jobId}/field-reports`),
   resolve: (id: string, note?: string) => req<{ report: FieldReportDto }>(`/api/field-reports/${id}/resolve`, { method: "POST", body: json({ note }) }),
   photoUrl: (jobId: string, photoId: string) => `/api/jobs/${jobId}/photos/${photoId}/file`,
+  /** Phase 96: the small copy for the 56 px preview. */
+  photoThumbUrl: (jobId: string, photoId: string) => `/api/jobs/${jobId}/photos/${photoId}/file?size=thumb`,
 };

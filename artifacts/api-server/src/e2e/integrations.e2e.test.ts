@@ -536,7 +536,7 @@ describe("Phase 65 — integrations", () => {
           return json(200, { QueryResponse: {} });
         }
         if (u.pathname.endsWith("/customer")) return json(200, { Customer: { Id: "58", Name: (req.json as { DisplayName: string }).DisplayName } });
-        if (u.pathname.endsWith("/invoice")) return json(200, { Invoice: { Id: "INV-1001", SyncToken: "0", TotalAmt: (req.json as { Line: { Amount: number }[] }).Line[0]!.Amount, Balance: 0 } });
+        if (u.pathname.endsWith("/invoice")) return json(200, { Invoice: { Id: "INV-1001", SyncToken: "0", TotalAmt: Math.round((req.json as { Line: { Amount: number }[] }).Line.reduce((s, l) => s + l.Amount * 100, 0)) / 100, Balance: 0 } });
         if (u.pathname.endsWith("/payment")) return json(200, { Payment: { Id: "PAY-3003" } });
         if (u.pathname.endsWith("/purchase")) return json(200, { Purchase: { Id: "P-2002" } });
         return json(404, { Fault: { Error: [{ Message: `unscripted ${u.pathname}` }] } });
@@ -551,8 +551,17 @@ describe("Phase 65 — integrations", () => {
 
       const invoiceCall = requestsTo(QBO).find((r) => r.url.endsWith("/invoice"))!;
       expect(invoiceCall, "Invoice posted").toBeTruthy();
-      // No tax code mapped: one tax-included line, as before Phase 88.
-      expect(invoiceCall.json).toMatchObject({ CustomerRef: { value: "58" }, DocNumber: sent!.number, GlobalTaxCalculation: "NotApplicable", Line: [{ Amount: sent!.totalCents / 100, DetailType: "SalesItemLineDetail", SalesItemLineDetail: { ItemRef: { value: "17" } } }] });
+      // No tax code mapped (Phase 96): the item line pre-tax, then the tax as a line of its own — the total still matches.
+      expect(invoiceCall.json).toMatchObject({
+        CustomerRef: { value: "58" },
+        DocNumber: sent!.number,
+        GlobalTaxCalculation: "NotApplicable",
+        Line: [
+          { Amount: sent!.subtotalCents / 100, DetailType: "SalesItemLineDetail", SalesItemLineDetail: { ItemRef: { value: "17" } } },
+          ...sent!.taxLines.map((t) => ({ Amount: t.amountCents / 100, Description: `${t.label} ${t.rate}%` })),
+        ],
+      });
+      expect(Math.round((invoiceCall.json as { Line: { Amount: number }[] }).Line.reduce((s, l) => s + l.Amount * 100, 0))).toBe(sent!.totalCents);
       const paymentCall = requestsTo(QBO).find((r) => r.url.endsWith("/payment"))!;
       expect(paymentCall.json).toMatchObject({ CustomerRef: { value: "58" }, TotalAmt: sent!.totalCents / 100, Line: [{ Amount: sent!.totalCents / 100, LinkedTxn: [{ TxnId: "INV-1001", TxnType: "Invoice" }] }] });
       expect(requestsTo(QBO).filter((r) => r.url.endsWith("/customer")), "one customer, reused for the payment").toHaveLength(1);

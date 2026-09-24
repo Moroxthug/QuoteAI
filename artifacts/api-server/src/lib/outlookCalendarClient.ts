@@ -84,6 +84,24 @@ export type OutlookEventPayload = {
   isAllDay: boolean;
 };
 
+/**
+ * Phase 96: the mailbox's calendars, so Settings can pick one. The default
+ * calendar is reported as "primary" (createOutlookEvent's shortcut path).
+ * The existing `Calendars.ReadWrite` scope already covers this call.
+ */
+export async function listOutlookCalendars(accessToken: string): Promise<{ id: string; name: string; isPrimary: boolean; canWrite: boolean }[]> {
+  const data = await graphRequest<{ value?: { id: string; name?: string; isDefaultCalendar?: boolean; canEdit?: boolean }[] }>(
+    accessToken,
+    "/me/calendars?$select=id,name,isDefaultCalendar,canEdit&$top=100",
+  );
+  return (data.value ?? []).map((c) => ({
+    id: c.isDefaultCalendar ? "primary" : c.id,
+    name: c.name || c.id,
+    isPrimary: !!c.isDefaultCalendar,
+    canWrite: c.canEdit !== false,
+  }));
+}
+
 export async function createOutlookEvent(accessToken: string, calendarId: string, payload: OutlookEventPayload): Promise<{ id: string }> {
   const path = calendarId === "primary" ? "/me/calendar/events" : `/me/calendars/${encodeURIComponent(calendarId)}/events`;
   return graphRequest(accessToken, path, { method: "POST", body: JSON.stringify(payload) });

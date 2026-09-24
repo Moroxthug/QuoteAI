@@ -123,25 +123,60 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
 
   // Copy externalized packages to dist/node_modules so they're found at runtime
   // (pnpm uses symlinks which Vercel's includeFiles doesn't resolve)
-  const externalPkgs = ["pdfmake", "mammoth", "pdf-parse"];
+  const externalPkgs = ["pdfmake", "mammoth", "pdf-parse", "sharp"];
   const distNodeModules = path.resolve(distDir, "node_modules");
+  const packageRootOf = async (entry) => {
+    // Walk up to find the package root (directory containing package.json)
+    let pkgDir = path.dirname(entry);
+    while (pkgDir !== path.dirname(pkgDir)) {
+      try {
+        await import("node:fs").then((fs) => fs.promises.access(path.join(pkgDir, "package.json")));
+        return pkgDir;
+      } catch {
+        pkgDir = path.dirname(pkgDir);
+      }
+    }
+    return pkgDir;
+  };
   for (const pkg of externalPkgs) {
     try {
-      const pkgMain = globalThis.require.resolve(pkg);
-      // Walk up to find the package root (directory containing package.json)
-      let pkgDir = path.dirname(pkgMain);
-      while (pkgDir !== path.dirname(pkgDir)) {
-        try {
-          const pkgJson = path.join(pkgDir, "package.json");
-          await import("node:fs").then(fs => fs.promises.access(pkgJson));
-          break;
-        } catch {
-          pkgDir = path.dirname(pkgDir);
-        }
-      }
+      const pkgDir = await packageRootOf(globalThis.require.resolve(pkg));
       const dest = path.resolve(distNodeModules, pkg);
       await cp(pkgDir, dest, { recursive: true, force: true });
       console.log(`Copied ${pkg} -> dist/node_modules/${pkg}`);
+
+      // Phase 96: sharp keeps its native binary and libvips in per-platform
+      // optional packages (@img/sharp-linux-x64, @img/sharp-libvips-linux-x64…)
+      // that pnpm installs as siblings of sharp, not inside it. Copy whichever
+      // of them resolve on this machine (the build host's platform), and their
+      // own optional deps (the libvips package hangs off the binary package).
+      if (pkg === "sharp") {
+        const seen = new Set();
+        const copyOptional = async (fromDir) => {
+          const manifest = JSON.parse(await import("node:fs").then((fs) => fs.promises.readFile(path.join(fromDir, "package.json"), "utf8")));
+          // Every runtime dependency (e.g. @img/colour), plus the @img/ platform packages among the optional ones.
+          const names = [...Object.keys(manifest.dependencies ?? {}), ...Object.keys(manifest.optionalDependencies ?? {}).filter((n) => n.startsWith("@img/"))];
+          for (const name of names) {
+            if (seen.has(name)) continue;
+            seen.add(name);
+            const req = createRequire(path.join(fromDir, "package.json"));
+            let dir = null;
+            for (const spec of [`${name}/package.json`, `${name}/package`, name]) {
+              try {
+                dir = await packageRootOf(req.resolve(spec));
+                break;
+              } catch {
+                /* try the next spelling: `exports` maps differ per package */
+              }
+            }
+            if (!dir) continue; // another platform's package: not installed here
+            await cp(dir, path.resolve(distNodeModules, name), { recursive: true, force: true });
+            console.log(`Copied ${name} -> dist/node_modules/${name}`);
+            await copyOptional(dir);
+          }
+        };
+        await copyOptional(pkgDir);
+      }
     } catch (err) {
       console.warn(`Could not copy ${pkg}: ${err.message}`);
     }

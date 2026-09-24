@@ -2971,11 +2971,18 @@ components:
         lastSyncedAt:
           type: string
           nullable: true
+        calendarId:
+          type: string
+          description: Phase 96 — the calendar events are written to ("primary" = the account's main one).
+        calendarName:
+          type: string
+          nullable: true
       required:
         - provider
         - accountEmail
         - isEnabled
         - connectedAt
+        - calendarId
 
     CalendarStatus:
       type: object

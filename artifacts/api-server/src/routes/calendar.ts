@@ -7,9 +7,10 @@ import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
-import { buildGoogleAuthUrl } from "../lib/googleCalendarClient.js";
+import { buildGoogleAuthUrl, CalendarScopeError } from "../lib/googleCalendarClient.js";
 import { buildOutlookAuthUrl } from "../lib/outlookCalendarClient.js";
-import { listCalendarConnections, connectCalendar, disconnectCalendar, setCalendarEnabled } from "../calendar/service.js";
+import { listCalendarConnections, connectCalendar, disconnectCalendar, setCalendarEnabled, getCalendarConnection } from "../calendar/service.js";
+import { listWritableCalendars, moveConnectionToCalendar } from "../calendar/sync.js";
 import { syncAllInbound, syncFeed } from "../calendar/inbound.js";
 import { buildAgenda, publishableSchedule } from "../calendar/agenda.js";
 import { buildIcs } from "../calendar/ics.js";
@@ -72,6 +73,9 @@ router.get("/calendar/status", requireAuth, requirePermission("integrations", "v
         isEnabled: c.isEnabled,
         connectedAt: c.connectedAt.toISOString(),
         lastSyncedAt: c.lastSyncedAt?.toISOString() ?? null,
+        // Phase 96: which calendar the events go to ("primary" = the account's main one, no name).
+        calendarId: c.calendarId,
+        calendarName: c.calendarName,
       })),
     });
   } catch (err) {
@@ -150,6 +154,63 @@ router.patch("/calendar/:provider/toggle", requireAuth, requirePermission("integ
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error toggling calendar sync");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// ── Phase 96: which calendar ─────────────────────────────────────────────────
+
+// GET /api/calendar/:provider/calendars — the calendars the connected account
+// can write to, and the one events currently go to. A Google connection made
+// before the calendar-list scope answers `needsReconnect: true` with an empty
+// list rather than an error.
+router.get("/calendar/:provider/calendars", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
+  try {
+    const provider = providerParam.parse(req.params.provider);
+    const userId = getUserId(res);
+    const conn = await getCalendarConnection(userId, provider);
+    if (!conn) {
+      res.status(404).json({ error: "NOT_CONNECTED" });
+      return;
+    }
+    const current = { id: conn.calendarId, name: conn.calendarName };
+    try {
+      const calendars = await listWritableCalendars(userId, provider);
+      res.json({ current, calendars, needsReconnect: false });
+    } catch (err) {
+      if (err instanceof CalendarScopeError) {
+        res.json({ current, calendars: [], needsReconnect: true });
+        return;
+      }
+      throw err;
+    }
+  } catch (err) {
+    req.log.error({ err }, "Error listing calendars");
+    res.status(502).json({ error: "PROVIDER_ERROR", message: "The calendar provider did not answer; try again in a minute." });
+  }
+});
+
+// PUT /api/calendar/:provider/calendar — pick the calendar events are written
+// to. Moves the upcoming events QuoteAI already created: deleted from the old
+// calendar, pushed again into the new one (past items stay put).
+router.put("/calendar/:provider/calendar", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
+  try {
+    const provider = providerParam.parse(req.params.provider);
+    const userId = getUserId(res);
+    const body = z.object({ calendarId: z.string().trim().min(1).max(500), calendarName: z.string().trim().max(200).nullable().optional() }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const conn = await getCalendarConnection(userId, provider);
+    if (!conn) {
+      res.status(404).json({ error: "NOT_CONNECTED" });
+      return;
+    }
+    const moved = await moveConnectionToCalendar(conn, body.data.calendarId, body.data.calendarName ?? null);
+    res.json({ success: true, calendarId: body.data.calendarId, calendarName: body.data.calendarId === "primary" ? null : (body.data.calendarName ?? null), ...moved });
+  } catch (err) {
+    req.log.error({ err }, "Error changing calendar");
     res.status(500).json({ error: "Internal server error" });
   }
 });

@@ -242,8 +242,8 @@ export async function deletePayment(realmId: string, accessToken: string, id: st
   await qboRequest(realmId, accessToken, "/payment?operation=delete", { method: "POST", body: JSON.stringify({ Id: id, SyncToken: syncToken }) });
 }
 
-export async function createExpense(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<{ Id: string }> {
-  const data = await qboRequest<{ Purchase: { Id: string } }>(realmId, accessToken, "/purchase", { method: "POST", body: JSON.stringify(payload) });
+export async function createExpense(realmId: string, accessToken: string, payload: Record<string, unknown>): Promise<{ Id: string; TotalAmt?: number }> {
+  const data = await qboRequest<{ Purchase: { Id: string; TotalAmt?: number } }>(realmId, accessToken, "/purchase", { method: "POST", body: JSON.stringify(payload) });
   return data.Purchase;
 }
 

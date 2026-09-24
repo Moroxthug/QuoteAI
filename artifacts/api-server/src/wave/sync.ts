@@ -6,11 +6,12 @@ import { nameKey } from "../books/keys.js";
 
 // v1 scope: each synced invoice/cost lands as ONE money transaction in Wave
 // (the invoice/expense total, tax-inclusive) rather than a full line-by-line
-// + tax-code breakdown — same simplification as the QuickBooks sync (Phase
-// 11), for the same reason: a company's Wave tax-code setup differs per
-// company and detailed tax mapping is out of scope for a one-way "get it
-// into your books" sync. A company can re-categorize the line in Wave
-// afterwards if they want more detail.
+// + tax-code breakdown — the simplification the QuickBooks sync had until
+// Phase 96 (it now sends lines with tax codes; Wave still doesn't), for the
+// same reason: a company's Wave tax-code setup differs per company and
+// detailed tax mapping is out of scope for a one-way "get it into your
+// books" sync. A company can re-categorize the line in Wave afterwards if
+// they want more detail.
 
 async function logSync(params: {
   userId: string;

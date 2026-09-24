@@ -115,7 +115,8 @@ const can = useCan();
               return (
                 <div key={p.id} className={cn("photo", isSelected && "on")}>
                   <button type="button" className="photo-img" onClick={() => toggle(p.id)}>
-                    <img src={jobsApi.photoFileUrl(job.id, p.id)} alt={p.caption || p.fileName} />
+                    {/* Phase 96: the grid loads the small copy; the original stays one request away for the lightbox-less view. */}
+                    <img src={jobsApi.photoThumbUrl(job.id, p.id)} alt={p.caption || p.fileName} loading="lazy" decoding="async" />
                   </button>
                   <button type="button" className={cn("chk", isSelected && "on")} onClick={() => toggle(p.id)} aria-pressed={isSelected}>
                     {isSelected && <Check />}

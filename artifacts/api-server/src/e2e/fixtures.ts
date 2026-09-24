@@ -7,7 +7,7 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable } from "@workspace/db";
+import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable, calendarConnectionsTable } from "@workspace/db";
 import { encryptSecret } from "../lib/crypto.js";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
@@ -363,6 +363,36 @@ async function seedBooks(userId: string, projectId: string, language: "en" | "fr
   };
   stubHost("https://sandbox-quickbooks.api.intuit.com/", qbo);
   stubHost("https://quickbooks.api.intuit.com/", qbo);
+
+  // Phase 96: a connected Google Calendar, so the integrations tab shows the
+  // connected card with its calendar picker. Google itself is stubbed: the
+  // list answers two writable calendars, event writes get ids, reads are empty.
+  await db.insert(calendarConnectionsTable).values({
+    userId,
+    provider: "google",
+    accountEmail: language === "fr" ? "bureau@northside.example" : "office@northside.example",
+    accessTokenEnc: encryptSecret("showcase-gcal"),
+    refreshTokenEnc: encryptSecret("showcase-gcal-refresh"),
+    tokenExpiresAt: new Date(Date.now() + 30 * 86_400_000),
+    calendarId: "crew@group.calendar.google.com",
+    calendarName: language === "fr" ? "Équipe Northside" : "Northside crew",
+    lastSyncedAt: new Date(Date.now() - 3_600_000),
+  });
+  let gcalEvent = 0;
+  stubHost("https://www.googleapis.com/", (req) => {
+    if (req.url.includes("/calendar/v3/users/me/calendarList")) {
+      return json(200, {
+        items: [
+          { id: "office@northside.example", summary: "office@northside.example", primary: true, accessRole: "owner" },
+          { id: "crew@group.calendar.google.com", summary: language === "fr" ? "Équipe Northside" : "Northside crew", accessRole: "writer" },
+          { id: "holidays@group.v.calendar.google.com", summary: "Holidays", accessRole: "reader" },
+        ],
+      });
+    }
+    if (req.method === "POST" || req.method === "PATCH") return json(200, { id: `showcase-gevt-${++gcalEvent}` });
+    if (req.method === "DELETE") return new Response(null, { status: 204 });
+    return json(200, { items: [] });
+  });
 }
 
 /**

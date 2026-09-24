@@ -117,9 +117,9 @@ function fakeQuickbooks(realmId: string) {
       return hit ? json(200, { Invoice: hit }) : json(404, { Fault: {} });
     }
     if (u.pathname.endsWith("/invoice")) {
-      const line = (body.Line as { Amount: number }[])[0]!;
-      // Mapped tax code: QuickBooks adds 13 % itself.
-      const total = body.GlobalTaxCalculation === "TaxExcluded" ? Math.round(line.Amount * 113) / 100 : line.Amount;
+      const base = (body.Line as { Amount: number }[]).reduce((s, l) => s + l.Amount, 0);
+      // Mapped tax code: QuickBooks adds 13 % itself (Phase 96: over every line).
+      const total = body.GlobalTaxCalculation === "TaxExcluded" ? Math.round(base * 113) / 100 : Math.round(base * 100) / 100;
       const row = { Id: `QI-${++state.n}`, DocNumber: body.DocNumber as string, SyncToken: "0", TotalAmt: total };
       state.invoices.push(row);
       return json(200, { Invoice: { ...row, Balance: total } });

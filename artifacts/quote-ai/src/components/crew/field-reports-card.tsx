@@ -36,7 +36,7 @@ export function FieldReportRow({ report, showJob }: { report: FieldReportDto; sh
     <div className="note-row" data-testid="field-report">
       {report.photoId && (
         <a href={crewApi.photoUrl(report.projectId, report.photoId)} target="_blank" rel="noopener noreferrer" className="shrink-0">
-          <img src={crewApi.photoUrl(report.projectId, report.photoId)} alt={report.body || t("crew.photoFrom").replace("{name}", report.authorName)} className="h-14 w-14 object-cover rounded-lg" style={{ border: "1px solid var(--line)" }} loading="lazy" />
+          <img src={crewApi.photoThumbUrl(report.projectId, report.photoId)} alt={report.body || t("crew.photoFrom").replace("{name}", report.authorName)} className="h-14 w-14 object-cover rounded-lg" style={{ border: "1px solid var(--line)" }} loading="lazy" />
         </a>
       )}
       <div className="body">

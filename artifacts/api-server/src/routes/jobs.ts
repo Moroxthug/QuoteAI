@@ -43,6 +43,7 @@ import { serializeInvoice } from "./invoices.js";
 import { Readable } from "node:stream";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
 import { photoUpload, serializePhoto, storeJobPhoto } from "../jobs/photos.js";
+import { thumbnailOrOriginal, deleteThumbnail } from "../jobs/thumbnails.js";
 import { sendJobPhotoShare } from "../lib/jobMessaging.js";
 import { sendSms } from "../lib/sms.js";
 import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesFromCalendar } from "../calendar/sync.js";
@@ -1051,7 +1052,8 @@ router.get("/jobs/:id/photos/:photoId/file", requireAuth, requirePermission("job
       res.status(404).json({ error: "Not found" });
       return;
     }
-    const file = await objectStorage.downloadPrivateObject(photo.fileUrl.replace(/^\/objects\//, ""));
+    // Phase 96: `?size=thumb` serves the small JPEG (made on first request for older photos); the original when none can be made.
+    const file = req.query.size === "thumb" ? (await thumbnailOrOriginal(photo)).body : await objectStorage.downloadPrivateObject(photo.fileUrl.replace(/^\/objects\//, ""));
     res.status(file.status);
     file.headers.forEach((v, k) => res.setHeader(k, v));
     if (file.body) Readable.fromWeb(file.body as unknown as import("node:stream/web").ReadableStream<Uint8Array>).pipe(res);
@@ -1114,6 +1116,7 @@ router.delete("/jobs/:id/photos/:photoId", requireAuth, requirePermission("jobs"
       return;
     }
     await objectStorage.deleteObjectBuffer(photo.fileUrl.replace(/^\/objects\//, ""));
+    await deleteThumbnail(photo);
     await db.delete(jobPhotosTable).where(eq(jobPhotosTable.id, photo.id));
     res.json({ success: true });
   } catch (err) {
@@ -1160,13 +1163,14 @@ router.post("/jobs/:id/photos/share", requireAuth, requirePermission("jobs", "ed
       res.status(500).json({ error: "Business profile not found" });
       return;
     }
-    const photoUrls = await Promise.all(
-      photos.map((p) => objectStorage.getPresignedGetURL(p.fileUrl.replace(/^\/objects\//, ""), 30 * 24 * 60 * 60)),
-    );
+    const SHARE_TTL = 30 * 24 * 60 * 60;
+    const photoUrls = await Promise.all(photos.map((p) => objectStorage.getPresignedGetURL(p.fileUrl.replace(/^\/objects\//, ""), SHARE_TTL)));
+    // Phase 96: the email shows the thumbnails inline (each linking to its original); a photo without one shows as a link only.
+    const thumbUrls = await Promise.all(photos.map((p) => (p.thumbUrl ? objectStorage.getPresignedGetURL(p.thumbUrl.replace(/^\/objects\//, ""), SHARE_TTL).catch(() => null) : Promise.resolve(null))));
     const [wa] = await db.select().from(whatsappConnectionsTable).where(eq(whatsappConnectionsTable.userId, userId));
     const whatsappTemplateName = wa?.isEnabled ? (process.env.WHATSAPP_PHOTO_SHARE_TEMPLATE ?? null) : null;
 
-    const result = await sendJobPhotoShare({ client, profile, photoUrls, whatsappTemplateName });
+    const result = await sendJobPhotoShare({ client, profile, photoUrls, thumbUrls, whatsappTemplateName });
     if (!result.ok) {
       res.status(502).json({ error: "SEND_FAILED", reason: result.reason });
       return;

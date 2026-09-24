@@ -805,6 +805,9 @@ export interface CalendarConnectionStatus {
   isEnabled: boolean;
   connectedAt: string;
   lastSyncedAt?: string | null;
+  /** Phase 96 — the calendar events are written to ("primary" = the account's main one). */
+  calendarId: string;
+  calendarName?: string | null;
 }
 
 /**

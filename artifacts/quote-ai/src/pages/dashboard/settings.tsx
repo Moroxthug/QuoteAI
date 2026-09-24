@@ -35,6 +35,7 @@ import { cn } from "@/lib/utils";
 import { Link, useSearch } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { CalendarFeedsCard } from "@/components/dashboard/calendar-feeds-card";
+import { CalendarTargetPicker } from "@/components/dashboard/calendar-target-picker";
 import { useCan } from "@/hooks/use-role";
 import { BusinessTab } from "./settings-business-tab";
 import { SecurityTab } from "./settings-security-tab";
@@ -1095,14 +1096,17 @@ function QuickbooksMappingCard() {
             {taxSets.map((set, i) => (
               <div key={set} className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground w-32 shrink-0" id={`qb-tax-${i}-label`}>{set === "none" ? t("dashboard.settings.quickbooks.noTax") : set}</span>
-                <Select value={taxCodeIds[set] ?? ""} onValueChange={(v) => setTaxCodeIds(prev => ({ ...prev, [set]: v }))}>
-                  <SelectTrigger id={`qb-tax-${i}`} aria-labelledby={`qb-tax-${i}-label qb-tax-${i}`}>
-                    <SelectValue placeholder={status?.taxCodeMap?.[set] ?? t("dashboard.settings.quickbooks.taxIncluded")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accounts?.taxCodes.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                {/* Phase 96: min-w-0 so a long placeholder ("Not mapped (tax included)") truncates at 375 instead of pushing the row wider than the phone. */}
+                <div className="min-w-0 flex-1">
+                  <Select value={taxCodeIds[set] ?? ""} onValueChange={(v) => setTaxCodeIds(prev => ({ ...prev, [set]: v }))}>
+                    <SelectTrigger id={`qb-tax-${i}`} aria-labelledby={`qb-tax-${i}-label qb-tax-${i}`} className="w-full min-w-0 [&>span]:truncate">
+                      <SelectValue placeholder={status?.taxCodeMap?.[set] ?? t("dashboard.settings.quickbooks.taxIncluded")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts?.taxCodes.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             ))}
           </div>
@@ -2533,6 +2537,8 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
         {conn?.lastSyncedAt && (
           <p className="text-xs text-muted-foreground">{t("dashboard.settings.calendar.lastSynced")} {new Date(conn.lastSyncedAt).toLocaleString()}</p>
         )}
+        {/* Phase 96: which of the account's calendars the events go to. */}
+        <CalendarTargetPicker provider={provider} calendarId={conn?.calendarId ?? "primary"} calendarName={conn?.calendarName ?? null} onReconnect={() => void handleConnect()} />
         <div className="flex flex-wrap gap-3">
           <button onClick={handleToggle} disabled={toggleCal.isPending} className="btn btn-navy btn-sm gap-2">
             {toggleCal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

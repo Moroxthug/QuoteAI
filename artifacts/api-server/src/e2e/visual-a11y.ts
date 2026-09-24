@@ -138,6 +138,11 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     // .ics subscriptions and the published feed live — a real page state with
     // its own forms, never swept before.
     dash("/dashboard/settings?tab=integrations"), dash("/dashboard/settings?tab=widget"), dash("/dashboard/profile"), dash("/dashboard/billing"),
+    // Phase 96: the calendar picker open on the connected Google card (the list is stubbed in fixtures.ts).
+    { path: "/dashboard/settings?tab=integrations", session: "owner", name: "/dashboard/settings?tab=integrations calendar picker", drive: async (p) => {
+      await p.locator('[data-testid="calendar-target-google"] button', { hasText: /Change|Changer/ }).click();
+      await p.waitForSelector("#calendar-target-google");
+    } },
     dash("/dashboard/catalog"), dash("/dashboard/clients"), ...(s.clientId ? [dash(`/dashboard/clients/${s.clientId}`)] : []),
     dash("/dashboard/leads"), dash("/dashboard/imports"),
     dash("/dashboard/contracts"), dash(`/dashboard/contracts/${s.contractId}`), dash(`/dashboard/contracts/${s.pendingContractId}`),

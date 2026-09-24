@@ -15,7 +15,9 @@ const AUTH_BASE = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const REVOKE_URL = "https://oauth2.googleapis.com/revoke";
 const API_BASE = "https://www.googleapis.com/calendar/v3";
-const SCOPE = "https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.email";
+// Phase 96: `calendar.calendarlist.readonly` is what lets Settings list the
+// account's calendars to pick one; a connection made before it must reconnect.
+const SCOPE = "https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.calendarlist.readonly https://www.googleapis.com/auth/userinfo.email";
 
 export function buildGoogleAuthUrl(state: string): string {
   const params = new URLSearchParams({
@@ -105,6 +107,38 @@ export async function deleteGoogleEvent(accessToken: string, calendarId: string,
     // Already gone (deleted by the user on their calendar, or never created) — not a failure worth surfacing.
     logger.warn({ err, eventId }, "Google Calendar event delete failed (ignoring)");
   }
+}
+
+// ── Phase 96: which calendar ─────────────────────────────────────────────────
+
+export type ListedCalendar = { id: string; name: string; isPrimary: boolean; canWrite: boolean };
+
+export class CalendarScopeError extends Error {
+  constructor() {
+    super("The connection predates the calendar-list permission; reconnect to choose a calendar");
+    this.name = "CalendarScopeError";
+  }
+}
+
+/**
+ * The calendars the account can write to. The primary one is reported with
+ * the id "primary" (what every write path uses when nothing was picked).
+ * Throws `CalendarScopeError` when the token predates the calendarList scope
+ * (Google answers 403): the caller asks the person to reconnect.
+ */
+export async function listGoogleCalendars(accessToken: string): Promise<ListedCalendar[]> {
+  const res = await fetch(`${API_BASE}/users/me/calendarList?minAccessRole=writer&showHidden=false&maxResults=250`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (res.status === 403) throw new CalendarScopeError();
+  if (!res.ok) throw new Error(`Google Calendar API /users/me/calendarList failed: ${res.status} ${await res.text()}`);
+  const data = (await res.json()) as { items?: { id: string; summary?: string; summaryOverride?: string; primary?: boolean; accessRole?: string }[] };
+  return (data.items ?? []).map((c) => ({
+    id: c.primary ? "primary" : c.id,
+    name: c.summaryOverride || c.summary || c.id,
+    isPrimary: !!c.primary,
+    canWrite: c.accessRole === "writer" || c.accessRole === "owner",
+  }));
 }
 
 // ── Phase 85: reading the other way ──────────────────────────────────────────

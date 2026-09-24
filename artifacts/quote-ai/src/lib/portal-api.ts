@@ -65,7 +65,7 @@ export const portalApi = {
   /** PDFs and photos need the session header, so they are fetched as blobs (see PortalPage). */
   invoicePdfPath: (token: string, invoiceId: string) => `/api/portal/${token}/invoices/${invoiceId}/pdf?download=1`,
   contractPdfPath: (token: string, contractId: string) => `/api/portal/${token}/contracts/${contractId}/pdf?download=1`,
-  photoPath: (token: string, photoId: string) => `/api/portal/${token}/photos/${photoId}/file`,
+  photoPath: (token: string, photoId: string, size?: "thumb") => `/api/portal/${token}/photos/${photoId}/file${size ? `?size=${size}` : ""}`,
   fetchBlob: async (token: string, path: string): Promise<Blob> => {
     const res = await fetch(path, { headers: sessionHeaders(token) });
     if (!res.ok) throw new Error(`Request failed (${res.status})`);

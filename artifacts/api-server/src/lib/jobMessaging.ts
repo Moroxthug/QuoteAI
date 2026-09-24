@@ -147,6 +147,8 @@ export async function sendJobPhotoShare(params: {
   client: Client;
   profile: BusinessProfile;
   photoUrls: string[];
+  /** Phase 96: aligned with `photoUrls`; a signed thumbnail link shown inline, or null for a link-only row. */
+  thumbUrls?: (string | null)[];
   whatsappTemplateName?: string | null;
 }): Promise<JobMessageResult> {
   const { client, profile, photoUrls } = params;
@@ -160,7 +162,14 @@ export async function sendJobPhotoShare(params: {
   }
 
   if (!client.email) return { ok: false, reason: "no_email" };
-  const links = photoUrls.map((u) => `<div style="margin:8px 0;"><a href="${u}" style="color:#2563eb;">${escapeHtml(u)}</a></div>`).join("");
+  const links = photoUrls
+    .map((u, i) => {
+      const thumb = params.thumbUrls?.[i] ?? null;
+      return thumb
+        ? `<div style="margin:8px 0;"><a href="${u}" style="color:#2563eb;"><img src="${thumb}" alt="" width="240" style="display:block;max-width:100%;height:auto;border-radius:8px;border:1px solid #e5e7eb;" /></a></div>`
+        : `<div style="margin:8px 0;"><a href="${u}" style="color:#2563eb;">${escapeHtml(u)}</a></div>`;
+    })
+    .join("");
   const bodyHtml = `<p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body)}</p>${links}`;
   const html = wrapEmailHtml({ clientName: client.name, profile, lang, unsubscribeToken: client.marketingUnsubscribeToken, subject, bodyHtml });
   const result = await sendEmail({ to: client.email, profile, subject, html, unsubscribeToken: client.marketingUnsubscribeToken });

@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { db, jobPhotosTable, milestonesTable, type JobPhoto } from "@workspace/db";
 import { and, eq, sql } from "drizzle-orm";
 import { ObjectStorageService } from "../lib/objectStorage.js";
+import { storeThumbnail } from "./thumbnails.js";
 
 const objectStorage = new ObjectStorageService();
 
@@ -32,6 +33,8 @@ export function serializePhoto(p: JobPhoto) {
     sortOrder: p.sortOrder,
     sharedAt: p.sharedAt ? p.sharedAt.toISOString() : null,
     createdAt: p.createdAt.toISOString(),
+    /** Phase 96: whether `…/file?size=thumb` already has a stored thumbnail (it is made on first request otherwise). */
+    hasThumb: !!p.thumbUrl,
   };
 }
 
@@ -63,6 +66,8 @@ export async function storeJobPhoto(params: {
   const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/heic": "heic" }[params.file.mimetype] ?? "bin";
   const subPath = `job-photos/${params.userId}/${params.projectId}/${randomUUID()}.${ext}`;
   const fileUrl = await objectStorage.uploadObjectBuffer({ subPath, buffer: params.file.buffer, contentType: params.file.mimetype });
+  // Phase 96: the gallery-sized copy, made now when sharp can decode the file (else lazily on first request, or never for HEIC).
+  const thumbUrl = await storeThumbnail(fileUrl, params.file.buffer, params.file.mimetype);
   const [{ count }] = await db.select({ count: sql<number>`count(*)::int` }).from(jobPhotosTable).where(eq(jobPhotosTable.projectId, params.projectId));
   const [photo] = await db
     .insert(jobPhotosTable)
@@ -74,6 +79,7 @@ export async function storeJobPhoto(params: {
       fileSize: params.file.size,
       mimeType: params.file.mimetype,
       fileUrl,
+      thumbUrl,
       caption: (params.caption ?? "").slice(0, 500),
       sortOrder: Number(count ?? 0),
       clientRef,

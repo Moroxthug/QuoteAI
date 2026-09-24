@@ -33,8 +33,10 @@ export const calendarConnectionsTable = pgTable(
     accessTokenEnc: text("access_token_enc").notNull(),
     refreshTokenEnc: text("refresh_token_enc").notNull(),
     tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }).notNull(),
-    /** The calendar milestones are pushed into. v1 always writes to the account's primary calendar. */
+    /** The calendar milestones and blocks are pushed into: "primary", or an id picked from the account's list (Phase 96). */
     calendarId: text("calendar_id").notNull().default("primary"),
+    /** Phase 96: the picked calendar's display name for the settings card; null = the primary calendar. */
+    calendarName: text("calendar_name"),
     isEnabled: boolean("is_enabled").notNull().default(true),
     connectedAt: timestamp("connected_at", { withTimezone: true }).notNull().defaultNow(),
     lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),

@@ -218,6 +218,8 @@ export type JobPhotoDto = {
   sortOrder: number;
   sharedAt: string | null;
   createdAt: string;
+  /** Phase 96: a stored thumbnail exists (the thumb URL works either way — it is made on first request). */
+  hasThumb?: boolean;
 };
 
 export type MilestoneEdit = {
@@ -333,6 +335,8 @@ export const jobsApi = {
   /** Phase 74: one-off "on my way" text to the job's client. */
   onMyWay: (id: string, body: { etaMinutes?: number }) => req<{ success: true; body: string; segments: number }>(`/api/jobs/${id}/sms/on-my-way`, { method: "POST", body: json(body) }),
   photoFileUrl: (id: string, photoId: string) => `/api/jobs/${id}/photos/${photoId}/file`,
+  /** Phase 96: the gallery-sized JPEG (≤480 px); falls back to the original server-side when none can be made. */
+  photoThumbUrl: (id: string, photoId: string) => `/api/jobs/${id}/photos/${photoId}/file?size=thumb`,
 
   // Notes (Phase 78)
   listNotes: (id: string) => req<{ notes: JobNoteDto[] }>(`/api/jobs/${id}/notes`),

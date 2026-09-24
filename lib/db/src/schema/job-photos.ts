@@ -23,6 +23,8 @@ export const jobPhotosTable = pgTable(
     fileSize: integer("file_size").notNull(),
     mimeType: text("mime_type").notNull(),
     fileUrl: text("file_url").notNull(),
+    /** Phase 96: the small JPEG next to the original (`<file>.thumb.jpg`); null until one is made — on upload, or lazily on the first thumbnail request. */
+    thumbUrl: text("thumb_url"),
     caption: text("caption").notNull().default(""),
     sortOrder: integer("sort_order").notNull().default(0),
     sharedAt: timestamp("shared_at", { withTimezone: true }),

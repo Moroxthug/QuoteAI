@@ -496,7 +496,8 @@ function PortalImage({ token, photoId, alt }: { token: string; photoId: string; 
   useEffect(() => {
     let url: string | null = null;
     let cancelled = false;
-    portalApi.fetchBlob(token, portalApi.photoPath(token, photoId))
+    // Phase 96: the grid shows thumbnails; the original is one tap away.
+    portalApi.fetchBlob(token, portalApi.photoPath(token, photoId, "thumb"))
       .then((blob) => { if (cancelled) return; url = URL.createObjectURL(blob); setSrc(url); })
       .catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; if (url) URL.revokeObjectURL(url); };

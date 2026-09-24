@@ -46,7 +46,14 @@ export type PublishStateDto = {
   lastAccessedAt: string | null;
 };
 
+// Phase 96: which calendar the events are written to.
+export type ListedCalendarDto = { id: string; name: string; isPrimary: boolean; canWrite: boolean };
+export type CalendarChoiceDto = { current: { id: string; name: string | null }; calendars: ListedCalendarDto[]; needsReconnect: boolean };
+
 export const calendarApi = {
+  listCalendars: (provider: "google" | "outlook") => req<CalendarChoiceDto>(`/api/calendar/${provider}/calendars`),
+  setCalendar: (provider: "google" | "outlook", calendarId: string, calendarName: string | null) =>
+    req<{ success: true; calendarId: string; calendarName: string | null; removed: number; pushed: number; failed: number }>(`/api/calendar/${provider}/calendar`, { method: "PUT", body: JSON.stringify({ calendarId, calendarName }) }),
   agenda: (from: Date, to: Date, lang?: "en" | "fr") =>
     req<AgendaDto>(`/api/calendar/agenda?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}${lang ? `&lang=${lang}` : ""}`),
   refresh: () => req<{ events: number; errors: string[] }>("/api/calendar/refresh", { method: "POST" }),

@@ -95,7 +95,9 @@ export class ObjectStorageService {
 
   async deleteObjectBuffer(subPath: string): Promise<void> {
     const supabase = getSupabaseClient();
-    await supabase.storage.from(PRIVATE_BUCKET).remove([subPath]);
+    const { error } = await supabase.storage.from(PRIVATE_BUCKET).remove([subPath]);
+    // Phase 96: a failed remove used to vanish silently; the caller deletes its row regardless, so at least say so.
+    if (error) console.warn(`Storage remove failed for ${subPath}: ${error.message}`);
   }
 
   // Phase 72: whole-tenant listing and removal for the data export and the

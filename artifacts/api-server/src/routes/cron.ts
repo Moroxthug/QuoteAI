@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { timingSafeEqual } from "node:crypto";
 import { retryDueAutomations } from "../lib/automation";
 import { runContractMaintenance } from "../contracts/maintenance.js";
 import { runInvoiceMaintenance } from "../invoices/maintenance.js";
@@ -21,26 +20,9 @@ import { db, cronTicksTable } from "@workspace/db";
 import { eq, lt } from "drizzle-orm";
 import { automationBacklog, pingHeartbeat, recentAutomationFailures, sendOpsAlert } from "../lib/ops.js";
 import { captureException, flush } from "../lib/errorTracking.js";
+import { cronAuthorized } from "../lib/cronAuth.js";
 
 const router = Router();
-
-// Vercel sends `Authorization: Bearer $CRON_SECRET`; we accept the same
-// header from any caller so a tick can be triggered manually with curl.
-function cronAuthorized(req: { headers: { authorization?: string } }, res: { status: (n: number) => { json: (b: unknown) => void } }): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    res.status(503).json({ error: "CRON_SECRET not configured" });
-    return false;
-  }
-  const header = req.headers.authorization ?? "";
-  const expected = Buffer.from(`Bearer ${secret}`);
-  const provided = Buffer.from(header);
-  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
-    res.status(401).json({ error: "Unauthorized" });
-    return false;
-  }
-  return true;
-}
 
 // GET /api/cron/tick — invoked by Vercel Cron (see vercel.json), once a day.
 router.get("/cron/tick", async (req, res) => {

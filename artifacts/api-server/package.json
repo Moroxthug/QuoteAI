@@ -22,7 +22,10 @@
     "ops:backup": "tsx scripts/backup.ts",
     "ops:restore": "tsx scripts/restore.ts",
     "ops:rotate-token-key": "tsx scripts/rotate-token-key.ts",
-    "ops:preflight": "tsx scripts/preflight.ts"
+    "ops:preflight": "tsx scripts/preflight.ts",
+    "ops:owner-check": "tsx scripts/owner-check.ts",
+    "ops:rehearse": "tsx scripts/rehearse.ts",
+    "ops:legal-packet": "tsx scripts/legal-packet.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

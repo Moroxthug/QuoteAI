@@ -19,7 +19,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 | 95 | French legal pages + who did what | assistant | **done** 2026-09-23 |
 | 96 | Integrations, one level deeper | assistant | **done** 2026-09-23 |
 | 97 | Test coverage where there is none | assistant | **done** 2026-09-23 |
-| 98 | Owner handoff kit | assistant | not started |
+| 98 | Owner handoff kit | assistant | **done** 2026-09-23 |
 | 99 | Everything left to the owner | **owner** | open |
 
 ---
@@ -83,15 +83,15 @@ Everything the assistant can prepare so each Phase 99 item is minutes, not an af
 
 ## Phase 99 — Everything left to the owner
 
-Grouped by urgency. **(→ assistant)** marks items where you only provide a value or credential and the assistant does the rest in a conversation.
+**Start here:** `CRON_SECRET='…' pnpm ops:owner-check` prints this whole list with each item's current state and next step (RUNBOOKS §36); run it again after each item. Grouped by urgency. **(→ assistant)** marks items where you only provide a value or credential and the assistant does the rest in a conversation.
 
 ### Blocks launch
 
 | # | Item | What to do | Time | Then |
 |---|---|---|---|---|
 | L-1 | **Database backups** (O1, GO/NO-GO 1.1) | GitHub → repo Settings → Secrets: `BACKUP_DATABASE_URL`, `BACKUP_SUPABASE_URL`, `BACKUP_SUPABASE_SERVICE_ROLE_KEY`, `BACKUP_PASSPHRASE` (RUNBOOKS §5). Run the "backup" workflow once, download the artifact. Optionally Supabase Pro for daily backups. | 15 min | — |
-| L-2 | **Restore rehearsal** (O3, 1.2) | Supabase → the unused July project `cynlsphsuxrnctsxcmve` → Database → reset password → copy the pooler URL. | 5 min | **→ assistant** runs `ops:restore` + schema drift against it |
-| L-3 | **Legal review** (O8, 1.3, 1.4) | Send the legal packet (Phase 98) to a Canadian construction/consumer-law lawyer: contract templates ON/BC/AB/QC/generic, ToS and privacy policy in English and French (the French pages from Phase 95 are a translation, and terms §1 has a new "both versions have the same effect" clause to confirm). Book now, it takes weeks. | 30 min + wait | **→ assistant** applies changes, bumps `TEMPLATE_VERSION` |
+| L-2 | **Restore rehearsal** (O3, 1.2) | Supabase → the unused July project `cynlsphsuxrnctsxcmve` → Database → reset password → copy the pooler URL. | 5 min | **→ assistant** runs `ops:rehearse --target <url>` (backup → restore → schema drift → row in `docs/RESTORE-REHEARSALS.md`) |
+| L-3 | **Legal review** (O8, 1.3, 1.4) | Send `docs/legal-packet/QuoteAI-legal-packet.pdf` (Phase 98) to a Canadian construction/consumer-law lawyer: contract templates ON/BC/AB/QC/generic, ToS and privacy policy in English and French (the French pages from Phase 95 are a translation, and terms §1 has a new "both versions have the same effect" clause to confirm). Book now, it takes weeks. | 30 min + wait | **→ assistant** applies changes, bumps `TEMPLATE_VERSION` |
 | L-4 | **Registered business identity** (O5, 1.5) | Decide the legal name, mailing address, tax numbers, person in charge of personal information (Law 25). | 5 min | **→ assistant** fills `lib/legal-entity` (privacy, ToS, footer, every email) |
 | L-5 | **Staging Supabase project** (O3, 1.6) | Create it (or reuse the July slot after L-2), then GitHub secrets `E2E_DATABASE_URL`, `E2E_SUPABASE_URL`, `E2E_SUPABASE_SERVICE_ROLE_KEY`. From then on the test suite stops touching production. | 20 min | **→ assistant** applies migrations 0000-0053 and turns the CI e2e job on |
 | L-6 | **Error tracking + alerts** (O4, 1.7) | Sentry project → `SENTRY_DSN`, `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN/ORG/PROJECT` in Vercel. Healthchecks.io (or Better Stack) check → `CRON_HEARTBEAT_URL`. Uptime monitor on `GET /api/healthz/ops`. `OPS_ALERT_EMAIL`. (RUNBOOKS §1-§2) | 30 min | — |
@@ -292,3 +292,23 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 - WhatsApp's OTP compare (`otpRow.otp !== otp`) is a plain comparison; it is rate limited and expires in 15 minutes, so left as is.
 
 **Verification**: `pnpm typecheck` ✓ (root, including `tsc --build` over `lib/api-zod`) · `api-spec codegen` ✓ with no diff · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` unchanged (99 exports / 35 types) · route matrix **483** routes, manual **9** (all signed webhooks), `route-matrix.test.ts` **12/12** with the new rule 8 · unit **206 tests** · e2e **phase97 7/7** · **full e2e suite 34 files / 261 tests, all green in one run** (every route converted here is exercised by at least one of them). No UI changed, so no `qa:visual` run.
+
+### Phase 98 — Owner handoff kit (2026-09-23)
+
+**Built**
+- **`pnpm ops:owner-check`** (`artifacts/api-server/scripts/owner-check.ts`): every Phase 99 item with its number, DONE / PARTIAL / TODO / MANUAL / ?, the detail and the next step; exit 1 while an L-item is open. Answers from the deployment, GitHub (`gh`), Vercel (optional token) and the checkout — the manual items are listed too, so the report is the whole list.
+- **`GET /api/healthz/owner`** (`lib/ownerReadiness.ts`), behind `CRON_SECRET`: presence of each launch variable by item (never a value), and each Stripe add-on/annual price id and the pilot code checked with the deployment's own Stripe key (mode matches the key, active, CAD, monthly vs yearly; code exists and is active). `cronAuthorized` moved to `lib/cronAuth.ts` to share it.
+- **`ops:rehearse --target <url>`**: backup → `ops:restore --wipe` → schema drift → a row in the new `docs/RESTORE-REHEARSALS.md`, which owner-check reads for L-2. The URL goes through the environment, never a command line.
+- **`ops:legal-packet`** → `docs/legal-packet/QuoteAI-legal-packet.pdf` (and `.html`), 1 file for the lawyer: cover (versions, what's undecided), questions A–F, the recipients of personal information read from the live policy, the signing evidence and consent sentences, all six contract templates rendered by the product's own renderer with sample values (direct agreement, statutory holdback on in ON/BC/AB), and the terms and privacy policy EN + FR as served.
+- **`LAUNCH-GO-NO-GO.md` §1–§4 refreshed** to what the systems answer today, each line tagged with its Phase 99 item; new 1.11 (Stripe prices + pilot code); §2 points at the PDF; two stale §4 lines struck (export/deletion shipped in 72; the stray `incentives.ts` edit is gone). Runbook §36; Phase 99's L-2/L-3 point at the new commands.
+
+**Found (and fixed)**
+1. **CI on `main` had been red since Phase 94**: `money-format.test.ts` expected `1,5 k$`, Linux ICU prints `1,5 k $`. The test now accepts either; the decimal is what it pins.
+2. **The privacy policy's recipient list was missing three**: Twilio (SMS to clients and crew, Phase 74), Sentry (error reports, Phase 69) and the browsers' push services (Phase 77). Added in English and French, "last updated" moved to 23 September.
+3. **The GitHub repository has no Actions secrets at all**, and the nightly Backup has been "succeeding" in 10 seconds by skipping. Owner-check now asks for the artifact, not the green tick.
+
+**Found, not fixed (owner)**
+- Production today (`ops:preflight`): all deployment checks pass; the one FAIL is `LEGAL_ENTITY` blank; annual billing and the pilot code are off. owner-check without `CRON_SECRET`: 8 to do, 9 manual, 9 not checkable — the Sensitive values can't be read from a checkout, by design.
+- The Vercel MCP connection here is not authorized for the `youssefbouchtaoui-4103s-projects` scope, so the Sensitive check (P-4) was not run; owner-check does it with a token.
+
+**Verification**: `pnpm typecheck` ✓ · eslint on the new/changed files 0 errors · unit **31 files / 211 tests** (+`ownerReadiness.test.ts` 5; the money test green) · e2e **phase98 2/2** (401 without / with a wrong secret; presence only, no value in the body) · route matrix **484** (+`GET /api/healthz/owner`, allowlisted as cron-secret-checked) · `env:inventory` exit 0 (`VERCEL_TOKEN/PROJECT_ID/TEAM_ID` classified local) · `ops:owner-check` run against production · `ops:rehearse` run end to end against a closed port (fresh 101-table backup taken, restore refused cleanly, fail row written — then removed along with the backup) · `ops:legal-packet` generated from production, sections checked by screenshot. No UI beyond the privacy text changed, so no `qa:visual` run.

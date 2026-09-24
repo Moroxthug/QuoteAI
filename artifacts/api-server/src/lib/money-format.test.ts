@@ -39,7 +39,9 @@ describe("money formatting follows the app's language", () => {
     setMoneyLang("fr");
     const ticks = [0, 500, 1000, 1500, 2000, 2500].map((v) => plain(formatCadShort(v)));
     expect(new Set(ticks).size).toBe(ticks.length);
-    expect(ticks[3]).toBe("1,5 k$");
+    // ICU builds differ on the space before the symbol ("1,5 k$" on Windows,
+    // "1,5 k $" on the Linux runner); the decimal is what this pins.
+    expect(ticks[3]).toMatch(/^1,5 k ?\$$/);
     setMoneyLang("en");
   });
 });

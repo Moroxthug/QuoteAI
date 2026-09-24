@@ -3,6 +3,9 @@ import { HealthCheckResponse } from "@workspace/api-zod";
 import { pool, TAX_PROFILES } from "@workspace/db";
 import { opsHealth } from "../lib/ops.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
+import { cronAuthorized } from "../lib/cronAuth.js";
+import { ownerReadiness } from "../lib/ownerReadiness.js";
+import { getUncachableStripeClient } from "../stripeClient.js";
 
 const router: IRouter = Router();
 
@@ -38,6 +41,21 @@ router.get("/healthz/ops", opsLimiter, async (_req, res) => {
   }
 });
 
+// Phase 98: the owner's launch settings as this deployment sees them —
+// presence of each variable (never a value) and the Stripe price ids / pilot
+// code checked against this deployment's own Stripe key. Behind CRON_SECRET:
+// it is `pnpm ops:owner-check` that asks, and the answer maps the setup.
+router.get("/healthz/owner", opsLimiter, async (req, res) => {
+  if (!cronAuthorized(req, res)) return;
+  try {
+    const stripe = process.env.STRIPE_SECRET_KEY ? await getUncachableStripeClient() : null;
+    res.setHeader("Cache-Control", "no-store");
+    res.json(await ownerReadiness(process.env, stripe));
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ status: "error", error: msg });
+  }
+});
 
 // Phase 71: static, public — the dashboard's manual-quote builder needs every
 // province's components to show "GST 5 % + QST 9.975 %" as the user picks a

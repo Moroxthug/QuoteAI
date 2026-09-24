@@ -27,7 +27,7 @@ function PrivacyEn() {
       lang="en"
       title="Privacy Policy"
       description="QuoteAI's privacy policy — how we collect, use, and protect your personal information."
-      updated="September 21, 2026"
+      updated="September 23, 2026"
       path="/privacy-policy/"
       altPath="/fr/confidentialite/"
     >
@@ -120,6 +120,9 @@ function PrivacyEn() {
           <li><strong>Intuit Inc. (QuickBooks) and Wave Financial Inc.</strong> — accounting sync when you connect them.</li>
           <li><strong>Financeit Canada Inc. and Flinks Technology Inc.</strong> — client financing offers and bank-transaction matching when you enable them.</li>
           <li><strong>PostHog, Inc. and Google LLC (Google Analytics)</strong> — product analytics and website traffic measurement.</li>
+          <li><strong>Twilio Inc.</strong> — text messages (SMS) you choose to send to clients and crew, and the replies they send back.</li>
+          <li><strong>Functional Software, Inc. (Sentry)</strong> — error reports when something fails in the app; they carry the technical context of the error (page, browser, account identifier), not the content of your quotes.</li>
+          <li><strong>Apple Inc., Google LLC and Mozilla Corporation</strong> — delivery of the push notifications you turn on, through your browser's own push service.</li>
         </ul>
         <p className="mt-3">
           We do not sell personal information to third parties. Where information is processed or
@@ -190,7 +193,7 @@ function PrivacyFr() {
       lang="fr"
       title="Politique de confidentialité"
       description="Politique de confidentialité de QuoteAI : comment nous recueillons, utilisons et protégeons vos renseignements personnels."
-      updated="21 septembre 2026"
+      updated="23 septembre 2026"
       path="/fr/confidentialite/"
       altPath="/privacy-policy/"
     >
@@ -283,6 +286,9 @@ function PrivacyFr() {
           <li><strong>Intuit Inc. (QuickBooks) et Wave Financial Inc.</strong> — synchronisation comptable lorsque vous les connectez.</li>
           <li><strong>Financeit Canada Inc. et Flinks Technology Inc.</strong> — offres de financement aux clients et rapprochement des transactions bancaires lorsque vous les activez.</li>
           <li><strong>PostHog, Inc. et Google LLC (Google Analytics)</strong> — analyse de l'utilisation du produit et mesure de la fréquentation du site.</li>
+          <li><strong>Twilio Inc.</strong> — textos (SMS) que vous choisissez d'envoyer à vos clients et à votre équipe, et les réponses qu'ils vous renvoient.</li>
+          <li><strong>Functional Software, Inc. (Sentry)</strong> — rapports d'erreur lorsqu'une fonction de l'application échoue; ils contiennent le contexte technique de l'erreur (page, navigateur, identifiant du compte), et non le contenu de vos soumissions.</li>
+          <li><strong>Apple Inc., Google LLC et Mozilla Corporation</strong> — acheminement des notifications que vous activez, par le service de notifications de votre navigateur.</li>
         </ul>
         <p className="mt-3">
           Nous ne vendons pas de renseignements personnels à des tiers. Lorsque des renseignements sont traités ou

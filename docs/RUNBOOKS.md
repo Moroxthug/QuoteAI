@@ -132,7 +132,7 @@ The script refuses the backup's own source unless `--allow-same-source`, refuses
 
 **Restoring production itself:** `--truncate --data-only` on the production URL with `--allow-same-source`, from the newest artifact (download it from the Actions run, unzip). Put the app in maintenance first (Vercel → pause project, or set the deployment protection) so no writes race the load; run; unpause; run the cron tick by hand (§2a step 3).
 
-**Rehearsal log:** backup of production taken 2026-09-21 (77 tables, 83 rows, Storage empty) and verified; encrypted round-trip verified; **the restore into a second project has not been run yet** — see the Phase 69 build log for why and what is needed.
+**Rehearsal log:** `docs/RESTORE-REHEARSALS.md`, one row per `ops:rehearse` run (§36). Backup of production taken 2026-09-21 (77 tables, 83 rows) and verified; encrypted round-trip verified; **the restore into a second project has not been run yet** — it needs only the target URL now.
 
 **Supabase-side:** Project paused for inactivity (Free plan, 7 days idle) → Supabase dashboard → Restore; the API returns 500s meanwhile. Project deleted → the nightly artifact is the only copy.
 
@@ -727,3 +727,35 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | "A new route fails route-matrix rule 8" | Parse the body with a schema (`X.safeParse(req.body ?? {})`) and read from `.data`; reading `req.body.field` next to a schema counts as hand validation too |
 | "The change order was signed but the calendar still shows the old dates" | Look for `Calendar sync failed for change-order shift` in the logs and the milestone's row in `calendar_synced_events`; the next edit of that milestone retries it |
 | Test runs | `phase97.e2e` (change order over HTTP end to end with Gmail, calendar and QuickBooks retry; photos upload/replay/share by email and WhatsApp/refusals/delete; assistant chat read tool → cards → confirm/dismiss → send → pay, failure, start over); `scripts/route-matrix.test.ts` rule 8 |
+
+---
+
+## 36. The owner's handoff kit: owner-check, the rehearsal, the legal packet (Phase 98)
+
+Three commands turn the Phase 99 list (`docs/LAUNCH-FINISH-PLAN.md`) into minutes.
+
+**`pnpm ops:owner-check`** — every Phase 99 item, DONE / PARTIAL / TODO / MANUAL / ? with its number and the next step; exit 1 while an L-item is open. Read-only.
+```bash
+CRON_SECRET='…' pnpm ops:owner-check                     # production
+CRON_SECRET='…' VERCEL_TOKEN=… VERCEL_PROJECT_ID=prj_3Xs1CcZ9QM7wd07jY20C2vBFaUTI VERCEL_TEAM_ID=team_wL0vGmmTFqp9ZfCoCfdQF72Y pnpm ops:owner-check
+pnpm ops:owner-check -- --url https://<preview>.vercel.app --json
+```
+Where the answers come from:
+- **The deployment**: `GET /api/healthz/owner` with `Authorization: Bearer $CRON_SECRET` (the same secret as the cron; 401 otherwise, 503 when unset). It answers **true/false per variable, never a value**, and checks every Stripe price id (`STRIPE_PRICE_YEARLY_*`, `STRIPE_PRICE_GROUP_COMPANY[_YEARLY]`, `STRIPE_PRICE_EXTRA_SEAT[_YEARLY]`) and `PILOT_PROMO_CODE` with the Stripe key that deployment uses: same mode as the key (a test id on a live key is the usual mistake), active, CAD, the right interval; the code exists and is active. Without `CRON_SECRET` the report falls back to the public `/api/payments/plans` and `/api/payments/pilot` and marks the rest "?".
+- **GitHub** through `gh` (logged in): secret names only, and whether the last successful Backup run left an artifact — a run without secrets is green in 10 s and backs nothing up.
+- **Vercel** (optional token): the variable *types*, for P-4 (Sensitive).
+- **This checkout**: `lib/legal-entity`, the cron schedule in `vercel.json`, `docs/RESTORE-REHEARSALS.md`, §5 of `LAUNCH-GO-NO-GO.md`.
+- `CRON_SECRET` is Sensitive in Vercel, so `.env.staging` has it blank: pass it from the password manager. `/healthz/owner` shares the 30/min limiter with `/healthz/ops`.
+
+**`ops:rehearse`** — the restore rehearsal (L-2) in one call. The target is **wiped**.
+```bash
+pnpm --filter @workspace/api-server ops:rehearse --target 'postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:5432/postgres'
+# restore a nightly artifact instead of a fresh backup (the truer test): unzip it, then
+BACKUP_PASSPHRASE='…' pnpm --filter @workspace/api-server ops:rehearse --target '…' --from .backups/quoteai-backup-<run>
+# also Storage: --storage with RESTORE_SUPABASE_URL / RESTORE_SUPABASE_SERVICE_ROLE_KEY
+```
+Steps: `ops:backup --no-storage` of production into `.backups/rehearsal-<stamp>` (gitignored; unencrypted unless `BACKUP_PASSPHRASE` is set — delete it afterwards) → `ops:restore --wipe` (URL passed through the environment, never argv) → `schema-drift` on the target → one row appended to `docs/RESTORE-REHEARSALS.md` (pass/fail, table and row counts, timings, the project ref — never the password). Commit that row. `restore.ts` still refuses the backup's own source, so production as the target stops at the restore step untouched.
+
+**`ops:legal-packet`** — `docs/legal-packet/QuoteAI-legal-packet.pdf` (+ `.html`) for L-3. Questions for the lawyer, the privacy policy's recipient list (read from the page), the signing evidence and the exact consent sentences, all six contract templates rendered by `contracts/render.ts` with sample values (direct agreement, 10 % holdback in ON/BC/AB), and the four legal pages as served by `--site` (default production). Regenerate after changing a template, `TEMPLATE_VERSION`, a legal page or `lib/legal-entity` — **deploy first**, the pages come from the site. Needs Chrome (or `QA_CHROME_PATH`). If the questions change, edit them in `scripts/legal-packet.ts`, not only in `LAUNCH-GO-NO-GO.md` §2.
+
+**Also in Phase 98**: the privacy policy (EN + FR) now names Twilio, Sentry and the browsers' push services as recipients; `cronAuthorized` moved to `lib/cronAuth.ts`; the money-format test accepts either ICU spacing before "$" (Linux CI and Windows differ), which had turned CI red since Phase 94's test.

@@ -11,6 +11,7 @@
     "lint:strict": "eslint . --max-warnings=0",
     "knip": "knip --no-progress",
     "env:inventory": "pnpm --filter @workspace/scripts env-inventory",
+    "ops:owner-check": "pnpm --filter @workspace/api-server ops:owner-check",
     "spell": "cspell --no-progress artifacts/quote-ai/src/i18n/*.ts artifacts/quote-ai/src/data/*.ts artifacts/quote-ai/src/pages/*.tsx artifacts/api-server/src/lib/email*.ts artifacts/api-server/src/lib/*Messaging.ts"
   },
   "private": true,

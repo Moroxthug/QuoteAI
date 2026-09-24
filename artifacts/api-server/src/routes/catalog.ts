@@ -9,6 +9,20 @@ import type { QuoteChapter } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
+import { z } from "zod";
+import { CreateCatalogItemBody, BulkCreateCatalogItemsBodyItem, UpdateCatalogItemBody } from "@workspace/api-zod";
+
+// The generated contract, with the lengths and "not blank" the handlers always required.
+const catalogFields = {
+  nome: z.string().trim().min(1).max(500),
+  categoria: z.string().max(200).optional(),
+  um: z.string().trim().min(1).max(30),
+  prezzoUnitario: z.number().finite().min(-10_000_000).max(10_000_000),
+  note: z.string().max(2000).optional(),
+};
+const CatalogItemSchema = CreateCatalogItemBody.extend(catalogFields);
+const BulkCatalogSchema = z.array(BulkCreateCatalogItemsBodyItem.extend(catalogFields)).max(5000);
+const CatalogUpdateSchema = UpdateCatalogItemBody.extend({ nome: catalogFields.nome.optional(), categoria: z.string().max(200).nullable().optional(), um: catalogFields.um.optional(), prezzoUnitario: catalogFields.prezzoUnitario.optional(), note: z.string().max(2000).nullable().optional() });
 
 const router = Router();
 
@@ -97,18 +111,12 @@ router.get("/catalog", requireAuth, async (req, res) => {
 router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const { nome, categoria, um, prezzoUnitario, note } = req.body as {
-      nome?: string;
-      categoria?: string;
-      um?: string;
-      prezzoUnitario?: number;
-      note?: string;
-    };
-
-    if (!nome || !um || prezzoUnitario === undefined) {
-      res.status(400).json({ error: "nome, um, and prezzoUnitario are required" });
+    const parsed = CatalogItemSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "nome, um, and prezzoUnitario are required", details: parsed.error });
       return;
     }
+    const { nome, categoria, um, prezzoUnitario, note } = parsed.data;
 
     const [created] = await db
       .insert(priceCatalogItemsTable)
@@ -132,25 +140,16 @@ router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async 
 router.post("/catalog/bulk", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const items = req.body as Array<{
-      nome?: string;
-      categoria?: string;
-      um?: string;
-      prezzoUnitario?: number;
-      note?: string;
-    }>;
-
-    if (!Array.isArray(items)) {
-      res.status(400).json({ error: "body must be an array of items" });
+    const parsed = BulkCatalogSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "body must be an array of items, each with nome, um and prezzoUnitario", details: parsed.error });
       return;
     }
+    const items = parsed.data;
 
     const inserted = [];
     if (items.length > 0) {
       const values = items.map(item => {
-        if (!item.nome || !item.um || item.prezzoUnitario === undefined) {
-          throw new Error("Invalid item in bulk array: nome, um, prezzoUnitario are required");
-        }
         return {
           userId,
           nome: item.nome.trim(),
@@ -348,13 +347,12 @@ router.put("/catalog/:id", requireAuth, requirePermission("quotes", "edit"), asy
   try {
     const userId = getUserId(res);
     const id = String(req.params.id);
-    const { nome, categoria, um, prezzoUnitario, note } = req.body as {
-      nome?: string;
-      categoria?: string;
-      um?: string;
-      prezzoUnitario?: number;
-      note?: string;
-    };
+    const parsed = CatalogUpdateSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid parameters", details: parsed.error });
+      return;
+    }
+    const { nome, categoria, um, prezzoUnitario, note } = parsed.data;
 
     const updates: Partial<typeof priceCatalogItemsTable.$inferInsert> = {};
     if (nome !== undefined) updates.nome = nome.trim();

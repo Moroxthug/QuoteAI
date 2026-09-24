@@ -12,6 +12,7 @@ import path from "path";
 import { PRICE_TO_PLAN } from "./payments.js";
 import { opsHealth } from "../lib/ops.js";
 import { retryAutomationNow } from "../lib/automation.js";
+import { z } from "zod";
 
 const router = Router();
 
@@ -224,9 +225,13 @@ router.get("/admin/users/:userId/quotes", async (req, res) => {
 router.post("/admin/users/:userId/apikey", async (req, res) => {
   try {
     const { userId } = req.params;
-    const { apiKey } = req.body;
-    
-    let newApiKey = apiKey;
+    const body = z.object({ apiKey: z.string().trim().max(200).optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+
+    let newApiKey = body.data.apiKey;
     if (!newApiKey) {
       newApiKey = `quoteai_pk_${crypto.randomBytes(24).toString("hex")}`;
     }
@@ -263,11 +268,12 @@ router.get("/admin/settings", async (_req, res) => {
 
 router.post("/admin/settings", async (req, res) => {
   try {
-    const { key, value } = req.body as { key: string; value: string };
-    if (!key || value === undefined) {
+    const body = z.object({ key: z.string().trim().min(1).max(100), value: z.string().max(10_000) }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "key and value required" });
       return;
     }
+    const { key, value } = body.data;
     await db
       .insert(settingsTable)
       .values({ key, value })
@@ -281,13 +287,14 @@ router.post("/admin/settings", async (req, res) => {
 
 router.post("/admin/grant-plan", async (req, res) => {
   try {
-    const { email, plan, days = 365 } = req.body as { email?: string; plan?: string; days?: number };
-    if (!email || !plan) {
-      res.status(400).json({ error: "email and plan required" });
+    const validPlans = ["monthly_starter", "monthly_pro", "monthly_elite"] as const;
+    const body = z.object({ email: z.string().trim().min(1).max(254), plan: z.string().min(1), days: z.number().int().min(1).max(3650).default(365) }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: body.error.issues.some((i) => i.path[0] === "days") ? "days must be a whole number from 1 to 3650" : "email and plan required" });
       return;
     }
-    const validPlans = ["monthly_starter", "monthly_pro", "monthly_elite"];
-    if (!validPlans.includes(plan)) {
+    const { email, plan, days } = body.data;
+    if (!(validPlans as readonly string[]).includes(plan)) {
       res.status(400).json({ error: `Invalid plan. Valid values: ${validPlans.join(", ")}` });
       return;
     }
@@ -323,11 +330,12 @@ router.post("/admin/grant-plan", async (req, res) => {
 
 router.post("/admin/sync-subscription", async (req, res) => {
   try {
-    const { email } = req.body as { email?: string };
-    if (!email) {
+    const body = z.object({ email: z.string().trim().min(1).max(254) }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "email required" });
       return;
     }
+    const { email } = body.data;
 
     const stripe = await getUncachableStripeClient();
 
@@ -399,11 +407,12 @@ router.post("/admin/sync-subscription", async (req, res) => {
 // Force-link a Stripe customer to a quoteai user (useful when emails don't match)
 router.post("/admin/sync-by-customer", requireAdmin, async (req, res) => {
   try {
-    const { stripeCustomerId, userEmail } = req.body as { stripeCustomerId?: string; userEmail?: string };
-    if (!stripeCustomerId || !userEmail) {
+    const body = z.object({ stripeCustomerId: z.string().trim().min(1).max(100), userEmail: z.string().trim().min(1).max(254) }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "stripeCustomerId and userEmail required" });
       return;
     }
+    const { stripeCustomerId, userEmail } = body.data;
 
     // Find quoteai user by email
     const [authUser] = await db
@@ -932,11 +941,13 @@ router.get("/admin/widget/stats", async (_req, res) => {
 // POST /api/admin/widget/create-client - Creates a virtual (unregistered) client/company and assigns an API key
 router.post("/admin/widget/create-client", async (req, res) => {
   try {
-    const { companyName, email, phone, address, vatNumber } = req.body;
-    if (!companyName || !companyName.trim()) {
-      res.status(400).json({ error: "Company name is required." });
+    const optional = z.string().trim().max(500).optional();
+    const body = z.object({ companyName: z.string().trim().min(1).max(200), email: optional, phone: optional, address: optional, vatNumber: optional }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Company name is required.", details: body.error });
       return;
     }
+    const { companyName, email, phone, address, vatNumber } = body.data;
     const tempUserId = `temp_widget_${crypto.randomBytes(12).toString("hex")}`;
     const apiKey = `quoteai_pk_${crypto.randomBytes(24).toString("hex")}`;
 

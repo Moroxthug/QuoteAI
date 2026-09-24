@@ -239,7 +239,12 @@ router.post("/sign/:token/decline", signLimiter, async (req, res) => {
       res.status(409).json({ error: "already_signed" });
       return;
     }
-    const reason = typeof req.body?.reason === "string" ? req.body.reason.trim().slice(0, 1000) : null;
+    const body = z.object({ reason: z.string().max(5000).nullish() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "invalid_reason" });
+      return;
+    }
+    const reason = body.data.reason?.trim().slice(0, 1000) ?? null;
     await db.update(contractSignersTable).set({ status: "declined", declinedAt: new Date(), declineReason: reason, ip: req.ip ?? null, userAgent: req.headers["user-agent"] ?? null }).where(eq(contractSignersTable.id, signer.id));
     await db.update(contractsTable).set({ status: "declined" }).where(eq(contractsTable.id, loaded.contract.id));
     await logContractEvent({ contractId: loaded.contract.id, type: "declined", actor: "customer", signerId: signer.id, detail: { reason }, ip: req.ip, userAgent: req.headers["user-agent"] });

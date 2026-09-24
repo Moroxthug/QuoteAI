@@ -109,7 +109,7 @@ function indexFile(absFile: string): FileIndex {
       }
     } else if (ts.isImportDeclaration(stmt) && ts.isStringLiteral(stmt.moduleSpecifier)) {
       const mod = stmt.moduleSpecifier.text;
-      if (mod === "zod") usesZod = true;
+      if (mod === "zod" || mod === "@workspace/api-zod") usesZod = true;
       if (mod.startsWith(".") && !NON_SCOPING_IMPORT_MODULES.test(mod) && stmt.importClause?.namedBindings && ts.isNamedImports(stmt.importClause.namedBindings)) {
         for (const el of stmt.importClause.namedBindings.elements) serviceImports.add(el.name.text);
       }
@@ -250,8 +250,10 @@ function classifyWebhook(reach: string, method: string, routePath: string): stri
 }
 
 function classifyValidation(idx: FileIndex, reach: string): RouteRow["validation"] {
-  if (idx.usesZod && /\.(safeParse|parse)\(/.test(reach)) return "zod";
-  if (/insert\w+Schema|\w+Schema\.(safeParse|parse)/.test(reach)) return "zod";
+  const parsed = (idx.usesZod && /\.(safeParse|parse)\(/.test(reach)) || /insert\w+Schema|\w+Schema\.(safeParse|parse)/.test(reach);
+  // Phase 97: a field read straight off req.body beside the schema is still hand validation.
+  const loose = /req\.body/.test(reach.replace(/\.(safeParse|parse)\(\s*(\{\s*\.\.\.\s*)?req\.body\b(\s*\?\?\s*\{\s*\})?/g, ""));
+  if (parsed && !loose) return "zod";
   if (/req\.body/.test(reach)) return "manual";
   return "none";
 }
@@ -338,7 +340,7 @@ export function renderMarkdown(rows: RouteRow[]): string {
     `${rows.length} routes across ${byFile.size} files.`,
     "",
     "Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (`requireAdmin`), none. **Perm**: `requirePermission(area, action)`. **RL**: rate limiter in the chain.",
-    "**Val**: zod / manual `req.body` handling / none. **Gate**: plan or feature check found in the handler (or a same-file helper it calls). **Scope**: how a `:param` handler ties the row to the acting org —",
+    "**Val**: zod / manual `req.body` handling (also a route that parses a schema but reads other `req.body` fields by hand) / none — manual is allowed only on signed webhooks. **Gate**: plan or feature check found in the handler (or a same-file helper it calls). **Scope**: how a `:param` handler ties the row to the acting org —",
     "`predicate` (`eq(t.userId, userId)` in the query), `post-check` (`row.userId !== userId` after fetch), `helper` (an imported service receives `userId`), `n/a` (no params / public / admin), **NONE** (nothing found — must be allowlisted with a reason in the test).",
     "**Archived**: archivable tables the handler reads and whether `archivedAt` is filtered. **Token**: how a public-token route compares its secret. **Webhook**: signature-verification evidence.",
     "",

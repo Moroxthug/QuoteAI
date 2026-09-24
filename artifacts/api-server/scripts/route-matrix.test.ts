@@ -167,6 +167,12 @@ describe("route matrix (Phase 62)", () => {
     expect(unverified).toEqual([]);
   });
 
+  it("rule 8: request bodies are parsed by a schema — only signed webhooks read the raw body", () => {
+    // Phase 97: the last hand-validated routes moved to zod. A webhook must see the
+    // exact bytes the provider signed, so it is the one place `req.body` is read as-is.
+    expect(rows.filter((r) => r.validation === "manual" && r.webhookVerify === null).map(key)).toEqual([]);
+  });
+
   it("docs/ROUTE-MATRIX.md is up to date", () => {
     const committed = readFileSync(MATRIX_PATH, "utf8").replace(/\r\n/g, "\n");
     expect(committed).toBe(renderMarkdown(rows));

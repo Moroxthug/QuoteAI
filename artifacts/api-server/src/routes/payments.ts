@@ -4,10 +4,16 @@ import { requirePermission } from "../middlewares/requirePermission";
 import { getBaseUrl } from "../lib/baseUrl";
 import { db, quotesTable, businessProfilesTable, authUsersTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
-import { CreateCheckoutSessionBody } from "@workspace/api-zod";
+import { z } from "zod";
+import { CreateCheckoutSessionBody, UnlockQuoteWithSubscriptionBody, ChangePlanBody } from "@workspace/api-zod";
+
+// Phase 91/93 fields the generated contract does not carry yet: seats bought at sign-up, and where Checkout returns to.
+const CheckoutBodySchema = CreateCheckoutSessionBody.extend({ extraSeats: z.number().int().optional(), returnTo: z.enum(["team"]).optional() });
+// A missing cadence has always meant monthly.
+const ChangePlanBodySchema = ChangePlanBody.extend({ interval: ChangePlanBody.shape.interval.optional() });
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { addonPriceIdFor, annualBillingAvailable, isBillingInterval, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { addonPriceIdFor, annualBillingAvailable, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -210,7 +216,7 @@ router.get("/payments/trial-status", requireAuth, async (req, res) => {
 router.post("/payments/checkout", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const parsed = CreateCheckoutSessionBody.safeParse(req.body);
+    const parsed = CheckoutBodySchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: "Invalid request", details: parsed.error });
       return;
@@ -240,7 +246,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
 
     // Phase 93: a plan bought at the end of onboarding comes back to Team → Members,
     // where the logins just paid for are handed out (a fixed list — never a URL from the body).
-    const returnPath = (req.body as { returnTo?: unknown })?.returnTo === "team" ? "/dashboard/team?tab=members&" : "/dashboard?";
+    const returnPath = parsed.data.returnTo === "team" ? "/dashboard/team?tab=members&" : "/dashboard?";
     const successUrl = quoteId
       ? `${baseUrl}/dashboard/quotes/${quoteId}?payment=success`
       : `${baseUrl}${returnPath}payment=success`;
@@ -264,7 +270,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
     const discounts = await pilotDiscount(stripe, parsed.data.promoCode);
 
     // Phase 91: seats beyond the plan's, chosen at sign-up, ride on the same checkout as their own line.
-    const requestedSeats = Number.isInteger((req.body as { extraSeats?: unknown })?.extraSeats) ? Math.min(200, Math.max(0, (req.body as { extraSeats: number }).extraSeats)) : 0;
+    const requestedSeats = Math.min(200, Math.max(0, parsed.data.extraSeats ?? 0));
     const seatPriceId = plan.interval && requestedSeats > 0 ? addonPriceIdFor("extra_seat", interval) : null;
     const extraSeats = seatPriceId ? requestedSeats : 0;
 
@@ -372,12 +378,12 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
 router.post("/payments/unlock-quote", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const { quoteId } = req.body as { quoteId: string };
-
-    if (!quoteId) {
+    const body = UnlockQuoteWithSubscriptionBody.extend({ quoteId: z.string().min(1).max(100) }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "quoteId required" });
       return;
     }
+    const { quoteId } = body.data;
 
     const [profile] = await db
       .select()
@@ -562,13 +568,14 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
 router.post("/payments/change-plan", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const body = (req.body ?? {}) as { planType?: unknown; interval?: unknown; promoCode?: unknown };
-    const planType = typeof body.planType === "string" ? body.planType : "";
-    const interval: BillingInterval = isBillingInterval(body.interval) ? body.interval : "month";
-    if (!isSubscriptionTier(planType)) {
-      res.status(400).json({ error: "Invalid plan type" });
+    const parsed = ChangePlanBodySchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid plan type", details: parsed.error });
       return;
     }
+    const body = parsed.data;
+    const planType = body.planType;
+    const interval: BillingInterval = body.interval ?? "month";
     const plan = PLANS.find((p) => p.id === planType)!;
     const priceId = interval === "year" ? yearlyPriceIdFor(planType) : plan.stripePriceId;
     if (!priceId) {

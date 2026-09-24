@@ -1,4 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
+import { z } from "zod";
 import { db, conversations, messages, settingsTable } from "@workspace/db";
 import { eq, desc, asc } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
@@ -126,7 +127,12 @@ router.get("/support/admin-status", async (_req, res) => {
 
 router.post("/support/admin-status", requireAdmin, async (req, res) => {
   try {
-    const { online } = req.body;
+    const body = z.object({ online: z.boolean() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "online (boolean) is required" });
+      return;
+    }
+    const { online } = body.data;
     const value = online ? "true" : "false";
 
     await db
@@ -149,10 +155,13 @@ router.post("/support/admin-status", requireAdmin, async (req, res) => {
 // Start conversation (Visitor)
 router.post("/support/conversations", createConversationLimiter, async (req, res) => {
   try {
-    let { visitorName, visitorEmail, visitorPhone } = req.body;
-    if (typeof visitorName === "string") visitorName = visitorName.slice(0, MAX_VISITOR_FIELD_LENGTH);
-    if (typeof visitorEmail === "string") visitorEmail = visitorEmail.slice(0, MAX_VISITOR_FIELD_LENGTH);
-    if (typeof visitorPhone === "string") visitorPhone = visitorPhone.slice(0, MAX_VISITOR_FIELD_LENGTH);
+    const visitorField = z.string().transform((s) => s.slice(0, MAX_VISITOR_FIELD_LENGTH)).nullish();
+    const body = z.object({ visitorName: visitorField, visitorEmail: visitorField, visitorPhone: visitorField }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid visitor details" });
+      return;
+    }
+    const { visitorName, visitorEmail, visitorPhone } = body.data;
 
     const dateStr = new Date().toLocaleDateString("en-CA", {
       day: "2-digit",
@@ -227,17 +236,17 @@ router.post("/support/conversations/:id/messages", sendMessageLimiter, requireCo
       return;
     }
 
-    const { content } = req.body;
-    // The caller may only claim to be an admin if they actually authenticated
-    // as one (checked by requireConversationAccess) — every other sender is
-    // forced to "user", regardless of what the request body asks for.
-    const requestedRole = req.body.role;
-    const role = requestedRole === "admin" && (await isAdmin(req)) ? "admin" : "user";
-    if (!content) {
+    const body = z.object({ content: z.string().min(1), role: z.string().max(20).optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "Role and content are required" });
       return;
     }
-    if (typeof content !== "string" || content.length > MAX_MESSAGE_LENGTH) {
+    const { content } = body.data;
+    // The caller may only claim to be an admin if they actually authenticated
+    // as one (checked by requireConversationAccess) — every other sender is
+    // forced to "user", regardless of what the request body asks for.
+    const role = body.data.role === "admin" && (await isAdmin(req)) ? "admin" : "user";
+    if (content.length > MAX_MESSAGE_LENGTH) {
       res.status(400).json({ error: `Message too long (maximum ${MAX_MESSAGE_LENGTH} characters).` });
       return;
     }

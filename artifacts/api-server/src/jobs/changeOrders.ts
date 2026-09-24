@@ -13,13 +13,15 @@ import {
   type ChangeOrder,
   type ChangeOrderItem,
 } from "@workspace/db";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { logContractEvent } from "../contracts/service.js";
 import { TEMPLATE_VERSION } from "../contracts/templates.js";
 import { fmtDate, fmtMoney } from "../contracts/render.js";
 import { createNotification, writeAudit } from "../lib/notifications.js";
 import { addCalendarDays } from "./dates.js";
 import { currentActorId } from "../lib/requestContext.js";
+import { syncMilestoneToCalendar } from "../calendar/sync.js";
+import { logger } from "../lib/logger.js";
 
 // ── Change orders ────────────────────────────────────────────────────────────
 // The signable document is a `contracts` row (kind = change_order) so the
@@ -259,6 +261,7 @@ export async function applySignedChangeOrder(doc: Contract): Promise<{ applied: 
 
   const now = new Date();
   const delta = co.scheduleDeltaDays;
+  const shifted: string[] = [];
   await db.transaction(async (tx) => {
     // Claim first so a concurrent retry cannot apply the amount twice.
     const [claimed] = await tx
@@ -288,9 +291,16 @@ export async function applySignedChangeOrder(doc: Contract): Promise<{ applied: 
             plannedEnd: m.plannedEnd ? addCalendarDays(m.plannedEnd, delta) : m.plannedEnd,
           })
           .where(eq(milestonesTable.id, m.id));
+        shifted.push(m.id);
       }
     }
   });
+
+  // Phase 97: the moved milestones follow on the connected calendar, as a date edit on the job page does.
+  if (shifted.length) {
+    const moved = await db.select().from(milestonesTable).where(inArray(milestonesTable.id, shifted));
+    await Promise.all(moved.map((m) => syncMilestoneToCalendar(doc.userId, m, project.name).catch((err) => logger.error({ err, milestoneId: m.id }, "Calendar sync failed for change-order shift"))));
+  }
 
   await writeAudit({ userId: doc.userId, actorType: "system", entityType: "change_order", entityId: co.id, action: "applied", diff: { totalCents: co.totalCents, scheduleDeltaDays: delta, projectId: project.id } });
   await createNotification({

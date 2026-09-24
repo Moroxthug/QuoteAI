@@ -32,9 +32,9 @@ export function serializeProposal(p: AssistantProposal) {
   return { id: p.id, messageId: p.messageId, projectId: p.projectId, kind: p.kind, summary: p.summary, payload: p.payload, status: p.status, resultEntityType: p.resultEntityType, resultEntityId: p.resultEntityId, error: p.error, resolvedAt: p.resolvedAt?.toISOString() ?? null, createdAt: p.createdAt.toISOString() };
 }
 
-function langOf(req: { headers: Record<string, unknown>; body?: unknown }): Lang {
-  const fromBody = (req.body as { language?: string } | undefined)?.language;
-  if (fromBody === "fr" || fromBody === "en") return fromBody;
+/** The language the route parsed from the body wins; otherwise the request headers. */
+function langOf(req: { headers: Record<string, unknown> }, fromBody?: Lang): Lang {
+  if (fromBody) return fromBody;
   const header = String(req.headers["x-language"] ?? req.headers["accept-language"] ?? "");
   return header.toLowerCase().startsWith("fr") ? "fr" : "en";
 }
@@ -69,7 +69,7 @@ router.post("/assistant/conversations/:id/messages", requireAuth, requirePermiss
     if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
     const loaded = await loadConversation(userId, req.params.id as string);
     if (!loaded) { res.status(404).json({ error: "Not found" }); return; }
-    const result = await runAssistantTurn({ conversation: loaded.conversation, userId, content: body.data.content, language: langOf(req) });
+    const result = await runAssistantTurn({ conversation: loaded.conversation, userId, content: body.data.content, language: langOf(req, body.data.language) });
     res.json({ messages: result.messages.map(serializeMessage), proposals: result.proposals.map(serializeProposal) });
   } catch (err) {
     req.log.error({ err }, "Assistant turn failed");
@@ -149,7 +149,7 @@ async function ownedJob(userId: string, projectId: string): Promise<Project | nu
 }
 
 /** Shared tail of the three action routes: gate → job → conversation → on-site turn. */
-async function runAction(req: Request, res: Response, params: { projectId: string; content: string; source: "voice" | "photo"; imageDataUrl?: string | null; photoId?: string | null; extra?: Record<string, unknown> }) {
+async function runAction(req: Request, res: Response, params: { projectId: string; content: string; source: "voice" | "photo"; language?: Lang; imageDataUrl?: string | null; photoId?: string | null; extra?: Record<string, unknown> }) {
   const userId = getUserId(res);
   const gate = await requireAssistant(userId);
   if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan, message: "On-site actions use the assistant, which requires the Elite plan" }); return; }
@@ -157,7 +157,7 @@ async function runAction(req: Request, res: Response, params: { projectId: strin
   if (!job) { res.status(404).json({ error: "Not found" }); return; }
   const conv = await getOrCreateConversation(userId, job.id);
   try {
-    const result = await runAssistantTurn({ conversation: conv, userId, content: params.content, language: langOf(req), source: params.source, imageDataUrl: params.imageDataUrl ?? null, photoId: params.photoId ?? null });
+    const result = await runAssistantTurn({ conversation: conv, userId, content: params.content, language: langOf(req, params.language), source: params.source, imageDataUrl: params.imageDataUrl ?? null, photoId: params.photoId ?? null });
     res.json({ conversationId: conv.id, ...(params.extra ?? {}), messages: result.messages.map(serializeMessage), proposals: result.proposals.map(serializeProposal) });
   } catch (err) {
     req.log.error({ err }, "On-site assistant turn failed");
@@ -170,7 +170,7 @@ router.post("/assistant/actions", requireAuth, requirePermission("jobs", "edit")
   try {
     const body = z.object({ projectId: z.string().uuid(), text: z.string().trim().min(1).max(4000), language: z.enum(["en", "fr"]).optional() }).safeParse(req.body);
     if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
-    await runAction(req, res, { projectId: body.data.projectId, content: body.data.text, source: "voice" });
+    await runAction(req, res, { projectId: body.data.projectId, content: body.data.text, source: "voice", language: body.data.language });
   } catch (err) {
     req.log.error({ err }, "Error running on-site action");
     res.status(500).json({ error: "Internal server error" });
@@ -184,7 +184,7 @@ router.post("/assistant/voice", requireAuth, requirePermission("jobs", "edit"), 
     if (!fields.success) { res.status(400).json({ error: "Invalid parameters", details: fields.error }); return; }
     const file = req.file;
     if (!file) { res.status(400).json({ error: "No audio file provided" }); return; }
-    const language = langOf(req);
+    const language = langOf(req, fields.data.language);
     let transcript = "";
     try {
       const uploadable = await toFile(file.buffer, file.originalname || "recording.webm", { type: file.mimetype });
@@ -196,7 +196,7 @@ router.post("/assistant/voice", requireAuth, requirePermission("jobs", "edit"), 
       return;
     }
     if (!transcript) { res.status(422).json({ error: "EMPTY_TRANSCRIPT", message: "Didn't catch that — try speaking more clearly." }); return; }
-    await runAction(req, res, { projectId: fields.data.projectId, content: transcript, source: "voice", extra: { transcript } });
+    await runAction(req, res, { projectId: fields.data.projectId, content: transcript, source: "voice", language, extra: { transcript } });
   } catch (err) {
     req.log.error({ err }, "Error running voice action");
     res.status(500).json({ error: "Internal server error" });
@@ -226,7 +226,7 @@ router.post("/assistant/photo", requireAuth, requirePermission("jobs", "edit"), 
     }
     const imageDataUrl = `data:${file.mimetype};base64,${file.buffer.toString("base64")}`;
     const content = note ? `[Photo] ${note}` : "[Photo] What do you see, and does it change the job?";
-    await runAction(req, res, { projectId: job.id, content, source: "photo", imageDataUrl, photoId: stored.photo.id, extra: { photo: serializePhoto(stored.photo) } });
+    await runAction(req, res, { projectId: job.id, content, source: "photo", language: fields.data.language, imageDataUrl, photoId: stored.photo.id, extra: { photo: serializePhoto(stored.photo) } });
   } catch (err) {
     req.log.error({ err }, "Error running photo action");
     res.status(500).json({ error: "Internal server error" });

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { ConnectWhatsappBody, VerifyWhatsappBody, ToggleWhatsappBody } from "@workspace/api-zod";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrationAvailability.js";
@@ -1404,8 +1405,9 @@ router.get("/whatsapp/usage", requireAuth, async (req, res) => {
 router.post("/whatsapp/connect", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const { phoneNumber } = req.body as { phoneNumber?: string };
-    if (!phoneNumber?.trim()) { res.status(400).json({ error: "phoneNumber is required" }); return; }
+    const body = ConnectWhatsappBody.safeParse(req.body ?? {});
+    if (!body.success || !body.data.phoneNumber.trim() || body.data.phoneNumber.length > 40) { res.status(400).json({ error: "phoneNumber is required" }); return; }
+    const { phoneNumber } = body.data;
     const normalized = normalizePhone(phoneNumber.trim());
     if (!normalized) { res.status(400).json({ error: "Invalid number. Use international format, e.g. +1 416 555 1234" }); return; }
 
@@ -1439,8 +1441,9 @@ router.post("/whatsapp/connect", requireAuth, requirePermission("integrations", 
 router.post("/whatsapp/verify", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const { phoneNumber, otp } = req.body as { phoneNumber?: string; otp?: string };
-    if (!phoneNumber?.trim() || !otp?.trim()) { res.status(400).json({ error: "phoneNumber and otp are required" }); return; }
+    const body = VerifyWhatsappBody.safeParse(req.body ?? {});
+    if (!body.success || !body.data.phoneNumber.trim() || !body.data.otp.trim() || body.data.phoneNumber.length > 40 || body.data.otp.length > 20) { res.status(400).json({ error: "phoneNumber and otp are required" }); return; }
+    const { phoneNumber, otp } = body.data;
     const normalized = normalizePhone(phoneNumber.trim());
     if (!normalized) { res.status(400).json({ error: "Invalid number" }); return; }
 
@@ -1478,8 +1481,9 @@ router.delete("/whatsapp/disconnect", requireAuth, requirePermission("integratio
 router.patch("/whatsapp/toggle", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const { isEnabled } = req.body as { isEnabled?: boolean };
-    if (typeof isEnabled !== "boolean") { res.status(400).json({ error: "isEnabled (boolean) is required" }); return; }
+    const body = ToggleWhatsappBody.safeParse(req.body ?? {});
+    if (!body.success) { res.status(400).json({ error: "isEnabled (boolean) is required" }); return; }
+    const { isEnabled } = body.data;
     await db.update(whatsappConnectionsTable).set({ isEnabled }).where(eq(whatsappConnectionsTable.userId, userId));
     res.json({ success: true, isEnabled });
   } catch (err) {

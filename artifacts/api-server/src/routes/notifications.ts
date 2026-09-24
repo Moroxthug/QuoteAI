@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import { db, notificationsTable } from "@workspace/db";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
@@ -28,7 +29,12 @@ router.get("/notifications", requireAuth, async (req, res) => {
 router.post("/notifications/read", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
-    const ids = Array.isArray(req.body?.ids) ? (req.body.ids as unknown[]).filter((x): x is string => typeof x === "string") : null;
+    const body = z.object({ ids: z.array(z.string().uuid()).max(500).optional() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const ids = body.data.ids ?? null;
     const where = ids && ids.length > 0
       ? and(eq(notificationsTable.userId, userId), isNull(notificationsTable.readAt), sql`${notificationsTable.id} = any(${ids}::uuid[])`)
       : and(eq(notificationsTable.userId, userId), isNull(notificationsTable.readAt));

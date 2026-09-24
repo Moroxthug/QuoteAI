@@ -8,6 +8,21 @@ import { PLANS } from "../routes/payments.js";
 import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { linkQuoteToClient } from "../lib/clients.js";
 import { currentActorId } from "../lib/requestContext.js";
+import { z } from "zod";
+import { CreateManualQuoteBody } from "@workspace/api-zod";
+
+/**
+ * Phase 97: the request body of both manual-create routes (in-app and the
+ * public API). A bad company snapshot is still ignored in favour of the saved
+ * profile, as before, rather than refused.
+ */
+export const ManualQuoteBodySchema = CreateManualQuoteBody.extend({ companySnapshot: z.unknown().optional() });
+
+/** The error string the routes answered with before the body was parsed up front. */
+export function manualQuoteBodyError(err: z.ZodError): string {
+  const field = err.issues[0]?.path[0];
+  return field === "capitoli" ? "Invalid capitoli" : field === "clientData" ? "Invalid clientData" : "Invalid parameters";
+}
 
 export type ManualQuoteInput = {
   capitoli?: unknown;

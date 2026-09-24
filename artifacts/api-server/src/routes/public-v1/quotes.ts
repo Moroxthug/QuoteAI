@@ -5,7 +5,7 @@ import { requireApiKey, publicApiLimiter } from "../../middlewares/apiKeyAuth.js
 import { requirePermission } from "../../middlewares/requirePermission.js";
 import { getUserId } from "../../middlewares/authMiddleware.js";
 import { serializeQuote } from "../quotes.js";
-import { createManualQuote, type ManualQuoteInput } from "../../quotes/manualCreate.js";
+import { createManualQuote, ManualQuoteBodySchema, manualQuoteBodyError } from "../../quotes/manualCreate.js";
 
 const router = Router();
 
@@ -39,7 +39,12 @@ router.get("/quotes/:id", requireApiKey, publicApiLimiter, requirePermission("qu
 router.post("/quotes", requireApiKey, publicApiLimiter, requirePermission("quotes", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const result = await createManualQuote(userId, req.body as ManualQuoteInput);
+    const body = ManualQuoteBodySchema.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: manualQuoteBodyError(body.error), details: body.error });
+      return;
+    }
+    const result = await createManualQuote(userId, body.data);
     if (!result.ok) {
       res.status(result.status).json({ error: result.error, details: result.details });
       return;

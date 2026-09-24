@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { db, businessProfilesTable, googleLsaImportLogTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
@@ -148,11 +149,12 @@ router.delete("/google-lsa/disconnect", requireAuth, requirePermission("integrat
 router.patch("/google-lsa/toggle", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const isEnabled = req.body?.isEnabled;
-    if (typeof isEnabled !== "boolean") {
+    const body = z.object({ isEnabled: z.boolean() }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "Invalid parameters" });
       return;
     }
+    const { isEnabled } = body.data;
     await setGoogleLsaEnabled(userId, isEnabled);
     res.json({ success: true });
   } catch (err) {

@@ -17,6 +17,10 @@ import {
   DeleteQuoteParams,
   GenerateQuotePdfParams,
   RegenerateQuoteBody,
+  CreateQuoteVariantBody,
+  UpdateQuoteVariantBody,
+  SendQuotePdfEmailBody,
+  SuggestItemDescriptionBody,
 } from "@workspace/api-zod";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { REGIONAL_PRICING_GUIDANCE, DESCRIPTION_QUALITY_GUIDANCE } from "../lib/generateQuoteFromText.js";
@@ -43,7 +47,7 @@ import { generateNumeroPreventivo } from "../lib/quoteNumber.js";
 import { sendQuotePdfEmail } from "../lib/email.js";
 import { quoteFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 import { linkQuoteToClient, ensureClientForQuote } from "../lib/clients.js";
-import { createManualQuote, type ManualQuoteInput } from "../quotes/manualCreate.js";
+import { createManualQuote, ManualQuoteBodySchema, manualQuoteBodyError } from "../quotes/manualCreate.js";
 import { loadPriceReferences, priceCheckChapters, repriceChapters } from "../quotes/priceCheck.js";
 import { writeAudit } from "../lib/notifications.js";
 import { z } from "zod";
@@ -450,6 +454,16 @@ These are the same user's previous quotes. Stay consistent with the unit prices 
 ${examples.join("\n\n---\n\n")}`;
 }
 
+// Multipart text fields; clientData / companySnapshot are JSON strings checked against their own schemas below.
+const CreateQuoteFields = z.object({
+  rawInput: z.string().trim().min(1).max(20_000),
+  misure: z.union([z.string().max(20_000), z.record(z.union([z.string(), z.number()]))]).optional(),
+  templateId: z.string().max(50).optional(),
+  targetTotalEur: z.union([z.string().max(30), z.number()]).optional(),
+  clientData: z.string().max(20_000).optional(),
+  companySnapshot: z.string().max(200_000).optional(),
+});
+
 // POST /api/quotes  (multipart/form-data: rawInput, clientData?, companySnapshot?, images[])
 router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, imageUpload.array("images", 3), async (req, res) => {
   try {
@@ -487,36 +501,38 @@ router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallL
     }
     // ─────────────────────────────────────────────────────────────────────────
 
-    const rawInput = typeof req.body.rawInput === "string" ? req.body.rawInput.trim() : "";
-    if (!rawInput) {
-      res.status(400).json({ error: "rawInput is required" });
+    const fields = CreateQuoteFields.safeParse(req.body ?? {});
+    if (!fields.success) {
+      res.status(400).json({ error: fields.error.issues.some((i) => i.path[0] === "rawInput") ? "rawInput is required" : "Invalid parameters", details: fields.error });
       return;
     }
+    const f = fields.data;
+    const rawInput = f.rawInput;
 
     let misure: Record<string, string | number> | undefined;
-    if (req.body.misure) {
+    if (f.misure) {
       try {
-        misure = typeof req.body.misure === "string" ? JSON.parse(req.body.misure) : req.body.misure;
+        misure = typeof f.misure === "string" ? JSON.parse(f.misure) : f.misure;
       } catch (err) {
         req.log.warn({ err }, "Error parsing body.misure");
       }
     }
 
-    const requestedTemplateId = typeof req.body.templateId === "string" ? req.body.templateId : "standard";
+    const requestedTemplateId = f.templateId ?? "standard";
     const validTemplateIds = ["standard", "arosio", "mariagrazia"];
     const templateId = validTemplateIds.includes(requestedTemplateId) ? requestedTemplateId : "standard";
 
-    const rawTargetTotal = req.body.targetTotalEur;
+    const rawTargetTotal = f.targetTotalEur;
     const targetTotalEur: number | null =
       rawTargetTotal !== undefined && rawTargetTotal !== "" && !isNaN(Number(rawTargetTotal)) && Number(rawTargetTotal) > 0
         ? Number(rawTargetTotal)
         : null;
 
     let clientDataInput: QuoteClientData | undefined;
-    if (req.body.clientData) {
+    if (f.clientData) {
       let parsed: unknown;
       try {
-        parsed = JSON.parse(req.body.clientData);
+        parsed = JSON.parse(f.clientData);
       } catch {
         res.status(400).json({ error: "clientData must be valid JSON" });
         return;
@@ -530,10 +546,10 @@ router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallL
     }
 
     let companySnapshotInput: QuoteCompanySnapshot | undefined;
-    if (req.body.companySnapshot) {
+    if (f.companySnapshot) {
       let parsed: unknown;
       try {
-        parsed = JSON.parse(req.body.companySnapshot);
+        parsed = JSON.parse(f.companySnapshot);
       } catch {
         res.status(400).json({ error: "companySnapshot must be valid JSON" });
         return;
@@ -1295,8 +1311,13 @@ router.post("/quotes/:id/variants", requireAuth, requirePermission("quotes", "ed
       return;
     }
 
-    const body = req.body as Record<string, unknown>;
-    const cloneFrom = typeof body.cloneFromVariantId === "string"
+    const parsed = CreateQuoteVariantBody.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid request", details: parsed.error });
+      return;
+    }
+    const body = parsed.data;
+    const cloneFrom = body.cloneFromVariantId
       ? existingVariants.find(v => v.id === body.cloneFromVariantId)
       : undefined;
 
@@ -1308,8 +1329,8 @@ router.post("/quotes/:id/variants", requireAuth, requirePermission("quotes", "ed
       .values({
         quoteId: id,
         userId,
-        label: typeof body.label === "string" ? body.label : (defaultLabels[existingVariants.length] ?? ""),
-        description: typeof body.description === "string" ? body.description : "",
+        label: body.label ?? (defaultLabels[existingVariants.length] ?? ""),
+        description: body.description ?? "",
         position: existingVariants.length,
         items: (Array.isArray(source.items) ? source.items : []) as QuoteItem[],
         capitoli: (Array.isArray(source.capitoli) ? source.capitoli : []) as QuoteChapter[],
@@ -1354,14 +1375,19 @@ router.put("/quotes/:id/variants/:variantId", requireAuth, requirePermission("qu
       return;
     }
 
-    const body = req.body as Record<string, unknown>;
+    const parsed = UpdateQuoteVariantBody.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid request", details: parsed.error });
+      return;
+    }
+    const body = parsed.data;
     const updates: Partial<typeof existing> = {};
-    if (typeof body.label === "string") updates.label = body.label;
-    if (typeof body.description === "string") updates.description = body.description;
-    if (Array.isArray(body.items)) updates.items = body.items as QuoteItem[];
-    if (Array.isArray(body.capitoli)) updates.capitoli = body.capitoli as QuoteChapter[];
+    if (body.label !== undefined) updates.label = body.label;
+    if (body.description !== undefined) updates.description = body.description;
+    if (body.items) updates.items = body.items as QuoteItem[];
+    if (body.capitoli) updates.capitoli = body.capitoli as QuoteChapter[];
     if (body.sconto !== undefined) updates.sconto = body.sconto as QuoteDiscount | null;
-    if (Array.isArray(body.condizioniPagamento)) updates.condizioniPagamento = body.condizioniPagamento as string[];
+    if (body.condizioniPagamento) updates.condizioniPagamento = body.condizioniPagamento;
     if (body.subtotale !== undefined) updates.subtotale = String(body.subtotale);
     if (body.ivaPercentuale !== undefined) updates.ivaPercentuale = String(body.ivaPercentuale);
     if (body.ivaValore !== undefined) updates.ivaValore = String(body.ivaValore);
@@ -1550,10 +1576,15 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
     }
 
     // Phase 0 fields are not in the generated UpdateQuoteBody (which strips
-    // unknown keys), so they are validated here.
-    const rawBody = req.body as Record<string, unknown>;
+    // unknown keys), so they are validated here; the schedule's shape by its own schema below.
+    const extras = z.object({ province: z.string().max(40).nullable().optional(), paymentSchedule: z.unknown().optional() }).safeParse(req.body);
+    if (!extras.success) {
+      res.status(400).json({ error: "Invalid province code", details: extras.error });
+      return;
+    }
+    const rawBody = extras.data;
     if (rawBody.province !== undefined) {
-      const p = rawBody.province === null ? null : normalizeProvince(String(rawBody.province));
+      const p = rawBody.province === null ? null : normalizeProvince(rawBody.province);
       if (rawBody.province !== null && !p) {
         res.status(400).json({ error: "Invalid province code" });
         return;
@@ -1773,12 +1804,12 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
   try {
     const userId = getUserId(res);
     const id = req.params.id as string;
-    const { toEmail, clientName } = req.body as { toEmail?: string; clientName?: string };
-
-    if (!toEmail || !toEmail.includes("@")) {
+    const parsed = SendQuotePdfEmailBody.safeParse(req.body ?? {});
+    if (!parsed.success) {
       res.status(400).json({ error: "Recipient email address is required" });
       return;
     }
+    const { toEmail, clientName } = parsed.data;
 
     const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
     if (!quote) { res.status(404).json({ error: "Not found" }); return; }
@@ -2346,7 +2377,12 @@ router.post("/quotes/:id/generate-pdf-pro", requireAuth, requirePermission("quot
 router.post("/quotes/manual", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const result = await createManualQuote(userId, req.body as ManualQuoteInput);
+    const body = ManualQuoteBodySchema.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: manualQuoteBodyError(body.error), details: body.error });
+      return;
+    }
+    const result = await createManualQuote(userId, body.data);
     if (!result.ok) {
       res.status(result.status).json({ error: result.error, details: result.details, code: result.status === 429 ? "QUOTA_EXCEEDED" : undefined });
       return;
@@ -2361,11 +2397,12 @@ router.post("/quotes/manual", requireAuth, requirePermission("quotes", "edit"), 
 // POST /api/quotes/suggest-item-description — AI helper for manual quote items
 router.post("/quotes/suggest-item-description", requireAuth, requirePermission("quotes", "edit"), aiCallLimiter, async (req, res) => {
   try {
-    const { brief, context } = req.body as { brief?: string; context?: string };
-    if (!brief || typeof brief !== "string" || !brief.trim()) {
+    const parsed = SuggestItemDescriptionBody.extend({ brief: z.string().trim().min(1).max(1000), context: z.string().max(4000).optional() }).safeParse(req.body ?? {});
+    if (!parsed.success) {
       res.status(400).json({ error: "brief is required" });
       return;
     }
+    const { brief, context } = parsed.data;
 
     const systemPrompt = `Sei un esperto di preventivi per l'edilizia e artigianato italiano.
 Genera UNA sola descrizione professionale e tecnica per una voce di lavoro/materiale da inserire in un computo metrico.

@@ -709,3 +709,21 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | "Thumbnails don't appear in production" | Look for `sharp unavailable` in the logs: the Linux `@img/` packages were not copied (`build.mjs` prints `Copied @img/sharp-linux-x64` on a good build). Photos still work at full size meanwhile |
 | "A HEIC photo has no thumbnail" | Expected: the prebuilt libvips has no HEIC decoder. The crew app re-encodes to JPEG on the phone; the office gallery does not |
 | Test runs | `phase96.e2e` (lines with holdback, QC cost mapped and unmapped, Google list/move/reconnect, Outlook list and pick, thumbnail on upload / lazily / tiny file / delete); `quickbooks/lines.test.ts`. Regression: `phase88`, `integrations`, `schedule`, `phase85`, `security`, `offline-push`, `phase86`, `portal`, `voice-actions` |
+
+## 35. Request bodies are schema-checked; a signed change order moves the calendar (Phase 97)
+
+**Where**: every route in `api-server/src/routes/**` parses `req.body` with a zod schema before reading it — the generated contract from `@workspace/api-zod` where one exists (catalog, variants, manual quote, change-plan, unlock, WhatsApp, send-PDF), a local `z.object` otherwise. `quotes/manualCreate.ts` exports `ManualQuoteBodySchema` for both manual-create routes (in-app and `POST /api/v1/public/quotes`). The route matrix's rule 8 (`scripts/route-matrix.test.ts`) fails CI when a route reads `req.body` by hand; the only exceptions are the signed inbound webhooks, which must see the exact bytes the provider signed. `jobs/changeOrders.ts` → `applySignedChangeOrder` now re-syncs the milestones it shifted to the connected calendar.
+
+**How it fits**:
+- A malformed body is a **400** with `details` (the zod issues) instead of a 500 from somewhere deeper — e.g. a non-UUID in `POST /api/notifications/read`, an item without `um` in `POST /api/catalog/bulk`, a `days` of 0 in admin grant-plan. The error strings the UI and the public API already knew were kept (`"rawInput is required"`, `"Invalid capitoli"`, `"nome, um, and prezzoUnitario are required"`, `"brief is required"`…).
+- Kept lenient on purpose: a bad `companySnapshot` on a manual quote is still ignored in favour of the saved profile; `extraSeats` on checkout is still clamped to 0-200; a missing `interval` on change-plan still means monthly; contract void and signing-decline reasons are still trimmed to 500 / 1000 characters.
+- New limits where there were none: quote description ≤ 20 000 characters, catalog name ≤ 500, bulk import ≤ 5 000 rows, notification ids ≤ 500 per call, widget contact fields ≤ 300 each.
+- **Change orders and the calendar**: when the client signs a change order with a schedule delta, the open milestones move (as before) and each moved milestone is pushed to the connected Google/Outlook calendar — the same event is PATCHed; milestones never pushed before (calendar connected after the job was set up) are created. A calendar failure is logged and leaves its usual `failed` row; the change order is applied regardless.
+
+| Ask | Do |
+|---|---|
+| "The app says Invalid parameters where it used to work" | The response's `details` names the field. The client sent the wrong type (a price as a string, a non-UUID id); fix the caller — the old code would have stored or crashed on it |
+| "The public API rejects my quote now" | `POST /api/v1/public/quotes` follows `CreateManualQuoteBody` in `lib/api-spec/openapi.yaml`: `capitoli` required, numbers as numbers. Same schema as the in-app builder |
+| "A new route fails route-matrix rule 8" | Parse the body with a schema (`X.safeParse(req.body ?? {})`) and read from `.data`; reading `req.body.field` next to a schema counts as hand validation too |
+| "The change order was signed but the calendar still shows the old dates" | Look for `Calendar sync failed for change-order shift` in the logs and the milestone's row in `calendar_synced_events`; the next edit of that milestone retries it |
+| Test runs | `phase97.e2e` (change order over HTTP end to end with Gmail, calendar and QuickBooks retry; photos upload/replay/share by email and WhatsApp/refusals/delete; assistant chat read tool → cards → confirm/dismiss → send → pay, failure, start over); `scripts/route-matrix.test.ts` rule 8 |

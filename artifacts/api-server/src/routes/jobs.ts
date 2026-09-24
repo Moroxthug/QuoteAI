@@ -1016,10 +1016,15 @@ router.post(
         res.status(400).json({ error: "No file provided" });
         return;
       }
+      const fields = z.object({ caption: z.string().max(500).optional(), milestoneId: z.string().uuid().optional(), clientRef: z.string().max(100).optional() }).safeParse(req.body ?? {});
+      if (!fields.success) {
+        res.status(400).json({ error: "Invalid parameters", details: fields.error });
+        return;
+      }
       // Phase 77: the offline outbox re-posts the same photo until it gets an answer — same clientRef, same row.
       let stored: Awaited<ReturnType<typeof storeJobPhoto>>;
       try {
-        stored = await storeJobPhoto({ userId, projectId: project.id, file, caption: typeof req.body?.caption === "string" ? req.body.caption : "", milestoneId: typeof req.body?.milestoneId === "string" ? req.body.milestoneId : null, clientRef: typeof req.body?.clientRef === "string" ? req.body.clientRef : null });
+        stored = await storeJobPhoto({ userId, projectId: project.id, file, caption: fields.data.caption ?? "", milestoneId: fields.data.milestoneId ?? null, clientRef: fields.data.clientRef ?? null });
       } catch (err) {
         if ((err as Error).message === "Milestone not found") {
           res.status(404).json({ error: "Milestone not found" });

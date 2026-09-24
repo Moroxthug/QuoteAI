@@ -301,7 +301,12 @@ router.post(
         res.status(400).json({ error: "No file provided" });
         return;
       }
-      const projectIdRaw = typeof req.body?.projectId === "string" && req.body.projectId ? String(req.body.projectId) : null;
+      const fields = z.object({ projectId: z.string().max(100).optional() }).safeParse(req.body ?? {});
+      if (!fields.success) {
+        res.status(400).json({ error: "Invalid parameters", details: fields.error });
+        return;
+      }
+      const projectIdRaw = fields.data.projectId || null;
       const project = projectIdRaw ? await ownedProject(userId, projectIdRaw) : null;
       if (projectIdRaw && !project) {
         res.status(404).json({ error: "Job not found" });

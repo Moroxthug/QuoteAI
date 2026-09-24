@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable, normalizeProvince, quoteTaxLines } from "@workspace/db";
 import { eq, or, isNull, inArray } from "drizzle-orm";
 import { catalogOwnerIds } from "../groups/service.js";
@@ -26,6 +27,17 @@ import {
 const router = Router();
 
 const MAX_RAW_INPUT_LENGTH = 6000;
+
+// The widget's request (and any API-key caller's). rawInput's own length is checked in the handler for its message.
+const shortText = z.string().max(300).optional();
+const PublicQuoteBodySchema = z.object({
+  rawInput: z.string().max(MAX_RAW_INPUT_LENGTH * 2).optional(),
+  clientData: z.object({ nome: shortText, email: shortText, phone: shortText, indirizzo: shortText, city: shortText, postalCode: shortText, province: shortText }).optional(),
+  misure: z.record(z.union([z.string().max(200), z.number()])).optional(),
+  lang: z.string().max(10).optional(),
+  /** Phase 92: honeypot — a field the widget hides from people; only form-filling bots type in it. */
+  website: z.string().max(2000).optional(),
+});
 
 // /api/public/* is open to any origin (widget visitors on customer sites), so
 // it's rate-limited both per source IP and per tenant API key — the latter
@@ -298,14 +310,12 @@ router.post("/public/quotes", quoteIpLimiter, quoteApiKeyLimiter, async (req, re
 
     const userId = profile.userId;
 
-    const { rawInput, clientData, misure, lang: rawLang, website } = req.body as {
-      rawInput?: string;
-      clientData?: { nome: string; email?: string; phone?: string; indirizzo?: string; city?: string; postalCode?: string; province?: string };
-      misure?: Record<string, string | number>;
-      lang?: string;
-      /** Phase 92: honeypot — a field the widget hides from people; only form-filling bots type in it. */
-      website?: string;
-    };
+    const parsedBody = PublicQuoteBodySchema.safeParse(req.body ?? {});
+    if (!parsedBody.success) {
+      res.status(400).json({ error: "Invalid request.", details: parsedBody.error });
+      return;
+    }
+    const { rawInput, clientData, misure, lang: rawLang, website } = parsedBody.data;
     const lang: "en" | "fr" = rawLang === "fr" ? "fr" : "en";
 
     // Answer a bot like a success so it has nothing to retry against, and store nothing.
@@ -640,7 +650,12 @@ router.get("/public/quotes/:id", quoteViewLimiter, async (req, res) => {
 router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) => {
   try {
     const id = req.params.id as string;
-    const { nomeConferma, variantId } = req.body as { nomeConferma?: string; variantId?: string };
+    const parsedBody = z.object({ nomeConferma: z.string().max(1000).optional(), variantId: z.string().max(100).optional() }).safeParse(req.body ?? {});
+    if (!parsedBody.success) {
+      res.status(400).json({ error: "Enter your first and last name to confirm acceptance." });
+      return;
+    }
+    const { nomeConferma, variantId } = parsedBody.data;
 
     const trimmedName = (nomeConferma || "").trim();
     if (!trimmedName) {

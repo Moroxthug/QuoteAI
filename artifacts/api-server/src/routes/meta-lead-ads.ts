@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { z } from "zod";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { db, businessProfilesTable, metaLeadAdsImportLogTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { eq, desc } from "drizzle-orm";
@@ -145,11 +146,12 @@ router.delete("/meta-lead-ads/disconnect", requireAuth, requirePermission("integ
 router.patch("/meta-lead-ads/toggle", requireAuth, requirePermission("integrations", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
-    const isEnabled = req.body?.isEnabled;
-    if (typeof isEnabled !== "boolean") {
+    const body = z.object({ isEnabled: z.boolean() }).safeParse(req.body ?? {});
+    if (!body.success) {
       res.status(400).json({ error: "Invalid parameters" });
       return;
     }
+    const { isEnabled } = body.data;
     await setMetaLeadAdsEnabled(userId, isEnabled);
     res.json({ success: true });
   } catch (err) {

@@ -362,7 +362,12 @@ router.post("/contracts/:id/void", requireAuth, requirePermission("contracts", "
       res.status(409).json({ error: "LOCKED", message: "An executed contract cannot be voided from here." });
       return;
     }
-    const reason = typeof req.body?.reason === "string" ? req.body.reason.slice(0, 500) : null;
+    const body = z.object({ reason: z.string().max(5000).nullish() }).safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const reason = body.data.reason?.slice(0, 500) ?? null;
     await db.update(contractsTable).set({ status: "voided", voidedAt: new Date(), voidReason: reason }).where(eq(contractsTable.id, loaded.contract.id));
     await db.update(contractSignersTable).set({ tokenHash: null, tokenExpiresAt: null }).where(eq(contractSignersTable.contractId, loaded.contract.id));
     await logContractEvent({ contractId: loaded.contract.id, type: "voided", actor: "contractor", detail: { reason }, ip: req.ip, userAgent: req.headers["user-agent"] });

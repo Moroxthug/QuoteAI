@@ -79,7 +79,8 @@ router.post("/push/test", requireAuth, testLimiter, async (req, res) => {
       res.status(503).json({ error: "NOT_CONFIGURED", message: "Push notifications are not set up on this server yet." });
       return;
     }
-    const lang = req.body?.language === "fr" ? "fr" : "en";
+    const body = z.object({ language: z.enum(["en", "fr"]).optional() }).safeParse(req.body ?? {});
+    const lang = body.success && body.data.language === "fr" ? "fr" : "en";
     const summary = await sendPushToCompany(
       getUserId(res),
       { title: lang === "fr" ? "QuoteAI — notification test" : "QuoteAI — test notification", body: lang === "fr" ? "Les notifications fonctionnent sur cet appareil." : "Notifications are working on this device.", link: "/dashboard/notifications", tag: "push-test" },

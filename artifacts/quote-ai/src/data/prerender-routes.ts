@@ -32,6 +32,8 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     { path: "/contatti", lang: "en" },
     { path: "/privacy-policy", lang: "en" },
     { path: "/terms", lang: "en" },
+    { path: "/fr/confidentialite", lang: "fr" },
+    { path: "/fr/conditions", lang: "fr" },
     { path: "/mappa-sito", lang: "en" },
     // Help centre (Phase 70): index + every article (EN; the toggle re-renders FR client-side).
     { path: "/help", lang: "en" },

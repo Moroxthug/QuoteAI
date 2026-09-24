@@ -24,7 +24,9 @@ function isEnglishLocalePath(pathname: string): boolean {
     pathname.startsWith("/quotes/") ||
     pathname.startsWith("/provinces/") ||
     pathname === "/pricing" || pathname === "/pricing/" ||
-    pathname === "/pilot" || pathname === "/pilot/"
+    pathname === "/pilot" || pathname === "/pilot/" ||
+    pathname === "/privacy-policy" || pathname === "/privacy-policy/" ||
+    pathname === "/terms" || pathname === "/terms/"
   );
 }
 

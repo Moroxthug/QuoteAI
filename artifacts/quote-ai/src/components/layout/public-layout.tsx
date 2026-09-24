@@ -293,8 +293,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <h2>{t("footer.support")}</h2>
             <Link href="/help/">{t("footer.helpCenter")}</Link>
             <button onClick={() => setSupportOpen(true)}>{t("support.contactSupport")}</button>
-            <Link href="/privacy-policy/">{t("footer.privacyPolicy")}</Link>
-            <Link href="/terms/">{t("footer.terms")}</Link>
+            <Link href={localizedPath("/privacy-policy/", lang)}>{t("footer.privacyPolicy")}</Link>
+            <Link href={localizedPath("/terms/", lang)}>{t("footer.terms")}</Link>
             <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>
           </div>
         </div>
@@ -304,8 +304,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
         <div className="wrap ft-bottom">
           <span>&copy; {new Date().getFullYear()} quoteai. {t("footer.rights")}</span>
           <div className="ft-legal">
-            <Link href="/privacy-policy/">{t("footer.privacyPolicy")}</Link>
-            <Link href="/terms/">{t("footer.terms")}</Link>
+            <Link href={localizedPath("/privacy-policy/", lang)}>{t("footer.privacyPolicy")}</Link>
+            <Link href={localizedPath("/terms/", lang)}>{t("footer.terms")}</Link>
             <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>
           </div>
           <LanguageToggle variant="dark" />

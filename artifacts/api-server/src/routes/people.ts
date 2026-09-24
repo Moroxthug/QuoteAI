@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId, getActorRole } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
-import { loadPerson, personActivity, personCompanies, personStats, roleInCompany } from "../people/service.js";
+import { loadPerson, personActivity, personCompanies, personStats, roleInCompany, teamLeaderboard } from "../people/service.js";
 
 // ── Phase 91: every person's own page ────────────────────────────────────────
 // /api/me is the signed-in person: their details and photo (shared across the
@@ -163,6 +163,18 @@ router.get("/team/people/:userId", requireAuth, requirePermission("team", "view"
     });
   } catch (err) {
     req.log.error({ err }, "Error loading teammate profile");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/team/leaderboard?days=90 — Phase 95: sent, won, win rate and
+// invoiced per person, for the people who run the team (owner, admin).
+router.get("/team/leaderboard", requireAuth, requirePermission("team", "full"), async (req, res) => {
+  try {
+    const n = Number.parseInt(String(req.query.days ?? "90"), 10);
+    res.json(await teamLeaderboard(getUserId(res), { days: Number.isFinite(n) ? n : 90 }));
+  } catch (err) {
+    req.log.error({ err }, "Error computing team leaderboard");
     res.status(500).json({ error: "Internal server error" });
   }
 });

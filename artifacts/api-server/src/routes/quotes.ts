@@ -1833,6 +1833,12 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
       publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
 
+    // Phase 95: the first person to send it is credited if the client accepts.
+    const sender = currentActorId();
+    if (sender && !quote.sentByUserId) {
+      await db.update(quotesTable).set({ sentByUserId: sender }).where(and(eq(quotesTable.id, quote.id), isNull(quotesTable.sentByUserId)));
+    }
+
     // Phase 21: start the follow-up reminder sequence, unless the quote is
     // already accepted or the client has unsubscribed from reminders.
     if (quote.status !== "accepted" && !quote.unsubscribedAt) {

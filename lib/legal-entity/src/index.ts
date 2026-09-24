@@ -79,3 +79,17 @@ export function taxNumbersLine(lang: "en" | "fr", entity: LegalEntity = LEGAL_EN
 export function legalIdentityLines(lang: "en" | "fr", entity: LegalEntity = LEGAL_ENTITY): string[] {
   return [operatedByLine(lang, entity), addressLine(entity), taxNumbersLine(lang, entity)].filter((l) => l.length > 0);
 }
+
+// Phase 95 — French needs the preposition that goes with each province
+// ("en Ontario", "au Québec", "à l'Île-du-Prince-Édouard"); English is "in X".
+const FR_PROVINCE_PREPOSITION: Record<string, string> = {
+  AB: "en", BC: "en", MB: "au", NB: "au", NL: "à", NS: "en", NT: "dans les", NU: "au", ON: "en", PE: "à l'", QC: "au", SK: "en", YT: "au",
+};
+
+/** "in Ontario" / "en Ontario", "au Québec", "à l'Île-du-Prince-Édouard", "dans les Territoires du Nord-Ouest". */
+export function inProvince(code: string, lang: "en" | "fr" = "en"): string {
+  const name = provinceName(code, lang);
+  if (lang === "en") return `in ${name}`;
+  const prep = FR_PROVINCE_PREPOSITION[code.toUpperCase()] ?? "en";
+  return prep.endsWith("'") ? `${prep}${name}` : `${prep} ${name}`;
+}

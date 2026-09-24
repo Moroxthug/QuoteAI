@@ -86,6 +86,8 @@ export const quotesTable = pgTable("quotes", {
   userId: text("user_id").notNull(),
   /** Phase 91: the person (auth user) who made it — null for rows made before, by the public API, or by automation. */
   createdByUserId: text("created_by_user_id"),
+  /** Phase 95: the person who first emailed it to the client (an accepted quote is credited to them) — null before Phase 95 or when it never went out from the app. */
+  sentByUserId: text("sent_by_user_id"),
   /** Linked client record (Phase 0). Null only for legacy rows that could not be matched. */
   clientId: uuid("client_id").references(() => clientsTable.id, { onDelete: "set null" }),
   /** Province the work is performed in (drives tax + contract template). */

@@ -415,7 +415,7 @@ function DeleteAccountCard({ status }: { status: AccountStatusDto }) {
         </ul>
         <p className="text-xs text-muted-foreground">
           {t("dashboard.settings.account.deletePolicy")}{" "}
-          <a href="/privacy-policy/" target="_blank" rel="noopener" className="underline">{t("dashboard.settings.account.privacyPolicy")}</a>
+          <a href={lang === "fr" ? "/fr/confidentialite/" : "/privacy-policy/"} target="_blank" rel="noopener" className="underline">{t("dashboard.settings.account.privacyPolicy")}</a>
         </p>
         <button className="btn btn-navy" style={{ background: "var(--red)", borderColor: "var(--red)" }} onClick={() => setOpen(true)}>
           {t("dashboard.settings.account.deleteButton")}

@@ -160,6 +160,9 @@ function Router() {
       <Route path={PATHS.CONTATTI} component={() => <Suspense fallback={null}><ContattiPage /></Suspense>} />
       <Route path={PATHS.PRIVACY} component={() => <Suspense fallback={null}><PrivacyPage /></Suspense>} />
       <Route path={PATHS.TERMS} component={() => <Suspense fallback={null}><TermsPage /></Suspense>} />
+      {/* Phase 95 — the legal pages in French (same components, language from the /fr prefix) */}
+      <Route path="/fr/confidentialite" component={() => <Suspense fallback={null}><PrivacyPage /></Suspense>} />
+      <Route path="/fr/conditions" component={() => <Suspense fallback={null}><TermsPage /></Suspense>} />
       {/* Old Italian-era paths kept as redirects so existing links/bookmarks keep working */}
       <Route path="/privacy" component={() => <Redirect to={PATHS.PRIVACY} />} />
       <Route path="/termini" component={() => <Redirect to={PATHS.TERMS} />} />

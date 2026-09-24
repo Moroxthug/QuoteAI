@@ -513,7 +513,8 @@ export async function sendInvoice(params: { invoiceId: string; userId?: string; 
   const dueDate = resend ? inv.dueDate : addDays(now, dueDays);
 
   const rawToken = invoiceToken(inv);
-  await db.update(invoicesTable).set({ issueDate, dueDate, publicTokenHash: hashToken(rawToken), status: resend ? inv.status : "sent", sentAt: inv.sentAt ?? now, autoSendAt: null, scheduledFor: inv.scheduledFor && inv.scheduledFor > now ? now : inv.scheduledFor }).where(eq(invoicesTable.id, inv.id));
+  // Phase 95: sentByUserId is the first person to send it (null when a schedule sends it).
+  await db.update(invoicesTable).set({ issueDate, dueDate, publicTokenHash: hashToken(rawToken), status: resend ? inv.status : "sent", sentAt: inv.sentAt ?? now, sentByUserId: inv.sentByUserId ?? (params.actor === "contractor" ? currentActorId() : null), autoSendAt: null, scheduledFor: inv.scheduledFor && inv.scheduledFor > now ? now : inv.scheduledFor }).where(eq(invoicesTable.id, inv.id));
   const fresh = (await loadInvoice(inv.id))!;
   const stored = await renderAndStore(fresh);
   const [updated] = await db.update(invoicesTable).set({ pdfUrl: stored.url, pdfHash: stored.sha256 }).where(eq(invoicesTable.id, inv.id)).returning();

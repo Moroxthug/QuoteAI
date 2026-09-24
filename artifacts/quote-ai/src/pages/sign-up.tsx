@@ -16,7 +16,7 @@ function safeLocalPath(raw: string | null, fallback: string): string {
 }
 
 export default function SignUpPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   useDocumentTitle(`${t("signUp.title")} · QuoteAI`);
   const search = useSearch();
   // Phase 91: a plan picked on the pricing page rides through sign-up to the end of onboarding (checkout with the seats chosen there).
@@ -214,9 +214,9 @@ export default function SignUpPage() {
 
                 <p className="auth-fine">
                   {t("signUp.agreeToPrefix")}{" "}
-                  <Link href="/termini/">{t("signUp.termsOfService")}</Link>{" "}
+                  <Link href={lang === "fr" ? "/fr/conditions/" : "/terms/"}>{t("signUp.termsOfService")}</Link>{" "}
                   {t("signUp.andThe")}{" "}
-                  <Link href="/privacy/">{t("signUp.privacyPolicy")}</Link>.
+                  <Link href={lang === "fr" ? "/fr/confidentialite/" : "/privacy-policy/"}>{t("signUp.privacyPolicy")}</Link>.
                 </p>
               </form>
             </>

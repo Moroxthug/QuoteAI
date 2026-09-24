@@ -79,12 +79,12 @@ export default function MappaSitoPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
+                  <Link href={lang === "fr" ? "/fr/confidentialite/" : "/privacy-policy/"} className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.privacyPolicy")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/termini/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
+                  <Link href={lang === "fr" ? "/fr/conditions/" : "/terms/"} className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.termsOfService")}
                   </Link>
                 </li>

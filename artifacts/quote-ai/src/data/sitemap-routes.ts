@@ -33,8 +33,8 @@ const _PUBLIC_ROUTES = [
   { name: "HELP",       path: "/help",       priority: "0.8", changefreq: "monthly", lastmod: "2026-09-21" },
   { name: "CHI_SIAMO",  path: "/chi-siamo",  priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
   { name: "CONTATTI",   path: "/contatti",   priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
-  { name: "PRIVACY",    path: "/privacy-policy", priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-20" },
-  { name: "TERMS",      path: "/terms",       priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-20" },
+  { name: "PRIVACY",    path: "/privacy-policy", priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-23" },
+  { name: "TERMS",      path: "/terms",       priority: "0.4", changefreq: "yearly",  lastmod: "2026-09-23" },
   { name: "MAPPA_SITO", path: "/mappa-sito", priority: "0.5", changefreq: "monthly", lastmod: "2026-09-20" },
 ] as const satisfies ReadonlyArray<PublicRoute>;
 

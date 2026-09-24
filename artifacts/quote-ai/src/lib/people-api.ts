@@ -39,12 +39,13 @@ export type PersonStatsDto = {
   months: number;
   since: string;
   attributionSince: string;
-  quotes: { created: number; valueCents: number; won: number; wonValueCents: number; winRate: number | null };
+  /** Phase 95: sent = first sent by them; won / winRate = credited to them (sent by them, or made by them and never sent). */
+  quotes: { created: number; valueCents: number; sent: number; won: number; wonValueCents: number; winRate: number | null };
   invoices: { issued: number; invoicedCents: number; paidCents: number };
   jobs: number;
   contracts: number;
   hours: { total: number; linkedWorker: boolean };
-  series: { month: string; quotes: number; quoteValueCents: number; won: number; invoicedCents: number; hours: number }[];
+  series: { month: string; quotes: number; quoteValueCents: number; sent: number; won: number; invoicedCents: number; hours: number }[];
 };
 
 export type ActivityDto = { id: string; at: string; action: string; entityType: string; entityId: string; link: string | null };
@@ -53,6 +54,13 @@ export type MeDto = {
   person: PersonDto;
   companies: { orgId: string; companyName: string; role: Role; joinedAt: string | null; isOwn: boolean }[];
   current: { orgId: string; role: Role };
+};
+
+export type LeaderboardDto = {
+  days: number;
+  since: string;
+  attributionSince: string;
+  rows: { userId: string; name: string; image: string | null; role: Role; sent: number; won: number; winRate: number | null; invoicedCents: number }[];
 };
 
 export type TeammateDto = { person: PersonDto; role: Role; stats: PersonStatsDto; seesMoney: boolean; activity: ActivityDto[] };
@@ -72,6 +80,7 @@ export const peopleApi = {
   myStats: (months: number) => req<PersonStatsDto>(`/api/me/stats?months=${months}`),
   myActivity: () => req<{ items: ActivityDto[] }>("/api/me/activity"),
   teammate: (userId: string, months: number) => req<TeammateDto>(`/api/team/people/${encodeURIComponent(userId)}?months=${months}`),
+  leaderboard: (days = 90) => req<LeaderboardDto>(`/api/team/leaderboard?days=${days}`),
 
   seats: () => req<SeatsDto>("/api/seats"),
   setSeats: (extraSeats: number) => req<SeatsDto>("/api/seats", { method: "PUT", body: json({ extraSeats }) }),

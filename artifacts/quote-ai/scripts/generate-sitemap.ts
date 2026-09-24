@@ -44,6 +44,8 @@ entries.push(url(`${BASE_URL}/fr/`, "1.0", "weekly", PUBLIC_ROUTES.find((r) => r
 const frOf = (path: string) => PUBLIC_ROUTES.find((r) => r.path === path)!;
 entries.push(url(`${BASE_URL}/fr/tarifs/`, frOf("/pricing").priority, frOf("/pricing").changefreq, frOf("/pricing").lastmod));
 entries.push(url(`${BASE_URL}/fr/pilote/`, frOf("/pilot").priority, frOf("/pilot").changefreq, frOf("/pilot").lastmod));
+entries.push(url(`${BASE_URL}/fr/confidentialite/`, frOf("/privacy-policy").priority, frOf("/privacy-policy").changefreq, frOf("/privacy-policy").lastmod));
+entries.push(url(`${BASE_URL}/fr/conditions/`, frOf("/terms").priority, frOf("/terms").changefreq, frOf("/terms").lastmod));
 for (const province of PILOT_PROVINCES) {
   entries.push(url(`${BASE_URL}/provinces/${province.slug}/`, "0.8", "monthly", "2026-09-22"));
   entries.push(url(`${BASE_URL}/fr/provinces/${province.frSlug}/`, "0.8", "monthly", "2026-09-22"));

@@ -201,7 +201,7 @@ function Numbers({ stats, loading, months, setMonths, seesMoney }: { stats: Pers
       {loading || !stats ? <Skeleton className="h-28 w-full rounded-[var(--radius-mk)]" /> : (
         <>
           <section className="stat-grid">
-            <Stat icon={FileText} label={t("me.stat.quotes")} value={String(stats.quotes.created)} sub={money(stats.quotes.valueCents)} />
+            <Stat icon={FileText} label={t("me.stat.quotes")} value={String(stats.quotes.created)} sub={t("me.stat.sentSub").replace("{n}", String(stats.quotes.sent)).replace("{value}", money(stats.quotes.valueCents))} />
             <Stat icon={Trophy} label={t("me.stat.won")} value={String(stats.quotes.won)} sub={stats.quotes.winRate == null ? t("me.stat.noRate") : t("me.stat.rate").replace("{pct}", stats.quotes.winRate.toFixed(0))} />
             <Stat icon={Receipt} label={t("me.stat.invoiced")} value={money(stats.invoices.invoicedCents)} sub={t("me.stat.invoices").replace("{n}", String(stats.invoices.issued))} />
             {stats.hours.linkedWorker
@@ -212,13 +212,14 @@ function Numbers({ stats, loading, months, setMonths, seesMoney }: { stats: Pers
             <div className="card-head"><div><h2>{t("me.byMonth")}</h2><p className="sub">{t("me.attribution").replace("{date}", format(new Date(`${stats.attributionSince}T12:00:00`), "d MMMM yyyy", { locale }))}</p></div></div>
             <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("me.byMonth")}>
               <table className="tbl">
-                <thead><tr><th>{t("group.col.month")}</th><th className="t-amt">{t("me.stat.quotes")}</th><th className="t-amt">{t("me.col.value")}</th><th className="t-amt">{t("me.stat.won")}</th><th className="t-amt">{t("me.stat.invoiced")}</th>{stats.hours.linkedWorker && <th className="t-amt">{t("me.stat.hours")}</th>}</tr></thead>
+                <thead><tr><th>{t("group.col.month")}</th><th className="t-amt">{t("me.stat.quotes")}</th><th className="t-amt">{t("me.col.value")}</th><th className="t-amt">{t("me.col.sent")}</th><th className="t-amt">{t("me.stat.won")}</th><th className="t-amt">{t("me.stat.invoiced")}</th>{stats.hours.linkedWorker && <th className="t-amt">{t("me.stat.hours")}</th>}</tr></thead>
                 <tbody>
                   {[...stats.series].reverse().map((m) => (
                     <tr key={m.month}>
                       <td>{format(new Date(`${m.month}-01T12:00:00`), "MMM yyyy", { locale })}</td>
                       <td className="t-amt">{m.quotes}</td>
                       <td className="t-amt">{money(m.quoteValueCents)}</td>
+                      <td className="t-amt">{m.sent}</td>
                       <td className="t-amt">{m.won}</td>
                       <td className="t-amt">{money(m.invoicedCents)}</td>
                       {stats.hours.linkedWorker && <td className="t-amt">{m.hours.toFixed(1)}</td>}

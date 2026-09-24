@@ -42,7 +42,7 @@ export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
 /**
  * Phase 81 — static public pages that have a real French URL (a prerendered
  * page of their own, in the sitemap, claimed by hreflang). Everything not
- * listed here — the blog, the help centre, /whatsapp, the legal pages — is
+ * listed here — the blog, the help centre, /whatsapp — is
  * English-only for now: the language toggle on those just flips the chrome.
  *
  * This list lives in this module (rather than beside each page) because it is
@@ -52,6 +52,9 @@ export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
 export const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
   { en: "/pricing", fr: "/fr/tarifs" },
   { en: "/pilot", fr: "/fr/pilote" },
+  // Phase 95: the legal pages.
+  { en: "/privacy-policy", fr: "/fr/confidentialite" },
+  { en: "/terms", fr: "/fr/conditions" },
 ];
 
 /** Phase 81 — province landing pages: English slug ↔ French slug. */

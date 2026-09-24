@@ -68,7 +68,7 @@ export default function TeamPage() {
       {tab === "workers" && workers && <WorkersTab workers={workers.items} locale={locale} />}
       {tab === "time" && <TimeTab workers={workers?.items ?? []} locale={locale} />}
       {tab === "equipment" && <EquipmentTab />}
-      {tab === "members" && <MembersTab />}
+      {tab === "members" && <><MembersTab /><Leaderboard /></>}
     </div>
   );
 }
@@ -155,6 +155,58 @@ const can = useCan();
       <AccessCodesDialog open={codesOpen} onOpenChange={setCodesOpen} available={seats ? seats.limit - seats.used : 0} onMade={() => { refresh(); void queryClient.invalidateQueries({ queryKey: ["seats"] }); }} onError={onError} />
       {seatInfo && <SeatsDialog seats={seatInfo} open={seatsOpen} onOpenChange={setSeatsOpen} onError={onError} />}
     </div>
+  );
+}
+
+
+// Phase 95: who sent what and what was won on their credit, last 90 days.
+// For the people who run the team; hidden while the company is one person.
+function Leaderboard() {
+  const { t, lang } = useLanguage();
+  const can = useCan();
+  const { data } = useQuery({ queryKey: ["team-leaderboard"], queryFn: () => peopleApi.leaderboard(90), staleTime: 60_000, enabled: can("team", "full") });
+  const { data: me } = useQuery({ queryKey: ["me"], queryFn: peopleApi.me, staleTime: 60_000 });
+  if (!data || data.rows.length < 2) return null;
+  const seesMoney = can("invoicing", "view");
+  return (
+    <section className="card" style={{ marginTop: 16 }} aria-labelledby="team-leaderboard-title">
+      <div className="card-head">
+        <div>
+          <h2 id="team-leaderboard-title">{t("team.board.title")}</h2>
+          <p className="sub">{t("team.board.sub").replace("{days}", String(data.days))}</p>
+        </div>
+      </div>
+      <div className="tbl-wrap" tabIndex={0} role="region" aria-labelledby="team-leaderboard-title">
+        <table className="tbl">
+          <thead>
+            <tr>
+              <th>{t("team.col.member")}</th>
+              <th className="t-amt">{t("team.board.sent")}</th>
+              <th className="t-amt">{t("team.board.won")}</th>
+              <th className="t-amt">{t("team.board.rate")}</th>
+              {seesMoney && <th className="t-amt">{t("team.board.invoiced")}</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {data.rows.map((r) => (
+              <tr key={r.userId}>
+                <td>
+                  <Link href={r.userId === me?.person.id ? "/dashboard/me" : `/dashboard/people/${r.userId}`} className="cell-flex">
+                    <PersonAvatar name={r.name} image={r.image} />
+                    <span className="min-w-0"><span className="t-strong block">{r.name}</span><span className="t-sub">{t(`group.role.${r.role}`)}</span></span>
+                  </Link>
+                </td>
+                <td className="t-amt">{r.sent}</td>
+                <td className="t-amt">{r.won}</td>
+                <td className="t-amt">{r.winRate == null ? "—" : t("team.board.pct").replace("{pct}", r.winRate.toFixed(0))}</td>
+                {seesMoney && <td className="t-amt">{formatCents(r.invoicedCents)}</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="foot-note" style={{ padding: "0 20px 16px" }}>{t("team.board.note").replace("{date}", format(new Date(`${data.attributionSince}T12:00:00`), "d MMMM yyyy", { locale: lang === "fr" ? frCA : enCA }))}</p>
+    </section>
   );
 }
 

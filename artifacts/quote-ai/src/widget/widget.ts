@@ -273,7 +273,7 @@ a { color: var(--accent); }
       h(
         "span",
         {},
-        h("a", { href: `${origin}/privacy-policy`, target: "_blank", rel: "noopener" }, t.privacyLink),
+        h("a", { href: `${origin}${lang === "fr" ? "/fr/confidentialite/" : "/privacy-policy/"}`, target: "_blank", rel: "noopener" }, t.privacyLink),
         " · ",
         h("a", { href: "https://quoteai.ca", target: "_blank", rel: "noopener" }, t.poweredBy),
       ),

@@ -16,7 +16,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 | 92 | The embed widget that doesn't exist | assistant | **done** 2026-09-23 |
 | 93 | Sign-up, walked for real | assistant | **done** 2026-09-23 |
 | 94 | Job and quote rough edges | assistant | **done** 2026-09-23 |
-| 95 | French legal pages + who did what | assistant | not started |
+| 95 | French legal pages + who did what | assistant | **done** 2026-09-23 |
 | 96 | Integrations, one level deeper | assistant | not started |
 | 97 | Test coverage where there is none | assistant | not started |
 | 98 | Owner handoff kit | assistant | not started |
@@ -91,7 +91,7 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 |---|---|---|---|---|
 | L-1 | **Database backups** (O1, GO/NO-GO 1.1) | GitHub → repo Settings → Secrets: `BACKUP_DATABASE_URL`, `BACKUP_SUPABASE_URL`, `BACKUP_SUPABASE_SERVICE_ROLE_KEY`, `BACKUP_PASSPHRASE` (RUNBOOKS §5). Run the "backup" workflow once, download the artifact. Optionally Supabase Pro for daily backups. | 15 min | — |
 | L-2 | **Restore rehearsal** (O3, 1.2) | Supabase → the unused July project `cynlsphsuxrnctsxcmve` → Database → reset password → copy the pooler URL. | 5 min | **→ assistant** runs `ops:restore` + schema drift against it |
-| L-3 | **Legal review** (O8, 1.3, 1.4) | Send the legal packet (Phase 98) to a Canadian construction/consumer-law lawyer: contract templates ON/BC/AB/QC/generic, ToS, privacy policy EN+FR. Book now, it takes weeks. | 30 min + wait | **→ assistant** applies changes, bumps `TEMPLATE_VERSION` |
+| L-3 | **Legal review** (O8, 1.3, 1.4) | Send the legal packet (Phase 98) to a Canadian construction/consumer-law lawyer: contract templates ON/BC/AB/QC/generic, ToS and privacy policy in English and French (the French pages from Phase 95 are a translation, and terms §1 has a new "both versions have the same effect" clause to confirm). Book now, it takes weeks. | 30 min + wait | **→ assistant** applies changes, bumps `TEMPLATE_VERSION` |
 | L-4 | **Registered business identity** (O5, 1.5) | Decide the legal name, mailing address, tax numbers, person in charge of personal information (Law 25). | 5 min | **→ assistant** fills `lib/legal-entity` (privacy, ToS, footer, every email) |
 | L-5 | **Staging Supabase project** (O3, 1.6) | Create it (or reuse the July slot after L-2), then GitHub secrets `E2E_DATABASE_URL`, `E2E_SUPABASE_URL`, `E2E_SUPABASE_SERVICE_ROLE_KEY`. From then on the test suite stops touching production. | 20 min | **→ assistant** applies migrations 0000-0053 and turns the CI e2e job on |
 | L-6 | **Error tracking + alerts** (O4, 1.7) | Sentry project → `SENTRY_DSN`, `VITE_SENTRY_DSN`, `SENTRY_AUTH_TOKEN/ORG/PROJECT` in Vercel. Healthchecks.io (or Better Stack) check → `CRON_HEARTBEAT_URL`. Uptime monitor on `GET /api/healthz/ops`. `OPS_ALERT_EMAIL`. (RUNBOOKS §1-§2) | 30 min | — |
@@ -223,3 +223,24 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 - The picker lists clients who were on a quote (`/api/clients` groups quotes). A client with no quote yet, such as one created through the public API, isn't offered.
 
 **Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` 3 fewer unused exports than before the phase (the duplicate formatters) · `i18n-audit` **4688 = 4688**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **480** (regenerated, line numbers only) · unit **29 files / 195 tests** (new `lib/money-format.test.ts`) · e2e **phase94 3/3** · regression **quotes, money, lifecycle, security (21/21 after the fixture fix), phase92, portal** green · `pnpm build` ✓ · `qa:visual` on the dashboard, quote form (plus a new client with a bad email, and a picked client), quotes, analytics, settings, billing, catalog, contracts, documents, the job page (plus its completion dialog), job setup: **140 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · French job page, charts, quote form and completion dialog checked by eye.
+
+### Phase 95 — French legal pages + who did what (2026-09-23)
+
+**Built**
+- **`/fr/confidentialite` and `/fr/conditions`**: the privacy policy and terms in French, section for section, with the same `LEGAL_ENTITY` lines (`inProvince()` added to `lib/legal-entity` for "en Ontario" / "au Québec"). One file per page, English and French side by side, sharing `components/legal-page-shell.tsx` (breadcrumb, title, last updated, hreflang both ways, `inLanguage`). Prerendered, in the sitemap, in `LOCALE_PAGE_PAIRS` (so the toggle goes between the pair) and in the URL-decides-language list. French privacy also names the Commission d'accès à l'information. Terms §1 (both languages) says both versions exist with the same effect; the English terms' date moved to September 23.
+- **Links in the reader's language**: the public footer (both places), sign-up (it linked the old `/termini/` and `/privacy/` redirects), the site map, Settings → Security, the widget's privacy link, the French account-deletion email.
+- **Sent by** (migration 0054, applied): `quotes.sent_by_user_id` stamped by the first signed-in person to email the quote, `invoices.sent_by_user_id` by the first person to send the invoice (a scheduled send stamps nobody). Nothing backfilled.
+- **Won by**: an accepted quote is credited to whoever sent it, or to its maker when it never went out from the app. `/api/me/stats` and the teammate page gain `quotes.sent` and a monthly "sent"; won and win rate follow the credit; invoiced follows the sender, else the maker. "Quotes made" tile now reads "3 · 2 sent · $51,099.30"; the month table has a Sent column; the note under it says how a win is credited.
+- **Team leaderboard**: `GET /api/team/leaderboard?days=90` (team:full = owner, admin) and a card under Team → Team members: person, quotes sent, won, win rate, invoiced (amount only for roles that see invoices), sorted by wins then invoiced, hidden with one person. Two grouped queries whatever the team size.
+- Runbook §33.
+
+**Found (and fixed)**
+1. Sign-up's "terms" and "privacy" links and the site map's pointed at the Italian-era redirect paths `/termini/` and `/privacy/`.
+2. The personal page's English win rate read "100 % won" (French spacing in English).
+
+**Not done / deferred**
+- Terms §4.1 names the one-off purchases as the pricing page does ("Soumission à l'unité"); the English still says "Single with Watermark / Single Clean". Left for the lawyer pass.
+- A quote sent only through a contract (never emailed on its own) isn't stamped with a sender; it is credited to its maker.
+- Showcase and older invoices have no maker or sender, so the leaderboard's "invoiced" starts at zero for everyone until new invoices go out.
+
+**Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` unchanged (100 exports / 34 types) · `i18n-audit` **4698 = 4698**, 0 missing, 0 split · route matrix **481** (regenerated: `GET /api/team/leaderboard`, team:full) · unit **29 files / 195 tests** · e2e **phase95 4/4** · regression **phase91, security, quotes, lifecycle, phase88, phase80** (54/54) · `pnpm build` ✓ (440 pages prerendered, `validate-prerender` and `validate-sitemap` 440/440; `/fr/confidentialite` is `lang="fr-CA"` with canonical + hreflang en/fr/x-default) · `qa:visual` on the four legal pages, sign-up, site map, `/dashboard/me` (owner and foreman), a teammate's page and Team → Members with the leaderboard: **70 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · French leaderboard, French "Mon profil" and the French privacy page at 375 checked by eye.

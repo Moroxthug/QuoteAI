@@ -56,7 +56,7 @@ export async function sendAccountDeletionScheduledEmail(params: { toEmail: strin
         body: `Nous avons reçu la demande de suppression de votre compte QuoteAI${who}. Vous êtes déconnecté partout, votre abonnement est annulé et vos intégrations sont déconnectées. Le <strong>${fmtDate(params.scheduledFor, lang)}</strong>, vos données seront effacées définitivement.<br/><br/>Exception légale : les contrats signés et les factures émises sont conservés 7 ans (exigence de l'ARC et de Revenu Québec), sans lien avec votre profil, puis supprimés.`,
         btn: "Annuler la suppression",
         hint: "Ce n'était pas vous ? Cliquez sur le bouton ci-dessus avant la date indiquée : votre compte sera réactivé et vous pourrez vous reconnecter (l'abonnement et les intégrations devront être rétablis).",
-        footer: "Envoyé par QuoteAI. Politique de confidentialité : " + getBaseUrl() + "/privacy-policy/",
+        footer: "Envoyé par QuoteAI. Politique de confidentialité : " + getBaseUrl() + "/fr/confidentialite/",
       }
     : {
         subject: "Your QuoteAI account deletion is scheduled",

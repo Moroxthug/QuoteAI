@@ -95,6 +95,8 @@ async function onboardTo(page: Page, step: 2 | 3 | 4) {
   await page.click(".card-foot .btn-navy");
   await page.waitForSelector('[data-step="4"]', { timeout: 15_000 });
 }
+// Phase 95: set once the foreman has joined, so the teammate page can be swept.
+let sweepForemanId: string | null = null;
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
   const pub = (path: string): RouteSpec => ({ path, session: "public" });
   const dash = (path: string): RouteSpec => ({ path, session: "owner" });
@@ -107,6 +109,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026"),
     pub("/quotes/painter"), pub("/quotes/painter/toronto"), pub("/fr/soumissions/peintre"), pub("/fr/soumissions/peintre/montreal"),
     pub("/chi-siamo"), pub("/contatti"), pub("/privacy-policy"), pub("/terms"), pub("/mappa-sito"),
+    // Phase 95: the legal pages in French.
+    pub("/fr/confidentialite"), pub("/fr/conditions"),
     // Phase 82: the pages Phases 70/81 added were never in this sweep.
     pub("/pricing"), pub("/fr/tarifs"), pub("/pilot"), pub("/fr/pilote"),
     pub("/provinces/british-columbia"), pub("/provinces/quebec"), pub("/fr/provinces/quebec"),
@@ -164,6 +168,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/group"), dash("/dashboard/group?tab=companies"), dash("/dashboard/group?tab=crew"),
     // Phase 91: the person's own page (owner and a foreman, whose first visit is the setup form), and the members tab with seats and codes.
     dash("/dashboard/me"), dash("/dashboard/team?tab=members"), foreman("/dashboard/me"),
+    // Phase 95: a teammate's page as the owner sees it (sent / won), next to the leaderboard on the members tab.
+    ...(sweepForemanId ? [dash(`/dashboard/people/${sweepForemanId}`)] : []),
     foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"), foreman("/dashboard/books"), foreman("/dashboard/pay"), foreman("/dashboard/group"),
   ];
   // `--routes=jobs,pricing` is a substring match; `--routes==/,=/dashboard`
@@ -433,7 +439,7 @@ const { installVendorStubs } = await import("./vendorStub.js");
 installVendorStubs();
 const { startServer, stopServer, createOrg, createUser, cleanupAll } = await import("./harness.js");
 const { seedShowcase, setSignTokenCapture } = await import("./fixtures.js");
-const { db, businessProfilesTable } = await import("@workspace/db");
+const { db, businessProfilesTable, quotesTable } = await import("@workspace/db");
 const { eq } = await import("drizzle-orm");
 setSignTokenCapture(() => {
   for (let i = mailbox.length - 1; i >= 0; i--) {
@@ -461,7 +467,13 @@ try {
   if (foremanInvite.status === 201) {
     const foremanUser = await createUser({ email: foremanEmail, name: "Jordan Foreman" });
     const accepted = await foremanUser.api(`/api/team/invite/${String(foremanInvite.body.url).split("/team-invite/")[1]}/accept`, { method: "POST" });
-    if (accepted.status === 200) foremanToken = foremanUser.token;
+    if (accepted.status === 200) {
+      foremanToken = foremanUser.token;
+      sweepForemanId = foremanUser.userId;
+      // Phase 95: give the showcase quotes senders, so the leaderboard and both people's numbers have something to show.
+      const qs = await db.select({ id: quotesTable.id }).from(quotesTable).where(eq(quotesTable.userId, org.userId));
+      for (const [i, q] of qs.entries()) await db.update(quotesTable).set({ createdByUserId: org.userId, sentByUserId: i % 3 === 1 ? foremanUser.userId : org.userId }).where(eq(quotesTable.id, q.id));
+    }
   }
   if (!foremanToken) console.warn("[qa-visual] could not set up the foreman session — its routes are skipped");
   // Phase 93: signed in, no company — onboarding's own audience. And someone the showcase invited who signed

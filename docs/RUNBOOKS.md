@@ -670,3 +670,21 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | "The client has two records" | One was created with a different email or phone (a real namesake, or a typo). Edit the one to keep; quotes keep their own copy of the details |
 | "The quote form doesn't show my client" | Only clients who were on a quote appear in the picker (`/api/clients` groups quotes). Imported clients with no quote don't show there yet |
 | Test runs | `phase94.e2e` (AI and manual quotes keep email and phone on the quote and the client; a name-only client is filled, not duplicated; a namesake with another email is separate). Unit `lib/money-format.test.ts`. `qa:visual` sweeps the quote form with a new client (bad email) and a picked client, and the job's completion dialog |
+
+## 33. French legal pages, who sent it, who won it (Phase 95)
+
+**Where**: the legal pages `artifacts/quote-ai/src/pages/privacy-policy.tsx` and `pages/terms.tsx` (English and French in one file each, frame in `components/legal-page-shell.tsx`). Crediting `artifacts/api-server/src/people/service.ts` (`personStats`, `teamLeaderboard`). The stamps: `routes/quotes.ts` (`send-pdf-email`) and `invoices/service.ts` (`sendInvoice`). Migration `lib/db/drizzle/0054_phase95_sent_by.sql`.
+
+**How it fits**:
+- **Legal pages in French**: `/fr/confidentialite` and `/fr/conditions`, prerendered, in the sitemap, hreflang both ways, the language toggle goes between the pair. The URL decides the language (`/privacy-policy` is always English). Footer, sign-up, site map, Settings → Security, the widget and the deletion email link to the page in the reader's language. Both versions are an AI draft awaiting the lawyer (Phase 99 L-3). **Change both languages together.** Terms §1 now says both versions exist and have the same effect (a clause for the lawyer to confirm, Charter of the French Language).
+- **Sent by**: `quotes.sent_by_user_id` is set the first time a signed-in person emails the quote; a later send by someone else doesn't move it. `invoices.sent_by_user_id` the same when a person sends an invoice; a scheduled send leaves it empty. Nothing before Phase 95 is backfilled.
+- **Crediting**: a quote is credited to whoever sent it, or to whoever made it if it never went out from the app (a link copied by hand, signed on the spot). "Won" = accepted and credited to the person. Win rate = won ÷ decided (accepted, or out 30+ days). An invoice is credited to its sender, else its maker. "Quotes made" still counts who made it.
+- **Leaderboard** (Team → Team members, owner and admin only, `GET /api/team/leaderboard?days=90`): everyone active in the company with sent, won, win rate and invoiced (invoiced only for people who can see invoices). Hidden while the company is one person.
+
+| Ask | Do |
+|---|---|
+| "The lawyer changed the English terms" | Apply the same change to the French function in the same file, bump both "Last updated" dates and the `lastmod` in `data/sitemap-routes.ts` |
+| "My salesperson won a quote but it counts for the estimator" | The estimator emailed it first (the first sender keeps the credit), or it was never sent from QuoteAI, so it went to its maker. `select created_by_user_id, sent_by_user_id from quotes where id = …` |
+| "An invoice counts for nobody" | Made before Phase 91 and sent by a schedule: no person on either column. Expected |
+| "I don't see the leaderboard" | Office, foreman and viewer roles don't; neither does a one-person company |
+| Test runs | `phase95.e2e` (first sender keeps the credit, won by sender or maker, scheduled invoice, personal numbers, leaderboard access). `qa:visual` sweeps `/fr/confidentialite`, `/fr/conditions`, the members tab with the leaderboard and a teammate's page |

@@ -342,5 +342,5 @@ export const jobsApi = {
 
 export { req as apiRequest, json as apiJson };
 
-export const formatCad = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
-export const formatCents = (c: number) => formatCad(c / 100);
+// Phase 94: locale-aware, see lib/money.ts. Re-exported so existing imports keep working.
+export { formatCad, formatCents } from "./money";

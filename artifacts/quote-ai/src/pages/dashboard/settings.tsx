@@ -44,6 +44,7 @@ import { COST_CATEGORY_KEYS } from "@/components/jobs/cost-entry-dialog";
 import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
 import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
 import { stripeConnectApi, financeitApi, developerApi, flinksApi, metaLeadAdsApi, googleLsaApi, type AutomationEventName, type FlinksAccountDto } from "@/lib/invoices-api";
+import { moneyLocale } from "@/lib/money";
 
 function useProfileSchema() {
   const { t } = useLanguage();
@@ -444,8 +445,8 @@ function BillingTab() {
   const planLabel = isElite ? "Elite" : isPro ? "Pro" : isStarter ? "Starter" : null;
   const planPrice = currentPlanPriceLabel(sub, Array.isArray(plans) ? plans : undefined, t, lang)
     ?? (isElite ? t("dashboard.billing.priceElite") : isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : null);
-  const renewalDate = sub?.periodEnd ? new Date(sub.periodEnd).toLocaleDateString("en-CA", { day: "2-digit", month: "long", year: "numeric" }) : null;
-  const resetDate = sub?.quotaResetDate ? new Date(sub.quotaResetDate).toLocaleDateString("en-CA", { day: "2-digit", month: "long" }) : null;
+  const renewalDate = sub?.periodEnd ? new Date(sub.periodEnd).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long", year: "numeric" }) : null;
+  const resetDate = sub?.quotaResetDate ? new Date(sub.quotaResetDate).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long" }) : null;
 
   return (
     <div className="space-y-6">

@@ -2,7 +2,7 @@
 // palette (validated for CVD separation and contrast), tooltip styling and a
 // couple of tiny building blocks so every chart reads as one system.
 import type { ReactNode } from "react";
-import { formatCents } from "@/lib/jobs-api";
+import { formatCents, formatCadShort } from "@/lib/money";
 
 /** Fixed series colours — assigned by entity, never cycled. */
 export const SERIES = {
@@ -20,13 +20,7 @@ export const TOOLTIP_STYLE = { borderRadius: 8, border: "1px solid #e2e8f0", fon
 export const AXIS_TICK = { fontSize: 11, fill: "#64748b" } as const;
 
 export const money = (v: number) => formatCents(v);
-export const moneyShort = (v: number) => {
-  const d = v / 100;
-  const abs = Math.abs(d);
-  if (abs >= 1_000_000) return `${(d / 1_000_000).toFixed(1)}M $`;
-  if (abs >= 1_000) return `${Math.round(d / 1_000)}k $`;
-  return `${Math.round(d)} $`;
-};
+export const moneyShort = (v: number) => formatCadShort(v / 100);
 
 export function ChartCard({ title, subtitle, children, right, className }: { title: string; subtitle?: string; children: ReactNode; right?: ReactNode; className?: string }) {
   return (

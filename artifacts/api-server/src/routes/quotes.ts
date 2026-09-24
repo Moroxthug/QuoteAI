@@ -1105,6 +1105,9 @@ Write all output text in English.`
       ? {
           nome: clientDataInput.nome,
           indirizzo: clientDataInput.indirizzo || "",
+          // Phase 94: the quote form now asks for these; they used to be dropped here.
+          email: clientDataInput.email?.trim() || undefined,
+          phone: clientDataInput.phone?.trim() || undefined,
           businessNumber: clientDataInput.businessNumber,
           partitaIva: clientDataInput.partitaIva,
           city: clientDataInput.city,

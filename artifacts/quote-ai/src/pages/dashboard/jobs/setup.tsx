@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
-import { jobsApi, formatCents, type JobDetailDto, type MilestoneDto, type BudgetLineDto, type CostCategory, type SetupEdits } from "@/lib/jobs-api";
+import { jobsApi, formatCents, formatCad, type JobDetailDto, type MilestoneDto, type BudgetLineDto, type CostCategory, type SetupEdits } from "@/lib/jobs-api";
 import { Gantt } from "@/components/jobs/gantt";
 
 type MilestoneDraft = { id?: string; key?: string; title: string; description: string; plannedStart: string; plannedEnd: string; paymentTermId: string | null; valueCents: number; taskCount: number; status: MilestoneDto["status"] };
@@ -219,7 +219,7 @@ export default function JobSetupPage() {
                 <option value="">{t("jobs.milestone.noPayment")}</option>
                 {linkableTerms.map((x) => (
                   <option key={x.id} value={x.id} disabled={milestones.some((o, oi) => oi !== i && o.paymentTermId === x.id)}>
-                    {x.amountType === "percent" ? `${x.value}%` : `$${x.value}`} — {x.label}
+                    {x.amountType === "percent" ? `${x.value}%` : formatCad(x.value)} — {x.label}
                   </option>
                 ))}
               </select>
@@ -237,7 +237,7 @@ export default function JobSetupPage() {
               return (
                 <span key={x.id} className={cn(linked && "ok")}>
                   <CheckCircle2 />
-                  {x.amountType === "percent" ? `${x.value}%` : `$${x.value}`} {x.label}
+                  {x.amountType === "percent" ? `${x.value}%` : formatCad(x.value)} {x.label}
                   {x.trigger === "on_signing" && ` (${t("jobs.setup.dueNow")})`}
                 </span>
               );

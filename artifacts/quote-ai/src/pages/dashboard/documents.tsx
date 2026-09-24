@@ -20,6 +20,7 @@ import type { UploadedDocument } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
+import { formatCad, moneyLocale } from "@/lib/money";
 
 const fmt = (s: string, vars: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 
@@ -30,11 +31,10 @@ const formatFileSize = (bytes: number | null) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const formatCurrency = (v: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 2 }).format(v);
+const formatCurrency = (v: number) => formatCad(v);
 
 const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat("en-CA", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(iso));
+  new Intl.DateTimeFormat(moneyLocale(), { day: "2-digit", month: "short", year: "numeric" }).format(new Date(iso));
 
 function StatusChip({ status }: { status: UploadedDocument["status"] }) {
   const { t } = useLanguage();

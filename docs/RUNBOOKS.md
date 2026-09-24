@@ -653,3 +653,20 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | "I paid for 4 logins but only have 2" | `STRIPE_PRICE_EXTRA_SEAT` wasn't set when they checked out (step 4 said so). Once it's set: Team → Members → Logins |
 | "The dashboard said nothing after I paid" | Before Phase 93 it didn't. Now there's a notice; if the plan still shows Free, Settings → Billing → sync |
 | Test runs | `phase93.e2e` walks five people (new owner; owner from /pricing; employee with a code; emailed invite, then /onboarding by accident; invitee without the link) in EN and FR at 1280 and 375 px against the real SPA. Screenshots in `artifacts/api-server/.qa/phase93/`. `qa:visual` sweeps every onboarding step as a signed-in newcomer, and the invitation screen as an invitee |
+
+## 32. Money in the app's language, client contact details on quotes (Phase 94)
+
+**Where**: `artifacts/quote-ai/src/lib/money.ts` (every dashboard amount; `formatCad`/`formatCents` in `lib/jobs-api.ts` re-export it), set from `i18n/LanguageContext.tsx`. The quote form's client card `pages/dashboard/new.tsx` (both the AI and the manual tab). Client records from quotes `artifacts/api-server/src/lib/clients.ts` (`ensureClientForQuote`). The completion dialog `components/jobs/lifecycle-dialogs.tsx`.
+
+**How it fits**:
+- **Amounts follow the language on screen**: "$12,345.50" in English, "12 345,50 $" in French. Chart axes use one decimal ("$1.5K" / "1,5 k$"). The pages a client opens (the invoice, the contract signing page, the client portal, the public quote) keep their own formatter, in the language of that invoice, contract or page.
+- **The quote form asks for the client's email and phone** (optional). Picking a client shows theirs, editable. The picker lists the account's clients from every device (`GET /api/clients`), then any this browser remembers. A malformed email stops the save with the error under the field.
+- **Client records**: a quote with a name and an email/phone finds the client with that exact name+email+phone. If there is none, it takes the one saved **by name alone**, as long as that record's email/phone are blank or the same, and fills in the blanks. It never overwrites a detail already on record. A namesake with a different email gets their own record. The record's key is left alone (the portal addresses a client by `md5(dedupKey)`).
+- **Mark complete** also lists milestones not marked done (up to five). They don't block, and completing leaves them as they are. Open permits still block (Phase 87).
+
+| Ask | Do |
+|---|---|
+| "My French dashboard shows dollars the English way" | A page that formats with its own `Intl.NumberFormat("en-CA", …)`. Route it through `lib/money.ts`. `grep -rn '"en-CA"' artifacts/quote-ai/src` lists the leftovers (admin is English only, on purpose) |
+| "The client has two records" | One was created with a different email or phone (a real namesake, or a typo). Edit the one to keep; quotes keep their own copy of the details |
+| "The quote form doesn't show my client" | Only clients who were on a quote appear in the picker (`/api/clients` groups quotes). Imported clients with no quote don't show there yet |
+| Test runs | `phase94.e2e` (AI and manual quotes keep email and phone on the quote and the client; a name-only client is filled, not duplicated; a namesake with another email is separate). Unit `lib/money-format.test.ts`. `qa:visual` sweeps the quote form with a new client (bad email) and a picked client, and the job's completion dialog |

@@ -18,6 +18,7 @@ import {
   Loader2,
   Info,
 } from "lucide-react";
+import { moneyLocale } from "@/lib/money";
 
 function QuotaBar({ used, limit }: { used: number; limit: number }) {
   const { t } = useLanguage();
@@ -76,11 +77,11 @@ export default function BillingPage() {
     ?? (isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : isElite ? t("dashboard.billing.priceElite") : null);
 
   const renewalDate = sub?.periodEnd
-    ? new Date(sub.periodEnd).toLocaleDateString("en-CA", { day: "2-digit", month: "long", year: "numeric" })
+    ? new Date(sub.periodEnd).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long", year: "numeric" })
     : null;
 
   const resetDate = sub?.quotaResetDate
-    ? new Date(sub.quotaResetDate).toLocaleDateString("en-CA", { day: "2-digit", month: "long" })
+    ? new Date(sub.quotaResetDate).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long" })
     : null;
 
   return (

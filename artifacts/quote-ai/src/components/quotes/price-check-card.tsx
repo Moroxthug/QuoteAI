@@ -10,8 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import { priceCheckApi, type PriceCheckFindingDto } from "@/lib/analytics-api";
+import { formatCad } from "@/lib/money";
 
-const cad = (v: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(v);
+const cad = (v: number) => formatCad(v);
 const signed = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${cad(Math.abs(v))}`;
 
 const priceCheckQueryKey = (quoteId: string) => ["quote-price-check", quoteId] as const;

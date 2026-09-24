@@ -20,6 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import type { CatalogItem } from "@workspace/api-client-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { formatCad } from "@/lib/money";
 
 const UM_OPTIONS = ["mq", "ml", "mc", "cad", "ore", "kg", "a.c.", "pezzi", "kw", "lt", "t", "m", "%"];
 
@@ -57,9 +58,7 @@ const EMPTY_FORM: ItemFormData = {
   note: "",
 };
 
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
-}
+const formatCurrency = (n: number) => formatCad(n);
 
 interface ParsedItem {
   nome: string;

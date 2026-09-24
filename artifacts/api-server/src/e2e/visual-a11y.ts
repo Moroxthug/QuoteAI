@@ -138,6 +138,20 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/leads"), dash("/dashboard/imports"),
     dash("/dashboard/contracts"), dash(`/dashboard/contracts/${s.contractId}`), dash(`/dashboard/contracts/${s.pendingContractId}`),
     dash("/dashboard/invoices"), dash(`/dashboard/invoices/${s.invoiceId}`),
+    // Phase 94: the quote form's client fields (a new client with a bad email; a picked client's contact details) and the completion dialog.
+    { path: "/dashboard/new", session: "owner", name: "/dashboard/new new client (bad email)", drive: async (p) => {
+      await p.locator(".pick-row .pill.dashed, .add-dashed").first().click();
+      await p.locator('input[type="email"]').fill("dana@");
+      await p.waitForSelector(".field-err");
+    } },
+    { path: "/dashboard/new", session: "owner", name: "/dashboard/new picked client", drive: async (p) => {
+      await p.locator(".pick-row .pill:not(.dashed)").first().click();
+      await p.waitForSelector('.form-grid input[type="email"]');
+    } },
+    { path: `/dashboard/jobs/${s.jobId}`, session: "owner", name: `/dashboard/jobs/${s.jobId} complete dialog`, drive: async (p) => {
+      await p.locator(".head-actions button", { hasText: /Mark complete|Marquer terminé/ }).click();
+      await p.waitForSelector('[role="alertdialog"]');
+    } },
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
     dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
     // Phase 87: every tab of the Compliance page is its own page state.

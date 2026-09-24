@@ -6,9 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
 import { type PaymentSchedule, paymentTermAmount, validateSchedule } from "@/lib/payment-schedule";
+import { formatCad } from "@/lib/money";
 
-const formatCad = (amount: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
 
 /**
  * Sidebar card on the quote detail page: shows the structured payment

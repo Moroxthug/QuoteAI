@@ -11,11 +11,10 @@ import {
   scheduleTotal,
   validateSchedule,
 } from "@/lib/payment-schedule";
+import { formatCad } from "@/lib/money";
 
 const TERM_TYPES: PaymentTermType[] = ["deposit", "milestone", "completion", "holdback_release"];
 
-const formatCad = (amount: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
 
 /**
  * Editable list of payment tranches. `total` is the quote total the

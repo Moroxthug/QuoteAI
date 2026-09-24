@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type JobDetailDto, type JobStatus, type MilestoneDto, type MilestoneStatus, type TaskDto } from "@/lib/jobs-api";
 import { contractsApi } from "@/lib/contracts-api";
+import { formatCadWhole } from "@/lib/money";
 import { invoicesApi } from "@/lib/invoices-api";
 import { Gantt } from "@/components/jobs/gantt";
 import { JobStatusBadge, MilestoneStatusBadge, ChangeOrderStatusBadge } from "@/components/jobs/badges";
@@ -38,6 +39,8 @@ const TABS = ["overview", "schedule", "changes", "costs", "invoices", "team", "p
 type Tab = (typeof TABS)[number];
 const TAB_ICONS: Record<Tab, typeof LayoutDashboard> = { overview: LayoutDashboard, schedule: CalendarDays, changes: GitBranch, costs: Wallet, invoices: Receipt, team: Users, photos: Camera, messages: MessageSquare, documents: FolderOpen, assistant: Sparkles };
 
+// Phase 94: the KPI tiles show whole dollars (the cents are in the lines below and in each tab); five tiles to a row left no room for them.
+const wholeCents = (c: number) => formatCadWhole(c / 100);
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 
 export default function JobDetailPage() {
@@ -131,10 +134,10 @@ const can = useCan();
 
       {/* KPI strip */}
       <section className="stat-grid cols-5">
-        <Kpi label={t("jobs.kpi.value")} value={formatCents(job.totalValueCents)} sub={job.changeOrdersCents ? `${formatCents(job.contractValueCents)} + ${formatCents(job.changeOrdersCents)} ${t("jobs.kpi.co")}` : undefined} />
-        <Kpi label={t("jobs.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={`${formatCents(invoiceTotals.collectedCents)} ${t("jobs.kpi.collected")}${invoiceTotals.outstandingCents ? ` · ${formatCents(invoiceTotals.outstandingCents)} ${t("jobs.kpi.outstanding")}` : ""}`} tone={invoiceTotals.overdueCents ? "bad" : "teal"} />
-        <Kpi label={t("jobs.kpi.budget")} value={budgetTotalCents ? formatCents(budgetTotalCents) : "—"} sub={projectedMargin !== null ? `${t("jobs.kpi.projectedMargin")} ${projectedMargin}%` : undefined} />
-        <Kpi label={t("jobs.kpi.costs")} value={formatCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} tone={budgetTotalCents && actualCosts > budgetTotalCents ? "bad" : undefined} />
+        <Kpi label={t("jobs.kpi.value")} value={wholeCents(job.totalValueCents)} sub={job.changeOrdersCents ? `${formatCents(job.contractValueCents)} + ${formatCents(job.changeOrdersCents)} ${t("jobs.kpi.co")}` : undefined} />
+        <Kpi label={t("jobs.kpi.invoiced")} value={wholeCents(invoiceTotals.invoicedCents)} sub={`${formatCents(invoiceTotals.collectedCents)} ${t("jobs.kpi.collected")}${invoiceTotals.outstandingCents ? ` · ${formatCents(invoiceTotals.outstandingCents)} ${t("jobs.kpi.outstanding")}` : ""}`} tone={invoiceTotals.overdueCents ? "bad" : "teal"} />
+        <Kpi label={t("jobs.kpi.budget")} value={budgetTotalCents ? wholeCents(budgetTotalCents) : "—"} sub={projectedMargin !== null ? `${t("jobs.kpi.projectedMargin")} ${projectedMargin}%` : undefined} />
+        <Kpi label={t("jobs.kpi.costs")} value={wholeCents(actualCosts)} sub={costs.pendingCount ? `${costs.pendingCount} ${t("jobs.kpi.toReview")}` : budgetTotalCents ? `${Math.round((actualCosts / budgetTotalCents) * 100)}% ${t("jobs.kpi.ofBudget")}` : undefined} tone={budgetTotalCents && actualCosts > budgetTotalCents ? "bad" : undefined} />
         <Kpi label={t("jobs.kpi.progress")} value={`${job.progressPercent}%`} sub={`${done}/${milestones.length} ${t("jobs.milestonesShort")}`} tone="ok" progress={job.progressPercent} />
       </section>
 

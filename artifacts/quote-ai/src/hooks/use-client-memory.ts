@@ -9,6 +9,8 @@ export interface SavedClient {
   province?: string;
   businessNumber?: string;
   partitaIva?: string;
+  email?: string;
+  phone?: string;
   lastUsed: number;
 }
 

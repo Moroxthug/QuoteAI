@@ -23,10 +23,26 @@ export async function ensureClientForQuote(userId: string, clientData: QuoteClie
     businessNumber: clientData?.businessNumber?.trim() || clientData?.partitaIva?.trim() || null,
   };
 
-  const [existing] = await db
+  let [existing] = await db
     .select()
     .from(clientsTable)
     .where(and(eq(clientsTable.userId, userId), eq(clientsTable.dedupKey, dedupKey)));
+  // Phase 94: quote forms now collect email and phone. A client first saved by
+  // name alone (every quote before this phase) is the same person, so fill in
+  // their contact details instead of starting a second record.
+  // Only when nothing on record contradicts the new details: a namesake with
+  // their own email is someone else. The key is left alone (the client portal
+  // addresses a client by md5(dedupKey)).
+  if (!existing && (incoming.email || incoming.phone)) {
+    const [byName] = await db
+      .select()
+      .from(clientsTable)
+      .where(and(eq(clientsTable.userId, userId), eq(clientsTable.dedupKey, clientDedupKey({ name }))));
+    const same = (a: string | null, b: string | null) => !a || !b || a.trim().toLowerCase() === b.toLowerCase();
+    if (byName && same(byName.email, incoming.email) && same(byName.phone, incoming.phone)) {
+      existing = byName;
+    }
+  }
 
   if (existing) {
     const fill: Partial<typeof existing> = {};

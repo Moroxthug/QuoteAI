@@ -15,7 +15,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 |---|---|---|---|
 | 92 | The embed widget that doesn't exist | assistant | **done** 2026-09-23 |
 | 93 | Sign-up, walked for real | assistant | **done** 2026-09-23 |
-| 94 | Job and quote rough edges | assistant | not started |
+| 94 | Job and quote rough edges | assistant | **done** 2026-09-23 |
 | 95 | French legal pages + who did what | assistant | not started |
 | 96 | Integrations, one level deeper | assistant | not started |
 | 97 | Test coverage where there is none | assistant | not started |
@@ -197,3 +197,29 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 - The `sent_by` / leaderboard work is Phase 95.
 
 **Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` unchanged from before the phase · `i18n-audit` **4677 = 4677**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **480** (regenerated; the new accept route allowlisted with its reason) · unit **28 files / 191 tests** · e2e **phase93 20/20** · regression **team, security (21/21), account, billing, phase91, phase92** green · `pnpm build` ✓ · `qa:visual` on onboarding (every step as newcomer + invitation as invitee), sign-in/up, `/join`, `/team-invite`, `/pricing`, `/dashboard`, Team → Members: **112 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · every walk step checked by eye at 375 and 1280, EN and FR.
+
+### Phase 94 — Job and quote rough edges (2026-09-23)
+
+**Built**
+- **Money in the app's language** (`lib/money.ts`): `formatCad` / `formatCents` / `formatCadWhole` / `formatCadShort` / `formatAmount` follow the language the `LanguageProvider` renders with (set during render, so the first paint is right). `lib/jobs-api.ts` re-exports them, so its 30-odd callers changed nothing. Fourteen private `Intl.NumberFormat("en-CA", …)` copies (quotes list and editor, manual builder, payment schedule card and editor, catalog, contracts, documents, analytics, dashboard, price check, Gantt, job setup, the SEO quote mockup) now use it, and so do the long-format dates on Billing, Settings and Documents. French reads "12 345,50 $".
+- **Chart axes**: one decimal, compact, in the language on screen ("$1.5K" / "1,5 k$"). The old ticks rounded to whole thousands, so 1 500 and 2 000 both read "2k $".
+- **Client email and phone on both quote forms** (AI and manual share the client card): optional, labels tied to their fields, a malformed email shown under the field and the save stopped with focus on it. Picking a client shows their email and phone, editable. The picker now lists the account's clients from every device (`/api/clients`), then whatever this browser remembers. French placeholders are Montréal / QC / H2X 1Y4.
+- **Server**: `POST /api/quotes` (AI) kept only name/address/tax numbers from the form and dropped email and phone. It keeps them now. `ensureClientForQuote`: a quote with an email/phone for a client first saved by name alone fills in that record instead of creating a second one. This only happens when the record's email/phone are blank or the same (a namesake with another email stays separate), and the key is left alone because the portal addresses clients by `md5(dedupKey)`.
+- **Mark complete** also lists milestones not marked done (they don't block). The confirm dialogs themselves, the final-invoice and holdback drafts, and the permit block were already there (Phases 80 and 87). The plan's first bullet was out of date.
+- **Job page KPI tiles** show whole dollars, with a smaller figure in five-tile rows.
+- Runbook §32.
+
+**Found (and fixed)**
+1. The AI quote route threw away the client's email and phone even when a client sent them, so every CRM row from an AI quote started without contact details.
+2. The quote form's "saved clients" were this browser's localStorage only (a new laptop showed none). The session hand-off `quoteai:selected_client` is read but written nowhere (left alone, harmless).
+3. The client card's labels weren't tied to their inputs.
+4. The job page's KPI tiles broke amounts over two lines at 1280 ("$11,300 / 00", "$2,758.7 / 3"). French would have been worse.
+5. `security.e2e` had been failing since Phase 93: its new `pending-invites/:id/accept` route had no fixture, so the IDOR sweep counted three unseeded routes (limit two). It now uses A's invited-member row, so the check runs against a real foreign id.
+6. A draft of the completion dialog said "completing the job marks them done". It doesn't (the server leaves milestones alone), so the wording says what actually happens.
+
+**Not done / deferred**
+- `pages/admin.tsx` keeps en-CA on purpose (internal, English only). Timestamps printed with a bare `toLocaleString()` follow the browser's locale, not the app's (Settings integrations, security sessions).
+- Percentages still print "25%" in French (should be "25 %"): the job setup payment terms, KPI sub-lines.
+- The picker lists clients who were on a quote (`/api/clients` groups quotes). A client with no quote yet, such as one created through the public API, isn't offered.
+
+**Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` 3 fewer unused exports than before the phase (the duplicate formatters) · `i18n-audit` **4688 = 4688**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **480** (regenerated, line numbers only) · unit **29 files / 195 tests** (new `lib/money-format.test.ts`) · e2e **phase94 3/3** · regression **quotes, money, lifecycle, security (21/21 after the fixture fix), phase92, portal** green · `pnpm build` ✓ · `qa:visual` on the dashboard, quote form (plus a new client with a bad email, and a picked client), quotes, analytics, settings, billing, catalog, contracts, documents, the job page (plus its completion dialog), job setup: **140 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · French job page, charts, quote form and completion dialog checked by eye.

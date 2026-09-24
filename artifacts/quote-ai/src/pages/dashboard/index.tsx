@@ -52,6 +52,7 @@ import { CrewTodayCard } from "@/components/crew/crew-today-card";
 import { MARKETING_PLANS } from "@/data/pricing";
 import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 import { ForemanHome } from "@/components/crew/foreman-home";
+import { formatCadWhole } from "@/lib/money";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -706,8 +707,7 @@ const can = useCan();
   const { user } = useAuth();
   const [period, setPeriod] = useState<Period>("m");
 
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(amount);
+  const formatCurrency = (amount: number) => formatCadWhole(amount);
 
   const recentQuotes = stats?.recentQuotes || [];
   const firstName = user?.name?.split(" ")?.[0] || "";

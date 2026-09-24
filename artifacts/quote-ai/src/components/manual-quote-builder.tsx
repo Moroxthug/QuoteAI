@@ -11,6 +11,7 @@ import type { CreateManualQuoteBody } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { formatAmount } from "@/lib/money";
 
 const UM_OPTIONS = ["sq.ft", "ln.ft", "cu.yd", "kg", "t", "hrs", "g", "LS", "pcs", "ea.", "kW", "L"];
 
@@ -58,10 +59,14 @@ interface ClientData {
   province?: string;
   businessNumber?: string;
   partitaIva?: string;
+  email?: string;
+  phone?: string;
 }
 
 interface ManualQuoteBuilderProps {
   clientData?: ClientData;
+  /** Phase 94: the page's own check on the client fields (a bad email); false stops the save. */
+  onBeforeSubmit?: () => boolean;
   profileData?: {
     companyName?: string;
     vatNumber?: string | null;
@@ -97,9 +102,8 @@ function parseNum(v: string): number {
   return isNaN(n) ? 0 : n;
 }
 
-function fmt(n: number): string {
-  return n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+// Phase 94: in the app's language ("1 234,50" in French).
+const fmt = (n: number): string => formatAmount(n);
 
 function computeVoceTotale(v: VoceState): number {
   return Math.round(parseNum(v.quantita) * parseNum(v.prezzoUnitario) * 100) / 100;
@@ -162,7 +166,7 @@ function AISuggestButton({
   );
 }
 
-export default function ManualQuoteBuilder({ clientData, profileData }: ManualQuoteBuilderProps) {
+export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSubmit }: ManualQuoteBuilderProps) {
   const { t, lang } = useLanguage();
   const TEMPLATES = getTemplates(t);
   const [, setLocation] = useLocation();
@@ -234,6 +238,7 @@ export default function ManualQuoteBuilder({ clientData, profileData }: ManualQu
 
   const handleSubmit = () => {
     if (createManualQuote.isPending) return;
+    if (onBeforeSubmit && !onBeforeSubmit()) return;
 
     const hasContent = chapters.some(c => c.voci.some(v => v.descrizione.trim() && parseNum(v.prezzoUnitario) > 0));
     if (!hasContent) {

@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import type { SectorData } from "@/data/seo-data";
+import { formatCad } from "@/lib/money";
 
 // Deterministic pseudo-price so the same sector always renders the same
 // numbers (no client/server hydration mismatch, no real pricing claim —
@@ -10,9 +11,7 @@ function priceForItem(seed: string): number {
   return 90 + (hash % 18) * 45; // ranges roughly 90–855
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
-}
+const formatCurrency = (amount: number): string => formatCad(amount);
 
 export function QuotePreviewMockup({ sector }: { sector: SectorData }) {
   const items = sector.useCases.slice(0, 3).map((label) => {

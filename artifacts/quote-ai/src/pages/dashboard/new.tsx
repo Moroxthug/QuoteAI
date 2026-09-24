@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useId, useMemo } from "react";
 import { useLocation } from "wouter";
-import { useCreateQuote, useGetBusinessProfile, useGetSubscription } from "@workspace/api-client-react";
+import { useCreateQuote, useGetBusinessProfile, useGetSubscription, useListClients } from "@workspace/api-client-react";
 import {
   Sparkles, ImagePlus, ArrowRight, Loader2,
   X, User, Lock, Bot, PencilLine, FileText, FileSpreadsheet,
@@ -58,10 +58,25 @@ interface ClientForm {
   province: string;
   businessNumber: string;
   partitaIva: string;
+  email: string;
+  phone: string;
 }
 const emptyClient: ClientForm = {
-  nome: "", indirizzo: "", city: "", postalCode: "", province: "", businessNumber: "", partitaIva: "",
+  nome: "", indirizzo: "", city: "", postalCode: "", province: "", businessNumber: "", partitaIva: "", email: "", phone: "",
 };
+
+const toForm = (c: SavedClient): ClientForm => ({
+  nome: c.nome, indirizzo: c.indirizzo || "", city: c.city || "",
+  postalCode: c.postalCode || "", province: c.province || "",
+  businessNumber: c.businessNumber || "", partitaIva: c.partitaIva || "",
+  email: c.email || "", phone: c.phone || "",
+});
+
+// Phase 94: quotes used to be created with no way to enter the client's email
+// or phone, so every CRM row started without contact details. Loose check only:
+// the send dialog is where an address is really proven.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const clientEmailInvalid = (f: ClientForm) => f.email.trim() !== "" && !EMAIL_RE.test(f.email.trim());
 
 // ─── Shared client selector used in both tabs ───────────────────────────────
 interface ClientSelectorProps {
@@ -85,17 +100,36 @@ function ClientSelector({
   savedClients, selectSavedClient, clearClient, disabled,
 }: ClientSelectorProps) {
   const { t } = useLanguage();
-  const field = (key: keyof ClientForm, label: string, placeholder: string, opts?: { maxLength?: number; upper?: boolean; full?: boolean }) => (
-    <div className={cn("field", opts?.full && "full")}>
-      <label>{label}</label>
-      <input
-        placeholder={placeholder}
-        value={clientForm[key]}
-        onChange={e => { const v = opts?.upper ? e.target.value.toUpperCase() : e.target.value; setClientForm(f => ({ ...f, [key]: v })); }}
-        disabled={disabled}
-        maxLength={opts?.maxLength}
-      />
-    </div>
+  const idBase = useId();
+  const emailBad = clientEmailInvalid(clientForm);
+  const field = (key: keyof ClientForm, label: string, placeholder: string, opts?: { maxLength?: number; upper?: boolean; full?: boolean; type?: "email" | "tel"; autoComplete?: string }) => {
+    const id = `${idBase}-${key}`;
+    const err = key === "email" && emailBad;
+    return (
+      <div className={cn("field", opts?.full && "full")}>
+        <label htmlFor={id}>{label}</label>
+        <input
+          id={id}
+          type={opts?.type ?? "text"}
+          inputMode={opts?.type}
+          autoComplete={opts?.autoComplete ?? "off"}
+          placeholder={placeholder}
+          value={clientForm[key]}
+          onChange={e => { const v = opts?.upper ? e.target.value.toUpperCase() : e.target.value; setClientForm(f => ({ ...f, [key]: v })); }}
+          disabled={disabled}
+          maxLength={opts?.maxLength}
+          aria-invalid={err || undefined}
+          aria-describedby={err ? `${id}-err` : undefined}
+        />
+        {err && <p id={`${id}-err`} className="field-err">{t("dashboard.new.client.emailInvalid")}</p>}
+      </div>
+    );
+  };
+  const contactFields = (
+    <>
+      {field("email", t("dashboard.new.client.email"), t("dashboard.new.client.emailPlaceholder"), { type: "email", maxLength: 200 })}
+      {field("phone", t("dashboard.new.client.phone"), t("dashboard.new.client.phonePlaceholder"), { type: "tel", maxLength: 30 })}
+    </>
   );
   return (
     <section className="card">
@@ -125,6 +159,10 @@ function ClientSelector({
           <button type="button" onClick={clearClient} className="text-link danger">{t("dashboard.new.client.remove")}</button>
         </div>
       )}
+      {/* Phase 94: a picked client's contact details, prefilled and editable; blanks are saved to the client record. */}
+      {clientMode === "saved" && selectedClientId && (
+        <div className="form-grid tight" style={{ borderTop: "1px solid var(--soft)" }}>{contactFields}</div>
+      )}
 
       {savedClients.length === 0 && clientMode === "none" && (
         <div style={{ padding: 22 }}>
@@ -138,11 +176,12 @@ function ClientSelector({
         <>
           <div className="form-grid tight animate-in fade-in slide-in-from-top-1 duration-200" style={{ borderTop: "1px solid var(--soft)" }}>
             {field("nome", t("dashboard.new.client.nameLabel"), t("dashboard.new.client.namePlaceholder"), { full: true })}
+            {contactFields}
             {field("indirizzo", t("dashboard.new.client.addressLabel"), t("dashboard.new.client.addressPlaceholder"), { full: true })}
-            {field("city", t("dashboard.new.client.city"), "Toronto")}
+            {field("city", t("dashboard.new.client.city"), t("dashboard.new.client.cityPlaceholder"))}
             <div className="grid grid-cols-2 gap-2">
-              {field("province", t("dashboard.new.client.province"), "ON", { maxLength: 2, upper: true })}
-              {field("postalCode", t("dashboard.new.client.postalCode"), "M5H 2N2", { maxLength: 7, upper: true })}
+              {field("province", t("dashboard.new.client.province"), t("dashboard.new.client.provincePlaceholder"), { maxLength: 2, upper: true })}
+              {field("postalCode", t("dashboard.new.client.postalCode"), t("dashboard.new.client.postalPlaceholder"), { maxLength: 7, upper: true })}
             </div>
             {field("businessNumber", t("dashboard.new.client.businessNumber"), "123456789RT0001", { maxLength: 16, upper: true })}
             {field("partitaIva", t("dashboard.new.client.gstHst"), "123456789RT0001", { maxLength: 15 })}
@@ -177,7 +216,19 @@ export default function NewQuote() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { clients: savedClients, upsertClient } = useClientMemory();
+  const { clients: localClients, upsertClient } = useClientMemory();
+  // Phase 94: the picker offers the account's clients (every device, with their
+  // email and phone), then anything only this browser remembers.
+  const { data: serverClients } = useListClients();
+  const savedClients = useMemo<SavedClient[]>(() => {
+    const fromServer: SavedClient[] = (serverClients ?? []).map((c, i) => ({
+      id: `s:${c.id}`, nome: c.clientName, indirizzo: c.indirizzo ?? undefined, city: c.city ?? undefined,
+      postalCode: c.postalCode ?? undefined, province: c.province ?? undefined, businessNumber: c.businessNumber ?? undefined,
+      partitaIva: c.partitaIva ?? undefined, email: c.email ?? undefined, phone: c.phone ?? undefined, lastUsed: -i,
+    }));
+    const known = new Set(fromServer.map((c) => c.nome.trim().toLowerCase()));
+    return [...fromServer, ...localClients.filter((c) => !known.has(c.nome.trim().toLowerCase()))];
+  }, [serverClients, localClients]);
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -204,11 +255,7 @@ export default function NewQuote() {
         const c = JSON.parse(savedClient) as SavedClient;
         setClientMode("saved");
         setSelectedClientId(c.id);
-        setClientForm({
-          nome: c.nome, indirizzo: c.indirizzo || "", city: c.city || "",
-          postalCode: c.postalCode || "", province: c.province || "",
-          businessNumber: c.businessNumber || "", partitaIva: c.partitaIva || "",
-        });
+        setClientForm(toForm(c));
       } catch { /* ignore */ }
     }
   }, []);
@@ -268,6 +315,8 @@ export default function NewQuote() {
     return {
       nome: f.nome.trim(),
       indirizzo: f.indirizzo.trim(),
+      ...(f.email.trim() && !clientEmailInvalid(f) && { email: f.email.trim() }),
+      ...(f.phone.trim() && { phone: f.phone.trim() }),
       ...(f.city.trim() && { city: f.city.trim() }),
       ...(f.postalCode.trim() && { postalCode: f.postalCode.trim() }),
       ...(f.province.trim() && { province: f.province.trim() }),
@@ -278,6 +327,7 @@ export default function NewQuote() {
 
   const handleAiSubmit = () => {
     if (!input.trim() || isAiSubmitting) return;
+    if (clientEmailInvalid(clientForm)) { focusEmailError(); return; }
     const clientData = getClientData();
     if (rememberClient && clientData) upsertClient(clientData);
 
@@ -323,15 +373,15 @@ export default function NewQuote() {
 
   const isAiSubmitting = createQuote.isPending;
   const canAiSubmit = input.trim().length > 0 && !isAiSubmitting;
+  function focusEmailError() {
+    toast({ title: t("dashboard.new.client.emailInvalid"), variant: "destructive" });
+    document.querySelector<HTMLInputElement>('input[type="email"][aria-invalid="true"]')?.focus();
+  }
 
   const selectSavedClient = (c: SavedClient) => {
     setSelectedClientId(c.id);
     setClientMode("saved");
-    setClientForm({
-      nome: c.nome, indirizzo: c.indirizzo || "", city: c.city || "",
-      postalCode: c.postalCode || "", province: c.province || "",
-      businessNumber: c.businessNumber || "", partitaIva: c.partitaIva || "",
-    });
+    setClientForm(toForm(c));
   };
 
   const clearClient = () => {
@@ -612,6 +662,7 @@ export default function NewQuote() {
           <ManualQuoteBuilder
             clientData={clientData}
             profileData={profile ?? undefined}
+            onBeforeSubmit={() => { if (clientEmailInvalid(clientForm)) { focusEmailError(); return false; } return true; }}
           />
         </div>
       )}

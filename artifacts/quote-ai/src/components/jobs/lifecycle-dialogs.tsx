@@ -44,6 +44,8 @@ export function CompleteJobDialog({ data, open, onOpenChange, onConfirm, busy }:
   // Phase 87: the server refuses to complete a job with a permit still open, so say which ones before the click.
   const permits = useQuery({ queryKey: ["permits", data.job.id], queryFn: () => complianceApi.permits(data.job.id), enabled: open, retry: false });
   const openPermits = (permits.data?.permits ?? []).filter((p) => p.open);
+  // Phase 94: milestones not marked done are listed too. They do not block and completing the job leaves them as they are.
+  const openMilestones = data.milestones.filter((m) => m.status !== "completed");
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
@@ -54,6 +56,18 @@ export function CompleteJobDialog({ data, open, onOpenChange, onConfirm, busy }:
               <p>{preview.unbilledCents > 0 ? t("jobs.complete.finalDraft").replace("{amount}", formatCents(preview.unbilledCents)) : t("jobs.complete.nothingLeft")}</p>
               {preview.holdback && preview.holdback.withheldCents > 0 && (
                 <p>{t("jobs.complete.holdback").replace("{percent}", String(preview.holdback.percent)).replace("{amount}", formatCents(preview.holdback.withheldCents))}</p>
+              )}
+              {openMilestones.length > 0 && (
+                <div className="notice warn">
+                  <div className="grow">
+                    <p className="m-0" style={{ fontWeight: 700 }}>{t("jobs.complete.openMilestones").replace("{count}", String(openMilestones.length))}</p>
+                    <ul className="stack" style={{ gap: 2, marginTop: 6 }}>
+                      {openMilestones.slice(0, 5).map((m) => <li key={m.id}>{m.title}</li>)}
+                      {openMilestones.length > 5 && <li>{t("jobs.complete.andMore").replace("{count}", String(openMilestones.length - 5))}</li>}
+                    </ul>
+                    <p className="m-0" style={{ marginTop: 6 }}>{t("jobs.complete.openMilestonesHint")}</p>
+                  </div>
+                </div>
               )}
               {openPermits.length > 0 && (
                 <div className="notice danger" role="alert" style={{ fontWeight: 500 }}>

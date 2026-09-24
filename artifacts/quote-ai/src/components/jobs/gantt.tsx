@@ -4,6 +4,7 @@ import { enCA, frCA } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { MilestoneStatus } from "@/lib/jobs-api";
+import { formatCadWhole } from "@/lib/money";
 
 export type GanttRow = { id: string; title: string; start: string | null; end: string | null; status: MilestoneStatus; paymentAmountCents?: number | null };
 
@@ -67,7 +68,7 @@ export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id
                 <b>{r.title}</b>
                 <span>
                   {s && e ? `${format(s, "d MMM", { locale })} → ${format(e, "d MMM", { locale })}` : "—"}
-                  {r.paymentAmountCents ? ` · $${(r.paymentAmountCents / 100).toLocaleString("en-CA", { maximumFractionDigits: 0 })}` : ""}
+                  {r.paymentAmountCents ? ` · ${formatCadWhole(r.paymentAmountCents / 100)}` : ""}
                 </span>
               </div>
               <div className="gantt-track">

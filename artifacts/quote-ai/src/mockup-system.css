@@ -547,6 +547,9 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 .field label { display: block; font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 7px; }
 .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; font-size: 14.5px; color: var(--ink); background: #fff; outline: none; transition: border-color .2s, box-shadow .2s; }
 .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(16, 16, 49, .08); }
+/* Phase 94: a field-level error under its input (tied by aria-describedby). */
+.field input[aria-invalid="true"] { border-color: var(--red); }
+.field-err { margin: 6px 0 0; font-size: 12.5px; font-weight: 600; color: var(--red); }
 .set-row { display: flex; align-items: center; gap: 16px; padding: 16px 22px; border-top: 1px solid var(--soft); }
 .set-row:first-of-type { border-top: none; }
 .set-row .txt { flex: 1; min-width: 0; }
@@ -1071,6 +1074,8 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
 .page-head .meta a:hover { color: var(--navy); }
 
 .stat-grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+/* Phase 94: five tiles to a row are narrow; a smaller figure keeps "$11,300" / "11 300 $" on one line. */
+.stat-grid.cols-5 .stat-card .val { font-size: clamp(1.25rem, 1.6vw, 1.6rem); }
 .stat-card .sub { font-size: 12.5px; font-weight: 600; color: var(--faint); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stat-card .val.ok { color: var(--green-dark); }
 .stat-card .val.warn { color: var(--yellow-dark); }

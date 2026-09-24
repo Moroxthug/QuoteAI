@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, useEffect, u
 import { useLocation } from "wouter";
 import { type Lang } from "./translations";
 import { lookup, subscribeTranslations, getTranslationsVersion } from "./registry";
+import { setMoneyLang } from "@/lib/money";
 
 const STORAGE_KEY = "quoteai-lang";
 
@@ -59,6 +60,9 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 /** `initialLang` is only set by the build-time renderer (entry-server.tsx); the browser detects from URL/storage. */
 export function LanguageProvider({ children, initialLang }: { children: ReactNode; initialLang?: Lang }) {
   const [lang, setLangState] = useState<Lang>(() => initialLang ?? detectInitialLang());
+  // Phase 94: money helpers (lib/money.ts) format in this language. Set during
+  // render, not in an effect, so children rendered in this pass already see it.
+  setMoneyLang(lang);
 
   // The URL is authoritative for locale-routed pages (/, /quotes/*,
   // /fr, /fr/soumissions/*): keep `lang` in sync as the user navigates

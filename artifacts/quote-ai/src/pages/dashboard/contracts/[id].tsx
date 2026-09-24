@@ -15,8 +15,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { contractsApi, type ContractDto } from "@/lib/contracts-api";
 import { SignaturePad, type SignatureValue } from "@/components/signature-pad";
+import { formatCad } from "@/lib/money";
 
-const formatCad = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(n);
 
 /** Contract status → locked `.chip-*` colour (Phase 57). */
 export const STATUS_STYLES: Record<ContractDto["status"], string> = {

@@ -10,11 +10,11 @@ import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, Chevr
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { formatCad } from "@/lib/money";
 
 type StatusFilter = "all" | "draft" | "unlocked" | "pending_payment";
 
-const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
+const formatCurrency = (amount: number) => formatCad(amount);
 
 function statusChip(status: string, t: (key: string) => string): { cls: string; label: string } {
   if (status === "unlocked") return { cls: "chip-green", label: t("dashboard.quotesList.statusUnlocked") };

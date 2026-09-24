@@ -20,6 +20,7 @@ import { PriceCheckCard } from "@/components/quotes/price-check-card";
 import { jobsApi } from "@/lib/jobs-api";
 import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
+import { formatCad } from "@/lib/money";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -578,8 +579,7 @@ const can = useCan();
   // …and once the client has accepted: the accepted amount is what the contract is built on.
   // Phase 80: foreman/viewer (quotes:view) get the read-only page; the server refuses their edits anyway.
   const isEditLocked = !!quote.pdfDownloadedAt || quote.status === "accepted" || !can("quotes", "edit");
-  const formatCurrency = (amount: number) =>
-    new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD" }).format(amount);
+  const formatCurrency = (amount: number) => formatCad(amount);
 
   const hasCapitoli = Array.isArray(quote.capitoli) && quote.capitoli.length > 0;
   const capitoli = hasCapitoli ? quote.capitoli : [];

@@ -14,8 +14,9 @@ import { formatCents } from "@/lib/jobs-api";
 import { analyticsApi, type CompanyAnalyticsDto, type RiskFlag } from "@/lib/analytics-api";
 import { AXIS_TICK, ChartCard, Empty, LegendRow, SERIES, STATUS, TOOLTIP_STYLE, money, moneyShort } from "@/components/charts";
 import { JobStatusBadge } from "@/components/jobs/badges";
+import { formatCadWhole } from "@/lib/money";
 
-const formatCurrency = (v: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
+const formatCurrency = (v: number) => formatCadWhole(v);
 const QUOTE_STATUS_COLORS: Record<string, string> = { draft: SERIES.neutral, unlocked: SERIES.actual, pending: "#d97706" };
 const PERIODS = [3, 6, 12] as const;
 const PERIOD_SEG: Record<(typeof PERIODS)[number], "m" | "q" | "y"> = { 3: "m", 6: "q", 12: "y" };

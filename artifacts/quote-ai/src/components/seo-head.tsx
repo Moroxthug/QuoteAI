@@ -39,7 +39,7 @@ export function SeoHead({
   title,
   description,
   canonical,
-  ogImage = "https://quoteai.ca/opengraph.jpg",
+  ogImage = "https://quoteai.ca/opengraph.jpg?v=2", // ?v= busts the platforms' preview caches when the card changes
   noIndex = false,
   ogTitle,
   ogDescription,

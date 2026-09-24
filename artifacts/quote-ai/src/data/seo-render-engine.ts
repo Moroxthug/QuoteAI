@@ -61,7 +61,7 @@ function strHash(s: string): number {
 // pointed at /og/<slug>.jpg — a 404 on all 210 sector/city pages).
 
 export function getOgImagePath(sectorSlug: string): string {
-  return sectorSlug in SECTORS ? `/og/sectors/${sectorSlug}.png` : "/opengraph.jpg";
+  return sectorSlug in SECTORS ? `/og/sectors/${sectorSlug}.png` : "/opengraph.jpg?v=2";
 }
 
 // ─── Intro text — 4 variants, sectorType-aware, deterministic by city.slug ─

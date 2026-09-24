@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
+    "generate-home-og": "tsx ./scripts/generate-home-og-image.ts",
     "generate-og": "tsx ./scripts/generate-blog-og-images.ts && tsx ./scripts/generate-sector-og-images.ts",
     "prebuild": "tsx ./scripts/generate-sitemap.ts && tsx ./scripts/generate-blog-og-images.ts && tsx ./scripts/generate-sector-og-images.ts",
     "prerender": "vite build --config vite.config.ts --ssr src/entry-server.tsx --outDir dist/server && tsx ./scripts/generate-blog-og-images.ts && tsx ./scripts/generate-sector-og-images.ts && tsx ./scripts/prerender-seo.ts",
@@ -53,6 +54,7 @@
     "date-fns": "^3.6.0",
     "lighthouse": "^13.5.0",
     "lucide-react": "catalog:",
+    "playwright-core": "^1.63.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-helmet-async": "^3.0.0",

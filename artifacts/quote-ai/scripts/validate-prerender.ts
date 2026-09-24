@@ -135,7 +135,7 @@ function validateHtml(filePath: string, html: string): string[] {
   const bodyHtml = html.slice(html.indexOf("<body"));
   if (!/<link\b[^>]*rel="stylesheet"[^>]*href="\/assets\/index-[^"]+\.css"/i.test(bodyHtml)) errors.push("Full stylesheet <link> is not in <body>");
   const ogTag = metaTags.find((tag) => /\bproperty="og:image"/i.test(tag));
-  const og = ogTag ? /\bcontent="https:\/\/quoteai\.ca(\/[^"]+)"/i.exec(ogTag) : null;
+  const og = ogTag ? /\bcontent="https:\/\/quoteai\.ca(\/[^"?]+)(?:\?[^"]*)?"/i.exec(ogTag) : null; // a ?v= cache-buster is not part of the file
   if (!og) errors.push("Missing og:image");
   else if (!existsSync(join(distDir, og[1]!))) errors.push(`og:image ${og[1]} does not exist in dist/public`);
   const head = html.slice(html.indexOf("<head>"), html.indexOf("</head>"));

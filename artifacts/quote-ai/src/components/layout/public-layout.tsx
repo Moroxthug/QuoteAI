@@ -318,7 +318,8 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       )}
 
       {/* AI Support Bot Widget */}
-      <SupportBot />
+      {/* Phase 93: on the sign-in and sign-up forms the floating button sat on the submit button and the terms line at phone width. */}
+      {!/^\/sign-(in|up)(\/|$)/.test(location) && <SupportBot />}
     </div>
   );
 }

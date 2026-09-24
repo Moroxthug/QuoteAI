@@ -14,7 +14,7 @@ To pick up in a new conversation: *"go on with phase 92"* (or whichever is next 
 | Phase | Title | Who | State |
 |---|---|---|---|
 | 92 | The embed widget that doesn't exist | assistant | **done** 2026-09-23 |
-| 93 | Sign-up, walked for real | assistant | not started |
+| 93 | Sign-up, walked for real | assistant | **done** 2026-09-23 |
 | 94 | Job and quote rough edges | assistant | not started |
 | 95 | French legal pages + who did what | assistant | not started |
 | 96 | Integrations, one level deeper | assistant | not started |
@@ -161,3 +161,39 @@ Grouped by urgency. **(→ assistant)** marks items where you only provide a val
 - The contractor's lead notification is still English only (the visitor's receipt follows the widget's language).
 
 **Verification**: `pnpm typecheck` (in `pnpm build`) · `pnpm lint` **0 errors** (69 warnings, pre-existing) · `pnpm knip` clean · `i18n-audit` **4656 = 4656**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **478** (regenerated: the widget POST now reads the client back) · unit **28 files / 191 tests** · e2e **phase92 4/4** (a visitor on a cross-site page gets `$2,848 – $3,955`; the host's hostile CSS doesn't reach the form; errors in place with focus; consent required; draft quote + lead + client + both emails. French page with the AI down: French form, lead without a quote with the words kept, French receipt with no price box. Missing, wrong and regenerated keys show only the neutral box. Honeypot stores nothing. No uncaught page errors) · regression **security (IDOR + CORS), followups, quotes, public-tokens** green · `pnpm build` ✓ (`dist/public/widget.js` present) · `qa:visual` on `/widget-test.html`, Settings → Account and Settings → Widget, EN+FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · every widget state (step 1 and step 2 with errors, estimate, no estimate at 375 FR, not available) checked by eye.
+
+### Phase 93 — Sign-up, walked for real (2026-09-23)
+
+**Built**
+- **The walk** (`phase93.e2e`): Chrome against the real SPA (Vite proxied at the in-process API, shared launcher `e2e/viteServer.ts`), each person in their own browser with their own IP, the real sign-up form and the verification link out of the email. Five people, each in EN and FR at 1280 and 375 px (20 walks, a screenshot and an overflow / error-boundary / raw-key check at every step):
+  - A new owner: sign-up, "send it again", verify, the four steps, first quote, dashboard.
+  - An owner from `/pricing` with Pro and 4 logins wanted. Stripe is mocked at the SDK; EN runs have a seat price, FR runs don't. Checkout, then the way back.
+  - An employee with an access code: `/join`, sign up, verify, back to `/join`, join, profile.
+  - An emailed invite (admin) end to end, then `/onboarding` by accident: dashboard, the employer's company untouched, no company of their own.
+  - An invitee who signed up without the link.
+  Real sign-ups are cleaned up by address (`adoptUserByEmail`, and the stale purge now also takes `e2e-walk-…@example.invalid`).
+- **qa:visual reaches every onboarding step** without a URL a customer could use. A `newcomer` session (signed in, no company, reset before each page) is clicked through steps 1-4 and step 4 with `?plan=monthly_pro`. An `invitee` session shows the invitation screen.
+- **Account emails** (`lib/accountEmails.ts`): verify, reset and welcome in the site's language (`x-quoteai-lang` from the auth client, Accept-Language as fallback). Navy, no emojis. The welcome no longer promises "unlimited quotes / 3 free PDFs" and is not sent to people joining a company.
+- **Invitations waiting for your address**: `GET /api/team/pending-invites` and `POST …/:id/accept` (verified address only, never access-code rows). Onboarding shows them before any form.
+- **Back from Stripe**: onboarding's checkout returns to Team → Members. A notice on Team and the dashboard reports success or cancellation and syncs the subscription once.
+
+**Found (and fixed)**
+1. An invitee who signed up without their link had no way to join from onboarding. The only way on was to create a company of their own.
+2. Onboarding showed its form before knowing whose company it was. An admin member reaching it could have written over the employer's name, address and payment schedule.
+3. Step 4 showed "2 extra logins" and charged for none when `STRIPE_PRICE_EXTRA_SEAT` isn't set (true in production today). It also showed no total and put the arrow before "Continue to payment".
+4. After paying, the owner landed on `/dashboard?payment=success`, which nothing read: no confirmation, no way to the invite step, plan possibly not synced yet.
+5. The verification, reset and welcome emails were English only in purple, with emojis. The welcome went to every employee too, telling them to set up a business and pick a plan.
+6. The check-your-email screen had no way to resend.
+7. Step 3's button still said "Continue and create your first quote" (step 4 follows). In French it wrapped to four lines at 375 px. The default payment schedule was English in French. The two field icons sat on lines of their own. Step 1's placeholders were Toronto examples in French.
+8. `/join` and the invite page drew the logo as a speck, and their two buttons wrapped to two lines each at 375 px. The invite page showed the role as the raw word "admin" in French.
+9. The public header's "Sign up" broke onto two lines at 375 px. The floating help button covered the sign-up button and the terms line.
+10. Team → Members overflowed sideways at 375 px once a company has seats to buy (count + three buttons in a row that didn't wrap). The invite dialog's email and role labels weren't tied to their fields.
+11. The new owner's dashboard still said "Complete your profile" right after they had. The plan subtitle said Pro gives "unlimited quotes" (it's 60 a month). One French string said "devis".
+
+**Not done / deferred**
+- The subscription-activated email (sent by the webhook) still has emojis and the old colours; it is part of billing, not sign-up.
+- The contractor's lead notification is still English only (from Phase 92).
+- The dashboard mixes "30 seconds" and "60 seconds" for the first quote; so does the marketing site. Left alone.
+- The `sent_by` / leaderboard work is Phase 95.
+
+**Verification**: `pnpm typecheck` ✓ · `pnpm lint` **0 errors** (69 warnings, as before) · `pnpm knip` unchanged from before the phase · `i18n-audit` **4677 = 4677**, 0 missing, 0 split · `env:inventory` **no problems** · route matrix **480** (regenerated; the new accept route allowlisted with its reason) · unit **28 files / 191 tests** · e2e **phase93 20/20** · regression **team, security (21/21), account, billing, phase91, phase92** green · `pnpm build` ✓ · `qa:visual` on onboarding (every step as newcomer + invitation as invitee), sign-in/up, `/join`, `/team-invite`, `/pricing`, `/dashboard`, Team → Members: **112 pages**, EN × 5 widths + FR × 1280/375: 0 overflow, 0 gutter, **0 axe serious/critical**, 0 screen-reader findings, 0 raw keys · every walk step checked by eye at 375 and 1280, EN and FR.

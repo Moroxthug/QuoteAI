@@ -6,8 +6,7 @@ import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificat
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
-import { sendWelcomeEmail, escapeHtml } from "./email";
-import { getBaseUrl } from "./baseUrl";
+import { requestLang, verificationEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
 import { recordSecurityAuditEvent } from "./auditLog";
 
 // Minimal, duplicate-of-`resolveActingOrg` org lookup — kept local rather than
@@ -38,10 +37,6 @@ async function findPendingDeletionLocal(userId: string) {
 
 
 const resend = process.env.RESEND_API_KEY ? brandedResend(process.env.RESEND_API_KEY) : null;
-
-// Gmail and most webmail clients strip data: URI images from HTML emails,
-// so the logo must be a real hosted URL rather than an inline base64 SVG.
-const LOGO_URL = `${getBaseUrl()}/quoteai-logo.png`;
 
 const secret = process.env.BETTER_AUTH_SECRET ?? process.env.SESSION_SECRET;
 if (!secret) {
@@ -157,7 +152,7 @@ export const auth = betterAuth({
     // that existed before it (including an attacker's) must die with it.
     // better-auth defaults this to false.
     revokeSessionsOnPasswordReset: true,
-    async sendResetPassword({ user, url }) {
+    async sendResetPassword({ user, url }, request) {
       if (!resend) {
         logger.warn("RESEND_API_KEY not set — skipping password reset email");
         return;
@@ -166,8 +161,7 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: "QuoteAI <no-reply@quoteai.ca>",
           to: [user.email],
-          subject: "Reset your password – QuoteAI",
-          html: buildResetPasswordEmail(user.name, url),
+          ...resetPasswordEmail(requestLang(request?.headers), user.name, url),
         });
       } catch (err) {
         logger.error({ err }, "Failed to send password reset email");
@@ -178,14 +172,13 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     autoSignInAfterVerification: true,
-    async sendVerificationEmail({ user, url }) {
+    async sendVerificationEmail({ user, url }, request) {
       if (!resend) return;
       try {
         await resend.emails.send({
           from: "QuoteAI <no-reply@quoteai.ca>",
           to: [user.email],
-          subject: "Verify your email – QuoteAI",
-          html: buildVerificationEmail(user.name, url),
+          ...verificationEmail(requestLang(request?.headers), user.name, url),
         });
       } catch (err) {
         logger.error({ err }, "Failed to send verification email");
@@ -195,72 +188,28 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
-          await sendWelcomeEmail({ toEmail: user.email, toName: user.name });
+        // Phase 93: the welcome is for someone starting a company. A person
+        // signing up to join one (from /join or an invite link, or whose
+        // address already has an invitation waiting) is not told to set up a
+        // business and pick a plan.
+        after: async (user, ctx) => {
+          if (!resend) return;
+          try {
+            const callbackURL = String((ctx?.body as { callbackURL?: unknown } | undefined)?.callbackURL ?? "");
+            if (/^\/(join|team-invite)\b/.test(callbackURL)) return;
+            const [invited] = await db
+              .select({ id: organizationMembersTable.id })
+              .from(organizationMembersTable)
+              .where(and(eq(organizationMembersTable.invitedEmail, user.email.toLowerCase()), eq(organizationMembersTable.status, "invited")))
+              .limit(1);
+            if (invited) return;
+            await resend.emails.send({ from: "QuoteAI <no-reply@quoteai.ca>", to: [user.email], ...welcomeEmail(requestLang(ctx?.headers), user.name) });
+          } catch (err) {
+            logger.error({ err }, "Failed to send welcome email (non-fatal)");
+          }
         },
       },
     },
   },
 });
 
-function buildResetPasswordEmail(name: string, url: string): string {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"/><title>Reset your password – QuoteAI</title></head>
-<body style="margin:0;padding:0;background:#f5f3ff;font-family:system-ui,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f3ff;padding:32px 16px">
-<tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(124,58,237,0.10)">
-<tr><td style="background:linear-gradient(135deg,#7c3aed,#06b6d4);padding:28px 40px;text-align:center">
-  <img src="${LOGO_URL}" alt="QuoteAI" height="36" />
-</td></tr>
-<tr><td style="background:#fff;padding:32px 40px">
-  <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e">Reset your password</h1>
-  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${escapeHtml(name)},<br/>you requested to reset the password for your QuoteAI account. Click the button below:</p>
-  <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
-    <tr><td align="center" style="border-radius:10px;background:linear-gradient(135deg,#7c3aed,#06b6d4)">
-      <a href="${url}" style="display:inline-block;color:#fff;font-size:15px;font-weight:600;padding:13px 32px;border-radius:10px;text-decoration:none">Reset password →</a>
-    </td></tr>
-  </table>
-  <p style="margin:0;font-size:13px;color:#9ca3af">Didn't request this? You can safely ignore this email. Your password will remain unchanged.</p>
-</td></tr>
-<tr><td style="background:#f9fafb;padding:20px 40px;border-top:1px solid #f3f4f6;text-align:center">
-  <p style="margin:0;font-size:12px;color:#9ca3af">&copy; ${new Date().getFullYear()} QuoteAI · Professional AI-powered quotes</p>
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>`;
-}
-
-function buildVerificationEmail(name: string, url: string): string {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"/><title>Verify your email – QuoteAI</title></head>
-<body style="margin:0;padding:0;background:#f5f3ff;font-family:system-ui,sans-serif">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f3ff;padding:32px 16px">
-<tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(124,58,237,0.10)">
-<tr><td style="background:linear-gradient(135deg,#7c3aed,#06b6d4);padding:28px 40px;text-align:center">
-  <img src="${LOGO_URL}" alt="QuoteAI" height="36" />
-</td></tr>
-<tr><td style="background:#fff;padding:32px 40px">
-  <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e">Verify your email address</h1>
-  <p style="margin:0 0 24px;font-size:14px;color:#374151;line-height:1.7">Hi ${escapeHtml(name)},<br/>click the button below to verify your email address on QuoteAI.</p>
-  <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
-    <tr><td align="center" style="border-radius:10px;background:linear-gradient(135deg,#7c3aed,#06b6d4)">
-      <a href="${url}" style="display:inline-block;color:#fff;font-size:15px;font-weight:600;padding:13px 32px;border-radius:10px;text-decoration:none">Verify email →</a>
-    </td></tr>
-  </table>
-  <p style="margin:0;font-size:13px;color:#9ca3af">Didn't create an account on QuoteAI? You can safely ignore this email.</p>
-</td></tr>
-<tr><td style="background:#f9fafb;padding:20px 40px;border-top:1px solid #f3f4f6;text-align:center">
-  <p style="margin:0;font-size:12px;color:#9ca3af">&copy; ${new Date().getFullYear()} QuoteAI · Professional AI-powered quotes</p>
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>`;
-}

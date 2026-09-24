@@ -26,12 +26,12 @@ process.env.LOG_LEVEL ??= "warn";
 bootstrapQaEnv("qa-visual");
 process.env.NODE_ENV = "development";
 
-import { spawn, type ChildProcess } from "node:child_process";
 import { mkdirSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { screenReaderAudit, modalAudit, SR_BLOCKING, type SrFinding } from "./screen-reader.js";
+import { startVite, stopVite } from "./viteServer.js";
 
 const require = createRequire(import.meta.url);
 const AXE_PATH = require.resolve("axe-core/axe.min.js");
@@ -70,9 +70,31 @@ const VITE_PORT = Number(args.get("port") ?? 5197);
 const OUT = resolve(import.meta.dirname, "../../.qa", args.get("out") ?? "visual");
 
 // ── Routes ───────────────────────────────────────────────────────────────────
-/** `session`: who is signed in — nobody, the owner, or (Phase 86b) a foreman member of the same company. */
-type Session = "public" | "owner" | "foreman";
-type RouteSpec = { path: string; session: Session; name?: string };
+/**
+ * `session`: who is signed in — nobody, the owner, (Phase 86b) a foreman member of the same company, or
+ * (Phase 93) a newcomer: freshly signed up, no company yet, the person onboarding is for — and an invitee
+ * who signed up without their link.
+ */
+type Session = "public" | "owner" | "foreman" | "newcomer" | "invitee";
+/** `drive`: clicks from the loaded page to the state being checked (onboarding's steps have no URL of their own). */
+type RouteSpec = { path: string; session: Session; name?: string; drive?: (page: Page) => Promise<void> };
+
+// Phase 93: onboarding's steps 2-4 are only reachable by filling the steps before them, as a customer does.
+async function onboardTo(page: Page, step: 2 | 3 | 4) {
+  await page.fill("#companyName", "Sweep Renovations Ltd.");
+  await page.click(".card-foot .btn-navy");
+  await page.waitForSelector('[data-step="2"]');
+  if (step === 2) return;
+  await page.locator("fieldset").first().locator(".pill").first().click();
+  await page.fill("#setup-seats", "4");
+  await page.locator("fieldset").nth(1).locator(".pill").first().click();
+  await page.click(".card-foot .btn-navy");
+  await page.waitForSelector('[data-step="3"]');
+  if (step === 3) return;
+  await page.selectOption("#province", "ON");
+  await page.click(".card-foot .btn-navy");
+  await page.waitForSelector('[data-step="4"]', { timeout: 15_000 });
+}
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
   const pub = (path: string): RouteSpec => ({ path, session: "public" });
   const dash = (path: string): RouteSpec => ({ path, session: "owner" });
@@ -99,6 +121,13 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     // Phase 92: the widget on its sample contractor page (the form lives in a shadow root; axe walks into it).
     ...(s.widgetKey ? [{ path: `/widget-test.html?key=${s.widgetKey}`, session: "public" as const, name: "/widget-test.html" }] : []),
     dash("/onboarding"),
+    // Phase 93: every onboarding step, as the person it is for sees it.
+    { path: "/onboarding", session: "newcomer", name: "/onboarding step 1 (newcomer)" },
+    { path: "/onboarding", session: "newcomer", name: "/onboarding step 2 (newcomer)", drive: (p) => onboardTo(p, 2) },
+    { path: "/onboarding", session: "newcomer", name: "/onboarding step 3 (newcomer)", drive: (p) => onboardTo(p, 3) },
+    { path: "/onboarding", session: "newcomer", name: "/onboarding step 4 (newcomer)", drive: (p) => onboardTo(p, 4) },
+    { path: "/onboarding?plan=monthly_pro", session: "newcomer", name: "/onboarding step 4 plan (newcomer)", drive: (p) => onboardTo(p, 4) },
+    { path: "/onboarding", session: "invitee", name: "/onboarding invitation (invitee)" },
     dash("/dashboard"), dash("/dashboard/new"), dash("/dashboard/quotes"), dash(`/dashboard/quotes/${s.longQuoteId}`), dash(`/dashboard/quotes/${s.quoteId}`),
     dash("/dashboard/analytics"), dash("/dashboard/settings"), dash("/dashboard/settings/account"),
     // Phase 85: the integrations tab is where the calendar connections, the
@@ -129,44 +158,6 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
 }
 
 const slug = (path: string) => (path === "/" ? "home" : path.replace(/^\//, "").replace(/[^a-z0-9]+/gi, "-").replace(/-+$/, "").slice(0, 60)) || "home";
-
-// ── Vite ─────────────────────────────────────────────────────────────────────
-let vite: ChildProcess | null = null;
-async function startVite(apiBase: string): Promise<string> {
-  const url = `http://localhost:${VITE_PORT}`;
-  // A stale server from an aborted run would answer the health check below
-  // and then vanish under us — refuse to share the port.
-  const busy = await fetch(url, { signal: AbortSignal.timeout(1500) }).then(() => true, () => false);
-  if (busy) throw new Error(`port ${VITE_PORT} is already in use (a previous run's vite? pass --port=<n>)`);
-  vite = spawn("pnpm", ["--filter", "@workspace/quote-ai", "exec", "vite", "--port", String(VITE_PORT), "--strictPort", "--clearScreen", "false"], {
-    cwd: ROOT,
-    env: { ...process.env, API_PROXY_TARGET: apiBase, PORT: String(VITE_PORT), BROWSER: "none" },
-    shell: process.platform === "win32", // pnpm is a .cmd here and node refuses those without a shell
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  vite.stderr?.on("data", (d) => process.stderr.write(`[vite] ${d}`));
-  const deadline = Date.now() + 60_000;
-  while (Date.now() < deadline) {
-    try {
-      const r = await fetch(url, { signal: AbortSignal.timeout(2000) });
-      if (r.ok) return url;
-    } catch {}
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  throw new Error(`vite did not come up on ${url}`);
-}
-async function stopVite(): Promise<void> {
-  if (!vite?.pid) return;
-  const child = vite;
-  vite = null;
-  if (process.platform === "win32") {
-    // `shell: true` means the pid is cmd.exe → pnpm → node; /T takes the tree.
-    await new Promise<void>((done) => spawn("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore" }).on("exit", () => done()));
-  } else {
-    child.kill("SIGTERM");
-    await new Promise<void>((done) => child.on("exit", () => done()));
-  }
-}
 
 // ── Per-page checks ──────────────────────────────────────────────────────────
 type AxeNode = { target: string[]; html: string; any: Array<{ data?: Record<string, unknown> }> };
@@ -324,6 +315,10 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
+    if (r.drive) {
+      await r.drive(page);
+      await settle(page);
+    }
     result.title = await page.title();
     result.boundary = await page.evaluate(() => {
       const t = document.body.innerText;
@@ -424,6 +419,8 @@ const { installVendorStubs } = await import("./vendorStub.js");
 installVendorStubs();
 const { startServer, stopServer, createOrg, createUser, cleanupAll } = await import("./harness.js");
 const { seedShowcase, setSignTokenCapture } = await import("./fixtures.js");
+const { db, businessProfilesTable } = await import("@workspace/db");
+const { eq } = await import("drizzle-orm");
 setSignTokenCapture(() => {
   for (let i = mailbox.length - 1; i >= 0; i--) {
     const l = mailbox[i]!.links.find((x) => x.includes("/sign/"));
@@ -437,7 +434,7 @@ const t0 = Date.now();
 try {
   const apiBase = await startServer();
   process.env.QUOTEAI_BASE_URL = `http://localhost:${VITE_PORT}`;
-  const frontend = await startVite(apiBase);
+  const frontend = await startVite(VITE_PORT, apiBase);
   console.log(`[qa-visual] api ${apiBase} · frontend ${frontend}`);
 
   const org = await createOrg({ province: PROVINCE, companyName: PROVINCE === "QC" ? "Rénovations Tremblay inc." : "Northside Renovations Ltd." });
@@ -453,6 +450,14 @@ try {
     if (accepted.status === 200) foremanToken = foremanUser.token;
   }
   if (!foremanToken) console.warn("[qa-visual] could not set up the foreman session — its routes are skipped");
+  // Phase 93: signed in, no company — onboarding's own audience. And someone the showcase invited who signed
+  // up without the link: onboarding offers the invitation before any form.
+  const newcomer = await createUser({ name: "Morgan Newcomer" });
+  let inviteeToken: string | null = null;
+  const inviteeEmail = `invitee-sweep-${org.userId}@example.invalid`;
+  if ((await org.api("/api/team/members/invite", { body: { email: inviteeEmail, role: "office", send: false } })).status === 201) {
+    inviteeToken = (await createUser({ email: inviteeEmail, name: "Riley Invitee" })).token;
+  } else console.warn("[qa-visual] could not invite the invitee — its route is skipped");
   console.log(`[qa-visual] showcase seeded for ${org.email}:`, { ...showcase, invoiceToken: "…", signToken: showcase.signToken ? "…" : null, workerToken: showcase.workerToken ? "…" : null, teamInviteToken: showcase.teamInviteToken ? "…" : null });
 
   rmSync(OUT, { recursive: true, force: true });
@@ -463,9 +468,9 @@ try {
   const all = routes(showcase);
   for (const lang of LANGS) {
     const widths = lang === "fr" ? WIDTHS_FR : WIDTHS_EN;
-    for (const session of ["public", "owner", "foreman"] as const) {
+    for (const session of ["public", "owner", "foreman", "newcomer", "invitee"] as const) {
       const rs = all.filter((r) => r.session === session);
-      const bearer = session === "owner" ? org.token : session === "foreman" ? foremanToken : null;
+      const bearer = session === "owner" ? org.token : session === "foreman" ? foremanToken : session === "newcomer" ? newcomer.token : session === "invitee" ? inviteeToken : null;
       if (!rs.length || (session !== "public" && !bearer)) continue;
       const ctx = await browser.newContext({
         locale: lang === "fr" ? "fr-CA" : "en-CA",
@@ -476,6 +481,8 @@ try {
       await ctx.addInitScript((l: string) => { try { localStorage.setItem("quoteai-lang", l); } catch {} }, lang);
       for (const width of widths) {
         for (const r of rs) {
+          // Step 3 saves the company: every newcomer page starts from "no company yet" again.
+          if (session === "newcomer") await db.delete(businessProfilesTable).where(eq(businessProfilesTable.userId, newcomer.userId));
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
           const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.sr.length && `SR:${[...new Set(res.sr.map((f) => f.rule))].join(",")}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);

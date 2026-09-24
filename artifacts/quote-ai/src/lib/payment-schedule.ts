@@ -24,6 +24,22 @@ export type PaymentSchedule = {
   derived: boolean;
 };
 
+/** The starting schedule offered at onboarding and in Settings → Business, in the language on screen (Phase 93: it was English only). */
+export function defaultPaymentSchedule(lang: string): PaymentSchedule {
+  const fr = lang === "fr";
+  return {
+    currency: "CAD",
+    derived: false,
+    holdback: { enabled: false, percent: 10 },
+    terms: [
+      { id: "t1", type: "deposit", label: fr ? "Acompte à la signature du contrat" : "Deposit upon contract signing", trigger: "on_signing", amountType: "percent", value: 15, dueDays: 0 },
+      { id: "t2", type: "milestone", label: fr ? "Livraison des matériaux et début des travaux" : "Delivery of materials and start of work", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
+      { id: "t3", type: "milestone", label: fr ? "Fin substantielle des travaux" : "Substantial completion", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
+      { id: "t4", type: "completion", label: fr ? "Solde à la fin des travaux, après la visite avec le client" : "Final balance upon completion and client walkthrough", trigger: "on_completion", amountType: "percent", value: 15, dueDays: 15 },
+    ],
+  };
+}
+
 export const CANADIAN_PROVINCES: { code: string; en: string; fr: string }[] = [
   { code: "AB", en: "Alberta", fr: "Alberta" },
   { code: "BC", en: "British Columbia", fr: "Colombie-Britannique" },

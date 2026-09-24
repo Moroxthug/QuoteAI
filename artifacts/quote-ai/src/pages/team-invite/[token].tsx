@@ -29,7 +29,7 @@ export default function TeamInvitePage() {
   return (
     <main id="main" className="doc-shell flex items-center justify-center p-4">
       <div className="card w-full max-w-md p-8 text-center space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
-        <Logo style={{ height: 28, margin: "0 auto" }} />
+        <div className="flex justify-center"><Logo /></div>
 
         {isLoading && <Loader2 className="h-6 w-6 animate-spin mx-auto" style={{ color: "var(--navy)" }} />}
 
@@ -43,14 +43,14 @@ export default function TeamInvitePage() {
         {!isLoading && preview && !accept.isSuccess && (
           <div className="space-y-4">
             <h1 className="text-xl font-bold" style={{ color: "var(--navy)" }}>{fmt(t("invite.title"), { company: preview.companyName || t("invite.yourTeam") })}</h1>
-            <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{t("invite.invitedAs")} <strong>{preview.role}</strong>{t("invite.using")} <strong>{preview.email}</strong>.</p>
+            <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{t("invite.invitedAs")} <strong>{t(`join.role.${preview.role}`)}</strong>{t("invite.using")} <strong>{preview.email}</strong>.</p>
 
             {!isLoaded ? (
               <Loader2 className="h-5 w-5 animate-spin mx-auto" style={{ color: "var(--navy)" }} />
             ) : !isSignedIn ? (
               <div className="space-y-2">
                 <p className="text-xs" style={{ color: "var(--faint)" }}>{t("invite.signInHint")}</p>
-                <div className="flex gap-2 justify-center">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Link href={`/sign-in?next=${returnTo}`} className="btn btn-outline-navy btn-sm">{t("invite.signIn")}</Link>
                   <Link href={`/sign-up?next=${returnTo}`} className="btn btn-navy btn-sm">{t("invite.createAccount")}</Link>
                 </div>

@@ -31,6 +31,17 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verificationSent, setVerificationSent] = useState(false);
+  // Phase 93: a way out when the email does not arrive (spam folder, a typo caught late).
+  const [resend, setResend] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  async function resendVerification() {
+    setResend("sending");
+    try {
+      const r = await authClient.sendVerificationEmail({ email: email.trim(), callbackURL: nextPath });
+      setResend(r.error ? "error" : "sent");
+    } catch {
+      setResend("error");
+    }
+  }
 
   useEffect(() => {
     const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -126,6 +137,15 @@ export default function SignUpPage() {
               <h2 className="auth-title" style={{ marginBottom: 8 }}>{t("signUp.checkEmailTitle")}</h2>
               <p className="auth-sub" style={{ marginBottom: 24 }}>
                 {t("signUp.checkEmailBodyPrefix")} <strong style={{ color: "var(--ink)" }}>{email}</strong>. {t("signUp.checkEmailBodySuffix")}
+              </p>
+              <p className="auth-sub" style={{ marginBottom: 16 }}>
+                {t("signUp.noEmail")}{" "}
+                <button type="button" className="auth-link" onClick={resendVerification} disabled={resend === "sending" || resend === "sent"}>
+                  {resend === "sending" ? t("signUp.resending") : t("signUp.resend")}
+                </button>
+              </p>
+              <p role="status" aria-live="polite" className="auth-sub" style={{ marginBottom: 16, minHeight: 1 }}>
+                {resend === "sent" ? t("signUp.resent") : resend === "error" ? t("signUp.resendError") : ""}
               </p>
               <Link href="/sign-in" className="auth-link">
                 {t("signUp.backToLogin")}

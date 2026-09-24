@@ -3,17 +3,17 @@ import "@/i18n/dashboard";
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { useUpdateBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Building2, Upload, X, ImageIcon, ArrowRight, ArrowLeft, Sparkles, MapPin, Landmark, CalendarClock, Hammer, Users } from "lucide-react";
+import { Loader2, Building2, Upload, X, ImageIcon, ArrowRight, ArrowLeft, MapPin, Landmark, CalendarClock, Hammer, Users, Mail } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
 import { markOnboardingSkipped, markOnboardingDone } from "@/lib/onboarding-state";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
-import { CANADIAN_PROVINCES, type PaymentSchedule } from "@/lib/payment-schedule";
+import { CANADIAN_PROVINCES, defaultPaymentSchedule, type PaymentSchedule } from "@/lib/payment-schedule";
 import { WorkStepFields } from "@/components/onboarding/work-step";
 import { TeamStep } from "@/components/onboarding/team-step";
 import { peopleApi, type CompanySetup, type CompanyTrade } from "@/lib/people-api";
@@ -21,18 +21,6 @@ import { teamMembersApi } from "@/lib/team-members-api";
 
 const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
-
-const DEFAULT_SCHEDULE: PaymentSchedule = {
-  currency: "CAD",
-  derived: false,
-  holdback: { enabled: false, percent: 10 },
-  terms: [
-    { id: "t1", type: "deposit", label: "Deposit upon contract signing", trigger: "on_signing", amountType: "percent", value: 15, dueDays: 0 },
-    { id: "t2", type: "milestone", label: "Delivery of materials and start of work", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
-    { id: "t3", type: "milestone", label: "Substantial completion", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
-    { id: "t4", type: "completion", label: "Final balance upon completion and client walkthrough", trigger: "on_completion", amountType: "percent", value: 15, dueDays: 15 },
-  ],
-};
 
 export default function OnboardingPage() {
   const { t, lang } = useLanguage();
@@ -48,10 +36,23 @@ export default function OnboardingPage() {
   const plan = new URLSearchParams(useSearch()).get("plan");
   const [setup, setSetup] = useState<CompanySetup & { trades: CompanyTrade[] }>({ trades: [] });
   // Someone who joined a company (invite or access code) and owns none has no company to set up.
-  const { data: orgs } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, enabled: !!isSignedIn });
+  const orgsQuery = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, enabled: !!isSignedIn });
+  const orgs = orgsQuery.data;
+  const joinedOnly = !!orgs && orgs.items.length > 0 && !orgs.items.some((o) => o.isOwn);
   useEffect(() => {
-    if (orgs && orgs.items.length > 0 && !orgs.items.some((o) => o.isOwn)) setLocation("/dashboard");
-  }, [orgs, setLocation]);
+    if (joinedOnly) setLocation("/dashboard");
+  }, [joinedOnly, setLocation]);
+  // Phase 93: an invitation waiting for this address (signed up without the link) is offered before any form —
+  // otherwise the only way forward was to start a company of their own.
+  const ownsCompany = !!orgs?.items.some((o) => o.isOwn);
+  const invitesQuery = useQuery({ queryKey: ["pending-invites"], queryFn: teamMembersApi.pendingInvites, enabled: !!isSignedIn && !!orgs && !ownsCompany && !joinedOnly });
+  const [setUpOwn, setSetUpOwn] = useState(false);
+  const joinInvite = useMutation({
+    mutationFn: (id: string) => teamMembersApi.acceptPendingInvite(id),
+    // A full load: the acting company changed (a cookie), and nothing cached belongs to the old one.
+    onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard/me?welcome=1"; },
+    onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
+  });
 
   const [companyName, setCompanyName] = useState("");
   const [vatNumber, setVatNumber] = useState("");
@@ -66,9 +67,12 @@ export default function OnboardingPage() {
   const [province, setProvince] = useState("");
   const [licenceNumber, setLicenceNumber] = useState("");
   const [etransferEmail, setEtransferEmail] = useState("");
-  const [schedule, setSchedule] = useState<PaymentSchedule>(DEFAULT_SCHEDULE);
+  const [schedule, setSchedule] = useState<PaymentSchedule>(defaultPaymentSchedule(lang));
 
-  if (!isLoaded) {
+  // Phase 93: nothing is shown until we know whose company this would be (a member who reached this page must never
+  // get a form that writes over their employer's profile), and whether an invitation is waiting.
+  const deciding = !!isSignedIn && (orgsQuery.isPending || joinedOnly || (invitesQuery.isEnabled && invitesQuery.isPending));
+  if (!isLoaded || deciding) {
     return (
       <div className="min-h-[100dvh] flex items-center justify-center bg-white">
         <div className="w-8 h-8 rounded-full border-[3px] border-navy-400 border-t-transparent animate-spin" />
@@ -108,6 +112,8 @@ export default function OnboardingPage() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
+
+  const pendingInvites = invitesQuery.data?.items ?? [];
 
   const goToStep2 = () => {
     if (!companyName.trim()) return;
@@ -171,8 +177,33 @@ export default function OnboardingPage() {
       </header>
 
       <main id="main" className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {step === 1 ? (
+        <div className="w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-500" data-step={step}>
+          {pendingInvites.length > 0 && !setUpOwn ? (
+            <>
+              <div className="text-center mb-8">
+                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+                  style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
+                  <Mail className="h-8 w-8" style={{ color: "var(--navy)" }} />
+                </div>
+                <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--navy)" }}>{t("onboarding.invite.title")}</h1>
+                <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted-mk)" }}>{t("onboarding.invite.subtitle")}</p>
+              </div>
+              <div className="stack" style={{ gap: 12 }}>
+                {pendingInvites.map((inv) => (
+                  <section key={inv.id} className="card p-5 text-center stack" style={{ gap: 12 }} data-pending-invite="">
+                    {inv.logoUrl && <img src={inv.logoUrl} alt="" style={{ maxHeight: 44, margin: "0 auto" }} />}
+                    <p className="m-0" style={{ color: "var(--ink)" }}>
+                      {t("onboarding.invite.body").replace("{company}", inv.companyName || "—").replace("{role}", t(`join.role.${inv.role}`))}
+                    </p>
+                    <button type="button" className="btn btn-navy" disabled={joinInvite.isPending} onClick={() => joinInvite.mutate(inv.id)}>
+                      {t("onboarding.invite.join").replace("{company}", inv.companyName || "—")} {joinInvite.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                    </button>
+                  </section>
+                ))}
+                <button type="button" className="btn btn-outline-navy w-full" onClick={() => setSetUpOwn(true)}>{t("onboarding.invite.own")}</button>
+              </div>
+            </>
+          ) : step === 1 ? (
             <>
               {/* Welcome header */}
               <div className="text-center mb-8">
@@ -227,15 +258,15 @@ export default function OnboardingPage() {
                   </div>
                   <div className="field">
                     <label htmlFor="phone">{t("onboarding.phone")}</label>
-                    <input id="phone" placeholder="+1 416 555 0123" value={phone} onChange={e => setPhone(e.target.value)} />
+                    <input id="phone" placeholder={t("onboarding.phonePlaceholder")} value={phone} onChange={e => setPhone(e.target.value)} />
                   </div>
                   <div className="field full">
                     <label htmlFor="address">{t("onboarding.address")}</label>
-                    <input id="address" placeholder="123 Main St, Toronto, ON M5V 2T6" value={address} onChange={e => setAddress(e.target.value)} />
+                    <input id="address" placeholder={t("onboarding.addressPlaceholder")} value={address} onChange={e => setAddress(e.target.value)} />
                   </div>
                   <div className="field full">
                     <label htmlFor="email">{t("onboarding.businessEmail")}</label>
-                    <input id="email" type="email" placeholder="info@yourcompany.ca" value={email} onChange={e => setEmail(e.target.value)} />
+                    <input id="email" type="email" placeholder={t("onboarding.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} />
                   </div>
                 </div>
 
@@ -332,14 +363,14 @@ export default function OnboardingPage() {
                     <input id="licence" placeholder={province === "QC" ? "RBQ 1234-5678-01" : t("onboarding.licencePlaceholder")} value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} />
                   </div>
                   <div className="field full">
-                    <label htmlFor="etransfer" className="flex items-center gap-1.5">
+                    <label htmlFor="etransfer" style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <Landmark className="h-3.5 w-3.5" style={{ color: "var(--faint)" }} /> {t("onboarding.etransferEmail")}
                     </label>
-                    <input id="etransfer" type="email" placeholder="payments@yourcompany.ca" value={etransferEmail} onChange={e => setEtransferEmail(e.target.value)} />
+                    <input id="etransfer" type="email" placeholder={t("onboarding.etransferPlaceholder")} value={etransferEmail} onChange={e => setEtransferEmail(e.target.value)} />
                     <span className="text-[11px] mt-1 block" style={{ color: "var(--faint)" }}>{t("onboarding.etransferHint")}</span>
                   </div>
                   <div className="field full">
-                    <label className="flex items-center gap-1.5">
+                    <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <CalendarClock className="h-3.5 w-3.5" style={{ color: "var(--faint)" }} /> {t("onboarding.scheduleTitle")}
                     </label>
                     <p className="text-[11px] mb-2" style={{ color: "var(--faint)" }}>{t("onboarding.scheduleHint")}</p>
@@ -361,7 +392,7 @@ export default function OnboardingPage() {
                       {isSaving ? (
                         <><Loader2 className="h-4 w-4 animate-spin" /> {t("onboarding.saving")}</>
                       ) : (
-                        <><Sparkles className="h-4 w-4" /> {t("onboarding.finish")} <ArrowRight className="h-4 w-4" /></>
+                        <>{t("onboarding.continueButton")} <ArrowRight className="h-4 w-4" /></>
                       )}
                     </button>
                   </div>

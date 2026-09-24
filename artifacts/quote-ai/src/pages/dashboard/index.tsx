@@ -49,6 +49,8 @@ import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
 import { CalendarCard } from "@/components/dashboard/calendar-card";
 import { CrewTodayCard } from "@/components/crew/crew-today-card";
+import { MARKETING_PLANS } from "@/data/pricing";
+import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 import { ForemanHome } from "@/components/crew/foreman-home";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
@@ -180,13 +182,14 @@ function StarterUpgradeCard() {
 }
 
 /* ─── OnboardingView ─────────────────────────────────────────────────────── */
-function OnboardingView() {
+function OnboardingView({ profileDone }: { profileDone: boolean }) {
   const { t } = useLanguage();
 const can = useCan();
   const steps = [
-    { icon: Building2, num: "1", title: t("dashboard.index.onboarding.step1.title"), desc: t("dashboard.index.onboarding.step1.desc"), href: "/dashboard/profile", cta: t("dashboard.index.onboarding.step1.cta") },
-    { icon: MessageSquare, num: "2", title: t("dashboard.index.onboarding.step2.title"), desc: t("dashboard.index.onboarding.step2.desc"), href: "/dashboard/new", cta: t("dashboard.index.onboarding.step2.cta") },
-    { icon: Download, num: "3", title: t("dashboard.index.onboarding.step3.title"), desc: t("dashboard.index.onboarding.step3.desc"), href: null, cta: null },
+    // Phase 93: someone who just finished onboarding has done this one — say so instead of asking again.
+    { icon: Building2, num: "1", done: profileDone, title: t(profileDone ? "dashboard.index.onboarding.step1.doneTitle" : "dashboard.index.onboarding.step1.title"), desc: t(profileDone ? "dashboard.index.onboarding.step1.doneDesc" : "dashboard.index.onboarding.step1.desc"), href: "/dashboard/profile", cta: t("dashboard.index.onboarding.step1.cta") },
+    { icon: MessageSquare, num: "2", done: false, title: t("dashboard.index.onboarding.step2.title"), desc: t("dashboard.index.onboarding.step2.desc"), href: "/dashboard/new", cta: t("dashboard.index.onboarding.step2.cta") },
+    { icon: Download, num: "3", done: false, title: t("dashboard.index.onboarding.step3.title"), desc: t("dashboard.index.onboarding.step3.desc"), href: null, cta: null },
   ];
   return (
     <div className="space-y-3">
@@ -200,10 +203,12 @@ const can = useCan();
             {t("dashboard.index.onboarding.subtitle")}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5 text-left">
-            {steps.map(({ icon: Icon, num, title, desc, href, cta }) => (
+            {steps.map(({ icon: Icon, num, done, title, desc, href, cta }) => (
               <div key={num} className="rounded-lg bg-muted border border-border p-3.5">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className="h-5 w-5 rounded-full bg-navy-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{num}</span>
+                  {done
+                    ? <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: "var(--green-dark)" }} aria-label={t("dashboard.index.onboarding.stepDone")} />
+                    : <span className="h-5 w-5 rounded-full bg-navy-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{num}</span>}
                   <Icon className="h-3.5 w-3.5 text-navy-500" />
                   <span className="text-sm font-semibold text-foreground">{title}</span>
                 </div>
@@ -686,12 +691,16 @@ export default function DashboardHome() {
   return role === "foreman" ? <ForemanHome /> : <OwnerHome />;
 }
 
+/** Phase 93: the monthly quote allowance from the pricing data (Pro was shown as "unlimited"; it is 60). */
+const planQuota = (plan: string | null | undefined): number | null => MARKETING_PLANS.find((p) => p.id === plan)?.quotaPerMonth ?? null;
+
 function OwnerHome() {
   const { t } = useLanguage();
 const can = useCan();
   const { data: stats, isLoading: isLoadingStats } = useGetQuoteStats();
   const { data: subscription } = useGetSubscription();
   const { data: trialStatus } = useGetTrialStatus();
+  const { data: profile } = useGetBusinessProfile();
   const { data: allQuotes } = useListQuotes();
   const { data: followUpsData } = useQuery({ queryKey: ["leads", "followups"], queryFn: () => leadsApi.list() });
   const { user } = useAuth();
@@ -761,7 +770,7 @@ const can = useCan();
               : subscription?.isActive
                 ? t("dashboard.index.subtitlePlanActive")
                     .replace("{plan}", subscription.plan === "monthly_pro" ? "Pro" : subscription.plan === "monthly_elite" ? "Elite" : "Starter")
-                    .replace("{quotesInfo}", subscription.plan === "monthly_starter" ? t("dashboard.index.quotesPerMonth") : t("dashboard.index.unlimitedQuotes"))
+                    .replace("{quotesInfo}", planQuota(subscription.plan) === null ? t("dashboard.index.unlimitedQuotes") : t("dashboard.index.quotesPerMonth").replace("{count}", String(planQuota(subscription.plan))))
                 : t("dashboard.index.subtitleTotalQuotes").replace("{count}", String(stats?.total ?? 0))}
           </p>
         </div>
@@ -781,6 +790,8 @@ const can = useCan();
         </div>
       </div>
 
+      <PaymentReturnNotice />
+
       {can("quotes", "edit") && <DashboardComposer />}
 
       <InstallPrompt className="mt-4" />
@@ -797,7 +808,7 @@ const can = useCan();
 
       {isNewUser ? (
         <div style={{ marginTop: 16 }}>
-          <OnboardingView />
+          <OnboardingView profileDone={!!profile?.companyName} />
         </div>
       ) : (
         <>

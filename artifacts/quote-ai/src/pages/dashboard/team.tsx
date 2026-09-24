@@ -19,6 +19,7 @@ import { PersonAvatar } from "@/components/people/avatar";
 import { AccessCodesDialog } from "@/components/team/access-codes";
 import { SeatsDialog } from "@/components/team/seats-dialog";
 import { peopleApi } from "@/lib/people-api";
+import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 
 const TABS = ["workers", "time", "equipment", "members"] as const;
 type Tab = (typeof TABS)[number];
@@ -48,6 +49,8 @@ export default function TeamPage() {
           <p className="sub">{t("team.subtitle")}</p>
         </div>
       </div>
+
+      <PaymentReturnNotice />
 
       <div className="pills mb-4">
         {TABS.map((k) => {
@@ -105,8 +108,9 @@ const can = useCan();
     <div className="card">
       <div className="toolbar">
         <p className="foot-note m-0">{t("team.members.intro")}</p>
-        <div className="grow flex items-center gap-2">
-          {seats && <span className="foot-note">{seats.used}/{seats.limit} {t("team.members.seatsUsed")}</span>}
+        {/* Phase 93: wraps on a phone (the count and three buttons pushed "Invite member" off a 375 px screen). */}
+        <div className="grow flex flex-wrap items-center gap-2">
+          {seats && <span className="foot-note" style={{ whiteSpace: "nowrap" }}>{seats.used}/{seats.limit} {t("team.members.seatsUsed")}</span>}
           {can("settings", "full") && seatInfo?.canBuy && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setSeatsOpen(true)}><Armchair className="h-4 w-4" /> {t("seats.button")}</button>}
           {can("team", "full") && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setCodesOpen(true)}><KeyRound className="h-4 w-4" /> {t("codes.button")}</button>}
           {activeOrg && !activeOrg.isOwn && (
@@ -114,7 +118,7 @@ const can = useCan();
               <UserX className="h-4 w-4" /> {t("team.members.leave")}
             </button>
           )}
-          {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>}
+          {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" data-invite-member="" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>}
         </div>
       </div>
 
@@ -206,10 +210,10 @@ function InviteMemberDialog({ open, onOpenChange, onInvited, onError }: { open: 
       <DialogContent>
         <DialogHeader><DialogTitle>{t("team.members.dialogTitle")}</DialogTitle><DialogDescription>{t("team.members.dialogDesc")}</DialogDescription></DialogHeader>
         <DialogBody>
-          <div className="field"><label>{t("team.members.email")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></div>
+          <div className="field"><label htmlFor="invite-member-email">{t("team.members.email")}</label><input id="invite-member-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus /></div>
           <div className="field">
-            <label>{t("team.members.role")}</label>
-            <select value={role} onChange={(e) => setRole(e.target.value as TeamMemberRole)}>
+            <label htmlFor="invite-member-role">{t("team.members.role")}</label>
+            <select id="invite-member-role" value={role} onChange={(e) => setRole(e.target.value as TeamMemberRole)}>
               {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{t(`team.members.role.${r}`)}</option>)}
             </select>
           </div>

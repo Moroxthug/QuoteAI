@@ -49,6 +49,7 @@ const PERMISSIONLESS_MUTATIONS: Allow[] = [
   { match: /^POST \/api\/storage\/uploads\/request-url$/, reason: "signed upload URL scoped to the acting org; the consuming route enforces its own permission" },
   { match: /^POST \/api\/team\/invite\/:token\/accept$/, reason: "the invitee is joining — has no role in the org yet" },
   { match: /^POST \/api\/team\/code\/:code\/redeem$/, reason: "Phase 91: the person is joining with an access code — has no role in the org yet" },
+  { match: /^POST \/api\/team\/pending-invites\/:id\/accept$/, reason: "Phase 93: the invitee is joining — has no role in the org yet; only an open invitation sent to the actor's own verified address matches" },
   { match: /^(PUT \/api\/me|POST \/api\/me\/avatar|DELETE \/api\/me\/avatar)$/, reason: "Phase 91: a person edits their own profile and photo (their auth user row, keyed by the actor, not the org)" },
   { match: /^POST \/api\/team\/switch$/, reason: "switches the actor's own active org" },
   { match: /^POST \/api\/team\/members\/leave$/, reason: "Phase 72: the actor removes their own membership — no role needed" },

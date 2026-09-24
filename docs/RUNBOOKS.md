@@ -631,3 +631,25 @@ A **permit** that is `needed`, `applied` or `issued` blocks completing the job: 
 | A lead with no quote | The AI didn't answer in time or priced nothing; the request text is on the lead. Make the quote by hand |
 | "I changed nothing and it looks different" | `/widget.js` is cached up to an hour (a day while revalidating); every site has a new version within a day |
 | Test runs | `phase92.e2e` serves the widget from one local origin and the "contractor site" from another, and drives Chrome; screenshots of every state land in `artifacts/api-server/.qa/phase92/` |
+
+## 31. Sign-up, onboarding and joining a company (Phase 93)
+
+**Where**: sign-up `pages/sign-up.tsx`, onboarding `pages/onboarding.tsx` (+ `components/onboarding/*`), the employee pages `pages/join.tsx` and `pages/team-invite/[token].tsx`, the return from Stripe `components/billing/payment-return-notice.tsx`. Account emails (verify, reset, welcome) `artifacts/api-server/src/lib/accountEmails.ts`, sent from `lib/auth.ts`. Invitations waiting for a signed-in address: `GET /api/team/pending-invites`, `POST /api/team/pending-invites/:id/accept` (`routes/team-members.ts`).
+
+**How it fits**:
+- **Emails follow the site's language.** The SPA sends `x-quoteai-lang` (from `<html lang>`) on every auth call; the server falls back to the browser's Accept-Language. Verify, reset and welcome are navy, no emojis, in EN or FR.
+- **The welcome is for owners only.** No welcome for someone signing up from `/join` or an invite link, or whose address already has an invitation waiting. It no longer promises trial terms.
+- **"Nothing yet? … send it again"** on the check-your-email screen resends the verification (limited like sign-up: 10 per IP per 15 min).
+- **Onboarding waits before showing any form.** It first checks which companies the person belongs to. Someone who only belongs to another company goes to the dashboard. Someone with an open emailed invitation to their verified address sees it first ("Join {company}", or "No, set up my own company"). Onboarding never writes over an employer's profile.
+- **Step 4 with a plan from /pricing**: the extra seats (`seatsWanted` − the plan's included seats) go to checkout as their own line only if `STRIPE_PRICE_EXTRA_SEAT` exists. Without it, the step says so and checks out the plan alone; it no longer shows a count it won't charge. It also shows the monthly total before tax.
+- **Back from Stripe**: checkout started from onboarding returns to Team → Members (`returnTo: "team"`, a fixed path, never a URL from the body); other plan checkouts return to the dashboard. Both show a notice ("payment received" / "cancelled, nothing charged"). On success they ask `POST /api/payments/sync-subscription` once, so the plan shows even if the webhook is late.
+- The default payment schedule (onboarding and Settings → Business) starts in the language on screen (`defaultPaymentSchedule(lang)`).
+
+| Ask | Do |
+|---|---|
+| "I never got the verification email" | They can press "send it again" on the screen they're on, or sign in (an unverified sign-in resends it too). Check Resend's log for the address |
+| "My employee got a 'set up your business' email" | They signed up from the plain sign-up page with an address nobody had invited yet. Harmless; they join with the code or link afterwards |
+| "I invited them, but they made their own company" | They chose "set up my own company" on the invitation screen, or were invited after they signed up. They can still open the invite link; Team → Members → Resend if it expired |
+| "I paid for 4 logins but only have 2" | `STRIPE_PRICE_EXTRA_SEAT` wasn't set when they checked out (step 4 said so). Once it's set: Team → Members → Logins |
+| "The dashboard said nothing after I paid" | Before Phase 93 it didn't. Now there's a notice; if the plan still shows Free, Settings → Billing → sync |
+| Test runs | `phase93.e2e` walks five people (new owner; owner from /pricing; employee with a code; emailed invite, then /onboarding by accident; invitee without the link) in EN and FR at 1280 and 375 px against the real SPA. Screenshots in `artifacts/api-server/.qa/phase93/`. `qa:visual` sweeps every onboarding step as a signed-in newcomer, and the invitation screen as an invitee |

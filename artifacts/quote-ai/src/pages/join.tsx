@@ -44,7 +44,7 @@ export default function JoinPage() {
   return (
     <main id="main" className="doc-shell flex items-center justify-center p-4">
       <div className="card w-full max-w-md p-8 space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
-        <Logo style={{ height: 28, margin: "0 auto" }} />
+        <div className="flex justify-center"><Logo /></div>
         <div className="text-center space-y-1">
           <h1 className="text-xl font-bold" style={{ color: "var(--navy)" }}>{t("join.title")}</h1>
           <p className="text-sm m-0" style={{ color: "var(--muted-mk)" }}>{t("join.subtitle")}</p>
@@ -90,7 +90,7 @@ export default function JoinPage() {
             ) : !isSignedIn ? (
               <div className="space-y-2">
                 <p className="text-xs m-0" style={{ color: "var(--faint)" }}>{t("join.needAccount")}</p>
-                <div className="flex gap-2 justify-center">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Link href={`/sign-up?next=${returnTo}`} className="btn btn-navy btn-sm">{t("join.createAccount")}</Link>
                   <Link href={`/sign-in?next=${returnTo}`} className="btn btn-outline-navy btn-sm">{t("join.signIn")}</Link>
                 </div>

@@ -317,6 +317,67 @@ router.post("/team/invite/:token/accept", requireAuth, async (req, res) => {
   }
 });
 
+// ── Phase 93: invitations waiting for the signed-in address ──────────────────
+// Someone invited by email who signed up without the link (it's in another
+// inbox, or they typed quoteai.ca) lands on onboarding with nothing to join,
+// and the only way forward was to start a company of their own. The address
+// is verified (better-auth refuses a session before that), so an invitation
+// sent to it can be offered — and accepted — without the emailed token.
+// Access-code rows never match: their placeholder address is not a real one.
+
+async function pendingInvitesFor(email: string) {
+  if (!email) return [];
+  const rows = await db
+    .select()
+    .from(organizationMembersTable)
+    .where(and(eq(organizationMembersTable.invitedEmail, email), eq(organizationMembersTable.status, "invited")));
+  return rows.filter((m) => !m.accessCodeHash && !!m.inviteTokenExpiresAt && m.inviteTokenExpiresAt.getTime() > Date.now());
+}
+
+// GET /api/team/pending-invites
+router.get("/team/pending-invites", requireAuth, async (req, res) => {
+  try {
+    const email = getUserEmail(res).toLowerCase().trim();
+    const items = [];
+    for (const m of await pendingInvitesFor(email)) {
+      const p = await loadProfile(m.ownerId);
+      items.push({ id: m.id, companyName: p?.companyName || "", role: m.role, logoUrl: p?.logoUrl ?? null });
+    }
+    res.json({ items });
+  } catch (err) {
+    req.log.error({ err }, "Error listing pending invites");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/team/pending-invites/:id/accept
+router.post("/team/pending-invites/:id/accept", requireAuth, async (req, res) => {
+  try {
+    const actorId = getActorUserId(res);
+    const email = getUserEmail(res).toLowerCase().trim();
+    const member = (await pendingInvitesFor(email)).find((m) => m.id === req.params.id);
+    if (!member) {
+      res.status(404).json({ error: "NOT_FOUND", message: "There is no open invitation for this address." });
+      return;
+    }
+    if (member.ownerId === actorId) {
+      res.status(409).json({ error: "OWN_COMPANY", message: "This is your own company." });
+      return;
+    }
+    const [updated] = await db
+      .update(organizationMembersTable)
+      .set({ status: "active", userId: actorId, joinedAt: new Date(), inviteTokenHash: null, inviteTokenExpiresAt: null })
+      .where(eq(organizationMembersTable.id, member.id))
+      .returning();
+    await writeAudit({ userId: member.ownerId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "invite_accepted", diff: { via: "signed_in_address" } });
+    res.cookie(ACTIVE_ORG_COOKIE, member.ownerId, cookieOpts());
+    res.json({ member: serializeMember(updated!) });
+  } catch (err) {
+    req.log.error({ err }, "Error accepting pending invite");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // ── Org switcher ─────────────────────────────────────────────────────────────
 
 // GET /api/team/orgs — every org this person can act as: their own (if they own one) + active memberships

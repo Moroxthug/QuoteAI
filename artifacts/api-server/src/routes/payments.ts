@@ -238,9 +238,12 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
 
     const baseUrl = getBaseUrl();
 
+    // Phase 93: a plan bought at the end of onboarding comes back to Team → Members,
+    // where the logins just paid for are handed out (a fixed list — never a URL from the body).
+    const returnPath = (req.body as { returnTo?: unknown })?.returnTo === "team" ? "/dashboard/team?tab=members&" : "/dashboard?";
     const successUrl = quoteId
       ? `${baseUrl}/dashboard/quotes/${quoteId}?payment=success`
-      : `${baseUrl}/dashboard?payment=success`;
+      : `${baseUrl}${returnPath}payment=success`;
     const cancelUrl = quoteId
       ? `${baseUrl}/dashboard/quotes/${quoteId}?payment=cancelled`
       : `${baseUrl}/dashboard?payment=cancelled`;

@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Loader2, Save, MapPin, Landmark, Zap, CalendarClock, Star } from "lucide-react";
 import { PaymentScheduleEditor } from "@/components/payment-schedule-editor";
-import { CANADIAN_PROVINCES, type PaymentSchedule } from "@/lib/payment-schedule";
+import { CANADIAN_PROVINCES, defaultPaymentSchedule, type PaymentSchedule } from "@/lib/payment-schedule";
 
 type TaxProfile = { province: string; components: { code: string; label: string; rate: number }[]; totalRate: number };
 
@@ -36,17 +36,6 @@ function parseCadence(text: string): number[] | null {
   return days.every((d) => Number.isInteger(d) && d >= 1 && d <= 90) ? days : null;
 }
 
-const DEFAULT_SCHEDULE: PaymentSchedule = {
-  currency: "CAD",
-  derived: false,
-  holdback: { enabled: false, percent: 10 },
-  terms: [
-    { id: "t1", type: "deposit", label: "Deposit upon contract signing", trigger: "on_signing", amountType: "percent", value: 15, dueDays: 0 },
-    { id: "t2", type: "milestone", label: "Delivery of materials and start of work", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
-    { id: "t3", type: "milestone", label: "Substantial completion", trigger: "milestone", amountType: "percent", value: 35, dueDays: 15 },
-    { id: "t4", type: "completion", label: "Final balance upon completion and client walkthrough", trigger: "on_completion", amountType: "percent", value: 15, dueDays: 15 },
-  ],
-};
 
 /**
  * "Business" settings tab: Canadian identity (province, tax numbers,
@@ -76,7 +65,7 @@ export function BusinessTab() {
   const [leadCadence, setLeadCadence] = useState("1, 3, 7");
   const [quoteCadence, setQuoteCadence] = useState("2, 5, 10");
   const [reviewDelayDays, setReviewDelayDays] = useState(3);
-  const [schedule, setSchedule] = useState<PaymentSchedule>(DEFAULT_SCHEDULE);
+  const [schedule, setSchedule] = useState<PaymentSchedule>(defaultPaymentSchedule(lang));
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -97,7 +86,9 @@ export function BusinessTab() {
     setLeadCadence((profile.automationSettings?.leadFollowupDays ?? [1, 3, 7]).join(", "));
     setQuoteCadence((profile.automationSettings?.quoteFollowupDays ?? [2, 5, 10]).join(", "));
     setReviewDelayDays(profile.automationSettings?.reviewRequestDelayDays ?? 3);
-    setSchedule(profile.defaultPaymentSchedule ?? DEFAULT_SCHEDULE);
+    setSchedule(profile.defaultPaymentSchedule ?? defaultPaymentSchedule(lang));
+    // The language only picks the starting labels; switching it must not reload the form over the owner's edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   const taxHint = (() => {

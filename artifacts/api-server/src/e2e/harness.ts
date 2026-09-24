@@ -101,6 +101,17 @@ export async function createUser(opts: { name?: string; email?: string } = {}): 
   return { userId, email, name, token, api: (path, o = {}) => api(path, { ...o, token }) };
 }
 
+/**
+ * Phase 93: a user who signed up through the real form (the browser walks) has
+ * a better-auth id, not an `e2e_` one — track them by email so cleanupAll()
+ * still takes them. Returns the id, or null when no such user exists yet.
+ */
+export async function adoptUserByEmail(email: string): Promise<string | null> {
+  const [row] = await db.select({ id: authUsersTable.id }).from(authUsersTable).where(eq(authUsersTable.email, email.toLowerCase()));
+  if (row) created.add(row.id);
+  return row?.id ?? null;
+}
+
 export type OrgOptions = {
   province?: "ON" | "QC";
   plan?: "free" | "monthly_starter" | "monthly_pro" | "monthly_elite";
@@ -258,7 +269,9 @@ async function deleteStorageForUsers(userIds: string[]): Promise<void> {
  * process runs it.
  */
 export async function purgeStaleFixtures(): Promise<number> {
-  const rows = await db.execute<{ id: string }>(sql`select id from auth_user where id like 'e2e\_%' escape '\'`);
+  // Phase 93: people who signed up through the real form in a browser walk
+  // carry better-auth ids; their addresses are `e2e-walk-…@example.invalid`.
+  const rows = await db.execute<{ id: string }>(sql`select id from auth_user where id like 'e2e\_%' escape '\' or email like 'e2e-walk-%@example.invalid'`);
   const stale = rows.rows.map((r) => r.id).filter((id) => !created.has(id));
   if (stale.length) await cleanupUsers(stale);
   // PDFs whose user rows are already gone (a run that died between the two steps).

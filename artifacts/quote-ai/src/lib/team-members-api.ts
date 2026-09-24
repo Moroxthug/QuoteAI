@@ -3,6 +3,7 @@
 import { apiRequest as req, apiJson as json } from "./jobs-api";
 
 export type TeamMemberRole = "admin" | "office" | "foreman" | "viewer";
+export type PendingInviteDto = { id: string; companyName: string; role: TeamMemberRole; logoUrl: string | null };
 export type TeamMemberStatus = "invited" | "active" | "suspended";
 
 export type TeamMemberDto = {
@@ -33,6 +34,9 @@ export const teamMembersApi = {
   remove: (id: string) => req<{ success: true }>(`/api/team/members/${id}`, { method: "DELETE" }),
 
   orgs: () => req<{ items: OrgDto[]; activeOrgId: string; group: { status: "pending" | "active" } | null }>("/api/team/orgs"),
+  /** Phase 93: invitations sent to the signed-in address (accepted without the emailed link). */
+  pendingInvites: () => req<{ items: PendingInviteDto[] }>("/api/team/pending-invites"),
+  acceptPendingInvite: (id: string) => req<unknown>(`/api/team/pending-invites/${encodeURIComponent(id)}/accept`, { method: "POST" }),
   switchOrg: (orgId: string) => req<{ orgId: string; role: string }>("/api/team/switch", { method: "POST", body: json({ orgId }) }),
   /** Phase 72: remove yourself from a company you were invited to. */
   leave: (orgId: string) => req<{ success: true }>("/api/team/members/leave", { method: "POST", body: json({ orgId }) }),

@@ -8,6 +8,7 @@ import { PLAN_IDS, SEATS_INCLUDED, type PlanId } from "@/lib/plans";
 import { peopleApi } from "@/lib/people-api";
 import { teamMembersApi, type TeamMemberRole } from "@/lib/team-members-api";
 import { AccessCodesForm } from "@/components/team/access-codes";
+import { MARKETING_PLANS } from "@/data/pricing";
 
 // Phase 91: the last onboarding step. Either the plan picked on the pricing
 // page goes to checkout with the extra seats the company asked for, or — when
@@ -19,19 +20,25 @@ const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "admin"];
 const PLAN_NAMES: Record<PlanId, string> = { free: "Free", monthly_starter: "Starter", monthly_pro: "Pro", monthly_elite: "Elite" };
 
 export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: string | null; seatsWanted: number | undefined; fieldCrew: boolean | undefined; onDone: () => void }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const onError = (e: Error & { code?: string }) => toast({ title: e.code === "SEAT_LIMIT" ? t("team.members.seatLimitTitle") : t("jobs.error"), description: e.message, variant: "destructive" });
   const chosen = plan && (PLAN_IDS as readonly string[]).includes(plan) && plan !== "free" ? (plan as PlanId) : null;
   const profile = useQuery({ queryKey: ["onboarding-profile"], queryFn: () => apiRequest<{ features?: Record<string, boolean> }>("/api/business-profile") });
   const hasTeam = !!profile.data?.features?.team_accounts;
-  const seats = useQuery({ queryKey: ["seats"], queryFn: peopleApi.seats, enabled: hasTeam });
+  // Phase 93: asked even before there is a plan — it says whether extra seats can be bought at all (a Stripe price exists).
+  const seats = useQuery({ queryKey: ["seats"], queryFn: peopleApi.seats, enabled: profile.isSuccess });
+  const seatsPriced = !!seats.data && seats.data.reason !== "SEATS_UNAVAILABLE";
 
   const included = chosen ? SEATS_INCLUDED[chosen] : 0;
   const [extra, setExtra] = useState(() => Math.max(0, (seatsWanted ?? 0) - included));
+  const extraToBuy = seatsPriced ? extra : 0;
+  const planMonthly = MARKETING_PLANS.find((p) => p.id === chosen)?.monthly ?? 0;
+  const monthlyTotal = new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(planMonthly + (extraToBuy * SEAT_CENTS) / 100);
   const checkout = useMutation({
-    mutationFn: () => apiRequest<{ url: string }>("/api/payments/checkout", { method: "POST", body: apiJson({ planType: chosen, extraSeats: extra }) }),
+    // Back from Stripe, the owner lands on Team, where the logins they just paid for are handed out.
+    mutationFn: () => apiRequest<{ url: string }>("/api/payments/checkout", { method: "POST", body: apiJson({ planType: chosen, extraSeats: extraToBuy, returnTo: "team" }) }),
     onSuccess: (r) => { window.location.href = r.url; },
     onError,
   });
@@ -58,6 +65,7 @@ export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: strin
         <section className="card">
           <div className="card-head"><div><h2 className="flex items-center gap-2"><CreditCard className="h-4 w-4" /> {t("setup.team.planTitle").replace("{plan}", PLAN_NAMES[chosen])}</h2><p className="sub">{t("setup.team.planSub").replace("{included}", String(included))}</p></div></div>
           <div className="p-5 stack" style={{ gap: 12 }}>
+            {seatsPriced ? (
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="t-strong m-0">{t("setup.team.extraSeats")}</p>
@@ -69,9 +77,13 @@ export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: strin
                 <button type="button" className="ic-btn" aria-label={t("seats.more")} disabled={extra >= 200} onClick={() => setExtra((n) => n + 1)}><Plus /></button>
               </div>
             </div>
-            <p className="text-sm m-0">{t("setup.team.total").replace("{total}", String(included + extra)).replace("{wanted}", String(seatsWanted ?? included))}</p>
-            <button type="button" className="btn btn-navy" disabled={checkout.isPending} onClick={() => checkout.mutate()}>
-              {checkout.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />} {t("setup.team.checkout")}
+            ) : seats.data ? (
+              <div className="notice info" data-seats-unavailable=""><Mail /><span className="grow">{t("setup.team.seatsUnavailable").replace("{included}", String(included))}</span></div>
+            ) : null}
+            {seatsPriced && <p className="text-sm m-0">{t("setup.team.total").replace("{total}", String(included + extra)).replace("{wanted}", String(seatsWanted ?? included))}</p>}
+            {seats.data && <p className="text-sm m-0 t-strong">{t("setup.team.monthly").replace("{amount}", monthlyTotal)}</p>}
+            <button type="button" className="btn btn-navy" data-checkout="" disabled={checkout.isPending || !seats.data} onClick={() => checkout.mutate()}>
+              {t("setup.team.checkout")} {checkout.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
             </button>
             <p className="foot-note m-0">{t("setup.team.checkoutHint")}</p>
           </div>

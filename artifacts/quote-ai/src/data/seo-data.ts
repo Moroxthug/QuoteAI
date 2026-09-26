@@ -211,7 +211,7 @@ export const SECTORS: Record<string, SectorData> = {
     intro: "Water lines, heating, fixtures: every plumbing job has line items that are hard to explain to a customer. quoteai understands the terminology — fittings, PEX, manifolds, furnace, thermostat — and generates a clear, professional quote in 30 seconds.",
     h2Benefits: "Why plumbers choose quoteai",
     benefits: [
-      { title: "From the fix to the quote in 60 seconds", desc: "Just fixed the leak and the customer wants a quote for the next job? Generate it on the spot." },
+      { title: "From the fix to the quote in 30 seconds", desc: "Just fixed the leak and the customer wants a quote for the next job? Generate it on the spot." },
       { title: "Prices for fixtures and materials", desc: "The AI suggests typical prices for copper pipe, fittings, valves, condensing furnaces and fixture installs across the Canadian market." },
       { title: "Clear, itemized quotes", desc: "Every job broken into labour, materials, and disposal. The customer sees the transparency and trusts the number." },
       { title: "Fast response", desc: "Send the PDF by text or email. The customer can approve it right from their phone before you're back on the road." },
@@ -421,7 +421,7 @@ export const SECTORS: Record<string, SectorData> = {
     howItWorks: [
       { step: "1. Describe the structure", desc: "Write: '10x6 ft sliding steel gate with motor, 100 ft chain-link fence at 5 ft height with posts every 6 ft.'" },
       { step: "2. AI estimates materials and labour", desc: "quoteai estimates steel weight, welding hours, and paint/finish cost. Generates line items with unit prices and quantities." },
-      { step: "3. Professional document in 60 seconds", desc: "A PDF with your company header and logo. The customer receives a document that justifies the price you're asking." },
+      { step: "3. Professional document in 30 seconds", desc: "A PDF with your company header and logo. The customer receives a document that justifies the price you're asking." },
     ],
     h2UseCases: "Common jobs for welders and fabricators",
     useCases: [
@@ -884,13 +884,13 @@ export const SECTORS: Record<string, SectorData> = {
       { title: "Automatic square footage", desc: "Describe the areas and the AI calculates the square footage to order, including typical waste for the format and layout." },
       { title: "A line item per material", desc: "Porcelain, natural stone, mosaic: every material with its own price. The customer sees exactly what they're buying." },
       { title: "Subfloor prep included", desc: "The AI recognizes prep line items: self-levelling, waterproofing membrane, old-floor removal. Nothing gets missed." },
-      { title: "Quote from the customer's home in 60 seconds", desc: "Walk the space, describe the job, send the PDF. All in under two minutes before you leave." },
+      { title: "Quote from the customer's home in 30 seconds", desc: "Walk the space, describe the job, send the PDF. All in under two minutes before you leave." },
     ],
     h2HowItWorks: "How it works: 3 steps",
     howItWorks: [
       { step: "1. Describe the install", desc: "Write: 'Install 20x120 wood-look porcelain tile in a 450 sq ft living room, remove old flooring, self-level the subfloor, matching baseboard.'" },
       { step: "2. AI calculates square footage and cost", desc: "quoteai estimates the square footage with waste, the subfloor-prep line items, and old-material removal. Unit prices for every task." },
-      { step: "3. PDF from the job site in 60 seconds", desc: "Still at the customer's home: describe the job, generate the PDF, send it. Whoever answers first wins the job." },
+      { step: "3. PDF from the job site in 30 seconds", desc: "Still at the customer's home: describe the job, generate the PDF, send it. Whoever answers first wins the job." },
     ],
     h2UseCases: "Common jobs for tile installers",
     useCases: [
@@ -1219,7 +1219,7 @@ export const SECTORS: Record<string, SectorData> = {
       { title: "Supply and install, separated", desc: "The document separates material cost from installation and subfloor prep. Full transparency." },
       { title: "Subfloor prep included", desc: "The AI automatically includes prep line items — self-levelling, underlayment, primer — when they're needed. Nothing gets missed." },
       { title: "Square footage with a waste allowance", desc: "The AI estimates the square footage to order, including typical waste for the format and layout. Order the right amount, no waste." },
-      { title: "From walkthrough to PDF in 60 seconds", desc: "Measure, describe, send. The customer gets the quote before you're back in the truck." },
+      { title: "From walkthrough to PDF in 30 seconds", desc: "Measure, describe, send. The customer gets the quote before you're back in the truck." },
     ],
     h2HowItWorks: "How it works: 3 steps",
     howItWorks: [

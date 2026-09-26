@@ -50,6 +50,24 @@
   --ease-mk: cubic-bezier(.2, .7, .2, 1);
   --shadow-lift: 0 24px 48px rgba(16, 16, 49, .16);
   --shadow-card: 0 14px 34px rgba(16, 16, 49, .10);
+
+  /* Phase 100 — calm mobile (docs/MOBILE-RULES.md). The safe areas are 0
+     everywhere but a notched phone / the installed app (viewport-fit=cover). */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  /* one type scale on phones: title 22 / section 17 / body 15 / meta 13 */
+  --fs-title: 22px;
+  --fs-section: 17px;
+  --fs-body: 15px;
+  --fs-meta: 13px;
+  /* spacing: 16 px gutters, 12 px between cards, 44 px targets */
+  --gutter-phone: 16px;
+  --gap-card: 12px;
+  --tap: 44px;
+  --tabbar-h: 60px;
+  --actionbar-h: 68px;
 }
 
 /* ---------- Typography resets (mockup body/heading baseline) ---------- */
@@ -64,12 +82,15 @@ h1, h2, h3, h4 { letter-spacing: -.015em; line-height: 1.15; }
    navy: it lands on top of the announcement bar, which is navy itself, so a
    navy pill with the standard navy ring would be invisible exactly when it
    matters. */
-.skip-link { position: fixed; top: 0; left: 50%; transform: translate(-50%, -140%); z-index: 200; background: #fff; color: var(--navy); font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 0 0 12px 12px; box-shadow: var(--shadow-lift); transition: transform .18s var(--ease-mk); }
-.skip-link:focus-visible, .skip-link:focus { transform: translate(-50%, 0); outline: 2px solid var(--navy); outline-offset: 2px; }
+/* Phase 100: the shadow only while it is on screen — parked above the
+   viewport its 48 px blur still reached ~57 px down and painted the grey
+   smudge behind the phone top bar. */
+.skip-link { position: fixed; top: 0; left: 50%; transform: translate(-50%, -140%); z-index: 200; background: #fff; color: var(--navy); font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: 0 0 12px 12px; transition: transform .18s var(--ease-mk); }
+.skip-link:focus-visible, .skip-link:focus { transform: translate(-50%, 0); outline: 2px solid var(--navy); outline-offset: 2px; box-shadow: var(--shadow-lift); }
 /* The sidebar's <nav> landmark must not become a flex child — the links are. */
 .sb-nav { display: contents; }
 
-.wrap { max-width: 1240px; margin-inline: auto; padding-inline: clamp(20px, 4vw, 40px); }
+.wrap { max-width: 1240px; margin-inline: auto; padding-inline: max(clamp(20px, 4vw, 40px), var(--safe-left)) max(clamp(20px, 4vw, 40px), var(--safe-right)); }
 .eyebrow { font-size: 13px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-mk); }
 .on-dark .eyebrow { color: #b7b9cc; }
 .sec-title { font-size: clamp(1.9rem, 3.4vw, 2.9rem); font-weight: 800; margin: 14px 0 16px; color: var(--navy); }
@@ -1924,4 +1945,143 @@ button.chap-head:hover { background: var(--soft-2); }
 @media (max-width: 640px) {
   .sched-row { grid-template-columns: 120px repeat(7, minmax(120px, 1fr)); }
   .sched-in.week { min-width: 980px; }
+}
+
+/* ==========================================================
+   CALM MOBILE (Phase 100) — the phone pieces the mockups never had
+   (docs/MOBILE-AND-APP-PLAN.md, docs/MOBILE-RULES.md)
+
+   Top bar title + back · bottom tab bar · action sheet (⋯) ·
+   bottom sheet · sticky action bar · list rows / responsive
+   table · stat strip · scroll tabs. Same tokens as everything
+   else; nothing here changes a desktop layout except where a
+   component is used, and then it reads the same at 1280.
+   ========================================================== */
+
+/* ---------- Top bar on phones: back · title (MobilePageHeader) ---------- */
+.tb-back { display: none; width: var(--tap); height: var(--tap); place-items: center; border-radius: 12px; color: var(--navy); flex: none; margin-left: -6px; }
+.tb-back:hover { background: var(--soft); }
+.tb-back svg { width: 22px; height: 22px; }
+.tb-title { display: none; min-width: 0; flex: 1; font-size: var(--fs-section); font-weight: 800; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -.01em; }
+.tb-more { display: none; }
+
+@media (max-width: 640px) {
+  .topbar { gap: 4px; height: calc(56px + var(--safe-top)); padding: var(--safe-top) max(var(--gutter-phone), var(--safe-right)) 0 max(10px, var(--safe-left)); }
+  .tb-back { display: grid; }
+  .tb-title { display: block; }
+  .tb-more { display: inline-flex; }
+  .tb-right { gap: 2px; margin-left: 0; }
+  .tb-avatar { width: 34px; height: 34px; font-size: 12.5px; }
+  /* 16 px gutters, one type scale */
+  .content { padding: 16px max(var(--gutter-phone), var(--safe-right)) 24px max(var(--gutter-phone), var(--safe-left)); }
+  .page-head { margin-bottom: 16px; gap: 12px; }
+  .page-head h1 { font-size: var(--fs-title); }
+  .page-head .sub { font-size: var(--fs-meta); }
+  .card + .card, .card + .stack, .stack + .card, .stat-grid + * { margin-top: var(--gap-card); }
+}
+
+/* ---------- Bottom tab bar (BottomTabBar) ---------- */
+.tabbar { display: none; }
+@media (max-width: 980px) {
+  .tabbar { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: rgba(255, 255, 255, .97); backdrop-filter: saturate(1.4) blur(10px); border-top: 1px solid var(--line); padding: 0 max(4px, var(--safe-right)) var(--safe-bottom) max(4px, var(--safe-left)); height: calc(var(--tabbar-h) + var(--safe-bottom)); }
+  .has-tabbar .main { padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom)); }
+}
+.tabbar-link { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 0; min-height: var(--tap); padding: 6px 2px; font-size: 11px; font-weight: 700; color: var(--faint); letter-spacing: .01em; border-radius: 12px; background: none; border: 0; }
+.tabbar-link svg { width: 22px; height: 22px; flex: none; }
+.tabbar-link span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabbar-link.active { color: var(--navy); }
+.tabbar-link.active svg { stroke-width: 2.4; }
+.tabbar-link .tabbar-badge { position: absolute; top: 4px; left: calc(50% + 6px); min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: var(--red); color: #fff; font-size: 10.5px; font-weight: 800; display: grid; place-items: center; border: 2px solid #fff; }
+.tabbar-new { display: flex; align-items: center; justify-content: center; }
+.tabbar-new > span { width: 46px; height: 46px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(16, 16, 49, .22); }
+.tabbar-new > span svg { width: 22px; height: 22px; }
+
+/* ---------- Sheets (BottomSheet, ActionSheet on phones) ----------
+   Built on .modal, which already docks to the bottom under 640 px. */
+.sheet-grab { display: none; }
+@media (max-width: 640px) {
+  .modal.sheet { padding-bottom: var(--safe-bottom); }
+  .sheet-grab { display: block; width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 8px auto 0; flex: none; }
+  .modal.sheet .modal-head { padding-top: 10px; }
+}
+.asheet-list { display: flex; flex-direction: column; padding: 6px 0; }
+.asheet-item { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 52px; padding: 0 20px; font-size: var(--fs-body); font-weight: 700; color: var(--navy); text-align: left; background: none; border: 0; }
+.asheet-item:hover, .asheet-item:focus-visible { background: var(--soft); }
+.asheet-item svg { width: 19px; height: 19px; color: var(--muted-mk); flex: none; }
+.asheet-item .asheet-hint { margin-left: auto; font-size: var(--fs-meta); font-weight: 600; color: var(--faint); }
+.asheet-item.danger, .asheet-item.danger svg { color: var(--red); }
+.asheet-item:disabled { opacity: .45; pointer-events: none; }
+.asheet-sep { height: 1px; background: var(--soft); margin: 6px 0; }
+.asheet-cancel { margin: 4px 16px 12px; }
+.more-btn { width: var(--tap); height: var(--tap); border-radius: 12px; display: inline-grid; place-items: center; color: var(--navy); border: 1px solid var(--line); background: #fff; flex: none; }
+.more-btn:hover { background: var(--soft); }
+.more-btn svg { width: 20px; height: 20px; }
+.more-btn.plain { border-color: transparent; background: transparent; }
+
+/* ---------- Sticky action bar (StickyActionBar) ----------
+   Desktop: an ordinary right-aligned row where it is placed.
+   Phone: docked above the tab bar / home indicator, one primary. */
+.action-bar { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.action-bar .btn-primary-slot { display: contents; }
+.action-bar-spacer { display: none; }
+@media (max-width: 640px) {
+  .action-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; justify-content: stretch; gap: 8px; padding: 10px max(var(--gutter-phone), var(--safe-right)) calc(10px + var(--safe-bottom)) max(var(--gutter-phone), var(--safe-left)); background: rgba(255, 255, 255, .97); backdrop-filter: saturate(1.4) blur(10px); border-top: 1px solid var(--line); }
+  .action-bar > .btn { flex: 1; padding: 13px 16px; min-height: var(--tap); }
+  .action-bar > .btn.secondary { flex: 0 1 auto; }
+  .action-bar-spacer { display: block; height: calc(var(--actionbar-h) + var(--safe-bottom)); }
+}
+@media (max-width: 640px) {
+  /* above the tab bar when both exist */
+  .has-tabbar .action-bar { bottom: calc(var(--tabbar-h) + var(--safe-bottom)); padding-bottom: 10px; }
+  .has-tabbar .action-bar-spacer { height: var(--actionbar-h); }
+}
+
+/* ---------- List rows (ListRow, ResponsiveTable below 640 px) ---------- */
+.lrows { display: flex; flex-direction: column; }
+.lrow { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 12px 16px; border-top: 1px solid var(--soft); color: inherit; text-align: left; width: 100%; background: none; }
+.lrows > .lrow:first-child, .lrows > li:first-child > .lrow { border-top: none; }
+a.lrow:hover, button.lrow:hover { background: #fafbfc; }
+.lrow-lead { flex: none; }
+.lrow-main { flex: 1; min-width: 0; }
+.lrow-title { display: block; font-size: var(--fs-body); font-weight: 700; color: var(--navy); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lrow-meta { display: block; margin-top: 3px; font-size: var(--fs-meta); font-weight: 600; color: var(--faint); line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lrow-end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; max-width: 45%; }
+.lrow-amt { font-size: var(--fs-body); font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lrow-chev { flex: none; width: 16px; height: 16px; color: var(--line); }
+
+/* ---------- Stat strip (StatStrip) ----------
+   One card, N cells with hairlines; 2 columns on a phone — never a tower
+   of full-width cards holding one number each. */
+.stat-strip { display: grid; grid-template-columns: repeat(var(--ss-cols, 4), minmax(0, 1fr)); background: #fff; border: 1px solid var(--line); border-radius: var(--radius-mk); overflow: hidden; }
+.stat-strip + * { margin-top: 16px; }
+.ss-item { padding: 16px 20px; min-width: 0; box-shadow: -1px 0 0 var(--soft); }
+.ss-lbl { display: block; font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-val { display: block; margin-top: 4px; font-size: clamp(1.2rem, 1.8vw, 1.6rem); font-weight: 800; letter-spacing: -.02em; color: var(--navy); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ss-val.ok { color: var(--green-dark); }
+.ss-val.warn { color: var(--yellow-dark); }
+.ss-val.bad { color: var(--red); }
+.ss-sub { display: block; margin-top: 2px; font-size: 12px; font-weight: 600; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 0; font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); }
+.stat-line b { color: var(--navy); font-weight: 800; font-variant-numeric: tabular-nums; margin-right: 4px; }
+.stat-line > span + span::before { content: "·"; margin: 0 8px; color: var(--line); }
+@media (max-width: 640px) {
+  .stat-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ss-item { padding: 12px 14px; box-shadow: -1px 0 0 var(--soft), 0 -1px 0 var(--soft); }
+  .ss-val { font-size: 1.2rem; }
+  .stat-strip + * { margin-top: var(--gap-card); }
+}
+
+/* ---------- Scroll tabs (ScrollTabs) — one line, never wrapping ---------- */
+.stabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 0; margin-bottom: 16px; scroll-padding-inline: 16px; }
+.stabs::-webkit-scrollbar { display: none; }
+.stabs .pill { white-space: nowrap; flex: none; }
+.stabs.sticky { position: sticky; top: 64px; z-index: 40; background: #fff; }
+@media (max-width: 640px) {
+  .stabs { margin-inline: calc(-1 * var(--gutter-phone)); padding-inline: var(--gutter-phone); margin-bottom: var(--gap-card); }
+  .stabs.sticky { top: calc(56px + var(--safe-top)); padding-block: 8px; border-bottom: 1px solid var(--soft); }
+  .stabs .pill { min-height: 38px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabbar, .action-bar { backdrop-filter: none; }
 }

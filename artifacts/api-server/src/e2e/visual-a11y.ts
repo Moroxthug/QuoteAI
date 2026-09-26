@@ -162,6 +162,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
       await p.waitForSelector('[role="alertdialog"]');
     } },
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
+    // Phase 100: the calm-mobile primitives on fake data (dev-server route).
+    dash("/dashboard/__preview"),
     dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
     // Phase 87: every tab of the Compliance page is its own page state.
     dash("/dashboard/compliance"), dash("/dashboard/compliance?tab=salesTax"), dash("/dashboard/compliance?tab=t5018"), dash("/dashboard/compliance?tab=reminders"),
@@ -192,6 +194,8 @@ type PageResult = {
   title: string; screenshot: string;
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
   gutter: { clientWidth: number; offenders: string[] } | null;
+  /** Phase 100: calm-mobile rule breaks at phone width — warnings until Phase 113 makes them errors. */
+  phone: PhoneWarning[];
   axe: Array<{ id: string; impact: string; help: string; count: number; targets: string[]; detail: string[] }>;
   sr: SrFinding[];
   consoleErrors: string[]; failedRequests: string[]; boundary: string | null; rawKeys: string[]; error?: string;
@@ -299,6 +303,113 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
   }, GUTTER_MIN);
 }
 
+// Phase 100 — the calm-mobile rules (docs/MOBILE-RULES.md) that a machine can
+// see, at phone width only. Warnings for now: Phase 113 turns them into the
+// gate, with a per-page height budget. Each names what it found so the fix is
+// obvious from the report alone.
+type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar";
+type PhoneWarning = { rule: PhoneRule; detail: string };
+const PHONE_WIDTH = 640;
+/** App pages taller than this many phone screens are reported (the budget per page is set in Phase 113). */
+const PHONE_SCREENS_WARN = 8;
+
+async function phoneRules(page: Page, width: number, session: Session): Promise<PhoneWarning[]> {
+  if (width > PHONE_WIDTH) return [];
+  // tsx wraps the named helpers below in `__name(…)` (see screen-reader.ts).
+  await page.evaluate("globalThis.__name = globalThis.__name || function (f) { return f }").catch(() => {});
+  const found = await page.evaluate(({ screensWarn, app }) => {
+    const out: Array<{ rule: string; detail: string }> = [];
+    const cw = document.documentElement.clientWidth;
+    const vh = window.innerHeight;
+    const label = (el: Element) => {
+      const cls = typeof (el as HTMLElement).className === "string" && (el as HTMLElement).className ? "." + (el as HTMLElement).className.trim().split(/\s+/).slice(0, 2).join(".") : "";
+      const text = ((el as HTMLElement).innerText ?? "").trim().replace(/\s+/g, " ").slice(0, 28);
+      return `${el.tagName.toLowerCase()}${cls}${text ? ` "${text}"` : ""}`;
+    };
+    const shown = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return false;
+      const cs = getComputedStyle(el);
+      return cs.visibility !== "hidden" && cs.display !== "none" && !el.closest("[inert], [aria-hidden='true'], [role='dialog']");
+    };
+    const inFixed = (el: Element) => {
+      for (let p: Element | null = el; p && p !== document.body; p = p.parentElement) {
+        const pos = getComputedStyle(p).position;
+        if (pos === "fixed" || pos === "sticky") return true;
+      }
+      return false;
+    };
+
+    // 1. More than two full-width buttons stacked on top of each other.
+    const btns = Array.from(document.querySelectorAll(".btn, button, a[role='button']"))
+      .filter((b) => shown(b) && !inFixed(b) && b.getBoundingClientRect().width >= cw * 0.7)
+      .map((b) => ({ el: b, r: b.getBoundingClientRect() }))
+      .sort((a, b) => a.r.top - b.r.top);
+    let run: typeof btns = [];
+    const flush = () => {
+      if (run.length > 2) out.push({ rule: "stacked-buttons", detail: `${run.length} full-width buttons in a column: ${run.slice(0, 4).map((x) => label(x.el)).join(", ")}` });
+      run = [];
+    };
+    for (const b of btns) {
+      const prev = run[run.length - 1];
+      if (prev && b.r.top - prev.r.bottom > 24) flush();
+      if (!prev || b.r.top >= prev.r.bottom - 2) run.push(b);
+    }
+    flush();
+
+    // 2. A stat card holding one number across the whole width.
+    const stats = Array.from(document.querySelectorAll(".stat-card")).filter((s) => shown(s) && s.getBoundingClientRect().width >= cw * 0.8);
+    if (stats.length) out.push({ rule: "full-width-stat", detail: `${stats.length} full-width .stat-card: ${stats.slice(0, 3).map(label).join(", ")}` });
+
+    // 3. A data table wider than its box (sideways scrolling for data).
+    for (const t of Array.from(document.querySelectorAll("table"))) {
+      if (!shown(t) || !t.parentElement) continue;
+      const box = t.parentElement.clientWidth;
+      if (t.scrollWidth > box + 1) out.push({ rule: "wide-table", detail: `${label(t)} is ${t.scrollWidth}px in a ${box}px box` });
+    }
+
+    // 4. Tabs / pill rows wrapping to a second line.
+    for (const row of Array.from(document.querySelectorAll(".pills, .stabs, [role='tablist'], .seg"))) {
+      if (!shown(row)) continue;
+      const tops = new Set(Array.from(row.children).filter(shown).map((c) => Math.round(c.getBoundingClientRect().top / 6)));
+      if (tops.size > 1) out.push({ rule: "wrapping-tabs", detail: `${label(row)} wraps to ${tops.size} lines` });
+    }
+
+    // 5. App pages taller than the warning budget.
+    const screens = document.documentElement.scrollHeight / vh;
+    if (app && screens > screensWarn) out.push({ rule: "tall-page", detail: `${screens.toFixed(1)} phone screens` });
+
+    // 6. The page's marked primary action is neither on screen one nor in a docked bar.
+    const primary = Array.from(document.querySelectorAll("[data-primary-action]")).find(shown);
+    if (primary && !inFixed(primary) && primary.getBoundingClientRect().top + window.scrollY > vh) {
+      out.push({ rule: "primary-offscreen", detail: `${label(primary)} starts ${Math.round(primary.getBoundingClientRect().top + window.scrollY)}px down` });
+    }
+    return out;
+  }, { screensWarn: PHONE_SCREENS_WARN, app: session !== "public" });
+
+  // 7. With a bottom tab bar, the end of the page must clear it.
+  const covered = await page.evaluate(async () => {
+    const bar = document.querySelector(".tabbar");
+    if (!bar || getComputedStyle(bar).display === "none") return null;
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const top = bar.getBoundingClientRect().top;
+    let bottom = 0;
+    for (const el of Array.from(document.querySelectorAll("#main *"))) {
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      if (r.height === 0 || cs.position === "fixed" || cs.visibility === "hidden") continue;
+      // Docked things (the bar itself, the action bar, sheets) are over the page, not the end of it.
+      if (el.closest("[role='dialog'], .action-bar, .tabbar")) continue;
+      bottom = Math.max(bottom, r.bottom);
+    }
+    window.scrollTo(0, 0);
+    return bottom > top + 1 ? `content ends ${Math.round(bottom - top)}px under the tab bar` : null;
+  });
+  if (covered) found.push({ rule: "under-tabbar", detail: covered });
+  return found as PhoneWarning[];
+}
+
 // [route, trigger selector, label] — the overlays a keyboard user meets.
 const MODAL_TRIGGERS: Array<[string, string, string]> = [
   ["/", ".menu-btn", "public mobile menu"],
@@ -336,7 +447,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
   const file = resolve(dir, `${slug(r.name ?? r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.name ?? r.path, session: r.session, title: "", screenshot: file, overflow: null, gutter: null, axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
+  const result: PageResult = { lang, width, path: r.name ?? r.path, session: r.session, title: "", screenshot: file, overflow: null, gutter: null, phone: [], axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -355,6 +466,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
     result.overflow = await overflow(page);
     result.gutter = await gutter(page, width);
     if (SCREENSHOTS) await page.screenshot({ path: file, fullPage: true });
+    result.phone = await phoneRules(page, width, r.session);
     if (RUN_AXE) result.axe = await runAxe(page);
     if (RUN_SR) {
       result.sr = await screenReaderAudit(page, { width });
@@ -426,6 +538,15 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
   for (const r of results) if (r.overflow) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.overflow.scrollWidth}/${r.overflow.clientWidth} — ${r.overflow.offenders.join(", ")}`);
   lines.push("", `## Phone gutter (< ${GUTTER_MIN}px from an edge at ≤ ${GUTTER_WIDTH}px)`, "");
   for (const r of results) if (r.gutter) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.gutter.offenders.join(" · ")}`);
+  lines.push("", `## Phone rules (≤ ${PHONE_WIDTH}px) — warnings until Phase 113`, "");
+  const byPhoneRule = new Map<string, string[]>();
+  for (const r of results) for (const w of r.phone) byPhoneRule.set(w.rule, [...(byPhoneRule.get(w.rule) ?? []), `\`${r.path}\` ${r.lang}@${r.width}: ${w.detail}`]);
+  for (const [rule, where] of [...byPhoneRule].sort((a, b) => b[1].length - a[1].length)) {
+    lines.push(`### ${rule} — ${where.length} page(s)`, "");
+    for (const w of where.slice(0, 60)) lines.push(`- ${w}`);
+    if (where.length > 60) lines.push(`- … ${where.length - 60} more`);
+    lines.push("");
+  }
   lines.push("", "## Raw translation keys on the page", "");
   for (const r of results) if (r.rawKeys.length) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.rawKeys.join(", ")}`);
   lines.push("", "## Console errors / failed requests", "");
@@ -516,7 +637,7 @@ try {
           if (session === "newcomer") await db.delete(businessProfilesTable).where(eq(businessProfilesTable.userId, newcomer.userId));
           const res = await checkPage(ctx, frontend, r, lang, width);
           results.push(res);
-          const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.sr.length && `SR:${[...new Set(res.sr.map((f) => f.rule))].join(",")}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
+          const flags = [res.overflow && "OVERFLOW", res.gutter && `GUTTER:${res.gutter.offenders.length}`, res.phone.length && `phone:${[...new Set(res.phone.map((w) => w.rule))].join(",")}`, res.sr.length && `SR:${[...new Set(res.sr.map((f) => f.rule))].join(",")}`, res.axe.some((a) => a.impact !== "moderate") && `AXE:${res.axe.filter((a) => a.impact !== "moderate").map((a) => a.id).join(",")}`, res.consoleErrors.length && `CONSOLE:${res.consoleErrors.length}`, res.failedRequests.length && `API:${res.failedRequests.length}`, res.boundary && `BOUNDARY:${res.boundary}`, res.rawKeys.length && `RAWKEY:${res.rawKeys.join(",")}`, res.error && `ERROR:${res.error}`].filter(Boolean);
           console.log(`${lang}@${String(width).padStart(4)} ${(r.name ?? r.path).padEnd(60)} ${flags.join(" ") || "ok"}`);
         }
       }
@@ -530,7 +651,8 @@ try {
   const rawKeyPages = results.filter((r) => r.rawKeys.length).length;
   const srBlocking = results.reduce((s, r) => s + r.sr.filter((f) => SR_BLOCKING.has(f.rule)).length, 0);
   const srOther = results.reduce((s, r) => s + r.sr.length, 0) - srBlocking;
-  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, screen-reader ${srBlocking} blocking + ${srOther} to read, raw i18n keys on ${rawKeyPages} → ${resolve(OUT, "report.md")}`);
+  const phonePages = results.filter((r) => r.phone.length).length;
+  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, screen-reader ${srBlocking} blocking + ${srOther} to read, raw i18n keys on ${rawKeyPages}, phone-rule warnings on ${phonePages} → ${resolve(OUT, "report.md")}`);
   if (KEEP) {
     console.log(`[qa-visual] --keep: account ${org.email} left in place; bearer ${org.token}; frontend ${frontend} (API ${apiBase}). Ctrl-C to stop.`);
     await new Promise(() => {});

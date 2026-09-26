@@ -20,6 +20,7 @@ import { SkipLink } from "@/components/a11y";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
+import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -98,6 +99,28 @@ function useSwipeToClose(enabled: boolean, onClose: () => void) {
   }, [enabled]);
 
   return ref;
+}
+
+/** Pages that are not in the sidebar but still need a name in the phone top bar. */
+const EXTRA_TITLES: Record<string, string> = {
+  "/dashboard/new": "dashboard.nav.newQuote",
+  "/dashboard/me": "dashboard.account.myProfile",
+  "/dashboard/profile": "dashboard.account.companyProfile",
+  "/dashboard/billing": "dashboard.account.planBilling",
+  "/dashboard/notifications": "notifications.title",
+  "/dashboard/people": "dashboard.nav.team",
+};
+
+/**
+ * Phase 100: the phone top bar's back target — the screen one level up
+ * (/dashboard/quotes/:id → /dashboard/quotes). Section roots have none; the
+ * bottom tabs (Phase 101) are how you move between sections.
+ */
+function parentOf(location: string): string | null {
+  const segs = location.split("/").filter(Boolean);
+  if (segs[0] !== "dashboard" || segs.length < 3) return null;
+  if (segs[1] === "people") return "/dashboard/team?tab=members";
+  return "/" + segs.slice(0, -1).join("/");
 }
 
 function isActive(navHref: string, location: string, exact: boolean) {
@@ -267,18 +290,22 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
   // name the tab after the section the user is in.
-  const navLabelsKey = allNavItems.map((item) => item.label).join("|"); // useNavItems returns a fresh array each render
+  const sectionOf = (path: string) => {
+    const extra = Object.keys(EXTRA_TITLES).find((p) => path === p || path.startsWith(p + "/"));
+    if (extra) return t(EXTRA_TITLES[extra]!);
+    return allNavItems
+      .filter((item) => (item.exact ? path === item.href : path === item.href || path.startsWith(item.href + "/") || path.startsWith(item.href + "?")))
+      .sort((a, b) => b.href.length - a.href.length)[0]?.label;
+  };
+  const sectionLabel = sectionOf(location);
+  const backHref = parentOf(location);
   useEffect(() => {
-    const section = allNavItems
-      .filter((item) => (item.exact ? location === item.href : location.startsWith(item.href)))
-      .sort((a, b) => b.href.length - a.href.length)[0];
     const previous = document.title;
-    document.title = section ? `${section.label} · QuoteAI` : "QuoteAI";
+    document.title = sectionLabel ? `${sectionLabel} · QuoteAI` : "QuoteAI";
     return () => {
       document.title = previous;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location, navLabelsKey]);
+  }, [sectionLabel]);
 
   useEffect(() => {
     try { localStorage.setItem("sidebar-collapsed", String(isCollapsed)); } catch {}
@@ -366,6 +393,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
+    <MobileHeaderProvider>
     <div className={cn("app", isCollapsed && "rail")}>
       <SkipLink />
       {/* Sidebar (desktop: rail-collapsible; mobile: slide-in drawer) */}
@@ -429,6 +457,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <button type="button" className="tb-menu" onClick={() => setIsMobileMenuOpen(true)} aria-label={t("dashboard.nav.toggleMenu")}>
             <Menu className="ic" style={{ width: 22, height: 22 }} />
           </button>
+          <MobilePageHeader title={sectionLabel ?? "QuoteAI"} backHref={backHref} backLabel={backHref ? sectionOf(backHref.split("?")[0]!) : undefined} />
           <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
           <div className="tb-right">
             <NotificationsBell variant="topbar" side="bottom" align="end" />
@@ -439,5 +468,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <main id="main" className="content"><OfflineBar />{children}</main>
       </div>
     </div>
+    </MobileHeaderProvider>
   );
 }

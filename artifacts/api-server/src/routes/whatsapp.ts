@@ -1365,6 +1365,14 @@ async function handleInboundOtpVerification(phoneNumber: string, otp: string): P
 
 // ── Management routes ─────────────────────────────────────────────────────────
 
+// Phase 100: the marketing pages ("Now on WhatsApp", the pilot's "WhatsApp
+// quoting") only say so once the integration can actually answer. Public, no
+// account data — the same env check the Connect button uses.
+router.get("/whatsapp/available", (_req, res) => {
+  res.set("Cache-Control", "public, max-age=300");
+  res.json({ available: isIntegrationConfigured("whatsapp") });
+});
+
 router.get("/whatsapp/status", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);

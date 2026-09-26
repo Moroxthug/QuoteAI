@@ -308,7 +308,7 @@ export default function Home() {
             <div className="step">
               <span className="n">2</span>
               <b>{lang === "fr" ? "L'IA génère un aperçu" : "The AI generates a preview"}</b>
-              <p>{lang === "fr" ? "Sections, prix et taxes en 60 secondes. Corrigez ou approuvez immédiatement." : "Sections, prices, and tax in 60 seconds. Correct or approve it right away."}</p>
+              <p>{lang === "fr" ? "Sections, prix et taxes en 30 secondes. Corrigez ou approuvez immédiatement." : "Sections, prices, and tax in 30 seconds. Correct or approve it right away."}</p>
             </div>
             <div className="step">
               <span className="n">3</span>

@@ -20,6 +20,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { breadcrumbJsonLd, webPageJsonLd } from "@/data/json-ld";
 import { PILOT_PROVINCES, provincePath, provinceName } from "@/data/province-data";
 import { rememberPilotPromo } from "@/lib/pilot-promo";
+import { useWhatsappAvailable } from "@/hooks/use-whatsapp-available";
 
 const GIVE_KEYS = ["give1", "give2", "give3", "give4"] as const;
 const ASK_KEYS = ["ask1", "ask2", "ask3"] as const;
@@ -38,6 +39,8 @@ export default function PilotPage() {
   const { t, lang } = useLanguage();
   const [, navigate] = useLocation();
   const { data: offer, isLoading } = useGetPilotOffer();
+  // Phase 100: "WhatsApp quoting" is only listed as shipped once it answers on this server.
+  const whatsappLive = useWhatsappAvailable();
 
   const canonical = lang === "fr" ? "https://quoteai.ca/fr/pilote/" : "https://quoteai.ca/pilot/";
   const altCanonical = lang === "fr" ? "https://quoteai.ca/pilot/" : "https://quoteai.ca/fr/pilote/";
@@ -134,7 +137,7 @@ export default function PilotPage() {
               <h3>{t("pilot.giveTitle")}</h3>
               <ul className="prov-notes">
                 {GIVE_KEYS.map((k) => (
-                  <li key={k}><Check className="h-4 w-4 shrink-0" /><span>{t(`pilot.${k}`)}</span></li>
+                  <li key={k}><Check className="h-4 w-4 shrink-0" /><span>{t(k === "give4" && !whatsappLive ? "pilot.give4NoWhatsapp" : `pilot.${k}`)}</span></li>
                 ))}
               </ul>
             </div>

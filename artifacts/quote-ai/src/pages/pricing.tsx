@@ -115,29 +115,22 @@ export default function PricingPage() {
       {/* ── PLANS ──────────────────────────────────────────── */}
       <ScrollSection className="sec" id="plans">
         <div className="wrap">
-          <div className="price-switch">
-            <div className="seg seg-2" data-period={effectiveInterval === "year" ? "y" : "m"} role="group" aria-label={t("pricing.cadence")}>
-              <div className="seg-thumb" aria-hidden="true" />
-              <button type="button" className="seg-b" onClick={() => setInterval("month")} aria-pressed={effectiveInterval === "month"}>
-                {t("pricing.monthly")}
-              </button>
-              <button
-                type="button"
-                className="seg-b"
-                onClick={() => setInterval("year")}
-                aria-pressed={effectiveInterval === "year"}
-                disabled={!annualAvailable}
-                title={annualAvailable ? undefined : t("pricing.annualSoon")}
-              >
-                {t("pricing.annual")}
-              </button>
-            </div>
-            {annualAvailable ? (
+          {/* Phase 100: until the yearly Stripe prices exist the page is monthly,
+              full stop — no greyed toggle explaining server configuration. */}
+          {annualAvailable && (
+            <div className="price-switch">
+              <div className="seg seg-2" data-period={effectiveInterval === "year" ? "y" : "m"} role="group" aria-label={t("pricing.cadence")}>
+                <div className="seg-thumb" aria-hidden="true" />
+                <button type="button" className="seg-b" onClick={() => setInterval("month")} aria-pressed={effectiveInterval === "month"}>
+                  {t("pricing.monthly")}
+                </button>
+                <button type="button" className="seg-b" onClick={() => setInterval("year")} aria-pressed={effectiveInterval === "year"}>
+                  {t("pricing.annual")}
+                </button>
+              </div>
               <span className="chip chip-green"><Sparkles className="h-3 w-3 mr-1" />{t("pricing.twoMonthsFree")}</span>
-            ) : (
-              <span className="chip chip-grey chip-wrap">{t("pricing.annualSoon")}</span>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="price-grid">
             {MARKETING_PLANS.map((plan) => {

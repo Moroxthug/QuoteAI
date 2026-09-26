@@ -150,7 +150,7 @@ export default function WhatsappPage() {
             <span style={{ textDecoration: "line-through", opacity: 0.5 }}>{t("whatsapp.thirtyToFortyMinutes")}</span>{" "}
             {t("whatsapp.toMakeAQuote")}
             <br />
-            <em style={{ fontStyle: "normal", color: "#8ef07f" }}>{t("whatsapp.youTake60Seconds")}</em>
+            <em style={{ fontStyle: "normal", color: "#8ef07f" }}>{t("whatsapp.youTake30Seconds")}</em>
           </h2>
           <p className="lead">
             {t("whatsapp.tradespersonRespondPrefix")} <strong>{t("whatsapp.threeXMoreLikely")}</strong> {t("whatsapp.toWinTheJob")}

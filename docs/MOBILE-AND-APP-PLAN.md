@@ -15,7 +15,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 
 | Phase | Title | Track | State |
 |---|---|---|---|
-| 100 | Mobile foundation: rules, primitives, the phone check | A | not started |
+| 100 | Mobile foundation: rules, primitives, the phone check | A | **done** 2026-09-26 |
 | 101 | Navigation: bottom tabs, the More sheet, one New button | A | not started |
 | 102 | Settings, rebuilt (desktop and phone) | A | not started |
 | 103 | Integrations: an app directory with real logos | A | not started |
@@ -215,3 +215,29 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 ## Build log
 
 *(one entry per phase: date, built, found, deferred, verification with the phone sheets)*
+
+### Phase 100 — 2026-09-26
+
+**Built**
+- `docs/MOBILE-RULES.md` — the ten rules, the component table, what the machine checks, how to make sheets; do/don't pictures in `docs/mobile-rules/`.
+- `components/mobile/`: `BottomTabBar` (≤ 980 px, marks `<html class="has-tabbar">`), `ActionSheet` (dropdown on desktop / sheet of 52 px rows on phones), `BottomSheet` (on `.modal`, grab handle, safe area), `StickyActionBar` (docked above tab bar + home indicator, spacer, `data-primary-action`), `ListRow` + `ResponsiveTable` (one column definition, `mobile: title/meta/amount/end/hidden`), `StatStrip` (grid / `line`), `ScrollTabs`, `MobilePageHeader` + `useMobileHeader()`.
+- Phone top bar on every dashboard page: ‹ back to the parent (`/dashboard/quotes/:id` → Quotes, `/dashboard/people/:id` → team members), the section title, the page's ⋯ when it registers actions. The tab title (`document.title`) now uses the same section lookup, which also names New quote / My profile / Plan & billing / Notifications.
+- CSS "CALM MOBILE (Phase 100)" in `mockup-system.css`: safe-area, type-scale, spacing tokens; phones get 16 px gutters, 22 px page titles, 12 px card gaps; `viewport-fit=cover`; `.wrap` respects the side safe areas.
+- `/dashboard/__preview` (dev server only, `src/dev/mobile-preview.tsx`): every primitive on fake data inside the real shell; swept by `qa:visual`.
+- `qa:visual` phone rules as warnings (≤ 640 px): stacked-buttons, full-width-stat, wide-table, wrapping-tabs, tall-page (> 8 screens, app pages), primary-offscreen, under-tabbar — "Phone rules" section in report.md, `phone:` on the console line.
+- `qa:phone-sheets` (`src/e2e/phone-sheets.ts`): first N phone frames side by side per route, before/after with `--baseline`, plus an `index.html` for a phone.
+- Honesty fixes: new public `GET /api/whatsapp/available` (the same env check as Connect, allow-listed in the route-matrix test); the "Now on WhatsApp" bar and the pilot's "…and WhatsApp quoting" wait for it (a WhatsApp-free `pilot.give4NoWhatsapp` otherwise, also what the prerender shows). `/pricing` shows monthly only until annual prices exist — the greyed toggle and "not set up on this server" chip are gone, FAQ reworded. "60 seconds" → "30 seconds" everywhere (dashboard empty states, SEO hero CTA, mega-menu, WhatsApp page, SEO sector copy).
+
+**Found**
+- The grey smudge behind the phone menu icon was the **skip link's shadow**: parked above the viewport, its 48 px blur reached ~57 px down. The shadow now only exists while the link is focused.
+- The phone rules' first read (34 pages, EN 375/1280): 14 pages warn — `/dashboard` and the job pages full-width stat cards, the job page 5 stacked buttons, `/dashboard/quotes` wide table + wrapping filter pills, every settings tab the wrapping pill row, `/pricing` and the homepage the comparison table (inside its deliberate scroller — Phase 112 turns it into a per-feature list), the calendar-picker settings state 8.0 screens. Exactly the audit's list; Phases 102-112 clear them.
+- Git Bash rewrites a bare `/` argument, so `--routes==/` doesn't reach the script on this machine; `/fr` stands in for the homepage (or run from PowerShell).
+
+**Deferred**
+- Nothing wired into real pages beyond the top bar — that is 101 (tab bar + More sheet) onwards.
+- `pnpm spell` was already failing before this phase (543 issues, mostly the word "whatsapp" and names); +1 from the new key id. Not touched here.
+
+**Verification**
+- `qa:visual --lang=en --widths=375,1280` over home/pilot/pricing/dashboard/quotes/jobs/settings/preview (34 pages) and `--lang=en,fr --widths=375,1280 --routes=/fr,__preview` (8 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; the preview page has no phone-rule warnings.
+- Phone sheets: `.qa/phone-sheets/p100/` (17 routes, before = `visual-mobile-audit`), `.qa/phone-sheets/p100b/dashboard-preview.png`. Before/after on `/pricing`: the WhatsApp bar and the annual-billing chip gone; dashboard top bar: smudge gone, "Dashboard" title in.
+- typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures), route-matrix test 12/12.

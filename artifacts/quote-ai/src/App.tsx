@@ -16,6 +16,8 @@ const WhatsappPage = lazy(() => import("@/pages/whatsapp"));
 // Phase 81 — the marketing pages built for the BC/ON/QC pilot.
 const PricingPage = lazy(() => import("@/pages/pricing"));
 const PilotPage = lazy(() => import("@/pages/pilot"));
+// Phase 100: the calm-mobile primitives on fake data — dev server only (the import is dropped from production builds).
+const MobilePreview = import.meta.env.DEV ? lazy(() => import("@/dev/mobile-preview")) : null;
 const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const SignUpPage = lazy(() => import("@/pages/sign-up"));
@@ -282,6 +284,11 @@ function Router() {
       <Route path="/dashboard/notifications" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><NotificationsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
+      {MobilePreview && (
+        <Route path="/dashboard/__preview" component={() => (
+          <DashboardLayout><DashSuspense><MobilePreview /></DashSuspense></DashboardLayout>
+        )} />
+      )}
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}
       <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />

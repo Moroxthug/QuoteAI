@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { X, Send, CheckCircle2, Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useModalTrap } from "@/hooks/use-modal-trap";
+import { useWhatsappAvailable } from "@/hooks/use-whatsapp-available";
 import { SkipLink } from "@/components/a11y";
 import SupportBot from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -64,6 +65,8 @@ function ProductsMegaMenu() {
 
 function AnnouncementBar() {
   const { t } = useLanguage();
+  // Phase 100: the bar announces WhatsApp quoting — say nothing until it is live.
+  const whatsappLive = useWhatsappAvailable();
   const [dismissed, setDismissed] = useState(() => {
     try {
       return sessionStorage.getItem("quoteai:annc_dismissed") === "1";
@@ -72,7 +75,7 @@ function AnnouncementBar() {
     }
   });
 
-  if (dismissed) return null;
+  if (dismissed || !whatsappLive) return null;
 
   return (
     <div className="annc">

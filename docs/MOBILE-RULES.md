@@ -1,0 +1,68 @@
+# Calm mobile — the rules
+
+Written in Phase 100 (docs/MOBILE-AND-APP-PLAN.md), applied in every phase after it, checked by machine where a machine can see it (`qa:visual` phone rules, warnings until Phase 113 makes them the gate). One idea behind all ten: **open a screen, see the thing, do the one obvious action.**
+
+The pictures are the first phone screen (375 × 812) — "before" from the 2026-09-26 audit (`.qa/visual-mobile-audit`), "after" from the primitives' preview page (`/dashboard/__preview`, dev server only).
+
+| Don't — quote detail, 2026-09-26 | Do — the same pieces, calm |
+|---|---|
+| ![Seven stacked buttons before the quote](mobile-rules/dont-quote-detail.png) | ![Content first, one sticky primary](mobile-rules/do-preview.png) |
+
+---
+
+## The ten rules
+
+1. **Content first.** The first phone screen shows the thing the page is about (the quote, the job, the list), not the controls around it.
+2. **One primary action per screen**, in a sticky bottom bar within thumb reach (`StickyActionBar`). Everything else goes in the **⋯ action sheet** (`ActionSheet`). Never more than two full-width buttons stacked anywhere.
+3. **Numbers as a strip, not a tower.** `StatStrip`: one card, 2 columns on a phone, or a single summary line (`variant="line"`). A card that holds one number is never full-width.
+4. **Lists, not tables.** Under 640 px every table becomes rows (`ResponsiveTable` → `ListRow`): a strong line (client / title), a quiet line (date · status), the amount on the right. No sideways scrolling for data.
+5. **Tabs scroll, they don't wrap.** One line (`ScrollTabs`), sticky under the header when the page is long; long option sets become a menu screen (Settings, Phase 102).
+6. **Progressive disclosure.** Options, filters and rarely-used fields sit behind "Options" / "Filter" and open as a `BottomSheet`.
+7. **One accent at a time.** Navy for structure, one colour for status; no full-bleed colour blocks side by side on a phone.
+8. **Space is the design.** 16 px gutters (`--gutter-phone`), 12 px between cards (`--gap-card`), 44 px targets (`--tap`), one type scale: title 22 / section 17 / body 15 / meta 13 (`--fs-title`, `--fs-section`, `--fs-body`, `--fs-meta`).
+9. **The phone knows it's a phone.** Safe areas (`--safe-top/right/bottom/left`, `viewport-fit=cover`), `inputmode` / `autocomplete` on every field, camera and microphone one tap away, the numeric keypad for money.
+10. **Same code, same words.** No separate mobile code path: the same components laid out by breakpoint, so the Capacitor app (docs/APP-PLAN.md) inherits all of it.
+
+## The pieces (`artifacts/quote-ai/src/components/mobile/`)
+
+| Component | Desktop | Phone (≤ 640 px unless noted) | Rule |
+|---|---|---|---|
+| `MobilePageHeader` + `useMobileHeader()` | hidden (sidebar + page heading say where you are) | top bar: ‹ back to the parent, the screen's title, its ⋯ | 1, 2 |
+| `BottomTabBar` | hidden | ≤ 980 px: 4-5 sections + optional centred **New**; marks `<html class="has-tabbar">` so pages leave room | — |
+| `ActionSheet` | dropdown menu | bottom sheet of 52 px rows + Cancel | 2 |
+| `BottomSheet` | centred modal | docked sheet with grab handle, safe-area padding | 6 |
+| `StickyActionBar` | right-aligned row in place | docked above the tab bar / home indicator, with a spacer; primary marked `data-primary-action` | 2 |
+| `ListRow`, `ResponsiveTable` | `.tbl` table (≥ 640 px) | `<ul>` of rows, one column definition (`mobile: "title" / "meta" / "amount" / "end" / "hidden"`) | 4 |
+| `StatStrip` | one card, N cells | 2-column grid; or `variant="line"` | 3 |
+| `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it | 5 |
+
+CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. Tokens in `:root`.
+
+**Using them**
+
+- A screen's primary action: `<StickyActionBar><ActionSheet actions={…} /><button className="btn btn-navy" data-primary-action>Send</button></StickyActionBar>`.
+- A detail page names itself in the phone top bar: `useMobileHeader(useMemo(() => ({ title: quote.title, actions }), [quote.title, actions]))` — memoise, every change re-renders the bar.
+- Tables: write the columns once and say where each lands on a phone; anything unmarked is hidden there — choose, don't inherit a desktop.
+
+## What the machine checks (`qa:visual`, ≤ 640 px)
+
+Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on the console line; warnings until Phase 113.
+
+| Rule id | Fires when |
+|---|---|
+| `stacked-buttons` | more than two buttons ≥ 70 % of the width in one column |
+| `full-width-stat` | a `.stat-card` ≥ 80 % of the width |
+| `wide-table` | a `<table>` wider than its box |
+| `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line |
+| `tall-page` | an app page taller than 8 phone screens (per-page budget in Phase 113) |
+| `primary-offscreen` | the `[data-primary-action]` is below screen one and not in a docked bar |
+| `under-tabbar` | with a tab bar showing, the end of the page is hidden under it |
+
+## The phone sheets
+
+```bash
+pnpm --filter @workspace/api-server qa:visual -- --lang=en --widths=375 --axe=false --sr=false --out=p1xx --routes=quotes
+pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p1xx --baseline=visual-mobile-audit
+```
+
+Each route's first three phone screens side by side (before over after with `--baseline`), plus an `index.html` to flick through on a phone, in `artifacts/api-server/.qa/phone-sheets/<from>/`. Every Track A phase attaches its sheets to the build log.

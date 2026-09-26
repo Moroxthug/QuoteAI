@@ -24,6 +24,7 @@ const violations = (filter: (r: RouteRow) => boolean, list: Allow[]) => rows.fil
 const PUBLIC_ROUTES: Allow[] = [
   { match: /^POST \/api\/(payments\/(connect-)?webhook|webhooks\/(financeit|resend)|whatsapp\/webhook|meta-lead-ads\/webhook|sms\/webhook)$/, reason: "inbound provider webhook — signature verified (Rule 7)" },
   { match: /^GET \/api\/(whatsapp|meta-lead-ads)\/webhook$/, reason: "Meta hub.challenge verification handshake (hub.verify_token checked)" },
+  { match: /^GET \/api\/whatsapp\/available$/, reason: "Phase 100: one boolean (is WhatsApp configured on this server) for the marketing pages — no account data" },
   { match: /^GET \/api\/healthz(\/db|\/ops)?$/, reason: "liveness/readiness/ops probes (Phase 69: /ops is rate limited and reveals counts + timestamps only)" },
   { match: /^GET \/api\/healthz\/owner$/, reason: "Phase 98: ops:owner-check — handler checks `Authorization: Bearer $CRON_SECRET` itself (cronAuthorized); answers yes/no per variable, never a value" },
   { match: /^GET \/api\/tax-profiles$/, reason: "Phase 71: static Canadian sales-tax table for the quote builder; no data, cache-control 1 day" },

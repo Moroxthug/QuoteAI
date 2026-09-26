@@ -21,7 +21,7 @@ Each item says exactly what to do. Do them in this order; none needs code from t
 Open your password manager. Confirm there is an entry with the exact value of `TOKEN_ENCRYPTION_KEY`. If there isn't (it is *Sensitive* in Vercel, so it can't be read back), *→ tell the assistant* and we rotate it (RUNBOOKS §6) while only two token rows exist.
 
 ### O3 — Second Supabase project = staging + restore rehearsal (20 min)
-1. Supabase dashboard → the unused July project `cynlsphsuxrnctsxcmve` → **Project Settings → Database → Reset database password**, then copy the **Session pooler** URI with the new password.
+1. **Superseded 2026-09-26:** the July project `cynlsphsuxrnctsxcmve` is **not** unused — it runs another live app and must never be a restore target. Use an empty Supabase database created through Vercel → Storage instead (LAUNCH-FINISH-PLAN L-2), and copy its **Session pooler** URI.
 2. Same → **API**: Project URL + service_role key.
 3. *→ give the assistant the three values* (paste them in chat; they go into `.env.staging`, never the repo). The assistant runs the restore rehearsal into it, then `schema-drift`, then adds `E2E_DATABASE_URL` / `E2E_SUPABASE_URL` / `E2E_SUPABASE_SERVICE_ROLE_KEY` as GitHub secrets so CI e2e stops touching production.
 

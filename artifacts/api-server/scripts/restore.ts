@@ -66,6 +66,15 @@ if (!verifyOnly && targetUrl.hostname === manifest.source.host && targetUrl.path
   console.error(`restore: target ${targetUrl.hostname} is the backup's source — pass --allow-same-source if you really mean to overwrite it`);
   process.exit(2);
 }
+// Supabase projects that hold someone's live data and must never be a restore
+// target. cynlsphsuxrnctsxcmve ("bchysf's Project", July 2026) was once listed
+// as unused in the docs; it runs another live app (owner, 2026-09-26).
+const PROTECTED_REFS = ["cynlsphsuxrnctsxcmve"];
+const hitRef = PROTECTED_REFS.find((ref) => targetUrl.hostname.includes(ref) || decodeURIComponent(targetUrl.username).includes(ref));
+if (!verifyOnly && hitRef) {
+  console.error(`restore: ${hitRef} is a protected live project — refusing to restore into it`);
+  process.exit(2);
+}
 
 function readData(rel: string): Buffer {
   const abs = join(backupDir, rel);

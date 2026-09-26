@@ -123,7 +123,7 @@ const setOnDeployment = (names: string[]) => (ready ? names.filter((n) => ready.
   add(
     passed
       ? { item: "L-2", title: "Restore rehearsal", status: "done", detail: `last passing rehearsal ${passed.slice(2, 12)}` }
-      : { item: "L-2", title: "Restore rehearsal", status: "todo", detail: last ? `last rehearsal ${last.slice(2, 12)} did not pass` : "never run against a real second database", next: "give the assistant the July project's pooler URL; it runs `ops:rehearse`" },
+      : { item: "L-2", title: "Restore rehearsal", status: "todo", detail: last ? `last rehearsal ${last.slice(2, 12)} did not pass` : "never run against a real second database", next: "create an empty Supabase database via Vercel → Storage (not connected to quoteai), give the assistant its pooler URL; it runs `ops:rehearse`" },
   );
 }
 

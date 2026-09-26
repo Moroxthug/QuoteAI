@@ -3,7 +3,7 @@
 Written 2026-09-26. Two tracks, in this order:
 
 - **Track A — Calm mobile (Phases 100-113).** Includes a full rebuild of **Settings and Integrations on desktop and phone** (102-103). The phone experience rebuilt around one idea: *open a screen, see the thing, do the one obvious action.* Nothing here is a new feature; it is the same product arranged for a 375 px screen and a thumb.
-- **Track B — The apps (Phases 114-118).** QuoteAI on Google Play and the App Store, built from the same React code with Capacitor, **with no Mac and no Apple device required to build** (cloud macOS builds). One iPhone to test on is still strongly advised (§B.0).
+- **Tracks B and C — The app and the videos (Phases 114-131), planned in `APP-PLAN.md`.** QuoteAI on Google Play and the App Store, built from the same React code with Capacitor, **with no Mac and no Apple device required to build** (cloud macOS builds). One iPhone to test on is still strongly advised.
 
 Track B starts after Track A's navigation, Settings/Integrations and core screens (100-106) — an app store listing of today's mobile layout would be the "messy" version with an icon.
 
@@ -29,11 +29,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | not started |
 | 112 | The public site on a phone | A | not started |
 | 113 | The phone gate: rules enforced, sheets reviewed | A | not started |
-| 114 | App foundation (Capacitor) | B | not started |
-| 115 | Native device features: push, camera, files, location | B | not started |
-| 116 | Google Play release | B | not started |
-| 117 | App Store release without a Mac | B | not started |
-| 118 | Store listings, release process, runbook | B | not started |
+| 114-131 | The app and the videos | B, C | see `APP-PLAN.md` |
 
 ---
 
@@ -105,7 +101,7 @@ The screenshots are the proof, so they get produced every time:
   - foreman: **Today · Jobs · Schedule · Crew · More**
   - worker: the crew app (108), not the dashboard
 - **More** opens a sheet grouping the other ~15 sections under four headings (Work, Money, Team, Business) with the notifications count and the account at the top. Plan-gated sections show their lock the same way the sidebar does.
-- **New** (a centred button or the top-bar +): one sheet — New quote, New client, Log a cost (photo), New job note. The same sheet the Capacitor app long-press shortcut opens (114).
+- **New** (a centred button or the top-bar +): one sheet — New quote, New client, Log a cost (photo), New job note. The same sheet the app's long-press shortcut opens (APP-PLAN Phase 119).
 - Scroll position and tab memory per section (Phase 84's scroll restoration extended); Android back and iOS swipe-back behave (history, not a trap).
 - The drawer stays for 640-980 px tablets if the tab bar reads worse there — decide on the sheets.
 
@@ -119,7 +115,7 @@ Today: one 2,980-line page, ten pill tabs, stacked cards each with its own Save 
   - *Selling*: Quote defaults & follow-ups (cadence, review delay), Website widget (one place, with the Test button)
   - *Messaging*: Email sender, SMS, WhatsApp
   - *Connected apps* → Phase 103
-  - *Plan & billing*: plan, usage, invoices (hidden in the native apps, §B.0)
+  - *Plan & billing*: plan, usage, invoices (hidden in the native apps, APP-PLAN Phase 118)
 - **Desktop**: two panes — a grouped left list (icon, name, one-line status like "2FA on" or "Not set up") and the section on the right at a readable width (~720 px). Deep-linkable URLs `/dashboard/settings/<section>`; the old `?tab=` links redirect.
 - **Phone**: the same left list *is* the first screen (a menu); a section opens as its own page with a back arrow.
 - **One save model**: fields save on a **sticky "Unsaved changes — Discard / Save" bar** that appears only when something changed (no per-card Save buttons, no losing edits when switching sections — a "leave without saving?" prompt).
@@ -210,77 +206,9 @@ Today: a 4,847 px column of cards with generic icons. Rebuilt as a directory, li
 
 ---
 
-## B.0 The app stores without a Mac — what that really means
+## Track B and Track C → `docs/APP-PLAN.md`
 
-| Need | Without a Mac | Cost |
-|---|---|---|
-| Write the app | Capacitor wraps the existing React build. The iOS project is generated and edited on Windows (Swift Package Manager, no CocoaPods); nobody opens Xcode. | — |
-| Build and sign iOS | A cloud macOS machine: **Codemagic** (free tier includes macOS build minutes each month; automatic code signing from an App Store Connect API key) or **GitHub Actions** macOS runners (private repos burn macOS minutes 10× faster). Certificates and provisioning profiles are created through the App Store Connect API — no Keychain, no Mac. | Free tier to start |
-| Build Android | GitHub Actions on Linux, or locally on Windows with Android Studio. | Free |
-| Apple Developer Program | Enrol at developer.apple.com with an Apple ID with two-factor on (an SMS phone number works as the trusted device). **Organisation** enrolment needs a D-U-N-S number and the registered business (ties to Phase 99 L-4); **individual** shows your personal name as the seller. | US$99 / year |
-| Google Play Console | Identity verification. **Personal** accounts created since late 2023 must run a closed test with at least 12 testers for 14 days before production; **organisation** accounts (D-U-N-S) skip that. | US$25 once |
-| Test on iOS | TestFlight installs builds on a real iPhone — the only way to feel it. Options: borrow one, a used iPhone (any model on a supported iOS), or a cloud device service (BrowserStack/others) for spot checks. The simulator runs only on a Mac (Codemagic can take simulator screenshots for the store). | Borrow / ~$150-250 used |
-| App Review | Apple reviews every release (usually 1-2 days). A reviewer logs in with a demo account we provide. | — |
-
-**Recommendation:** Capacitor, bundled web assets (not a remote-URL shell), Codemagic for iOS, GitHub Actions for Android, organisation accounts once the business is registered (L-4) — individual accounts are fine for internal testing meanwhile, but transferring an app between account types later is paperwork.
-
-**The three App Store rules that shape the build** (and Play's equivalents):
-1. **No buying inside the app** (Guideline 3.1.1; Play's payments policy is similar). The plan picker, upgrade buttons, single-quote purchase and checkout links are hidden in the native apps; an account is subscribed on the website. On iOS the app may not even point to the website to buy (anti-steering, outside the US). The contractor's *clients* paying invoices by card is a physical service and stays.
-2. **More than a website** (4.2 minimum functionality). Native push, camera capture, offline crew mode, location clock-in, share sheet and file saving are what make it an app — Phase 115 is not optional.
-3. **Account deletion inside the app** (5.1.1(v)) — already built (Phase 72), must be reachable from the app's settings. Sign in with Apple is **not** required: QuoteAI has no social logins.
-
-## Phase 114 — App foundation (Capacitor)
-
-- `artifacts/mobile` (Capacitor 7+) wrapping the quote-ai client build: `appId ca.quoteai.app`, name QuoteAI, bundled assets, splash and icons generated from the logo.
-- **Auth for a bundled app**: the WebView's origin is `capacitor://localhost` (iOS) / `https://localhost` (Android), so cookies to quoteai.ca are third-party. Use better-auth's **bearer** plugin (already on): token in the device keychain/keystore (secure storage plugin), sent as `Authorization`; CORS + `TRUSTED_ORIGINS` for the two app origins; 2FA flow checked.
-- An `isNativeApp` flag: hides purchase UI (rule 1), the marketing site and cookie banner; the app opens straight to sign-in or Today.
-- **Offline**: the IndexedDB outbox (Phase 77) works without the service worker; iOS WKWebView does not run service workers for `capacitor://`, and doesn't need to — the shell is bundled. Verify the outbox replay and the offline pages in both.
-- Links: `/p`, `/sign`, `/i`, `/join` links opened from email stay in the browser (they are for clients); `quoteai.ca/dashboard/*` links open the app when installed (Android App Links + iOS Universal Links: `assetlinks.json` and `apple-app-site-association` served by the site).
-- Status bar colour, safe areas (100 already), Android back button to history, keyboard resize mode, pull-to-refresh on lists.
-- CI: Android debug APK on every push to `main`.
-
-## Phase 115 — Native device features: push, camera, files, location
-
-- **Push**: Firebase Cloud Messaging for both platforms (FCM relays to Apple's APNs with an APNs key from the Apple developer site — made in the browser). A `device_tokens` table next to the Phase 77 web-push subscriptions; every notification that goes to web push also goes to the devices; tapping it opens the right screen. Permission asked at a moment that explains itself (after the first quote is sent, "Know when they accept?"), not at launch.
-- **Camera**: job photos and receipts through the native camera (and library), compressed on device before upload, working with the offline outbox.
-- **Files**: PDFs (quote, invoice, contract, payroll export) saved and shared through the native share sheet — a WebView can't download a blob the way a browser does.
-- **Location**: clock-in location with the permission strings Apple requires ("QuoteAI records where you clock in so your employer can confirm site attendance") and only while in use.
-- **Voice**: dictation uses the microphone permission, same strings discipline.
-- Optional, if cheap: Face ID / fingerprint to reopen the app, app-icon shortcuts (New quote, Clock in).
-
-## Phase 116 — Google Play release
-
-- Owner: Play Console account (organisation if the business is registered), app created, testers list.
-- Assistant: release-signed AAB from GitHub Actions (upload key in GitHub secrets, Play App Signing holds the app key), version code from the build number; store listing EN + FR; **Data safety** form answered from the privacy policy's recipient list; content rating; target API level current; account deletion URL (`/dashboard/settings` security → the public help article that explains it).
-- Internal testing → closed testing (12 testers × 14 days if a personal account) → production, staged rollout 20 % → 100 %.
-
-## Phase 117 — App Store release without a Mac
-
-- Owner: Apple Developer Program enrolment; App Store Connect app record; an **App Store Connect API key** (admin creates it in the browser) handed to Codemagic; a demo account for App Review; a test iPhone or a plan for one.
-- Assistant: `codemagic.yaml` — build the web assets, `cap sync ios`, automatic signing, build, upload to **TestFlight**; the same workflow on a tag submits for review. Push entitlement and APNs key wired to FCM. `Info.plist` usage strings (camera, photos, microphone, location-when-in-use). **Privacy nutrition labels** from the recipient list; App Tracking Transparency not needed if no tracking SDK runs in the app (PostHog in the app configured without cross-app tracking, or off).
-- Review notes that pre-empt the usual rejections: what the app does beyond the website (push, camera, offline field mode, location clock-in), where account deletion is, that subscriptions are managed outside the app and the app sells nothing, the demo login.
-- iPhone only at first (no iPad screenshots needed), portrait.
-
-## Phase 118 — Store listings, release process, runbook
-
-- Screenshots generated from the real app screens at the required sizes (the same fake-data preview routes + Chrome at device sizes; Codemagic simulator for true iOS frames), EN and FR, captions in the product's own voice; short/long descriptions; keywords; support and privacy URLs; the promo video optional.
-- Release process in `RUNBOOKS.md`: version numbers, a tag builds both stores, staged rollout, how to roll back (halt rollout / expedited review), what a web deploy does and doesn't change in the app (bundled assets update only with a new build — or with a live-update service later, decision recorded), and the checks before every submission (`qa:visual`, the phone sheets, a TestFlight + internal-track install).
-- `ops:owner-check` gains the app items (store accounts, API key present in CI, last successful build per platform).
-
----
-
-## Owner items for Track B (added to Phase 99 when Track B starts)
-
-| # | Item | Time | Cost |
-|---|---|---|---|
-| M-1 | Decide individual vs organisation store accounts (organisation needs L-4 + a D-U-N-S number, free from Dun & Bradstreet, takes days to a couple of weeks) | 5 min + wait | free |
-| M-2 | Google Play Console account + identity verification | 30 min + wait | US$25 |
-| M-3 | Apple Developer Program enrolment | 30 min + wait (1-2 days, longer for organisations) | US$99/yr |
-| M-4 | App Store Connect API key → Codemagic (the assistant says exactly which role and where to paste) | 10 min | free tier |
-| M-5 | Firebase project (for push), APNs key uploaded to it | 20 min | free |
-| M-6 | An iPhone for TestFlight (borrow / used) and an Android phone | — | — |
-| M-7 | 12 testers for Google's closed test if the Play account is personal | 14 days | — |
-| M-8 | Demo account for App Review (the assistant seeds it) | 5 min | — |
+The app (Phases 114-126: designed first, instant, real-time sync and offline, the native shell, store releases without a Mac) and the video tutorials (Phases 127-131) are planned in [APP-PLAN.md](APP-PLAN.md). Track B starts after Phases 100-106 here.
 
 ---
 

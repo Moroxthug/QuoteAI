@@ -165,7 +165,9 @@ async function loadData(client: pg.PoolClient): Promise<void> {
     } catch {
       if (cyclic.length) console.warn(`  role cannot disable FK triggers and these tables reference each other in a cycle: ${cyclic.join(", ")} — the load may fail on them`);
     }
-    if (has("--truncate")) {
+    // --wipe too: some migrations seed rows (incentives_catalog), which the
+    // backup carries as well — load into empty tables, not on top of seeds.
+    if (has("--truncate") || has("--wipe")) {
       await client.query(`TRUNCATE ${tables.map((t) => `"public"."${t}"`).join(", ")} CASCADE`);
     } else if (!has("--wipe")) {
       const { rows: [nonEmpty] } = await client.query<{ n: string }>(
@@ -175,7 +177,13 @@ async function loadData(client: pg.PoolClient): Promise<void> {
     }
     for (const t of order) {
       const entry = manifest.tables.find((m) => m.name === t)!;
-      const stream = client.query(copyFrom(`COPY "public"."${t}" FROM STDIN WITH (FORMAT csv, HEADER)`));
+      // Name the columns in the source's order (backup.ts lists them by
+      // ordinal_position, the order COPY TO wrote them): a schema rebuilt from
+      // the migrations can order columns differently from the source.
+      const cols = (manifest.schema.columns as { table_name: string; column_name: string }[])
+        .filter((c) => c.table_name === t)
+        .map((c) => `"${c.column_name.replace(/"/g, '""')}"`);
+      const stream = client.query(copyFrom(`COPY "public"."${t}"${cols.length ? ` (${cols.join(", ")})` : ""} FROM STDIN WITH (FORMAT csv, HEADER)`));
       const source = entry.file.endsWith(".enc") ? Readable.from([readData(entry.file)]) : createReadStream(join(backupDir, entry.file));
       await pipeline(source, createGunzip(), stream);
       const { rows: [cnt] } = await client.query<{ n: string }>(`select count(*)::text as n from "public"."${t}"`);

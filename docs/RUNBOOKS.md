@@ -132,7 +132,7 @@ The script refuses the backup's own source unless `--allow-same-source`, refuses
 
 **Restoring production itself:** `--truncate --data-only` on the production URL with `--allow-same-source`, from the newest artifact (download it from the Actions run, unzip). Put the app in maintenance first (Vercel → pause project, or set the deployment protection) so no writes race the load; run; unpause; run the cron tick by hand (§2a step 3).
 
-**Rehearsal log:** `docs/RESTORE-REHEARSALS.md`, one row per `ops:rehearse` run (§36). Backup of production taken 2026-09-21 (77 tables, 83 rows) and verified; encrypted round-trip verified; **the restore into a second project has not been run yet** — it needs only the target URL now.
+**Rehearsal log:** `docs/RESTORE-REHEARSALS.md`, one row per `ops:rehearse` run (§36). Backup of production taken 2026-09-21 (77 tables, 83 rows) and verified; encrypted round-trip verified; **Restore into a second project: pass on 2026-09-26** (Phase 99 log in LAUNCH-FINISH-PLAN; it found and fixed pushed-only tables/columns, positional COPY and seed double-loading).
 
 **Supabase-side:** Project paused for inactivity (Free plan, 7 days idle) → Supabase dashboard → Restore; the API returns 500s meanwhile. Project deleted → the nightly artifact is the only copy.
 

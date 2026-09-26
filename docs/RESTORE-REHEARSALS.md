@@ -4,3 +4,4 @@ One row per `pnpm --filter @workspace/api-server ops:rehearse` run (Phase 98). A
 
 | Date | Result | Backup | Target project | Tables / rows | Backup time | Restore time | Note |
 |---|---|---|---|---|---|---|---|
+| 2026-09-26 | pass | `.backups/rehearsal-2026-09-26T22-36-42` (taken 2026-09-26 22:36) | tpjzvnxdduvfunhofoyh | 101 / 294 | 6 s | 45 s | restored, row counts and schema match |

@@ -38,9 +38,18 @@ jobs:
   # when the E2E_* secrets are set (repo Settings → Secrets → Actions); until
   # then every step is skipped and the job is green. NEVER point these at the
   # production project — the suite creates and deletes real users/rows/PDFs.
+  #
+  # One e2e run at a time: every run shares the one staging database, and each
+  # file's first user purges every e2e_ user it didn't make itself — two runs
+  # at once delete each other's fixtures (random 401s, "row missing"; Phase 99,
+  # 2026-09-26). A newer run waits; a still-queued older one is dropped. Never
+  # run the suite locally against the staging DB while a CI run is going.
   e2e:
     runs-on: ubuntu-latest
     needs: test
+    concurrency:
+      group: e2e-staging-db
+      cancel-in-progress: false
     env:
       HAS_E2E_SECRETS: ${{ secrets.E2E_DATABASE_URL != '' }}
     steps:

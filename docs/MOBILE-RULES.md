@@ -1,6 +1,6 @@
 # Calm mobile — the rules
 
-Written in Phase 100 (docs/MOBILE-AND-APP-PLAN.md), applied in every phase after it, checked by machine where a machine can see it (`qa:visual` phone rules, warnings until Phase 113 makes them the gate). One idea behind all ten: **open a screen, see the thing, do the one obvious action.**
+Written in Phase 100 (docs/MOBILE-AND-APP-PLAN.md), applied in every phase after it, checked by machine where a machine can see it (`qa:visual` phone rules — the gate since Phase 113: a break fails the sweep). One idea behind all ten: **open a screen, see the thing, do the one obvious action.**
 
 The pictures are the first phone screen (375 × 812) — "before" from the 2026-09-26 audit (`.qa/visual-mobile-audit`), "after" from the primitives' preview page (`/dashboard/__preview`, dev server only).
 
@@ -62,7 +62,7 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 
 ## What the machine checks (`qa:visual`, ≤ 640 px)
 
-Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on the console line; warnings until Phase 113.
+Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on the console line. **Since Phase 113 they are errors**: `qa:visual` exits 1 on any of them (and on any overflow, gutter, serious/critical axe node, blocking screen-reader finding, raw key or error page); `--gate=false` reports without failing, for a baseline before a change. The report also lists every phone page's height against its budget, tallest first.
 
 | Rule id | Fires when |
 |---|---|
@@ -70,7 +70,7 @@ Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on 
 | `full-width-stat` | a `.stat-card` ≥ 80 % of the width (not `.stat-card.editable`, which holds a field) |
 | `wide-table` | a `<table>` wider than its box |
 | `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line (not `.pills.choices`: a set of chips to pick from is meant to wrap, Phase 111) |
-| `tall-page` | an app page taller than 8 phone screens (per-page budget in Phase 113) |
+| `tall-page` | taller than its budget: 6 phone screens for an app page, 10 for a public page, or the page's own entry in `PHONE_BUDGETS` (`src/e2e/visual-a11y.ts`) — each with the reason it is long and its height when set (Phase 113) |
 | `primary-offscreen` | the `[data-primary-action]` is below screen one and not in a docked bar |
 | `under-tabbar` | with a tab bar showing, the end of the page is hidden under it |
 
@@ -82,6 +82,22 @@ pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p1xx --baseline=vi
 ```
 
 Each route's first three phone screens side by side (before over after with `--baseline`), plus an `index.html` to flick through on a phone, in `artifacts/api-server/.qa/phone-sheets/<from>/`. Every Track A phase attaches its sheets to the build log.
+
+**The whole app in one review page (Phase 113):** `qa:phone-sheets -- --from=<run> --lang=en,fr --format=jpg --scale=0.7` puts EN over FR on one sheet per route and lists them tallest first — the page to hold on a real phone after a sweep.
+
+**Height budgets.** A new page starts at the default (6 screens in the app, 10 on the public site). If it needs more, it gets its own `PHONE_BUDGETS` entry with the reason and the height the day it was set. Adding an entry is not the fix for a page that grew: fold something first (a section behind a toggle, rows instead of cards, a sheet instead of an open form). The report's "Phone heights" table shows how much room each page has left.
+
+## What the phases learned (100-113)
+
+- **Most of the mess was order, not size.** The same pieces, rearranged so the content comes before the controls, did more than any redesign: the quote first and one docked primary (105), the job's tabs on screen one (106), Clock in on screen one (108).
+- **Every ⋯ needs a home on a computer too.** `ActionSheet` is a dropdown wide and a sheet narrow, so a menu written once works everywhere; never build a phone-only menu.
+- **French is the width test.** French strings are about 20 % longer: the catalog's header bar at 768 px (110) and the assistant's starter questions (113) broke only in French. Sweep both languages before calling a phone layout done.
+- **Data length is not layout length.** A 30-line quote is a long page however well it is laid out; budget those pages by what they hold (`PHONE_BUDGETS`), and keep the default for everything else.
+- **Label-in-name.** Don't `aria-label` a row or a strip button with text different from what it shows; put extra words in an `sr-only` span after the visible text (105, 109).
+- **Things that widen a phone page by accident:** `sr-only` (absolute) text inside a sideways scroller that isn't `position: relative` (112); a sheet's inline grid style beating a media query (107). The overflow check catches both; the fix is in the scroller, not the text.
+- **Hover and drag are desktop-only.** Hover icons show on touch screens (`@media (hover: none)`), boards get a "Move to" menu, swipes are shortcuts paired with a button.
+- **Fields on a phone are 16 px**, or iOS zooms the page (111); give every field its keyboard and autofill.
+- **The sweep's full-page screenshot puts fixed things mid-page** (the top bar, docked bars, sheets): to judge a sheet, look at the first 812 px only.
 
 **The crew app (`/t/:token`, Phase 108)** — a public page with no tab bar, so the docked bar sits on the home indicator:
 

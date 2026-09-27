@@ -10,6 +10,12 @@
 //   pnpm --filter @workspace/api-server qa:visual -- --lang=en --widths=375 --axe=false --sr=false --out=p100 --routes=quotes
 //   pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p100
 //   pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p100 --baseline=visual-mobile-audit --routes=dashboard-quotes --frames=4
+//   pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p113 --lang=en,fr --format=jpg --scale=0.7   # Phase 113: the review page
+//
+// With two languages each sheet stacks EN over FR (same route, same frames),
+// and index.html lists every route tallest first — the one page the owner
+// flicks through on a phone. --format=jpg --scale=0.7 keeps it light enough to
+// publish.
 //
 // Reads  .qa/<from>/<lang>/<width>/*.png   (qa:visual's layout)
 // Writes .qa/phone-sheets/<from>/<route>.png + index.html (open it on a phone).
@@ -25,7 +31,10 @@ for (const a of process.argv.slice(2)) {
 }
 const QA = resolve(import.meta.dirname, "../../.qa");
 const FROM = args.get("from") ?? "visual";
-const LANG = args.get("lang") ?? "en";
+const LANGS = (args.get("lang") ?? "en").split(",").filter(Boolean);
+const LANG = LANGS[0]!;
+const FORMAT = args.get("format") === "jpg" ? "jpg" : "png";
+const SCALE = Number(args.get("scale") ?? 1);
 const WIDTH = Number(args.get("width") ?? 375);
 const FRAME_H = Number(args.get("frame") ?? 812);
 const FRAMES = Number(args.get("frames") ?? 3);
@@ -38,9 +47,16 @@ const LABEL_H = 34;
 const PAD = 20;
 
 const dirOf = (run: string) => resolve(QA, run, LANG, String(WIDTH));
+const dirOfLang = (run: string, lang: string) => resolve(QA, run, lang, String(WIDTH));
 const src = dirOf(FROM);
-if (!existsSync(src)) {
-  console.error(`[phone-sheets] no screenshots at ${src} — run qa:visual with --widths=${WIDTH} --out=${FROM} first`);
+for (const lang of LANGS) {
+  if (!existsSync(dirOfLang(FROM, lang))) {
+    console.error(`[phone-sheets] no screenshots at ${dirOfLang(FROM, lang)} — run qa:visual with --lang=${lang} --widths=${WIDTH} --out=${FROM} first`);
+    process.exit(1);
+  }
+}
+if (BASELINE && LANGS.length > 1) {
+  console.error("[phone-sheets] --baseline compares one language: pass a single --lang");
   process.exit(1);
 }
 const base = BASELINE ? dirOf(BASELINE) : null;
@@ -87,18 +103,36 @@ async function sheet(name: string, rows: Row[]) {
       layers.push({ input: text(colW, 40, "(end of page)", 13, 600, "#6d6f76"), top: y + LABEL_H + 12, left: PAD + i * (colW + GAP) });
     }
   });
-  const file = resolve(OUT, `${name}.png`);
-  await sharp({ create: { width: w, height: h, channels: 3, background: "#ffffff" } }).composite(layers).png({ compressionLevel: 9 }).toFile(file);
+  const file = resolve(OUT, `${name}.${FORMAT}`);
+  let img = sharp(await sharp({ create: { width: w, height: h, channels: 3, background: "#ffffff" } }).composite(layers).png().toBuffer());
+  if (SCALE !== 1) img = img.resize({ width: Math.round(w * SCALE) });
+  await (FORMAT === "jpg" ? img.jpeg({ quality: 72, mozjpeg: true }) : img.png({ compressionLevel: 9 })).toFile(file);
   return file;
 }
 
 mkdirSync(OUT, { recursive: true });
-const pngs = readdirSync(src).filter((f) => f.endsWith(".png") && (FILTER.length === 0 || FILTER.some((x) => f.includes(x)))).sort();
-const made: Array<{ name: string; screens: number; before?: number }> = [];
+const wanted = (f: string) => f.endsWith(".png") && (FILTER.length === 0 || FILTER.some((x) => f.includes(x)));
+const pngs = [...new Set(LANGS.flatMap((l) => readdirSync(dirOfLang(FROM, l)).filter(wanted)))].sort();
+const made: Array<{ name: string; screens: number; before?: number; byLang?: Record<string, number> }> = [];
 for (const f of pngs) {
   const name = basename(f, ".png");
-  const after = await frames(resolve(src, f));
   const rows: Row[] = [];
+  if (LANGS.length > 1) {
+    // Phase 113: one sheet per route, a row per language.
+    const byLang: Record<string, number> = {};
+    for (const lang of LANGS) {
+      const file = resolve(dirOfLang(FROM, lang), f);
+      if (!existsSync(file)) continue;
+      const fr = await frames(file);
+      byLang[lang] = fr.screens;
+      rows.push({ label: `${lang.toUpperCase()} · ${name}`, ...fr });
+    }
+    await sheet(name, rows);
+    made.push({ name, screens: Math.max(...Object.values(byLang)), byLang });
+    console.log(`${name.padEnd(64)} ${Object.entries(byLang).map(([l, n]) => `${l} ${n.toFixed(1)}`).join(" · ")} screens`);
+    continue;
+  }
+  const after = await frames(resolve(src, f));
   let before: Awaited<ReturnType<typeof frames>> | null = null;
   if (base && existsSync(resolve(base, f))) {
     before = await frames(resolve(base, f));
@@ -110,12 +144,17 @@ for (const f of pngs) {
   console.log(`${name.padEnd(64)} ${after.screens.toFixed(1)} screens${before ? ` (was ${before.screens.toFixed(1)})` : ""}`);
 }
 
-// One page to flick through on a phone: every sheet, widest first, with its height.
-const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+// One page to flick through on a phone: every sheet, tallest first (Phase 113; it was alphabetical), with its height.
+made.sort((a, b) => b.screens - a.screens);
+const heights = (m: (typeof made)[number]) =>
+  m.byLang ? Object.entries(m.byLang).map(([l, n]) => `${l.toUpperCase()} ${n.toFixed(1)}`).join(" · ") : `${m.screens.toFixed(1)}${m.before !== undefined ? ` (was ${m.before.toFixed(1)})` : ""}`;
+const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Phone sheets — ${esc(FROM)}</title>
-<style>body{font:15px/1.5 system-ui,sans-serif;margin:16px;color:#101031}h1{font-size:20px}figure{margin:0 0 28px}figcaption{font-weight:700;margin-bottom:6px}img{max-width:100%;border:1px solid #dfe1e6;border-radius:8px}</style>
-<h1>Phone sheets — ${esc(FROM)} (${LANG}, ${WIDTH} px, first ${FRAMES} screens)</h1>
-${made.map((m) => `<figure><figcaption>${esc(m.name)} — ${m.screens.toFixed(1)} screens${m.before !== undefined ? ` (was ${m.before.toFixed(1)})` : ""}</figcaption><img src="${encodeURIComponent(m.name)}.png" loading="lazy" alt=""></figure>`).join("\n")}
+<style>:root{color-scheme:light}body{font:15px/1.5 system-ui,sans-serif;margin:16px;color:#101031;background:#fff}h1{font-size:20px;margin:0 0 4px}p{margin:0 0 16px;color:#4a4c55}figure{margin:0 0 28px}figcaption{font-weight:700;margin-bottom:6px}figcaption span{font-weight:400;color:#4a4c55}img{max-width:100%;height:auto;border:1px solid #dfe1e6;border-radius:8px}</style>
+<h1>Phone sheets — ${esc(FROM)}</h1>
+<p>${made.length} pages at ${WIDTH} px (${LANGS.map((l) => l.toUpperCase()).join(" over ")}), the first ${FRAMES} phone screens of each, tallest page first. Heights are in phone screens of ${FRAME_H} px.</p>
+${made.map((m) => `<figure id="${esc(m.name)}"><figcaption>${esc(m.name)} <span>— ${heights(m)} screens</span></figcaption><img src="${encodeURIComponent(m.name)}.${FORMAT}" loading="lazy" alt="${esc(m.name)}, first phone screens"></figure>`).join("\n")}
+</html>
 `;
 writeFileSync(resolve(OUT, "index.html"), html);
 console.log(`\n[phone-sheets] ${made.length} sheet(s) → ${OUT}`);

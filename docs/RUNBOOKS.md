@@ -878,3 +878,11 @@ Settings → Connected apps (`/dashboard/settings/apps`) is a directory of tiles
 - **/pricing on a phone**: the plans are a row you swipe, opened on Pro; the plan names above it jump to a plan. The comparison is one feature per row with each plan's answer under it.
 - **The support chat on a phone** opens from "Questions? Chat with us" just above the footer — there is no floating chat button on a phone. On a computer the round button is still at the bottom right.
 - **The footer on a phone** is six folded sections; tap a heading to open it.
+
+## 49. The phone gate (Phase 113)
+
+- **`qa:visual` now fails (exit 1)** when a page breaks a phone rule: more than two full-width buttons stacked, a full-width stat card, a table wider than the screen, tabs on two lines, a page over its height budget, a primary action off screen one, content under the tab bar. It also fails on any sideways overflow, a gutter under 12 px, a serious/critical accessibility finding, a blocking screen-reader finding, a raw translation key or an error page. Console errors and failed API calls stay in the report only.
+- **A baseline before a change**: add `--gate=false`, which writes the same report without failing.
+- **"tall-page" failed.** The page got longer than its budget (6 phone screens in the app, 10 on the public site, or its own entry in `PHONE_BUDGETS` in `artifacts/api-server/src/e2e/visual-a11y.ts`). Fold something first (a section behind a toggle, rows instead of cards, a form in a sheet); raise a budget only for a page that is long because of what it holds, and write why.
+- **The review page**: after a 375 px sweep in both languages, `pnpm --filter @workspace/api-server qa:phone-sheets -- --from=<out> --lang=en,fr --format=jpg --scale=0.7` writes `.qa/phone-sheets/<out>/index.html`, every page's first three phone screens (EN over FR), tallest first.
+- **The assistant's starter questions** are one row you swipe on a phone (in French they were four full-width lines).

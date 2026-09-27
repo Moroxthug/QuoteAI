@@ -8,7 +8,10 @@
 //   • horizontal overflow           (scrollWidth > clientWidth, with the widest offenders)
 //   • axe-core violations           (serious/critical are the exit criterion; moderate listed)
 //   • console errors + failed /api requests + React error-boundary text
-// and writes .qa/visual/report.{json,md}. Nothing leaves the machine: email
+// and writes .qa/visual/report.{json,md}. Since Phase 113 it is a gate: it
+// exits 1 on any overflow, gutter, serious/critical axe node, blocking
+// screen-reader finding, raw key, error page or phone rule (height budgets
+// included) — `--gate=false` reports without failing. Nothing leaves the machine: email
 // is captured at the fetch boundary, other vendors are stubbed, AI falls back.
 //
 //   pnpm --filter @workspace/api-server qa:visual                  # EN at 5 widths, FR at 1280/375
@@ -64,6 +67,8 @@ const RUN_AXE = args.get("axe") !== "false";
 const RUN_SR = args.get("sr") !== "false";
 const SCREENSHOTS = args.get("screenshots") !== "false";
 const KEEP = args.has("keep");
+// Phase 113: findings fail the run (exit 1); --gate=false only reports them (a baseline before a phase).
+const GATE = args.get("gate") !== "false";
 const PROVINCE = (args.get("province") ?? "ON") as "ON" | "QC";
 const VITE_PORT = Number(args.get("port") ?? 5197);
 // A second run alongside a full sweep needs its own port AND its own output dir (the run starts by wiping it).
@@ -404,8 +409,10 @@ type PageResult = {
   title: string; screenshot: string;
   overflow: { scrollWidth: number; clientWidth: number; offenders: string[] } | null;
   gutter: { clientWidth: number; offenders: string[] } | null;
-  /** Phase 100: calm-mobile rule breaks at phone width — warnings until Phase 113 makes them errors. */
+  /** Phase 100: calm-mobile rule breaks at phone width — errors since Phase 113. */
   phone: PhoneWarning[];
+  /** Phase 113: the page's height in phone screens (at phone widths only). */
+  screens: number | null;
   axe: Array<{ id: string; impact: string; help: string; count: number; targets: string[]; detail: string[] }>;
   sr: SrFinding[];
   consoleErrors: string[]; failedRequests: string[]; boundary: string | null; rawKeys: string[]; error?: string;
@@ -515,20 +522,40 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
 }
 
 // Phase 100 — the calm-mobile rules (docs/MOBILE-RULES.md) that a machine can
-// see, at phone width only. Warnings for now: Phase 113 turns them into the
-// gate, with a per-page height budget. Each names what it found so the fix is
-// obvious from the report alone.
+// see, at phone width only. Phase 113 made them the gate: any of them fails
+// the run (exit 1), and every page has a height budget. Each names what it
+// found so the fix is obvious from the report alone.
 type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar";
 type PhoneWarning = { rule: PhoneRule; detail: string };
 const PHONE_WIDTH = 640;
-/** App pages taller than this many phone screens are reported (the budget per page is set in Phase 113). */
-const PHONE_SCREENS_WARN = 8;
 
-async function phoneRules(page: Page, width: number, session: Session): Promise<PhoneWarning[]> {
-  if (width > PHONE_WIDTH) return [];
+// Phase 113 — how many phone screens (812 px) a page may be. The defaults are
+// the calm-mobile target; the exceptions are long on purpose (a document the
+// client reads, long-form help and SEO articles) and each says why. A page
+// that grows past its budget fails the sweep: fold something, don't raise it.
+const PHONE_BUDGET_APP = 6;
+const PHONE_BUDGET_PUBLIC = 10;
+const PHONE_BUDGETS: Array<{ match: RegExp; screens: number; why: string }> = [
+  // Baseline 2026-09-27 (.qa/p113-pre, EN + FR at 375) in brackets.
+  { match: /^\/dashboard\/contracts\/.+ agreement$/, screens: 10, why: "the contract's full agreement, unfolded on purpose [9.2]" },
+  { match: /^\/dashboard\/quotes\/.+ edit/, screens: 8, why: "the 30-line showcase quote being edited, one row per line [7.0]" },
+  { match: /^\/dashboard\/pay/, screens: 7, why: "the pay rules form [6.1 FR]" },
+  { match: /^\/(quotes\/[a-z-]+(\/[a-z-]+)?|fr\/soumissions\/[a-z-]+(\/[a-z-]+)?)\/?$/, screens: 17, why: "a long-form SEO trade article [16.3]" },
+  { match: /^\/(mappa-sito|site-?map|plan-du-site)/, screens: 16, why: "the sitemap: one link per page [15.2]" },
+  { match: /^\/(fr\/)?blog\/?$/, screens: 14, why: "the article index [12.9]" },
+];
+function phoneBudget(path: string, session: Session): { screens: number; why: string } {
+  const hit = PHONE_BUDGETS.find((b) => b.match.test(path));
+  if (hit) return hit;
+  return session === "public" ? { screens: PHONE_BUDGET_PUBLIC, why: "public page" } : { screens: PHONE_BUDGET_APP, why: "app page" };
+}
+
+async function phoneRules(page: Page, width: number, r: RouteSpec): Promise<{ warnings: PhoneWarning[]; screens: number | null }> {
+  if (width > PHONE_WIDTH) return { warnings: [], screens: null };
+  const budget = phoneBudget(r.name ?? r.path, r.session);
   // tsx wraps the named helpers below in `__name(…)` (see screen-reader.ts).
   await page.evaluate("globalThis.__name = globalThis.__name || function (f) { return f }").catch(() => {});
-  const found = await page.evaluate(({ screensWarn, app }) => {
+  const { out: found, screens } = await page.evaluate(({ budget, why }) => {
     const out: Array<{ rule: string; detail: string }> = [];
     const cw = document.documentElement.clientWidth;
     const vh = window.innerHeight;
@@ -589,17 +616,17 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
       if (tops.size > 1) out.push({ rule: "wrapping-tabs", detail: `${label(row)} wraps to ${tops.size} lines` });
     }
 
-    // 5. App pages taller than the warning budget.
+    // 5. Taller than the page's budget (Phase 113: every page has one).
     const screens = document.documentElement.scrollHeight / vh;
-    if (app && screens > screensWarn) out.push({ rule: "tall-page", detail: `${screens.toFixed(1)} phone screens` });
+    if (screens > budget) out.push({ rule: "tall-page", detail: `${screens.toFixed(1)} phone screens, budget ${budget} (${why})` });
 
     // 6. The page's marked primary action is neither on screen one nor in a docked bar.
     const primary = Array.from(document.querySelectorAll("[data-primary-action]")).find(shown);
     if (primary && !inFixed(primary) && primary.getBoundingClientRect().top + window.scrollY > vh) {
       out.push({ rule: "primary-offscreen", detail: `${label(primary)} starts ${Math.round(primary.getBoundingClientRect().top + window.scrollY)}px down` });
     }
-    return out;
-  }, { screensWarn: PHONE_SCREENS_WARN, app: session !== "public" });
+    return { out, screens };
+  }, { budget: budget.screens, why: budget.why });
 
   // 7. With a bottom tab bar, the end of the page must clear it.
   const covered = await page.evaluate(async () => {
@@ -621,7 +648,7 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
     return bottom > top + 1 ? `content ends ${Math.round(bottom - top)}px under the tab bar` : null;
   });
   if (covered) found.push({ rule: "under-tabbar", detail: covered });
-  return found as PhoneWarning[];
+  return { warnings: found as PhoneWarning[], screens };
 }
 
 // [route, trigger selector, label] — the overlays a keyboard user meets.
@@ -662,7 +689,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
   const dir = resolve(OUT, lang, String(width));
   mkdirSync(dir, { recursive: true });
   const file = resolve(dir, `${slug(r.name ?? r.path)}.png`);
-  const result: PageResult = { lang, width, path: r.name ?? r.path, session: r.session, title: "", screenshot: file, overflow: null, gutter: null, phone: [], axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
+  const result: PageResult = { lang, width, path: r.name ?? r.path, session: r.session, title: "", screenshot: file, overflow: null, gutter: null, phone: [], screens: null, axe: [], sr: [], consoleErrors, failedRequests, boundary: null, rawKeys: [] };
   try {
     await page.goto(`${base}${r.path}`, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await settle(page);
@@ -681,7 +708,9 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
     result.overflow = await overflow(page);
     result.gutter = await gutter(page, width);
     if (SCREENSHOTS) await page.screenshot({ path: file, fullPage: true });
-    result.phone = await phoneRules(page, width, r.session);
+    const phone = await phoneRules(page, width, r);
+    result.phone = phone.warnings;
+    result.screens = phone.screens;
     if (RUN_AXE) result.axe = await runAxe(page);
     if (RUN_SR) {
       result.sr = await screenReaderAudit(page, { width });
@@ -753,7 +782,7 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
   for (const r of results) if (r.overflow) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.overflow.scrollWidth}/${r.overflow.clientWidth} — ${r.overflow.offenders.join(", ")}`);
   lines.push("", `## Phone gutter (< ${GUTTER_MIN}px from an edge at ≤ ${GUTTER_WIDTH}px)`, "");
   for (const r of results) if (r.gutter) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.gutter.offenders.join(" · ")}`);
-  lines.push("", `## Phone rules (≤ ${PHONE_WIDTH}px) — warnings until Phase 113`, "");
+  lines.push("", `## Phone rules (≤ ${PHONE_WIDTH}px) — errors (Phase 113 gate)`, "");
   const byPhoneRule = new Map<string, string[]>();
   for (const r of results) for (const w of r.phone) byPhoneRule.set(w.rule, [...(byPhoneRule.get(w.rule) ?? []), `\`${r.path}\` ${r.lang}@${r.width}: ${w.detail}`]);
   for (const [rule, where] of [...byPhoneRule].sort((a, b) => b[1].length - a[1].length)) {
@@ -761,6 +790,15 @@ function writeReport(results: PageResult[], meta: Record<string, unknown>) {
     for (const w of where.slice(0, 60)) lines.push(`- ${w}`);
     if (where.length > 60) lines.push(`- … ${where.length - 60} more`);
     lines.push("");
+  }
+  // Phase 113: every phone page's height against its budget, tallest first — the headroom is what the next change can spend.
+  const tall = results.filter((r) => r.screens !== null).sort((a, b) => b.screens! - a.screens!);
+  if (tall.length) {
+    lines.push("", `## Phone heights (screens of 812 px, tallest first)`, "", "| page | lang@width | screens | budget |", "|---|---|---|---|");
+    for (const r of tall) {
+      const b = phoneBudget(r.path, r.session);
+      lines.push(`| \`${r.path}\` | ${r.lang}@${r.width} | ${r.screens!.toFixed(1)}${r.screens! > b.screens ? " **over**" : ""} | ${b.screens} (${b.why}) |`);
+    }
   }
   lines.push("", "## Raw translation keys on the page", "");
   for (const r of results) if (r.rawKeys.length) lines.push(`- \`${r.path}\` ${r.lang}@${r.width}: ${r.rawKeys.join(", ")}`);
@@ -791,6 +829,7 @@ setSignTokenCapture(() => {
 });
 
 let browser: Browser | null = null;
+let exitCode = 0;
 const t0 = Date.now();
 try {
   const apiBase = await startServer();
@@ -901,7 +940,15 @@ try {
   const srBlocking = results.reduce((s, r) => s + r.sr.filter((f) => SR_BLOCKING.has(f.rule)).length, 0);
   const srOther = results.reduce((s, r) => s + r.sr.length, 0) - srBlocking;
   const phonePages = results.filter((r) => r.phone.length).length;
-  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, screen-reader ${srBlocking} blocking + ${srOther} to read, raw i18n keys on ${rawKeyPages}, phone-rule warnings on ${phonePages} → ${resolve(OUT, "report.md")}`);
+  const broken = results.filter((r) => r.boundary || r.error).length;
+  console.log(`\n[qa-visual] ${results.length} pages in ${Math.round((Date.now() - t0) / 1000)}s — overflow on ${overflows}, gutter on ${gutters}, axe serious/critical nodes ${serious}, screen-reader ${srBlocking} blocking + ${srOther} to read, raw i18n keys on ${rawKeyPages}, phone-rule errors on ${phonePages}, broken ${broken} → ${resolve(OUT, "report.md")}`);
+  // Phase 113: the sweep is a gate. Every one of these has been zero since the phase that introduced it;
+  // console errors and failed requests stay in the report only (third-party noise, rate limits on purpose).
+  const failures = overflows + gutters + serious + srBlocking + rawKeyPages + phonePages + broken;
+  if (GATE && failures) {
+    console.error(`[qa-visual] FAILED: ${failures} finding(s) — see report.md (--gate=false to only report)`);
+    exitCode = 1;
+  }
   if (KEEP) {
     console.log(`[qa-visual] --keep: account ${org.email} left in place; bearer ${org.token}; frontend ${frontend} (API ${apiBase}). Ctrl-C to stop.`);
     await new Promise(() => {});
@@ -914,4 +961,4 @@ try {
     await stopServer();
   }
 }
-process.exit(0);
+process.exit(exitCode);

@@ -28,7 +28,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 110 | The long tail | A | **done** 2026-09-27 |
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | **done** 2026-09-27 |
 | 112 | The public site on a phone | A | **done** 2026-09-27 |
-| 113 | The phone gate: rules enforced, sheets reviewed | A | not started |
+| 113 | The phone gate: rules enforced, sheets reviewed | A | **done** 2026-09-27 (owner: real-device pass) |
 | 114-131 | The app and the videos | B, C | see `APP-PLAN.md` |
 
 ---
@@ -645,3 +645,32 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - In the browser pane at 375: the plan row opens on Pro, tapping Starter / Elite scrolls to it and moves the highlight; "Chat with us" opens the panel 8 px from each edge with the close button showing; the page is 375 px wide.
 - Screen heights (EN 375, before → after): home 23.6 → 9.1, /fr 24.5 → 9.5, pricing 12.8 → 8.7, /fr/tarifs 14.1 → 9.4, pilot 6.6 → 5.7, BC 7.8 → 6.8, help 6.1 → 5.5, article 9.1 → 8.4, blog 13.5 → 12.7.
 - typecheck (quote-ai), eslint on the touched files (one existing hook warning in support-bot.tsx).
+
+### Phase 113 — 2026-09-27
+
+**Built**
+- **`qa:visual` is a gate.** The phone rules from Phase 100 are errors, and the run exits 1 on any of them, as well as on any overflow, gutter, serious/critical axe node, blocking screen-reader finding, raw translation key or error page (`broken` on the summary line). Console errors and failed API calls stay in the report only (vendor noise, deliberate rate limits). `--gate=false` reports without failing, for a baseline before a change.
+- **A height budget for every page** (`PHONE_BUDGETS` in `src/e2e/visual-a11y.ts`): 6 phone screens for an app page (was a flat 8 for app pages only), 10 for a public page (public pages had none), and six named exceptions, each with its reason and its height the day it was set: the contract's unfolded agreement 10 [9.2], the 30-line showcase quote in the editor 8 [7.0], pay rules 7 [6.1 FR], SEO trade articles 17 [16.3], the sitemap 16 [15.2], the blog index 14 [12.9]. The report gained a "Phone heights" table, every phone page against its budget, tallest first.
+- **`qa:phone-sheets --lang=en,fr`**: one sheet per route with English above French, `--format=jpg --scale=0.7` for a light page, and `index.html` now tallest first.
+- **The review page**, published privately for the owner's phone pass: https://claude.ai/artifact/FbbQQkQp7FmPbx6ycVZfGt, 191 pages (Dashboard 142, What clients see 13, Crew app 5, Public site 31), filterable by area.
+- **The assistant's starter questions** are one swipe row on a phone (in French they were four full-width buttons in a column, the one rule break in the whole app).
+- `docs/MOBILE-RULES.md`: the gate, height budgets ("fold something first, then budget"), the review page, and "What the phases learned (100-113)". Runbook §49.
+
+**Decided**
+- The gate covers every check that has been zero since the phase that introduced it, not only the phone rules: a sweep that passes should mean nothing is known to be broken.
+- The default app budget is 6 screens, below the old warning threshold of 8. The baseline showed only three app pages over 6, and all three are long because of what they hold.
+- A budget exception names its reason and its height when set, so a page that creeps up is visible in review.
+
+**Found**
+- Baseline `.qa/p113-pre` (EN + FR at 375, 382 pages): 0 overflow, 0 gutter, 0 axe, 0 screen-reader, 0 raw keys. Phone rules: the contract agreement tall-page (EN, FR, known since 107) and `/dashboard/assistant` stacked-buttons **in French only** (four starter questions, each wrapping to the full width).
+- French is the width test again (like 110's catalog bar at 768): a layout that is calm in English can stack in French.
+
+**Deferred (owner)**
+- **The real-device pass (Phase 99 P-1, repeated)**: open the review page on a phone, then use the app on a real iPhone and Android phone: sign in, a quote from start to sent, a job, clock in on `/t`, accept and sign as a client. Anything found becomes a fix phase before Track B.
+- A screen-reader pass on a real phone (VoiceOver / TalkBack) is still owed from Phase 83.
+
+**Verification**
+- Gated sweep `qa:visual --lang=en,fr --widths=375` (382 pages, `.qa/p113`, 1,094 s): **0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader, 0 raw keys, 0 phone-rule errors, 0 broken; exit 0**.
+- The gate fails when it should: with the public budget set to 1 for a moment, `--routes=help` exited 1 with `FAILED: 2 finding(s)`.
+- Phone sheets `.qa/phone-sheets/p113/` (EN over FR, 191 sheets, 13 MB); `/dashboard/assistant` 1.4 screens with the questions in one row in both languages.
+- typecheck (api-server).

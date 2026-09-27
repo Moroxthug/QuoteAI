@@ -3164,3 +3164,11 @@ a.w-now-row:hover { background: var(--soft); }
   .marquee::-webkit-scrollbar { display: none; }
   .mq-track { flex-wrap: nowrap; justify-content: flex-start; width: max-content; padding-inline: 16px; }
 }
+
+/* ===== THE PHONE GATE (Phase 113) ===== */
+@media (max-width: 640px) {
+  /* The assistant's starter questions: in French they stacked as four full-width sentences; one row you swipe instead. */
+  .chat-sug { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-inline: 16px; scroll-padding-inline: 16px; scroll-snap-type: x proximity; position: relative; }
+  .chat-sug::-webkit-scrollbar { display: none; }
+  .chat-sug .pill { flex: 0 0 auto; max-width: 78%; white-space: normal; text-align: left; scroll-snap-align: start; }
+}

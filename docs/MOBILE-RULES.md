@@ -56,6 +56,7 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 - A screen's primary action: `<StickyActionBar><ActionSheet actions={…} /><button className="btn btn-navy" data-primary-action>Send</button></StickyActionBar>`.
 - A detail page names itself in the phone top bar: `useMobileHeader(useMemo(() => ({ title: quote.title, actions }), [quote.title, actions]))` — memoise, every change re-renders the bar.
 - Tables: write the columns once and say where each lands on a phone; anything unmarked is hidden there — choose, don't inherit a desktop.
+- **A board becomes an agenda (Phase 109, the schedule).** A grid a mouse drags on (people × days, a time axis) does not shrink to a phone: under 768 px show a strip to jump (seven days with a dot per item, red for a problem) and the chosen day as `ListRow`s grouped by what the reader asks (by person / by job, a two-way switch), with the one action (Add) docked and every change made in the item's sheet. Pages that pick a whole layout by width use `useMediaQueryNow` (`hooks/use-media-query.ts`), which answers on the first render, so the wrong layout never fetches or flashes.
 - Small utilities (Phases 105-106): `.hide-phone` / `.show-phone` (≤ 640 px / above it); an `.item-row.wrap-phone` puts its `.row-acts` on a second line on a phone instead of squeezing the text; hover-only icons (`.hover-act`) are always visible on touch screens (`@media (hover: none)`), so on a phone put them in a `RowMore`.
 
 ## What the machine checks (`qa:visual`, ≤ 640 px)

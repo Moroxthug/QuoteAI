@@ -181,6 +181,12 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     // empty states.
     const now = Date.now();
     await org.api("/api/schedule/blocks", { body: { projectId: project.id, collaboratorId: worker.body.worker.id, startsAt: new Date(now - 3_600_000).toISOString(), endsAt: new Date(now + 4 * 3_600_000).toISOString(), notes: language === "fr" ? "Code de la barrière 4471" : "Gate code 4471" } });
+    // Phase 109: tomorrow a full day plus a pickup that overlaps it (the
+    // agenda's double-booking line) and an unassigned block the day after.
+    const at = (days: number, h: number, m = 0) => { const d = new Date(now); d.setDate(d.getDate() + days); d.setHours(h, m, 0, 0); return d.toISOString(); };
+    await org.api("/api/schedule/blocks", { body: { projectId: project.id, collaboratorId: worker.body.worker.id, startsAt: at(1, 7), endsAt: at(1, 15, 30) } });
+    await org.api("/api/schedule/blocks", { body: { collaboratorId: worker.body.worker.id, title: language === "fr" ? "Chercher les matériaux" : "Pick up materials", startsAt: at(1, 12), endsAt: at(1, 13, 30) } });
+    await org.api("/api/schedule/blocks", { body: { projectId: project.id, startsAt: at(2, 7), endsAt: at(2, 15, 30) } });
     await org.api(`/api/jobs/${project.id}/tasks`, { body: { title: language === "fr" ? "Retirer les anciennes armoires" : "Strip the old cabinets" } });
     if (workerToken) {
       for (const [kind, body] of [["blocker", language === "fr" ? "Pas de courant sur le chantier" : "No power on site"], ["note", language === "fr" ? "Dégât d'eau derrière l'évier" : "Water damage behind the sink"]] as const) {

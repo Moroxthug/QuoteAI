@@ -24,7 +24,6 @@ export function MockupToggle({
     <button
       type="button"
       role="switch"
-      aria-pressed={checked}
       aria-checked={checked}
       aria-label={label}
       disabled={disabled}

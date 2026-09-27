@@ -10,8 +10,11 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { useDocumentTitle } from "@/hooks/use-document-title";
-import { scheduleApi, type ScheduleBlockDto, type ScheduleJobDto, type ScheduleMilestoneDto } from "@/lib/schedule-api";
-import { BlockDialog, type BlockDraft } from "@/components/schedule/block-dialog";
+import { useMediaQueryNow } from "@/hooks/use-media-query";
+import { scheduleApi, type ScheduleBlockDto, type ScheduleJobDto } from "@/lib/schedule-api";
+import { BlockDialog, defaultShift, type BlockDraft } from "@/components/schedule/block-dialog";
+import { MilestoneChips, PhoneAgenda, type AgendaMode } from "@/components/schedule/phone-agenda";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 
 // ── Phase 75: /dashboard/schedule ───────────────────────────────────────────
 // Week view: one lane per worker (+ Unassigned), one column per day; a
@@ -20,6 +23,8 @@ import { BlockDialog, type BlockDraft } from "@/components/schedule/block-dialog
 // empty space to create a block and drag a block to move it (HTML5 DnD; a
 // plain tap opens the block). Conflicts come from the server and show as a
 // red outline + icon.
+// Phase 109: under 768 px the board gives way to a week strip and the chosen
+// day as an agenda (components/schedule/phone-agenda.tsx); Add block is docked.
 
 const UNASSIGNED = "__unassigned__";
 const HOUR_START = 6;
@@ -29,6 +34,10 @@ const DAY_MS = 86_400_000;
 
 type View = "week" | "day";
 type Lane = { id: string; name: string; role: string };
+
+const PHONE = "(max-width: 767px)";
+const TOUCH = "(pointer: coarse)";
+const BY_KEY = "schedule-agenda-by";
 
 const startOfLocalDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const parseDay = (s: string) => new Date(`${s}T00:00:00`);
@@ -46,16 +55,13 @@ function daysTouched(b: ScheduleBlockDto, from: Date, n: number): number[] {
   return out;
 }
 
-function milestoneOnDay(m: ScheduleMilestoneDto, day: Date): boolean {
-  if (!m.plannedStart) return false;
-  const s = parseDay(m.plannedStart);
-  const e = m.plannedEnd ? parseDay(m.plannedEnd) : s;
-  return day >= s && day <= e;
-}
-
 export default function SchedulePage() {
   const { t, lang } = useLanguage();
-const can = useCan();
+  const can = useCan();
+  const phone = useMediaQueryNow(PHONE);
+  const touch = useMediaQueryNow(TOUCH);
+  const [by, setBy] = useState<AgendaMode>(() => { try { return sessionStorage.getItem(BY_KEY) === "job" ? "job" : "person"; } catch { return "person"; } });
+  const pickBy = (m: AgendaMode) => { setBy(m); try { sessionStorage.setItem(BY_KEY, m); } catch { /* private mode */ } };
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -66,11 +72,13 @@ const can = useCan();
   const [anchor, setAnchor] = useState<Date>(() => (params.get("date") ? parseDay(params.get("date")!) : new Date()));
   useDocumentTitle(t("schedule.title"));
 
+  // A phone always loads the anchor's week: the strip needs it, and moving between its days costs nothing.
+  const weekly = view === "week" || phone;
   const range = useMemo(() => {
-    const from = view === "week" ? startOfWeek(anchor, { weekStartsOn: 1 }) : startOfLocalDay(anchor);
-    const days = view === "week" ? 7 : 1;
+    const from = weekly ? startOfWeek(anchor, { weekStartsOn: 1 }) : startOfLocalDay(anchor);
+    const days = weekly ? 7 : 1;
     return { from, to: addDays(from, days), days };
-  }, [view, anchor]);
+  }, [weekly, anchor]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["schedule", range.from.toISOString(), range.to.toISOString()],
@@ -123,6 +131,11 @@ const can = useCan();
   const openDraft = (laneId: string, from: Date, to: Date, allDay: boolean) =>
     canEdit && setDialog({ block: null, draft: { collaboratorId: laneId === UNASSIGNED ? null : laneId, projectId: jobFilter, startsAt: from, endsAt: to, allDay } });
 
+  const bookOn = (day: Date, workerId: string | null) => {
+    if (!canEdit) return;
+    const { startsAt, endsAt } = defaultShift(day);
+    setDialog({ block: null, draft: { collaboratorId: workerId, projectId: jobFilter, startsAt, endsAt, allDay: false } });
+  };
   const shift = (n: number) => setAnchor((a) => addDays(a, view === "week" ? 7 * n : n));
   const rangeLabel = view === "week"
     ? `${format(range.from, "d MMM", { locale })} – ${format(addDays(range.to, -1), "d MMM yyyy", { locale })}`
@@ -134,9 +147,9 @@ const can = useCan();
       <div className="page-head">
         <div>
           <h1>{t("schedule.title")}</h1>
-          <p className="sub">{t("schedule.subtitle")}</p>
+          <p className="sub hide-phone">{touch ? t("schedule.subtitleTouch") : t("schedule.subtitle")}</p>
         </div>
-        <div className="head-actions">
+        {!phone && <div className="head-actions">
           <div className="seg seg-2" data-period={view === "week" ? "m" : "y"} role="tablist">
             <span className="seg-thumb" />
             <button type="button" role="tab" aria-selected={view === "week"} className="seg-b" onClick={() => setView("week")}>{t("schedule.week")}</button>
@@ -147,12 +160,49 @@ const can = useCan();
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setAnchor(new Date())}>{t("schedule.today")}</button>
             <button type="button" className="ic-btn" aria-label={t("schedule.next")} onClick={() => shift(1)}><ChevronRight /></button>
           </div>
-          {canEdit && <button type="button" className="btn btn-navy" onClick={() => { const d = startOfLocalDay(view === "day" ? anchor : new Date()); openDraft(UNASSIGNED, new Date(d.getTime() + 8 * 3_600_000), new Date(d.getTime() + 16 * 3_600_000), false); }}>
+          {canEdit && <button type="button" className="btn btn-navy" onClick={() => bookOn(startOfLocalDay(view === "day" ? anchor : new Date()), null)}>
             <Plus className="h-4 w-4" /> {t("schedule.addBlock")}
           </button>}
-        </div>
+        </div>}
       </div>
 
+      {phone ? (
+        <>
+          {filteredJob && (
+            <Link href="/dashboard/schedule" className="chip chip-teal ag-only">{t("schedule.onlyJob")}: {filteredJob.name} <X className="h-3 w-3 ml-1" /></Link>
+          )}
+          {isLoading && <div className="space-y-3"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" /></div>}
+          {error && <div className="notice warn"><AlertTriangle /><div className="grow">{(error as Error & { code?: string }).code === "PLAN_REQUIRED" ? t("schedule.planRequired") : (error as Error).message}{(error as Error & { code?: string }).code === "PLAN_REQUIRED" && <> <Link href="/dashboard/billing" className="text-link">{t("schedule.upgrade")}</Link></>}</div></div>}
+          {data && (
+            <PhoneAgenda
+              weekFrom={range.from}
+              day={startOfLocalDay(anchor)}
+              onPickDay={setAnchor}
+              onShiftWeek={(n) => setAnchor((a) => addDays(a, 7 * n))}
+              onToday={() => setAnchor(startOfLocalDay(new Date()))}
+              mode={by}
+              onMode={pickBy}
+              blocks={blocks}
+              allBlocks={data.blocks}
+              workers={data.workers}
+              jobs={jobs}
+              locale={locale}
+              canEdit={canEdit}
+              onOpen={(b) => setDialog({ block: b, draft: null })}
+              onBook={(id) => bookOn(startOfLocalDay(anchor), id)}
+            />
+          )}
+          {data && data.workers.length === 0 && <p className="foot-note mt-3 mb-0">{t("schedule.noWorkersHint")} <Link href="/dashboard/team" className="text-link">{t("schedule.goToTeam")}</Link></p>}
+          <p className="foot-note mt-3 mb-0">{t("schedule.hintPhone")}</p>
+          {canEdit && (
+            <StickyActionBar>
+              <button type="button" className="btn btn-navy" data-primary-action onClick={() => bookOn(startOfLocalDay(anchor), null)}>
+                <Plus className="h-4 w-4" /> {t("schedule.addBlock")}
+              </button>
+            </StickyActionBar>
+          )}
+        </>
+      ) : (
       <div className="card">
         <div className="toolbar">
           <span className="font-bold" style={{ color: "var(--navy)" }}><CalendarDays className="inline h-4 w-4 mr-1.5 -mt-0.5" />{rangeLabel}</span>
@@ -181,10 +231,11 @@ const can = useCan();
         {data && data.workers.length === 0 && (
           <div className="card-foot"><p className="foot-note m-0">{t("schedule.noWorkersHint")} <Link href="/dashboard/team" className="text-link">{t("schedule.goToTeam")}</Link></p></div>
         )}
-        <p className="foot-note px-5 pb-4 pt-3 m-0">{t("schedule.hint")}</p>
+        <p className="foot-note px-5 pb-4 pt-3 m-0">{touch ? t("schedule.hintTouch") : t("schedule.hint")}</p>
       </div>
+      )}
 
-      <BlockDialog open={!!dialog} onOpenChange={(o) => { if (!o) setDialog(null); }} block={dialog?.block ?? null} draft={dialog?.draft ?? null} jobs={data?.jobs ?? []} workers={data?.workers ?? []} />
+      <BlockDialog open={!!dialog} onOpenChange={(o) => { if (!o) setDialog(null); }} block={dialog?.block ?? null} draft={dialog?.draft ?? null} jobs={data?.jobs ?? []} workers={data?.workers ?? []} blocks={data?.blocks ?? []} />
     </div>
   );
 }
@@ -214,20 +265,6 @@ function BlockChip({ b, onOpen, style, showTime = true, className }: { b: Schedu
   );
 }
 
-function MilestoneChips({ jobs, day }: { jobs: ScheduleJobDto[]; day: Date }) {
-  const items = jobs.flatMap((j) => j.milestones.filter((m) => milestoneOnDay(m, day)).map((m) => ({ job: j, m })));
-  if (!items.length) return null;
-  return (
-    <>
-      {items.map(({ job, m }) => (
-        <Link key={m.id} href={`/dashboard/jobs/${job.id}?tab=schedule`} className={cn("sched-ms", m.status)} title={`${job.name} — ${m.title}`}>
-          <b>{job.name}</b> {m.title}
-        </Link>
-      ))}
-    </>
-  );
-}
-
 // ── Week view ────────────────────────────────────────────────────────────────
 
 function WeekBoard({ from, lanes, blocks, jobs, locale, onOpen, onCreate, onDrop }: {
@@ -253,7 +290,7 @@ function WeekBoard({ from, lanes, blocks, jobs, locale, onOpen, onCreate, onDrop
       const lo = Math.min(sel.a, sel.b);
       const hi = Math.max(sel.a, sel.b);
       const first = days[lo]!;
-      if (lo === hi) onCreate(sel.lane, new Date(first.getTime() + 8 * 3_600_000), new Date(first.getTime() + 16 * 3_600_000), false);
+      if (lo === hi) { const { startsAt, endsAt } = defaultShift(first); onCreate(sel.lane, startsAt, endsAt, false); }
       else onCreate(sel.lane, first, addDays(days[hi]!, 1), true);
       setSel(null);
     };

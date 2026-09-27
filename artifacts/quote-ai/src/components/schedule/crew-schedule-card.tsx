@@ -7,7 +7,7 @@ import { AlertTriangle, CalendarDays, Plus } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { localDay } from "@/lib/local-day";
 import { scheduleApi, type ScheduleBlockDto } from "@/lib/schedule-api";
-import { BlockDialog, type BlockDraft } from "@/components/schedule/block-dialog";
+import { BlockDialog, defaultShift, type BlockDraft } from "@/components/schedule/block-dialog";
 
 /**
  * Phase 75: the job page's slice of the schedule board — this job's crew
@@ -28,8 +28,8 @@ export function CrewScheduleCard({ jobId }: { jobId: string }) {
   const blocks = data?.blocks ?? [];
 
   const addDraft = () => {
-    const d = new Date(`${localDay(new Date())}T08:00:00`);
-    setDialog({ block: null, draft: { projectId: jobId, startsAt: d, endsAt: new Date(d.getTime() + 8 * 3_600_000) } });
+    const { startsAt, endsAt } = defaultShift(new Date());
+    setDialog({ block: null, draft: { projectId: jobId, startsAt, endsAt } });
   };
 
   return (
@@ -47,7 +47,7 @@ export function CrewScheduleCard({ jobId }: { jobId: string }) {
       {blocks.length === 0 ? (
         <div className="act-body"><p className="foot-note m-0">{t("schedule.jobCard.empty")}</p></div>
       ) : (
-        <div>
+        <ul className="m-0 p-0 list-none">
           {blocks.map((b) => {
             const s = new Date(b.startsAt);
             const e = new Date(b.endsAt);
@@ -55,18 +55,18 @@ export function CrewScheduleCard({ jobId }: { jobId: string }) {
               ? `${format(s, "EEE d MMM", { locale })}${isSameDay(s, new Date(e.getTime() - 1)) ? "" : ` → ${format(new Date(e.getTime() - 1), "EEE d MMM", { locale })}`} · ${t("schedule.allDay")}`
               : `${format(s, "EEE d MMM", { locale })} · ${format(s, "H:mm")}–${format(e, "H:mm")}`;
             return (
-              <button key={b.id} type="button" className="item-row w-full text-left" onClick={() => setDialog({ block: b, draft: null })}>
+              <li key={b.id}><button type="button" className="item-row w-full text-left" onClick={() => setDialog({ block: b, draft: null })}>
                 <div className="grow min-w-0">
                   <span className="ttl block truncate">{b.collaboratorName ?? t("schedule.unassigned")}{b.milestoneTitle ? ` · ${b.milestoneTitle}` : ""}{b.title ? ` · ${b.title}` : ""}</span>
                   <span className="sub block text-xs" style={{ color: "var(--faint)" }}>{when}{b.notes ? ` · ${b.notes}` : ""}</span>
                 </div>
                 {b.conflicts.length > 0 && <span className="chip chip-red"><AlertTriangle className="h-3 w-3 mr-1" /> {t("schedule.legend.conflict")}</span>}
-              </button>
+              </button></li>
             );
           })}
-        </div>
+        </ul>
       )}
-      <BlockDialog open={!!dialog} onOpenChange={(o) => { if (!o) setDialog(null); }} block={dialog?.block ?? null} draft={dialog?.draft ?? null} jobs={data?.jobs ?? []} workers={data?.workers ?? []} lockJob />
+      <BlockDialog open={!!dialog} onOpenChange={(o) => { if (!o) setDialog(null); }} block={dialog?.block ?? null} draft={dialog?.draft ?? null} jobs={data?.jobs ?? []} workers={data?.workers ?? []} blocks={blocks} lockJob />
     </section>
   );
 }

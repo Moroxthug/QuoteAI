@@ -102,6 +102,22 @@ async function openPhoneSheet(page: Page, trigger: string, sheet: string) {
   await b.click();
   await page.waitForSelector(sheet);
 }
+/** Phase 109: on the phone agenda, pick tomorrow in the week strip (the next week's Monday on a Sunday). False wider, where there is no strip. */
+async function scheduleTomorrow(page: Page): Promise<boolean> {
+  const days = page.locator(".ag-strip .ag-d");
+  if (!(await days.first().isVisible().catch(() => false))) return false;
+  const all = await days.evaluateAll((els) => els.map((e) => e.classList.contains("today")));
+  const i = all.indexOf(true);
+  if (i === 6) {
+    await page.locator(".ag-nav .ic-btn").last().click();
+    await page.waitForFunction(() => !document.querySelector(".ag-strip .ag-d.today"));
+    await days.first().click();
+  } else {
+    await days.nth(i + 1).click();
+  }
+  await page.waitForSelector(".ag-group, .ag-empty");
+  return true;
+}
 // Phase 102: every section of pages/dashboard/settings (the owner sees them all).
 const SETTINGS_SECTIONS = ["profile", "security", "company", "taxes", "invoicing", "followups", "widget", "email", "sms", "whatsapp", "apps", "plan"];
 // Phase 103: every app in the directory that opens a panel (the other three open their settings section, swept above).
@@ -276,6 +292,20 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/dashboard/jobs", session: "owner", name: "/dashboard/jobs receipts", drive: (p) => openPhoneSheet(p, ".rq-phone .lrow", "[role=dialog] .lrows") },
     // Phase 106: every tab of the job page is its own page state.
     ...["schedule", "changes", "costs", "invoices", "team", "photos", "messages", "documents"].map((tab) => dash(`/dashboard/jobs/${s.jobId}?tab=${tab}`)),
+    // Phase 109: the schedule's Add block sheet (docked on a phone, the header button wider), and on a
+    // phone tomorrow's agenda (the showcase's double-booking) by person, by job, and its clashing block opened.
+    { path: "/dashboard/schedule", session: "owner", name: "/dashboard/schedule add block", drive: (p) => openPhoneSheet(p, ".action-bar [data-primary-action], .head-actions .btn-navy", "[role=dialog] #blk-worker") },
+    { path: "/dashboard/schedule", session: "owner", name: "/dashboard/schedule tomorrow", drive: async (p) => { await scheduleTomorrow(p); } },
+    { path: "/dashboard/schedule", session: "owner", name: "/dashboard/schedule tomorrow by job", drive: async (p) => {
+      if (!(await scheduleTomorrow(p))) return;
+      await p.locator(".ag-day-head [role=tab]").nth(1).click();
+      await p.waitForSelector(".ag-day-head [role=tab][aria-selected=true]:nth-of-type(2)");
+    } },
+    { path: "/dashboard/schedule", session: "owner", name: "/dashboard/schedule tomorrow clash", drive: async (p) => {
+      if (!(await scheduleTomorrow(p))) return;
+      await p.locator(".ag-row.clash").first().click();
+      await p.waitForSelector("[role=dialog] #blk-worker");
+    } },
     // Phase 101: the phone navigation's sheets (no-ops above 980 px, where the sidebar is the navigation).
     { path: "/dashboard", session: "owner", name: "/dashboard More sheet", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
     { path: "/dashboard", session: "owner", name: "/dashboard New sheet", drive: (p) => openPhoneSheet(p, ".tb-new", "[role=dialog] .asheet-list") },

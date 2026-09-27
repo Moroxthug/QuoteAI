@@ -24,7 +24,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 106 | Jobs: list and the job page | A | **done** 2026-09-27 |
 | 107 | Money and people: invoices, clients, leads, contracts | A | **done** 2026-09-27 |
 | 108 | The crew app and the foreman | A | **done** 2026-09-27 |
-| 109 | Schedule on a phone | A | not started |
+| 109 | Schedule on a phone | A | **done** 2026-09-27 |
 | 110 | The long tail | A | not started |
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | not started |
 | 112 | The public site on a phone | A | not started |
@@ -512,3 +512,32 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - Recheck after the last polish: `qa:visual --lang=en,fr --widths=375,768,1280 --routes=/t/,=/dashboard,dashboard/jobs/` (150 pages, `.qa/p108b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, **0 phone-rule warnings** (the foreman home's stacked-buttons warning and `/t`'s wrapping company pills from the baseline are gone).
 - Phone sheets: `.qa/phone-sheets/p108/` (before = `.qa/phone-sheets/p108-pre/`): **crew app 1.5 screens (was 4.4)**, Clock in on screen one (was screen two, after the company picker, the changes list and Today), Report · Photo docked; **foreman home 1.7 (was 2.3)**, first screen = what is stuck, who is where and the first hours to approve (was three stacked buttons and the start of one tall card).
 - typecheck (quote-ai), eslint on the touched files (clean), knip (nothing new), i18n-audit (the `a11y.close` split fixed; nothing new).
+
+### Phase 109 — 2026-09-27
+
+**Built**
+- **The schedule under 768 px is an agenda** (`components/schedule/phone-agenda.tsx`): a **week strip** (seven days, a dot per block, a red dot on a day with a double-booking; ‹ › a week, **Today**) and the chosen day as a list, **By person** (each person's blocks with the hours they cover, Unassigned after, then **Free:** — the workers with nothing that day; tapping one books them) or **By job** (each site with its address to Maps, then who is on it). The choice is remembered for the visit (session storage). Milestones on that day sit above the list. A tap opens the block; nothing on a phone drags. The drag board stays at 768 px and wider.
+- **Add block is docked** (`StickyActionBar`, `data-primary-action`) and opens the block form **as a bottom sheet** (`BlockDialog` now on `BottomSheet`, everywhere): **who, job, day, from–to** in that order, then all day, label, notes. New blocks default to the chosen day **7:00–15:30** (`defaultShift`; the header button, a tap on the week board and the job page's Crew schedule card too, which were 8:00–16:00). Picking a job with no worker chosen fills in **the job's crew** (the worker most often booked on it in what is loaded).
+- **Double-booking inline**: on the agenda row ("Double-booked: Pick up materials 12:00–13:30", the time tile turns red) and **live in the sheet** while the block is set ("Pat Worker already has … — saving double-books them."), from the loaded blocks; saving is still allowed, as before.
+- **Copy for touch**: on a coarse pointer the board's subtitle and tip say "tap" instead of "drag" (`schedule.subtitleTouch`, `schedule.hintTouch`); the phone gets its own tip (`schedule.hintPhone`).
+- `useMediaQueryNow` (`hooks/use-media-query.ts`): answers on the first render, so a page choosing its whole layout by width never fetches or draws the wrong one first. A phone always loads the anchor's week (the strip needs it).
+- Showcase fixture: tomorrow a full day for the worker plus an overlapping pickup (the double-booking), and an unassigned block the day after. `qa:visual` sweeps the Add block sheet, tomorrow's agenda by person and by job, and the clashing block opened.
+- 16 EN/FR strings (`schedule.m.*`, `schedule.dialog.clash`, the touch/phone copy); runbook §45; MOBILE-RULES.md (a board becomes an agenda).
+
+**Decided**
+- The breakpoint is 768 px (the plan's), not the 640 px phone rules: a small tablet held upright cannot use a seven-column board either. At 768 and wider the board is unchanged.
+- Moving a block on a phone is done in its sheet (day, hours, worker); no touch drag was added. The touch copy says so rather than promising a drag HTML5 DnD does not reliably give a finger.
+- A person's hours on the agenda are the time covered, not the sum of blocks, so a double-booked stretch counts once (8.5 h, not 10).
+
+**Found**
+- **`MockupToggle` carried `aria-pressed` on a `role="switch"`** (axe aria-allowed-attr, critical) — every toggle in the product; no sweep had opened a dialog containing one until the block sheet. `aria-checked` alone now.
+- The job page's Crew schedule card listed its blocks as bare full-width buttons (stacked-buttons once the fixture had three); they are list items now.
+
+**Deferred**
+- A touch drag on the tablet board (768-980 px) — tap and the sheet cover it; revisit if the pilot asks.
+
+**Verification**
+- `qa:visual --lang=en --widths=375,1280 --routes=dashboard/schedule,dashboard/jobs/` (38 pages, `.qa/p109`): found the toggle's aria-pressed (3 nodes), label-in-name on the strip's days (the full date now follows the visible "Mo 28" as screen-reader text instead of replacing it) and the card's stacked buttons — all fixed.
+- Recheck `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/schedule,dashboard/jobs/` (114 pages, `.qa/p109b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, 0 phone-rule warnings. After the hours fix, `--lang=en,fr --widths=375 --routes=dashboard/schedule` (12 pages, `.qa/p109c`): all 0.
+- Phone sheets: `.qa/phone-sheets/p109/` (baseline `visual-mobile-audit`): **the schedule is 1.0-1.1 screens as before, but the first screen is now the week and the day's list with Add block docked** (was a week grid showing two days and "drag on the board"). Tomorrow's sheet shows the double-booking on both rows; the clash sheet shows the live warning above Save.
+- typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (four new exports made file-local; nothing new), i18n-audit (nothing new).

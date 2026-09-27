@@ -2864,3 +2864,51 @@ a.w-now-row:hover { background: var(--soft); }
   .crew-hint { padding: 0 16px 4px; }
   .swipe-under { padding: 0 16px; }
 }
+
+/* ==========================================================
+   SCHEDULE ON A PHONE (Phase 109) — pages/dashboard/schedule.tsx,
+   components/schedule/phone-agenda.tsx. Under 768 px: a week
+   strip (a dot per block, red when double-booked) to jump, the
+   chosen day as an agenda by person or by job, Add block docked.
+   ========================================================== */
+.agenda { display: flex; flex-direction: column; gap: var(--gap-card); }
+.ag-only { display: inline-flex; margin-bottom: var(--gap-card); }
+.ag-week { padding: 10px 10px 8px; }
+.ag-week-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px 8px; }
+.ag-week-head > b { display: block; white-space: nowrap; font-size: 15px; font-weight: 800; color: var(--navy); }
+.ag-week-head > b::first-letter, .ag-day-head h2::first-letter { text-transform: uppercase; }
+.ag-nav { display: flex; align-items: center; gap: 4px; }
+.ag-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ag-d { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 62px; padding: 6px 0; border-radius: 12px; background: none; color: var(--muted-mk); transition: background .15s; }
+.ag-d > span { font-size: 11.5px; font-weight: 700; }
+.ag-d > span::first-letter { text-transform: uppercase; }
+.ag-d > b { font-size: 17px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.2; }
+.ag-d.today > b { color: var(--teal-dark); }
+.ag-d.on { background: var(--navy); color: rgba(255, 255, 255, .8); }
+.ag-d.on > b { color: #fff; }
+.ag-dots { display: flex; gap: 3px; height: 6px; align-items: center; }
+.ag-dots em { width: 5px; height: 5px; border-radius: 999px; background: var(--teal); }
+.ag-d.on .ag-dots em { background: #fff; }
+.ag-dots em.red, .ag-d.on .ag-dots em.red { background: var(--red); box-shadow: 0 0 0 1px #fff; }
+.ag-day { padding-bottom: 4px; }
+.ag-day-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 16px 10px; }
+.ag-day-head h2 { font-size: var(--fs-section); font-weight: 800; color: var(--navy); margin: 0; }
+.ag-ms { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 16px 10px; }
+.ag-ms .sched-ms { max-width: 100%; }
+.ag-empty { margin: 0; padding: 4px 16px 14px; font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); }
+.ag-group { border-top: 1px solid var(--soft); }
+.ag-group-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px; padding: 12px 16px 0; }
+.ag-group-head h3 { margin: 0; font-size: 14.5px; font-weight: 800; color: var(--navy); min-width: 0; }
+.ag-group-head > span { font-size: 12.5px; font-weight: 700; color: var(--muted-mk); font-variant-numeric: tabular-nums; }
+.ag-group.muted h3 { color: var(--muted-mk); }
+.ag-group .lrow { border-top: none; min-height: 60px; padding: 8px 16px; }
+.ag-time { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 54px; min-height: 44px; border-radius: 10px; background: var(--soft-2); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.ag-time b { font-size: 14px; font-weight: 800; color: var(--navy); }
+.ag-time span { font-size: 11.5px; font-weight: 700; color: var(--muted-mk); }
+.ag-time.all b { font-size: 11px; text-align: center; padding: 0 4px; }
+.ag-row.clash .ag-time { background: var(--red-t); }
+.ag-clash { display: inline-flex; align-items: flex-start; gap: 4px; font-size: 12.5px; font-weight: 700; color: var(--red); }
+.ag-clash svg { width: 13px; height: 13px; flex: none; margin-top: 2px; }
+.ag-free { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--soft); font-size: var(--fs-meta); font-weight: 700; color: var(--muted-mk); }
+.ag-free .chip { min-height: 36px; padding: 0 14px; background: var(--soft-2); color: var(--navy); font-size: 13px; }
+.ag-free button.chip:hover { background: var(--teal-t); }

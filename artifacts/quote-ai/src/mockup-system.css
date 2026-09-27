@@ -2786,3 +2786,81 @@ button.qline:hover { background: #fafbfc; }
 @media (max-width: 640px) {
   .aging-legend .aging-zero { display: none; }
 }
+
+/* ==========================================================
+   THE CREW APP AND THE FOREMAN (Phase 108) — pages/t/[token].tsx,
+   components/crew/*. Now first (the shift, Maps, Clock in / out),
+   Report and Photo docked, the rest in sheets; the foreman's
+   home in the Today layout with hours as a swipe list.
+   ========================================================== */
+/* Worker header */
+.w-company { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; min-height: 28px; font-size: 12.5px; font-weight: 600; color: var(--muted-mk); }
+.w-company:hover { color: var(--navy); }
+.w-lang { min-width: 36px; min-height: 36px; font-size: 12.5px; font-weight: 700; color: var(--muted-mk); border-radius: 10px; }
+.w-lang:hover { background: var(--soft); color: var(--navy); }
+.w-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 999px; background: var(--teal-t); color: var(--teal-dark); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.w-chip:hover { background: var(--teal); color: #fff; }
+
+/* Now */
+.w-now { padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+.w-now.on { border-color: var(--teal); }
+.w-now-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-mk); }
+.w-now.on .w-now-eyebrow { color: var(--teal-dark); }
+.w-live { width: 8px; height: 8px; border-radius: 999px; background: var(--teal); box-shadow: 0 0 0 4px var(--teal-t); }
+.w-now-title { font-size: 20px; font-weight: 800; line-height: 1.25; color: var(--navy); min-width: 0; overflow-wrap: anywhere; }
+.w-now-phase { display: block; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--muted-mk); }
+.w-timer { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0 2px; }
+.w-timer-n { font-size: 44px; font-weight: 800; line-height: 1.05; color: var(--navy); font-variant-numeric: tabular-nums; }
+.w-timer-s { font-size: 12.5px; font-weight: 600; color: var(--muted-mk); }
+.w-now-rows { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.w-now-rows > li + li { border-top: 1px solid var(--soft); }
+.w-now-row { display: flex; align-items: center; gap: 10px; min-height: 50px; padding: 10px 14px; font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.w-now-row > svg { width: 18px; height: 18px; flex: none; color: var(--navy); }
+.w-now-row .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+a.w-now-row:hover { background: var(--soft); }
+.w-now-go { display: inline-flex; align-items: center; gap: 2px; flex: none; font-size: 13px; font-weight: 700; color: var(--navy); }
+.w-now-go svg, .w-now-chev { width: 16px; height: 16px; color: var(--muted-mk); flex: none; }
+.w-now-note { padding: 10px 14px; background: var(--soft); font-size: 14px; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.w-big { min-height: 56px; font-size: 17px; }
+.lrow.on { background: var(--soft); }
+.lrow.on .lrow-title { color: var(--navy); }
+
+/* Foreman */
+.ny-count.red { background: var(--red); }
+.crew-block { border-color: var(--red); }
+.crew-sum { padding: 2px 20px 10px; font-size: var(--fs-meta); font-weight: 700; color: var(--muted-mk); }
+.crew-sum.warn { color: var(--yellow-dark); }
+.crew-jobs > li { padding: 12px 20px 14px; border-top: 1px solid var(--soft); }
+.crew-job-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.crew-job-name { font-size: var(--fs-body); font-weight: 700; color: var(--navy); min-width: 0; }
+.crew-job-addr { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; min-width: 0; font-size: 12.5px; font-weight: 600; color: var(--muted-mk); }
+.crew-job-addr svg { width: 13px; height: 13px; flex: none; }
+.crew-people { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.crew-people.pad { margin: 0; padding: 4px 20px 16px; }
+.crew-people > li { display: flex; align-items: center; gap: 10px; font-size: 14px; min-height: 28px; }
+.crew-person { flex: 1; min-width: 0; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-time { font-size: 12.5px; font-weight: 600; color: var(--muted-mk); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.crew-hint { padding: 0 20px 6px; font-size: 12.5px; font-weight: 600; color: var(--muted-mk); }
+.crew-hrs { display: inline-flex; align-items: center; justify-content: center; gap: 1px; min-width: 48px; height: 40px; padding: 0 8px; white-space: nowrap; border-radius: 12px; background: var(--soft-2); flex: none; font-size: 16px; font-weight: 800; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
+.crew-hrs small { font-size: 11px; font-weight: 700; color: var(--muted-mk); }
+
+/* Swipe row (components/mobile/swipe-row.tsx) */
+.swipe-row { position: relative; overflow: hidden; border-top: 1px solid var(--soft); }
+.lrows > li:first-child > .swipe-row { border-top: none; }
+.swipe-row .lrow { border-top: none; }
+.swipe-under { position: absolute; inset: 0; display: flex; align-items: center; gap: 8px; padding: 0 20px; background: var(--green-dark); color: #fff; font-size: 14px; font-weight: 800; }
+.swipe-under svg { width: 18px; height: 18px; }
+.swipe-top { position: relative; background: #fff; touch-action: pan-y; transition: transform .22s var(--ease-mk); }
+.swipe-row.gone .swipe-top { transition: transform .22s var(--ease-mk); }
+@media (prefers-reduced-motion: reduce) {
+  .swipe-top, .swipe-row.gone .swipe-top { transition: none; }
+}
+
+@media (max-width: 640px) {
+  .w-now { padding: 16px; }
+  .crew-sum { padding: 0 16px 8px; }
+  .crew-jobs > li { padding: 12px 16px 14px; }
+  .crew-people.pad { padding: 4px 16px 14px; }
+  .crew-hint { padding: 0 16px 4px; }
+  .swipe-under { padding: 0 16px; }
+}

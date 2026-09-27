@@ -14,8 +14,12 @@ export const mapsUrl = (address: string) => `https://www.google.com/maps/search/
  * worker is booked on today, when, where (a maps link), who to call on site,
  * and the tasks under it, tickable offline. Phase 86b: a worker the office
  * allowed to can add a task there too (also offline).
+ *
+ * Phase 108: the job in the Now card (`nowJobId`) already shows its address,
+ * site contact and gate code there, so here it is only its checklist; a
+ * second job booked today keeps its own. One job: no job heading at all.
  */
-export function WorkerToday({ token, jobs, canAddTasks }: { token: string; jobs: WorkerTodayJobDto[]; canAddTasks: boolean }) {
+export function WorkerToday({ token, jobs, canAddTasks, nowJobId }: { token: string; jobs: WorkerTodayJobDto[]; canAddTasks: boolean; nowJobId?: string | null }) {
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
   const outbox = useOutbox(token);
@@ -55,25 +59,29 @@ export function WorkerToday({ token, jobs, canAddTasks }: { token: string; jobs:
     }
   };
 
-  if (jobs.length === 0) return null;
+  // The Now job with nothing to tick and nothing to add has nothing left to say here.
+  const shown = jobs.filter((j) => j.id !== nowJobId || canAddTasks || j.tasks.length > 0 || (added[j.id] ?? []).length > 0);
+  if (shown.length === 0) return null;
+  const single = shown.length === 1;
   return (
     <section className="card p-4 space-y-3" aria-labelledby="worker-today-h">
       <h2 id="worker-today-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}>
-        <Sun className="h-4 w-4" /> {t("crew.todayTitle")}
+        <Sun className="h-4 w-4" /> {single && shown[0]!.id === nowJobId ? t("worker.m.tasksTitle") : t("crew.todayTitle")}
       </h2>
-      {jobs.map((j) => {
+      {shown.map((j) => {
+        const isNow = j.id === nowJobId;
         const mine = (added[j.id] ?? []).filter((a) => !j.tasks.some((x) => x.id === a.id));
         const tasks = [...j.tasks, ...mine];
         const open = tasks.filter((x) => (local[x.id] ?? x.status) !== "done").length;
         return (
-          <article key={j.id} className="rounded-xl p-3 space-y-2" style={{ border: "1px solid var(--line)" }}>
-            <div className="flex items-baseline justify-between gap-3">
+          <article key={j.id} className={single && isNow ? "space-y-2" : "rounded-xl p-3 space-y-2"} style={single && isNow ? undefined : { border: "1px solid var(--line)" }}>
+            {!(single && isNow) && <div className="flex items-baseline justify-between gap-3">
               <h3 className="font-semibold text-sm" style={{ color: "var(--navy)" }}>{j.name}</h3>
               <span className="text-xs tabular-nums shrink-0" style={{ color: "var(--muted-mk)" }}>
                 {j.blocks.length === 0 ? t("crew.clockedInHere") : j.blocks.map((b) => (b.allDay ? t("worker.allDay") : `${format(new Date(b.startsAt), "H:mm", { locale })}–${format(new Date(b.endsAt), "H:mm", { locale })}`)).join(", ")}
               </span>
-            </div>
-            {(j.address || j.contact) && (
+            </div>}
+            {!isNow && (j.address || j.contact) && (
               <div className="flex flex-wrap gap-2">
                 {j.address && (
                   <a className="btn btn-sm btn-outline-navy" href={mapsUrl(j.address)} target="_blank" rel="noopener noreferrer">
@@ -88,7 +96,7 @@ export function WorkerToday({ token, jobs, canAddTasks }: { token: string; jobs:
                 {j.contact && !j.contact.phone && <span className="text-xs self-center" style={{ color: "var(--muted-mk)" }}>{t("crew.siteContact")}: {j.contact.name}</span>}
               </div>
             )}
-            {j.blocks.filter((b) => b.notes).map((b) => (
+            {!isNow && j.blocks.filter((b) => b.notes).map((b) => (
               <p key={b.id} className="text-xs rounded-lg px-2 py-1.5" style={{ background: "var(--soft)", color: "var(--ink)" }}>{b.notes}</p>
             ))}
             {tasks.length > 0 && (

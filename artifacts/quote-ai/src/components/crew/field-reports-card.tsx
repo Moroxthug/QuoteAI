@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Check, HardHat, Loader2 } from "lucide-react";
+import { Check, HardHat, Loader2, OctagonAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
@@ -73,13 +73,32 @@ export function FieldReportRow({ report, showJob }: { report: FieldReportDto; sh
  * Phase 86 — "From the field" on the job's Overview: every photo, note,
  * blocker and materials claim the crew sent from /t/:token, newest first.
  * Open blockers are answered here; the answer shows on the worker's page.
+ *
+ * Phase 108: blocked first. `only="blockers"` is the red card at the top of
+ * the Overview (open blockers alone); `only="rest"` is everything else, in
+ * its old place further down. Both read the same request.
  */
-export function FieldReportsCard({ jobId }: { jobId: string }) {
+export function FieldReportsCard({ jobId, only }: { jobId: string; only?: "blockers" | "rest" }) {
   const { t } = useLanguage();
   const { data, isLoading } = useQuery({ queryKey: ["field-reports", jobId], queryFn: () => crewApi.jobReports(jobId) });
-  const reports = data?.reports ?? [];
-  const open = reports.filter((r) => r.kind === "blocker" && !r.resolvedAt).length;
+  const isOpen = (r: FieldReportDto) => r.kind === "blocker" && !r.resolvedAt;
+  const all = data?.reports ?? [];
+  const reports = only === "blockers" ? all.filter(isOpen) : only === "rest" ? all.filter((r) => !isOpen(r)) : all;
+  const open = reports.filter(isOpen).length;
   if (isLoading || reports.length === 0) return null;
+  if (only === "blockers") {
+    return (
+      <section className="card crew-block" data-testid="job-blockers" aria-labelledby="job-blockers-h">
+        <div className="card-head">
+          <div><h2 id="job-blockers-h" style={{ color: "var(--red)" }}><OctagonAlert className="inline h-4 w-4 mr-1 -mt-0.5" />{t("crew.blockedNow")}</h2></div>
+          <span className="ny-count red">{open}</span>
+        </div>
+        <div className="act-body">
+          <div className="note-list">{reports.map((r) => <FieldReportRow key={r.id} report={r} />)}</div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="card" data-testid="field-reports-card" style={open ? { borderColor: "var(--red)" } : undefined}>
       <div className="card-head">

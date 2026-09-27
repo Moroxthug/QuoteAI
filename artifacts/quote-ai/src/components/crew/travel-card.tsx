@@ -17,8 +17,9 @@ const day = (s: string) => new Date(`${s}T00:00:00`);
  * Phase 89b — km and per diem from the site. An employee logs the distance or
  * the days; the office prices it at the company's rate and approves it under
  * Pay, so no amount is ever shown here. Goes through the offline outbox.
+ * Phase 108: `bare` is the form inside the Travel sheet.
  */
-export function TravelCard({ token, jobs, today, defaultJobId, travel, allowances }: { token: string; jobs: Job[]; today: string; defaultJobId: string | null; travel: { km: boolean; perDiem: boolean }; allowances: WorkerAllowanceDto[] }) {
+export function TravelCard({ token, jobs, today, defaultJobId, travel, allowances, bare }: { token: string; jobs: Job[]; today: string; defaultJobId: string | null; travel: { km: boolean; perDiem: boolean }; allowances: WorkerAllowanceDto[]; bare?: boolean }) {
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
   const queryClient = useQueryClient();
@@ -63,9 +64,10 @@ export function TravelCard({ token, jobs, today, defaultJobId, travel, allowance
   const pending = useMemo(() => outbox.rows.filter((r) => r.op.kind === "worker.allowance"), [outbox.rows]);
   if (!kinds.length) return null;
 
+  const Wrap = bare ? "div" : "section";
   return (
-    <section className="card p-4 space-y-3" aria-labelledby="travel-h">
-      <h2 id="travel-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Car className="h-4 w-4" /> {t("crew.travel.title")}</h2>
+    <Wrap className={bare ? "space-y-3" : "card p-4 space-y-3"} {...(bare ? {} : { "aria-labelledby": "travel-h" })}>
+      {!bare && <h2 id="travel-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Car className="h-4 w-4" /> {t("crew.travel.title")}</h2>}
 
       {kinds.length > 1 && (
         <div role="group" aria-label={t("crew.travel.kindLabel")} className="grid grid-cols-2 gap-2">
@@ -164,6 +166,6 @@ export function TravelCard({ token, jobs, today, defaultJobId, travel, allowance
           </ul>
         </div>
       )}
-    </section>
+    </Wrap>
   );
 }

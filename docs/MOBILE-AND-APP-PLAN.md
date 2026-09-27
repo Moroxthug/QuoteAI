@@ -23,7 +23,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 105 | Quotes: list, new quote, quote detail | A | **done** 2026-09-27 |
 | 106 | Jobs: list and the job page | A | **done** 2026-09-27 |
 | 107 | Money and people: invoices, clients, leads, contracts | A | **done** 2026-09-27 |
-| 108 | The crew app and the foreman | A | not started |
+| 108 | The crew app and the foreman | A | **done** 2026-09-27 |
 | 109 | Schedule on a phone | A | not started |
 | 110 | The long tail | A | not started |
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | not started |
@@ -479,3 +479,36 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - Recheck after the last polish plus a regression pass for the non-modal menu: `qa:visual --lang=en,fr --widths=375,1280 --routes=dashboard/invoices,dashboard/leads,dashboard/quotes,dashboard/jobs,=/dashboard` (128 pages, `.qa/p107c`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, **0 phone-rule warnings**.
 - Phone sheets: `.qa/phone-sheets/p107b/` (before = `.qa/phone-sheets/p107-pre/`, the same screens on the old code): contract **2.0 screens (was 9.0-9.2)**, first screen = client, job, status, price, where it stands and the next step; invoice 3.1 (was 4.0) with Record payment docked; client 1.0 (was 2.3) with Call / Text / Email / Map on screen one; analytics 3.2 (was 4.7); invoices list 1.4 (was 2.0); leads 1.0 (was 1.5) with every stage one tap away instead of six stacked columns.
 - typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (nothing new), i18n-audit (no new findings).
+
+### Phase 108 — 2026-09-27
+
+**Built**
+- **The crew app (`/t/:token`) on one screen**: **Now** first — the shift that is on (or next today) as the eyebrow ("Today · 7:00–15:30", "On the clock" with a live dot once clocked in), the job as the heading, its **address one tap to Maps**, the site contact to call, the shift's notes (the gate code), the phase picker when the job has phases, and **Clock in / Clock out** as the one big button; while clocked in, the timer (and "waiting to sync" for a clock-in made offline). With two or more jobs, **Change job** opens a sheet of jobs (today's marked). Then **today's tasks** as the checklist (the Now job's address and contact are not repeated there; a second job booked today keeps its own), **Coming up** (the next five shifts after the ones in Now), and **Your hours** (this week's total, the last four entries, "Show all").
+- **Report · Photo docked at the bottom** (`StickyActionBar`): Report opens the report form in a sheet (note / blocked / materials, the photo, what you sent); **Photo** opens the camera and lands in the same sheet with the picture attached. The sheet closes itself once the report is saved (or queued offline). **⋯** holds **Log hours by hand** (the manual form, in a sheet: job, phase, day, hours with the stepper and 4 / 6 / 8 / 10, a note) and **Travel and per diem** (when the office has a rate) — three always-open forms before, none now.
+- **"Since you last looked" is a count chip** in the header ("4 new") that opens the list in a sheet with **Got it**. **The company switch** (a person on two group companies' crews) is the company name under the worker's name, opening a menu — the "You work for" card is gone. The worker's name is the page's heading; the logo is left out on a phone.
+- **The foreman's home** in the Today layout (Phase 104): **Blocked right now** first and only when something is (red, with Answer), **Who is where** (one line — "0 on site · 1 not clocked in · 1 job", yellow when someone is late — then each job with its address to Maps and its people, their time and whether they are in), **Hours to approve** as a **swipe list** (swipe a row right on a phone; the ✓ on every row and Approve all work everywhere), **From the field**, and **Next up** (the next five things) instead of the month grid. The three stacked Schedule / Jobs / Hours buttons are gone: they are the bottom tabs on a phone and the sidebar on a desktop.
+- **The job page, blocked first**: on the Overview, a job's open blockers are a red card at the top (answered there), then **On this job today** (who is booked, their time, in or not, and anyone clocked in without a booking), then Up next. The rest of the field reports stay in their place further down. Owner and foreman alike.
+- **`SwipeRow`** (`components/mobile/swipe-row.tsx`): a row a thumb swipes right to act on. Touch and pen only (a mouse never drags it), `touch-action: pan-y` and a gesture that starts vertical never becomes a swipe, the row slides out when the swipe lands and comes back if the action fails. Always paired with a visible button.
+- `CrewTodayCard` split into `CrewLocked`, `CrewBlockers`, `CrewWhoIsWhere`, `HoursToApprove`, `CrewFromTheField`, `JobCrewToday` (one request between them); `components/crew/worker-hours.tsx` (`ManualHoursForm`, `WorkerHoursList`); `FieldReportCard` and `TravelCard` take `bare` for a sheet; `FieldReportsCard` takes `only="blockers" | "rest"`. `CalendarCard` (the month grid, the foreman's last user) deleted.
+- 19 new EN/FR strings (`worker.m.*`, `crew.m.*`); runbook §44; MOBILE-RULES.md (`SwipeRow`, the crew app's layout); `qa:visual` drives the crew app's Report sheet, changes sheet, ⋯ → hours sheet and company switch.
+
+**Decided**
+- Clock in / out is the crew app's real primary, and it sits in the Now card on screen one; the docked bar holds what a worker does *during* the shift (Report, Photo). The bar's primary (`data-primary-action`) is Report.
+- Hours by hand and travel are behind ⋯, not on the page: the clock is how hours get in; typing them is the exception (a forgotten day). The travel and report lists (what you sent) live in their sheets.
+- The foreman home has no shortcut buttons at all — the navigation already has Jobs, Schedule and Crew, and the hours card links to all hours.
+- Blocked-first on the job page applies to the owner too: an open blocker is the most urgent thing on a job for whoever opens it.
+- The swipe only approves (the one safe, common action); rejecting an entry stays on the Hours page with its reason field.
+
+**Found**
+- **The dialog's Close label (`a11y.close`) was in the dashboard-only dictionary**: any public page opening a sheet would have read the raw key to a screen reader. The crew app is the first public page with sheets; the key moved to the core dictionary (`i18n-audit` flagged it; `qa:visual`'s raw-key scan only reads visible text, not `aria-label`).
+- The crew app shows in the worker's own language whatever the browser asks for (the office sets it per worker) — so the FR sweep of `/t` renders English for the showcase worker. By design, noted.
+
+**Deferred**
+- Approve hours by swipe on the Hours tab of Team (`/dashboard/team?tab=time`) — the full list there keeps its table and checkboxes (Phase 110 with the long tail).
+- The foreman's top bar still shows the + (New) sheet; what it offers a foreman is Phase 110's pass over the + list.
+
+**Verification**
+- `qa:visual --lang=en --widths=375,1280 --routes=/t/,=/dashboard,dashboard/jobs/` (50 pages, `.qa/p108`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, 0 phone-rule warnings.
+- Recheck after the last polish: `qa:visual --lang=en,fr --widths=375,768,1280 --routes=/t/,=/dashboard,dashboard/jobs/` (150 pages, `.qa/p108b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, **0 phone-rule warnings** (the foreman home's stacked-buttons warning and `/t`'s wrapping company pills from the baseline are gone).
+- Phone sheets: `.qa/phone-sheets/p108/` (before = `.qa/phone-sheets/p108-pre/`): **crew app 1.5 screens (was 4.4)**, Clock in on screen one (was screen two, after the company picker, the changes list and Today), Report · Photo docked; **foreman home 1.7 (was 2.3)**, first screen = what is stuck, who is where and the first hours to approve (was three stacked buttons and the start of one tall card).
+- typecheck (quote-ai), eslint on the touched files (clean), knip (nothing new), i18n-audit (the `a11y.close` split fixed; nothing new).

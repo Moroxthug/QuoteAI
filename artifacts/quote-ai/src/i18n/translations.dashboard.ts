@@ -193,6 +193,9 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "crew.link.jobs": "Jobs",
     "crew.link.hours": "Hours",
     "crew.foremanSub": "Who is on which site today, what is stuck, and whose hours are waiting.",
+    // Phase 108: the crew app on one screen
+    "crew.m.swipeHint": "Swipe a row right to approve it.",
+    "crew.m.onThisJob": "On this job today",
     "notes.title": "Notes",
     "notes.empty": "No notes yet. Write one here, or dictate \"note: …\" from the site.",
     "notes.placeholder": "Add a note about this job…",
@@ -2656,7 +2659,6 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "clients.detail.quote": "Quote",
     "clients.detail.quoteAccepted": "Accepted",
     // Phase 67 — aria-labels / placeholders that were still English literals
-    "a11y.close": "Close",
     "a11y.reportingPeriod": "Reporting period",
     "a11y.generateQuote": "Generate quote",
     "a11y.moveUp": "Move up",
@@ -4164,6 +4166,8 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "crew.link.jobs": "Chantiers",
     "crew.link.hours": "Heures",
     "crew.foremanSub": "Qui est sur quel chantier aujourd'hui, ce qui bloque et les heures en attente.",
+    "crew.m.swipeHint": "Glissez une ligne vers la droite pour l'approuver.",
+    "crew.m.onThisJob": "Sur ce chantier aujourd'hui",
     "notes.title": "Notes",
     "notes.empty": "Aucune note. Écrivez-en une ici ou dictez « note : … » depuis le chantier.",
     "notes.placeholder": "Ajouter une note sur ce chantier…",
@@ -6627,7 +6631,6 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "clients.detail.quote": "Soumission",
     "clients.detail.quoteAccepted": "Acceptée",
     // Phase 67 — aria-labels / placeholders that were still English literals
-    "a11y.close": "Fermer",
     "a11y.reportingPeriod": "Période du rapport",
     "a11y.generateQuote": "Générer la soumission",
     "a11y.moveUp": "Monter",

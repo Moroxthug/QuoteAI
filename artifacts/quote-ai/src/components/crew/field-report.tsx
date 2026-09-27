@@ -27,8 +27,12 @@ function parseDollars(v: string): number | null {
  * Phase 86 — report from the field without an account. A photo with a note,
  * "I'm blocked" (which pushes to the office), or materials used against the
  * job. Goes through the offline outbox like the clock does, photo and all.
+ *
+ * Phase 108: `bare` is the form inside the Report sheet (the sheet has the
+ * title); `initialPhoto` is the picture the Photo button just took, and
+ * `onSent` closes the sheet once the report is saved.
  */
-export function FieldReportCard({ token, jobs, defaultJobId, reports }: { token: string; jobs: Job[]; defaultJobId: string | null; reports: FieldReportDto[] }) {
+export function FieldReportCard({ token, jobs, defaultJobId, reports, bare, initialPhoto, onSent }: { token: string; jobs: Job[]; defaultJobId: string | null; reports: FieldReportDto[]; bare?: boolean; initialPhoto?: File | null; onSent?: () => void }) {
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
   const queryClient = useQueryClient();
@@ -39,7 +43,7 @@ export function FieldReportCard({ token, jobs, defaultJobId, reports }: { token:
   const [kind, setKind] = useState<FieldReportKind>("note");
   const [body, setBody] = useState("");
   const [amount, setAmount] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photo, setPhoto] = useState<File | null>(initialPhoto ?? null);
   const [preview, setPreview] = useState<string | null>(null);
   const [sent, setSent] = useState<false | "online" | "offline">(false);
 
@@ -71,15 +75,17 @@ export function FieldReportCard({ token, jobs, defaultJobId, reports }: { token:
       if (fileInput.current) fileInput.current.value = "";
       setSent(r.queued ? "offline" : "online");
       setTimeout(() => setSent(false), 3500);
+      if (onSent) setTimeout(onSent, 900);
     },
   });
 
   const pending = useMemo(() => outbox.rows.filter((r) => r.op.kind === "worker.report"), [outbox.rows]);
 
   if (jobs.length === 0) return null;
+  const Wrap = bare ? "div" : "section";
   return (
-    <section className="card p-4 space-y-3" aria-labelledby="field-report-h">
-      <h2 id="field-report-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Camera className="h-4 w-4" /> {t("crew.reportTitle")}</h2>
+    <Wrap className={bare ? "space-y-3" : "card p-4 space-y-3"} {...(bare ? {} : { "aria-labelledby": "field-report-h" })}>
+      {!bare && <h2 id="field-report-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Camera className="h-4 w-4" /> {t("crew.reportTitle")}</h2>}
 
       <div className="field">
         <label htmlFor="report-job">{t("worker.job")}</label>
@@ -170,6 +176,6 @@ export function FieldReportCard({ token, jobs, defaultJobId, reports }: { token:
           </ul>
         </div>
       )}
-    </section>
+    </Wrap>
   );
 }

@@ -30,6 +30,7 @@ import { OverviewCharts, useJobAnalytics } from "@/components/jobs/overview-char
 import { AssistantPanel } from "@/components/assistant/assistant-panel";
 import { PhotosTab } from "@/components/jobs/photos-tab";
 import { FieldReportsCard } from "@/components/crew/field-reports-card";
+import { JobCrewToday } from "@/components/crew/crew-today-card";
 import { PermitsCard } from "@/components/jobs/permits-card";
 import { CrewScheduleCard } from "@/components/schedule/crew-schedule-card";
 import { ClientThreadCard } from "@/components/clients/client-thread";
@@ -310,6 +311,9 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
   const total = job.contract?.total ?? job.contractValueCents / 100;
   return (
     <div className="stack">
+      {/* Phase 108: what is stuck and who is on site today come first. */}
+      <FieldReportsCard jobId={job.id} only="blockers" />
+      <JobCrewToday jobId={job.id} />
       {/* Phase 106: what happens next on site comes before the numbers. */}
       {next && (
         <section className="card j-next" style={{ borderColor: "var(--teal)" }}>
@@ -341,7 +345,7 @@ function OverviewTab({ data, locale, onGoTo }: { data: JobDetailDto; locale: typ
             </div>
           </section>
 
-          <FieldReportsCard jobId={job.id} />
+          <FieldReportsCard jobId={job.id} only="rest" />
 
           <PermitsCard jobId={job.id} />
 

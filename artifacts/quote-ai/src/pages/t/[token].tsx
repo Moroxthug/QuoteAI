@@ -1,24 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Clock, Loader2, Trash2, CheckCircle2, AlertTriangle, Minus, Plus, MapPin, Square, CalendarDays, CloudUpload, WifiOff } from "lucide-react";
+import { AlertTriangle, CalendarDays, Camera, Car, ChevronDown, ChevronRight, Clock, CloudUpload, Loader2, MapPin, MessageSquareText, Phone, Square, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
-import { workerApi } from "@/lib/team-api";
+import { workerApi, type WorkerPageDto } from "@/lib/team-api";
 import { Logo } from "@/components/logo";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { runOrQueue, enqueue, useOutbox } from "@/lib/offline/outbox";
-import { WorkerToday } from "@/components/crew/worker-today";
+import { ActionSheet } from "@/components/mobile/action-sheet";
+import { BottomSheet } from "@/components/mobile/bottom-sheet";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { WorkerToday, mapsUrl } from "@/components/crew/worker-today";
 import { WorkerChanges } from "@/components/crew/worker-changes";
 import { FieldReportCard } from "@/components/crew/field-report";
 import { TravelCard } from "@/components/crew/travel-card";
-
-const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
-const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+import { ManualHoursForm, WorkerHoursList, isoDay } from "@/components/crew/worker-hours";
 
 /** Resolves to {lat, lng} or null — never rejects, since a clock-in must work even without location. */
 function getLocation(): Promise<{ lat: number; lng: number } | null> {
@@ -39,6 +40,21 @@ function elapsedLabel(sinceIso: string, now: number) {
   return `${h}:${String(m).padStart(2, "0")}`;
 }
 
+type Block = { id: string; startsAt: string; endsAt: string; allDay: boolean; notes: string };
+
+/** Today's shift that is on now, else the next one today, else the first — with its job. */
+function currentShift(data: WorkerPageDto, now: number) {
+  const all = data.todayJobs.flatMap((job) => job.blocks.map((b) => ({ job, b })));
+  return (
+    all.find(({ b }) => !b.allDay && new Date(b.startsAt).getTime() <= now && new Date(b.endsAt).getTime() > now) ??
+    all.find(({ b }) => new Date(b.endsAt).getTime() > now) ??
+    all[0] ??
+    null
+  );
+}
+
+type Sheet = null | "job" | "report" | "hours" | "travel";
+
 /**
  * Public worker time-entry page. No login: the magic-link token identifies
  * the worker. Built for a phone on site — pick the job, tap the hours, done.
@@ -48,9 +64,16 @@ function elapsedLabel(sinceIso: string, now: number) {
  * with its real time and replayed on reconnect; a clock-in that has not
  * synced yet still shows its running timer here and can be clocked out.
  *
- * Phase 86: the crew's app. Today's jobs come first (tasks, a maps link, the
- * person on site to call), then the schedule and the clock, then "report from
- * site" — a photo, a blocker, materials used — which also queues offline.
+ * Phase 86: the crew's app — today's jobs, tasks, the schedule, "report from
+ * site" (a photo, a blocker, materials used), which also queues offline.
+ *
+ * Phase 108: one screen, not four. **Now** comes first — the shift that is on
+ * (or next), its address one tap to Maps, the site contact and the gate code,
+ * and Clock in / out as the big button. Then today's tasks as a checklist,
+ * what is coming up, and the week's hours. Report and Photo are docked at the
+ * bottom and open a sheet; hours by hand and travel are behind ⋯. "Since you
+ * last looked" is a count chip in the header, and the company switch (two
+ * group companies) is the company name in the header.
  */
 export default function WorkerTimePage() {
   const { token: linkToken } = useParams<{ token: string }>();
@@ -66,14 +89,12 @@ export default function WorkerTimePage() {
 
   const [projectId, setProjectId] = useState("");
   const [milestoneId, setMilestoneId] = useState("");
-  const [date, setDate] = useState(isoDay(new Date()));
-  const [hours, setHours] = useState(8);
-  const [note, setNote] = useState("");
-  const [saved, setSaved] = useState<false | "online" | "offline">(false);
   const [locating, setLocating] = useState(false);
   const [locationOff, setLocationOff] = useState(false);
   const [now, setNow] = useState(() => Date.now());
-  useEffect(() => { if (data && !projectId && data.jobs.length === 1) setProjectId(data.jobs[0]!.id); }, [data, projectId]);
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
   const switchCompany = (c: { workerId: string; primary: boolean }) => {
     const next = c.primary ? null : c.workerId;
     setAsWorker(next);
@@ -85,35 +106,27 @@ export default function WorkerTimePage() {
     window.history.replaceState(null, "", u.toString());
   };
   useDocumentTitle(`${t("worker.clockInOut")} · ${data?.companyName ?? "QuoteAI"}`);
-  useEffect(() => {
-    if (!data?.activeEntry) return;
-    const id = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(id);
-  }, [data?.activeEntry]);
 
-  const job = data?.jobs.find((j) => j.id === projectId);
-  const jobName = (id: string) => data?.jobs.find((j) => j.id === id)?.name ?? "";
   const outbox = useOutbox(token);
   // A clock-in saved on this phone that the server has not seen yet (and no queued clock-out for it).
   const pendingClockIn = useMemo(() => {
     const rows = outbox.rows.filter((r) => r.status === "pending");
     return rows.find((r) => r.op.kind === "worker.clockIn" && !rows.some((o) => o.op.kind === "worker.clockOut" && o.op.entryClientRef === r.id)) ?? null;
   }, [outbox.rows]);
-  const pendingEntries = useMemo(() => outbox.rows.filter((r) => r.op.kind === "worker.addEntry"), [outbox.rows]);
+  const pendingOp = pendingClockIn?.op.kind === "worker.clockIn" ? pendingClockIn.op : null;
+  const running = !!(pendingOp || data?.activeEntry);
+  // The timer and "which shift is on" move with the clock.
   useEffect(() => {
-    if (!pendingClockIn) return;
     const id = setInterval(() => setNow(Date.now()), 30_000);
     return () => clearInterval(id);
-  }, [pendingClockIn]);
+  }, []);
 
-  const add = useMutation({
-    mutationFn: () => {
-      const body = { projectId, date, hours, milestoneId: milestoneId || null, note: note.trim() || undefined };
-      return runOrQueue({ kind: "worker.addEntry", token: token!, ...body }, { scope: token!, label: `${hours} h · ${jobName(projectId)}` }, (clientRef) => workerApi.add(token!, { ...body, clientRef }));
-    },
-    onSuccess: (r) => { queryClient.invalidateQueries({ queryKey: ["worker", token] }); setNote(""); setSaved(r.queued ? "offline" : "online"); setTimeout(() => setSaved(false), 3000); },
-  });
-  const remove = useMutation({ mutationFn: (id: string) => workerApi.remove(token!, id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }) });
+  const shift = data ? currentShift(data, now) : null;
+  // What the Now card is about before anyone picks: today's shift, else the only job.
+  const suggested = shift?.job.id ?? (data?.jobs.length === 1 ? data.jobs[0]!.id : "");
+  useEffect(() => { if (!projectId && suggested) setProjectId(suggested); }, [projectId, suggested]);
+
+  const jobName = (id: string) => data?.jobs.find((j) => j.id === id)?.name ?? "";
 
   const clockIn = useMutation({
     mutationFn: async () => {
@@ -133,21 +146,13 @@ export default function WorkerTimePage() {
       const loc = await getLocation();
       setLocating(false);
       const at = new Date().toISOString();
-      const label = `${t("worker.clockOut")} · ${"entryId" in target ? (data?.activeEntry?.projectName ?? "") : jobName((pendingClockIn?.op as { projectId?: string })?.projectId ?? "")}`;
+      const label = `${t("worker.clockOut")} · ${"entryId" in target ? (data?.activeEntry?.projectName ?? "") : jobName(pendingOp?.projectId ?? "")}`;
       // The clock-in itself is still queued: the clock-out must follow it in the same queue.
       if ("entryClientRef" in target) return { queued: true as const, row: await enqueue({ kind: "worker.clockOut", token: token!, entryClientRef: target.entryClientRef, lat: loc?.lat, lng: loc?.lng, at }, { scope: token!, label }) };
       return runOrQueue({ kind: "worker.clockOut", token: token!, entryId: target.entryId, lat: loc?.lat, lng: loc?.lng, at }, { scope: token!, label }, () => workerApi.clockOut(token!, { entryId: target.entryId, lat: loc?.lat, lng: loc?.lng, at }));
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }),
   });
-
-  const weekTotal = useMemo(() => {
-    if (!data) return 0;
-    const start = new Date(); start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); start.setHours(0, 0, 0, 0);
-    return data.entries.filter((e) => e.status !== "rejected" && e.date && day(e.date)!.getTime() >= start.getTime()).reduce((s, e) => s + e.hours, 0);
-  }, [data]);
-  // The currently-open clock-in (if any) already renders in its own card above.
-  const closedEntries = useMemo(() => (data ? data.entries.filter((e) => !(e.clockInAt && !e.clockOutAt)) : []), [data]);
 
   if (isLoading) return <div className="doc-shell flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--navy)" }} /></div>;
   if (error || !data) {
@@ -165,199 +170,238 @@ export default function WorkerTimePage() {
     );
   }
 
-  const pendingOp = pendingClockIn?.op.kind === "worker.clockIn" ? pendingClockIn.op : null;
+  // The job the Now card is about: the running clock's, else the one picked (or suggested).
+  const nowJobId = pendingOp?.projectId ?? data.activeEntry?.projectId ?? projectId;
+  const nowJob = data.jobs.find((j) => j.id === nowJobId) ?? null;
+  const nowToday = data.todayJobs.find((j) => j.id === nowJobId) ?? null;
+  const nowBlock: Block | null = shift && shift.job.id === nowJobId ? shift.b : (nowToday?.blocks[0] ?? null);
+  const address = nowToday?.address || nowJob?.address || null;
+  const hm = (iso: string) => format(new Date(iso), "H:mm", { locale });
+  const blockTime = (b: Block) => (b.allDay ? t("worker.allDay") : `${hm(b.startsAt)}–${hm(b.endsAt)}`);
+  const phaseTitle = (pid: string, mid: string | null | undefined) => (mid ? data.jobs.find((j) => j.id === pid)?.milestones.find((m) => m.id === mid)?.title ?? "" : "");
+  const defaultJobId = data.activeEntry?.projectId ?? (nowJobId || null);
+  // Today's shifts on the Now job are in the Now card; the list below is what comes after.
+  const nowBlockIds = new Set((nowToday?.blocks ?? []).map((b) => b.id));
+  const comingUp = data.schedule.filter((b) => !nowBlockIds.has(b.id) && new Date(b.endsAt).getTime() > now);
+  const travelOn = !!data.travel && (data.travel.km || data.travel.perDiem);
+  const current = data.companies.find((c) => c.current);
+
+  const eyebrow = running ? t("worker.m.onTheClock") : nowBlock ? `${t("worker.today")} · ${blockTime(nowBlock)}` : t("worker.m.now");
 
   return (
-    <div className="doc-shell pb-16">
+    <div className="doc-shell">
       <header className="doc-head">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0"><div className="font-bold truncate" style={{ color: "var(--navy)" }}>{data.worker.name}</div><div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{data.companyName}</div></div>
-          <div className="flex items-center gap-3">
-            <button className="text-xs" style={{ color: "var(--muted-mk)" }} onClick={() => setLang(lang === "fr" ? "en" : "fr")}>{lang === "fr" ? "EN" : "FR"}</button>
-            <Logo className="h-5" />
+          <div className="min-w-0">
+            <h1 className="font-bold truncate text-base" style={{ color: "var(--navy)" }}>{data.worker.name}</h1>
+            {data.companies.length > 1 ? (
+              <ActionSheet
+                title={t("worker.companies")}
+                align="start"
+                actions={data.companies.map((c) => ({ label: c.current ? `${c.companyName} · ${t("worker.m.current")}` : c.companyName, disabled: c.current, onSelect: () => switchCompany(c) }))}
+                trigger={
+                  <button type="button" className="w-company" aria-label={`${t("worker.m.switchCompany")} — ${current?.companyName ?? data.companyName}`}>
+                    <span className="truncate">{data.companyName}</span> <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  </button>
+                }
+              />
+            ) : (
+              <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{data.companyName}</div>
+            )}
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <WorkerChanges token={token!} changes={data.changes} upTo={data.changesUpTo} />
+            <button type="button" className="w-lang" onClick={() => setLang(lang === "fr" ? "en" : "fr")} aria-label={lang === "fr" ? "English" : "Français"}>{lang === "fr" ? "EN" : "FR"}</button>
+            <Logo className="h-5 hide-phone" />
           </div>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {data.companies.length > 1 && (
-          <nav className="card p-3" aria-label={t("worker.companies")}>
-            <p className="text-xs mb-2" style={{ color: "var(--muted-mk)" }}>{t("worker.companies")}</p>
-            <div className="pills" style={{ flexWrap: "wrap" }}>
-              {data.companies.map((c) => (
-                <button key={c.workerId} type="button" className={c.current ? "pill on" : "pill"} aria-pressed={c.current} onClick={() => !c.current && switchCompany(c)}>{c.companyName}</button>
-              ))}
-            </div>
-          </nav>
-        )}
         <OfflineBar scope={token} />
-        <WorkerChanges token={token!} changes={data.changes} upTo={data.changesUpTo} />
-        <WorkerToday token={token!} jobs={data.todayJobs} canAddTasks={data.worker.canAddTasks} />
-        {data.schedule.length > 0 && (
-          <section className="card p-4 space-y-2">
-            <h2 className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.schedule")}</h2>
+
+        {/* ── Now ─────────────────────────────────────────────────────── */}
+        <section className={cn("card w-now", running && "on")} aria-labelledby="w-now-h">
+          <p className="w-now-eyebrow">{running && <span className="w-live" aria-hidden="true" />}{eyebrow}</p>
+          {data.jobs.length === 0 && !running ? (
+            <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{t("worker.noJobs")}</p>
+          ) : (
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <h2 id="w-now-h" className="w-now-title">
+                  {pendingOp ? jobName(pendingOp.projectId) : data.activeEntry ? data.activeEntry.projectName : nowJob?.name ?? t("crew.pickJob")}
+                  {(() => {
+                    const ph = pendingOp ? phaseTitle(pendingOp.projectId, pendingOp.milestoneId) : data.activeEntry ? data.activeEntry.milestoneTitle : phaseTitle(projectId, milestoneId);
+                    return ph ? <span className="w-now-phase">{ph}</span> : null;
+                  })()}
+                </h2>
+                {!running && data.jobs.length > 1 && (
+                  <button type="button" className="text-link shrink-0 mt-1" onClick={() => setSheet("job")}>{t("worker.m.changeJob")}</button>
+                )}
+              </div>
+
+              {running && (
+                <div className="w-timer">
+                  <span className="w-timer-n">{elapsedLabel(pendingOp?.at ?? data.activeEntry!.clockInAt!, now)}</span>
+                  <span className="w-timer-s">{t("worker.clockedInSince")} {format(new Date(pendingOp?.at ?? data.activeEntry!.clockInAt!), "HH:mm")}</span>
+                  {pendingOp && <span className="w-timer-s inline-flex items-center gap-1" style={{ color: "var(--teal-dark)" }}><CloudUpload className="h-3 w-3" /> {t("worker.pendingSync")}</span>}
+                </div>
+              )}
+
+              {(address || nowToday?.contact || (nowToday?.blocks ?? []).some((b) => b.notes)) && (
+                <ul className="w-now-rows">
+                  {address && (
+                    <li>
+                      <a className="w-now-row" href={mapsUrl(address)} target="_blank" rel="noopener noreferrer">
+                        <MapPin aria-hidden="true" /> <span className="grow">{address}</span> <span className="w-now-go">{t("worker.m.maps")}<ChevronRight aria-hidden="true" /></span>
+                      </a>
+                    </li>
+                  )}
+                  {nowToday?.contact?.phone && (
+                    <li>
+                      <a className="w-now-row" href={`tel:${nowToday.contact.phone.replace(/[^\d+]/g, "")}`}>
+                        <Phone aria-hidden="true" /> <span className="grow">{t("crew.call")} {nowToday.contact.name}</span> <ChevronRight className="w-now-chev" aria-hidden="true" />
+                      </a>
+                    </li>
+                  )}
+                  {nowToday?.contact && !nowToday.contact.phone && (
+                    <li className="w-now-row static"><Phone aria-hidden="true" /> <span className="grow">{t("crew.siteContact")}: {nowToday.contact.name}</span></li>
+                  )}
+                  {(nowToday?.blocks ?? []).filter((b) => b.notes).map((b) => (
+                    <li key={b.id} className="w-now-note">{b.notes}</li>
+                  ))}
+                </ul>
+              )}
+
+              {!running && nowJob && nowJob.milestones.length > 0 && (
+                <div className="field">
+                  <label htmlFor="worker-phase">{t("worker.phase")}</label>
+                  <select id="worker-phase" value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)}>
+                    <option value="">{t("worker.anyPhase")}</option>
+                    {nowJob.milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
+                  </select>
+                </div>
+              )}
+
+              {running ? (
+                <>
+                  {clockOut.error && <p className="text-xs" role="alert" style={{ color: "var(--red)" }}>{(clockOut.error as Error).message}</p>}
+                  <button type="button" className="btn btn-navy w-full w-big" disabled={clockOut.isPending} onClick={() => clockOut.mutate(pendingOp ? { entryClientRef: pendingClockIn!.id } : { entryId: data.activeEntry!.id })}>
+                    {clockOut.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Square className="h-4 w-4 fill-current" />} {locating && clockOut.isPending ? t("worker.locating") : t("worker.clockOut")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  {clockIn.error && <p className="text-xs" role="alert" style={{ color: "var(--red)" }}>{(clockIn.error as Error).message}</p>}
+                  {locationOff && <p className="text-[11px] inline-flex items-center gap-1" style={{ color: "var(--yellow-dark)" }}><MapPin className="h-3 w-3" /> {t("worker.locationOff")}</p>}
+                  <button type="button" className="btn btn-navy w-full w-big" disabled={!projectId || clockIn.isPending} onClick={() => clockIn.mutate()}>
+                    {clockIn.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Clock className="h-5 w-5" />} {locating && clockIn.isPending ? t("worker.locating") : t("worker.clockIn")}
+                  </button>
+                </>
+              )}
+            </>
+          )}
+        </section>
+
+        <WorkerToday token={token!} jobs={data.todayJobs} canAddTasks={data.worker.canAddTasks} nowJobId={nowJobId || null} />
+
+        {comingUp.length > 0 && (
+          <section className="card p-4 space-y-1" aria-labelledby="w-next-h">
+            <h2 id="w-next-h" className="text-sm font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><CalendarDays className="h-4 w-4" /> {t("worker.m.comingUp")}</h2>
             <ul className="divide-y" style={{ borderColor: "var(--soft)" }}>
-              {data.schedule.map((b) => {
+              {comingUp.slice(0, 5).map((b) => {
                 const s = new Date(b.startsAt);
-                const e = new Date(b.endsAt);
-                const isToday = isoDay(s) === data.today;
                 return (
                   <li key={b.id} className="py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-semibold" style={{ color: isToday ? "var(--teal-dark)" : "var(--ink)" }}>{isToday ? t("worker.today") : format(s, "EEE d MMM", { locale })}</span>
-                      <span className="text-xs tabular-nums" style={{ color: "var(--muted-mk)" }}>{b.allDay ? t("worker.allDay") : `${format(s, "H:mm")}–${format(e, "H:mm")}`}</span>
+                      <span className="font-semibold" style={{ color: isoDay(s) === data.today ? "var(--teal-dark)" : "var(--ink)" }}>{isoDay(s) === data.today ? t("worker.today") : format(s, "EEE d MMM", { locale })}</span>
+                      <span className="text-xs tabular-nums" style={{ color: "var(--muted-mk)" }}>{blockTime(b)}</span>
                     </div>
                     <div className="truncate" style={{ color: "var(--navy)" }}>{b.label}{b.milestoneTitle ? ` · ${b.milestoneTitle}` : ""}</div>
                     {b.address && <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{b.address}</div>}
-                    {b.notes && <div className="text-xs" style={{ color: "var(--faint)" }}>{b.notes}</div>}
+                    {b.notes && <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{b.notes}</div>}
                   </li>
                 );
               })}
             </ul>
           </section>
         )}
-        <section className="card p-4 space-y-4">
-          <h1 className="text-base font-bold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Clock className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("worker.clockInOut")}</h1>
 
-          {pendingOp ? (
-            <div className="rounded-xl p-4 space-y-3 text-center" style={{ border: "1px dashed var(--navy)", background: "var(--soft)" }}>
-              <div className="text-sm" style={{ color: "var(--ink)" }}>{jobName(pendingOp.projectId)}{pendingOp.milestoneId ? ` · ${data.jobs.find((j) => j.id === pendingOp.projectId)?.milestones.find((m) => m.id === pendingOp.milestoneId)?.title ?? ""}` : ""}</div>
-              <div className="text-3xl font-bold tabular-nums" style={{ color: "var(--navy)" }}>{elapsedLabel(pendingOp.at, now)}</div>
-              <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.clockedInSince")} {format(new Date(pendingOp.at), "HH:mm")}</div>
-              <div className="text-[11px] inline-flex items-center gap-1 justify-center" style={{ color: "var(--teal-dark)" }}><CloudUpload className="h-3 w-3" /> {t("worker.pendingSync")}</div>
-              {clockOut.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(clockOut.error as Error).message}</p>}
-              <button className="btn btn-navy w-full text-base" disabled={clockOut.isPending} onClick={() => clockOut.mutate({ entryClientRef: pendingClockIn!.id })}>
-                {clockOut.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Square className="h-4 w-4 fill-current" />} {locating && clockOut.isPending ? t("worker.locating") : t("worker.clockOut")}
-              </button>
-            </div>
-          ) : data.activeEntry ? (
-            <div className="rounded-xl p-4 space-y-3 text-center" style={{ border: "1px solid var(--line)", background: "var(--soft)" }}>
-              <div className="text-sm" style={{ color: "var(--ink)" }}>{data.activeEntry.projectName}{data.activeEntry.milestoneTitle ? ` · ${data.activeEntry.milestoneTitle}` : ""}</div>
-              <div className="text-3xl font-bold tabular-nums" style={{ color: "var(--navy)" }}>{elapsedLabel(data.activeEntry.clockInAt!, now)}</div>
-              <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.clockedInSince")} {format(new Date(data.activeEntry.clockInAt!), "HH:mm")}</div>
-              {clockOut.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(clockOut.error as Error).message}</p>}
-              <button className="btn btn-navy w-full text-base" disabled={clockOut.isPending} onClick={() => clockOut.mutate({ entryId: data.activeEntry!.id })}>
-                {clockOut.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Square className="h-4 w-4 fill-current" />} {locating && clockOut.isPending ? t("worker.locating") : t("worker.clockOut")}
-              </button>
-            </div>
-          ) : (
+        <WorkerHoursList token={token!} entries={data.entries} jobs={data.jobs} />
+
+        <InstallPrompt compact />
+
+        <StickyActionBar label={t("worker.m.actions")}>
+          <ActionSheet
+            actions={[
+              { label: t("worker.m.hoursByHand"), icon: Clock, onSelect: () => setSheet("hours") },
+              travelOn && { label: t("crew.travel.title"), icon: Car, onSelect: () => setSheet("travel") },
+            ]}
+          />
+          {data.jobs.length > 0 && (
             <>
-              <div className="space-y-1">
-                <label className="text-xs font-medium" style={{ color: "var(--muted-mk)" }}>{t("worker.job")}</label>
-                {data.jobs.length === 0 ? <p className="text-sm" style={{ color: "var(--muted-mk)" }}>{t("worker.noJobs")}</p> : (
-                  <div className="grid gap-2">
-                    {data.jobs.map((j) => (
-                      <button
-                        key={j.id}
-                        onClick={() => { setProjectId(j.id); setMilestoneId(""); }}
-                        className="text-left rounded-xl px-3 py-2.5 transition-colors"
-                        style={projectId === j.id ? { border: "1px solid var(--navy)", background: "var(--soft)" } : { border: "1px solid var(--line)", background: "#fff" }}
-                      >
-                        <div className="font-medium text-sm" style={{ color: "var(--navy)" }}>{j.name}</div>
-                        {j.address && <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{j.address}</div>}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {job && job.milestones.length > 0 && (
-                <div className="field">
-                  <label htmlFor="worker-phase">{t("worker.phase")}</label>
-                  <select id="worker-phase" value={milestoneId} onChange={(e) => setMilestoneId(e.target.value)}>
-                    <option value="">{t("worker.anyPhase")}</option>
-                    {job.milestones.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
-                  </select>
-                </div>
-              )}
-
-              {clockIn.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(clockIn.error as Error).message}</p>}
-              {locationOff && <p className="text-[11px] inline-flex items-center gap-1" style={{ color: "var(--yellow-dark)" }}><MapPin className="h-3 w-3" /> {t("worker.locationOff")}</p>}
-              <button className="btn btn-navy w-full text-base" disabled={!projectId || clockIn.isPending} onClick={() => clockIn.mutate()}>
-                {clockIn.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <MapPin className="h-5 w-5" />} {locating && clockIn.isPending ? t("worker.locating") : t("worker.clockIn")}
+              <button type="button" className="btn btn-outline-navy secondary" onClick={() => photoInput.current?.click()}>
+                <Camera className="h-4 w-4" /> {t("worker.m.photo")}
+              </button>
+              <button type="button" className="btn btn-navy" data-primary-action onClick={() => { setPhoto(null); setSheet("report"); }}>
+                <MessageSquareText className="h-4 w-4" /> {t("worker.m.report")}
               </button>
             </>
           )}
-        </section>
-
-        <FieldReportCard token={token!} jobs={data.jobs} defaultJobId={data.activeEntry?.projectId ?? data.todayJobs[0]?.id ?? (data.jobs.length === 1 ? data.jobs[0]!.id : null)} reports={data.reports} />
-
-        {data.travel && <TravelCard token={token!} jobs={data.jobs} today={data.today} defaultJobId={data.activeEntry?.projectId ?? data.todayJobs[0]?.id ?? (data.jobs.length === 1 ? data.jobs[0]!.id : null)} travel={data.travel} allowances={data.allowances} />}
-
-        <section className="card p-4 space-y-4">
-          <h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("worker.orManual")}</h2>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="field">
-              <label htmlFor="worker-date">{t("worker.date")}</label>
-              <input id="worker-date" type="date" value={date} max={isoDay(new Date())} onChange={(e) => setDate(e.target.value)} />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium" style={{ color: "var(--muted-mk)" }}>{t("worker.hours")}</label>
-              <div className="flex items-center rounded-xl h-11 overflow-hidden" style={{ border: "1px solid var(--line)", background: "#fff" }}>
-                <button type="button" aria-label={t("a11y.decrease")} className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.max(0.5, Math.round((h - 0.5) * 2) / 2))}><Minus className="h-4 w-4" /></button>
-                <input type="number" step="0.5" min="0.5" max="24" aria-label={t("worker.hours")} value={hours} onChange={(e) => setHours(Math.min(24, Math.max(0.5, Number(e.target.value) || 0.5)))} className="flex-1 min-w-0 text-center font-bold text-lg outline-none" style={{ color: "var(--navy)" }} />
-                <button type="button" aria-label={t("a11y.increase")} className="h-full w-11 flex items-center justify-center" style={{ color: "var(--ink)" }} onClick={() => setHours((h) => Math.min(24, Math.round((h + 0.5) * 2) / 2))}><Plus className="h-4 w-4" /></button>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {[4, 6, 8, 10].map((h) => (
-              <button
-                key={h}
-                onClick={() => setHours(h)}
-                className="rounded-full px-3 py-1 text-xs font-medium"
-                style={hours === h ? { background: "var(--navy)", color: "#fff", border: "1px solid var(--navy)" } : { background: "#fff", border: "1px solid var(--line)", color: "var(--muted-mk)" }}
-              >
-                {h} h
-              </button>
-            ))}
-          </div>
-          <div className="field">
-            <label className="sr-only">{t("worker.notePlaceholder")}</label>
-            <input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("worker.notePlaceholder")} />
-          </div>
-
-          {add.error && <p className="text-xs" style={{ color: "var(--red)" }}>{(add.error as Error).message}</p>}
-          <button className="btn w-full text-base" style={saved ? { background: saved === "offline" ? "var(--teal-dark)" : "var(--green-dark)", color: "#fff" } : { background: "var(--navy)", color: "#fff" }} disabled={!projectId || add.isPending} onClick={() => add.mutate()}>
-            {add.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : saved === "offline" ? <CloudUpload className="h-5 w-5" /> : saved ? <CheckCircle2 className="h-5 w-5" /> : null} {saved === "offline" ? t("worker.savedOffline") : saved ? t("worker.saved") : t("worker.submit")}
-          </button>
-          <p className="text-[11px] text-center" style={{ color: "var(--faint)" }}>{t("worker.approvalHint")}</p>
-        </section>
-
-        <section className="card p-4 space-y-2">
-          <div className="flex items-center justify-between"><h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("worker.recent")}</h2><span className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("worker.thisWeek")}: <span className="font-semibold" style={{ color: "var(--ink)" }}>{weekTotal} h</span></span></div>
-          {closedEntries.length === 0 && pendingEntries.length === 0 ? <p className="text-sm py-3 text-center" style={{ color: "var(--faint)" }}>{t("worker.noEntries")}</p> : (
-            <ul className="divide-y" style={{ borderColor: "var(--soft)" }}>
-              {pendingEntries.map((r) => {
-                const op = r.op as Extract<typeof r.op, { kind: "worker.addEntry" }>;
-                return (
-                  <li key={r.id} className="flex items-center gap-3 py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate"><span className="font-medium" style={{ color: "var(--ink)" }}>{op.hours} h</span> <span style={{ color: "var(--muted-mk)" }}>· {jobName(op.projectId)}</span></div>
-                      <div className="text-[11px]" style={{ color: "var(--faint)" }}>{format(day(op.date)!, "EEE d MMM", { locale })}{op.note ? ` · ${op.note}` : ""}</div>
-                    </div>
-                    <span className={cn("doc-status", r.status === "failed" ? "danger" : "warn")}>{r.status === "failed" ? t("worker.status.failed") : t("worker.status.pending")}</span>
-                  </li>
-                );
-              })}
-              {closedEntries.map((e) => (
-                <li key={e.id} className="flex items-center gap-3 py-2 text-sm" style={{ borderColor: "var(--soft)" }}>
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate"><span className="font-medium" style={{ color: "var(--ink)" }}>{e.hours} h</span> <span style={{ color: "var(--muted-mk)" }}>· {e.projectName}</span>{e.milestoneTitle ? <span style={{ color: "var(--faint)" }}> · {e.milestoneTitle}</span> : null}</div>
-                    <div className="text-[11px]" style={{ color: "var(--faint)" }}>{e.date ? format(day(e.date)!, "EEE d MMM", { locale }) : ""}{e.note ? ` · ${e.note}` : ""}{e.status === "rejected" && e.rejectedReason ? ` · ${e.rejectedReason}` : ""}</div>
-                  </div>
-                  {e.geofenceFlagged && <span title={t("worker.geofenceFlag")}><MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--yellow-dark)" }} /></span>}
-                  <span className={cn("doc-status", e.status === "approved" ? "ok" : e.status === "rejected" ? "danger" : "warn")}>{t(`worker.status.${e.status}`)}</span>
-                  {e.status === "submitted" && <button style={{ color: "var(--line)" }} onClick={() => remove.mutate(e.id)}><Trash2 className="h-4 w-4" /></button>}
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <InstallPrompt compact />
+        </StickyActionBar>
+        <input
+          ref={photoInput}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden="true"
+          onChange={(e) => {
+            const f = e.target.files?.[0] ?? null;
+            e.target.value = "";
+            if (!f) return;
+            setPhoto(f);
+            setSheet("report");
+          }}
+        />
       </main>
+
+      <BottomSheet open={sheet === "job"} onOpenChange={(o) => !o && setSheet(null)} title={t("worker.m.pickJob")} flush>
+        <ul className="lrows" role="radiogroup" aria-label={t("worker.job")}>
+          {data.jobs.map((j) => (
+            <li key={j.id}>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={projectId === j.id}
+                className={cn("lrow", projectId === j.id && "on")}
+                onClick={() => { setProjectId(j.id); setMilestoneId(""); setSheet(null); }}
+              >
+                <span className="lrow-main">
+                  <span className="lrow-title">{j.name}</span>
+                  {j.address && <span className="lrow-meta">{j.address}</span>}
+                </span>
+                {data.todayJobs.some((x) => x.id === j.id) && <span className="chip chip-teal">{t("worker.today")}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </BottomSheet>
+
+      <BottomSheet open={sheet === "report"} onOpenChange={(o) => { if (!o) { setSheet(null); setPhoto(null); } }} title={t("crew.reportTitle")}>
+        <FieldReportCard bare token={token!} jobs={data.jobs} defaultJobId={defaultJobId} reports={data.reports} initialPhoto={photo} onSent={() => { setSheet(null); setPhoto(null); }} />
+      </BottomSheet>
+
+      <BottomSheet open={sheet === "hours"} onOpenChange={(o) => !o && setSheet(null)} title={t("worker.m.hoursByHand")}>
+        <ManualHoursForm token={token!} jobs={data.jobs} defaultJobId={defaultJobId} onSaved={() => setSheet(null)} />
+      </BottomSheet>
+
+      {data.travel && (
+        <BottomSheet open={sheet === "travel"} onOpenChange={(o) => !o && setSheet(null)} title={t("crew.travel.title")}>
+          <TravelCard bare token={token!} jobs={data.jobs} today={data.today} defaultJobId={defaultJobId} travel={data.travel} allowances={data.allowances} />
+        </BottomSheet>
+      )}
     </div>
   );
 }

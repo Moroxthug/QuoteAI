@@ -20,7 +20,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 6. **Progressive disclosure.** Options, filters and rarely-used fields sit behind "Options" / "Filter" and open as a `BottomSheet`.
 7. **One accent at a time.** Navy for structure, one colour for status; no full-bleed colour blocks side by side on a phone.
 8. **Space is the design.** 16 px gutters (`--gutter-phone`), 12 px between cards (`--gap-card`), 44 px targets (`--tap`), one type scale: title 22 / section 17 / body 15 / meta 13 (`--fs-title`, `--fs-section`, `--fs-body`, `--fs-meta`).
-9. **The phone knows it's a phone.** Safe areas (`--safe-top/right/bottom/left`, `viewport-fit=cover`), `inputmode` / `autocomplete` on every field, camera and microphone one tap away, the numeric keypad for money. Nothing needs a hover or a drag: a board you drag cards across also gives each card a "Move to" menu (leads, Phase 107).
+9. **The phone knows it's a phone.** Safe areas (`--safe-top/right/bottom/left`, `viewport-fit=cover`), `inputmode` / `autocomplete` on every field, camera and microphone one tap away, the numeric keypad for money. Nothing needs a hover or a drag: a board you drag cards across also gives each card a "Move to" menu (leads, Phase 107). A swipe is a shortcut, never the only way: a swiped row keeps its button (hours to approve, Phase 108).
 10. **Same code, same words.** No separate mobile code path: the same components laid out by breakpoint, so the Capacitor app (docs/APP-PLAN.md) inherits all of it.
 
 ## The pieces (`artifacts/quote-ai/src/components/mobile/`)
@@ -37,6 +37,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it; runs to the screen edges (`data-bleed`, skipped by the gutter check) | 5 |
 | `RowMore` | hidden (the row keeps its hover icons — pair them with `hide-phone`) | one ⋯ at the end of a row opening its actions as a sheet (Phase 106) | 2 |
 | `PhoneListBar` | not used (the list keeps its pill row) | a list's head: search that stays at the top, the filter as a sheet with counts, the active filter as a removable chip (Phase 107; the quotes list's, shared) | 5, 6 |
+| `SwipeRow` | an ordinary row (a mouse never drags it) | swipe right to run the row's one safe action (approve); touch / pen only, vertical scroll untouched, comes back if the action fails. **Always paired with a visible button** (rule 9) (Phase 108) | 9 |
 
 CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. Tokens in `:root`.
 
@@ -79,3 +80,9 @@ pnpm --filter @workspace/api-server qa:phone-sheets -- --from=p1xx --baseline=vi
 ```
 
 Each route's first three phone screens side by side (before over after with `--baseline`), plus an `index.html` to flick through on a phone, in `artifacts/api-server/.qa/phone-sheets/<from>/`. Every Track A phase attaches its sheets to the build log.
+
+**The crew app (`/t/:token`, Phase 108)** — a public page with no tab bar, so the docked bar sits on the home indicator:
+
+- Screen one is **Now**: the shift, the job, address → Maps, site contact, the shift notes, and Clock in / out as the big button (`.w-big`, 56 px). Nothing above it but the header (name, company switch, the changes chip, FR / EN).
+- Docked: ⋯ (hours by hand, travel) · Photo (secondary) · Report (primary). Forms are sheets, never always-open cards.
+- Sheets on a public page need their strings in the core dictionary (`translations.ts`), the dialog's Close label included.

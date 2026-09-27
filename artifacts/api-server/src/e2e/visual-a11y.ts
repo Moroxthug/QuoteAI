@@ -130,6 +130,20 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub(`/p/${s.longQuoteId}`), pub(`/i/${s.invoiceToken}`),
     ...(s.signToken ? [pub(`/sign/${s.signToken}`)] : []),
     ...(s.workerToken ? [pub(`/t/${s.workerToken}`)] : []),
+    // Phase 108: the crew app's sheets — Report (the docked primary), the changes chip, ⋯ (then hours by hand), the company switch.
+    ...(s.workerToken
+      ? [
+          { path: `/t/${s.workerToken}`, session: "public" as const, name: "/t report sheet", drive: (p: Page) => openPhoneSheet(p, ".action-bar [data-primary-action]", "[role=dialog] #report-body") },
+          { path: `/t/${s.workerToken}`, session: "public" as const, name: "/t changes sheet", drive: (p: Page) => openPhoneSheet(p, ".w-chip", "[role=dialog] ul") },
+          { path: `/t/${s.workerToken}`, session: "public" as const, name: "/t hours sheet", drive: async (p: Page) => {
+            await p.locator(".action-bar .more-btn").first().click();
+            await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+            await p.getByText(/Log hours by hand|Saisir des heures/).first().click();
+            await p.waitForSelector("[role=dialog] #worker-hours");
+          } },
+          { path: `/t/${s.workerToken}`, session: "public" as const, name: "/t company switch", drive: (p: Page) => openPhoneSheet(p, ".w-company", "[role=dialog] .asheet-list, [role=menu]") },
+        ]
+      : []),
     ...(s.teamInviteToken ? [pub(`/team-invite/${s.teamInviteToken}`)] : []),
     // Phase 91: the access-code page, empty and with a code filled in.
     pub("/join"), ...(s.joinCode ? [pub(`/join?code=${s.joinCode}`)] : []),

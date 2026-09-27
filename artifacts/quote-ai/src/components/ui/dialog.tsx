@@ -48,14 +48,30 @@ const DialogContent = React.forwardRef<
     /** Drop the corner close button (e.g. the command palette). */
     hideClose?: boolean
   }
->(({ className, children, size = "md", tall, hideClose, ...props }, ref) => {
+>(({ className, children, size = "md", tall, hideClose, onOpenAutoFocus, onCloseAutoFocus, ...props }, ref) => {
   const { t } = useLanguage()
+  // Phase 101: Radix hands focus back to a <DialogTrigger> on close; a dialog
+  // opened from state (the phone More / New sheets, ActionSheet, most of the
+  // app's dialogs) has none, so focus fell to <body>. Remember whatever had
+  // focus when it opened and go back there instead.
+  const opener = React.useRef<HTMLElement | null>(null)
   return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn("modal", size !== "md" && size, tall && "tall", className)}
+      onOpenAutoFocus={(e) => {
+        opener.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null
+        onOpenAutoFocus?.(e)
+      }}
+      onCloseAutoFocus={(e) => {
+        onCloseAutoFocus?.(e)
+        const el = opener.current
+        if (e.defaultPrevented || !el?.isConnected) return
+        e.preventDefault()
+        el.focus()
+      }}
       {...props}
     >
       {children}

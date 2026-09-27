@@ -43,12 +43,13 @@ export function VoiceActions({ jobId }: { jobId: string }) {
         <Camera className="h-4 w-4" /> {t("voice.photo")}
       </button>
       <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="hidden" onChange={onPick} data-testid="voice-photo-input" />
-      {mode && <ActionSheet jobId={jobId} mode={mode} photo={photo} onClose={() => { setMode(null); setPhoto(null); }} />}
+      {mode && <JobCaptureSheet jobId={jobId} mode={mode} photo={photo} onClose={() => { setMode(null); setPhoto(null); }} />}
     </>
   );
 }
 
-function ActionSheet({ jobId, mode, photo, onClose }: { jobId: string; mode: Mode; photo: File | null; onClose: () => void }) {
+/** Phase 101: also opened from the phone New sheet (components/layout/phone-nav.tsx) for a picked job. */
+export function JobCaptureSheet({ jobId, mode, photo, onClose }: { jobId: string; mode: Mode; photo: File | null; onClose: () => void }) {
   const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();

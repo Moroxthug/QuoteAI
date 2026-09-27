@@ -4,10 +4,9 @@
 // without seeding an account. English literals on purpose: this page never
 // ships.
 import { useMemo, useState } from "react";
-import { Briefcase, Copy, Download, FileText, Home, MoreHorizontal, Pencil, Play, Trash2, Wallet, SlidersHorizontal } from "lucide-react";
+import { Copy, Download, FileText, MoreHorizontal, Pencil, Play, Trash2, SlidersHorizontal } from "lucide-react";
 import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
 import { BottomSheet } from "@/components/mobile/bottom-sheet";
-import { BottomTabBar } from "@/components/mobile/bottom-tab-bar";
 import { ListRow, ResponsiveTable, type Column } from "@/components/mobile/list-row";
 import { useMobileHeader } from "@/components/mobile/mobile-page-header";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
@@ -132,17 +131,7 @@ export default function MobilePreview() {
         </div>
       </BottomSheet>
 
-      <BottomTabBar
-        label="Sections"
-        newLabel="New"
-        onNew={() => setFilterOpen(true)}
-        tabs={[
-          { href: "/dashboard", label: "Today", icon: Home, exact: true },
-          { href: "/dashboard/__preview", label: "Quotes", icon: FileText, badge: 2 },
-          { href: "/dashboard/jobs", label: "Jobs", icon: Briefcase },
-          { href: "/dashboard/invoices", label: "Money", icon: Wallet },
-        ]}
-      />
+      {/* The real tab bar (Phase 101, components/layout/phone-nav.tsx) comes with the layout. */}
     </>
   );
 }

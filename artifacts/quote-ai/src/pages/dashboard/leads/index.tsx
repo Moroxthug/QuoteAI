@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
@@ -24,6 +25,14 @@ const can = useCan();
   const { data, isLoading } = useQuery({ queryKey: ["leads"], queryFn: () => leadsApi.list() });
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  // Phase 101: the phone New sheet opens this form with ?new=1 (then drops it, so Back does not reopen it).
+  const query = useSearch();
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    if (new URLSearchParams(query).get("new") !== "1") return;
+    setCreateOpen(true);
+    navigate("/dashboard/leads", { replace: true });
+  }, [query, navigate]);
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "", preferredChannel: "email" as LeadChannel });
   const [dragOverCol, setDragOverCol] = useState<LeadStatus | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);

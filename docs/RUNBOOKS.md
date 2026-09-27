@@ -760,3 +760,14 @@ Steps: `ops:backup --no-storage` of production into `.backups/rehearsal-<stamp>`
 **`ops:legal-packet`** — `docs/legal-packet/QuoteAI-legal-packet.pdf` (+ `.html`) for L-3. Questions for the lawyer, the privacy policy's recipient list (read from the page), the signing evidence and the exact consent sentences, all six contract templates rendered by `contracts/render.ts` with sample values (direct agreement, 10 % holdback in ON/BC/AB), and the four legal pages as served by `--site` (default production). Regenerate after changing a template, `TEMPLATE_VERSION`, a legal page or `lib/legal-entity` — **deploy first**, the pages come from the site. Needs Chrome (or `QA_CHROME_PATH`). If the questions change, edit them in `scripts/legal-packet.ts`, not only in `LAUNCH-GO-NO-GO.md` §2.
 
 **Also in Phase 98**: the privacy policy (EN + FR) now names Twilio, Sentry and the browsers' push services as recipients; `cronAuthorized` moved to `lib/cronAuth.ts`; the money-format test accepts either ICU spacing before "$" (Linux CI and Windows differ), which had turned CI red since Phase 94's test.
+
+## 37. The phone's navigation: tabs, More, + (Phase 101)
+
+At 980 px and narrower (phones, most tablets in portrait) the dashboard has **no sidebar and no ☰ menu**. Support answers:
+
+- **"Where did the menu go?"** — the bar at the bottom. The last tab, **More**, holds every section that is not a tab, the account, notifications and sign-out. Its red number is unread notifications.
+- **"I can't find Invoices / Pay / Books"** — the **Money** tab (Pro plans). On a Starter plan the tabs are Today · Quotes · Clients · Leads, since jobs and invoices are Pro.
+- **A foreman** sees Today · Jobs · Schedule · Crew. No New quote: a foreman's role can view quotes, not write them (Phase 80 matrix).
+- **"+ does nothing / is missing"** — it only lists what the role may do; a viewer has no +. Receipt photo and job note need an open job (not completed, setup confirmed); with none the job list says so.
+- **"The tab opened an old screen"** — tabs reopen the last screen used in that tab this session (sessionStorage `phone-tab-memory`). Tapping the tab again goes to its first screen. Closing the browser tab clears it.
+- The receipt photo uses the same `POST /api/costs/receipts` as the Costs tab's dropzone; failures show the same toast (PLAN_REQUIRED → "needs a Pro plan").

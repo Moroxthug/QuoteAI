@@ -19,6 +19,16 @@ import { useEffect } from "react";
 /** Where each visited URL was left, so Back can put it back. */
 const positions = new Map<string, number>();
 
+/**
+ * Phase 101 — the phone tabs remember where you were in each section, so
+ * going back to a tab is a push that should land like a Back: the next push
+ * to this URL restores its saved position instead of starting at the top.
+ */
+let restoreNext: string | null = null;
+export function restoreScrollOnNextVisit(href: string) {
+  restoreNext = new URL(href, window.location.origin).href;
+}
+
 function stickyHeaderOffset(): number {
   // `.site-head` (public) and `.topbar` (dashboard) are sticky: an anchor
   // scrolled to 0 would sit underneath them.
@@ -86,7 +96,9 @@ export function ScrollManager() {
       currentHref = window.location.href;
       if (previousHref === currentHref) return;
 
-      if (kind === "pop") {
+      const restore = restoreNext === currentHref;
+      restoreNext = null;
+      if (kind === "pop" || restore) {
         const saved = positions.get(currentHref);
         applyRepeatedly(() => saved ?? 0);
         return;

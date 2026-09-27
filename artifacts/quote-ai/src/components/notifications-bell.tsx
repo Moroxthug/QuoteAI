@@ -24,6 +24,12 @@ async function fetchNotifications(): Promise<{ items: NotificationItem[]; unread
   return res.json();
 }
 
+/** Phase 101: the unread count for the phone More tab and sheet — the same cached request the bell makes. */
+export function useUnreadNotifications(): number {
+  const { data } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchNotifications, refetchInterval: 60_000, staleTime: 30_000 });
+  return data?.unread ?? 0;
+}
+
 /**
  * Notifications entry point — a `.bell` icon button in the topbar, or a
  * `.sb-link`-styled trigger in the sidebar's bottom block — both open the

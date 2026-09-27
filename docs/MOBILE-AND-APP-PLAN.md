@@ -16,7 +16,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | Phase | Title | Track | State |
 |---|---|---|---|
 | 100 | Mobile foundation: rules, primitives, the phone check | A | **done** 2026-09-26 |
-| 101 | Navigation: bottom tabs, the More sheet, one New button | A | not started |
+| 101 | Navigation: bottom tabs, the More sheet, one New button | A | **done** 2026-09-26 |
 | 102 | Settings, rebuilt (desktop and phone) | A | not started |
 | 103 | Integrations: an app directory with real logos | A | not started |
 | 104 | Today (dashboard home) | A | not started |
@@ -241,3 +241,31 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en --widths=375,1280` over home/pilot/pricing/dashboard/quotes/jobs/settings/preview (34 pages) and `--lang=en,fr --widths=375,1280 --routes=/fr,__preview` (8 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; the preview page has no phone-rule warnings.
 - Phone sheets: `.qa/phone-sheets/p100/` (17 routes, before = `visual-mobile-audit`), `.qa/phone-sheets/p100b/dashboard-preview.png`. Before/after on `/pricing`: the WhatsApp bar and the annual-billing chip gone; dashboard top bar: smudge gone, "Dashboard" title in.
 - typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures), route-matrix test 12/12.
+
+### Phase 101 — 2026-09-26
+
+**Built**
+- `components/layout/phone-nav.tsx`: at ≤ 980 px the sidebar is gone (`display: none`, no drawer, no ☰) and `PhoneTabBar` takes over — Today + the first three of the role's list that the plan shows + More. Owner / admin / office / viewer: Quotes · Jobs · Money (Money covers invoices, pay, books, compliance); a plan without jobs and invoices gets Clients · Leads. Foreman: Jobs · Schedule · Crew (team + people pages). Workers are not dashboard users (the `/t` crew app, Phase 108), so there is no worker set.
+- **More** sheet: account row (→ My profile), Notifications with the unread count (also the More tab's badge), the company switcher when there are two or more, every other section under Work / Money / Team / Business with the sidebar's Pro badge, Company profile / Plan & billing, Sign out. The More tab is highlighted while you are on a section that has no tab.
+- **+** in the top bar (not a centred tab: five tabs + New is six cells with no centre): New quote, New lead (`/dashboard/leads?new=1` opens the form, then drops the parameter), Photo of a receipt (pick an open job → the camera opens in the same tap → `POST /api/costs/receipts` → the job's Costs tab), Job note (pick a job → the Phase 78 Dictate sheet, now exported as `JobCaptureSheet`). Filtered by role; no + when a role can do none of it.
+- Tab memory: each tab reopens its last screen (path + query, sessionStorage) at its last scroll position (`restoreScrollOnNextVisit` in Phase 84's scroll manager); tapping the tab you are in goes to its first screen, then to the top. Every move is a push, so Android Back / iOS swipe-back retrace your steps; an open sheet closes when the screen changes.
+- Phone top bar (≤ 640 px): back · title · ⋯ · +, on 16 px gutters; the bell and the avatar moved into More. 641-980 px keeps search, bell and avatar beside the +. `BottomTabBar` gained `match`, `onTabClick`, `expanded`.
+- `DialogContent` now returns focus to whatever opened it when there is no `<DialogTrigger>`. Radix only knows its own trigger, so every dialog opened from state — the new sheets, Phase 100's ActionSheet, most of the app's dialogs — dropped focus to `<body>` on close.
+- `qa:visual`: the More / New sheet states (owner and foreman); the modal audit opens More and + instead of the old drawer and skips driven states; the gutter check ignores `.sr-only` text. Runbook §37 (support answers) and a navigation section in MOBILE-RULES.
+
+**Decided**
+- The tab bar also serves 641-980 px (tablets): at 768 it reads well (`.qa/p101/en/768/dashboard.png`), and one navigation model beats a drawer kept only for tablets.
+- The plan's "New client" became **New lead**: clients are created from a quote (the Clients page's Add button already opens New quote); a lead is the standalone record.
+
+**Found**
+- The More sheet's scrolling body let its cards shrink (a flex column of `overflow: hidden` children): the Notifications card collapsed to a hairline. Children are `flex: none` now.
+- French "Aujourd'hui" sat 11 px from the edge with 4 px tab-bar padding; 8 px now.
+
+**Deferred**
+- Android's hardware Back closing an open sheet without leaving the screen needs the native shell (APP-PLAN, Capacitor `backButton`); in a browser, Back leaves the screen and the sheet closes with it.
+- The page-content phone warnings (wide tables, wrapping pills, full-width stats, the foreman home's stacked buttons) belong to Phases 104-110.
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280` over /dashboard, the More / New sheet states, quotes, leads, invoices, jobs, schedule, team, me, __preview, as owner and foreman (102 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings (More and + open, trap focus, and close back onto their trigger), 0 raw keys, no `under-tabbar` warnings.
+- Phone sheets: `.qa/phone-sheets/p101/` (17 routes, before = `p100`): the ☰ gone, the tab bar in, + in the top bar.
+- typecheck (quote-ai), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures).

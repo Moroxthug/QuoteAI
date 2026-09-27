@@ -28,7 +28,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | Component | Desktop | Phone (≤ 640 px unless noted) | Rule |
 |---|---|---|---|
 | `MobilePageHeader` + `useMobileHeader()` | hidden (sidebar + page heading say where you are) | top bar: ‹ back to the parent, the screen's title, its ⋯ | 1, 2 |
-| `BottomTabBar` | hidden | ≤ 980 px: 4-5 sections + optional centred **New**; marks `<html class="has-tabbar">` so pages leave room | — |
+| `BottomTabBar` | hidden | ≤ 980 px: 4-5 sections + optional centred **New**; marks `<html class="has-tabbar">` so pages leave room; `match` for extra paths, `onTabClick` to take over navigation | — |
 | `ActionSheet` | dropdown menu | bottom sheet of 52 px rows + Cancel | 2 |
 | `BottomSheet` | centred modal | docked sheet with grab handle, safe-area padding | 6 |
 | `StickyActionBar` | right-aligned row in place | docked above the tab bar / home indicator, with a spacer; primary marked `data-primary-action` | 2 |
@@ -37,6 +37,14 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it | 5 |
 
 CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. Tokens in `:root`.
+
+**The dashboard's navigation at ≤ 980 px (Phase 101, `components/layout/phone-nav.tsx`)** — there is no sidebar and no drawer:
+
+- **Tabs**: Today + the first three of the role's list that the plan shows, + More. Owner / admin / office / viewer: Quotes · Jobs · Money (invoices, pay, books, compliance) — a Starter plan without jobs and invoices gets Clients · Leads. Foreman: Jobs · Schedule · Crew.
+- **More** (sheet): the account, notifications (its count is on the More tab), the company switcher when there is more than one, then every other section under Work / Money / Team / Business with the same Pro badge as the sidebar, then sign out. More is highlighted while you are on a section that has no tab.
+- **+** (top bar): New quote, New lead (`/dashboard/leads?new=1`), Photo of a receipt (pick a job → camera → the receipt waits on the job's costs), Job note (pick a job → the Dictate sheet). Only what the role may do; no + when that is nothing.
+- **Memory**: each tab reopens the last screen you had in it (path + query, session storage) at the scroll position you left; tapping the tab you are in goes to its first screen, then to the top. Every move is a history push, so Back retraces your steps; an open sheet closes when the screen changes.
+- On a phone (≤ 640 px) the bell and the avatar leave the top bar (they are in More); between 641 and 980 px the top bar keeps the search, the bell and the avatar.
 
 **Using them**
 

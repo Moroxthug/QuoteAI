@@ -15,12 +15,23 @@ export type TabItem = {
   onClick?: () => void;
   /** Force the active state (More while its sheet is open). */
   active?: boolean;
+  /** For a button tab: whether the sheet it opens is open (aria-expanded). */
+  expanded?: boolean;
+  /** Other paths that belong to this tab (Money covers invoices, books, pay…). */
+  match?: string[];
 };
+
+const under = (location: string, href: string) => location === href || location.startsWith(href + "/") || location.startsWith(href + "?");
+
+export function tabOwns(tab: TabItem, location: string) {
+  if (tab.onClick) return false;
+  if (tab.exact) return location === tab.href;
+  return under(location, tab.href) || !!tab.match?.some((m) => under(location, m));
+}
 
 function isActive(tab: TabItem, location: string) {
   if (tab.active !== undefined) return tab.active;
-  if (tab.exact) return location === tab.href;
-  return location === tab.href || location.startsWith(tab.href + "/") || location.startsWith(tab.href + "?");
+  return tabOwns(tab, location);
 }
 
 /**
@@ -28,9 +39,10 @@ function isActive(tab: TabItem, location: string) {
  * the screen, within thumb reach, instead of twenty links behind a hamburger.
  * Shown under 980 px only (CSS); while mounted it marks <html> with
  * `has-tabbar` so the page and any StickyActionBar leave room for it.
- * Phase 101 wires it into the dashboard with the role-aware tab sets.
+ * Phase 101 wires it into the dashboard with the role-aware tab sets
+ * (components/layout/phone-nav.tsx).
  */
-export function BottomTabBar({ tabs, label, onNew, newLabel }: { tabs: TabItem[]; label: string; onNew?: () => void; newLabel?: string }) {
+export function BottomTabBar({ tabs, label, onNew, newLabel, onTabClick }: { tabs: TabItem[]; label: string; onNew?: () => void; newLabel?: string; /** Runs before a link tab navigates; call preventDefault to take over (tab memory). */ onTabClick?: (tab: TabItem, event: React.MouseEvent) => void }) {
   const [location] = useLocation();
 
   useEffect(() => {
@@ -49,11 +61,11 @@ export function BottomTabBar({ tabs, label, onNew, newLabel }: { tabs: TabItem[]
       </>
     );
     return tab.onClick ? (
-      <button key={tab.label} type="button" className={cn("tabbar-link", active && "active")} onClick={tab.onClick} aria-expanded={tab.active}>
+      <button key={tab.label} type="button" className={cn("tabbar-link", active && "active")} onClick={tab.onClick} aria-haspopup="dialog" aria-expanded={tab.expanded ?? false}>
         {inner}
       </button>
     ) : (
-      <Link key={tab.href} href={tab.href} className={cn("tabbar-link", active && "active")} aria-current={active ? "page" : undefined}>
+      <Link key={tab.href} href={tab.href} className={cn("tabbar-link", active && "active")} aria-current={active ? "page" : undefined} onClick={onTabClick ? (e) => onTabClick(tab, e) : undefined}>
         {inner}
       </Link>
     );

@@ -95,6 +95,13 @@ async function onboardTo(page: Page, step: 2 | 3 | 4) {
   await page.click(".card-foot .btn-navy");
   await page.waitForSelector('[data-step="4"]', { timeout: 15_000 });
 }
+// Phase 101: opens a phone sheet when its trigger is on screen (the tab bar exists at 980 px and below).
+async function openPhoneSheet(page: Page, trigger: string, sheet: string) {
+  const b = page.locator(trigger).first();
+  if (!(await b.isVisible().catch(() => false))) return;
+  await b.click();
+  await page.waitForSelector(sheet);
+}
 // Phase 95: set once the foreman has joined, so the teammate page can be swept.
 let sweepForemanId: string | null = null;
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
@@ -162,6 +169,10 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
       await p.waitForSelector('[role="alertdialog"]');
     } },
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
+    // Phase 101: the phone navigation's sheets (no-ops above 980 px, where the sidebar is the navigation).
+    { path: "/dashboard", session: "owner", name: "/dashboard More sheet", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
+    { path: "/dashboard", session: "owner", name: "/dashboard New sheet", drive: (p) => openPhoneSheet(p, ".tb-new", "[role=dialog] .asheet-list") },
+    { path: "/dashboard", session: "foreman", name: "/dashboard More sheet (foreman)", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
     // Phase 100: the calm-mobile primitives on fake data (dev-server route).
     dash("/dashboard/__preview"),
     dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
@@ -261,6 +272,7 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
       if (el.closest("[data-bleed]")) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden" || cs.position === "fixed" || Number(cs.opacity) === 0) continue;
+      if (el.getBoundingClientRect().width <= 1) continue; // .sr-only: heard, never painted
       // Measure the glyphs, not the box: a full-bleed band whose text is inset
       // by its own padding is exactly what we want, and the box says otherwise.
       let left = Infinity;
@@ -413,7 +425,8 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
 // [route, trigger selector, label] — the overlays a keyboard user meets.
 const MODAL_TRIGGERS: Array<[string, string, string]> = [
   ["/", ".menu-btn", "public mobile menu"],
-  ["/dashboard", ".tb-menu", "dashboard mobile sidebar"],
+  ["/dashboard", ".tabbar button.tabbar-link", "dashboard More sheet"], // Phase 101: the drawer is gone; More is the sheet
+  ["/dashboard", ".tb-new", "dashboard New sheet"],
 ];
 
 async function runAxe(page: Page): Promise<PageResult["axe"]> {
@@ -475,7 +488,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
       // narrow viewport where the drawer exists at all.
       if (width <= GUTTER_WIDTH) {
         for (const [route, trigger, label] of MODAL_TRIGGERS) {
-          if (r.path !== route) continue;
+          if (r.path !== route || r.drive) continue; // a driven state may already have a sheet open over the trigger
           result.sr.push(...(await modalAudit(page, trigger, label)));
         }
       }

@@ -1,12 +1,12 @@
 import "@/i18n/dashboard";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, FileText, Menu, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
+import { LayoutDashboard, FileText, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
 import { peopleApi } from "@/lib/people-api";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -15,12 +15,12 @@ import { authClient } from "@/lib/auth-client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useModalTrap } from "@/hooks/use-modal-trap";
 import { SkipLink } from "@/components/a11y";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
 import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
+import { PhoneNewButton, PhoneTabBar } from "@/components/layout/phone-nav";
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -51,54 +51,11 @@ function useNavItems() {
   ].map(item => ({ ...item, label: t(item.labelKey), groupLabel: t(`dashboard.nav.group.${item.group}`) }));
 }
 
-/**
- * Attaches touch listeners to a div ref and calls `onClose` when the user
- * swipes left. Only fires when horizontal movement dominates (|dx| > |dy| * 1.5)
- * so vertical scrolling inside the drawer is never blocked.
- */
-function useSwipeToClose(enabled: boolean, onClose: () => void) {
-  const ref = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    if (!enabled) return;
-    const el = ref.current;
-    if (!el) return;
-
-    function onTouchStart(e: TouchEvent) {
-      startX.current = e.touches[0]!.clientX;
-      startY.current = e.touches[0]!.clientY;
-    }
-
-    function onTouchEnd(e: TouchEvent) {
-      const dx = e.changedTouches[0]!.clientX - startX.current;
-      const dy = e.changedTouches[0]!.clientY - startY.current;
-      // Swipe left: at least 50px, and clearly more horizontal than vertical
-      if (dx < -50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-        onCloseRef.current();
-      }
-    }
-
-    function onTouchCancel() {
-      // Reset gesture state if the OS interrupts the touch (e.g. incoming call on iOS)
-      startX.current = 0;
-      startY.current = 0;
-    }
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    el.addEventListener("touchcancel", onTouchCancel, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchCancel);
-    };
-  }, [enabled]);
-
-  return ref;
+async function signOut() {
+  await authClient.signOut();
+  // Phase 77: the service worker keeps API reads for offline use — not for the next person on this browser.
+  await clearOfflineCaches();
+  window.location.href = "/";
 }
 
 /** Pages that are not in the sidebar but still need a name in the phone top bar. */
@@ -157,13 +114,6 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
   const { t } = useLanguage();
   const can = useCan();
 
-  async function handleSignOut() {
-    await authClient.signOut();
-    // Phase 77: the service worker keeps API reads for offline use — not for the next person on this browser.
-    await clearOfflineCaches();
-    window.location.href = "/";
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
@@ -192,7 +142,7 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 focus:text-red-600 gap-2">
+        <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600 focus:text-red-600 gap-2">
           <LogOut className="h-3.5 w-3.5" /> {t("dashboard.account.signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -266,16 +216,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const can = useCan();
   const { isLoaded, isSignedIn, isError, user } = useAuth();
   const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
-  const swipeRef = useSwipeToClose(isMobileMenuOpen, closeMenu);
-  // Below this width the sidebar stops being a column and becomes a drawer
-  // parked off-canvas (mockup-system.css `@media (max-width: 980px)`), which
-  // is a visual state only: its 20 links stay in the tab order and in the
-  // accessibility tree until something says otherwise (Phase 83).
-  const sidebarIsDrawer = useMediaQuery("(max-width: 980px)");
-  const drawerOpen = sidebarIsDrawer && isMobileMenuOpen;
-  useModalTrap(drawerOpen, swipeRef, closeMenu);
+  // Phase 101: at 980 px and below the sidebar is gone (CSS) and the phone
+  // tabs + More sheet take over — the hamburger drawer they replace hid twenty
+  // links two taps away.
+  const phoneNav = useMediaQuery("(max-width: 980px)");
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try { return localStorage.getItem("sidebar-collapsed") === "true"; } catch { return false; }
   });
@@ -310,13 +254,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try { localStorage.setItem("sidebar-collapsed", String(isCollapsed)); } catch {}
   }, [isCollapsed]);
-
-  // Lock body scroll while the mobile drawer is open.
-  useEffect(() => {
-    if (!isMobileMenuOpen) return;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, [isMobileMenuOpen]);
 
   if (!isLoaded) {
     return (
@@ -357,6 +294,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const email = user?.email ?? "";
   // The account button is named by `name`: its visible initials stay the name's first letters so they are part of that name (label-in-name).
   const initials = name.slice(0, 2).toUpperCase();
+  const avatar = photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />;
 
   const NavLinks = () => (
     <>
@@ -372,7 +310,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              onClick={closeMenu}
               className={cn("sb-link", active && "active")}
               title={item.label}
               // The `active` class is a colour; this is the part a screen
@@ -396,19 +333,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <MobileHeaderProvider>
     <div className={cn("app", isCollapsed && "rail")}>
       <SkipLink />
-      {/* Sidebar (desktop: rail-collapsible; mobile: slide-in drawer) */}
-      <aside
-        ref={swipeRef}
-        className={cn("sidebar", isMobileMenuOpen && "open")}
-        aria-label={t("dashboard.nav.navMenu")}
-        // Off-canvas and closed: gone for the keyboard and the screen reader
-        // too, not just for the eye.
-        inert={sidebarIsDrawer && !isMobileMenuOpen ? true : undefined}
-        {...(drawerOpen ? { role: "dialog" as const, "aria-modal": true } : {})}
-      >
+      {/* Sidebar (desktop, rail-collapsible; display: none at 980 px and below — PhoneTabBar instead) */}
+      <aside className="sidebar" aria-label={t("dashboard.nav.navMenu")}>
         <div className="sb-top">
           <span className="sb-mark">q</span>
-          <Link href="/dashboard" className="sb-logo" onClick={closeMenu}>
+          <Link href="/dashboard" className="sb-logo">
             <Logo style={{ height: 28 }} />
           </Link>
           <button
@@ -422,7 +351,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {canNewQuote && (
-          <Link href="/dashboard/new" onClick={closeMenu} className="btn btn-white sb-new" aria-current={location === "/dashboard/new" ? "page" : undefined}>
+          <Link href="/dashboard/new" className="btn btn-white sb-new" aria-current={location === "/dashboard/new" ? "page" : undefined}>
             <Plus className="ic" style={{ width: 16, height: 16 }} />
             <span className="btn-txt">{t("dashboard.nav.newQuote")}</span>
           </Link>
@@ -437,7 +366,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <AccountMenu
             trigger={
               <button className="sb-user" type="button">
-                <span className="sb-avatar">{photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />}</span>
+                <span className="sb-avatar">{avatar}</span>
                 <span className="sb-userinfo">
                   <b>{name}</b>
                   <span>{email}</span>
@@ -449,24 +378,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
-      {isMobileMenuOpen && <div className="scrim show" data-modal-scrim="" onClick={closeMenu} />}
-
       {/* Main column */}
       <div className="main">
         <header className="topbar">
-          <button type="button" className="tb-menu" onClick={() => setIsMobileMenuOpen(true)} aria-label={t("dashboard.nav.toggleMenu")}>
-            <Menu className="ic" style={{ width: 22, height: 22 }} />
-          </button>
           <MobilePageHeader title={sectionLabel ?? "QuoteAI"} backHref={backHref} backLabel={backHref ? sectionOf(backHref.split("?")[0]!) : undefined} />
           <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
           <div className="tb-right">
+            {phoneNav && <PhoneNewButton hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")} />}
+            {/* On a phone both live in More (its tab carries the unread count). */}
             <NotificationsBell variant="topbar" side="bottom" align="end" />
-            <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />}</button>} />
+            <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{avatar}</button>} />
           </div>
         </header>
 
         <main id="main" className="content"><OfflineBar />{children}</main>
       </div>
+      {phoneNav && (
+        <PhoneTabBar
+          navItems={NAV_ITEMS}
+          moreProps={{ navItems: NAV_ITEMS, name, email, avatar, canBilling: can("settings", "full"), onSignOut: signOut }}
+        />
+      )}
     </div>
     </MobileHeaderProvider>
   );

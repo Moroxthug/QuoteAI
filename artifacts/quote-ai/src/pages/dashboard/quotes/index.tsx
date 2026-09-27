@@ -1,35 +1,43 @@
-import { useListQuotes, useDeleteQuote, useDuplicateQuote, useArchiveQuote, getListQuotesQueryKey } from "@workspace/api-client-react";
+import { useListQuotes, useDeleteQuote, useDuplicateQuote, useArchiveQuote, getListQuotesQueryKey, type QuoteSummary } from "@workspace/api-client-react";
 import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight, Archive } from "lucide-react";
+import { ListRow } from "@/components/mobile/list-row";
+import { BottomSheet } from "@/components/mobile/bottom-sheet";
+import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight, Archive, ListFilter, X, Check } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { formatCad } from "@/lib/money";
+import { formatCad, moneyLocale } from "@/lib/money";
+import { quoteStatusChip } from "@/components/quotes/quote-status";
 
-type StatusFilter = "all" | "draft" | "unlocked" | "pending_payment";
+type StatusFilter = "all" | "draft" | "unlocked" | "sent" | "accepted" | "pending_payment";
 
 const formatCurrency = (amount: number) => formatCad(amount);
 
-function statusChip(status: string, t: (key: string) => string): { cls: string; label: string } {
-  if (status === "unlocked") return { cls: "chip-green", label: t("dashboard.quotesList.statusUnlocked") };
-  if (status === "pending_payment") return { cls: "chip-yellow", label: t("dashboard.quotesList.statusPending") };
-  return { cls: "chip-grey", label: t("dashboard.quotesList.statusDraft") };
+function matchesFilter(q: QuoteSummary, f: StatusFilter): boolean {
+  if (f === "all") return true;
+  if (f === "sent") return q.status === "unlocked" && !!q.sentAt;
+  if (f === "unlocked") return q.status === "unlocked" && !q.sentAt;
+  return q.status === f;
 }
 
 export default function QuotesList() {
-  const { t } = useLanguage();
-const can = useCan();
-  const FILTERS: StatusFilter[] = ["all", "draft", "unlocked", "pending_payment"];
+  const { t, lang } = useLanguage();
+  const can = useCan();
+  const phone = useMediaQuery("(max-width: 640px)");
+  const FILTERS: StatusFilter[] = ["all", "draft", "unlocked", "sent", "accepted", "pending_payment"];
   const FILTER_LABELS: Record<StatusFilter, string> = {
     all: t("dashboard.quotesList.statusAll"),
     draft: t("dashboard.quotesList.statusDraft"),
     unlocked: t("dashboard.quotesList.statusUnlocked"),
+    sent: t("quotes.m.statusSent"),
+    accepted: t("quotes.m.statusAccepted"),
     pending_payment: t("dashboard.quotesList.statusPending"),
   };
   const { data: quotes, isLoading } = useListQuotes();
@@ -38,6 +46,7 @@ const can = useCan();
   const archiveQuote = useArchiveQuote();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [filterOpen, setFilterOpen] = useState(false);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -77,24 +86,43 @@ const can = useCan();
     });
   };
 
+  const needle = searchTerm.trim().toLowerCase();
   const filteredQuotes = (quotes ?? []).filter(q => {
     const matchesSearch =
-      !searchTerm ||
-      q.clientData?.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      q.descrizioneGenerale?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || q.status === statusFilter;
-    return matchesSearch && matchesStatus;
+      !needle ||
+      q.clientData?.nome?.toLowerCase().includes(needle) ||
+      q.title?.toLowerCase().includes(needle) ||
+      q.descrizioneGenerale?.toLowerCase().includes(needle);
+    return matchesSearch && matchesFilter(q, statusFilter);
   });
+  const countFor = (f: StatusFilter) => (quotes ?? []).filter((q) => matchesFilter(q, f)).length;
+  const shortDate = (iso: string) => new Date(iso).toLocaleDateString(moneyLocale(lang), { day: "numeric", month: "short", year: new Date(iso).getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
+  const heading = (q: QuoteSummary) => q.title?.trim() || q.descrizioneGenerale || t("dashboard.quotesList.noDescription");
+
+  const search = (
+    <label className="search sm grow">
+      <Search className="h-4 w-4" />
+      <input
+        type="search"
+        enterKeyHint="search"
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        placeholder={t("dashboard.quotesList.searchPlaceholder")}
+        aria-label={t("dashboard.quotesList.searchPlaceholder")}
+      />
+    </label>
+  );
 
   return (
-    <div className="animate-in fade-in duration-500">
+    <div className="animate-in fade-in duration-500 qlist">
       <div className="page-head">
         <div>
           <h1>{t("dashboard.quotesList.title")}</h1>
           <p className="sub">{t("dashboard.quotesList.subtitle")}</p>
         </div>
+        {/* On a phone the + in the top bar is the New quote button (Phase 101). */}
         {can("quotes", "edit") && (
-          <div className="head-actions">
+          <div className="head-actions hide-phone">
             <Link href="/dashboard/new" className="btn btn-navy">
               <Plus className="h-4 w-4" />
               {t("dashboard.quotesList.createFirstQuote")}
@@ -104,30 +132,46 @@ const can = useCan();
       </div>
 
       <div className="card">
-        <div className="toolbar">
-          <div className="pills">
-            {FILTERS.map(f => (
-              <button
-                key={f}
-                type="button"
-                className={cn("pill", statusFilter === f && "on")}
-                onClick={() => setStatusFilter(f)}
-              >
-                {FILTER_LABELS[f]}
-              </button>
-            ))}
+        {phone ? (
+          // Phase 105: the search stays at the top while the list scrolls; the
+          // status filter is a sheet, and the one that's on shows as a chip.
+          <div className="toolbar qlist-bar">
+            {search}
+            <button
+              type="button"
+              className={cn("more-btn", statusFilter !== "all" && "on")}
+              onClick={() => setFilterOpen(true)}
+              aria-label={t("quotes.m.filter")}
+              aria-haspopup="dialog"
+            >
+              <ListFilter />
+            </button>
+            {statusFilter !== "all" && (
+              <div className="qlist-active">
+                <button type="button" className="chip chip-navy-soft" onClick={() => setStatusFilter("all")} aria-label={t("quotes.m.clearFilter").replace("{filter}", FILTER_LABELS[statusFilter])}>
+                  {FILTER_LABELS[statusFilter]} <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
           </div>
-          <label className="search sm grow">
-            <Search className="h-4 w-4" />
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder={t("dashboard.quotesList.searchPlaceholder")}
-              aria-label={t("dashboard.quotesList.searchPlaceholder")}
-            />
-          </label>
-        </div>
+        ) : (
+          <div className="toolbar">
+            <div className="pills">
+              {FILTERS.map(f => (
+                <button
+                  key={f}
+                  type="button"
+                  className={cn("pill", statusFilter === f && "on")}
+                  aria-pressed={statusFilter === f}
+                  onClick={() => setStatusFilter(f)}
+                >
+                  {FILTER_LABELS[f]}
+                </button>
+              ))}
+            </div>
+            {search}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="p-5 space-y-3">
@@ -150,6 +194,23 @@ const can = useCan();
               </Link>
             ) : null}
           </div>
+        ) : phone ? (
+          <ul className="lrows" aria-label={t("dashboard.quotesList.title")}>
+            {filteredQuotes.map(quote => {
+              const chip = quoteStatusChip(quote, t);
+              return (
+                <li key={quote.id}>
+                  <ListRow
+                    href={`/dashboard/quotes/${quote.id}`}
+                    title={quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}
+                    meta={[heading(quote), shortDate(quote.createdAt)]}
+                    amount={quote.status === "draft" ? "—" : formatCurrency(quote.totale)}
+                    end={<span className={cn("chip", chip.cls)}>{chip.label}</span>}
+                  />
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <div className="tbl-wrap">
             <table className="tbl">
@@ -160,19 +221,19 @@ const can = useCan();
                   <th>{t("dashboard.quotesList.colStatus")}</th>
                   <th>{t("dashboard.quotesList.colDate")}</th>
                   <th style={{ textAlign: "right" }}>{t("dashboard.quotesList.colValue")}</th>
-                  <th></th>
+                  <th><span className="sr-only">{t("dashboard.quotesList.options")}</span></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredQuotes.map(quote => {
-                  const chip = statusChip(quote.status, t);
+                  const chip = quoteStatusChip(quote, t);
                   return (
                     <tr key={quote.id} {...rowLink(() => navigate(`/dashboard/quotes/${quote.id}`))}>
                       <td>
                         <span className="cell-flex">
                           <span className="cell-ic"><FileText className="h-4 w-4" /></span>
                           <span>
-                            <span className="t-strong">{quote.descrizioneGenerale || t("dashboard.quotesList.noDescription")}</span>
+                            <span className="t-strong">{heading(quote)}</span>
                             <span className="t-sub">
                               {quote.lineItemCount} {quote.lineItemCount === 1 ? t("dashboard.quotesList.lineItem") : t("dashboard.quotesList.lineItems")}
                             </span>
@@ -250,6 +311,25 @@ const can = useCan();
           </div>
         )}
       </div>
+
+      <BottomSheet open={filterOpen} onOpenChange={setFilterOpen} title={t("quotes.m.filter")} flush>
+        <div className="asheet-list" role="radiogroup" aria-label={t("dashboard.quotesList.colStatus")}>
+          {FILTERS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              role="radio"
+              aria-checked={statusFilter === f}
+              className="asheet-item"
+              onClick={() => { setStatusFilter(f); setFilterOpen(false); }}
+            >
+              <span>{FILTER_LABELS[f]}</span>
+              <span className="asheet-hint">{countFor(f)}</span>
+              {statusFilter === f ? <Check /> : <span style={{ width: 19 }} />}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
     </div>
   );
 }

@@ -1,11 +1,7 @@
 import { useState, useRef, useCallback, useEffect, useId, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useCreateQuote, useGetBusinessProfile, useGetSubscription, useListClients } from "@workspace/api-client-react";
-import {
-  Sparkles, ImagePlus, ArrowRight, Loader2,
-  X, User, Lock, Bot, PencilLine, FileText, FileSpreadsheet,
-  LayoutTemplate, CheckCircle2, BookOpen, Plus
-} from "lucide-react";
+import { Sparkles, ImagePlus, Loader2, X, User, Lock, FileText, FileSpreadsheet, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useClientMemory } from "@/hooks/use-client-memory";
@@ -15,6 +11,9 @@ import { PriceCatalogSection } from "@/components/price-catalog-section";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { QuoteOptions, parseTarget } from "@/components/quotes/quote-options";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -343,7 +342,7 @@ export default function NewQuote() {
       : undefined;
 
     const allAttachments = [...photos, ...docs];
-    const parsedTarget = targetTotalEur.trim() !== "" ? Number(targetTotalEur.replace(/\./g, "").replace(",", ".")) : undefined;
+    const parsedTarget = parseTarget(targetTotalEur);
     createQuote.mutate(
       {
         data: {
@@ -352,7 +351,7 @@ export default function NewQuote() {
           companySnapshot: companySnapshot ? JSON.stringify(companySnapshot) : undefined,
           images: allAttachments.length > 0 ? allAttachments : undefined,
           templateId,
-          targetTotalEur: parsedTarget && !isNaN(parsedTarget) && parsedTarget > 0 ? parsedTarget : undefined,
+          targetTotalEur: parsedTarget,
         },
       },
       {
@@ -389,6 +388,8 @@ export default function NewQuote() {
     setSelectedClientId(null);
     setClientForm(emptyClient);
   };
+
+  const isPro = subscription?.isActive && (subscription.plan === "monthly_pro" || subscription.plan === "monthly_business" || subscription.plan === "monthly_elite");
 
   const planPhotoLabel = !subscription?.isActive
     ? null
@@ -437,84 +438,41 @@ export default function NewQuote() {
         </div>
       </div>
 
-      {/* ── Tab switcher ── */}
-      <div className="pills" style={{ marginBottom: 16 }}>
-        <button type="button" onClick={() => setActiveTab("ai")} className={cn("pill", activeTab === "ai" && "on")}>
-          <Bot /> {t("dashboard.new.tabAi")}
-        </button>
-        <button type="button" onClick={() => setActiveTab("manual")} className={cn("pill", activeTab === "manual" && "on")}>
-          <PencilLine /> {t("dashboard.new.tabManual")}
-        </button>
-        <button type="button" onClick={() => setActiveTab("listino")} className={cn("pill", activeTab === "listino" && "on")}>
-          <BookOpen /> {t("dashboard.new.tabCatalog")}
-        </button>
-      </div>
+      {/* ── Mode switch (Phase 105: one scrolling line, never wrapping) ── */}
+      <ScrollTabs
+        label={t("quotes.m.modes")}
+        value={activeTab}
+        onChange={(v) => setActiveTab(v as typeof activeTab)}
+        tabs={[
+          { id: "ai", label: t("dashboard.new.tabAi") },
+          { id: "manual", label: t("dashboard.new.tabManual") },
+          { id: "listino", label: t("dashboard.new.tabCatalog") },
+        ]}
+      />
 
-      {/* ══ AI TAB ══════════════════════════════════════════════════════════ */}
+      {/* ══ AI TAB ══════════════════════════════════════════════════════════
+          Phase 105: the box the page is for comes first, then who it is for,
+          then the options as one line. */}
       {activeTab === "ai" && (
         <div className="stack animate-in fade-in duration-200">
-          {/* Template selector */}
-          <div>
-            <span className="eyebrow flex items-center gap-2" style={{ fontSize: 11, marginBottom: 8 }}>
-              <LayoutTemplate className="h-3.5 w-3.5" /> {t("dashboard.new.layoutLabel")}
-            </span>
-            <div className="src-grid flush">
-              {([
-                { id: "standard" as const, label: t("dashboard.new.template.standard.label"), desc: t("dashboard.new.template.standard.desc"), proOnly: false },
-                { id: "arosio" as const, label: t("dashboard.new.template.professional.label"), desc: t("dashboard.new.template.professional.desc"), proOnly: true },
-                { id: "mariagrazia" as const, label: t("dashboard.new.template.elegant.label"), desc: t("dashboard.new.template.elegant.desc"), proOnly: true },
-              ]).map((tmpl) => {
-                const isActive = templateId === tmpl.id;
-                const isPro = subscription?.isActive && (subscription.plan === "monthly_pro" || subscription.plan === "monthly_business" || subscription.plan === "monthly_elite");
-                const requiresPro = tmpl.proOnly && !isPro;
-                return (
-                  <button
-                    key={tmpl.id}
-                    type="button"
-                    onClick={() => {
-                      if (requiresPro) {
-                        toast({ title: t("dashboard.new.toast.proRequiredTitle"), description: t("dashboard.new.toast.proRequiredDesc"), variant: "destructive" });
-                        return;
-                      }
-                      setTemplateId(tmpl.id);
-                    }}
-                    className={cn("src sm", isActive && "on")}
-                  >
-                    <b>
-                      {isActive && <CheckCircle2 />}
-                      {tmpl.label}
-                      {requiresPro && <span className="chip chip-yellow">{t("dashboard.new.template.pro")}</span>}
-                    </b>
-                    <p>{tmpl.desc}</p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <div className="card composer comp-box">
+            <label htmlFor="new-quote-describe" className="sr-only">{t("dashboard.new.inputPlaceholder")}</label>
+            <textarea
+              id="new-quote-describe"
+              value={input}
+              rows={4}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => {
+                // Enter is a new line in a box this size; Ctrl/⌘+Enter writes the quote.
+                if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && canAiSubmit) {
+                  e.preventDefault();
+                  handleAiSubmit();
+                }
+              }}
+              placeholder={t("dashboard.new.inputPlaceholder")}
+              disabled={isAiSubmitting}
+            />
 
-          {/* Target total input */}
-          <div className="card">
-            <div className="field inline" style={{ padding: "12px 20px" }}>
-              <span>{t("dashboard.new.targetAmount")}</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={targetTotalEur}
-                onChange={e => {
-                  const v = e.target.value.replace(/[^0-9.,]/g, "");
-                  setTargetTotalEur(v);
-                }}
-                placeholder={t("dashboard.new.targetPlaceholder")}
-                className="flex-1 min-w-0 text-right"
-                style={{ fontVariantNumeric: "tabular-nums" }}
-                disabled={isAiSubmitting}
-              />
-              <span>{t("dashboard.new.taxIncl")}</span>
-            </div>
-          </div>
-
-          {/* AI composer card */}
-          <div className="card composer">
             {/* Photo strip */}
             {photos.length > 0 && (
               <div className="att-strip">
@@ -526,11 +484,6 @@ export default function NewQuote() {
                     </button>
                   </div>
                 ))}
-                {photos.length < maxPhotos && !attachmentsFull && (
-                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isAiSubmitting} className="att-add">
-                    <span className="grid place-items-center gap-0.5"><ImagePlus />{t("dashboard.new.add")}</span>
-                  </button>
-                )}
               </div>
             )}
 
@@ -539,80 +492,53 @@ export default function NewQuote() {
               <div className="att-strip">
                 {docs.map((file, idx) => (
                   <div key={idx} className="att-doc">
-                    {file.type === "application/pdf" ? <FileText className="ic" />
-                      : file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? <FileSpreadsheet className="ic" />
-                      : <FileText className="ic" />}
+                    {file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? <FileSpreadsheet className="ic" /> : <FileText className="ic" />}
                     <span>{file.name}</span>
                     <button type="button" onClick={() => removeDoc(idx)} disabled={isAiSubmitting} className="att-x" aria-label={t("dashboard.new.client.remove")}>
                       <X />
                     </button>
                   </div>
                 ))}
-                {!attachmentsFull && (
-                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isAiSubmitting} className="att-add wide">
-                    <ImagePlus /> {t("dashboard.new.add")}
-                  </button>
-                )}
               </div>
             )}
 
-            {/* Bar row */}
-            <div className="comp-row">
+            {/* Tools inside the box: photo, microphone */}
+            <div className="comp-tools">
               {photoAllowed ? (
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isAiSubmitting || photos.length >= maxPhotos}
+                  disabled={isAiSubmitting || attachmentsFull || photos.length >= maxPhotos}
                   title={fmt(t("dashboard.new.attachTooltip"), { maxPhotos, maxTotal: MAX_ATTACHMENTS })}
                   aria-label={fmt(t("dashboard.new.attachTooltip"), { maxPhotos, maxTotal: MAX_ATTACHMENTS })}
                   className="comp-mic"
-                  style={photos.length > 0 ? { background: "var(--soft-2)", color: "var(--navy)" } : undefined}
                 >
-                  <ImagePlus className="h-4 w-4" />
+                  <ImagePlus className="h-[18px] w-[18px]" />
                 </button>
               ) : (
-                <span className="comp-lock" title={t("dashboard.new.paidPlanOnly")} aria-label={t("dashboard.new.paidPlanOnly")}>
+                <span className="comp-lock" title={t("dashboard.new.paidPlanOnly")} aria-label={t("dashboard.new.paidPlanOnly")} role="img">
                   <Lock className="h-4 w-4" />
                 </span>
               )}
-
-              <span className="comp-ic"><Sparkles className="h-[18px] w-[18px]" /></span>
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === "Enter" && !e.shiftKey && canAiSubmit) {
-                    e.preventDefault();
-                    handleAiSubmit();
-                  }
-                }}
-                placeholder={t("dashboard.new.inputPlaceholder")}
-                aria-label={t("dashboard.new.inputPlaceholder")}
-                disabled={isAiSubmitting}
-              />
-
               <MicButton
                 disabled={isAiSubmitting}
                 onTranscribed={text => setInput(prev => (prev.trim() ? `${prev.trim()} ${text}` : text))}
               />
-
-              <button type="button" onClick={handleAiSubmit} disabled={!canAiSubmit} className="comp-send" aria-label={t("dashboard.new.tabAi")}>
-                {isAiSubmitting ? <Loader2 className="chev animate-spin" /> : <ArrowRight className="chev" />}
-              </button>
             </div>
-
             {photoAllowed && photos.length === 0 && docs.length === 0 && (
               <div className="comp-hint">{planPhotoLabel} {t("dashboard.new.photoHintSuffix")}</div>
             )}
 
-            <div className="comp-ex">
-              <span className="eyebrow">{t("dashboard.new.examplesLabel")}</span>
-              {EXAMPLES.map(ex => (
-                <button key={ex.label} type="button" onClick={() => setInput(ex.text)} disabled={isAiSubmitting} className="pill">
-                  {ex.label}
-                </button>
-              ))}
-            </div>
+            {!input.trim() && (
+              <div className="comp-ex">
+                <span className="eyebrow">{t("dashboard.new.examplesLabel")}</span>
+                {EXAMPLES.map(ex => (
+                  <button key={ex.label} type="button" onClick={() => setInput(ex.text)} disabled={isAiSubmitting} className="pill">
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <input
@@ -640,6 +566,23 @@ export default function NewQuote() {
             clearClient={clearClient}
             disabled={isAiSubmitting}
           />
+
+          <QuoteOptions
+            templateId={templateId}
+            onTemplate={setTemplateId}
+            isPro={!!isPro}
+            onProRequired={() => toast({ title: t("dashboard.new.toast.proRequiredTitle"), description: t("dashboard.new.toast.proRequiredDesc"), variant: "destructive" })}
+            target={targetTotalEur}
+            onTarget={setTargetTotalEur}
+            disabled={isAiSubmitting}
+          />
+
+          <StickyActionBar label={t("dashboard.new.title")}>
+            <button type="button" className="btn btn-navy" onClick={handleAiSubmit} disabled={!canAiSubmit} data-primary-action>
+              {isAiSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {isAiSubmitting ? t("quotes.m.writing") : t("quotes.m.writeQuote")}
+            </button>
+          </StickyActionBar>
         </div>
       )}
 

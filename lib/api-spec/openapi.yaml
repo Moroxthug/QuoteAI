@@ -1844,6 +1844,15 @@ components:
           type: string
           format: date-time
           nullable: true
+        sentAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the quote was last emailed to the client (Phase 105 picks the primary action from it).
+        jobId:
+          type: string
+          nullable: true
+          description: The job started from this quote, on GET /quotes/{id} only (Phase 105).
         pdfUrl:
           type: string
           nullable: true
@@ -1915,6 +1924,13 @@ components:
           $ref: "#/components/schemas/QuoteClientData"
         descrizioneGenerale:
           type: string
+        title:
+          type: string
+          nullable: true
+          description: The quote heading (titoloPreventivoRiga1), Phase 105.
+        sentAt:
+          type: string
+          nullable: true
         lineItemCount:
           type: integer
         subtotale:

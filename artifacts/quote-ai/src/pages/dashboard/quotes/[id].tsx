@@ -1,10 +1,17 @@
 import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
-import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
+import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, useArchiveQuote, useDeleteQuote, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Download, Lock, CheckCircle2, Edit2, Save, FileText, FileSpreadsheet, ImageIcon, ChevronDown, ChevronRight, Plus, Trash2, X, Pencil, Sparkles, AlertTriangle, RefreshCw, Loader2, Copy, Star, FileDown, LayoutTemplate, Mail, Hammer } from "lucide-react";
-import { useState, useRef, useEffect, Fragment } from "react";
+import { ArrowLeft, Download, Lock, CheckCircle2, Edit2, Save, FileText, FileSpreadsheet, ImageIcon, ChevronDown, ChevronRight, Plus, Trash2, X, Pencil, Sparkles, AlertTriangle, RefreshCw, Loader2, Copy, Star, FileDown, LayoutTemplate, Mail, Hammer, Archive, Briefcase, Send } from "lucide-react";
+import { useState, useRef, useEffect, useMemo, Fragment } from "react";
+import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { BottomSheet } from "@/components/mobile/bottom-sheet";
+import { useMobileHeader } from "@/components/mobile/mobile-page-header";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { QuoteLineRows, LineItemSheet, parseAmount, type LineDraft } from "@/components/quotes/line-rows";
+import { quoteStatusChip } from "@/components/quotes/quote-status";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
@@ -142,6 +149,15 @@ const can = useCan();
   const [clientName, setClientName] = useState("");
   const [clientAddress, setClientAddress] = useState("");
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(new Set());
+  // Phase 105: on a phone the quote is a header card, chapters that open, and
+  // lines as rows; a line is edited in a sheet.
+  const phone = useMediaQuery("(max-width: 640px)");
+  const [isLayoutSheetOpen, setIsLayoutSheetOpen] = useState(false);
+  const [lineSheet, setLineSheet] = useState<{ ci: number; vi: number | null } | null>(null);
+  const archiveQuote = useArchiveQuote();
+  const deleteQuote = useDeleteQuote();
+  const heroTitle = quote?.clientData?.nome || t("dashboard.quoteDetail.title");
+  useMobileHeader(useMemo(() => ({ title: heroTitle }), [heroTitle]));
 
   const handleCopyPublicLink = async () => {
     if (!id) return;
@@ -179,7 +195,9 @@ const can = useCan();
       setClientName(quote.clientData?.nome || "");
       setClientAddress(quote.clientData?.indirizzo || "");
       if (quote.capitoli && quote.capitoli.length > 0) {
-        setExpandedChapters(new Set(quote.capitoli.map(c => c.lettera)));
+        // A phone opens on the chapter list (the subtotals); a wide screen on every line.
+        const narrow = typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches;
+        setExpandedChapters(narrow && quote.capitoli.length > 1 ? new Set() : new Set(quote.capitoli.map(c => c.lettera)));
       }
     }
   }, [quote, id]);
@@ -566,6 +584,54 @@ const can = useCan();
     setEditCapitoli(prev => prev.filter((_, ci) => ci !== capIdx));
   };
 
+  const saveSheetLine = (line: LineDraft) => {
+    if (!lineSheet) return;
+    const voce: EditVoce = { descrizione: line.descrizione, um: line.um, quantita: parseAmount(line.quantita), prezzoUnitario: parseAmount(line.prezzoUnitario) };
+    const { ci, vi } = lineSheet;
+    if (vi === null) {
+      if (!voce.descrizione.trim() && !voce.prezzoUnitario) return;
+      setEditCapitoli(prev => prev.map((cap, i) => (i !== ci ? cap : { ...cap, voci: [...cap.voci, voce] })));
+    } else {
+      setEditCapitoli(prev => prev.map((cap, i) => (i !== ci ? cap : { ...cap, voci: cap.voci.map((v, j) => (j === vi ? voce : v)) })));
+    }
+  };
+
+  const handleArchive = () => {
+    if (!id) return;
+    archiveQuote.mutate({ id }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+        toast({ title: t("dashboard.quotesList.archivedToast") });
+        navigate("/dashboard/quotes");
+      },
+      onError: () => toast({ title: t("dashboard.quotesList.archiveErrorToast"), variant: "destructive" }),
+    });
+  };
+
+  const handleDelete = () => {
+    if (!id || !confirm(t("dashboard.quotesList.confirmDelete"))) return;
+    deleteQuote.mutate({ id }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+        toast({ title: t("dashboard.quotesList.deletedToast") });
+        navigate("/dashboard/quotes");
+      },
+      onError: () => toast({ title: t("dashboard.quotesList.deleteErrorToast"), variant: "destructive" }),
+    });
+  };
+
+  const handleDuplicate = () => {
+    if (!id) return;
+    duplicateQuote.mutate({ id }, {
+      onSuccess: (newQuote) => {
+        queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+        toast({ title: t("dashboard.quoteDetail.quoteDuplicated"), description: t("dashboard.quoteDetail.quoteDuplicatedDesc") });
+        navigate(`/dashboard/quotes/${newQuote.id}`);
+      },
+      onError: () => toast({ title: t("dashboard.quoteDetail.errorDuplicate"), variant: "destructive" }),
+    });
+  };
+
   if (isLoadingQuote || isLoadingProfile) {
     return <div className="p-8 space-y-4"><Skeleton className="h-12 w-64" /><Skeleton className="h-64 w-full" /></div>;
   }
@@ -671,81 +737,180 @@ const can = useCan();
     { id: "mariagrazia", label: t("dashboard.quoteDetail.templateElegantName"), desc: t("dashboard.quoteDetail.templateElegantDesc"), proOnly: true },
   ] as const;
 
-  return (
-    <div className="animate-in fade-in duration-300" style={{ maxWidth: 1120, marginInline: "auto" }}>
-      <Link href="/dashboard/quotes" className="back-link"><ArrowLeft /> {t("dashboard.quoteDetail.backToList")}</Link>
+  const chooseTemplate = (tmpl: (typeof templateChoices)[number]) => {
+    if (isEditLocked) return;
+    if (tmpl.proOnly && !isPro) { setIsPaywallOpen(true); return; }
+    if (localTemplateId === tmpl.id || !id) return;
+    // Optimistic update
+    setLocalTemplateId(tmpl.id);
+    updateQuote.mutate({ id, data: { templateId: tmpl.id } }, {
+      onSuccess: (updated) => {
+        queryClient.setQueryData(getGetQuoteQueryKey(id), updated);
+        toast({ title: t("dashboard.quoteDetail.templateUpdated"), description: `Template "${tmpl.label}" ${t("dashboard.quoteDetail.templateSelected")}` });
+      },
+      onError: () => {
+        // Rollback
+        setLocalTemplateId(quote.templateId ?? "standard");
+        toast({ title: t("dashboard.quoteDetail.error"), description: t("dashboard.quoteDetail.errorChangeTemplate"), variant: "destructive" });
+      },
+    });
+  };
 
-      {/* Page head */}
-      <div className="page-head">
-        <div className="min-w-0">
-          <div className="title-row">
-            <h1><FileText /> {t("dashboard.quoteDetail.title")}</h1>
+  // ── Phase 105: the header card ─────────────────────────────────────────────
+  const canEdit = can("quotes", "edit");
+  const jobId = (quote as { jobId?: string | null }).jobId ?? null;
+  const sentAt = (quote as { sentAt?: string | null }).sentAt ?? null;
+  const statusChip = quoteStatusChip({ status: quote.status, sentAt }, t);
+  const heroSub = quote.titoloPreventivoRiga2 || (quote.clientData?.nome ? quote.descrizioneGenerale : "") || "";
+  const isOpen = !isLocked && (quote.status === "unlocked" || quote.status === "accepted");
+  const editTotal = (() => {
+    const sub = editCapitoli.reduce((s, cap) => s + cap.voci.reduce((cs, v) => cs + Number(v.quantita) * Number(v.prezzoUnitario), 0), 0);
+    const taxable = editScontoPerc > 0 ? sub * (1 - editScontoPerc / 100) : sub;
+    return taxable * (1 + editIvaPerc / 100);
+  })();
+
+  // One primary, chosen by where the quote is: locked → unlock it; not sent →
+  // send it; sent → the client's link; accepted → the job.
+  type Primary = { label: string; icon: typeof Send; onClick?: () => void; href?: string; pending?: boolean };
+  const startJob: Primary | null = jobId
+    ? { label: t("quotes.m.openJob"), icon: Briefcase, href: `/dashboard/jobs/${jobId}` }
+    : isOpen && can("jobs", "edit") ? { label: t("quotes.m.startJob"), icon: Hammer, onClick: handleAvviaCantiere, pending: avviandoCantiere } : null;
+  const sendAction: Primary | null = isOpen && canEdit
+    ? { label: sentAt ? t("quotes.m.sendAgain") : t("dashboard.quoteDetail.send"), icon: Send, onClick: () => setIsEmailDialogOpen(true), pending: sendPdfEmail.isPending }
+    : null;
+  const copyLink: Primary | null = isOpen ? { label: t("dashboard.quoteDetail.copyClientLink"), icon: Copy, onClick: handleCopyPublicLink } : null;
+  const primary: Primary | null = isEditMode
+    ? { label: updateQuote.isPending ? t("dashboard.quoteDetail.saving") : t("dashboard.quoteDetail.saveChanges"), icon: Save, onClick: handleSaveEdit, pending: updateQuote.isPending }
+    : isLocked
+      ? (canEdit ? { label: t("quotes.m.unlock"), icon: Lock, onClick: handleUnlock } : null)
+      : quote.status === "accepted"
+        ? startJob ?? copyLink
+        : sentAt ? copyLink : sendAction ?? copyLink;
+  const asSheet = (p: Primary | null): SheetAction | null =>
+    p && p !== primary ? { label: p.label, icon: p.icon, href: p.href, onSelect: p.onClick, disabled: p.pending } : null;
+  const moreActions: Array<SheetAction | false | null> = [
+    !isEditLocked && { label: t("dashboard.quoteDetail.editQuote"), icon: Pencil, onSelect: enterEditMode },
+    !isEditLocked && { label: t("dashboard.quoteDetail.regenerateWithAi"), icon: Sparkles, onSelect: () => setIsRegenOpen(true) },
+    asSheet(sendAction),
+    asSheet(copyLink),
+    canEdit && { label: t("dashboard.quoteDetail.downloadPdf"), icon: isLocked ? Lock : Download, onSelect: isLocked ? handleUnlock : handleDownload, disabled: generatePdf.isPending, hint: "PDF" },
+    quote.capitolatoPro && isPro && quote.status === "unlocked" && { label: t("dashboard.quoteDetail.downloadProPdf"), icon: FileDown, onSelect: handleDownloadProPdf, disabled: generatePdfPro.isPending },
+    !quote.capitolatoPro && canEdit && { label: isPro ? t("dashboard.quoteDetail.upgradeToProSpec") : t("dashboard.quoteDetail.proSpec"), icon: Star, onSelect: handleUpgradeToCapitolato, disabled: upgradeToCapitolato.isPending },
+    phone && { label: t("quotes.m.pdfLayout"), icon: LayoutTemplate, onSelect: () => setIsLayoutSheetOpen(true), hint: templateName },
+    asSheet(startJob),
+    canEdit && { label: t("dashboard.quoteDetail.duplicateQuote"), icon: Copy, onSelect: handleDuplicate, disabled: duplicateQuote.isPending },
+    can("quotes", "full") && { label: t("dashboard.quotesList.archive"), icon: Archive, onSelect: handleArchive, separated: true, disabled: archiveQuote.isPending },
+    can("quotes", "full") && { label: t("dashboard.quotesList.delete"), icon: Trash2, onSelect: handleDelete, danger: true, disabled: deleteQuote.isPending },
+  ].filter((a): a is SheetAction => !!a);
+
+  const templateButtons = templateChoices.map(tmpl => {
+    const isActive = localTemplateId === tmpl.id;
+    const requiresPro = tmpl.proOnly && !isPro;
+    return (
+      <button
+        key={tmpl.id}
+        type="button"
+        disabled={isEditLocked}
+        aria-pressed={isActive}
+        onClick={() => chooseTemplate(tmpl)}
+        className={cn("src sm", isActive && "on")}
+      >
+        <b>
+          {isActive && <CheckCircle2 />}
+          {tmpl.label}
+          {requiresPro && <span className="chip chip-yellow">PRO</span>}
+          {isEditLocked && <Lock className="h-3.5 w-3.5 ml-auto" style={{ color: "var(--faint)" }} />}
+        </b>
+        <p>{tmpl.desc}</p>
+      </button>
+    );
+  });
+
+  // The phone's rows: every template reads the same there (Professional and
+  // Elegant keep their look in the PDF and on a wide screen).
+  const phoneChapters = (capitoli: Array<{ lettera: string; titolo: string; subtotale: number; voci: Array<{ descrizione: string; um: string; quantita: number; prezzoUnitario: number; totale: number }> }>) => (
+    <div className="paper-sec">
+      <span className="eyebrow">{t("quotes.m.breakdown")}</span>
+      {capitoli.map(cap => {
+        const isExpanded = expandedChapters.has(cap.lettera);
+        return (
+          <div key={cap.lettera} className="chap-block">
+            <button type="button" className="chap-head" onClick={() => toggleChapter(cap.lettera)} aria-expanded={isExpanded}>
+              <b>{cap.lettera}. {cap.titolo}</b>
+              <span className="amt">{formatCurrency(cap.subtotale)}</span>
+              {isExpanded ? <ChevronDown className="chev" /> : <ChevronRight className="chev" />}
+            </button>
+            {isExpanded && <QuoteLineRows lines={cap.voci} label={`${cap.lettera}. ${cap.titolo}`} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const sheetVoce = lineSheet && lineSheet.vi !== null ? editCapitoli[lineSheet.ci]?.voci[lineSheet.vi] : undefined;
+
+  return (
+    <div className="animate-in fade-in duration-300 q-page" style={{ maxWidth: 1120, marginInline: "auto" }}>
+      <Link href="/dashboard/quotes" className="back-link hide-phone"><ArrowLeft /> {t("dashboard.quoteDetail.backToList")}</Link>
+
+      {/* Phase 105: who it's for, the total and where it stands first; one
+          primary action (docked at the bottom on a phone), the rest in ⋯. */}
+      <section className="card q-hero">
+        <div className="q-hero-main">
+          <div className="q-hero-eyebrow">
+            <FileText aria-hidden="true" />
+            <span>{quote.numeroPreventivoData || t("dashboard.quoteDetail.quoteLabel")}</span>
+            <span>{format(new Date(quote.createdAt), "d MMM yyyy", { locale: dateLocale })}</span>
+          </div>
+          <h1>{heroTitle}</h1>
+          {heroSub && <p className="q-hero-sub">{heroSub}</p>}
+          <div className="q-hero-chips">
             {isLocked ? (
               <span className="chip chip-grey"><Lock className="h-3 w-3 mr-1" /> {t("dashboard.quoteDetail.statusDraftLocked")}</span>
+            ) : quote.status === "accepted" ? (
+              <span className="chip chip-green"><CheckCircle2 className="h-3 w-3 mr-1" /> {quote.acceptedByName ? `${t("dashboard.quoteDetail.acceptedByPrefix")} ${quote.acceptedByName}` : statusChip.label}</span>
             ) : (
-              <span className="chip chip-green"><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.quoteDetail.statusUnlocked")}</span>
-            )}
-            {quote.status === "accepted" && (
-              <span className="chip chip-green"><CheckCircle2 className="h-3 w-3 mr-1" /> {t("dashboard.quoteDetail.acceptedByPrefix")} {quote.acceptedByName}</span>
+              <span className={cn("chip", statusChip.cls)}>{statusChip.label}</span>
             )}
             {quote.capitolatoPro && (
               <span className="chip chip-purple"><Star className="h-3 w-3 mr-1" /> {t("dashboard.quoteDetail.proSpecBadge")}</span>
             )}
-            <span className="chip chip-grey"><LayoutTemplate className="h-3 w-3 mr-1" /> {templateName}</span>
-          </div>
-          <div className="meta">
-            <span>{t("dashboard.quoteDetail.createdOnPrefix")} {format(new Date(quote.createdAt), "dd MMMM yyyy", { locale: dateLocale })}</span>
-            {quote.numeroPreventivoData && <span>{quote.numeroPreventivoData}</span>}
+            <span className="chip chip-grey hide-phone"><LayoutTemplate className="h-3 w-3 mr-1" /> {templateName}</span>
           </div>
         </div>
-        <div className="head-actions">
-          {!isEditLocked && (
-            <button type="button" className={cn("btn btn-sm", isEditMode ? "btn-navy" : "btn-outline-navy")} onClick={isEditMode ? () => setIsEditMode(false) : enterEditMode}>
-              {isEditMode ? <X className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-              {isEditMode ? t("dashboard.quoteDetail.closeEditor") : t("dashboard.quoteDetail.edit")}
-            </button>
-          )}
-          {!isEditLocked && (
-            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsRegenOpen(true)}>
-              <Sparkles className="h-4 w-4" /> {t("dashboard.quoteDetail.regenerate")}
-            </button>
-          )}
-          <button type="button" onClick={isLocked ? handleUnlock : handleDownload} disabled={generatePdf.isPending} className={cn("btn btn-sm", isLocked ? "btn-navy" : "btn-outline-navy")}>
-            {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-            {t("dashboard.quoteDetail.downloadPdf")}
-          </button>
-          {!isLocked && can("quotes", "edit") && (
-            <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
-              {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-              {t("dashboard.quoteDetail.sendByEmail")}
-            </button>
-          )}
-          {!isLocked && (quote?.status === "unlocked" || quote?.status === "accepted") && (
-            <button type="button" className="btn btn-sm btn-outline-navy" onClick={handleCopyPublicLink}>
-              <Copy className="h-4 w-4" /> {t("dashboard.quoteDetail.copyClientLink")}
-            </button>
-          )}
-          {!isLocked && quote?.status === "unlocked" && can("jobs", "edit") && (
-            <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={handleAvviaCantiere} disabled={avviandoCantiere}>
-              {avviandoCantiere ? <Loader2 className="h-4 w-4 animate-spin" /> : <Hammer className="h-4 w-4" />}
-              {t("dashboard.quoteDetail.startCrmProject")}
-            </button>
-          )}
-          {!quote.capitolatoPro && can("quotes", "edit") && (
-            <button type="button" className="btn btn-sm btn-outline-navy" onClick={handleUpgradeToCapitolato} disabled={upgradeToCapitolato.isPending}>
-              {upgradeToCapitolato.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className="h-4 w-4" />}
-              {isPro ? t("dashboard.quoteDetail.upgradeToProSpec") : t("dashboard.quoteDetail.proSpec")}
-              {!isPro && <Lock className="h-3 w-3 opacity-60" />}
-            </button>
-          )}
-          {quote.capitolatoPro && isPro && quote.status === "unlocked" && (
-            <button type="button" className="btn btn-sm btn-outline-navy" onClick={handleDownloadProPdf} disabled={generatePdfPro.isPending}>
-              {generatePdfPro.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileDown className="h-4 w-4" />}
-              {t("dashboard.quoteDetail.downloadProPdf")}
-            </button>
+        <div className="q-hero-side">
+          <span className="q-hero-lbl">{t("dashboard.quoteDetail.total")}</span>
+          <b className="q-hero-total">{formatCurrency(isEditMode ? editTotal : quote.totale)}</b>
+          {(primary || moreActions.length > 0) && (
+            <StickyActionBar label={t("dashboard.quoteDetail.actionsTitle")}>
+              {isEditMode && (
+                <button type="button" className="btn btn-outline-navy secondary" onClick={() => setIsEditMode(false)}>
+                  {t("dashboard.quoteDetail.cancel")}
+                </button>
+              )}
+              {!isEditMode && <ActionSheet actions={moreActions} title={t("dashboard.quoteDetail.actionsTitle")} />}
+              {primary && (
+                primary.href ? (
+                  <Link href={primary.href} className="btn btn-navy" data-primary-action>
+                    <primary.icon className="h-4 w-4" /> {primary.label}
+                  </Link>
+                ) : (
+                  <button type="button" className="btn btn-navy" onClick={primary.onClick} disabled={primary.pending} data-primary-action>
+                    {primary.pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <primary.icon className="h-4 w-4" />} {primary.label}
+                  </button>
+                )
+              )}
+            </StickyActionBar>
           )}
         </div>
-      </div>
+      </section>
+
+      {isEditLocked && can("quotes", "edit") && (
+        <div className="notice warn q-lock-note">
+          <AlertTriangle />
+          <span className="grow">{t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.downloadedWarning")}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Main preview card */}
@@ -779,7 +944,7 @@ const can = useCan();
 
             <div className={cn("doc-view paper", !isEditMode && "readonly")}>
               {/* Company header */}
-              <div className="paper-head">
+              <div className="paper-head hide-phone">
                 <div>
                   {companyLogoUrl && <img src={companyLogoUrl} alt={t("a11y.companyLogo")} />}
                   <h2>{companyName}</h2>
@@ -803,7 +968,7 @@ const can = useCan();
                 </div>
               ) : (
                 quote.titoloPreventivoRiga1 && (
-                  <div className="paper-title">
+                  <div className="paper-title hide-phone">
                     <b>{quote.titoloPreventivoRiga1}</b>
                     {quote.titoloPreventivoRiga2 && <i>{quote.titoloPreventivoRiga2}</i>}
                   </div>
@@ -923,7 +1088,7 @@ const can = useCan();
 
               {/* Quadro Sintetico — shown for Standard template in edit mode or view mode */}
               {localTemplateId === "standard" && (isEditMode ? editCapitoli.length > 0 : hasCapitoli) && (
-                <div className="paper-sec">
+                <div className="paper-sec hide-phone">
                   <span className="eyebrow">{t("dashboard.quoteDetail.summaryOverview")}</span>
                   <div className="paper-tw" tabIndex={0}>
                     <table className="ptbl">
@@ -954,7 +1119,36 @@ const can = useCan();
               )}
 
               {/* Chapter detail sections — branched by template */}
-              {isEditMode && localTemplateId === "arosio" ? (
+              {isEditMode && phone ? (
+                /* ── PHONE EDITOR (Phase 105): chapters with their lines as rows; a line opens in a sheet ── */
+                <div className="paper-sec">
+                  <span className="eyebrow">{t("quotes.m.breakdown")}</span>
+                  {editCapitoli.map((cap, capIdx) => {
+                    const capSub = cap.voci.reduce((s, v) => s + Number(v.quantita) * Number(v.prezzoUnitario), 0);
+                    return (
+                      <div key={capIdx} className="chap-block edit">
+                        <div className="chap-head wrap">
+                          <span className="let">{cap.lettera}.</span>
+                          <input value={cap.titolo} onChange={e => updateCapitolo(capIdx, "titolo", e.target.value)} className="inl" placeholder={t("dashboard.quoteDetail.chapterTitlePlaceholderLower")} aria-label={t("dashboard.quoteDetail.chapterTitlePlaceholderLower")} />
+                          <button type="button" onClick={() => removeCapitolo(capIdx)} className="ic-btn danger" title={t("dashboard.quoteDetail.deleteChapter")} aria-label={t("dashboard.quoteDetail.deleteChapter")}><Trash2 /></button>
+                          <input value={cap.osservazione ?? ""} onChange={e => updateCapitolo(capIdx, "osservazione", e.target.value)} className="inl obs" placeholder={t("dashboard.quoteDetail.notePlaceholder")} aria-label={t("dashboard.quoteDetail.notePlaceholder")} />
+                        </div>
+                        <QuoteLineRows
+                          lines={cap.voci}
+                          label={`${cap.lettera}. ${cap.titolo}`}
+                          onEdit={(vi) => setLineSheet({ ci: capIdx, vi })}
+                          onAdd={() => setLineSheet({ ci: capIdx, vi: null })}
+                        />
+                        <div className="chap-foot">
+                          <span>{t("dashboard.quoteDetail.subtotalPrefix")}</span>
+                          <span>{formatCurrency(capSub)}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <button type="button" onClick={addCapitolo} className="add-dashed" style={{ marginTop: 12 }}><Plus /> {t("dashboard.quoteDetail.addChapter")}</button>
+                </div>
+              ) :isEditMode && localTemplateId === "arosio" ? (
                 /* ── AROSIO EDITOR: numbered sections, navy headers, subtotals ── */
                 <div className="paper-sec">
                   <div className="paper-tw" tabIndex={0}>
@@ -1045,27 +1239,7 @@ const can = useCan();
                             <span className="amt">{formatCurrency(capSub)}</span>
                             <button type="button" onClick={() => removeCapitolo(capIdx)} className="ic-btn danger" title={t("dashboard.quoteDetail.deleteChapter")} aria-label={t("dashboard.quoteDetail.deleteChapter")}><Trash2 /></button>
                           </div>
-                          {/* Voci — stacked cards on phones, table from 640px up */}
-                          <div className="chap-mobile">
-                            {cap.voci.map((voce, vi) => {
-                              const vTot = Number(voce.quantita) * Number(voce.prezzoUnitario);
-                              return (
-                                <div key={vi} className="li">
-                                  <div className="row">
-                                    <input value={voce.descrizione} onChange={e => updateVoce(capIdx, vi, "descrizione", e.target.value)} className="inp-sm" placeholder={t("dashboard.quoteDetail.itemDescriptionPlaceholder")} aria-label={t("dashboard.quoteDetail.colDescription")} />
-                                    <button type="button" onClick={() => removeVoce(capIdx, vi)} className="ic-btn danger" title={t("dashboard.quoteDetail.deleteItem")} aria-label={t("dashboard.quoteDetail.deleteItem")}><X /></button>
-                                  </div>
-                                  <div className="grid3">
-                                    <label>{t("dashboard.quoteDetail.colUnit")}<input value={voce.um} onChange={e => updateVoce(capIdx, vi, "um", e.target.value)} className="inp-sm c" /></label>
-                                    <label>{t("dashboard.quoteDetail.colQty")}<input type="number" value={voce.quantita} onChange={e => updateVoce(capIdx, vi, "quantita", e.target.value === "" ? 0 : Number(e.target.value))} className="inp-sm c" min={0} step={0.01} /></label>
-                                    <label>{t("dashboard.quoteDetail.colUnitPrice")}<input type="number" value={voce.prezzoUnitario} onChange={e => updateVoce(capIdx, vi, "prezzoUnitario", e.target.value === "" ? 0 : Number(e.target.value))} className="inp-sm r" min={0} step={0.01} /></label>
-                                  </div>
-                                  <div className="tot"><span>{t("dashboard.quoteDetail.colTotal")}</span><b>{formatCurrency(vTot)}</b></div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          <div className="chap-desk paper-tw">
+                          <div className="paper-tw">
                             <table className="ptbl soft">
                               <thead>{editHeadCells(false)}</thead>
                               <tbody>
@@ -1084,6 +1258,12 @@ const can = useCan();
                     {/* Add chapter */}
                     <button type="button" onClick={addCapitolo} className="add-dashed" style={{ marginTop: 12 }}><Plus /> {t("dashboard.quoteDetail.addChapter")}</button>
                   </div>
+                </div>
+              ) : phone && hasCapitoli ? (
+                phoneChapters(capitoli)
+              ) : phone ? (
+                <div className="paper-sec">
+                  <QuoteLineRows lines={quote.items.map(i => ({ descrizione: i.descrizione, um: i.unita, quantita: i.quantita, prezzoUnitario: i.prezzoUnitario, totale: i.totale }))} label={t("dashboard.quoteDetail.detailedBreakdown")} />
                 </div>
               ) : localTemplateId === "arosio" && hasCapitoli ? (
                 /* ── AROSIO VIEW: numbered sections, navy headers, subtotals ── */
@@ -1336,59 +1516,6 @@ const can = useCan();
 
         {/* Sidebar */}
         <div className="stack">
-          <section className="card">
-            <div className="card-head"><div><h2>{t("dashboard.quoteDetail.actionsTitle")}</h2></div></div>
-            <div className="act-list">
-              <button type="button" onClick={isLocked ? handleUnlock : handleDownload} disabled={generatePdf.isPending} className={cn("btn btn-sm", isLocked ? "btn-navy" : "btn-outline-navy")}>
-                {generatePdf.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isLocked ? <Lock className="h-4 w-4" /> : <Download className="h-4 w-4" />}
-                {t("dashboard.quoteDetail.downloadPdf")}
-              </button>
-              {!isLocked && can("quotes", "edit") && (
-                <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(true)} disabled={sendPdfEmail.isPending}>
-                  {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-                  {t("dashboard.quoteDetail.sendByEmail")}
-                </button>
-              )}
-              {!isEditLocked && (
-                <>
-                  <button type="button" className="btn btn-sm btn-outline-navy" onClick={isEditMode ? () => setIsEditMode(false) : enterEditMode}>
-                    <Pencil className="h-4 w-4" />
-                    {isEditMode ? t("dashboard.quoteDetail.closeEditor") : t("dashboard.quoteDetail.editQuote")}
-                  </button>
-                  <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsRegenOpen(true)}>
-                    <Sparkles className="h-4 w-4" />
-                    {t("dashboard.quoteDetail.regenerateWithAi")}
-                  </button>
-                </>
-              )}
-              {can("quotes", "edit") && <button
-                type="button"
-                className="btn btn-sm btn-outline-navy"
-                disabled={duplicateQuote.isPending}
-                onClick={() => {
-                  if (!id) return;
-                  duplicateQuote.mutate({ id }, {
-                    onSuccess: (newQuote) => {
-                      queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
-                      toast({ title: t("dashboard.quoteDetail.quoteDuplicated"), description: t("dashboard.quoteDetail.quoteDuplicatedDesc") });
-                      navigate(`/dashboard/quotes/${newQuote.id}`);
-                    },
-                    onError: () => toast({ title: t("dashboard.quoteDetail.errorDuplicate"), variant: "destructive" }),
-                  });
-                }}
-              >
-                {duplicateQuote.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
-                {t("dashboard.quoteDetail.duplicateQuote")}
-              </button>}
-              {isEditLocked && can("quotes", "edit") && (
-                <div className="notice warn">
-                  <AlertTriangle />
-                  <span className="grow">{t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.downloadedWarning")}</span>
-                </div>
-              )}
-            </div>
-          </section>
-
           {/* Phase 79: catalog / receipt prices that moved since this quote was priced */}
           {!isEditLocked && !!id && <PriceCheckCard quoteId={id} enabled={hasCapitoli} />}
 
@@ -1488,54 +1615,15 @@ const can = useCan();
             </section>
           )}
 
-          {/* Template picker */}
-          <section className="card">
+          {/* Template picker (a sheet from ⋯ on a phone) */}
+          <section className="card hide-phone">
             <div className="card-head">
               <div>
                 <h2 className="flex items-center gap-2"><LayoutTemplate className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("dashboard.quoteDetail.pdfTemplateTitle")}</h2>
                 <p className="sub">{isEditLocked ? t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.lockedAfterDownload") : t("dashboard.quoteDetail.chooseYourPdfLayout")}</p>
               </div>
             </div>
-            <div className="src-list">
-              {templateChoices.map(tmpl => {
-                const isActive = localTemplateId === tmpl.id;
-                const requiresPro = tmpl.proOnly && !isPro;
-                return (
-                  <button
-                    key={tmpl.id}
-                    type="button"
-                    disabled={isEditLocked}
-                    onClick={() => {
-                      if (isEditLocked) return;
-                      if (requiresPro) { setIsPaywallOpen(true); return; }
-                      if (isActive || !id) return;
-                      // Optimistic update
-                      setLocalTemplateId(tmpl.id);
-                      updateQuote.mutate({ id, data: { templateId: tmpl.id } }, {
-                        onSuccess: (updated) => {
-                          queryClient.setQueryData(getGetQuoteQueryKey(id), updated);
-                          toast({ title: t("dashboard.quoteDetail.templateUpdated"), description: `Template "${tmpl.label}" ${t("dashboard.quoteDetail.templateSelected")}` });
-                        },
-                        onError: () => {
-                          // Rollback
-                          setLocalTemplateId(quote.templateId ?? "standard");
-                          toast({ title: t("dashboard.quoteDetail.error"), description: t("dashboard.quoteDetail.errorChangeTemplate"), variant: "destructive" });
-                        },
-                      });
-                    }}
-                    className={cn("src sm", isActive && "on")}
-                  >
-                    <b>
-                      {isActive && <CheckCircle2 />}
-                      {tmpl.label}
-                      {requiresPro && <span className="chip chip-yellow">PRO</span>}
-                      {isEditLocked && <Lock className="h-3.5 w-3.5 ml-auto" style={{ color: "var(--faint)" }} />}
-                    </b>
-                    <p>{tmpl.desc}</p>
-                  </button>
-                );
-              })}
-            </div>
+            <div className="src-list">{templateButtons}</div>
             {isEditLocked && (
               <div className="card-foot"><span className="foot-note" style={{ color: "var(--yellow-dark)" }}>{t("dashboard.quoteDetail.templateLockedAfterDownload")}</span></div>
             )}
@@ -1556,7 +1644,7 @@ const can = useCan();
 
           {/* Summary card */}
           {hasCapitoli && (
-            <section className="card">
+            <section className="card hide-phone">
               <div className="card-head"><div><h2>{t("dashboard.quoteDetail.chapterSummary")}</h2></div></div>
               <div className="kv-list">
                 {capitoli.map(cap => (
@@ -1567,14 +1655,42 @@ const can = useCan();
             </section>
           )}
 
-          <section className="card">
-            <div className="card-head"><div><h2 className="flex items-center gap-2"><FileText className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("dashboard.quoteDetail.originalInput")}</h2></div></div>
-            <div className="act-body">
-              <p className="foot-note" style={{ fontStyle: "italic", fontWeight: 500 }}>"{quote.rawInput}"</p>
-            </div>
-          </section>
+          {/* Manual quotes have no original request. */}
+          {quote.rawInput?.trim() && (
+            <section className="card">
+              <div className="card-head"><div><h2 className="flex items-center gap-2"><FileText className="h-4 w-4" style={{ color: "var(--faint)" }} /> {t("dashboard.quoteDetail.originalInput")}</h2></div></div>
+              <div className="act-body">
+                <p className="foot-note" style={{ fontStyle: "italic", fontWeight: 500 }}>"{quote.rawInput}"</p>
+              </div>
+            </section>
+          )}
         </div>
       </div>
+
+      {/* ── Phase 105: the PDF layout on a phone (the side card is hidden there) ── */}
+      <BottomSheet
+        open={isLayoutSheetOpen}
+        onOpenChange={setIsLayoutSheetOpen}
+        title={t("dashboard.quoteDetail.pdfTemplateTitle")}
+        description={isEditLocked ? t(quote.status === "accepted" ? "dashboard.quoteDetail.acceptedWarning" : "dashboard.quoteDetail.lockedAfterDownload") : t("dashboard.quoteDetail.chooseYourPdfLayout")}
+        footer={<button type="button" className="btn btn-navy" onClick={() => setIsLayoutSheetOpen(false)}>{t("quotes.m.done")}</button>}
+      >
+        <div className="src-list flush">{templateButtons}</div>
+      </BottomSheet>
+
+      {/* ── Phase 105: one line of the quote, edited in a sheet on a phone ── */}
+      {lineSheet && editCapitoli[lineSheet.ci] && (
+        <LineItemSheet
+          open={!!lineSheet}
+          onOpenChange={(o) => { if (!o) setLineSheet(null); }}
+          isNew={!sheetVoce}
+          initial={sheetVoce
+            ? { descrizione: sheetVoce.descrizione, um: sheetVoce.um, quantita: String(sheetVoce.quantita), prezzoUnitario: String(sheetVoce.prezzoUnitario) }
+            : { descrizione: "", um: "LS", quantita: "1", prezzoUnitario: "" }}
+          onSave={saveSheetLine}
+          onDelete={sheetVoce && lineSheet.vi !== null ? () => removeVoce(lineSheet.ci, lineSheet.vi!) : undefined}
+        />
+      )}
 
       {/* ── CAPITOLATO PRO DIALOG ── */}
       <Dialog open={isCapitolatoDialogOpen} onOpenChange={setIsCapitolatoDialogOpen}>

@@ -194,6 +194,10 @@ export interface Quote {
   status: QuoteStatus;
   acceptedByName?: string | null;
   acceptedAt?: string | null;
+  /** When the quote was last emailed to the client (Phase 105 picks the primary action from it). */
+  sentAt?: string | null;
+  /** The job started from this quote, on GET /quotes/{id} only (Phase 105). */
+  jobId?: string | null;
   pdfUrl?: string | null;
   rawInput: string;
   pdfDownloadedAt?: string | null;
@@ -225,6 +229,9 @@ export interface QuoteSummary {
   province?: string | null;
   clientData: QuoteClientData;
   descrizioneGenerale: string;
+  /** The quote heading (titoloPreventivoRiga1), Phase 105. */
+  title?: string | null;
+  sentAt?: string | null;
   lineItemCount: number;
   subtotale: number;
   ivaValore: number;

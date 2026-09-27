@@ -185,6 +185,40 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
       await p.locator(".pick-row .pill:not(.dashed)").first().click();
       await p.waitForSelector('.form-grid input[type="email"]');
     } },
+    // Phase 105: the quote screens' sheets — the new quote's Options, the manual
+    // tab and one of its lines, the list's filter, a quote's ⋯, its edit mode and
+    // one line of it (the line sheets exist on a phone only; wider, the drive stops
+    // at the editor), a locked quote, and the foreman's read-only quote.
+    { path: "/dashboard/new", session: "owner", name: "/dashboard/new options", drive: async (p) => {
+      await p.locator(".qopts").first().click();
+      await p.waitForSelector("[role=dialog] .qopts-set");
+    } },
+    { path: "/dashboard/new", session: "owner", name: "/dashboard/new manual", drive: async (p) => {
+      await p.locator(".stabs .pill").nth(1).click();
+      await p.waitForSelector(".li-body");
+    } },
+    { path: "/dashboard/new", session: "owner", name: "/dashboard/new manual line", drive: async (p) => {
+      await p.locator(".stabs .pill").nth(1).click();
+      await p.waitForSelector(".li-body");
+      await openPhoneSheet(p, ".li-body .qline", "[role=dialog] .line-sheet");
+    } },
+    { path: "/dashboard/quotes", session: "owner", name: "/dashboard/quotes filter", drive: (p) => openPhoneSheet(p, ".qlist-bar .more-btn", "[role=dialog] .asheet-list") },
+    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} more`, drive: async (p) => {
+      await p.locator(".q-hero .more-btn").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
+    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit`, drive: async (p) => {
+      await p.locator(".q-hero .more-btn").first().click();
+      await p.locator("[role=dialog] .asheet-item, [role=menuitem]").first().click();
+      await p.waitForSelector(".edit-bar");
+    } },
+    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit line`, drive: async (p) => {
+      await p.locator(".q-hero .more-btn").first().click();
+      await p.locator("[role=dialog] .asheet-item, [role=menuitem]").first().click();
+      await p.waitForSelector(".edit-bar");
+      await openPhoneSheet(p, ".chap-block .qline", "[role=dialog] .line-sheet");
+    } },
+    dash(`/dashboard/quotes/${s.pendingQuoteId}`), foreman(`/dashboard/quotes/${s.quoteId}`),
     { path: `/dashboard/jobs/${s.jobId}`, session: "owner", name: `/dashboard/jobs/${s.jobId} complete dialog`, drive: async (p) => {
       await p.locator(".head-actions button", { hasText: /Mark complete|Marquer terminé/ }).click();
       await p.waitForSelector('[role="alertdialog"]');
@@ -380,8 +414,10 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
     };
 
     // 1. More than two full-width buttons stacked on top of each other.
-    // (Phase 102: a settings switch row is a <button role="switch"> the width of its card — a list row, not an action.)
+    // (Phase 102: a settings switch row is a <button role="switch"> the width of its card — a list row, not an action.
+    // Phase 105: the same for a section header that opens and closes ([aria-expanded]) and a row of a list (li > button).)
     const btns = Array.from(document.querySelectorAll(".btn, button:not([role='switch']), a[role='button']"))
+      .filter((b) => !(b.matches("button[aria-expanded]:not(.btn)") || b.matches("li > button:not(.btn)")))
       .filter((b) => shown(b) && !inFixed(b) && b.getBoundingClientRect().width >= cw * 0.7)
       .map((b) => ({ el: b, r: b.getBoundingClientRect() }))
       .sort((a, b) => a.r.top - b.r.top);

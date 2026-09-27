@@ -60,7 +60,7 @@ Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on 
 
 | Rule id | Fires when |
 |---|---|
-| `stacked-buttons` | more than two buttons ≥ 70 % of the width in one column |
+| `stacked-buttons` | more than two buttons ≥ 70 % of the width in one column (rows are not counted: a switch row, a section header that opens and closes, a button that is a list row) |
 | `full-width-stat` | a `.stat-card` ≥ 80 % of the width |
 | `wide-table` | a `<table>` wider than its box |
 | `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line |

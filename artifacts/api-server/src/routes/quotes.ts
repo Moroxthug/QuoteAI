@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
-import { db, quotesTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
+import { db, quotesTable, projectsTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { quoteLanguageFor, qt, fmtQuoteDate, fmtQty } from "../quotes/i18n.js";
@@ -243,6 +243,7 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     status: q.status,
     acceptedByName: q.acceptedByName ?? null,
     acceptedAt: q.acceptedAt?.toISOString() ?? null,
+    sentAt: q.sentAt?.toISOString() ?? null,
     pdfUrl: q.pdfUrl ?? null,
     rawInput: q.rawInput,
     pdfDownloadedAt: q.pdfDownloadedAt?.toISOString() ?? null,
@@ -344,12 +345,20 @@ router.get("/quotes", requireAuth, async (req, res) => {
         province: quotesTable.province,
         clientData: quotesTable.clientData,
         descrizioneGenerale: quotesTable.descrizioneGenerale,
-        lineItemCount: sql<number>`coalesce(jsonb_array_length(${quotesTable.items}), 0)::int`,
+        title: quotesTable.titoloPreventivoRiga1,
+        // Phase 105: AI and manual quotes keep their lines in chapters (capitoli[].voci);
+        // `items` is the legacy flat list, so counting it alone said "0 line items".
+        lineItemCount: sql<number>`greatest(
+          coalesce(jsonb_array_length(${quotesTable.items}), 0),
+          coalesce((select sum(jsonb_array_length(coalesce(c->'voci', '[]'::jsonb)))
+                    from jsonb_array_elements(case when jsonb_typeof(${quotesTable.capitoli}) = 'array' then ${quotesTable.capitoli} else '[]'::jsonb end) c), 0)
+        )::int`,
         subtotale: quotesTable.subtotale,
         ivaValore: quotesTable.ivaValore,
         totale: quotesTable.totale,
         status: quotesTable.status,
         acceptedAt: quotesTable.acceptedAt,
+        sentAt: quotesTable.sentAt,
         pdfUrl: quotesTable.pdfUrl,
         capitolatoPro: quotesTable.capitolatoPro,
         templateId: quotesTable.templateId,
@@ -367,12 +376,14 @@ router.get("/quotes", requireAuth, async (req, res) => {
         province: normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null,
         clientData: q.clientData,
         descrizioneGenerale: q.descrizioneGenerale,
+        title: q.title ?? null,
         lineItemCount: q.lineItemCount,
         subtotale: Number(q.subtotale),
         ivaValore: Number(q.ivaValore),
         totale: Number(q.totale),
         status: q.status,
         acceptedAt: q.acceptedAt?.toISOString() ?? null,
+        sentAt: q.sentAt?.toISOString() ?? null,
         pdfUrl: q.pdfUrl ?? null,
         capitolatoPro: q.capitolatoPro ?? false,
         templateId: q.templateId ?? "standard",
@@ -1244,12 +1255,14 @@ router.get("/quotes/:id", requireAuth, async (req, res) => {
       return;
     }
 
-    const [attachments, variants] = await Promise.all([
+    const [attachments, variants, [job]] = await Promise.all([
       db.select().from(quoteAttachmentsTable).where(eq(quoteAttachmentsTable.quoteId, id)),
       db.select().from(quoteVariantsTable).where(eq(quoteVariantsTable.quoteId, id)).orderBy(quoteVariantsTable.position),
+      // Phase 105: the page offers "Open job" instead of "Start job" once one exists.
+      db.select({ id: projectsTable.id }).from(projectsTable).where(and(eq(projectsTable.quoteId, id), eq(projectsTable.userId, userId))).limit(1),
     ]);
 
-    res.json(serializeQuote(quote, attachments, variants));
+    res.json({ ...serializeQuote(quote, attachments, variants), jobId: job?.id ?? null });
   } catch (err) {
     req.log.error({ err }, "Error fetching quote");
     res.status(500).json({ error: "Internal server error" });

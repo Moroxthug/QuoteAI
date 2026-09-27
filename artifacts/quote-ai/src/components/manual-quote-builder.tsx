@@ -1,7 +1,11 @@
 import { useState, useCallback } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { QuoteLineRows, LineItemSheet, parseAmount, type LineDraft } from "@/components/quotes/line-rows";
+import { QuoteOptions } from "@/components/quotes/quote-options";
 import {
   Plus, Trash2, ChevronDown, ChevronUp, Sparkles, Loader2,
-  GripVertical, X, CheckCircle2, ArrowRight,
+  GripVertical, X, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateManualQuote, useSuggestItemDescription, useListCatalogItems, useListTaxProfiles } from "@workspace/api-client-react";
@@ -14,14 +18,6 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { formatAmount } from "@/lib/money";
 
 const UM_OPTIONS = ["sq.ft", "ln.ft", "cu.yd", "kg", "t", "hrs", "g", "LS", "pcs", "ea.", "kW", "L"];
-
-function getTemplates(t: (key: string) => string) {
-  return [
-    { id: "standard", label: t("manualQuote.template.standard.label"), desc: t("manualQuote.template.standard.desc") },
-    { id: "arosio", label: t("manualQuote.template.arosio.label"), desc: t("manualQuote.template.arosio.desc") },
-    { id: "mariagrazia", label: t("manualQuote.template.mariagrazia.label"), desc: t("manualQuote.template.mariagrazia.desc") },
-  ] as const;
-}
 
 function getDefaultCondizioni(t: (key: string) => string) {
   return [
@@ -83,7 +79,8 @@ function uid() {
 }
 
 function mkVoce(): VoceState {
-  return { id: uid(), descrizione: "", um: "mq", quantita: "1", prezzoUnitario: "" };
+  // Phase 105: was "mq" (Italian), which isn't in UM_OPTIONS — the picker showed "sq.ft" but "mq" was saved.
+  return { id: uid(), descrizione: "", um: "LS", quantita: "1", prezzoUnitario: "" };
 }
 
 function mkChapter(index: number, t: (key: string) => string): ChapterState {
@@ -125,11 +122,14 @@ function AISuggestButton({
   chapterTitle,
   projectTitle,
   onSuggest,
+  labelled,
 }: {
   voce: VoceState;
   chapterTitle: string;
   projectTitle: string;
   onSuggest: (desc: string) => void;
+  /** A pill with its words (the line sheet) instead of the bare icon. */
+  labelled?: boolean;
 }) {
   const suggest = useSuggestItemDescription();
   const { toast } = useToast();
@@ -156,24 +156,27 @@ function AISuggestButton({
       onClick={handleClick}
       disabled={suggest.isPending}
       title={t("manualQuote.improveWithAi")}
-      className="ic-btn"
-      aria-label={t("manualQuote.improveWithAi")}
+      className={labelled ? "pill" : "ic-btn"}
+      aria-label={labelled ? undefined : t("manualQuote.improveWithAi")}
     >
       {suggest.isPending
         ? <Loader2 className="animate-spin" />
         : <Sparkles />}
+      {labelled && t("manualQuote.improveWithAi")}
     </button>
   );
 }
 
 export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSubmit }: ManualQuoteBuilderProps) {
   const { t, lang } = useLanguage();
-  const TEMPLATES = getTemplates(t);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createManualQuote = useCreateManualQuote();
   const { data: catalogItems = [] } = useListCatalogItems();
   const [activeVoceId, setActiveVoceId] = useState<string | null>(null);
+  // Phase 105: on a phone a line is a row; tapping it opens the line in a sheet.
+  const phone = useMediaQuery("(max-width: 640px)");
+  const [sheet, setSheet] = useState<{ chId: string; vId: string | null } | null>(null);
 
   const [templateId, setTemplateId] = useState<"standard" | "arosio" | "mariagrazia">("standard");
   const [titoloRiga1, setTitoloRiga1] = useState(t("manualQuote.defaultDocTitle"));
@@ -311,34 +314,31 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
 
   const isSubmitting = createManualQuote.isPending;
 
+  const sheetChapter = sheet ? chapters.find((c) => c.id === sheet.chId) : undefined;
+  const sheetVoce = sheet?.vId ? sheetChapter?.voci.find((v) => v.id === sheet.vId) : undefined;
+  const saveSheetLine = (line: LineDraft) => {
+    if (!sheetChapter) return;
+    const clean = { ...line, quantita: line.quantita || "0", prezzoUnitario: line.prezzoUnitario ? String(parseAmount(line.prezzoUnitario)) : "" };
+    if (sheetVoce) updateVoce(sheetChapter.id, sheetVoce.id, clean);
+    else if (clean.descrizione.trim() || clean.prezzoUnitario) {
+      setChapters((prev) => prev.map((c) => (c.id === sheetChapter.id ? { ...c, voci: [...c.voci, { id: uid(), ...clean }] } : c)));
+    }
+  };
+
   return (
     <div className="stack">
 
-      {/* ── Template ── */}
-      <section className="card">
-        <div className="card-head"><div><h2>{t("manualQuote.pdfTemplate")}</h2></div></div>
-        <div className="src-grid" style={{ paddingTop: 16 }}>
-          {TEMPLATES.map(tpl => (
-            <button
-              key={tpl.id}
-              type="button"
-              onClick={() => setTemplateId(tpl.id)}
-              className={cn("src sm", templateId === tpl.id && "on")}
-            >
-              <b>{templateId === tpl.id && <CheckCircle2 />}{tpl.label}</b>
-              <p>{tpl.desc}</p>
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* ── Layout (Phase 105: one line that opens a sheet, as on the AI tab) ── */}
+      <QuoteOptions templateId={templateId} onTemplate={setTemplateId} isPro onProRequired={() => undefined} disabled={isSubmitting} />
 
       {/* ── Title & Description ── */}
       <section className="card">
         <div className="card-head"><div><h2>{t("manualQuote.quoteHeader")}</h2></div></div>
         <div className="form-grid tight">
           <div className="field full">
-            <label>{t("manualQuote.jobSubject")}</label>
+            <label htmlFor="mq-subject">{t("manualQuote.jobSubject")}</label>
             <input
+              id="mq-subject"
               placeholder={t("manualQuote.jobSubjectPlaceholder")}
               value={titoloRiga2}
               onChange={e => setTitoloRiga2(e.target.value)}
@@ -346,16 +346,18 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
             />
           </div>
           <div className="field full">
-            <label>{t("manualQuote.documentTitle")}</label>
+            <label htmlFor="mq-doc-title">{t("manualQuote.documentTitle")}</label>
             <input
+              id="mq-doc-title"
               value={titoloRiga1}
               onChange={e => setTitoloRiga1(e.target.value)}
               disabled={isSubmitting}
             />
           </div>
           <div className="field full">
-            <label>{t("manualQuote.generalDescription")}</label>
+            <label htmlFor="mq-description">{t("manualQuote.generalDescription")}</label>
             <textarea
+              id="mq-description"
               value={descrizione}
               onChange={e => setDescrizione(e.target.value)}
               placeholder={t("manualQuote.generalDescriptionPlaceholder")}
@@ -384,6 +386,7 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
                   value={ch.titolo}
                   onChange={e => updateChapter(ch.id, { titolo: e.target.value })}
                   placeholder={`${t("manualQuote.chapterWord")} ${lettera}`}
+                  aria-label={`${t("manualQuote.chapterWord")} ${lettera}`}
                   className="inl"
                   disabled={isSubmitting}
                 />
@@ -409,7 +412,28 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
                 )}
               </div>
 
-              {!ch.collapsed && (
+              {!ch.collapsed && phone && (
+                <div className="li-body phone">
+                  <QuoteLineRows
+                    label={`${t("manualQuote.chapterWord")} ${lettera}`}
+                    lines={ch.voci.map((v) => ({ descrizione: v.descrizione, um: v.um, quantita: parseNum(v.quantita), prezzoUnitario: parseNum(v.prezzoUnitario) }))}
+                    onEdit={(i) => setSheet({ chId: ch.id, vId: ch.voci[i]!.id })}
+                    onAdd={() => setSheet({ chId: ch.id, vId: null })}
+                  />
+                  <div className="obs">
+                    <input
+                      value={ch.osservazione}
+                      onChange={e => updateChapter(ch.id, { osservazione: e.target.value })}
+                      placeholder={t("manualQuote.chapterNotePlaceholder")}
+                      aria-label={t("manualQuote.chapterNotePlaceholder")}
+                      className="inp-sm dashed"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {!ch.collapsed && !phone && (
                 <div className="li-body">
                   {/* Column headers */}
                   <div className="li-head">
@@ -435,6 +459,7 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
                               onFocus={() => setActiveVoceId(v.id)}
                               onBlur={() => setTimeout(() => setActiveVoceId(null), 250)}
                               placeholder={t("manualQuote.itemDescriptionPlaceholder")}
+                              aria-label={t("manualQuote.colDescription")}
                               className="inp-sm"
                               disabled={isSubmitting}
                             />
@@ -545,6 +570,7 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
                       value={ch.osservazione}
                       onChange={e => updateChapter(ch.id, { osservazione: e.target.value })}
                       placeholder={t("manualQuote.chapterNotePlaceholder")}
+                      aria-label={t("manualQuote.chapterNotePlaceholder")}
                       className="inp-sm dashed"
                       disabled={isSubmitting}
                     />
@@ -657,11 +683,46 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
       </section>
 
       {/* ── Submit ── */}
-      <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn btn-navy" style={{ width: "100%" }}>
-        {isSubmitting
-          ? <><Loader2 className="h-4 w-4 animate-spin" />{t("manualQuote.creatingInProgress")}</>
-          : <>{t("manualQuote.createQuote")} <ArrowRight className="chev" /></>}
-      </button>
+      <StickyActionBar label={t("manualQuote.createQuote")}>
+        <button type="button" onClick={handleSubmit} disabled={isSubmitting} className="btn btn-navy" data-primary-action>
+          {isSubmitting
+            ? <><Loader2 className="h-4 w-4 animate-spin" />{t("manualQuote.creatingInProgress")}</>
+            : <>{t("manualQuote.createQuote")} <ArrowRight className="chev" /></>}
+        </button>
+      </StickyActionBar>
+
+      {sheetChapter && (
+        <LineItemSheet
+          open={!!sheet}
+          onOpenChange={(o) => { if (!o) setSheet(null); }}
+          isNew={!sheetVoce}
+          initial={sheetVoce ? { descrizione: sheetVoce.descrizione, um: sheetVoce.um, quantita: sheetVoce.quantita, prezzoUnitario: sheetVoce.prezzoUnitario } : { descrizione: "", um: "hrs", quantita: "1", prezzoUnitario: "" }}
+          units={UM_OPTIONS}
+          onSave={saveSheetLine}
+          onDelete={sheetVoce && sheetChapter.voci.length > 1 ? () => removeVoce(sheetChapter.id, sheetVoce.id) : undefined}
+          descTools={(draft, patch) => {
+            const q = draft.descrizione.trim().toLowerCase();
+            const matches = q.length >= 2 ? catalogItems.filter((item) => item.nome.toLowerCase().includes(q) && item.nome.toLowerCase() !== q).slice(0, 4) : [];
+            return (
+              <div className="line-sheet-tools">
+                <AISuggestButton
+                  voce={{ id: "sheet", ...draft }}
+                  chapterTitle={sheetChapter.titolo}
+                  projectTitle={titoloRiga2}
+                  onSuggest={(desc) => patch({ descrizione: desc })}
+                  labelled
+                />
+                {matches.map((item) => (
+                  <button key={item.id} type="button" className="pill" onClick={() => patch({ descrizione: item.nome, um: item.um, prezzoUnitario: String(item.prezzoUnitario) })}>
+                    {item.nome} <span className="faint">({item.um}) ${item.prezzoUnitario}</span>
+                  </button>
+                ))}
+              </div>
+            );
+          }}
+        />
+      )}
     </div>
+
   );
 }

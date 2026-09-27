@@ -20,7 +20,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 102 | Settings, rebuilt (desktop and phone) | A | **done** 2026-09-26 |
 | 103 | Integrations: an app directory with real logos | A | **done** 2026-09-26 |
 | 104 | Today (dashboard home) | A | **done** 2026-09-26 |
-| 105 | Quotes: list, new quote, quote detail | A | not started |
+| 105 | Quotes: list, new quote, quote detail | A | **done** 2026-09-27 |
 | 106 | Jobs: list and the job page | A | not started |
 | 107 | Money and people: invoices, clients, leads, contracts | A | not started |
 | 108 | The crew app and the foreman | A | not started |
@@ -373,3 +373,36 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en,fr --widths=375,768,1280 --routes==/dashboard` (42 pages, `.qa/p104`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; the only phone-rule warning is the foreman's home (Phase 108).
 - Phone sheets: `.qa/phone-sheets/p104/` (before = `visual-mobile-audit`): the owner's home **2.8 screens (was 5.3)**, all five Needs-you rows on the first screen; the Pro owner's 1.4.
 - `vitest src/today` 8/8, route-matrix test 12/12 (without the Copy files), typecheck (quote-ai, api-server), eslint on the touched files (one old warning in the composer), knip (nothing new), i18n-audit (no new findings).
+
+### Phase 105 — 2026-09-27
+
+**Built**
+- **Quote detail**: a header card first — the client as the heading, the job's subject under it, the status chip, the total — then the document. **One primary** by where the quote is: Unlock quote (locked) → Send (never emailed) → Copy link for client (emailed; Send again in ⋯) → Start job / **Open job** (accepted; the page now knows its job). Everything else is in ⋯ (`ActionSheet`): Edit, Regenerate, Download PDF, Pro PDF / Pro spec, PDF layout (phone), Duplicate, and **Archive / Delete**, which only the list's row menu had. On a phone the ⋯ + primary dock at the bottom (`StickyActionBar`); on a desktop they sit under the total. The Actions side card is gone (it repeated the head buttons); the "editing is locked" notice sits under the header card.
+- On a phone: the company letterhead, the document title and the chapter summary table are hidden (the header card says it); chapters are **collapsible rows** (closed when there are several) and **lines are rows** — description on two lines at most, "qty unit × price" under it, the amount right (`components/quotes/line-rows.tsx`). Professional and Elegant read like Standard there; the PDF keeps its layout. The PDF template card and the chapter summary card are hidden on phones (⋯ → PDF layout opens the same choices in a sheet).
+- **Edit mode on a phone**: chapters with their lines as rows; tapping a line opens it in a **bottom sheet** (description, quantity, unit, unit price with the decimal keypad, the line total; Done / Delete line); "Add item" opens an empty one. Save / Cancel are the docked bar. Replaces the stacked five-input cards.
+- **Quotes list**: rows on a phone (client · subject and date · amount and status chip); the search stays at the top while the list scrolls; the status filter is a sheet with counts, the one that's on shows as a removable chip. New statuses **Sent** and **Accepted** (both were "Unlocked") and filters for them. The page's New quote button hides on a phone (the + in the top bar is it).
+- **New quote**: modes as `ScrollTabs`; the **describe box first** — a multiline field with the photo and microphone buttons inside it, the examples only while it's empty; then the client; then **Options** — one line ("Standard · no target amount") that opens a sheet with the layout and the target amount (`components/quotes/quote-options.tsx`). **Write my quote** is the docked primary; Ctrl/⌘+Enter also sends (Enter is a new line now).
+- **Manual builder**: its layout cards became the same Options line; on a phone its lines are rows edited in the same sheet (with Improve with AI and price-list matches under the description); **Create quote** docks at the bottom.
+- API: `sentAt` on a quote and in the list, the list's `title`, and `jobId` on `GET /quotes/{id}` (spec + codegen). 23 new EN/FR strings; runbook §41; `qa:visual` drives the Options sheet, the manual tab and a line of it, the list's filter, a quote's ⋯, its edit mode and a line of it, a locked quote and the foreman's read-only quote.
+
+**Decided**
+- The primary follows the quote's life, not the role's full menu: the thing you do next with this quote. Duplicate, PDF, Regenerate are all one tap further.
+- A phone shows one layout for every template: Professional's numbered navy table and Elegant's flat list are PDF looks; on a 375 px screen they were a horizontal scroll of 6-column tables.
+- Chapters start closed on a phone only when there are several: the header card has the total, the chapter rows have the subtotals, and the long quote fits in 2.8 screens instead of 10.5.
+- The target amount and the layout are rarely changed: one line that says what they are, not three cards and a field above the box.
+- `qa:visual`'s `stacked-buttons` no longer counts a section header that opens and closes (`[aria-expanded]`) or a button that is a list row (`li > button`) — rows, not stacked actions, like the settings switch rows in Phase 102 (MOBILE-RULES.md updated).
+
+**Found**
+- **The quotes list said "0 line items" for every AI or manual quote**: it counted the legacy flat `items` only; those quotes keep their lines in chapters. `GET /api/quotes` counts both now.
+- **The manual builder saved "mq" as the unit of every new line**: the default unit was Italian and not in the unit list, so the picker showed "sq.ft" while "mq" went into the quote. New lines default to "LS".
+- The manual builder's three header fields had labels that weren't tied to their inputs, and its line inputs had none (axe `label`, critical — never swept before: the manual tab had no drive state). Labelled now.
+- The Original input card showed a lone dash on manual quotes (no request text). Hidden when empty.
+
+**Deferred**
+- Phase 106 picks up jobs; the quote's side cards (Good/Better/Best, contract, payment schedule) keep their Phase 60 look under the document on a phone.
+- There is no "trade" option: nothing in the quote request takes one (the AI infers it from the description).
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/quotes,dashboard/new` (90 pages, `.qa/p105b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, 0 phone-rule warnings. The first pass (`.qa/p105`, EN 375 + 1280) found the unlabelled manual fields, a label-in-name mismatch on the line rows (the aria-label dropped the "qty × price" line; now the visible text is the name after an sr-only "Edit line:"), and the stacked-buttons false positive; a recheck after the header-card spacer fix (`.qa/p105c`, EN + FR 375, 14 pages) is clean.
+- Phone sheets: `.qa/phone-sheets/p105b/` (before = `visual-mobile-audit`): the long quote **2.8 screens (was 10.5)**, first screen = client, subject, status, total and Send; new quote 1.3 (was 1.5) with the describe box on screen one; the list 1.0.
+- typecheck (quote-ai, api-server, libs via codegen), eslint on the touched files (two old exhaustive-deps warnings), knip (nothing new), i18n-audit (no new findings).

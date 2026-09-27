@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Project manager home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="plus"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">EB</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Morning, Emma</h1>
+    <p>Your 3 jobs · 1 inspection today</p>
+    <span class="role-chip"><i data-lucide="clipboard-list" style="width:14px;height:14px"></i>Project manager</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>Ask what's slipping, update a client…</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Needs you</h2><span class="count">4</span></div>
+    <div class="row"><div class="lead red"><i data-lucide="calendar-x"></i></div>
+      <div class="body"><div class="t">Tile start will slip</div><div class="s">Highland · drywall blocked, 3 days at risk</div></div>
+      <button class="btn primary">Re-plan</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="hourglass"></i></div>
+      <div class="body"><div class="t">Waiting on Volt Electric</div><div class="s">Panel upgrade quote · asked 3 days ago</div></div>
+      <button class="btn outline">Chase</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="file-diff"></i></div>
+      <div class="body"><div class="t">Change order to draft</div><div class="s">Reid asked for a heated bench</div></div>
+      <button class="btn outline">Draft</button></div>
+    <div class="row"><div class="lead teal"><i data-lucide="message-circle"></i></div>
+      <div class="body"><div class="t">Weekly update due</div><div class="s">Elmcrest · the client gets one every Friday</div></div>
+      <button class="btn outline">Write</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>My jobs</h2><span class="link">All</span></div>
+    <div class="row"><div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="t">Highland master suite</span><span class="chip red">At risk</span></div>
+      <div class="s num">Gate 3 of 5 · budget used 58% at 65% done</div>
+      <div class="bar"><i style="width:65%"></i></div></div></div>
+    <div class="row"><div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="t">148 Elmcrest kitchen</span><span class="chip green">On track</span></div>
+      <div class="s num">Gate 2 of 4 · budget used 37% at 40% done</div>
+      <div class="bar"><i style="width:40%"></i></div></div></div>
+    <div class="row"><div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="t">82 King St basement suite</span><span class="chip amber">Over budget</span></div>
+      <div class="s num">Gate 4 of 6 · budget used 71% at 60% done</div>
+      <div class="bar"><i style="width:60%;background:var(--amber)"></i></div></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>This week</h2></div>
+    <div class="row"><div class="lead teal"><i data-lucide="search-check"></i></div>
+      <div class="body"><div class="t">Framing inspection · King St</div><div class="s">Today 14:00 · City of Burnaby</div></div><span class="chip grey">Booked</span></div>
+    <div class="row"><div class="lead"><i data-lucide="truck"></i></div>
+      <div class="body"><div class="t">Cabinets delivered · Elmcrest</div><div class="s">Thu 8:00 · 14 boxes</div></div><span class="chip green">Confirmed</span></div>
+    <div class="row"><div class="lead"><i data-lucide="users"></i></div>
+      <div class="body"><div class="t">Drywall crew · Highland</div><div class="s">Fri · depends on the sign-off</div></div><span class="chip amber">Tentative</span></div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="briefcase"></i>Jobs</div>
+  <div class="tab"><i data-lucide="calendar"></i>Schedule</div>
+  <div class="tab"><i data-lucide="folder"></i>Documents</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

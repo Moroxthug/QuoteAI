@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Safety coordinator home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="plus"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">GH</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Morning, Gina</h1>
+    <p>3 active sites · 0 incidents this month</p>
+    <span class="role-chip"><i data-lucide="shield-check" style="width:14px;height:14px"></i>Safety coordinator</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>"Which sites haven't had a talk this week?"</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Needs you</h2><span class="count">4</span></div>
+    <div class="row"><div class="lead red"><i data-lucide="file-x"></i></div>
+      <div class="body"><div class="t">Volt Electric clearance expired</div><div class="s">WorkSafeBC letter · on site at King St today</div></div>
+      <button class="btn primary">Request</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="clipboard-pen"></i></div>
+      <div class="body"><div class="t">Hazard assessment to sign</div><div class="s">Highland · wet-weather work, submitted by Luc</div></div>
+      <button class="btn outline">Review</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="badge-alert"></i></div>
+      <div class="body"><div class="t">2 tickets expiring</div><div class="s">Amir fall protection · Kai first aid</div></div>
+      <button class="btn outline">Book</button></div>
+    <div class="row"><div class="lead teal"><i data-lucide="message-square-warning"></i></div>
+      <div class="body"><div class="t">Near miss to follow up</div><div class="s">Elmcrest · unsecured ladder, Tuesday</div></div>
+      <button class="btn outline">Open</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Toolbox talks</h2><span class="sub">this week</span></div>
+    <div class="row"><div class="body"><div class="t">Highland Reno</div><div class="s">Due today · Luc</div></div><span class="chip amber">Due</span></div>
+    <div class="row"><div class="body"><div class="t">148 Elmcrest</div><div class="s">Mon · ladders · 4 of 4 signed</div></div><span class="chip green">Done</span></div>
+    <div class="row"><div class="body"><div class="t">82 King St</div><div class="s">Mon · 2 of 3 signed · Volt missing</div></div><span class="chip amber">1 missing</span></div>
+  </section>
+
+  <section class="card">
+    <div class="stats">
+      <div><div class="l">Days safe</div><div class="v num">112</div><div class="d">no lost time</div></div>
+      <div><div class="l">Talks</div><div class="v num">96%</div><div class="d">on time, 90 days</div></div>
+      <div><div class="l">Tickets</div><div class="v num">41/43</div><div class="d">current</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>COR audit</h2><span class="sub">due March</span><span class="link">Checklist</span></div>
+    <div class="row" style="border-top:1px solid var(--line)"><div class="body">
+      <div style="display:flex;justify-content:space-between"><span class="t">Evidence ready</span><span class="s num">68%</span></div>
+      <div class="bar"><i style="width:68%"></i></div>
+      <div class="s" style="margin-top:6px">Missing: 2 site inspections, emergency drill record</div></div></div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="shield-check"></i>Safety</div>
+  <div class="tab"><i data-lucide="users"></i>Crew</div>
+  <div class="tab"><i data-lucide="folder"></i>Documents</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

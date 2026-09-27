@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Office manager home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="plus"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">SL</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Hi, Sophie</h1>
+    <p>2 calls to return · 3 invoices to send</p>
+    <span class="role-chip"><i data-lucide="phone" style="width:14px;height:14px"></i>Office manager</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>Ask, book, remind, send…</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Needs you</h2><span class="count">5</span></div>
+    <div class="row"><div class="lead teal"><i data-lucide="phone-incoming"></i></div>
+      <div class="body"><div class="t">Call back: Mrs. Okafor</div><div class="s">Missed call 8:42 · deck quote question</div></div>
+      <button class="btn primary">Call</button></div>
+    <div class="row"><div class="lead"><i data-lucide="inbox"></i></div>
+      <div class="body"><div class="t">2 new leads</div><div class="s">Basement suite, Surrey · roof leak, Burnaby</div></div>
+      <button class="btn outline">Book visits</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="send"></i></div>
+      <div class="body"><div class="t">3 invoices ready to send</div><div class="s num">$23,480 · milestones completed yesterday</div></div>
+      <button class="btn outline">Review</button></div>
+    <div class="row"><div class="lead red"><i data-lucide="clock-alert"></i></div>
+      <div class="body"><div class="t">3 invoices overdue</div><div class="s num">$18,640 · oldest 34 days</div></div>
+      <button class="btn outline">Remind</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="pen-line"></i></div>
+      <div class="body"><div class="t">Chen contract not signed</div><div class="s">Sent 4 days ago</div></div>
+      <button class="btn outline">Nudge</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Today</h2><span class="sub">who's where</span><span class="link">Schedule</span></div>
+    <div class="row"><div class="lead num" style="font-size:11px">7:00</div>
+      <div class="body"><div class="t">Highland Reno</div><div class="s">Luc, Dave, Amir, Jo · Sam not in yet</div></div><span class="chip amber">1 late</span></div>
+    <div class="row"><div class="lead num" style="font-size:11px">7:15</div>
+      <div class="body"><div class="t">148 Elmcrest</div><div class="s">Dana, Kai, Ben</div></div><span class="chip green">On site</span></div>
+    <div class="row"><div class="lead num" style="font-size:11px">9:30</div>
+      <div class="body"><div class="t">Site visit · Chen</div><div class="s">Priya</div></div><span class="chip grey">Planned</span></div>
+    <div class="row"><div class="lead num" style="font-size:11px">14:00</div>
+      <div class="body"><div class="t">Inspection · King St</div><div class="s">City of Burnaby · framing</div></div><span class="chip grey">Booked</span></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Money this month</h2></div>
+    <div class="stats">
+      <div><div class="l">Invoiced</div><div class="v num">$112k</div><div class="d">28 invoices</div></div>
+      <div><div class="l">Collected</div><div class="v num">$86.4k</div><div class="d">77%</div></div>
+      <div><div class="l">To match</div><div class="v num">2</div><div class="d">e-Transfers</div></div>
+    </div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="file-text"></i>Quotes</div>
+  <div class="tab"><i data-lucide="briefcase"></i>Jobs</div>
+  <div class="tab"><i data-lucide="wallet"></i>Money</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

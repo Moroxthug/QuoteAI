@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Dispatcher home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="plus"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">RT</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Hi, Raj</h1>
+    <p>14 calls today · 2 not assigned</p>
+    <span class="role-chip"><i data-lucide="radio" style="width:14px;height:14px"></i>Dispatcher</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>"Who can take a no-heat call in Burnaby?"</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Not assigned</h2><span class="count">2</span></div>
+    <div class="row"><div class="lead red"><i data-lucide="flame"></i></div>
+      <div class="body"><div class="t">No heat · furnace</div><div class="s">Burnaby · called 8:05 · senior at home</div></div>
+      <button class="btn primary">Assign</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="droplets"></i></div>
+      <div class="body"><div class="t">Leaking water heater</div><div class="s">New Westminster · called 8:20</div></div>
+      <button class="btn outline">Assign</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Running late</h2><span class="count">1</span></div>
+    <div class="row"><div class="lead amber">KM</div>
+      <div class="body"><div class="t">Kai → Dhillon, 9:00</div><div class="s num">Still at previous call · 25 min late</div></div>
+      <button class="btn outline">Tell client</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Techs</h2><span class="sub num">5 working</span></div>
+    <div class="row"><div class="lead green">AL</div>
+      <div class="body"><div class="t">Ana L.</div><div class="s">Gas fitter · free · 6 km from Burnaby call</div></div><span class="chip green">Free</span></div>
+    <div class="row"><div class="lead">KM</div>
+      <div class="body"><div class="t">Kai M.</div><div class="s">Plumber · on call, Richmond · done ~9:20</div></div><span class="chip teal">On call</span></div>
+    <div class="row"><div class="lead">TB</div>
+      <div class="body"><div class="t">Theo B.</div><div class="s">HVAC · driving to Coquitlam</div></div><span class="chip teal">Driving</span></div>
+    <div class="row"><div class="lead">JP</div>
+      <div class="body"><div class="t">Jess P.</div><div class="s">Plumber, apprentice · with Kai</div></div><span class="chip grey">Paired</span></div>
+    <div class="row"><div class="lead green">MW</div>
+      <div class="body"><div class="t">Mo W.</div><div class="s">HVAC · free after 10:00</div></div><span class="chip grey">10:00</span></div>
+  </section>
+
+  <section class="card">
+    <div class="stats">
+      <div><div class="l">Done</div><div class="v num">4</div><div class="d">of 14</div></div>
+      <div><div class="l">On time</div><div class="v num">92%</div><div class="d">this week</div></div>
+      <div><div class="l">Callbacks</div><div class="v num">1</div><div class="d">this week</div></div>
+    </div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="radio"></i>Dispatch</div>
+  <div class="tab"><i data-lucide="calendar"></i>Schedule</div>
+  <div class="tab"><i data-lucide="users"></i>Clients</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

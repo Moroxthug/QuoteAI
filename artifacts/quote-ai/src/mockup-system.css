@@ -2912,3 +2912,36 @@ a.w-now-row:hover { background: var(--soft); }
 .ag-free { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--soft); font-size: var(--fs-meta); font-weight: 700; color: var(--muted-mk); }
 .ag-free .chip { min-height: 36px; padding: 0 14px; background: var(--soft-2); color: var(--navy); font-size: 13px; }
 .ag-free button.chip:hover { background: var(--teal-t); }
+
+/* ── Phase 110: the long tail ─────────────────────────────────────────────── */
+/* A phone row with its own ⋯ (ResponsiveTable rowActions). */
+.lrow-split { display: flex; align-items: center; border-top: 1px solid var(--soft); }
+.lrows > li.lrow-split:first-child { border-top: none; }
+.lrow-split > .lrow { flex: 1; min-width: 0; border-top: none; }
+.lrow-split > .row-more { margin-right: 8px; }
+.lrow.dim, .tbl tr.dim { opacity: .6; }
+.tbl tr.total td { font-weight: 800; color: var(--navy); }
+.lrow.total { background: var(--soft); }
+.lrow-lead > input[type="checkbox"] { width: 20px; height: 20px; display: block; }
+.lrow-end .cta-link, .lrow-end .btn { white-space: nowrap; }
+.lrows.wrap-meta .lrow-meta { white-space: normal; }
+.t-unit { font-weight: 600; color: var(--faint); font-size: var(--fs-meta); }
+.pay-id-inp { width: 180px; }
+@media (max-width: 640px) { .pay-id-inp { width: 130px; } }
+@media (max-width: 640px) {
+  /* The job setup's save bar docks like an action bar (it floated over the tab bar). */
+  .save-bar.dock-phone { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; margin: 0; flex-wrap: nowrap; gap: 8px; border-radius: 0; border-width: 1px 0 0; box-shadow: none; padding: 10px max(var(--gutter-phone), var(--safe-right)) calc(10px + var(--safe-bottom)) max(var(--gutter-phone), var(--safe-left)); }
+  .has-tabbar .save-bar.dock-phone { bottom: calc(var(--tabbar-h) + var(--safe-bottom)); padding-bottom: 10px; }
+  .save-bar.dock-phone > .foot-note { display: none; }
+  .save-bar.dock-phone > .btn { flex: 1; min-height: var(--tap); }
+  .save-bar.dock-phone > .btn.secondary { flex: 0 1 auto; }
+  /* Import: the three steps as three short lines, not three cards. */
+  .steps-3 { gap: 8px; }
+  .steps-3 .step-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .steps-3 .step-card .step-num { margin: 0; flex: none; }
+  .steps-3 .step-card b { margin: 0; font-size: 14.5px; }
+  .steps-3 .step-card p { display: none; }
+}
+@media (max-width: 640px) { .stat-grid.setup-strip .val:not(.sm) { font-size: 20px; white-space: nowrap; } }
+.ny-pill.sq { min-width: 44px; padding: 0 10px; }
+@media (min-width: 641px) { .head-actions > .action-bar { flex-wrap: wrap; } }

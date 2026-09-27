@@ -7,8 +7,12 @@ import { AlertTriangle, ArrowRight, BellRing, CalendarClock, Check, Download, Ex
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { ListRow, ResponsiveTable, type Column } from "@/components/mobile/list-row";
+import { RowMore } from "@/components/mobile/row-more";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useCan } from "@/hooks/use-role";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { formatCents } from "@/lib/jobs-api";
@@ -21,6 +25,7 @@ import {
   type ReminderPresetDto,
   type ReminderRecurrence,
   type Registrations,
+  type T5018Dto,
 } from "@/lib/compliance-api";
 
 // ── Phase 87: /dashboard/compliance ─────────────────────────────────────────
@@ -85,16 +90,7 @@ export default function CompliancePage() {
 
       {data?.enabled && (
         <>
-          <div className="pills mb-4">
-            {TABS.map((k) => {
-              const Icon = TAB_ICONS[k];
-              return (
-                <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
-                  <Icon /> {t(`compliance.tab.${k}`)}{k === "deadlines" && overdue ? <span className="cnt">{overdue}</span> : null}
-                </button>
-              );
-            })}
-          </div>
+          <ScrollTabs sticky label={t("compliance.title")} value={tab} onChange={(k) => setTab(k as Tab)} tabs={TABS.map((k) => ({ id: k, label: t(`compliance.tab.${k}`), icon: TAB_ICONS[k], count: k === "deadlines" && overdue ? overdue : undefined }))} />
           {tab === "deadlines" && <DeadlinesTab deadlines={data.deadlines} reminders={data.reminders} settings={data.settings} registrations={data.registrations} locale={locale} onWorksheet={openWorksheet} onReminders={() => setTab("reminders")} />}
           {tab === "salesTax" && <SalesTaxTab deadlines={data.deadlines} period={period} setPeriod={setPeriod} locale={locale} />}
           {tab === "t5018" && <T5018Tab settings={data.settings} />}
@@ -130,6 +126,7 @@ function DeadlinesTab({ deadlines, reminders, settings, registrations, locale, o
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [setupOpen, setSetupOpen] = useState(false);
+  const phone = useMediaQuery("(max-width: 640px)");
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["compliance"] });
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
   const mark = useMutation({ mutationFn: (d: DeadlineDto) => complianceApi.markFiled(d.kind, d.periodKey), onSuccess: () => { refresh(); toast({ title: t("compliance.markedToast") }); }, onError });
@@ -192,6 +189,48 @@ function DeadlinesTab({ deadlines, reminders, settings, registrations, locale, o
         groups.filter((g) => g.rows.length > 0).map((g) => (
           <section key={g.key} className="card">
             <div className="card-head"><div><h2>{t(`compliance.group.${g.key}`)}</h2></div></div>
+            {phone ? (
+              // Phase 110: a deadline on a phone — what, when, where it stands; preparing and marking it filed behind its ⋯.
+              <ul className="lrows" aria-label={t(`compliance.group.${g.key}`)}>
+                {g.rows.map((row) => {
+                  if (row.type === "deadline") {
+                    const d = row.d;
+                    const actions = [
+                      d.hasWorksheet && { label: t("compliance.prepare"), icon: Receipt, onSelect: () => onWorksheet(d) },
+                      d.kind === "t5018" && { label: t("compliance.prepare"), icon: Users, href: "/dashboard/compliance?tab=t5018" },
+                      canFull && (d.state === "filed"
+                        ? { label: t("compliance.unmark"), icon: Undo2, onSelect: () => unmark.mutate(d) }
+                        : { label: t(d.kind === "sales_tax_payment" || d.kind === "gst_instalment" ? "compliance.markPaid" : "compliance.markFiled"), icon: Check, onSelect: () => mark.mutate(d) }),
+                      { label: t(`compliance.authority.${d.kind === "t5018" ? "t5018" : d.authority}`), icon: ExternalLink, separated: true, onSelect: () => window.open(d.url, "_blank", "noopener,noreferrer") },
+                    ];
+                    return (
+                      <li key={d.key} className="lrow-split">
+                        <ListRow
+                          title={deadlineLabel(t, d)}
+                          meta={[format(dayDate(d.dueDate), "PP", { locale }), t("compliance.period").replace("{from}", format(dayDate(d.periodStart), "d MMM", { locale })).replace("{to}", format(dayDate(d.periodEnd), "d MMM yyyy", { locale }))]}
+                          end={<StateChip state={d.state} daysLeft={d.daysLeft} />}
+                        />
+                        <RowMore label={t("team.m.rowActions").replace("{name}", deadlineLabel(t, d))} actions={actions} />
+                      </li>
+                    );
+                  }
+                  const r = row.r;
+                  return (
+                    <li key={r.id} className={canFull || r.url ? "lrow-split" : undefined}>
+                      <ListRow
+                        title={r.title}
+                        meta={[format(dayDate(r.dueDate), "PP", { locale }), t(`compliance.reminderKind.${r.kind}`), r.authority]}
+                        end={<StateChip state={r.state} daysLeft={r.daysLeft} />}
+                      />
+                      <RowMore label={t("team.m.rowActions").replace("{name}", r.title)} actions={[
+                        canFull && { label: t("compliance.done"), icon: Check, onSelect: () => done.mutate(r.id) },
+                        !!r.url && { label: t("compliance.open"), icon: ExternalLink, onSelect: () => window.open(r.url!, "_blank", "noopener,noreferrer") },
+                      ]} />
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
             <div className="tbl-wrap">
               <table className="tbl">
                 <thead>
@@ -245,6 +284,7 @@ function DeadlinesTab({ deadlines, reminders, settings, registrations, locale, o
                 </tbody>
               </table>
             </div>
+            )}
           </section>
         ))
       )}
@@ -341,15 +381,6 @@ function SetupDialog({ open, onOpenChange, settings, province, hasPst }: { open:
 
 // ── Sales tax worksheet ──────────────────────────────────────────────────────
 
-function Stat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "ok" | "bad" | "teal" }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className={cn("val", tone)}>{value}</p>
-      {sub && <p className="sub">{sub}</p>}
-    </div>
-  );
-}
 
 function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: DeadlineDto[]; period: Period | null; setPeriod: (p: Period) => void; locale: typeof enCA }) {
   const { t } = useLanguage();
@@ -372,6 +403,7 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
   const p = period ?? fallback;
   const { data, isLoading, error } = useQuery({ queryKey: ["worksheet", p.from, p.to], queryFn: () => complianceApi.worksheet(p.from, p.to), retry: false });
   const s = data?.summary;
+  const phone = useMediaQuery("(max-width: 640px)");
   const qc = data?.province === "QC";
   const pstLabel = data?.province === "MB" ? "RST" : "PST";
 
@@ -398,19 +430,19 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
 
       {s && data && (
         <>
-          <section className="stat-grid">
-            <Stat label={t("compliance.line101")} value={formatCents(s.salesCents)} sub={t("compliance.invoiceCount").replace("{n}", String(s.invoiceCount))} />
-            <Stat label={qc ? t("compliance.line105qc") : t("compliance.line105")} value={formatCents(s.gstHst.collectedCents)} />
-            <Stat label={t("compliance.line108")} value={formatCents(s.gstHst.creditsCents)} tone="teal" />
-            <Stat label={t("compliance.line109")} value={formatCents(s.gstHst.netCents)} sub={s.gstHst.netCents < 0 ? t("compliance.refund") : undefined} tone={s.gstHst.netCents < 0 ? "ok" : undefined} />
-          </section>
+          <StatStrip label={t("compliance.tab.salesTax")} items={[
+            { label: t("compliance.line101"), value: formatCents(s.salesCents), sub: t("compliance.invoiceCount").replace("{n}", String(s.invoiceCount)) },
+            { label: qc ? t("compliance.line105qc") : t("compliance.line105"), value: formatCents(s.gstHst.collectedCents) },
+            { label: t("compliance.line108"), value: formatCents(s.gstHst.creditsCents) },
+            { label: t("compliance.line109"), value: formatCents(s.gstHst.netCents), sub: s.gstHst.netCents < 0 ? t("compliance.refund") : undefined, tone: s.gstHst.netCents < 0 ? "ok" : undefined },
+          ]} />
           {(qc || s.qst.collectedCents !== 0 || s.qst.creditsCents !== 0) && (
-            <section className="stat-grid">
-              <Stat label={t("compliance.qstCollected")} value={formatCents(s.qst.collectedCents)} />
-              <Stat label={t("compliance.qstCredits")} value={formatCents(s.qst.creditsCents)} tone="teal" />
-              <Stat label={t("compliance.qstNet")} value={formatCents(s.qst.netCents)} sub={s.qst.netCents < 0 ? t("compliance.refund") : undefined} />
-              <Stat label={t("compliance.nonRecoverable")} value={formatCents(s.nonRecoverableCents)} />
-            </section>
+            <StatStrip label="QST" items={[
+              { label: t("compliance.qstCollected"), value: formatCents(s.qst.collectedCents) },
+              { label: t("compliance.qstCredits"), value: formatCents(s.qst.creditsCents) },
+              { label: t("compliance.qstNet"), value: formatCents(s.qst.netCents), sub: s.qst.netCents < 0 ? t("compliance.refund") : undefined, tone: s.qst.netCents < 0 ? "ok" : undefined },
+              { label: t("compliance.nonRecoverable"), value: formatCents(s.nonRecoverableCents) },
+            ]} />
           )}
           {s.pst.collectedCents !== 0 && (
             <div className="notice info"><Info /><span className="grow">{t("compliance.pstCollected").replace("{tax}", pstLabel).replace("{amount}", formatCents(s.pst.collectedCents))}</span></div>
@@ -428,6 +460,20 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
           <section className="card">
             <div className="card-head"><div><h2>{t("compliance.invoicesIssued")}</h2><p className="sub">{t("compliance.invoicesIssuedSub")}</p></div></div>
             {data.invoices.length === 0 ? <div className="card-empty">{t("compliance.noInvoices")}</div> : (
+              phone ? (
+                <ul className="lrows" aria-label={t("compliance.invoicesIssued")}>
+                  {data.invoices.slice(0, 100).map((inv) => (
+                    <li key={inv.id}>
+                      <ListRow
+                        href={`/dashboard/invoices/${inv.id}`}
+                        title={`${inv.number} · ${inv.customer}`}
+                        meta={[format(dayDate(inv.day), "PP", { locale }), inv.taxLines.map((l) => `${l.code} ${formatCents(l.amountCents)}`).join(" · ") || null]}
+                        amount={formatCents(inv.taxableCents)}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
               <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("compliance.invoicesIssued")}>
                 <table className="tbl">
                   <thead><tr><th>{t("compliance.col.date")}</th><th>{t("compliance.col.invoice")}</th><th className="t-amt">{t("compliance.col.preTax")}</th><th className="t-amt">{t("compliance.col.tax")}</th></tr></thead>
@@ -443,12 +489,33 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
                   </tbody>
                 </table>
               </div>
+              )
             )}
           </section>
 
           <section className="card">
             <div className="card-head"><div><h2>{t("compliance.purchases")}</h2><p className="sub">{t("compliance.purchasesSub")}</p></div></div>
             {data.costs.length === 0 ? <div className="card-empty">{t("compliance.noPurchases")}</div> : (
+              phone ? (
+                <ul className="lrows" aria-label={t("compliance.purchases")}>
+                  {data.costs.slice(0, 100).map((c) => {
+                    const b = c.taxBreakdown;
+                    const split = (b.GST ?? 0) + (b.HST ?? 0) + (b.QST ?? 0) + (b.PST ?? 0) + (b.RST ?? 0);
+                    const counted = c.status === "confirmed" && !(c.taxCents > 0 && split === 0);
+                    const credit = (["GST", "HST", "QST"] as const).filter((k) => b[k]).map((k) => `${k} ${formatCents(b[k]!)}`).join(" · ");
+                    return (
+                      <li key={c.id}>
+                        <ListRow
+                          title={c.vendor || c.description || "—"}
+                          meta={[format(dayDate(c.day), "PP", { locale }), counted ? credit || null : null]}
+                          amount={formatCents(c.subtotalCents)}
+                          end={counted ? undefined : <span className="chip chip-yellow">{c.status !== "confirmed" ? t("compliance.awaitingReview") : t("compliance.notSplit")}</span>}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
               <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("compliance.purchases")}>
                 <table className="tbl">
                   <thead><tr><th>{t("compliance.col.date")}</th><th>{t("compliance.col.vendor")}</th><th className="t-amt">{t("compliance.col.preTax")}</th><th className="t-amt">{t("compliance.col.credit")}</th></tr></thead>
@@ -470,6 +537,7 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
                   </tbody>
                 </table>
               </div>
+              )
             )}
             {(data.costs.length > 100 || data.invoices.length > 100) && <div className="card-foot"><span className="foot-note">{t("compliance.truncated")}</span></div>}
           </section>
@@ -487,6 +555,7 @@ function T5018Tab({ settings }: { settings: ComplianceSettings }) {
   // Before the June 30 deadline, last year is the one being prepared.
   const [year, setYear] = useState(new Date().getMonth() < 6 ? thisYear - 1 : thisYear);
   const { data, isLoading } = useQuery({ queryKey: ["t5018", year], queryFn: () => complianceApi.t5018(year) });
+  const phone = useMediaQuery("(max-width: 639.98px)");
   return (
     <div className="stack" style={{ gap: 16 }}>
       {!settings.t5018 && <div className="notice info"><Info /><span className="grow">{t("compliance.t5018Off")}</span></div>}
@@ -503,23 +572,20 @@ function T5018Tab({ settings }: { settings: ComplianceSettings }) {
         {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full" /></div> : !data || data.recipients.length === 0 ? (
           <div className="card-empty">{t("compliance.t5018Empty")}</div>
         ) : (
-          <div className="tbl-wrap">
-            <table className="tbl">
-              <thead><tr><th>{t("compliance.col.recipient")}</th><th>{t("compliance.col.entries")}</th><th className="t-amt">{t("compliance.col.preTax")}</th><th className="t-amt">{t("compliance.col.tax")}</th><th className="t-amt">{t("compliance.col.total")}</th><th></th></tr></thead>
-              <tbody>
-                {data.recipients.map((r) => (
-                  <tr key={r.key}>
-                    <td><span className="t-strong">{r.name}</span><span className="t-sub">{t(`compliance.source.${r.source}`)}{r.bankDated > 0 ? ` · ${t("compliance.bankDated").replace("{n}", String(r.bankDated))}` : ""}</span></td>
-                    <td>{r.entryCount}</td>
-                    <td className="t-amt">{formatCents(r.subtotalCents)}</td>
-                    <td className="t-amt">{formatCents(r.taxCents)}</td>
-                    <td className="t-amt t-strong">{formatCents(r.totalCents)}</td>
-                    <td>{r.overThreshold ? <span className="chip chip-teal">{t("compliance.slipLikely")}</span> : <span className="chip chip-grey">{t("compliance.under500")}</span>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ResponsiveTable
+            label={t("compliance.tab.t5018")}
+            rows={data.recipients}
+            getKey={(r) => r.key}
+            columns={([
+              { key: "who", header: t("compliance.col.recipient"), mobile: "title", cell: (r) => (phone ? r.name : <><span className="t-strong">{r.name}</span><span className="t-sub">{t(`compliance.source.${r.source}`)}{r.bankDated > 0 ? ` · ${t("compliance.bankDated").replace("{n}", String(r.bankDated))}` : ""}</span></>) },
+              { key: "src", header: "", mobile: "meta", cell: (r) => `${t(`compliance.source.${r.source}`)}${r.bankDated > 0 ? ` · ${t("compliance.bankDated").replace("{n}", String(r.bankDated))}` : ""}` },
+              { key: "n", header: t("compliance.col.entries"), mobile: "meta", cell: (r) => (phone ? t("compliance.m.entries").replace("{n}", String(r.entryCount)) : r.entryCount) },
+              { key: "pre", header: t("compliance.col.preTax"), align: "right", cell: (r) => <span className="t-amt">{formatCents(r.subtotalCents)}</span> },
+              { key: "tax", header: t("compliance.col.tax"), align: "right", cell: (r) => <span className="t-amt">{formatCents(r.taxCents)}</span> },
+              { key: "total", header: t("compliance.col.total"), align: "right", mobile: "amount", cell: (r) => <span className="t-amt t-strong">{formatCents(r.totalCents)}</span> },
+              { key: "slip", header: "", mobile: "end", cell: (r) => (r.overThreshold ? <span className="chip chip-teal">{t("compliance.slipLikely")}</span> : <span className="chip chip-grey">{t("compliance.under500")}</span>) },
+            ] satisfies Column<T5018Dto["recipients"][number]>[]).filter((c) => c.key !== "src" || phone)}
+          />
         )}
         <div className="card-foot"><span className="foot-note">{t("compliance.t5018Foot")}</span></div>
       </section>
@@ -536,6 +602,7 @@ function RemindersTab({ reminders, presets, locale }: { reminders: ReminderDto[]
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<{ open: boolean; reminder: ReminderDto | null }>({ open: false, reminder: null });
+  const phone = useMediaQuery("(max-width: 639.98px)");
   const refresh = () => { queryClient.invalidateQueries({ queryKey: ["compliance"] }); queryClient.invalidateQueries({ queryKey: ["agenda"] }); };
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
   const done = useMutation({ mutationFn: (id: string) => complianceApi.reminderDone(id), onSuccess: refresh, onError });
@@ -548,33 +615,30 @@ function RemindersTab({ reminders, presets, locale }: { reminders: ReminderDto[]
         {canFull && <div className="grow flex justify-end"><button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, reminder: null })}><Plus className="h-4 w-4" /> {t("compliance.addReminder")}</button></div>}
       </div>
       {reminders.length === 0 ? <div className="card-empty">{t("compliance.remindersEmpty")}</div> : (
-        <div className="tbl-wrap">
-          <table className="tbl">
-            <thead><tr><th>{t("compliance.col.due")}</th><th>{t("compliance.col.what")}</th><th>{t("compliance.col.repeats")}</th><th>{t("compliance.col.status")}</th><th></th></tr></thead>
-            <tbody>
-              {reminders.map((r) => (
-                <tr key={r.id}>
-                  <td className="t-strong" style={{ whiteSpace: "nowrap" }}>{format(dayDate(r.dueDate), "PP", { locale })}</td>
-                  <td>
-                    <span className="t-strong">{r.title}</span>
-                    <span className="t-sub">{[t(`compliance.reminderKind.${r.kind}`), r.authority, r.reference].filter(Boolean).join(" · ")}</span>
-                  </td>
-                  <td>{t(`compliance.recurrence.${r.recurrence}`)}</td>
-                  <td><StateChip state={r.state} daysLeft={r.daysLeft} /></td>
-                  <td>
-                    {canFull && (
-                      <div className="row-act">
-                        <button type="button" className="btn btn-sm btn-outline-navy" disabled={done.isPending} onClick={() => done.mutate(r.id)}><Check className="h-3.5 w-3.5" /> {t("compliance.done")}</button>
-                        <button type="button" className="ic-btn" title={t("compliance.edit")} aria-label={t("compliance.edit")} onClick={() => setEditing({ open: true, reminder: r })}><Pencil /></button>
-                        <button type="button" className="ic-btn danger" title={t("compliance.delete")} aria-label={t("compliance.delete")} onClick={() => { if (confirm(t("compliance.deleteConfirm"))) remove.mutate(r.id); }}><Trash2 /></button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResponsiveTable
+          label={t("compliance.tab.reminders")}
+          rows={reminders}
+          getKey={(r) => r.id}
+          rowActions={canFull ? (r) => [
+            { label: t("compliance.done"), icon: Check, onSelect: () => done.mutate(r.id) },
+            { label: t("compliance.edit"), icon: Pencil, onSelect: () => setEditing({ open: true, reminder: r }) },
+            { label: t("compliance.delete"), icon: Trash2, danger: true, separated: true, onSelect: () => { if (confirm(t("compliance.deleteConfirm"))) remove.mutate(r.id); } },
+          ] : undefined}
+          rowActionsLabel={(r) => t("team.m.rowActions").replace("{name}", r.title)}
+          columns={[
+            { key: "due", header: t("compliance.col.due"), mobile: "meta", cell: (r) => <span className="t-strong" style={{ whiteSpace: "nowrap" }}>{format(dayDate(r.dueDate), "PP", { locale })}</span> },
+            { key: "what", header: t("compliance.col.what"), mobile: "title", cell: (r) => (phone ? r.title : <><span className="t-strong">{r.title}</span><span className="t-sub">{[t(`compliance.reminderKind.${r.kind}`), r.authority, r.reference].filter(Boolean).join(" · ")}</span></>) },
+            { key: "rep", header: t("compliance.col.repeats"), mobile: "meta", cell: (r) => t(`compliance.recurrence.${r.recurrence}`) },
+            { key: "state", header: t("compliance.col.status"), mobile: "end", cell: (r) => <StateChip state={r.state} daysLeft={r.daysLeft} /> },
+            { key: "act", header: "", cell: (r) => canFull && (
+              <div className="row-act">
+                <button type="button" className="btn btn-sm btn-outline-navy" disabled={done.isPending} onClick={() => done.mutate(r.id)}><Check className="h-3.5 w-3.5" /> {t("compliance.done")}</button>
+                <button type="button" className="ic-btn" title={t("compliance.edit")} aria-label={t("compliance.edit")} onClick={() => setEditing({ open: true, reminder: r })}><Pencil /></button>
+                <button type="button" className="ic-btn danger" title={t("compliance.delete")} aria-label={t("compliance.delete")} onClick={() => { if (confirm(t("compliance.deleteConfirm"))) remove.mutate(r.id); }}><Trash2 /></button>
+              </div>
+            ) },
+          ]}
+        />
       )}
       <div className="card-foot"><span className="foot-note">{t("compliance.remindersFoot")}</span></div>
       <ReminderDialog open={editing.open} reminder={editing.reminder} presets={presets} onOpenChange={(v) => setEditing((s) => ({ ...s, open: v }))} />

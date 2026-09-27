@@ -20,6 +20,12 @@ import { AccessCodesDialog } from "@/components/team/access-codes";
 import { SeatsDialog } from "@/components/team/seats-dialog";
 import { peopleApi } from "@/lib/people-api";
 import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { ListRow } from "@/components/mobile/list-row";
+import { RowMore } from "@/components/mobile/row-more";
+import { ActionSheet } from "@/components/mobile/action-sheet";
+import { SwipeRow } from "@/components/mobile/swipe-row";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 const TABS = ["workers", "time", "equipment", "members"] as const;
 type Tab = (typeof TABS)[number];
@@ -52,17 +58,13 @@ export default function TeamPage() {
 
       <PaymentReturnNotice />
 
-      <div className="pills mb-4">
-        {TABS.map((k) => {
-          const Icon = TAB_ICONS[k];
-          const count = k === "time" ? (pending?.items.length ?? 0) : 0;
-          return (
-            <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
-              <Icon /> {t(`team.tab.${k}`)}{count ? <span className="cnt">{count}</span> : null}
-            </button>
-          );
-        })}
-      </div>
+      <ScrollTabs
+        sticky
+        label={t("team.title")}
+        value={tab}
+        onChange={(k) => setTab(k as Tab)}
+        tabs={TABS.map((k) => ({ id: k, label: t(`team.tab.${k}`), icon: TAB_ICONS[k], count: k === "time" && pending?.items.length ? pending.items.length : undefined }))}
+      />
 
       {isLoading ? <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div> : null}
       {tab === "workers" && workers && <WorkersTab workers={workers.items} locale={locale} />}
@@ -103,6 +105,8 @@ const can = useCan();
 
   const members = data?.items ?? [];
   const seats = data?.seats;
+  const phone = useMediaQuery("(max-width: 640px)");
+  const leaveCompany = () => { if (activeOrg && confirm(t("team.members.leaveConfirm").replace("{company}", activeOrg.companyName))) leave.mutate(activeOrg.orgId); };
 
   return (
     <div className="card">
@@ -111,19 +115,32 @@ const can = useCan();
         {/* Phase 93: wraps on a phone (the count and three buttons pushed "Invite member" off a 375 px screen). */}
         <div className="grow flex flex-wrap items-center gap-2">
           {seats && <span className="foot-note" style={{ whiteSpace: "nowrap" }}>{seats.used}/{seats.limit} {t("team.members.seatsUsed")}</span>}
-          {can("settings", "full") && seatInfo?.canBuy && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setSeatsOpen(true)}><Armchair className="h-4 w-4" /> {t("seats.button")}</button>}
-          {can("team", "full") && <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setCodesOpen(true)}><KeyRound className="h-4 w-4" /> {t("codes.button")}</button>}
+          {/* Phase 110: on a phone Invite stays, the rest is one ⋯. */}
+          {can("settings", "full") && seatInfo?.canBuy && <button type="button" className="btn btn-outline-navy btn-sm hide-phone" onClick={() => setSeatsOpen(true)}><Armchair className="h-4 w-4" /> {t("seats.button")}</button>}
+          {can("team", "full") && <button type="button" className="btn btn-outline-navy btn-sm hide-phone" onClick={() => setCodesOpen(true)}><KeyRound className="h-4 w-4" /> {t("codes.button")}</button>}
           {activeOrg && !activeOrg.isOwn && (
-            <button type="button" className="btn btn-outline-navy btn-sm" disabled={leave.isPending} onClick={() => { if (confirm(t("team.members.leaveConfirm").replace("{company}", activeOrg.companyName))) leave.mutate(activeOrg.orgId); }}>
+            <button type="button" className="btn btn-outline-navy btn-sm hide-phone" disabled={leave.isPending} onClick={leaveCompany}>
               <UserX className="h-4 w-4" /> {t("team.members.leave")}
             </button>
           )}
           {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" data-invite-member="" onClick={() => setInviteOpen(true)}><Plus className="h-4 w-4" /> {t("team.members.invite")}</button>}
+          {phone && <ActionSheet actions={[
+            can("settings", "full") && seatInfo?.canBuy && { label: t("seats.button"), icon: Armchair, onSelect: () => setSeatsOpen(true) },
+            can("team", "full") && { label: t("codes.button"), icon: KeyRound, onSelect: () => setCodesOpen(true) },
+            activeOrg && !activeOrg.isOwn && { label: t("team.members.leave"), icon: UserX, danger: true, separated: true, onSelect: leaveCompany },
+          ]} />}
         </div>
       </div>
 
       {isLoading ? (
         <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div>
+      ) : phone ? (
+        <ul className="lrows" aria-label={t("team.tab.members")}>
+          <li><ListRow href="/dashboard/me" lead={<PersonAvatar name={me?.person.name} image={me?.person.image} />} title={me?.person.name ?? t("team.members.you")} meta={[t("team.members.you"), me ? t(`group.role.${me.current.role}`) : null]} /></li>
+          {members.map((m) => m.userId && m.userId === me?.person.id ? null : (
+            <MemberPhoneRow key={m.id} member={m} onResend={() => resend.mutate(m.id)} onSuspend={() => setStatus.mutate({ id: m.id, status: m.status === "suspended" ? "active" : "suspended" })} onRemove={() => { if (confirm(t("team.members.removeConfirm"))) remove.mutate(m.id); }} />
+          ))}
+        </ul>
       ) : (
         <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.members")}>
           <table className="tbl">
@@ -166,6 +183,7 @@ function Leaderboard() {
   const can = useCan();
   const { data } = useQuery({ queryKey: ["team-leaderboard"], queryFn: () => peopleApi.leaderboard(90), staleTime: 60_000, enabled: can("team", "full") });
   const { data: me } = useQuery({ queryKey: ["me"], queryFn: peopleApi.me, staleTime: 60_000 });
+  const phone = useMediaQuery("(max-width: 640px)");
   if (!data || data.rows.length < 2) return null;
   const seesMoney = can("invoicing", "view");
   return (
@@ -176,6 +194,21 @@ function Leaderboard() {
           <p className="sub">{t("team.board.sub").replace("{days}", String(data.days))}</p>
         </div>
       </div>
+      {phone ? (
+        <ul className="lrows" aria-labelledby="team-leaderboard-title">
+          {data.rows.map((r) => (
+            <li key={r.userId}>
+              <ListRow
+                href={r.userId === me?.person.id ? "/dashboard/me" : `/dashboard/people/${r.userId}`}
+                lead={<PersonAvatar name={r.name} image={r.image} />}
+                title={r.name}
+                meta={[t("team.m.board").replace("{sent}", String(r.sent)).replace("{won}", String(r.won)), r.winRate == null ? null : t("team.board.pct").replace("{pct}", r.winRate.toFixed(0))]}
+                amount={seesMoney ? formatCents(r.invoicedCents) : undefined}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
       <div className="tbl-wrap" tabIndex={0} role="region" aria-labelledby="team-leaderboard-title">
         <table className="tbl">
           <thead>
@@ -205,6 +238,7 @@ function Leaderboard() {
           </tbody>
         </table>
       </div>
+      )}
       <p className="foot-note" style={{ padding: "0 20px 16px" }}>{t("team.board.note").replace("{date}", format(new Date(`${data.attributionSince}T12:00:00`), "d MMMM yyyy", { locale: lang === "fr" ? frCA : enCA }))}</p>
     </section>
   );
@@ -244,6 +278,36 @@ const can = useCan();
         </div>}
       </td>
     </tr>
+  );
+}
+
+/** Phase 110 — a member on a phone: who, their role, the status chip, the row's actions behind ⋯. */
+function MemberPhoneRow({ member, onResend, onSuspend, onRemove }: { member: TeamMemberDto; onResend: () => void; onSuspend: () => void; onRemove: () => void }) {
+  const { t } = useLanguage();
+  const can = useCan();
+  const statusLabel = member.status === "active" ? t("team.members.statusActive") : member.status === "suspended" ? t("team.members.statusSuspended") : t("team.members.statusInvited");
+  const statusChip = member.status === "active" ? "chip-green" : member.status === "suspended" ? "chip-grey" : "chip-yellow";
+  const name = member.kind === "code" && !member.email ? t("codes.pendingRow").replace("{hint}", member.codeHint ?? "") : (member.name ?? member.email);
+  const row = (
+    <ListRow
+      href={member.status === "active" && member.userId ? `/dashboard/people/${member.userId}` : undefined}
+      lead={<PersonAvatar name={member.kind === "code" ? "#" : (member.name ?? member.email)} image={member.image} />}
+      title={name}
+      meta={[t(`team.members.role.${member.role}`), member.name && member.email ? member.email : null]}
+      end={<span className={cn("chip", statusChip)}>{statusLabel}</span>}
+      chevron={false}
+    />
+  );
+  if (!can("team", "full")) return <li>{row}</li>;
+  return (
+    <li className="lrow-split">
+      {row}
+      <RowMore label={t("team.m.rowActions").replace("{name}", name ?? "")} actions={[
+        member.status !== "active" && member.kind === "email" && { label: t("team.members.resend"), icon: RotateCw, onSelect: onResend },
+        member.status !== "invited" && { label: member.status === "suspended" ? t("team.members.reactivate") : t("team.members.suspend"), icon: member.status === "suspended" ? UserCheck : UserX, onSelect: onSuspend },
+        { label: t("team.members.remove"), icon: Trash2, danger: true, separated: true, onSelect: onRemove },
+      ]} />
+    </li>
   );
 }
 
@@ -320,6 +384,7 @@ const can = useCan();
 
   const list = workers.filter((w) => showInactive || w.active);
   const inactiveCount = workers.filter((w) => !w.active).length;
+  const phone = useMediaQuery("(max-width: 640px)");
 
   return (
     <div className="card">
@@ -332,6 +397,34 @@ const can = useCan();
       </div>
       {list.length === 0 ? (
         <div className="card-empty">{t("team.workers.empty")}</div>
+      ) : phone ? (
+        <ul className="lrows" aria-label={t("team.tab.workers")}>
+          {list.map((w) => {
+            const row = (
+              <ListRow
+                className={cn(!w.active && "dim")}
+                lead={<span className="avat">{w.name.slice(0, 2).toUpperCase()}</span>}
+                title={w.name}
+                meta={[t(`team.type.${w.workerType}`), w.role && w.role !== "worker" ? w.role : null, `${w.hoursThisMonth.toFixed(1)} h`, !w.active ? t("team.workers.inactive") : null]}
+                amount={`${formatCents(Math.round(w.hourlyRateCents * (1 + w.burdenPercent / 100)))}/h`}
+                end={w.pendingCount > 0 ? <span className="chip chip-yellow">{w.pendingCount} {t("team.workers.toApprove")}</span> : undefined}
+                onClick={can("team", "full") ? () => setEditing({ open: true, worker: w }) : undefined}
+              />
+            );
+            return can("team", "full") ? (
+              <li key={w.id} className="lrow-split">
+                {row}
+                <RowMore label={t("team.m.rowActions").replace("{name}", w.name)} actions={[
+                  w.active && { label: w.hasInvite ? t("team.workers.newLink") : t("team.workers.timeLink"), icon: Link2, onSelect: () => issue.mutate(w) },
+                  w.hasInvite && { label: t("team.workers.revoke"), icon: X, onSelect: () => revoke.mutate(w.id) },
+                  { label: t("team.workers.edit"), icon: Pencil, onSelect: () => setEditing({ open: true, worker: w }) },
+                  { label: w.active ? t("team.workers.deactivate") : t("team.workers.reactivate"), icon: w.active ? UserX : UserCheck, onSelect: () => toggleActive.mutate(w) },
+                  { label: t("team.workers.delete"), icon: Trash2, danger: true, separated: true, onSelect: () => { if (confirm(t("team.workers.deleteConfirm"))) remove.mutate(w.id); } },
+                ]} />
+              </li>
+            ) : <li key={w.id}>{row}</li>;
+          })}
+        </ul>
       ) : (
         <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.workers")}>
           <table className="tbl">
@@ -476,6 +569,7 @@ const can = useCan();
   const [from, setFrom] = useState(isoDay(new Date(now.getFullYear(), now.getMonth(), 1)));
   const [to, setTo] = useState(isoDay(now));
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const phone = useMediaQuery("(max-width: 640px)");
 
   const params = { status: status === "all" ? undefined : status, workerId: workerId || undefined, from: status === "submitted" ? undefined : from, to: status === "submitted" ? undefined : to };
   const { data, isLoading } = useQuery({ queryKey: ["time-entries", params], queryFn: () => teamApi.timeEntries(params) });
@@ -528,8 +622,10 @@ const can = useCan();
 
         {status === "submitted" && submittedIds.length > 0 && can("jobs", "edit") && (
           <div className="bulk-row" style={{ margin: "0 18px 14px" }}>
-            <button type="button" className="text-link" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
-            <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</button>
+            {/* Phase 110: a phone approves one by one (swipe or ✓) or all at once; picking a few is a desktop job. */}
+            {phone && <p className="crew-hint m-0 grow">{t("crew.m.swipeHint")}</p>}
+            <button type="button" className="text-link hide-phone" onClick={() => setSelected(new Set(selected.size === submittedIds.length ? [] : submittedIds))}>{selected.size === submittedIds.length ? t("team.time.selectNone") : t("team.time.selectAll")}</button>
+            <button type="button" className="btn btn-sm btn-navy hide-phone" style={{ background: "var(--green)" }} disabled={approveMany.isPending || selected.size === 0} onClick={() => approveMany.mutate([...selected])}><Check className="h-4 w-4" /> {t("team.time.approveSelected")} ({selected.size})</button>
             <button type="button" className="btn btn-sm btn-outline-navy" disabled={approveMany.isPending} onClick={() => approveMany.mutate(submittedIds)}>{t("team.time.approveAll")} ({submittedIds.length})</button>
           </div>
         )}
@@ -542,10 +638,41 @@ const can = useCan();
           {grouped.map(([name, entries]) => (
             <section key={name}>
               <div className="te-group"><b>{name}</b><span>· {entries.reduce((s, e) => s + e.hours, 0).toFixed(2)} h · {formatCents(entries.filter((e) => e.status !== "rejected").reduce((s, e) => s + e.costCents, 0))}</span></div>
-              {entries.map((e) => (
+              {phone ? (
+                <ul className="lrows" aria-label={name}>
+                  {entries.map((e) => {
+                    const canEdit = can("jobs", "edit");
+                    const submitted = e.status === "submitted";
+                    const body = (
+                      <div className={cn("lrow", e.status === "rejected" && "dim")}>
+                        <span className="crew-hrs" aria-hidden="true">{e.hours}<small>h</small></span>
+                        <span className="lrow-main">
+                          <span className="lrow-title"><span className="sr-only">{e.hours} h · </span>{e.projectName}</span>
+                          <span className={cn("lrow-meta", e.geofenceFlagged && "warn")}>
+                            {[e.date ? format(day(e.date)!, "EEE d MMM", { locale }) : null, e.milestoneTitle, e.overtimeHours > 0 ? t("team.time.overtime").replace("{h}", String(e.overtimeHours)) : null, e.holidayHours > 0 ? t("team.time.onHoliday") : null, e.geofenceFlagged ? t("team.time.geofenceFlag") : null, e.note].filter(Boolean).join(" · ")}
+                          </span>
+                        </span>
+                        <span className="lrow-end">
+                          <span className="lrow-amt">{formatCents(e.costCents)}</span>
+                          {!submitted && <TimeStatusBadge status={e.status} />}
+                        </span>
+                        {canEdit && submitted && (
+                          <button type="button" className="ny-pill ny-act sq" aria-label={`${t("crew.approve")} — ${e.projectName} ${e.hours} h`} disabled={setOne.isPending} onClick={() => setOne.mutate({ id: e.id, status: "approved" })}><Check className="h-4 w-4" /></button>
+                        )}
+                        {canEdit && <RowMore label={t("team.m.rowActions").replace("{name}", `${e.projectName} · ${e.hours} h`)} actions={[
+                          submitted && { label: t("team.time.filter.rejected"), icon: X, onSelect: () => setOne.mutate({ id: e.id, status: "rejected" }) },
+                          !submitted && { label: t("jobs.team.reopen"), icon: RotateCw, onSelect: () => setOne.mutate({ id: e.id, status: "submitted" }) },
+                          { label: t("jobs.m.deleteHours"), icon: Trash2, danger: true, separated: true, onSelect: () => del.mutate(e.id) },
+                        ]} />}
+                      </div>
+                    );
+                    return <li key={e.id}>{canEdit && submitted ? <SwipeRow label={t("crew.approve")} onSwipe={() => setOne.mutateAsync({ id: e.id, status: "approved" })}>{body}</SwipeRow> : body}</li>;
+                  })}
+                </ul>
+              ) : entries.map((e) => (
                 <div key={e.id} className={cn("item-row", e.status === "rejected" && "muted")}>
                   {e.status === "submitted" ? (
-                    <button type="button" className={cn("chk", selected.has(e.id) && "on")} aria-pressed={selected.has(e.id)} onClick={() => toggle(e.id)}>{selected.has(e.id) && <Check />}</button>
+                    <button type="button" className={cn("chk", selected.has(e.id) && "on")} aria-pressed={selected.has(e.id)} aria-label={t("team.m.select").replace("{name}", `${e.projectName} · ${e.hours} h`)} onClick={() => toggle(e.id)}>{selected.has(e.id) && <Check />}</button>
                   ) : <span className="spacer" />}
                   <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
                   <div className="grow">
@@ -559,7 +686,7 @@ const can = useCan();
                     {e.status === "submitted" && <button type="button" className="ic-btn ok" title={t("team.time.filter.approved")} onClick={() => setOne.mutate({ id: e.id, status: "approved" })}><Check /></button>}
                     {e.status === "submitted" && <button type="button" className="ic-btn bad" title={t("team.time.filter.rejected")} onClick={() => setOne.mutate({ id: e.id, status: "rejected" })}><X /></button>}
                     {e.status !== "submitted" && <button type="button" className="text-link" style={{ color: "var(--muted-mk)" }} onClick={() => setOne.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
-                    <button type="button" className="ic-btn danger" onClick={() => del.mutate(e.id)}><Trash2 /></button>
+                    <button type="button" className="ic-btn danger" aria-label={t("jobs.m.deleteHours")} onClick={() => del.mutate(e.id)}><Trash2 /></button>
                   </div>}
                 </div>
               ))}
@@ -587,6 +714,7 @@ const can = useCan();
   const toggle = useMutation({ mutationFn: (e: EquipmentDto) => teamApi.updateEquipment(e.id, { active: !e.active }), onSuccess: refresh, onError });
   const remove = useMutation({ mutationFn: (id: string) => teamApi.deleteEquipment(id), onSuccess: (r) => { refresh(); if (r.deactivated) toast({ title: t("team.equipment.deactivatedInstead") }); }, onError });
   const items = data?.items ?? [];
+  const phone = useMediaQuery("(max-width: 640px)");
   const monthlyOverhead = items.filter((e) => e.active && e.ownership === "financed").reduce((s, e) => s + (e.financing.monthlyPaymentCents ?? 0), 0);
 
   return (
@@ -599,6 +727,31 @@ const can = useCan();
       </div>
       {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /></div> : items.length === 0 ? (
         <div className="card-empty">{t("team.equipment.empty")}</div>
+      ) : phone ? (
+        <ul className="lrows" aria-label={t("team.tab.equipment")}>
+          {items.map((e) => {
+            const row = (
+              <ListRow
+                className={cn(!e.active && "dim")}
+                lead={<span className="cell-ic"><Wrench className="h-4 w-4" /></span>}
+                title={e.name}
+                meta={[t(`team.ownership.${e.ownership}`), e.ownership === "financed" && e.financing.monthlyPaymentCents ? `${formatCents(e.financing.monthlyPaymentCents)}/${t("team.equipment.month")}` : null, `${t("team.equipment.chargedThisMonth")} ${formatCents(e.usageCentsThisMonth)}`, !e.active ? t("team.workers.inactive") : null]}
+                amount={`${formatCents(e.usageRateCents)}/${t(`team.unit.${e.usageUnit}`)}`}
+                onClick={can("team", "full") ? () => setEditing({ open: true, item: e }) : undefined}
+              />
+            );
+            return can("team", "full") ? (
+              <li key={e.id} className="lrow-split">
+                {row}
+                <RowMore label={t("team.m.rowActions").replace("{name}", e.name)} actions={[
+                  { label: t("team.equipment.edit"), icon: Pencil, onSelect: () => setEditing({ open: true, item: e }) },
+                  { label: e.active ? t("team.workers.deactivate") : t("team.workers.reactivate"), icon: e.active ? UserX : UserCheck, onSelect: () => toggle.mutate(e) },
+                  { label: t("team.m.deleteEquipment"), icon: Trash2, danger: true, separated: true, onSelect: () => { if (confirm(t("team.equipment.deleteConfirm"))) remove.mutate(e.id); } },
+                ]} />
+              </li>
+            ) : <li key={e.id}>{row}</li>;
+          })}
+        </ul>
       ) : (
         <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("team.tab.equipment")}>
           <table className="tbl">

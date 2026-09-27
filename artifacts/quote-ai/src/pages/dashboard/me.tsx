@@ -3,13 +3,16 @@ import { Link, useLocation, useParams, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { ArrowRight, Briefcase, Camera, CircleCheck, Clock, FileText, History, Info, Loader2, Mail, Phone, Receipt, Trash2, Trophy } from "lucide-react";
+import { ArrowRight, Camera, CircleCheck, Clock, History, Info, Loader2, Mail, Phone, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { formatCents } from "@/lib/jobs-api";
 import { PersonAvatar } from "@/components/people/avatar";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { ListRow } from "@/components/mobile/list-row";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { peopleApi, type ActivityDto, type PersonDto, type PersonStatsDto } from "@/lib/people-api";
 
 // ── Phase 91: a page for every person ────────────────────────────────────────
@@ -174,19 +177,10 @@ function EditCard({ person, setup }: { person: PersonDto; setup: boolean }) {
 
 // ── Numbers ──────────────────────────────────────────────────────────────────
 
-function Stat({ icon: Icon, label, value, sub }: { icon: typeof FileText; label: string; value: string; sub?: string }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl flex items-center gap-1.5"><Icon className="h-3.5 w-3.5" /> {label}</p>
-      <p className="val">{value}</p>
-      {sub && <p className="sub">{sub}</p>}
-    </div>
-  );
-}
-
 function Numbers({ stats, loading, months, setMonths, seesMoney }: { stats: PersonStatsDto | undefined; loading: boolean; months: number; setMonths: (n: number) => void; seesMoney: boolean }) {
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
+  const phone = useMediaQuery("(max-width: 640px)");
   const money = (c: number) => (seesMoney ? formatCents(c) : "—");
   return (
     <>
@@ -200,16 +194,29 @@ function Numbers({ stats, loading, months, setMonths, seesMoney }: { stats: Pers
       </section>
       {loading || !stats ? <Skeleton className="h-28 w-full rounded-[var(--radius-mk)]" /> : (
         <>
-          <section className="stat-grid">
-            <Stat icon={FileText} label={t("me.stat.quotes")} value={String(stats.quotes.created)} sub={t("me.stat.sentSub").replace("{n}", String(stats.quotes.sent)).replace("{value}", money(stats.quotes.valueCents))} />
-            <Stat icon={Trophy} label={t("me.stat.won")} value={String(stats.quotes.won)} sub={stats.quotes.winRate == null ? t("me.stat.noRate") : t("me.stat.rate").replace("{pct}", stats.quotes.winRate.toFixed(0))} />
-            <Stat icon={Receipt} label={t("me.stat.invoiced")} value={money(stats.invoices.invoicedCents)} sub={t("me.stat.invoices").replace("{n}", String(stats.invoices.issued))} />
-            {stats.hours.linkedWorker
-              ? <Stat icon={Clock} label={t("me.stat.hours")} value={stats.hours.total.toFixed(1)} sub={t("me.stat.jobs").replace("{n}", String(stats.jobs))} />
-              : <Stat icon={Briefcase} label={t("me.stat.jobsLabel")} value={String(stats.jobs)} sub={t("me.stat.contracts").replace("{n}", String(stats.contracts))} />}
-          </section>
+          <StatStrip label={t("me.numbers")} items={[
+            { label: t("me.stat.quotes"), value: String(stats.quotes.created), sub: t("me.stat.sentSub").replace("{n}", String(stats.quotes.sent)).replace("{value}", money(stats.quotes.valueCents)) },
+            { label: t("me.stat.won"), value: String(stats.quotes.won), sub: stats.quotes.winRate == null ? t("me.stat.noRate") : t("me.stat.rate").replace("{pct}", stats.quotes.winRate.toFixed(0)) },
+            { label: t("me.stat.invoiced"), value: money(stats.invoices.invoicedCents), sub: t("me.stat.invoices").replace("{n}", String(stats.invoices.issued)) },
+            stats.hours.linkedWorker
+              ? { label: t("me.stat.hours"), value: stats.hours.total.toFixed(1), sub: t("me.stat.jobs").replace("{n}", String(stats.jobs)) }
+              : { label: t("me.stat.jobsLabel"), value: String(stats.jobs), sub: t("me.stat.contracts").replace("{n}", String(stats.contracts)) },
+          ]} />
           <section className="card">
             <div className="card-head"><div><h2>{t("me.byMonth")}</h2><p className="sub">{t("me.attribution").replace("{date}", format(new Date(`${stats.attributionSince}T12:00:00`), "d MMMM yyyy", { locale }))}</p></div></div>
+            {phone ? (
+              <ul className="lrows" aria-label={t("me.byMonth")}>
+                {[...stats.series].reverse().map((m) => (
+                  <li key={m.month}>
+                    <ListRow
+                      title={format(new Date(`${m.month}-01T12:00:00`), "MMMM yyyy", { locale })}
+                      meta={[t("me.m.month").replace("{quotes}", String(m.quotes)).replace("{sent}", String(m.sent)).replace("{won}", String(m.won)), stats.hours.linkedWorker ? `${m.hours.toFixed(1)} h` : null]}
+                      amount={seesMoney ? money(m.invoicedCents) : undefined}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
             <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("me.byMonth")}>
               <table className="tbl">
                 <thead><tr><th>{t("group.col.month")}</th><th className="t-amt">{t("me.stat.quotes")}</th><th className="t-amt">{t("me.col.value")}</th><th className="t-amt">{t("me.col.sent")}</th><th className="t-amt">{t("me.stat.won")}</th><th className="t-amt">{t("me.stat.invoiced")}</th>{stats.hours.linkedWorker && <th className="t-amt">{t("me.stat.hours")}</th>}</tr></thead>
@@ -228,6 +235,7 @@ function Numbers({ stats, loading, months, setMonths, seesMoney }: { stats: Pers
                 </tbody>
               </table>
             </div>
+            )}
           </section>
         </>
       )}

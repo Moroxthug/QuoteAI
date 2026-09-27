@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { formatCad, moneyLocale } from "@/lib/money";
+import { RowMore } from "@/components/mobile/row-more";
 
 const fmt = (s: string, vars: Record<string, string | number>) => s.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
 
@@ -150,7 +151,12 @@ const can = useCan();
         )}
       </div>
 
-      {can("quotes", "edit") && <div className="flex items-center gap-1 shrink-0">
+      {/* Phase 110: on a phone Process and Delete are the row's ⋯. */}
+      {can("quotes", "edit") && <RowMore label={t("team.m.rowActions").replace("{name}", doc.fileName)} actions={[
+        (doc.status === "pending" || doc.status === "error") && { label: t("documents.process"), icon: Zap, disabled: extractMut.isPending, onSelect: () => extractMut.mutate({ id: doc.id }) },
+        { label: t("documents.delete"), icon: Trash2, danger: true, separated: true, disabled: deleteMut.isPending, onSelect: () => deleteMut.mutate({ id: doc.id }) },
+      ]} />}
+      {can("quotes", "edit") && <div className="flex items-center gap-1 shrink-0 hide-phone">
         {(doc.status === "pending" || doc.status === "error") && (
           <button
             type="button"
@@ -434,7 +440,7 @@ export default function DocumentsPage() {
             </h2>
           </div>
           {pendingCount > 0 && (
-            <span className="sub" style={{ color: "var(--yellow-dark)" }}>{pendingCount} pending processing</span>
+            <span className="sub" style={{ color: "var(--yellow-dark)" }}>{t("documents.pendingCount").replace("{n}", String(pendingCount))}</span>
           )}
         </div>
         {isLoading ? (

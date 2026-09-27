@@ -7,8 +7,11 @@ import { AlertTriangle, ArrowRight, Briefcase, Check, ChevronLeft, ChevronRight,
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { ListRow, ResponsiveTable } from "@/components/mobile/list-row";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useCan, useRole } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -84,16 +87,7 @@ export default function PayPage() {
 
       {data?.enabled && (
         <>
-          <div className="pills mb-4">
-            {TABS.map((k) => {
-              const Icon = TAB_ICONS[k];
-              return (
-                <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
-                  <Icon /> {t(`pay.tab.${k}`)}
-                </button>
-              );
-            })}
-          </div>
+          <ScrollTabs sticky label={t("pay.title")} value={tab} onChange={(k) => setTab(k as Tab)} tabs={TABS.map((k) => ({ id: k, label: t(`pay.tab.${k}`), icon: TAB_ICONS[k] }))} />
           {tab === "period" && <PeriodTab settings={data} onSettings={() => setTab("settings")} />}
           {tab === "jobs" && <JobsTab />}
           {tab === "settings" && <SettingsTab data={data} />}
@@ -201,12 +195,12 @@ function PeriodTab({ settings, onSettings }: { settings: Enabled; onSettings: ()
           {data.pendingAllowances.length > 0 && <CrewAllowances items={data.pendingAllowances} />}
           {fmt === "qbo_payroll" && <div className="notice info"><Info /><span className="grow">{t("pay.qboNote")}</span></div>}
 
-          <section className="stat-grid">
-            <Stat label={t("pay.stat.gross")} value={formatCents(data.totals.grossCents)} sub={data.employees.length === 1 ? t("pay.stat.employee") : t("pay.stat.employees").replace("{n}", String(data.employees.length))} />
-            <Stat label={t("pay.stat.hours")} value={hrs(data.totals.hours)} sub={t("pay.stat.overtime").replace("{h}", hrs(data.totals.overtimeHours))} />
-            <Stat label={t("pay.stat.holiday")} value={formatCents(data.totals.holidayCents)} />
-            <Stat label={t("pay.stat.allowances")} value={formatCents(data.totals.allowanceCents)} />
-          </section>
+          <StatStrip label={t("pay.tab.period")} items={[
+            { label: t("pay.stat.gross"), value: formatCents(data.totals.grossCents), sub: data.employees.length === 1 ? t("pay.stat.employee") : t("pay.stat.employees").replace("{n}", String(data.employees.length)) },
+            { label: t("pay.stat.hours"), value: hrs(data.totals.hours), sub: t("pay.stat.overtime").replace("{h}", hrs(data.totals.overtimeHours)) },
+            { label: t("pay.stat.holiday"), value: formatCents(data.totals.holidayCents) },
+            { label: t("pay.stat.allowances"), value: formatCents(data.totals.allowanceCents) },
+          ]} />
 
           {data.employees.length === 0 ? (
             <div className="card dashed card-empty">{t("pay.empty")}</div>
@@ -218,28 +212,22 @@ function PeriodTab({ settings, onSettings }: { settings: Enabled; onSettings: ()
           {data.subcontractors.length > 0 && (
             <section className="card">
               <div className="card-head"><div><h2>{t("pay.subs.title")}</h2><p className="sub">{t("pay.subs.sub")}</p></div></div>
-              <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("pay.subs.title")}>
-                <table className="tbl">
-                  <thead><tr><th>{t("pay.col.name")}</th><th className="t-amt">{t("pay.col.hours")}</th><th className="t-amt">{t("pay.col.straight")}</th></tr></thead>
-                  <tbody>{data.subcontractors.map((s) => <tr key={s.workerId}><td>{s.name}</td><td className="t-amt">{hrs(s.hours)}</td><td className="t-amt">{formatCents(s.amountCents)}</td></tr>)}</tbody>
-                </table>
-              </div>
+              <ResponsiveTable
+                label={t("pay.subs.title")}
+                rows={data.subcontractors}
+                getKey={(s) => s.workerId}
+                columns={[
+                  { key: "name", header: t("pay.col.name"), mobile: "title", cell: (s) => s.name },
+                  { key: "hours", header: t("pay.col.hours"), align: "right", mobile: "meta", cell: (s) => <span className="t-amt">{hrs(s.hours)} h</span> },
+                  { key: "amount", header: t("pay.col.straight"), align: "right", mobile: "amount", cell: (s) => <span className="t-amt">{formatCents(s.amountCents)}</span> },
+                ]}
+              />
             </section>
           )}
           <p className="foot-note">{t("pay.disclaimer")}</p>
           <AllowanceDialog target={adding} period={data} onClose={() => setAdding(null)} />
         </>
       )}
-    </div>
-  );
-}
-
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className="val">{value}</p>
-      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }
@@ -442,6 +430,7 @@ function AllowanceDialog({ target, period, onClose }: { target: EmployeePayDto |
 function JobsTab() {
   const { t } = useLanguage();
   const { data, isLoading, error, go } = usePeriod();
+  const phone = useMediaQuery("(max-width: 640px)");
   return (
     <div className="stack" style={{ gap: 16 }}>
       <section className="card"><div className="toolbar">{data ? <PeriodNav data={data} go={go} /> : <Skeleton className="h-8 w-56" />}<p className="foot-note m-0 grow">{t("pay.jobs.intro")}</p></div></section>
@@ -449,6 +438,21 @@ function JobsTab() {
       {error && <div className="card card-empty">{(error as Error).message}</div>}
       {data && (data.jobs.length === 0 ? <div className="card dashed card-empty">{t("pay.empty")}</div> : (
         <section className="card">
+          {/* Phase 110: on a phone a job is its hours, overtime, allowances and the labour total; the split (straight, premium, burden) stays on the desktop. */}
+          {phone ? (
+            <ul className="lrows" aria-label={t("pay.tab.jobs")}>
+              {data.jobs.map((j) => (
+                <li key={j.projectId ?? "none"}>
+                  <ListRow
+                    href={j.projectId ? `/dashboard/jobs/${j.projectId}` : undefined}
+                    title={j.name ?? t("pay.jobs.noJob")}
+                    meta={[`${hrs(j.hours)} h`, j.overtimeHours ? t("pay.m.overtime").replace("{h}", hrs(j.overtimeHours)) : null, j.allowanceCents ? `${t("pay.col.allowances")} ${formatCents(j.allowanceCents)}` : null]}
+                    amount={formatCents(j.totalCents)}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
           <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("pay.tab.jobs")}>
             <table className="tbl">
               <thead><tr><th>{t("pay.col.job")}</th><th className="t-amt">{t("pay.col.hours")}</th><th className="t-amt">{t("pay.col.overtime")}</th><th className="t-amt">{t("pay.col.straight")}</th><th className="t-amt">{t("pay.col.premium")}</th><th className="t-amt">{t("pay.col.burden")}</th><th className="t-amt">{t("pay.col.allowances")}</th><th className="t-amt">{t("pay.col.total")}</th></tr></thead>
@@ -468,6 +472,7 @@ function JobsTab() {
               </tbody>
             </table>
           </div>
+          )}
           <div className="card-foot"><span className="foot-note">{t("pay.jobs.foot").replace("{holiday}", formatCents(data.totals.holidayCents))}</span></div>
         </section>
       ))}
@@ -681,12 +686,15 @@ function SettingsTab({ data }: { data: Enabled }) {
         </div>
       </section>
 
+      {/* Phase 110: Save docks on a phone (a long form); the reset and the hint stay with the form. */}
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" className="btn btn-sm btn-navy" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("pay.settings.save")}</button>
         {(form.ownOvertime || form.averaging || form.preset || form.method !== data.provinceDefaults.holidays.method) && (
           <button type="button" className="text-link" onClick={() => { applyPreset(""); set({ averaging: false, substituteWeekend: false }); }}>{t("pay.settings.resetRules")}</button>
         )}
         <p className="foot-note m-0 grow">{t("pay.settings.saveHint")}</p>
+        <StickyActionBar label={t("pay.settings.save")}>
+          <button type="button" className="btn btn-sm btn-navy" data-primary-action disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("pay.settings.save")}</button>
+        </StickyActionBar>
       </div>
 
       <PayrollNumbers />
@@ -754,19 +762,15 @@ function PayrollNumbers() {
     <section className="card">
       <div className="card-head"><div><h2>{t("pay.ids.title")}</h2><p className="sub">{t("pay.ids.sub")}</p></div></div>
       {/* Its inputs take focus themselves, so no scroll region of its own. */}
-      <div className="tbl-wrap">
-        <table className="tbl">
-          <thead><tr><th>{t("pay.col.name")}</th><th>{t("pay.ids.number")}</th></tr></thead>
-          <tbody>
-            {employees.map((w) => (
-              <tr key={w.id}>
-                <td>{w.name}{!w.active && <span className="t-sub">{t("pay.ids.inactive")}</span>}</td>
-                <td><input className="inp-sm" style={{ width: 180 }} aria-label={t("pay.ids.numberFor").replace("{name}", w.name)} maxLength={40} value={draft[w.id] ?? w.payrollId ?? ""} onChange={(e) => setDraft({ ...draft, [w.id]: e.target.value })} /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ResponsiveTable
+        label={t("pay.ids.title")}
+        rows={employees}
+        getKey={(w) => w.id}
+        columns={[
+          { key: "name", header: t("pay.col.name"), mobile: "title", cell: (w) => <>{w.name}{!w.active && <span className="t-sub">{t("pay.ids.inactive")}</span>}</> },
+          { key: "id", header: t("pay.ids.number"), mobile: "end", cell: (w) => <input className="inp-sm pay-id-inp" aria-label={t("pay.ids.numberFor").replace("{name}", w.name)} maxLength={40} value={draft[w.id] ?? w.payrollId ?? ""} onChange={(e) => setDraft({ ...draft, [w.id]: e.target.value })} /> },
+        ]}
+      />
       <div className="card-foot"><span className="foot-note">{t("pay.ids.hint")}</span><button type="button" className="btn btn-sm btn-navy" disabled={!dirty || save.isPending} onClick={() => save.mutate()}>{save.isPending && <Loader2 className="h-4 w-4 animate-spin" />} {t("jobs.save")}</button></div>
     </section>
   );

@@ -9,6 +9,7 @@ import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, Dia
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useCan, useRole } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -68,16 +69,7 @@ export default function BooksPage() {
 
       {data?.enabled && (
         <>
-          <div className="pills mb-4">
-            {TABS.map((k) => {
-              const Icon = TAB_ICONS[k];
-              return (
-                <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
-                  <Icon /> {t(`books.tab.${k}`)}
-                </button>
-              );
-            })}
-          </div>
+          <ScrollTabs sticky label={t("books.title")} value={tab} onChange={(k) => setTab(k as Tab)} tabs={TABS.map((k) => ({ id: k, label: t(`books.tab.${k}`), icon: TAB_ICONS[k] }))} />
           {tab === "close" && <CloseTab overview={data} />}
           {tab === "bank" && <BankTab overview={data} />}
           {tab === "claims" && <ClaimsTab />}

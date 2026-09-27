@@ -25,7 +25,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 107 | Money and people: invoices, clients, leads, contracts | A | **done** 2026-09-27 |
 | 108 | The crew app and the foreman | A | **done** 2026-09-27 |
 | 109 | Schedule on a phone | A | **done** 2026-09-27 |
-| 110 | The long tail | A | not started |
+| 110 | The long tail | A | **done** 2026-09-27 |
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | not started |
 | 112 | The public site on a phone | A | not started |
 | 113 | The phone gate: rules enforced, sheets reviewed | A | not started |
@@ -541,3 +541,37 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - Recheck `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/schedule,dashboard/jobs/` (114 pages, `.qa/p109b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, 0 phone-rule warnings. After the hours fix, `--lang=en,fr --widths=375 --routes=dashboard/schedule` (12 pages, `.qa/p109c`): all 0.
 - Phone sheets: `.qa/phone-sheets/p109/` (baseline `visual-mobile-audit`): **the schedule is 1.0-1.1 screens as before, but the first screen is now the week and the day's list with Add block docked** (was a week grid showing two days and "drag on the board"). Tomorrow's sheet shows the double-booking on both rows; the clash sheet shows the live warning above Save.
 - typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (four new exports made file-local; nothing new), i18n-audit (nothing new).
+
+### Phase 110 — 2026-09-27
+
+**Built**
+- **Every remaining table is a list on a phone** (Team workers / members / leaderboard / equipment, Pay labour-by-job / subcontractors / payroll numbers, Compliance deadlines / invoices issued / purchases / T5018 / reminders, Group by company / by month / billing / crew, the price catalog, your own page by month, the archive): the name, a quiet line, the amount on the right; what the desktop row did with its buttons is in the row's **⋯** (`RowMore`). The desktop tables are unchanged. Baseline: 21 of 30 pages had phone-rule warnings (wide tables, wrapping tabs, full-width stats, stacked buttons); now none.
+- **`ResponsiveTable` grew** `mobile: "lead"` (an avatar, a checkbox), `rowActions` / `rowActionsLabel` (the phone row's ⋯, in an `li.lrow-split`) and `rowClassName` (`dim` for inactive, `total` for a totals row). Pages whose desktop cells hold more than a phone line use a `phone ?` branch of `ListRow`s instead.
+- **Tabs scroll**: Team, Books, Pay, Compliance and Group use `ScrollTabs` (sticky, now with the pills' icons and counts) instead of a pill row that wrapped to two lines.
+- **Numbers as strips**: Pay, the sales-tax worksheet (GST/HST and QST), Group overview, your own page and the catalog (a single line on a phone) use `StatStrip`.
+- **Hours by swipe on Team → Time entries** (deferred from 108): a waiting entry swipes right to approve or takes its ✓; reject / reopen / delete in its ⋯; **Approve all** stays; select-some is desktop-only.
+- **Docked primaries**: the catalog's **Add item** (the two imports behind its ⋯), Pay's **Save the rules**, the job setup's **Save draft · Save plan** (its bar floated over the tab bar; it now docks above it, the note stays with the form). Team members: **Invite member** stays, seats / access codes / leave company behind ⋯.
+- Imports: the three step cards are three short lines on a phone. Documents: Process / Delete in the row's ⋯; "pending processing" was hard-coded English (`documents.pendingCount`).
+- **The foreman's +** lists receipt photo, then job note, then new job (deferred from 108).
+- 10 EN/FR strings (`team.m.*`, `pay.m.overtime`, `compliance.m.entries`, `group.m.jobs`, `me.m.month`, `documents.pendingCount`); runbook §46; MOBILE-RULES.md (ResponsiveTable's new props, "a table with buttons on each row"); `qa:visual` sweeps the owner's Time entries and Equipment tabs, a worker's row ⋯ and the catalog's ⋯.
+
+**Decided**
+- A phone row shows what a person decides on (name, the money, the status); breakdown columns (straight / premium / burden on labour by job, pre-tax / tax on T5018) stay on the desktop.
+- Marking a deadline filed is in the deadline's ⋯, not a button on every row: the row's job on a phone is to say what is due and how soon.
+- Stat icons on your own page went with the strip (the strips elsewhere have none).
+
+**Found**
+- **Team → Time entries' delete and select buttons had no name** (axe button-name, owner and foreman) — both labelled.
+- The job setup's save bar sat on top of the tab bar on a phone (half its buttons hidden).
+- French catalog at 768 px overflowed once the header buttons moved into an action bar; the bar wraps above phone width.
+
+**Deferred**
+- The job setup's milestone editor keeps its stacked fields on a phone (dates one above the other); a sheet per milestone would be the next step if the pilot edits plans on a phone.
+- Books' match dialog and the pay allowance dialog are still centred dialogs, not bottom sheets.
+
+**Verification**
+- Baseline `qa:visual --lang=en --widths=375` (30 pages, `.qa/p110-pre`): phone-rule warnings on 21, axe button-name on the foreman's Time entries.
+- `qa:visual --lang=en --widths=375,1280` (68 pages, `.qa/p110`): 0 overflow, 0 gutter, 0 screen-reader, 0 raw keys, **0 phone-rule warnings**; axe button-name on Time entries at 1280 (the select toggle) — fixed.
+- Recheck `qa:visual --lang=en,fr --widths=375,768,1280` (192 pages, `.qa/p110b`): 0 axe, 0 gutter, 0 screen-reader, 0 raw keys, 0 phone-rule warnings; FR catalog overflow at 768 — fixed, `--lang=fr` catalog + team (30 pages, `.qa/p110c`): all 0.
+- Phone sheets `.qa/phone-sheets/p110/` (baseline `p110-pre`): pay 2.0 screens (was 2.5), group 2.4 (2.8), sales tax 2.2 (2.9), compliance 1.6 (1.8), me 4.2 (4.7), imports 1.8 (2.2), members 1.4 (1.7), catalog 1.0 (1.2); every row's amount and actions now on screen (they were cut off at the right).
+- typecheck (quote-ai, api-server), eslint on the touched files (no errors; three existing hook warnings), knip (nothing new), i18n-audit (nothing new: the "English literal" hits in touched files are `&&` expressions; the one unknown key is in a " - Copy" file).

@@ -247,6 +247,8 @@ function MoreSheet({ open, onOpenChange, tabs, navItems, name, email, avatar, ca
 
 type Intent = "receipt" | "note";
 
+const FOREMAN_ORDER = ["receipt", "note", "job", "quote", "lead", "invoice"];
+
 /**
  * The + in the phone top bar. Quote and lead open their screens; a receipt
  * photo and a spoken note first ask which job, then open the camera (in the
@@ -255,6 +257,7 @@ type Intent = "receipt" | "note";
 export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; hasInvoices?: boolean }) {
   const { t } = useLanguage();
   const can = useCan();
+  const { role } = useRole();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [location, navigate] = useLocation();
@@ -296,6 +299,8 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
     hasJobs && can("costs", "edit") && { key: "receipt", label: t("mobile.new.receipt"), icon: Camera, run: () => { setOpen(false); setIntent("receipt"); } },
     hasJobs && can("jobs", "edit") && { key: "note", label: t("mobile.new.note"), icon: Mic, run: () => { setOpen(false); setIntent("note"); } },
   ].filter((a): a is { key: string; label: string; icon: LucideIcon; run: () => void } => !!a);
+  // Phase 110: a foreman adds from the site — the receipt and the note first, a new job last.
+  if (role === "foreman") actions.sort((a, b) => FOREMAN_ORDER.indexOf(a.key) - FOREMAN_ORDER.indexOf(b.key));
   if (actions.length === 0) return null;
 
   const pickJob = (jobId: string) => {

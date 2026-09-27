@@ -6,8 +6,11 @@ import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, Building2, ChevronLeft, ChevronRight, CircleCheck, HardHat, Info, LayoutDashboard, Link2, Lock, Unlink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { ListRow, ResponsiveTable } from "@/components/mobile/list-row";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { formatCents } from "@/lib/jobs-api";
 import { groupApi, type GroupBillingDto, type GroupCompanyDto, type GroupCrewDto, type GroupPageDto } from "@/lib/group-api";
@@ -73,16 +76,7 @@ export default function GroupPage() {
 
       {data && active && (
         <>
-          <div className="pills mb-4">
-            {TABS.map((k) => {
-              const Icon = TAB_ICONS[k];
-              return (
-                <button key={k} type="button" onClick={() => setTab(k)} className={cn("pill", tab === k && "on")}>
-                  <Icon /> {t(`group.tab.${k}`)}
-                </button>
-              );
-            })}
-          </div>
+          <ScrollTabs sticky label={t("group.title")} value={tab} onChange={(k) => setTab(k as Tab)} tabs={TABS.map((k) => ({ id: k, label: t(`group.tab.${k}`), icon: TAB_ICONS[k] }))} />
           {tab === "overview" && <OverviewTab available={data.available} />}
           {tab === "companies" && <CompaniesTab data={data} />}
           {tab === "crew" && <CrewTab available={data.available} />}
@@ -168,16 +162,6 @@ function Invitation({ data }: { data: GroupPageDto }) {
 
 // ── Overview ─────────────────────────────────────────────────────────────────
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className="val">{value}</p>
-      {sub && <p className="sub">{sub}</p>}
-    </div>
-  );
-}
-
 const pct = (n: number | null) => (n == null ? "—" : `${n.toFixed(1)} %`);
 
 function OverviewTab({ available }: { available: boolean }) {
@@ -185,6 +169,7 @@ function OverviewTab({ available }: { available: boolean }) {
   const locale = lang === "fr" ? frCA : enCA;
   const [months, setMonths] = useState(6);
   const { data, isLoading, error } = useQuery({ queryKey: ["group-overview", months], queryFn: () => groupApi.overview(months), retry: false, enabled: available });
+  const phone = useMediaQuery("(max-width: 639.98px)");
   if (!available) return <Locked />;
   if (isLoading) return <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />;
   if (error || !data) return <div className="card card-empty">{(error as Error)?.message}</div>;
@@ -211,12 +196,12 @@ function OverviewTab({ available }: { available: boolean }) {
         <div className="card dashed card-empty">{t("group.overview.none")}</div>
       ) : (
         <>
-          <section className="stat-grid">
-            <Stat label={t("group.stat.invoiced")} value={formatCents(c.invoicedCents)} sub={t("group.stat.collected").replace("{amount}", formatCents(c.collectedCents))} />
-            <Stat label={t("group.stat.costs")} value={formatCents(c.costCents)} />
-            <Stat label={t("group.stat.margin")} value={formatCents(c.marginCents)} sub={pct(c.marginPercent)} />
-            <Stat label={t("group.stat.outstanding")} value={formatCents(c.outstandingCents)} sub={t("group.stat.overdue").replace("{amount}", formatCents(c.overdueCents))} />
-          </section>
+          <StatStrip label={t("group.tab.overview")} items={[
+            { label: t("group.stat.invoiced"), value: formatCents(c.invoicedCents), sub: t("group.stat.collected").replace("{amount}", formatCents(c.collectedCents)) },
+            { label: t("group.stat.costs"), value: formatCents(c.costCents) },
+            { label: t("group.stat.margin"), value: formatCents(c.marginCents), sub: pct(c.marginPercent) },
+            { label: t("group.stat.outstanding"), value: formatCents(c.outstandingCents), sub: t("group.stat.overdue").replace("{amount}", formatCents(c.overdueCents)) },
+          ]} />
 
           {(data.intercompany.invoicedCents !== 0 || data.intercompany.costCents !== 0) && (
             <div className="notice teal">
@@ -232,6 +217,21 @@ function OverviewTab({ available }: { available: boolean }) {
 
           <section className="card">
             <div className="card-head"><div><h2>{t("group.overview.byCompany")}</h2></div></div>
+            {phone ? (
+              // Phase 110: a company on a phone — invoiced on the right, margin, what is owed and the jobs on the quiet line.
+              <ul className="lrows wrap-meta" aria-label={t("group.overview.byCompany")}>
+                {[...data.companies.map((co) => ({ key: co.orgId, name: co.companyName, totals: co.totals, jobs: co.activeJobs, total: false })), { key: "group", name: t("group.col.group"), totals: c, jobs: c.activeJobs, total: true }].map((r) => (
+                  <li key={r.key}>
+                    <ListRow
+                      className={r.total ? "total" : undefined}
+                      title={r.name}
+                      meta={[`${t("group.col.marginPct")} ${pct(r.totals.marginPercent)}`, `${t("group.stat.outstanding")} ${formatCents(r.totals.outstandingCents)}`, r.totals.overdueCents ? <span key="o" className="t-bad">{t("group.stat.overdue").replace("{amount}", formatCents(r.totals.overdueCents))}</span> : null, t("group.m.jobs").replace("{n}", String(r.jobs))]}
+                      amount={formatCents(r.totals.invoicedCents)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : (
             <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("group.overview.byCompany")}>
               <table className="tbl">
                 <thead>
@@ -269,20 +269,22 @@ function OverviewTab({ available }: { available: boolean }) {
                 </tbody>
               </table>
             </div>
+            )}
           </section>
 
           <section className="card">
             <div className="card-head"><div><h2>{t("group.overview.byMonth")}</h2><p className="sub">{t("group.overview.byMonthSub")}</p></div></div>
-            <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("group.overview.byMonth")}>
-              <table className="tbl">
-                <thead><tr><th>{t("group.col.month")}</th><th className="t-amt">{t("group.stat.invoiced")}</th><th className="t-amt">{t("group.col.collected")}</th><th className="t-amt">{t("group.stat.costs")}</th></tr></thead>
-                <tbody>
-                  {[...data.series].reverse().map((m) => (
-                    <tr key={m.month}><td>{monthLabel(m.month)}</td><td className="t-amt">{formatCents(m.invoicedCents)}</td><td className="t-amt">{formatCents(m.collectedCents)}</td><td className="t-amt">{formatCents(m.costCents)}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ResponsiveTable
+              label={t("group.overview.byMonth")}
+              rows={[...data.series].reverse()}
+              getKey={(m) => m.month}
+              columns={[
+                { key: "month", header: t("group.col.month"), mobile: "title", cell: (m) => monthLabel(m.month) },
+                { key: "inv", header: t("group.stat.invoiced"), align: "right", mobile: "amount", cell: (m) => <span className="t-amt">{formatCents(m.invoicedCents)}</span> },
+                { key: "col", header: t("group.col.collected"), align: "right", mobile: "meta", cell: (m) => (phone ? `${t("group.col.collected")} ${formatCents(m.collectedCents)}` : <span className="t-amt">{formatCents(m.collectedCents)}</span>) },
+                { key: "cost", header: t("group.stat.costs"), align: "right", mobile: "meta", cell: (m) => (phone ? `${t("group.stat.costs")} ${formatCents(m.costCents)}` : <span className="t-amt">{formatCents(m.costCents)}</span>) },
+              ]}
+            />
           </section>
         </>
       )}
@@ -377,26 +379,20 @@ function CompaniesTab({ data }: { data: GroupPageDto }) {
           {billingCompany?.isCurrent && (
             <>
               {reason && <div className="notice warn"><AlertTriangle /><span className="grow">{reason}</span></div>}
-              <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("group.billing.title")}>
-                <table className="tbl">
-                  <thead><tr><th>{t("group.col.company")}</th><th>{t("group.billing.col.plan")}</th><th></th></tr></thead>
-                  <tbody>
-                    {activeCompanies.filter((c) => !c.isCurrent).map((c) => (
-                      <tr key={c.orgId}>
-                        <td className="t-strong">{c.companyName}</td>
-                        <td>{c.covered ? <span className="chip chip-teal">{t("group.billing.covered")}</span> : <span className="chip chip-grey">{t("group.billing.ownPlan")}</span>}</td>
-                        <td style={{ textAlign: "right" }}>
-                          {data.canDecide && (c.covered ? (
-                            <button type="button" className="btn btn-sm btn-outline-navy" disabled={setCovered.isPending} onClick={() => confirmThen(t("group.billing.stopConfirm").replace("{company}", c.companyName), () => setCovered.mutate({ orgId: c.orgId, covered: false }))}>{t("group.billing.stop")}</button>
-                          ) : (
-                            <button type="button" className="btn btn-sm btn-navy" disabled={setCovered.isPending || !!reason} onClick={() => confirmThen(t("group.billing.coverConfirm").replace("{company}", c.companyName), () => setCovered.mutate({ orgId: c.orgId, covered: true }))}>{t("group.billing.cover")}</button>
-                          ))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ResponsiveTable
+                label={t("group.billing.title")}
+                rows={activeCompanies.filter((c) => !c.isCurrent)}
+                getKey={(c) => c.orgId}
+                columns={[
+                  { key: "co", header: t("group.col.company"), mobile: "title", cell: (c) => <span className="t-strong">{c.companyName}</span> },
+                  { key: "plan", header: t("group.billing.col.plan"), mobile: "meta", cell: (c) => (c.covered ? <span className="chip chip-teal">{t("group.billing.covered")}</span> : <span className="chip chip-grey">{t("group.billing.ownPlan")}</span>) },
+                  { key: "act", header: "", align: "right", mobile: "end", cell: (c) => data.canDecide && (c.covered ? (
+                    <button type="button" className="btn btn-sm btn-outline-navy" disabled={setCovered.isPending} onClick={() => confirmThen(t("group.billing.stopConfirm").replace("{company}", c.companyName), () => setCovered.mutate({ orgId: c.orgId, covered: false }))}>{t("group.billing.stop")}</button>
+                  ) : (
+                    <button type="button" className="btn btn-sm btn-navy" disabled={setCovered.isPending || !!reason} onClick={() => confirmThen(t("group.billing.coverConfirm").replace("{company}", c.companyName), () => setCovered.mutate({ orgId: c.orgId, covered: true }))}>{t("group.billing.cover")}</button>
+                  )) },
+                ]}
+              />
               {data.canDecide && <div><button type="button" className="btn btn-sm btn-txt" disabled={setPays.isPending} onClick={() => confirmThen(t("group.billing.stopPayingConfirm"), () => setPays.mutate(false))}>{t("group.billing.stopPaying")}</button></div>}
             </>
           )}
@@ -492,22 +488,18 @@ function CrewTab({ available }: { available: boolean }) {
         {data.workers.length === 0 ? (
           <div className="card-empty">{t("group.crew.noWorkers")}</div>
         ) : (
-          <div className="tbl-wrap" tabIndex={0} role="region" aria-label={t("group.crew.all")}>
-            <table className="tbl">
-              <thead><tr><th><span className="sr-only">{t("group.crew.pick")}</span></th><th>{t("group.col.name")}</th><th>{t("group.col.company")}</th><th>{t("group.col.role")}</th><th></th></tr></thead>
-              <tbody>
-                {data.workers.map((w) => (
-                  <tr key={w.id}>
-                    <td style={{ width: 36 }}><input type="checkbox" aria-label={t("group.crew.pickName").replace("{name}", w.name).replace("{company}", w.companyName)} checked={picked.includes(w.id)} onChange={() => toggle(w.id)} /></td>
-                    <td className="t-strong">{w.name}</td>
-                    <td>{w.companyName}</td>
-                    <td>{w.role}</td>
-                    <td>{w.personId && <span className="chip chip-teal"><Link2 className="h-3 w-3" /> {t("group.crew.linked")}</span>}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ResponsiveTable
+            label={t("group.crew.all")}
+            rows={data.workers}
+            getKey={(w) => w.id}
+            columns={[
+              { key: "pick", header: <span className="sr-only">{t("group.crew.pick")}</span>, mobile: "lead", cell: (w) => <input type="checkbox" aria-label={t("group.crew.pickName").replace("{name}", w.name).replace("{company}", w.companyName)} checked={picked.includes(w.id)} onChange={() => toggle(w.id)} /> },
+              { key: "name", header: t("group.col.name"), mobile: "title", cell: (w) => <span className="t-strong">{w.name}</span> },
+              { key: "co", header: t("group.col.company"), mobile: "meta", cell: (w) => w.companyName },
+              { key: "role", header: t("group.col.role"), mobile: "meta", cell: (w) => w.role },
+              { key: "linked", header: "", mobile: "end", cell: (w) => w.personId && <span className="chip chip-teal"><Link2 className="h-3 w-3" /> {t("group.crew.linked")}</span> },
+            ]}
+          />
         )}
         <div className="card-foot flex flex-wrap items-center gap-3">
           <span className="foot-note grow">{picked.length >= 2 && !distinctCompanies ? t("group.crew.sameCompany") : t("group.crew.linkHint")}</span>

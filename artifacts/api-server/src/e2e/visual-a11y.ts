@@ -329,6 +329,10 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/group"), dash("/dashboard/group?tab=companies"), dash("/dashboard/group?tab=crew"),
     // Phase 91: the person's own page (owner and a foreman, whose first visit is the setup form), and the members tab with seats and codes.
     dash("/dashboard/me"), dash("/dashboard/team?tab=members"), foreman("/dashboard/me"),
+    // Phase 110: the owner's hours and equipment tabs, a worker's row ⋯ and the members ⋯ on a phone (no-ops wider: no .row-more there).
+    dash("/dashboard/team?tab=time"), dash("/dashboard/team?tab=equipment"),
+    { path: "/dashboard/team", session: "owner", name: "/dashboard/team row sheet", drive: (p) => openPhoneSheet(p, ".lrow-split .row-more button", "[role=dialog] .asheet-list") },
+    { path: "/dashboard/catalog", session: "owner", name: "/dashboard/catalog more sheet", drive: (p) => openPhoneSheet(p, ".action-bar .more-btn", "[role=dialog] .asheet-list") },
     // Phase 95: a teammate's page as the owner sees it (sent / won), next to the leaderboard on the members tab.
     ...(sweepForemanId ? [dash(`/dashboard/people/${sweepForemanId}`)] : []),
     foreman("/dashboard"), foreman("/dashboard/jobs"), foreman(`/dashboard/jobs/${s.jobId}`), foreman("/dashboard/schedule"), foreman("/dashboard/team"), foreman("/dashboard/team?tab=time"), foreman("/dashboard/team?tab=equipment"), foreman("/dashboard/books"), foreman("/dashboard/pay"), foreman("/dashboard/group"),

@@ -850,3 +850,13 @@ Settings → Connected apps (`/dashboard/settings/apps`) is a directory of tiles
 - **Adding a block**: **Add block** at the bottom of the screen (the header button on a computer) opens the form as a sheet: who, the job, the day, 7:00–15:30 by default. Picking a job with nobody chosen fills in the worker most often booked on that job. A job page's Crew schedule card does the same for its job.
 - **"It says double-booked"**: the form warns before saving when that person already has something overlapping ("Pat Worker already has Pick up materials at 12:00–13:30"), and saving is still allowed. On the phone list the clashing blocks are marked in red with what they clash with; tap one to change its day, hours or worker.
 - **Moving a block on a phone** is done by opening it and changing the day, the hours or the worker; nothing on a phone drags. On a touch screen the board's tip says so ("tap … to change it") instead of "drag".
+
+## 46. The rest of the dashboard on a phone (Phase 110)
+
+- **"The table is cut off"** — it no longer is: on a phone every list in Team, Pay, Books, Compliance, Group, the price catalog, your own page and the archive is a list of rows (the name, a quiet line under it, the amount on the right). What a row's buttons did on a computer (edit, deactivate, send a new link, mark filed, restore…) is in the row's **⋯**. The full tables are unchanged on a computer.
+- **Approving hours on a phone** (Team → Time entries): swipe a row right, or tap its ✓; **Approve all** approves every waiting entry. Rejecting, reopening and deleting are in the row's ⋯. Picking a few entries with checkboxes is a computer thing.
+- **Team members on a phone**: **Invite member** stays; paid seats, access codes and leaving the company are behind the ⋯ next to it.
+- **Price catalog on a phone**: **Add item** sits at the bottom of the screen; importing from past quotes or from a photo / PDF is behind its ⋯.
+- **Pay rules on a phone**: **Save the rules** sits at the bottom of the screen while you scroll the form. Labour by job shows each job's hours, overtime and total; the split (straight, premium, burden) is on a computer.
+- **Job setup on a phone**: Save draft and Confirm sit at the bottom, above the tabs (the bar used to float over them).
+- **The foreman's +** lists what a foreman adds from site first: a photo of a receipt, then a job note, then a new job.

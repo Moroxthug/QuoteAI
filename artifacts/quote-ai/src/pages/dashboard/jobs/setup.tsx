@@ -144,7 +144,7 @@ export default function JobSetupPage() {
               {regenerate.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} {t("jobs.setup.regenerate")}
             </button>
           )}
-          <button type="button" className="btn btn-sm btn-outline-navy" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {t("jobs.setup.save")}</button>
+          <button type="button" className="btn btn-sm btn-outline-navy hide-phone" disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {t("jobs.setup.save")}</button>
         </div>
       </div>
 
@@ -281,10 +281,13 @@ export default function JobSetupPage() {
         </div>
       </section>
 
-      <div className="save-bar">
+      {/* Phase 110: on a phone the bar docks above the tabs (it floated over them), its note stays with the form. */}
+      <p className="foot-note show-phone" style={{ marginTop: 16 }}>{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</p>
+      <div className="action-bar-spacer" aria-hidden="true" />
+      <div className="save-bar dock-phone">
         <span className="foot-note">{confirmed ? t("jobs.setup.editFooter") : t("jobs.setup.footer")}</span>
-        <button type="button" className="btn btn-sm btn-outline-navy" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</button>
-        <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>
+        <button type="button" className="btn btn-sm btn-outline-navy secondary" disabled={save.isPending} onClick={() => save.mutate()}>{t("jobs.setup.save")}</button>
+        <button type="button" className="btn btn-sm btn-navy" data-primary-action style={{ background: "var(--green)" }} disabled={confirm.isPending || milestones.length === 0} onClick={() => confirm.mutate()}>
           {confirm.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
           {confirmed ? t("jobs.setup.saveAndBack") : t("jobs.setup.confirm")}
         </button>

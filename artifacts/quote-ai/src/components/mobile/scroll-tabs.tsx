@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type ScrollTab = { id: string; label: string; count?: number; href?: string };
+export type ScrollTab = { id: string; label: string; count?: number; href?: string; icon?: LucideIcon };
 
 /**
  * Phase 100 — tabs scroll, they don't wrap (docs/MOBILE-RULES.md rule 5).
@@ -44,8 +45,10 @@ export function ScrollTabs({
     <div ref={ref} className={cn("stabs", sticky && "sticky", className)} role="group" aria-label={label} data-bleed>
       {tabs.map((tab) => {
         const active = tab.id === value;
+        const Icon = tab.icon;
         const inner = (
           <>
+            {Icon && <Icon aria-hidden="true" />}
             {tab.label}
             {tab.count !== undefined && <span className="cnt">{tab.count}</span>}
           </>

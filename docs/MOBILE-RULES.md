@@ -32,7 +32,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | `ActionSheet` | dropdown menu | bottom sheet of 52 px rows + Cancel | 2 |
 | `BottomSheet` | centred modal | docked sheet with grab handle, safe-area padding | 6 |
 | `StickyActionBar` | right-aligned row in place | docked above the tab bar / home indicator, with a spacer; primary marked `data-primary-action` | 2 |
-| `ListRow`, `ResponsiveTable` | `.tbl` table (≥ 640 px) | `<ul>` of rows, one column definition (`mobile: "title" / "meta" / "amount" / "end" / "hidden"`) | 4 |
+| `ListRow`, `ResponsiveTable` | `.tbl` table (≥ 640 px) | `<ul>` of rows, one column definition (`mobile: "lead" / "title" / "meta" / "amount" / "end" / "hidden"`); `rowActions` gives each phone row its own ⋯ for what the desktop row did with its buttons, `rowClassName` dims (`dim`) or bolds (`total`) a row (Phase 110) | 4 |
 | `StatStrip` | one card, N cells | 2-column grid; or `variant="line"` | 3 |
 | `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it; runs to the screen edges (`data-bleed`, skipped by the gutter check) | 5 |
 | `RowMore` | hidden (the row keeps its hover icons — pair them with `hide-phone`) | one ⋯ at the end of a row opening its actions as a sheet (Phase 106) | 2 |
@@ -57,6 +57,7 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 - A detail page names itself in the phone top bar: `useMobileHeader(useMemo(() => ({ title: quote.title, actions }), [quote.title, actions]))` — memoise, every change re-renders the bar.
 - Tables: write the columns once and say where each lands on a phone; anything unmarked is hidden there — choose, don't inherit a desktop.
 - **A board becomes an agenda (Phase 109, the schedule).** A grid a mouse drags on (people × days, a time axis) does not shrink to a phone: under 768 px show a strip to jump (seven days with a dot per item, red for a problem) and the chosen day as `ListRow`s grouped by what the reader asks (by person / by job, a two-way switch), with the one action (Add) docked and every change made in the item's sheet. Pages that pick a whole layout by width use `useMediaQueryNow` (`hooks/use-media-query.ts`), which answers on the first render, so the wrong layout never fetches or flashes.
+- **A table with buttons on each row (Phase 110, the long tail).** Write the columns once with `ResponsiveTable`, mark the button column `hidden` and hand the same actions to `rowActions` — or, where a desktop cell holds more than a phone line can, render `ListRow`s in a `phone ?` branch with the row in an `li.lrow-split` next to a `RowMore`. A tab row is `ScrollTabs` (it takes the pill icons), a stat grid is `StatStrip`, a long settings form docks its Save in a `StickyActionBar`, a page's header buttons become the docked primary plus a ⋯ (the catalog).
 - Small utilities (Phases 105-106): `.hide-phone` / `.show-phone` (≤ 640 px / above it); an `.item-row.wrap-phone` puts its `.row-acts` on a second line on a phone instead of squeezing the text; hover-only icons (`.hover-act`) are always visible on touch screens (`@media (hover: none)`), so on a phone put them in a `RowMore`.
 
 ## What the machine checks (`qa:visual`, ≤ 640 px)

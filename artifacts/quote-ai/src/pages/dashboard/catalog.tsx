@@ -35,6 +35,13 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import type { CatalogItem } from "@workspace/api-client-react";
 import { formatCad } from "@/lib/money";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { ResponsiveTable, type Column } from "@/components/mobile/list-row";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { ActionSheet } from "@/components/mobile/action-sheet";
+import { useMediaQuery } from "@/hooks/use-media-query";
+
+type SharedItem = CatalogItem & { shared?: boolean; sharedFrom?: string | null };
 
 const UM_OPTIONS = ["mq", "ml", "mc", "cad", "ore", "kg", "a.c.", "pezzi", "kw", "lt", "t", "m", "%"];
 
@@ -320,6 +327,7 @@ const can = useCan();
   const [editingItem, setEditingItem] = useState<CatalogItem | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isOcrOpen, setIsOcrOpen] = useState(false);
+  const phone = useMediaQuery("(max-width: 640px)");
 
   // Elite includes everything Pro does (Phase 66: Elite accounts were shown the "Upgrade to Pro" wall).
   const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
@@ -437,19 +445,26 @@ const can = useCan();
           <h1>{t("dashboard.nav.catalog")}</h1>
           <p className="sub">{t("dashboard.catalog.header.subtitle")}</p>
         </div>
-        {can("quotes", "edit") && <div className="head-actions">
-          <button type="button" className="btn btn-outline-navy btn-sm" onClick={handleImport} disabled={importFromQuotes.isPending}>
-            {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            {t("dashboard.catalog.importFromQuotes")}
-          </button>
-          <button type="button" className="btn btn-outline-navy btn-sm" onClick={() => setIsOcrOpen(true)}>
-            <Import className="h-4 w-4" />
-            {t("dashboard.catalog.importFromPhotoPdf")}
-          </button>
-          <button type="button" className="btn btn-navy" onClick={() => setIsCreateOpen(true)}>
-            <Plus className="h-4 w-4" />
-            {t("dashboard.catalog.addItem")}
-          </button>
+        {/* Phase 110: on a phone Add item docks and the two imports sit behind its ⋯. */}
+        {can("quotes", "edit") && (isLoading || items.length > 0) && <div className="head-actions">
+          <StickyActionBar label={t("dashboard.nav.catalog")}>
+            <button type="button" className="btn btn-outline-navy btn-sm hide-phone" onClick={handleImport} disabled={importFromQuotes.isPending}>
+              {importFromQuotes.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              {t("dashboard.catalog.importFromQuotes")}
+            </button>
+            <button type="button" className="btn btn-outline-navy btn-sm hide-phone" onClick={() => setIsOcrOpen(true)}>
+              <Import className="h-4 w-4" />
+              {t("dashboard.catalog.importFromPhotoPdf")}
+            </button>
+            {phone && <ActionSheet actions={[
+              { label: t("dashboard.catalog.importFromQuotes"), icon: Download, disabled: importFromQuotes.isPending, onSelect: handleImport },
+              { label: t("dashboard.catalog.importFromPhotoPdf"), icon: Import, onSelect: () => setIsOcrOpen(true) },
+            ]} />}
+            <button type="button" className="btn btn-navy" data-primary-action onClick={() => setIsCreateOpen(true)}>
+              <Plus className="h-4 w-4" />
+              {t("dashboard.catalog.addItem")}
+            </button>
+          </StickyActionBar>
         </div>}
       </div>
 
@@ -479,20 +494,11 @@ const can = useCan();
         </div>
       ) : (
         <>
-          <div className="stat-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-            <div className="card stat-card">
-              <p className="lbl">{t("dashboard.catalog.summary.totalItems")}</p>
-              <p className="val">{items.length}</p>
-            </div>
-            <div className="card stat-card">
-              <p className="lbl">{t("dashboard.catalog.summary.categories")}</p>
-              <p className="val">{categories.filter(c => c !== noCategoryLabel).length}</p>
-            </div>
-            <div className="card stat-card">
-              <p className="lbl">{t("dashboard.catalog.summary.avgPrice")}</p>
-              <p className="val">{formatCurrency(items.reduce((s, i) => s + i.prezzoUnitario, 0) / items.length)}</p>
-            </div>
-          </div>
+          <StatStrip label={t("dashboard.nav.catalog")} variant={phone ? "line" : "grid"} items={[
+            { label: t("dashboard.catalog.summary.totalItems"), value: items.length },
+            { label: t("dashboard.catalog.summary.categories"), value: categories.filter(c => c !== noCategoryLabel).length },
+            { label: t("dashboard.catalog.summary.avgPrice"), value: formatCurrency(items.reduce((s, i) => s + i.prezzoUnitario, 0) / items.length) },
+          ]} />
 
           <div className="card" style={{ marginTop: 16 }}>
             <div className="toolbar">
@@ -501,43 +507,36 @@ const can = useCan();
                 <input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder={t("dashboard.catalog.searchPlaceholder")} aria-label={t("dashboard.catalog.searchPlaceholder")} />
               </label>
             </div>
-            <div className="tbl-wrap">
-              <table className="tbl">
-                <thead>
-                  <tr>
-                    <th>{t("dashboard.catalog.col.item")}</th>
-                    <th>{t("dashboard.catalog.col.category")}</th>
-                    <th>{t("dashboard.catalog.col.unit")}</th>
-                    <th style={{ textAlign: "right" }}>{t("dashboard.catalog.col.unitPrice")}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleItems.map(item => {
-                    // Phase 90: an item from the group's catalog — read here, edited in its own company.
-                    const shared = item as CatalogItem & { shared?: boolean; sharedFrom?: string | null };
-                    return (
-                    <tr key={item.id} className="group">
-                      <td>
-                        <span className="t-strong">{item.nome}</span>
-                        {shared.shared && <span className="chip chip-teal" style={{ marginLeft: 8 }}>{t("dashboard.catalog.shared").replace("{company}", shared.sharedFrom || "—")}</span>}
-                        {item.note && <span className="t-sub">{item.note}</span>}
-                      </td>
-                      <td>{item.categoria || noCategoryLabel}</td>
-                      <td>{item.um}</td>
-                      <td className="t-amt" style={{ textAlign: "right" }}>{formatCurrency(item.prezzoUnitario)}</td>
-                      <td>
-                        {can("quotes", "edit") && !shared.shared && <div className="row-act">
-                          <button type="button" className="ic-btn" aria-label={t("a11y.edit")} onClick={() => setEditingItem(item)}><Pencil /></button>
-                          <button type="button" className="ic-btn danger" aria-label={t("a11y.delete")} onClick={() => setDeletingId(item.id)}><Trash2 /></button>
-                        </div>}
-                      </td>
-                    </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <ResponsiveTable
+              label={t("dashboard.nav.catalog")}
+              rows={visibleItems as SharedItem[]}
+              getKey={(item) => String(item.id)}
+              rowActions={(item) => (can("quotes", "edit") && !item.shared ? [
+                { label: t("a11y.edit"), icon: Pencil, onSelect: () => setEditingItem(item) },
+                { label: t("a11y.delete"), icon: Trash2, danger: true, separated: true, onSelect: () => setDeletingId(item.id) },
+              ] : [])}
+              rowActionsLabel={(item) => t("team.m.rowActions").replace("{name}", item.nome)}
+              columns={([
+                // Phase 90: an item from the group's catalog — read here, edited in its own company.
+                { key: "item", header: t("dashboard.catalog.col.item"), mobile: "title", cell: (item) => (phone ? item.nome : (
+                  <>
+                    <span className="t-strong">{item.nome}</span>
+                    {item.shared && <span className="chip chip-teal" style={{ marginLeft: 8 }}>{t("dashboard.catalog.shared").replace("{company}", item.sharedFrom || "—")}</span>}
+                    {item.note && <span className="t-sub">{item.note}</span>}
+                  </>
+                )) },
+                { key: "cat", header: t("dashboard.catalog.col.category"), mobile: "meta", cell: (item) => item.categoria || noCategoryLabel },
+                { key: "shared", header: "", mobile: "meta", cell: (item) => (phone && item.shared ? t("dashboard.catalog.shared").replace("{company}", item.sharedFrom || "—") : null) },
+                { key: "um", header: t("dashboard.catalog.col.unit"), cell: (item) => item.um },
+                { key: "price", header: t("dashboard.catalog.col.unitPrice"), align: "right", mobile: "amount", cell: (item) => <span className="t-amt">{formatCurrency(item.prezzoUnitario)}{phone && item.um ? <span className="t-unit"> /{item.um}</span> : null}</span> },
+                { key: "act", header: "", cell: (item) => can("quotes", "edit") && !item.shared && (
+                  <div className="row-act">
+                    <button type="button" className="ic-btn" aria-label={t("a11y.edit")} onClick={() => setEditingItem(item)}><Pencil /></button>
+                    <button type="button" className="ic-btn danger" aria-label={t("a11y.delete")} onClick={() => setDeletingId(item.id)}><Trash2 /></button>
+                  </div>
+                ) },
+              ] satisfies Column<SharedItem>[]).filter((c) => c.key !== "shared" || phone)}
+            />
             <div className="card-foot"><span className="foot-note">{t("dashboard.catalog.itemCount").replace("{count}", String(visibleItems.length))}</span></div>
           </div>
         </>

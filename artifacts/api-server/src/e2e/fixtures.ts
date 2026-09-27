@@ -7,7 +7,7 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable, calendarConnectionsTable, leadsTable } from "@workspace/db";
+import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable, calendarConnectionsTable, leadsTable, quoteVariantsTable } from "@workspace/db";
 import { encryptSecret } from "../lib/crypto.js";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
@@ -44,6 +44,8 @@ export type Showcase = {
   joinCode: string | null;
   /** Phase 92: the widget key — `/widget-test.html?key=…`. */
   widgetKey: string | null;
+  /** Phase 111: unlocked with Good / Better / Best — the `/p/:id` tier picker. */
+  tieredQuoteId: string;
 };
 
 function need<T>(v: T | null | undefined, what: string): T {
@@ -251,6 +253,23 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   }
   const waiting = await seedQuote(userId, { province, clientName: "Alex Morin", clientEmail: "alex@e2e-test.invalid" });
   await db.update(quotesTable).set({ sentAt: new Date(Date.now() - 6 * 86_400_000), clientData: { ...waiting.clientData, phone: "6135550163" } }).where(eq(quotesTable.id, waiting.id));
+  // Phase 111: the waiting quote offers three tiers, so the client's page renders its tier picker.
+  const tiers = language === "fr"
+    ? [["Essentiel", "Armoires de série, comptoir stratifié"], ["Confort", "Armoires semi-sur-mesure, quartz"], ["Prestige", "Sur mesure, quartz, dosseret en céramique"]]
+    : [["Good", "Stock cabinets, laminate counter"], ["Better", "Semi-custom cabinets, quartz"], ["Best", "Custom cabinets, quartz, tile backsplash"]];
+  const taxRate = getTaxProfile(province).totalRate;
+  await db.insert(quoteVariantsTable).values(tiers.map(([label, description], position) => {
+    const sub = [10_000, 14_500, 21_800][position]!;
+    const tax = Math.round(sub * taxRate) / 100;
+    return {
+      quoteId: waiting.id, userId, label: label!, description: description!, position,
+      capitoli: [
+        { lettera: "A", titolo: "Demolition and prep", subtotale: 4000, voci: [{ descrizione: "Demo existing cabinets", quantita: 1, um: "lot", prezzoUnitario: 4000, totale: 4000 }] },
+        { lettera: "B", titolo: "Cabinets and countertops", subtotale: sub - 4000, voci: [{ descrizione: "Install cabinets and counters", quantita: 1, um: "lot", prezzoUnitario: sub - 4000, totale: sub - 4000 }] },
+      ],
+      subtotale: String(sub), ivaPercentuale: String(taxRate), ivaValore: String(tax), totale: String(sub + tax),
+    };
+  }));
 
   await seedBooks(userId, project.id, language);
   await seedGroup(org, project.id, worker.status === 201 ? String(worker.body.worker.id) : null, language);
@@ -275,7 +294,7 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
     quoteId: quote.id, longQuoteId: longQuote.id, pendingQuoteId: pending.id,
     contractId: contract.id, pendingContractId: pendingContract.id,
     jobId: project.id, invoiceId: sent.id, invoiceToken: invoiceToken(manualSent),
-    signToken, workerToken, teamInviteToken, clientId, joinCode, widgetKey,
+    signToken, workerToken, teamInviteToken, clientId, joinCode, widgetKey, tieredQuoteId: waiting.id,
   };
 }
 

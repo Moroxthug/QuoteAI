@@ -16,7 +16,7 @@ export function WorkStepFields({ value, onChange }: { value: Required<Pick<Compa
     <div className="form-grid">
       <fieldset className="field full" style={{ border: 0, padding: 0, margin: 0 }}>
         <legend className="mb-2" style={{ fontSize: 13, fontWeight: 700, color: "var(--navy)" }}>{t("setup.trades")}</legend>
-        <div className="pills" style={{ flexWrap: "wrap", gap: 8 }}>
+        <div className="pills choices" style={{ flexWrap: "wrap", gap: 8 }}>
           {COMPANY_TRADES.map((trade) => (
             <button key={trade} type="button" className={value.trades.includes(trade) ? "pill on" : "pill"} aria-pressed={value.trades.includes(trade)} onClick={() => toggle(trade)}>
               {t(`setup.trade.${trade}`)}

@@ -19,6 +19,7 @@ export function BottomSheet({
   footer,
   size = "md",
   flush,
+  noAutoFocus,
   children,
 }: {
   open: boolean;
@@ -29,11 +30,13 @@ export function BottomSheet({
   size?: DialogSize;
   /** Body without padding (a list that runs edge to edge). */
   flush?: boolean;
+  /** Phase 111: open without focusing the first field (a sheet whose first field would raise the phone keyboard over what it is for, e.g. a signature pad). */
+  noAutoFocus?: boolean;
   children: ReactNode;
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size={size} className="sheet" {...(description ? {} : { "aria-describedby": undefined })}>
+      <DialogContent size={size} className="sheet" {...(noAutoFocus ? { onOpenAutoFocus: (e: Event) => e.preventDefault() } : {})} {...(description ? {} : { "aria-describedby": undefined })}>
         <div className="sheet-grab" aria-hidden="true" />
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

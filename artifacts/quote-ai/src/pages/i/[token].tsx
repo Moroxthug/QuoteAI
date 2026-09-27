@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, AlertTriangle, Download, CheckCircle2, Banknote, Mail, Copy, CreditCard, MailCheck, Clock, LayoutDashboard } from "lucide-react";
@@ -7,11 +7,18 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { publicInvoiceApi } from "@/lib/invoices-api";
 import { Logo } from "@/components/logo";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
+import { BottomSheet } from "@/components/mobile/bottom-sheet";
 
 /**
  * Public invoice page (/i/:token). No login: the customer sees the invoice,
  * the balance and how to pay, and can download the PDF. Payments are by
  * e-Transfer / cheque — nothing is collected here.
+ *
+ * Phase 111: the balance and how to pay are the first screen; one action is
+ * docked on a phone — Pay by card when the contractor takes cards, otherwise
+ * "I've sent it" for an e-Transfer — with the PDF (and the other one) behind ⋯.
  */
 export default function PublicInvoicePage() {
   const { token } = useParams<{ token: string }>();
@@ -37,10 +44,21 @@ export default function PublicInvoicePage() {
     if (data?.invoice.language) setLang(data.invoice.language);
   }, [data?.invoice.language, setLang]);
 
+  const invoice = data?.invoice;
+  const pi = invoice?.paymentInstructions ?? {};
+  const pdfHref = token ? publicInvoiceApi.pdfUrl(token, true) : "";
+  const canCard = !!invoice?.canPayByCard;
+  const canSent = !!pi.etransferEmail;
+  // The docked bar: one primary, the rest behind ⋯ (docs/MOBILE-RULES.md rule 2).
+  const more = useMemo<SheetAction[]>(() => [
+    ...(canCard && canSent ? [{ label: t("publicInvoice.iSentIt"), icon: Clock, onSelect: () => setConfirming(true) }] : []),
+    { label: t("publicInvoice.downloadPdf"), icon: Download, onSelect: () => { window.location.href = pdfHref; } },
+  ], [canCard, canSent, pdfHref, t]);
+
   if (isLoading) {
     return <div className="doc-shell flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--navy)" }} /></div>;
   }
-  if (error || !data) {
+  if (error || !data || !invoice) {
     return (
       <div className="doc-shell flex items-center justify-center p-6">
         <div className="card max-w-md w-full p-8 text-center" style={{ boxShadow: "var(--shadow-card)" }}>
@@ -52,17 +70,16 @@ export default function PublicInvoicePage() {
     );
   }
 
-  const { invoice } = data;
   const fmt = (c: number) => new Intl.NumberFormat(invoice.language === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(c / 100);
   const day = (s: string) => new Date(s).toLocaleDateString(invoice.language === "fr" ? "fr-CA" : "en-CA", { dateStyle: "long" });
   const paid = invoice.status === "paid";
   const voided = invoice.status === "void";
   const pendingConfirmation = invoice.status === "pending_confirmation";
   const credit = invoice.type === "credit_note";
-  const pi = invoice.paymentInstructions ?? {};
+  const owing = !paid && !voided && !pendingConfirmation && !credit;
 
   return (
-    <div className="doc-shell pb-16">
+    <div className={owing ? "doc-shell pb-16 doc-docked" : "doc-shell pb-16"}>
       <header className="doc-head">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
@@ -97,59 +114,56 @@ export default function PublicInvoicePage() {
             <p className="text-sm mt-1">{t("publicInvoice.pendingConfirmationDesc")}</p>
           </div>
         )}
-        {!paid && !voided && !pendingConfirmation && !credit && (
-          <div className="rounded-2xl p-5" style={invoice.status === "overdue" ? { border: "1px solid var(--red-t)", background: "var(--red-t)" } : { border: "1px solid var(--line)", background: "var(--soft)" }}>
+        {owing && (
+          <div className="inv-due rounded-2xl p-4 sm:p-5" style={invoice.status === "overdue" ? { border: "1px solid var(--red-t)", background: "var(--red-t)" } : { border: "1px solid var(--line)", background: "var(--soft)" }}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
+                {/* Not an h1: the invoice document below carries the page heading. */}
                 <div className="text-xs font-semibold uppercase tracking-wide" style={{ color: invoice.status === "overdue" ? "var(--red)" : "var(--navy)" }}>{invoice.status === "overdue" ? t("publicInvoice.overdue") : t("publicInvoice.balanceDue")}</div>
                 <div className="text-3xl font-extrabold mt-1" style={{ color: "var(--navy)" }}>{fmt(invoice.balanceCents)}</div>
                 <div className="text-sm mt-1" style={{ color: "var(--ink)" }}>{t("publicInvoice.dueBy")} <strong>{day(invoice.dueDate)}</strong>{invoice.paidCents > 0 ? ` · ${t("publicInvoice.alreadyPaid")} ${fmt(invoice.paidCents)}` : ""}</div>
               </div>
-              <a href={publicInvoiceApi.pdfUrl(token!, true)} className="btn btn-outline-navy btn-sm" style={{ background: "#fff" }}><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
             </div>
-
-            {invoice.canPayByCard && (
-              <div className="mt-4">
-                <button className="btn btn-navy w-full sm:w-auto" onClick={() => payLink.mutate()} disabled={payLink.isPending}>
-                  {payLink.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />} {t("publicInvoice.payByCard")}
-                </button>
-              </div>
-            )}
 
             {(pi.etransferEmail || pi.chequePayableTo || pi.note) && (
               <div className="mt-4 rounded-xl p-4 space-y-2 text-sm" style={{ background: "rgba(255,255,255,.8)", border: "1px solid #fff" }}>
-                <div className="font-semibold inline-flex items-center gap-2" style={{ color: "var(--navy)" }}><Banknote className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("publicInvoice.howToPay")}</div>
+                <h2 className="font-semibold inline-flex items-center gap-2 text-sm" style={{ color: "var(--navy)" }}><Banknote className="h-4 w-4" style={{ color: "var(--navy)" }} /> {t("publicInvoice.howToPay")}</h2>
                 {pi.etransferEmail && (
                   <div className="flex flex-wrap items-center gap-2">
                     <Mail className="h-4 w-4" style={{ color: "var(--faint)" }} />
                     <span style={{ color: "var(--ink)" }}>{t("publicInvoice.etransferTo")}</span>
-                    <code className="rounded px-2 py-0.5 font-semibold" style={{ background: "var(--soft-2)", color: "var(--navy)" }}>{pi.etransferEmail}</code>
-                    <button type="button" aria-label={t("a11y.copyEmail")} style={{ color: "var(--navy)" }} onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
+                    <span className="inline-flex items-center gap-1 max-w-full">
+                      <code className="rounded px-2 py-0.5 font-semibold break-all" style={{ background: "var(--soft-2)", color: "var(--navy)" }}>{pi.etransferEmail}</code>
+                      <button type="button" className="ic-btn" aria-label={t("a11y.copyEmail")} style={{ color: "var(--navy)" }} onClick={() => { navigator.clipboard.writeText(pi.etransferEmail!); toast({ title: t("invoices.copied") }); }}><Copy className="h-4 w-4" /></button>
+                    </span>
                   </div>
                 )}
                 {pi.chequePayableTo && <div style={{ color: "var(--ink)" }}>{t("publicInvoice.chequeTo")} <strong>{pi.chequePayableTo}</strong></div>}
                 {pi.note && <div style={{ color: "var(--ink)" }}>{pi.note}</div>}
                 <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{t("publicInvoice.reference")} <strong>{invoice.number}</strong>.</div>
-                {pi.etransferEmail && !confirming && (
-                  <button className="mt-1 inline-flex items-center gap-1.5 font-medium" style={{ color: "var(--navy)" }} onClick={() => setConfirming(true)}>
-                    <Clock className="h-4 w-4" /> {t("publicInvoice.iSentIt")}
-                  </button>
-                )}
-                {confirming && (
-                  <div className="mt-2 rounded-lg p-3 space-y-2" style={{ background: "var(--soft)", border: "1px solid var(--line)" }}>
-                    <p style={{ color: "var(--ink)" }}>{t("publicInvoice.markSentConfirm")}</p>
-                    <div className="flex gap-2">
-                      <button className="btn btn-outline-navy btn-sm" onClick={() => setConfirming(false)}>{t("jobs.cancel")}</button>
-                      <button className="btn btn-navy btn-sm" onClick={() => markSent.mutate()} disabled={markSent.isPending}>{markSent.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}{t("publicInvoice.confirmSent")}</button>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
+
+            <div className="mt-4">
+              <StickyActionBar label={t("publicInvoice.howToPay")}>
+                <ActionSheet actions={more} />
+                {canCard ? (
+                  <button type="button" className="btn btn-navy" data-primary-action onClick={() => payLink.mutate()} disabled={payLink.isPending}>
+                    {payLink.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />} {t("publicInvoice.payByCard")} · {fmt(invoice.balanceCents)}
+                  </button>
+                ) : canSent ? (
+                  <button type="button" className="btn btn-navy" data-primary-action onClick={() => setConfirming(true)}>
+                    <Clock className="h-4 w-4" /> {t("publicInvoice.iSentIt")}
+                  </button>
+                ) : (
+                  <a href={pdfHref} className="btn btn-navy" data-primary-action><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
+                )}
+              </StickyActionBar>
+            </div>
           </div>
         )}
 
-        <div className="card p-5 sm:p-10" style={{ boxShadow: "var(--shadow-card)" }}>
+        <div className="card p-4 sm:p-10 inv-doc" style={{ boxShadow: "var(--shadow-card)" }}>
           <style dangerouslySetInnerHTML={{ __html: data.css }} />
           <div dangerouslySetInnerHTML={{ __html: data.html }} />
         </div>
@@ -163,10 +177,28 @@ export default function PublicInvoicePage() {
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm" style={{ color: "var(--muted-mk)" }}>
-          <a href={publicInvoiceApi.pdfUrl(token!, true)} className="inline-flex items-center gap-2 font-medium hover:underline" style={{ color: "var(--navy)" }}><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
-          <span>{t("publicInvoice.questions")} {invoice.companyEmail ? <a href={`mailto:${invoice.companyEmail}`} className="underline">{invoice.companyEmail}</a> : invoice.companyName}{invoice.companyPhone ? ` · ${invoice.companyPhone}` : ""}</span>
+          <a href={pdfHref} className="inline-flex items-center gap-2 font-medium hover:underline" style={{ color: "var(--navy)" }}><Download className="h-4 w-4" /> {t("publicInvoice.downloadPdf")}</a>
+          <span>{t("publicInvoice.questions")} {invoice.companyEmail ? <a href={`mailto:${invoice.companyEmail}`} className="underline">{invoice.companyEmail}</a> : invoice.companyName}{invoice.companyPhone ? <> · <a href={`tel:${invoice.companyPhone.replace(/[^\d+]/g, "")}`} className="underline">{invoice.companyPhone}</a></> : ""}</span>
         </div>
       </main>
+
+      <BottomSheet
+        open={confirming}
+        onOpenChange={(o) => { if (!markSent.isPending) setConfirming(o); }}
+        title={t("publicInvoice.iSentIt")}
+        description={t("publicInvoice.markSentConfirm")}
+        size="sm"
+        footer={
+          <>
+            <button type="button" className="btn btn-outline-navy secondary" onClick={() => setConfirming(false)}>{t("jobs.cancel")}</button>
+            <button type="button" className="btn btn-navy" onClick={() => markSent.mutate()} disabled={markSent.isPending}>{markSent.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}{t("publicInvoice.confirmSent")}</button>
+          </>
+        }
+      >
+        {pi.etransferEmail && (
+          <p className="text-sm m-0" style={{ color: "var(--ink)" }}>{t("publicInvoice.etransferTo")} <b style={{ color: "var(--navy)" }}>{pi.etransferEmail}</b> · {fmt(invoice.balanceCents)}</p>
+        )}
+      </BottomSheet>
     </div>
   );
 }

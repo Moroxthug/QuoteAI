@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, AlertTriangle, Mail, ShieldCheck, LayoutDashboard, FileText, FileSignature, Receipt, Camera, MessageSquare, Download, CreditCard, Clock, ExternalLink, CheckCircle2, LogOut, MapPin, Send, Circle } from "lucide-react";
+import { Loader2, AlertTriangle, Mail, ShieldCheck, LayoutDashboard, FileText, FileSignature, Receipt, Camera, MessageSquare, Download, CreditCard, Clock, ExternalLink, CheckCircle2, LogOut, MapPin, Send, Circle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { Logo } from "@/components/logo";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { portalApi, getPortalSession, setPortalSession, type PortalOverviewDto, type PortalJobDto, type PortalMessageDto } from "@/lib/portal-api";
 
 type Section = "home" | "quotes" | "contracts" | "invoices" | "photos" | "messages";
@@ -66,15 +67,18 @@ export default function PortalPage() {
             {company.logoUrl ? <img src={company.logoUrl} alt="" className="h-8 w-8 rounded-lg object-contain shrink-0" style={{ border: "1px solid var(--line)" }} /> : null}
             <div className="min-w-0">
               <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{t("portal.title")}</div>
-              <div className="text-sm font-semibold truncate" style={{ color: "var(--navy)" }}>{company.name}</div>
+              {/* Phase 111: signed in, the company is the page's heading (the gate has its own). */}
+              {authenticated
+                ? <h1 className="text-sm font-semibold truncate" style={{ color: "var(--navy)" }}>{company.name}</h1>
+                : <div className="text-sm font-semibold truncate" style={{ color: "var(--navy)" }}>{company.name}</div>}
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {authenticated && (
               <button
                 type="button"
-                className="text-xs inline-flex items-center gap-1 font-medium"
-                style={{ color: "var(--muted-mk)" }}
+                className="portal-out"
+                aria-label={t("portal.signOut")}
                 onClick={async () => {
                   try { await portalApi.logout(token!); } catch { /* the local session is dropped regardless */ }
                   setPortalSession(token!, null);
@@ -82,10 +86,10 @@ export default function PortalPage() {
                   setSessionVersion((v) => v + 1);
                 }}
               >
-                <LogOut className="h-3.5 w-3.5" /> {t("portal.signOut")}
+                <LogOut className="h-4 w-4" /> <span className="hide-phone">{t("portal.signOut")}</span>
               </button>
             )}
-            <Logo className="h-6" />
+            <span className="hide-phone"><Logo className="h-6" /></span>
           </div>
         </div>
       </header>
@@ -153,19 +157,19 @@ function Gate({ token, clientName, emailMasked, companyName, onVerified }: { tok
             value={code}
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
             onKeyDown={(e) => { if (e.key === "Enter" && code.length === 6) verify.mutate(); }}
+            pattern="[0-9]*"
+            enterKeyHint="go"
+            autoFocus
             placeholder="000000"
             aria-label={t("a11y.otpCode")}
             aria-invalid={error ? true : undefined}
-            className="text-center text-2xl tracking-[0.5em] font-bold h-14 w-full rounded-xl"
-            style={{ border: "1px solid var(--line)", color: "var(--ink)" }}
+            className="otp-input"
           />
-          {error && <p className="text-sm" style={{ color: "var(--red)" }}>{error}</p>}
-          <div className="flex flex-col sm:flex-row gap-2">
-            <button type="button" onClick={() => verify.mutate()} disabled={code.length !== 6 || verify.isPending} className="btn btn-navy flex-1">
-              {verify.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("portal.open")}
-            </button>
-            <button type="button" onClick={() => request.mutate()} disabled={request.isPending} className="btn btn-outline-navy">{t("sign.resendCode")}</button>
-          </div>
+          {error && <p className="text-sm" role="alert" style={{ color: "var(--red)" }}>{error}</p>}
+          <button type="button" onClick={() => verify.mutate()} disabled={code.length !== 6 || verify.isPending} className="btn btn-navy w-full">
+            {verify.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} {t("portal.open")}
+          </button>
+          <button type="button" onClick={() => request.mutate()} disabled={request.isPending} className="text-link mx-auto block">{request.isPending ? <Loader2 className="h-4 w-4 animate-spin inline" /> : null} {t("sign.resendCode")}</button>
         </>
       )}
     </div>
@@ -191,28 +195,43 @@ function Portal({ token, data }: { token: string; data: PortalOverviewDto }) {
 
   return (
     <>
-      <div className="pills scroll">
-        {SECTIONS.map((k) => {
-          const Icon = SECTION_ICONS[k];
-          const count = counts[k];
-          return (
-            <button key={k} type="button" onClick={() => setSection(k)} className={cn("pill inline-flex items-center gap-1.5", section === k && "on")}>
-              <Icon className="h-4 w-4" /> {t(`portal.section.${k}`)}{count ? <span className="cnt ml-1 rounded-full px-1.5 text-[11px]" style={{ background: section === k ? "rgba(255,255,255,.2)" : "var(--soft-2)" }}>{count}</span> : null}
-            </button>
-          );
-        })}
+      <div data-portal-tabs>
+        <ScrollTabs
+          label={t("portal.title")}
+          value={section}
+          onChange={(k) => setSection(k as Section)}
+          tabs={SECTIONS.map((k) => ({ id: k, label: t(`portal.section.${k}`), icon: SECTION_ICONS[k], count: counts[k] || undefined }))}
+        />
       </div>
 
       {section === "home" && (
         <div className="stack">
           {(owing > 0 || toSign.length > 0 || toAccept.length > 0) && (
-            <section className="card p-5" style={{ borderColor: "var(--yellow-t)", background: "var(--yellow-t)" }}>
-              <p className="eyebrow" style={{ color: "var(--yellow-dark)" }}>{t("portal.attention")}</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {owing > 0 && <button type="button" className="btn btn-sm btn-navy" onClick={() => setSection("invoices")}><Receipt className="h-4 w-4" /> {t("portal.attention.owing").replace("{amount}", cents(owing))}</button>}
-                {toSign.length > 0 && <button type="button" className="btn btn-sm btn-outline-navy" style={{ background: "#fff" }} onClick={() => setSection("contracts")}><FileSignature className="h-4 w-4" /> {t(toSign.length === 1 ? "portal.attention.sign" : "portal.attention.signMany").replace("{n}", String(toSign.length))}</button>}
-                {toAccept.length > 0 && <button type="button" className="btn btn-sm btn-outline-navy" style={{ background: "#fff" }} onClick={() => setSection("quotes")}><FileText className="h-4 w-4" /> {t(toAccept.length === 1 ? "portal.attention.quote" : "portal.attention.quoteMany").replace("{n}", String(toAccept.length))}</button>}
-              </div>
+            <section className="card portal-attn">
+              <div className="card-head"><div><h2>{t("portal.attention")}</h2></div></div>
+              <ul className="lrows">
+                {owing > 0 && (
+                  <li><button type="button" className="lrow" onClick={() => setSection("invoices")}>
+                    <Receipt className="lrow-lead portal-attn-ic" aria-hidden="true" />
+                    <span className="lrow-main"><span className="lrow-title">{t("portal.attention.owing").replace("{amount}", cents(owing))}</span><span className="lrow-meta">{t("portal.invoices.sub")}</span></span>
+                    <ChevronRight className="lrow-chev" aria-hidden="true" />
+                  </button></li>
+                )}
+                {toSign.length > 0 && (
+                  <li><button type="button" className="lrow" onClick={() => setSection("contracts")}>
+                    <FileSignature className="lrow-lead portal-attn-ic" aria-hidden="true" />
+                    <span className="lrow-main"><span className="lrow-title">{t(toSign.length === 1 ? "portal.attention.sign" : "portal.attention.signMany").replace("{n}", String(toSign.length))}</span><span className="lrow-meta">{toSign.map((c) => c.title).join(" · ")}</span></span>
+                    <ChevronRight className="lrow-chev" aria-hidden="true" />
+                  </button></li>
+                )}
+                {toAccept.length > 0 && (
+                  <li><button type="button" className="lrow" onClick={() => setSection("quotes")}>
+                    <FileText className="lrow-lead portal-attn-ic" aria-hidden="true" />
+                    <span className="lrow-main"><span className="lrow-title">{t(toAccept.length === 1 ? "portal.attention.quote" : "portal.attention.quoteMany").replace("{n}", String(toAccept.length))}</span><span className="lrow-meta">{toAccept.map((q) => q.title || t("publicQuote.quoteFallback")).join(" · ")}</span></span>
+                    <ChevronRight className="lrow-chev" aria-hidden="true" />
+                  </button></li>
+                )}
+              </ul>
             </section>
           )}
           {data.jobs.length === 0 ? (
@@ -227,13 +246,15 @@ function Portal({ token, data }: { token: string; data: PortalOverviewDto }) {
         <section className="card">
           <div className="card-head"><div><h2>{t("portal.section.quotes")}</h2><p className="sub">{t("portal.quotes.sub")}</p></div></div>
           {data.quotes.length === 0 ? <div className="card-empty">{t("portal.quotes.empty")}</div> : data.quotes.map((q) => (
-            <div key={q.id} className="item-row">
+            <div key={q.id} className="item-row wrap-phone">
               <div className="grow">
                 <span className="ttl">{q.title || t("publicQuote.quoteFallback")}{q.number ? ` · ${q.number}` : ""}</span>
                 <span className="sub">{day(q.createdAt)} · {fmt.format(q.total)}</span>
               </div>
               <span className={cn("chip", q.status === "accepted" ? "chip-green" : "chip-yellow")}>{q.status === "accepted" ? t("portal.quote.accepted") : t("portal.quote.awaiting")}</span>
-              <a href={q.url} className="btn btn-sm btn-outline-navy"><ExternalLink className="h-4 w-4" /> {q.status === "accepted" ? t("portal.view") : t("portal.quote.review")}</a>
+              <div className="row-acts">
+                <a href={q.url} className={cn("btn btn-sm", q.status === "accepted" ? "btn-outline-navy" : "btn-navy")}><ExternalLink className="h-4 w-4" /> {q.status === "accepted" ? t("portal.view") : t("portal.quote.review")}</a>
+              </div>
             </div>
           ))}
         </section>
@@ -321,18 +342,20 @@ function ContractsSection({ token, data, day, fmt }: { token: string; data: Port
     <section className="card">
       <div className="card-head"><div><h2>{t("portal.section.contracts")}</h2><p className="sub">{t("portal.contracts.sub")}</p></div></div>
       {data.contracts.length === 0 ? <div className="card-empty">{t("portal.contracts.empty")}</div> : data.contracts.map((c) => (
-        <div key={c.id} className="item-row flex-wrap">
+        <div key={c.id} className="item-row flex-wrap wrap-phone">
           <div className="grow">
             <span className="ttl">{c.title} · {c.contractNumber}</span>
             <span className="sub">{fmt.format(c.total)}{c.signedAt ? ` · ${t("portal.contract.signedOn")} ${day(c.signedAt)}` : c.sentAt ? ` · ${t("portal.contract.sentOn")} ${day(c.sentAt)}` : ""}</span>
           </div>
           <span className={cn("chip", chip(c.status))}>{t(`portal.contract.status.${c.status}`)}</span>
-          {c.canSign && (
-            <button type="button" className="btn btn-sm btn-navy" onClick={() => sign.mutate(c.id)} disabled={sign.isPending}>
-              {sign.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSignature className="h-4 w-4" />} {t("portal.contract.sign")}
-            </button>
-          )}
-          <DownloadButton token={token} path={portalApi.contractPdfPath(token, c.id)} filename={`${c.contractNumber}.pdf`} />
+          <div className="row-acts">
+            <DownloadButton token={token} path={portalApi.contractPdfPath(token, c.id)} filename={`${c.contractNumber}.pdf`} />
+            {c.canSign && (
+              <button type="button" className="btn btn-sm btn-navy" onClick={() => sign.mutate(c.id)} disabled={sign.isPending}>
+                {sign.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileSignature className="h-4 w-4" />} {t("portal.contract.sign")}
+              </button>
+            )}
+          </div>
         </div>
       ))}
     </section>
@@ -361,23 +384,25 @@ function InvoicesSection({ token, data, day, cents }: { token: string; data: Por
     const credit = inv.type === "credit_note";
     const canAct = !credit && inv.status !== "paid" && inv.status !== "pending_confirmation" && inv.balanceCents > 0;
     return (
-      <div key={inv.id} className="item-row flex-wrap" style={inv.status === "overdue" ? { background: "var(--red-t)" } : undefined}>
+      <div key={inv.id} className="item-row flex-wrap wrap-phone" style={inv.status === "overdue" ? { background: "var(--red-t)" } : undefined}>
         <div className="grow">
           <span className="ttl">{credit ? t("invoices.type.credit_note") : t("publicInvoice.invoice")} {inv.number}{inv.title ? ` · ${inv.title}` : ""}</span>
           <span className="sub">{inv.status === "paid" ? `${t("publicInvoice.paidOn")} ${day(inv.paidAt)}` : `${t("publicInvoice.dueBy")} ${day(inv.dueDate)}`}{inv.paidCents > 0 && inv.status !== "paid" ? ` · ${t("publicInvoice.alreadyPaid")} ${cents(inv.paidCents)}` : ""}</span>
         </div>
         <b style={{ color: "var(--navy)" }}>{cents(credit || inv.status === "paid" ? inv.totalCents : inv.balanceCents)}</b>
         <span className={cn("chip", chip(inv.status))}>{t(`portal.invoice.status.${inv.status}`)}</span>
+        <div className="row-acts">
+        {inv.url && <a href={inv.url} className="btn btn-sm btn-outline-navy" aria-label={t("portal.view")}><ExternalLink className="h-4 w-4" /></a>}
+        <DownloadButton token={token} path={portalApi.invoicePdfPath(token, inv.id)} filename={`${inv.number}.pdf`} />
         {canAct && inv.canPayByCard && (
           <button type="button" className="btn btn-sm btn-navy" onClick={() => pay.mutate(inv.id)} disabled={pay.isPending}>
             {pay.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />} {t("publicInvoice.payByCard")}
           </button>
         )}
         {canAct && inv.etransferEmail && confirming !== inv.id && (
-          <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setConfirming(inv.id)}><Clock className="h-4 w-4" /> {t("publicInvoice.iSentIt")}</button>
+          <button type="button" className={cn("btn btn-sm", inv.canPayByCard ? "btn-outline-navy" : "btn-navy")} onClick={() => setConfirming(inv.id)}><Clock className="h-4 w-4" /> {t("publicInvoice.iSentIt")}</button>
         )}
-        <DownloadButton token={token} path={portalApi.invoicePdfPath(token, inv.id)} filename={`${inv.number}.pdf`} />
-        {inv.url && <a href={inv.url} className="btn btn-sm btn-outline-navy" aria-label={t("portal.view")}><ExternalLink className="h-4 w-4" /></a>}
+        </div>
         {confirming === inv.id && (
           <div className="w-full mt-2 rounded-lg p-3 space-y-2 text-sm" style={{ background: "var(--soft)", border: "1px solid var(--line)" }}>
             <p style={{ color: "var(--ink)" }}>{t("portal.invoice.etransferTo").replace("{email}", inv.etransferEmail ?? "")} {t("publicInvoice.markSentConfirm")}</p>
@@ -448,10 +473,10 @@ function MessagesSection({ token, data }: { token: string; data: PortalOverviewD
           )}
           <div className="field">
             <label htmlFor="portal-msg-body">{t("portal.messages.compose")}</label>
-            <textarea id="portal-msg-body" rows={3} value={body} onChange={(e) => setBody(e.target.value)} maxLength={4000} placeholder={t("portal.messages.placeholder")} />
+            <textarea id="portal-msg-body" rows={3} enterKeyHint="enter" autoCapitalize="sentences" value={body} onChange={(e) => setBody(e.target.value)} maxLength={4000} placeholder={t("portal.messages.placeholder")} />
           </div>
           <div className="flex justify-end">
-            <button type="button" className="btn btn-navy" onClick={() => send.mutate()} disabled={!body.trim() || send.isPending}>
+            <button type="button" className="btn btn-navy portal-send" onClick={() => send.mutate()} disabled={!body.trim() || send.isPending}>
               {send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />} {t("portal.messages.send")}
             </button>
           </div>

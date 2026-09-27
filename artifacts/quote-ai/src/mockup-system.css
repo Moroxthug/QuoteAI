@@ -2945,3 +2945,96 @@ a.w-now-row:hover { background: var(--soft); }
 @media (max-width: 640px) { .stat-grid.setup-strip .val:not(.sm) { font-size: 20px; white-space: nowrap; } }
 .ny-pill.sq { min-width: 44px; padding: 0 10px; }
 @media (min-width: 641px) { .head-actions > .action-bar { flex-wrap: wrap; } }
+
+/* ==========================================================
+   WHAT CLIENTS SEE (Phase 111) — /p, /sign, /i, /portal, the
+   sign-in / sign-up / onboarding forms. The document first,
+   one docked primary (Accept / Sign / Pay), each step a sheet.
+   ========================================================== */
+/* A document page with a docked bar: the room at the end is the page's, not the bar's in-flow spacer. */
+.doc-docked .action-bar-spacer { display: none; }
+@media (max-width: 640px) {
+  .doc-docked { padding-bottom: calc(var(--actionbar-h) + var(--safe-bottom) + 16px); }
+  .doc-head .doc-lang { padding: 8px 12px; min-height: 36px; font-size: 13px; }
+  /* Every field at 16 px on a phone: iOS zooms the page into any smaller one (and then leaves it zoomed). */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not(.otp-input):not(.code-input), select, textarea { font-size: 16px !important; }
+  /* A focused field scrolls into view above a docked bar, not under it. */
+  html { scroll-padding-bottom: calc(var(--actionbar-h) + var(--safe-bottom) + 16px); }
+}
+
+/* The quote's options side by side at every width */
+.pq-tiers-label { font-size: var(--fs-meta); font-weight: 700; color: var(--muted-mk); margin-bottom: 8px; text-align: center; }
+.pq-tiers { display: grid; gap: 10px; }
+.pq-tier { display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: var(--tap); padding: 14px 16px; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 14px; transition: border-color .2s, box-shadow .2s, background .2s; }
+.pq-tier.on { border-color: var(--navy); background: var(--soft); box-shadow: 0 0 0 2px rgba(16, 16, 49, .12); }
+.pq-tier.dim { opacity: .5; }
+.pq-tier:disabled { cursor: default; }
+.pq-tier-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.pq-tier-name { font-size: 14px; font-weight: 800; color: var(--navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pq-tier-desc { font-size: 12.5px; font-weight: 600; color: var(--muted-mk); line-height: 1.4; }
+.pq-tier-total { margin-top: auto; padding-top: 4px; font-size: 18px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pq-tier-note { margin-top: 10px; text-align: center; font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); }
+.pq-bar-total { display: flex; flex-direction: column; margin-right: auto; font-size: 20px; font-weight: 800; color: var(--navy); line-height: 1.15; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pq-bar-total small { font-size: 12px; font-weight: 700; color: var(--muted-mk); }
+.pq-sum { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: 14px; font-weight: 700; color: var(--muted-mk); }
+.pq-sum b { font-size: 18px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .pq-tiers { gap: 8px; }
+  .pq-tier { padding: 10px 10px 12px; border-radius: 12px; }
+  .pq-tier-name { font-size: 13px; }
+  .pq-tier-total { font-size: 14.5px; }
+  .pq-bar-total { font-size: 17px; }
+  .action-bar > .pq-bar-total { flex: 0 1 auto; }
+}
+
+/* The one-time code: big digits, the phone's own autofill */
+.otp-input { width: 100%; height: 60px; border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--ink); text-align: center; font-size: 28px; font-weight: 800; letter-spacing: .45em; padding-left: .45em; font-variant-numeric: tabular-nums; outline: none; }
+.otp-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(16, 16, 49, .08); }
+.otp-input[aria-invalid="true"] { border-color: var(--red); }
+.code-input { font-size: 20px !important; letter-spacing: .12em; text-align: center; font-weight: 700; }
+
+/* Signing: the bar is pinned to the window at every width (a contract is long); the pad sized for a thumb */
+.sign-dock-hint { display: inline-flex; align-items: center; gap: 4px; margin-right: auto; font-size: 12.5px; font-weight: 600; color: var(--muted-mk); }
+.sign-dock-error { margin-top: 6px; text-align: center; font-size: 12.5px; color: var(--red); }
+@media (min-width: 641px) {
+  .sign-page .sign-dock .action-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 14px max(16px, calc((100vw - 768px) / 2 + 16px)); background: rgba(255, 255, 255, .96); border-top: 1px solid var(--line); backdrop-filter: blur(8px); }
+  .sign-page { padding-bottom: 96px; }
+}
+.sig-modes { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--soft-2); }
+.sig-mode { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 16px; border-radius: 9px; font-size: 14px; font-weight: 700; color: var(--muted-mk); }
+.sig-mode.on { background: #fff; color: var(--navy); box-shadow: 0 1px 3px rgba(16, 16, 49, .12); }
+.sig-canvas { display: block; width: 100%; height: 160px; border-radius: 14px; border: 2px dashed var(--line); background: #fff; cursor: crosshair; }
+.sig-hint { font-size: 14px; font-weight: 600; color: var(--muted-mk); }
+.sig-clear { position: absolute; top: 6px; right: 6px; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border-radius: 10px; background: rgba(255, 255, 255, .9); font-size: 13px; font-weight: 700; color: var(--muted-mk); }
+.sig-clear:hover { color: var(--navy); }
+@media (max-width: 640px) {
+  .sig-canvas { height: 200px; }
+  .k-doc-public { padding: 16px; }
+}
+
+/* The invoice: the balance card holds the bar on a computer; the document never forces a sideways scroll */
+.inv-doc { overflow-x: auto; }
+
+/* The portal */
+.portal-out { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 10px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--muted-mk); }
+.portal-out:hover { background: var(--soft); color: var(--navy); }
+.portal-attn { border-color: var(--yellow-t); }
+.portal-attn .card-head h2 { color: var(--yellow-dark); }
+.portal-attn-ic { width: 20px; height: 20px; color: var(--navy); }
+@media (max-width: 640px) {
+  .portal-out { width: var(--tap); height: var(--tap); justify-content: center; padding: 0; }
+  .portal-send { width: 100%; }
+}
+
+/* Onboarding: the first field on screen one; the payment schedule as one line until it is changed */
+.ob-sched { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.ob-sched-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 13px; font-weight: 600; color: var(--muted-mk); }
+.ob-sched-txt b { font-size: 14.5px; font-weight: 800; color: var(--navy); }
+@media (max-width: 640px) {
+  .ob-icon { display: none; }
+  .ob-head { margin-bottom: 16px; }
+  .ob-head h1 { font-size: var(--fs-title); }
+  .auth-shell { padding: 24px 16px 40px; align-items: flex-start; }
+  .auth-card-body { padding: 28px 20px 22px; }
+  .auth-card-foot { padding: 16px 20px; }
+}

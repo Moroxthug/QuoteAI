@@ -69,7 +69,7 @@ Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on 
 | `stacked-buttons` | more than two buttons ≥ 70 % of the width in one column (rows are not counted: a switch row, a section header that opens and closes, a button that is a list row) |
 | `full-width-stat` | a `.stat-card` ≥ 80 % of the width (not `.stat-card.editable`, which holds a field) |
 | `wide-table` | a `<table>` wider than its box |
-| `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line |
+| `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line (not `.pills.choices`: a set of chips to pick from is meant to wrap, Phase 111) |
 | `tall-page` | an app page taller than 8 phone screens (per-page budget in Phase 113) |
 | `primary-offscreen` | the `[data-primary-action]` is below screen one and not in a docked bar |
 | `under-tabbar` | with a tab bar showing, the end of the page is hidden under it |
@@ -88,3 +88,12 @@ Each route's first three phone screens side by side (before over after with `--b
 - Screen one is **Now**: the shift, the job, address → Maps, site contact, the shift notes, and Clock in / out as the big button (`.w-big`, 56 px). Nothing above it but the header (name, company switch, the changes chip, FR / EN).
 - Docked: ⋯ (hours by hand, travel) · Photo (secondary) · Report (primary). Forms are sheets, never always-open cards.
 - Sheets on a public page need their strings in the core dictionary (`translations.ts`), the dialog's Close label included.
+
+**What clients see (Phase 111: `/p`, `/sign`, `/i`, `/portal`)** — opened from an email on a phone, often the only screens a contractor's customer ever sees:
+
+- The document is the page, under the `doc-head` (who it is from, what it is). A status the client needs (accepted, paid, declined) is the first thing on the page, not a banner after the document.
+- One docked primary — **Accept** with the total beside it, **Review & sign / Sign**, **Pay by card · amount** or **I've sent it** — and a step that asks for something (the name, the emailed code, the signature, a reason to decline, "I've sent it") opens as a `BottomSheet` over the document instead of a form appended after it. A page like this puts `.doc-docked` on its shell: the room at the end is the page's padding (the bar's in-flow spacer would land mid-page).
+- A long document keeps its bar pinned on a computer too (`.sign-page`): reading thirty screens of contract to find the button is the same problem at 1280.
+- Codes use `.otp-input` (`inputMode="numeric"`, `autoComplete="one-time-code"`, `pattern="[0-9]*"`); a signature pad is as wide as its sheet and 200 px tall on a phone, with 40 px mode and clear buttons.
+- **Every field is 16 px on a phone** (a global rule in the Phase 111 CSS; `.otp-input` / `.code-input` are larger on purpose): iOS zooms the page into any smaller field. `html` has a `scroll-padding-bottom` the height of a docked bar, so a focused field scrolls into view above it. Give every field its keyboard and autofill: `type="email"` + `autoComplete="email"` + `autoCapitalize="none"`, `type="tel"`, `autoComplete="name" / "organization" / "street-address"`, and `enterKeyHint` (next / go / done / send).
+- Choices shown as chips (`.pills.choices`, onboarding's trades) wrap on purpose; tabs never do.

@@ -85,12 +85,13 @@ export function SignaturePad({ value, onChange, defaultName }: { value: Signatur
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
-        <button type="button" onClick={() => switchMode("drawn")} className={cn("px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all", mode === "drawn" ? "bg-card shadow-sm text-slate-900" : "text-slate-500")}>
-          <PenLine className="h-3.5 w-3.5" /> {t("signature.draw")}
+      {/* Phase 111: thumb-sized: a two-way switch with 40 px targets, the pad as wide as the sheet and taller on a phone. */}
+      <div className="sig-modes" role="group" aria-label={t("sign.signTitle")}>
+        <button type="button" onClick={() => switchMode("drawn")} aria-pressed={mode === "drawn"} className={cn("sig-mode", mode === "drawn" && "on")}>
+          <PenLine className="h-4 w-4" /> {t("signature.draw")}
         </button>
-        <button type="button" onClick={() => switchMode("typed")} className={cn("px-3 py-1.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all", mode === "typed" ? "bg-card shadow-sm text-slate-900" : "text-slate-500")}>
-          <Type className="h-3.5 w-3.5" /> {t("signature.type")}
+        <button type="button" onClick={() => switchMode("typed")} aria-pressed={mode === "typed"} className={cn("sig-mode", mode === "typed" && "on")}>
+          <Type className="h-4 w-4" /> {t("signature.type")}
         </button>
       </div>
 
@@ -98,16 +99,16 @@ export function SignaturePad({ value, onChange, defaultName }: { value: Signatur
         <div className="relative">
           <canvas
             ref={canvasRef}
-            className="w-full h-40 rounded-xl border-2 border-dashed border-slate-300 bg-card touch-none cursor-crosshair"
+            className="sig-canvas touch-none"
             onPointerDown={start}
             onPointerMove={move}
             onPointerUp={end}
             onPointerLeave={end}
             onPointerCancel={end}
           />
-          {!value && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-slate-500">{t("signature.drawHint")}</div>}
-          <button type="button" onClick={clear} className="absolute top-2 right-2 text-xs text-slate-500 hover:text-slate-800 bg-card/80 rounded-md px-2 py-1 flex items-center gap-1">
-            <Eraser className="h-3 w-3" /> {t("signature.clear")}
+          {!value && <div className="sig-hint pointer-events-none absolute inset-0 flex items-center justify-center">{t("signature.drawHint")}</div>}
+          <button type="button" onClick={clear} className="sig-clear">
+            <Eraser className="h-4 w-4" /> {t("signature.clear")}
           </button>
         </div>
       ) : (
@@ -119,6 +120,9 @@ export function SignaturePad({ value, onChange, defaultName }: { value: Signatur
               onChange(e.target.value.trim() ? { type: "typed", data: e.target.value.trim() } : null);
             }}
             placeholder={t("signature.typePlaceholder")}
+            aria-label={t("signature.typePlaceholder")}
+            autoComplete="name"
+            autoCapitalize="words"
             className="w-full h-11 rounded-lg border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-navy-400"
           />
           <div className="h-24 rounded-xl border border-slate-200 bg-card flex items-center justify-center overflow-hidden">

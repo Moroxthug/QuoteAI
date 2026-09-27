@@ -68,6 +68,7 @@ export default function OnboardingPage() {
   const [licenceNumber, setLicenceNumber] = useState("");
   const [etransferEmail, setEtransferEmail] = useState("");
   const [schedule, setSchedule] = useState<PaymentSchedule>(defaultPaymentSchedule(lang));
+  const [scheduleOpen, setScheduleOpen] = useState(false);
 
   // Phase 93: nothing is shown until we know whose company this would be (a member who reached this page must never
   // get a form that writes over their employer's profile), and whether an invitation is waiting.
@@ -180,8 +181,8 @@ export default function OnboardingPage() {
         <div className="w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-500" data-step={step}>
           {pendingInvites.length > 0 && !setUpOwn ? (
             <>
-              <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+              <div className="ob-head text-center mb-8">
+                <div className="ob-icon mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Mail className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
@@ -206,8 +207,8 @@ export default function OnboardingPage() {
           ) : step === 1 ? (
             <>
               {/* Welcome header */}
-              <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+              <div className="ob-head text-center mb-8">
+                <div className="ob-icon mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Building2 className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
@@ -249,24 +250,27 @@ export default function OnboardingPage() {
                       placeholder={t("onboarding.companyNamePlaceholder")}
                       value={companyName}
                       onChange={e => setCompanyName(e.target.value)}
+                      autoComplete="organization"
+                      autoCapitalize="words"
+                      enterKeyHint="next"
                       autoFocus
                     />
                   </div>
                   <div className="field">
                     <label htmlFor="vatNumber">{t("onboarding.businessNumber")}</label>
-                    <input id="vatNumber" placeholder="123456789 RT0001" value={vatNumber} onChange={e => setVatNumber(e.target.value)} />
+                    <input id="vatNumber" placeholder="123456789 RT0001" value={vatNumber} onChange={e => setVatNumber(e.target.value)} autoComplete="off" autoCapitalize="characters" spellCheck={false} enterKeyHint="next" />
                   </div>
                   <div className="field">
                     <label htmlFor="phone">{t("onboarding.phone")}</label>
-                    <input id="phone" placeholder={t("onboarding.phonePlaceholder")} value={phone} onChange={e => setPhone(e.target.value)} />
+                    <input id="phone" type="tel" inputMode="tel" autoComplete="tel" enterKeyHint="next" placeholder={t("onboarding.phonePlaceholder")} value={phone} onChange={e => setPhone(e.target.value)} />
                   </div>
                   <div className="field full">
                     <label htmlFor="address">{t("onboarding.address")}</label>
-                    <input id="address" placeholder={t("onboarding.addressPlaceholder")} value={address} onChange={e => setAddress(e.target.value)} />
+                    <input id="address" autoComplete="street-address" enterKeyHint="next" placeholder={t("onboarding.addressPlaceholder")} value={address} onChange={e => setAddress(e.target.value)} />
                   </div>
                   <div className="field full">
                     <label htmlFor="email">{t("onboarding.businessEmail")}</label>
-                    <input id="email" type="email" placeholder={t("onboarding.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} />
+                    <input id="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} enterKeyHint="done" placeholder={t("onboarding.emailPlaceholder")} value={email} onChange={e => setEmail(e.target.value)} />
                   </div>
                 </div>
 
@@ -292,8 +296,8 @@ export default function OnboardingPage() {
             </>
           ) : step === 2 ? (
             <>
-              <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+              <div className="ob-head text-center mb-8">
+                <div className="ob-icon mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Hammer className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
@@ -317,8 +321,8 @@ export default function OnboardingPage() {
             </>
           ) : step === 4 ? (
             <>
-              <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+              <div className="ob-head text-center mb-8">
+                <div className="ob-icon mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <Users className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
@@ -331,8 +335,8 @@ export default function OnboardingPage() {
           ) : (
             <>
               {/* Step 3 header (province, licence, payments) */}
-              <div className="text-center mb-8">
-                <div className="mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
+              <div className="ob-head text-center mb-8">
+                <div className="ob-icon mx-auto h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
                   style={{ background: "linear-gradient(135deg, rgba(16,16,49,0.15), rgba(15,151,162,0.15))" }}>
                   <MapPin className="h-8 w-8" style={{ color: "var(--navy)" }} />
                 </div>
@@ -360,13 +364,13 @@ export default function OnboardingPage() {
                   </div>
                   <div className="field">
                     <label htmlFor="licence">{t("onboarding.licence")}</label>
-                    <input id="licence" placeholder={province === "QC" ? "RBQ 1234-5678-01" : t("onboarding.licencePlaceholder")} value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} />
+                    <input id="licence" placeholder={province === "QC" ? "RBQ 1234-5678-01" : t("onboarding.licencePlaceholder")} value={licenceNumber} onChange={e => setLicenceNumber(e.target.value)} autoCapitalize="characters" spellCheck={false} enterKeyHint="next" />
                   </div>
                   <div className="field full">
                     <label htmlFor="etransfer" style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <Landmark className="h-3.5 w-3.5" style={{ color: "var(--faint)" }} /> {t("onboarding.etransferEmail")}
                     </label>
-                    <input id="etransfer" type="email" placeholder={t("onboarding.etransferPlaceholder")} value={etransferEmail} onChange={e => setEtransferEmail(e.target.value)} />
+                    <input id="etransfer" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} enterKeyHint="done" placeholder={t("onboarding.etransferPlaceholder")} value={etransferEmail} onChange={e => setEtransferEmail(e.target.value)} />
                     <span className="text-[11px] mt-1 block" style={{ color: "var(--faint)" }}>{t("onboarding.etransferHint")}</span>
                   </div>
                   <div className="field full">
@@ -374,7 +378,17 @@ export default function OnboardingPage() {
                       <CalendarClock className="h-3.5 w-3.5" style={{ color: "var(--faint)" }} /> {t("onboarding.scheduleTitle")}
                     </label>
                     <p className="text-[11px] mb-2" style={{ color: "var(--faint)" }}>{t("onboarding.scheduleHint")}</p>
-                    <PaymentScheduleEditor value={schedule} onChange={setSchedule} total={0} />
+                    {scheduleOpen ? (
+                      <PaymentScheduleEditor value={schedule} onChange={setSchedule} total={0} />
+                    ) : (
+                      <div className="ob-sched">
+                        <span className="ob-sched-txt">
+                          <b>{t(schedule.terms.length === 1 ? "onboarding.schedulePayments1" : "onboarding.schedulePayments").replace("{n}", String(schedule.terms.length))}</b>
+                          <span>{schedule.terms.map((x) => (x.amountType === "percent" ? `${x.value}${lang === "fr" ? " %" : "%"}` : new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(x.value))).join(" · ")}</span>
+                        </span>
+                        <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setScheduleOpen(true)}>{t("onboarding.scheduleChange")}</button>
+                      </div>
+                    )}
                   </div>
                 </div>
 

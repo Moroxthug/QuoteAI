@@ -124,6 +124,39 @@ const SETTINGS_SECTIONS = ["profile", "security", "company", "taxes", "invoicing
 const APP_PANELS = ["quickbooks", "wave", "google_calendar", "outlook_calendar", "ics", "gmail", "stripe", "financeit", "flinks", "meta_leads", "google_lsa", "api"];
 // Phase 95: set once the foreman has joined, so the teammate page can be swept.
 let sweepForemanId: string | null = null;
+// Phase 111: the showcase client's portal link and a session from its emailed code (set once seeded).
+let sweepPortal: { token: string; session: string } | null = null;
+/**
+ * Phase 111: the pending contract's customer back to "not verified" (or straight to verified, for the
+ * signature sheet — the code request is rate-limited per IP, so only the code step asks for one), then the
+ * page again, then the docked primary: every /sign route starts from the same place.
+ */
+async function signFrom(page: Page, contractId: string, step: "review" | "code" | "signature") {
+  const { db, contractSignersTable } = await import("@workspace/db");
+  const { and, eq } = await import("drizzle-orm");
+  const verified = step === "signature";
+  await db.update(contractSignersTable)
+    .set({ otpVerifiedAt: verified ? new Date() : null, otpHash: null, otpAttempts: 0, status: verified ? "verified" : "viewed" })
+    .where(and(eq(contractSignersTable.contractId, contractId), eq(contractSignersTable.role, "customer")));
+  await page.reload();
+  await page.waitForSelector(".doc-head");
+  if (step === "review") return;
+  const primary = page.locator("[data-primary-action]").first();
+  if (!(await primary.isVisible().catch(() => false))) return;
+  await primary.click();
+  await page.waitForSelector(verified ? "[role=dialog] #sign-full-name" : '[role=dialog] input[autocomplete="one-time-code"]');
+}
+/** Phase 111: the portal signed out (the gate) or signed in on one section (by tab position: home, quotes, contracts, invoices, photos, messages). */
+async function portalAt(page: Page, p: { token: string; session: string }, section: number | null) {
+  const key = `qai_portal_session:${p.token.slice(0, 16)}`;
+  await page.evaluate(([k, v]) => { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch {} }, [key, section === null ? "" : p.session] as const);
+  await page.reload();
+  if (section === null) { await page.waitForSelector("main .card"); return; }
+  const tabs = page.locator("[data-portal-tabs] button, .pills.scroll button");
+  await tabs.first().waitFor();
+  if (section > 0) await tabs.nth(section).click();
+  await page.waitForTimeout(150);
+}
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
   const pub = (path: string): RouteSpec => ({ path, session: "public" });
   const dash = (path: string): RouteSpec => ({ path, session: "owner" });
@@ -144,7 +177,26 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/help"), pub("/help/getting-started"),
     pub("/sign-in"), pub("/sign-up"), pub("/this-route-does-not-exist"),
     pub(`/p/${s.longQuoteId}`), pub(`/i/${s.invoiceToken}`),
-    ...(s.signToken ? [pub(`/sign/${s.signToken}`)] : []),
+    // Phase 111: the client's side on a phone — the accept sheet, a quote with tiers, the signing steps, the portal.
+    { path: `/p/${s.longQuoteId}`, session: "public", name: "/p accept sheet", drive: (p) => openPhoneSheet(p, ".action-bar [data-primary-action]", "[role=dialog] #nomeConferma") },
+    pub(`/p/${s.tieredQuoteId}`),
+    ...(s.signToken
+      ? [
+          { path: `/sign/${s.signToken}`, session: "public" as const, drive: (p: Page) => signFrom(p, s.pendingContractId, "review") },
+          { path: `/sign/${s.signToken}`, session: "public" as const, name: "/sign code sheet", drive: (p: Page) => signFrom(p, s.pendingContractId, "code") },
+          { path: `/sign/${s.signToken}`, session: "public" as const, name: "/sign signature sheet", drive: (p: Page) => signFrom(p, s.pendingContractId, "signature") },
+        ]
+      : []),
+    ...(sweepPortal
+      ? ((pt) => [
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal gate", drive: (p: Page) => portalAt(p, pt, null) },
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal home", drive: (p: Page) => portalAt(p, pt, 0) },
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal quotes", drive: (p: Page) => portalAt(p, pt, 1) },
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal contracts", drive: (p: Page) => portalAt(p, pt, 2) },
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal invoices", drive: (p: Page) => portalAt(p, pt, 3) },
+          { path: `/portal/${pt.token}`, session: "public" as const, name: "/portal messages", drive: (p: Page) => portalAt(p, pt, 5) },
+        ])(sweepPortal)
+      : []),
     ...(s.workerToken ? [pub(`/t/${s.workerToken}`)] : []),
     // Phase 108: the crew app's sheets — Report (the docked primary), the changes chip, ⋯ (then hours by hand), the company switch.
     ...(s.workerToken
@@ -531,7 +583,7 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
     }
 
     // 4. Tabs / pill rows wrapping to a second line.
-    for (const row of Array.from(document.querySelectorAll(".pills, .stabs, [role='tablist'], .seg"))) {
+    for (const row of Array.from(document.querySelectorAll(".pills:not(.choices), .stabs, [role='tablist'], .seg"))) {
       if (!shown(row)) continue;
       const tops = new Set(Array.from(row.children).filter(shown).map((c) => Math.round(c.getBoundingClientRect().top / 6)));
       if (tops.size > 1) out.push({ rule: "wrapping-tabs", detail: `${label(row)} wraps to ${tops.size} lines` });
@@ -775,6 +827,38 @@ try {
   if ((await org.api("/api/team/members/invite", { body: { email: inviteeEmail, role: "office", send: false } })).status === 201) {
     inviteeToken = (await createUser({ email: inviteeEmail, name: "Riley Invitee" })).token;
   } else console.warn("[qa-visual] could not invite the invitee — its route is skipped");
+  // Phase 111: the main client's portal, signed in the way a client is — the emailed code, verified.
+  {
+    const { api } = await import("./harness.js");
+    const clients = await org.api("/api/clients");
+    const main = Array.isArray(clients.body) ? (clients.body as { id: string; email?: string | null }[]).find((c) => c.email === "client@e2e-test.invalid") : undefined;
+    const link = main ? await org.api(`/api/clients/${main.id}/portal`) : null;
+    const token = typeof link?.body?.url === "string" ? String(link.body.url).split("/portal/")[1] : null;
+    if (token) {
+      // The showcase's work belongs to this client (the fixture seeds it without a client): the running job and its
+      // invoices, the signed and the unsigned contract, and the quote with tiers still to accept.
+      const { clientsTable, contractsTable, projectsTable, invoicesTable } = await import("@workspace/db");
+      const { and, inArray } = await import("drizzle-orm");
+      const [row] = await db.select({ id: clientsTable.id }).from(clientsTable).where(and(eq(clientsTable.userId, org.userId), eq(clientsTable.email, "client@e2e-test.invalid")));
+      if (row) {
+        await db.update(quotesTable).set({ clientId: row.id }).where(inArray(quotesTable.id, [showcase.quoteId, showcase.pendingQuoteId, showcase.tieredQuoteId]));
+        await db.update(contractsTable).set({ clientId: row.id }).where(inArray(contractsTable.id, [showcase.contractId, showcase.pendingContractId]));
+        await db.update(projectsTable).set({ clientId: row.id }).where(eq(projectsTable.id, showcase.jobId));
+        await db.update(invoicesTable).set({ clientId: row.id }).where(eq(invoicesTable.projectId, showcase.jobId));
+      }
+      const before = mailbox.length;
+      await api(`/api/portal/${token}/otp`, { body: {} });
+      const code = mailbox.slice(before).map((m) => /^(\d{6}) /.exec(m.subject)?.[1]).find(Boolean);
+      const ok = code ? await api(`/api/portal/${token}/verify`, { body: { code } }) : null;
+      if (ok?.status === 200 && typeof ok.body.session === "string") sweepPortal = { token, session: ok.body.session };
+      // Something from the company to read, and a reply, so Messages is not its empty state.
+      if (sweepPortal) {
+        await org.api(`/api/clients/${main!.id}/messages`, { body: { body: showcase.language === "fr" ? "Bonjour! Les armoires arrivent jeudi. On commence l'installation vendredi matin." : "Hi! The cabinets arrive Thursday. We start the install Friday morning." } }).catch(() => null);
+        await api(`/api/portal/${token}/messages`, { body: { body: showcase.language === "fr" ? "Parfait, merci. La porte de côté sera débarrée." : "Perfect, thanks. The side door will be unlocked." }, headers: { "X-Portal-Session": sweepPortal.session } });
+      }
+    }
+    if (!sweepPortal) console.warn("[qa-visual] could not open the showcase client's portal — its routes are skipped");
+  }
   console.log(`[qa-visual] showcase seeded for ${org.email}:`, { ...showcase, invoiceToken: "…", signToken: showcase.signToken ? "…" : null, workerToken: showcase.workerToken ? "…" : null, teamInviteToken: showcase.teamInviteToken ? "…" : null });
 
   rmSync(OUT, { recursive: true, force: true });

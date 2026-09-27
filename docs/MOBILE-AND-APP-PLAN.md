@@ -26,7 +26,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 108 | The crew app and the foreman | A | **done** 2026-09-27 |
 | 109 | Schedule on a phone | A | **done** 2026-09-27 |
 | 110 | The long tail | A | **done** 2026-09-27 |
-| 111 | What clients see: accept, sign, pay, portal, sign-up | A | not started |
+| 111 | What clients see: accept, sign, pay, portal, sign-up | A | **done** 2026-09-27 |
 | 112 | The public site on a phone | A | not started |
 | 113 | The phone gate: rules enforced, sheets reviewed | A | not started |
 | 114-131 | The app and the videos | B, C | see `APP-PLAN.md` |
@@ -575,3 +575,38 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - Recheck `qa:visual --lang=en,fr --widths=375,768,1280` (192 pages, `.qa/p110b`): 0 axe, 0 gutter, 0 screen-reader, 0 raw keys, 0 phone-rule warnings; FR catalog overflow at 768 — fixed, `--lang=fr` catalog + team (30 pages, `.qa/p110c`): all 0.
 - Phone sheets `.qa/phone-sheets/p110/` (baseline `p110-pre`): pay 2.0 screens (was 2.5), group 2.4 (2.8), sales tax 2.2 (2.9), compliance 1.6 (1.8), me 4.2 (4.7), imports 1.8 (2.2), members 1.4 (1.7), catalog 1.0 (1.2); every row's amount and actions now on screen (they were cut off at the right).
 - typecheck (quote-ai, api-server), eslint on the touched files (no errors; three existing hook warnings), knip (nothing new), i18n-audit (nothing new: the "English literal" hits in touched files are `&&` expressions; the one unknown key is in a " - Copy" file).
+
+### Phase 111 — 2026-09-27
+
+**Built**
+- **Quote (`/p`)**: Good / Better / Best side by side at every width (they were three stacked full-width cards on a phone; the chosen tier's description sits under them on a phone). **Accept** docked with the total (and tier) beside it; it opens a sheet with the total being accepted and the full name (`autoComplete="name"`). Accepted → the green confirmation is the first thing on the page. The discount and rebate amounts now follow the page's language (they were always en-CA).
+- **Signing (`/sign`)**: the contract is the page; **Decline · Review & sign** is one docked row (they stacked full-width on a phone) and stays pinned on a computer too. The emailed code, the signature and declining are **sheets** over the contract instead of panels appended after 7 screens of it (nothing scrolled the reader there). The code field is `.otp-input` (numeric, `one-time-code`, `pattern`), the signature sheet opens without focusing a field (the keyboard would cover the pad), the pad is 200 px tall on a phone with 40 px Draw / Type and Clear targets, and the pad's page can't scroll under the finger. After a reload the primary says what's next (Continue signing / Sign contract).
+- **Invoice (`/i`)**: balance, due date and how to pay first; one docked primary — **Pay by card · amount** when the company takes cards, otherwise **I've sent it** (confirmed in a sheet); the PDF (and "I've sent it" beside a card payment) behind ⋯. The phone number at the bottom is a `tel:` link.
+- **Portal**: sections as `ScrollTabs`; "Needs your attention" as rows to tap (amount to pay, contracts to sign, quotes to review, each naming what); quotes / contracts / invoices keep their buttons on their own line on a phone (`.item-row.wrap-phone`), the one that matters in navy; the header gives the company its full width (sign-out an icon, the QuoteAI logo off a phone) and is the page's `h1` once signed in; the code gate is one field, Open my portal, and Resend as a link.
+- **Forms**: every field on a phone is 16 px (a global rule: iOS zooms into anything smaller — the app's fields were 14.5 px), and `html` has a `scroll-padding-bottom` the height of a docked bar so a focused field lands above it. Sign-in (email, password, 2FA with `one-time-code` and a name, reset email), sign-up, `/join` (`.code-input`), onboarding (organization, tel, street-address, email) all got keyboard types, autofill and `enterKeyHint`. Auth card and invite / join cards have phone padding.
+- **Onboarding**: no icon tile on a phone (the first field is on screen one), the payment schedule a one-line summary ("4 payments · 15% · 35% · 35% · 15%") with **Change** — step 3 went from 2.4 phone screens to 1.0. The trades are `.pills.choices` (a chip set meant to wrap; the wrapping-tabs rule skips it).
+- `BottomSheet` takes `noAutoFocus`. `qa:visual` sweeps a quote with tiers (the showcase's waiting quote now has three), the accept sheet, the signing code and signature sheets (the signer is reset in the database per route; the code request is rate-limited per IP so only the code step asks for one), and the portal signed in the way a client is (emailed code verified; the showcase's job, invoices, contracts and tiered quote linked to its client, a message each way) — gate, home, quotes, contracts, invoices, messages. 9 EN/FR strings; runbook §47; MOBILE-RULES.md "What clients see".
+
+**Decided**
+- A step that asks the client for something opens as a sheet over the document, at every width (same code: centred on a computer).
+- The signing bar stays pinned on a computer: finding the button after thirty screens of contract is the same problem at 1280.
+- "I've sent it" is the primary only when there is no card payment; with a card it is the quiet one.
+- The 16 px field rule is app-wide, not only on client pages: the zoom happens on every form.
+
+**Found**
+- The signed-in portal had no `h1` (screen-reader landmarks report on every section).
+- The showcase's main client had an empty portal: the fixture's chain has no client id, so the sweep never saw a real one.
+- The signature pad's Type tab was 4.34:1 contrast (axe) and its typed field had no label.
+- The quote page formatted the discount line and the rebate amounts in English whatever the page language.
+- Git Bash turns `--routes=/p/` into `P:/`; run with `MSYS_NO_PATHCONV=1`.
+
+**Deferred**
+- The portal's message composer stays at the end of the thread (not a docked chat bar): a keyboard-attached bar needs the app's `visualViewport` handling (Track B).
+- The invoice document's own HTML layout (the customer's template) is unchanged; on a phone it scrolls sideways inside its card if a template ever gets wider than the screen.
+
+**Verification**
+- Baseline `qa:visual --lang=en --widths=375,1280` (50 pages, `.qa/p111-pre` + `.qa/p111-pre-p`): stacked-buttons on the tiered quote, wrapping-tabs on onboarding step 2, axe color-contrast on the signature pad, 10 screen-reader landmark reports (portal without an `h1`).
+- After (`.qa/p111`, 50 pages): 0 overflow, 0 gutter, 0 axe, 0 raw keys, 0 phone-rule warnings; 8 landmark reports from two new `h1`s that collided with the documents' own (reverted).
+- Recheck: the whole app `--lang=en --widths=375` (191 pages, `.qa/p111-all`, for the 16 px field rule): 0 overflow, 0 gutter, 0 axe, 0 screen-reader, 0 raw keys; phone-rule warnings only the four public comparison tables (Phase 112) and the unfolded contract agreement (9.2 screens, unchanged since Phase 107). `--lang=fr --widths=375,768,1280` on the client pages (75 pages, `.qa/p111-fr`): all 0.
+- Phone sheets `.qa/phone-sheets/p111/` (baseline `p111-pre`, `p111-pre-p`): tiered quote 1.3 screens (1.7) with the three prices in one row and Accept docked; onboarding step 3 1.0 (2.4), step 1 1.2 (1.3); sign-in 2.9 (3.0); signing's code and signature steps now on screen one as sheets (they were panels after 7.5 screens); portal header shows the full company name; invoice 2.1 (2.2) with the action docked.
+- typecheck (quote-ai, api-server), eslint on the touched files (clean).

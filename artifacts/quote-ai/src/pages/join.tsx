@@ -43,7 +43,7 @@ export default function JoinPage() {
 
   return (
     <main id="main" className="doc-shell flex items-center justify-center p-4">
-      <div className="card w-full max-w-md p-8 space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
+      <div className="card w-full max-w-md p-6 sm:p-8 space-y-5" style={{ boxShadow: "var(--shadow-card)" }}>
         <div className="flex justify-center"><Logo /></div>
         <div className="text-center space-y-1">
           <h1 className="text-xl font-bold" style={{ color: "var(--navy)" }}>{t("join.title")}</h1>
@@ -61,8 +61,10 @@ export default function JoinPage() {
                 placeholder="XXXXX-XXXXX"
                 autoComplete="one-time-code"
                 autoCapitalize="characters"
+                autoCorrect="off"
                 spellCheck={false}
-                style={{ fontSize: 20, letterSpacing: ".12em", textAlign: "center", fontWeight: 700 }}
+                enterKeyHint="go"
+                className="code-input"
                 autoFocus
               />
             </div>

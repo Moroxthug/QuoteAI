@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Briefcase, Building2, CalendarDays, Camera, Check, ChevronRight, CreditCard, FilePlus2, FileText, HardHat, Home, LayoutGrid, Loader2, LogOut, Mic, Plus, Target, Users, Wallet, type LucideIcon } from "lucide-react";
+import { Bell, Briefcase, Building2, CalendarDays, Camera, Check, ChevronRight, CreditCard, FilePlus2, FileText, HardHat, Home, LayoutGrid, Loader2, LogOut, Mic, Plus, Receipt, Target, Users, Wallet, type LucideIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BottomTabBar, tabOwns, type TabItem } from "@/components/mobile/bottom-tab-bar";
 import { BottomSheet } from "@/components/mobile/bottom-sheet";
@@ -252,7 +252,7 @@ type Intent = "receipt" | "note";
  * photo and a spoken note first ask which job, then open the camera (in the
  * same tap, so the browser allows it) or the recorder.
  */
-export function PhoneNewButton({ hasJobs }: { hasJobs: boolean }) {
+export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; hasInvoices?: boolean }) {
   const { t } = useLanguage();
   const can = useCan();
   const { toast } = useToast();
@@ -291,6 +291,8 @@ export function PhoneNewButton({ hasJobs }: { hasJobs: boolean }) {
     can("leads", "edit") && { key: "lead", label: t("mobile.new.lead"), icon: Target, run: () => navigate("/dashboard/leads?new=1") },
     // Phase 106: the jobs list's New job button lives here on a phone.
     hasJobs && can("jobs", "edit") && { key: "job", label: t("jobs.newJob"), icon: Briefcase, run: () => navigate("/dashboard/jobs?new=1") },
+    // Phase 107: and the invoices list’s New invoice.
+    hasInvoices && can("invoicing", "edit") && { key: "invoice", label: t("invoices.new"), icon: Receipt, run: () => navigate("/dashboard/invoices?new=1") },
     hasJobs && can("costs", "edit") && { key: "receipt", label: t("mobile.new.receipt"), icon: Camera, run: () => { setOpen(false); setIntent("receipt"); } },
     hasJobs && can("jobs", "edit") && { key: "note", label: t("mobile.new.note"), icon: Mic, run: () => { setOpen(false); setIntent("note"); } },
   ].filter((a): a is { key: string; label: string; icon: LucideIcon; run: () => void } => !!a);

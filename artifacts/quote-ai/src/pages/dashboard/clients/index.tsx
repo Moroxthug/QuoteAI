@@ -6,6 +6,9 @@ import { Users, Search, Plus, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ListRow } from "@/components/mobile/list-row";
+import { PhoneListBar } from "@/components/mobile/list-filter";
 
 const formatCurrency = (v: number, lang: string) =>
   new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
@@ -15,6 +18,7 @@ export default function ClientsPage() {
   const [search, setSearch] = useState("");
   const [, navigate] = useLocation();
   const { t, lang } = useLanguage();
+  const phone = useMediaQuery("(max-width: 640px)");
 
   const filtered = (clients ?? []).filter(c => {
     if (!search) return true;
@@ -31,7 +35,8 @@ export default function ClientsPage() {
           <h1>{t("clients.title")}</h1>
           <p className="sub">{t("clients.subtitle")}</p>
         </div>
-        <div className="head-actions">
+        {/* On a phone the + in the top bar starts a quote (a client comes with it). */}
+        <div className="head-actions hide-phone">
           <Link href="/dashboard/new" className="btn btn-navy">
             <Plus className="h-4 w-4" />
             {t("clients.add")}
@@ -39,7 +44,10 @@ export default function ClientsPage() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card qlist">
+        {phone ? (
+          <PhoneListBar search={search} onSearch={setSearch} placeholder={t("clients.search")} />
+        ) : (
         <div className="toolbar">
           <label className="search sm">
             <Search className="h-4 w-4" />
@@ -52,6 +60,7 @@ export default function ClientsPage() {
             />
           </label>
         </div>
+        )}
 
         {isLoading ? (
           <div className="p-5 space-y-3">
@@ -66,6 +75,25 @@ export default function ClientsPage() {
             </p>
             <Link href="/dashboard/new" className="btn btn-navy btn-sm">{t("clients.empty.cta")}</Link>
           </div>
+        ) : phone ? (
+          // Phase 107: who, where and how many quotes / what they are worth / active or prospect.
+          <ul className="lrows" aria-label={t("clients.title")}>
+            {filtered.map((client) => {
+              const active = client.unlockedCount > 0;
+              return (
+                <li key={client.id}>
+                  <ListRow
+                    href={`/dashboard/clients/${client.id}`}
+                    lead={<span className="avat" aria-hidden="true">{client.clientName.slice(0, 2)}</span>}
+                    title={client.clientName}
+                    meta={[client.city || client.phone || client.email, t(client.quoteCount === 1 ? "clients.m.oneQuote" : "clients.m.quotes").replace("{n}", String(client.quoteCount))]}
+                    amount={formatCurrency(client.totalValue, lang)}
+                    end={<span className={cn("chip", active ? "chip-green" : "chip-teal")}>{active ? t("clients.status.active") : t("clients.status.prospect")}</span>}
+                  />
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <div className="tbl-wrap">
             <table className="tbl">

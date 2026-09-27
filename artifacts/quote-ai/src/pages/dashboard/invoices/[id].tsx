@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { ArrowLeft, Receipt, Send, Download, Banknote, Ban, FileMinus, BellRing, Pencil, Check, X, Loader2, Copy, ExternalLink, Trash2, Briefcase, Clock, AlertTriangle, MailQuestion, Archive } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { useMobileHeader } from "@/components/mobile/mobile-page-header";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -18,7 +22,7 @@ import { LineEditor, RecordPaymentDialog, CreditNoteDialog, rowsFromLines, toLin
 export default function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, lang } = useLanguage();
-const can = useCan();
+  const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -40,6 +44,8 @@ const can = useCan();
   const remind = useMutation({ mutationFn: () => invoicesApi.remind(id!), onSuccess: () => { refresh(); toast({ title: t("invoices.reminderSent") }); }, onError });
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
   const archive = useMutation({ mutationFn: () => invoicesApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/invoices"); }, onError });
+  const number = data?.invoice.number;
+  useMobileHeader(useMemo(() => (number ? { title: number } : null), [number]));
 
   if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-96 w-full rounded-[var(--radius-mk)]" /></div>;
   if (error || !data) return <div className="card card-empty">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-link">{t("invoices.backToList")}</Link></div>;
@@ -50,43 +56,74 @@ const can = useCan();
   const isCredit = inv.type === "credit_note";
   const scheduled = isDraft && !!inv.scheduledFor && new Date(inv.scheduledFor) > new Date();
   const overdueDays = Math.floor((Date.now() - new Date(inv.dueDate).getTime()) / 86_400_000);
+  const canEdit = can("invoicing", "edit");
+  const canFull = can("invoicing", "full");
+  const publicUrl = data.publicUrl;
+  // The one thing to do next with this invoice: send the draft, then record what comes in.
+  const primary = isCredit || !canEdit || editing ? null
+    : isDraft ? { label: t("invoices.send"), icon: Send, onClick: () => setSendOpen(true) }
+    : open ? { label: t("invoices.recordPayment"), icon: Banknote, onClick: () => setPayOpen(true) }
+    : null;
+  const moreActions: Array<SheetAction | false> = [
+    { label: t("invoices.m.downloadPdf"), icon: Download, onSelect: () => { window.location.href = invoicesApi.pdfUrl(inv.id, true); } },
+    isDraft && !editing && canEdit && { label: t("invoices.edit"), icon: Pencil, onSelect: () => setEditing(true) },
+    open && !isCredit && canEdit && { label: t("invoices.resend"), icon: Send, onSelect: () => setSendOpen(true) },
+    open && canEdit && !!inv.customer.email && { label: t("invoices.remind"), icon: BellRing, disabled: remind.isPending, onSelect: () => remind.mutate() },
+    !!publicUrl && { label: t("invoices.m.copyLink"), icon: Copy, separated: true, onSelect: () => { navigator.clipboard.writeText(publicUrl); toast({ title: t("invoices.copied") }); } },
+    !!publicUrl && { label: t("invoices.m.openLink"), icon: ExternalLink, onSelect: () => { window.open(publicUrl, "_blank", "noopener"); } },
+    (open || inv.status === "paid") && !isCredit && canFull && { label: t("invoices.creditNote"), icon: FileMinus, separated: true, onSelect: () => setCreditOpen(true) },
+    (inv.status === "paid" || inv.status === "void") && canFull && { label: t("dashboard.quotesList.archive"), icon: Archive, disabled: archive.isPending, onSelect: () => archive.mutate() },
+    inv.status !== "void" && !isDraft && canFull && { label: t("invoices.void"), icon: Ban, danger: true, separated: true, onSelect: () => setVoidOpen(true) },
+    isDraft && canFull && { label: t("invoices.deleteDraft"), icon: Trash2, danger: true, separated: true, disabled: remove.isPending, onSelect: () => remove.mutate() },
+  ];
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <Link href="/dashboard/invoices" className="back-link"><ArrowLeft /> {t("invoices.backToList")}</Link>
-      <div className="page-head">
-        <div className="min-w-0">
-          <div className="title-row">
-            <h1><Receipt />{inv.number}</h1>
+    <div className="animate-in fade-in duration-300 q-page">
+      <Link href="/dashboard/invoices" className="back-link hide-phone"><ArrowLeft /> {t("invoices.backToList")}</Link>
+
+      {/* Phase 107: who it is for, what is still owed and where it stands first;
+          one primary action by where the invoice is (docked at the bottom on a
+          phone), the rest in the menu — like the quote (Phase 105). */}
+      <section className="card q-hero i-hero">
+        <div className="q-hero-main">
+          <div className="q-hero-eyebrow">
+            <Receipt aria-hidden="true" />
+            <span>{inv.number}</span>
+            <span>{format(new Date(inv.issueDate), "d MMM yyyy", { locale })}</span>
+          </div>
+          <h1>{inv.customer.name || inv.number}</h1>
+          {inv.title ? <p className="q-hero-sub">{inv.title}</p>
+            : inv.projectId && <p className="q-hero-sub"><Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`} className="j-hero-link">{inv.projectName ?? t("invoices.job")}</Link></p>}
+          <div className="q-hero-chips">
             <InvoiceStatusBadge status={inv.status} scheduled={scheduled} />
             <InvoiceTypeBadge type={inv.type} />
-          </div>
-          <div className="meta">
-            <span>{inv.customer.name}{inv.customer.email ? ` · ${inv.customer.email}` : ""}</span>
-            {inv.projectId && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`}><Briefcase />{inv.projectName ?? t("invoices.job")}</Link>}
-            {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`}>{t("invoices.creditFor")}</Link>}
+            {inv.projectId && inv.title && <Link href={`/dashboard/jobs/${inv.projectId}?tab=invoices`} className="chip chip-grey i-hero-link"><Briefcase className="h-3 w-3 mr-1" />{inv.projectName ?? t("invoices.job")}</Link>}
+            {inv.creditNoteForId && <Link href={`/dashboard/invoices/${inv.creditNoteForId}`} className="chip chip-grey i-hero-link">{t("invoices.creditFor")}</Link>}
           </div>
         </div>
-        <div className="head-actions">
-          <a href={invoicesApi.pdfUrl(inv.id, true)} className="btn btn-sm btn-outline-navy"><Download className="h-4 w-4" /> PDF</a>
-          {isDraft && !editing && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(true)}><Pencil className="h-4 w-4" /> {t("invoices.edit")}</button>}
-          {isDraft && can("invoicing", "full") && <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => remove.mutate()} disabled={remove.isPending}><Trash2 className="h-4 w-4" /> {t("invoices.deleteDraft")}</button>}
-          {(isDraft || open) && !isCredit && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-navy" onClick={() => setSendOpen(true)}><Send className="h-4 w-4" /> {isDraft ? t("invoices.send") : t("invoices.resend")}</button>}
-          {open && !isCredit && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setPayOpen(true)}><Banknote className="h-4 w-4" /> {t("invoices.recordPayment")}</button>}
-          {open && can("invoicing", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => remind.mutate()} disabled={remind.isPending || !inv.customer.email}><BellRing className="h-4 w-4" /> {t("invoices.remind")}</button>}
-          {(open || inv.status === "paid") && !isCredit && can("invoicing", "full") && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setCreditOpen(true)}><FileMinus className="h-4 w-4" /> {t("invoices.creditNote")}</button>}
-          {inv.status !== "void" && !isDraft && can("invoicing", "full") && <button type="button" className="text-link" onClick={() => setVoidOpen(true)}><Ban /> {t("invoices.void")}</button>}
-          {(inv.status === "paid" || inv.status === "void") && can("invoicing", "full") && <button type="button" className="text-link" onClick={() => archive.mutate()} disabled={archive.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>}
+        <div className="q-hero-side">
+          <span className="q-hero-lbl">{isCredit ? t("invoices.creditAmount") : open ? t("invoices.balance") : t("invoices.total")}</span>
+          <b className={cn("q-hero-total", inv.status === "overdue" && "t-bad")}>{formatCents(open ? inv.balanceCents : inv.totalCents)}</b>
+          <StickyActionBar label={t("invoices.m.actions")}>
+            <ActionSheet actions={moreActions} title={t("invoices.m.actions")} />
+            {primary && (
+              <button type="button" className="btn btn-navy" onClick={primary.onClick} data-primary-action>
+                <primary.icon className="h-4 w-4" /> {primary.label}
+              </button>
+            )}
+          </StickyActionBar>
         </div>
-      </div>
-
-      {/* Status strip */}
-      <section className="stat-grid">
-        <Kpi label={isCredit ? t("invoices.creditAmount") : t("invoices.total")} value={formatCents(inv.totalCents)} />
-        <Kpi label={t("invoices.paid")} value={formatCents(inv.paidCents)} tone="ok" />
-        <Kpi label={t("invoices.balance")} value={formatCents(inv.balanceCents)} tone={inv.status === "overdue" ? "bad" : inv.balanceCents > 0 ? "teal" : undefined} />
-        <Kpi label={t("invoices.dueOn")} value={format(new Date(inv.dueDate), "PP", { locale })} sub={inv.status === "overdue" ? `${overdueDays} ${t("invoices.daysOverdue")}` : inv.sentAt ? `${t("invoices.sentOn")} ${format(new Date(inv.sentAt), "PP", { locale })}` : undefined} tone={inv.status === "overdue" ? "bad" : undefined} />
       </section>
+
+      <StatStrip
+        label={t("invoices.m.numbers")}
+        items={[
+          { label: isCredit ? t("invoices.creditAmount") : t("invoices.total"), value: formatCents(inv.totalCents) },
+          { label: t("invoices.paid"), value: formatCents(inv.paidCents), tone: inv.paidCents > 0 ? "ok" : undefined },
+          { label: t("invoices.balance"), value: formatCents(inv.balanceCents), tone: inv.status === "overdue" ? "bad" : undefined },
+          { label: t("invoices.dueOn"), value: format(new Date(inv.dueDate), "PP", { locale }), tone: inv.status === "overdue" ? "bad" : undefined, sub: inv.status === "overdue" ? `${overdueDays} ${t("invoices.daysOverdue")}` : inv.sentAt ? `${t("invoices.sentOn")} ${format(new Date(inv.sentAt), "PP", { locale })}` : undefined },
+        ]}
+      />
 
       {scheduled && (
         <div className="notice info">
@@ -117,7 +154,7 @@ const can = useCan();
 
         <div className="stack">
           {data.publicUrl && (
-            <section className="card">
+            <section className="card hide-phone">
               <div className="card-head"><div><h2>{t("invoices.publicLink")}</h2><p className="sub">{t("invoices.publicLinkHint")}</p></div></div>
               <div className="act-body">
                 <div className="field inline">
@@ -172,16 +209,6 @@ const can = useCan();
 
 // ── Pieces ───────────────────────────────────────────────────────────────────
 
-function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" | "teal" }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className={cn("val", tone)}>{value}</p>
-      {sub && <p className="sub">{sub}</p>}
-    </div>
-  );
-}
-
 function PendingConfirmationBanner({ invoice, onDone }: { invoice: InvoiceDto; onDone: () => void }) {
   const { t } = useLanguage();
 const can = useCan();
@@ -221,7 +248,7 @@ function RemovePayment({ invoiceId, paymentId, onDone }: { invoiceId: string; pa
   const { t } = useLanguage();
   const { toast } = useToast();
   const m = useMutation({ mutationFn: () => invoicesApi.removePayment(invoiceId, paymentId), onSuccess: onDone, onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }) });
-  return <button type="button" className="ic-btn danger" title={t("invoices.removePayment")} onClick={() => m.mutate()} disabled={m.isPending}><X /></button>;
+  return <button type="button" className="ic-btn danger" title={t("invoices.removePayment")} aria-label={t("invoices.removePayment")} onClick={() => m.mutate()} disabled={m.isPending}><X /></button>;
 }
 
 function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDone: () => void; onCancel: () => void }) {
@@ -246,17 +273,17 @@ function DraftEditor({ data, onDone, onCancel }: { data: InvoiceDetailDto; onDon
     <section className="card">
       <div className="card-head"><div><h2>{t("invoices.edit")}</h2><p className="sub">{inv.number}</p></div></div>
       <div className="form-grid tight">
-        <div className="field"><label>{t("invoices.field.title")}</label><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
-        <div className="field"><label>{t("invoices.field.customerEmail")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-        <div className="field"><label>{t("invoices.field.dueDays")}</label><input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" /></div>
-        <div className="field"><label>{t("invoices.field.holdback")}</label><input value={holdback} onChange={(e) => setHoldback(e.target.value)} inputMode="numeric" disabled={lockedHoldback} /></div>
+        <div className="field"><label htmlFor="invdet-1">{t("invoices.field.title")}</label><input id="invdet-1" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t(`invoices.type.${inv.type}`)} /></div>
+        <div className="field"><label htmlFor="invdet-2">{t("invoices.field.customerEmail")}</label><input id="invdet-2" type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+        <div className="field"><label htmlFor="invdet-3">{t("invoices.field.dueDays")}</label><input id="invdet-3" value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" /></div>
+        <div className="field"><label htmlFor="invdet-4">{t("invoices.field.holdback")}</label><input id="invdet-4" value={holdback} onChange={(e) => setHoldback(e.target.value)} inputMode="numeric" disabled={lockedHoldback} /></div>
         <div className="field">
-          <label>{t("invoices.field.language")}</label>
-          <select value={language} onChange={(e) => setLanguage(e.target.value as "en" | "fr")}><option value="en">English</option><option value="fr">Français</option></select>
+          <label htmlFor="invdet-5">{t("invoices.field.language")}</label>
+          <select id="invdet-5" value={language} onChange={(e) => setLanguage(e.target.value as "en" | "fr")}><option value="en">English</option><option value="fr">Français</option></select>
         </div>
-        <div className="field"><label>{t("invoices.field.paymentNote")}</label><input value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder={t("invoices.field.paymentNotePlaceholder")} /></div>
+        <div className="field"><label htmlFor="invdet-6">{t("invoices.field.paymentNote")}</label><input id="invdet-6" value={paymentNote} onChange={(e) => setPaymentNote(e.target.value)} placeholder={t("invoices.field.paymentNotePlaceholder")} /></div>
         <div className="full"><LineEditor rows={rows} onChange={setRows} /></div>
-        <div className="field full"><label>{t("invoices.field.notes")}</label><textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} /></div>
+        <div className="field full"><label htmlFor="invdet-7">{t("invoices.field.notes")}</label><textarea id="invdet-7" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} /></div>
       </div>
       <div className="card-foot" style={{ justifyContent: "flex-end" }}>
         <button type="button" className="btn btn-sm btn-outline-navy" onClick={onCancel}><X className="h-4 w-4" /> {t("jobs.cancel")}</button>
@@ -287,8 +314,8 @@ function SendDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
       </>}
     >
       {scheduled && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.sendEarlyWarning")}</span></div>}
-      <div className="field"><label>{t("invoices.field.customerEmail")}</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={invoice.status !== "draft"} /></div>
-      <div className="field"><label>{t("invoices.field.message")}</label><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder={t("invoices.field.messagePlaceholder")} /></div>
+      <div className="field"><label htmlFor="invdet-8">{t("invoices.field.customerEmail")}</label><input id="invdet-8" type="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={invoice.status !== "draft"} /></div>
+      <div className="field"><label htmlFor="invdet-9">{t("invoices.field.message")}</label><textarea id="invdet-9" value={message} onChange={(e) => setMessage(e.target.value)} rows={3} placeholder={t("invoices.field.messagePlaceholder")} /></div>
     </SimpleDialog>
   );
 }
@@ -309,7 +336,7 @@ function VoidDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
         <button type="button" className="btn btn-sm btn-red" onClick={() => m.mutate()} disabled={m.isPending}>{m.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.voidConfirm")}</button>
       </>}
     >
-      <div className="field"><label>{t("invoices.field.reason")}</label><textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
+      <div className="field"><label htmlFor="invdet-10">{t("invoices.field.reason")}</label><textarea id="invdet-10" value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
     </SimpleDialog>
   );
 }

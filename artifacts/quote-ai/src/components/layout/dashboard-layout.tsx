@@ -383,7 +383,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <MobilePageHeader title={sectionLabel ?? "QuoteAI"} backHref={backHref} backLabel={backHref ? sectionOf(backHref.split("?")[0]!) : undefined} />
           <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
           <div className="tb-right">
-            {phoneNav && <PhoneNewButton hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")} />}
+            {phoneNav && <PhoneNewButton hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")} hasInvoices={NAV_ITEMS.some((i) => i.href === "/dashboard/invoices")} />}
             {/* On a phone both live in More (its tab carries the unread count). */}
             <NotificationsBell variant="topbar" side="bottom" align="end" />
             <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{avatar}</button>} />

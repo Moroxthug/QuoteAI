@@ -2699,3 +2699,90 @@ button.qline:hover { background: #fafbfc; }
   /* The job setup's summary: the name field across, the value and the dates side by side. */
   .stat-grid.setup-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
 }
+
+/* ==========================================================
+   MONEY AND PEOPLE (Phase 107) — invoices, clients, leads,
+   contracts, analytics. The invoice and the contract read like
+   the quote (a header card, one primary by where it stands, the
+   rest in the menu); lists are rows; a client is one tap from a
+   call; the leads board is one stage at a time on a phone.
+   ========================================================== */
+.t-bad { color: var(--red) !important; }
+.t-warn { color: var(--yellow-dark); }
+.t-ok { color: var(--green-dark); }
+.t-faint { color: var(--faint); }
+.i-hero-link { text-decoration: none; }
+.i-hero-link:hover { background: var(--soft-2); color: var(--navy); }
+
+/* Aging (invoices list) */
+.aging-card { padding: 18px 22px; }
+.aging-legend { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+
+/* Client header: name, then call / text / email / map */
+.c-hero-name { display: flex; align-items: center; gap: 12px; margin-top: 6px; min-width: 0; }
+.c-hero-name .avat { width: 40px; height: 40px; font-size: 14px; }
+.c-hero-name h1 { margin-top: 0; min-width: 0; }
+.c-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.c-act { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 99px; background: #fff; font-size: 13.5px; font-weight: 700; color: var(--navy); text-decoration: none; transition: border-color .2s, background .2s; }
+.c-act:hover { border-color: var(--navy); background: var(--soft-2); }
+.c-act svg { width: 16px; height: 16px; }
+.c-msgs { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; align-items: start; }
+.c-msgs > .card { margin-top: 0; }
+
+/* Contract header: the steps as a thin bar on a phone; the agreement folded */
+.k-prog { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 12px; }
+.k-prog i { height: 5px; border-radius: 99px; background: var(--soft-2); }
+.k-prog i.done { background: var(--green); }
+.k-next { margin-top: 6px; font-size: var(--fs-meta); font-weight: 700; color: var(--navy); }
+.k-doc-toggle { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 14px 16px; text-align: left; color: inherit; }
+.k-doc-toggle > svg { width: 20px; height: 20px; flex: none; color: var(--muted-mk); }
+.k-doc-toggle .grow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.k-doc-toggle b { font-size: 14.5px; font-weight: 700; color: var(--navy); }
+.k-doc-toggle .grow span { font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); }
+.k-doc-close { display: flex; align-items: center; justify-content: flex-end; gap: 6px; width: 100%; min-height: var(--tap); margin-bottom: 8px; font-size: 13px; font-weight: 700; color: var(--navy); }
+.k-doc-close svg { width: 16px; height: 16px; transform: rotate(180deg); }
+
+/* Leads: a lead's own "Move to" menu (drag needs a mouse) */
+.kan-foot .kan-move { order: 3; }
+.kanban.one { grid-template-columns: minmax(0, 1fr); }
+.kanban.one .kan-col { background: none; padding: 0; }
+
+/* Analytics: the wide chart on the left from 981 px; one chart per screen on a phone */
+@media (min-width: 981px) {
+  .split-2.wide-left { grid-template-columns: 2fr 1fr; }
+}
+.split-2:empty { display: none; }
+.a-flush { margin: -20px -22px -18px; }
+@media (max-width: 980px) {
+  .a-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .c-msgs { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Invoice lines as rows (LineEditor on a phone) */
+.li-body.li-phone { padding: 0; gap: 0; }
+.li-phone .li-sum { padding: 12px 14px 0; }
+.line-sheet-nums.two { grid-template-columns: 1fr 1.3fr; }
+
+@media (max-width: 640px) {
+  .aging-card { padding: 16px; }
+  .aging-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+  .a-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .a-charts { margin-top: var(--gap-card); }
+  .a-flush { margin: -16px; }
+  .c-hero .q-hero-main { width: 100%; }
+  .c-hero-sub { overflow-wrap: anywhere; }
+  .c-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 8px; }
+  .c-act { flex-direction: column; gap: 4px; min-height: 60px; padding: 8px 4px; border-radius: 14px; font-size: 12.5px; justify-content: center; }
+  .c-act svg { width: 20px; height: 20px; }
+  .kanban.one { gap: var(--gap-card); }
+  .kanban.one .kan-card { padding: 14px 16px; }
+  .kanban.one .kan-card:hover { transform: none; }
+  .kan-foot .kan-move { width: 40px; height: 40px; }
+  .line-sheet-nums.two { grid-template-columns: 1fr 1fr; }
+  .line-sheet-nums.two > .field:last-child { grid-column: auto; }
+}
+.kan-foot:has(.kan-move) { justify-content: flex-start; }
+.kan-foot:has(.kan-move) > .btn { margin-left: auto; }
+@media (max-width: 640px) {
+  .aging-legend .aging-zero { display: none; }
+}

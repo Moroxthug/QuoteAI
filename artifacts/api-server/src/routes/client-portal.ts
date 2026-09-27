@@ -75,6 +75,8 @@ router.get("/clients/:id/portal", requireAuth, requirePermission("jobs", "view")
     }
     const url = await ensurePortalLink(client);
     res.json({
+      // Phase 107: the client page lists this client’s jobs and invoices, which carry the UUID (the page URL has the md5).
+      clientId: client.id,
       url,
       hasEmail: !!client.email,
       email: client.email,

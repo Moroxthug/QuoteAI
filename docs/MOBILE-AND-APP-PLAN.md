@@ -22,7 +22,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 104 | Today (dashboard home) | A | **done** 2026-09-26 |
 | 105 | Quotes: list, new quote, quote detail | A | **done** 2026-09-27 |
 | 106 | Jobs: list and the job page | A | **done** 2026-09-27 |
-| 107 | Money and people: invoices, clients, leads, contracts | A | not started |
+| 107 | Money and people: invoices, clients, leads, contracts | A | **done** 2026-09-27 |
 | 108 | The crew app and the foreman | A | not started |
 | 109 | Schedule on a phone | A | not started |
 | 110 | The long tail | A | not started |
@@ -440,4 +440,42 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 **Verification**
 - `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/jobs,=/dashboard` (138 pages, `.qa/p106b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; phone-rule warnings only on the foreman's home (Phase 108) and the setup summary (fixed after, see the recheck). First pass (`.qa/p106`, EN 375 + 1280) found the tab rail gutter and the geofence label; the recheck after the last fixes (`.qa/p106c`, EN + FR 375, 32 pages) is clean with **0 phone-rule warnings**.
 - Phone sheets: `.qa/phone-sheets/p106b/` and `p106b-fr/` (before = `.qa/phone-sheets/p106-pre/`, the same sweep on the old code): the job page **4.3 screens (was 6.3)**, first screen = the job, its progress, the four numbers, the tabs and Photo / Dictate; Schedule 2.1 (was 3.3), Change orders 1.3 (2.1), Costs 3.1 (3.9), Team 3.2 (3.8), Photos 1.5 (2.3), Documents 1.4 (2.2); the list 1.0 with the receipts as one row.
+- typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (nothing new), i18n-audit (no new findings).
+
+### Phase 107 — 2026-09-27
+
+**Built**
+- **Invoice page**: a header card first — the number and issue date, the client as the heading, the invoice's title (or its job, as a link), status and type, and **what is still owed** (the total for a draft, a paid or void invoice, or a credit note). **One primary** by where the invoice is: **Send** (draft) → **Record payment** (sent, viewed, awaiting the e-Transfer, partly paid, overdue); none once paid or void. Everything else is in ⋯: Download PDF, Edit draft, Resend, Remind, Copy customer link, Open what the customer sees, Credit note, Archive, Void, Discard draft. Docked at the bottom on a phone, under the amount on a desktop. The four stat cards are a `StatStrip`; the customer-link card is left out on a phone (it is in ⋯). The row of seven buttons (PDF, Resend, Record payment, Remind, Credit note, Void — five of them full-width on a phone) is gone.
+- **Invoice lines on a phone** (New invoice, Edit draft): rows and a line in a sheet — `QuoteLineRows` and `LineItemSheet` from Phase 105, with a new `noUnit` (invoices price quantity × amount). An untouched first line is the empty form, so the list starts with "Add item".
+- **Invoices list**: the four numbers as a strip; the aging card's legend two by two on a phone, the empty buckets left out; rows on a phone (client, number and when it is due / was paid, the amount — the balance once part is paid — and the status; `components/invoices/invoice-list-row.tsx`); the search and a filter sheet as on the quotes list. **New invoice** moved to the top bar's + on a phone (`/dashboard/invoices?new=1`).
+- **`PhoneListBar`** (`components/mobile/list-filter.tsx`): the quotes list's sticky search + filter sheet with counts + removable chip, made shared; used by invoices, contracts and clients.
+- **Client page**: the name, town and "client since", then **Call · Text · Email · Map** (`tel:`, `sms:`, `mailto:`, Google Maps; only those the client has details for), four numbers (quotes and how many won, quoted value, won value, owed to you), then sticky tabs **Quotes · Jobs · Invoices · Messages** (`?tab=`). Quotes as rows with the Phase 105 status chip; the client's jobs (started from their quotes or created for them) with progress; their invoices; the thread and the portal card. `GET /api/clients/:id/portal` now returns the client row's `clientId` — the page URL carries the md5 of the quotes grouping, jobs and invoices carry the UUID. The "{n} in total" line was English-only; gone with the old layout.
+- **Clients list**: rows on a phone (avatar, name, town or contact · "3 quotes", lifetime value, Active / Prospect).
+- **Leads**: on a phone **one stage at a time** — the stages as sticky tabs with counts, swipe left / right on the list for the next one, opening on the first stage with leads. Each lead has **⋯ → Move to …** on every width (the board was drag-only: no way to move a lead on a phone or with a keyboard). New lead is the top bar's + on a phone.
+- **Contract page**: a header card (number and date, client, job, status, the related quote and job, the price) and the next step as the one primary — **Sign as company** → **Send to customer** → **Resend link** while the customer has not signed; Save / Cancel docked while editing. ⋯: PDF (signed PDF once signed), Edit (draft), Archive, Void. On a phone: a four-segment progress bar and "Next: …" in the header, the waiting / executed notice under it, and **the agreement folded** into one row ("Read the agreement · 16 sections") — open, it has "Fold the agreement"; the Next step card and the steps row are the desktop's.
+- **Contracts list**: rows on a phone (client, number · job, price, status), a search (new: number, client or job) and the filter sheet.
+- **Analytics**: the six business numbers and the four quote numbers as strips (three across between 641 and 980 px, two on a phone). On a phone **one chart at a time**, picked from tabs (Profit, Receivables, Cash flow, Jobs at risk with its count, Margins); margins by job is a list (job, client · costs of value · progress, the margin coloured, the status).
+- 41 new EN/FR strings (`invoices.m.*`, `clients.m.*`, `leads.m.*`, `contracts.m.*`, `analytics.m.*`); runbook §43; MOBILE-RULES.md (`PhoneListBar`, the + sheet's full list, "nothing needs a hover or a drag"); `qa:visual` drives the invoices and contracts filter sheets, the invoice's and the contract's ⋯, the agreement unfolded, a new invoice's line sheet, the client's three other tabs, a lead's Move menu and two analytics charts.
+
+**Decided**
+- The invoice's primary is Record payment from the moment it is sent — what comes next is money in; Resend and Remind are one tap further (reminders go out on their own at 3 / 7 / 14 days).
+- A contract's text is folded on a phone, not shortened: 9 screens of legal text is what the client reads and signs; the contractor checks where it stands and acts. One tap unfolds all of it.
+- The desktop ⋯ menu is **not modal** any more (`DropdownMenu modal={false}` in `ActionSheet`): a menu is not a dialog (WAI-ARIA), and the modal one hid the whole page from assistive tech while open (axe `aria-hidden-focus`, first seen on the leads Move menu, true of every ⋯ on a desktop). Escape, outside click and focus return are unchanged; the phone sheet stays a modal dialog.
+- Leads keep drag on a desktop; the Move menu is the way that works everywhere.
+- Client tabs are on every width (the desktop page was the thread and the portal before the quotes; now it opens on the quotes like the phone).
+
+**Found**
+- **Analytics on a phone and a tablet kept its charts squeezed two to a row**: an inline `grid-template-columns: 2fr 1fr` beat the stylesheet's one-column rule under 980 px (the aging list was 80 px wide at 375). A `wide-left` class applies it from 981 px only.
+- **The New invoice form and the invoice's own dialogs (record payment, credit note, send, void, edit draft) had labels not tied to their fields** — 22 of them — and the line editor's inputs and delete buttons had no name (axe `label`, `select-name`, `button-name`, critical; the New invoice form had never been swept). Tied / named now.
+- The leads board's "No leads here" was grey on grey below 4.5:1 (axe `color-contrast`).
+- The showcase's "Pay Client" invoice is past due but still says Sent (the overdue flip is the cron's; the aging card counts it in 1–30 days). Not a display bug — noted.
+
+**Deferred**
+- The Documents (price-list uploads) page is already one phone screen; its rows get their pass in Phase 110 with the long tail.
+- The invoice's HTML document itself (the customer's layout) is unchanged — it is what the client sees at `/i/…` (Phase 111).
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/invoices,dashboard/clients,dashboard/leads,dashboard/contracts,dashboard/analytics` (126 pages, `.qa/p107b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; the only phone-rule warning is the agreement **unfolded on purpose** (9.2 screens, EN + FR). The first pass (`.qa/p107`, EN 375 + 1280) found the unlabelled invoice fields, the leads contrast and the modal menu.
+- Recheck after the last polish plus a regression pass for the non-modal menu: `qa:visual --lang=en,fr --widths=375,1280 --routes=dashboard/invoices,dashboard/leads,dashboard/quotes,dashboard/jobs,=/dashboard` (128 pages, `.qa/p107c`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, **0 phone-rule warnings**.
+- Phone sheets: `.qa/phone-sheets/p107b/` (before = `.qa/phone-sheets/p107-pre/`, the same screens on the old code): contract **2.0 screens (was 9.0-9.2)**, first screen = client, job, status, price, where it stands and the next step; invoice 3.1 (was 4.0) with Record payment docked; client 1.0 (was 2.3) with Call / Text / Email / Map on screen one; analytics 3.2 (was 4.7); invoices list 1.4 (was 2.0); leads 1.0 (was 1.5) with every stage one tap away instead of six stacked columns.
 - typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (nothing new), i18n-audit (no new findings).

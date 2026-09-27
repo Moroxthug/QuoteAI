@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Loader2, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { LineItemSheet, QuoteLineRows, parseAmount } from "@/components/quotes/line-rows";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents } from "@/lib/jobs-api";
 import { invoicesApi, PAYMENT_METHODS, type InvoiceDto, type LineInput, type PaymentMethod } from "@/lib/invoices-api";
@@ -25,8 +27,43 @@ export function rowsFromLines(lines: { description: string; quantity: number; un
 
 export function LineEditor({ rows, onChange }: { rows: Row[]; onChange: (rows: Row[]) => void }) {
   const { t } = useLanguage();
+  const phone = useMediaQuery("(max-width: 640px)");
+  // Phase 107: on a phone the lines are rows and a line opens in a sheet (null = closed, -1 = a new line).
+  const [sheet, setSheet] = useState<number | null>(null);
   const update = (i: number, patch: Partial<Row>) => onChange(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   const subtotal = rows.reduce((s, r) => s + rowCents(r), 0);
+  if (phone) {
+    // An untouched first line is the empty form, not a line: the list starts with "Add item".
+    const shown = rows.filter((r) => r.description.trim() || r.unit !== "");
+    const indexOf = (k: number) => rows.indexOf(shown[k]!);
+    const editing = sheet !== null && sheet >= 0 ? rows[sheet] : undefined;
+    return (
+      <div className="li-body li-phone">
+        <QuoteLineRows
+          label={t("invoices.m.lines")}
+          lines={shown.map((r) => ({ descrizione: r.description, um: "", quantita: Number(r.quantity) || 0, prezzoUnitario: Number(r.unit) || 0 }))}
+          onEdit={(k) => setSheet(indexOf(k))}
+          onAdd={() => setSheet(-1)}
+        />
+        <div className="li-sum"><span>{t("invoices.subtotal")}</span><b>{formatCents(subtotal)}</b></div>
+        <LineItemSheet
+          open={sheet !== null}
+          onOpenChange={(o) => { if (!o) setSheet(null); }}
+          isNew={sheet === -1}
+          noUnit
+          initial={{ descrizione: editing?.description ?? "", um: "", quantita: editing?.quantity ?? "1", prezzoUnitario: editing?.unit ?? "" }}
+          onSave={(d) => {
+            const row: Row = { description: d.descrizione, quantity: String(parseAmount(d.quantita) || 1), unit: d.prezzoUnitario.trim() === "" ? "" : parseAmount(d.prezzoUnitario).toFixed(2) };
+            if (sheet === -1 || sheet === null) {
+              const blank = rows.findIndex((r) => !r.description.trim() && r.unit === "");
+              onChange(blank >= 0 ? rows.map((r, idx) => (idx === blank ? row : r)) : [...rows, row]);
+            } else onChange(rows.map((r, idx) => (idx === sheet ? row : r)));
+          }}
+          onDelete={sheet !== null && sheet >= 0 ? () => onChange(rows.length === 1 ? [emptyRow()] : rows.filter((_, idx) => idx !== sheet)) : undefined}
+        />
+      </div>
+    );
+  }
   return (
     <div className="li-body">
       <div className="li-head cols-5">
@@ -35,11 +72,11 @@ export function LineEditor({ rows, onChange }: { rows: Row[]; onChange: (rows: R
       <div>
         {rows.map((r, i) => (
           <div key={i} className="li-row cols-5">
-            <div className="desc"><input className="inp-sm" value={r.description} onChange={(e) => update(i, { description: e.target.value })} placeholder={t("invoices.line.placeholder")} /></div>
-            <input className="inp-sm r qty" value={r.quantity} onChange={(e) => update(i, { quantity: e.target.value })} inputMode="decimal" />
-            <input className="inp-sm r price" value={r.unit} onChange={(e) => update(i, { unit: e.target.value })} inputMode="decimal" placeholder="0.00" />
+            <div className="desc"><input className="inp-sm" aria-label={`${t("invoices.line.description")} ${i + 1}`} value={r.description} onChange={(e) => update(i, { description: e.target.value })} placeholder={t("invoices.line.placeholder")} /></div>
+            <input className="inp-sm r qty" aria-label={`${t("invoices.line.qty")} ${i + 1}`} value={r.quantity} onChange={(e) => update(i, { quantity: e.target.value })} inputMode="decimal" />
+            <input className="inp-sm r price" aria-label={`${t("invoices.line.unit")} ${i + 1}`} value={r.unit} onChange={(e) => update(i, { unit: e.target.value })} inputMode="decimal" placeholder="0.00" />
             <div className="tot">{formatCents(rowCents(r))}</div>
-            <button type="button" className="ic-btn danger" disabled={rows.length === 1} onClick={() => onChange(rows.filter((_, idx) => idx !== i))}><Trash2 /></button>
+            <button type="button" className="ic-btn danger" aria-label={`${t("quotes.m.deleteLine")} ${i + 1}`} disabled={rows.length === 1} onClick={() => onChange(rows.filter((_, idx) => idx !== i))}><Trash2 /></button>
           </div>
         ))}
       </div>
@@ -92,34 +129,34 @@ export function NewInvoiceDialog({ open, onOpenChange, defaultJobId, defaultClie
         <DialogBody>
           <div className="form-grid">
             <div className="field">
-              <label>{t("invoices.field.job")}</label>
-              <select value={jobId} onChange={(e) => setJobId(e.target.value)} disabled={!!defaultJobId}>
+              <label htmlFor="invdlg-1">{t("invoices.field.job")}</label>
+              <select id="invdlg-1" value={jobId} onChange={(e) => setJobId(e.target.value)} disabled={!!defaultJobId}>
                 <option value="">{t("invoices.field.noJob")}</option>
                 {(jobs?.items ?? []).map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
               </select>
             </div>
             {!jobId && (
               <div className="field">
-                <label>{t("invoices.field.client")}</label>
-                <select value={clientId} onChange={(e) => setClientId(e.target.value)}>
+                <label htmlFor="invdlg-2">{t("invoices.field.client")}</label>
+                <select id="invdlg-2" value={clientId} onChange={(e) => setClientId(e.target.value)}>
                   <option value="">—</option>
                   {clientList.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
             )}
             <div className="field">
-              <label>{t("invoices.field.title")}</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("invoices.field.titlePlaceholder")} />
+              <label htmlFor="invdlg-3">{t("invoices.field.title")}</label>
+              <input id="invdlg-3" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("invoices.field.titlePlaceholder")} />
             </div>
             <div className="field">
-              <label>{t("invoices.field.dueDays")}</label>
-              <input value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" />
+              <label htmlFor="invdlg-4">{t("invoices.field.dueDays")}</label>
+              <input id="invdlg-4" value={dueDays} onChange={(e) => setDueDays(e.target.value)} inputMode="numeric" />
             </div>
           </div>
           <LineEditor rows={rows} onChange={setRows} />
           <div className="field">
-            <label>{t("invoices.field.notes")}</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+            <label htmlFor="invdlg-5">{t("invoices.field.notes")}</label>
+            <textarea id="invdlg-5" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
           </div>
         </DialogBody>
         <DialogFooter>
@@ -167,15 +204,15 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
         </DialogHeader>
         <DialogBody>
           <div className="form-grid">
-            <div className="field"><label>{t("invoices.payment.amount")}</label><input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" /></div>
-            <div className="field"><label>{t("invoices.payment.date")}</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
+            <div className="field"><label htmlFor="invdlg-6">{t("invoices.payment.amount")}</label><input id="invdlg-6" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" /></div>
+            <div className="field"><label htmlFor="invdlg-7">{t("invoices.payment.date")}</label><input id="invdlg-7" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
             <div className="field">
-              <label>{t("invoices.payment.method")}</label>
-              <select value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>
+              <label htmlFor="invdlg-8">{t("invoices.payment.method")}</label>
+              <select id="invdlg-8" value={method} onChange={(e) => setMethod(e.target.value as typeof method)}>
                 {PAYMENT_METHODS.map((m) => <option key={m} value={m}>{t(`invoices.method.${m}`)}</option>)}
               </select>
             </div>
-            <div className="field"><label>{t("invoices.payment.reference")}</label><input value={reference} onChange={(e) => setReference(e.target.value)} placeholder={t("invoices.payment.referencePlaceholder")} /></div>
+            <div className="field"><label htmlFor="invdlg-9">{t("invoices.payment.reference")}</label><input id="invdlg-9" value={reference} onChange={(e) => setReference(e.target.value)} placeholder={t("invoices.payment.referencePlaceholder")} /></div>
           </div>
           <label className={invoice.customer.email ? "chk-row" : "chk-row disabled"}><input type="checkbox" checked={receipt} disabled={!invoice.customer.email} onChange={(e) => setReceipt(e.target.checked)} /> {t("invoices.payment.sendReceipt")}</label>
           {cents > invoice.balanceCents && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.payment.overpay")}</span></div>}
@@ -221,9 +258,9 @@ export function CreditNoteDialog({ invoice, open, onOpenChange }: { invoice: Inv
           <DialogDescription>{t("invoices.creditNoteDesc")}</DialogDescription>
         </DialogHeader>
         <DialogBody>
-          <div className="field"><label>{t("invoices.credit.amount")}</label><input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0.00" /><div className="field-hint">{t("invoices.credit.amountHint")} {formatCents(invoice.taxableCents)}</div></div>
-          <div className="field"><label>{t("invoices.credit.description")}</label><input value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("invoices.credit.descriptionPlaceholder")} /></div>
-          <div className="field"><label>{t("invoices.credit.reason")}</label><textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
+          <div className="field"><label htmlFor="invdlg-10">{t("invoices.credit.amount")}</label><input id="invdlg-10" value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="0.00" /><div className="field-hint">{t("invoices.credit.amountHint")} {formatCents(invoice.taxableCents)}</div></div>
+          <div className="field"><label htmlFor="invdlg-11">{t("invoices.credit.description")}</label><input id="invdlg-11" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t("invoices.credit.descriptionPlaceholder")} /></div>
+          <div className="field"><label htmlFor="invdlg-12">{t("invoices.credit.reason")}</label><textarea id="invdlg-12" value={reason} onChange={(e) => setReason(e.target.value)} rows={2} /></div>
         </DialogBody>
         <DialogFooter>
           <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>

@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetQuoteStats, useListQuotes, useGetBusinessProfile } from "@workspace/api-client-react";
@@ -15,6 +15,10 @@ import { analyticsApi, type CompanyAnalyticsDto, type RiskFlag } from "@/lib/ana
 import { AXIS_TICK, ChartCard, Empty, LegendRow, SERIES, STATUS, TOOLTIP_STYLE, money, moneyShort } from "@/components/charts";
 import { JobStatusBadge } from "@/components/jobs/badges";
 import { formatCadWhole } from "@/lib/money";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ListRow } from "@/components/mobile/list-row";
+import { ScrollTabs } from "@/components/mobile/scroll-tabs";
+import { StatStrip } from "@/components/mobile/stat-strip";
 
 const formatCurrency = (v: number) => formatCadWhole(v);
 const QUOTE_STATUS_COLORS: Record<string, string> = { draft: SERIES.neutral, unlocked: SERIES.actual, pending: "#d97706" };
@@ -68,9 +72,15 @@ function GateCard() {
   );
 }
 
+type BizChart = "pnl" | "aging" | "cash" | "risks" | "margins";
+
 function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDto | undefined; isLoading: boolean; locale: typeof enCA }) {
   const { t } = useLanguage();
-  if (isLoading || !data) return <div className="stat-grid six">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}</div>;
+  // Phase 107: on a phone the charts are one per screen, picked from a row of tabs.
+  const phone = useMediaQuery("(max-width: 640px)");
+  const [chart, setChart] = useState<BizChart>("pnl");
+  const show = (c: BizChart) => !phone || chart === c;
+  if (isLoading || !data) return <Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" />;
   const tot = data.totals;
   const monthLabel = (m: string) => format(new Date(`${m}-01T00:00:00`), "MMM", { locale });
   const monthRows = data.months.map((m) => ({ ...m, label: monthLabel(m.month) }));
@@ -87,17 +97,37 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
 
   return (
     <div>
-      <div className="stat-grid six">
-        <Tile label={t("analytics.invoiced")} value={formatCents(tot.invoicedCents)} sub={t("analytics.inPeriod")} />
-        <Tile label={t("analytics.collected")} value={formatCents(tot.collectedCents)} sub={t("analytics.inPeriod")} tone="text-emerald-600" />
-        <Tile label={t("analytics.costs")} value={formatCents(tot.costCents)} sub={t("analytics.confirmedOnly")} />
-        <Tile label={t("analytics.grossMargin")} value={tot.marginPercent === null ? "—" : `${tot.marginPercent}%`} sub={formatCents(tot.marginCents)} tone={tot.marginPercent !== null && tot.marginPercent < 15 ? "text-rose-600" : "text-emerald-600"} />
-        <Tile label={t("analytics.outstanding")} value={formatCents(tot.outstandingCents)} sub={tot.overdueCents ? `${formatCents(tot.overdueCents)} ${t("analytics.overdue")}` : t("analytics.nothingOverdue")} tone={tot.overdueCents ? "text-rose-600" : undefined} />
-        <Tile label={t("analytics.pipeline")} value={formatCents(tot.pipelineCents)} sub={t("analytics.pipelineHint")} tone="text-blue-600" />
-      </div>
+      <StatStrip
+        className="a-strip"
+        label={t("analytics.title")}
+        items={[
+          { label: t("analytics.invoiced"), value: formatCents(tot.invoicedCents), sub: t("analytics.inPeriod") },
+          { label: t("analytics.collected"), value: formatCents(tot.collectedCents), sub: t("analytics.inPeriod"), tone: "ok" },
+          { label: t("analytics.costs"), value: formatCents(tot.costCents), sub: t("analytics.confirmedOnly") },
+          { label: t("analytics.grossMargin"), value: tot.marginPercent === null ? "—" : `${tot.marginPercent}%`, sub: formatCents(tot.marginCents), tone: tot.marginPercent !== null && tot.marginPercent < 15 ? "bad" : "ok" },
+          { label: t("analytics.outstanding"), value: formatCents(tot.outstandingCents), sub: tot.overdueCents ? `${formatCents(tot.overdueCents)} ${t("analytics.overdue")}` : t("analytics.nothingOverdue"), tone: tot.overdueCents ? "bad" : undefined },
+          { label: t("analytics.pipeline"), value: formatCents(tot.pipelineCents), sub: t("analytics.pipelineHint") },
+        ]}
+      />
 
-      <div className="split-2" style={{ gridTemplateColumns: "2fr 1fr" }}>
-        <ChartCard title={t("analytics.pnl")} subtitle={t("analytics.pnlHint")}>
+      {phone && (
+        <ScrollTabs
+          className="a-charts"
+          label={t("analytics.m.charts")}
+          value={chart}
+          onChange={(id) => setChart(id as BizChart)}
+          tabs={[
+            { id: "pnl", label: t("analytics.m.pnl") },
+            { id: "aging", label: t("analytics.m.aging") },
+            { id: "cash", label: t("analytics.m.cash") },
+            { id: "risks", label: t("analytics.m.risks"), count: data.jobs.risks.length || undefined },
+            { id: "margins", label: t("analytics.m.margins") },
+          ]}
+        />
+      )}
+
+      <div className="split-2 wide-left">
+        {show("pnl") && <ChartCard title={t("analytics.pnl")} subtitle={t("analytics.pnlHint")}>
           {!hasMoney ? <Empty text={t("analytics.noData")} /> : (
             <>
               <LegendRow items={[{ color: SERIES.invoiced, label: t("analytics.invoiced") }, { color: SERIES.actual, label: t("analytics.costs") }, { color: SERIES.collected, label: t("analytics.collected") }]} />
@@ -124,9 +154,9 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
               </div>
             </>
           )}
-        </ChartCard>
+        </ChartCard>}
 
-        <ChartCard title={t("invoices.aging.title")} subtitle={`${t("invoices.aging.total")} ${formatCents(data.aging.totalCents)}`}>
+        {show("aging") && <ChartCard title={t("invoices.aging.title")} subtitle={`${t("invoices.aging.total")} ${formatCents(data.aging.totalCents)}`}>
           {data.aging.totalCents === 0 ? <Empty text={t("analytics.noReceivables")} /> : (
             <ul className="space-y-2.5">
               {aging.map((a) => (
@@ -137,11 +167,11 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
               ))}
             </ul>
           )}
-        </ChartCard>
+        </ChartCard>}
       </div>
 
-      <div className="split-2" style={{ gridTemplateColumns: "2fr 1fr" }}>
-        <ChartCard title={t("analytics.cashFlow")} subtitle={t("analytics.cashFlowHint")}>
+      <div className="split-2 wide-left">
+        {show("cash") && <ChartCard title={t("analytics.cashFlow")} subtitle={t("analytics.cashFlowHint")}>
           {cashRows.every((w) => !w.inflowCents && !w.expectedCents && !w.outflowCents) ? <Empty text={t("analytics.noData")} /> : (
             <>
               <LegendRow items={[{ color: SERIES.invoiced, label: t("analytics.invoicesDue") }, { color: "#7dd3fc", label: t("analytics.expectedBillings") }, { color: SERIES.outflow, label: t("analytics.plannedCosts") }, { color: SERIES.collected, label: t("analytics.cumulativeNet") }]} />
@@ -160,9 +190,9 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
               </ResponsiveContainer>
             </>
           )}
-        </ChartCard>
+        </ChartCard>}
 
-        <ChartCard title={t("analytics.risks")} subtitle={t("analytics.risksHint")}>
+        {show("risks") && <ChartCard title={t("analytics.risks")} subtitle={t("analytics.risksHint")}>
           {data.jobs.risks.length === 0 ? (
             <div className="h-40 flex flex-col items-center justify-center text-sm text-slate-500 gap-1"><CheckCircle2 className="h-6 w-6 text-emerald-500" />{t("analytics.noRisks")}</div>
           ) : (
@@ -175,11 +205,25 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
               ))}
             </ul>
           )}
-        </ChartCard>
+        </ChartCard>}
       </div>
 
-      <ChartCard title={t("analytics.jobMargins")} subtitle={t("analytics.jobMarginsHint")} right={<div className="flex flex-wrap gap-1.5">{Object.entries(data.jobs.byStatus).map(([s, n]) => <span key={s} className="chip chip-grey">{n} {t(`jobs.status.${s}`)}</span>)}</div>}>
-        {data.jobs.margins.length === 0 ? <Empty text={t("analytics.noJobs")} /> : (
+      {show("margins") && <ChartCard title={t("analytics.jobMargins")} subtitle={t("analytics.jobMarginsHint")} right={<div className="flex flex-wrap gap-1.5">{Object.entries(data.jobs.byStatus).map(([s, n]) => <span key={s} className="chip chip-grey">{n} {t(`jobs.status.${s}`)}</span>)}</div>}>
+        {data.jobs.margins.length === 0 ? <Empty text={t("analytics.noJobs")} /> : phone ? (
+          <ul className="lrows a-flush" aria-label={t("analytics.jobMargins")}>
+            {data.jobs.margins.map((j) => (
+              <li key={j.id}>
+                <ListRow
+                  href={`/dashboard/jobs/${j.id}`}
+                  title={j.name}
+                  meta={[j.clientName, t("analytics.m.costsOf").replace("{costs}", formatCents(j.costCents)).replace("{value}", formatCents(j.subtotalCents)), `${j.progressPercent}%`]}
+                  amount={<span className={cn(j.marginPercent === null ? "t-faint" : j.marginPercent < 10 ? "t-bad" : j.marginPercent < 20 ? "t-warn" : "t-ok")}>{j.marginPercent === null ? "—" : `${j.marginPercent}%`}</span>}
+                  end={<JobStatusBadge status={j.status as never} />}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
           <div className="tbl-wrap" style={{ margin: "-20px -22px -18px" }}>
             <table className="tbl">
               <thead><tr><th>{t("analytics.job")}</th><th>{t("analytics.status")}</th><th style={{ textAlign: "right" }}>{t("analytics.valuePreTax")}</th><th style={{ textAlign: "right" }}>{t("analytics.costs")}</th><th style={{ textAlign: "right" }}>{t("analytics.margin")}</th><th style={{ textAlign: "right" }}>{t("analytics.progress")}</th></tr></thead>
@@ -198,7 +242,7 @@ function BusinessSection({ data, isLoading, locale }: { data: CompanyAnalyticsDt
             </table>
           </div>
         )}
-      </ChartCard>
+      </ChartCard>}
     </div>
   );
 }
@@ -209,16 +253,6 @@ function RiskChip({ flag, risk }: { flag: RiskFlag; risk: CompanyAnalyticsDto["j
   const extra = flag === "over_budget" ? formatCents(d.overBudgetCents) : flag === "budget_burn" && d.burnPercent !== null ? `${d.burnPercent}%` : flag === "behind_schedule" ? `${d.daysBehind} ${t("analytics.days")}` : flag === "overdue_invoices" ? formatCents(d.overdueCents) : formatCents(d.billingGapCents);
   const bad = flag === "over_budget" || flag === "overdue_invoices" || flag === "behind_schedule";
   return <span className={cn("chip", bad ? "chip-red" : "chip-yellow")}>{t(`analytics.flag.${flag}`)} · {extra}</span>;
-}
-
-function Tile({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: string }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className={cn("val truncate", tone)}>{value}</p>
-      {sub && <p className={cn("delta", !tone && "flat")}>{sub}</p>}
-    </div>
-  );
 }
 
 // ── Quotes (all plans) ───────────────────────────────────────────────────────
@@ -262,21 +296,12 @@ function QuotesSection({ months, locale }: { months: number; locale: typeof enCA
   return (
     <div style={{ marginTop: 16 }}>
       <h2 className="text-lg font-bold text-slate-900 mb-3">{t("analytics.quotesSection")}</h2>
-      <div className="stat-grid">
-        {statCards.map(({ label, value, sub, format: fmt }) => (
-          <div key={label} className="card stat-card">
-            <p className="lbl">{label}</p>
-            {isLoading ? <Skeleton className="h-8 w-24 mt-1" /> : (
-              <>
-                <p className="val">{fmt(value)}</p>
-                <p className="delta flat">{sub}</p>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+      <StatStrip
+        label={t("analytics.quotesSection")}
+        items={statCards.map(({ label, value, sub, format: fmt }) => ({ label, value: isLoading ? "—" : fmt(value), sub: isLoading ? undefined : sub }))}
+      />
 
-      <div className="split-2" style={{ gridTemplateColumns: "2fr 1fr" }}>
+      <div className="split-2 wide-left">
         <ChartCard title={t("analytics.quotesPerMonth")}>
           {isLoading ? <Skeleton className="h-48 w-full" /> : (
             <ResponsiveContainer width="100%" height={200}>

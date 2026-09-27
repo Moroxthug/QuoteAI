@@ -65,7 +65,7 @@ export function ActionSheet({
 
   if (!phone) {
     return (
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>{button}</DropdownMenuTrigger>
         <DropdownMenuContent align={align} className="min-w-[210px]">
           {visible.map((a, i) => (

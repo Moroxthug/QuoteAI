@@ -175,6 +175,35 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     dash("/dashboard/leads"), dash("/dashboard/imports"),
     dash("/dashboard/contracts"), dash(`/dashboard/contracts/${s.contractId}`), dash(`/dashboard/contracts/${s.pendingContractId}`),
     dash("/dashboard/invoices"), dash(`/dashboard/invoices/${s.invoiceId}`),
+    // Phase 107: the money-and-people phone states — list filters, the invoice's and the contract's menu,
+    // the agreement unfolded, a new invoice's line in a sheet, a client's tabs, a lead's Move menu, one chart at a time.
+    { path: "/dashboard/invoices", session: "owner", name: "/dashboard/invoices filter", drive: (p) => openPhoneSheet(p, ".qlist-bar .more-btn", "[role=dialog] .asheet-list") },
+    { path: `/dashboard/invoices/${s.invoiceId}`, session: "owner", name: `/dashboard/invoices/${s.invoiceId} more`, drive: async (p) => {
+      await p.locator(".i-hero .more-btn").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
+    { path: "/dashboard/invoices?new=1", session: "owner", name: "/dashboard/invoices new invoice line", drive: async (p) => {
+      await p.waitForSelector("[role=dialog] .li-body");
+      await openPhoneSheet(p, "[role=dialog] .li-phone .qline.add", "[role=dialog] .line-sheet");
+    } },
+    { path: "/dashboard/contracts", session: "owner", name: "/dashboard/contracts filter", drive: (p) => openPhoneSheet(p, ".qlist-bar .more-btn", "[role=dialog] .asheet-list") },
+    { path: `/dashboard/contracts/${s.pendingContractId}`, session: "owner", name: `/dashboard/contracts/${s.pendingContractId} more`, drive: async (p) => {
+      await p.locator(".k-hero .more-btn").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
+    { path: `/dashboard/contracts/${s.contractId}`, session: "owner", name: `/dashboard/contracts/${s.contractId} agreement`, drive: async (p) => {
+      const b = p.locator(".k-doc-toggle").first();
+      if (await b.isVisible().catch(() => false)) { await b.click(); await p.waitForSelector(".doc-view"); }
+    } },
+    ...(s.clientId ? ["jobs", "invoices", "messages"].map((tab) => dash(`/dashboard/clients/${s.clientId}?tab=${tab}`)) : []),
+    { path: "/dashboard/leads", session: "owner", name: "/dashboard/leads move", drive: async (p) => {
+      await p.locator(".kan-move").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
+    ...["aging", "margins"].map((chart, i): RouteSpec => ({ path: "/dashboard/analytics", session: "owner", name: `/dashboard/analytics ${chart}`, drive: async (p) => {
+      const pill = p.locator(".a-charts .pill").nth(i === 0 ? 1 : 4);
+      if (await pill.isVisible().catch(() => false)) await pill.click();
+    } })),
     // Phase 94: the quote form's client fields (a new client with a bad email; a picked client's contact details) and the completion dialog.
     { path: "/dashboard/new", session: "owner", name: "/dashboard/new new client (bad email)", drive: async (p) => {
       await p.locator(".pick-row .pill.dashed, .add-dashed").first().click();

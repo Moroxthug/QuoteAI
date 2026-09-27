@@ -37,7 +37,7 @@ export function QuoteLineRows({ lines, onEdit, onAdd, label }: {
             {onEdit && <span className="sr-only">{t("quotes.m.editLine")}: </span>}
             <span className="qline-main">
               <span className={cn("qline-desc", !l.descrizione.trim() && "faint")}>{desc}</span>
-              <span className="qline-calc">{qty(l.quantita)} {l.um} × {formatCad(l.prezzoUnitario)}</span>
+              <span className="qline-calc">{qty(l.quantita)}{l.um ? ` ${l.um}` : ""} × {formatCad(l.prezzoUnitario)}</span>
             </span>
             <span className="qline-amt">{formatCad(total)}</span>
             {onEdit && <ChevronRight className="qline-chev" aria-hidden="true" />}
@@ -77,12 +77,14 @@ export const parseAmount = (v: string) => {
  * the unit field into a picker; `descTools` puts helpers under the
  * description (the AI "improve" button, catalog matches).
  */
-export function LineItemSheet({ open, onOpenChange, initial, isNew, units, onSave, onDelete, descTools }: {
+export function LineItemSheet({ open, onOpenChange, initial, isNew, units, noUnit, onSave, onDelete, descTools }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial: LineDraft;
   isNew?: boolean;
   units?: readonly string[];
+  /** Phase 107: lines priced without a unit (invoices): quantity and price only. */
+  noUnit?: boolean;
   onSave: (line: LineDraft) => void;
   /** Absent when the line can't be removed (the only line of a chapter). */
   onDelete?: () => void;
@@ -121,12 +123,12 @@ export function LineItemSheet({ open, onOpenChange, initial, isNew, units, onSav
           <textarea id={`${id}-d`} rows={3} value={draft.descrizione} onChange={(e) => patch({ descrizione: e.target.value })} placeholder={t("dashboard.quoteDetail.itemDescriptionPlaceholder")} />
           {descTools?.(draft, patch)}
         </div>
-        <div className="line-sheet-nums">
+        <div className={cn("line-sheet-nums", noUnit && "two")}>
           <div className="field">
             <label htmlFor={`${id}-q`}>{t("dashboard.quoteDetail.colQty")}</label>
             <input id={`${id}-q`} inputMode="decimal" autoComplete="off" value={draft.quantita} onChange={(e) => patch({ quantita: e.target.value.replace(/[^0-9.,]/g, "") })} />
           </div>
-          <div className="field">
+          {!noUnit && <div className="field">
             <label htmlFor={`${id}-u`}>{t("dashboard.quoteDetail.colUnit")}</label>
             {unitOptions ? (
               <select id={`${id}-u`} value={draft.um} onChange={(e) => patch({ um: e.target.value })}>
@@ -135,7 +137,7 @@ export function LineItemSheet({ open, onOpenChange, initial, isNew, units, onSav
             ) : (
               <input id={`${id}-u`} autoComplete="off" value={draft.um} onChange={(e) => patch({ um: e.target.value })} />
             )}
-          </div>
+          </div>}
           <div className="field">
             <label htmlFor={`${id}-p`}>{t("dashboard.quoteDetail.colUnitPrice")}</label>
             <input id={`${id}-p`} inputMode="decimal" autoComplete="off" placeholder="0.00" value={draft.prezzoUnitario} onChange={(e) => patch({ prezzoUnitario: e.target.value.replace(/[^0-9.,]/g, "") })} />

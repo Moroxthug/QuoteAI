@@ -1,35 +1,35 @@
-﻿import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { rowLink } from "@/lib/row-link";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Receipt, Search, ChevronRight, Plus, AlertTriangle, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InvoiceListRow, invoiceStatusChip } from "@/components/invoices/invoice-list-row";
+import { PhoneListBar } from "@/components/mobile/list-filter";
+import { StatStrip } from "@/components/mobile/stat-strip";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { useGetBusinessProfile } from "@workspace/api-client-react";
 import { hasFeature } from "@/lib/plans";
 import { formatCents } from "@/lib/jobs-api";
-import { invoicesApi, isOpenInvoice, type InvoiceDto, type AgingDto, type InvoiceStatus } from "@/lib/invoices-api";
+import { invoicesApi, isOpenInvoice, type InvoiceDto, type AgingDto } from "@/lib/invoices-api";
 import { InvoiceStatusBadge, InvoiceTypeBadge } from "@/components/jobs/badges";
 import { NewInvoiceDialog } from "@/components/invoices/invoice-dialogs";
 
 const FILTERS = ["all", "draft", "open", "overdue", "paid", "void"] as const;
 type Filter = (typeof FILTERS)[number];
 
-function statusChip(status: InvoiceStatus): string {
-  if (status === "paid") return "chip-green";
-  if (status === "overdue") return "chip-red";
-  if (status === "void") return "chip-grey";
-  if (status === "draft") return "chip-grey";
-  return "chip-yellow";
-}
+const inFilter = (i: InvoiceDto, f: Filter): boolean => (f === "all" ? true : f === "open" ? isOpenInvoice(i.status) : i.status === f);
+
 
 export default function InvoicesPage() {
   const { t, lang } = useLanguage();
-const can = useCan();
+  const can = useCan();
+  const phone = useMediaQuery("(max-width: 640px)");
   const locale = lang === "fr" ? frCA : enCA;
   const { data: profile } = useGetBusinessProfile();
   const gated = profile ? !hasFeature(profile as never, "invoicing") : false;
@@ -37,17 +37,21 @@ const can = useCan();
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [newOpen, setNewOpen] = useState(false);
+  // Phase 107: the phone New sheet opens the form with ?new=1 (then drops it, so Back does not reopen it).
+  const query = useSearch();
+  const [, navigate] = useLocation();
+  useEffect(() => {
+    if (new URLSearchParams(query).get("new") !== "1" || !profile) return;
+    if (!gated) setNewOpen(true);
+    navigate("/dashboard/invoices", { replace: true });
+  }, [query, navigate, gated, profile]);
+  const all = data?.items ?? [];
 
   const items = useMemo(() => {
-    const all = data?.items ?? [];
     const q = search.trim().toLowerCase();
-    return all.filter((i) => {
-      const inFilter =
-        filter === "all" ? true
-        : filter === "open" ? isOpenInvoice(i.status)
-        : i.status === filter;
+    return (data?.items ?? []).filter((i) => {
       const inSearch = !q || i.number.toLowerCase().includes(q) || (i.clientName ?? "").toLowerCase().includes(q) || (i.projectName ?? "").toLowerCase().includes(q);
-      return inFilter && inSearch;
+      return inFilter(i, filter) && inSearch;
     });
   }, [data, filter, search]);
 
@@ -59,7 +63,7 @@ const can = useCan();
           <p className="sub">{t("invoices.subtitle")}</p>
         </div>
         {can("invoicing", "edit") && (
-          <div className="head-actions">
+          <div className="head-actions hide-phone">
             <button type="button" className="btn btn-navy" onClick={() => setNewOpen(true)} disabled={gated}><Plus className="h-4 w-4" /> {t("invoices.new")}</button>
           </div>
         )}
@@ -74,20 +78,34 @@ const can = useCan();
         </div>
       ) : (
         <>
-          <div className="stat-grid">
-            <Stat label={t("invoices.stat.outstanding")} value={formatCents(data?.stats.outstandingCents ?? 0)} />
-            <Stat label={t("invoices.stat.overdue")} value={formatCents(data?.stats.overdueCents ?? 0)} sub={data?.stats.overdueCount ? `${data.stats.overdueCount} ${t("invoices.stat.invoices")}` : undefined} neg={!!data?.stats.overdueCents} />
-            <Stat label={t("invoices.stat.paidMonth")} value={formatCents(data?.stats.paidThisMonthCents ?? 0)} />
-            <Stat label={t("invoices.stat.drafts")} value={String(data?.stats.drafts ?? 0)} />
-          </div>
+          {/* Phase 107: the four numbers as one strip (two by two on a phone). */}
+          <StatStrip
+            label={t("invoices.title")}
+            items={[
+              { label: t("invoices.stat.outstanding"), value: formatCents(data?.stats.outstandingCents ?? 0) },
+              { label: t("invoices.stat.overdue"), value: formatCents(data?.stats.overdueCents ?? 0), tone: data?.stats.overdueCents ? "bad" : undefined, sub: data?.stats.overdueCount ? `${data.stats.overdueCount} ${t("invoices.stat.invoices")}` : undefined },
+              { label: t("invoices.stat.paidMonth"), value: formatCents(data?.stats.paidThisMonthCents ?? 0) },
+              { label: t("invoices.stat.drafts"), value: String(data?.stats.drafts ?? 0) },
+            ]}
+          />
 
           {data && data.aging.totalCents > 0 && <Aging aging={data.aging} />}
 
-          <div className="card" style={{ marginTop: 16 }}>
+          <div className="card qlist" style={{ marginTop: 16 }}>
+            {phone ? (
+              <PhoneListBar<Filter>
+                search={search}
+                onSearch={setSearch}
+                placeholder={t("invoices.searchPlaceholder")}
+                filters={FILTERS.map((f) => ({ id: f, label: t(`invoices.filter.${f}`), count: all.filter((i) => inFilter(i, f)).length }))}
+                value={filter}
+                onChange={setFilter}
+              />
+            ) : (
             <div className="toolbar">
               <div className="pills">
                 {FILTERS.map((f) => (
-                  <button key={f} type="button" className={cn("pill", filter === f && "on")} onClick={() => setFilter(f)}>{t(`invoices.filter.${f}`)}</button>
+                  <button key={f} type="button" className={cn("pill", filter === f && "on")} aria-pressed={filter === f} onClick={() => setFilter(f)}>{t(`invoices.filter.${f}`)}</button>
                 ))}
               </div>
               <label className="search sm grow">
@@ -95,6 +113,7 @@ const can = useCan();
                 <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("invoices.searchPlaceholder")} aria-label={t("invoices.searchPlaceholder")} />
               </label>
             </div>
+            )}
 
             {isLoading ? (
               <div className="p-5 space-y-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}</div>
@@ -104,6 +123,10 @@ const can = useCan();
                 <h3 className="text-base font-medium text-foreground mb-1">{t("invoices.emptyTitle")}</h3>
                 <p className="text-sm text-muted-foreground">{t("invoices.emptyDesc")}</p>
               </div>
+            ) : phone ? (
+              <ul className="lrows" aria-label={t("invoices.title")}>
+                {items.map((inv) => <li key={inv.id}><InvoiceListRow inv={inv} locale={locale} /></li>)}
+              </ul>
             ) : (
               <div className="tbl-wrap">
                 <table className="tbl">
@@ -145,18 +168,8 @@ function InvoiceTableRow({ inv, locale }: { inv: InvoiceDto; locale: typeof enCA
       <td>{format(new Date(inv.issueDate), "PP", { locale })}</td>
       <td>{format(new Date(inv.dueDate), "PP", { locale })}</td>
       <td className="t-amt" style={{ textAlign: "right" }}>{formatCents(inv.totalCents)}</td>
-      <td><span className={cn("chip", statusChip(inv.status))}>{t(`invoices.status.${inv.status}`)}</span></td>
+      <td><span className={cn("chip", invoiceStatusChip(inv.status))}>{t(`invoices.status.${inv.status}`)}</span></td>
     </tr>
-  );
-}
-
-function Stat({ label, value, sub, neg }: { label: string; value: string; sub?: string; neg?: boolean }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className="val">{value}</p>
-      {sub && <p className={cn("delta", neg ? "neg" : "flat")}>{sub}</p>}
-    </div>
   );
 }
 
@@ -171,7 +184,7 @@ const BUCKETS: { key: keyof Omit<AgingDto, "totalCents" | "overdueCents">; color
 function Aging({ aging }: { aging: AgingDto }) {
   const { t } = useLanguage();
   return (
-    <section className="card" style={{ marginTop: 16, padding: "18px 22px" }}>
+    <section className="card aging-card" style={{ marginTop: 16 }}>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm font-bold text-slate-900 inline-flex items-center gap-2"><Clock className="h-4 w-4 text-slate-400" /> {t("invoices.aging.title")}</h2>
         <span className="text-sm text-slate-600">{t("invoices.aging.total")} <span className="font-semibold text-slate-900">{formatCents(aging.totalCents)}</span></span>
@@ -179,9 +192,9 @@ function Aging({ aging }: { aging: AgingDto }) {
       <div className="h-3 rounded-full bg-slate-100 overflow-hidden flex">
         {BUCKETS.map((b) => (aging[b.key] > 0 ? <div key={b.key} className="h-full" style={{ width: `${(aging[b.key] / aging.totalCents) * 100}%`, background: b.color }} title={`${t(`invoices.aging.${b.key}`)}: ${formatCents(aging[b.key])}`} /> : null))}
       </div>
-      <div className="grid grid-cols-5 gap-2 mt-2">
+      <div className="aging-legend">
         {BUCKETS.map((b) => (
-          <div key={b.key} className="min-w-0">
+          <div key={b.key} className={cn("min-w-0", aging[b.key] === 0 && "aging-zero")}>
             <div className="flex items-center gap-1.5 text-[11px] text-slate-500 truncate"><span className="h-2 w-2 rounded-full shrink-0" style={{ background: b.color }} /> {t(`invoices.aging.${b.key}`)}</div>
             <div className={cn("text-sm font-semibold tabular-nums", aging[b.key] > 0 ? "text-slate-900" : "text-slate-500")}>{formatCents(aging[b.key])}</div>
           </div>

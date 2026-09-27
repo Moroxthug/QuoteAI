@@ -8,11 +8,22 @@ import { FileSignature, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ListRow } from "@/components/mobile/list-row";
+import { PhoneListBar } from "@/components/mobile/list-filter";
+import { formatCadWhole } from "@/lib/money";
 import { contractsApi, type ContractDto } from "@/lib/contracts-api";
 
 const FILTERS = ["all", "review", "signed", "closed"] as const;
 type Filter = (typeof FILTERS)[number];
 const FILTER_KEY: Record<Filter, string> = { all: "all", review: "sent", signed: "signed", closed: "closed" };
+
+function inFilter(c: ContractDto, f: Filter): boolean {
+  if (f === "all") return true;
+  if (f === "review") return c.status === "sent" || c.status === "viewed";
+  if (f === "signed") return c.status === "signed";
+  return ["draft", "declined", "voided", "expired"].includes(c.status);
+}
 
 function statusChip(status: ContractDto["status"], t: (key: string) => string): { cls: string; label: string } {
   if (status === "signed") return { cls: "chip-green", label: t("contracts.status.signed") };
@@ -27,16 +38,13 @@ export default function ContractsListPage() {
   const [, navigate] = useLocation();
   const { data, isLoading } = useQuery({ queryKey: ["contracts"], queryFn: contractsApi.list });
   const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
+  const phone = useMediaQuery("(max-width: 640px)");
 
   const items = useMemo(() => {
-    const all = data?.items ?? [];
-    return all.filter((c) => {
-      if (filter === "all") return true;
-      if (filter === "review") return c.status === "sent" || c.status === "viewed";
-      if (filter === "signed") return c.status === "signed";
-      return ["draft", "declined", "voided", "expired"].includes(c.status);
-    });
-  }, [data, filter]);
+    const q = search.trim().toLowerCase();
+    return (data?.items ?? []).filter((c) => inFilter(c, filter) && (!q || c.contractNumber.toLowerCase().includes(q) || c.variables.customer.name.toLowerCase().includes(q) || c.variables.projectTitle.toLowerCase().includes(q)));
+  }, [data, filter, search]);
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -47,16 +55,27 @@ export default function ContractsListPage() {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card qlist">
+        {phone ? (
+          <PhoneListBar<Filter>
+            search={search}
+            onSearch={setSearch}
+            placeholder={t("contracts.m.search")}
+            filters={FILTERS.map((f) => ({ id: f, label: t(`contracts.filter.${FILTER_KEY[f]}`), count: (data?.items ?? []).filter((c) => inFilter(c, f)).length }))}
+            value={filter}
+            onChange={setFilter}
+          />
+        ) : (
         <div className="toolbar">
           <div className="pills">
             {FILTERS.map((f) => (
-              <button key={f} type="button" className={cn("pill", filter === f && "on")} onClick={() => setFilter(f)}>
+              <button key={f} type="button" className={cn("pill", filter === f && "on")} aria-pressed={filter === f} onClick={() => setFilter(f)}>
                 {t(`contracts.filter.${FILTER_KEY[f]}`)}
               </button>
             ))}
           </div>
         </div>
+        )}
 
         {isLoading ? (
           <div className="p-5 space-y-3">
@@ -69,6 +88,24 @@ export default function ContractsListPage() {
             <p className="text-sm text-muted-foreground mb-2">{t("contracts.emptyDesc")}</p>
             <Link href="/dashboard/quotes" className="cta-link mx-auto">{t("contracts.goToQuotes")}</Link>
           </div>
+        ) : phone ? (
+          // Phase 107: the client, the contract and its job / the price / where it stands.
+          <ul className="lrows" aria-label={t("contracts.title")}>
+            {items.map((c) => {
+              const chip = statusChip(c.status, t);
+              return (
+                <li key={c.id}>
+                  <ListRow
+                    href={`/dashboard/contracts/${c.id}`}
+                    title={c.variables.customer.name || c.contractNumber}
+                    meta={[c.contractNumber, c.variables.projectTitle]}
+                    amount={formatCadWhole(c.variables.total)}
+                    end={<span className={cn("chip", chip.cls)}>{chip.label}</span>}
+                  />
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <div className="tbl-wrap">
             <table className="tbl">

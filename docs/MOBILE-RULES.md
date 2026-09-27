@@ -20,7 +20,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 6. **Progressive disclosure.** Options, filters and rarely-used fields sit behind "Options" / "Filter" and open as a `BottomSheet`.
 7. **One accent at a time.** Navy for structure, one colour for status; no full-bleed colour blocks side by side on a phone.
 8. **Space is the design.** 16 px gutters (`--gutter-phone`), 12 px between cards (`--gap-card`), 44 px targets (`--tap`), one type scale: title 22 / section 17 / body 15 / meta 13 (`--fs-title`, `--fs-section`, `--fs-body`, `--fs-meta`).
-9. **The phone knows it's a phone.** Safe areas (`--safe-top/right/bottom/left`, `viewport-fit=cover`), `inputmode` / `autocomplete` on every field, camera and microphone one tap away, the numeric keypad for money.
+9. **The phone knows it's a phone.** Safe areas (`--safe-top/right/bottom/left`, `viewport-fit=cover`), `inputmode` / `autocomplete` on every field, camera and microphone one tap away, the numeric keypad for money. Nothing needs a hover or a drag: a board you drag cards across also gives each card a "Move to" menu (leads, Phase 107).
 10. **Same code, same words.** No separate mobile code path: the same components laid out by breakpoint, so the Capacitor app (docs/APP-PLAN.md) inherits all of it.
 
 ## The pieces (`artifacts/quote-ai/src/components/mobile/`)
@@ -36,6 +36,7 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | `StatStrip` | one card, N cells | 2-column grid; or `variant="line"` | 3 |
 | `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it; runs to the screen edges (`data-bleed`, skipped by the gutter check) | 5 |
 | `RowMore` | hidden (the row keeps its hover icons — pair them with `hide-phone`) | one ⋯ at the end of a row opening its actions as a sheet (Phase 106) | 2 |
+| `PhoneListBar` | not used (the list keeps its pill row) | a list's head: search that stays at the top, the filter as a sheet with counts, the active filter as a removable chip (Phase 107; the quotes list's, shared) | 5, 6 |
 
 CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. Tokens in `:root`.
 
@@ -43,7 +44,7 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 
 - **Tabs**: Today + the first three of the role's list that the plan shows, + More. Owner / admin / office / viewer: Quotes · Jobs · Money (invoices, pay, books, compliance) — a Starter plan without jobs and invoices gets Clients · Leads. Foreman: Jobs · Schedule · Crew.
 - **More** (sheet): the account, notifications (its count is on the More tab), the company switcher when there is more than one, then every other section under Work / Money / Team / Business with the same Pro badge as the sidebar, then sign out. More is highlighted while you are on a section that has no tab.
-- **+** (top bar): New quote, New lead (`/dashboard/leads?new=1`), Photo of a receipt (pick a job → camera → the receipt waits on the job's costs), Job note (pick a job → the Dictate sheet). Only what the role may do; no + when that is nothing.
+- **+** (top bar): New quote, New lead (`/dashboard/leads?new=1`), New job (`/dashboard/jobs?new=1`), New invoice (`/dashboard/invoices?new=1`, Phase 107), Photo of a receipt (pick a job → camera → the receipt waits on the job's costs), Job note (pick a job → the Dictate sheet). Only what the role may do; no + when that is nothing.
 - **Memory**: each tab reopens the last screen you had in it (path + query, session storage) at the scroll position you left; tapping the tab you are in goes to its first screen, then to the top. Every move is a history push, so Back retraces your steps; an open sheet closes when the screen changes.
 - On a phone (≤ 640 px) the bell and the avatar leave the top bar (they are in More); between 641 and 980 px the top bar keeps the search, the bell and the avatar.
 

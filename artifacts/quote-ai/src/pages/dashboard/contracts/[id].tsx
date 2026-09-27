@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import {
-  ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive,
+  ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive, ChevronDown, FileText, Briefcase,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MockupToggle } from "@/components/ui/mockup-toggle";
@@ -16,6 +16,10 @@ import { useCan } from "@/hooks/use-role";
 import { contractsApi, type ContractDto } from "@/lib/contracts-api";
 import { SignaturePad, type SignatureValue } from "@/components/signature-pad";
 import { formatCad } from "@/lib/money";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
+import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { useMobileHeader } from "@/components/mobile/mobile-page-header";
 
 
 /** Contract status → locked `.chip-*` colour (Phase 57). */
@@ -58,6 +62,11 @@ export default function ContractDetailPage() {
   const [sendEmail, setSendEmail] = useState("");
   const [voidOpen, setVoidOpen] = useState(false);
   const [voidReason, setVoidReason] = useState("");
+  // Phase 107: on a phone the agreement's text is one tap away (the header card says what it is and where it stands).
+  const phone = useMediaQuery("(max-width: 640px)");
+  const [docOpen, setDocOpen] = useState(false);
+  const number = data?.contract.contractNumber;
+  useMobileHeader(useMemo(() => (number ? { title: number } : null), [number]));
 
   useEffect(() => {
     if (!contract) return;
@@ -188,40 +197,77 @@ export default function ContractDetailPage() {
     );
   }
 
+  const canEdit = can("contracts", "edit");
+  const nextStep = steps.find((s) => !s.done);
+  // The contract's next step: sign it as the company, send it, then nudge the customer.
+  const primary = !isOpen || !canEdit ? null
+    : contractorSigner?.status !== "signed" ? { label: t("contracts.signAsCompany"), icon: FileSignature, onClick: () => setSignOpen(true), disabled: false }
+    : !contract.sentAt ? { label: t("contracts.sendToCustomer"), icon: Send, onClick: () => setSendOpen(true), disabled: !canSend }
+    : customerSigner?.status !== "signed" ? { label: t("contracts.resend"), icon: RefreshCw, onClick: () => setSendOpen(true), disabled: false }
+    : null;
+  const moreActions: Array<SheetAction | false | null | undefined> = [
+    { label: contract.hasSignedPdf ? t("contracts.downloadSigned") : t("contracts.downloadPdf"), icon: Download, onSelect: () => { window.open(contractsApi.pdfUrl(contract.id, true), "_blank", "noopener"); } },
+    isDraft && canEdit && { label: t("contracts.edit"), icon: Pencil, onSelect: () => { setEditing(true); setDocOpen(true); } },
+    isOpen && !!contract.sentAt && canEdit && customerSigner?.status !== "signed" && primary?.icon !== RefreshCw && { label: t("contracts.resend"), icon: RefreshCw, onSelect: () => setSendOpen(true) },
+    !isOpen && !isDraft && can("contracts", "full") && { label: t("dashboard.quotesList.archive"), icon: Archive, disabled: archiveContract.isPending, onSelect: () => archiveContract.mutate() },
+    isOpen && can("contracts", "full") && { label: t("contracts.void"), icon: Ban, danger: true, separated: true, onSelect: () => setVoidOpen(true) },
+  ];
+
   const backHref = contract.kind === "change_order" && contract.projectId ? `/dashboard/jobs/${contract.projectId}?tab=changes` : "/dashboard/contracts";
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <Link href={backHref} className="back-link"><ArrowLeft /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}</Link>
-      <div className="page-head">
-        <div className="min-w-0">
-          <div className="title-row">
-            <h1><FileSignature />{contract.contractNumber}</h1>
+    <div className="animate-in fade-in duration-300 q-page">
+      <Link href={backHref} className="back-link hide-phone"><ArrowLeft /> {contract.kind === "change_order" ? t("contracts.backToJob") : t("contracts.backToList")}</Link>
+
+      {/* Phase 107: who it is with, the price and where it stands first; the
+          next step as the one primary (docked on a phone), the rest in the menu. */}
+      <section className="card q-hero k-hero">
+        <div className="q-hero-main">
+          <div className="q-hero-eyebrow">
+            <FileSignature aria-hidden="true" />
+            <span>{contract.contractNumber}</span>
+            <span>{format(new Date(contract.createdAt), "d MMM yyyy", { locale })}</span>
+          </div>
+          <h1>{contract.variables.customer.name || contract.contractNumber}</h1>
+          {contract.variables.projectTitle && <p className="q-hero-sub">{contract.variables.projectTitle}</p>}
+          <div className="q-hero-chips">
             <ContractStatusBadge status={contract.status} />
             {contract.kind === "change_order" && <span className="chip chip-yellow">{t("contracts.changeOrder")}</span>}
+            {contract.quoteId && <Link href={`/dashboard/quotes/${contract.quoteId}`} className="chip chip-grey i-hero-link"><FileText className="h-3 w-3 mr-1" />{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link>}
+            {contract.projectId && <Link href={`/dashboard/jobs/${contract.projectId}`} className="chip chip-grey i-hero-link"><Briefcase className="h-3 w-3 mr-1" />{t("contracts.openJob")}</Link>}
           </div>
-          <div className="meta">
-            <span>{contract.variables.customer.name} · {contract.variables.projectTitle} · <strong style={{ color: "var(--navy)" }}>{formatCad(contract.variables.total)}</strong></span>
-            {contract.quoteId && <Link href={`/dashboard/quotes/${contract.quoteId}`}>{t("contracts.viewQuote")} {contract.variables.quoteNumber}</Link>}
-            {contract.projectId && <Link href={`/dashboard/jobs/${contract.projectId}`}>{t("contracts.openJob")}</Link>}
-          </div>
-        </div>
-        <div className="head-actions">
-          <a href={contractsApi.pdfUrl(contract.id, true)} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-navy">
-            <Download className="h-4 w-4" /> {contract.hasSignedPdf ? t("contracts.downloadSigned") : t("contracts.downloadPdf")}
-          </a>
-          {isOpen && !editing && can("contracts", "full") && (
-            <button type="button" className="btn btn-sm btn-outline-navy" style={{ borderColor: "var(--red)", color: "var(--red)" }} onClick={() => setVoidOpen(true)}><Ban className="h-4 w-4" /> {t("contracts.void")}</button>
+          {isOpen && (
+            <div className="k-prog show-phone" aria-label={t("contracts.m.progress").replace("{done}", String(steps.filter((s) => s.done).length)).replace("{total}", String(steps.length))} role="img">
+              {steps.map((s) => <i key={s.key} className={cn(s.done && "done")} />)}
+            </div>
           )}
-          {!isOpen && !isDraft && can("contracts", "full") && (
-            <button type="button" className="text-link" onClick={() => archiveContract.mutate()} disabled={archiveContract.isPending}><Archive /> {t("dashboard.quotesList.archive")}</button>
-          )}
+          {isOpen && nextStep && <p className="k-next show-phone">{t("contracts.m.next").replace("{step}", nextStep.label)}</p>}
         </div>
-      </div>
+        <div className="q-hero-side">
+          <span className="q-hero-lbl">{t("contracts.detail.total")}</span>
+          <b className="q-hero-total">{formatCad(contract.variables.total)}</b>
+          <StickyActionBar label={t("contracts.m.actions")}>
+            {editing ? (
+              <button type="button" className="btn btn-outline-navy secondary" onClick={() => setEditing(false)} disabled={save.isPending}>{t("contracts.cancel")}</button>
+            ) : (
+              <ActionSheet actions={moreActions} title={t("contracts.m.actions")} />
+            )}
+            {editing ? (
+              <button type="button" className="btn btn-navy" onClick={() => save.mutate()} disabled={save.isPending} data-primary-action>
+                {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {t("contracts.save")}
+              </button>
+            ) : primary && (
+              <button type="button" className="btn btn-navy" onClick={primary.onClick} disabled={primary.disabled} data-primary-action>
+                <primary.icon className="h-4 w-4" /> {primary.label}
+              </button>
+            )}
+          </StickyActionBar>
+        </div>
+      </section>
 
       {/* Progress */}
       {isOpen && (
-        <div className="steps-inline">
+        <div className="steps-inline hide-phone">
           {steps.map((s, i) => (
             <div key={s.key} className={cn("step-pill", s.done && "done")}>
               {s.done ? <CheckCircle2 /> : <span className="num">{i + 1}</span>}
@@ -245,7 +291,7 @@ export default function ContractDetailPage() {
             <div className="notice info">
               <Sparkles />
               <span className="grow">{t("contracts.draftHint")}</span>
-              <div className="actions">
+              <div className="actions hide-phone">
                 {editing ? (
                   <>
                     <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setEditing(false)} disabled={save.isPending}><X className="h-4 w-4" /> {t("contracts.cancel")}</button>
@@ -256,6 +302,23 @@ export default function ContractDetailPage() {
                 ) : null}
               </div>
             </div>
+          )}
+
+          {phone && !editing && (contract.status === "signed" || (isOpen && contract.sentAt && customerSigner?.status !== "signed")) && (
+            contract.status === "signed" ? (
+              <div className="notice ok">
+                <CheckCircle2 />
+                <span className="grow">{t("contracts.executed").replace("{date}", contract.signedAt ? format(new Date(contract.signedAt), "PPP", { locale }) : "")}</span>
+              </div>
+            ) : (
+              <div className="notice teal">
+                <Clock />
+                <span className="grow">
+                  {t("contracts.waitingCustomer").replace("{email}", customerSigner?.email ?? "")}
+                  {contract.expiresAt && <small>{t("contracts.expires")} {format(new Date(contract.expiresAt), "PPP", { locale })}</small>}
+                </span>
+              </div>
+            )
           )}
 
           {editing ? (
@@ -327,8 +390,22 @@ export default function ContractDetailPage() {
                 </div>
               </div>
             </section>
+          ) : phone && !docOpen ? (
+            <button type="button" className="card k-doc-toggle" aria-expanded={false} onClick={() => setDocOpen(true)}>
+              <FileText aria-hidden="true" />
+              <span className="grow">
+                <b>{t("contracts.m.readAgreement")}</b>
+                <span>{t("contracts.m.sections").replace("{n}", String(contract.document.sections.length))}</span>
+              </span>
+              <ChevronDown aria-hidden="true" />
+            </button>
           ) : (
             <section className="card doc-view">
+              {phone && (
+                <button type="button" className="k-doc-close" aria-expanded={true} onClick={() => setDocOpen(false)}>
+                  {t("contracts.m.hideAgreement")} <ChevronDown aria-hidden="true" />
+                </button>
+              )}
               <style dangerouslySetInnerHTML={{ __html: data!.css }} />
               <div dangerouslySetInnerHTML={{ __html: data!.html }} />
             </section>
@@ -337,7 +414,7 @@ export default function ContractDetailPage() {
 
         {/* Sidebar */}
         <div className="stack">
-          <section className="card">
+          <section className="card hide-phone">
             <div className="card-head"><div><h2>{t("contracts.nextStep")}</h2></div></div>
             <div className="act-body stack" style={{ gap: 10 }}>
               {contract.status === "signed" ? (

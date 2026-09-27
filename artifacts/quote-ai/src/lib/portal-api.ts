@@ -75,7 +75,7 @@ export const portalApi = {
 
 // ── Contractor side ─────────────────────────────────────────────────────────
 
-export type ClientPortalStatusDto = { url: string | null; hasEmail: boolean; email: string | null; invitedAt: string | null; lastSeenAt: string | null; unread: number };
+export type ClientPortalStatusDto = { clientId: string; url: string | null; hasEmail: boolean; email: string | null; invitedAt: string | null; lastSeenAt: string | null; unread: number };
 export type ClientThreadDto = { messages: PortalMessageDto[]; client: { id: string; name: string; email: string | null; portalLastSeenAt: string | null } };
 
 export const clientPortalApi = {

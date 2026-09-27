@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface-variant": "#47464e", "on-tertiary-container": "#9864ff", "tertiary-fixed": "#eaddff", "on-surface": "#1a1c1e", "on-primary-fixed-variant": "#434367", "secondary-container": "#99edf9", "primary-container": "#181839", "primary": "#000000", "surface-variant": "#e3e2e6", "on-secondary-fixed-variant": "#004f57", "on-primary": "#ffffff", "inverse-on-surface": "#f1f0f4", "outline": "#78767f", "secondary-fixed": "#9cf0fc", "surface": "#faf9fc", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "on-secondary-container": "#006d78", "surface-container": "#eeedf1", "surface-dim": "#dad9dd", "tertiary-fixed-dim": "#d2bcff", "secondary-fixed-dim": "#80d3df", "inverse-surface": "#2f3033", "surface-container-high": "#e9e8eb", "on-error-container": "#93000a", "on-tertiary-fixed-variant": "#5900c7", "on-tertiary-fixed": "#25005a", "on-secondary": "#ffffff", "inverse-primary": "#c4c3ed", "error-container": "#ffdad6", "secondary": "#006973", "on-background": "#1a1c1e", "on-primary-fixed": "#181839", "on-secondary-fixed": "#001f23", "surface-bright": "#faf9fc", "on-error": "#ffffff", "surface-container-low": "#f4f3f7", "on-tertiary": "#ffffff", "outline-variant": "#c8c5cf", "surface-tint": "#5b5b80", "background": "#faf9fc", "primary-fixed": "#e2dfff", "primary-fixed-dim": "#c4c3ed", "tertiary": "#000000", "tertiary-container": "#25005a", "on-primary-container": "#8180a7", "surface-container-highest": "#e3e2e6" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-lg": "1.25rem", "gutter": "0.75rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "space-xs": "0.25rem", "margin": "1rem" }, fontFamily: { "body-sm": ["Hanken Grotesk"], "title-md": ["Hanken Grotesk"], "headline-md": ["Hanken Grotesk"], "body-md": ["Hanken Grotesk"], "metric-lg": ["Hanken Grotesk"], "display-lg": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"], "label-sm": ["Hanken Grotesk"], "metric-sm": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "metric-sm": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-full"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="QuoteAI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopTw2pHCVFm8_yZ6Jqg4tQjnmp8L12RUoRFs6ozx4RLScvid1vxd6zYYpKMQTTEsCJcncKZPLn0SysDBHsYW6HqIlZoYXG4P5oO-LazcQzah6uiuwPSYFreTLRJNzwZqXQ9jlY0MsAYfHvRA90AI-9BJNUEFmX9MZBXwnaWUdRm6SATOk86D9Oz66q7lTdOOoGEoxI1anqXA5aZfPkPH65i9IFt1n_4YFgPDFy3nQT0AxY2Xk5ULa"/><span class="font-headline-md text-headline-md tracking-tight text-on-surface">QuoteAI</span><span class="hidden">Jobs</span></div><div class="flex items-center gap-1"><button aria-label="Quick create new estimate or job" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">add</span></button><button aria-label="Notifications" class="w-11 h-11 relative flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><button aria-label="Contractor Profile" class="w-11 h-11 flex items-center justify-center pl-1" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaEk7Vt_tpYFGlSXUmR7eR5LFizahqnbtAOsG2uUkLJUYcxm19q2lL1zJOFwMbKNF3jHvWSOIESTNlnQUsGqFV9AKsTB0AVJwL5LnGryLpVdNQKTEPTxBmPENclWLCQ5DXYK991qxTwhqrFOmG5WaWLpW5g8t8mFBQtbH3Th2vH2YJ-RSSAWj7KYRdn70svbqqWe5ztq3BZYpRvLDFopR_3maSXsr50kqKDYI_PCCxg07OFdahyI_f"/></button></div></div></header><main class="flex-1 w-full bg-surface pt-14 pb-20"><div class="flex flex-col w-full pb-8">
+<!-- Top Job Header Context Card -->
+<section class="px-margin pt-space-sm pb-space-md">
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Active · On Track
+            </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant font-medium">Site ID #J-8821</span>
+</div>
+<div class="mt-space-xs flex items-center gap-2">
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight truncate" id="job-title-display">Highland Master Suite &amp; Ensuite</h1>
+<button aria-label="Rename job title" class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-high text-on-surface-variant transition-colors flex-shrink-0" id="rename-trigger-btn">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<div class="mt-space-xs flex items-center gap-2 flex-wrap">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary hover:underline" href="#">
+<span class="material-symbols-outlined text-[16px]">description</span>
+              Quote #Q-2024-089
+            </a>
+<span class="text-outline text-[12px]">•</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">$78,500 CAD Contract</span>
+</div>
+</div>
+<button aria-label="Job settings menu" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<!-- Quick Client & Location Micro-bar -->
+<div class="mt-space-md pt-space-sm bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center flex-shrink-0 font-label-sm text-label-sm">
+            MR
+          </div>
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Marcus &amp; Elena Reid</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">442 Highland Cres, Oakville, ON</p>
+</div>
+</div>
+<a class="w-8 h-8 rounded-full bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary hover:bg-surface-variant transition-colors flex-shrink-0" href="tel:+19055550184">
+<span class="material-symbols-outlined text-[16px]">phone</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Sticky Segmented Sub-Navigation Pills -->
+<div class="sticky top-14 z-30 bg-surface/95 backdrop-blur-md py-2 px-margin shadow-[0_2px_6px_rgba(0,0,0,0.02)]">
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-[16px]">dashboard</span>
+        Overview
+      </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">calendar_month</span>
+        Schedule &amp; Milestones
+      </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">rule</span>
+        Change Orders
+        <span class="w-5 h-5 rounded-full bg-primary-container text-on-primary text-[10px] font-bold flex items-center justify-center">1</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+        Costs &amp; Receipts
+        <span class="w-5 h-5 rounded-full bg-error-container text-on-error-container text-[10px] font-bold flex items-center justify-center">2</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">payments</span>
+        Invoices
+      </button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">groups</span>
+        Crew &amp; Time
+      </button>
+</div>
+</div>
+<div class="px-margin flex flex-col gap-space-md mt-space-sm">
+<!-- Immediate Field Blocker / Inspection Resolution Alert -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-start gap-3">
+<div class="w-9 h-9 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Site Inspection Cleared</span>
+<span class="font-body-sm text-body-sm text-outline">9:15 AM Today</span>
+</div>
+<p class="font-title-md text-title-md text-on-surface mt-0.5">Plumbing Rough-In City Sign-Off</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Inspector Dave Kowalski signed Halton ticket #PL-4091. Rough-in hydrostatic test held 50 PSI for 24h.</p>
+</div>
+</div>
+<!-- 4-Metric Canadian Contractor KPI Grid -->
+<section>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Metric 1: Contract Value -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Contract Value</span>
+<span class="material-symbols-outlined text-outline text-[18px]">request_quote</span>
+</div>
+<div class="mt-2">
+<p class="font-headline-md text-headline-md text-on-surface tabular-nums tracking-tight">$78,500</p>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5 font-medium">CAD Fixed-Price</p>
+</div>
+</div>
+<!-- Metric 2: Invoiced to Date -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Billed to Date</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">account_balance_wallet</span>
+</div>
+<div class="mt-2">
+<p class="font-headline-md text-headline-md text-on-surface tabular-nums tracking-tight">$39,250</p>
+<div class="flex items-center gap-1.5 mt-0.5">
+<div class="w-12 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-1/2"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">50%</span>
+</div>
+</div>
+</div>
+<!-- Metric 3: Costs to Date & Margin -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Job Costs</span>
+<span class="material-symbols-outlined text-outline text-[18px]">trending_up</span>
+</div>
+<div class="mt-2">
+<p class="font-headline-md text-headline-md text-on-surface tabular-nums tracking-tight">$28,400</p>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5 font-medium">36.2% Gross Margin</p>
+</div>
+</div>
+<!-- Metric 4: Milestones Progress -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Scope Progress</span>
+<span class="material-symbols-outlined text-outline text-[18px]">flag</span>
+</div>
+<div class="mt-2">
+<p class="font-headline-md text-headline-md text-on-surface tabular-nums tracking-tight">65%</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">3 of 5 Gates Done</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Tactical Field Action Bar -->
+<section>
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Field Command</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tap to trigger</span>
+</div>
+<div class="grid grid-cols-4 gap-2">
+<button class="bg-surface-container-lowest active:bg-surface-container-high rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-sm transition-all group" id="voice-dictate-btn">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface text-center leading-tight">Dictate Note</span>
+</button>
+<button class="bg-surface-container-lowest active:bg-surface-container-high rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-sm transition-all group" id="add-photo-btn">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface text-center leading-tight">Add Photo</span>
+</button>
+<button class="bg-surface-container-lowest active:bg-surface-container-high rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-sm transition-all group" id="log-hours-btn">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[20px]">timer</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface text-center leading-tight">Log Hours</span>
+</button>
+<button class="bg-surface-container-lowest active:bg-surface-container-high rounded-xl p-2.5 flex flex-col items-center justify-center gap-1.5 shadow-sm transition-all group" id="sms-client-btn">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[20px]">navigation</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface text-center leading-tight">On My Way</span>
+</button>
+</div>
+</section>
+<!-- Active Milestone Setup & Task Editor Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<!-- Milestone Header -->
+<div class="p-space-md bg-surface-container-low">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-0.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm">
+            Current Phase: Gate 3 of 5
+          </span>
+<span class="font-label-md text-label-md text-secondary font-semibold">Oct 18 – Oct 28</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mt-space-xs">
+          Custom Tile &amp; Plumbing Rough-In
+        </h3>
+<div class="mt-2 flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Releases Draw #3 upon sign-off:</span>
+<span class="font-title-md text-title-md text-on-surface font-bold tabular-nums">$19,400 CAD</span>
+</div>
+<!-- Progress track -->
+<div class="w-full bg-surface-container-high h-2 rounded-full mt-2.5 overflow-hidden">
+<div class="bg-secondary h-full transition-all duration-300 w-3/4" id="milestone-progress-bar"></div>
+</div>
+</div>
+<!-- Interactive Setup Checklist -->
+<div class="p-space-md">
+<div class="flex items-center justify-between mb-space-sm">
+<h4 class="font-title-md text-title-md text-on-surface">Inspection &amp; Build Checkpoints</h4>
+<span class="font-body-sm text-body-sm text-on-surface-variant" id="checkpoint-counter">3 of 4 Done</span>
+</div>
+<div class="space-y-2.5">
+<!-- Item 1 (Checked) -->
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<input checked="" class="task-checkbox mt-1 w-5 h-5 rounded accent-black cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-title-md text-title-md text-on-surface block line-through opacity-75">Waterproofing rough-in inspection passed</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Inspected Oct 20 by City of Oakville</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px] flex-shrink-0 mt-0.5">verified</span>
+</label>
+<!-- Item 2 (Checked) -->
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<input checked="" class="task-checkbox mt-1 w-5 h-5 rounded accent-black cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-title-md text-title-md text-on-surface block line-through opacity-75">Schluter Kerdi shower pan 24-hr flood test</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Zero drop in water plug column verified</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px] flex-shrink-0 mt-0.5">verified</span>
+</label>
+<!-- Item 3 (Checked) -->
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<input checked="" class="task-checkbox mt-1 w-5 h-5 rounded accent-black cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-title-md text-title-md text-on-surface block line-through opacity-75">DITRA-HEAT floor cable resistance measurement</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Factory baseline 42.6Ω vs actual 42.9Ω logged</p>
+</div>
+<span class="material-symbols-outlined text-secondary text-[18px] flex-shrink-0 mt-0.5">verified</span>
+</label>
+<!-- Item 4 (Unchecked/Active) -->
+<label class="flex items-start gap-3 p-2.5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer select-none">
+<input class="task-checkbox mt-1 w-5 h-5 rounded accent-black cursor-pointer" type="checkbox"/>
+<div class="flex-1 min-w-0">
+<span class="font-title-md text-title-md text-on-surface block">Install 24x48 porcelain slab floor tiles</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Mapei Ultralite mortar · 1/16" leveling clips</p>
+</div>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm flex-shrink-0 mt-0.5">
+              In Progress
+            </span>
+</label>
+</div>
+<!-- Add Task Quick Input -->
+<div class="mt-space-md pt-space-sm flex items-center gap-2">
+<input class="flex-1 h-11 px-3.5 rounded-lg bg-surface text-on-surface font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary" id="new-task-input" placeholder="Add checkpoint task..." type="text"/>
+<button class="h-11 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1 active:scale-95 transition-all" id="add-task-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            Add
+          </button>
+</div>
+</div>
+</section>
+<!-- Recent Site Documentation Activity -->
+<section class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-title-md text-title-md text-on-surface">Field Media &amp; Logs</h3>
+<button class="font-label-md text-label-md text-secondary hover:underline flex items-center">
+          View All (14)
+          <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<div class="relative rounded-lg overflow-hidden h-24 bg-surface-container group">
+<img class="w-full h-full object-cover" data-alt="High resolution detailed photo of residential curbless shower bathroom remodel waterproofing, orange Schluter Kerdi membrane on drywall, clean brass plumbing fixtures rough in." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxTsCpj59LD325P0Wkm0C6HD32Ofl_PBlQBa5JU0N46vdKVjSyCaxyxQrkL3E12lMYS74Rgajn7p81jDTpK38tyqbMXUhU3fSFd6UXTesvleBt2X3tKaAyJUJaUglB_UlD7VW3XtEBmlD2PyhDzPkRpnKcNHE2gVE3e-MTNKTbaS93i8zcoHWL7YGjSq6Q1ymjcep6tlWYMXSSFe9DmNE4-Ytj-SFYH1MQki6GWE-n61lXm42RwYim"/>
+<span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white font-label-sm text-[10px]">Oct 22</span>
+</div>
+<div class="relative rounded-lg overflow-hidden h-24 bg-surface-container group">
+<img class="w-full h-full object-cover" data-alt="Close up architectural construction photography of heated bathroom floor Ditra heat uncoupling membrane with yellow heating element wire neatly embedded." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdsAoUwWKiNqZBa2pbfMzl1WGj63VSkkffLDWDD6dTcsbqi-ifj8wy3wToYOLHqQ8VkqGiTungbZp67pIT3as8Ap1DfPSPZjN0kv1SB6M3MhIRza2eqvu5AdTZugk7Eu8pec1G0IBpZZxs0vROpfkZJVL7F6OVRG0RSl96MZQdeFZVAeNo4nps9cEvuqDZUAaqCTvajHW1YucZLcnOmFFJdLrQpAcm1bPlcoC8YLomCgNP3g_jOAwx"/>
+<span class="absolute bottom-1 left-1 px-1.5 py-0.5 rounded bg-black/60 text-white font-label-sm text-[10px]">Oct 21</span>
+</div>
+<div class="relative rounded-lg overflow-hidden h-24 bg-surface-container group flex flex-col justify-end p-2 bg-gradient-to-t from-black/70 to-transparent">
+<img class="absolute inset-0 w-full h-full object-cover -z-10" data-alt="Contractor measuring shower pan slope with precision digital spirit level tool on fresh drypack cement screed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpSzYBkAwZ7UHFlis0F4LLBKrFf0Gk3S0qGyKF5G3IcUEpAvi6stCMU5xYo6WcwxmwPgPl2_4CZdsFNqHsAMd2V48C3otDD2xw5mWW5ue-j7KB114lCQI77aOoRDjKRnfreWA-f81L_9JRwya9Fe4bhKi_ppSIQNJwJk03oql_7Ku6BJ3skYDfKaaadRSeCAG3hd8vSUcfoCPi5gRPwbzLjzILOMfz9VLNAgfoOv8CYzdOiaBULKhO"/>
+<span class="text-white font-label-sm text-[10px] truncate">Slope check passed</span>
+</div>
+</div>
+</section>
+<!-- Change Order Warning Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">assignment_late</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">CO #02: Heated Bench Add-on</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">$1,850 CAD · Client review pending</p>
+</div>
+</div>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center gap-1 flex-shrink-0 active:scale-95 transition-transform">
+        Review
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Voice Note Micro-Modal Overlay (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end justify-center transition-opacity duration-200 hidden" id="voice-sheet">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-t-2xl p-space-xl shadow-xl flex flex-col items-center">
+<div class="w-12 h-1.5 rounded-full bg-surface-container-highest mb-space-md"></div>
+<div class="w-20 h-20 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shadow-lg relative">
+<span class="material-symbols-outlined text-[36px]">mic</span>
+<span class="absolute inset-0 rounded-full bg-tertiary-fixed animate-ping opacity-40"></span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface mt-space-md">Listening for site notes...</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mt-1">Speak trade terms, materials or change requests in Canadian English or French</p>
+<button class="w-full mt-space-xl py-3 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="close-voice-sheet-btn">
+        Save Transcription to Highland Suite Log
+      </button>
+</div>
+</div>
+<!-- Inline Renaming Modal (Hidden by default) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-margin hidden" id="rename-modal">
+<div class="w-full max-w-sm bg-surface-container-lowest rounded-xl p-space-md shadow-xl flex flex-col gap-space-md">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Rename Job Project</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Update the client-facing work order description</p>
+</div>
+<input class="h-12 px-3 rounded-lg bg-surface font-title-md text-title-md text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" id="rename-input" type="text" value="Highland Master Suite &amp; Ensuite"/>
+<div class="flex items-center justify-end gap-2">
+<button class="px-4 py-2 rounded-full bg-surface-container font-label-md text-label-md text-on-surface" id="cancel-rename-btn">Cancel</button>
+<button class="px-5 py-2 rounded-full bg-primary font-label-md text-label-md text-on-primary" id="save-rename-btn">Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Dynamic Checklist & Progress Handler
+  const checkboxes = document.querySelectorAll('.task-checkbox');
+  const counterEl = document.getElementById('checkpoint-counter');
+  const progressBar = document.getElementById('milestone-progress-bar');
+
+  function updateChecklistProgress() {
+    const total = checkboxes.length;
+    const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+    if (counterEl) {
+      counterEl.textContent = `${checked} of ${total} Done`;
+    }
+    if (progressBar) {
+      const pct = total === 0 ? 0 : Math.round((checked / total) * 100);
+      progressBar.style.width = `${pct}%`;
+    }
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const textSpan = e.target.parentElement.querySelector('span.font-title-md');
+      if (textSpan) {
+        if (e.target.checked) {
+          textSpan.classList.add('line-through', 'opacity-75');
+        } else {
+          textSpan.classList.remove('line-through', 'opacity-75');
+        }
+      }
+      updateChecklistProgress();
+    });
+  });
+
+  // Voice Note Sheet Trigger
+  const voiceBtn = document.getElementById('voice-dictate-btn');
+  const voiceSheet = document.getElementById('voice-sheet');
+  const closeVoiceBtn = document.getElementById('close-voice-sheet-btn');
+
+  if (voiceBtn && voiceSheet) {
+    voiceBtn.addEventListener('click', () => {
+      voiceSheet.classList.remove('hidden');
+    });
+  }
+  if (closeVoiceBtn && voiceSheet) {
+    closeVoiceBtn.addEventListener('click', () => {
+      voiceSheet.classList.add('hidden');
+    });
+    voiceSheet.addEventListener('click', (e) => {
+      if (e.target === voiceSheet) {
+        voiceSheet.classList.add('hidden');
+      }
+    });
+  }
+
+  // Renaming Modal Interactions
+  const renameBtn = document.getElementById('rename-trigger-btn');
+  const renameModal = document.getElementById('rename-modal');
+  const renameInput = document.getElementById('rename-input');
+  const saveRenameBtn = document.getElementById('save-rename-btn');
+  const cancelRenameBtn = document.getElementById('cancel-rename-btn');
+  const titleDisplay = document.getElementById('job-title-display');
+
+  if (renameBtn && renameModal) {
+    renameBtn.addEventListener('click', () => {
+      renameModal.classList.remove('hidden');
+      renameInput.focus();
+    });
+  }
+  if (cancelRenameBtn && renameModal) {
+    cancelRenameBtn.addEventListener('click', () => {
+      renameModal.classList.add('hidden');
+    });
+  }
+  if (saveRenameBtn && renameModal && titleDisplay) {
+    saveRenameBtn.addEventListener('click', () => {
+      const val = renameInput.value.trim();
+      if (val) {
+        titleDisplay.textContent = val;
+      }
+      renameModal.classList.add('hidden');
+    });
+  }
+
+  // Client SMS quick trigger simulation
+  const smsBtn = document.getElementById('sms-client-btn');
+  if (smsBtn) {
+    smsBtn.addEventListener('click', () => {
+      window.location.href = "sms:+19055550184?body=Hi%20Marcus,%20this%20is%20QuoteAI%20Contracting.%20I'm%20en%20route%20to%20the%20Highland%20Cres%20site%20now,%20ETA%2018%20mins.";
+    });
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-label-md"><div class="h-[60px] px-gutter grid grid-cols-5 items-center"><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="today" href="#"><span class="material-symbols-outlined text-[22px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Today</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="quotes" href="#"><span class="material-symbols-outlined text-[22px]">description</span><span class="font-label-sm text-label-sm mt-0.5">Quotes</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="jobs" href="#"><span class="material-symbols-outlined text-[22px]">work</span><span class="font-label-sm text-label-sm mt-0.5">Jobs</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="money" href="#"><span class="material-symbols-outlined text-[22px]">account_balance_wallet</span><span class="font-label-sm text-label-sm mt-0.5">Money</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors relative" data-path="more" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-error"></span></div><span class="font-label-sm text-label-sm mt-0.5">More</span></a></div></nav></body></html>

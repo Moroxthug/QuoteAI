@@ -1,0 +1,354 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface-variant": "#47464e", "on-tertiary-container": "#9864ff", "tertiary-fixed": "#eaddff", "on-surface": "#1a1c1e", "on-primary-fixed-variant": "#434367", "secondary-container": "#99edf9", "primary-container": "#181839", "primary": "#000000", "surface-variant": "#e3e2e6", "on-secondary-fixed-variant": "#004f57", "on-primary": "#ffffff", "inverse-on-surface": "#f1f0f4", "outline": "#78767f", "secondary-fixed": "#9cf0fc", "surface": "#faf9fc", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "on-secondary-container": "#006d78", "surface-container": "#eeedf1", "surface-dim": "#dad9dd", "tertiary-fixed-dim": "#d2bcff", "secondary-fixed-dim": "#80d3df", "inverse-surface": "#2f3033", "surface-container-high": "#e9e8eb", "on-error-container": "#93000a", "on-tertiary-fixed-variant": "#5900c7", "on-tertiary-fixed": "#25005a", "on-secondary": "#ffffff", "inverse-primary": "#c4c3ed", "error-container": "#ffdad6", "secondary": "#006973", "on-background": "#1a1c1e", "on-primary-fixed": "#181839", "on-secondary-fixed": "#001f23", "surface-bright": "#faf9fc", "on-error": "#ffffff", "surface-container-low": "#f4f3f7", "on-tertiary": "#ffffff", "outline-variant": "#c8c5cf", "surface-tint": "#5b5b80", "background": "#faf9fc", "primary-fixed": "#e2dfff", "primary-fixed-dim": "#c4c3ed", "tertiary": "#000000", "tertiary-container": "#25005a", "on-primary-container": "#8180a7", "surface-container-highest": "#e3e2e6" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-lg": "1.25rem", "gutter": "0.75rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "space-xs": "0.25rem", "margin": "1rem" }, fontFamily: { "body-sm": ["Hanken Grotesk"], "title-md": ["Hanken Grotesk"], "headline-md": ["Hanken Grotesk"], "body-md": ["Hanken Grotesk"], "metric-lg": ["Hanken Grotesk"], "display-lg": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"], "label-sm": ["Hanken Grotesk"], "metric-sm": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "metric-sm": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-full"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="QuoteAI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopTw2pHCVFm8_yZ6Jqg4tQjnmp8L12RUoRFs6ozx4RLScvid1vxd6zYYpKMQTTEsCJcncKZPLn0SysDBHsYW6HqIlZoYXG4P5oO-LazcQzah6uiuwPSYFreTLRJNzwZqXQ9jlY0MsAYfHvRA90AI-9BJNUEFmX9MZBXwnaWUdRm6SATOk86D9Oz66q7lTdOOoGEoxI1anqXA5aZfPkPH65i9IFt1n_4YFgPDFy3nQT0AxY2Xk5ULa"><span class="font-headline-md text-headline-md tracking-tight text-on-surface">QuoteAI</span><span class="hidden">Today</span></div><div class="flex items-center gap-1"><button aria-label="Quick create new estimate or job" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">add</span></button><button aria-label="Notifications" class="w-11 h-11 relative flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><button aria-label="Contractor Profile" class="w-11 h-11 flex items-center justify-center pl-1" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaEk7Vt_tpYFGlSXUmR7eR5LFizahqnbtAOsG2uUkLJUYcxm19q2lL1zJOFwMbKNF3jHvWSOIESTNlnQUsGqFV9AKsTB0AVJwL5LnGryLpVdNQKTEPTxBmPENclWLCQ5DXYK991qxTwhqrFOmG5WaWLpW5g8t8mFBQtbH3Th2vH2YJ-RSSAWj7KYRdn70svbqqWe5ztq3BZYpRvLDFopR_3maSXsr50kqKDYI_PCCxg07OFdahyI_f"></button></div></div></header><main class="flex-1 w-full bg-surface pt-14 pb-20"><div class="flex flex-col w-full px-margin pb-6 gap-space-lg">
+<!-- Top Greeting & Quick Actions -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-lg text-headline-lg text-on-surface">Hi, Marc!</span>
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Pro plan active · 48 of 60 quotes left this month</span>
+</div>
+<button class="h-10 px-4 rounded-full bg-primary-container text-on-primary flex items-center gap-1.5 shadow-sm active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="font-label-md text-label-md">New quote</span>
+</button>
+</div>
+<!-- Time Period Filter Strip -->
+<div class="flex items-center gap-1.5 p-1 bg-surface-container rounded-full w-fit">
+<button class="period-btn px-3 py-1 rounded-full bg-surface-container-lowest text-on-surface font-label-sm text-label-sm shadow-xs transition-colors" data-period="month" type="button">Month</button>
+<button class="period-btn px-3 py-1 rounded-full text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" data-period="quarter" type="button">Quarter</button>
+<button class="period-btn px-3 py-1 rounded-full text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" data-period="year" type="button">Year</button>
+</div>
+</section>
+<!-- AI 30-Second Quote Composer Box -->
+<section class="relative rounded-2xl bg-surface-container-lowest p-space-md shadow-md overflow-hidden">
+<div class="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-tertiary-container/10 pointer-events-none blur-2xl"></div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-1.5 text-on-tertiary-container">
+
+
+</div>
+
+</div>
+<div class="relative bg-surface-container-low rounded-xl p-3 mb-3">
+<textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 resize-none focus:outline-none" id="ai-composer-input" placeholder="Describe the job or tap mic to dictate in 30 seconds..." rows="2"></textarea>
+<!-- Quick Prompt Suggestions Chips -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 mt-1 no-scrollbar">
+<button class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container-highest/80 hover:bg-surface-container-highest font-label-sm text-label-sm text-on-surface flex items-center gap-1" onclick="setComposerText('Bathroom Reno: Master bath gut, 60x36 curbless shower, custom vanity &amp; radiant floor')" type="button">
+<span class="material-symbols-outlined text-[14px] text-secondary">bathtub</span> Bathroom Reno
+        </button>
+<button class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container-highest/80 hover:bg-surface-container-highest font-label-sm text-label-sm text-on-surface flex items-center gap-1" onclick="setComposerText('200A Electrical Upgrade: Service mast replacement, 40-circuit panel, EV charger conduit')" type="button">
+<span class="material-symbols-outlined text-[14px] text-on-secondary-container">bolt</span> 200A Electrical
+        </button>
+<button class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container-highest/80 hover:bg-surface-container-highest font-label-sm text-label-sm text-on-surface flex items-center gap-1" onclick="setComposerText('Custom Deck 16x20: Trex composite decking, aluminum railing, post footings, ledger flash')" type="button">
+<span class="material-symbols-outlined text-[14px] text-on-primary-container">deck</span> Deck 16x20
+        </button>
+</div>
+</div>
+<!-- Composer Bottom Controls -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
+<button aria-label="Attach blueprints or photos" class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">add_photo_alternate</span>
+</button>
+<button aria-label="Dictate job scope" class="w-9 h-9 rounded-full bg-tertiary-container text-on-tertiary flex items-center justify-center relative active:scale-95 transition-all shadow-xs" id="mic-trigger" type="button">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+<span class="hidden absolute inset-0 rounded-full bg-tertiary-container animate-ping opacity-60" id="mic-pulse"></span>
+</button>
+<div class="flex items-center gap-1 bg-surface-container px-2.5 py-1.5 rounded-full text-on-surface truncate min-w-0">
+<span class="material-symbols-outlined text-[15px] text-secondary shrink-0">apartment</span>
+<span class="font-label-sm text-label-sm truncate">Apex Residential · Toronto</span>
+</div>
+</div>
+<button aria-label="Generate Quote" class="w-10 h-10 shrink-0 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]">arrow_upward</span>
+</button>
+</div>
+</section>
+<!-- Key Financial & Quoting Stat Grid (2x2) -->
+<section class="grid grid-cols-2 gap-gutter">
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl flex flex-col justify-between shadow-xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-sm text-label-sm">Quotes (This Mo)</span>
+<span class="material-symbols-outlined text-[16px] text-secondary">request_quote</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-lg text-metric-lg text-on-surface">14</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-secondary mt-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="">+18% vs last mo</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl flex flex-col justify-between shadow-xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-sm text-label-sm">Unlocked Rev</span>
+<span class="material-symbols-outlined text-[16px] text-on-secondary-container">monetization_on</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-lg text-metric-lg text-on-surface">$142.8k</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-secondary mt-0.5">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span class="">+24% vs plan</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl flex flex-col justify-between shadow-xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-sm text-label-sm">Avg Job Size</span>
+<span class="material-symbols-outlined text-[16px] text-on-primary-container">receipt_long</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-lg text-metric-lg text-on-surface">$10,200</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 block">Target: $8,500</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-3.5 rounded-2xl flex flex-col justify-between shadow-xs">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="font-label-sm text-label-sm">Win Rate</span>
+<span class="material-symbols-outlined text-[16px] text-on-tertiary-container">verified</span>
+</div>
+<div class="mt-2">
+<div class="font-metric-lg text-metric-lg text-on-surface">64%</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 block">8 won of 12 sent</span>
+</div>
+</div>
+</section>
+<!-- Cash Next 60 Days Forecast Preview -->
+<section class="bg-surface-container-lowest p-space-md rounded-2xl shadow-xs flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">query_stats</span>
+<h3 class="font-title-md text-title-md text-on-surface">Cash Forecast · Next 60 Days</h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/40 px-2 py-0.5 rounded-full font-bold">+$46k Net</span>
+</div>
+<!-- Mini Visual Bar Comparison -->
+<div class="flex flex-col gap-2 mt-1">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-on-surface-variant">Expected Inflows</span>
+<span class="font-metric-sm text-metric-sm text-on-surface">$88,000</span>
+</div>
+<div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 78%;"></div>
+</div>
+<div class="flex items-center justify-between text-body-sm font-body-sm mt-1">
+<span class="text-on-surface-variant">Payroll &amp; Materials Out</span>
+<span class="font-metric-sm text-metric-sm text-on-surface-variant">$42,000</span>
+</div>
+<div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant/40 rounded-full" style="width: 42%;"></div>
+</div>
+</div>
+</section>
+<!-- Field Crew Activity ("The crew today") -->
+<section class="bg-surface-container-lowest p-space-md rounded-2xl shadow-xs flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h3 class="font-title-md text-title-md text-on-surface">The crew today</h3>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm font-bold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-ping"></span>
+            3 on site
+          </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Today · Thursday, Oct 24</span>
+</div>
+<button aria-label="Crew view" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-[18px]">group</span>
+</button>
+</div>
+<!-- Blocked Alert Item -->
+<div class="p-3 rounded-xl bg-error-container/40 flex items-start justify-between gap-2">
+<div class="flex items-start gap-2.5 min-w-0">
+<div class="w-7 h-7 rounded-full bg-error text-on-error flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-error-container font-bold">Highland Reno</span>
+<span class="px-1.5 py-0.2 rounded bg-error text-on-error font-label-sm text-[10px] uppercase tracking-wide">Blocked</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-error-container line-clamp-2 mt-0.5">Need electrical inspection sign-off before drywall crew begins taping.</p>
+</div>
+</div>
+<button class="shrink-0 px-3 py-1.5 rounded-full bg-on-error-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all" type="button">Answer</button>
+</div>
+<!-- Active Job Sites List -->
+<div class="flex flex-col gap-2.5">
+<!-- Job 1 -->
+<div class="p-3 bg-surface-container-low rounded-xl flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Modern renovated kitchen with high-end oak cabinets, marble waterfall island and recessed LED task lighting on active residential jobsite." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGHlzk4IH4D9vG0Ovw0sy81ALmG1S4-aL-RNPDnAgckoV3esMSbgtjGtwTaxlQQ7LieL0gbeVxzPv5CwQ-mTWMODdz_urVqPoxo88nE8HTaSuh35_TeyITTBVcQQRliqGk10xV4zyFjznBQSjNnw6y6_1MOszc-Fh26OXjA7hmCSSWyfhskdgdUkKze51t24i0Uivq9EC8Vpcz_sWPuQbAcQugzuF12_Bs0fxWYGRaBv2yCod06Jc-">
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">148 Elmcrest Blvd</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Kitchen Remodel · 3 workers</span>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">In since 7:15 AM · 14.5 hrs total</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">chevron_right</span>
+</div>
+<!-- Job 2 -->
+<div class="p-3 bg-surface-container-low rounded-xl flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Contractor framed basement suite with metal studs, vapor barrier, and rough-in plumbing pipes ready for inspection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV9pkHnbS6d5sOMygUyRfKqobCqC7K79ldj-wnxlk3Hoa7bhuhB-sbagU7Y6gu6aQD4j_murJ9xCXhA5pUbxVmEBAjg6YtbXqvFhx844AaV65NnDtu_hSgPVv-5vzgfqV3kNqz7Dt9hZvJfC-gHVxL60jlkiVEMfFt_UeF0XVpwto1F8Cp-m91KFbBsI9LAdp_OmueTSuOztlZCIqbHXd5ePYUAC2j_k-7wfFBONRG1sfdxPbpfUal">
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">82 King St W</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Basement Suite · 2 workers</span>
+<span class="font-label-sm text-label-sm text-secondary mt-0.5">Clocked in · On schedule</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- Hours to Approve Mini Action Banner -->
+<div class="p-2.5 bg-surface-container rounded-xl flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 min-w-0">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">schedule</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Dave K. · Framing</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">8.0 hrs pending approval</span>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm flex items-center gap-1 active:scale-95 transition-transform" id="approve-hours-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span class="">Approve</span>
+</button>
+</div>
+</section>
+<!-- Recent Quotes Section -->
+<section class="bg-surface-container-lowest p-space-md rounded-2xl shadow-xs flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-title-md text-title-md text-on-surface">Recent Quotes</h3>
+<a class="font-label-md text-label-md text-secondary hover:underline" href="#">View all (14)</a>
+</div>
+<!-- List Row 1 -->
+<div class="py-3 flex items-center justify-between gap-2">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">deck</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Custom Cedar Pergola</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">M. Thompson · Outdoor</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-metric-sm text-metric-sm text-on-surface">$14,500</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Accepted</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- List Row 2 -->
+<div class="py-3 flex items-center justify-between gap-2">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Full Electrical Rewire</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Apex Property · Commercial</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-metric-sm text-metric-sm text-on-surface">$8,900</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-secondary font-label-sm text-label-sm font-semibold">Unlocked</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- List Row 3 -->
+<div class="py-3 flex items-center justify-between gap-2">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+<span class="material-symbols-outlined text-[18px]">bathtub</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Master Ensuite Reno</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">S. Varma · Interior</span>
+</div>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-metric-sm text-metric-sm text-on-surface">$26,400</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">Pending</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+<script>
+  function setComposerText(text) {
+    const el = document.getElementById('ai-composer-input');
+    if (el) {
+      el.value = text;
+      el.focus();
+    }
+  }
+
+  // Dictation toggle simulation
+  const micBtn = document.getElementById('mic-trigger');
+  const micPulse = document.getElementById('mic-pulse');
+  let isRecording = false;
+
+  if (micBtn && micPulse) {
+    micBtn.addEventListener('click', () => {
+      isRecording = !isRecording;
+      if (isRecording) {
+        micPulse.classList.remove('hidden');
+        const input = document.getElementById('ai-composer-input');
+        if (input && !input.value) {
+          input.placeholder = "Listening in high fidelity on jobsite...";
+        }
+      } else {
+        micPulse.classList.add('hidden');
+        const input = document.getElementById('ai-composer-input');
+        if (input && !input.value) {
+          input.placeholder = "Describe the job or tap mic to dictate in 30 seconds...";
+        }
+      }
+    });
+  }
+
+  // Fast approve micro-interaction
+  const approveBtn = document.getElementById('approve-hours-btn');
+  if (approveBtn) {
+    approveBtn.addEventListener('click', function() {
+      this.innerHTML = '<span class="material-symbols-outlined text-[16px]">check_circle</span> Approved';
+      this.classList.remove('bg-secondary');
+      this.classList.add('bg-secondary/20', 'text-secondary');
+      this.disabled = true;
+    });
+  }
+
+  // Toggle periods
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.period-btn').forEach(b => {
+        b.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+        b.classList.add('text-on-surface-variant');
+      });
+      btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+      btn.classList.remove('text-on-surface-variant');
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-label-md"><div class="h-[60px] px-gutter grid grid-cols-5 items-center"><a aria-current="page" class="flex flex-col items-center justify-center h-full transition-colors text-primary font-label-md" data-path="today" href="#"><svg class="w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19h20"></path><path d="M4 19V11l8-7 8 7v8"></path><path d="M12 4v15"></path><path d="M8 12h8"></path><circle cx="12" cy="8.5" r="1.25" fill="currentColor" stroke="none"></circle></svg><span class="font-label-sm text-label-sm mt-0.5 font-semibold">Today</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="quotes" href="#"><svg class="w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path><path d="M8 9h2"></path></svg><span class="font-label-sm text-label-sm mt-0.5">Quotes</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="jobs" href="#"><svg class="w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 17h18"></path><path d="M7 3v18M17 3v18"></path><circle cx="7" cy="7" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="17" cy="7" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="7" cy="17" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="17" cy="17" r="1.2" fill="currentColor" stroke="none"></circle><path d="M7 7l10 10M17 7L7 17" stroke-dasharray="2 2"></path></svg><span class="font-label-sm text-label-sm mt-0.5">Jobs</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="money" href="#"><svg class="w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v10l9 5 9-5V7z"></path><path d="M12 2v20"></path><path d="M3 7l9 5 9-5"></path><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"></circle></svg><span class="font-label-sm text-label-sm mt-0.5">Money</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors relative" data-path="more" href="#"><div class="relative flex items-center justify-center"><svg class="w-[22px] h-[22px] transition-transform duration-200 group-hover:scale-105" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1.5"></rect><circle cx="17" cy="7" r="3.25"></circle><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect><path d="M4 14l6 6M10 14L4 20"></path></svg><span class="absolute -top-0.5 -right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></div><span class="font-label-sm text-label-sm mt-0.5">More</span></a></div></nav>
+
+
+
+</body></html>

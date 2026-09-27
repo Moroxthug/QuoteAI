@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en" style=""><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface-variant": "#47464e", "on-tertiary-container": "#9864ff", "tertiary-fixed": "#eaddff", "on-surface": "#1a1c1e", "on-primary-fixed-variant": "#434367", "secondary-container": "#99edf9", "primary-container": "#181839", "primary": "#000000", "surface-variant": "#e3e2e6", "on-secondary-fixed-variant": "#004f57", "on-primary": "#ffffff", "inverse-on-surface": "#f1f0f4", "outline": "#78767f", "secondary-fixed": "#9cf0fc", "surface": "#faf9fc", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "on-secondary-container": "#006d78", "surface-container": "#eeedf1", "surface-dim": "#dad9dd", "tertiary-fixed-dim": "#d2bcff", "secondary-fixed-dim": "#80d3df", "inverse-surface": "#2f3033", "surface-container-high": "#e9e8eb", "on-error-container": "#93000a", "on-tertiary-fixed-variant": "#5900c7", "on-tertiary-fixed": "#25005a", "on-secondary": "#ffffff", "inverse-primary": "#c4c3ed", "error-container": "#ffdad6", "secondary": "#006973", "on-background": "#1a1c1e", "on-primary-fixed": "#181839", "on-secondary-fixed": "#001f23", "surface-bright": "#faf9fc", "on-error": "#ffffff", "surface-container-low": "#f4f3f7", "on-tertiary": "#ffffff", "outline-variant": "#c8c5cf", "surface-tint": "#5b5b80", "background": "#faf9fc", "primary-fixed": "#e2dfff", "primary-fixed-dim": "#c4c3ed", "tertiary": "#000000", "tertiary-container": "#25005a", "on-primary-container": "#8180a7", "surface-container-highest": "#e3e2e6" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-lg": "1.25rem", "gutter": "0.75rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "space-xs": "0.25rem", "margin": "1rem" }, fontFamily: { "body-sm": ["Hanken Grotesk"], "title-md": ["Hanken Grotesk"], "headline-md": ["Hanken Grotesk"], "body-md": ["Hanken Grotesk"], "metric-lg": ["Hanken Grotesk"], "display-lg": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"], "label-sm": ["Hanken Grotesk"], "metric-sm": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "metric-sm": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-full"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="QuoteAI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopTw2pHCVFm8_yZ6Jqg4tQjnmp8L12RUoRFs6ozx4RLScvid1vxd6zYYpKMQTTEsCJcncKZPLn0SysDBHsYW6HqIlZoYXG4P5oO-LazcQzah6uiuwPSYFreTLRJNzwZqXQ9jlY0MsAYfHvRA90AI-9BJNUEFmX9MZBXwnaWUdRm6SATOk86D9Oz66q7lTdOOoGEoxI1anqXA5aZfPkPH65i9IFt1n_4YFgPDFy3nQT0AxY2Xk5ULa"/><span class="font-headline-md text-headline-md tracking-tight text-on-surface">QuoteAI</span><span class="hidden">Today</span></div><div class="flex items-center gap-1"><button aria-label="Quick create new estimate or job" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">add</span></button><button aria-label="Notifications" class="w-11 h-11 relative flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><button aria-label="Contractor Profile" class="w-11 h-11 flex items-center justify-center pl-1" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaEk7Vt_tpYFGlSXUmR7eR5LFizahqnbtAOsG2uUkLJUYcxm19q2lL1zJOFwMbKNF3jHvWSOIESTNlnQUsGqFV9AKsTB0AVJwL5LnGryLpVdNQKTEPTxBmPENclWLCQ5DXYK991qxTwhqrFOmG5WaWLpW5g8t8mFBQtbH3Th2vH2YJ-RSSAWj7KYRdn70svbqqWe5ztq3BZYpRvLDFopR_3maSXsr50kqKDYI_PCCxg07OFdahyI_f"/></button></div></div></header><main class="flex-1 w-full bg-surface pt-14 pb-20"><div class="flex flex-col w-full pb-10">
+<div class="px-margin pt-space-md flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex flex-col min-w-0">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight truncate">Price Catalog &amp; Assemblies</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">148 Verified line items referenced by quote engine</p>
+</div>
+<div class="flex items-center gap-space-xs shrink-0">
+<button class="h-10 px-3.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm" id="import-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+<span>Import</span>
+</button>
+<button class="h-10 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform" id="add-item-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add Item</span>
+</button>
+</div>
+</div>
+<!-- Intelligence & Summary Banner -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md shadow-sm flex flex-col gap-3 relative overflow-hidden">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-title-md text-on-surface">Price Intelligence Active</span>
+<span class="h-2 w-2 rounded-full bg-secondary shrink-0 animate-pulse"></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Synced with recent supplier invoices &amp; local Southern Ontario market rates</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-gutter pt-1">
+<div class="bg-surface-container-lowest rounded-lg p-2.5 flex flex-col shadow-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Catalog</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-metric-lg text-metric-lg text-on-surface">148</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Items</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-2.5 flex flex-col shadow-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Trades</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-metric-lg text-metric-lg text-on-surface">12</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Groups</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-lg p-2.5 flex flex-col shadow-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Avg Margin</span>
+<div class="flex items-baseline gap-1 mt-0.5">
+<span class="font-metric-lg text-metric-lg text-secondary">34.5%</span>
+<span class="material-symbols-outlined text-[14px] text-secondary">trending_up</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-11 pl-10 pr-10 bg-surface-container-lowest text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md rounded-xl shadow-xs focus:outline-none focus:ring-0 focus:bg-surface-container-low transition-all" id="catalog-search" placeholder="Search items, materials, codes or trades..." type="search"/>
+<button aria-label="Clear filter" class="hidden absolute inset-y-0 right-0 pr-3 items-center text-on-surface-variant hover:text-on-surface" id="clear-search" type="button">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Horizontal Category Filter Pills -->
+<div class="w-full overflow-x-auto -mx-margin px-margin scrollbar-none py-0.5 flex items-center gap-1.5" id="category-pills">
+<button class="category-chip px-3.5 h-8 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-transform active:scale-95" data-cat="all" type="button">All (148)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="demolition" type="button">Demolition (14)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="framing-drywall" type="button">Framing &amp; Drywall (28)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="plumbing" type="button">Plumbing (22)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="tile-stone" type="button">Tile &amp; Stone (19)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="electrical" type="button">Electrical (25)</button>
+<button class="category-chip px-3.5 h-8 rounded-full bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md whitespace-nowrap shadow-xs shrink-0 transition-colors" data-cat="finishes" type="button">Finishes (40)</button>
+</div>
+</div>
+<!-- Price Items & Assemblies List -->
+<div class="px-margin mt-space-md flex flex-col gap-3" id="item-list">
+<!-- Item 1 -->
+<div class="catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md" data-category="tile-stone" data-title="Schluter Kerdi Waterproofing Membrane KERDI-200">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">grid_on</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">Tile &amp; Stone</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant tracking-wider">KERDI-200</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">Schluter Kerdi Waterproofing Membrane</h2>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$6.85</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / sq ft</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">inventory_2</span>
+<span>Mat: $3.10</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">engineering</span>
+<span>Labor: $3.75</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button aria-label="Delete item" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">receipt_long</span>
+<span class="truncate">Oct 14 via Home Depot receipt</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md" data-category="framing-drywall" data-title="2x4 Wood Stud Framing 16 O.C.">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">view_column</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">Framing &amp; Drywall</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">2x4 Wood Stud Framing (16" O.C.)</h2>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$14.50</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / lin ft</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">inventory_2</span>
+<span>Mat: $5.20</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">engineering</span>
+<span>Labor: $9.30</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button aria-label="Delete item" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-on-tertiary-container">location_on</span>
+<span class="truncate">Average across Burlington / Oakville benchmark</span>
+</div>
+</div>
+<!-- Item 3: Assembly -->
+<div class="catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md relative overflow-hidden" data-category="plumbing" data-title="Rough-in 3-Piece Bathroom Plumbing Assembly">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">plumbing</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Assembly</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">Plumbing</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">Rough-in 3-Piece Bathroom Plumbing</h2>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$3,850.00</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / rough-in</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">layers</span>
+<span>4 Nested sub-tasks</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">handshake</span>
+<span>Subcontractor benchmark</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button aria-label="Delete item" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified</span>
+<span class="truncate">Includes vanity waste, toilet rough-in, tub/shower PEX supply</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md" data-category="tile-stone" data-title="Install 24x48 Large Format Porcelain Tile Mapei mortar">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">square</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">Tile &amp; Stone</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant">Labor + Sundry</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">Install 24x48 Large Format Porcelain Tile</h2>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$18.50</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / sq ft</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span>Includes Mapei mortar &amp; leveling clips</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button aria-label="Delete item" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">trending_up</span>
+<span class="truncate">Rate adjusted +4.2% for high-demand GTA spec</span>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md" data-category="demolition" data-title="City Building Permit Admin &amp; Drawing Fee Permits and Fees">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-start gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low text-on-surface-variant flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[22px]">policy</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">Permits &amp; Fees</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">City Building Permit Admin &amp; Drawing Fee</h2>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0">
+<div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$850.00</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / flat fee</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm bg-surface-container-low px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[14px]">receipt</span>
+<span>Pass-through + 15% coordination</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button aria-label="Edit item" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button aria-label="Delete item" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-1.5 pt-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px] text-on-surface-variant">account_balance</span>
+<span class="truncate">Standard municipal submission documentation</span>
+</div>
+</div>
+<!-- Empty State Container (Hidden by default) -->
+<div class="hidden flex-col items-center justify-center py-12 px-margin text-center bg-surface-container-lowest rounded-xl shadow-xs" id="empty-state">
+<div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-3">
+<span class="material-symbols-outlined text-[30px]">search_off</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface">No catalog items found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xs mt-1">Try refining your search keyword or clearing the trade category filter.</p>
+<button class="mt-4 px-4 h-9 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors" id="reset-filter-btn" type="button">
+        Reset filters
+      </button>
+</div>
+</div>
+<!-- Bottom OCR Bulk Import Bar -->
+<div class="px-margin mt-space-lg">
+<div class="w-full bg-primary-container text-on-primary rounded-xl p-space-md shadow-md flex items-center justify-between gap-space-md cursor-pointer hover:bg-opacity-95 transition-opacity" id="ocr-card">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container text-on-tertiary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[24px]">document_scanner</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-on-primary truncate">Bulk OCR Import</span>
+<p class="font-body-sm text-body-sm text-on-primary-container line-clamp-1">Scan supplier invoice or price sheet (PDF/JPG)</p>
+</div>
+</div>
+<div class="shrink-0 w-8 h-8 rounded-full bg-surface-container-lowest/10 flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Add Item Modal Drawer (Micro-interaction) -->
+<div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4" id="add-modal">
+<div class="bg-surface-container-lowest w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-space-lg flex flex-col gap-space-md shadow-xl max-h-[90vh] overflow-y-auto">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">post_add</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">New Catalog Item</h2>
+</div>
+<button class="w-9 h-9 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant" id="close-modal-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-3">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Line Item Title</label>
+<input class="w-full h-11 px-3.5 mt-1 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none focus:ring-1 focus:ring-primary" id="new-item-title" placeholder="e.g. 5/8 Type X Drywall Panel" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Trade Category</label>
+<select class="w-full h-11 px-3 mt-1 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none" id="new-item-cat">
+<option value="Tile &amp; Stone">Tile &amp; Stone</option>
+<option value="Framing &amp; Drywall">Framing &amp; Drywall</option>
+<option value="Plumbing">Plumbing</option>
+<option value="Electrical">Electrical</option>
+<option value="Finishes">Finishes</option>
+<option value="Demolition">Demolition</option>
+</select>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Unit</label>
+<input class="w-full h-11 px-3.5 mt-1 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none" id="new-item-unit" placeholder="sq ft, lin ft, each" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Unit Price (CAD)</label>
+<input class="w-full h-11 px-3.5 mt-1 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none" id="new-item-price" placeholder="0.00" step="0.01" type="number"/>
+</div>
+<div>
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Supplier Code</label>
+<input class="w-full h-11 px-3.5 mt-1 bg-surface-container-low text-on-surface rounded-lg font-body-md text-body-md focus:outline-none" id="new-item-code" placeholder="Optional SKU" type="text"/>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-2">
+<button class="flex-1 h-11 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors" id="cancel-add-btn" type="button">
+          Cancel
+        </button>
+<button class="flex-1 h-11 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-transform active:scale-95" id="save-item-btn" type="button">
+          Save Item
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function () {
+    const searchInput = document.getElementById('catalog-search');
+    const clearBtn = document.getElementById('clear-search');
+    const categoryChips = document.querySelectorAll('.category-chip');
+    const items = document.querySelectorAll('.catalog-item');
+    const emptyState = document.getElementById('empty-state');
+    const resetFilterBtn = document.getElementById('reset-filter-btn');
+
+    let activeCategory = 'all';
+
+    function filterList() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const itemCat = item.getAttribute('data-category');
+        const itemTitle = (item.getAttribute('data-title') || '').toLowerCase();
+        const matchesCat = (activeCategory === 'all') || (itemCat === activeCategory);
+        const matchesQuery = !query || itemTitle.includes(query);
+
+        if (matchesCat && matchesQuery) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+      } else {
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+      }
+
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+        clearBtn.classList.add('flex');
+      } else {
+        clearBtn.classList.add('hidden');
+        clearBtn.classList.remove('flex');
+      }
+    }
+
+    searchInput.addEventListener('input', filterList);
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filterList();
+      searchInput.focus();
+    });
+
+    categoryChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        categoryChips.forEach(c => {
+          c.classList.remove('bg-primary', 'text-on-primary');
+          c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+        });
+        chip.classList.add('bg-primary', 'text-on-primary');
+        chip.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+
+        activeCategory = chip.getAttribute('data-cat');
+        filterList();
+      });
+    });
+
+    resetFilterBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      activeCategory = 'all';
+      categoryChips.forEach((c, idx) => {
+        if (idx === 0) {
+          c.classList.add('bg-primary', 'text-on-primary');
+          c.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+        } else {
+          c.classList.remove('bg-primary', 'text-on-primary');
+          c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+        }
+      });
+      filterList();
+    });
+
+    // Delete item micro-interaction
+    document.addEventListener('click', (e) => {
+      const delBtn = e.target.closest('.delete-trigger');
+      if (delBtn) {
+        const row = delBtn.closest('.catalog-item');
+        if (row) {
+          row.style.opacity = '0';
+          row.style.transform = 'scale(0.95)';
+          row.style.transition = 'all 0.2s ease-out';
+          setTimeout(() => {
+            row.remove();
+            filterList();
+          }, 200);
+        }
+      }
+    });
+
+    // Modal Interaction
+    const addBtn = document.getElementById('add-item-btn');
+    const modal = document.getElementById('add-modal');
+    const closeBtn = document.getElementById('close-modal-btn');
+    const cancelBtn = document.getElementById('cancel-add-btn');
+    const saveBtn = document.getElementById('save-item-btn');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    addBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    saveBtn.addEventListener('click', () => {
+      const title = document.getElementById('new-item-title').value.trim();
+      const price = document.getElementById('new-item-price').value.trim();
+      const unit = document.getElementById('new-item-unit').value.trim() || 'unit';
+      const cat = document.getElementById('new-item-cat').value;
+
+      if (!title || !price) {
+        alert('Please fill out item title and unit price.');
+        return;
+      }
+
+      const list = document.getElementById('item-list');
+      const newCard = document.createElement('div');
+      newCard.className = 'catalog-item bg-surface-container-lowest rounded-xl p-space-md shadow-xs flex flex-col gap-2.5 transition-shadow hover:shadow-md';
+      newCard.setAttribute('data-category', 'tile-stone');
+      newCard.setAttribute('data-title', title);
+
+      newCard.innerHTML = `
+        <div class="flex items-start justify-between gap-space-sm">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg bg-surface-container-low text-secondary flex items-center justify-center shrink-0 mt-0.5">
+              <span class="material-symbols-outlined text-[22px]">new_label</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant">${cat}</span>
+                <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm">Just added</span>
+              </div>
+              <h2 class="font-title-md text-title-md text-on-surface mt-1 leading-snug">${title}</h2>
+            </div>
+          </div>
+          <div class="flex flex-col items-end shrink-0">
+            <div class="font-metric-lg text-metric-lg text-on-surface tabular-nums">$${parseFloat(price).toFixed(2)}</div>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">CAD / ${unit}</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Manual quick-entry item</span>
+          <div class="flex items-center gap-1">
+            <button type="button" class="w-8 h-8 rounded-full hover:bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+              <span class="material-symbols-outlined text-[18px]">edit</span>
+            </button>
+            <button type="button" class="delete-trigger w-8 h-8 rounded-full hover:bg-error-container hover:text-on-error-container flex items-center justify-center text-on-surface-variant">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      list.prepend(newCard);
+      closeModal();
+      document.getElementById('new-item-title').value = '';
+      document.getElementById('new-item-price').value = '';
+      document.getElementById('new-item-unit').value = '';
+      filterList();
+    });
+
+    const ocrCard = document.getElementById('ocr-card');
+    if (ocrCard) {
+      ocrCard.addEventListener('click', () => {
+        alert('OCR Engine Initialized: Select invoice photo or supplier catalog PDF to ingest.');
+      });
+    }
+
+    const importBtn = document.getElementById('import-btn');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        alert('Open CSV / Excel catalog importer');
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-label-md"><div class="h-[60px] px-gutter grid grid-cols-5 items-center"><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="today" href="#"><span class="material-symbols-outlined text-[22px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Today</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="quotes" href="#"><span class="material-symbols-outlined text-[22px]">description</span><span class="font-label-sm text-label-sm mt-0.5">Quotes</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="jobs" href="#"><span class="material-symbols-outlined text-[22px]">work</span><span class="font-label-sm text-label-sm mt-0.5">Jobs</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="money" href="#"><span class="material-symbols-outlined text-[22px]">account_balance_wallet</span><span class="font-label-sm text-label-sm mt-0.5">Money</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors relative" data-path="more" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-error"></span></div><span class="font-label-sm text-label-sm mt-0.5">More</span></a></div></nav>
+</body></html>

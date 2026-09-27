@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en" style=""><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-surface-variant": "#47464e", "on-tertiary-container": "#9864ff", "tertiary-fixed": "#eaddff", "on-surface": "#1a1c1e", "on-primary-fixed-variant": "#434367", "secondary-container": "#99edf9", "primary-container": "#181839", "primary": "#000000", "surface-variant": "#e3e2e6", "on-secondary-fixed-variant": "#004f57", "on-primary": "#ffffff", "inverse-on-surface": "#f1f0f4", "outline": "#78767f", "secondary-fixed": "#9cf0fc", "surface": "#faf9fc", "surface-container-lowest": "#ffffff", "error": "#ba1a1a", "on-secondary-container": "#006d78", "surface-container": "#eeedf1", "surface-dim": "#dad9dd", "tertiary-fixed-dim": "#d2bcff", "secondary-fixed-dim": "#80d3df", "inverse-surface": "#2f3033", "surface-container-high": "#e9e8eb", "on-error-container": "#93000a", "on-tertiary-fixed-variant": "#5900c7", "on-tertiary-fixed": "#25005a", "on-secondary": "#ffffff", "inverse-primary": "#c4c3ed", "error-container": "#ffdad6", "secondary": "#006973", "on-background": "#1a1c1e", "on-primary-fixed": "#181839", "on-secondary-fixed": "#001f23", "surface-bright": "#faf9fc", "on-error": "#ffffff", "surface-container-low": "#f4f3f7", "on-tertiary": "#ffffff", "outline-variant": "#c8c5cf", "surface-tint": "#5b5b80", "background": "#faf9fc", "primary-fixed": "#e2dfff", "primary-fixed-dim": "#c4c3ed", "tertiary": "#000000", "tertiary-container": "#25005a", "on-primary-container": "#8180a7", "surface-container-highest": "#e3e2e6" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "space-lg": "1.25rem", "gutter": "0.75rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "space-xs": "0.25rem", "margin": "1rem" }, fontFamily: { "body-sm": ["Hanken Grotesk"], "title-md": ["Hanken Grotesk"], "headline-md": ["Hanken Grotesk"], "body-md": ["Hanken Grotesk"], "metric-lg": ["Hanken Grotesk"], "display-lg": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"], "label-sm": ["Hanken Grotesk"], "metric-sm": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "title-md": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "metric-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "metric-sm": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }] } } } };</script><style>@layer base { html, body { margin: 0; padding: 0; min-height: 100%; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-full"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="QuoteAI Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopTw2pHCVFm8_yZ6Jqg4tQjnmp8L12RUoRFs6ozx4RLScvid1vxd6zYYpKMQTTEsCJcncKZPLn0SysDBHsYW6HqIlZoYXG4P5oO-LazcQzah6uiuwPSYFreTLRJNzwZqXQ9jlY0MsAYfHvRA90AI-9BJNUEFmX9MZBXwnaWUdRm6SATOk86D9Oz66q7lTdOOoGEoxI1anqXA5aZfPkPH65i9IFt1n_4YFgPDFy3nQT0AxY2Xk5ULa"/><span class="font-headline-md text-headline-md tracking-tight text-on-surface">QuoteAI</span><span class="hidden">Today</span></div><div class="flex items-center gap-1"><button aria-label="Quick create new estimate or job" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">add</span></button><button aria-label="Notifications" class="w-11 h-11 relative flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><button aria-label="Contractor Profile" class="w-11 h-11 flex items-center justify-center pl-1" type="button"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaEk7Vt_tpYFGlSXUmR7eR5LFizahqnbtAOsG2uUkLJUYcxm19q2lL1zJOFwMbKNF3jHvWSOIESTNlnQUsGqFV9AKsTB0AVJwL5LnGryLpVdNQKTEPTxBmPENclWLCQ5DXYK991qxTwhqrFOmG5WaWLpW5g8t8mFBQtbH3Th2vH2YJ-RSSAWj7KYRdn70svbqqWe5ztq3BZYpRvLDFopR_3maSXsr50kqKDYI_PCCxg07OFdahyI_f"/></button></div></div></header><main class="flex-1 w-full bg-surface pt-14 pb-20"><div class="flex flex-col w-full pb-24">
+<!-- Top Meta / Action Area -->
+<div class="px-margin pt-4 pb-3">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="min-w-0">
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-on-surface">Contracts &amp; Signatures</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Province-compliant CCDC &amp; residential agreements</p>
+</div>
+<button class="shrink-0 h-10 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Draft Contract</span>
+</button>
+</div>
+</div>
+<!-- Province Compliance Alert Banner -->
+<div class="px-margin mb-3">
+<div class="bg-surface-container-low rounded-xl p-3.5 shadow-sm">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-md text-label-md text-on-surface">Ontario Consumer Protection Act &amp; CCDC-2 Compliant</span>
+<span class="material-symbols-outlined text-outline text-[14px]">lock</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">
+            10-day cooling off period &amp; statutory holdback (10%) calculated automatically per Construction Act (R.S.O. 1990).
+          </p>
+<div class="mt-2 flex items-center gap-3">
+<div class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+<span class="font-label-sm text-label-sm">Tamper-Proof Audit</span>
+</div>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">SHA-256 Ledger Locked</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Filter Pills Scroller -->
+<div class="w-full overflow-x-auto no-scrollbar px-margin mb-4">
+<div class="flex items-center gap-2 w-max">
+<button class="h-8 px-3.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm" type="button">
+        All (18)
+      </button>
+<button class="h-8 px-3.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md active:bg-surface-container-high transition-colors" type="button">
+        Awaiting Signature (5)
+      </button>
+<button class="h-8 px-3.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md active:bg-surface-container-high transition-colors" type="button">
+        Fully Executed (11)
+      </button>
+<button class="h-8 px-3.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md active:bg-surface-container-high transition-colors" type="button">
+        Change Orders (4)
+      </button>
+</div>
+</div>
+<!-- Main Contracts Stream -->
+<div class="px-margin flex flex-col gap-3">
+<!-- Card 1: Fully Executed Master Suite -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">#CTR-2024-089</span>
+<span class="h-5 px-2 rounded-full bg-[#e9f6e6] text-[#227a15] font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#227a15]"></span>
+              Fully Executed · Signed Oct 18
+            </span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 truncate">Highland Master Suite &amp; Ensuite</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clients: Marcus &amp; Elena Reid</p>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Total Contract</span>
+<span class="font-metric-sm text-metric-sm text-on-surface tabular-nums font-semibold">$78,500 CAD</span>
+</div>
+</div>
+<!-- Execution Signatures Matrix -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between gap-2">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-[#227a15] shrink-0">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm text-on-surface truncate">Contractor: Marc J. (You)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[10px]">Signed Oct 17 · 4:12 PM</p>
+</div>
+</div>
+<div class="w-px h-6 bg-outline-variant shrink-0"></div>
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-[#227a15] shrink-0">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm text-on-surface truncate">Client: Marcus R.</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[10px]">Signed Oct 18 · 9:30 AM</p>
+</div>
+</div>
+</div>
+<!-- Verification Hash Stamp -->
+<div class="flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified</span>
+<span>SHA-256 Audit Trail: e48b...291f</span>
+</div>
+<span class="font-label-sm text-label-sm text-[#006973]">Certificate Valid</span>
+</div>
+<!-- Actions -->
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span>Download PDF</span>
+</button>
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">layers</span>
+<span>View 2 Change Orders</span>
+</button>
+</div>
+</div>
+<!-- Card 2: Awaiting Client E-Sign (High Urgency) -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">#CTR-2024-092</span>
+<span class="h-5 px-2 rounded-full bg-[#fdf6c9] text-[#7a5c00] font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7a5c00] animate-pulse"></span>
+              Awaiting Client E-Sign
+            </span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 truncate">148 Elmcrest Kitchen Expansion</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clients: Sarah &amp; Tom Jenkins</p>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Total Contract</span>
+<span class="font-metric-sm text-metric-sm text-on-surface tabular-nums font-semibold">$64,200 CAD</span>
+</div>
+</div>
+<!-- Status dispatch timeline -->
+<div class="bg-surface-container-low rounded-lg p-2.5 flex items-center justify-between text-on-surface">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">send_and_archive</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Sent 2 days ago via Email &amp; SMS</span>
+</div>
+<span class="font-label-sm text-label-sm text-[#bf3d09] bg-[#fdeee5] px-2 py-0.5 rounded">Opened 3x</span>
+</div>
+<!-- Quick Action Deck -->
+<div class="flex flex-col gap-2 pt-1">
+<div class="grid grid-cols-2 gap-2">
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">forward_to_inbox</span>
+<span>Resend Link</span>
+</button>
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+<span>Preview Draft</span>
+</button>
+</div>
+<!-- High Priority Glass Sign Trigger -->
+<button class="h-11 px-4 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-2 active:scale-[0.99] transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]">draw</span>
+<span>Sign on Glass (In Person Now)</span>
+</button>
+</div>
+</div>
+<!-- Card 3: Change Order Review -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-sm text-label-sm text-on-tertiary-container uppercase tracking-wider">Change Order CO-02</span>
+<span class="h-5 px-2 rounded-full bg-[#fdf6c9] text-[#7a5c00] font-label-sm text-label-sm">
+              Client Reviewing
+            </span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 truncate">Heated Bench &amp; Niche</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Linked to: Highland Suite (#CTR-2024-089)</p>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Scope Addition</span>
+<span class="font-metric-sm text-metric-sm text-[#006973] tabular-nums font-semibold">+$1,850 CAD</span>
+</div>
+</div>
+<div class="p-2.5 bg-surface-container-low rounded-lg flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
+<span>Includes Schluter DITRA-HEAT &amp; custom marble slab</span>
+<span class="font-label-sm text-label-sm text-on-surface tabular-nums">48h Expiry</span>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">notifications_active</span>
+<span>Remind Client</span>
+</button>
+<button class="h-10 px-3 rounded-lg bg-surface-container text-error font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+<span>Cancel CO</span>
+</button>
+</div>
+</div>
+<!-- Card 4: Fully Executed with Statutory Holdback Tracking -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<div class="flex items-start justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">#CTR-2024-085</span>
+<span class="h-5 px-2 rounded-full bg-[#e9f6e6] text-[#227a15] font-label-sm text-label-sm">
+              Fully Executed
+            </span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mt-1 truncate">82 King St W Basement Suite</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clients: David &amp; Claire Vance</p>
+</div>
+<div class="text-right shrink-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Base Contract</span>
+<span class="font-metric-sm text-metric-sm text-on-surface tabular-nums font-semibold">$52,000 CAD</span>
+</div>
+</div>
+<!-- Statutory Holdback Special Pill Banner -->
+<div class="p-3 bg-surface-container-low rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[16px]">account_balance</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Lien Holdback Active (10%)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-[11px]">Ontario Construction Act 45-day cycle</p>
+</div>
+</div>
+<span class="font-label-md text-label-md text-on-surface tabular-nums font-semibold">$5,200 CAD</span>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>View SHA Audit</span>
+</button>
+<button class="h-10 px-3 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 active:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">article</span>
+<span>View Contract</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom Floating "Sign on Glass" Tactical Drawer Quick-Button -->
+<div class="fixed bottom-[74px] right-margin z-40">
+<button class="h-12 px-5 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg flex items-center gap-2 active:scale-95 transition-transform" id="trigger-glass-pad" type="button">
+<span class="material-symbols-outlined text-[20px]">gesture</span>
+<span>Instant Sign on Glass</span>
+</button>
+</div>
+<!-- Interactive Sign On Glass Sheet Overlay (Hidden by Default) -->
+<div class="fixed inset-0 z-50 bg-[#101031]/40 backdrop-blur-sm hidden items-end justify-center" id="glass-pad-modal">
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-t-2xl p-5 shadow-2xl flex flex-col gap-4 animate-in slide-in-from-bottom duration-200">
+<div class="flex items-center justify-between pb-1">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Field Glass Sign</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Collect binding signature directly on this device</p>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface" id="close-glass-pad" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-3 py-2 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface truncate">148 Elmcrest - Kitchen Expansion ($64,200)</span>
+<span class="font-label-sm text-label-sm text-secondary uppercase font-semibold">CCDC Ready</span>
+</div>
+<!-- Canvas Pad Area -->
+<div class="relative w-full h-44 bg-surface rounded-xl flex flex-col justify-between p-3 overflow-hidden select-none">
+<div class="flex justify-between items-center text-on-surface-variant font-label-sm text-label-sm">
+<span>Sign inside designated bounds</span>
+<button class="text-error flex items-center gap-0.5" id="clear-signature" type="button">
+<span class="material-symbols-outlined text-[14px]">refresh</span>
+<span>Clear</span>
+</button>
+</div>
+<!-- Simulated Touch Signature Visual -->
+<svg class="w-full h-24 stroke-primary fill-none stroke-[2.5] stroke-linecap-round stroke-linejoin-round" id="sig-path" viewbox="0 0 300 100">
+<path d="M 30,65 Q 60,20 85,55 T 140,45 T 195,65 T 260,35"></path>
+</svg>
+<div class="flex items-center justify-between border-t border-dashed border-outline-variant pt-1 text-on-surface-variant font-body-sm text-body-sm text-[11px]">
+<span>X  Client / Authorised Signatory</span>
+<span class="text-secondary font-label-sm">GPS &amp; Timestamp Attached</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<input checked="" class="w-4 h-4 rounded text-primary accent-primary" id="legal-ack" type="checkbox"/>
+<label class="font-body-sm text-body-sm text-on-surface-variant leading-tight" for="legal-ack">
+          Signee acknowledges Ontario Home Owner protection terms and contract version CTR-2024-092.
+        </label>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<button class="h-11 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md" id="cancel-sign" type="button">
+          Cancel
+        </button>
+<button class="h-11 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-md" id="save-sign" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Execute &amp; Seal</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+    (function () {
+      const openBtn = document.getElementById('trigger-glass-pad');
+      const closeBtn = document.getElementById('close-glass-pad');
+      const cancelBtn = document.getElementById('cancel-sign');
+      const saveBtn = document.getElementById('save-sign');
+      const modal = document.getElementById('glass-pad-modal');
+      const clearBtn = document.getElementById('clear-signature');
+      const sigPath = document.getElementById('sig-path');
+
+      function openModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+
+      function closeModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+
+      if (openBtn) openBtn.addEventListener('click', openModal);
+      if (closeBtn) closeBtn.addEventListener('click', closeModal);
+      if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+      if (clearBtn && sigPath) {
+        clearBtn.addEventListener('click', function() {
+          sigPath.innerHTML = '';
+        });
+      }
+
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+          saveBtn.innerText = 'Hashing...';
+          setTimeout(function() {
+            saveBtn.innerText = 'Sealed (SHA-256)';
+            setTimeout(closeModal, 600);
+          }, 400);
+        });
+      }
+    })();
+  </script>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-label-md"><div class="h-[60px] px-gutter grid grid-cols-5 items-center"><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="today" href="#"><span class="material-symbols-outlined text-[22px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Today</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="quotes" href="#"><span class="material-symbols-outlined text-[22px]">description</span><span class="font-label-sm text-label-sm mt-0.5">Quotes</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="jobs" href="#"><span class="material-symbols-outlined text-[22px]">work</span><span class="font-label-sm text-label-sm mt-0.5">Jobs</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors" data-path="money" href="#"><span class="material-symbols-outlined text-[22px]">account_balance_wallet</span><span class="font-label-sm text-label-sm mt-0.5">Money</span></a><a class="flex flex-col items-center justify-center h-full text-on-surface-variant hover:text-on-surface transition-colors relative" data-path="more" href="#"><div class="relative flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">grid_view</span><span class="absolute -top-0.5 -right-1 w-2 h-2 rounded-full bg-error"></span></div><span class="font-label-sm text-label-sm mt-0.5">More</span></a></div></nav>
+</body></html>

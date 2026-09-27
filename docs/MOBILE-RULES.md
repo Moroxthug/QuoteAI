@@ -97,3 +97,11 @@ Each route's first three phone screens side by side (before over after with `--b
 - Codes use `.otp-input` (`inputMode="numeric"`, `autoComplete="one-time-code"`, `pattern="[0-9]*"`); a signature pad is as wide as its sheet and 200 px tall on a phone, with 40 px mode and clear buttons.
 - **Every field is 16 px on a phone** (a global rule in the Phase 111 CSS; `.otp-input` / `.code-input` are larger on purpose): iOS zooms the page into any smaller field. `html` has a `scroll-padding-bottom` the height of a docked bar, so a focused field scrolls into view above it. Give every field its keyboard and autofill: `type="email"` + `autoComplete="email"` + `autoCapitalize="none"`, `type="tel"`, `autoComplete="name" / "organization" / "street-address"`, and `enterKeyHint` (next / go / done / send).
 - Choices shown as chips (`.pills.choices`, onboarding's trades) wrap on purpose; tabs never do.
+
+**The public site (Phase 112: home, pricing, footer, chat)**
+
+- A marketing page keeps its desktop length if it reads well there; the phone gets a subset of the **same components**, hidden with `hide-phone` / shown with `show-phone`, never a second page. Hidden content stays in the prerendered HTML.
+- Colour slabs become rows on a phone (a title and one short line, `.tile-short`); a comparison table becomes one feature per row with each column's answer under it (`.cmp-list`); side-by-side plans become a swipe row opened on the recommended one (`.price-grid` ≤ 720 px, the scroller `position: relative` so absolute `sr-only` text can't widen the page).
+- Questions are a folded list (`components/faq-list.tsx`), not answer cards.
+- Nothing floats over a public page on a phone: the support chat opens from the "Questions? Chat with us" line above the footer (`openSupportChat()`).
+- A link on the phone drawer or footer never points at a section a phone hides.

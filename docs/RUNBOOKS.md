@@ -870,3 +870,11 @@ Settings → Connected apps (`/dashboard/settings/apps`) is a directory of tiles
 - **The client portal on a phone**: the sections scroll sideways in one row; the first section lists what needs the client (an amount to pay, a contract to sign, a quote to review) as rows to tap. Each quote, contract and invoice keeps its buttons (Review, Sign, Pay by card, PDF) on a line of their own under it. Sign out is the arrow icon at the top right.
 - **Every field on a phone is 16 px**, so an iPhone no longer zooms the page in when a field is tapped; a focused field scrolls into view above a bar at the bottom, not under it. Sign-in, sign-up, onboarding, the access code and the codes all bring up the right keyboard (email, phone, numbers) and offer the phone's autofill (name, email, company, address, one-time codes).
 - **Onboarding on a phone**: no big icon above each step, the first field is on the first screen. The default payment schedule is one line ("4 payments · 15% · 35% · 35% · 15%") with **Change**; the full editor opens only when asked.
+
+## 48. The public site on a phone (Phase 112)
+
+- **"The homepage on my phone is missing sections."** On purpose: a phone shows the hero, what QuoteAI does (a short list), the three stories, reviews, prices, questions, the trades and the sign-up call. The WhatsApp section, the competitor comparison, the impact numbers, news, guides and the long "what is QuoteAI" text are only on a computer (they are still in the page for search engines). To show a section on phones again, remove `hide-phone` from it in `pages/home.tsx`.
+- **Prices shown on the homepage** come from `artifacts/quote-ai/src/data/pricing.ts` (the same table as /pricing, checked against the server by `pricing-parity.test.ts`). Change a price there, never in the homepage text.
+- **/pricing on a phone**: the plans are a row you swipe, opened on Pro; the plan names above it jump to a plan. The comparison is one feature per row with each plan's answer under it.
+- **The support chat on a phone** opens from "Questions? Chat with us" just above the footer — there is no floating chat button on a phone. On a computer the round button is still at the bottom right.
+- **The footer on a phone** is six folded sections; tap a heading to open it.

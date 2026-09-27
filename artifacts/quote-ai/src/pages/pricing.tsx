@@ -14,11 +14,12 @@
 // is configured yet (owner track O9).
 
 import { Link, useLocation } from "wouter";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Minus, Crown, Zap, Sparkles, FileText } from "lucide-react";
 import { useGetPlans, getGetPlansQueryKey } from "@workspace/api-client-react";
 import { SeoHead } from "@/components/seo-head";
 import { MarketingImage } from "@/components/marketing-image";
+import { FaqList } from "@/components/faq-list";
 import { useAuth } from "@/hooks/use-auth";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -57,6 +58,36 @@ export default function PricingPage() {
   const { t, lang } = useLanguage();
   const [, navigate] = useLocation();
   const [interval, setInterval] = useState<"month" | "year">("month");
+  // Phase 112: on a phone the plans are a row you swipe, opened on Pro.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState<string>(MARKETING_PLANS.find((p) => p.popular)?.id ?? MARKETING_PLANS[0]!.id);
+  const scrollToPlan = (id: string, behavior: ScrollBehavior = "smooth") => {
+    const grid = gridRef.current;
+    const card = grid?.querySelector<HTMLElement>(`[data-plan="${id}"]`);
+    if (!grid || !card || grid.scrollWidth <= grid.clientWidth) return;
+    const g = grid.getBoundingClientRect(), c = card.getBoundingClientRect();
+    grid.scrollTo({ left: grid.scrollLeft + (c.left - g.left) - (g.width - c.width) / 2, behavior });
+  };
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    scrollToPlan(inView, "auto");
+    const onScroll = () => {
+      const g = grid.getBoundingClientRect();
+      const mid = g.left + g.width / 2;
+      let best = inView;
+      let bestDist = Infinity;
+      grid.querySelectorAll<HTMLElement>("[data-plan]").forEach((card) => {
+        const c = card.getBoundingClientRect();
+        const d = Math.abs(c.left + c.width / 2 - mid);
+        if (d < bestDist) { bestDist = d; best = card.dataset.plan!; }
+      });
+      setInView(best);
+    };
+    grid.addEventListener("scroll", onScroll, { passive: true });
+    return () => grid.removeEventListener("scroll", onScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once: open on Pro, then follow the swipe
+  }, []);
   // The live plan list keeps the page honest if a Stripe price ever moves;
   // until it arrives (and on the prerendered HTML) data/pricing.ts is shown.
   // No retries: this is a marketing page, and a server that cannot answer
@@ -134,11 +165,19 @@ export default function PricingPage() {
             </div>
           )}
 
-          <div className="price-grid">
+          {/* Phone: the plan names above the swipe row — which one you are on, and a tap to the next. */}
+          <nav className="plan-dots show-phone" aria-label={t("pricing.plansNav")}>
+            {MARKETING_PLANS.map((plan) => (
+              <button key={plan.id} type="button" aria-current={inView === plan.id ? "true" : undefined} onClick={() => scrollToPlan(plan.id)}>
+                {plan.name}
+              </button>
+            ))}
+          </nav>
+          <div className="price-grid" ref={gridRef} data-bleed>
             {MARKETING_PLANS.map((plan) => {
               const price = priceOf(plan);
               return (
-                <div key={plan.id} className={`card price-card${plan.popular ? " is-popular" : ""}`}>
+                <div key={plan.id} data-plan={plan.id} className={`card price-card${plan.popular ? " is-popular" : ""}`}>
                   <div className="price-head">
                     <div className="price-name">
                       {plan.id === "monthly_starter" ? <Zap className="h-4 w-4" /> : <Crown className="h-4 w-4" />}
@@ -233,7 +272,7 @@ export default function PricingPage() {
             </div>
             <p className="lead">{t("pricing.compareBody")}</p>
           </div>
-          <div className="card cmp-wrap" tabIndex={0}>
+          <div className="card cmp-wrap hide-phone" tabIndex={0}>
             <table className="cmp">
               <thead>
                 <tr>
@@ -266,6 +305,32 @@ export default function PricingPage() {
               </tbody>
             </table>
           </div>
+          <ul className="cmp-list show-phone">
+            {PRICING_ROWS.map((row) => (
+              <li key={row.labelKey} className="cmp-item">
+                <p className="cmp-f">{t(row.labelKey)}</p>
+                <dl className="cmp-vals">
+                  {MARKETING_PLANS.map((plan) => {
+                    const value = rowValue(row, plan, t);
+                    return (
+                      <div key={plan.id} className={plan.popular ? "q" : undefined}>
+                        <dt>{plan.name}</dt>
+                        <dd>
+                          {value === true ? (
+                            <><Check className="h-4 w-4" aria-hidden="true" /><span className="sr-only">{t("pricing.value.included")}</span></>
+                          ) : value === false ? (
+                            <><Minus className="h-4 w-4 off" aria-hidden="true" /><span className="sr-only">{t("pricing.value.notIncluded")}</span></>
+                          ) : (
+                            value
+                          )}
+                        </dd>
+                      </div>
+                    );
+                  })}
+                </dl>
+              </li>
+            ))}
+          </ul>
         </div>
       </ScrollSection>
 
@@ -278,14 +343,7 @@ export default function PricingPage() {
               <h2 className="h2">{t("pricing.faqTitle")}</h2>
             </div>
           </div>
-          <div className="dd-grid">
-            {PRICING_FAQ_KEYS.map((key) => (
-              <div key={key} className="card dd-card">
-                <h3>{t(`pricing.faq.${key}.q`)}</h3>
-                <p>{t(`pricing.faq.${key}.a`)}</p>
-              </div>
-            ))}
-          </div>
+          <FaqList items={PRICING_FAQ_KEYS.map((key) => ({ q: t(`pricing.faq.${key}.q`), a: t(`pricing.faq.${key}.a`) }))} />
         </div>
       </ScrollSection>
 

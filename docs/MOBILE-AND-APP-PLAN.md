@@ -27,7 +27,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 109 | Schedule on a phone | A | **done** 2026-09-27 |
 | 110 | The long tail | A | **done** 2026-09-27 |
 | 111 | What clients see: accept, sign, pay, portal, sign-up | A | **done** 2026-09-27 |
-| 112 | The public site on a phone | A | not started |
+| 112 | The public site on a phone | A | **done** 2026-09-27 |
 | 113 | The phone gate: rules enforced, sheets reviewed | A | not started |
 | 114-131 | The app and the videos | B, C | see `APP-PLAN.md` |
 
@@ -610,3 +610,38 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - Recheck: the whole app `--lang=en --widths=375` (191 pages, `.qa/p111-all`, for the 16 px field rule): 0 overflow, 0 gutter, 0 axe, 0 screen-reader, 0 raw keys; phone-rule warnings only the four public comparison tables (Phase 112) and the unfolded contract agreement (9.2 screens, unchanged since Phase 107). `--lang=fr --widths=375,768,1280` on the client pages (75 pages, `.qa/p111-fr`): all 0.
 - Phone sheets `.qa/phone-sheets/p111/` (baseline `p111-pre`, `p111-pre-p`): tiered quote 1.3 screens (1.7) with the three prices in one row and Accept docked; onboarding step 3 1.0 (2.4), step 1 1.2 (1.3); sign-in 2.9 (3.0); signing's code and signature steps now on screen one as sheets (they were panels after 7.5 screens); portal header shows the full company name; invoice 2.1 (2.2) with the action docked.
 - typecheck (quote-ai, api-server), eslint on the touched files (clean).
+
+### Phase 112 — 2026-09-27
+
+**Built**
+- **Homepage on a phone, 23.6 screens → 9.1** (FR 24.5 → 9.5): hero with the quote mock (the 30-second demo), what it does as **a list of six one-line rows** (title + a short line, a coloured dot instead of a colour slab; the long paragraphs stay on a computer), the three stories (quotes → job site → invoices) as words without their pictures, the two verified reviews, **a new prices section** and **new questions**, the trades as one swipe row, the final call, the footer. The WhatsApp section, the competitor comparison, the impact numbers, the newsroom, the guides and the deep dive are `hide-phone`: still in the HTML (prerender, search engines) and unchanged on a computer.
+- **Prices on the homepage** (every width): Starter / Pro / Business / Elite from `data/pricing.ts` — four cards on a computer, four rows on a phone with Pro tinted — and "Compare the plans". **Questions** (every width): four of the pricing questions as a folded list (`components/faq-list.tsx`).
+- **/pricing on a phone, 12.8 → 8.7 screens**: the plans are **a row you swipe**, opened on Pro, with the plan names above it (tap to jump, the one in view highlighted). The comparison table became **one feature at a time** (the feature, then Starter · Pro · Business · Elite with a tick, a dash or the value; Pro tinted). The seven questions are a folded list at every width (they were seven answer cards, three phone screens).
+- **The support chat on a phone**: no floating button (it sat on fine print and buttons); a **"Questions? Chat with us"** line above the footer opens it (`openSupportChat()`), and the open panel is the full width of the phone, never taller than the screen; the round button shows only while the panel is open, as its close button.
+- **Footer on a phone**: brand, then six folded sections (Trades, Features, Guides, Pilot program, Company, Support) — six link lists were ~1.5 screens on every public page. A plain `div` until after hydration, so the prerendered HTML is unchanged.
+- Public sections are 44 px apart on a phone (were 64 px each side), which is most of the 0.6–1.2 screens every other public page lost (pilot 6.6 → 5.7, provinces 7.8 → 6.8, help 6.1 → 5.5, article 9.1 → 8.4, whatsapp 8.3 → 6.8).
+- The phone drawer and footer no longer point at homepage sections a phone doesn't show: WhatsApp → `/whatsapp/`, Guides and Newsroom → `/blog/`, Compare → Help centre.
+- 3 strings in EN and FR (`supportBot.questions`, `supportBot.chatWithUs`, `pricing.plansNav`); runbook §48; MOBILE-RULES.md "The public site".
+
+**Decided**
+- The desktop homepage keeps its length (it reads well at 1280); the phone gets a subset of the same components, hidden per breakpoint, not a second page.
+- Prices and questions are new on the homepage at every width: a visitor should not have to find /pricing to learn what it costs.
+
+**Found**
+- The homepage's "What it costs" card still quoted the pre-Phase-99 prices (Starter $19 with 10 quotes, Pro $49, Elite $59 unlimited) and "two months free" (annual is not offered yet) — now built from `MARKETING_PLANS`.
+- The final call said "Join hundreds of Canadian contractors" before the pilot has started — now "Describe your next job and send the quote the same minute."
+- The swipe row widened the whole page to 921 px: the cards' `sr-only` words are `position: absolute` and escaped a scroller that wasn't positioned (`.price-grid { position: relative }` on a phone).
+- Under reduced motion the trades marquee wrapped into 1.5 screens of chips on a phone; it is a swipe row there now.
+- The homepage cards on /#plans-teaser were pushed down 16 px by the global `.card + .card` rule (grid cells).
+
+**Deferred**
+- The impact band ("4–6 hrs saved per week … the numbers our users report", "average verified rating") is a pre-launch claim; hidden on a phone here, unchanged on a computer — the owner should decide it with the go/no-go copy review.
+- SEO trade pages stay long on a phone (`/quotes/painter` 15.7 screens, `/fr/soumissions/peintre` 16.3): they are long-form content by design; the footer/section spacing took ~1.3 screens off each.
+- The "Questions?" line is the only way into the chat on a phone; the footer's "Contact support" (the email form) is inside the folded Support section.
+
+**Verification**
+- Baseline `qa:visual --lang=en --widths=375,1280` on the public pages (42 pages, `.qa/p112-pre`): phone-rule wide-table on /pricing and /fr/tarifs; homepage 23.6 screens.
+- After, `--lang=en,fr --widths=375,768,1280` on the public pages plus `/p`, `/i`, sign-in, sign-up (168 pages, `.qa/p112b`): **0 overflow, 0 gutter, 0 axe, 0 screen-reader, 0 raw keys, 0 phone-rule warnings**. Homepage recheck after the marquee fix (`.qa/p112d`, EN + FR 375): all 0.
+- In the browser pane at 375: the plan row opens on Pro, tapping Starter / Elite scrolls to it and moves the highlight; "Chat with us" opens the panel 8 px from each edge with the close button showing; the page is 375 px wide.
+- Screen heights (EN 375, before → after): home 23.6 → 9.1, /fr 24.5 → 9.5, pricing 12.8 → 8.7, /fr/tarifs 14.1 → 9.4, pilot 6.6 → 5.7, BC 7.8 → 6.8, help 6.1 → 5.5, article 9.1 → 8.4, blog 13.5 → 12.7.
+- typecheck (quote-ai), eslint on the touched files (one existing hook warning in support-bot.tsx).

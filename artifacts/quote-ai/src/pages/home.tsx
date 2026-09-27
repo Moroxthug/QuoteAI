@@ -12,6 +12,25 @@ import { BLOG_INDEX } from "@/data/blog-index";
 import { sectorLabel, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { homepageJsonLd } from "@/data/json-ld";
+import { MARKETING_PLANS, type MarketingPlan } from "@/data/pricing";
+import { FaqList } from "@/components/faq-list";
+
+/** Phase 112: the questions the homepage answers (the full list is on /pricing). */
+const HOME_FAQ_KEYS = ["trial", "oneshot", "cancel", "pilot"] as const;
+
+function money(n: number, lang: string): string {
+  return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(n);
+}
+
+/** "Starter $29 (15 quotes), Pro $79 (60 quotes), Business $249 (unlimited), Elite custom" — from the same table as /pricing. */
+function planSentence(lang: string): string {
+  const fr = lang === "fr";
+  return MARKETING_PLANS.map((p: MarketingPlan) => {
+    if (p.monthly === null) return fr ? `${p.name} sur mesure` : `${p.name} at a custom price`;
+    const quota = p.quotaPerMonth === null ? (fr ? "illimité" : "unlimited") : fr ? `${p.quotaPerMonth} soumissions` : `${p.quotaPerMonth} quotes`;
+    return `${p.name} ${money(p.monthly, lang)} (${quota})`;
+  }).join(", ");
+}
 
 function ScrollSection({
   children,
@@ -44,7 +63,7 @@ const TRADE_SLUGS = [
 
 export default function Home() {
   const { isSignedIn } = useAuth();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const [, navigate] = useLocation();
 
   const tradeLabel = (slug: string) => sectorLabel(slug, lang);
@@ -156,60 +175,66 @@ export default function Home() {
           <div className="tiles">
             <Link href="#story-quotes" className="tile t-green">
               <h3>{lang === "fr" ? "Soumissions IA" : "AI Quotes"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Décrivez le travail, recevez une soumission chiffrée et taxée en 30 secondes." : "Describe the job, get a priced and taxed quote in 30 seconds."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Décrivez le travail en langage courant — ou envoyez une note vocale WhatsApp ou une photo — et obtenez une soumission chiffrée avec postes, quantités et TPS/TVH par province en environ 30 secondes. Appuyée sur votre catalogue de prix, signée par signature électronique."
                   : "Describe the job in plain language — or send a WhatsApp voice note or photo — and get a priced, branded quote with line items, quantities and GST/HST by province in about 30 seconds. Backed by your price catalog, signed with e-signature."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
             <Link href="#story-jobs" className="tile t-purple">
               <h3>{lang === "fr" ? "CRM et prospects" : "CRM & Leads"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Chaque prospect dans un pipeline, relancé jusqu'à la signature." : "Every lead in one pipeline, followed up until it signs."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Les prospects entrants atterrissent dans un pipeline kanban avant de devenir des soumissions. Notez-les, relancez-les, et faites-les avancer jusqu'à signature sans un seul tableur."
                   : "Incoming leads land in a kanban pipeline before they become quotes. Score them, follow up, and move them to signed without a spreadsheet in sight."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
             <Link href="#story-jobs" className="tile t-teal">
               <h3>{lang === "fr" ? "Chantiers" : "Job Sites"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Une soumission acceptée devient un chantier : tâches, équipe, budget." : "An accepted quote becomes a job: tasks, crew, budget."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Une soumission acceptée devient un chantier : tâches avec échéances, équipe assignée, fournisseurs suivis et budget réel vs prévu — le tout lié à la soumission d'origine."
                   : "An accepted quote becomes a job: tasks with deadlines, team assignment, supplier tracking and budget vs actual — linked to the original quote."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
             <Link href="#story-invoicing" className="tile t-yellow">
               <h3>{lang === "fr" ? "Facturation et paiements" : "Invoicing & Payments"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Des factures depuis la soumission, des rappels jusqu'au paiement." : "Invoices from the quote, reminders until it is paid."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Les factures sont générées depuis les soumissions ou chantiers acceptés, avec une vue client publique. Des rappels partent selon l'échéancier jusqu'au paiement."
                   : "Invoices generate from accepted quotes or jobs, with a public invoice view for clients. Reminders go out on schedule until it's paid."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
             <Link href="#story-invoicing" className="tile t-green">
               <h3>{lang === "fr" ? "Contrats et documents" : "Contracts & Documents"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Contrats signés en ligne, chaque document dans une archive." : "Contracts signed online, every document in one archive."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Les contrats sont générés depuis les soumissions et chantiers acceptés. Chaque fichier, soumission, client et facture reste consultable dans une archive — suppression réversible incluse."
                   : "Contracts generate from accepted quotes and jobs. Every file, quote, client and invoice stays searchable in one archive — soft-delete included."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
             <Link href="#products" className="tile t-purple">
               <h3>{lang === "fr" ? "Équipe, analytique et assistant" : "Team, Analytics & Assistant"}</h3>
-              <p>
+              <p className="tile-short">{lang === "fr" ? "Des rôles pour l'équipe, des chiffres pour vous, un assistant pour tous." : "Roles for your crew, numbers for you, an assistant for both."}</p>
+              <p className="tile-long">
                 {lang === "fr"
                   ? "Comptes multi-utilisateurs avec rôles et invitations, tableaux de bord de revenus, taux de conversion et délais, un assistant IA dans votre tableau de bord, et des imports pour vos listes de prix et clients existants."
                   : "Multi-user accounts with roles and invites, dashboards for revenue, win rate and turnaround, an AI assistant inside your dashboard, and imports for your existing price lists and client data."}
               </p>
-              <span className="cta-link">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
+              <span className="cta-link tile-more">{lang === "fr" ? "En savoir plus" : "Learn more"} <ArrowRight className="chev h-4 w-4" /></span>
             </Link>
           </div>
-          <div className="also">
+          <div className="also hide-phone">
             <span className="lbl">{lang === "fr" ? "Aussi inclus" : "Also included"}</span>
             {(lang === "fr"
               ? ["Soumissions WhatsApp", "Signature électronique", "Catalogue de prix", "TPS/TVH par province", "Bilingue FR / EN", "Suivi du temps des employés", "Invitations d'équipe", "Imports de tableurs et PDF", "Documents et archive", "Assistant IA"]
@@ -225,7 +250,7 @@ export default function Home() {
       <ScrollSection className="sec soft">
         <div className="wrap">
           <div className="split" id="story-quotes">
-            <div className="split-media">
+            <div className="split-media hide-phone">
               <MarketingImage slot="home-quotes" />
             </div>
             <div className="split-body">
@@ -242,7 +267,7 @@ export default function Home() {
             </div>
           </div>
           <div className="split rev" id="story-jobs">
-            <div className="split-media">
+            <div className="split-media hide-phone">
               <MarketingImage slot="home-jobs" />
             </div>
             <div className="split-body">
@@ -259,7 +284,7 @@ export default function Home() {
             </div>
           </div>
           <div className="split" id="story-invoicing">
-            <div className="split-media">
+            <div className="split-media hide-phone">
               <MarketingImage slot="home-invoicing" />
             </div>
             <div className="split-body">
@@ -279,7 +304,7 @@ export default function Home() {
       </ScrollSection>
 
       {/* ── WHATSAPP ───────────────────────────────────────── */}
-      <ScrollSection className="sec" id="whatsapp">
+      <ScrollSection className="sec hide-phone" id="whatsapp">
         <div className="wrap">
           <div className="split">
             <div>
@@ -295,7 +320,7 @@ export default function Home() {
                 {lang === "fr" ? "Voir la fonctionnalité complète" : "See the full feature"} <ArrowRight className="chev h-4 w-4" />
               </Link>
             </div>
-            <div className="split-media">
+            <div className="split-media hide-phone">
               <MarketingImage slot="home-whatsapp" />
             </div>
           </div>
@@ -320,7 +345,7 @@ export default function Home() {
       </ScrollSection>
 
       {/* ── COMPARISON ─────────────────────────────────────── */}
-      <ScrollSection className="sec soft" id="comparison">
+      <ScrollSection className="sec soft hide-phone" id="comparison">
         <div className="wrap">
           <div className="sec-head">
             <div>
@@ -378,10 +403,10 @@ export default function Home() {
       </ScrollSection>
 
       {/* ── IMPACT (real, live-counted numbers) ───────────────── */}
-      <StatsBar />
+      <StatsBar className="hide-phone" />
 
       {/* ── NEWSROOM (real blog posts) ─────────────────────── */}
-      <ScrollSection className="sec" id="newsroom">
+      <ScrollSection className="sec hide-phone" id="newsroom">
         <div className="wrap">
           <div className="sec-head">
             <div>
@@ -412,8 +437,57 @@ export default function Home() {
       {/* ── REVIEWS (real, verified testimonials) ─────────────── */}
       <TestimonialsSection />
 
+      {/* ── PLANS (Phase 112: the prices, before anyone has to find /pricing) ── */}
+      <ScrollSection className="sec" id="plans-teaser">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <span className="eyebrow grey">{lang === "fr" ? "Tarifs" : "Pricing"}</span>
+              <h2 className="h2">{lang === "fr" ? "Un forfait pour chaque taille d'entreprise" : "A plan for every size of business"}</h2>
+            </div>
+            <p className="lead">
+              {lang === "fr"
+                ? "Sept jours gratuits, sans carte de crédit. Prix en dollars canadiens, avant taxes."
+                : "Seven days free, no credit card. Prices in Canadian dollars, before tax."}
+            </p>
+          </div>
+          <ul className="pt-list">
+            {MARKETING_PLANS.map((plan) => (
+              <li key={plan.id} className={`card pt-plan${plan.popular ? " is-popular" : ""}`}>
+                <div className="pt-name">
+                  <h3>{plan.name}</h3>
+                  {plan.popular && <span className="chip chip-teal">{t("pricing.mostPopular")}</span>}
+                </div>
+                <p className="pt-price">
+                  {plan.monthly === null ? t("pricing.custom") : <>{money(plan.monthly, lang)}<span>{t("pricing.perMonth")}</span></>}
+                </p>
+                <p className="pt-quota">
+                  {plan.quotaPerMonth === null ? t("pricing.quotaUnlimited") : t("pricing.quotaPerMonth").replace("{count}", String(plan.quotaPerMonth))}
+                </p>
+              </li>
+            ))}
+          </ul>
+          <Link href={lang === "fr" ? "/fr/tarifs/" : "/pricing/"} className="cta-link pt-more">
+            {lang === "fr" ? "Comparer les forfaits" : "Compare the plans"} <ArrowRight className="chev h-4 w-4" />
+          </Link>
+        </div>
+      </ScrollSection>
+
+      {/* ── QUESTIONS ──────────────────────────────────────── */}
+      <ScrollSection className="sec soft" id="faq">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <span className="eyebrow grey">{t("pricing.faqEyebrow")}</span>
+              <h2 className="h2">{t("pricing.faqTitle")}</h2>
+            </div>
+          </div>
+          <FaqList items={HOME_FAQ_KEYS.map((k) => ({ q: t(`pricing.faq.${k}.q`), a: t(`pricing.faq.${k}.a`) }))} />
+        </div>
+      </ScrollSection>
+
       {/* ── GUIDES ─────────────────────────────────────────── */}
-      <ScrollSection className="sec" id="guides">
+      <ScrollSection className="sec hide-phone" id="guides">
         <div className="wrap">
           <div className="sec-head">
             <div>
@@ -458,7 +532,7 @@ export default function Home() {
           <div className="sec-head" style={{ justifyContent: "center", textAlign: "center", flexDirection: "column", alignItems: "center" }}>
             <span className="eyebrow grey">{lang === "fr" ? "Couverture" : "Coverage"}</span>
             <h2 className="h2">{lang === "fr" ? "Des soumissions pour chaque métier et ville" : "Quotes for every trade and city"}</h2>
-            <p className="lead" style={{ marginInline: "auto" }}>
+            <p className="lead hide-phone" style={{ marginInline: "auto" }}>
               {lang === "fr"
                 ? "Dix-huit métiers avec leur propre vocabulaire, croisés avec 15+ villes canadiennes pour des pages locales — chacune appliquant automatiquement les règles de taxe de votre province."
                 : "Eighteen trade verticals with their own vocabulary, crossed with 15+ Canadian cities for local pages — each applying your province's tax rules automatically."}
@@ -482,7 +556,7 @@ export default function Home() {
           </div>
         </div>
         <div className="wrap">
-          <div className="cov-note">
+          <div className="cov-note hide-phone">
             <span className="chip chip-green">{lang === "fr" ? "18 métiers" : "18 trade verticals"}</span>
             <span className="chip chip-teal">{lang === "fr" ? "15+ villes canadiennes" : "15+ Canadian cities"}</span>
             <span className="chip chip-grey">{lang === "fr" ? "Bilingue FR / EN" : "Bilingual FR / EN"}</span>
@@ -500,7 +574,7 @@ export default function Home() {
       </ScrollSection>
 
       {/* ── DEEP DIVE ──────────────────────────────────────── */}
-      <ScrollSection className="sec" id="deep-dive">
+      <ScrollSection className="sec hide-phone" id="deep-dive">
         <div className="wrap">
           <div className="split" style={{ paddingTop: 0 }}>
             <div>
@@ -565,8 +639,8 @@ export default function Home() {
               <h3>{lang === "fr" ? "Combien ça coûte pour commencer" : "What it costs to get started"}</h3>
               <p>
                 {lang === "fr"
-                  ? "L'inscription est gratuite, et votre première soumission est générée sans carte de crédit. Ensuite : payez à l'unité (5 $ à 13 $), ou démarrez un abonnement mensuel (Starter 19 $ avec 10 soumissions, Pro 49 $ avec 60 soumissions, Elite 59 $ illimité) — ou payez à l'année et obtenez deux mois gratuits. Modifiez ou annulez votre forfait à tout moment."
-                  : "Signing up is free, and your first quote is generated without entering a credit card. From there you can choose: pay for a single quote ($5 to $13) when you need one, or start a monthly subscription (Starter $19 with 10 quotes, Pro $49 with 60 quotes, Elite $59 unlimited) — or pay yearly and get two months free. You can change or cancel your plan at any time from your account."}
+                  ? `L'inscription est gratuite et l'essai de 7 jours ne demande aucune carte de crédit. Ensuite : payez une soumission à l'unité (5 $ ou 13 $), ou choisissez un forfait mensuel — ${planSentence(lang)}. Changez ou annulez votre forfait à tout moment.`
+                  : `Signing up is free and the 7-day trial needs no credit card. From there, pay for a single quote ($5 or $13) when you need one, or pick a monthly plan — ${planSentence(lang)}. You can change or cancel your plan at any time from your account.`}
               </p>
               <Link href={lang === "fr" ? "/fr/tarifs/" : "/pricing/"} className="cta-link" style={{ marginTop: 14 }}>
                 {lang === "fr" ? "Voir la page des tarifs" : "See the full pricing page"} <ArrowRight className="chev h-4 w-4" />
@@ -586,8 +660,8 @@ export default function Home() {
           <h2>{lang === "fr" ? "Prêt à transformer votre entreprise?" : "Ready to transform your business?"}</h2>
           <p>
             {lang === "fr"
-              ? "Rejoignez des centaines d'entrepreneurs et d'artisans canadiens qui économisent des heures chaque semaine."
-              : "Join hundreds of Canadian contractors and tradespeople who save hours every week."}
+              ? "Décrivez votre prochain travail et envoyez la soumission dans la même minute."
+              : "Describe your next job and send the quote the same minute."}
           </p>
           <div className="cta-actions">
             <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-white">

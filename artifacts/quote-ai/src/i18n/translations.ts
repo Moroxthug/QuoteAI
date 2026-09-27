@@ -742,6 +742,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "scene4.chapterC.item3": "Testing and code compliance certification",
 
     "supportBot.guestName": "Guest",
+    "supportBot.questions": "Questions?",
+    "supportBot.chatWithUs": "Chat with us",
     "supportBot.restoreChat": "Restore Support Chat",
     "supportBot.dragToClose": "Drag here to close",
     "supportBot.headerTitle": "QuoteAI AI Support",
@@ -1164,6 +1166,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pricing.annual": "Annual",
     "pricing.twoMonthsFree": "2 months free",
     "pricing.mostPopular": "Most popular",
+    "pricing.plansNav": "Plans",
     "pricing.perMonth": "/month",
     "pricing.perYear": "/year",
     "pricing.perMonthEquivalent": "Works out to {amount} per month",
@@ -2062,6 +2065,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "scene4.chapterC.item3": "Essais et certification de conformité",
 
     "supportBot.guestName": "Invité",
+    "supportBot.questions": "Des questions?",
+    "supportBot.chatWithUs": "Écrivez-nous",
     "supportBot.restoreChat": "Restaurer le clavardage de soutien",
     "supportBot.dragToClose": "Glissez ici pour fermer",
     "supportBot.headerTitle": "Soutien IA QuoteAI",
@@ -2484,6 +2489,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pricing.annual": "Annuel",
     "pricing.twoMonthsFree": "2 mois gratuits",
     "pricing.mostPopular": "Le plus choisi",
+    "pricing.plansNav": "Forfaits",
     "pricing.perMonth": "/mois",
     "pricing.perYear": "/an",
     "pricing.perMonthEquivalent": "Revient à {amount} par mois",

@@ -11,6 +11,16 @@ type Message = {
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+/**
+ * Phase 112 — on a phone the floating button is gone (it covered fine print and
+ * buttons); the "Questions? Chat with us" line above the footer opens the
+ * panel through this event instead.
+ */
+const OPEN_EVENT = "quoteai:open-support-chat";
+export function openSupportChat() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
 export default function SupportBot() {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +62,16 @@ export default function SupportBot() {
       console.error("Failed to check admin status", e);
     }
   };
+
+  useEffect(() => {
+    const open = () => {
+      setIsDismissed(false);
+      setIsOpen(true);
+      if (!conversationId) setShowOnboarding(true);
+    };
+    window.addEventListener(OPEN_EVENT, open);
+    return () => window.removeEventListener(OPEN_EVENT, open);
+  }, [conversationId]);
 
   // Phase 68: only while the panel is open. Polling from every public page
   // for every visitor (15 s, forever) was a serverless invocation per
@@ -329,7 +349,7 @@ export default function SupportBot() {
         }}
         aria-label={t("a11y.supportChat")}
         aria-expanded={isOpen}
-        className={`fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-tr from-navy-600 to-navy-600 text-white shadow-xl hover:shadow-navy-500/30 transition-all duration-300 z-[9999] hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 ${
+        className={`sb-launcher fixed bottom-6 right-6 p-4 rounded-full bg-gradient-to-tr from-navy-600 to-navy-600 text-white shadow-xl hover:shadow-navy-500/30 transition-all duration-300 z-[9999] hover:scale-105 active:scale-95 flex items-center justify-center border border-white/20 ${
           isOpen ? "rotate-90 bg-slate-800" : ""
         }`}
       >
@@ -342,7 +362,7 @@ export default function SupportBot() {
           style={{
             transform: `translate(${dragPos.x}px, ${dragPos.y}px)`,
           }}
-          className="fixed bottom-24 right-6 w-96 h-[500px] rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-[9999] transition-all duration-300 animate-in slide-in-from-bottom-5"
+          className="sb-panel fixed bottom-24 right-6 w-96 h-[500px] rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl border border-slate-200/80 flex flex-col overflow-hidden z-[9999] transition-all duration-300 animate-in slide-in-from-bottom-5"
         >
           {/* Header */}
           <div className="p-4 bg-gradient-to-r from-navy-600 to-navy-600 text-white flex items-center justify-between">

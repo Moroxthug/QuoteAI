@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils";
 import { X, Send, CheckCircle2, Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useModalTrap } from "@/hooks/use-modal-trap";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { useWhatsappAvailable } from "@/hooks/use-whatsapp-available";
 import { SkipLink } from "@/components/a11y";
-import SupportBot from "@/components/support-bot";
+import SupportBot, { openSupportChat } from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
 import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
@@ -133,6 +134,32 @@ function LanguageToggle({ variant = "pill" }: { variant?: "pill" | "dark" }) {
   );
 }
 
+/**
+ * Phase 112 — a footer column. On a computer the heading and its links; on a
+ * phone a folded section (six lists of links were 1.5 phone screens on every
+ * public page). A plain div until after hydration, so the prerendered HTML and
+ * the first client render agree.
+ */
+function FooterCol({ title, folded, children }: { title: string; folded: boolean; children: React.ReactNode }) {
+  if (!folded) {
+    return (
+      <div className="ft-col">
+        <h2>{title}</h2>
+        {children}
+      </div>
+    );
+  }
+  return (
+    <details className="ft-col ft-fold">
+      <summary>
+        <h2>{title}</h2>
+        <ChevronDown className="ft-chev h-4 w-4" aria-hidden="true" />
+      </summary>
+      <div className="ft-fold-body">{children}</div>
+    </details>
+  );
+}
+
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useAuth();
   const { t, lang } = useLanguage();
@@ -140,6 +167,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const [supportOpen, setSupportOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [location, navigate] = useLocation();
+  const phone = useMediaQuery("(max-width: 640px)");
   const drawerRef = useRef<HTMLDivElement>(null);
   const closeDrawer = useCallback(() => setMobileMenuOpen(false), []);
   useModalTrap(mobileMenuOpen, drawerRef, closeDrawer);
@@ -219,9 +247,9 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/pricing/", lang))}>{t("nav.pricing")}</button>
               <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/#trades", lang))}>{t("nav.trades")}</button>
               <button className="mnav-link" onClick={() => handleMobileNav(localizedPath("/pilot/", lang))}>{t("nav.pilot")}</button>
-              <button className="mnav-link" onClick={() => handleMobileNav("/#whatsapp")}>{t("nav.whatsapp")}</button>
-              <button className="mnav-link" onClick={() => handleMobileNav("/#guides")}>{t("nav.guides")}</button>
-              <button className="mnav-link" onClick={() => handleMobileNav("/#comparison")}>{t("nav.compare")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav("/whatsapp/")}>{t("nav.whatsapp")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav("/blog/")}>{t("nav.guides")}</button>
+              <button className="mnav-link" onClick={() => handleMobileNav("/help/")}>{t("footer.helpCenter")}</button>
               {!isSignedIn ? (
                 <button className="mnav-link" onClick={() => handleMobileNav("/sign-in")}>{t("nav.signIn")}</button>
               ) : (
@@ -242,6 +270,18 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
       <main id="main" className="flex-1 flex flex-col">{children}</main>
 
+      {/* Phase 112: on a phone the floating chat button sat on the page's
+          fine print and buttons; the chat opens from this line instead. */}
+      {!/^\/sign-(in|up)(\/|$)/.test(location) && (
+        <div className="sb-inline show-phone">
+          <div className="wrap">
+            <span>{t("supportBot.questions")}</span>
+            <button type="button" className="cta-link" onClick={openSupportChat}>
+              {t("supportBot.chatWithUs")}
+            </button>
+          </div>
+        </div>
+      )}
       <footer className="footer">
         <div className="wrap ft-grid">
           <div className="ft-brand">
@@ -250,33 +290,29 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </Link>
             <p>{t("footer.tagline")}</p>
           </div>
-          <div className="ft-col">
-            <h2>{t("footer.trades")}</h2>
+          <FooterCol title={t("footer.trades")} folded={phone}>
             {Object.entries(TRADE_LABELS[lang]).slice(0, 7).map(([slug, label]) => (
               <Link key={slug} href={localizedPath(`/quotes/${slug}/`, lang)}>{label}</Link>
             ))}
             <Link href={localizedPath("/#trades", lang)}>{t("footer.allTrades")}</Link>
-          </div>
-          <div className="ft-col">
-            <h2>{t("footer.features")}</h2>
-            <Link href="/#whatsapp">{t("nav.whatsapp")}<span className="chip-new chip">{t("nav.new")}</span></Link>
+          </FooterCol>
+          <FooterCol title={t("footer.features")} folded={phone}>
+            <Link href="/whatsapp/">{t("nav.whatsapp")}<span className="chip-new chip">{t("nav.new")}</span></Link>
             <Link href="/#story-jobs">{t("footer.jobSites")}</Link>
             <Link href="/#story-invoicing">{t("footer.contracts")}</Link>
             <Link href="/#products">{t("footer.analytics")}</Link>
             <Link href="/#products">{t("footer.aiAssistant")}</Link>
             <Link href="/#products">{t("footer.imports")}</Link>
-          </div>
-          <div className="ft-col">
-            <h2>{t("footer.guides")}</h2>
+          </FooterCol>
+          <FooterCol title={t("footer.guides")} folded={phone}>
             <Link href="/blog/">{t("footer.blog")}</Link>
             <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
             <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
             <Link href={localizedPath("/quotes/how-to-quote/", lang)}>{t("footer.howToQuote")}</Link>
             <Link href={localizedPath("/quotes/free-quote/", lang)}>{t("footer.freeQuotes")}</Link>
-          </div>
-          <div className="ft-col">
+          </FooterCol>
+          <FooterCol title={t("footer.pilotProgram")} folded={phone}>
             {/* Phase 81 — the pilot marketing pages, both languages */}
-            <h2>{t("footer.pilotProgram")}</h2>
             <Link href={localizedPath("/pricing/", lang)}>{t("nav.pricing")}</Link>
             <Link href={localizedPath("/pilot/", lang)}>{t("nav.pilot")}</Link>
             {PROVINCE_SLUG_PAIRS.map((p) => (
@@ -284,22 +320,20 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 {PROVINCE_NAMES[p.code][lang]}
               </Link>
             ))}
-          </div>
-          <div className="ft-col">
-            <h2>{t("footer.company")}</h2>
+          </FooterCol>
+          <FooterCol title={t("footer.company")} folded={phone}>
             <Link href="/chi-siamo/">{t("footer.aboutUs")}</Link>
             <Link href="/contatti/">{t("footer.contact")}</Link>
-            <Link href="/#newsroom">{t("footer.newsroom")}</Link>
+            <Link href="/blog/">{t("footer.newsroom")}</Link>
             <Link href="/#reviews">{t("footer.reviews")}</Link>
-          </div>
-          <div className="ft-col">
-            <h2>{t("footer.support")}</h2>
+          </FooterCol>
+          <FooterCol title={t("footer.support")} folded={phone}>
             <Link href="/help/">{t("footer.helpCenter")}</Link>
             <button onClick={() => setSupportOpen(true)}>{t("support.contactSupport")}</button>
             <Link href={localizedPath("/privacy-policy/", lang)}>{t("footer.privacyPolicy")}</Link>
             <Link href={localizedPath("/terms/", lang)}>{t("footer.terms")}</Link>
             <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>
-          </div>
+          </FooterCol>
         </div>
         <div className="wrap"><p className="ft-fine">{t("footer.fine")}</p></div>
         {/* Phase 73: registered entity (lib/legal-entity) — one line per part, blank until O5 */}

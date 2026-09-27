@@ -38,11 +38,11 @@ function StatTile({
 }
 
 /** Dark full-bleed "impact" band (docs/mockups/homepage-mockup-v2.html .impact) — real, live-counted stats, no invented numbers. */
-export function StatsBar() {
+export function StatsBar({ className = "" }: { className?: string }) {
   const { lang } = useLanguage();
 
   return (
-    <section className="sec impact on-dark" id="impact">
+    <section className={`sec impact on-dark ${className}`} id="impact">
       <div className="wrap">
         <div>
           <span className="eyebrow on-dark">{lang === "fr" ? "Impact" : "Impact"}</span>

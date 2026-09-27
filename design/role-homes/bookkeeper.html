@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Bookkeeper home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="search"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">NR</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Hi, Nadia</h1>
+    <p>September closes in 3 days</p>
+    <span class="role-chip"><i data-lucide="calculator" style="width:14px;height:14px"></i>Bookkeeper</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>Ask about invoices, payments, tax…</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Needs you</h2><span class="count">4</span></div>
+    <div class="row"><div class="lead green"><i data-lucide="arrow-down-left"></i></div>
+      <div class="body"><div class="t">2 e-Transfers to match</div><div class="s num">$7,112.00 · $3,450.00</div></div>
+      <button class="btn primary">Match</button></div>
+    <div class="row"><div class="lead red"><i data-lucide="clock-alert"></i></div>
+      <div class="body"><div class="t">3 invoices overdue</div><div class="s num">$18,640 · oldest 34 days</div></div>
+      <button class="btn outline">Remind</button></div>
+    <div class="row"><div class="lead amber"><i data-lucide="receipt"></i></div>
+      <div class="body"><div class="t">11 receipts to categorize</div><div class="s">From the crew app this week</div></div>
+      <button class="btn outline">Review</button></div>
+    <div class="row"><div class="lead teal"><i data-lucide="file-check"></i></div>
+      <div class="body"><div class="t">Holdback ready to release</div><div class="s num">Ellis addition · $4,120 · lien period ended</div></div>
+      <button class="btn outline">Invoice</button></div>
+  </section>
+
+  <section class="card">
+    <div class="stats">
+      <div><div class="l">Collected</div><div class="v num">$86.4k</div><div class="d">September</div></div>
+      <div><div class="l">Owed to you</div><div class="v num">$41.2k</div><div class="d">12 invoices</div></div>
+      <div><div class="l">Costs</div><div class="v num">$52.9k</div><div class="d">September</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Sales tax this period</h2><span class="sub">Jul – Sep</span></div>
+    <div class="row"><div class="body"><div class="t">GST collected</div></div><div class="amt num">$9,842.50</div></div>
+    <div class="row"><div class="body"><div class="t">PST collected (BC)</div></div><div class="amt num">$3,104.20</div></div>
+    <div class="row"><div class="body"><div class="t">Input tax credits</div><div class="s">From categorized costs</div></div><div class="amt num">−$2,646.10</div></div>
+    <div class="row"><div class="body"><div class="t">GST owing</div><div class="s">Due Oct 31</div></div><div class="amt num" style="font-size:17px">$7,196.40</div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Exports</h2></div>
+    <div class="row"><div class="lead"><i data-lucide="users"></i></div>
+      <div class="body"><div class="t">Payroll hours</div><div class="s num">Sep 15 – 28 · 6 people · approved</div></div>
+      <button class="btn outline"><i data-lucide="download" style="width:14px;height:14px"></i>Export</button></div>
+    <div class="row"><div class="lead"><i data-lucide="book-open"></i></div>
+      <div class="body"><div class="t">QuickBooks sync</div><div class="s">Last synced 12 min ago</div></div>
+      <span class="chip green">On</span></div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="wallet"></i>Money</div>
+  <div class="tab"><i data-lucide="receipt"></i>Costs</div>
+  <div class="tab"><i data-lucide="chart-column"></i>Reports</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

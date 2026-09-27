@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Customize home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body style="background:#8e8ea3">
+<div class="sheet">
+  <div class="grab"></div>
+  <div class="sheet-h"><h2>Customize home</h2><button class="iconbtn"><i data-lucide="x"></i></button></div>
+  <p class="help">Show, hide and reorder what's on your Today. Only sections your role can see are listed.</p>
+
+  <div class="group">Sections</div>
+  <div class="srow"><div class="grip"><i data-lucide="lock"></i></div>
+    <div class="body"><div class="t">Needs you</div><div class="s">Always on. Safety and overdue items always show</div></div>
+    <div class="seg" style="margin:0;width:136px"><span class="on">Full</span><span>Count</span></div></div>
+  <div class="srow"><div class="grip"><i data-lucide="grip-vertical"></i></div>
+    <div class="body"><div class="t">Site visits today</div></div><div class="toggle on"></div></div>
+  <div class="srow"><div class="grip"><i data-lucide="grip-vertical"></i></div>
+    <div class="body"><div class="t">Waiting on a reply</div></div><div class="toggle on"></div></div>
+  <div class="srow"><div class="grip"><i data-lucide="grip-vertical"></i></div>
+    <div class="body"><div class="t">Numbers</div><div class="s">Win rate, sent, pipeline</div></div><div class="toggle on"></div></div>
+  <div class="srow off"><div class="grip"><i data-lucide="grip-vertical"></i></div>
+    <div class="body"><div class="t">New leads</div></div><div class="toggle"></div></div>
+  <div class="srow off"><div class="grip"><i data-lucide="grip-vertical"></i></div>
+    <div class="body"><div class="t">Win rate by job type</div></div><div class="toggle"></div></div>
+  <div class="srow off"><div class="grip"><i data-lucide="lock"></i></div>
+    <div class="body"><div class="t">Cash forecast</div></div><div class="lock"><i data-lucide="lock"></i>Not in your role</div></div>
+
+  <div class="group">Bottom tabs · Today, then pick 3</div>
+  <div class="tabpick">
+    <span class="on"><i data-lucide="inbox"></i>Leads</span>
+    <span class="on"><i data-lucide="file-text"></i>Quotes</span>
+    <span class="on"><i data-lucide="users"></i>Clients</span>
+    <span><i data-lucide="calendar"></i>Schedule</span>
+    <span><i data-lucide="briefcase"></i>Jobs</span>
+    <span><i data-lucide="book-open"></i>Catalog</span>
+  </div>
+
+  <div class="group">Numbers cover</div>
+  <div class="seg"><span>Week</span><span class="on">Month</span><span>Quarter</span></div>
+  <div class="group">Density</div>
+  <div class="seg"><span class="on">Comfortable</span><span>Compact</span></div>
+
+  <div class="sheet-f">
+    <button class="btn outline">Reset to default</button>
+    <button class="btn primary">Done</button>
+  </div>
+</div>
+<script>lucide.createIcons();</script>
+</body></html>

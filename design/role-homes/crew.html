@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Crew home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="bell"></i></button>
+  <div class="avatar">AS</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Hi, Amir</h1>
+    <p>Wednesday, October 1</p>
+  </div>
+
+  <section class="card now">
+    <div class="k">Your shift · 7:00 – 15:30</div>
+    <h3>Highland Reno</h3>
+    <div class="addr"><i data-lucide="map-pin"></i>442 Highland Cres, North Vancouver</div>
+    <div class="meta">
+      <span class="chip grey">Gate code 4471</span>
+      <span class="chip grey">Park on street</span>
+      <span class="chip teal">Foreman: Luc</span>
+    </div>
+    <div class="clock"><button class="btn primary big"><i data-lucide="log-in"></i>Clock in</button></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn outline" style="flex:1;justify-content:center;height:44px"><i data-lucide="navigation" style="width:16px;height:16px"></i>Directions</button>
+      <button class="btn outline" style="flex:1;justify-content:center;height:44px"><i data-lucide="phone" style="width:16px;height:16px"></i>Call Luc</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>My tasks</h2><span class="sub num">0 of 3</span></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Strip old flooring, main bath</div><div class="s">With Jo M.</div></div></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Haul debris to the bin</div></div></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Sweep and protect the hallway</div><div class="s">Photo when done</div></div></div>
+  </section>
+
+  <div class="quick">
+    <div><i data-lucide="camera"></i>Photo</div>
+    <div><i data-lucide="triangle-alert"></i>Report issue</div>
+    <div><i data-lucide="mic" style="color:var(--violet)"></i>Ask</div>
+  </div>
+
+  <section class="card">
+    <div class="card-h"><h2>My hours</h2><span class="sub">this week</span><span class="link">Details</span></div>
+    <div class="row" style="border-top:1px solid var(--line)"><div class="body">
+      <div style="display:flex;justify-content:space-between"><span class="t num">24.5 h</span><span class="s num">of 40 h</span></div>
+      <div class="bar"><i style="width:61%"></i></div></div></div>
+    <div class="row"><div class="lead teal"><i data-lucide="graduation-cap"></i></div>
+      <div class="body"><div class="t">Apprentice logbook</div><div class="s num">Carpentry year 2 · 2,410 of 3,600 h</div></div>
+      <div class="chev"><i data-lucide="chevron-right"></i></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>My tickets</h2></div>
+    <div class="row"><div class="lead amber"><i data-lucide="badge-check"></i></div>
+      <div class="body"><div class="t">Fall protection</div><div class="s">Expires Nov 14 · renew soon</div></div>
+      <span class="chip amber">45 days</span></div>
+    <div class="row"><div class="lead green"><i data-lucide="badge-check"></i></div>
+      <div class="body"><div class="t">WHMIS</div><div class="s">Valid until 2027</div></div>
+      <span class="chip green">Valid</span></div>
+  </section>
+
+  <div class="customize"><i data-lucide="languages"></i>English · Français</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="sun"></i>Now</div>
+  <div class="tab"><i data-lucide="list-checks"></i>Tasks</div>
+  <div class="tab"><i data-lucide="image"></i>Photos</div>
+  <div class="tab"><i data-lucide="user"></i>Me</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

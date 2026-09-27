@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=390">
+<title>Foreman home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head><body>
+<header class="appbar">
+  <div class="logo"><div class="logo-mark">Q</div>QuoteAI</div><div class="spacer"></div>
+  <button class="iconbtn"><i data-lucide="plus"></i></button>
+  <button class="iconbtn"><i data-lucide="bell"></i><span class="dot"></span></button>
+  <div class="avatar">LB</div>
+</header>
+<main>
+  <div class="greet">
+    <h1>Morning, Luc</h1>
+    <p>Highland Reno · 6°C, light rain after 2 pm</p>
+    <span class="role-chip"><i data-lucide="hard-hat" style="width:14px;height:14px"></i>Site supervisor</span>
+  </div>
+
+  <div class="assist"><div class="mic"><i data-lucide="mic"></i></div><span>Ask, log a cost or a note…</span><div class="send"><i data-lucide="arrow-up"></i></div></div>
+
+  <section class="card">
+    <div class="card-h"><h2>Needs you</h2><span class="count">3</span></div>
+    <div class="row"><div class="lead amber"><i data-lucide="clock"></i></div>
+      <div class="body"><div class="t">Approve hours</div><div class="s num">4 people · 31.5 h yesterday</div></div>
+      <button class="btn primary">Approve</button></div>
+    <div class="row"><div class="lead red"><i data-lucide="octagon-alert"></i></div>
+      <div class="body"><div class="t">Drywall is blocked</div><div class="s">Waiting on the electrical sign-off</div></div>
+      <button class="btn outline"><i data-lucide="phone" style="width:14px;height:14px"></i>Inspector</button></div>
+    <div class="row"><div class="lead teal"><i data-lucide="shield-check"></i></div>
+      <div class="body"><div class="t">Toolbox talk due today</div><div class="s">Topic suggested: working in wet conditions</div></div>
+      <button class="btn outline">Start</button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Crew here now</h2><span class="chip teal">3 of 4</span></div>
+    <div class="row"><div class="lead">DK</div>
+      <div class="body"><div class="t">Dave K.</div><div class="s">Framing · lead hand</div></div>
+      <div class="trail s num" style="color:var(--muted);font-size:13px">In 7:02</div></div>
+    <div class="row"><div class="lead">AS</div>
+      <div class="body"><div class="t">Amir S.</div><div class="s">Carpentry · apprentice, year 2</div></div>
+      <div class="trail num" style="color:var(--muted);font-size:13px">In 7:10</div></div>
+    <div class="row"><div class="lead">JM</div>
+      <div class="body"><div class="t">Jo M.</div><div class="s">Labourer</div></div>
+      <div class="trail num" style="color:var(--muted);font-size:13px">In 7:15</div></div>
+    <div class="row"><div class="lead amber">ST</div>
+      <div class="body"><div class="t">Sam T.</div><div class="s">Not clocked in · shift started 7:00</div></div>
+      <button class="iconbtn"><i data-lucide="phone"></i></button></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Today's tasks</h2><span class="sub num">2 of 5 done</span></div>
+    <div class="who">Dave K.</div>
+    <div class="check"><div class="box done"><i data-lucide="check"></i></div><div class="body"><div class="t done">Frame ensuite partition wall</div></div></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Install blocking for vanity and grab bars</div><div class="s">Photo required</div></div></div>
+    <div class="who">Amir S. and Jo M.</div>
+    <div class="check"><div class="box done"><i data-lucide="check"></i></div><div class="body"><div class="t done">Strip old flooring, main bath</div></div></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Haul debris to the bin</div></div></div>
+    <div class="check"><div class="box"></div><div class="body"><div class="t">Sweep and protect the hallway</div></div></div>
+  </section>
+
+  <section class="card">
+    <div class="card-h"><h2>Arriving today</h2></div>
+    <div class="row"><div class="lead"><i data-lucide="truck"></i></div>
+      <div class="body"><div class="t">Drywall · 42 sheets</div><div class="s num">Supplier delivery · 10:30–11:00</div></div>
+      <span class="chip green">Confirmed</span></div>
+  </section>
+
+  <div class="customize"><i data-lucide="sliders-horizontal"></i>Customize home</div>
+</main>
+<nav class="tabbar">
+  <div class="tab on"><i data-lucide="house"></i>Today</div>
+  <div class="tab"><i data-lucide="briefcase"></i>Jobs</div>
+  <div class="tab"><i data-lucide="calendar"></i>Schedule</div>
+  <div class="tab"><i data-lucide="users"></i>Crew</div>
+  <div class="tab"><i data-lucide="layout-grid"></i>More</div>
+</nav>
+<script>lucide.createIcons();</script>
+</body></html>

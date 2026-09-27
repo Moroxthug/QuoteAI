@@ -194,6 +194,12 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/dashboard", session: "owner", name: "/dashboard More sheet", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
     { path: "/dashboard", session: "owner", name: "/dashboard New sheet", drive: (p) => openPhoneSheet(p, ".tb-new", "[role=dialog] .asheet-list") },
     { path: "/dashboard", session: "foreman", name: "/dashboard More sheet (foreman)", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
+    // Phase 104: Today's period switch (a sheet on a phone, a menu wider), and the home a Pro owner sees (no crew tier: no blockers or hours).
+    { path: "/dashboard", session: "owner", name: "/dashboard period switch", drive: async (p) => {
+      await p.locator(".today-stats .more-btn").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
+    { path: "/dashboard", session: "pro", name: "/dashboard (pro)" },
     // Phase 100: the calm-mobile primitives on fake data (dev-server route).
     dash("/dashboard/__preview"),
     dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),

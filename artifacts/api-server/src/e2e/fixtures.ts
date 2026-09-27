@@ -7,7 +7,7 @@
 // row it needs is missing). Everything is owned by the org's user, so
 // `cleanupAll()` from the harness removes it.
 
-import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable, calendarConnectionsTable } from "@workspace/db";
+import { db, collaboratorsTable, quotesTable, contractsTable, contractSignersTable, projectsTable, milestonesTable, costEntriesTable, invoicesTable, clientsTable, priceCatalogItemsTable, businessProfilesTable, getTaxProfile, fieldReportsTable, flinksConnectionsTable, flinksTransactionsTable, quickbooksConnectionsTable, uploadedDocumentsTable, calendarConnectionsTable, leadsTable } from "@workspace/db";
 import { encryptSecret } from "../lib/crypto.js";
 import { and, eq } from "drizzle-orm";
 import "../automations/index.js";
@@ -227,6 +227,22 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
       ],
     },
   });
+
+  // Phase 104: one of each thing the home's "Needs you" merges besides the
+  // crew's blocker above — the manual invoice nine days past due, hours typed
+  // in and waiting, a lead to call back today, and a quote sent a week ago that
+  // nobody answered — so the sweep renders the list, not its empty state.
+  await db.update(invoicesTable).set({ dueDate: new Date(Date.now() - 9 * 86_400_000) }).where(eq(invoicesTable.id, manualSent.id));
+  if (worker.status === 201) {
+    await org.api(`/api/jobs/${project.id}/time-entries`, { body: { workerId: worker.body.worker.id, date: new Date().toISOString().slice(0, 10), hours: 7.5, approve: false, note: language === "fr" ? "Démolition" : "Demolition" } });
+  }
+  const lead = await org.api("/api/leads", { body: { name: "Robin Tremblay", phone: "6135550177", notes: language === "fr" ? "Salle de bain, rappeler après 17 h" : "Bathroom, call back after 5 pm" } });
+  if (lead.status === 201 || lead.status === 200) {
+    const leadId = String(lead.body.lead?.id ?? lead.body.id);
+    await db.update(leadsTable).set({ status: "contacted", nextFollowUpAt: new Date() }).where(eq(leadsTable.id, leadId));
+  }
+  const waiting = await seedQuote(userId, { province, clientName: "Alex Morin", clientEmail: "alex@e2e-test.invalid" });
+  await db.update(quotesTable).set({ sentAt: new Date(Date.now() - 6 * 86_400_000), clientData: { ...waiting.clientData, phone: "6135550163" } }).where(eq(quotesTable.id, waiting.id));
 
   await seedBooks(userId, project.id, language);
   await seedGroup(org, project.id, worker.status === 201 ? String(worker.body.worker.id) : null, language);

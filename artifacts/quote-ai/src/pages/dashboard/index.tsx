@@ -5,17 +5,12 @@ import {
   useGetTrialStatus,
   useCreateQuote,
   useGetBusinessProfile,
-  useListQuotes,
 } from "@workspace/api-client-react";
-import type { QuoteSummary } from "@workspace/api-client-react";
-import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   FileText,
   FileSpreadsheet,
-  TrendingUp,
-  CalendarDays,
   Sparkles,
   Plus,
   ArrowRight,
@@ -36,7 +31,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useClientMemory } from "@/hooks/use-client-memory";
 import type { SavedClient } from "@/hooks/use-client-memory";
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -44,11 +39,10 @@ import { cn } from "@/lib/utils";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan, useRole } from "@/hooks/use-role";
-import { leadsApi, type LeadDto } from "@/lib/leads-api";
 import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
-import { CalendarCard } from "@/components/dashboard/calendar-card";
-import { CrewTodayCard } from "@/components/crew/crew-today-card";
+import { CrewLine, NeedsYouCard, NextUpCard, TodayStats } from "@/components/dashboard/today";
+import { ListRow } from "@/components/mobile/list-row";
 import { MARKETING_PLANS } from "@/data/pricing";
 import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 import { ForemanHome } from "@/components/crew/foreman-home";
@@ -81,66 +75,6 @@ interface ClientForm {
 const emptyClient: ClientForm = {
   nome: "", indirizzo: "", city: "", postalCode: "", province: "", businessNumber: "", partitaIva: "",
 };
-
-/* ─── period stats + revenue bars (real data, computed from the user's quotes) ─ */
-
-type Period = "m" | "q" | "y";
-
-function periodRange(period: Period, offset: number): { start: Date; end: Date } {
-  const now = new Date();
-  if (period === "m") {
-    return {
-      start: new Date(now.getFullYear(), now.getMonth() + offset, 1),
-      end: new Date(now.getFullYear(), now.getMonth() + offset + 1, 1),
-    };
-  }
-  if (period === "q") {
-    const currentQStart = Math.floor(now.getMonth() / 3) * 3 + offset * 3;
-    return {
-      start: new Date(now.getFullYear(), currentQStart, 1),
-      end: new Date(now.getFullYear(), currentQStart + 3, 1),
-    };
-  }
-  return {
-    start: new Date(now.getFullYear() + offset, 0, 1),
-    end: new Date(now.getFullYear() + offset + 1, 0, 1),
-  };
-}
-
-function computePeriodStats(quotes: QuoteSummary[], period: Period, offset: number) {
-  const { start, end } = periodRange(period, offset);
-  const inRange = quotes.filter(q => {
-    const d = new Date(q.createdAt);
-    return d >= start && d < end;
-  });
-  const unlocked = inRange.filter(q => q.status === "unlocked");
-  const unlockedRevenue = unlocked.reduce((sum, q) => sum + q.totale, 0);
-  const avgValue = unlocked.length > 0 ? unlockedRevenue / unlocked.length : 0;
-  return { count: inRange.length, unlocked: unlocked.length, unlockedRevenue, avgValue };
-}
-
-function deltaPct(current: number, previous: number): number | null {
-  if (previous <= 0) return null;
-  return Math.round(((current - previous) / previous) * 100);
-}
-
-function weeklyRevenueBuckets(quotes: QuoteSummary[]): number[] {
-  const now = new Date();
-  const dow = now.getDay();
-  const diffToMonday = (dow + 6) % 7;
-  const thisMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diffToMonday);
-  const buckets = new Array(8).fill(0) as number[];
-  for (const q of quotes) {
-    if (q.status !== "unlocked") continue;
-    const d = new Date(q.createdAt);
-    const diffDays = Math.floor((thisMonday.getTime() - d.getTime()) / 86400000);
-    if (diffDays < 0) continue;
-    const weeksAgo = Math.floor(diffDays / 7);
-    const idx = 7 - weeksAgo;
-    if (idx >= 0 && idx < 8) buckets[idx] += q.totale;
-  }
-  return buckets;
-}
 
 /* ─── StatusBadge ────────────────────────────────────────────────────────── */
 function quoteStatusChip(status: string, t: (key: string) => string): { cls: string; label: string } {
@@ -213,7 +147,7 @@ const can = useCan();
                   <Icon className="h-3.5 w-3.5 text-navy-500" />
                   <span className="text-sm font-semibold text-foreground">{title}</span>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-1.5">{desc}</p>
+                <p className="text-xs leading-relaxed mb-1.5" style={{ color: "var(--muted-mk)" }}>{desc}</p>
                 {href && cta && <Link href={href} className="text-xs font-semibold text-navy-600 hover:text-navy-700 transition-colors">{cta}</Link>}
               </div>
             ))}
@@ -313,6 +247,8 @@ function DashboardComposer() {
   const [clientForm, setClientForm] = useState<ClientForm>(emptyClient);
   const [rememberClient, setRememberClient] = useState(false);
   const [clientOpen, setClientOpen] = useState(false);
+  // Phase 104: one line on the home page; the client part appears once the box is used.
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
     return () => { photoPreviews.forEach(url => URL.revokeObjectURL(url)); };
@@ -421,6 +357,7 @@ function DashboardComposer() {
 
   const isSubmitting = createQuote.isPending;
   const canSubmit = input.trim().length > 0 && !isSubmitting;
+  const expanded = focused || input.trim().length > 0 || photos.length + docs.length > 0 || clientOpen || !!clientForm.nome;
 
   const selectSavedClient = (c: SavedClient) => {
     setSelectedClientId(c.id);
@@ -440,7 +377,7 @@ function DashboardComposer() {
   };
 
   return (
-    <section className={cn("card composer", isSubmitting && "busy")}>
+    <section className={cn("card composer", isSubmitting && "busy")} onFocus={() => setFocused(true)}>
       {/* Photo strip */}
       {photos.length > 0 && (
         <div className="px-3 pt-3 flex gap-2 flex-wrap border-b border-border pb-3">
@@ -549,6 +486,7 @@ function DashboardComposer() {
       />
 
       {/* Client section */}
+      {expanded && <>
       <button type="button" onClick={() => setClientOpen(v => !v)} className="comp-client">
         <User className="h-3.5 w-3.5" />
         <span>{t("dashboard.new.client.label")}</span>
@@ -681,6 +619,7 @@ function DashboardComposer() {
           )}
         </div>
       )}
+      </>}
     </section>
   );
 }
@@ -695,72 +634,36 @@ export default function DashboardHome() {
 /** Phase 93: the monthly quote allowance from the pricing data (Pro was shown as "unlimited"; it is 60). */
 const planQuota = (plan: string | null | undefined): number | null => MARKETING_PLANS.find((p) => p.id === plan)?.quotaPerMonth ?? null;
 
+/**
+ * Phase 104: Today. What needs you first, the describe-a-job line, then the
+ * period's numbers as one strip, the crew as one line and the next five
+ * things — instead of a greeting followed by a tower of cards.
+ */
 function OwnerHome() {
   const { t } = useLanguage();
-const can = useCan();
+  const can = useCan();
   const { data: stats, isLoading: isLoadingStats } = useGetQuoteStats();
   const { data: subscription } = useGetSubscription();
   const { data: trialStatus } = useGetTrialStatus();
   const { data: profile } = useGetBusinessProfile();
-  const { data: allQuotes } = useListQuotes();
-  const { data: followUpsData } = useQuery({ queryKey: ["leads", "followups"], queryFn: () => leadsApi.list() });
   const { user } = useAuth();
-  const [period, setPeriod] = useState<Period>("m");
 
-  const formatCurrency = (amount: number) => formatCadWhole(amount);
-
-  const recentQuotes = stats?.recentQuotes || [];
+  const recentQuotes = (stats?.recentQuotes || []).slice(0, 5);
   const firstName = user?.name?.split(" ")?.[0] || "";
   const isNewUser = !isLoadingStats && (stats?.total ?? 0) === 0;
-
-  const periodStats = useMemo(() => {
-    const quotes = allQuotes ?? [];
-    const current = computePeriodStats(quotes, period, 0);
-    const previous = computePeriodStats(quotes, period, -1);
-    return { current, previous };
-  }, [allQuotes, period]);
-
-  const weeklyBuckets = useMemo(() => weeklyRevenueBuckets(allQuotes ?? []), [allQuotes]);
-  const maxBucket = Math.max(0, ...weeklyBuckets);
-  const hotIdx = maxBucket > 0 ? weeklyBuckets.lastIndexOf(maxBucket) : -1;
-
-  const upcomingFollowUps = useMemo(() => {
-    const leads = (followUpsData?.items ?? []).filter((l): l is LeadDto & { nextFollowUpAt: string } => !!l.nextFollowUpAt);
-    return leads.sort((a, b) => new Date(a.nextFollowUpAt).getTime() - new Date(b.nextFollowUpAt).getTime()).slice(0, 3);
-  }, [followUpsData]);
-
-  const followUpChip = (dateStr: string): { label: string; cls: string } => {
-    const d = new Date(dateStr);
-    const now = new Date();
-    const startOfDay = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
-    const diffDays = Math.round((startOfDay(d) - startOfDay(now)) / 86400000);
-    if (diffDays <= 0) return { label: t("dashboard.index.followUps.today"), cls: "chip-yellow" };
-    if (diffDays === 1) return { label: t("dashboard.index.followUps.tomorrow"), cls: "chip-grey" };
-    return { label: d.toLocaleDateString("en-CA"), cls: "chip-grey" };
-  };
-
-  const STAT_CARDS = [
-    { key: "count" as const, label: t("dashboard.index.stat.quotesPeriod"), icon: CalendarDays, isCurrency: false },
-    { key: "unlocked" as const, label: t("dashboard.index.stat.unlocked"), icon: CheckCircle2, isCurrency: false },
-    { key: "unlockedRevenue" as const, label: t("dashboard.index.stat.unlockedRevenue"), icon: TrendingUp, isCurrency: true },
-    { key: "avgValue" as const, label: t("dashboard.index.stat.avgValue"), icon: Sparkles, isCurrency: true },
-  ];
 
   if (isLoadingStats) {
     return (
       <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Skeleton className="h-16 w-full rounded-[var(--radius)]" />
-        <Skeleton className="h-32 w-full rounded-[var(--radius)]" />
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-[var(--radius)]" />)}
-        </div>
-        <Skeleton className="h-52 rounded-[var(--radius)]" />
+        <Skeleton className="h-14 w-full rounded-[var(--radius)]" />
+        <Skeleton className="h-64 w-full rounded-[var(--radius)]" />
       </div>
     );
   }
 
   return (
-    <div className="animate-in fade-in duration-500">
+    <div className="today animate-in fade-in duration-500">
       <div className="page-head">
         <div>
           <h1>{firstName ? t("dashboard.index.greetingName").replace("{name}", firstName) : t("dashboard.index.greetingFallback")}</h1>
@@ -774,20 +677,15 @@ const can = useCan();
                 : t("dashboard.index.subtitleTotalQuotes").replace("{count}", String(stats?.total ?? 0))}
           </p>
         </div>
-        <div className="head-actions">
-          <div className="seg" data-period={period} role="group" aria-label={t("a11y.reportingPeriod")}>
-            <button type="button" className="seg-b" onClick={() => setPeriod("m")}>{t("dashboard.index.period.month")}</button>
-            <button type="button" className="seg-b" onClick={() => setPeriod("q")}>{t("dashboard.index.period.quarter")}</button>
-            <button type="button" className="seg-b" onClick={() => setPeriod("y")}>{t("dashboard.index.period.year")}</button>
-            <span className="seg-thumb" />
-          </div>
-          {can("quotes", "edit") && (
+        {/* On a phone the + in the top bar is the new-quote button. */}
+        {can("quotes", "edit") && (
+          <div className="head-actions today-new">
             <Link href="/dashboard/new" className="btn btn-navy">
               <Plus className="h-4 w-4" />
               {t("dashboard.index.quickActions.newQuote")}
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <PaymentReturnNotice />
@@ -797,7 +695,7 @@ const can = useCan();
       <InstallPrompt className="mt-4" />
 
       {trialStatus?.isTrialActive && !subscription?.isActive && (
-        <div style={{ marginTop: 16 }}>
+        <div className="today-gap">
           <TrialBanner
             downloadsUsed={trialStatus.trialDownloadsUsed}
             downloadsLimit={trialStatus.trialDownloadsLimit}
@@ -807,33 +705,52 @@ const can = useCan();
       )}
 
       {isNewUser ? (
-        <div style={{ marginTop: 16 }}>
+        <div className="today-gap">
           <OnboardingView profileDone={!!profile?.companyName} />
         </div>
       ) : (
         <>
-          <section className="stat-grid" style={{ marginTop: 16 }}>
-            {STAT_CARDS.map(({ key, label, icon: Icon, isCurrency }) => {
-              const raw = periodStats.current[key];
-              const value = isCurrency ? formatCurrency(raw) : String(raw);
-              const pct = deltaPct(raw, periodStats.previous[key]);
-              return (
-                <div key={key} className="card stat-card">
-                  <p className="lbl">{label}</p>
-                  <p className="val">{value}</p>
-                  {pct !== null && (
-                    <p className={cn("delta", pct === 0 && "flat", pct < 0 && "neg")}>
-                      {pct > 0 ? "+" : ""}{pct}% {t("dashboard.index.vsLastPeriod")}
-                    </p>
-                  )}
-                  <Icon className="sr-only" aria-hidden />
-                </div>
-              );
-            })}
-          </section>
+          <div className="today-grid">
+            <div className="today-main">
+              <NeedsYouCard />
+              <TodayStats />
+              {recentQuotes.length > 0 && (
+                <section className="card" aria-labelledby="recent-quotes-h">
+                  <div className="today-head">
+                    <h2 id="recent-quotes-h">{t("dashboard.index.recentQuotes.title")}</h2>
+                    <Link href="/dashboard/quotes" className="cta-link today-link">
+                      {t("dashboard.index.recentQuotes.viewAll")} <ArrowRight className="chev" />
+                    </Link>
+                  </div>
+                  <ul className="lrows">
+                    {recentQuotes.map((quote) => {
+                      const chip = quoteStatusChip(quote.status, t);
+                      return (
+                        <li key={quote.id}>
+                          <ListRow
+                            href={`/dashboard/quotes/${quote.id}`}
+                            title={quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}
+                            meta={new Date(quote.createdAt).toLocaleDateString("en-CA")}
+                            amount={formatCadWhole(quote.totale)}
+                            end={<span className={cn("chip", chip.cls)}>{chip.label}</span>}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              )}
+            </div>
+            <div className="today-side">
+              <CrewLine />
+              <NextUpCard />
+              {/* Phase 79: 60-day cash-flow outlook (Elite) */}
+              <CashFlowCard plan={subscription?.plan} isActive={subscription?.isActive} />
+            </div>
+          </div>
 
           {!subscription?.isActive && (
-            <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-[var(--radius)] p-4 flex items-center justify-between gap-4" style={{ marginTop: 16 }}>
+            <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-[var(--radius)] p-4 flex items-center justify-between gap-4 today-gap">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
                   <Crown className="h-4 w-4 text-navy-500" />
@@ -850,125 +767,8 @@ const can = useCan();
           )}
 
           {subscription?.isActive && subscription?.plan === "monthly_starter" && (
-            <div style={{ marginTop: 16 }}><StarterUpgradeCard /></div>
+            <div className="today-gap"><StarterUpgradeCard /></div>
           )}
-
-          {/* Phase 86: the crew's day — only when a crew is out or something waits on the office */}
-          <CrewTodayCard variant="owner" />
-
-          {/* Phase 85: the month, and what is on it */}
-          <CalendarCard />
-
-          {/* Phase 79: 60-day cash-flow outlook (Elite) */}
-          <CashFlowCard plan={subscription?.plan} isActive={subscription?.isActive} />
-
-          <section className="mid-grid">
-            <div className="card">
-              <div className="card-head">
-                <div>
-                  <h2>{t("dashboard.index.recentQuotes.title")}</h2>
-                  <p className="sub">{t("dashboard.index.recentQuotes.subtitle").replace("{count}", String(recentQuotes.length))}</p>
-                </div>
-                <Link href="/dashboard/quotes" className="cta-link">
-                  {t("dashboard.index.recentQuotes.viewAll")} <ArrowRight className="chev" />
-                </Link>
-              </div>
-              <div>
-                {recentQuotes.map((quote) => {
-                  const chip = quoteStatusChip(quote.status, t);
-                  return (
-                    <Link key={quote.id} href={`/dashboard/quotes/${quote.id}`} className="q-row">
-                      <span className="q-ic"><FileText className="h-4 w-4" /></span>
-                      <div className="q-body">
-                        <p className="q-title">{quote.clientData?.nome || t("dashboard.quotesList.clientNotSpecified")}</p>
-                        <div className="q-meta">
-                          <span className={cn("chip", chip.cls)}>{chip.label}</span>
-                          <span className="q-date">{new Date(quote.createdAt).toLocaleDateString("en-CA")}</span>
-                        </div>
-                      </div>
-                      <span className="q-amt">{formatCurrency(quote.totale)}</span>
-                      <ArrowRight className="chev" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="stack">
-              <div className="card">
-                <div className="card-head">
-                  <div>
-                    <h2>{t("dashboard.index.revenueByWeek.title")}</h2>
-                    <p className="sub">{t("dashboard.index.revenueByWeek.subtitle")}</p>
-                  </div>
-                </div>
-                <div className="act-body">
-                  <div className="bars">
-                    {weeklyBuckets.map((v, i) => (
-                      <span
-                        key={i}
-                        className={cn("bar", i === hotIdx && "hot")}
-                        style={{ height: maxBucket > 0 ? `${Math.max(4, Math.round((v / maxBucket) * 100))}%` : "4%" }}
-                      />
-                    ))}
-                  </div>
-                  <div className="bar-x">
-                    {weeklyBuckets.map((_, i) => <span key={i}>W{i + 1}</span>)}
-                  </div>
-                </div>
-              </div>
-
-              <div className="card">
-                <div className="card-head">
-                  <div>
-                    <h2>{t("dashboard.index.followUps.title")}</h2>
-                    <p className="sub">{t("dashboard.index.followUps.subtitle")}</p>
-                  </div>
-                </div>
-                {upcomingFollowUps.length === 0 ? (
-                  <p className="fu-row" style={{ color: "var(--faint)" }}>{t("dashboard.index.followUps.empty")}</p>
-                ) : (
-                  upcomingFollowUps.map(lead => {
-                    const chip = followUpChip(lead.nextFollowUpAt as string);
-                    return (
-                      <div key={lead.id} className="fu-row">
-                        <div>
-                          <b>{lead.name}</b>
-                          <span>{t(`leads.status.${lead.status}`)}</span>
-                        </div>
-                        <span className={cn("chip", chip.cls)}>{chip.label}</span>
-                      </div>
-                    );
-                  })
-                )}
-                <div className="card-foot">
-                  <Link href="/dashboard/leads" className="cta-link">
-                    {t("dashboard.index.followUps.openCrm")} <ArrowRight className="chev" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="qa-grid">
-            {can("quotes", "edit") && (
-              <Link href="/dashboard/new" className="card qa">
-                <span className="qa-ic green"><Plus className="h-4 w-4" /></span>
-                <span><b>{t("dashboard.index.quickActions.newQuote")}</b><span>{t("dashboard.index.qa.newQuote.desc")}</span></span>
-                <ArrowRight className="chev" />
-              </Link>
-            )}
-            <Link href="/dashboard/quotes" className="card qa">
-              <span className="qa-ic navy"><FileText className="h-4 w-4" /></span>
-              <span><b>{t("dashboard.index.quickActions.allQuotes")}</b><span>{t("dashboard.index.qa.allQuotes.desc")}</span></span>
-              <ArrowRight className="chev" />
-            </Link>
-            <Link href="/dashboard/settings/company" className="card qa">
-              <span className="qa-ic teal"><Building2 className="h-4 w-4" /></span>
-              <span><b>{t("dashboard.index.quickActions.companyProfile")}</b><span>{t("dashboard.index.qa.profile.desc")}</span></span>
-              <ArrowRight className="chev" />
-            </Link>
-          </section>
         </>
       )}
     </div>

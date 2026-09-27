@@ -19,7 +19,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 101 | Navigation: bottom tabs, the More sheet, one New button | A | **done** 2026-09-26 |
 | 102 | Settings, rebuilt (desktop and phone) | A | **done** 2026-09-26 |
 | 103 | Integrations: an app directory with real logos | A | **done** 2026-09-26 |
-| 104 | Today (dashboard home) | A | not started |
+| 104 | Today (dashboard home) | A | **done** 2026-09-26 |
 | 105 | Quotes: list, new quote, quote detail | A | not started |
 | 106 | Jobs: list and the job page | A | not started |
 | 107 | Money and people: invoices, clients, leads, contracts | A | not started |
@@ -341,3 +341,35 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en,fr --widths=375,768,1280 --routes=settings` (198 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 raw keys; the only phone-rule warnings are `/dashboard/pay?tab=settings` (Phase 107). Its two findings (the API key field's focus ring, the leave prompt at 768) were fixed and rechecked: 768 + 1280 EN/FR (132 pages, `.qa/p103-recheck`) and the API panel (`.qa/p103-api`), clean.
 - Phone sheets: `.qa/phone-sheets/p103/` (33 routes, before = `visual-mobile-audit`): the directory 1.8 screens (was 7.2 as one column); every app panel 1-1.4 screens except QuickBooks (3.9: its account, tax-code and seven category mappings).
 - typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (no new findings: the one missing key is in an untracked `translations - Copy.ts`; "Meta Lead Ads" is the same in both languages on purpose).
+
+### Phase 104 — 2026-09-26
+
+**Built**
+- **"Needs you"**: one list, most urgent first, from a new server read `GET /api/today/needs-you` (`api-server/src/today/service.ts`, `routes/today.ts`). It merges a blocker reported on site (Answer → the job), an e-Transfer the customer says they sent (Confirm → the invoice), invoices past due, most days late first (**Remind** sends the reminder from the row; Open when the role can't send, the customer has no email, or it was reminded in the last 3 days), hours waiting for approval as one row ("7.5 h to approve · 1 entry · 1 person" → Review), leads whose follow-up is today or earlier (**Call** when there is a number), and quotes sent 3-45 days ago with no answer once the automatic follow-ups are over or off (Call / Follow up). Five rows, then "Show all N". Each part is filtered by the role's permissions and the plan (blockers and hours need the crew tier), so a viewer gets a shorter list, not a 403. An empty list says "Nothing needs you right now."
+- **The numbers** as one `StatStrip` from `GET /api/today/stats?from&to&prevFrom` (the browser's months): Quotes, Won (count and value), Outstanding (open invoices now, red with "$x overdue" when any are late), Collected (payments in, credit notes excluded). Whole dollars. The Month / Quarter / Year switch moved into the calendar button beside the heading ("This month"), an `ActionSheet` (a sheet on a phone, a menu wider).
+- **The crew as one line** ("0 on site · 1 not clocked in · 1 job", yellow when someone booked hasn't clocked in) linking to the schedule; hidden when nobody is booked. **Next up**: the next five things from the Phase 85 agenda over two weeks (blocks, milestones, invoices due, follow-ups, filings, permits, connected calendars), with Open schedule — the month grid is gone from the home (the foreman's home keeps it until Phase 108).
+- **The describe-a-job box** is one line until it is used: the client row and saved-client chips appear once it has focus, text or an attachment.
+- Layout: two columns on a wide screen (Needs you, numbers, recent quotes | crew, next up, the Elite cash outlook), one column under 980 px. On a phone the page's New quote button hides (the + in the top bar is it). Recent quotes are `ListRow`s.
+- Removed from the home: the four-card stat tower, the revenue-by-week bars, the separate follow-ups card (now rows of Needs you), the owner's crew card (its blockers and hours are rows now, its roster a line), the three quick-action tiles (the tabs and + cover them).
+- 52 new EN/FR strings; runbook §40; `qa:visual` has the period switch and a Pro owner's home; the showcase seeds one of each Needs-you kind (an invoice 9 days late, typed hours waiting, a lead due today, a quote sent 6 days ago).
+
+**Decided**
+- The list is computed on the server: one request instead of five, and the per-role and per-plan filtering in one place with the permission matrix. Its order is unit-tested (`today/service.test.ts`): on site first, then money, then people waiting on an answer.
+- Days late count the company's local calendar against the due date's own day (due dates are stored as that day's UTC midnight — read in Toronto they'd be the evening before). Due today is not late.
+- A quote whose automatic follow-ups are still running is not "waiting": the sequence is doing the chasing. It joins the list when the sequence ends, is off, or the client unsubscribed.
+- Hours are approved on the Team page, not from the row: approving in bulk from a summary line hides who worked where.
+- Lead rows open the leads board (there is no page per lead yet).
+
+**Found**
+- The onboarding cards' step text was 4.39:1 on its grey tile (never swept — the showcase always had quotes; the new Pro-owner route has none). `--muted-mk` now.
+- `docs/ROUTE-MATRIX.md` was stale (485 routes; 499 before this phase's two). Regenerated with the untracked " - Copy" route files moved aside — with them in the tree the generator doubles every file.
+- Office-entered hours auto-approve unless `approve: false` is sent; the seed sends it.
+
+**Deferred**
+- The foreman's home (stacked Schedule / Jobs / Hours buttons, the month calendar): Phase 108.
+- An e-Transfer-to-confirm row is not in the showcase (it would change the invoice screens other phases check).
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes==/dashboard` (42 pages, `.qa/p104`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; the only phone-rule warning is the foreman's home (Phase 108).
+- Phone sheets: `.qa/phone-sheets/p104/` (before = `visual-mobile-audit`): the owner's home **2.8 screens (was 5.3)**, all five Needs-you rows on the first screen; the Pro owner's 1.4.
+- `vitest src/today` 8/8, route-matrix test 12/12 (without the Copy files), typecheck (quote-ai, api-server), eslint on the touched files (one old warning in the composer), knip (nothing new), i18n-audit (no new findings).

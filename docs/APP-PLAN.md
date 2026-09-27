@@ -15,7 +15,7 @@ Same conventions as every plan: one phase per conversation, in order, one commit
 
 | Phase | Title | Track | State |
 |---|---|---|---|
-| 114 | The app, designed first: mockups you approve on your phone | B | not started |
+| 114 | The app, designed first: mockups you approve on your phone | B | **built** 2026-09-27 (owner: approve each screen on the phone) |
 | 115 | Fast: performance budgets and an instant-feeling app | B | not started |
 | 116 | Sync I: open instantly, read offline | B | not started |
 | 117 | Sync II: every change queued, merged, and live on every device | B | not started |
@@ -55,8 +55,8 @@ Plus the store basics: crash-free sessions > 99.5 %, store rating ≥ 4.6, app s
 
 | # | Decision | Options | Recommendation |
 |---|---|---|---|
-| D-1 | Dark mode in the app | none (as the web, Phase 38) / follow the phone's setting | **Follow the phone**, app-only at first: phone users expect it at night and in the store screenshots; it needs a dark palette designed in 114, so decide before 114 |
-| D-2 | Tablets | phone only / iPad + Android tablets | **Phone only** for the first release (no iPad screenshots or review needed); the web already serves tablets |
+| D-1 | Dark mode in the app | none (as the web, Phase 38) / follow the phone's setting | **Decided 2026-09-27 (Phase 114, on the recommendation): follow the phone.** Was: **Follow the phone**, app-only at first: phone users expect it at night and in the store screenshots; it needs a dark palette designed in 114, so decide before 114 |
+| D-2 | Tablets | phone only / iPad + Android tablets | **Decided 2026-09-27 (Phase 114, on the recommendation): phone only.** Was: **Phone only** for the first release (no iPad screenshots or review needed); the web already serves tablets |
 | D-3 | Store accounts | individual / organisation | Organisation once the business is registered (Phase 99 L-4); individual is fine for internal testing |
 | D-4 | Voice of the videos | your own voice / a synthetic voice / a hired narrator | **Your voice for the 60-second overview** (people buy from a person), a consistent synthetic voice for the task guides so they can be regenerated when screens change |
 | D-5 | Where videos are hosted | YouTube / a video host (Mux, Cloudflare Stream) / Vercel Blob | **YouTube** for the public library (free, searchable, subtitles) + **self-hosted short MP4s** for in-app clips (no third-party player, no tracking cookies, work in the app) |
@@ -256,3 +256,13 @@ Each in English and French (Québec French voice), vertical 1080×1920 for phone
 ## Build log
 
 *(one entry per phase: date, built, found, deferred, verification — sheets, a real-device install, the sync suite)*
+
+### Phase 114 — 2026-09-27
+
+- **Built:** `docs/mockups/app/index.html` — 25 screens drawn at phone size (390 × 844), every one in English and French (`fr-CA` numbers: 14 500 $, 7,5 h, 9 h 42) and in light and dark, with tap-through navigation that shows the motion spec (push, pop, tab cross-fade, sheet), a full-screen mode to hold on the phone, the screen's first-screen / one-action / ⋯ notes beside it, and **Approve / Ask for a change** per screen saved in the page's database (read back with ArtifactData, collection `reviews`, one doc per screen id). Published privately: https://claude.ai/artifact/Jx2qihtQht7soqPR67yZ2T. `docs/APP-DESIGN.md` is the written spec later phases build from: the map per role, each screen's primary action, the light and dark tokens, type, spacing, icons, numbers, empty states, and the motion and haptics table.
+- **Screens:** Today, Quotes, New quote typing and dictating, Quote, Send, Jobs, Job, Photo capture, Money, Invoice + record payment, Client, Assistant (from VOICE-ASSISTANT-PLAN's calm design, so it is in the approved app), Notifications, More, Integrations, Offline, Sync with a conflict, Foreman Today, Schedule day, Crew Now with Clock in, Welcome, Sign in, First run, First quote sent + the notification ask.
+- **Decided:** D-1 dark follows the phone, D-2 phone only (the plan's recommendations; change them here if not).
+- **Choices worth a look:** violet is the assistant's colour and nothing else; dark mode's primary button is pale lavender with navy text (a navy button disappears on a dark ground); money has no cents in lists, cents on invoices; the camera is always dark; Money gets a tab of its own for owners (Pay and Books as rows inside it on a phone); no prices or upgrade anywhere in the app build.
+- **Found:** the web design system is light-only (Phase 38), so the dark palette is new and app-only; Integrations logos are drawn as letters in the mockup, the real logos (Phase 103) go in the build.
+- **Owed (owner, M-2):** open the page on the phone, go through all 25 screens in both languages and both themes, Approve or Ask for a change on each. The phase closes when all 25 are approved; changes are made to the mockup and re-published to the same link.
+

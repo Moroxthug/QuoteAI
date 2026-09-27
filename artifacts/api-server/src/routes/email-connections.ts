@@ -96,7 +96,7 @@ router.get("/email-connections/:provider/connect", requireAuth, requirePermissio
 });
 
 // GET /api/email-connections/:provider/callback
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&email=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?email=${status}`;
 
 router.get("/email-connections/:provider/callback", requireAuth, async (req, res) => {
   try {

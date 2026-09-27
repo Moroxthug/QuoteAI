@@ -47,7 +47,7 @@ export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }:
       </div>
       {!hasContractsFeature ? (
         <div className="act-list">
-          <Link href="/dashboard/settings?tab=billing" className="add-dashed" style={{ padding: 10, fontSize: 13 }}>
+          <Link href="/dashboard/settings/plan" className="add-dashed" style={{ padding: 10, fontSize: 13 }}>
             <Lock /> {t("contracts.cardUpgrade")}
           </Link>
         </div>

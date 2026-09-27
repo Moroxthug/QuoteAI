@@ -111,7 +111,7 @@ router.get("/google-lsa/connect", requireAuth, requirePermission("integrations",
 
 // GET /api/google-lsa/callback — Google redirects the browser here after the company grants
 // access; this exchanges the code server-side and redirects back into Settings with a status flag.
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&googleLsa=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?googleLsa=${status}`;
 
 router.get("/google-lsa/callback", requireAuth, async (req, res) => {
   try {

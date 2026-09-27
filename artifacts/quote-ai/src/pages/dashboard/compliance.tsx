@@ -178,7 +178,7 @@ function DeadlinesTab({ deadlines, reminders, settings, registrations, locale, o
         {missingNumber && (
           <div className="card-foot">
             <span className="foot-note">{t("compliance.missingNumber")}</span>
-            <Link href="/dashboard/settings?tab=business" className="cta-link" style={{ fontSize: 13 }}>{t("compliance.openSettings")} <ArrowRight className="chev" /></Link>
+            <Link href="/dashboard/settings/taxes" className="cta-link" style={{ fontSize: 13 }}>{t("compliance.openSettings")} <ArrowRight className="chev" /></Link>
           </div>
         )}
       </section>

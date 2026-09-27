@@ -292,7 +292,7 @@ export function CalendarCard() {
               {t("dashboard.calendar.openBoard")} <ArrowRight className="chev" />
             </Link>
             {!agenda.data?.externalEnabled && (
-              <Link href="/dashboard/settings?tab=integrations" className="foot-note" style={{ textDecoration: "underline" }}>
+              <Link href="/dashboard/settings/apps" className="foot-note" style={{ textDecoration: "underline" }}>
                 {t("dashboard.calendar.connectPrompt")}
               </Link>
             )}

@@ -167,7 +167,7 @@ router.post("/sms/webhook", webhookLimiter, async (req, res) => {
           type: "sms_reply",
           title: `Text reply from ${phone}`,
           body: body.slice(0, 280),
-          link: "/dashboard/settings?tab=sms",
+          link: "/dashboard/settings/sms",
         });
       } else if (outcome.kind === "opt_out") {
         await createNotification({

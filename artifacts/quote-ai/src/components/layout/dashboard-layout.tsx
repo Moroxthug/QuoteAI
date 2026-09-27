@@ -62,7 +62,6 @@ async function signOut() {
 const EXTRA_TITLES: Record<string, string> = {
   "/dashboard/new": "dashboard.nav.newQuote",
   "/dashboard/me": "dashboard.account.myProfile",
-  "/dashboard/profile": "dashboard.account.companyProfile",
   "/dashboard/billing": "dashboard.account.planBilling",
   "/dashboard/notifications": "notifications.title",
   "/dashboard/people": "dashboard.nav.team",
@@ -125,13 +124,13 @@ function AccountMenu({ trigger }: { trigger: React.ReactNode }) {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/dashboard/settings?tab=account" className="cursor-pointer flex items-center gap-2">
+          <Link href="/dashboard/settings/company" className="cursor-pointer flex items-center gap-2">
             <Building2 className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.companyProfile")}
           </Link>
         </DropdownMenuItem>
         {can("settings", "full") && (
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/settings?tab=billing" className="cursor-pointer flex items-center gap-2">
+            <Link href="/dashboard/settings/plan" className="cursor-pointer flex items-center gap-2">
               <CreditCard className="h-3.5 w-3.5 text-muted-foreground" /> {t("dashboard.account.planBilling")}
             </Link>
           </DropdownMenuItem>

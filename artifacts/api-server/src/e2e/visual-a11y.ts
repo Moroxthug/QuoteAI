@@ -102,6 +102,8 @@ async function openPhoneSheet(page: Page, trigger: string, sheet: string) {
   await b.click();
   await page.waitForSelector(sheet);
 }
+// Phase 102: every section of pages/dashboard/settings (the owner sees them all).
+const SETTINGS_SECTIONS = ["profile", "security", "company", "taxes", "invoicing", "followups", "widget", "email", "sms", "whatsapp", "apps", "plan"];
 // Phase 95: set once the foreman has joined, so the teammate page can be swept.
 let sweepForemanId: string | null = null;
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
@@ -140,13 +142,26 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/onboarding?plan=monthly_pro", session: "newcomer", name: "/onboarding step 4 plan (newcomer)", drive: (p) => onboardTo(p, 4) },
     { path: "/onboarding", session: "invitee", name: "/onboarding invitation (invitee)" },
     dash("/dashboard"), dash("/dashboard/new"), dash("/dashboard/quotes"), dash(`/dashboard/quotes/${s.longQuoteId}`), dash(`/dashboard/quotes/${s.quoteId}`),
-    dash("/dashboard/analytics"), dash("/dashboard/settings"), dash("/dashboard/settings/account"),
-    // Phase 85: the integrations tab is where the calendar connections, the
-    // .ics subscriptions and the published feed live — a real page state with
-    // its own forms, never swept before.
-    dash("/dashboard/settings?tab=integrations"), dash("/dashboard/settings?tab=widget"), dash("/dashboard/profile"), dash("/dashboard/billing"),
+    dash("/dashboard/analytics"), dash("/dashboard/billing"),
+    // Phase 102: Settings is one page per section. /dashboard/settings is the
+    // section list on a phone (a wide screen opens the first section); the
+    // apps section holds the calendar connections, .ics subscriptions and feed.
+    dash("/dashboard/settings"),
+    ...SETTINGS_SECTIONS.map((id) => dash(`/dashboard/settings/${id}`)),
+    foreman("/dashboard/settings"), foreman("/dashboard/settings/plan"),
+    // The save bar (a field edited), then the "leave without saving?" prompt (a link followed with the edit pending).
+    { path: "/dashboard/settings/company", session: "owner", name: "/dashboard/settings/company unsaved", drive: async (p) => {
+      await p.locator("#s-company-phone").fill("604 555 0199");
+      await p.waitForSelector(".savebar");
+    } },
+    { path: "/dashboard/settings/company", session: "owner", name: "/dashboard/settings/company leave prompt", drive: async (p) => {
+      await p.locator("#s-company-phone").fill("604 555 0199");
+      await p.waitForSelector(".savebar");
+      await p.locator('.snav-item[href$="/taxes"]:visible, .tb-back:visible').first().click();
+      await p.waitForSelector('[role="alertdialog"]');
+    } },
     // Phase 96: the calendar picker open on the connected Google card (the list is stubbed in fixtures.ts).
-    { path: "/dashboard/settings?tab=integrations", session: "owner", name: "/dashboard/settings?tab=integrations calendar picker", drive: async (p) => {
+    { path: "/dashboard/settings/apps", session: "owner", name: "/dashboard/settings/apps calendar picker", drive: async (p) => {
       await p.locator('[data-testid="calendar-target-google"] button', { hasText: /Change|Changer/ }).click();
       await p.waitForSelector("#calendar-target-google");
     } },
@@ -353,7 +368,8 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
     };
 
     // 1. More than two full-width buttons stacked on top of each other.
-    const btns = Array.from(document.querySelectorAll(".btn, button, a[role='button']"))
+    // (Phase 102: a settings switch row is a <button role="switch"> the width of its card — a list row, not an action.)
+    const btns = Array.from(document.querySelectorAll(".btn, button:not([role='switch']), a[role='button']"))
       .filter((b) => shown(b) && !inFixed(b) && b.getBoundingClientRect().width >= cw * 0.7)
       .map((b) => ({ el: b, r: b.getBoundingClientRect() }))
       .sort((a, b) => a.r.top - b.r.top);

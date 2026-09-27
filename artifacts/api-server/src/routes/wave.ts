@@ -122,7 +122,7 @@ router.get("/wave/connect", requireAuth, requirePermission("integrations", "full
 // GET /api/wave/callback — Wave redirects the browser here after the company approves
 // access; this exchanges the code server-side (never exposing it to frontend JS) and redirects
 // back into Settings with a status flag.
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&wave=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?wave=${status}`;
 
 router.get("/wave/callback", requireAuth, async (req, res) => {
   try {

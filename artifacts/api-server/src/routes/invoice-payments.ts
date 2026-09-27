@@ -22,7 +22,7 @@ async function requireCardPaymentsFeature(userId: string): Promise<{ ok: true } 
   return { ok: false, plan: minimumPlanFor("invoice_card_payments") };
 }
 
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&stripeConnect=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?stripeConnect=${status}`;
 
 // GET /api/invoice-payments/connect/status
 router.get("/invoice-payments/connect/status", requireAuth, requirePermission("integrations", "view"), async (req, res) => {

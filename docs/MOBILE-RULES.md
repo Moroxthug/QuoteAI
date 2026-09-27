@@ -46,6 +46,8 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 - **Memory**: each tab reopens the last screen you had in it (path + query, session storage) at the scroll position you left; tapping the tab you are in goes to its first screen, then to the top. Every move is a history push, so Back retraces your steps; an open sheet closes when the screen changes.
 - On a phone (≤ 640 px) the bell and the avatar leave the top bar (they are in More); between 641 and 980 px the top bar keeps the search, the bell and the avatar.
 
+**Long option sets: the settings pattern (Phase 102, `pages/dashboard/settings/`)** — rule 5's "menu screen". Under 860 px the grouped list is the first screen and each section opens as its own page with ‹ back; wider, the list sits on the left and the section on the right. Sections are built from `SettingsSection` / `SettingsGroup` / `SettingsRow` (label and help left, field right; stacked ≤ 640 px) / `ToggleRow` (the whole row is the switch) / `ActionRow` in `settings/ui.tsx`. Nothing saves on change: a section keeps one `useSettingsDraft` and the page shows one sticky **Unsaved changes — Discard / Save** bar (docked above the tab bar on a phone), with a "Leave without saving?" prompt on in-app links.
+
 **Using them**
 
 - A screen's primary action: `<StickyActionBar><ActionSheet actions={…} /><button className="btn btn-navy" data-primary-action>Send</button></StickyActionBar>`.

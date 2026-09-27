@@ -261,7 +261,7 @@ function BankTab({ overview }: { overview: Overview }) {
       <div className="notice info">
         <Info />
         <span className="grow">{t("books.bank.notConnected")}</span>
-        <span className="actions"><Link href="/dashboard/settings?tab=integrations" className="btn btn-sm btn-navy">{t("books.bank.connect")}</Link></span>
+        <span className="actions"><Link href="/dashboard/settings/apps" className="btn btn-sm btn-navy">{t("books.bank.connect")}</Link></span>
       </div>
     );
   }

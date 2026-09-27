@@ -22,7 +22,7 @@ function money(n: number, lang: string): string {
   return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
 }
 
-export function PlanPicker({ compact = false }: { compact?: boolean }) {
+export function PlanPicker({ compact = false, currentFirst = false }: { compact?: boolean; /** Phase 102 (Settings): the current plan leads, and on a phone the cards swipe sideways. */ currentFirst?: boolean }) {
   const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -93,8 +93,8 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
         </p>
       )}
 
-      <div className={cn("grid gap-4", compact ? "sm:grid-cols-3" : "md:grid-cols-3")}>
-        {tiers.map((plan) => {
+      <div className={cn("grid gap-4", compact ? "sm:grid-cols-3" : "md:grid-cols-3", currentFirst && "plan-swipe")} {...(currentFirst ? { role: "region", tabIndex: 0, "aria-label": t("dashboard.billing.comparePlansTitle") } : {})}>
+        {(currentFirst ? [...tiers].sort((a, b) => Number(isCurrent(b.id as Tier)) - Number(isCurrent(a.id as Tier))) : tiers).map((plan) => {
           const tier = plan.id as Tier;
           const isPro = tier === "monthly_pro";
           const isElite = tier === "monthly_business"; // the top self-serve card keeps the amber accent

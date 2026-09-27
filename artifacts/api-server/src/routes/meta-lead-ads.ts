@@ -109,7 +109,7 @@ router.get("/meta-lead-ads/connect", requireAuth, requirePermission("integration
 
 // GET /api/meta-lead-ads/callback — Meta redirects the browser here after the company approves
 // access; this exchanges the code server-side and redirects back into Settings with a status flag.
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&metaLeadAds=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?metaLeadAds=${status}`;
 
 router.get("/meta-lead-ads/callback", requireAuth, async (req, res) => {
   try {

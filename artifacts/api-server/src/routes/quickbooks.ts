@@ -144,7 +144,7 @@ router.get("/quickbooks/connect", requireAuth, requirePermission("integrations",
 // GET /api/quickbooks/callback — Intuit redirects the browser here after the company approves
 // access; this exchanges the code server-side (never exposing it to frontend JS) and redirects
 // back into Settings with a status flag.
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&qb=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?qb=${status}`;
 
 router.get("/quickbooks/callback", requireAuth, async (req, res) => {
   try {

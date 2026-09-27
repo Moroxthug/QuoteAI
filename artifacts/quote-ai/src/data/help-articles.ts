@@ -71,8 +71,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ]),
       h("2. Complete the business profile", "2. Complétez le profil d'entreprise"),
       p(
-        "Open Settings → Business Account. The fields that matter most:",
-        "Ouvrez Paramètres → Compte d'entreprise. Les champs les plus importants :",
+        "Open Settings → Company details, then Taxes & province. The fields that matter most:",
+        "Ouvrez Paramètres → Coordonnées de l'entreprise, puis Taxes et province. Les champs les plus importants :",
       ),
       bullets([
         ["Legal name, address and phone — printed on every document and required on invoices by the CRA.", "Nom légal, adresse et téléphone — imprimés sur chaque document et exigés sur les factures par l'ARC."],
@@ -84,12 +84,12 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ]),
       h("3. Choose a plan", "3. Choisissez un forfait"),
       p(
-        "Settings → Plan & Billing. Starter covers quotes, emailing them and acceptance notifications. Pro adds the price catalog, contracts and e-signature, jobs, costs, invoicing and team accounts (2 seats included). Elite adds worker time tracking, the AI assistant, advanced analytics and 5 seats. Billing is handled by Stripe; you can cancel any time and keep access until the end of the period you paid for.",
+        "Settings → Plan & billing. Starter covers quotes, emailing them and acceptance notifications. Pro adds the price catalog, contracts and e-signature, jobs, costs, invoicing and team accounts (2 seats included). Elite adds worker time tracking, the AI assistant, advanced analytics and 5 seats. Billing is handled by Stripe; you can cancel any time and keep access until the end of the period you paid for.",
         "Paramètres → Forfait et facturation. Starter couvre les soumissions, leur envoi par courriel et les notifications d'acceptation. Pro ajoute le catalogue de prix, les contrats et la signature électronique, les chantiers, les coûts, la facturation et les comptes d'équipe (2 sièges inclus). Elite ajoute le suivi du temps des travailleurs, l'assistant IA, les analyses avancées et 5 sièges. La facturation est gérée par Stripe; vous pouvez annuler à tout moment et conserver l'accès jusqu'à la fin de la période payée.",
       ),
       note(
-        "Usage (quotes generated, photos analysed, WhatsApp messages) resets on the 1st of each month and is visible under Settings → Usage. Going over your allowance never blocks you — it is there to tell you when to upgrade.",
-        "L'utilisation (soumissions générées, photos analysées, messages WhatsApp) est réinitialisée le 1er de chaque mois et visible sous Paramètres → Utilisation. Dépasser votre allocation ne vous bloque jamais — c'est là pour vous indiquer quand passer à un forfait supérieur.",
+        "Usage (quotes generated, photos analysed, WhatsApp messages) resets on the 1st of each month and is visible under Settings → Plan & billing. Going over your allowance never blocks you — it is there to tell you when to upgrade.",
+        "L'utilisation (soumissions générées, photos analysées, messages WhatsApp) est réinitialisée le 1er de chaque mois et visible sous Paramètres → Forfait et facturation. Dépasser votre allocation ne vous bloque jamais — c'est là pour vous indiquer quand passer à un forfait supérieur.",
       ),
     ],
   },
@@ -146,7 +146,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     blocks: [
       h("Two ways to send", "Deux façons d'envoyer"),
       bullets([
-        ["Send by email — enter the client's address; the PDF is attached and the email carries a button to the online quote. If you connected Gmail (Settings → Integrations), it goes out from your own inbox and replies land there.", "Envoyer par courriel — entrez l'adresse du client; le PDF est joint et le courriel contient un bouton vers la soumission en ligne. Si vous avez connecté Gmail (Paramètres → Intégrations), il part de votre propre boîte et les réponses y arrivent."],
+        ["Send by email — enter the client's address; the PDF is attached and the email carries a button to the online quote. If you connected Gmail (Settings → Email sender), it goes out from your own inbox and replies land there.", "Envoyer par courriel — entrez l'adresse du client; le PDF est joint et le courriel contient un bouton vers la soumission en ligne. Si vous avez connecté Gmail (Paramètres → Expéditeur des courriels), il part de votre propre boîte et les réponses y arrivent."],
         ["Copy link — paste it into WhatsApp, a text message or your own email. The link opens the same page.", "Copier le lien — collez-le dans WhatsApp, un texto ou votre propre courriel. Le lien ouvre la même page."],
       ]),
       h("What the customer sees", "Ce que voit le client"),
@@ -234,8 +234,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       h("Working the job", "Pendant les travaux"),
       bullets([
         ["The job page shows the timeline, the budget against actual costs, time logged, documents and every invoice on the job.", "La page du chantier montre la ligne du temps, le budget par rapport aux coûts réels, le temps enregistré, les documents et chaque facture du chantier."],
-        ["Mark a milestone complete when the work is done. If the payment schedule ties a payment to that milestone, the progress invoice is generated (with the holdback deducted when it is on) and sent, or left as a draft — your choice in Settings → Business Account → Automation.", "Marquez un jalon terminé quand le travail est fait. Si l'échéancier de paiement lie un paiement à ce jalon, la facture d'étape est générée (retenue déduite si elle est activée) et envoyée, ou laissée en brouillon — votre choix dans Paramètres → Compte d'entreprise → Automatisation."],
-        ["Connect Google Calendar or Outlook (Settings → Integrations) and milestones appear in your calendar; moving a date in QuoteAI moves the event.", "Connectez Google Agenda ou Outlook (Paramètres → Intégrations) et les jalons apparaissent dans votre calendrier; déplacer une date dans QuoteAI déplace l'événement."],
+        ["Mark a milestone complete when the work is done. If the payment schedule ties a payment to that milestone, the progress invoice is generated (with the holdback deducted when it is on) and sent, or left as a draft — your choice in Settings → Invoices & payments → Invoice automation.", "Marquez un jalon terminé quand le travail est fait. Si l'échéancier de paiement lie un paiement à ce jalon, la facture d'étape est générée (retenue déduite si elle est activée) et envoyée, ou laissée en brouillon — votre choix dans Paramètres → Factures et paiements → Automatisation des factures."],
+        ["Connect Google Calendar or Outlook (Settings → Connected apps) and milestones appear in your calendar; moving a date in QuoteAI moves the event.", "Connectez Google Agenda ou Outlook (Paramètres → Applications connectées) et les jalons apparaissent dans votre calendrier; déplacer une date dans QuoteAI déplace l'événement."],
         ["Set the job-site location on the Team tab so workers' clock-ins are checked against it.", "Définissez l'emplacement du chantier dans l'onglet Équipe pour que les pointages des travailleurs y soient comparés."],
       ]),
       h("Change orders", "Avenants (ordres de changement)"),
@@ -273,12 +273,12 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
       h("Send and get paid", "Envoyer et se faire payer"),
       p(
-        "Under Settings → Business Account → Automation, choose whether invoices are sent automatically (after a delay you set) or left as drafts for you to send. The customer receives an email with the PDF and a link to their invoice page, which shows the balance due and how to pay:",
-        "Sous Paramètres → Compte d'entreprise → Automatisation, choisissez si les factures sont envoyées automatiquement (après un délai que vous fixez) ou laissées en brouillon pour que vous les envoyiez. Le client reçoit un courriel avec le PDF et un lien vers sa page de facture, qui montre le solde dû et comment payer :",
+        "Under Settings → Invoices & payments → Invoice automation, choose whether invoices are sent automatically (after a delay you set) or left as drafts for you to send. The customer receives an email with the PDF and a link to their invoice page, which shows the balance due and how to pay:",
+        "Sous Paramètres → Factures et paiements → Automatisation des factures, choisissez si les factures sont envoyées automatiquement (après un délai que vous fixez) ou laissées en brouillon pour que vous les envoyiez. Le client reçoit un courriel avec le PDF et un lien vers sa page de facture, qui montre le solde dû et comment payer :",
       ),
       bullets([
         ["Interac e-Transfer to the email from your profile, with the invoice number as the reference. The customer clicks \"I sent it\" and you get a notification to confirm once the money lands.", "Virement Interac au courriel de votre profil, avec le numéro de facture comme référence. Le client clique sur « Je l'ai envoyé » et vous recevez une notification pour confirmer une fois l'argent reçu."],
-        ["Card payment, if you connected Stripe (Settings → Integrations → Stripe Connect). The money goes straight to your own bank account; QuoteAI never holds it. The invoice is marked paid automatically.", "Paiement par carte, si vous avez connecté Stripe (Paramètres → Intégrations → Stripe Connect). L'argent va directement dans votre propre compte bancaire; QuoteAI ne le détient jamais. La facture est marquée payée automatiquement."],
+        ["Card payment, if you connected Stripe (Settings → Connected apps → Stripe Connect). The money goes straight to your own bank account; QuoteAI never holds it. The invoice is marked paid automatically.", "Paiement par carte, si vous avez connecté Stripe (Paramètres → Applications connectées → Stripe Connect). L'argent va directement dans votre propre compte bancaire; QuoteAI ne le détient jamais. La facture est marquée payée automatiquement."],
         ["Cheque, with your mailing address.", "Chèque, à votre adresse postale."],
       ]),
       h("Recording payments and reminders", "Enregistrer les paiements et les rappels"),
@@ -292,8 +292,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
         "Quand le contrat prévoit une retenue, chaque facture d'étape indique le montant retenu et la facture de libération est créée pour vous après le délai légal de privilège. Le rappel vous indique quand vous pouvez la facturer.",
       ),
       note(
-        "Paid invoices sync to QuickBooks Online or Wave if you connected one (Elite). Nothing is posted twice: each sync is logged under Settings → Integrations with a Retry button if your accounting software was unreachable.",
-        "Les factures payées se synchronisent avec QuickBooks en ligne ou Wave si vous en avez connecté un (Elite). Rien n'est comptabilisé deux fois : chaque synchronisation est journalisée sous Paramètres → Intégrations avec un bouton Réessayer si votre logiciel comptable était injoignable.",
+        "Paid invoices sync to QuickBooks Online or Wave if you connected one (Elite). Nothing is posted twice: each sync is logged under Settings → Connected apps with a Retry button if your accounting software was unreachable.",
+        "Les factures payées se synchronisent avec QuickBooks en ligne ou Wave si vous en avez connecté un (Elite). Rien n'est comptabilisé deux fois : chaque synchronisation est journalisée sous Paramètres → Applications connectées avec un bouton Réessayer si votre logiciel comptable était injoignable.",
       ),
     ],
   },
@@ -356,8 +356,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
         ["Viewer — read-only everywhere. Good for an accountant or a partner.", "Lecteur — lecture seule partout. Idéal pour un comptable ou un associé."],
       ]),
       p(
-        "Only the owner sees Plan & Billing and can change the company's legal details.",
-        "Seul le propriétaire voit Forfait et facturation et peut modifier les informations légales de l'entreprise.",
+        "Only the owner sees the plan in Plan & billing and can change the company's legal details.",
+        "Seul le propriétaire voit le forfait dans Forfait et facturation et peut modifier les informations légales de l'entreprise.",
       ),
       h("Inviting someone", "Inviter quelqu'un"),
       steps([
@@ -366,7 +366,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
         ["Change a role at any time. Suspend someone to block access without losing their history; Remove them when they leave.", "Changez un rôle à tout moment. Suspendez quelqu'un pour bloquer l'accès sans perdre son historique; Retirez-le quand il quitte."],
       ]),
       note(
-        "Pro includes 2 seats and Elite 5 (the owner counts as one). When every seat is used, the invite button tells you; add seats from Plan & Billing.",
+        "Pro includes 2 seats and Elite 5 (the owner counts as one). When every seat is used, the invite button tells you; add seats from Settings → Plan & billing.",
         "Pro inclut 2 sièges et Elite 5 (le propriétaire compte pour un). Quand tous les sièges sont utilisés, le bouton d'invitation vous l'indique; ajoutez des sièges depuis Forfait et facturation.",
       ),
     ],
@@ -384,9 +384,9 @@ export const HELP_ARTICLES: HelpArticle[] = [
     blocks: [
       h("Where leads come from", "D'où viennent les prospects"),
       bullets([
-        ["Website widget — Settings → Website Integration gives you a snippet for your site; visitors describe their job and become a lead with a draft quote.", "Widget de site web — Paramètres → Intégration au site web vous donne un extrait de code; les visiteurs décrivent leur travail et deviennent un prospect avec une soumission brouillon."],
-        ["WhatsApp — connect your WhatsApp Business number (Settings → WhatsApp Bot) and customers can send a text, voice memo or photo; the bot answers with a quote and creates the lead.", "WhatsApp — connectez votre numéro WhatsApp Business (Paramètres → Robot WhatsApp) et les clients peuvent envoyer un texto, un mémo vocal ou une photo; le robot répond avec une soumission et crée le prospect."],
-        ["Meta Lead Ads and Google Local Services Ads — connect them under Settings → Integrations and new leads are imported automatically, with the source recorded.", "Meta Lead Ads et Google Local Services Ads — connectez-les sous Paramètres → Intégrations et les nouveaux prospects sont importés automatiquement, avec leur source enregistrée."],
+        ["Website widget — Settings → Website widget gives you a snippet for your site; visitors describe their job and become a lead with a draft quote.", "Widget de site web — Paramètres → Widget pour site Web vous donne un extrait de code; les visiteurs décrivent leur travail et deviennent un prospect avec une soumission brouillon."],
+        ["WhatsApp — connect your WhatsApp Business number (Settings → WhatsApp) and customers can send a text, voice memo or photo; the bot answers with a quote and creates the lead.", "WhatsApp — connectez votre numéro WhatsApp Business (Paramètres → WhatsApp) et les clients peuvent envoyer un texto, un mémo vocal ou une photo; le robot répond avec une soumission et crée le prospect."],
+        ["Meta Lead Ads and Google Local Services Ads — connect them under Settings → Connected apps and new leads are imported automatically, with the source recorded.", "Meta Lead Ads et Google Local Services Ads — connectez-les sous Paramètres → Applications connectées et les nouveaux prospects sont importés automatiquement, avec leur source enregistrée."],
         ["By hand — New lead on the Leads page, or from a phone call.", "À la main — Nouveau prospect sur la page Prospects, ou après un appel téléphonique."],
       ]),
       h("Working the pipeline", "Travailler le pipeline"),
@@ -401,8 +401,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
       h("Review requests", "Demandes d'avis"),
       p(
-        "Settings → Business Account → Reviews & reachout: paste your Google review link and leave the toggle on. Three days after a job is marked complete, the customer gets one message asking for a review — once per job, never to a client who has unsubscribed, and only if the link is set.",
-        "Paramètres → Compte d'entreprise → Avis et relance : collez votre lien d'avis Google et laissez l'option activée. Trois jours après qu'un chantier est marqué terminé, le client reçoit un seul message lui demandant un avis — une fois par chantier, jamais à un client désabonné, et seulement si le lien est défini.",
+        "Settings → Quotes & follow-ups → Reviews: paste your Google review link and leave the toggle on. Three days after a job is marked complete, the customer gets one message asking for a review — once per job, never to a client who has unsubscribed, and only if the link is set.",
+        "Paramètres → Soumissions et relances → Avis : collez votre lien d'avis Google et laissez l'option activée. Trois jours après qu'un chantier est marqué terminé, le client reçoit un seul message lui demandant un avis — une fois par chantier, jamais à un client désabonné, et seulement si le lien est défini.",
       ),
     ],
   },
@@ -418,8 +418,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
     readingTimeMin: 5,
     blocks: [
       p(
-        "All integrations live under Settings → Integrations. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Disconnect at any time from the same place.",
-        "Toutes les intégrations se trouvent sous Paramètres → Intégrations. Chacune se connecte avec un bouton Connecter qui vous envoie chez le fournisseur pour approuver l'accès; QuoteAI conserve le jeton obtenu chiffré et ne voit jamais votre mot de passe. Déconnectez à tout moment au même endroit.",
+        "All integrations live under Settings → Connected apps. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Disconnect at any time from the same place.",
+        "Toutes les intégrations se trouvent sous Paramètres → Applications connectées. Chacune se connecte avec un bouton Connecter qui vous envoie chez le fournisseur pour approuver l'accès; QuoteAI conserve le jeton obtenu chiffré et ne voit jamais votre mot de passe. Déconnectez à tout moment au même endroit.",
       ),
       h("Email from your own inbox", "Courriel depuis votre propre boîte"),
       p(
@@ -450,8 +450,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ]),
       h("Public API and Zapier", "API publique et Zapier"),
       p(
-        "Settings → Integrations → API keys creates a key for the QuoteAI REST API (quotes, clients, leads, invoices, plus webhooks for the events that matter to you). Use it directly or through Zapier and Make to connect tools we do not integrate natively.",
-        "Paramètres → Intégrations → Clés API crée une clé pour l'API REST de QuoteAI (soumissions, clients, prospects, factures, plus des webhooks pour les événements qui vous importent). Utilisez-la directement ou via Zapier et Make pour connecter les outils que nous n'intégrons pas nativement.",
+        "Settings → Connected apps → API keys creates a key for the QuoteAI REST API (quotes, clients, leads, invoices, plus webhooks for the events that matter to you). Use it directly or through Zapier and Make to connect tools we do not integrate natively.",
+        "Paramètres → Applications connectées → Clés API crée une clé pour l'API REST de QuoteAI (soumissions, clients, prospects, factures, plus des webhooks pour les événements qui vous importent). Utilisez-la directement ou via Zapier et Make pour connecter les outils que nous n'intégrons pas nativement.",
       ),
     ],
   },

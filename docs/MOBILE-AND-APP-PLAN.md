@@ -17,7 +17,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 |---|---|---|---|
 | 100 | Mobile foundation: rules, primitives, the phone check | A | **done** 2026-09-26 |
 | 101 | Navigation: bottom tabs, the More sheet, one New button | A | **done** 2026-09-26 |
-| 102 | Settings, rebuilt (desktop and phone) | A | not started |
+| 102 | Settings, rebuilt (desktop and phone) | A | **done** 2026-09-26 |
 | 103 | Integrations: an app directory with real logos | A | not started |
 | 104 | Today (dashboard home) | A | not started |
 | 105 | Quotes: list, new quote, quote detail | A | not started |
@@ -269,3 +269,36 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en,fr --widths=375,768,1280` over /dashboard, the More / New sheet states, quotes, leads, invoices, jobs, schedule, team, me, __preview, as owner and foreman (102 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings (More and + open, trap focus, and close back onto their trigger), 0 raw keys, no `under-tabbar` warnings.
 - Phone sheets: `.qa/phone-sheets/p101/` (17 routes, before = `p100`): the ☰ gone, the tab bar in, + in the top bar.
 - typecheck (quote-ai), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures).
+
+### Phase 102 — 2026-09-26
+
+**Built**
+- `pages/dashboard/settings.tsx` (2,982 lines) and its three `settings-*-tab.tsx` siblings replaced by `pages/dashboard/settings/`: one file per section plus `index.tsx` (the list, routing, redirects, the leave prompt), `ui.tsx` (`SettingsSection` / `SettingsGroup` / `SettingsRow` / `ToggleRow` / `ActionRow`, `useSettingsDraft`, `SaveBar`) and `data.ts` (the typed business profile, one partial-PUT saver).
+- Twelve sections at `/dashboard/settings/<section>` in five groups — **You**: Profile (summary → `/dashboard/me`), Sign-in & security (2FA, sessions, history, export, and deletion under a separate "Danger zone"); **Business**: Company details (name, numbers, licence, contact, logo together), Taxes & province, Invoices & payments (e-Transfer, default payment schedule, invoice automation); **Selling**: Quotes & follow-ups (cadences, accepted-quote email, review requests), Website widget (one place, with the Try-it button); **Messaging**: Email sender, SMS, WhatsApp; **Apps and plan**: Connected apps, Plan & billing (plan + usage + plan cards, current plan first, swiping on a phone).
+- Wide screens: grouped list on the left (icon, name, one-line status, red dot for "2FA off", "phone or address missing", "province not set", "GST/HST number missing"), the section at ≤ 720 px on the right. Under 860 px the list is its own screen and a section opens as a page (‹ back and the section name in the top bar via `useMobileHeader`).
+- **One save model**: each section keeps one draft; a sticky "Unsaved changes — Discard / Save" bar appears only while it differs (docked above the tab bar on phones), Save disabled while a field is invalid (cadence, URL, email — each says why). In-app links with edits pending open "Leave without saving?" (Keep editing / Discard / Save and leave); closing or reloading asks through `beforeunload`. Saves send only the changed fields (the endpoint merges `automationSettings`). The SMS switches, which used to save on every tap, joined the draft.
+- Redirects: `?tab=account|business|billing|usage|integrations|whatsapp|sms|widget|security`, `/dashboard/settings/account` and `/dashboard/profile` (its page deleted — a duplicate of Company details) land on the new sections, other query params kept. Every internal link and the OAuth callbacks (QuickBooks, Wave, calendars, Gmail, Meta, LSA, Stripe Connect), the SMS notification link and the month-end checklist now point at the section directly.
+- `PlanPicker currentFirst`; help-centre articles renamed to the new section names (EN/FR); 70 new EN/FR strings; runbook §38; a settings paragraph in MOBILE-RULES.
+- `qa:visual`: all twelve sections, the list, the foreman's list and plan, the save bar, the leave prompt, the apps calendar picker. The stacked-buttons phone rule no longer counts `role="switch"` rows (a list, not actions).
+
+**Decided**
+- The plan's "Documents & branding (PDF layout, colours, footer, terms)" has no settings behind it yet — there is no PDF colour/footer/terms setting to move. The section became **Invoices & payments**, holding what exists; a real branding section waits for those settings.
+- Section gates are the old tabs' gates, with two changes: Company details and the widget now need `settings:edit` (a team member used to see a form whose save came back 403), and Email sender / Connected apps open to Business as well as Elite (each card already admitted Business; only the tab was Elite-only). Phase 103 rebuilds Connected apps as the directory.
+- Single-pane below 860 px (not 640): at 768 two panes leave the section ~490 px wide.
+- Browser Back with unsaved edits is not intercepted (wouter has no navigation blocker); the draft is dropped. Links, the tab bar, ‹ back and closing the tab all ask.
+
+**Found**
+- The WhatsApp section's three example tiles were 4.39:1 (never swept before — the WhatsApp tab wasn't in the route list); now `--muted-mk`.
+- In the narrower settings pane, "Switch to Business" overflowed its plan card; the buttons wrap there now.
+- A first run showed an error boundary on three desktop pages: the Vite server hot-reloaded `ui.tsx` while I edited it mid-sweep. Clean on the rerun.
+
+**Deferred**
+- Profile is a summary with a link: the editing stays on `/dashboard/me` with the person's stats.
+- Connected apps is still the long column (7.2 phone screens) — Phase 103.
+- `/dashboard/pay?tab=settings` keeps its wide table / wrapping tabs warnings (Phase 107).
+- Hiding Plan & billing in the native apps: APP-PLAN Phase 118.
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes=settings` (114 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; phone-rule warnings only on `/dashboard/pay?tab=settings`. Plan page rechecked after the button fix (`.qa/p102-plan`).
+- Phone sheets: `.qa/phone-sheets/p102/` (19 routes, before = `visual-mobile-audit`): the settings list 1.4 screens (was 2.6, ten wrapping pills); every section except Connected apps within 2.6 screens.
+- typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures; the literals left are URL/number placeholders), route-matrix test 12/12.

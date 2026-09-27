@@ -186,7 +186,7 @@ export async function monthChecklist(userId: string, province: string | null, mo
     item("tax_unsplit", true, "/dashboard/compliance?tab=salesTax", taxUnsplit),
     item("invoices_draft", true, "/dashboard/invoices", drafts),
     item("time_unapproved", true, "/dashboard/team?tab=time", time),
-    item("not_in_books", !!books, "/dashboard/settings?tab=integrations", notInBooks),
+    item("not_in_books", !!books, "/dashboard/settings/apps", notInBooks),
   ];
 
   const [closed] = await db.select().from(booksClosesTable).where(and(eq(booksClosesTable.userId, userId), eq(booksClosesTable.month, month)));

@@ -36,7 +36,6 @@ const DashboardHome = lazy(() => import("@/pages/dashboard/index"));
 const NewQuote = lazy(() => import("@/pages/dashboard/new"));
 const QuotesList = lazy(() => import("@/pages/dashboard/quotes/index"));
 const QuoteDetail = lazy(() => import("@/pages/dashboard/quotes/[id]"));
-const ProfileSettings = lazy(() => import("@/pages/dashboard/profile"));
 const BillingPage = lazy(() => import("@/pages/dashboard/billing"));
 const SettingsPage = lazy(() => import("@/pages/dashboard/settings"));
 const CatalogPage = lazy(() => import("@/pages/dashboard/catalog"));
@@ -197,15 +196,14 @@ function Router() {
       <Route path="/dashboard/analytics" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><AnalyticsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
-      <Route path="/dashboard/settings/account" component={() => (
+      <Route path="/dashboard/settings/:section" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><SettingsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
       <Route path="/dashboard/settings" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><SettingsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />
-      <Route path="/dashboard/profile" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ProfileSettings /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
+      {/* Phase 102: the old company profile page duplicated Settings → Company details. */}
+      <Route path="/dashboard/profile" component={() => <Redirect to="/dashboard/settings/company" />} />
       <Route path="/dashboard/billing" component={() => (
         <OnboardingGuard><DashboardLayout><DashSuspense><BillingPage /></DashSuspense></DashboardLayout></OnboardingGuard>
       )} />

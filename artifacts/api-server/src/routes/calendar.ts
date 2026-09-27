@@ -105,7 +105,7 @@ router.get("/calendar/:provider/connect", requireAuth, requirePermission("integr
 
 // GET /api/calendar/:provider/callback — the provider redirects the browser here after the company
 // approves access; this exchanges the code server-side and redirects back into Settings.
-const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings?tab=integrations&cal=${status}`;
+const settingsUrl = (status: "connected" | "error") => `${getBaseUrl()}/dashboard/settings/apps?cal=${status}`;
 
 router.get("/calendar/:provider/callback", requireAuth, async (req, res) => {
   try {

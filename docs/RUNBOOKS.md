@@ -771,3 +771,15 @@ At 980 px and narrower (phones, most tablets in portrait) the dashboard has **no
 - **"+ does nothing / is missing"** — it only lists what the role may do; a viewer has no +. Receipt photo and job note need an open job (not completed, setup confirmed); with none the job list says so.
 - **"The tab opened an old screen"** — tabs reopen the last screen used in that tab this session (sessionStorage `phone-tab-memory`). Tapping the tab again goes to its first screen. Closing the browser tab clears it.
 - The receipt photo uses the same `POST /api/costs/receipts` as the Costs tab's dropzone; failures show the same toast (PLAN_REQUIRED → "needs a Pro plan").
+
+## 38. Settings: sections, one save bar (Phase 102)
+
+Settings is now one page per section at `/dashboard/settings/<section>`: `profile`, `security`, `company`, `taxes`, `invoicing`, `followups`, `widget`, `email`, `sms`, `whatsapp`, `apps`, `plan`. Support answers:
+
+- **"Where is Business Account / the Business tab?"** — split by topic: name, numbers, contact, licence and logo → **Company details**; province and GST/HST/QST/PST → **Taxes & province**; e-Transfer email, default payment schedule, invoice automation → **Invoices & payments**; follow-up cadences, the "email me when accepted" switch and review requests → **Quotes & follow-ups**.
+- **"I changed something and it didn't save"** — nothing saves on its own any more (that includes the SMS switches, which used to save on tap). Edits wait for the dark **Unsaved changes — Discard / Save** bar at the bottom. Following a link with edits pending asks "Leave without saving?". Browser Back does not ask (closing or reloading the tab does, with the browser's own prompt).
+- **"Save is greyed out"** — a field is invalid (a cadence like "1, 3, 100", a review link without https://, a bad email); the field says why.
+- **Red dot in the list** — something to finish: two-step sign-in off, phone or address missing, province or GST/HST number missing. It is only shown to people who can edit that section.
+- **Old links still work**: `?tab=account` → company, `business` → taxes, `billing`/`usage` → plan, `integrations` → apps (OAuth returns keep their `?qb=connected` etc.), and `/dashboard/profile` and `/dashboard/settings/account` → company. The OAuth callbacks now return straight to `/dashboard/settings/apps`.
+- **Who sees what** (same gates as the old tabs): everyone — Profile, Sign-in & security, Plan & billing (usage only; the plan and Stripe buttons need `settings:full`). `settings:edit` — the Business and Selling sections and SMS (SMS also needs a paid plan). `integrations:full` — WhatsApp (Pro and up), Email sender and Connected apps (Business and Elite; Connected apps used to be Elite-only at the tab level, while each card already let Business in).
+- On a phone the list is the first screen; a section opens as a page with ‹ back. Under 860 px wide the same happens on tablets.

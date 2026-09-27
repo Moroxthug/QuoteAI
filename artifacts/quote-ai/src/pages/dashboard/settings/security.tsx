@@ -8,6 +8,7 @@ import { ShieldCheck, ShieldOff, Loader2, Monitor, LogOut, Copy, Check, Download
 import { authClient } from "@/lib/auth-client";
 import { securityApi } from "@/lib/security-api";
 import { accountApi, type AccountApiError, type AccountStatusDto } from "@/lib/account-api";
+import { SettingsSection } from "./ui";
 import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const AUDIT_ACTION_LABELS: Record<string, string> = {
@@ -470,23 +471,30 @@ function DeleteAccountCard({ status }: { status: AccountStatusDto }) {
 }
 
 function AccountCards() {
+  const { t } = useLanguage();
   const { data, isLoading, refetch } = useQuery({ queryKey: ["account-status"], queryFn: accountApi.status });
   if (isLoading || !data) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   return (
     <>
       {data.ownsProfile && <DataExportCard status={data} refetch={refetch} />}
-      <DeleteAccountCard status={data} />
+      {/* Phase 102: deleting the account sits apart, under its own heading, after everything else. */}
+      <div className="sdanger" role="group" aria-labelledby="settings-danger-zone">
+        <h3 id="settings-danger-zone">{t("settings.security.dangerZone")}</h3>
+        <DeleteAccountCard status={data} />
+      </div>
     </>
   );
 }
 
-export function SecurityTab() {
+/** You → Sign-in & security: two-step sign-in, where you're signed in, the sign-in history, your data export and account deletion. */
+export function SecuritySection() {
+  const { t } = useLanguage();
   return (
-    <div className="stack">
+    <SettingsSection title={t("settings.section.security")} intro={t("settings.intro.security")}>
       <TwoFactorCard />
       <SessionsCard />
       <AuditLogCard />
       <AccountCards />
-    </div>
+    </SettingsSection>
   );
 }

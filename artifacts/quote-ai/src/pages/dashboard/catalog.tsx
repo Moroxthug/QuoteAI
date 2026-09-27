@@ -424,7 +424,7 @@ const can = useCan();
           <BookOpen />
           <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)", marginBottom: 6 }}>{t("dashboard.catalog.proOnly.title")}</h2>
           <p style={{ maxWidth: 420, margin: "0 auto 18px" }}>{t("dashboard.catalog.proOnly.desc")}</p>
-          <button type="button" className="btn btn-sm btn-navy" onClick={() => window.location.href = "/dashboard/settings?tab=billing"}>{t("dashboard.catalog.proOnly.cta")}</button>
+          <button type="button" className="btn btn-sm btn-navy" onClick={() => window.location.href = "/dashboard/settings/plan"}>{t("dashboard.catalog.proOnly.cta")}</button>
         </div>
       </div>
     );

@@ -306,7 +306,7 @@ export function PriceCatalogSection() {
         <BookOpen />
         <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)", marginBottom: 6 }}>{t("dashboard.catalog.proOnly.title")}</h2>
         <p style={{ maxWidth: 440, margin: "0 auto 16px" }}>{t("dashboard.catalog.proOnly.desc")}</p>
-        <button type="button" onClick={() => window.location.href = "/dashboard/settings?tab=billing"} className="btn btn-navy btn-sm">
+        <button type="button" onClick={() => window.location.href = "/dashboard/settings/plan"} className="btn btn-navy btn-sm">
           {t("dashboard.catalog.proOnly.cta")}
         </button>
       </div>

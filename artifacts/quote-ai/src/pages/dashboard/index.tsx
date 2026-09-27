@@ -188,7 +188,7 @@ function OnboardingView({ profileDone }: { profileDone: boolean }) {
 const can = useCan();
   const steps = [
     // Phase 93: someone who just finished onboarding has done this one — say so instead of asking again.
-    { icon: Building2, num: "1", done: profileDone, title: t(profileDone ? "dashboard.index.onboarding.step1.doneTitle" : "dashboard.index.onboarding.step1.title"), desc: t(profileDone ? "dashboard.index.onboarding.step1.doneDesc" : "dashboard.index.onboarding.step1.desc"), href: "/dashboard/profile", cta: t("dashboard.index.onboarding.step1.cta") },
+    { icon: Building2, num: "1", done: profileDone, title: t(profileDone ? "dashboard.index.onboarding.step1.doneTitle" : "dashboard.index.onboarding.step1.title"), desc: t(profileDone ? "dashboard.index.onboarding.step1.doneDesc" : "dashboard.index.onboarding.step1.desc"), href: "/dashboard/settings/company", cta: t("dashboard.index.onboarding.step1.cta") },
     { icon: MessageSquare, num: "2", done: false, title: t("dashboard.index.onboarding.step2.title"), desc: t("dashboard.index.onboarding.step2.desc"), href: "/dashboard/new", cta: t("dashboard.index.onboarding.step2.cta") },
     { icon: Download, num: "3", done: false, title: t("dashboard.index.onboarding.step3.title"), desc: t("dashboard.index.onboarding.step3.desc"), href: null, cta: null },
   ];
@@ -227,7 +227,7 @@ const can = useCan();
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        <Link href="/dashboard/profile" className="card p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group">
+        <Link href="/dashboard/settings/company" className="card p-3 flex items-center gap-2.5 hover:border-navy-200 hover:bg-navy-50/30 transition-all group">
           <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-navy-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.onboarding.companyProfile")}</span>
         </Link>
@@ -963,7 +963,7 @@ const can = useCan();
               <span><b>{t("dashboard.index.quickActions.allQuotes")}</b><span>{t("dashboard.index.qa.allQuotes.desc")}</span></span>
               <ArrowRight className="chev" />
             </Link>
-            <Link href="/dashboard/profile" className="card qa">
+            <Link href="/dashboard/settings/company" className="card qa">
               <span className="qa-ic teal"><Building2 className="h-4 w-4" /></span>
               <span><b>{t("dashboard.index.quickActions.companyProfile")}</b><span>{t("dashboard.index.qa.profile.desc")}</span></span>
               <ArrowRight className="chev" />

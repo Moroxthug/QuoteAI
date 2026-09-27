@@ -1154,7 +1154,7 @@ Write all output text in English.`
           capitoli,
           sconto,
           condizioniPagamento,
-          capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite")),
+          capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_business" || profile?.subscriptionPlan === "monthly_elite")),
           titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
           titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
           numeroPreventivoData,
@@ -1560,7 +1560,7 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
           .select({ subscriptionStatus: businessProfilesTable.subscriptionStatus, subscriptionPlan: businessProfilesTable.subscriptionPlan })
           .from(businessProfilesTable)
           .where(eq(businessProfilesTable.userId, userId));
-        const isProUser = profileData?.subscriptionStatus === "active" && (profileData?.subscriptionPlan === "monthly_pro" || profileData?.subscriptionPlan === "monthly_elite");
+        const isProUser = profileData?.subscriptionStatus === "active" && (profileData?.subscriptionPlan === "monthly_pro" || profileData?.subscriptionPlan === "monthly_business" || profileData?.subscriptionPlan === "monthly_elite");
         if (!isProUser) {
           res.status(403).json({ error: "PRO_REQUIRED", message: "This template requires an active Pro or Elite subscription" });
           return;
@@ -1762,7 +1762,7 @@ router.post("/quotes/:id/generate-pdf", requireAuth, requirePermission("quotes",
     }
 
     const isProOrElite = profile?.subscriptionStatus === "active" &&
-      (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite");
+      (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_business" || profile?.subscriptionPlan === "monthly_elite");
     const unlockedPlan = effectiveStatus === "unlocked" && quote.status === "draft"
       ? "trial"
       : quote.unlockedWithPlan;
@@ -2195,7 +2195,7 @@ router.post("/quotes/:id/upgrade-to-capitolato", requireAuth, requirePermission(
       .from(businessProfilesTable)
       .where(eq(businessProfilesTable.userId, userId));
 
-    const isProUser = profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite");
+    const isProUser = profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_business" || profile?.subscriptionPlan === "monthly_elite");
     if (!isProUser) {
       res.status(403).json({ error: "Pro or Elite plan required", code: "PRO_REQUIRED" });
       return;
@@ -2342,7 +2342,7 @@ router.post("/quotes/:id/generate-pdf-pro", requireAuth, requirePermission("quot
       .from(businessProfilesTable)
       .where(eq(businessProfilesTable.userId, userId));
 
-    const isProUser = profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite");
+    const isProUser = profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_business" || profile?.subscriptionPlan === "monthly_elite");
     if (!isProUser) {
       res.status(403).json({ error: "Pro or Elite plan required", code: "PRO_REQUIRED" });
       return;

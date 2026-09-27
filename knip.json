@@ -18,7 +18,8 @@
     "@fontsource-variable/figtree"
   ],
   "ignoreBinaries": [
-    "ffmpeg"
+    "ffmpeg",
+    "stripe"
   ],
   "rules": {
     "exports": "warn",

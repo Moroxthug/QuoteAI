@@ -7,8 +7,7 @@
     "hello": "tsx ./src/hello.ts",
     "env-inventory": "tsx ./src/env-inventory.ts",
     "apply-clerk-email-templates": "tsx ./src/apply-clerk-email-templates.ts",
-    "stripe-annual-prices": "tsx ./src/stripe-annual-prices.ts",
-    "stripe-addon-prices": "tsx ./src/stripe-addon-prices.ts",
+    "stripe-catalog": "tsx ./src/stripe-catalog.ts",
     "vapid-keys": "tsx ./src/vapid-keys.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

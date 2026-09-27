@@ -149,7 +149,7 @@ function Trend({ current, prev }: { current: number; prev: number }) {
 function PlanBadge({ plan, status }: { plan: string | null; status: string | null }) {
   const { t } = useLanguage();
   if (!plan || status !== "active") return <span className="text-xs text-gray-400 font-medium bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">{t("admin.noPlan")}</span>;
-  const isPro = plan === "monthly_pro";
+  const isPro = plan === "monthly_pro" || plan === "monthly_business";
   const isElite = plan === "monthly_elite";
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
@@ -158,7 +158,7 @@ function PlanBadge({ plan, status }: { plan: string | null; status: string | nul
       "bg-navy-50 text-navy-700 border border-navy-200"
     }`}>
       {isPro || isElite ? <Crown className="h-3 w-3" /> : <Zap className="h-3 w-3" />}
-      {isElite ? "Elite" : isPro ? "Pro" : "Starter"}
+      {isElite ? "Elite" : plan === "monthly_business" ? "Business" : isPro ? "Pro" : "Starter"}
     </span>
   );
 }
@@ -1541,6 +1541,7 @@ export default function AdminPage() {
                       >
                         <option value="monthly_starter">{t("admin.planStarterDesc")}</option>
                         <option value="monthly_pro">{t("admin.planProDesc")}</option>
+                        <option value="monthly_business">{t("admin.planBusinessDesc")}</option>
                         <option value="monthly_elite">{t("admin.planEliteDesc")}</option>
                       </select>
                     </div>

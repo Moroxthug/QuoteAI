@@ -1,53 +1,103 @@
 // Phase 73 (docs/PILOT-LAUNCH-PLAN.md): annual billing + the Stripe Connect
 // application fee. Pure config/maths — no Stripe calls — so it is unit-testable
 // (tests stub process.env) and the routes stay thin.
+//
+// Phase 99 (2026-09-26): every Stripe price id comes from the environment.
+// They used to be hard-coded in routes/payments.ts and belonged to a Stripe
+// account the business no longer had, so checkout failed. The whole catalog is
+// created by `pnpm --filter @workspace/scripts stripe-catalog [-- --live]`,
+// which prints these variables.
 
 export type BillingInterval = "month" | "year";
-export type SubscriptionTier = "monthly_starter" | "monthly_pro" | "monthly_elite";
+export type SubscriptionTier = "monthly_starter" | "monthly_pro" | "monthly_business" | "monthly_elite";
+/** The plans with a published price and a checkout. Elite is custom: sold by the owner, one price per customer. */
+export type SelfServeTier = Exclude<SubscriptionTier, "monthly_elite">;
+export type OneShotPlan = "oneshot_watermark" | "oneshot_clean";
+
+export const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"];
+export const SELF_SERVE_TIERS: readonly SelfServeTier[] = ["monthly_starter", "monthly_pro", "monthly_business"];
+
+export function isSubscriptionTier(id: unknown): id is SubscriptionTier {
+  return typeof id === "string" && (SUBSCRIPTION_TIERS as readonly string[]).includes(id);
+}
+export function isSelfServeTier(id: unknown): id is SelfServeTier {
+  return typeof id === "string" && (SELF_SERVE_TIERS as readonly string[]).includes(id);
+}
 
 /** Annual = 10 × monthly ("2 months free"). */
 const ANNUAL_MONTHS_CHARGED = 10;
 
-/**
- * Yearly Stripe prices are created once per Stripe account by
- * `pnpm --filter @workspace/scripts stripe-annual-prices` (owner track O9)
- * and pasted into these env vars. Missing = annual billing is honestly
- * "coming soon" in the UI rather than a broken checkout.
- */
-function yearlyPriceIds(): Record<SubscriptionTier, string | undefined> {
+const clean = (v: string | undefined): string | null => {
+  const t = v?.trim();
+  return t && t.length > 0 ? t : null;
+};
+
+// Spelled out (not built from a prefix) so env:inventory can see every variable read.
+function monthlyPriceIds(): Record<SelfServeTier | OneShotPlan, string | undefined> {
   return {
-    monthly_starter: process.env.STRIPE_PRICE_YEARLY_STARTER,
-    monthly_pro: process.env.STRIPE_PRICE_YEARLY_PRO,
-    monthly_elite: process.env.STRIPE_PRICE_YEARLY_ELITE,
+    monthly_starter: process.env.STRIPE_PRICE_STARTER,
+    monthly_pro: process.env.STRIPE_PRICE_PRO,
+    monthly_business: process.env.STRIPE_PRICE_BUSINESS,
+    oneshot_watermark: process.env.STRIPE_PRICE_ONESHOT_WATERMARK,
+    oneshot_clean: process.env.STRIPE_PRICE_ONESHOT_CLEAN,
   };
 }
 
+function yearlyPriceIds(): Record<SelfServeTier, string | undefined> {
+  return {
+    monthly_starter: process.env.STRIPE_PRICE_YEARLY_STARTER,
+    monthly_pro: process.env.STRIPE_PRICE_YEARLY_PRO,
+    monthly_business: process.env.STRIPE_PRICE_YEARLY_BUSINESS,
+  };
+}
+
+/** The monthly (or one-off) Stripe price for a plan; null = not configured on this deployment (or Elite). */
+export function planPriceIdFor(planId: string): string | null {
+  return clean((monthlyPriceIds() as Record<string, string | undefined>)[planId]);
+}
+
 export function yearlyPriceIdFor(tier: SubscriptionTier): string | null {
-  const v = yearlyPriceIds()[tier]?.trim();
-  return v && v.length > 0 ? v : null;
+  return isSelfServeTier(tier) ? clean(yearlyPriceIds()[tier]) : null;
 }
 
 export function annualBillingAvailable(): boolean {
-  const ids = yearlyPriceIds();
-  return (Object.keys(ids) as SubscriptionTier[]).every((t) => yearlyPriceIdFor(t) !== null);
+  return SELF_SERVE_TIERS.every((t) => yearlyPriceIdFor(t) !== null);
 }
 
 export function yearlyPriceFor(monthlyPrice: number): number {
   return monthlyPrice * ANNUAL_MONTHS_CHARGED;
 }
 
-/** Maps any known Stripe price id (monthly or yearly) back to { tier, interval }. */
-export function resolvePrice(
-  priceId: string | undefined | null,
-  monthlyPriceToTier: Record<string, string>,
-): { tier: SubscriptionTier; interval: BillingInterval } | null {
-  if (!priceId) return null;
-  const yearly = yearlyPriceIds();
-  for (const tier of Object.keys(yearly) as SubscriptionTier[]) {
-    if (yearlyPriceIdFor(tier) === priceId) return { tier, interval: "year" };
+type PriceLike = { id?: string | null; metadata?: Record<string, string> | null; recurring?: { interval?: string | null } | null } | string | null | undefined;
+
+/**
+ * Maps a Stripe price (monthly or yearly) back to { tier, interval }: first the
+ * configured ids, then the price's `quoteai_plan` metadata — how a custom Elite
+ * price made for one customer in the dashboard unlocks Elite.
+ */
+export function resolvePrice(price: PriceLike): { tier: SubscriptionTier; interval: BillingInterval } | null {
+  if (!price) return null;
+  const id = typeof price === "string" ? price : price.id;
+  if (id) {
+    for (const tier of SELF_SERVE_TIERS) {
+      if (yearlyPriceIdFor(tier) === id) return { tier, interval: "year" };
+      if (planPriceIdFor(tier) === id) return { tier, interval: "month" };
+    }
   }
-  const tier = monthlyPriceToTier[priceId];
-  if (tier === "monthly_starter" || tier === "monthly_pro" || tier === "monthly_elite") return { tier, interval: "month" };
+  if (typeof price !== "string") {
+    const tagged = price.metadata?.quoteai_plan;
+    if (isSubscriptionTier(tagged)) return { tier: tagged, interval: price.recurring?.interval === "year" ? "year" : "month" };
+  }
+  return null;
+}
+
+/** Any known price id → plan id, including the one-off quotes (admin tools). */
+export function planForPrice(price: PriceLike): string | null {
+  const sub = resolvePrice(price);
+  if (sub) return sub.tier;
+  const id = typeof price === "string" ? price : price?.id;
+  if (!id) return null;
+  for (const p of ["oneshot_watermark", "oneshot_clean"] as const) if (planPriceIdFor(p) === id) return p;
   return null;
 }
 
@@ -56,13 +106,13 @@ export function resolvePrice(
 //  - group_company: each company a group's paying company covers (Phase 90)
 //  - extra_seat: each login beyond the plan's included seats (Phase 91)
 // Prices are created once per Stripe mode by `pnpm --filter @workspace/scripts
-// stripe-addon-prices` (owner track), one per interval because a subscription
+// stripe-catalog` (owner track), one per interval because a subscription
 // cannot mix monthly and yearly items. Missing = the add-on is honestly
 // unavailable in the UI instead of a broken checkout.
 
 export type AddonKind = "group_company" | "extra_seat";
 
-/** What the add-ons cost per month (CAD cents) — for display only; must match scripts/src/stripe-addon-prices.ts. */
+/** What the add-ons cost per month (CAD cents) — for display only; must match scripts/src/stripe-catalog.ts. */
 export const ADDON_MONTHLY_CENTS: Record<AddonKind, number> = { group_company: 2900, extra_seat: 1500 };
 // Spelled out (not built from a prefix) so env:inventory can see every variable read.
 const ADDON_PRICE_ENV: Record<AddonKind, Record<BillingInterval, () => string | undefined>> = {

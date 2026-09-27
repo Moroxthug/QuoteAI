@@ -18,7 +18,7 @@ import { AXIS_TICK, LegendRow, SERIES, TOOLTIP_STYLE, money, moneyShort } from "
 export function CashFlowCard({ plan, isActive }: { plan: string | null | undefined; isActive: boolean | undefined }) {
   const { t, lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
-  const elite = !!isActive && plan === "monthly_elite";
+  const elite = !!isActive && (plan === "monthly_business" || plan === "monthly_elite"); // Phase 99: analytics are Business and up
   const outlook = useQuery({ queryKey: ["cash-flow-outlook"], queryFn: () => cashFlowApi.outlook(), enabled: elite, retry: false, staleTime: 60_000 });
 
   if (!isActive) return null;

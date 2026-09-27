@@ -50,6 +50,7 @@ import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesF
 import { logger } from "../lib/logger.js";
 import { permitCompletionBlock } from "../compliance/service.js";
 import { currentActorId } from "../lib/requestContext.js";
+import { ensureRoomForJob } from "../jobs/activeJobCap.js";
 
 const router = Router();
 const objectStorage = new ObjectStorageService();
@@ -214,6 +215,7 @@ router.post("/jobs", requireAuth, requirePermission("jobs", "edit"), async (req,
         return;
       }
     }
+    if (!(await ensureRoomForJob(userId, res))) return;
     const quote = d.quoteId ? (await db.select().from(quotesTable).where(and(eq(quotesTable.id, d.quoteId), eq(quotesTable.userId, userId))))[0] : undefined;
     const [project] = await db
       .insert(projectsTable)
@@ -462,6 +464,8 @@ router.post("/jobs/:id/restore", requireAuth, requirePermission("jobs", "full"),
     const userId = getUserId(res);
     const project = await ownedProject(userId, req.params.id as string);
     if (!project) { res.status(404).json({ error: "Not found" }); return; }
+    // Phase 99: a restored job that is still running counts toward the plan's cap.
+    if (project.archivedAt && !project.completedAt && project.setupStatus === "confirmed" && !(await ensureRoomForJob(userId, res, project.id))) return;
     const [updated] = await db
       .update(projectsTable)
       .set({ archivedAt: null, archivedByName: null })
@@ -619,6 +623,7 @@ router.post("/jobs/:id/setup/confirm", requireAuth, requirePermission("jobs", "e
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
     }
+    if (project.setupStatus !== "confirmed" && !(await ensureRoomForJob(userId, res, project.id))) return;
     await applySetupEdits(userId, project, body.data);
     await db.update(projectsTable).set({ setupStatus: "confirmed", setupConfirmedAt: new Date(), status: project.status === "planning" ? "active" : project.status }).where(eq(projectsTable.id, project.id));
     await recomputeProgress(project.id);

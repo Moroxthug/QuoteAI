@@ -15,16 +15,17 @@ import { MARKETING_PLANS } from "@/data/pricing";
 // the company already has team accounts — the owner invites people right
 // here, by email or with access codes. Crews on site never need a seat.
 
-const SEAT_CENTS = 1500; // display only; matches scripts/src/stripe-addon-prices.ts
+const SEAT_CENTS = 1500; // display only; matches scripts/src/stripe-catalog.ts
 const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "admin"];
-const PLAN_NAMES: Record<PlanId, string> = { free: "Free", monthly_starter: "Starter", monthly_pro: "Pro", monthly_elite: "Elite" };
+const PLAN_NAMES: Record<PlanId, string> = { free: "Free", monthly_starter: "Starter", monthly_pro: "Pro", monthly_business: "Business", monthly_elite: "Elite" };
 
 export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: string | null; seatsWanted: number | undefined; fieldCrew: boolean | undefined; onDone: () => void }) {
   const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const onError = (e: Error & { code?: string }) => toast({ title: e.code === "SEAT_LIMIT" ? t("team.members.seatLimitTitle") : t("jobs.error"), description: e.message, variant: "destructive" });
-  const chosen = plan && (PLAN_IDS as readonly string[]).includes(plan) && plan !== "free" ? (plan as PlanId) : null;
+  // Phase 99: Elite has no checkout (custom price), so an old ?plan=monthly_elite link lands here as "no plan yet".
+  const chosen = plan && (PLAN_IDS as readonly string[]).includes(plan) && plan !== "free" && plan !== "monthly_elite" ? (plan as PlanId) : null;
   const profile = useQuery({ queryKey: ["onboarding-profile"], queryFn: () => apiRequest<{ features?: Record<string, boolean> }>("/api/business-profile") });
   const hasTeam = !!profile.data?.features?.team_accounts;
   // Phase 93: asked even before there is a plan — it says whether extra seats can be bought at all (a Stripe price exists).

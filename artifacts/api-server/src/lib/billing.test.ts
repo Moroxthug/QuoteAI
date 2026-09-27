@@ -1,35 +1,54 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { annualBillingAvailable, applicationFeeCents, connectFeeBps, connectFeePercentLabel, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor } from "./billing.js";
-
-const MONTHLY = { price_m_starter: "monthly_starter", price_m_pro: "monthly_pro", price_m_elite: "monthly_elite" };
+import { annualBillingAvailable, applicationFeeCents, connectFeeBps, connectFeePercentLabel, isPilotPromoCode, pilotPromoCode, planForPrice, planPriceIdFor, resolvePrice, yearlyPriceFor, yearlyPriceIdFor } from "./billing.js";
 
 afterEach(() => vi.unstubAllEnvs());
 
-function stubYearly(ids: Partial<Record<"STARTER" | "PRO" | "ELITE", string>>) {
-  for (const k of ["STARTER", "PRO", "ELITE"] as const) vi.stubEnv(`STRIPE_PRICE_YEARLY_${k}`, ids[k] ?? "");
+function stubYearly(ids: Partial<Record<"STARTER" | "PRO" | "BUSINESS", string>>) {
+  for (const k of ["STARTER", "PRO", "BUSINESS"] as const) vi.stubEnv(`STRIPE_PRICE_YEARLY_${k}`, ids[k] ?? "");
+}
+function stubMonthly(ids: Partial<Record<"STARTER" | "PRO" | "BUSINESS", string>>) {
+  for (const k of ["STARTER", "PRO", "BUSINESS"] as const) vi.stubEnv(`STRIPE_PRICE_${k}`, ids[k] ?? "");
 }
 
 describe("annual billing config", () => {
-  it("is unavailable until all three yearly price ids are set", () => {
+  it("is unavailable until all three self-serve yearly price ids are set (Elite is custom)", () => {
     stubYearly({});
     expect(annualBillingAvailable()).toBe(false);
     stubYearly({ STARTER: "a", PRO: "b" });
     expect(annualBillingAvailable()).toBe(false);
-    stubYearly({ STARTER: "a", PRO: "b", ELITE: "c" });
+    stubYearly({ STARTER: "a", PRO: "b", BUSINESS: "c" });
     expect(annualBillingAvailable()).toBe(true);
+    expect(yearlyPriceIdFor("monthly_elite")).toBeNull();
   });
 
   it("charges 10 months for a year", () => {
-    expect(yearlyPriceFor(19)).toBe(190);
-    expect(yearlyPriceFor(59)).toBe(590);
+    expect(yearlyPriceFor(29)).toBe(290);
+    expect(yearlyPriceFor(249)).toBe(2490);
   });
 
   it("resolves monthly and yearly price ids back to a tier + interval", () => {
+    stubMonthly({ PRO: "price_m_pro", BUSINESS: "price_m_biz" });
     stubYearly({ PRO: "price_y_pro" });
-    expect(resolvePrice("price_m_pro", MONTHLY)).toEqual({ tier: "monthly_pro", interval: "month" });
-    expect(resolvePrice("price_y_pro", MONTHLY)).toEqual({ tier: "monthly_pro", interval: "year" });
-    expect(resolvePrice("price_unknown", MONTHLY)).toBeNull();
-    expect(resolvePrice(undefined, MONTHLY)).toBeNull();
+    expect(resolvePrice("price_m_pro")).toEqual({ tier: "monthly_pro", interval: "month" });
+    expect(resolvePrice({ id: "price_m_biz" })).toEqual({ tier: "monthly_business", interval: "month" });
+    expect(resolvePrice("price_y_pro")).toEqual({ tier: "monthly_pro", interval: "year" });
+    expect(resolvePrice("price_unknown")).toBeNull();
+    expect(resolvePrice(undefined)).toBeNull();
+  });
+
+  it("a custom price made for one Elite customer resolves through its quoteai_plan metadata", () => {
+    stubMonthly({});
+    expect(resolvePrice({ id: "price_custom_acme", metadata: { quoteai_plan: "monthly_elite" }, recurring: { interval: "year" } })).toEqual({ tier: "monthly_elite", interval: "year" });
+    expect(resolvePrice({ id: "price_custom_x", metadata: { quoteai_plan: "not_a_plan" } })).toBeNull();
+    expect(planForPrice({ id: "price_custom_acme", metadata: { quoteai_plan: "monthly_elite" } })).toBe("monthly_elite");
+  });
+
+  it("one-off quote prices map back for the admin tools, and an unconfigured plan has no price", () => {
+    vi.stubEnv("STRIPE_PRICE_ONESHOT_CLEAN", "price_one_clean");
+    vi.stubEnv("STRIPE_PRICE_STARTER", "");
+    expect(planForPrice("price_one_clean")).toBe("oneshot_clean");
+    expect(planPriceIdFor("monthly_starter")).toBeNull();
+    expect(planPriceIdFor("monthly_elite")).toBeNull();
   });
 });
 

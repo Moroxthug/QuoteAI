@@ -15,11 +15,11 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 136 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 357 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 427 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
-| 479 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 521 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 563 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
+| 359 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 429 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
+| 481 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 523 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 565 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
 
 ## artifacts/api-server/src/routes/account.ts
 
@@ -34,21 +34,21 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 46 | GET | `/api/settings/registration` | none | — | — | none | — | n/a | — | — | — |
-| 61 | GET | `/api/admin/metrics` | admin | — | — | none | — | n/a | — | — | — |
-| 130 | GET | `/api/admin/users` | admin | — | — | none | — | n/a | — | — | — |
-| 194 | GET | `/api/admin/users/:userId/quotes` | admin | — | — | none | — | n/a | — | — | — |
-| 225 | POST | `/api/admin/users/:userId/apikey` | admin | — | — | zod | — | n/a | — | — | — |
-| 257 | GET | `/api/admin/settings` | admin | — | — | none | — | n/a | — | — | — |
-| 269 | POST | `/api/admin/settings` | admin | — | — | zod | — | n/a | — | — | — |
-| 288 | POST | `/api/admin/grant-plan` | admin | — | — | zod | — | n/a | — | — | — |
-| 331 | POST | `/api/admin/sync-subscription` | admin | — | — | zod | — | n/a | — | — | — |
-| 408 | POST | `/api/admin/sync-by-customer` | admin | — | — | zod | — | n/a | — | — | — |
-| 472 | GET | `/api/admin/quote-stats` | admin | — | — | none | — | n/a | — | — | — |
-| 594 | GET | `/api/admin/seo-audit` | admin | — | — | none | — | n/a | — | — | — |
-| 688 | GET | `/api/admin/search-console` | admin | — | — | zod | — | n/a | — | — | — |
-| 869 | GET | `/api/admin/widget/stats` | admin | — | — | none | — | n/a | — | — | — |
-| 942 | POST | `/api/admin/widget/create-client` | admin | — | — | zod | — | n/a | — | — | — |
+| 47 | GET | `/api/settings/registration` | none | — | — | none | — | n/a | — | — | — |
+| 62 | GET | `/api/admin/metrics` | admin | — | — | none | — | n/a | — | — | — |
+| 133 | GET | `/api/admin/users` | admin | — | — | none | — | n/a | — | — | — |
+| 197 | GET | `/api/admin/users/:userId/quotes` | admin | — | — | none | — | n/a | — | — | — |
+| 228 | POST | `/api/admin/users/:userId/apikey` | admin | — | — | zod | — | n/a | — | — | — |
+| 260 | GET | `/api/admin/settings` | admin | — | — | none | — | n/a | — | — | — |
+| 272 | POST | `/api/admin/settings` | admin | — | — | zod | — | n/a | — | — | — |
+| 291 | POST | `/api/admin/grant-plan` | admin | — | — | zod | — | n/a | — | — | — |
+| 334 | POST | `/api/admin/sync-subscription` | admin | — | — | zod | — | n/a | — | — | — |
+| 410 | POST | `/api/admin/sync-by-customer` | admin | — | — | zod | — | n/a | — | — | — |
+| 475 | GET | `/api/admin/quote-stats` | admin | — | — | none | — | n/a | — | — | — |
+| 597 | GET | `/api/admin/seo-audit` | admin | — | — | none | — | n/a | — | — | — |
+| 691 | GET | `/api/admin/search-console` | admin | — | — | zod | — | n/a | — | — | — |
+| 872 | GET | `/api/admin/widget/stats` | admin | — | — | none | — | n/a | — | — | — |
+| 945 | POST | `/api/admin/widget/create-client` | admin | — | — | zod | — | n/a | — | — | — |
 | 986 | GET | `/api/admin/margin` | admin | — | — | none | — | n/a | — | — | — |
 | 1048 | GET | `/api/admin/email-events` | admin | — | — | none | — | n/a | — | — | — |
 | 1066 | GET | `/api/admin/incentives` | admin | — | — | none | — | n/a | — | — | — |
@@ -227,20 +227,20 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 21 | GET | `/api/crm/projects` | session | — | — | none | — | n/a | — | — | — |
-| 35 | POST | `/api/crm/projects` | session | jobs:edit | — | zod | — | n/a | — | — | — |
-| 78 | PUT | `/api/crm/projects/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 138 | DELETE | `/api/crm/projects/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 161 | GET | `/api/crm/projects/:projectId/tasks` | session | — | — | none | — | predicate | — | — | — |
-| 189 | POST | `/api/crm/projects/:projectId/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 235 | PATCH | `/api/crm/projects/:projectId/tasks/:taskId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 279 | GET | `/api/crm/projects/:projectId/assignments` | session | — | — | none | — | predicate | — | — | — |
-| 316 | POST | `/api/crm/projects/:projectId/assignments` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 368 | DELETE | `/api/crm/projects/:projectId/assignments/:assignmentId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 401 | GET | `/api/crm/collaborators` | session | — | — | none | — | n/a | — | — | — |
-| 415 | POST | `/api/crm/collaborators` | session | jobs:edit | — | zod | — | n/a | — | — | — |
-| 452 | GET | `/api/crm/suppliers` | session | — | — | none | — | n/a | — | — | — |
-| 466 | POST | `/api/crm/suppliers` | session | jobs:edit | — | zod | — | n/a | — | — | — |
+| 22 | GET | `/api/crm/projects` | session | — | — | none | — | n/a | — | — | — |
+| 36 | POST | `/api/crm/projects` | session | jobs:edit | — | zod | — | n/a | — | — | — |
+| 80 | PUT | `/api/crm/projects/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 140 | DELETE | `/api/crm/projects/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 163 | GET | `/api/crm/projects/:projectId/tasks` | session | — | — | none | — | predicate | — | — | — |
+| 191 | POST | `/api/crm/projects/:projectId/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 237 | PATCH | `/api/crm/projects/:projectId/tasks/:taskId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 281 | GET | `/api/crm/projects/:projectId/assignments` | session | — | — | none | — | predicate | — | — | — |
+| 318 | POST | `/api/crm/projects/:projectId/assignments` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 370 | DELETE | `/api/crm/projects/:projectId/assignments/:assignmentId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 403 | GET | `/api/crm/collaborators` | session | — | — | none | — | n/a | — | — | — |
+| 417 | POST | `/api/crm/collaborators` | session | jobs:edit | — | zod | — | n/a | — | — | — |
+| 454 | GET | `/api/crm/suppliers` | session | — | — | none | — | n/a | — | — | — |
+| 468 | POST | `/api/crm/suppliers` | session | jobs:edit | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/cron.ts
 
@@ -398,36 +398,36 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 154 | GET | `/api/jobs` | session | jobs:view | — | none | — | n/a | projects:ok | — | — |
-| 184 | POST | `/api/jobs` | session | jobs:edit | — | zod | hasFeature(jobs) | n/a | — | — | — |
-| 340 | GET | `/api/jobs/:id` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 355 | PUT | `/api/jobs/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 419 | DELETE | `/api/jobs/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 442 | POST | `/api/jobs/:id/archive` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 460 | POST | `/api/jobs/:id/restore` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 587 | PUT | `/api/jobs/:id/setup` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 609 | POST | `/api/jobs/:id/setup/confirm` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 634 | POST | `/api/jobs/:id/setup/regenerate` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 681 | POST | `/api/jobs/:id/milestones` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 718 | PUT | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 760 | DELETE | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 781 | POST | `/api/jobs/:id/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 802 | PATCH | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 832 | DELETE | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 850 | PUT | `/api/jobs/:id/budget` | session | jobs:full | — | zod | — | predicate | — | — | — |
-| 890 | POST | `/api/jobs/:id/change-orders` | session | jobs:full | — | zod | hasFeature(jobs) | predicate | — | — | — |
-| 914 | PUT | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | zod | — | predicate | — | — | — |
-| 939 | DELETE | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 977 | GET | `/api/jobs/:id/photos` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 993 | POST | `/api/jobs/:id/photos` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1047 | GET | `/api/jobs/:id/photos/:photoId/file` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 1076 | PUT | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1110 | DELETE | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 1135 | POST | `/api/jobs/:id/photos/share` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1198 | GET | `/api/jobs/:id/notes` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 1215 | POST | `/api/jobs/:id/notes` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1243 | DELETE | `/api/jobs/:id/notes/:noteId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 1269 | POST | `/api/jobs/:id/sms/on-my-way` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 155 | GET | `/api/jobs` | session | jobs:view | — | none | — | n/a | projects:ok | — | — |
+| 185 | POST | `/api/jobs` | session | jobs:edit | — | zod | hasFeature(jobs) | n/a | — | — | — |
+| 342 | GET | `/api/jobs/:id` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 357 | PUT | `/api/jobs/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 421 | DELETE | `/api/jobs/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 444 | POST | `/api/jobs/:id/archive` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 462 | POST | `/api/jobs/:id/restore` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 591 | PUT | `/api/jobs/:id/setup` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 613 | POST | `/api/jobs/:id/setup/confirm` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 639 | POST | `/api/jobs/:id/setup/regenerate` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 686 | POST | `/api/jobs/:id/milestones` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 723 | PUT | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 765 | DELETE | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 786 | POST | `/api/jobs/:id/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 807 | PATCH | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 837 | DELETE | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 855 | PUT | `/api/jobs/:id/budget` | session | jobs:full | — | zod | — | predicate | — | — | — |
+| 895 | POST | `/api/jobs/:id/change-orders` | session | jobs:full | — | zod | hasFeature(jobs) | predicate | — | — | — |
+| 919 | PUT | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | zod | — | predicate | — | — | — |
+| 944 | DELETE | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 982 | GET | `/api/jobs/:id/photos` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 998 | POST | `/api/jobs/:id/photos` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1052 | GET | `/api/jobs/:id/photos/:photoId/file` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 1081 | PUT | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1115 | DELETE | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 1140 | POST | `/api/jobs/:id/photos/share` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1203 | GET | `/api/jobs/:id/notes` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 1220 | POST | `/api/jobs/:id/notes` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1248 | DELETE | `/api/jobs/:id/notes/:noteId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 1274 | POST | `/api/jobs/:id/sms/on-my-way` | session | jobs:edit | — | zod | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/leads.ts
 
@@ -476,16 +476,16 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 160 | GET | `/api/payments/plans` | none | — | — | none | — | n/a | — | — | — |
-| 170 | GET | `/api/payments/pilot` | none | — | — | none | — | n/a | — | — | — |
-| 202 | GET | `/api/payments/trial-status` | session | — | — | none | — | n/a | — | — | — |
-| 216 | POST | `/api/payments/checkout` | session | settings:full | — | zod | — | n/a | — | — | — |
-| 319 | GET | `/api/payments/subscription` | session | — | — | none | quota-check | n/a | — | — | — |
-| 378 | POST | `/api/payments/unlock-quote` | session | quotes:edit | — | zod | — | n/a | — | — | — |
-| 428 | POST | `/api/payments/portal` | session | settings:full | — | none | — | n/a | — | — | — |
-| 456 | POST | `/api/payments/sync-subscription` | session | settings:full | — | none | — | n/a | — | — | — |
-| 568 | POST | `/api/payments/change-plan` | session | settings:full | — | zod | — | n/a | — | — | — |
-| 661 | GET | `/api/payments/verify/:quoteId` | session | — | — | none | — | post-check | — | — | — |
+| 155 | GET | `/api/payments/plans` | none | — | — | none | — | n/a | — | — | — |
+| 165 | GET | `/api/payments/pilot` | none | — | — | none | — | n/a | — | — | — |
+| 197 | GET | `/api/payments/trial-status` | session | — | — | none | — | n/a | — | — | — |
+| 211 | POST | `/api/payments/checkout` | session | settings:full | — | zod | — | n/a | — | — | — |
+| 323 | GET | `/api/payments/subscription` | session | — | — | none | quota-check | n/a | — | — | — |
+| 382 | POST | `/api/payments/unlock-quote` | session | quotes:edit | — | zod | — | n/a | — | — | — |
+| 432 | POST | `/api/payments/portal` | session | settings:full | — | none | — | n/a | — | — | — |
+| 460 | POST | `/api/payments/sync-subscription` | session | settings:full | — | none | — | n/a | — | — | — |
+| 573 | POST | `/api/payments/change-plan` | session | settings:full | — | zod | — | n/a | — | — | — |
+| 670 | GET | `/api/payments/verify/:quoteId` | session | — | — | none | — | post-check | — | — | — |
 
 ## artifacts/api-server/src/routes/people.ts
 

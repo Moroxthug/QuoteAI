@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetPlans, useGetSubscription, useChangePlan, getGetSubscriptionQueryKey, type Plan, type SubscriptionInfo } from "@workspace/api-client-react";
-import { CheckCircle2, Crown, Zap, Loader2, Sparkles, Info, Tag } from "lucide-react";
+import { CheckCircle2, Crown, Zap, Loader2, Sparkles, Info, Tag, Mail } from "lucide-react";
+import { ELITE_CONTACT_HREF } from "@/data/pricing";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { forgetPilotPromo, pilotPromo } from "@/lib/pilot-promo";
@@ -9,12 +10,13 @@ import { cn } from "@/lib/utils";
 
 // Phase 73: the one plan grid used by /dashboard/billing and Settings →
 // Billing. Monthly / annual toggle (annual = 10 × monthly, "2 months free"),
-// three tiers, and an in-place switch with proration for an active
-// subscriber — or a Checkout redirect for everyone else.
+// the self-serve tiers, and an in-place switch with proration for an active
+// subscriber — or a Checkout redirect for everyone else. Phase 99: Elite is
+// custom-priced, so it is a "talk to us" strip under the grid, not a card.
 
 type Interval = "month" | "year";
-type Tier = "monthly_starter" | "monthly_pro" | "monthly_elite";
-const TIERS: readonly Tier[] = ["monthly_starter", "monthly_pro", "monthly_elite"];
+type Tier = "monthly_starter" | "monthly_pro" | "monthly_business";
+const TIERS: readonly Tier[] = ["monthly_starter", "monthly_pro", "monthly_business"];
 
 function money(n: number, lang: string): string {
   return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: n % 1 === 0 ? 0 : 2 }).format(n);
@@ -95,9 +97,11 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
         {tiers.map((plan) => {
           const tier = plan.id as Tier;
           const isPro = tier === "monthly_pro";
-          const isElite = tier === "monthly_elite";
-          const yearly = plan.yearlyPrice ?? plan.price * 10;
-          const price = effectiveInterval === "year" ? yearly : plan.price;
+          const isElite = tier === "monthly_business"; // the top self-serve card keeps the amber accent
+          const monthly = plan.price ?? 0;
+          const yearly = plan.yearlyPrice ?? monthly * 10;
+          const price = effectiveInterval === "year" ? yearly : monthly;
+          const unavailable = plan.checkoutAvailable === false;
           const current = isCurrent(tier);
           const busy = pending === tier;
           const features = compact ? plan.features.slice(0, 4) : plan.features;
@@ -146,7 +150,8 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
                   <button
                     type="button"
                     className={cn("btn w-full gap-2", current ? "btn-outline-navy" : isElite ? "btn-navy bg-amber-500 hover:bg-amber-600 border-0" : "btn-navy")}
-                    disabled={current || busy || changePlan.isPending}
+                    disabled={current || busy || changePlan.isPending || unavailable}
+                    title={unavailable ? t("billing.picker.planUnavailable") : undefined}
                     onClick={() => (sub?.isActive ? setConfirming(tier) : run(tier))}
                   >
                     {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
@@ -164,6 +169,17 @@ export function PlanPicker({ compact = false }: { compact?: boolean }) {
           );
         })}
       </div>
+      <div className={cn("card flex flex-wrap items-center justify-between gap-3 p-4", sub?.isActive && sub.plan === "monthly_elite" ? "border-2 border-emerald-300" : "")}>
+        <div className="min-w-0">
+          <p className="font-semibold flex items-center gap-2"><Crown className="h-4 w-4 text-amber-600" />Elite <span className="text-sm font-normal text-muted-foreground">— {t("billing.picker.eliteCustom")}</span></p>
+          <p className="text-xs text-muted-foreground mt-0.5">{t("billing.picker.eliteDesc")}</p>
+        </div>
+        {sub?.isActive && sub.plan === "monthly_elite" ? (
+          <span className="chip chip-green"><CheckCircle2 className="h-3 w-3 mr-1" />{t("billing.picker.current")}</span>
+        ) : (
+          <a className="btn btn-outline-navy btn-sm gap-2" href={ELITE_CONTACT_HREF}><Mail className="h-4 w-4" />{t("billing.picker.eliteContact")}</a>
+        )}
+      </div>
       <p className="text-xs text-muted-foreground">{t("billing.picker.taxesNote")}</p>
     </div>
   );
@@ -174,6 +190,7 @@ export function currentPlanPriceLabel(sub: SubscriptionInfo | undefined, plans: 
   if (!sub?.isActive || !sub.plan || !Array.isArray(plans)) return null;
   const plan = plans.find((p) => p.id === sub.plan);
   if (!plan) return null;
+  if (plan.price === null) return null; // Elite: custom price, the caller shows its own label
   if (sub.interval === "year") return `${money(plan.yearlyPrice ?? plan.price * 10, lang)}${t("billing.picker.perYear")}`;
   return `${money(plan.price, lang)}${t("billing.picker.perMonth")}`;
 }

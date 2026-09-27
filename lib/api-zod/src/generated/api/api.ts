@@ -1912,7 +1912,7 @@ export const RequestUploadUrlResponse = zod.object({
  */
 export const CreateCheckoutSessionBody = zod.object({
   "quoteId": zod.string().optional(),
-  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite', 'oneshot_watermark', 'oneshot_clean']),
+  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_business', 'monthly_elite', 'oneshot_watermark', 'oneshot_clean']),
   "interval": zod.enum(['month', 'year']).optional().describe('Billing cadence for subscription plans (Phase 73). Defaults to month.'),
   "promoCode": zod.string().optional().describe('Pilot-programme promo code (Phase 81). Applied to Checkout only when it matches the server\'s configured code; anything else is ignored.')
 })
@@ -1947,14 +1947,16 @@ export const VerifyPaymentResponse = zod.object({
 export const GetPlansResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "price": zod.number(),
+  "price": zod.number().nullable().describe('CAD per month (or per purchase); null for a custom-priced plan (Elite, Phase 99)'),
   "currency": zod.string(),
   "interval": zod.string().nullish(),
   "features": zod.array(zod.string()),
   "hasWatermark": zod.boolean(),
   "quotaPerMonth": zod.number().nullish(),
   "yearlyPrice": zod.number().nullish().describe('Annual price (10 × monthly) for subscription plans (Phase 73)'),
-  "yearlyAvailable": zod.boolean().optional()
+  "yearlyAvailable": zod.boolean().optional(),
+  "custom": zod.boolean().optional().describe('Sold by the owner, not through checkout (Elite, Phase 99)'),
+  "checkoutAvailable": zod.boolean().optional().describe('This deployment has a Stripe price for the plan (Phase 99)')
 })
 export const GetPlansResponse = zod.array(GetPlansResponseItem)
 
@@ -2015,7 +2017,7 @@ export const GetTrialStatusResponse = zod.object({
  * @summary Switch subscription tier and/or billing cadence with proration (Phase 73)
  */
 export const ChangePlanBody = zod.object({
-  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_elite']),
+  "planType": zod.enum(['monthly_starter', 'monthly_pro', 'monthly_business', 'monthly_elite']),
   "interval": zod.enum(['month', 'year']),
   "promoCode": zod.string().optional().describe('Pilot-programme promo code (Phase 81) — only honoured on the Checkout path, for a company with no live subscription.')
 })

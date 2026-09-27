@@ -16,8 +16,22 @@ import type Stripe from "stripe";
 /** Every variable an owner item turns on, by Phase 99 item. Presence is all that is reported. */
 export const OWNER_VARS: Record<string, string[]> = {
   "L-6": ["SENTRY_DSN", "VITE_SENTRY_DSN", "SENTRY_AUTH_TOKEN", "SENTRY_ORG", "SENTRY_PROJECT", "CRON_HEARTBEAT_URL", "OPS_ALERT_EMAIL"],
-  "L-8": ["STRIPE_PRICE_GROUP_COMPANY", "STRIPE_PRICE_GROUP_COMPANY_YEARLY", "STRIPE_PRICE_EXTRA_SEAT", "STRIPE_PRICE_EXTRA_SEAT_YEARLY"],
-  "L-9": ["STRIPE_PRICE_YEARLY_STARTER", "STRIPE_PRICE_YEARLY_PRO", "STRIPE_PRICE_YEARLY_ELITE", "PILOT_PROMO_CODE"],
+  // Phase 99: the whole catalog (scripts: stripe-catalog) — plans, one-off quotes, add-ons.
+  "L-8": [
+    "STRIPE_PRICE_STARTER",
+    "STRIPE_PRICE_PRO",
+    "STRIPE_PRICE_BUSINESS",
+    "STRIPE_PRICE_YEARLY_STARTER",
+    "STRIPE_PRICE_YEARLY_PRO",
+    "STRIPE_PRICE_YEARLY_BUSINESS",
+    "STRIPE_PRICE_ONESHOT_WATERMARK",
+    "STRIPE_PRICE_ONESHOT_CLEAN",
+    "STRIPE_PRICE_GROUP_COMPANY",
+    "STRIPE_PRICE_GROUP_COMPANY_YEARLY",
+    "STRIPE_PRICE_EXTRA_SEAT",
+    "STRIPE_PRICE_EXTRA_SEAT_YEARLY",
+  ],
+  "L-9": ["PILOT_PROMO_CODE"],
   "P-5": ["POSTHOG_KEY", "VITE_POSTHOG_KEY", "RESEND_WEBHOOK_SECRET"],
   "P-6": ["CRON_STALE_AFTER_HOURS"],
   "F-1": [
@@ -36,15 +50,20 @@ export const OWNER_VARS: Record<string, string[]> = {
   "F-5": ["META_APP_ID", "META_APP_SECRET", "META_REDIRECT_URI", "META_LEADGEN_VERIFY_TOKEN", "GSC_SERVICE_ACCOUNT_KEY", "GSC_SITE_URL"],
 };
 
-/** The price variables and what each must be: recurring CAD at this interval. */
-export const PRICE_VARS: Record<string, "month" | "year"> = {
+/** The price variables and what each must be: CAD, recurring at this interval ("once" = a one-off payment). */
+export const PRICE_VARS: Record<string, "month" | "year" | "once"> = {
+  STRIPE_PRICE_STARTER: "month",
+  STRIPE_PRICE_PRO: "month",
+  STRIPE_PRICE_BUSINESS: "month",
+  STRIPE_PRICE_YEARLY_STARTER: "year",
+  STRIPE_PRICE_YEARLY_PRO: "year",
+  STRIPE_PRICE_YEARLY_BUSINESS: "year",
+  STRIPE_PRICE_ONESHOT_WATERMARK: "once",
+  STRIPE_PRICE_ONESHOT_CLEAN: "once",
   STRIPE_PRICE_GROUP_COMPANY: "month",
   STRIPE_PRICE_GROUP_COMPANY_YEARLY: "year",
   STRIPE_PRICE_EXTRA_SEAT: "month",
   STRIPE_PRICE_EXTRA_SEAT_YEARLY: "year",
-  STRIPE_PRICE_YEARLY_STARTER: "year",
-  STRIPE_PRICE_YEARLY_PRO: "year",
-  STRIPE_PRICE_YEARLY_ELITE: "year",
 };
 
 export type PriceCheck = {
@@ -103,7 +122,8 @@ export async function ownerReadiness(env: NodeJS.ProcessEnv, stripe: StripeLike 
       if (p.livemode !== live) problems.push(`a ${p.livemode ? "live" : "test"}-mode price on a ${mode}-mode key — paste the ${mode} id`);
       if (!p.active) problems.push("archived in Stripe");
       if (p.currency !== "cad") problems.push(`currency ${p.currency}, not cad`);
-      if (p.recurring?.interval !== interval) problems.push(`bills every ${p.recurring?.interval ?? "once"}, should be every ${interval}`);
+      const got = p.recurring?.interval ?? "once";
+      if (got !== interval) problems.push(got === "once" ? `is a one-off payment, should bill every ${interval}` : interval === "once" ? `bills every ${got}, should be a one-off payment` : `bills every ${got}, should be every ${interval}`);
       prices[name] = { set: true, ok: problems.length === 0, problem: problems.join("; ") || undefined, amount: p.unit_amount, currency: p.currency, interval: p.recurring?.interval ?? null };
     } catch (err) {
       const msg = (err as { code?: string; message?: string }).code === "resource_missing" ? `no such price in ${mode} mode — likely pasted from the other mode` : ((err as Error).message ?? "lookup failed").slice(0, 160);

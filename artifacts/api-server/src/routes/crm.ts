@@ -13,6 +13,7 @@ import {
 import { z } from "zod";
 import { permitCompletionBlock } from "../compliance/service.js";
 import { currentActorId } from "../lib/requestContext.js";
+import { ensureRoomForJob } from "../jobs/activeJobCap.js";
 
 
 const router = Router();
@@ -52,6 +53,7 @@ router.post("/crm/projects", requireAuth, requirePermission("jobs", "edit"), asy
     }
 
     const { name, description, quoteId, status, startDate, endDate, budget } = parsed.data;
+    if (!(await ensureRoomForJob(userId, res))) return;
 
     const [project] = await db
       .insert(projectsTable)

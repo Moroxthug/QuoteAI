@@ -13,6 +13,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, type JobSummaryDto } from "@/lib/jobs-api";
 import { ReceiptQueue } from "@/components/jobs/receipt-queue";
+import { jobLimitToast } from "@/lib/plan-errors";
 
 function statusChip(j: JobSummaryDto, t: (key: string) => string): { cls: string; label: string } {
   if (j.setupStatus === "pending_review") return { cls: "chip-yellow", label: t("jobs.status.pending_review") };
@@ -132,7 +133,7 @@ function CreateJobDialog({ open, onOpenChange }: { open: boolean; onOpenChange: 
       onOpenChange(false);
       navigate(`/dashboard/jobs/${res.job.id}`);
     },
-    onError: (e: Error & { code?: string }) => toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("jobs.error"), description: e.message, variant: "destructive" }),
+    onError: (e: Error & { code?: string }) => toast({ ...(jobLimitToast(e, t) ?? { title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("jobs.error"), description: e.message }), variant: "destructive" }),
   });
 
   return (

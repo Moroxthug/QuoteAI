@@ -4,7 +4,10 @@
 // The frontend keeps a mirror in src/lib/plans.ts (it does not import this
 // package because of the pg dependency).
 
-export const PLAN_IDS = ["free", "monthly_starter", "monthly_pro", "monthly_elite"] as const;
+// Phase 99 (2026-09-26) repricing: Starter / Pro / Business are self-serve with
+// a published price; Elite is custom-priced (sold by the owner, one Stripe price
+// per customer) and is the only plan with every feature.
+export const PLAN_IDS = ["free", "monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 
 export const PRODUCT_FEATURES = [
@@ -36,14 +39,16 @@ export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const ELITE: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "financeit", "public_api", "gmail_send", "wave_sync", "flinks_bank_feed", "meta_lead_ads", "google_lsa", "multi_entity"];
+const BUSINESS: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "gmail_send", "wave_sync"];
+const ELITE: ProductFeature[] = [...BUSINESS, "financeit", "public_api", "flinks_bank_feed", "meta_lead_ads", "google_lsa", "multi_entity"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */
 export const SEATS_INCLUDED: Record<PlanId, number> = {
   free: 1,
   monthly_starter: 1,
   monthly_pro: 2,
-  monthly_elite: 5,
+  monthly_business: 5,
+  monthly_elite: 10,
 };
 
 export function seatsIncluded(plan: PlanId): number {
@@ -63,15 +68,34 @@ export const MONTHLY_USAGE_ALLOWANCE: Record<PlanId, { receiptScans: number | nu
   free: { receiptScans: 0, whatsappMessages: 0, smsMessages: 0 },
   monthly_starter: { receiptScans: 20, whatsappMessages: 0, smsMessages: 50 },
   monthly_pro: { receiptScans: 100, whatsappMessages: 200, smsMessages: 300 },
-  monthly_elite: { receiptScans: 300, whatsappMessages: 1000, smsMessages: 1000 },
+  monthly_business: { receiptScans: 300, whatsappMessages: 1000, smsMessages: 1000 },
+  monthly_elite: { receiptScans: 1000, whatsappMessages: 3000, smsMessages: 3000 },
 };
 
 export const PLAN_FEATURES: Record<PlanId, ReadonlySet<ProductFeature>> = {
   free: new Set<ProductFeature>(["quotes"]),
   monthly_starter: new Set(STARTER),
   monthly_pro: new Set(PRO),
+  monthly_business: new Set(BUSINESS),
   monthly_elite: new Set(ELITE),
 };
+
+/**
+ * Phase 99: jobs open at once (not completed, not archived) — Pro's cap, so a
+ * growing crew moves up to Business. null = no cap (plans without "jobs" never
+ * reach the check).
+ */
+export const ACTIVE_JOB_LIMIT: Record<PlanId, number | null> = {
+  free: null,
+  monthly_starter: null,
+  monthly_pro: 3,
+  monthly_business: null,
+  monthly_elite: null,
+};
+
+export function activeJobLimit(profile: PlanLike): number | null {
+  return ACTIVE_JOB_LIMIT[effectivePlan(profile)];
+}
 
 export type PlanLike = {
   subscriptionPlan?: string | null;

@@ -92,7 +92,7 @@ export function PriceCatalogSection() {
   const [csvFileName, setCsvFileName] = useState("");
   const [csvError, setCsvError] = useState("");
 
-  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
+  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getListCatalogItemsQueryKey() });
 

@@ -11,6 +11,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { jobsApi, formatCents, formatCad, type JobDetailDto, type MilestoneDto, type BudgetLineDto, type CostCategory, type SetupEdits } from "@/lib/jobs-api";
 import { Gantt } from "@/components/jobs/gantt";
+import { jobLimitToast } from "@/lib/plan-errors";
 
 type MilestoneDraft = { id?: string; key?: string; title: string; description: string; plannedStart: string; plannedEnd: string; paymentTermId: string | null; valueCents: number; taskCount: number; status: MilestoneDto["status"] };
 type BudgetDraft = { category: CostCategory; label: string; amount: string };
@@ -87,7 +88,7 @@ export default function JobSetupPage() {
       toast({ title: t("jobs.setup.confirmed"), description: t("jobs.setup.confirmedDesc") });
       navigate(`/dashboard/jobs/${id}`);
     },
-    onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
+    onError: (e: Error) => toast({ ...(jobLimitToast(e, t) ?? { title: t("jobs.error"), description: e.message }), variant: "destructive" }),
   });
   const regenerate = useMutation({
     mutationFn: () => jobsApi.regenerateSetup(id!),

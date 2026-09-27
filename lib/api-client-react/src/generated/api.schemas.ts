@@ -374,6 +374,7 @@ export type CreateCheckoutBodyPlanType = typeof CreateCheckoutBodyPlanType[keyof
 export const CreateCheckoutBodyPlanType = {
   monthly_starter: 'monthly_starter',
   monthly_pro: 'monthly_pro',
+  monthly_business: 'monthly_business',
   monthly_elite: 'monthly_elite',
   oneshot_watermark: 'oneshot_watermark',
   oneshot_clean: 'oneshot_clean',
@@ -405,6 +406,7 @@ export type ChangePlanBodyPlanType = typeof ChangePlanBodyPlanType[keyof typeof 
 export const ChangePlanBodyPlanType = {
   monthly_starter: 'monthly_starter',
   monthly_pro: 'monthly_pro',
+  monthly_business: 'monthly_business',
   monthly_elite: 'monthly_elite',
 } as const;
 
@@ -468,7 +470,8 @@ export interface CheckoutResult {
 export interface Plan {
   id: string;
   name: string;
-  price: number;
+  /** CAD per month (or per purchase); null for a custom-priced plan (Elite, Phase 99) */
+  price: number | null;
   currency: string;
   interval?: string | null;
   features: string[];
@@ -477,6 +480,10 @@ export interface Plan {
   /** Annual price (10 × monthly) for subscription plans (Phase 73) */
   yearlyPrice?: number | null;
   yearlyAvailable?: boolean;
+  /** Sold by the owner, not through checkout (Elite, Phase 99) */
+  custom?: boolean;
+  /** This deployment has a Stripe price for the plan (Phase 99) */
+  checkoutAvailable?: boolean;
 }
 
 export interface CapitolatoPdfResult {

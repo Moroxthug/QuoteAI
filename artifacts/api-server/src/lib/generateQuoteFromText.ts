@@ -225,7 +225,7 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
     ivaValore: ivaValoreVal.toFixed(2),
     totale: totaleVal.toFixed(2),
     note: aiData.note ?? "Quote valid for 30 days from the issue date. Excludes permits, unforeseen conditions behind existing walls/floors, and any work not explicitly listed above.",
-    capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_elite")),
+    capitolatoPro: !!(profile?.subscriptionStatus === "active" && (profile?.subscriptionPlan === "monthly_pro" || profile?.subscriptionPlan === "monthly_business" || profile?.subscriptionPlan === "monthly_elite")),
     templateId,
   };
 }

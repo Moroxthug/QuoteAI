@@ -44,7 +44,7 @@ function getExamples(t: (key: string) => string) {
 
 function getMaxPhotos(plan: string | null | undefined, isActive: boolean): number {
   if (!isActive) return 0;
-  if (plan === "monthly_elite") return 5;
+  if (plan === "monthly_elite" || plan === "monthly_business") return 5;
   if (plan === "monthly_pro") return 3;
   if (plan === "monthly_starter") return 1;
   return 0;
@@ -396,7 +396,9 @@ export default function NewQuote() {
       ? t("dashboard.new.plan.starter")
       : subscription.plan === "monthly_pro"
         ? t("dashboard.new.plan.pro")
-        : t("dashboard.new.plan.elite");
+        : subscription.plan === "monthly_business"
+          ? t("dashboard.new.plan.business")
+          : t("dashboard.new.plan.elite");
 
   const clientData = getClientData();
 
@@ -463,7 +465,7 @@ export default function NewQuote() {
                 { id: "mariagrazia" as const, label: t("dashboard.new.template.elegant.label"), desc: t("dashboard.new.template.elegant.desc"), proOnly: true },
               ]).map((tmpl) => {
                 const isActive = templateId === tmpl.id;
-                const isPro = subscription?.isActive && (subscription.plan === "monthly_pro" || subscription.plan === "monthly_elite");
+                const isPro = subscription?.isActive && (subscription.plan === "monthly_pro" || subscription.plan === "monthly_business" || subscription.plan === "monthly_elite");
                 const requiresPro = tmpl.proOnly && !isPro;
                 return (
                   <button

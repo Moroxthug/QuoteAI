@@ -58,7 +58,7 @@ import { formatCadWhole } from "@/lib/money";
 
 function getMaxPhotos(plan: string | null | undefined, isActive: boolean): number {
   if (!isActive) return 0;
-  if (plan === "monthly_elite") return 5;
+  if (plan === "monthly_elite" || plan === "monthly_business") return 5;
   if (plan === "monthly_pro") return 3;
   if (plan === "monthly_starter") return 1;
   return 0;
@@ -769,7 +769,7 @@ const can = useCan();
               ? t("dashboard.index.subtitleNewUser")
               : subscription?.isActive
                 ? t("dashboard.index.subtitlePlanActive")
-                    .replace("{plan}", subscription.plan === "monthly_pro" ? "Pro" : subscription.plan === "monthly_elite" ? "Elite" : "Starter")
+                    .replace("{plan}", subscription.plan === "monthly_pro" ? "Pro" : subscription.plan === "monthly_business" ? "Business" : subscription.plan === "monthly_elite" ? "Elite" : "Starter")
                     .replace("{quotesInfo}", planQuota(subscription.plan) === null ? t("dashboard.index.unlimitedQuotes") : t("dashboard.index.quotesPerMonth").replace("{count}", String(planQuota(subscription.plan))))
                 : t("dashboard.index.subtitleTotalQuotes").replace("{count}", String(stats?.total ?? 0))}
           </p>

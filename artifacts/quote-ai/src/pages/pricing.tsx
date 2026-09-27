@@ -3,7 +3,7 @@
 // Until now "See plans" on the homepage pointed at an anchor inside a prose
 // card, /whatsapp linked to "/#pricing" (an anchor that does not exist), and
 // the only real plan grid lived behind the login. This is the page those
-// links wanted: the same three tiers, the same monthly/annual cadence the
+// links wanted: the same tiers (Phase 99: three published, Elite custom), the same monthly/annual cadence the
 // billing page offers, the pay-per-quote options, an honest comparison table
 // built from the plan feature map the server gates on, and the questions a
 // contractor asks before typing a card number.
@@ -25,6 +25,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { breadcrumbJsonLd, pricingJsonLd, faqJsonLd } from "@/data/json-ld";
 import {
   MARKETING_PLANS,
+  ELITE_CONTACT_HREF,
   ONE_SHOT_OPTIONS,
   PRICING_ROWS,
   PRICING_FAQ_KEYS,
@@ -64,10 +65,11 @@ export default function PricingPage() {
     query: { queryKey: getGetPlansQueryKey(), retry: false, staleTime: 5 * 60_000 },
   });
 
-  const priceOf = (plan: MarketingPlan): number => {
+  const priceOf = (plan: MarketingPlan): number | null => {
+    if (plan.monthly === null) return null; // Elite: custom price
     const live = Array.isArray(livePlans) ? livePlans.find((p) => p.id === plan.id) : undefined;
     const monthly = live?.price ?? plan.monthly;
-    return interval === "year" ? (live?.yearlyPrice ?? yearlyPrice(monthly)) : monthly;
+    return effectiveInterval === "year" ? (live?.yearlyPrice ?? yearlyPrice(monthly)) : monthly;
   };
   const oneShotPrice = (id: string, fallback: number): number =>
     (Array.isArray(livePlans) ? livePlans.find((p) => p.id === id)?.price : undefined) ?? fallback;
@@ -143,11 +145,15 @@ export default function PricingPage() {
                       <h2>{plan.name}</h2>
                       {plan.popular && <span className="chip chip-teal">{t("pricing.mostPopular")}</span>}
                     </div>
-                    <p className="price-amount">
-                      {money(price, lang)}
-                      <span>{effectiveInterval === "year" ? t("pricing.perYear") : t("pricing.perMonth")}</span>
-                    </p>
-                    {effectiveInterval === "year" && (
+                    {price === null ? (
+                      <p className="price-amount">{t("pricing.custom")}</p>
+                    ) : (
+                      <p className="price-amount">
+                        {money(price, lang)}
+                        <span>{effectiveInterval === "year" ? t("pricing.perYear") : t("pricing.perMonth")}</span>
+                      </p>
+                    )}
+                    {effectiveInterval === "year" && plan.monthly !== null && (
                       <p className="price-sub">{t("pricing.perMonthEquivalent").replace("{amount}", money(monthlyEquivalent(plan.monthly), lang))}</p>
                     )}
                     <p className="price-sub">
@@ -172,12 +178,16 @@ export default function PricingPage() {
                     })}
                   </ul>
                   <div className="price-foot">
-                    <button
-                      className={plan.popular ? "btn btn-navy w-full" : "btn btn-outline-navy w-full"}
-                      onClick={() => navigate(isSignedIn ? "/dashboard/billing" : `/sign-up?plan=${plan.id}`)}
-                    >
-                      {isSignedIn ? t("pricing.choosePlan").replace("{name}", plan.name) : t("pricing.startFree")}
-                    </button>
+                    {plan.monthly === null ? (
+                      <a className="btn btn-outline-navy w-full" href={ELITE_CONTACT_HREF}>{t("pricing.talkToUs")}</a>
+                    ) : (
+                      <button
+                        className={plan.popular ? "btn btn-navy w-full" : "btn btn-outline-navy w-full"}
+                        onClick={() => navigate(isSignedIn ? "/dashboard/billing" : `/sign-up?plan=${plan.id}`)}
+                      >
+                        {isSignedIn ? t("pricing.choosePlan").replace("{name}", plan.name) : t("pricing.startFree")}
+                      </button>
+                    )}
                   </div>
                 </div>
               );

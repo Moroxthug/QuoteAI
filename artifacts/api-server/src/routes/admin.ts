@@ -9,7 +9,8 @@ import crypto from "crypto";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 
-import { PRICE_TO_PLAN } from "./payments.js";
+import { planForPrice, planItemOf } from "../lib/billing.js";
+import { PLANS } from "./payments.js";
 import { opsHealth } from "../lib/ops.js";
 import { retryAutomationNow } from "../lib/automation.js";
 import { z } from "zod";
@@ -100,14 +101,16 @@ router.get("/admin/metrics", async (_req, res) => {
     let starterCount = 0;
     let proCount = 0;
     let activeSubscriptions = 0;
+    // Phase 99: list prices from PLANS; Elite is custom-priced, so it is counted but not in this MRR.
+    let mrr = 0;
     for (const row of subscriptionRows) {
       if (row.status === "active") {
         activeSubscriptions += Number(row.cnt);
         if (row.plan === "monthly_starter") starterCount += Number(row.cnt);
         if (row.plan === "monthly_pro") proCount += Number(row.cnt);
+        mrr += Number(row.cnt) * (PLAN_MONTHLY_PRICE_CAD[row.plan ?? ""] ?? 0);
       }
     }
-    const mrr = starterCount * 19 + proCount * 49;
 
     res.json({
       totalUsers,
@@ -287,7 +290,7 @@ router.post("/admin/settings", async (req, res) => {
 
 router.post("/admin/grant-plan", async (req, res) => {
   try {
-    const validPlans = ["monthly_starter", "monthly_pro", "monthly_elite"] as const;
+    const validPlans = ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"] as const;
     const body = z.object({ email: z.string().trim().min(1).max(254), plan: z.string().min(1), days: z.number().int().min(1).max(3650).default(365) }).safeParse(req.body ?? {});
     if (!body.success) {
       res.status(400).json({ error: body.error.issues.some((i) => i.path[0] === "days") ? "days must be a whole number from 1 to 3650" : "email and plan required" });
@@ -363,8 +366,7 @@ router.post("/admin/sync-subscription", async (req, res) => {
     for (const customer of customers.data) {
       const subs = await stripe.subscriptions.list({ customer: customer.id, status: "all", limit: 5 });
       for (const sub of subs.data) {
-        const priceId = sub.items.data[0]?.price?.id;
-        const planType = priceId ? PRICE_TO_PLAN[priceId] : undefined;
+        const planType = planForPrice(planItemOf(sub.items.data)?.price) ?? undefined;
         if (!planType) continue;
 
         const isActive = sub.status === "active" || sub.status === "trialing";
@@ -435,12 +437,13 @@ router.post("/admin/sync-by-customer", requireAdmin, async (req, res) => {
       return;
     }
 
-    const priceId = activeSub.items.data[0]?.price?.id;
-    const planType = priceId ? PRICE_TO_PLAN[priceId] : undefined;
+    const price = planItemOf(activeSub.items.data)?.price;
+    const priceId = price?.id;
+    const planType = planForPrice(price) ?? undefined;
     const isActive = activeSub.status === "active" || activeSub.status === "trialing";
 
     if (!planType) {
-      res.status(400).json({ error: `Unknown price ID: ${priceId} — add to PRICE_TO_PLAN map` });
+      res.status(400).json({ error: `Unknown price ID: ${priceId} — set its STRIPE_PRICE_* variable, or tag a custom price with metadata quoteai_plan` });
       return;
     }
 
@@ -977,11 +980,8 @@ router.post("/admin/widget/create-client", async (req, res) => {
 // what the account pays — flags accounts running at a loss before it's a
 // pattern, so pricing/allowances (plans.ts MONTHLY_USAGE_ALLOWANCE) can be
 // corrected.
-const PLAN_MONTHLY_PRICE_CAD: Record<string, number> = {
-  monthly_starter: 19,
-  monthly_pro: 49,
-  monthly_elite: 59,
-};
+// Phase 99: list prices come from PLANS (Elite is custom: no list price, so it reads as 0 here).
+const PLAN_MONTHLY_PRICE_CAD: Record<string, number> = Object.fromEntries(PLANS.filter((p) => p.interval === "month" && p.price !== null).map((p) => [p.id, p.price as number]));
 
 router.get("/admin/margin", async (req, res) => {
   try {

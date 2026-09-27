@@ -60,17 +60,25 @@ describe("owner readiness", () => {
       {
         STRIPE_SECRET_KEY: "sk_live_x",
         STRIPE_PRICE_YEARLY_PRO: "price_test", // test id on a live key
-        STRIPE_PRICE_YEARLY_ELITE: "price_monthly", // monthly where yearly belongs
+        STRIPE_PRICE_YEARLY_BUSINESS: "price_monthly", // monthly where yearly belongs
         STRIPE_PRICE_GROUP_COMPANY: "price_gone", // not in this mode at all
         PILOT_PROMO_CODE: "NOPE",
       },
       stripe,
     );
     expect(r.stripe.prices.STRIPE_PRICE_YEARLY_PRO.problem).toMatch(/test-mode price on a live-mode key/);
-    expect(r.stripe.prices.STRIPE_PRICE_YEARLY_ELITE.problem).toMatch(/every month, should be every year/);
+    expect(r.stripe.prices.STRIPE_PRICE_YEARLY_BUSINESS.problem).toMatch(/every month, should be every year/);
     expect(r.stripe.prices.STRIPE_PRICE_GROUP_COMPANY.problem).toMatch(/no such price in live mode/);
     expect(r.stripe.promo).toMatchObject({ set: true, ok: false });
     expect(r.stripe.promo.problem).toMatch(/no promotion code "NOPE"/);
+  });
+
+  test("a one-off quote price must not be recurring, and a plan price must be (Phase 99)", async () => {
+    const stripe = fakeStripe({ price_once: { ...monthly(true), recurring: null }, price_sub: monthly(true) });
+    const r = await ownerReadiness({ STRIPE_SECRET_KEY: "sk_live_x", STRIPE_PRICE_ONESHOT_CLEAN: "price_once", STRIPE_PRICE_ONESHOT_WATERMARK: "price_sub", STRIPE_PRICE_BUSINESS: "price_once" }, stripe);
+    expect(r.stripe.prices.STRIPE_PRICE_ONESHOT_CLEAN.ok).toBe(true);
+    expect(r.stripe.prices.STRIPE_PRICE_ONESHOT_WATERMARK.problem).toMatch(/bills every month, should be a one-off payment/);
+    expect(r.stripe.prices.STRIPE_PRICE_BUSINESS.problem).toMatch(/is a one-off payment, should bill every month/);
   });
 
   test("an inactive pilot code is not ok", async () => {

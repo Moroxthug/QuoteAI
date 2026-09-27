@@ -322,7 +322,7 @@ const can = useCan();
   const [isOcrOpen, setIsOcrOpen] = useState(false);
 
   // Elite includes everything Pro does (Phase 66: Elite accounts were shown the "Upgrade to Pro" wall).
-  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
+  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getListCatalogItemsQueryKey() });
 

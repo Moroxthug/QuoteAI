@@ -6,7 +6,7 @@ import multer from "multer";
 import { db, quotesTable, businessProfilesTable, authUsersTable, emailEventsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { auth, getTrustedOrigins } from "./lib/auth";
-import { PRICE_TO_PLAN, PLANS } from "./routes/payments.js";
+import { PLANS } from "./routes/payments.js";
 import { addonQuantityOf, isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
 import { subscriptionChanged } from "./groups/service.js";
 import { sendSubscriptionEmail } from "./lib/email";
@@ -181,9 +181,11 @@ app.post(
 
 
     // Shared helper: upsert subscription in DB, resolving user by customerId or email
-    async function syncSubscription(customerId: string, priceId: string | undefined, status: string) {
+    async function syncSubscription(customerId: string, price: Parameters<typeof resolvePrice>[0], status: string) {
       // Phase 73: yearly price ids resolve to the same tier with interval "year".
-      const resolved = resolvePrice(priceId, PRICE_TO_PLAN);
+      // Phase 99: a custom Elite price resolves through its quoteai_plan metadata.
+      const resolved = resolvePrice(price);
+      const priceId = typeof price === "string" ? price : price?.id;
       const planType = resolved?.tier;
       if (!planType || !resolved) {
         logger.warn({ customerId, priceId }, "Unknown price ID in subscription sync — skipping");
@@ -299,7 +301,7 @@ app.post(
 
             if (email) {
               const info = PLANS.find((p) => p.id === planType && p.interval);
-              if (info) {
+              if (info && info.price !== null) {
                 await sendSubscriptionEmail({
                   toEmail: email,
                   toName: name,
@@ -319,10 +321,10 @@ app.post(
       if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated") {
         const sub = event.data.object;
         const customerId = sub.customer as string;
-        const priceId = planItemOf(sub.items?.data ?? [])?.price?.id;
+        const price = planItemOf(sub.items?.data ?? [])?.price;
         const status = sub.status ?? "";
         if (customerId) {
-          await syncSubscription(customerId, priceId, status);
+          await syncSubscription(customerId, price, status);
           // Phase 91: extra seats follow the subscription's seat item (changed in the portal or here).
           await db.update(businessProfilesTable).set({ extraSeats: addonQuantityOf(sub.items?.data ?? [], "extra_seat") }).where(eq(businessProfilesTable.stripeCustomerId, customerId));
         }

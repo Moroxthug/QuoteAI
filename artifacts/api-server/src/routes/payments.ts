@@ -13,7 +13,7 @@ const CheckoutBodySchema = CreateCheckoutSessionBody.extend({ extraSeats: z.numb
 const ChangePlanBodySchema = ChangePlanBody.extend({ interval: ChangePlanBody.shape.interval.optional() });
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { addonPriceIdFor, annualBillingAvailable, planItemOf, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval, type SubscriptionTier } from "../lib/billing";
+import { addonPriceIdFor, annualBillingAvailable, isSelfServeTier, planItemOf, planPriceIdFor, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -50,70 +50,73 @@ export function getTrialStatus(profile: typeof businessProfilesTable.$inferSelec
 
 const router = Router();
 
-export const PLANS = [
+// Phase 99 (2026-09-26) repricing. Stripe price ids are not here any more:
+// they come from the environment (lib/billing.ts, `planPriceIdFor`). Elite is
+// custom-priced — `price: null`, no self-serve checkout; the owner sells it and
+// makes the customer's Stripe price with metadata quoteai_plan=monthly_elite.
+type PlanDef = {
+  id: string;
+  name: string;
+  /** CAD per month (or per purchase for one-offs); null = custom (Elite). */
+  price: number | null;
+  currency: "cad";
+  interval: "month" | null;
+  features: string[];
+  hasWatermark: boolean;
+  quotaPerMonth: number | null;
+  tier: "starter" | "pro" | "business" | "elite" | "oneshot";
+  /** Sold by the owner, not through checkout. */
+  custom?: boolean;
+};
+
+export const PLANS: PlanDef[] = [
   {
     id: "monthly_starter",
-    stripePriceId: "price_1UEgdQEI5cvpdr6NMQIPKpao",
     name: "Starter",
-    price: 19,
+    price: 29,
     currency: "cad",
     interval: "month",
-    features: [
-      "10 quotes per month",
-      "PDF with company logo",
-      "'Made with quoteai.ca' footer line",
-      "Standard template included",
-      "Notes upload (2 quotes/month)",
-      "Voice recording (1 quote/month)",
-    ],
+    features: ["15 quotes per month", "Quotes emailed with an accept link", "PDF with company logo", "'Made with quoteai.ca' footer line"],
     hasWatermark: true,
-    quotaPerMonth: 10,
+    quotaPerMonth: 15,
     tier: "starter",
   },
   {
     id: "monthly_pro",
-    stripePriceId: "price_1UEgdSEI5cvpdr6Nx6dNesfl",
     name: "Pro",
-    price: 49,
+    price: 79,
     currency: "cad",
     interval: "month",
-    features: [
-      "60 quotes per month",
-      "Clean PDFs — no watermark",
-      "Custom company logo",
-      "All PDF templates available",
-      "Notes upload (30 quotes/month)",
-      "Voice recording (30 quotes/month)",
-      "Priority AI generation",
-    ],
+    features: ["60 quotes per month", "Contracts and e-signature", "Up to 3 active jobs", "Costs and invoicing", "2 logins", "Clean PDFs"],
     hasWatermark: false,
     quotaPerMonth: 60,
     tier: "pro",
   },
   {
-    id: "monthly_elite",
-    stripePriceId: "price_1UEgdVEI5cvpdr6NHbrrdO88",
-    name: "Elite",
-    price: 59,
+    id: "monthly_business",
+    name: "Business",
+    price: 249,
     currency: "cad",
     interval: "month",
-    features: [
-      "Unlimited quotes",
-      "Clean PDFs — no watermark",
-      "Custom company logo",
-      "All PDF templates available",
-      "Unlimited notes upload",
-      "Unlimited voice recording",
-      "Maximum priority AI generation",
-      "Dedicated support",
-    ],
+    features: ["Unlimited quotes and jobs", "Crew app, time and payroll", "QuickBooks, Wave and calendar sync", "Card payments on invoices", "Job assistant and analytics", "5 logins"],
+    hasWatermark: false,
+    quotaPerMonth: null,
+    tier: "business",
+  },
+  {
+    id: "monthly_elite",
+    name: "Elite",
+    price: null,
+    currency: "cad",
+    interval: "month",
+    features: ["Everything in Business", "Several companies on one bill", "Public API and webhooks", "Lead ads, bank feeds and financing", "10+ logins", "Onboarding with us"],
     hasWatermark: false,
     quotaPerMonth: null,
     tier: "elite",
+    custom: true,
   },
   {
     id: "oneshot_watermark",
-    stripePriceId: "price_1UEgdiEI5cvpdr6NTlQf5eJK",
     name: "Single with Watermark",
     price: 5,
     currency: "cad",
@@ -125,7 +128,6 @@ export const PLANS = [
   },
   {
     id: "oneshot_clean",
-    stripePriceId: "price_1UEgdkEI5cvpdr6NbbRfMtsd",
     name: "Single Clean",
     price: 13,
     currency: "cad",
@@ -137,23 +139,16 @@ export const PLANS = [
   },
 ];
 
-export const PRICE_TO_PLAN = PLANS.reduce<Record<string, string>>((acc, plan) => {
-  if (plan.stripePriceId) {
-    acc[plan.stripePriceId] = plan.id;
-  }
-  return acc;
-}, {});
-
-const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ["monthly_starter", "monthly_pro", "monthly_elite"];
-const isSubscriptionTier = (id: string): id is SubscriptionTier => (SUBSCRIPTION_TIERS as readonly string[]).includes(id);
-
 /** Phase 73: the public plan list carries the annual price (10 × monthly) and whether annual checkout is configured. */
 export function publicPlans() {
   const yearly = annualBillingAvailable();
-  return PLANS.map(({ stripePriceId: _priceId, ...plan }) => ({
+  return PLANS.map((plan) => ({
     ...plan,
-    yearlyPrice: plan.interval ? yearlyPriceFor(plan.price) : null,
-    yearlyAvailable: !!plan.interval && yearly,
+    custom: plan.custom ?? false,
+    yearlyPrice: plan.interval && plan.price !== null ? yearlyPriceFor(plan.price) : null,
+    yearlyAvailable: !!plan.interval && !plan.custom && yearly,
+    /** Phase 99: false when this deployment has no Stripe price for the plan (the button says so instead of failing). */
+    checkoutAvailable: !plan.custom && planPriceIdFor(plan.id) !== null,
   }));
 }
 
@@ -228,11 +223,20 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
       res.status(400).json({ error: "Invalid plan type" });
       return;
     }
+    if (plan.custom) {
+      res.status(400).json({ error: "CUSTOM_PLAN", message: "Elite is set up with us — contact sales" });
+      return;
+    }
     // Phase 73: annual cadence picks the yearly price for the same tier.
     const interval: BillingInterval = parsed.data.interval ?? "month";
-    let priceId = plan.stripePriceId;
+    let priceId = planPriceIdFor(plan.id);
+    if (!priceId) {
+      logger.error({ planType }, "No Stripe price configured for this plan (STRIPE_PRICE_* — run the stripe-catalog script)");
+      res.status(503).json({ error: "PLAN_UNAVAILABLE", message: "This plan cannot be bought right now" });
+      return;
+    }
     if (interval === "year") {
-      const yearlyId = isSubscriptionTier(plan.id) ? yearlyPriceIdFor(plan.id) : null;
+      const yearlyId = isSelfServeTier(plan.id) ? yearlyPriceIdFor(plan.id) : null;
       if (!yearlyId) {
         res.status(400).json({ error: "ANNUAL_BILLING_UNAVAILABLE", message: "Annual billing is not configured for this plan" });
         return;
@@ -517,8 +521,9 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
     }
 
     const sub = subscriptions.data[0];
-    const priceId = planItemOf(sub.items.data)?.price?.id;
-    const resolved = resolvePrice(priceId, PRICE_TO_PLAN);
+    const price = planItemOf(sub.items.data)?.price;
+    const priceId = price?.id;
+    const resolved = resolvePrice(price);
     const planType = resolved?.tier ?? null;
 
     if (!planType || !resolved) {
@@ -576,8 +581,12 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
     const body = parsed.data;
     const planType = body.planType;
     const interval: BillingInterval = body.interval ?? "month";
+    if (!isSelfServeTier(planType)) {
+      res.status(400).json({ error: "CUSTOM_PLAN", message: "Elite is set up with us — contact sales" });
+      return;
+    }
     const plan = PLANS.find((p) => p.id === planType)!;
-    const priceId = interval === "year" ? yearlyPriceIdFor(planType) : plan.stripePriceId;
+    const priceId = interval === "year" ? yearlyPriceIdFor(planType) : planPriceIdFor(planType);
     if (!priceId) {
       res.status(400).json({ error: "ANNUAL_BILLING_UNAVAILABLE", message: "Annual billing is not configured for this plan" });
       return;
@@ -643,7 +652,7 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
           toEmail: authUser.email,
           toName: authUser.name || "Customer",
           planName: plan.name,
-          planPrice: interval === "year" ? yearlyPriceFor(plan.price) : plan.price,
+          planPrice: interval === "year" ? yearlyPriceFor(plan.price ?? 0) : (plan.price ?? 0),
           planInterval: interval,
         });
       }

@@ -11,11 +11,13 @@
 // tests import both sides and fail the build on any drift.
 
 import { describe, expect, it } from "vitest";
-import { TAX_PROFILES as SERVER_TAX_PROFILES, PROVINCE_NAMES as SERVER_PROVINCE_NAMES } from "@workspace/db";
+import { TAX_PROFILES as SERVER_TAX_PROFILES, PROVINCE_NAMES as SERVER_PROVINCE_NAMES, PLAN_IDS as SERVER_PLAN_IDS, PLAN_FEATURES as SERVER_PLAN_FEATURES, SEATS_INCLUDED as SERVER_SEATS, ACTIVE_JOB_LIMIT as SERVER_JOB_LIMIT } from "@workspace/db";
+import { PLAN_IDS as CLIENT_PLAN_IDS, PLAN_FEATURES as CLIENT_PLAN_FEATURES, SEATS_INCLUDED as CLIENT_SEATS, ACTIVE_JOB_LIMIT as CLIENT_JOB_LIMIT } from "../../../quote-ai/src/lib/plans.js";
 import { PLANS } from "../routes/payments.js";
 import { yearlyPriceFor } from "./billing.js";
 import {
   MARKETING_PLANS,
+  PUBLISHED_PLANS,
   ONE_SHOT_OPTIONS,
   ANNUAL_MONTHS_CHARGED,
   yearlyPrice,
@@ -58,9 +60,35 @@ describe("pricing page mirrors the Stripe plan table", () => {
 
   it("annual is 10 months on both sides", () => {
     expect(ANNUAL_MONTHS_CHARGED).toBe(10);
-    for (const plan of MARKETING_PLANS) {
+    for (const plan of PUBLISHED_PLANS) {
       expect(yearlyPrice(plan.monthly)).toBe(yearlyPriceFor(plan.monthly));
     }
+  });
+
+  it("Elite is the custom plan on both sides, and the only one", () => {
+    expect(MARKETING_PLANS.filter((p) => p.monthly === null).map((p) => p.id)).toEqual(["monthly_elite"]);
+    expect(PLANS.filter((p) => p.custom).map((p) => p.id)).toEqual(["monthly_elite"]);
+  });
+});
+
+// Phase 99: the UI gates and the pricing table read a frontend copy of the plan
+// rules; the server gates on lib/db. They must be the same table.
+describe("plan rules mirror (lib/plans.ts ← lib/db schema/plans.ts)", () => {
+  it("same plans, same features, same logins, same job cap", () => {
+    expect([...CLIENT_PLAN_IDS]).toEqual([...SERVER_PLAN_IDS]);
+    for (const plan of SERVER_PLAN_IDS) {
+      expect([...CLIENT_PLAN_FEATURES[plan]].sort(), `${plan} features`).toEqual([...SERVER_PLAN_FEATURES[plan]].sort());
+      expect(CLIENT_SEATS[plan], `${plan} seats`).toBe(SERVER_SEATS[plan]);
+      expect(CLIENT_JOB_LIMIT[plan], `${plan} job cap`).toBe(SERVER_JOB_LIMIT[plan]);
+    }
+  });
+
+  it("each plan up the ladder keeps everything the one below has", () => {
+    const ladder = ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"] as const;
+    for (let i = 1; i < ladder.length; i++) {
+      for (const f of SERVER_PLAN_FEATURES[ladder[i - 1]!]) expect(SERVER_PLAN_FEATURES[ladder[i]!].has(f), `${ladder[i]} lacks ${f}`).toBe(true);
+    }
+    expect(SERVER_JOB_LIMIT.monthly_pro).toBe(3);
   });
 });
 

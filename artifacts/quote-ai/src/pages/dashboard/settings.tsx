@@ -440,12 +440,14 @@ function BillingTab() {
 
   if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
   const isStarter = sub?.plan === "monthly_starter";
-  const isPro = sub?.plan === "monthly_pro";
+  const isBusiness = sub?.plan === "monthly_business";
+  // Business shares the Pro card styling; Elite keeps its own.
+  const isPro = sub?.plan === "monthly_pro" || isBusiness;
   const isElite = sub?.plan === "monthly_elite";
   const isActive = sub?.isActive ?? false;
-  const planLabel = isElite ? "Elite" : isPro ? "Pro" : isStarter ? "Starter" : null;
+  const planLabel = isElite ? "Elite" : isBusiness ? "Business" : isPro ? "Pro" : isStarter ? "Starter" : null;
   const planPrice = currentPlanPriceLabel(sub, Array.isArray(plans) ? plans : undefined, t, lang)
-    ?? (isElite ? t("dashboard.billing.priceElite") : isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : null);
+    ?? (isElite ? t("dashboard.billing.priceElite") : isBusiness ? t("dashboard.billing.priceBusiness") : isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : null);
   const renewalDate = sub?.periodEnd ? new Date(sub.periodEnd).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long", year: "numeric" }) : null;
   const resetDate = sub?.quotaResetDate ? new Date(sub.quotaResetDate).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long" }) : null;
 
@@ -572,7 +574,7 @@ function WhatsappUpsellCard() {
   const handleCheckout = (planId: string) => {
     setLoadingPlanId(planId);
     createCheckout.mutate(
-      { data: { planType: planId as "monthly_pro" | "monthly_elite" } },
+      { data: { planType: planId as "monthly_pro" | "monthly_business" } },
       {
         onSuccess: (r) => { window.location.href = r.url; },
         onError: () => {
@@ -621,10 +623,10 @@ function WhatsappUpsellCard() {
               {t("dashboard.settings.whatsappUpsell.upgradeToProPrice")}
             </button>
             <button className="btn btn-navy bg-amber-500 hover:bg-amber-600 text-white border-0 gap-2"
-              onClick={() => handleCheckout("monthly_elite")}
-              disabled={loadingPlanId === "monthly_elite"}>
-              {loadingPlanId === "monthly_elite" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
-              {t("dashboard.settings.whatsappUpsell.upgradeToElitePrice")}
+              onClick={() => handleCheckout("monthly_business")}
+              disabled={loadingPlanId === "monthly_business"}>
+              {loadingPlanId === "monthly_business" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
+              {t("dashboard.settings.whatsappUpsell.upgradeToBusinessPrice")}
             </button>
           </div>
         </div>
@@ -712,7 +714,7 @@ function WhatsappTab() {
   };
 
   const isPro = subscription?.plan === "monthly_pro" && subscription?.isActive;
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   const hasWhatsappAccess = isPro || isElite;
 
   if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius)]" />;
@@ -955,7 +957,7 @@ function QuickbooksUpsellCard() {
   const handleCheckout = () => {
     setLoading(true);
     createCheckout.mutate(
-      { data: { planType: "monthly_elite" } },
+      { data: { planType: "monthly_business" } },
       {
         onSuccess: (r) => { window.location.href = r.url; },
         onError: () => {
@@ -1272,7 +1274,7 @@ function QuickbooksTab() {
   const disconnectQb = useDisconnectQuickbooks();
   const toggleQb = useToggleQuickbooks();
 
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   const isConnected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
 
@@ -1382,7 +1384,7 @@ function WaveUpsellCard() {
   const handleCheckout = () => {
     setLoading(true);
     createCheckout.mutate(
-      { data: { planType: "monthly_elite" } },
+      { data: { planType: "monthly_business" } },
       {
         onSuccess: (r) => { window.location.href = r.url; },
         onError: () => {
@@ -1586,7 +1588,7 @@ function WaveTab() {
   const disconnectWaveMutation = useDisconnectWave();
   const toggleWaveMutation = useToggleWave();
 
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   const isConnected = status?.connected ?? false;
   const isEnabled = status?.isEnabled ?? true;
 
@@ -1697,7 +1699,7 @@ function StripeConnectTab() {
     onError: () => toast({ title: t("dashboard.settings.stripeConnect.error"), variant: "destructive" }),
   });
 
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   if (!isElite) return null; // the Integrations tab itself is Elite-only, but this keeps the card self-contained if that ever changes
   if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius)]" />;
 
@@ -2557,7 +2559,7 @@ function CalendarProviderCard({ provider }: { provider: CalendarProvider }) {
 function CalendarSyncTab() {
   const { t } = useLanguage();
   const { data: subscription } = useGetSubscription();
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   if (!isElite) return null;
 
   return (
@@ -2680,7 +2682,7 @@ function EmailConnectionCard() {
 function EmailSendTab() {
   const { t } = useLanguage();
   const { data: subscription } = useGetSubscription();
-  const isElite = subscription?.plan === "monthly_elite" && subscription?.isActive;
+  const isElite = (subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite") && subscription?.isActive;
   if (!isElite) return null;
 
   return (
@@ -2900,7 +2902,7 @@ const can = useCan();
   const isAccountPath = typeof window !== "undefined" && window.location.pathname.includes("/account");
   const tabFromParam = params.get("tab");
   const { data: subscription } = useGetSubscription();
-  const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
+  const isProOrElite = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
   const isElite = subscription?.isActive && subscription?.plan === "monthly_elite";
   const isPaid = !!subscription?.isActive && !!subscription?.plan && subscription.plan !== "free";
   const defaultTab = (isAccountPath || tabFromParam === "account") ? "account" : tabFromParam === "business" ? "business" : tabFromParam === "whatsapp" ? "whatsapp" : tabFromParam === "sms" ? "sms" : tabFromParam === "widget" ? "widget" : tabFromParam === "usage" ? "usage" : tabFromParam === "integrations" ? "integrations" : tabFromParam === "security" ? "security" : "billing";

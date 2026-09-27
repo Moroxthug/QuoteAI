@@ -23,7 +23,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
 import { loadDotenv, STAGING_ENV_PATH } from "../src/e2e/qaEnv.js";
-import type { OwnerReadiness } from "../src/lib/ownerReadiness.js";
+import { PRICE_VARS, type OwnerReadiness } from "../src/lib/ownerReadiness.js";
 
 const cronSecretFromShell = process.env.CRON_SECRET; // before .env.staging, whose Sensitive values are blank
 loadDotenv(STAGING_ENV_PATH);
@@ -184,10 +184,8 @@ function priceRow(item: string, title: string, names: string[], script: string) 
     next: bad.length ? `pnpm --filter @workspace/scripts ${script} with the ${ready.stripe.mode} key, paste into Vercel, redeploy` : undefined,
   });
 }
-priceRow("L-8", "Stripe add-on prices", ["STRIPE_PRICE_GROUP_COMPANY", "STRIPE_PRICE_GROUP_COMPANY_YEARLY", "STRIPE_PRICE_EXTRA_SEAT", "STRIPE_PRICE_EXTRA_SEAT_YEARLY"], "stripe-addon-prices");
-
 if (ready) {
-  priceRow("L-9", "Stripe annual prices", ["STRIPE_PRICE_YEARLY_STARTER", "STRIPE_PRICE_YEARLY_PRO", "STRIPE_PRICE_YEARLY_ELITE"], "stripe-annual-prices");
+  priceRow("L-8", "Stripe prices (plans, one-offs, add-ons)", Object.keys(PRICE_VARS), "stripe-catalog");
   const p = ready.stripe.promo;
   add({
     item: "L-9",
@@ -200,10 +198,11 @@ if (ready) {
   // Without the secret the public API still answers the yes/no.
   const plans = await getJson<{ plans?: Array<{ id: string; yearlyAvailable?: boolean }> } | Array<{ id: string; yearlyAvailable?: boolean }>>("/api/payments/plans");
   const list = Array.isArray(plans.body) ? plans.body : (plans.body?.plans ?? []);
-  const paid = list.filter((x) => x.id !== "free");
+  const paid = list.filter((x) => x.id !== "free" && !(x as { custom?: boolean }).custom && (x as { interval?: string | null }).interval);
   const annual = paid.length > 0 && paid.every((x) => x.yearlyAvailable);
+  const buyable = paid.length > 0 && paid.every((x) => (x as { checkoutAvailable?: boolean }).checkoutAvailable);
   const pilot = await getJson<{ enabled?: boolean; code?: string }>("/api/payments/pilot");
-  add({ item: "L-9", title: "Stripe annual prices", status: annual ? "partial" : "todo", detail: annual ? `annual offered on the site (ids not validated: ${ownerNote})` : "the site says annual billing is \"coming soon\" — STRIPE_PRICE_YEARLY_* unset" });
+  add({ item: "L-8", title: "Stripe prices (plans, one-offs, add-ons)", status: buyable && annual ? "partial" : "todo", detail: buyable ? `plans can be bought${annual ? " monthly and yearly" : ", yearly not yet"} (ids not validated: ${ownerNote})` : "the site cannot sell a plan — STRIPE_PRICE_* unset (run stripe-catalog)" });
   add({ item: "L-9", title: "Pilot promotion code", status: pilot.body?.enabled ? "partial" : "todo", detail: pilot.body?.enabled ? `/pilot shows ${pilot.body.code} (not checked against Stripe: ${ownerNote})` : "/pilot says no code is running — PILOT_PROMO_CODE unset" });
 }
 

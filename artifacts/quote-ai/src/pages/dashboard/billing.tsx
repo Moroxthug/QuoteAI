@@ -71,10 +71,11 @@ export default function BillingPage() {
   const isActive = sub?.isActive ?? false;
 
   const isElite = sub?.plan === "monthly_elite";
-  const planLabel = isPro ? "Pro" : isStarter ? "Starter" : isElite ? "Elite" : null;
-  // Phase 73: the label follows the live cadence ("$490/year" on annual).
+  const isBusiness = sub?.plan === "monthly_business";
+  const planLabel = isPro ? "Pro" : isBusiness ? "Business" : isStarter ? "Starter" : isElite ? "Elite" : null;
+  // Phase 73: the label follows the live cadence ("$490/year" on annual). Phase 99: Elite is custom-priced.
   const planPrice = currentPlanPriceLabel(sub, Array.isArray(plans) ? plans : undefined, t, lang)
-    ?? (isPro ? t("dashboard.billing.pricePro") : isStarter ? t("dashboard.billing.priceStarter") : isElite ? t("dashboard.billing.priceElite") : null);
+    ?? (isPro ? t("dashboard.billing.pricePro") : isBusiness ? t("dashboard.billing.priceBusiness") : isStarter ? t("dashboard.billing.priceStarter") : isElite ? t("dashboard.billing.priceElite") : null);
 
   const renewalDate = sub?.periodEnd
     ? new Date(sub.periodEnd).toLocaleDateString(moneyLocale(), { day: "2-digit", month: "long", year: "numeric" })
@@ -103,7 +104,7 @@ export default function BillingPage() {
           <div className="card">
             <div className="card-head">
               <div className="flex items-center gap-3">
-                <div className="qa-ic navy">{isPro ? <Crown className="h-6 w-6" /> : <Zap className="h-6 w-6" />}</div>
+                <div className="qa-ic navy">{isPro || isBusiness || isElite ? <Crown className="h-6 w-6" /> : <Zap className="h-6 w-6" />}</div>
                 <div>
                   <h2>QuoteAI {planLabel}</h2>
                   <p className="sub">{planPrice}</p>

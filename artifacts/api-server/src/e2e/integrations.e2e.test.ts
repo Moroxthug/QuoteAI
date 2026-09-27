@@ -253,7 +253,8 @@ describe("Phase 65 — integrations", () => {
       expect(welcome[0]!.subject.toLowerCase()).toContain("pro");
 
       // Plan change from the Stripe dashboard / portal → synced by customer id (no Stripe API call needed).
-      const upgraded = await stripeWebhook(stripeEvent("customer.subscription.updated", { id: "sub_e2e", customer: customerId, status: "active", items: { data: [{ price: { id: "price_1UEgdVEI5cvpdr6NHbrrdO88" } }] } }));
+      // Phase 99: Elite is custom-priced — a price made for this customer, tagged quoteai_plan=monthly_elite.
+      const upgraded = await stripeWebhook(stripeEvent("customer.subscription.updated", { id: "sub_e2e", customer: customerId, status: "active", items: { data: [{ price: { id: "price_custom_e2e_elite", metadata: { quoteai_plan: "monthly_elite" }, recurring: { interval: "month" } } }] } }));
       expect(upgraded.status).toBe(200);
       [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, org.userId));
       expect(profile!.subscriptionPlan).toBe("monthly_elite");

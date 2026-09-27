@@ -3,7 +3,7 @@
 // <SeoHead> — the build-time render (entry-server.tsx) serialises exactly what
 // the hydrated page renders, so crawler and browser always agree.
 import { TESTIMONIALS, AGGREGATE_RATING } from "@/components/testimonials-section";
-import { MARKETING_PLANS, ONE_SHOT_OPTIONS } from "@/data/pricing";
+import { PUBLISHED_PLANS, ONE_SHOT_OPTIONS } from "@/data/pricing";
 import { translations } from "@/i18n/translations";
 
 export const BASE_URL = "https://quoteai.ca";
@@ -55,7 +55,8 @@ export function faqJsonLd(items: Array<{ q: string; a: string }>): JsonLdSchema 
  * actually spend.
  */
 export function pricingJsonLd(lang: "en" | "fr"): JsonLdSchema {
-  const monthly = MARKETING_PLANS.map((p) => p.monthly);
+  // Phase 99: only plans with a published price are offers (Elite is custom).
+  const monthly = PUBLISHED_PLANS.map((p) => p.monthly);
   const oneShot = ONE_SHOT_OPTIONS.map((o) => o.price);
   return {
     "@context": "https://schema.org",
@@ -72,7 +73,7 @@ export function pricingJsonLd(lang: "en" | "fr"): JsonLdSchema {
       priceCurrency: "CAD",
       lowPrice: String(Math.min(...oneShot)),
       highPrice: String(Math.max(...monthly)),
-      offerCount: String(MARKETING_PLANS.length + ONE_SHOT_OPTIONS.length),
+      offerCount: String(PUBLISHED_PLANS.length + ONE_SHOT_OPTIONS.length),
       availability: "https://schema.org/InStock",
     },
   };

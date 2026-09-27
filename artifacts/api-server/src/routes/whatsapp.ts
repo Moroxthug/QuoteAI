@@ -469,7 +469,7 @@ async function sendQuotePreview(from: string, data: PendingQuoteData, iterationC
 
 async function handleGreeting(from: string, userId: string, profile: typeof businessProfilesTable.$inferSelect) {
   const isPro = profile.subscriptionStatus === "active" &&
-    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_elite");
+    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_business" || profile.subscriptionPlan === "monthly_elite");
 
   const prefs = await getPreferences(userId);
 
@@ -774,7 +774,7 @@ async function handleTemplateMenu(
   profile: typeof businessProfilesTable.$inferSelect,
 ) {
   const isPro = profile.subscriptionStatus === "active" &&
-    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_elite");
+    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_business" || profile.subscriptionPlan === "monthly_elite");
 
   const currentDefault = prefs.defaultTemplate ?? "standard";
   const lines = TEMPLATES.map((t, i) => {
@@ -802,7 +802,7 @@ async function handleTemplateMenuReply(
   profile: typeof businessProfilesTable.$inferSelect,
 ) {
   const isPro = profile.subscriptionStatus === "active" &&
-    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_elite");
+    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_business" || profile.subscriptionPlan === "monthly_elite");
 
   const templateId = templateFromChoice(text);
   if (!templateId) {
@@ -891,7 +891,7 @@ async function handleTemplateSelectionReply(
   }
 
   const isPro = profile.subscriptionStatus === "active" &&
-    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_elite");
+    (profile.subscriptionPlan === "monthly_pro" || profile.subscriptionPlan === "monthly_business" || profile.subscriptionPlan === "monthly_elite");
 
   if ((templateId === "mariagrazia" || templateId === "arosio") && !isPro) {
     await sendWhatsappText(
@@ -1253,7 +1253,7 @@ router.post("/whatsapp/webhook", async (req, res) => {
 
       // ── Plan check ──────────────────────────────────────────────────────────────
       const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, connection.userId));
-      const allowedPlans = ["monthly_pro", "monthly_elite"];
+      const allowedPlans = ["monthly_pro", "monthly_business", "monthly_elite"];
       if (profile?.subscriptionStatus !== "active" || !allowedPlans.includes(profile?.subscriptionPlan ?? "")) {
         await sendWhatsappText(from, `⚠️ Your account doesn't have an active plan that includes WhatsApp. Upgrade it at ${QUOTEAI_BASE_URL}/dashboard/settings`);
         return;
@@ -1420,7 +1420,7 @@ router.post("/whatsapp/connect", requireAuth, requirePermission("integrations", 
     if (!normalized) { res.status(400).json({ error: "Invalid number. Use international format, e.g. +1 416 555 1234" }); return; }
 
     const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
-    const allowedPlans = ["monthly_pro", "monthly_elite"];
+    const allowedPlans = ["monthly_pro", "monthly_business", "monthly_elite"];
     if (profile?.subscriptionStatus !== "active" || !allowedPlans.includes(profile?.subscriptionPlan ?? "")) {
       res.status(403).json({ error: "WhatsApp integration is only available on the Pro and Elite plans." });
       return;

@@ -225,7 +225,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   });
 
   const { data: subscription } = useGetSubscription();
-  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
+  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
   // Hooks must run on every render — keep this above the early returns below.
   const allNavItems = useNavItems();
   const { data: orgsData } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });

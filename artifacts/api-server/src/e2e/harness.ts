@@ -114,7 +114,7 @@ export async function adoptUserByEmail(email: string): Promise<string | null> {
 
 export type OrgOptions = {
   province?: "ON" | "QC";
-  plan?: "free" | "monthly_starter" | "monthly_pro" | "monthly_elite";
+  plan?: "free" | "monthly_starter" | "monthly_pro" | "monthly_business" | "monthly_elite";
   companyName?: string;
   profile?: Partial<typeof businessProfilesTable.$inferInsert>;
 };

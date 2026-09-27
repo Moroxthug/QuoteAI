@@ -21,6 +21,7 @@ import { jobsApi } from "@/lib/jobs-api";
 import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
 import { formatCad } from "@/lib/money";
+import { jobLimitToast } from "@/lib/plan-errors";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -344,7 +345,7 @@ const can = useCan();
       navigate(`/dashboard/jobs/${res.job.id}`);
     } catch (err) {
       const e = err as Error & { code?: string };
-      toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("dashboard.quoteDetail.error"), description: e.code === "PLAN_REQUIRED" ? e.message : t("dashboard.quoteDetail.errorStartProject"), variant: "destructive" });
+      toast({ ...(jobLimitToast(e, t) ?? { title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("dashboard.quoteDetail.error"), description: e.code === "PLAN_REQUIRED" ? e.message : t("dashboard.quoteDetail.errorStartProject") }), variant: "destructive" });
     } finally {
       setAvviandoCantiere(false);
     }
@@ -571,7 +572,7 @@ const can = useCan();
 
   if (!quote) return <div>{t("dashboard.quoteDetail.quoteNotFound")}</div>;
 
-  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_elite");
+  const isPro = subscription?.isActive && (subscription?.plan === "monthly_pro" || subscription?.plan === "monthly_business" || subscription?.plan === "monthly_elite");
   const isTrialActive = trialStatus?.isTrialActive ?? false;
   // Pro/Elite subscribers and active trial users can always download
   const isLocked = quote.status !== "unlocked" && !isPro && !isTrialActive;
@@ -1664,8 +1665,8 @@ const can = useCan();
               <>
                 <div className="plan-grid two" style={{ paddingTop: 10 }}>
                   {[
-                    { id: "monthly_pro", label: "Pro", price: "$49", badge: t("dashboard.quoteDetail.mostPopular"), features: [t("dashboard.quoteDetail.feature60Quotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featurePhotoUpload")], highlight: true },
-                    { id: "monthly_elite", label: "Elite", price: "$59", badge: t("dashboard.quoteDetail.unlimited"), features: [t("dashboard.quoteDetail.featureUnlimitedQuotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featureDedicatedSupport")], highlight: false },
+                    { id: "monthly_pro", label: "Pro", price: "$79", badge: t("dashboard.quoteDetail.mostPopular"), features: [t("dashboard.quoteDetail.feature60Quotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featurePhotoUpload")], highlight: true },
+                    { id: "monthly_business", label: "Business", price: "$249", badge: t("dashboard.quoteDetail.unlimited"), features: [t("dashboard.quoteDetail.featureUnlimitedQuotes"), t("dashboard.quoteDetail.featureNoWatermark"), t("dashboard.quoteDetail.featureAllTemplates"), t("dashboard.quoteDetail.featureDedicatedSupport")], highlight: false },
                   ].map((opt) => (
                     <div key={opt.id} className={cn("plan-opt", opt.highlight && "hot")}>
                       <span className={cn("tag", !opt.highlight && "gold")}>{opt.badge}</span>

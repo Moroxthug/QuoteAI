@@ -7,6 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import type { PermissionArea } from "@workspace/permissions";
 import { useToast } from "@/hooks/use-toast";
+import { jobLimitToast } from "@/lib/plan-errors";
 
 type ArchiveType = "quote" | "client" | "invoice" | "job" | "contract";
 type ArchiveItem = { id: string; type: ArchiveType; label: string; archivedAt: string; archivedByName: string | null };
@@ -50,13 +51,16 @@ export default function ArchivePage() {
       const path = RESTORE_PATH[item.type];
       if (!path) throw new Error("Not restorable");
       const res = await fetch(path.replace("{id}", item.id), { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: "{}" });
-      if (!res.ok) throw new Error("Failed to restore");
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        throw Object.assign(new Error("Failed to restore"), { code: body.error });
+      }
     },
     onSuccess: () => {
       toast({ title: t("archive.restoredToast") });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
-    onError: () => toast({ title: t("archive.restoreErrorToast"), variant: "destructive" }),
+    onError: (e) => toast({ ...(jobLimitToast(e, t) ?? { title: t("archive.restoreErrorToast") }), variant: "destructive" }),
   });
 
   const items = data?.items ?? [];

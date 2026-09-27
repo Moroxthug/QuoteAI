@@ -18,7 +18,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 100 | Mobile foundation: rules, primitives, the phone check | A | **done** 2026-09-26 |
 | 101 | Navigation: bottom tabs, the More sheet, one New button | A | **done** 2026-09-26 |
 | 102 | Settings, rebuilt (desktop and phone) | A | **done** 2026-09-26 |
-| 103 | Integrations: an app directory with real logos | A | not started |
+| 103 | Integrations: an app directory with real logos | A | **done** 2026-09-26 |
 | 104 | Today (dashboard home) | A | not started |
 | 105 | Quotes: list, new quote, quote detail | A | not started |
 | 106 | Jobs: list and the job page | A | not started |
@@ -302,3 +302,42 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en,fr --widths=375,768,1280 --routes=settings` (114 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; phone-rule warnings only on `/dashboard/pay?tab=settings`. Plan page rechecked after the button fix (`.qa/p102-plan`).
 - Phone sheets: `.qa/phone-sheets/p102/` (19 routes, before = `visual-mobile-audit`): the settings list 1.4 screens (was 2.6, ten wrapping pills); every section except Connected apps within 2.6 screens.
 - typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (0 hard failures; the literals left are URL/number placeholders), route-matrix test 12/12.
+
+### Phase 103 — 2026-09-26
+
+**Built**
+- `pages/dashboard/settings/apps.tsx` (1,772 lines, nine stacked cards) replaced by `pages/dashboard/settings/apps/`: `catalog.ts` (the 15 apps: group, logo, the plan feature that unlocks each, the OAuth return params), `status.ts` (one hook that turns every status endpoint and sync log into a pill), `ui.tsx` (`BrandLogo`, `StatusPill`, `LockNote`, `SyncLog`, `DisconnectRow` with a confirm, `AccountFacts`), the panels by group (`accounting.tsx`, `calendar.tsx`, `gmail.tsx`, `payments.tsx`, `leads.tsx`, `developer.tsx`) and `index.tsx` (the directory and the detail).
+- **The directory**: tiles, 3 across on a wide screen and 2 on a phone, each with the company's logo, the name, one line on what it does (or, once connected, the account: company, email, bank) and a pill — Connected, Needs attention, Paused, Connect / Set up, Coming soon, or a lock with the plan's name. Connected apps first (the ones needing attention leading), then Accounting, Calendar, Email, Messaging, Payments & financing, Banking, Leads, Your website & developers; the apps the server can't offer yet sit in a quiet "Coming soon" row of logo + name at the bottom. Search on top (15 apps > the 12 the plan set). A trademark line at the foot names every owner.
+- **"Needs attention"** is real, not decorative: a QuickBooks/Wave/calendar sync whose newest attempt failed (the logs are append-only, so an item stops counting once a retry succeeds), Stripe sign-up unfinished, a Gmail send error, a calendar feed that can't be read, Flinks connected with no account picked.
+- **The detail** at `/dashboard/settings/apps?app=<id>`: a side panel from the right on a wide screen, a page of its own under 860 px (‹ back to the directory and the app's name in the top bar). It says what the app does and what it shares and with whom (the privacy policy's list), then either the lock, the "not available yet" note, or the app's own settings in the Phase 102 vocabulary: the account (company or email, connected since, last sync), an on/off switch (it used to be an Enable/Disable button pair), the app's settings (QuickBooks account, deposit, tax-code and cost-category mapping; Wave's; the calendar picker; the Financeit dealer ID; Flinks' account picker; API keys and webhooks), the sync or import log with Retry, and **Disconnect** last, in its own card, behind a confirm. WhatsApp, SMS and the widget open their existing settings sections.
+- **Every plan sees the directory** (anyone with `integrations:full`; it was Business and Elite). An app outside the plan shows a lock pill and, opened, "Included in the Business plan — available on Business and the plans above it" with See plans (a link to Plan & billing, which the native apps will hide — APP-PLAN 118 — so no checkout button lives here). Locked apps' status endpoints are never called. The gates come from `lib/plans.ts`, the mirror of the server's table.
+- **Back from an OAuth screen** (`?qb=connected`, `?wave=`, `?cal=`, `?email=`, `?stripeConnect=`, `?metaLeadAds=`, `?googleLsa=`): a toast says which app connected (or didn't) and its panel opens. Nothing read those params before — people came back to an unchanged page. The calendar callback now adds `&provider=` so the right calendar opens.
+- **Official logos** in `public/brands/` with `BRANDS.md` (source URL, date, variant, each owner's rules): Google's G, Google Calendar and Gmail icons, Intuit's "Connect to QuickBooks" button (green and transparent), Wave, Stripe, Financeit, Flinks — each from the company's own domain, unaltered. Wordmarks get a wider box. **Intuit's rules followed**: its Connect button starts the QuickBooks connection, shown only while disconnected, and "Disconnect from QuickBooks" is the reverse.
+- Email sender (Messaging) now shows the same Gmail panel as the directory. The calendar feeds card lost its own icon tile (the panel header has it). Books' "Connect your bank" goes straight to the Flinks panel.
+- 167 new EN/FR strings; the section intro rewritten; help-centre articles corrected (QuickBooks/Wave are Business and up, not Elite; "Stripe Connect" → Stripe; "API keys" → API & webhooks); runbook §39.
+- `qa:visual`: all 12 app panels, the calendar picker driven on the Google Calendar panel, and a new **Pro owner session** (a second showcase company on Pro) for the directory and QuickBooks' lock.
+
+**Decided**
+- **No logo where the owner doesn't license one.** Microsoft (Outlook) and Twilio allow their logos only with express written permission; Meta's WhatsApp and Meta kits sit behind an "I accept the guidelines" click, which is the owner's to make (and the Meta logo needs a Meta contact's approval for every use). Those tiles show a plain icon. The QuickBooks app icon is only downloadable signed in to developer.intuit.com (the press-room logos are "editorial use only"), so QuickBooks shows an icon until the owner adds `public/brands/quickbooks.svg` — the tile picks it up with no code change.
+- The status pill sits at the foot of the tile, not beside the logo: a wordmark (Flinks, Stripe) pushed it onto its own line and the tiles stopped lining up.
+- WhatsApp, SMS and the widget keep their settings sections; their tiles lead there rather than duplicating them in a panel.
+- Mapping edits keep their own "Save mapping" button inside the panel (the Phase 102 save bar belongs to the page behind the panel's scrim).
+- Between 641 and 859 px a section (or an app) is a page of its own but the phone top bar and its ‹ are hidden, so there was no way back to the list: a "‹ Settings" / "‹ Connected apps" link now sits above the section at those widths only. (A Phase 102 gap; the leave-prompt check at 768 found it.)
+- The panel takes focus itself when it opens, not its first switch (Radix's default painted a focus ring on a row nobody chose).
+
+**Found**
+- **Saving the QuickBooks or Wave mapping wiped every cost-category mapping you didn't touch.** The old card sent `null` for each unpicked category and the server deletes a mapping on `null`, so picking just the payment account and saving cleared all of them. The panels now send only what changed.
+- The five pre-102 files (`settings.tsx`, `profile.tsx`, the three `settings-*-tab.tsx`) were back on disk as untracked files (identical to their pre-102 versions but for CRLF). Vite resolves `@/pages/dashboard/settings` to `settings.tsx` before `settings/index.tsx`, so local dev and `qa:visual` were serving the old settings page. Moved out of the tree (git still has them at `bc8df71^`); production never had them.
+
+- `qa:visual`'s focus-ring check was fooled by focus traps: focusing anything behind an open panel lands on the panel's first field, which was then measured "before" while already focused. It blurs an already-focused element first now.
+- The API key field used the old shadcn `Input`, with no focus state inside a settings row; the panels use the settings fields now.
+
+**Deferred**
+- Owner: download Intuit's QuickBooks app icon (and the hover states of the Connect button, which Intuit asks for) from developer.intuit.com; tick Meta's guideline box and download the WhatsApp kit if a WhatsApp logo is wanted; confirm Flinks' legal entity name for the trademark line (BRANDS.md).
+- Stripe has no Disconnect: there is no endpoint. The panel says to write to support.
+- The settings list shows no status line for Connected apps (it would call a dozen status endpoints on every settings visit).
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes=settings` (198 pages): 0 overflow, 0 gutter, 0 axe serious/critical, 0 raw keys; the only phone-rule warnings are `/dashboard/pay?tab=settings` (Phase 107). Its two findings (the API key field's focus ring, the leave prompt at 768) were fixed and rechecked: 768 + 1280 EN/FR (132 pages, `.qa/p103-recheck`) and the API panel (`.qa/p103-api`), clean.
+- Phone sheets: `.qa/phone-sheets/p103/` (33 routes, before = `visual-mobile-audit`): the directory 1.8 screens (was 7.2 as one column); every app panel 1-1.4 screens except QuickBooks (3.9: its account, tax-code and seven category mappings).
+- typecheck (quote-ai, api-server), eslint on the touched files, knip (nothing new), i18n-audit (no new findings: the one missing key is in an untracked `translations - Copy.ts`; "Meta Lead Ads" is the same in both languages on purpose).

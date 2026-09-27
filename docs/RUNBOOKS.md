@@ -783,3 +783,16 @@ Settings is now one page per section at `/dashboard/settings/<section>`: `profil
 - **Old links still work**: `?tab=account` → company, `business` → taxes, `billing`/`usage` → plan, `integrations` → apps (OAuth returns keep their `?qb=connected` etc.), and `/dashboard/profile` and `/dashboard/settings/account` → company. The OAuth callbacks now return straight to `/dashboard/settings/apps`.
 - **Who sees what** (same gates as the old tabs): everyone — Profile, Sign-in & security, Plan & billing (usage only; the plan and Stripe buttons need `settings:full`). `settings:edit` — the Business and Selling sections and SMS (SMS also needs a paid plan). `integrations:full` — WhatsApp (Pro and up), Email sender and Connected apps (Business and Elite; Connected apps used to be Elite-only at the tab level, while each card already let Business in).
 - On a phone the list is the first screen; a section opens as a page with ‹ back. Under 860 px wide the same happens on tablets.
+
+
+## 39. Connected apps: the directory (Phase 103)
+
+Settings → Connected apps (`/dashboard/settings/apps`) is a directory of tiles, one per integration, in `pages/dashboard/settings/apps/` (`catalog.ts` lists them, `status.ts` turns each status endpoint into a pill, one file per group of panels).
+
+- **Every plan sees it** (anyone with `integrations:full`). An app the plan doesn't include shows a lock and the plan that adds it; its status endpoint is never called. The plan table is `lib/plans.ts` (the server's mirror), so a gate changes in one place.
+- **Pills**: Connected · Needs attention (a sync whose newest attempt failed, Stripe sign-up unfinished, a Gmail send error, a calendar feed that can't be read, Flinks with no account picked) · Paused (switched off in its panel) · Connect / Set up · Coming soon (the server has no app registration: `available: false`, Phase 65) · a lock with the plan name.
+- **A tile opens the app**: a side panel on a wide screen, its own page on a phone, at `/dashboard/settings/apps?app=<id>` (quickbooks, wave, google_calendar, outlook_calendar, ics, gmail, stripe, financeit, flinks, meta_leads, google_lsa, api). WhatsApp, SMS and the widget open their own settings sections. Support can send that link to land someone on the right panel.
+- **After an OAuth screen** the callbacks return with `?qb=`, `?wave=`, `?cal=` (plus `&provider=`), `?email=`, `?stripeConnect=`, `?metaLeadAds=`, `?googleLsa=` set to `connected` or `error`: the page says which, and opens that app's panel.
+- **"Needs attention" on QuickBooks or Wave**: open the panel; the sync log lists what failed with the reason and a Retry. The logs are append-only, so an item stops counting once a retry succeeds.
+- **Logos** are in `public/brands/` with `BRANDS.md` (source, date, each owner's rules). Outlook, Twilio, WhatsApp and Meta show a neutral icon on purpose: their owners license logos only by written permission or behind a terms click. The QuickBooks tile shows an icon until the owner adds Intuit's app icon (`public/brands/quickbooks.svg`, downloadable when signed in to developer.intuit.com). Intuit's own "Connect to QuickBooks" button is used for connecting, and "Disconnect from QuickBooks" for the reverse, as its app review requires.
+- **Stripe has no Disconnect** in the app (there is no endpoint); the panel says to write to support.

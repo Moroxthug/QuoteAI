@@ -224,6 +224,9 @@ export async function screenReaderAudit(page: Page, opts: { width: number }): Pr
       // perfectly good — so measure the element and its first few ancestors.
       const chain: HTMLElement[] = [];
       for (let p: HTMLElement | null = el; p && p !== document.body && chain.length < 4; p = p.parentElement) chain.push(p);
+      // Phase 103: inside a focus trap (an open panel), focusing anything behind it lands on the
+      // panel's first field — which is then measured "before" while already focused. Start it blurred.
+      if (document.activeElement === el) el.blur();
       const before = chain.map((n) => ring(getComputedStyle(n)));
       try {
         el.focus({ preventScroll: true });

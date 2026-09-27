@@ -75,7 +75,7 @@ const OUT = resolve(import.meta.dirname, "../../.qa", args.get("out") ?? "visual
  * (Phase 93) a newcomer: freshly signed up, no company yet, the person onboarding is for — and an invitee
  * who signed up without their link.
  */
-type Session = "public" | "owner" | "foreman" | "newcomer" | "invitee";
+type Session = "public" | "owner" | "foreman" | "newcomer" | "invitee" | "pro";
 /** `drive`: clicks from the loaded page to the state being checked (onboarding's steps have no URL of their own). */
 type RouteSpec = { path: string; session: Session; name?: string; drive?: (page: Page) => Promise<void> };
 
@@ -104,6 +104,8 @@ async function openPhoneSheet(page: Page, trigger: string, sheet: string) {
 }
 // Phase 102: every section of pages/dashboard/settings (the owner sees them all).
 const SETTINGS_SECTIONS = ["profile", "security", "company", "taxes", "invoicing", "followups", "widget", "email", "sms", "whatsapp", "apps", "plan"];
+// Phase 103: every app in the directory that opens a panel (the other three open their settings section, swept above).
+const APP_PANELS = ["quickbooks", "wave", "google_calendar", "outlook_calendar", "ics", "gmail", "stripe", "financeit", "flinks", "meta_leads", "google_lsa", "api"];
 // Phase 95: set once the foreman has joined, so the teammate page can be swept.
 let sweepForemanId: string | null = null;
 function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
@@ -157,11 +159,15 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/dashboard/settings/company", session: "owner", name: "/dashboard/settings/company leave prompt", drive: async (p) => {
       await p.locator("#s-company-phone").fill("604 555 0199");
       await p.waitForSelector(".savebar");
-      await p.locator('.snav-item[href$="/taxes"]:visible, .tb-back:visible').first().click();
+      await p.locator('.snav-item[href$="/taxes"]:visible, .tb-back:visible, .settings-back:visible').first().click();
       await p.waitForSelector('[role="alertdialog"]');
     } },
-    // Phase 96: the calendar picker open on the connected Google card (the list is stubbed in fixtures.ts).
-    { path: "/dashboard/settings/apps", session: "owner", name: "/dashboard/settings/apps calendar picker", drive: async (p) => {
+    // Phase 103: each app's detail (a side panel wide, a page on a phone); a Pro owner sees Elite/Business apps locked.
+    ...APP_PANELS.map((id) => dash(`/dashboard/settings/apps?app=${id}`)),
+    { path: "/dashboard/settings/apps", session: "pro", name: "/dashboard/settings/apps (pro)" },
+    { path: "/dashboard/settings/apps?app=quickbooks", session: "pro", name: "/dashboard/settings/apps?app=quickbooks (pro)" },
+    // Phase 96: the calendar picker open on the connected Google calendar (the list is stubbed in fixtures.ts).
+    { path: "/dashboard/settings/apps?app=google_calendar", session: "owner", name: "/dashboard/settings/apps?app=google_calendar calendar picker", drive: async (p) => {
       await p.locator('[data-testid="calendar-target-google"] button', { hasText: /Change|Changer/ }).click();
       await p.waitForSelector("#calendar-target-google");
     } },
@@ -634,6 +640,8 @@ try {
   // Phase 93: signed in, no company — onboarding's own audience. And someone the showcase invited who signed
   // up without the link: onboarding offers the invitation before any form.
   const newcomer = await createUser({ name: "Morgan Newcomer" });
+  // Phase 103: an owner on Pro, for the apps their plan doesn't include.
+  const proOwner = await createOrg({ plan: "monthly_pro", province: PROVINCE, companyName: PROVINCE === "QC" ? "Plomberie Gagnon inc." : "Lakeside Plumbing Ltd." });
   let inviteeToken: string | null = null;
   const inviteeEmail = `invitee-sweep-${org.userId}@example.invalid`;
   if ((await org.api("/api/team/members/invite", { body: { email: inviteeEmail, role: "office", send: false } })).status === 201) {
@@ -649,9 +657,9 @@ try {
   const all = routes(showcase);
   for (const lang of LANGS) {
     const widths = lang === "fr" ? WIDTHS_FR : WIDTHS_EN;
-    for (const session of ["public", "owner", "foreman", "newcomer", "invitee"] as const) {
+    for (const session of ["public", "owner", "foreman", "newcomer", "invitee", "pro"] as const) {
       const rs = all.filter((r) => r.session === session);
-      const bearer = session === "owner" ? org.token : session === "foreman" ? foremanToken : session === "newcomer" ? newcomer.token : session === "invitee" ? inviteeToken : null;
+      const bearer = session === "owner" ? org.token : session === "foreman" ? foremanToken : session === "newcomer" ? newcomer.token : session === "invitee" ? inviteeToken : session === "pro" ? proOwner.token : null;
       if (!rs.length || (session !== "public" && !bearer)) continue;
       const ctx = await browser.newContext({
         locale: lang === "fr" ? "fr-CA" : "en-CA",

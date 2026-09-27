@@ -278,7 +278,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
       bullets([
         ["Interac e-Transfer to the email from your profile, with the invoice number as the reference. The customer clicks \"I sent it\" and you get a notification to confirm once the money lands.", "Virement Interac au courriel de votre profil, avec le numéro de facture comme référence. Le client clique sur « Je l'ai envoyé » et vous recevez une notification pour confirmer une fois l'argent reçu."],
-        ["Card payment, if you connected Stripe (Settings → Connected apps → Stripe Connect). The money goes straight to your own bank account; QuoteAI never holds it. The invoice is marked paid automatically.", "Paiement par carte, si vous avez connecté Stripe (Paramètres → Applications connectées → Stripe Connect). L'argent va directement dans votre propre compte bancaire; QuoteAI ne le détient jamais. La facture est marquée payée automatiquement."],
+        ["Card payment, if you connected Stripe (Settings → Connected apps → Stripe). The money goes straight to your own bank account; QuoteAI never holds it. The invoice is marked paid automatically.", "Paiement par carte, si vous avez connecté Stripe (Paramètres → Applications connectées → Stripe). L'argent va directement dans votre propre compte bancaire; QuoteAI ne le détient jamais. La facture est marquée payée automatiquement."],
         ["Cheque, with your mailing address.", "Chèque, à votre adresse postale."],
       ]),
       h("Recording payments and reminders", "Enregistrer les paiements et les rappels"),
@@ -292,8 +292,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
         "Quand le contrat prévoit une retenue, chaque facture d'étape indique le montant retenu et la facture de libération est créée pour vous après le délai légal de privilège. Le rappel vous indique quand vous pouvez la facturer.",
       ),
       note(
-        "Paid invoices sync to QuickBooks Online or Wave if you connected one (Elite). Nothing is posted twice: each sync is logged under Settings → Connected apps with a Retry button if your accounting software was unreachable.",
-        "Les factures payées se synchronisent avec QuickBooks en ligne ou Wave si vous en avez connecté un (Elite). Rien n'est comptabilisé deux fois : chaque synchronisation est journalisée sous Paramètres → Applications connectées avec un bouton Réessayer si votre logiciel comptable était injoignable.",
+        "Paid invoices sync to QuickBooks Online or Wave if you connected one (Business and Elite). Nothing is posted twice: each sync is logged in the app's panel under Settings → Connected apps, with a Retry button if your accounting software was unreachable.",
+        "Les factures payées se synchronisent avec QuickBooks en ligne ou Wave si vous en avez connecté un (Business et Elite). Rien n'est comptabilisé deux fois : chaque synchronisation est journalisée dans le panneau de l'application sous Paramètres → Applications connectées, avec un bouton Réessayer si votre logiciel comptable était injoignable.",
       ),
     ],
   },
@@ -418,8 +418,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
     readingTimeMin: 5,
     blocks: [
       p(
-        "All integrations live under Settings → Connected apps. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Disconnect at any time from the same place.",
-        "Toutes les intégrations se trouvent sous Paramètres → Applications connectées. Chacune se connecte avec un bouton Connecter qui vous envoie chez le fournisseur pour approuver l'accès; QuoteAI conserve le jeton obtenu chiffré et ne voit jamais votre mot de passe. Déconnectez à tout moment au même endroit.",
+        "All integrations live under Settings → Connected apps. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Tap an app to see what it does and what it shares; disconnect at any time from the same place.",
+        "Toutes les intégrations se trouvent sous Paramètres → Applications connectées. Chacune se connecte avec un bouton Connecter qui vous envoie chez le fournisseur pour approuver l'accès; QuoteAI conserve le jeton obtenu chiffré et ne voit jamais votre mot de passe. Touchez une application pour voir ce qu'elle fait et ce qu'elle partage; déconnectez-la à tout moment au même endroit.",
       ),
       h("Email from your own inbox", "Courriel depuis votre propre boîte"),
       p(
@@ -450,8 +450,8 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ]),
       h("Public API and Zapier", "API publique et Zapier"),
       p(
-        "Settings → Connected apps → API keys creates a key for the QuoteAI REST API (quotes, clients, leads, invoices, plus webhooks for the events that matter to you). Use it directly or through Zapier and Make to connect tools we do not integrate natively.",
-        "Paramètres → Applications connectées → Clés API crée une clé pour l'API REST de QuoteAI (soumissions, clients, prospects, factures, plus des webhooks pour les événements qui vous importent). Utilisez-la directement ou via Zapier et Make pour connecter les outils que nous n'intégrons pas nativement.",
+        "Settings → Connected apps → API & webhooks creates a key for the QuoteAI REST API (quotes, clients, leads, invoices, plus webhooks for the events that matter to you). Use it directly or through Zapier and Make to connect tools we do not integrate natively.",
+        "Paramètres → Applications connectées → API et webhooks crée une clé pour l'API REST de QuoteAI (soumissions, clients, prospects, factures, plus des webhooks pour les événements qui vous importent). Utilisez-la directement ou via Zapier et Make pour connecter les outils que nous n'intégrons pas nativement.",
       ),
     ],
   },

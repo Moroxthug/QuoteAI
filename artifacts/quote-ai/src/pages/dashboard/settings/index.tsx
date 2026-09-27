@@ -3,7 +3,7 @@ import { Link, useLocation, useRoute, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetSubscription } from "@workspace/api-client-react";
 import {
-  Building2, CalendarClock, ChevronRight, CreditCard, Globe, Landmark, Mail, MessageCircle, MessageSquareText, Plug, Receipt, ShieldCheck, UserRound,
+  Building2, CalendarClock, ChevronLeft, ChevronRight, CreditCard, Globe, Landmark, Mail, MessageCircle, MessageSquareText, Plug, Receipt, ShieldCheck, UserRound,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -28,6 +28,7 @@ import { EmailSection } from "./email";
 import { SmsSection } from "./sms";
 import { WhatsappSection } from "./whatsapp";
 import { AppsSection } from "./apps";
+import { APPS_HREF, appById } from "./apps/catalog";
 import { PlanSection, planLabelOf } from "./plan";
 
 // ── Phase 102: Settings as a settings area ───────────────────────────────────
@@ -86,7 +87,8 @@ function useVisibleSections() {
       email: businessUp && can("integrations", "full"),
       sms: isPaid && can("settings", "edit"),
       whatsapp: proUp && can("integrations", "full"),
-      apps: businessUp && can("integrations", "full"),
+      // Phase 103: every plan sees the directory; what the plan lacks shows a lock.
+      apps: can("integrations", "full"),
       plan: true,
     };
     return SECTIONS.filter((s) => show[s.id]);
@@ -196,7 +198,13 @@ export default function SettingsPage() {
   }, [pendingHref, reg, navigate]);
 
   const activeLabel = active ? t(`settings.section.${active.id}`) : null;
-  const header = useMemo(() => (single && activeLabel ? { title: activeLabel } : null), [single, activeLabel]);
+  // An app opened from the directory is a page of its own on a phone: its name, ‹ back to the directory.
+  const openApp = active?.id === "apps" ? appById(new URLSearchParams(search).get("app")) : undefined;
+  const appLabel = openApp ? t(`apps.${openApp.id}.name`) : null;
+  const header = useMemo(
+    () => (!single ? null : appLabel ? { title: appLabel, backHref: APPS_HREF } : activeLabel ? { title: activeLabel } : null),
+    [single, activeLabel, appLabel],
+  );
   useMobileHeader(header);
 
   const showList = !single || !raw;
@@ -211,6 +219,13 @@ export default function SettingsPage() {
             <p className="sub">{t("settings.subtitle")}</p>
           </div>
         </div>
+      )}
+      {/* 641-859 px: a section is its own page but the phone top bar (and its ‹) is not shown — so the way back lives here. */}
+      {single && raw && (
+        <Link href={openApp ? APPS_HREF : "/dashboard/settings"} className="settings-back">
+          <ChevronLeft aria-hidden="true" />
+          {openApp ? t("settings.section.apps") : t("dashboard.settings.title")}
+        </Link>
       )}
       <div className="settings-grid">
         {showList && (

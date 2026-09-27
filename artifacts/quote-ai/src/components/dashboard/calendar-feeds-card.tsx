@@ -119,9 +119,6 @@ export function CalendarFeedsCard() {
     <div className="card" style={{ padding: "18px 22px 20px" }}>
       {/* ── Subscribed .ics feeds ─────────────────────────────────────────── */}
       <div className="flex items-start gap-3">
-        <div className="h-10 w-10 rounded-[var(--radius-sm)] bg-sky-100 flex items-center justify-center shrink-0">
-          <Link2 className="h-5 w-5 text-sky-600" />
-        </div>
         <div className="min-w-0">
           <h3 className="text-sm font-semibold">{t("dashboard.settings.calendarFeeds.title")}</h3>
           <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.calendarFeeds.desc")}</p>

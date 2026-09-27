@@ -11,6 +11,7 @@ import { formatCents, type JobDetailDto } from "@/lib/jobs-api";
 import { invoicesApi } from "@/lib/invoices-api";
 import { InvoiceRow } from "@/pages/dashboard/invoices";
 import { NewInvoiceDialog } from "@/components/invoices/invoice-dialogs";
+import { StatStrip } from "@/components/mobile/stat-strip";
 
 /**
  * Invoices tab on the job page: the billing plan (one row per payment
@@ -45,12 +46,15 @@ const can = useCan();
 
   return (
     <div>
-      <section className="stat-grid">
-        <Kpi label={t("invoices.kpi.invoiced")} value={formatCents(invoiceTotals.invoicedCents)} sub={invoiceTotals.draftCount ? `${invoiceTotals.draftCount} ${t(invoiceTotals.draftCount === 1 ? "invoices.kpi.draftsOne" : "invoices.kpi.drafts")}` : undefined} />
-        <Kpi label={t("invoices.kpi.collected")} value={formatCents(invoiceTotals.collectedCents)} tone="ok" />
-        <Kpi label={t("invoices.kpi.outstanding")} value={formatCents(invoiceTotals.outstandingCents)} tone="teal" sub={invoiceTotals.overdueCents ? `${formatCents(invoiceTotals.overdueCents)} ${t("invoices.kpi.overdue")}` : undefined} />
-        <Kpi label={t("invoices.kpi.remaining")} value={formatCents(remainingCents)} sub={t("invoices.kpi.remainingSub")} />
-      </section>
+      {/* Phase 106: one strip (2 × 2 on a phone), not four full-width cards. */}
+      <StatStrip
+        items={[
+          { label: t("invoices.kpi.invoiced"), value: formatCents(invoiceTotals.invoicedCents), sub: invoiceTotals.draftCount ? `${invoiceTotals.draftCount} ${t(invoiceTotals.draftCount === 1 ? "invoices.kpi.draftsOne" : "invoices.kpi.drafts")}` : undefined },
+          { label: t("invoices.kpi.collected"), value: formatCents(invoiceTotals.collectedCents), tone: "ok" },
+          { label: t("invoices.kpi.outstanding"), value: formatCents(invoiceTotals.outstandingCents), tone: invoiceTotals.overdueCents ? "bad" : undefined, sub: invoiceTotals.overdueCents ? `${formatCents(invoiceTotals.overdueCents)} ${t("invoices.kpi.overdue")}` : undefined },
+          { label: t("invoices.kpi.remaining"), value: formatCents(remainingCents), sub: t("invoices.kpi.remainingSub") },
+        ]}
+      />
 
       {job.contract && terms.length > 0 && (
         <section className="card">
@@ -63,7 +67,7 @@ const can = useCan();
               const kind = term.trigger === "on_signing" ? "deposit" : term.type === "completion" || term.trigger === "on_completion" ? "final" : term.trigger === "holdback_release" ? "holdback_release" : "term";
               const amount = job.contract ? Math.round((term.amountType === "percent" ? (job.contract.total * term.value) / 100 : term.value) * 100) : 0;
               return (
-                <div key={term.id} className="item-row">
+                <div key={term.id} className="item-row wrap-phone">
                   {inv ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: inv.status === "paid" ? "var(--green)" : "var(--teal)" }} /> : released ? <Circle className="h-4 w-4 shrink-0" style={{ color: "var(--yellow-dark)" }} /> : <Lock className="h-4 w-4 shrink-0" style={{ color: "var(--line)" }} />}
                   <div className="grow">
                     <span className="ttl">{term.label}</span>
@@ -73,29 +77,33 @@ const can = useCan();
                     </span>
                   </div>
                   <span className="amt">{formatCents(inv?.totalCents ?? amount)}</span>
-                  {inv ? (
-                    <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${inv.id}`)}>{t("invoices.plan.open")}</button>
-                  ) : can("invoicing", "edit") && (
-                    <button type="button" className={cn("btn btn-sm", released ? "btn-navy" : "btn-outline-navy")} disabled={create.isPending} onClick={() => create.mutate({ kind, paymentTermId: term.id, milestoneId: ms?.id })}>
-                      {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} {t("invoices.plan.create")}
-                    </button>
-                  )}
+                  <span className="row-acts">
+                    {inv ? (
+                      <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${inv.id}`)}>{t("invoices.plan.open")}</button>
+                    ) : can("invoicing", "edit") && (
+                      <button type="button" className={cn("btn btn-sm", released ? "btn-navy" : "btn-outline-navy")} disabled={create.isPending} onClick={() => create.mutate({ kind, paymentTermId: term.id, milestoneId: ms?.id })}>
+                        {create.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} {t("invoices.plan.create")}
+                      </button>
+                    )}
+                  </span>
                 </div>
               );
             })}
             {holdback?.enabled && !terms.some((x) => x.trigger === "holdback_release") && (
-              <div className="item-row">
+              <div className="item-row wrap-phone">
                 {live.some((i) => i.type === "holdback_release") ? <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--teal)" }} /> : <Lock className="h-4 w-4 shrink-0" style={{ color: "var(--line)" }} />}
                 <div className="grow">
                   <span className="ttl">{t("invoices.type.holdback_release")} ({holdback.percent}%)</span>
                   <span className="sub">{t("invoices.plan.afterLien")}</span>
                 </div>
                 <span className="amt">{formatCents(live.filter((i) => i.type !== "holdback_release").reduce((s, i) => s + i.holdbackCents, 0))}</span>
-                {live.some((i) => i.type === "holdback_release") ? (
-                  <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${live.find((i) => i.type === "holdback_release")!.id}`)}>{t("invoices.plan.open")}</button>
-                ) : can("invoicing", "edit") && (
-                  <button type="button" className="btn btn-sm btn-outline-navy" disabled={create.isPending || job.status !== "completed"} onClick={() => create.mutate({ kind: "holdback_release" })}><Plus className="h-3.5 w-3.5" /> {t("invoices.plan.create")}</button>
-                )}
+                <span className="row-acts">
+                  {live.some((i) => i.type === "holdback_release") ? (
+                    <button type="button" className="text-link" onClick={() => navigate(`/dashboard/invoices/${live.find((i) => i.type === "holdback_release")!.id}`)}>{t("invoices.plan.open")}</button>
+                  ) : can("invoicing", "edit") && (
+                    <button type="button" className="btn btn-sm btn-outline-navy" disabled={create.isPending || job.status !== "completed"} onClick={() => create.mutate({ kind: "holdback_release" })}><Plus className="h-3.5 w-3.5" /> {t("invoices.plan.create")}</button>
+                  )}
+                </span>
               </div>
             )}
           </div>
@@ -120,16 +128,6 @@ const can = useCan();
       </section>
 
       <NewInvoiceDialog open={manualOpen} onOpenChange={setManualOpen} defaultJobId={job.id} />
-    </div>
-  );
-}
-
-function Kpi({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "ok" | "warn" | "bad" | "teal" }) {
-  return (
-    <div className="card stat-card">
-      <p className="lbl">{label}</p>
-      <p className={cn("val", tone)}>{value}</p>
-      {sub && <p className="sub">{sub}</p>}
     </div>
   );
 }

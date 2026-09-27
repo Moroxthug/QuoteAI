@@ -19,6 +19,9 @@ type ApiError = Error & { code?: string; status?: number; requiredPlan?: string 
  * the sheet behind them: record or pick a photo → the assistant turns it into
  * proposal cards → confirm. Same cards as the Assistant tab, same server
  * turn, so the chat thread shows what happened on site.
+ *
+ * Phase 106: they are the job page's docked bar (StickyActionBar) — Photo
+ * the secondary, Dictate the primary — so both render as direct children.
  */
 export function VoiceActions({ jobId }: { jobId: string }) {
   const { t } = useLanguage();
@@ -36,11 +39,11 @@ export function VoiceActions({ jobId }: { jobId: string }) {
 
   return (
     <>
-      <button type="button" className="btn btn-sm btn-navy" onClick={() => setMode("voice")} title={t("voice.dictateHint")}>
-        <Mic className="h-4 w-4" /> {t("voice.dictate")}
-      </button>
-      <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => fileRef.current?.click()} title={t("voice.photoHint")}>
+      <button type="button" className="btn btn-outline-navy secondary" onClick={() => fileRef.current?.click()} title={t("voice.photoHint")}>
         <Camera className="h-4 w-4" /> {t("voice.photo")}
+      </button>
+      <button type="button" className="btn btn-navy" onClick={() => setMode("voice")} title={t("voice.dictateHint")} data-primary-action>
+        <Mic className="h-4 w-4" /> {t("voice.dictate")}
       </button>
       <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="hidden" onChange={onPick} data-testid="voice-photo-input" />
       {mode && <JobCaptureSheet jobId={jobId} mode={mode} photo={photo} onClose={() => { setMode(null); setPhoto(null); }} />}

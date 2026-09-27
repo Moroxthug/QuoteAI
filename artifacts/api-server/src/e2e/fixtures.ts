@@ -15,6 +15,7 @@ import { raiseAutomation } from "../lib/automation.js";
 import { logContractEvent, finalizeContract, sendContractToCustomer } from "../contracts/service.js";
 import { buildInvoiceContext, createInvoice, sendInvoice, recordPayment, invoiceToken } from "../invoices/service.js";
 import { TINY_PNG_DATA_URL } from "../lib/pngDataUrl.js";
+import { recomputeProgress } from "../jobs/setup.js";
 import { api, createOrg, seedQuote, type TestUser } from "./harness.js";
 
 export type Showcase = {
@@ -128,6 +129,7 @@ export async function seedShowcase(org: TestUser & { province: "ON" | "QC" }, op
   await db.insert(costEntriesTable).values({ userId, projectId: project.id, category: "subcontractor", vendor: "Tile Pros", description: "Subcontracted tiling", subtotalCents: 120000, taxCents: 0, totalCents: 120000, status: "pending_review", source: "manual", createdBy: "user" });
   const releaseMilestone = need(milestones.find((m) => m.paymentTermId && m.paymentAmountCents), "milestone linked to a payment term");
   await db.update(milestonesTable).set({ status: "completed", actualStart: new Date(), actualEnd: new Date() }).where(eq(milestonesTable.id, releaseMilestone.id));
+  await recomputeProgress(project.id);
   await raiseOrThrow({ event: "milestone.completed", userId, entityType: "milestone", entityId: releaseMilestone.id, payload: { projectId: project.id } });
   const progressInvoice = need(
     (await db.select().from(invoicesTable).where(eq(invoicesTable.paymentTermId, releaseMilestone.paymentTermId!))).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0],

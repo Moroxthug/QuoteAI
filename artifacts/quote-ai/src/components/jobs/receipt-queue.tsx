@@ -4,6 +4,9 @@ import { Receipt, Upload, Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { BottomSheet } from "@/components/mobile/bottom-sheet";
+import { ListRow } from "@/components/mobile/list-row";
 import { jobsApi, formatCents, type CostEntryDto, type JobSummaryDto } from "@/lib/jobs-api";
 import { CostEntryDialog } from "./cost-entry-dialog";
 
@@ -11,14 +14,20 @@ import { CostEntryDialog } from "./cost-entry-dialog";
  * Company-wide receipt inbox shown on the jobs list: scan a receipt without
  * opening a job first (the AI picks the job) and review anything pending,
  * including receipts it could not match.
+ *
+ * Phase 106: on a phone it is one row ("2 receipts to review ›") over the
+ * jobs, the receipts in a sheet; with nothing to review it is not shown
+ * (Photo of a receipt is in the top bar's + sheet).
  */
 export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const { t } = useLanguage();
-const can = useCan();
+  const can = useCan();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const phone = useMediaQuery("(max-width: 640px)");
   const { data } = useQuery({ queryKey: ["costs-review"], queryFn: jobsApi.reviewQueue });
   const [dialog, setDialog] = useState<{ open: boolean; entry: CostEntryDto | null }>({ open: false, entry: null });
+  const [sheetOpen, setSheetOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const scan = useMutation({
     mutationFn: (file: File) => jobsApi.scanReceipt(file),
@@ -27,17 +36,59 @@ const can = useCan();
   });
   const entries = data?.entries ?? [];
   const openJobs = jobs.filter((j) => j.status === "planning" || j.status === "active").map((j) => ({ id: j.id, name: j.name }));
+  const review = (e: CostEntryDto) => { setSheetOpen(false); setDialog({ open: true, entry: e }); };
+  const dialogEl = <CostEntryDialog jobId={dialog.entry?.projectId ?? null} entry={dialog.entry} milestones={[]} jobs={openJobs} open={dialog.open} onOpenChange={(v) => setDialog((d) => ({ ...d, open: v }))} />;
+  const fileEl = <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) scan.mutate(f); e.target.value = ""; }} />;
+  const scanButton = can("costs", "edit") && (
+    <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>
+      {scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}
+    </button>
+  );
+
+  if (phone) {
+    if (entries.length === 0) return dialogEl;
+    return (
+      <>
+        <div className="card rq-phone">
+          <ListRow
+            onClick={() => setSheetOpen(true)}
+            chevron
+            lead={<span className="ic warn rq-ic"><Receipt /></span>}
+            title={`${entries.length} ${t("jobs.receipts.toReview")}`}
+            meta={t("jobs.receipts.desc")}
+          />
+        </div>
+        <BottomSheet open={sheetOpen} onOpenChange={setSheetOpen} title={t("jobs.m.receiptsTitle")} flush footer={scanButton || undefined}>
+          {fileEl}
+          <ul className="lrows">
+            {entries.map((e) => (
+              <li key={e.id}>
+                <ListRow
+                  onClick={() => review(e)}
+                  chevron
+                  title={e.vendor || t("jobs.costs.unknownVendor")}
+                  meta={[e.projectName ?? t("jobs.receipts.noJob"), t(`jobs.cost.${e.category}`)]}
+                  amount={formatCents(e.totalCents)}
+                />
+              </li>
+            ))}
+          </ul>
+        </BottomSheet>
+        {dialogEl}
+      </>
+    );
+  }
 
   return (
     <div className="card">
       <div className="item-row" style={{ borderTop: "none" }}>
-      <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) scan.mutate(f); e.target.value = ""; }} />
+        {fileEl}
         <span className="ic warn"><Receipt /></span>
         <div className="grow">
           <b className="ttl">{entries.length ? `${entries.length} ${t("jobs.receipts.toReview")}` : t("jobs.receipts.title")}</b>
           <span className="sub">{t("jobs.receipts.desc")}</span>
         </div>
-        {can("costs", "edit") && <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>{scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}</button>}
+        {scanButton}
       </div>
       {entries.length > 0 && (
         <div>
@@ -54,7 +105,7 @@ const can = useCan();
           ))}
         </div>
       )}
-      <CostEntryDialog jobId={dialog.entry?.projectId ?? null} entry={dialog.entry} milestones={[]} jobs={openJobs} open={dialog.open} onOpenChange={(v) => setDialog((d) => ({ ...d, open: v }))} />
+      {dialogEl}
     </div>
   );
 }

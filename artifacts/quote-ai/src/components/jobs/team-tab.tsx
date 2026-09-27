@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
-import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loader2 } from "lucide-react";
+import { Plus, Trash2, Check, X, Clock, Wrench, Users, ExternalLink, MapPin, Loader2, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -12,6 +12,7 @@ import { useCan } from "@/hooks/use-role";
 import { runOrQueue } from "@/lib/offline/outbox";
 import { jobsApi, formatCents, type JobDetailDto, type TimeEntryDto, type UsageUnit } from "@/lib/jobs-api";
 import { teamApi } from "@/lib/team-api";
+import { RowMore } from "@/components/mobile/row-more";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const today = () => localDay();
@@ -123,21 +124,35 @@ const can = useCan();
           {timeEntries.length === 0 ? <div className="card-empty">{t("jobs.team.noHours")}</div> : (
             <div>
               {timeEntries.map((e) => (
-                <div key={e.id} className={cn("item-row", e.status === "rejected" && "muted")}>
-                  <span className="date">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
+                <div key={e.id} className={cn("item-row jt-row", e.status === "rejected" && "muted")}>
+                  <span className="date hide-phone">{e.date ? format(day(e.date)!, "d MMM yy", { locale }) : "—"}</span>
+                  {/* Phase 106: on a phone the date and the phase join the quiet line and the status sits under the amount, so the name keeps its width. */}
                   <div className="grow">
-                    <span className="ttl"><b>{e.workerName}</b> <span style={{ color: "var(--muted-mk)" }}>· {e.hours} h</span>{e.milestoneTitle ? <span style={{ color: "var(--faint)" }}> · {e.milestoneTitle}</span> : null}</span>
-                    {e.note && <span className="sub">{e.note}</span>}
+                    <span className="ttl"><b>{e.workerName}</b> <span style={{ color: "var(--muted-mk)" }}>· {e.hours} h</span>{e.milestoneTitle ? <span className="hide-phone" style={{ color: "var(--faint)" }}> · {e.milestoneTitle}</span> : null}</span>
+                    {(e.note || e.date || e.milestoneTitle) && (
+                      <span className={cn("sub", !e.note && "show-phone")}>
+                        <span className="show-phone">{[e.date ? format(day(e.date)!, "d MMM", { locale }) : null, e.milestoneTitle].filter(Boolean).join(" · ")}{e.note ? " · " : ""}</span>
+                        {e.note}
+                      </span>
+                    )}
                   </div>
                   {e.geofenceFlagged && <span title={t("team.time.geofenceFlag")}><MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--yellow-dark)" }} /></span>}
-                  <TimeStatusBadge status={e.status} />
-                  <span className={cn("amt w-20 text-right", e.status !== "approved" && "faint")}>{formatCents(e.costCents)}</span>
-                  {can("jobs", "edit") && <div className="flex gap-1 shrink-0 items-center">
+                  <span className="jt-end">
+                    <TimeStatusBadge status={e.status} />
+                    <span className={cn("amt w-20 text-right", e.status !== "approved" && "faint")}>{formatCents(e.costCents)}</span>
+                  </span>
+                  {can("jobs", "edit") && <RowMore label={t("jobs.m.rowActions").replace("{name}", `${e.workerName} · ${e.hours} h`)} actions={[
+                    e.status === "submitted" && { label: t("jobs.team.approve"), icon: Check, onSelect: () => setStatus.mutate({ id: e.id, status: "approved" }) },
+                    e.status === "submitted" && { label: t("jobs.team.reject"), icon: X, onSelect: () => setStatus.mutate({ id: e.id, status: "rejected" }) },
+                    e.status !== "submitted" && { label: t("jobs.team.reopen"), icon: RotateCcw, onSelect: () => setStatus.mutate({ id: e.id, status: "submitted" }) },
+                    { label: t("jobs.m.deleteHours"), icon: Trash2, danger: true, separated: true, onSelect: () => delTime.mutate(e.id) },
+                  ]} />}
+                  {can("jobs", "edit") && <div className="flex gap-1 shrink-0 items-center hide-phone">
                     {e.status === "submitted" && <button type="button" title={t("jobs.team.approve")} className="ic-btn ok" onClick={() => setStatus.mutate({ id: e.id, status: "approved" })}><Check /></button>}
                     {e.status === "submitted" && <button type="button" title={t("jobs.team.reject")} className="ic-btn bad" onClick={() => setStatus.mutate({ id: e.id, status: "rejected" })}><X /></button>}
                     <div className="hover-act">
                       {e.status !== "submitted" && <button type="button" title={t("jobs.team.reopen")} className="text-link" style={{ fontSize: 12 }} onClick={() => setStatus.mutate({ id: e.id, status: "submitted" })}>{t("jobs.team.reopen")}</button>}
-                      <button type="button" className="ic-btn danger" onClick={() => delTime.mutate(e.id)}><Trash2 /></button>
+                      <button type="button" className="ic-btn danger" aria-label={t("jobs.m.deleteHours")} onClick={() => delTime.mutate(e.id)}><Trash2 /></button>
                     </div>
                   </div>}
                 </div>
@@ -177,7 +192,8 @@ const can = useCan();
                   <span className="date">{u.date ? format(day(u.date)!, "d MMM yy", { locale }) : "—"}</span>
                   <div className="grow"><span className="ttl"><b>{u.equipmentName}</b> <span style={{ color: "var(--muted-mk)" }}>· {u.quantity} {t(`team.unit.${u.unit}`)}</span>{u.note ? <span style={{ color: "var(--faint)" }}> · {u.note}</span> : null}</span></div>
                   <span className="amt">{formatCents(u.costCents)}</span>
-                  {can("jobs", "edit") && <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => delUsage.mutate(u.id)}><Trash2 /></button></div>}
+                  {can("jobs", "edit") && <div className="hover-act hide-phone"><button type="button" className="ic-btn danger" aria-label={t("jobs.m.deleteUsage")} onClick={() => delUsage.mutate(u.id)}><Trash2 /></button></div>}
+                  {can("jobs", "edit") && <RowMore label={t("jobs.m.rowActions").replace("{name}", u.equipmentName ?? "")} actions={[{ label: t("jobs.m.deleteUsage"), icon: Trash2, danger: true, onSelect: () => delUsage.mutate(u.id) }]} />}
                 </div>
               ))}
             </div>
@@ -198,7 +214,8 @@ const can = useCan();
                 <div key={a.id} className="item-row">
                   <span className="avat">{a.collaboratorName.slice(0, 2)}</span>
                   <div className="grow"><b className="ttl">{a.collaboratorName}</b><span className="sub">{a.collaboratorRole}{a.collaboratorHourlyRate ? ` · ${formatCents(a.collaboratorHourlyRate)}/h` : ""}</span></div>
-                  {can("jobs", "edit") && <div className="hover-act"><button type="button" className="ic-btn danger" onClick={() => unassign.mutate(a.id)}><Trash2 /></button></div>}
+                  {can("jobs", "edit") && <div className="hover-act hide-phone"><button type="button" className="ic-btn danger" aria-label={t("jobs.m.unassign")} onClick={() => unassign.mutate(a.id)}><Trash2 /></button></div>}
+                  {can("jobs", "edit") && <RowMore label={t("jobs.m.rowActions").replace("{name}", a.collaboratorName)} actions={[{ label: t("jobs.m.unassign"), icon: Trash2, danger: true, onSelect: () => unassign.mutate(a.id) }]} />}
                 </div>
               ))}
             </div>
@@ -239,8 +256,8 @@ const can = useCan();
             </button>}
             {job.latitude && job.longitude && (
               <div className="field">
-                <label>{t("jobs.team.radiusLabel")}</label>
-                <select value={job.geofenceRadiusMeters ?? ""} disabled={!can("jobs", "edit")} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} style={tight}>
+                <label htmlFor="geofence-radius">{t("jobs.team.radiusLabel")}</label>
+                <select id="geofence-radius" value={job.geofenceRadiusMeters ?? ""} disabled={!can("jobs", "edit")} onChange={(e) => setRadius.mutate(e.target.value ? Number(e.target.value) : null)} style={tight}>
                   <option value="">{t("jobs.team.radiusOff")}</option>
                   {[100, 250, 500, 1000, 2000].map((r) => <option key={r} value={r}>{r} m</option>)}
                 </select>

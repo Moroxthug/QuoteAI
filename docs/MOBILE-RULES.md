@@ -34,7 +34,8 @@ The pictures are the first phone screen (375 × 812) — "before" from the 2026-
 | `StickyActionBar` | right-aligned row in place | docked above the tab bar / home indicator, with a spacer; primary marked `data-primary-action` | 2 |
 | `ListRow`, `ResponsiveTable` | `.tbl` table (≥ 640 px) | `<ul>` of rows, one column definition (`mobile: "title" / "meta" / "amount" / "end" / "hidden"`) | 4 |
 | `StatStrip` | one card, N cells | 2-column grid; or `variant="line"` | 3 |
-| `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it | 5 |
+| `ScrollTabs` | one row of pills | one scrolling row, active kept in view; `sticky` pins it; runs to the screen edges (`data-bleed`, skipped by the gutter check) | 5 |
+| `RowMore` | hidden (the row keeps its hover icons — pair them with `hide-phone`) | one ⋯ at the end of a row opening its actions as a sheet (Phase 106) | 2 |
 
 CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. Tokens in `:root`.
 
@@ -53,6 +54,7 @@ CSS: the "CALM MOBILE (Phase 100)" section at the end of `mockup-system.css`. To
 - A screen's primary action: `<StickyActionBar><ActionSheet actions={…} /><button className="btn btn-navy" data-primary-action>Send</button></StickyActionBar>`.
 - A detail page names itself in the phone top bar: `useMobileHeader(useMemo(() => ({ title: quote.title, actions }), [quote.title, actions]))` — memoise, every change re-renders the bar.
 - Tables: write the columns once and say where each lands on a phone; anything unmarked is hidden there — choose, don't inherit a desktop.
+- Small utilities (Phases 105-106): `.hide-phone` / `.show-phone` (≤ 640 px / above it); an `.item-row.wrap-phone` puts its `.row-acts` on a second line on a phone instead of squeezing the text; hover-only icons (`.hover-act`) are always visible on touch screens (`@media (hover: none)`), so on a phone put them in a `RowMore`.
 
 ## What the machine checks (`qa:visual`, ≤ 640 px)
 
@@ -61,7 +63,7 @@ Reported under "Phone rules" in `.qa/<out>/report.md` and as `phone:<rules>` on 
 | Rule id | Fires when |
 |---|---|
 | `stacked-buttons` | more than two buttons ≥ 70 % of the width in one column (rows are not counted: a switch row, a section header that opens and closes, a button that is a list row) |
-| `full-width-stat` | a `.stat-card` ≥ 80 % of the width |
+| `full-width-stat` | a `.stat-card` ≥ 80 % of the width (not `.stat-card.editable`, which holds a field) |
 | `wide-table` | a `<table>` wider than its box |
 | `wrapping-tabs` | a `.pills` / `.stabs` / `[role=tablist]` / `.seg` row on more than one line |
 | `tall-page` | an app page taller than 8 phone screens (per-page budget in Phase 113) |

@@ -2574,3 +2574,128 @@ button.qline:hover { background: #fafbfc; }
   .q-hero .action-bar-spacer { display: none; }
   .q-page { padding-bottom: var(--actionbar-h); }
 }
+
+/* ==========================================================
+   JOBS (Phase 106) — pages/dashboard/jobs/*, components/jobs/*.
+   The job first (a header card: name, client, address to Maps,
+   dates, progress), four numbers as a strip, the tabs sticky,
+   Photo + Dictate docked on a phone, the rest in ⋯; rows that
+   wrap their buttons instead of squeezing the text.
+   ========================================================== */
+@media (min-width: 641px) {
+  .show-phone { display: none !important; }
+}
+
+/* Header card (reuses .q-hero) */
+.j-hero-link { color: inherit; }
+.j-hero-link:hover { color: var(--navy); text-decoration: underline; }
+.j-name { overflow-wrap: anywhere; }
+.j-rename input { width: min(320px, 100%); font-size: 18px; font-weight: 700; }
+.j-addr { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; max-width: 100%; font-size: 14px; font-weight: 600; color: var(--muted-mk); }
+.j-addr svg { width: 15px; height: 15px; flex: none; color: var(--faint); }
+.j-addr-txt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.j-addr:hover .j-addr-txt { color: var(--navy); text-decoration: underline; }
+.j-hero-side { min-width: 250px; align-items: stretch; text-align: left; }
+.j-prog-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.j-prog-ms { font-size: 12.5px; font-weight: 600; color: var(--faint); white-space: nowrap; }
+.j-prog { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.j-prog .pbar { flex: 1; width: auto; }
+.j-prog-val { font-size: 1.35rem; font-weight: 800; color: var(--navy); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.j-hero-acts { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+/* Overview: health as a strip, labelled budget bars, one chart at a time on a phone */
+.j-health .ss-sub { white-space: normal; }
+.j-chart-switch { flex-wrap: nowrap; }
+.j-chart-switch .pill { white-space: nowrap; }
+.legend-under { margin-top: 10px; }
+.legend-under > div { margin-bottom: 0; }
+.bva { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.bva-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.bva-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13.5px; font-weight: 700; color: var(--navy); }
+.bva-num { flex: none; font-size: 13px; font-weight: 600; color: var(--muted-mk); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bva-num b { font-weight: 800; color: var(--navy); }
+.bva-num b.bad { color: var(--red); }
+.bva-track { position: relative; height: 10px; margin-top: 6px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.bva-track i { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 99px; }
+.bva-sub { display: block; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--purple); }
+
+/* Timeline as a list (Gantt on a phone) */
+.gl { list-style: none; margin: 0; padding: 0; }
+.gl-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 10px 0; border-top: 1px solid var(--soft); background: none; text-align: left; color: inherit; }
+.gl > li:first-child > .gl-row { border-top: none; padding-top: 0; }
+.gl-main { flex: 1; min-width: 0; }
+.gl-main b { display: block; font-size: 14.5px; font-weight: 700; color: var(--navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gl-main span { display: block; margin-top: 2px; font-size: var(--fs-meta); font-weight: 600; color: var(--faint); }
+
+/* Rows whose buttons wrap under the text on a phone */
+.row-acts { display: contents; }
+.jt-end { display: contents; }
+
+/* Jobs list rows */
+.lrow-below { display: block; margin-top: 8px; }
+.jlist-prog { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted-mk); font-variant-numeric: tabular-nums; }
+.jlist-prog .pbar { width: 96px; height: 5px; }
+.rq-ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--yellow-t); color: var(--yellow-dark); }
+.rq-ic svg { width: 16px; height: 16px; }
+
+/* Touch screens have no hover: row actions that appear on hover are always there. */
+@media (hover: none) {
+  .item-row .hover-act, .task-row .ic-btn, .photo .photo-del { opacity: 1; }
+}
+
+@media (max-width: 640px) {
+  .j-page { padding-bottom: var(--actionbar-h); }
+  .j-hero .q-hero-side { flex-direction: column; align-items: stretch; gap: 2px; min-width: 0; }
+  .j-hero h1 { display: flex; }
+  .j-addr { display: flex; min-height: var(--tap); margin-top: 2px; }
+  .j-hero .q-hero-chips { margin-top: 2px; }
+  .j-hero-acts { margin-top: 8px; }
+  .j-prog-val { font-size: 1.15rem; }
+
+  .j-health { grid-template-columns: minmax(0, 1fr); }
+  .j-health .ss-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: baseline; }
+  .j-health .ss-val { margin-top: 0; font-size: 1.05rem; text-align: right; }
+  .j-health .ss-sub { grid-column: 1 / -1; }
+
+  .item-row.wrap-phone { flex-wrap: wrap; row-gap: 8px; padding-inline: 16px; }
+  .item-row.wrap-phone > .grow { flex: 1 1 55%; }
+  .item-row.wrap-phone > .row-acts { display: flex; flex: 1 0 100%; justify-content: flex-end; align-items: center; gap: 8px; }
+  .item-row.wrap-phone > .row-acts:empty { display: none; }
+
+  .ms-row { flex-wrap: wrap; row-gap: 10px; }
+  .ms-row > .ms-toggle { flex: 1 1 100%; }
+  .ms-row > .ms-acts { flex: 1 0 100%; justify-content: flex-end; }
+  .ms-body { padding: 0 16px 16px 16px; }
+  .task-row { min-height: var(--tap); padding: 4px 0; }
+  .task-row .grow { white-space: normal; }
+  .task-row .chk { position: relative; width: 22px; height: 22px; border-radius: 6px; }
+  .task-row .chk::after { content: ""; position: absolute; inset: -11px; }
+  .task-row .chk svg { width: 14px; height: 14px; }
+
+  .dropzone.flush.compact-phone { display: flex; align-items: center; gap: 12px; padding: 12px 16px; text-align: left; }
+  .dropzone.compact-phone .dz-ic { margin: 0; flex: none; }
+  .dropzone.compact-phone b { font-size: 14px; }
+  .dropzone.compact-phone p { display: none; }
+
+  .photo-grid .photo { border-radius: 10px; }
+  .photo-grid .photo .chk { top: 6px; left: 6px; }
+  .photo-grid .photo .photo-del { top: 6px; right: 6px; width: 28px; height: 28px; }
+  .photo-grid .photo .photo-meta { padding: 5px 7px; font-size: 11px; }
+  .photo-grid .photo .photo-meta span { display: none; }
+
+  .jt-row .jt-end { display: flex; flex: none; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .jt-row .amt.w-20 { width: auto; }
+  .item-row.jt-row { padding-inline: 16px; }
+
+  .jlist .lrow { align-items: flex-start; padding-inline: 14px; }
+  .jlist .lrow-chev { align-self: center; }
+  .rq-phone { margin-bottom: var(--gap-card); }
+  .rq-phone .lrow { padding-inline: 14px; }
+}
+.j-chart-head { display: block; }
+.j-chart-head .j-chart-switch { margin-bottom: 8px; }
+.row-more { flex: none; }
+@media (max-width: 640px) {
+  /* The job setup's summary: the name field across, the value and the dates side by side. */
+  .stat-grid.setup-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-card); }
+}

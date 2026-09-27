@@ -149,7 +149,7 @@ export default function JobSetupPage() {
       </div>
 
       {/* Summary strip */}
-      <section className="stat-grid">
+      <section className="stat-grid setup-strip">
         <div className="card stat-card editable span-2">
           <label className="lbl" htmlFor="setup-name">{t("jobs.field.name")}</label>
           <input id="setup-name" className="inp-sm" value={name} onChange={(e) => setName(e.target.value)} />

@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 export function ListRow({
   title,
   meta,
+  below,
   amount,
   end,
   lead,
@@ -24,6 +25,8 @@ export function ListRow({
   title: ReactNode;
   /** Pieces of the quiet line; empty ones are dropped, the rest joined by " · ". */
   meta?: ReactNode | ReactNode[];
+  /** Under the quiet line (a progress bar). */
+  below?: ReactNode;
   amount?: ReactNode;
   /** Under the amount (a status chip), or alone on the right. */
   end?: ReactNode;
@@ -48,6 +51,7 @@ export function ListRow({
             ))}
           </span>
         )}
+        {below && <span className="lrow-below">{below}</span>}
       </span>
       {(amount !== undefined || end) && (
         <span className="lrow-end">

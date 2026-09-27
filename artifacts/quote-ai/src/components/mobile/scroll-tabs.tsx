@@ -40,7 +40,8 @@ export function ScrollTabs({
   }, [value]);
 
   return (
-    <div ref={ref} className={cn("stabs", sticky && "sticky", className)} role="group" aria-label={label}>
+    // data-bleed: on a phone the rail runs to the screen edges, and a pill scrolled half out of view is the cue that it scrolls (the qa:visual gutter check skips it).
+    <div ref={ref} className={cn("stabs", sticky && "sticky", className)} role="group" aria-label={label} data-bleed>
       {tabs.map((tab) => {
         const active = tab.id === value;
         const inner = (

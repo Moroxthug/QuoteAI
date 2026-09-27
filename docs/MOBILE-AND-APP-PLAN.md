@@ -21,7 +21,7 @@ Same conventions as every plan before: one phase per conversation, in order, one
 | 103 | Integrations: an app directory with real logos | A | **done** 2026-09-26 |
 | 104 | Today (dashboard home) | A | **done** 2026-09-26 |
 | 105 | Quotes: list, new quote, quote detail | A | **done** 2026-09-27 |
-| 106 | Jobs: list and the job page | A | not started |
+| 106 | Jobs: list and the job page | A | **done** 2026-09-27 |
 | 107 | Money and people: invoices, clients, leads, contracts | A | not started |
 | 108 | The crew app and the foreman | A | not started |
 | 109 | Schedule on a phone | A | not started |
@@ -406,3 +406,38 @@ The app (Phases 114-126: designed first, instant, real-time sync and offline, th
 - `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/quotes,dashboard/new` (90 pages, `.qa/p105b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys, 0 phone-rule warnings. The first pass (`.qa/p105`, EN 375 + 1280) found the unlabelled manual fields, a label-in-name mismatch on the line rows (the aria-label dropped the "qty × price" line; now the visible text is the name after an sr-only "Edit line:"), and the stacked-buttons false positive; a recheck after the header-card spacer fix (`.qa/p105c`, EN + FR 375, 14 pages) is clean.
 - Phone sheets: `.qa/phone-sheets/p105b/` (before = `visual-mobile-audit`): the long quote **2.8 screens (was 10.5)**, first screen = client, subject, status, total and Send; new quote 1.3 (was 1.5) with the describe box on screen one; the list 1.0.
 - typecheck (quote-ai, api-server, libs via codegen), eslint on the touched files (two old exhaustive-deps warnings), knip (nothing new), i18n-audit (no new findings).
+
+### Phase 106 — 2026-09-27
+
+**Built**
+- **Job page**: a header card first — the contract number and dates, the job's name (rename from ⋯ or the desktop pencil), the client, the address as one line that opens the phone's maps app, the status, and the progress (bar, %, "1/3 milestones"). Then **four numbers as a `StatStrip`** (contract value, invoiced, costs to date, projected margin — the budget under it), then the **tabs as sticky `ScrollTabs`** with their "waiting for you" counts; switching tab while they are stuck brings you to the top of the new one. The top bar names the job.
+- **Photo** (secondary) and **Dictate** (primary) are the page's buttons — docked at the bottom on a phone, under the progress on a desktop. Everything else is in **⋯** in the order a job lives it: On my way, Start / Resume, Edit plan, Rename job, Put on hold, Mark complete; once completed: Reopen, Archive. A completed job keeps only its ⋯. The old head row (Dictate, Photo, On my way, Edit plan, Put on hold, Mark complete — five full-width buttons on a phone) is gone.
+- **Overview**: *Up next* first, then schedule health and unbilled work as a strip (rows on a phone), then the charts. **Budget vs actual is now labelled bars** (category and "spent / budget" written over each bar, red past the budget, a lilac tail and a line for what waits for review) on every width; on a phone the two charts share one card with a switch (one chart at a time), legends under the chart, a narrower money axis. The timeline is a **list of milestones on a phone** (`Gantt` → number, title, dates · payment, status; a row opens the Schedule). The budget-plan card is left out on a phone (the chart says it). The projected margin moved from the health tiles to the page strip (the analytics projection, same request, falling back to the budget estimate).
+- **Schedule**: on a phone the milestone cards are the schedule (no week chart); Start / Complete wrap under the title instead of overlapping it; tasks are checklist rows with a 44 px target and a name for the checkbox.
+- **Change orders, costs, invoices**: rows wrap their buttons onto a second line on a phone (`.wrap-phone` + `.row-acts`); the costs drop zone is one line ("Drop a receipt…" had nothing to drop on a phone); the date joins the quiet line. The invoices tab's four stat cards are a strip.
+- **Team**: hour rows keep the name and hours (date and phase on the quiet line, status under the amount). **Row actions on a phone are one ⋯ per row** (`RowMore`, new in `components/mobile/`): approve / reject / reopen / delete hours, delete equipment use, remove from the job, edit / delete a cost — the hover icons they replace would all show at once on a touch screen.
+- **Photos**: three to a row on a phone, the upload one line.
+- **Jobs list**: rows on a phone — the job, the client and what's next ("Next: Cabinets and countertops, 13 Oct", "On hold" or the completion date), a progress bar, the value in whole dollars and the status (`ListRow` got a `below` slot). The receipts inbox is one row above the jobs ("2 receipts to review ›", the receipts in a sheet) and is not shown when nothing waits. **New job** moved to the top bar's + sheet on a phone (`/dashboard/jobs?new=1`, like New lead).
+- Job setup: its summary is two numbers side by side on a phone.
+- 21 new EN/FR strings (`jobs.m.*`); runbook §42; `qa:visual` sweeps every job tab (`?tab=`), the job's ⋯, Mark complete through ⋯, and the receipts sheet.
+
+**Decided**
+- The bar is Photo and Dictate for every open job, whatever its status — those are what you do standing in a kitchen; Start job and Mark complete are once-per-job and one tap further.
+- Budget vs actual as labelled bars everywhere, not only on phones: the numbers were only in a hover before, and "$2,194 / $2,880" over the bar says it without an axis.
+- On a phone, a row's small buttons live in one ⋯ at the end of the row rather than inline (approving hours is two taps there; Today's Needs-you list is where hours get approved at a glance).
+- `ScrollTabs` carries `data-bleed`: on a phone the rail runs to the screen edges and a pill half out of view is the cue that it scrolls, so `qa:visual`'s gutter check skips it. `full-width-stat` skips `.stat-card.editable` (a card holding a field, not a number). MOBILE-RULES.md updated.
+
+**Found**
+- **The Schedule tab's milestone rows overlapped their own Start button on a phone** (the title squeezed to one word per line behind the buttons) and the Team tab cut every worker to "Pat…" — neither tab had ever been swept (`qa:visual` only opened the Overview).
+- The task checkbox, the photo select box and the row delete buttons had no accessible name; the geofence radius label wasn't tied to its select (axe `select-name`, critical).
+- The showcase job said "0%" with one milestone of three done: the fixture completed the milestone without recomputing the job's progress. It does now (the product path always did).
+
+**Deferred**
+- The job setup page (`/jobs/:id/setup`) keeps its desktop form on a phone apart from the summary strip (Phase 110).
+- The Messages and Assistant tabs are unchanged (the thread and the chat already read as a phone conversation).
+- The foreman's home still has stacked buttons (Phase 108).
+
+**Verification**
+- `qa:visual --lang=en,fr --widths=375,768,1280 --routes=dashboard/jobs,=/dashboard` (138 pages, `.qa/p106b`): 0 overflow, 0 gutter, 0 axe serious/critical, 0 screen-reader findings, 0 raw keys; phone-rule warnings only on the foreman's home (Phase 108) and the setup summary (fixed after, see the recheck). First pass (`.qa/p106`, EN 375 + 1280) found the tab rail gutter and the geofence label; the recheck after the last fixes (`.qa/p106c`, EN + FR 375, 32 pages) is clean with **0 phone-rule warnings**.
+- Phone sheets: `.qa/phone-sheets/p106b/` and `p106b-fr/` (before = `.qa/phone-sheets/p106-pre/`, the same sweep on the old code): the job page **4.3 screens (was 6.3)**, first screen = the job, its progress, the four numbers, the tabs and Photo / Dictate; Schedule 2.1 (was 3.3), Change orders 1.3 (2.1), Costs 3.1 (3.9), Team 3.2 (3.8), Photos 1.5 (2.3), Documents 1.4 (2.2); the list 1.0 with the receipts as one row.
+- typecheck (quote-ai, api-server), eslint on the touched files (clean), knip (nothing new), i18n-audit (no new findings).

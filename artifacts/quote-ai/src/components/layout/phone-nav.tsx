@@ -289,6 +289,8 @@ export function PhoneNewButton({ hasJobs }: { hasJobs: boolean }) {
   const actions = [
     can("quotes", "edit") && { key: "quote", label: t("dashboard.nav.newQuote"), icon: FilePlus2, run: () => navigate("/dashboard/new") },
     can("leads", "edit") && { key: "lead", label: t("mobile.new.lead"), icon: Target, run: () => navigate("/dashboard/leads?new=1") },
+    // Phase 106: the jobs list's New job button lives here on a phone.
+    hasJobs && can("jobs", "edit") && { key: "job", label: t("jobs.newJob"), icon: Briefcase, run: () => navigate("/dashboard/jobs?new=1") },
     hasJobs && can("costs", "edit") && { key: "receipt", label: t("mobile.new.receipt"), icon: Camera, run: () => { setOpen(false); setIntent("receipt"); } },
     hasJobs && can("jobs", "edit") && { key: "note", label: t("mobile.new.note"), icon: Mic, run: () => { setOpen(false); setIntent("note"); } },
   ].filter((a): a is { key: string; label: string; icon: LucideIcon; run: () => void } => !!a);

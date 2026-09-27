@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 import { format, differenceInCalendarDays, addDays, startOfWeek } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { MilestoneStatusBadge } from "./badges";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { MilestoneStatus } from "@/lib/jobs-api";
 import { formatCadWhole } from "@/lib/money";
@@ -15,10 +18,14 @@ const parse = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
  * Lightweight CSS Gantt: one row per milestone, week columns, today marker.
  * Rows without dates render as a dashed placeholder so nothing disappears.
  * Styled by the `.gantt*` block in mockup-system.css (Phase 59).
+ * Phase 106: on a phone the week grid would be a sideways scroll with two
+ * visible weeks; there it is a list of the milestones in order instead
+ * (number, title, dates · payment, status), each row opening the milestone.
  */
 export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id: string) => void }) {
   const { lang } = useLanguage();
   const locale = lang === "fr" ? frCA : enCA;
+  const phone = useMediaQuery("(max-width: 640px)");
 
   const range = useMemo(() => {
     const dates = rows.flatMap((r) => [parse(r.start), parse(r.end)]).filter((d): d is Date => !!d);
@@ -33,6 +40,31 @@ export function Gantt({ rows, onRowClick }: { rows: GanttRow[]; onRowClick?: (id
     for (let d = from; d <= to; d = addDays(d, 7)) weeks.push(d);
     return { from, to, days, weeks, today };
   }, [rows]);
+
+  if (phone && rows.length > 0) {
+    return (
+      <ol className="gl">
+        {rows.map((r, i) => {
+          const s = parse(r.start);
+          const e = parse(r.end);
+          const inner = (
+            <>
+              <span className={cn("ms-num", r.status === "completed" && "done", r.status === "in_progress" && "on")}>{r.status === "completed" ? <Check aria-hidden="true" /> : i + 1}</span>
+              <span className="gl-main">
+                <b>{r.title}</b>
+                <span>
+                  {s && e ? `${format(s, "d MMM", { locale })} → ${format(e, "d MMM", { locale })}` : "—"}
+                  {r.paymentAmountCents ? ` · ${formatCadWhole(r.paymentAmountCents / 100)}` : ""}
+                </span>
+              </span>
+              <MilestoneStatusBadge status={r.status} />
+            </>
+          );
+          return <li key={r.id}>{onRowClick ? <button type="button" className="gl-row" onClick={() => onRowClick(r.id)}>{inner}</button> : <div className="gl-row">{inner}</div>}</li>;
+        })}
+      </ol>
+    );
+  }
 
   if (!range) {
     return <div className="gantt-none">—</div>;

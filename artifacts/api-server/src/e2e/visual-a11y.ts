@@ -219,11 +219,20 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
       await openPhoneSheet(p, ".chap-block .qline", "[role=dialog] .line-sheet");
     } },
     dash(`/dashboard/quotes/${s.pendingQuoteId}`), foreman(`/dashboard/quotes/${s.quoteId}`),
+    // Phase 106: Mark complete lives in the job's ⋯ (a sheet on a phone, a menu wider).
     { path: `/dashboard/jobs/${s.jobId}`, session: "owner", name: `/dashboard/jobs/${s.jobId} complete dialog`, drive: async (p) => {
-      await p.locator(".head-actions button", { hasText: /Mark complete|Marquer terminé/ }).click();
+      await p.locator(".j-hero .more-btn").first().click();
+      await p.locator("[role=dialog] .asheet-item, [role=menuitem]", { hasText: /Mark complete|Marquer terminé/ }).click();
       await p.waitForSelector('[role="alertdialog"]');
     } },
+    { path: `/dashboard/jobs/${s.jobId}`, session: "owner", name: `/dashboard/jobs/${s.jobId} more`, drive: async (p) => {
+      await p.locator(".j-hero .more-btn").first().click();
+      await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
+    } },
     dash("/dashboard/jobs"), dash(`/dashboard/jobs/${s.jobId}`), dash(`/dashboard/jobs/${s.jobId}/setup`),
+    { path: "/dashboard/jobs", session: "owner", name: "/dashboard/jobs receipts", drive: (p) => openPhoneSheet(p, ".rq-phone .lrow", "[role=dialog] .lrows") },
+    // Phase 106: every tab of the job page is its own page state.
+    ...["schedule", "changes", "costs", "invoices", "team", "photos", "messages", "documents"].map((tab) => dash(`/dashboard/jobs/${s.jobId}?tab=${tab}`)),
     // Phase 101: the phone navigation's sheets (no-ops above 980 px, where the sidebar is the navigation).
     { path: "/dashboard", session: "owner", name: "/dashboard More sheet", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
     { path: "/dashboard", session: "owner", name: "/dashboard New sheet", drive: (p) => openPhoneSheet(p, ".tb-new", "[role=dialog] .asheet-list") },
@@ -433,8 +442,8 @@ async function phoneRules(page: Page, width: number, session: Session): Promise<
     }
     flush();
 
-    // 2. A stat card holding one number across the whole width.
-    const stats = Array.from(document.querySelectorAll(".stat-card")).filter((s) => shown(s) && s.getBoundingClientRect().width >= cw * 0.8);
+    // 2. A stat card holding one number across the whole width (an `.editable` one holds a field, not a number — Phase 106).
+    const stats = Array.from(document.querySelectorAll(".stat-card:not(.editable)")).filter((s) => shown(s) && s.getBoundingClientRect().width >= cw * 0.8);
     if (stats.length) out.push({ rule: "full-width-stat", detail: `${stats.length} full-width .stat-card: ${stats.slice(0, 3).map(label).join(", ")}` });
 
     // 3. A data table wider than its box (sideways scrolling for data).

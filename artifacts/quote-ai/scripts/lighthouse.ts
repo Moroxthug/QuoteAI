@@ -5,6 +5,7 @@
 //   pnpm --filter @workspace/quote-ai qa:lighthouse -- --urls=/,/fr/ --runs=3
 //   pnpm --filter @workspace/quote-ai qa:lighthouse -- --api=http://127.0.0.1:5123 --urls=/p/<id>/
 //   pnpm --filter @workspace/quote-ai qa:lighthouse -- --base=https://quoteai.ca
+//   pnpm --filter @workspace/quote-ai qa:lighthouse -- --runs=1 --perf-floor=75   # CI (Phase 115)
 //
 // Serves dist/public through server/serve.mjs (same headers/compression as
 // the old Node host; Vercel's CDN is only faster), optionally proxying /api
@@ -44,7 +45,12 @@ const DEFAULT_URLS = [
 ];
 // Paths may be given without the leading slash (Git Bash rewrites "/x" into a Windows path).
 const URLS = (args.get("urls") ?? DEFAULT_URLS.join(",")).split(",").filter(Boolean).map((p) => (p === "home" ? "/" : p.startsWith("/") ? p : `/${p}`));
-const TARGETS = { performance: 90, seo: 100, cls: 0.1 };
+// Phase 115: `--perf-floor` lowers the performance bar for CI, whose shared
+// runners are slower than any phone Lighthouse simulates on a real desktop
+// (the local target stays 90); signed-in and customer pages are noindex, so
+// their SEO score is reported but not held to 100.
+const TARGETS = { performance: Number(args.get("perf-floor") ?? 90), seo: 100, cls: 0.1 };
+const NOINDEX = /^\/(dashboard|sign-in|sign-up|onboarding|p|i|sign|t|portal|team-invite|join)(\/|$)/;
 
 async function freePort(): Promise<number> {
   return new Promise((res, rej) => {
@@ -146,7 +152,7 @@ async function main() {
   ];
   writeFileSync(resolve(OUT, "report.md"), lines.join("\n"));
   writeFileSync(resolve(OUT, "report.json"), JSON.stringify(rows, null, 2));
-  const misses = rows.filter((r) => r.performance < TARGETS.performance || r.seo < TARGETS.seo || r.cls > TARGETS.cls);
+  const misses = rows.filter((r) => r.performance < TARGETS.performance || (r.seo < TARGETS.seo && !NOINDEX.test(r.url)) || r.cls > TARGETS.cls);
   console.log(`\n[lighthouse] ${rows.length} URLs → ${resolve(OUT, "report.md")}${misses.length ? ` — ${misses.length} under target (perf ≥ ${TARGETS.performance}, SEO ${TARGETS.seo}, CLS ≤ ${TARGETS.cls})` : " — all targets met"}`);
   process.exit(misses.length ? 1 : 0);
 }

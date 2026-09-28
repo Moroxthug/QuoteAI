@@ -5,7 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Plus, Loader2, Sparkles } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -35,6 +37,9 @@ const can = useCan();
   const [createOpen, setCreateOpen] = useState(false);
   const items = data?.items ?? [];
   const phone = useMediaQuery("(max-width: 640px)");
+  // Phase 115: first 50 rows now, the rest when idle; rows prefetch the job on press.
+  const shown = useProgressiveList(items);
+  const press = usePrefetchOnPress();
   // Phase 106: on a phone New job is in the top bar's + sheet, which opens this form with ?new=1 (then drops it, so Back does not reopen it).
   const query = useSearch();
   useEffect(() => {
@@ -70,9 +75,7 @@ const can = useCan();
 
       <div className="card">
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={5} />
         ) : items.length === 0 ? (
           <div className="text-center py-14 px-5">
             <Sparkles className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -83,7 +86,7 @@ const can = useCan();
         ) : phone ? (
           // Phase 106: job · client and what's next / how far along / what it's worth.
           <ul className="lrows jlist" aria-label={t("jobs.title")}>
-            {items.map((j) => {
+            {shown.map((j) => {
               const chip = statusChip(j, t);
               return (
                 <li key={j.id}>
@@ -118,7 +121,7 @@ const can = useCan();
                 </tr>
               </thead>
               <tbody>
-                {items.map((j) => {
+                {shown.map((j) => {
                   const chip = statusChip(j, t);
                   const pending = j.setupStatus === "pending_review";
                   const href = pending ? `/dashboard/jobs/${j.id}/setup` : `/dashboard/jobs/${j.id}`;
@@ -128,7 +131,7 @@ const can = useCan();
                       ? `${format(new Date(`${j.plannedStart}T00:00:00`), "MMM d", { locale })} – ${format(new Date(`${j.plannedEnd}T00:00:00`), "MMM d", { locale })}`
                       : "—";
                   return (
-                    <tr key={j.id} {...rowLink(() => navigate(href))}>
+                    <tr key={j.id} {...rowLink(() => navigate(href))} {...press(href)}>
                       <td>
                         <span className="t-strong">{j.name}</span>
                         {j.address && <span className="t-sub">{j.address}</span>}

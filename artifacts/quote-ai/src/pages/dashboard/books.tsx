@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, Banknote, BookCheck, Check, CircleCheck, CircleDashed, HardHat, Info, Link2, Loader2, Lock, Plus, RefreshCw, Undo2, EyeOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton, ListSkeleton, TabsSkeleton } from "@/components/skeletons";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -51,7 +52,7 @@ export default function BooksPage() {
         </div>
       </div>
 
-      {(!roleLoaded || (allowed && isLoading)) && <div className="space-y-3"><Skeleton className="h-12 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>}
+      {(!roleLoaded || (allowed && isLoading)) && <div aria-busy="true"><TabsSkeleton /><CardSkeleton rows={6} /></div>}
 
       {roleLoaded && (!allowed || error) && <div className="notice info"><Info /><span className="grow">{!allowed || (error as Error & { status?: number }).status === 403 ? t("books.notYourRole") : (error as Error).message}</span></div>}
 
@@ -121,7 +122,7 @@ function CloseTab({ overview }: { overview: Overview }) {
         </div>
       </section>
 
-      {isLoading && <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />}
+      {isLoading && <CardSkeleton rows={6} />}
       {error && <div className="card card-empty">{(error as Error).message}</div>}
 
       {data && (
@@ -271,7 +272,7 @@ function BankTab({ overview }: { overview: Overview }) {
           </p>
           <button type="button" className="btn btn-sm btn-outline-navy" disabled={sync.isPending} onClick={() => sync.mutate()}>{sync.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} {t("books.bank.refresh")}</button>
         </div>
-        {isLoading ? <div className="p-5"><Skeleton className="h-32 w-full" /></div> : !data || data.lines.length === 0 ? (
+        {isLoading ? <ListSkeleton rows={4} /> : !data || data.lines.length === 0 ? (
           <div className="card-empty">{t(status === "unmatched" ? "books.bank.allMatched" : "books.bank.empty")}</div>
         ) : phone ? (
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }} aria-label={t("books.tab.bank")}>
@@ -479,7 +480,7 @@ function ClaimsTab() {
     onError: (e: Error & { code?: string }) => toast({ title: t("jobs.error"), description: e.code === "CLAIM_SYNCED" ? t("books.claims.synced") : e.message, variant: "destructive" }),
   });
 
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" />;
+  if (isLoading) return <CardSkeleton rows={4} />;
   return (
     <div className="stack" style={{ gap: 16 }}>
       <div className="notice info"><Info /><span className="grow">{t("books.claims.intro")}</span></div>

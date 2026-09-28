@@ -5,6 +5,8 @@ import "./index.css";
 import { initAnalytics } from "./lib/analytics.ts";
 import { initErrorTracking } from "./lib/error-tracking.ts";
 import { initPwa } from "./lib/pwa.ts";
+import { detectInitialLang } from "./i18n/detect.ts";
+import { ensureStrings } from "./i18n/registry.ts";
 
 initErrorTracking();
 initAnalytics();
@@ -20,10 +22,18 @@ const rootEl = document.getElementById("root")!;
 const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
 const hydrate = rootEl.dataset.ssr === pathname && rootEl.children.length > 0;
 
+// Phase 115: the strings come one language at a time (i18n/registry.ts). The
+// first render's language is known now, so its dictionary loads alongside the
+// App chunk instead of after it; the signed-in app's own dictionary starts too
+// (the dashboard layout waits for it, App.tsx).
+const lang = detectInitialLang();
+const strings = ensureStrings(lang);
+if (/^\/(dashboard|onboarding)(\/|$)/.test(pathname)) void ensureStrings(lang, ["dashboard"]).catch(() => {});
+
 // The App chunk is loaded on demand (it is ~2/3 of the entry's JavaScript);
 // prerendered pages carry a <link rel="modulepreload"> for it
 // (scripts/prerender-seo.ts) so hydration does not wait on a second round trip.
-void import("./App.tsx").then(({ default: App }) => {
+void Promise.all([import("./App.tsx"), strings]).then(([{ default: App }]) => {
   const tree = (
     <StrictMode>
       <HelmetProvider>

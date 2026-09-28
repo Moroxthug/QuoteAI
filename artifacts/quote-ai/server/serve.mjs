@@ -8,6 +8,10 @@ import http from "node:http";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, "..", "dist", "public");
 const INDEX_HTML = path.join(PUBLIC_DIR, "index.html");
+// Phase 115: the same fallbacks as vercel.json — /dashboard/* gets the app
+// frame, any other route without its own file the bare shell (not the homepage).
+const APP_HTML = path.join(PUBLIC_DIR, "app.html");
+const SPA_HTML = path.join(PUBLIC_DIR, "spa.html");
 
 const rawPort = process.env.PORT;
 if (!rawPort) {
@@ -140,9 +144,11 @@ app.use(
   }),
 );
 
-function sendIndex(res) {
+function sendIndex(req, res) {
   res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
-  res.sendFile(INDEX_HTML);
+  const shell = /^\/dashboard(\/|$)/.test(req.path) ? APP_HTML : SPA_HTML;
+  // A build from before Phase 115 has neither: fall back to index.html as it used to.
+  res.sendFile(fs.existsSync(shell) ? shell : INDEX_HTML);
 }
 
 app.use((req, res, next) => {
@@ -153,7 +159,7 @@ app.use((req, res, next) => {
   if (!accept.includes("text/html")) {
     return next();
   }
-  sendIndex(res);
+  sendIndex(req, res);
 });
 
 app.use((_req, res) => {

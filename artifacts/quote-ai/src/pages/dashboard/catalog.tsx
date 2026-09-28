@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Pencil, Trash2, Download, Loader2, BookOpen, Search, Check, Import, AlertTriangle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
 import {
   Dialog,
   DialogBody,
@@ -469,9 +469,7 @@ const can = useCan();
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-14 w-full" />)}
-        </div>
+        <div className="card"><ListSkeleton rows={8} chip={false} sub={false} /></div>
       ) : items.length === 0 ? (
         <div className="card" style={{ padding: "40px 22px", textAlign: "center" }}>
           <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />

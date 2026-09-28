@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
+import { ListSkeleton } from "@/components/skeletons";
 import { FolderOpen, Upload, Loader2, CheckCircle2, AlertCircle, Clock, Trash2, Zap, FileText, ImageIcon, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X, Scale } from "lucide-react";
 import {
   useListDocuments,
@@ -444,9 +445,7 @@ export default function DocumentsPage() {
           )}
         </div>
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <ListSkeleton rows={5} lead="icon" amount={false} />
         ) : docs.length === 0 ? (
           <div className="py-12 text-center">
             <FolderOpen className="h-10 w-10 mx-auto mb-3" style={{ color: "var(--faint)" }} />

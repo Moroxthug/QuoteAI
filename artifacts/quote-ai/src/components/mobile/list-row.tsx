@@ -3,9 +3,11 @@ import { Link, useLocation } from "wouter";
 import { ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { rowLink } from "@/lib/row-link";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { cn } from "@/lib/utils";
 import type { SheetAction } from "./action-sheet";
 import { RowMore } from "./row-more";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 
 /**
  * Phase 100 — one row of a phone list (docs/MOBILE-RULES.md rule 4): a strong
@@ -40,6 +42,8 @@ export function ListRow({
   chevron?: boolean;
   className?: string;
 }) {
+  // Phase 115: a link row starts loading its screen when pressed (usePrefetchOnPress).
+  const press = usePrefetchOnPress();
   const parts = (Array.isArray(meta) ? meta : [meta]).filter((m) => m !== null && m !== undefined && m !== false && m !== "");
   const body = (
     <>
@@ -64,7 +68,7 @@ export function ListRow({
       {(chevron ?? !!href) && <ChevronRight className="lrow-chev" aria-hidden="true" />}
     </>
   );
-  if (href) return <Link href={href} className={cn("lrow", className)}>{body}</Link>;
+  if (href) return <Link href={href} className={cn("lrow", className)} {...press(href)}>{body}</Link>;
   if (onClick) return <button type="button" className={cn("lrow", className)} onClick={onClick}>{body}</button>;
   return <div className={cn("lrow", className)}>{body}</div>;
 }
@@ -118,6 +122,9 @@ export function ResponsiveTable<T>({
 }) {
   const phone = useMediaQuery("(max-width: 639.98px)");
   const [, navigate] = useLocation();
+  const press = usePrefetchOnPress();
+  // Phase 115: long lists render their first rows now and the rest when the browser is idle.
+  const shown = useProgressiveList(rows);
   if (rows.length === 0 && empty) return <>{empty}</>;
 
   if (phone) {
@@ -128,7 +135,7 @@ export function ResponsiveTable<T>({
     const end = columns.find((c) => c.mobile === "end");
     return (
       <ul className="lrows" aria-label={label}>
-        {rows.map((row) => {
+        {shown.map((row) => {
           const actions = rowActions?.(row).filter(Boolean) ?? [];
           const item = (
             <ListRow
@@ -165,11 +172,11 @@ export function ResponsiveTable<T>({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => {
+          {shown.map((row) => {
             const href = rowHref?.(row);
             const link = href ? rowLink(() => navigate(href)) : null;
             return (
-              <tr key={getKey(row)} {...link} className={cn(link?.className, rowClassName?.(row)) || undefined}>
+              <tr key={getKey(row)} {...link} {...press(href)} className={cn(link?.className, rowClassName?.(row)) || undefined}>
                 {columns.map((c) => (
                   <td key={c.key} style={c.align === "right" ? { textAlign: "right" } : undefined}>{c.cell(row)}</td>
                 ))}

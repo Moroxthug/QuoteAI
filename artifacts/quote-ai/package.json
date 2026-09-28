@@ -19,7 +19,8 @@
     "ga-traffic-report": "tsx ./scripts/ga-traffic-report.ts",
     "gsc-inspect": "tsx ./scripts/gsc-inspect-urls.ts",
     "i18n-audit": "tsx ./scripts/i18n-audit.ts",
-    "qa:lighthouse": "tsx ./scripts/lighthouse.ts"
+    "qa:lighthouse": "tsx ./scripts/lighthouse.ts",
+    "qa:bundle": "tsx ./scripts/bundle-budget.ts"
   },
   "devDependencies": {
     "@fontsource-variable/figtree": "^5.3.0",

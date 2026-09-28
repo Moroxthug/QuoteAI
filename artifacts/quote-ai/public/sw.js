@@ -29,7 +29,12 @@ const STATIC_CACHE = `qai-static-${VERSION}`;
 const API_CACHE = "qai-api";
 const KEEP = new Set([SHELL_CACHE, ASSET_CACHE, STATIC_CACHE, API_CACHE]);
 
-const SHELL_URL = "/index.html";
+// Phase 115: the signed-in app has its own shell (the app frame drawn in HTML);
+// every other route without a saved page gets the bare one — never the
+// prerendered homepage that index.html is. Same split as vercel.json.
+const APP_SHELL_URL = "/app.html";
+const SPA_SHELL_URL = "/spa.html";
+const shellFor = (pathname) => (pathname === "/dashboard" || pathname.startsWith("/dashboard/") ? APP_SHELL_URL : SPA_SHELL_URL);
 const STATIC_PRECACHE = ["/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/quoteai-logo.png", "/fonts/figtree-latin-wght-normal.woff2"];
 
 /** API reads kept for offline use (pathname only; the query string is part of the cache key). */
@@ -44,7 +49,7 @@ self.addEventListener("install", (event) => {
     (async () => {
       const shell = await caches.open(SHELL_CACHE);
       // The shell must be there; a missing chunk is not fatal (it is fetched on demand).
-      await shell.add(new Request(SHELL_URL, { cache: "reload" }));
+      await shell.addAll([APP_SHELL_URL, SPA_SHELL_URL].map((u) => new Request(u, { cache: "reload" })));
       const assets = await caches.open(ASSET_CACHE);
       await Promise.all(PRECACHE.map((u) => assets.add(u).catch(() => undefined)));
       const statics = await caches.open(STATIC_CACHE);
@@ -114,7 +119,7 @@ async function navigate(req) {
   try {
     return await fetch(req);
   } catch {
-    const shell = await caches.match(SHELL_URL);
+    const shell = await caches.match(shellFor(new URL(req.url).pathname));
     if (shell) return shell;
     return new Response(OFFLINE_HTML, { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } });
   }

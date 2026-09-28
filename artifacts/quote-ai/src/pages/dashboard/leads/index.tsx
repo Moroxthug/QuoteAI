@@ -14,6 +14,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { ActionSheet } from "@/components/mobile/action-sheet";
 import { leadsApi, type LeadChannel, type LeadDto, type LeadStatus } from "@/lib/leads-api";
+import { patch, useOptimisticMutation } from "@/lib/optimistic";
 
 const COLUMNS: LeadStatus[] = ["new", "contacted", "quoted", "won", "lost", "unsubscribed"];
 
@@ -76,10 +77,11 @@ export default function LeadsListPage() {
     onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
   });
 
-  const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: LeadStatus }) => leadsApi.update(id, { status }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
-    onError: (err: Error) => toast({ variant: "destructive", title: "Error", description: err.message }),
+  // Phase 115: a lead moves to its new stage on the drop / tap, with Undo back to the old one.
+  const statusMutation = useOptimisticMutation({
+    mutationFn: ({ lead, status }: { lead: LeadDto; status: LeadStatus }) => leadsApi.update(lead.id, { status }),
+    patch: ({ lead, status }) => [patch<{ items: LeadDto[] }>(["leads"], (d) => ({ ...d, items: d.items.map((l) => (l.id === lead.id ? { ...l, status } : l)) }))],
+    undo: ({ lead, status }) => ({ title: t("undo.leadMoved").replace("{name}", lead.name).replace("{stage}", t(`leads.status.${status}`)), inverse: { lead: { ...lead, status }, status: lead.status } }),
   });
 
   // Phase 74: flip a lead between email and text follow-ups (needs a phone; records the SMS consent basis server-side).
@@ -106,7 +108,7 @@ export default function LeadsListPage() {
     if (!id) return;
     const lead = items.find((l) => l.id === id);
     if (!lead || lead.status === status) return;
-    statusMutation.mutate({ id, status });
+    statusMutation.mutate({ lead, status });
   };
 
   return (
@@ -130,8 +132,14 @@ export default function LeadsListPage() {
       </div>
 
       {isLoading ? (
-        <div className="kanban">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-64 w-full rounded-[16px]" />)}
+        // Phase 115: columns of lead cards, as the board will be (one column on a phone).
+        <div className={cn("kanban skel-wait", phone && "one")} aria-busy="true">
+          {(phone ? [3] : [3, 2, 2, 1]).map((n, i) => (
+            <div key={i} className="kan-col" aria-hidden="true">
+              <div className="kan-head"><Skeleton className="skel-line skel-title" style={{ width: 84 }} /></div>
+              {Array.from({ length: n }, (_, j) => <Skeleton key={j} className="h-[112px] w-full rounded-[12px]" />)}
+            </div>
+          ))}
         </div>
       ) : items.length === 0 ? (
         <div className="card text-center py-16 text-slate-500">{t("leads.empty")}</div>
@@ -206,8 +214,7 @@ export default function LeadsListPage() {
                               actions={COLUMNS.filter((c) => c !== lead.status).map((c) => ({
                                 label: t("leads.m.moveTo").replace("{stage}", t(`leads.status.${c}`)),
                                 icon: ArrowRight,
-                                disabled: statusMutation.isPending,
-                                onSelect: () => statusMutation.mutate({ id: lead.id, status: c }),
+                                onSelect: () => statusMutation.mutate({ lead, status: c }),
                               }))}
                             />
                           )}

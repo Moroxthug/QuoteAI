@@ -1,4 +1,3 @@
-import "@/i18n/dashboard";
 import { useState, useEffect, Fragment } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";

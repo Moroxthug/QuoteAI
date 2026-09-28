@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Users, Clock, Wrench, Plus, KeyRound, Armchair, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin, Wallet } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -66,7 +66,7 @@ export default function TeamPage() {
         tabs={TABS.map((k) => ({ id: k, label: t(`team.tab.${k}`), icon: TAB_ICONS[k], count: k === "time" && pending?.items.length ? pending.items.length : undefined }))}
       />
 
-      {isLoading ? <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div> : null}
+      {isLoading ? <div className="card"><ListSkeleton rows={4} lead="avatar" /></div> : null}
       {tab === "workers" && workers && <WorkersTab workers={workers.items} locale={locale} />}
       {tab === "time" && <TimeTab workers={workers?.items ?? []} locale={locale} />}
       {tab === "equipment" && <EquipmentTab />}
@@ -133,7 +133,7 @@ const can = useCan();
       </div>
 
       {isLoading ? (
-        <div className="p-5"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /></div>
+        <ListSkeleton rows={4} lead="avatar" amount={false} />
       ) : phone ? (
         <ul className="lrows" aria-label={t("team.tab.members")}>
           <li><ListRow href="/dashboard/me" lead={<PersonAvatar name={me?.person.name} image={me?.person.image} />} title={me?.person.name ?? t("team.members.you")} meta={[t("team.members.you"), me ? t(`group.role.${me.current.role}`) : null]} /></li>
@@ -631,7 +631,7 @@ const can = useCan();
         )}
       </div>
 
-      {isLoading ? <Skeleton className="h-32 w-full rounded-[var(--radius-mk)]" /> : items.length === 0 ? (
+      {isLoading ? <div className="card"><ListSkeleton rows={5} lead="check" /></div> : items.length === 0 ? (
         <div className="card dashed card-empty">{status === "submitted" ? t("team.time.nothingToApprove") : t("team.time.empty")}</div>
       ) : (
         <div className="card">
@@ -725,7 +725,7 @@ const can = useCan();
           {can("team", "full") && <button type="button" className="btn btn-navy btn-sm" onClick={() => setEditing({ open: true, item: null })}><Plus className="h-4 w-4" /> {t("team.equipment.add")}</button>}
         </div>
       </div>
-      {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /></div> : items.length === 0 ? (
+      {isLoading ? <ListSkeleton rows={4} lead="icon" /> : items.length === 0 ? (
         <div className="card-empty">{t("team.equipment.empty")}</div>
       ) : phone ? (
         <ul className="lrows" aria-label={t("team.tab.equipment")}>

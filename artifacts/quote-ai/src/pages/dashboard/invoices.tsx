@@ -5,7 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Receipt, Search, ChevronRight, Plus, AlertTriangle, Clock } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton, StatStripSkeleton } from "@/components/skeletons";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { InvoiceListRow, invoiceStatusChip } from "@/components/invoices/invoice-list-row";
 import { PhoneListBar } from "@/components/mobile/list-filter";
 import { StatStrip } from "@/components/mobile/stat-strip";
@@ -54,6 +56,8 @@ export default function InvoicesPage() {
       return inFilter(i, filter) && inSearch;
     });
   }, [data, filter, search]);
+  // Phase 115: a long list draws its first 50 rows now, the rest when idle.
+  const shown = useProgressiveList(items);
 
   return (
     <div className="animate-in fade-in duration-300">
@@ -79,7 +83,7 @@ export default function InvoicesPage() {
       ) : (
         <>
           {/* Phase 107: the four numbers as one strip (two by two on a phone). */}
-          <StatStrip
+          {isLoading ? <StatStripSkeleton cells={4} /> : <StatStrip
             label={t("invoices.title")}
             items={[
               { label: t("invoices.stat.outstanding"), value: formatCents(data?.stats.outstandingCents ?? 0) },
@@ -87,7 +91,7 @@ export default function InvoicesPage() {
               { label: t("invoices.stat.paidMonth"), value: formatCents(data?.stats.paidThisMonthCents ?? 0) },
               { label: t("invoices.stat.drafts"), value: String(data?.stats.drafts ?? 0) },
             ]}
-          />
+          />}
 
           {data && data.aging.totalCents > 0 && <Aging aging={data.aging} />}
 
@@ -116,7 +120,7 @@ export default function InvoicesPage() {
             )}
 
             {isLoading ? (
-              <div className="p-5 space-y-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}</div>
+              <ListSkeleton rows={6} />
             ) : items.length === 0 ? (
               <div className="text-center py-14 px-5">
                 <Receipt className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -125,7 +129,7 @@ export default function InvoicesPage() {
               </div>
             ) : phone ? (
               <ul className="lrows" aria-label={t("invoices.title")}>
-                {items.map((inv) => <li key={inv.id}><InvoiceListRow inv={inv} locale={locale} /></li>)}
+                {shown.map((inv) => <li key={inv.id}><InvoiceListRow inv={inv} locale={locale} /></li>)}
               </ul>
             ) : (
               <div className="tbl-wrap">
@@ -141,7 +145,7 @@ export default function InvoicesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((inv) => <InvoiceTableRow key={inv.id} inv={inv} locale={locale} />)}
+                    {shown.map((inv) => <InvoiceTableRow key={inv.id} inv={inv} locale={locale} />)}
                   </tbody>
                 </table>
               </div>
@@ -161,8 +165,9 @@ export default function InvoicesPage() {
 function InvoiceTableRow({ inv, locale }: { inv: InvoiceDto; locale: typeof enCA }) {
   const { t } = useLanguage();
   const [, navigate] = useLocation();
+  const press = usePrefetchOnPress();
   return (
-    <tr {...rowLink(() => navigate(`/dashboard/invoices/${inv.id}`))}>
+    <tr {...rowLink(() => navigate(`/dashboard/invoices/${inv.id}`))} {...press(`/dashboard/invoices/${inv.id}`)}>
       <td className="t-strong">{inv.number}</td>
       <td>{inv.clientName}{inv.projectName ? <span className="t-sub">{inv.projectName}</span> : null}</td>
       <td>{format(new Date(inv.issueDate), "PP", { locale })}</td>
@@ -212,8 +217,9 @@ export function InvoiceRow({ inv, locale, compact }: { inv: InvoiceDto; locale: 
     : isOpenInvoice(inv.status) ? `${inv.paidCents > 0 ? `${formatCents(inv.balanceCents)} ${t("invoices.due")} · ` : ""}${t("invoices.dueOn")} ${format(new Date(inv.dueDate), "PP", { locale })}`
     : scheduled ? `${t("invoices.sendableOn")} ${format(new Date(inv.scheduledFor!), "PP", { locale })}`
     : format(new Date(inv.issueDate), "PP", { locale });
+  const press = usePrefetchOnPress();
   return (
-    <Link href={`/dashboard/invoices/${inv.id}`} className="q-row">
+    <Link href={`/dashboard/invoices/${inv.id}`} className="q-row" {...press(`/dashboard/invoices/${inv.id}`)}>
       <span className={cn("q-ic", overdue && "bg-[var(--red-t)] text-[var(--red)]", inv.status === "paid" && "bg-[var(--green-t)] text-[var(--green-dark)]")}>
         {overdue ? <AlertTriangle className="h-4 w-4" /> : <Receipt className="h-4 w-4" />}
       </span>

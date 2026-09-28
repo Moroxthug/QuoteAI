@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Loader2, Plus, StickyNote, Trash2 } from "lucide-react";
+import { Plus, StickyNote, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { applyPatches, patch, rollback, showUndoToast, useOptimisticMutation, useUndoableRemove } from "@/lib/optimistic";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -26,18 +27,43 @@ const can = useCan();
   const key = ["job-notes", jobId];
   const { data, isLoading } = useQuery({ queryKey: key, queryFn: () => jobsApi.listNotes(jobId) });
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
-  const add = useMutation({
-    mutationFn: (body: string) => jobsApi.addNote(jobId, { body }),
-    onSuccess: ({ note }) => { setDraft(""); queryClient.setQueryData(key, (prev: typeof data) => (prev ? { notes: [note, ...prev.notes] } : prev)); },
-    onError,
+  // Phase 115: a note shows the moment it is added (a stand-in row until the
+  // server's arrives) with an Undo that deletes it; a deleted note goes at once
+  // and is only deleted on the server once its Undo has passed.
+  type Notes = { notes: JobNoteDto[] };
+  const without = (id: string) => patch<Notes>(key, (d) => ({ notes: d.notes.filter((n) => n.id !== id) }));
+  const add = useOptimisticMutation({
+    mutationFn: ({ body }: { body: string; tempId: string }) => jobsApi.addNote(jobId, { body }),
+    patch: ({ body, tempId }) => [patch<Notes>(key, (d) => ({ notes: [{ id: tempId, projectId: jobId, milestoneId: null, photoId: null, body, source: "manual", authorName: "", createdAt: new Date().toISOString() }, ...d.notes] }))],
+    onSuccess: ({ note }, { tempId }) => {
+      queryClient.setQueryData<Notes>(key, (prev) => (prev ? { notes: prev.notes.map((n) => (n.id === tempId ? note : n)) } : prev));
+      showUndoToast({
+        title: t("undo.noteAdded"),
+        undoLabel: t("common.undo"),
+        onUndo: () => {
+          void applyPatches(queryClient, [without(note.id)]).then((snap) =>
+            jobsApi.deleteNote(jobId, note.id).then(
+              () => void queryClient.invalidateQueries({ queryKey: key }),
+              (e: Error) => { rollback(queryClient, snap); onError(e); },
+            ),
+          );
+        },
+      });
+    },
+    onError: (e) => onError(e),
   });
-  const remove = useMutation({
-    mutationFn: (noteId: string) => jobsApi.deleteNote(jobId, noteId),
-    onSuccess: (_r, noteId) => queryClient.setQueryData(key, (prev: typeof data) => (prev ? { notes: prev.notes.filter((n) => n.id !== noteId) } : prev)),
-    onError,
+  const remove = useUndoableRemove({
+    commit: (noteId: string) => jobsApi.deleteNote(jobId, noteId),
+    patch: (noteId) => [without(noteId)],
+    title: () => t("undo.noteDeleted"),
   });
 
-  const submit = () => { const b = draft.trim(); if (b && !add.isPending) add.mutate(b); };
+  const submit = () => {
+    const b = draft.trim();
+    if (!b) return;
+    setDraft("");
+    add.mutate({ body: b, tempId: `tmp-${Date.now()}` });
+  };
   const notes: JobNoteDto[] = data?.notes ?? [];
 
   return (
@@ -48,7 +74,7 @@ const can = useCan();
       </div>
       <div className="act-body">
         {isLoading ? (
-          <Skeleton className="h-12 w-full" />
+          <div className="note-list skel-wait" aria-busy="true"><Skeleton className="h-[62px] w-full rounded-[12px]" aria-hidden="true" /><Skeleton className="h-[62px] w-full rounded-[12px]" aria-hidden="true" /></div>
         ) : notes.length === 0 ? (
           <p className="text-sm text-slate-500">{t("notes.empty")}</p>
         ) : (
@@ -64,7 +90,7 @@ const can = useCan();
                     <span>{formatDistanceToNow(new Date(n.createdAt), { addSuffix: true, locale })}</span>
                   </div>
                 </div>
-                {can("jobs", "edit") && <button type="button" className="ic-btn danger" onClick={() => remove.mutate(n.id)} disabled={remove.isPending} aria-label={t("notes.delete")}><Trash2 /></button>}
+                {can("jobs", "edit") && <button type="button" className="ic-btn danger" onClick={() => remove(n.id)} disabled={n.id.startsWith("tmp-")} aria-label={t("notes.delete")}><Trash2 /></button>}
               </div>
             ))}
           </div>
@@ -79,8 +105,8 @@ const can = useCan();
             rows={1}
             data-testid="note-input"
           />
-          <button type="button" className="btn btn-sm btn-navy" onClick={submit} disabled={!draft.trim() || add.isPending}>
-            {add.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} {t("notes.add")}
+          <button type="button" className="btn btn-sm btn-navy" onClick={submit} disabled={!draft.trim()}>
+            <Plus className="h-4 w-4" /> {t("notes.add")}
           </button>
         </div>}
       </div>

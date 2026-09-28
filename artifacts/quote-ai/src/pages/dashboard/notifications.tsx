@@ -1,9 +1,10 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Bell, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { useMarkNotificationsRead } from "@/components/notifications-bell";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { PushToggle } from "@/components/pwa/push-toggle";
 
@@ -34,22 +35,9 @@ function dotColor(type: string): "green" | "teal" | "yellow" | "grey" {
 
 export default function NotificationsPage() {
   const { t, lang } = useLanguage();
-  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchNotifications, staleTime: 30_000 });
-  const markRead = useMutation({
-    mutationFn: async (ids?: string[]) => {
-      await fetch("/api/notifications/read", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(ids ? { ids } : {}),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    },
-  });
+  // Phase 115: read shows at once here and on the bell (both feeds are patched).
+  const markRead = useMarkNotificationsRead();
 
   const items = data?.items ?? [];
   const unread = data?.unread ?? 0;
@@ -75,9 +63,7 @@ export default function NotificationsPage() {
 
       <div className="card">
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={6} chip={false} />
         ) : items.length === 0 ? (
           <div className="text-center py-14 px-5">
             <Bell className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />

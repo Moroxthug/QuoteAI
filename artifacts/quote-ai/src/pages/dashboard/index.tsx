@@ -43,6 +43,7 @@ import { InstallPrompt } from "@/components/pwa/install-prompt";
 import { CashFlowCard } from "@/components/dashboard/cash-flow-card";
 import { CrewLine, NeedsYouCard, NextUpCard, TodayStats } from "@/components/dashboard/today";
 import { ListRow } from "@/components/mobile/list-row";
+import { CardSkeleton, StatStripSkeleton } from "@/components/skeletons";
 import { MARKETING_PLANS } from "@/data/pricing";
 import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 import { ForemanHome } from "@/components/crew/foreman-home";
@@ -654,10 +655,17 @@ function OwnerHome() {
 
   if (isLoadingStats) {
     return (
-      <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <Skeleton className="h-16 w-full rounded-[var(--radius)]" />
-        <Skeleton className="h-14 w-full rounded-[var(--radius)]" />
-        <Skeleton className="h-64 w-full rounded-[var(--radius)]" />
+      // Phase 115: the greeting, what needs you, the numbers and recent quotes, as they will sit.
+      <div className="today skel-wait" aria-busy="true">
+        <div className="page-head" aria-hidden="true">
+          <div style={{ width: "100%" }}>
+            <Skeleton className="skel-line skel-h1" style={{ width: 220, marginTop: 0 }} />
+            <Skeleton className="skel-line skel-sub" style={{ width: 280, marginTop: 10 }} />
+          </div>
+        </div>
+        <CardSkeleton rows={3} list={{ lead: "icon", chip: false }} immediate />
+        <StatStripSkeleton cells={4} immediate className="today-gap" />
+        <CardSkeleton rows={5} immediate />
       </div>
     );
   }

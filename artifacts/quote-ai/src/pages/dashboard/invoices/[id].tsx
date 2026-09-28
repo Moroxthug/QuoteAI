@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { ArrowLeft, Receipt, Send, Download, Banknote, Ban, FileMinus, BellRing, Pencil, Check, X, Loader2, Copy, ExternalLink, Trash2, Briefcase, Clock, AlertTriangle, MailQuestion, Archive } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DetailSkeleton } from "@/components/skeletons";
+import { showUndoToast } from "@/lib/optimistic";
 import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { StatStrip } from "@/components/mobile/stat-strip";
@@ -43,11 +44,20 @@ export default function InvoiceDetailPage() {
 
   const remind = useMutation({ mutationFn: () => invoicesApi.remind(id!), onSuccess: () => { refresh(); toast({ title: t("invoices.reminderSent") }); }, onError });
   const remove = useMutation({ mutationFn: () => invoicesApi.remove(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("invoices.draftDeleted") }); navigate("/dashboard/invoices"); }, onError });
-  const archive = useMutation({ mutationFn: () => invoicesApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["invoices"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/invoices"); }, onError });
+  const archive = useMutation({
+    mutationFn: () => invoicesApi.archive(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      // Phase 115: a quiet Undo on the list this lands on (restores the invoice).
+      showUndoToast({ title: t("archive.archivedToast"), undoLabel: t("common.undo"), onUndo: () => { invoicesApi.restore(id!).then(() => { void queryClient.invalidateQueries({ queryKey: ["invoices"] }); void queryClient.invalidateQueries({ queryKey: ["archive"] }); }, onError); } });
+      navigate("/dashboard/invoices");
+    },
+    onError,
+  });
   const number = data?.invoice.number;
   useMobileHeader(useMemo(() => (number ? { title: number } : null), [number]));
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-96 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (isLoading) return <DetailSkeleton strip={4} rows={4} />;
   if (error || !data) return <div className="card card-empty">{t("invoices.notFound")} <Link href="/dashboard/invoices" className="text-link">{t("invoices.backToList")}</Link></div>;
 
   const inv = data.invoice;

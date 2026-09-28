@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { FileSignature, Sparkles, Loader2, ArrowRight, Lock } from "lucide-react";
+import { ListSkeleton } from "@/components/skeletons";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
@@ -52,7 +53,7 @@ export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }:
           </Link>
         </div>
       ) : isLoading ? (
-        <div className="act-list"><div className="h-10 rounded-xl animate-pulse" style={{ background: "var(--soft)" }} /></div>
+        <ListSkeleton rows={1} amount={false} />
       ) : contract && !closed ? (
         <Link href={`/dashboard/contracts/${contract.id}`} className="item-row" style={{ borderTop: "none" }}>
           <div className="grow">

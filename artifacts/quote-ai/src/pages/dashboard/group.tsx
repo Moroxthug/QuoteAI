@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, Building2, ChevronLeft, ChevronRight, CircleCheck, HardHat, Info, LayoutDashboard, Link2, Lock, Unlink } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton, StatStripSkeleton, TabsSkeleton } from "@/components/skeletons";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
@@ -66,7 +66,7 @@ export default function GroupPage() {
         </div>
       </div>
 
-      {isLoading && <div className="space-y-3"><Skeleton className="h-12 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>}
+      {isLoading && <div aria-busy="true"><TabsSkeleton /><CardSkeleton rows={6} /></div>}
       {error && <div className="notice info"><Info /><span className="grow">{(error as Error).message}</span></div>}
 
       {data?.coveredBy && <div className="notice teal mb-4"><CircleCheck /><span className="grow">{t("group.coveredBy").replace("{company}", data.coveredBy.companyName ?? "—")}</span></div>}
@@ -169,9 +169,10 @@ function OverviewTab({ available }: { available: boolean }) {
   const locale = lang === "fr" ? frCA : enCA;
   const [months, setMonths] = useState(6);
   const { data, isLoading, error } = useQuery({ queryKey: ["group-overview", months], queryFn: () => groupApi.overview(months), retry: false, enabled: available });
+  const loadingView = <div aria-busy="true"><StatStripSkeleton cells={4} /><CardSkeleton rows={6} /></div>;
   const phone = useMediaQuery("(max-width: 639.98px)");
   if (!available) return <Locked />;
-  if (isLoading) return <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />;
+  if (isLoading) return loadingView;
   if (error || !data) return <div className="card card-empty">{(error as Error)?.message}</div>;
   const c = data.consolidated;
   const name = (orgId: string) => data.companies.find((x) => x.orgId === orgId)?.companyName ?? data.excluded.find((x) => x.orgId === orgId)?.companyName ?? "—";
@@ -453,7 +454,7 @@ function CrewTab({ available }: { available: boolean }) {
   const link = useAct((ids: string[]) => groupApi.link(ids));
   const unlink = useAct((id: string) => groupApi.unlink(id));
   if (!available) return <Locked />;
-  if (isLoading) return <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />;
+  if (isLoading) return <CardSkeleton rows={6} list={{ lead: "avatar" }} />;
   if (error || !data) return <div className="card card-empty">{(error as Error)?.message}</div>;
 
   const pickedWorkers = data.workers.filter((w) => picked.includes(w.id));

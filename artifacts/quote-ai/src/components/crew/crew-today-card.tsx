@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { ArrowRight, Check, HardHat, Loader2, Lock, MapPin, OctagonAlert, Users } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/skeletons";
 import { SwipeRow } from "@/components/mobile/swipe-row";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -39,7 +39,7 @@ function personStatus(c: Person, now: number, t: (k: string) => string, hm: (iso
 export function CrewLocked() {
   const { t } = useLanguage();
   const { data, isLoading } = useCrewToday();
-  if (isLoading) return <Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" />;
+  if (isLoading) return <CardSkeleton rows={3} list={{ lead: "avatar", amount: false }} />;
   if (!data || data.enabled) return null;
   return (
     <section className="card" data-testid="crew-today">

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, BellRing, CalendarClock, Check, Download, ExternalLink, Info, Landmark, Loader2, Lock, Pencil, Plus, Receipt, Settings2, Trash2, Undo2, Users } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton, ListSkeleton, TabsSkeleton } from "@/components/skeletons";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -74,7 +74,7 @@ export default function CompliancePage() {
         <span className="grow" style={{ fontWeight: 500 }}>{t("compliance.disclaimer")}</span>
       </div>
 
-      {isLoading && <div className="space-y-3"><Skeleton className="h-16 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>}
+      {isLoading && <div aria-busy="true"><TabsSkeleton /><CardSkeleton rows={6} /></div>}
 
       {data && !data.enabled && (
         <section className="card">
@@ -425,7 +425,7 @@ function SalesTaxTab({ deadlines, period, setPeriod, locale }: { deadlines: Dead
         </div>
       </section>
 
-      {isLoading && <Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" />}
+      {isLoading && <CardSkeleton rows={4} />}
       {error && <div className="card card-empty">{(error as Error).message}</div>}
 
       {s && data && (
@@ -569,7 +569,7 @@ function T5018Tab({ settings }: { settings: ComplianceSettings }) {
             <a href={complianceApi.t5018CsvUrl(year)} className="btn btn-sm btn-outline-navy"><Download className="h-4 w-4" /> {t("compliance.csv")}</a>
           </div>
         </div>
-        {isLoading ? <div className="p-5"><Skeleton className="h-24 w-full" /></div> : !data || data.recipients.length === 0 ? (
+        {isLoading ? <ListSkeleton rows={3} /> : !data || data.recipients.length === 0 ? (
           <div className="card-empty">{t("compliance.t5018Empty")}</div>
         ) : (
           <ResponsiveTable

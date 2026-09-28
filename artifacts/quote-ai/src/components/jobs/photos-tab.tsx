@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, Loader2, Trash2, Share2, Check, ImageOff, CloudUpload } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -93,7 +94,10 @@ const can = useCan();
         </div>}
 
         {isLoading ? (
-          <div className="card-empty">…</div>
+          // Phase 115: square tiles where the photos will land (the grid's own aspect ratio).
+          <div className="photo-grid grid grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 skel-wait" aria-busy="true">
+            {Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="w-full aspect-square rounded-[14px]" aria-hidden="true" />)}
+          </div>
         ) : photos.length === 0 && pendingPhotos.length === 0 ? (
           <div className="card-empty">
             <ImageOff />

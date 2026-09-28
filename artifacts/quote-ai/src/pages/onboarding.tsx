@@ -1,5 +1,5 @@
-// Phase 91: the last steps use team, seat and access-code strings from the dashboard dictionary.
-import "@/i18n/dashboard";
+// Phase 91: the last steps use team, seat and access-code strings from the dashboard dictionary
+// (loaded with this page since Phase 115 — see withDashboardStrings in App.tsx).
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { useUpdateBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";

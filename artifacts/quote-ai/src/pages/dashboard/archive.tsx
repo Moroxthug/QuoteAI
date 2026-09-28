@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Archive as ArchiveIcon } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { patch, useOptimisticMutation } from "@/lib/optimistic";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import type { PermissionArea } from "@workspace/permissions";
@@ -44,11 +45,13 @@ export default function ArchivePage() {
   const { t, lang } = useLanguage();
   const can = useCan();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchArchive, staleTime: 15_000 });
   const locale = lang === "fr" ? frCA : enCA;
 
-  const restore = useMutation({
+  // Phase 115: a restored record leaves the archive at once (back if the server says no).
+  const restore = useOptimisticMutation({
+    patch: (item) => [patch<{ items: ArchiveItem[] }>(QUERY_KEY, (d) => ({ items: d.items.filter((x) => !(x.id === item.id && x.type === item.type)) }))],
+    invalidate: (item) => [item.type === "quote" ? ["/api/quotes"] : item.type === "invoice" ? ["invoices"] : item.type === "job" ? ["jobs"] : ["contracts"]],
     mutationFn: async (item: ArchiveItem) => {
       const path = RESTORE_PATH[item.type];
       if (!path) throw new Error("Not restorable");
@@ -58,10 +61,7 @@ export default function ArchivePage() {
         throw Object.assign(new Error("Failed to restore"), { code: body.error });
       }
     },
-    onSuccess: () => {
-      toast({ title: t("archive.restoredToast") });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-    },
+    onSuccess: () => { toast({ title: t("archive.restoredToast") }); },
     onError: (e) => toast({ ...(jobLimitToast(e, t) ?? { title: t("archive.restoreErrorToast") }), variant: "destructive" }),
   });
 
@@ -83,9 +83,7 @@ export default function ArchivePage() {
 
       <div className="card">
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={6} amount={false} />
         ) : items.length === 0 ? (
           <div className="text-center py-14 px-5">
             <ArchiveIcon className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -104,7 +102,7 @@ export default function ArchivePage() {
                 { key: "when", header: t("archive.colArchived"), mobile: "meta", cell: (item) => format(new Date(item.archivedAt), phone ? "PP" : "yyyy-MM-dd", { locale }) },
                 { key: "by", header: t("archive.colBy"), mobile: "meta", cell: (item) => item.archivedByName || (phone ? null : "—") },
                 { key: "act", header: "", mobile: "end", cell: (item) => RESTORE_PATH[item.type] && canRestore(item.type) && (
-                  <button type="button" className="cta-link" onClick={() => restore.mutate(item)} disabled={restore.isPending}>
+                  <button type="button" className="cta-link" onClick={() => restore.mutate(item)}>
                     {t("archive.restore")}{phone && <span className="sr-only"> {item.label}</span>}
                   </button>
                 ) },

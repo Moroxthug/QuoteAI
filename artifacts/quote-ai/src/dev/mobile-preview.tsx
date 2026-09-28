@@ -12,6 +12,8 @@ import { useMobileHeader } from "@/components/mobile/mobile-page-header";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { StatStrip } from "@/components/mobile/stat-strip";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { DetailSkeleton, ListSkeleton, StatStripSkeleton } from "@/components/skeletons";
+import { useSearch } from "wouter";
 
 type Q = { id: string; client: string; title: string; date: string; status: "sent" | "accepted" | "draft" | "expired"; amount: number };
 
@@ -31,6 +33,7 @@ export default function MobilePreview() {
   const [tab, setTab] = useState("all");
   const [filterOpen, setFilterOpen] = useState(false);
   const [status, setStatus] = useState<string>("any");
+  const skel = new URLSearchParams(useSearch()).get("skel") === "1";
 
   const actions = useMemo<SheetAction[]>(() => [
     { label: "Edit", icon: Pencil, onSelect: () => {} },
@@ -101,6 +104,15 @@ export default function MobilePreview() {
           <li><ListRow title="A static row with a very long title that has to truncate at phone width without wrapping" meta={["No link", "No amount"]} end={<span className="chip chip-grey">Draft</span>} /></li>
         </ul>
       </div>
+
+      {/* Phase 115: ?skel=1 puts the loading skeletons under the real rows they stand in for (off by default, so the phone sheets keep their height). */}
+      {skel && (
+        <>
+          <div className="card"><ListSkeleton rows={3} lead="icon" /></div>
+          <StatStripSkeleton cells={4} />
+          <DetailSkeleton strip={4} tabs rows={3} />
+        </>
+      )}
 
       <div className="card" style={{ padding: 16 }}>
         <p className="sub">Enough content to scroll past a phone screen, so the sticky bar and the tab bar are seen over the page, and the end of the page is seen above them.</p>

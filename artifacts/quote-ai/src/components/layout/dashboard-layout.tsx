@@ -1,4 +1,3 @@
-import "@/i18n/dashboard";
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, FileText, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +20,8 @@ import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
 import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
 import { PhoneNewButton, PhoneTabBar } from "@/components/layout/phone-nav";
+import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
+import { prefetchRoute } from "@/lib/route-chunks";
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -254,13 +255,25 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem("sidebar-collapsed", String(isCollapsed)); } catch {}
   }, [isCollapsed]);
 
-  if (!isLoaded) {
-    return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-background">
-        <div className="w-7 h-7 rounded-full border-[3px] border-navy-400 border-t-transparent animate-spin" />
-      </div>
-    );
-  }
+  // Phase 115: once the first screen is up, fetch the code of the main
+  // sections while the phone is idle, so the first tap on a tab renders at
+  // once instead of waiting for its chunk. Not on a data-saver or 2G link.
+  const idleHrefs = allNavItems.slice(0, 8).map((item) => item.href).join(" ");
+  useEffect(() => {
+    if (!isSignedIn) return;
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? "")) return;
+    const run = () => ["/dashboard/new", ...idleHrefs.split(" ")].forEach(prefetchRoute);
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const timer = window.setTimeout(() => {
+      if (w.requestIdleCallback) w.requestIdleCallback(run, { timeout: 4000 });
+      else run();
+    }, 1500);
+    return () => window.clearTimeout(timer);
+  }, [isSignedIn, idleHrefs]);
+
+  // Phase 115: the frame, not a spinner, while the session is checked.
+  if (!isLoaded) return <AppShellSkeleton />;
 
   // A failed session check (API down, cold 502) is not a sign-out: bouncing the
   // user to /sign-in loses their place and their unsaved work (Phase 66).
@@ -311,6 +324,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               href={item.href}
               className={cn("sb-link", active && "active")}
               title={item.label}
+              // Phase 115: the page's code starts loading on hover / press, before the click lands.
+              onPointerEnter={() => prefetchRoute(item.href)}
+              onPointerDown={() => prefetchRoute(item.href)}
+              onFocus={() => prefetchRoute(item.href)}
               // The `active` class is a colour; this is the part a screen
               // reader can hear.
               aria-current={active ? "page" : undefined}

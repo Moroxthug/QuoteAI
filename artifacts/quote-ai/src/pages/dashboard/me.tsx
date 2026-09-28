@@ -5,6 +5,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { ArrowRight, Camera, CircleCheck, Clock, History, Info, Loader2, Mail, Phone, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton } from "@/components/skeletons";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -33,7 +34,7 @@ export default function MePage() {
   const activity = useQuery({ queryKey: ["me-activity"], queryFn: peopleApi.myActivity });
   const welcome = new URLSearchParams(useSearch()).get("welcome") === "1";
 
-  if (me.isLoading) return <PageSkeleton />;
+  if (me.isLoading) return <MeSkeleton />;
   if (!me.data) return <div className="notice info"><Info /><span className="grow">{(me.error as Error)?.message}</span></div>;
   const { person, companies, current } = me.data;
   const company = companies.find((c) => c.orgId === current.orgId);
@@ -61,7 +62,7 @@ export function TeammatePage() {
   const [months, setMonths] = useState(6);
   const q = useQuery({ queryKey: ["teammate", userId, months], queryFn: () => peopleApi.teammate(userId!, months), enabled: !!userId, retry: false });
   useDocumentTitle(q.data?.person.name ?? t("me.teammate"));
-  if (q.isLoading) return <PageSkeleton />;
+  if (q.isLoading) return <MeSkeleton />;
   if (!q.data) return <div className="notice info"><Info /><span className="grow">{(q.error as Error & { status?: number })?.status === 404 ? t("me.notInCompany") : (q.error as Error)?.message}</span></div>;
   const { person, role, stats, seesMoney, activity } = q.data;
   return (
@@ -80,8 +81,15 @@ export function TeammatePage() {
   );
 }
 
-function PageSkeleton() {
-  return <div className="space-y-3"><Skeleton className="h-32 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
+/** Phase 115: the title, the identity card (photo, name, role) and the next card, as they will sit. */
+function MeSkeleton() {
+  return (
+    <div className="stack skel-wait" style={{ gap: 16 }} aria-busy="true">
+      <div className="page-head" aria-hidden="true"><div style={{ width: "100%" }}><Skeleton className="skel-line skel-h1" style={{ width: 180, marginTop: 0 }} /><Skeleton className="skel-line skel-sub" style={{ width: 240, marginTop: 10 }} /></div></div>
+      <div className="card" aria-hidden="true"><div className="skel-row" style={{ minHeight: 104 }}><Skeleton className="skel-lead avatar" style={{ width: 64, height: 64 }} /><div className="skel-main"><Skeleton className="skel-line skel-title" style={{ width: "40%" }} /><Skeleton className="skel-line skel-sub" style={{ width: "28%" }} /></div></div></div>
+      <CardSkeleton rows={4} immediate />
+    </div>
+  );
 }
 
 // ── Who ──────────────────────────────────────────────────────────────────────

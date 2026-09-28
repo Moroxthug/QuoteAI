@@ -26,7 +26,17 @@ const manifest: Record<string, ManifestChunk> = existsSync(manifestPath) ? JSON.
 const SHELL_ENTRIES = [
   "index.html",
   // The App is a dynamic import from main.tsx: Vite keys it by its output name.
-  ...Object.keys(manifest).filter((k) => /^_App-[w-]+.js$/.test(k)),
+  // (Phase 115: the pattern had lost its backslashes and matched nothing; the
+  // App still got in as a static import of the pages below.)
+  ...Object.keys(manifest).filter((k) => /^_App-[\w-]+\.js$/.test(k)),
+  // Phase 115: lazy imports are not in a chunk's `imports`, so the dashboard
+  // layout and the string packs (one chunk per language) are listed here —
+  // both languages, so switching works with no signal.
+  "src/components/layout/dashboard-layout.tsx",
+  "virtual:i18n/core/en",
+  "virtual:i18n/core/fr",
+  "virtual:i18n/dashboard/en",
+  "virtual:i18n/dashboard/fr",
   "src/pages/t/[token].tsx",
   "src/pages/dashboard/index.tsx",
   "src/pages/dashboard/jobs/index.tsx",

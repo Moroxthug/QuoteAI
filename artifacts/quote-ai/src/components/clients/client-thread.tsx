@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, MessageSquare, Send } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -46,7 +47,10 @@ const can = useCan();
       </div>
       <div className="act-body space-y-4">
         {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--faint)" }} />
+          <div className="space-y-3 skel-wait" aria-busy="true">
+            <Skeleton className="h-14 w-3/4 rounded-[14px]" aria-hidden="true" />
+            <Skeleton className="h-14 w-2/3 rounded-[14px] ml-auto" aria-hidden="true" />
+          </div>
         ) : messages.length === 0 ? (
           <p className="foot-note m-0">{t("thread.empty")}</p>
         ) : (

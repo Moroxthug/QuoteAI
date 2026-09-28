@@ -1,8 +1,9 @@
 import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
-import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, useArchiveQuote, useDeleteQuote, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey } from "@workspace/api-client-react";
+import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, useArchiveQuote, useDeleteQuote, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey, restoreQuote } from "@workspace/api-client-react";
+import { showUndoToast } from "@/lib/optimistic";
+import { DetailSkeleton } from "@/components/skeletons";
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Download, Lock, CheckCircle2, Edit2, Save, FileText, FileSpreadsheet, ImageIcon, ChevronDown, ChevronRight, Plus, Trash2, X, Pencil, Sparkles, AlertTriangle, RefreshCw, Loader2, Copy, Star, FileDown, LayoutTemplate, Mail, Hammer, Archive, Briefcase, Send } from "lucide-react";
 import { useState, useRef, useEffect, useMemo, Fragment } from "react";
 import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
@@ -601,7 +602,17 @@ const can = useCan();
     archiveQuote.mutate({ id }, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
-        toast({ title: t("dashboard.quotesList.archivedToast") });
+        // Phase 115: a quiet Undo on the list this lands on (restores the quote).
+        showUndoToast({
+          title: t("dashboard.quotesList.archivedToast"),
+          undoLabel: t("common.undo"),
+          onUndo: () => {
+            restoreQuote(id).then(
+              () => { void queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() }); void queryClient.invalidateQueries({ queryKey: ["archive"] }); },
+              () => toast({ title: t("archive.restoreErrorToast"), variant: "destructive" }),
+            );
+          },
+        });
         navigate("/dashboard/quotes");
       },
       onError: () => toast({ title: t("dashboard.quotesList.archiveErrorToast"), variant: "destructive" }),
@@ -633,7 +644,7 @@ const can = useCan();
   };
 
   if (isLoadingQuote || isLoadingProfile) {
-    return <div className="p-8 space-y-4"><Skeleton className="h-12 w-64" /><Skeleton className="h-64 w-full" /></div>;
+    return <DetailSkeleton strip={0} rows={5} />;
   }
 
   if (!quote) return <div>{t("dashboard.quoteDetail.quoteNotFound")}</div>;
@@ -946,7 +957,7 @@ const can = useCan();
               {/* Company header */}
               <div className="paper-head hide-phone">
                 <div>
-                  {companyLogoUrl && <img src={companyLogoUrl} alt={t("a11y.companyLogo")} />}
+                  {companyLogoUrl && <img src={companyLogoUrl} alt={t("a11y.companyLogo")} decoding="async" />}
                   <h2>{companyName}</h2>
                   {companyVat && <small>{t("dashboard.quoteDetail.taxIdLabel")} {companyVat}</small>}
                   {companyAddress && <small>{companyAddress}</small>}

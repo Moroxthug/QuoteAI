@@ -1,11 +1,14 @@
-import { useListQuotes, useDeleteQuote, useDuplicateQuote, useArchiveQuote, getListQuotesQueryKey, type QuoteSummary } from "@workspace/api-client-react";
+import { useListQuotes, useDeleteQuote, useDuplicateQuote, archiveQuote, restoreQuote, getListQuotesQueryKey, type QuoteSummary } from "@workspace/api-client-react";
 import { rowLink } from "@/lib/row-link";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { useOptimisticMutation, patch } from "@/lib/optimistic";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ListRow } from "@/components/mobile/list-row";
 import { BottomSheet } from "@/components/mobile/bottom-sheet";
@@ -43,7 +46,6 @@ export default function QuotesList() {
   const { data: quotes, isLoading } = useListQuotes();
   const deleteQuote = useDeleteQuote();
   const duplicateQuote = useDuplicateQuote();
-  const archiveQuote = useArchiveQuote();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [filterOpen, setFilterOpen] = useState(false);
@@ -63,15 +65,22 @@ export default function QuotesList() {
     });
   };
 
-  const handleArchive = (id: string) => {
-    archiveQuote.mutate({ id }, {
-      onSuccess: () => {
-        toast({ title: t("dashboard.quotesList.archivedToast") });
-        queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
-      },
-      onError: () => toast({ title: t("dashboard.quotesList.archiveErrorToast"), variant: "destructive" }),
-    });
-  };
+  // Phase 115: archiving takes the row out at once; Undo restores it (POST /api/quotes/:id/restore).
+  const archive = useOptimisticMutation({
+    mutationFn: ({ quote, restore }: { quote: QuoteSummary; restore?: boolean }) => (restore ? restoreQuote(quote.id) : archiveQuote(quote.id)),
+    patch: ({ quote, restore }) => [
+      patch<QuoteSummary[]>(getListQuotesQueryKey(), (list) =>
+        restore
+          ? (list.some((q) => q.id === quote.id) ? list : [...list, quote].sort((a, b) => b.createdAt.localeCompare(a.createdAt)))
+          : list.filter((q) => q.id !== quote.id),
+      ),
+    ],
+    invalidate: () => [["archive"]],
+    onError: (_e, { restore }) => toast({ title: t(restore ? "archive.restoreErrorToast" : "dashboard.quotesList.archiveErrorToast"), variant: "destructive" }),
+    undo: ({ quote, restore }) => (restore ? null : { title: t("dashboard.quotesList.archivedToast"), inverse: { quote, restore: true } }),
+  });
+  const handleArchive = (quote: QuoteSummary) => archive.mutate({ quote });
+  const press = usePrefetchOnPress();
 
   const handleDuplicate = (id: string) => {
     setDuplicatingId(id);
@@ -95,6 +104,8 @@ export default function QuotesList() {
       q.descrizioneGenerale?.toLowerCase().includes(needle);
     return matchesSearch && matchesFilter(q, statusFilter);
   });
+  // Phase 115: a long list draws its first 50 rows now, the rest when idle.
+  const shownQuotes = useProgressiveList(filteredQuotes);
   const countFor = (f: StatusFilter) => (quotes ?? []).filter((q) => matchesFilter(q, f)).length;
   const shortDate = (iso: string) => new Date(iso).toLocaleDateString(moneyLocale(lang), { day: "numeric", month: "short", year: new Date(iso).getFullYear() === new Date().getFullYear() ? undefined : "numeric" });
   const heading = (q: QuoteSummary) => q.title?.trim() || q.descrizioneGenerale || t("dashboard.quotesList.noDescription");
@@ -174,9 +185,7 @@ export default function QuotesList() {
         )}
 
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={6} lead={phone ? false : "icon"} />
         ) : filteredQuotes.length === 0 ? (
           <div className="text-center py-14 px-5">
             <FileText className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -196,7 +205,7 @@ export default function QuotesList() {
           </div>
         ) : phone ? (
           <ul className="lrows" aria-label={t("dashboard.quotesList.title")}>
-            {filteredQuotes.map(quote => {
+            {shownQuotes.map(quote => {
               const chip = quoteStatusChip(quote, t);
               return (
                 <li key={quote.id}>
@@ -225,10 +234,10 @@ export default function QuotesList() {
                 </tr>
               </thead>
               <tbody>
-                {filteredQuotes.map(quote => {
+                {shownQuotes.map(quote => {
                   const chip = quoteStatusChip(quote, t);
                   return (
-                    <tr key={quote.id} {...rowLink(() => navigate(`/dashboard/quotes/${quote.id}`))}>
+                    <tr key={quote.id} {...rowLink(() => navigate(`/dashboard/quotes/${quote.id}`))} {...press(`/dashboard/quotes/${quote.id}`)}>
                       <td>
                         <span className="cell-flex">
                           <span className="cell-ic"><FileText className="h-4 w-4" /></span>
@@ -273,7 +282,7 @@ export default function QuotesList() {
                               )}
                               {can("quotes", "full") && (
                                 <DropdownMenuItem
-                                  onClick={() => handleArchive(quote.id)}
+                                  onClick={() => handleArchive(quote)}
                                   className="cursor-pointer text-sm"
                                 >
                                   <Archive className="mr-2 h-3.5 w-3.5" /> {t("dashboard.quotesList.archive")}

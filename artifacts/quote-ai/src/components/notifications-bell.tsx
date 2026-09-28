@@ -1,4 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { patch, useOptimisticMutation } from "@/lib/optimistic";
 import { Link, useLocation } from "wouter";
 import { Bell, CheckCheck } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -17,6 +18,40 @@ type NotificationItem = {
 };
 
 const QUERY_KEY = ["notifications"];
+type Feed = { items: NotificationItem[]; unread: number };
+
+/**
+ * Phase 115: marking read is shown at once in every cached feed (the bell's
+ * ["notifications"] and the page's ["notifications", "page"] share the shape).
+ * The count drops by the ones this feed held; the refetch after settles it.
+ */
+function markFeedRead(feed: Feed, ids?: string[]): Feed {
+  const now = new Date().toISOString();
+  let cleared = 0;
+  const items = feed.items.map((n) => {
+    if (n.readAt || (ids && !ids.includes(n.id))) return n;
+    cleared++;
+    return { ...n, readAt: now };
+  });
+  return { items, unread: ids ? Math.max(0, feed.unread - cleared) : 0 };
+}
+
+/** Marks some (or all) notifications read, optimistically. A failure quietly puts the dots back. */
+export function useMarkNotificationsRead() {
+  return useOptimisticMutation({
+    mutationFn: async (ids?: string[]) => {
+      const res = await fetch("/api/notifications/read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(ids ? { ids } : {}),
+      });
+      if (!res.ok) throw new Error("Failed to mark read");
+    },
+    patch: (ids) => [patch<Feed>(QUERY_KEY, (d) => markFeedRead(d, ids))],
+    onError: () => {},
+  });
+}
 
 async function fetchNotifications(): Promise<{ items: NotificationItem[]; unread: number }> {
   const res = await fetch("/api/notifications?limit=20", { credentials: "include" });
@@ -38,19 +73,8 @@ export function useUnreadNotifications(): number {
 export function NotificationsBell({ variant = "topbar", side = "bottom", align = "end" }: { variant?: "topbar" | "sidebar"; side?: "right" | "bottom"; align?: "start" | "end" }) {
   const { t, lang } = useLanguage();
   const [path] = useLocation();
-  const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: QUERY_KEY, queryFn: fetchNotifications, refetchInterval: 60_000, staleTime: 30_000 });
-  const markRead = useMutation({
-    mutationFn: async (ids?: string[]) => {
-      await fetch("/api/notifications/read", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(ids ? { ids } : {}),
-      });
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
-  });
+  const markRead = useMarkNotificationsRead();
 
   const unread = data?.unread ?? 0;
   const items = data?.items ?? [];

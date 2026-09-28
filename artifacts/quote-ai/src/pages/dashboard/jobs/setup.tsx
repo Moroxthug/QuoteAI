@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, differenceInCalendarDays, format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Sparkles, ArrowLeft, Loader2, Plus, Trash2, ChevronUp, ChevronDown, CheckCircle2, RefreshCw, FileSignature, Wand2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DetailSkeleton } from "@/components/skeletons";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -108,7 +108,7 @@ export default function JobSetupPage() {
   const move = (i: number, dir: -1 | 1) => setMilestones((ms) => { const j = i + dir; if (j < 0 || j >= ms.length) return ms; const copy = [...ms]; [copy[i], copy[j]] = [copy[j]!, copy[i]!]; return copy; });
   const addMs = () => setMilestones((ms) => { const last = ms.at(-1); const s = last?.plannedEnd ? dayStr(addDays(parseDay(last.plannedEnd), 1)) : ""; return [...ms, { title: "", description: "", plannedStart: s, plannedEnd: s, paymentTermId: null, valueCents: 0, taskCount: 0, status: "planned" }]; });
 
-  if (isLoading || (data && loadedFor === null)) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (isLoading || (data && loadedFor === null)) return <DetailSkeleton strip={0} rows={6} />;
   if (error || !data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { job } = data;

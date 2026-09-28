@@ -1,54 +1,12 @@
-import { createContext, useCallback, useContext, useMemo, useState, useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState, useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import { type Lang } from "./translations";
-import { lookup, subscribeTranslations, getTranslationsVersion } from "./registry";
+import { lookup, subscribeTranslations, getTranslationsVersion, ensureStrings, stringsReady, setActiveLang } from "./registry";
+import { detectInitialLang, isEnglishLocalePath, isFrenchPath, LANG_STORAGE_KEY } from "./detect";
 import { setMoneyLang } from "@/lib/money";
 
-const STORAGE_KEY = "quoteai-lang";
-
-/** True for any URL under the /fr locale prefix (/fr, /fr/, /fr/soumissions/...). */
-export function isFrenchPath(pathname: string): boolean {
-  return pathname === "/fr" || pathname.startsWith("/fr/");
-}
-
-/**
- * English-locale routes: pages that have a French twin under /fr, so the URL
- * decides the language rather than a stored preference. Phase 81 added the
- * pricing, pilot and province pages to the list — without it, a visitor whose
- * last visit was French would hydrate the English /pricing in French and
- * React would tear the prerendered markup.
- */
-function isEnglishLocalePath(pathname: string): boolean {
-  return (
-    pathname === "/" ||
-    pathname.startsWith("/quotes/") ||
-    pathname.startsWith("/provinces/") ||
-    pathname === "/pricing" || pathname === "/pricing/" ||
-    pathname === "/pilot" || pathname === "/pilot/" ||
-    pathname === "/privacy-policy" || pathname === "/privacy-policy/" ||
-    pathname === "/terms" || pathname === "/terms/"
-  );
-}
-
-function detectInitialLang(): Lang {
-  if (typeof window === "undefined") return "en";
-  // The URL is the source of truth for prerendered/SEO routes — a /fr/ URL
-  // must always render French, regardless of a stale localStorage value,
-  // so static hreflang/lang metadata and the hydrated React tree agree.
-  // The same holds for "/" and /quotes/*: the sync effect below would flip
-  // them to English on mount anyway, and the homepage is server-rendered in
-  // English (Phase 68), so starting from a stored "fr" would only produce a
-  // hydration mismatch and a French flash.
-  if (isFrenchPath(window.location.pathname)) return "fr";
-  if (isEnglishLocalePath(window.location.pathname)) return "en";
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "fr") return stored;
-  } catch {
-    // localStorage unavailable (private browsing, etc.) — fall through
-  }
-  return navigator.language?.toLowerCase().startsWith("fr") ? "fr" : "en";
-}
+// Phase 115: detection moved to ./detect.ts so main.tsx can run it before React loads.
+export { isFrenchPath } from "./detect";
 
 interface LanguageContextValue {
   lang: Lang;
@@ -65,6 +23,24 @@ export function LanguageProvider({ children, initialLang }: { children: ReactNod
   // Phase 94: money helpers (lib/money.ts) format in this language. Set during
   // render, not in an effect, so children rendered in this pass already see it.
   setMoneyLang(lang);
+  // Phase 115: and the lazy dashboard roots load their strings in it.
+  setActiveLang(lang);
+
+  // Phase 115: each language is its own chunk. Switch once the target's
+  // strings are loaded (immediately when they already are), so nothing renders
+  // raw keys; the last request wins if two overlap.
+  const requested = useRef(lang);
+  const switchTo = useCallback((next: Lang) => {
+    requested.current = next;
+    if (stringsReady(next)) {
+      setLangState(next);
+      return;
+    }
+    ensureStrings(next).then(
+      () => { if (requested.current === next) setLangState(next); },
+      () => { /* offline: stay in the current language */ },
+    );
+  }, []);
 
   // The URL is authoritative for locale-routed pages (/, /quotes/*,
   // /fr, /fr/soumissions/*): keep `lang` in sync as the user navigates
@@ -76,9 +52,9 @@ export function LanguageProvider({ children, initialLang }: { children: ReactNod
   useEffect(() => {
     const isEnglishLocaleRoute = isEnglishLocalePath(wouterPath);
     if (isFrenchPath(wouterPath) && lang !== "fr") {
-      setLangState("fr");
+      switchTo("fr");
     } else if (isEnglishLocaleRoute && lang !== "en") {
-      setLangState("en");
+      switchTo("en");
     }
     // Any other path (dashboard, auth, blog, ...) doesn't have a distinct
     // French URL yet, so it doesn't force a language — the toggle there
@@ -95,16 +71,13 @@ export function LanguageProvider({ children, initialLang }: { children: ReactNod
   }, [lang]);
 
   const setLang = useCallback((next: Lang) => {
-    setLangState(next);
+    switchTo(next);
     try {
-      window.localStorage.setItem(STORAGE_KEY, next);
+      window.localStorage.setItem(LANG_STORAGE_KEY, next);
     } catch {
       // ignore write failures
     }
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = next;
-    }
-  }, []);
+  }, [switchTo]);
 
   const toggleLang = useCallback(() => {
     setLang(lang === "en" ? "fr" : "en");

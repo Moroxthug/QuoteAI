@@ -1,8 +1,7 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA } from "date-fns/locale";
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatStrip } from "@/components/mobile/stat-strip";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -11,7 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { analyticsApi, type JobAnalyticsDto } from "@/lib/analytics-api";
 import { formatCents } from "@/lib/jobs-api";
 import { formatCadWhole } from "@/lib/money";
-import { AXIS_TICK, ChartCard, Empty, LegendRow, SERIES, TOOLTIP_STYLE, money, moneyShort } from "@/components/charts";
+import { ChartCard, Empty, LegendRow, SERIES } from "@/components/charts";
 
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 const whole = (c: number) => formatCadWhole(c / 100);
@@ -161,27 +160,14 @@ function CurveChart({ data, locale }: { data: JobAnalyticsDto; locale: typeof en
   );
 }
 
-function CurveBody({ data, locale, compact }: { data: JobAnalyticsDto; locale: typeof enCA; compact?: boolean }) {
-  const { t } = useLanguage();
-  const rows = data.curve.map((p) => ({ ...p, label: format(day(p.week)!, "d MMM", { locale }) }));
-  const hasBudget = data.budgetCents > 0;
-  if (rows.length < 2) return <Empty text={t("analytics.noData")} />;
+// Phase 115: the chart itself (and recharts) arrives when it is drawn; the
+// skeleton holds its height so the page does not jump.
+const LazyCurveBody = lazy(() => import("./overview-curve"));
+function CurveBody(props: { data: JobAnalyticsDto; locale: typeof enCA; compact?: boolean }) {
   return (
-    <>
-      <ResponsiveContainer width="100%" height={compact ? 200 : 220}>
-        <LineChart data={rows} margin={{ top: 8, right: compact ? 4 : 12, left: 0, bottom: 0 }}>
-          <CartesianGrid vertical={false} stroke="#f1f5f9" />
-          <XAxis dataKey="label" tick={AXIS_TICK} axisLine={false} tickLine={false} minTickGap={compact ? 32 : 24} />
-          <YAxis tickFormatter={moneyShort} tick={AXIS_TICK} axisLine={false} tickLine={false} width={compact ? 44 : 64} tickCount={compact ? 4 : 5} />
-          <Tooltip formatter={(v: number, n: string) => [money(v), n]} contentStyle={TOOLTIP_STYLE} />
-          {hasBudget && <Line type="monotone" dataKey="plannedCents" name={t("analytics.job.plannedSpend")} stroke={SERIES.planned} strokeWidth={2} strokeDasharray="4 4" dot={false} isAnimationActive={false} />}
-          <Line type="monotone" dataKey="actualCents" name={t("analytics.job.actualCosts")} stroke={SERIES.actual} strokeWidth={2} dot={false} isAnimationActive={false} />
-          <Line type="monotone" dataKey="invoicedCents" name={t("analytics.invoiced")} stroke={SERIES.invoiced} strokeWidth={2} dot={false} isAnimationActive={false} />
-          <Line type="monotone" dataKey="collectedCents" name={t("analytics.collected")} stroke={SERIES.collected} strokeWidth={2} dot={false} isAnimationActive={false} />
-        </LineChart>
-      </ResponsiveContainer>
-      <div className="legend-under"><LegendRow items={[{ color: SERIES.actual, label: t("analytics.job.actualCosts") }, ...(hasBudget ? [{ color: SERIES.planned, label: t("analytics.job.plannedSpend"), dashed: true }] : []), { color: SERIES.invoiced, label: t("analytics.invoiced") }, { color: SERIES.collected, label: t("analytics.collected") }]} /></div>
-    </>
+    <Suspense fallback={<Skeleton className="w-full rounded-lg" style={{ height: props.compact ? 200 : 220 }} />}>
+      <LazyCurveBody {...props} />
+    </Suspense>
   );
 }
 

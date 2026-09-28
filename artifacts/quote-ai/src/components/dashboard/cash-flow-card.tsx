@@ -4,7 +4,7 @@
 // free/trial accounts see nothing (they already get the upgrade banners).
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Bar, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { lazy, Suspense } from "react";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, Lock, Wallet } from "lucide-react";
@@ -13,7 +13,10 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import { formatCents } from "@/lib/jobs-api";
 import { cashFlowApi } from "@/lib/analytics-api";
-import { AXIS_TICK, LegendRow, SERIES, TOOLTIP_STYLE, money, moneyShort } from "@/components/charts";
+import { LegendRow, SERIES } from "@/components/charts";
+
+// Phase 115: recharts loads with the chart, not with Today (see ./cash-flow-chart.tsx).
+const CashFlowChart = lazy(() => import("./cash-flow-chart"));
 
 export function CashFlowCard({ plan, isActive }: { plan: string | null | undefined; isActive: boolean | undefined }) {
   const { t, lang } = useLanguage();
@@ -81,21 +84,9 @@ export function CashFlowCard({ plan, isActive }: { plan: string | null | undefin
         ) : (
           <>
             <LegendRow items={[{ color: SERIES.invoiced, label: t("analytics.invoicesDue") }, { color: "#7dd3fc", label: t("dashboard.cash.scheduledAndTerms") }, { color: SERIES.outflow, label: t("analytics.plannedCosts") }, { color: "#f59e0b", label: t("dashboard.cash.payroll") }, { color: SERIES.collected, label: t("analytics.cumulativeNet") }]} />
-            <ResponsiveContainer width="100%" height={200}>
-              <ComposedChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} stackOffset="sign">
-                <CartesianGrid vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="label" tick={AXIS_TICK} axisLine={false} tickLine={false} />
-                <YAxis tickFormatter={moneyShort} tick={AXIS_TICK} axisLine={false} tickLine={false} width={64} />
-                <ReferenceLine y={0} stroke="#cbd5e1" />
-                <Tooltip formatter={(v: number, n: string) => [money(Math.abs(v)), n]} contentStyle={TOOLTIP_STYLE} cursor={{ fill: "#f8fafc" }} />
-                <Bar dataKey="inflowCents" name={t("analytics.invoicesDue")} stackId="c" fill={SERIES.invoiced} maxBarSize={28} />
-                <Bar dataKey="scheduledCents" name={t("dashboard.cash.scheduled")} stackId="c" fill="#7dd3fc" maxBarSize={28} />
-                <Bar dataKey="expectedCents" name={t("analytics.expectedBillings")} stackId="c" fill="#bae6fd" radius={[4, 4, 0, 0]} maxBarSize={28} />
-                <Bar dataKey="outflowNeg" name={t("analytics.plannedCosts")} stackId="c" fill={SERIES.outflow} maxBarSize={28} />
-                <Bar dataKey="payrollNeg" name={t("dashboard.cash.payroll")} stackId="c" fill="#f59e0b" radius={[0, 0, 4, 4]} maxBarSize={28} />
-                <Line type="monotone" dataKey="cumulativeCents" name={t("analytics.cumulativeNet")} stroke={SERIES.collected} strokeWidth={2} dot={false} isAnimationActive={false} />
-              </ComposedChart>
-            </ResponsiveContainer>
+            <Suspense fallback={<Skeleton className="w-full rounded-lg" style={{ height: 200 }} />}>
+              <CashFlowChart rows={rows} />
+            </Suspense>
           </>
         )}
       </div>

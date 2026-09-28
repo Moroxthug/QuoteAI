@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
 import { Link, useLocation, useRoute, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -17,25 +17,30 @@ import { peopleApi } from "@/lib/people-api";
 import { cn } from "@/lib/utils";
 import { SaveBar, useDraftHost, useSinglePane } from "./ui";
 import { PROVINCE_TAX, useBusinessProfile } from "./data";
-import { ProfileSection } from "./profile";
-import { SecuritySection } from "./security";
-import { CompanySection } from "./company";
-import { TaxesSection } from "./taxes";
-import { InvoicingSection } from "./invoicing";
-import { FollowupsSection } from "./followups";
-import { WidgetSection } from "./widget";
-import { EmailSection } from "./email";
-import { SmsSection } from "./sms";
-import { WhatsappSection } from "./whatsapp";
-import { AppsSection } from "./apps";
 import { APPS_HREF, appById } from "./apps/catalog";
 import { PlanSection, planLabelOf } from "./plan";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ── Phase 102: Settings as a settings area ───────────────────────────────────
 // /dashboard/settings/<section>. On a wide screen: the grouped list on the
 // left, the open section on the right. Under 860 px: the list is the first
 // screen (/dashboard/settings) and a section opens as its own page with a
 // back arrow. Old ?tab= links (emails, OAuth returns, bookmarks) redirect.
+
+// Phase 115: each section is its own chunk — Settings used to download all
+// twelve (~38 kB gzipped) to show one. The plan section stays in (the list
+// shows the plan's name).
+const ProfileSection = lazy(() => import("./profile").then((m) => ({ default: m.ProfileSection })));
+const SecuritySection = lazy(() => import("./security").then((m) => ({ default: m.SecuritySection })));
+const CompanySection = lazy(() => import("./company").then((m) => ({ default: m.CompanySection })));
+const TaxesSection = lazy(() => import("./taxes").then((m) => ({ default: m.TaxesSection })));
+const InvoicingSection = lazy(() => import("./invoicing").then((m) => ({ default: m.InvoicingSection })));
+const FollowupsSection = lazy(() => import("./followups").then((m) => ({ default: m.FollowupsSection })));
+const WidgetSection = lazy(() => import("./widget").then((m) => ({ default: m.WidgetSection })));
+const EmailSection = lazy(() => import("./email").then((m) => ({ default: m.EmailSection })));
+const SmsSection = lazy(() => import("./sms").then((m) => ({ default: m.SmsSection })));
+const WhatsappSection = lazy(() => import("./whatsapp").then((m) => ({ default: m.WhatsappSection })));
+const AppsSection = lazy(() => import("./apps").then((m) => ({ default: m.AppsSection })));
 
 type SectionId = "profile" | "security" | "company" | "taxes" | "invoicing" | "followups" | "widget" | "email" | "sms" | "whatsapp" | "apps" | "plan";
 type GroupId = "you" | "business" | "selling" | "messaging" | "more";
@@ -264,7 +269,9 @@ export default function SettingsPage() {
         {showPane && active && (
           <div className="settings-pane">
             <DraftProvider value={ctx}>
-              <active.Component key={active.id} />
+              <Suspense fallback={<div className="card" style={{ padding: 22 }} aria-hidden="true"><Skeleton style={{ height: 18, width: "40%" }} /><Skeleton style={{ height: 44, marginTop: 18 }} /><Skeleton style={{ height: 44, marginTop: 12 }} /><Skeleton style={{ height: 44, marginTop: 12 }} /></div>}>
+                <active.Component key={active.id} />
+              </Suspense>
             </DraftProvider>
             <SaveBar reg={reg} />
           </div>

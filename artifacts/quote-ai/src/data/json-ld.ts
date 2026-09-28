@@ -4,7 +4,7 @@
 // the hydrated page renders, so crawler and browser always agree.
 import { TESTIMONIALS, AGGREGATE_RATING } from "@/components/testimonials-section";
 import { PUBLISHED_PLANS, ONE_SHOT_OPTIONS } from "@/data/pricing";
-import { translations } from "@/i18n/translations";
+import { lookup } from "@/i18n/registry";
 
 export const BASE_URL = "https://quoteai.ca";
 
@@ -125,7 +125,8 @@ export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
       "@type": "Review",
       author: { "@type": "Person", name: t.name },
       reviewRating: { "@type": "Rating", ratingValue: String(t.rating), bestRating: "5", worstRating: "1" },
-      reviewBody: translations[lang][`testimonials.${t.key}.text`] ?? translations.en[`testimonials.${t.key}.text`] ?? "",
+      // Phase 115: the page's language is loaded before it renders (registry.ts); lookup falls back to English.
+      reviewBody: lookup(lang, `testimonials.${t.key}.text`),
     })),
   };
   return [website, software];

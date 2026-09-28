@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { ListSkeleton } from "@/components/skeletons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UploadCloud, Loader2, Download, Check, X, Trash2, CheckCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -316,7 +317,7 @@ const can = useCan();
         </div>
         <div style={{ padding: 22 }}>
           {candidatesLoading ? (
-            <div className="text-sm text-slate-400 py-8 text-center">…</div>
+            <ListSkeleton rows={4} lead="check" />
           ) : candidates.length === 0 ? (
             <div className="text-center py-12" style={{ color: "var(--faint)" }}>{t("imports.emptyQueue")}</div>
           ) : (

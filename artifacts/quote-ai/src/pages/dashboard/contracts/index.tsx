@@ -5,7 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { FileSignature, ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -40,11 +42,14 @@ export default function ContractsListPage() {
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const phone = useMediaQuery("(max-width: 640px)");
+  const press = usePrefetchOnPress();
 
   const items = useMemo(() => {
     const q = search.trim().toLowerCase();
     return (data?.items ?? []).filter((c) => inFilter(c, filter) && (!q || c.contractNumber.toLowerCase().includes(q) || c.variables.customer.name.toLowerCase().includes(q) || c.variables.projectTitle.toLowerCase().includes(q)));
   }, [data, filter, search]);
+  // Phase 115: a long list draws its first 50 rows now, the rest when idle.
+  const shown = useProgressiveList(items);
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -78,9 +83,7 @@ export default function ContractsListPage() {
         )}
 
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={6} />
         ) : items.length === 0 ? (
           <div className="text-center py-14 px-5">
             <FileSignature className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -91,7 +94,7 @@ export default function ContractsListPage() {
         ) : phone ? (
           // Phase 107: the client, the contract and its job / the price / where it stands.
           <ul className="lrows" aria-label={t("contracts.title")}>
-            {items.map((c) => {
+            {shown.map((c) => {
               const chip = statusChip(c.status, t);
               return (
                 <li key={c.id}>
@@ -120,10 +123,10 @@ export default function ContractsListPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((c) => {
+                {shown.map((c) => {
                   const chip = statusChip(c.status, t);
                   return (
-                    <tr key={c.id} {...rowLink(() => navigate(`/dashboard/contracts/${c.id}`))}>
+                    <tr key={c.id} {...rowLink(() => navigate(`/dashboard/contracts/${c.id}`))} {...press(`/dashboard/contracts/${c.id}`)}>
                       <td>
                         <span className="t-strong">{c.contractNumber}</span>
                         <span className="t-sub">{c.variables.projectTitle}</span>

@@ -2,7 +2,7 @@ import { defineConfig, transformWithEsbuild, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 
 // Phase 92: /widget.js, the snippet contractors paste on their own sites.
 // One self-contained file compiled on its own to an IIFE — no React, no
@@ -31,6 +31,79 @@ function widgetPlugin(): Plugin {
     },
   };
 }
+// Phase 115: one dictionary chunk per language. The strings are authored as
+// { en, fr } in one file (translations.ts, translations.dashboard.ts — the
+// i18n audit and every phase edit them that way), but a visitor only ever
+// needs one language: shipping both was ~half of the App and dashboard
+// chunks. `virtual:i18n/<pack>/<lang>` evaluates the source file at build
+// time and emits just that language as JSON.parse(...) (parsed faster than an
+// object literal of the same size); src/i18n/registry.ts loads the one it needs.
+const I18N_PACKS = {
+  core: { file: path.resolve(import.meta.dirname, "src/i18n/translations.ts"), exportName: "translations" },
+  dashboard: { file: path.resolve(import.meta.dirname, "src/i18n/translations.dashboard.ts"), exportName: "dashboardTranslations" },
+} as const;
+const I18N_ID = /^virtual:i18n\/(core|dashboard)\/(en|fr)$/;
+const i18nCache = new Map<string, { mtimeMs: number; mod: Record<string, Record<string, Record<string, string>>> }>();
+async function loadDictionaries(file: string) {
+  const { mtimeMs } = await stat(file);
+  const hit = i18nCache.get(file);
+  if (hit && hit.mtimeMs === mtimeMs) return hit.mod;
+  // Pure data plus `import type` (erased by esbuild), so it runs on its own.
+  const { code } = await transformWithEsbuild(await readFile(file, "utf8"), file, { loader: "ts", format: "esm" });
+  const mod = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
+  i18nCache.set(file, { mtimeMs, mod });
+  return mod;
+}
+function i18nSplitPlugin(): Plugin {
+  return {
+    name: "quoteai-i18n-split",
+    resolveId(id) {
+      return I18N_ID.test(id) ? `\0${id}` : undefined;
+    },
+    async load(id) {
+      const m = I18N_ID.exec(id.replace(/^\0/, ""));
+      if (!m || !id.startsWith("\0")) return;
+      const pack = I18N_PACKS[m[1] as keyof typeof I18N_PACKS];
+      this.addWatchFile(pack.file);
+      const dict = (await loadDictionaries(pack.file))[pack.exportName]?.[m[2]!];
+      if (!dict) throw new Error(`[i18n-split] ${pack.exportName}.${m[2]} not found in ${pack.file}`);
+      return `export default JSON.parse(${JSON.stringify(JSON.stringify(dict))});`;
+    },
+    handleHotUpdate({ file, server }) {
+      if (!Object.values(I18N_PACKS).some((p) => path.resolve(file) === p.file)) return;
+      for (const mod of server.moduleGraph.idToModuleMap.values()) {
+        if (mod.id && I18N_ID.test(mod.id.replace(/^\0/, ""))) server.moduleGraph.invalidateModule(mod);
+      }
+      server.ws.send({ type: "full-reload" });
+      return [];
+    },
+  };
+}
+
+// Phase 115: which chunk each lazy module landed in. Vite's manifest keys some
+// dynamic entries by their output name instead of their source (App.tsx,
+// pages/dashboard/settings/index.tsx), so scripts/bundle-budget.ts reads this
+// map — source path → chunk file — to find a screen's chunk from its source.
+function chunkMapPlugin(): Plugin {
+  return {
+    name: "quoteai-chunk-map",
+    generateBundle(_options, bundle) {
+      const map: Record<string, string> = {};
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type !== "chunk") continue;
+        // Every module, not just the facade: a lazy module that Rollup merged
+        // into a shared chunk has no facade of its own.
+        for (const moduleId of chunk.moduleIds) {
+          const id = moduleId.replace(/^\0/, "");
+          if (id.includes("node_modules")) continue;
+          map[id.startsWith("virtual:") ? id : path.relative(import.meta.dirname, id).split(path.sep).join("/")] = chunk.fileName;
+        }
+      }
+      this.emitFile({ type: "asset", fileName: ".vite/chunk-map.json", source: JSON.stringify(map, null, 1) });
+    },
+  };
+}
+
 const port = Number(process.env.PORT ?? "5173");
 const basePath = process.env.BASE_PATH ?? "/";
 
@@ -49,7 +122,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
     react(),
     tailwindcss(),
-    ...(isSsrBuild ? [] : [widgetPlugin()]),
+    i18nSplitPlugin(),
+    ...(isSsrBuild ? [] : [widgetPlugin(), chunkMapPlugin()]),
   ],
   resolve: {
     alias: {
@@ -87,6 +161,9 @@ export default defineConfig(({ isSsrBuild }) => ({
           // Tooltip/Toast) had to load all 136 kB of it on the homepage.
           // Rollup now splits it by usage (Phase 68). lucide-react stays
           // grouped — split by usage it became ~150 one-icon chunks.
+          // Phase 115: name the string packs (strings-core-en, strings-dashboard-fr…).
+          const pack = I18N_ID.exec(id.replace(/^\0/, ""));
+          if (pack) return `strings-${pack[1]}-${pack[2]}`;
           if (id.includes("node_modules/lucide-react")) {
             return "vendor-icons";
           }

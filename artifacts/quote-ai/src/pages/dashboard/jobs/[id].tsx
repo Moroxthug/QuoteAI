@@ -11,11 +11,12 @@ import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { StatStrip } from "@/components/mobile/stat-strip";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { useMobileHeader } from "@/components/mobile/mobile-page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DetailSkeleton } from "@/components/skeletons";
+import { useOptimisticMutation, useUndoableRemove, patch, showUndoToast, type CachePatch } from "@/lib/optimistic";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { jobsApi, formatCents, type JobDetailDto, type JobStatus, type MilestoneDto, type MilestoneStatus, type TaskDto } from "@/lib/jobs-api";
+import { jobsApi, formatCents, type JobDetailDto, type JobStatus, type JobSummaryDto, type MilestoneDto, type MilestoneStatus, type TaskDto } from "@/lib/jobs-api";
 import { contractsApi } from "@/lib/contracts-api";
 import { formatCadWhole } from "@/lib/money";
 import { invoicesApi } from "@/lib/invoices-api";
@@ -49,6 +50,19 @@ const wholeCents = (c: number) => formatCadWhole(c / 100);
 const day = (s: string | null) => (s ? new Date(`${s}T00:00:00`) : null);
 /** Opens the address in the phone's maps app (Google's universal link: the app when installed, the web otherwise). */
 const mapsUrl = (address: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
+// Phase 115: optimistic edits patch the cached job (["job", id]) and its row in
+// the jobs list (["jobs"]), the same two queries the old refresh() refetched.
+function jobPatches(id: string, p: Partial<Pick<JobSummaryDto, "status" | "name">>): CachePatch[] {
+  return [
+    patch<JobDetailDto>(["job", id], (d) => ({ ...d, job: { ...d.job, ...p } })),
+    patch<{ items: JobSummaryDto[] }>(["jobs"], (d) => ({ ...d, items: d.items.map((j) => (j.id === id ? { ...j, ...p } : j)) })),
+  ];
+}
+/** Every task of the job, under a milestone or not, through `fn`. */
+function mapTasks(d: JobDetailDto, fn: (tasks: TaskDto[]) => TaskDto[]): JobDetailDto {
+  return { ...d, milestones: d.milestones.map((m) => ({ ...m, tasks: fn(m.tasks) })), unassignedTasks: fn(d.unassignedTasks) };
+}
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -86,7 +100,13 @@ export default function JobDetailPage() {
   };
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
 
-  const setStatus = useMutation({ mutationFn: (status: JobStatus) => jobsApi.update(id!, { status }), onSuccess: refresh, onError });
+  // Phase 115: start / hold / resume show at once, with Undo. Reopening a
+  // completed job has none: completing again would re-run the completion automation.
+  const setStatus = useOptimisticMutation({
+    mutationFn: ({ status }: { status: JobStatus; from: JobStatus }) => jobsApi.update(id!, { status }),
+    patch: ({ status }) => jobPatches(id!, { status }),
+    undo: ({ status, from }) => (from === "completed" ? null : { title: t("undo.jobStatus").replace("{status}", t(`jobs.status.${status}`)), inverse: { status: from, from: status } }),
+  });
   // The job.completed automation runs before the PUT answers, so the final
   // invoice draft (when there was an unbilled balance) is already there.
   const complete = useMutation({
@@ -100,7 +120,16 @@ export default function JobDetailPage() {
     },
     onError,
   });
-  const archive = useMutation({ mutationFn: () => jobsApi.archive(id!), onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["jobs"] }); toast({ title: t("archive.archivedToast") }); navigate("/dashboard/jobs"); }, onError });
+  const archive = useMutation({
+    mutationFn: () => jobsApi.archive(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      // Phase 115: a quiet Undo on the list this lands on (restores the job).
+      showUndoToast({ title: t("archive.archivedToast"), undoLabel: t("common.undo"), onUndo: () => { jobsApi.restore(id!).then(() => { void queryClient.invalidateQueries({ queryKey: ["jobs"] }); void queryClient.invalidateQueries({ queryKey: ["archive"] }); }, onError); } });
+      navigate("/dashboard/jobs");
+    },
+    onError,
+  });
   const canEditJob = can("jobs", "edit");
   const canFullJob = can("jobs", "full");
 
@@ -112,17 +141,17 @@ export default function JobDetailPage() {
   // standing in a kitchen) lives in ⋯, in the order a job lives it.
   const more: Array<SheetAction | false> = !job ? [] : [
     !!job.client?.phone && job.status !== "completed" && canEditJob && { label: t("jobs.onMyWay.button"), icon: MessageSquareText, onSelect: () => setOnMyWayOpen(true) },
-    canEditJob && job.status === "planning" && { label: t("jobs.action.start"), icon: PlayCircle, onSelect: () => setStatus.mutate("active") },
-    canEditJob && job.status === "suspended" && { label: t("jobs.action.resume"), icon: PlayCircle, onSelect: () => setStatus.mutate("active") },
+    canEditJob && job.status === "planning" && { label: t("jobs.action.start"), icon: PlayCircle, onSelect: () => setStatus.mutate({ status: "active", from: job.status }) },
+    canEditJob && job.status === "suspended" && { label: t("jobs.action.resume"), icon: PlayCircle, onSelect: () => setStatus.mutate({ status: "active", from: job.status }) },
     canEditJob && { label: t("jobs.editSetup"), icon: Sparkles, href: `/dashboard/jobs/${job.id}/setup` },
     canEditJob && { label: t("jobs.m.rename"), icon: Pencil, onSelect: () => setRenaming(true) },
-    canEditJob && job.status === "active" && { label: t("jobs.action.suspend"), icon: PauseCircle, onSelect: () => setStatus.mutate("suspended"), separated: true },
+    canEditJob && job.status === "active" && { label: t("jobs.action.suspend"), icon: PauseCircle, onSelect: () => setStatus.mutate({ status: "suspended", from: job.status }), separated: true },
     canEditJob && job.status !== "completed" && { label: t("jobs.action.complete"), icon: CheckCircle2, onSelect: () => setCompleteOpen(true), disabled: complete.isPending, separated: job.status !== "active" },
-    canEditJob && job.status === "completed" && { label: t("jobs.action.reopen"), icon: RotateCcw, onSelect: () => setStatus.mutate("active"), separated: true },
+    canEditJob && job.status === "completed" && { label: t("jobs.action.reopen"), icon: RotateCcw, onSelect: () => setStatus.mutate({ status: "active", from: job.status }), separated: true },
     canFullJob && job.status === "completed" && { label: t("dashboard.quotesList.archive"), icon: Archive, onSelect: () => setArchiveOpen(true), disabled: archive.isPending, danger: true },
   ];
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-10 w-2/3" /><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>;
+  if (isLoading) return <DetailSkeleton strip={4} tabs rows={4} />;
   if (error || !data || !job) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
@@ -287,17 +316,24 @@ function EditableName({ id, name, editing, onEditingChange }: { id: string; name
   const { t } = useLanguage();
   const can = useCan();
   const [value, setValue] = useState(name);
-  const queryClient = useQueryClient();
   useEffect(() => { if (editing) setValue(name); }, [editing, name]);
-  const save = useMutation({
-    mutationFn: () => jobsApi.update(id, { name: value.trim() }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["job", id] }); queryClient.invalidateQueries({ queryKey: ["jobs"] }); onEditingChange(false); },
+  // Phase 115: the new name shows the moment it is saved; Undo puts the old one back.
+  const save = useOptimisticMutation({
+    mutationFn: ({ name: next }: { name: string; prev: string }) => jobsApi.update(id, { name: next }),
+    patch: ({ name: next }) => jobPatches(id, { name: next }),
+    undo: ({ name: next, prev }) => ({ title: t("undo.renamed").replace("{name}", next), inverse: { name: prev, prev: next } }),
   });
+  const submit = () => {
+    const next = value.trim();
+    if (!next) return;
+    onEditingChange(false);
+    if (next !== name) save.mutate({ name: next, prev: name });
+  };
   if (!editing) return <span className="inline-flex items-center gap-2 group min-w-0 max-w-full"><span className="j-name">{name}</span>{can("jobs", "edit") && <button type="button" className="ic-btn opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hide-phone" aria-label={t("a11y.rename")} onClick={() => onEditingChange(true)}><Pencil /></button>}</span>;
   return (
     <span className="field inline j-rename">
-      <input value={value} onChange={(e) => setValue(e.target.value)} aria-label={t("jobs.m.rename")} autoFocus onKeyDown={(e) => { if (e.key === "Enter") save.mutate(); if (e.key === "Escape") onEditingChange(false); }} />
-      <button type="button" className="ic-btn ok" aria-label={t("jobs.save")} onClick={() => save.mutate()} disabled={!value.trim() || save.isPending}><Check /></button>
+      <input value={value} onChange={(e) => setValue(e.target.value)} aria-label={t("jobs.m.rename")} autoFocus onKeyDown={(e) => { if (e.key === "Enter") submit(); if (e.key === "Escape") onEditingChange(false); }} />
+      <button type="button" className="ic-btn ok" aria-label={t("jobs.save")} onClick={submit} disabled={!value.trim()}><Check /></button>
       <button type="button" className="ic-btn" aria-label={t("jobs.cancel")} onClick={() => onEditingChange(false)}><X /></button>
     </span>
   );
@@ -421,10 +457,32 @@ const can = useCan();
   const { job, milestones, unassignedTasks } = data;
   const refresh = () => { queryClient.invalidateQueries({ queryKey: ["job", job.id] }); queryClient.invalidateQueries({ queryKey: ["jobs"] }); };
   const onError = (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" });
-  const setMs = useMutation({ mutationFn: ({ mid, status }: { mid: string; status: MilestoneStatus }) => jobsApi.updateMilestone(job.id, mid, { status }), onSuccess: (_r, v) => { refresh(); if (v.status === "completed") toast({ title: t("jobs.milestone.completedToast") }); }, onError });
+  // Phase 115: milestones and tasks change on the tap. Among milestone moves
+  // only Start has an Undo: completing one runs automations (payment release)
+  // that going back would not unwind.
+  const jobKey = ["job", job.id];
+  const setMs = useOptimisticMutation({
+    mutationFn: ({ mid, status }: { mid: string; status: MilestoneStatus; from: MilestoneStatus; title: string }) => jobsApi.updateMilestone(job.id, mid, { status }),
+    patch: ({ mid, status }) => [patch<JobDetailDto>(jobKey, (d) => ({ ...d, milestones: d.milestones.map((m) => (m.id === mid ? { ...m, status } : m)) }))],
+    invalidate: () => [["jobs"]],
+    onSuccess: (_r, v) => { if (v.status === "completed") toast({ title: t("jobs.milestone.completedToast") }); },
+    undo: (v) => (v.status === "in_progress" && v.from === "planned" ? { title: t("undo.milestoneStarted").replace("{title}", v.title), inverse: { ...v, status: "planned" as const, from: "in_progress" as const } } : null),
+  });
   const addTask = useMutation({ mutationFn: (v: { title: string; milestoneId: string | null }) => jobsApi.addTask(job.id, v), onSuccess: refresh, onError });
-  const toggleTask = useMutation({ mutationFn: (task: TaskDto) => jobsApi.updateTask(job.id, task.id, { status: task.status === "done" ? "todo" : "done" }), onSuccess: refresh, onError });
-  const delTask = useMutation({ mutationFn: (tid: string) => jobsApi.deleteTask(job.id, tid), onSuccess: refresh, onError });
+  const toggleTask = useOptimisticMutation({
+    mutationFn: ({ task, status }: { task: TaskDto; status: TaskDto["status"] }) => jobsApi.updateTask(job.id, task.id, { status }),
+    patch: ({ task, status }) => [patch<JobDetailDto>(jobKey, (d) => mapTasks(d, (tasks) => tasks.map((x) => (x.id === task.id ? { ...x, status } : x))))],
+    invalidate: () => [["jobs"]],
+    undo: ({ task, status }) => ({ title: t(status === "done" ? "undo.taskDone" : "undo.taskReopened").replace("{title}", task.title), inverse: { task, status: task.status } }),
+  });
+  const flipTask = (task: TaskDto) => toggleTask.mutate({ task, status: task.status === "done" ? "todo" : "done" });
+  // A deleted task goes at once; the DELETE is sent once its Undo has passed.
+  const delTask = useUndoableRemove({
+    commit: (tid: string) => jobsApi.deleteTask(job.id, tid),
+    patch: (tid) => [patch<JobDetailDto>(jobKey, (d) => mapTasks(d, (tasks) => tasks.filter((x) => x.id !== tid)))],
+    invalidate: () => [["jobs"]],
+    title: () => t("undo.taskDeleted"),
+  });
   const [newTask, setNewTask] = useState<{ milestoneId: string | null; title: string } | null>(null);
 
   const [open, setOpen] = useState<string | null>(milestones.find((m) => m.status === "in_progress")?.id ?? null);
@@ -469,16 +527,16 @@ const can = useCan();
                 </div>
                 </button>
                 {can("jobs", "edit") && <div className="ms-acts flex gap-2 shrink-0">
-                  {m.status === "planned" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</button>}
-                  {(m.status === "planned" || m.status === "in_progress") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setMs.mutate({ mid: m.id, status: "completed" })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</button>}
-                  {m.status === "completed" && <button type="button" className="text-link" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress" })}>{t("jobs.milestone.reopen")}</button>}
+                  {m.status === "planned" && <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress", from: m.status, title: m.title })}><PlayCircle className="h-3.5 w-3.5" /> {t("jobs.milestone.start")}</button>}
+                  {(m.status === "planned" || m.status === "in_progress") && <button type="button" className="btn btn-sm btn-navy" style={{ background: "var(--green)" }} onClick={() => setMs.mutate({ mid: m.id, status: "completed", from: m.status, title: m.title })}><CheckCircle2 className="h-3.5 w-3.5" /> {t("jobs.milestone.complete")}</button>}
+                  {m.status === "completed" && <button type="button" className="text-link" onClick={() => setMs.mutate({ mid: m.id, status: "in_progress", from: m.status, title: m.title })}>{t("jobs.milestone.reopen")}</button>}
                 </div>}
               </div>
               {expanded && (
                 <div className="ms-body" id={`ms-panel-${m.id}`}>
                   {m.description && <p>{m.description}</p>}
                   {m.paymentTermLabel && <p>{t("jobs.milestone.linkedPayment")}: <b>{m.paymentTermLabel}</b></p>}
-                  <TaskList tasks={m.tasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} readOnly={!can("jobs", "edit")} />
+                  <TaskList tasks={m.tasks} onToggle={flipTask} onDelete={delTask} readOnly={!can("jobs", "edit")} />
                   {!can("jobs", "edit") ? null : newTask?.milestoneId === m.id ? (
                     <form className="field inline mt-2" onSubmit={(e) => { e.preventDefault(); if (newTask.title.trim()) { addTask.mutate({ title: newTask.title.trim(), milestoneId: m.id }); setNewTask(null); } }}>
                       <input autoFocus className="flex-1" value={newTask.title} onChange={(e) => setNewTask({ milestoneId: m.id, title: e.target.value })} placeholder={t("jobs.task.placeholder")} style={{ padding: "8px 12px", fontSize: 13.5 }} />
@@ -504,7 +562,7 @@ const can = useCan();
         <section className="card">
           <div className="card-head"><div><h2>{t("jobs.schedule.otherTasks")}</h2></div></div>
           <div className="act-body">
-            <TaskList tasks={unassignedTasks} onToggle={(x) => toggleTask.mutate(x)} onDelete={(tid) => delTask.mutate(tid)} readOnly={!can("jobs", "edit")} />
+            <TaskList tasks={unassignedTasks} onToggle={flipTask} onDelete={delTask} readOnly={!can("jobs", "edit")} />
           </div>
         </section>
       )}

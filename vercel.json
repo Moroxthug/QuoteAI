@@ -24,8 +24,16 @@
       "destination": "/api/index"
     },
     {
+      "source": "/dashboard",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/dashboard/(.*)",
+      "destination": "/app.html"
+    },
+    {
       "source": "/((?!api/).*)",
-      "destination": "/index.html"
+      "destination": "/spa.html"
     }
   ],
   "headers": [

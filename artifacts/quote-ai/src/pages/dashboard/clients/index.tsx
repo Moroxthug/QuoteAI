@@ -1,6 +1,8 @@
 import { useListClients } from "@workspace/api-client-react";
 import { rowLink } from "@/lib/row-link";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { Link, useLocation } from "wouter";
 import { Users, Search, Plus, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +28,9 @@ export default function ClientsPage() {
     return c.clientName.toLowerCase().includes(q) || (c.email ?? "").toLowerCase().includes(q);
   });
 
+  // Phase 115: first 50 rows now, the rest when idle; rows prefetch the client on press.
+  const shown = useProgressiveList(filtered);
+  const press = usePrefetchOnPress();
   const totalQuotes = (clients ?? []).reduce((sum, c) => sum + c.quoteCount, 0);
 
   return (
@@ -63,9 +68,7 @@ export default function ClientsPage() {
         )}
 
         {isLoading ? (
-          <div className="p-5 space-y-3">
-            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-10 w-full rounded-[var(--radius-sm)]" />)}
-          </div>
+          <ListSkeleton rows={6} lead="avatar" />
         ) : filtered.length === 0 ? (
           <div className="text-center py-14 px-5">
             <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
@@ -78,7 +81,7 @@ export default function ClientsPage() {
         ) : phone ? (
           // Phase 107: who, where and how many quotes / what they are worth / active or prospect.
           <ul className="lrows" aria-label={t("clients.title")}>
-            {filtered.map((client) => {
+            {shown.map((client) => {
               const active = client.unlockedCount > 0;
               return (
                 <li key={client.id}>
@@ -108,12 +111,12 @@ export default function ClientsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(client => {
+                {shown.map(client => {
                   const status = client.unlockedCount > 0
                     ? { cls: "chip-green", label: t("clients.status.active") }
                     : { cls: "chip-teal", label: t("clients.status.prospect") };
                   return (
-                    <tr key={client.id} {...rowLink(() => navigate(`/dashboard/clients/${client.id}`))}>
+                    <tr key={client.id} {...rowLink(() => navigate(`/dashboard/clients/${client.id}`))} {...press(`/dashboard/clients/${client.id}`)}>
                       <td>
                         <span className="cell-flex">
                           <span className="avat">{client.clientName.slice(0, 2)}</span>

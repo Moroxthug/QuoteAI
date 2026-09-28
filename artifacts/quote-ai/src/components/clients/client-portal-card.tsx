@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, ExternalLink, Loader2, Mail, UserRound } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
@@ -33,7 +34,10 @@ const can = useCan();
       </div>
       <div className="act-body space-y-3">
         {!data ? (
-          <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--faint)" }} />
+          <div className="space-y-2 skel-wait" aria-busy="true">
+            <Skeleton className="skel-line skel-sub" style={{ width: "70%" }} aria-hidden="true" />
+            <Skeleton className="h-10 w-40 rounded-[10px]" aria-hidden="true" />
+          </div>
         ) : !data.hasEmail || !data.url ? (
           <p className="foot-note m-0">{t("portalCard.noEmail")}</p>
         ) : (

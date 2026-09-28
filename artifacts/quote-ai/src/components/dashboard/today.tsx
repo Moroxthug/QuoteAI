@@ -28,7 +28,8 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton, ListSkeleton, StatStripSkeleton } from "@/components/skeletons";
+import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { ActionSheet } from "@/components/mobile/action-sheet";
 import { StatStrip, type StatItem } from "@/components/mobile/stat-strip";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -95,6 +96,8 @@ function rowText(item: NeedsYouItemDto, t: T, dateLabel: (iso: string) => string
 
 function NeedsYouRow({ item }: { item: NeedsYouItemDto }) {
   const { t, lang } = useLanguage();
+  // Phase 115: the row starts loading what it opens when it is pressed.
+  const press = usePrefetchOnPress();
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -132,7 +135,7 @@ function NeedsYouRow({ item }: { item: NeedsYouItemDto }) {
   if (!inlineRemind && !call) {
     return (
       <li>
-        <Link href={item.href} className="lrow ny-row">
+        <Link href={item.href} className="lrow ny-row" {...press(item.href)}>
           {body}
           <span className="ny-pill" aria-hidden="true">{text.action}</span>
           <span className="sr-only"> — {text.action}</span>
@@ -142,7 +145,7 @@ function NeedsYouRow({ item }: { item: NeedsYouItemDto }) {
   }
   return (
     <li className="ny-split">
-      <Link href={item.href} className="lrow ny-row">{body}</Link>
+      <Link href={item.href} className="lrow ny-row" {...press(item.href)}>{body}</Link>
       {inlineRemind ? (
         <button type="button" className="ny-pill ny-act" disabled={remind.isPending} onClick={() => remind.mutate()} aria-label={`${text.action} — ${text.title}`}>
           {remind.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : text.action}
@@ -168,7 +171,7 @@ export function NeedsYouCard() {
         {items.length > 0 && <span className="ny-count">{items.length}</span>}
       </div>
       {isLoading ? (
-        <div className="px-4 pb-4 space-y-2"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
+        <ListSkeleton rows={3} lead="icon" chip={false} />
       ) : isError ? (
         <p className="today-empty">{t("today.ny.error")}</p>
       ) : items.length === 0 ? (
@@ -253,7 +256,7 @@ export function TodayStats() {
           actions={(["m", "q", "y"] as const).map((p) => ({ label: label[p], hint: p === period ? t("today.period.current") : undefined, onSelect: () => setPeriod(p) }))}
         />
       </div>
-      {isLoading ? <Skeleton className="h-[86px] w-full rounded-[var(--radius-mk)]" /> : items.length > 0 && <StatStrip items={items} label={label[period]} />}
+      {isLoading ? <StatStripSkeleton cells={4} /> : items.length > 0 && <StatStrip items={items} label={label[period]} />}
     </section>
   );
 }
@@ -313,6 +316,7 @@ const AHEAD_DAYS = 14;
 
 export function NextUpCard() {
   const { t, lang } = useLanguage();
+  const press = usePrefetchOnPress();
   const locale = lang === "fr" ? frCA : enCA;
   // Whole days from the start of today, so the key is stable across renders.
   const from = useMemo(() => startOfDay(new Date()), []);
@@ -329,7 +333,7 @@ export function NextUpCard() {
     return (data?.entries ?? []).filter((e) => e.state !== "done" && new Date(e.endsAt).getTime() > now).slice(0, NEXT);
   }, [data]);
 
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-[var(--radius-mk)]" />;
+  if (isLoading) return <CardSkeleton rows={3} list={{ lead: "icon", chip: false }} />;
   if (!data) return null;
 
   if (!data.scheduleEnabled) {
@@ -378,7 +382,7 @@ export function NextUpCard() {
             return (
               <li key={e.id}>
                 {e.href ? (
-                  <Link href={e.href} className="lrow">{body}</Link>
+                  <Link href={e.href} className="lrow" {...press(e.href)}>{body}</Link>
                 ) : e.externalUrl ? (
                   <a href={e.externalUrl} target="_blank" rel="noreferrer noopener" className="lrow">{body}</a>
                 ) : (

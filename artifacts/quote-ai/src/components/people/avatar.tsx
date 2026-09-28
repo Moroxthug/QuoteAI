@@ -10,6 +10,7 @@ function initialsOf(name: string | null | undefined, fallback = "?"): string {
 
 export function PersonAvatar({ name, image, size = 34, className }: { name: string | null | undefined; image?: string | null; size?: number; className?: string }) {
   const style = { width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.36)) };
-  if (image) return <img src={image} alt="" className={cn("avat", className)} style={{ ...style, objectFit: "cover" }} />;
+  // Phase 115: sized before it loads (width/height), fetched lazily and decoded off the main thread — team lists hold dozens.
+  if (image) return <img src={image} alt="" width={size} height={size} loading="lazy" decoding="async" className={cn("avat", className)} style={{ ...style, objectFit: "cover" }} />;
   return <span className={cn("avat", className)} style={style} aria-hidden="true">{initialsOf(name)}</span>;
 }

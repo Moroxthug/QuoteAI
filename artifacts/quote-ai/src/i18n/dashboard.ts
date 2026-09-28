@@ -1,8 +1,15 @@
-// Side-effect module: importing it merges the dashboard-only strings into the
-// runtime dictionary. Imported by every dashboard root (the dashboard layout
-// and the admin page) so the keys are registered before any dashboard page
-// renders, and bundled with those lazy chunks rather than the public entry.
-import { registerTranslations } from "./registry";
-import { dashboardTranslations } from "./translations.dashboard";
+// The dashboard-only strings (./translations.dashboard.ts), in the language
+// being rendered. Phase 68 imported them for their side effect from each
+// dashboard root; Phase 115 loads them per language, so the roots' lazy
+// imports in App.tsx wait on this instead (withDashboardStrings) and nothing
+// renders with raw keys.
+import { ensureStrings, getActiveLang } from "./registry";
 
-registerTranslations(dashboardTranslations);
+export function loadDashboardStrings(): Promise<void> {
+  return ensureStrings(getActiveLang(), ["dashboard"]);
+}
+
+/** Wraps a lazy() loader so the module and the dashboard strings arrive together. */
+export function withDashboardStrings<T>(load: () => Promise<T>): () => Promise<T> {
+  return () => Promise.all([load(), loadDashboardStrings()]).then(([mod]) => mod);
+}

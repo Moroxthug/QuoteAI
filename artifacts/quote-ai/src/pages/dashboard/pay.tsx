@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, ArrowRight, Briefcase, Check, ChevronLeft, ChevronRight, CircleCheck, Download, Info, Loader2, Lock, Plus, Settings2, Trash2, Wallet, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CardSkeleton, StatStripSkeleton, TabsSkeleton } from "@/components/skeletons";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -69,7 +70,7 @@ export default function PayPage() {
         </div>
       </div>
 
-      {(!roleLoaded || (allowed && isLoading)) && <div className="space-y-3"><Skeleton className="h-12 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" /></div>}
+      {(!roleLoaded || (allowed && isLoading)) && <div aria-busy="true"><TabsSkeleton /><CardSkeleton rows={6} /></div>}
 
       {roleLoaded && (!allowed || error) && <div className="notice info"><Info /><span className="grow">{!allowed || (error as Error & { status?: number }).status === 403 ? t("pay.notYourRole") : (error as Error).message}</span></div>}
 
@@ -169,7 +170,7 @@ function PeriodTab({ settings, onSettings }: { settings: Enabled; onSettings: ()
         </div>
       </section>
 
-      {isLoading && <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />}
+      {isLoading && <div aria-busy="true"><StatStripSkeleton cells={4} /><CardSkeleton rows={6} list={{ lead: "avatar" }} /></div>}
       {error && <div className="card card-empty">{(error as Error).message}</div>}
 
       {data && (
@@ -434,7 +435,7 @@ function JobsTab() {
   return (
     <div className="stack" style={{ gap: 16 }}>
       <section className="card"><div className="toolbar">{data ? <PeriodNav data={data} go={go} /> : <Skeleton className="h-8 w-56" />}<p className="foot-note m-0 grow">{t("pay.jobs.intro")}</p></div></section>
-      {isLoading && <Skeleton className="h-64 w-full rounded-[var(--radius-mk)]" />}
+      {isLoading && <CardSkeleton rows={6} />}
       {error && <div className="card card-empty">{(error as Error).message}</div>}
       {data && (data.jobs.length === 0 ? <div className="card dashed card-empty">{t("pay.empty")}</div> : (
         <section className="card">

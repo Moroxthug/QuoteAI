@@ -23,9 +23,12 @@
 // the Suspense boundaries as their chunks arrive in the browser.
 import { StrictMode } from "react";
 import ReactDOMStatic from "react-dom/static";
+import ReactDOMServer from "react-dom/server";
 import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
+import { AppShellSkeleton } from "./components/layout/app-shell-skeleton";
 import type { Lang } from "./i18n/translations";
+import { ensureStrings } from "./i18n/registry";
 
 export { listPrerenderRoutes } from "./data/prerender-routes";
 
@@ -42,6 +45,8 @@ const HOISTED_PREFIX_RE = /^(?:\s*(?:<(?:link|meta)\b[^>]*\/?>|<title>[^<]*<\/ti
 const HEAD_TAG_RE = /<title>[^<]*<\/title>|<(?:link|meta)\b[^>]*\/?>/g;
 
 export async function renderPage(path: string, lang: Lang): Promise<RenderedPage> {
+  // Phase 115: strings load per language (i18n/registry.ts) — before the render, as in main.tsx.
+  await ensureStrings(lang);
   // CommonJS package, Node build: `prerenderToNodeStream` (the web-stream
   // `prerender` only exists in the browser/edge builds) and no named exports.
   const { prelude } = await ReactDOMStatic.prerenderToNodeStream(
@@ -58,4 +63,15 @@ export async function renderPage(path: string, lang: Lang): Promise<RenderedPage
   if (!/<title>/.test(hoisted)) throw new Error(`No <title> rendered for ${path} — does the page render <SeoHead>?`);
   const head = (hoisted.match(HEAD_TAG_RE) ?? []).join("\n");
   return { body: html.slice(hoisted.length), head, htmlLang: lang === "fr" ? "fr-CA" : "en-CA" };
+}
+
+/**
+ * Phase 115: the app frame as static HTML for dist/public/app.html, the page
+ * Vercel serves for /dashboard/*. The first paint of the signed-in app is the
+ * frame and a page-shaped skeleton — the same markup the router shows while
+ * its chunks load — instead of a blank page (or, before this phase, the
+ * prerendered marketing homepage that index.html carries).
+ */
+export function renderAppShell(): string {
+  return ReactDOMServer.renderToStaticMarkup(<AppShellSkeleton />);
 }

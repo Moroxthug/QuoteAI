@@ -1,0 +1,296 @@
+{
+  "shell": {
+    "en": 305,
+    "fr": 310
+  },
+  "chunk": 75,
+  "screens": [
+    {
+      "name": "Today",
+      "path": "/dashboard",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/index.tsx"
+      ],
+      "budget": 335
+    },
+    {
+      "name": "Quotes",
+      "path": "/dashboard/quotes",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/quotes/index.tsx"
+      ],
+      "budget": 310
+    },
+    {
+      "name": "Quote",
+      "path": "/dashboard/quotes/:id",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/quotes/[id].tsx"
+      ],
+      "budget": 335
+    },
+    {
+      "name": "New quote",
+      "path": "/dashboard/new",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/new.tsx"
+      ],
+      "budget": 320
+    },
+    {
+      "name": "Jobs",
+      "path": "/dashboard/jobs",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/jobs/index.tsx"
+      ],
+      "budget": 315
+    },
+    {
+      "name": "Job",
+      "path": "/dashboard/jobs/:id",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/jobs/[id].tsx"
+      ],
+      "budget": 365
+    },
+    {
+      "name": "Money (invoices)",
+      "path": "/dashboard/invoices",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/invoices.tsx"
+      ],
+      "budget": 320
+    },
+    {
+      "name": "Invoice",
+      "path": "/dashboard/invoices/:id",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/invoices/[id].tsx"
+      ],
+      "budget": 320
+    },
+    {
+      "name": "Client",
+      "path": "/dashboard/clients/:id",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/clients/[name].tsx"
+      ],
+      "budget": 320
+    },
+    {
+      "name": "Schedule",
+      "path": "/dashboard/schedule",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/schedule.tsx"
+      ],
+      "budget": 325
+    },
+    {
+      "name": "Crew (Team)",
+      "path": "/dashboard/team",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/team.tsx"
+      ],
+      "budget": 330
+    },
+    {
+      "name": "Assistant",
+      "path": "/dashboard/assistant",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/assistant.tsx"
+      ],
+      "budget": 305
+    },
+    {
+      "name": "Notifications",
+      "path": "/dashboard/notifications",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/notifications.tsx"
+      ],
+      "budget": 305
+    },
+    {
+      "name": "Settings",
+      "path": "/dashboard/settings",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@layout",
+        "@dashboard-strings",
+        "src/pages/dashboard/settings/index.tsx"
+      ],
+      "budget": 315
+    },
+    {
+      "name": "Onboarding",
+      "path": "/onboarding",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "@dashboard-strings",
+        "src/pages/onboarding.tsx"
+      ],
+      "budget": 270
+    },
+    {
+      "name": "Home",
+      "path": "/",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/components/layout/public-layout.tsx",
+        "src/pages/home.tsx"
+      ],
+      "budget": 215
+    },
+    {
+      "name": "Home (FR)",
+      "path": "/fr/",
+      "lang": "fr",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/components/layout/public-layout.tsx",
+        "src/pages/home.tsx"
+      ],
+      "budget": 220
+    },
+    {
+      "name": "Pricing",
+      "path": "/pricing/",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/components/layout/public-layout.tsx",
+        "src/pages/pricing.tsx"
+      ],
+      "budget": 205
+    },
+    {
+      "name": "Sign in",
+      "path": "/sign-in",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/components/layout/public-layout.tsx",
+        "src/pages/sign-in.tsx"
+      ],
+      "budget": 195
+    },
+    {
+      "name": "Client quote",
+      "path": "/p/:id",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/pages/p/[id].tsx"
+      ],
+      "budget": 205
+    },
+    {
+      "name": "Client signing",
+      "path": "/sign/:token",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/pages/sign/[token].tsx"
+      ],
+      "budget": 200
+    },
+    {
+      "name": "Client invoice",
+      "path": "/i/:token",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/pages/i/[token].tsx"
+      ],
+      "budget": 210
+    },
+    {
+      "name": "Worker time",
+      "path": "/t/:token",
+      "roots": [
+        "index.html",
+        "@App",
+        "@strings",
+        "src/pages/t/[token].tsx"
+      ],
+      "budget": 225
+    }
+  ]
+}

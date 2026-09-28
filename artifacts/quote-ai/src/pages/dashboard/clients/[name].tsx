@@ -3,6 +3,7 @@ import { useParams, Link, useLocation, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useListClientQuotes, getListClientQuotesQueryKey, useGetBusinessProfile } from "@workspace/api-client-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ListSkeleton } from "@/components/skeletons";
 import { ArrowLeft, Mail, Phone, MapPin, MessageSquareText, Users } from "lucide-react";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
@@ -109,7 +110,7 @@ export default function ClientDetailPage() {
       <section className="card q-hero c-hero">
         <div className="q-hero-main">
           {isLoading ? (
-            <Skeleton className="h-8 w-56 rounded-md" />
+            <div className="skel-wait" aria-busy="true"><Skeleton className="skel-line skel-sub" style={{ width: 120 }} aria-hidden="true" /><Skeleton className="skel-line skel-h1" style={{ width: 240 }} aria-hidden="true" /><Skeleton className="skel-line skel-title" style={{ width: 160, marginTop: 10 }} aria-hidden="true" /></div>
           ) : (
             <>
               <div className="q-hero-eyebrow">
@@ -170,7 +171,7 @@ export default function ClientDetailPage() {
         <div className="card">
           {tab === "quotes" && (
             isLoading ? (
-              <div className="p-5 space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 w-full" />)}</div>
+              <ListSkeleton rows={4} />
             ) : !quotes || quotes.length === 0 ? (
               <div className="card-empty">{t("clients.detail.noQuotes")}</div>
             ) : (
@@ -193,7 +194,7 @@ export default function ClientDetailPage() {
             )
           )}
           {tab === "jobs" && (
-            jobsQ.isLoading ? <div className="p-5"><Skeleton className="h-10 w-full" /></div>
+            jobsQ.isLoading ? <ListSkeleton rows={3} />
             : jobs.length === 0 ? <div className="card-empty">{t("clients.m.noJobs")}</div>
             : (
               <ul className="lrows jlist" aria-label={t("clients.m.jobs")}>
@@ -218,7 +219,7 @@ export default function ClientDetailPage() {
             )
           )}
           {tab === "invoices" && (
-            invoicesQ.isLoading ? <div className="p-5"><Skeleton className="h-10 w-full" /></div>
+            invoicesQ.isLoading ? <ListSkeleton rows={3} />
             : invoices.length === 0 ? <div className="card-empty">{t("clients.m.noInvoices")}</div>
             : (
               <ul className="lrows" aria-label={t("clients.m.invoices")}>

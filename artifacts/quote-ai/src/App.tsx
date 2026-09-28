@@ -1,17 +1,34 @@
 import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wouter";
 import { useEffect, lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
 import { RouteAnnouncer } from "@/components/a11y";
 import { ScrollManager } from "@/components/scroll-manager";
 import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
+import { pageLoaders } from "@/lib/route-chunks";
+import { withDashboardStrings } from "@/i18n/dashboard";
+import { AppShellSkeleton, PageSkeleton } from "@/components/layout/app-shell-skeleton";
 
-import Home from "@/pages/home";
 // Every other public page is lazy (Phase 68): the homepage is the entry's
 // LCP-critical route and these pages — auth, onboarding, legal, contact,
 // WhatsApp, sitemap — were ~55 kB of the bundle it had to load first.
+// Phase 115: the homepage, the public layout and the 404 page are lazy too —
+// together ~35 kB gzipped that every signed-in screen was loading for nothing.
+// The homepage is prerendered, so its hero paints from the HTML either way;
+// the prerender preloads these chunks (scripts/prerender-seo.ts) for hydration.
+const Home = lazy(() => import("@/pages/home"));
+// The toast viewport (Radix Toast) is only needed once there is a toast; one
+// raised before it arrives waits in the use-toast store and shows on mount.
+const Toaster = lazy(() => import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })));
+const NotFound = lazy(() => import("@/pages/not-found"));
+const PublicLayoutLazy = lazy(() => import("@/components/layout/public-layout").then((m) => ({ default: m.PublicLayout })));
+function PublicLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <PublicLayoutLazy>{children}</PublicLayoutLazy>
+    </Suspense>
+  );
+}
 const WhatsappPage = lazy(() => import("@/pages/whatsapp"));
 // Phase 81 — the marketing pages built for the BC/ON/QC pilot.
 const PricingPage = lazy(() => import("@/pages/pricing"));
@@ -21,7 +38,7 @@ const MobilePreview = import.meta.env.DEV ? lazy(() => import("@/dev/mobile-prev
 const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const SignUpPage = lazy(() => import("@/pages/sign-up"));
-const OnboardingPage = lazy(() => import("@/pages/onboarding"));
+const OnboardingPage = lazy(withDashboardStrings(() => import("@/pages/onboarding")));
 const PrivacyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsPage = lazy(() => import("@/pages/terms"));
 const ChiSiamoPage = lazy(() => import("@/pages/chi-siamo"));
@@ -32,53 +49,56 @@ const HelpArticlePage = lazy(() => import("@/pages/help/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
-const DashboardHome = lazy(() => import("@/pages/dashboard/index"));
-const NewQuote = lazy(() => import("@/pages/dashboard/new"));
-const QuotesList = lazy(() => import("@/pages/dashboard/quotes/index"));
-const QuoteDetail = lazy(() => import("@/pages/dashboard/quotes/[id]"));
-const BillingPage = lazy(() => import("@/pages/dashboard/billing"));
-const SettingsPage = lazy(() => import("@/pages/dashboard/settings"));
-const CatalogPage = lazy(() => import("@/pages/dashboard/catalog"));
-const AnalyticsPage = lazy(() => import("@/pages/dashboard/analytics"));
-const AdminPage = lazy(() => import("@/pages/admin"));
-const ClientsPage = lazy(() => import("@/pages/dashboard/clients/index"));
-const LeadsListPage = lazy(() => import("@/pages/dashboard/leads/index"));
-const ImportsPage = lazy(() => import("@/pages/dashboard/imports/index"));
-const ClientDetailPage = lazy(() => import("@/pages/dashboard/clients/[name]"));
-const InvoicesPage = lazy(() => import("@/pages/dashboard/invoices"));
-const InvoiceDetailPage = lazy(() => import("@/pages/dashboard/invoices/[id]"));
+// Phase 115: the signed-in pages load through the shared loaders in
+// lib/route-chunks.ts, so a nav link or list row can prefetch the same chunk.
+const DashboardHome = lazy(pageLoaders.today);
+const NewQuote = lazy(pageLoaders.newQuote);
+const QuotesList = lazy(pageLoaders.quotes);
+const QuoteDetail = lazy(pageLoaders.quote);
+const BillingPage = lazy(pageLoaders.billing);
+const SettingsPage = lazy(pageLoaders.settings);
+const CatalogPage = lazy(pageLoaders.catalog);
+const AnalyticsPage = lazy(pageLoaders.analytics);
+// The admin and onboarding pages are dashboard roots of their own (no dashboard
+// layout above them), so they bring the dashboard strings with them.
+const AdminPage = lazy(withDashboardStrings(() => import("@/pages/admin")));
+const ClientsPage = lazy(pageLoaders.clients);
+const LeadsListPage = lazy(pageLoaders.leads);
+const ImportsPage = lazy(pageLoaders.imports);
+const ClientDetailPage = lazy(pageLoaders.client);
+const InvoicesPage = lazy(pageLoaders.invoices);
+const InvoiceDetailPage = lazy(pageLoaders.invoice);
 const PublicInvoicePage = lazy(() => import("@/pages/i/[token]"));
-const JobsListPage = lazy(() => import("@/pages/dashboard/jobs/index"));
-const JobDetailPage = lazy(() => import("@/pages/dashboard/jobs/[id]"));
-const JobSetupPage = lazy(() => import("@/pages/dashboard/jobs/setup"));
-const TeamPage = lazy(() => import("@/pages/dashboard/team"));
-const SchedulePage = lazy(() => import("@/pages/dashboard/schedule"));
-const CompliancePage = lazy(() => import("@/pages/dashboard/compliance"));
-const BooksPage = lazy(() => import("@/pages/dashboard/books"));
-const PayPage = lazy(() => import("@/pages/dashboard/pay"));
-const GroupPage = lazy(() => import("@/pages/dashboard/group"));
-const MePage = lazy(() => import("@/pages/dashboard/me"));
-const TeammatePage = lazy(() => import("@/pages/dashboard/me").then((m) => ({ default: m.TeammatePage })));
+const JobsListPage = lazy(pageLoaders.jobs);
+const JobDetailPage = lazy(pageLoaders.job);
+const JobSetupPage = lazy(pageLoaders.jobSetup);
+const TeamPage = lazy(pageLoaders.team);
+const SchedulePage = lazy(pageLoaders.schedule);
+const CompliancePage = lazy(pageLoaders.compliance);
+const BooksPage = lazy(pageLoaders.books);
+const PayPage = lazy(pageLoaders.pay);
+const GroupPage = lazy(pageLoaders.group);
+const MePage = lazy(pageLoaders.me);
+const TeammatePage = lazy(() => pageLoaders.me().then((m) => ({ default: m.TeammatePage })));
 const JoinPage = lazy(() => import("@/pages/join"));
-const AssistantPage = lazy(() => import("@/pages/dashboard/assistant"));
+const AssistantPage = lazy(pageLoaders.assistant);
 const WorkerTimePage = lazy(() => import("@/pages/t/[token]"));
 const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
-const DocumentsPage = lazy(() => import("@/pages/dashboard/documents"));
-const ArchivePage = lazy(() => import("@/pages/dashboard/archive"));
-const NotificationsPage = lazy(() => import("@/pages/dashboard/notifications"));
+const DocumentsPage = lazy(pageLoaders.documents);
+const ArchivePage = lazy(pageLoaders.archive);
+const NotificationsPage = lazy(pageLoaders.notifications);
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
 const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));
-const ContractsListPage = lazy(() => import("@/pages/dashboard/contracts/index"));
-const ContractDetailPage = lazy(() => import("@/pages/dashboard/contracts/[id]"));
+const ContractsListPage = lazy(pageLoaders.contracts);
+const ContractDetailPage = lazy(pageLoaders.contract);
 const SignPage = lazy(() => import("@/pages/sign/[token]"));
 const PortalPage = lazy(() => import("@/pages/portal/[token]"));
 const BlogArticlePage = lazy(() => import("@/pages/blog/[slug]"));
 const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
 
-import { PublicLayout } from "@/components/layout/public-layout";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import type { Lang } from "@/i18n/translations";
@@ -131,24 +151,82 @@ function DashSuspense({ children }: { children: React.ReactNode }) {
 // Lazy so the dashboard chunk is not a static dependency of the public entry:
 // a static import here would make Vite modulepreload the whole dashboard
 // bundle on the marketing homepage (Phase 61 finding).
-const DashboardLayoutLazy = lazy(() =>
+// Phase 115: it arrives with the dashboard strings in the page's language,
+// and the app frame is drawn while both are on their way (never a blank page).
+const DashboardLayoutLazy = lazy(withDashboardStrings(() =>
   import("@/components/layout/dashboard-layout").then((m) => ({ default: m.DashboardLayout })),
-);
+));
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<AppShellSkeleton />}>
       <DashboardLayoutLazy>{children}</DashboardLayoutLazy>
     </Suspense>
   );
 }
 
+// Phase 115: the signed-in app. Until now each dashboard route rendered its
+// own OnboardingGuard + layout inside an inline component, so every tap on a
+// tab unmounted and rebuilt the sidebar, the top bar and the tab bar, and a
+// page whose chunk wasn't loaded yet blanked the whole screen. Now the layout
+// stays; only the page area waits (with a page-shaped skeleton), and the
+// `key` still gives every URL a fresh page, as before.
+function DashboardApp() {
+  const [location] = useLocation();
+  return (
+    <OnboardingGuard>
+      <DashboardLayout>
+        <Suspense fallback={<PageSkeleton />}>
+          <Switch key={location}>
+            <Route path="/dashboard" component={DashboardHome} />
+            <Route path="/dashboard/new" component={NewQuote} />
+            <Route path="/dashboard/quotes" component={QuotesList} />
+            <Route path="/dashboard/quotes/:id" component={QuoteDetail} />
+            <Route path="/dashboard/analytics" component={AnalyticsPage} />
+            <Route path="/dashboard/settings/:section" component={SettingsPage} />
+            <Route path="/dashboard/settings" component={SettingsPage} />
+            {/* Phase 102: the old company profile page duplicated Settings → Company details. */}
+            <Route path="/dashboard/profile" component={() => <Redirect to="/dashboard/settings/company" />} />
+            <Route path="/dashboard/billing" component={BillingPage} />
+            <Route path="/dashboard/catalog" component={CatalogPage} />
+            <Route path="/dashboard/clients/:id" component={ClientDetailPage} />
+            <Route path="/dashboard/clients" component={ClientsPage} />
+            <Route path="/dashboard/leads" component={LeadsListPage} />
+            <Route path="/dashboard/imports" component={ImportsPage} />
+            <Route path="/dashboard/contracts/:id" component={ContractDetailPage} />
+            <Route path="/dashboard/contracts" component={ContractsListPage} />
+            <Route path="/dashboard/invoices/:id" component={InvoiceDetailPage} />
+            <Route path="/dashboard/invoices" component={InvoicesPage} />
+            <Route path="/dashboard/jobs/:id/setup" component={JobSetupPage} />
+            <Route path="/dashboard/jobs/:id" component={JobDetailPage} />
+            <Route path="/dashboard/jobs" component={JobsListPage} />
+            <Route path="/dashboard/assistant" component={AssistantPage} />
+            <Route path="/dashboard/team" component={TeamPage} />
+            <Route path="/dashboard/schedule" component={SchedulePage} />
+            <Route path="/dashboard/compliance" component={CompliancePage} />
+            <Route path="/dashboard/books" component={BooksPage} />
+            <Route path="/dashboard/me" component={MePage} />
+            <Route path="/dashboard/people/:userId" component={TeammatePage} />
+            <Route path="/dashboard/group" component={GroupPage} />
+            <Route path="/dashboard/pay" component={PayPage} />
+            <Route path="/dashboard/documents" component={DocumentsPage} />
+            <Route path="/dashboard/archive" component={ArchivePage} />
+            <Route path="/dashboard/notifications" component={NotificationsPage} />
+            <Route component={NotFound} />
+          </Switch>
+        </Suspense>
+      </DashboardLayout>
+    </OnboardingGuard>
+  );
+}
+
+
 function Router() {
   return (
     <Switch>
       {/* Public pages — paths from sitemap-routes.ts (shared with generate-sitemap.ts) */}
-      <Route path={PATHS.HOME} component={() => <PublicLayout><Home /></PublicLayout>} />
+      <Route path={PATHS.HOME} component={() => <PublicLayout><Suspense fallback={null}><Home /></Suspense></PublicLayout>} />
       {/* French homepage — same component, detects lang from the /fr prefix */}
-      <Route path="/fr" component={() => <PublicLayout><Home /></PublicLayout>} />
+      <Route path="/fr" component={() => <PublicLayout><Suspense fallback={null}><Home /></Suspense></PublicLayout>} />
       {/* Phase 81 — pricing, pilot and province pages, each with a real French URL */}
       <Route path={PATHS.PRICING} component={() => <PublicLayout><Suspense fallback={null}><PricingPage /></Suspense></PublicLayout>} />
       <Route path="/fr/tarifs" component={() => <PublicLayout><Suspense fallback={null}><PricingPage /></Suspense></PublicLayout>} />
@@ -180,113 +258,18 @@ function Router() {
 
       <Route path="/onboarding" component={() => <Suspense fallback={null}><OnboardingPage /></Suspense>} />
 
-      {/* Dashboard (private, not indexed) */}
-      <Route path="/dashboard" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><DashboardHome /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/new" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><NewQuote /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/quotes" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><QuotesList /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/quotes/:id" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><QuoteDetail /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/analytics" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><AnalyticsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/settings/:section" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><SettingsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/settings" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><SettingsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      {/* Phase 102: the old company profile page duplicated Settings → Company details. */}
-      <Route path="/dashboard/profile" component={() => <Redirect to="/dashboard/settings/company" />} />
-      <Route path="/dashboard/billing" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><BillingPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/catalog" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><CatalogPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/clients/:id" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ClientDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/clients" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ClientsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/leads" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><LeadsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/imports" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ImportsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/contracts/:id" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ContractDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/contracts" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ContractsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/invoices/:id" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><InvoiceDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/invoices" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><InvoicesPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/jobs/:id/setup" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><JobSetupPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/jobs/:id" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><JobDetailPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/jobs" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><JobsListPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/assistant" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><AssistantPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/team" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><TeamPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/schedule" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><SchedulePage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/compliance" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><CompliancePage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/books" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><BooksPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/me" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><MePage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/people/:userId" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><TeammatePage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/group" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><GroupPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/pay" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><PayPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      {/* The old CRM is retired (Phase 2): its working parts live in Jobs */}
-      <Route path="/crm" component={() => <Redirect to="/dashboard/jobs" />} />
-      <Route path="/crm/:rest*" component={() => <Redirect to="/dashboard/jobs" />} />
-      <Route path="/dashboard/documents" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><DocumentsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/archive" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><ArchivePage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
-      <Route path="/dashboard/notifications" component={() => (
-        <OnboardingGuard><DashboardLayout><DashSuspense><NotificationsPage /></DashSuspense></DashboardLayout></OnboardingGuard>
-      )} />
+      {/* Dashboard (private, not indexed). Phase 115: one route for the whole
+          signed-in app, so its layout stays mounted from page to page. */}
+      <Route path="/dashboard/admin" component={() => <DashSuspense><AdminPage /></DashSuspense>} />
       {MobilePreview && (
         <Route path="/dashboard/__preview" component={() => (
           <DashboardLayout><DashSuspense><MobilePreview /></DashSuspense></DashboardLayout>
         )} />
       )}
+      <Route path="/dashboard/*?" component={DashboardApp} />
+      {/* The old CRM is retired (Phase 2): its working parts live in Jobs */}
+      <Route path="/crm" component={() => <Redirect to="/dashboard/jobs" />} />
+      <Route path="/crm/:rest*" component={() => <Redirect to="/dashboard/jobs" />} />
 
       {/* Public e-signature page: the customer signs the contract from the emailed link */}
       <Route path="/sign/:token" component={() => <Suspense fallback={null}><SignPage /></Suspense>} />
@@ -314,9 +297,7 @@ function Router() {
       <Route path="/blog/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogArticlePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.BLOG} component={() => <PublicLayout><Suspense fallback={null}><BlogPage /></Suspense></PublicLayout>} />
 
-      <Route path="/dashboard/admin" component={() => <DashSuspense><AdminPage /></DashSuspense>} />
-
-      <Route component={NotFound} />
+      <Route component={() => <Suspense fallback={null}><NotFound /></Suspense>} />
     </Switch>
   );
 }
@@ -356,7 +337,7 @@ function App({ ssr }: { ssr?: { path: string; lang: Lang } } = {}) {
             <ErrorBoundary>
               <Router />
             </ErrorBoundary>
-            <Toaster />
+            <Suspense fallback={null}><Toaster /></Suspense>
             <RouteAnnouncer />
             <ScrollManager />
           </TooltipProvider>

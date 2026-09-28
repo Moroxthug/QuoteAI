@@ -34,6 +34,41 @@ jobs:
       - name: Build
         run: pnpm -r --if-present run build
 
+  # Phase 115 (docs/APP-PLAN.md): performance budgets, in a job of their own
+  # so a red static check above does not hide them. JavaScript per screen
+  # against artifacts/quote-ai/perf-budgets.json — a screen or a chunk over
+  # its budget fails — then Lighthouse's mobile profile over the built site
+  # (served by server/serve.mjs). CI runners are slower than the desktop the
+  # local target of 90 is measured on, so CI holds a floor of 75 and catches
+  # regressions; the local run keeps the stricter bar.
+  perf:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - name: Build the client
+        run: pnpm --filter @workspace/quote-ai build
+      - name: Bundle budgets
+        run: pnpm --filter @workspace/quote-ai qa:bundle
+      - name: Lighthouse (mobile)
+        run: pnpm --filter @workspace/quote-ai qa:lighthouse -- --runs=1 --perf-floor=75 --urls=/,/fr/,/pricing/,/quotes/painter/toronto/,/sign-in/
+      - name: Upload performance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-reports
+          path: |
+            artifacts/quote-ai/.qa/bundle/
+            artifacts/quote-ai/.qa/lighthouse/
+          if-no-files-found: ignore
+
   # Phase 63: the e2e suite against a disposable Supabase project. Runs only
   # when the E2E_* secrets are set (repo Settings → Secrets → Actions); until
   # then every step is skipped and the job is green. NEVER point these at the

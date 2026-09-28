@@ -35,9 +35,10 @@ if (!existsSync(ssrEntry)) {
 
 type Lang = "en" | "fr";
 interface RenderedPage { body: string; head: string; htmlLang: string }
-const { renderPage, listPrerenderRoutes } = (await import(pathToFileURL(ssrEntry).href)) as {
+const { renderPage, listPrerenderRoutes, renderAppShell } = (await import(pathToFileURL(ssrEntry).href)) as {
   renderPage: (path: string, lang: Lang) => Promise<RenderedPage>;
   listPrerenderRoutes: () => Array<{ path: string; lang: Lang }>;
+  renderAppShell: () => string;
 };
 
 // ─── Template surgery ──────────────────────────────────────────────────────
@@ -112,6 +113,46 @@ function injectAppPreload(html: string): string {
   return links ? html.replace("</head>", `    ${links}\n  </head>`) : html;
 }
 
+// Phase 115: the strings come one language per chunk and main.tsx waits for
+// them before hydrating, so each page preloads its own language's chunk.
+const STRINGS_CHUNKS: Record<Lang, string | undefined> = (() => {
+  const manifestPath = join(distDir, ".vite", "manifest.json");
+  const manifest = existsSync(manifestPath) ? (JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, { file: string }>) : {};
+  return { en: manifest["virtual:i18n/core/en"]?.file, fr: manifest["virtual:i18n/core/fr"]?.file };
+})();
+if (!STRINGS_CHUNKS.en || !STRINGS_CHUNKS.fr) throw new Error("The virtual:i18n/core/* chunks are missing from the Vite manifest");
+function injectStringsPreload(html: string, lang: Lang): string {
+  return html.replace("</head>", `    <link rel="modulepreload" crossorigin href="/${STRINGS_CHUNKS[lang]}">\n  </head>`);
+}
+
+// Phase 115: the public layout (every prerendered page) and the homepage are
+// lazy chunks now, out of the App chunk the signed-in app loads; hydration
+// waits for them, so they are preloaded with the page like the App is.
+const ROUTE_PRELOADS = (() => {
+  const manifestPath = join(distDir, ".vite", "manifest.json");
+  const manifest = existsSync(manifestPath) ? (JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, { file: string; imports?: string[] }>) : {};
+  const closure = (key: string) => {
+    const files = new Set<string>();
+    const walk = (k: string) => {
+      const chunk = manifest[k];
+      if (!chunk || files.has(chunk.file)) return;
+      files.add(chunk.file);
+      chunk.imports?.forEach(walk);
+    };
+    walk(key);
+    return [...files].filter((f) => f.endsWith(".js") && !APP_PRELOADS.includes(f.replace(/^assets\//, "")));
+  };
+  const layout = closure("src/components/layout/public-layout.tsx");
+  const home = closure("src/pages/home.tsx").filter((f) => !layout.includes(f));
+  if (!layout.length || !home.length) throw new Error("public-layout / home chunks are missing from the Vite manifest");
+  return { layout, home };
+})();
+function injectRoutePreload(html: string, routePath: string): string {
+  const files = [...ROUTE_PRELOADS.layout, ...(routePath === "/" || routePath === "/fr/" || routePath === "/fr" ? ROUTE_PRELOADS.home : [])];
+  const links = files.map((f) => `<link rel="modulepreload" crossorigin href="/${f}">`).join("\n    ");
+  return html.replace("</head>", `    ${links}\n  </head>`);
+}
+
 function writeRoute(routePath: string, html: string): void {
   const outDir = routePath === "/" ? distDir : join(distDir, routePath.replace(/^\//, ""));
   mkdirSync(outDir, { recursive: true });
@@ -129,6 +170,8 @@ const beasties = new Beasties({
   // sheet remains the single complete stylesheet the SPA needs after hydration.
   preload: "body",
   pruneSource: false,
+  // Off: Beasties only finds families named in the critical rules, and ours
+  // come through var(--font-mk); injectFontFaces() below inlines them instead.
   inlineFonts: false,
   preloadFonts: false,
   reduceInlineStyles: false,
@@ -138,8 +181,28 @@ const beasties = new Beasties({
   logLevel: "warn",
 });
 
+// Phase 115: Figtree's @font-face and its metric-matched fallback's
+// (src/index.css) inline at the top of <head>. Left in the stylesheet, which
+// Beasties moves to the end of <body>, neither face existed at first paint:
+// the text laid out in a system font, again when the sheet arrived and again
+// when Figtree did — the /fr/ hero's 0.23 CLS on a slow connection.
+const FONT_FACES = (() => {
+  const assets = join(distDir, "assets");
+  const faces = readdirSync(assets)
+    .filter((f) => f.endsWith(".css"))
+    .flatMap((f) => readFileSync(join(assets, f), "utf8").match(/@font-face\{[^}]*font-family:\s*["']?Figtree(?: Fallback)?["']?;[^}]*\}/g) ?? []);
+  const unique = [...new Set(faces)];
+  if (!unique.some((r) => r.includes("Fallback")) || !unique.some((r) => r.includes("figtree-latin"))) {
+    throw new Error("prerender: the Figtree / Figtree Fallback @font-face rules were not found in the built CSS");
+  }
+  return unique.join("");
+})();
+function injectFontFaces(html: string): string {
+  return html.replace("</title>", `</title>\n  <style>${FONT_FACES}</style>`);
+}
+
 async function inlineCriticalCss(html: string): Promise<string> {
-  const out = await beasties.process(html);
+  const out = injectFontFaces(await beasties.process(html));
   if (/\son(?:load|error)=/i.test(out) || /<script(?![^>]*type="application\/ld\+json")[^>]*>[^<]*beasties/i.test(out)) {
     throw new Error("Beasties emitted an inline handler or script — the CSP would block it");
   }
@@ -148,6 +211,7 @@ async function inlineCriticalCss(html: string): Promise<string> {
 
 // ─── Main ──────────────────────────────────────────────────────────────────
 
+// Read before the loop: the homepage render below overwrites index.html itself.
 const template = pruneModulepreload(readFileSync(templatePath, "utf-8"));
 const routes = listPrerenderRoutes();
 console.log(`Prerendering ${routes.length} pages...`);
@@ -156,10 +220,31 @@ const t0 = Date.now();
 let count = 0;
 for (const route of routes) {
   const page = await renderPage(route.path, route.lang);
-  let html = injectAppPreload(injectBody(injectHead(template, page), route.path, page.body));
+  let html = injectRoutePreload(injectStringsPreload(injectAppPreload(injectBody(injectHead(template, page), route.path, page.body)), route.lang), route.path);
   html = await inlineCriticalCss(html);
   writeRoute(route.path, html);
   count++;
   if (count % 50 === 0) console.log(`  … ${count}/${routes.length}`);
 }
 console.log(`Prerendered ${count} pages in ${((Date.now() - t0) / 1000).toFixed(1)} s.`);
+
+// ─── Shells for the routes that are not prerendered (Phase 115) ───────────
+//
+// Vercel used to answer every route without its own file with index.html —
+// which is the prerendered homepage — so opening /dashboard, a client's /p/
+// quote link or /sign-in showed the marketing hero until the app replaced it.
+// vercel.json now sends /dashboard/* to app.html (the app frame drawn in HTML,
+// the dashboard layout preloaded) and everything else to spa.html (the bare
+// template). Neither carries data-ssr, so main.tsx renders instead of hydrating.
+const layoutChunk = (() => {
+  const manifestPath = join(distDir, ".vite", "manifest.json");
+  const manifest = existsSync(manifestPath) ? (JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, { file: string }>) : {};
+  return manifest["src/components/layout/dashboard-layout.tsx"]?.file;
+})();
+const appHtml = injectAppPreload(template)
+  .replace('<div id="root"></div>', `<div id="root">${renderAppShell()}</div>`)
+  .replace("</head>", layoutChunk ? `  <link rel="modulepreload" crossorigin href="/${layoutChunk}">\n  </head>` : "</head>");
+if (!appHtml.includes('aria-busy="true"')) throw new Error("app.html: the app frame did not render into #root");
+writeFileSync(join(distDir, "app.html"), await inlineCriticalCss(appHtml), "utf-8");
+writeFileSync(join(distDir, "spa.html"), injectAppPreload(template), "utf-8");
+console.log("Wrote app.html (the app frame) and spa.html (bare shell).");

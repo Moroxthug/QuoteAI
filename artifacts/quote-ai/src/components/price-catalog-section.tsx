@@ -1,10 +1,10 @@
 import { useState, useRef } from "react";
+import { ListSkeleton } from "@/components/skeletons";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus, Pencil, Trash2, Loader2, BookOpen, Tag, Ruler,
   Check, Upload, AlertCircle, Search
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from "@/components/ui/dialog";
@@ -391,9 +391,7 @@ export function PriceCatalogSection() {
         </div>
 
         {isLoading ? (
-          <div className="stack" style={{ padding: 22 }}>
-            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-lg" />)}
-          </div>
+          <ListSkeleton rows={5} chip={false} sub={false} />
         ) : filteredItems.length === 0 ? (
           <div className="card-empty">
             <BookOpen />

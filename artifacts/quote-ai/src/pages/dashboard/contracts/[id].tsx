@@ -6,7 +6,6 @@ import { enCA, frCA } from "date-fns/locale";
 import {
   ArrowLeft, FileSignature, Send, Download, Ban, Pencil, Save, X, Loader2, CheckCircle2, Clock, AlertTriangle, Lock, Sparkles, RefreshCw, Archive, ChevronDown, FileText, Briefcase,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { MockupToggle } from "@/components/ui/mockup-toggle";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ActionSheet, type SheetAction } from "@/components/mobile/action-sheet";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { useMobileHeader } from "@/components/mobile/mobile-page-header";
+import { DetailSkeleton } from "@/components/skeletons";
 
 
 /** Contract status → locked `.chip-*` colour (Phase 57). */
@@ -179,14 +179,8 @@ export default function ContractDetailPage() {
     ];
   }, [contract, contractorSigner, customerSigner, t]);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-64" />
-        <Skeleton className="h-[600px] w-full rounded-[var(--radius-mk)]" />
-      </div>
-    );
-  }
+  // Phase 115: the hero (who, what, the total) and the document card, as they will sit.
+  if (isLoading) return <DetailSkeleton strip={0} rows={8} />;
   if (error || !contract || !vars) {
     return (
       <div className="card card-empty">

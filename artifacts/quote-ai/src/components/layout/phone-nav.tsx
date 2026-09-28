@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ListSkeleton } from "@/components/skeletons";
 import { Link, useLocation, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, Briefcase, Building2, CalendarDays, Camera, Check, ChevronRight, CreditCard, FilePlus2, FileText, HardHat, Home, LayoutGrid, Loader2, LogOut, Mic, Plus, Receipt, Target, Users, Wallet, type LucideIcon } from "lucide-react";
@@ -343,7 +344,7 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
         flush
       >
         {isLoading ? (
-          <p className="more-empty"><Loader2 className="h-4 w-4 animate-spin" /></p>
+          <ListSkeleton rows={3} chip={false} amount={false} />
         ) : openJobs.length === 0 ? (
           <p className="more-empty">{t("mobile.new.noJobs")}</p>
         ) : (

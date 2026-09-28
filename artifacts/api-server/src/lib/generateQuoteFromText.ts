@@ -10,7 +10,7 @@ import { resolveQuoteTaxRate } from "./tax.js";
 import { recordAiUsage } from "./usage.js";
 import { currentActorId } from "./requestContext.js";
 
-export const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
+const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
 
 You must turn a free-form description into a professional ECONOMIC ANALYSIS AND PRICED BILL OF QUANTITIES, structured into chapters, consistent with 2026 Canadian market prices.
 
@@ -103,7 +103,7 @@ Apply the adjustment consistently to ALL line items in the quote (labour and mat
 export const DESCRIPTION_QUALITY_GUIDANCE = `DESCRIPTION QUALITY:
 Every line item (the "descrizione" field) must be specific and professional, never generic: state precisely what is being done, and when relevant, with which materials, techniques, or execution methods (e.g. "Two-coat painting of walls and ceilings with washable breathable paint, including prior patching and sanding" instead of "Painting"). Avoid vague items such as "Various work", "General labour" or "Building materials" without further detail. If images are attached, use the visible details (condition of the space, surfaces, existing finishes, readable measurements) to make the line items more precise and to better calibrate quantities and prices.`;
 
-export const CAPITOLATO_CONTEXT = `PROFESSIONAL TECHNICAL SPECIFICATION MODE:
+const CAPITOLATO_CONTEXT = `PROFESSIONAL TECHNICAL SPECIFICATION MODE:
 For every work item, write the description in the style of a formal TECHNICAL SPECIFICATION (spec sheet), with AT LEAST 4-6 technical lines in formal English:
 - Precisely describe the operations performed and the execution methods (workflow, techniques, sequence of phases)
 - Specify materials, products, and components with technical characteristics and applicable Canadian/North American standards (National Building Code of Canada, CSA, ULC, ASTM, provincial building codes)
@@ -589,25 +589,6 @@ export async function saveQuoteToDb({
   await linkQuoteToClient(quote);
 
   return quote;
-}
-
-/**
- * Legacy interface: generates a quote AND saves it to DB in one step.
- * Used by the web flow and existing callers.
- */
-export async function generateQuoteFromText({
-  userId,
-  rawInput,
-  log,
-  source = "web",
-}: {
-  userId: string;
-  rawInput: string;
-  log: Logger;
-  source?: string;
-}): Promise<typeof quotesTable.$inferSelect> {
-  const data = await buildQuoteFromAI({ userId, rawInput, log });
-  return saveQuoteToDb({ userId, data, source });
 }
 
 // ── Guardrails ──────────────────────────────────────────────────────────────────

@@ -233,7 +233,3 @@ export async function buildContractPdf(params: {
   const final = await getPdfmake().createPdf(build(sha256)).getBuffer();
   return { buffer: final, sha256 };
 }
-
-export function sha256Hex(buffer: Buffer): string {
-  return createHash("sha256").update(buffer).digest("hex");
-}

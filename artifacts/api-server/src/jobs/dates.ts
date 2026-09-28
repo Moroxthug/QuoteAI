@@ -3,11 +3,11 @@
 
 const DAY_MS = 86_400_000;
 
-export function startOfDayUtc(d: Date): Date {
+function startOfDayUtc(d: Date): Date {
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
 }
 
-export function isWeekend(d: Date): boolean {
+function isWeekend(d: Date): boolean {
   const day = d.getUTCDay();
   return day === 0 || day === 6;
 }
@@ -20,7 +20,7 @@ export function nextWorkingDay(d: Date): Date {
 }
 
 /** Adds `n` working days (n ≥ 1 → lands on the n-th working day after `from`, weekends skipped). */
-export function addWorkingDays(from: Date, n: number): Date {
+function addWorkingDays(from: Date, n: number): Date {
   let cur = startOfDayUtc(from);
   let remaining = Math.max(0, Math.round(n));
   while (remaining > 0) {

@@ -154,9 +154,9 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 68 | GET | `/api/clients/:id/portal` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 92 | POST | `/api/clients/:id/portal/invite` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 123 | GET | `/api/clients/:id/messages` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 141 | POST | `/api/clients/:id/messages` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 94 | POST | `/api/clients/:id/portal/invite` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 125 | GET | `/api/clients/:id/messages` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 143 | POST | `/api/clients/:id/messages` | session | jobs:edit | — | zod | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/clients.ts
 
@@ -618,28 +618,28 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 269 | GET | `/api/quotes/stats` | session | — | — | none | — | n/a | — | — | — |
-| 337 | GET | `/api/quotes` | session | — | — | none | — | n/a | quotes:ok | — | — |
-| 468 | POST | `/api/quotes` | session | quotes:edit | aiCallLimiter | zod | plan-check | n/a | — | — | — |
-| 1228 | GET | `/api/quotes/:id` | session | — | — | zod | — | post-check | — | — | — |
-| 1260 | GET | `/api/quotes/:id/variants` | session | — | — | none | — | post-check | — | — | — |
-| 1289 | POST | `/api/quotes/:id/variants` | session | quotes:edit | — | zod | — | post-check | — | — | — |
-| 1354 | PUT | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | zod | — | post-check | — | — | — |
-| 1425 | GET | `/api/quotes/:id/price-check` | session | — | — | none | — | post-check | — | — | — |
-| 1441 | POST | `/api/quotes/:id/reprice` | session | quotes:edit | — | zod | — | post-check | — | — | — |
-| 1479 | DELETE | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | none | — | post-check | — | — | — |
-| 1525 | PUT | `/api/quotes/:id` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
-| 1657 | DELETE | `/api/quotes/:id` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1685 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1705 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | zod | — | post-check | — | — | — |
-| 1725 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
-| 1803 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | zod | — | predicate | — | — | — |
-| 1903 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
-| 1966 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | zod | — | predicate | — | — | — |
-| 2183 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | zod | plan-check | predicate | — | — | — |
-| 2326 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
-| 2377 | POST | `/api/quotes/manual` | session | quotes:edit | — | zod | — | n/a | — | — | — |
-| 2398 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | zod | — | n/a | — | — | — |
+| 270 | GET | `/api/quotes/stats` | session | — | — | none | — | n/a | — | — | — |
+| 338 | GET | `/api/quotes` | session | — | — | none | — | n/a | quotes:ok | — | — |
+| 479 | POST | `/api/quotes` | session | quotes:edit | aiCallLimiter | zod | plan-check | n/a | — | — | — |
+| 1239 | GET | `/api/quotes/:id` | session | — | — | zod | — | predicate | — | — | — |
+| 1273 | GET | `/api/quotes/:id/variants` | session | — | — | none | — | post-check | — | — | — |
+| 1302 | POST | `/api/quotes/:id/variants` | session | quotes:edit | — | zod | — | post-check | — | — | — |
+| 1367 | PUT | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | zod | — | post-check | — | — | — |
+| 1438 | GET | `/api/quotes/:id/price-check` | session | — | — | none | — | post-check | — | — | — |
+| 1454 | POST | `/api/quotes/:id/reprice` | session | quotes:edit | — | zod | — | post-check | — | — | — |
+| 1492 | DELETE | `/api/quotes/:id/variants/:variantId` | session | quotes:edit | — | none | — | post-check | — | — | — |
+| 1538 | PUT | `/api/quotes/:id` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
+| 1670 | DELETE | `/api/quotes/:id` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1698 | POST | `/api/quotes/:id/archive` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1718 | POST | `/api/quotes/:id/restore` | session | quotes:full | — | zod | — | post-check | — | — | — |
+| 1738 | POST | `/api/quotes/:id/generate-pdf` | session | quotes:edit | — | zod | plan-check | predicate | — | — | — |
+| 1816 | POST | `/api/quotes/:id/send-pdf-email` | session | quotes:edit | — | zod | — | predicate | — | — | — |
+| 1916 | POST | `/api/quotes/:id/duplicate` | session | quotes:edit | — | none | — | post-check | — | — | — |
+| 1979 | POST | `/api/quotes/:id/regenerate` | session | quotes:edit | aiCallLimiter | zod | — | predicate | — | — | — |
+| 2196 | POST | `/api/quotes/:id/upgrade-to-capitolato` | session | quotes:edit | aiCallLimiter | zod | plan-check | predicate | — | — | — |
+| 2339 | POST | `/api/quotes/:id/generate-pdf-pro` | session | quotes:edit | — | none | plan-check | predicate | — | — | — |
+| 2390 | POST | `/api/quotes/manual` | session | quotes:edit | — | zod | — | n/a | — | — | — |
+| 2411 | POST | `/api/quotes/suggest-item-description` | session | quotes:edit | aiCallLimiter | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/schedule.ts
 
@@ -795,15 +795,15 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 1186 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
-| 1200 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
-| 1371 | GET | `/api/whatsapp/available` | none | — | — | none | — | n/a | — | — | — |
-| 1376 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
-| 1388 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
-| 1413 | POST | `/api/whatsapp/connect` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 1449 | POST | `/api/whatsapp/verify` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 1478 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 1489 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1185 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
+| 1199 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
+| 1370 | GET | `/api/whatsapp/available` | none | — | — | none | — | n/a | — | — | — |
+| 1375 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
+| 1387 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
+| 1412 | POST | `/api/whatsapp/connect` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1448 | POST | `/api/whatsapp/verify` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1477 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 1488 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/worker-time.ts
 

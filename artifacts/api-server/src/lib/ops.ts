@@ -13,7 +13,7 @@ import { captureMessage } from "./errorTracking";
  * is 24 h + 1 h grace. Set CRON_STALE_AFTER_HOURS=2 when the schedule moves
  * to hourly.
  */
-export function cronStaleAfterMs(): number {
+function cronStaleAfterMs(): number {
   const hours = Number(process.env.CRON_STALE_AFTER_HOURS ?? "25");
   return (Number.isFinite(hours) && hours > 0 ? hours : 25) * 3_600_000;
 }

@@ -6,6 +6,10 @@
     "artifacts/quote-ai/public/sw.js",
     "artifacts/quote-ai/public/widget-test.js"
   ],
+  "ignoreIssues": {
+    "artifacts/quote-ai/src/components/ui/**": ["exports", "types"],
+    "artifacts/quote-ai/src/lib/*-api.ts": ["types"]
+  },
   "ignoreDependencies": [
     "prettier",
     "pdfkit",
@@ -14,8 +18,7 @@
     "xlsx",
     "@google/genai",
     "@types/react-dom",
-    "@types/pdf-parse",
-    "@fontsource-variable/figtree"
+    "@types/pdf-parse"
   ],
   "ignoreBinaries": [
     "ffmpeg",
@@ -33,7 +36,6 @@
   "workspaces": {
     ".": {
       "entry": [
-        "eslint.config.mjs",
         "api/index.js"
       ]
     },
@@ -41,7 +43,6 @@
       "entry": [
         "src/index.ts",
         "src/app.ts",
-        "build.mjs",
         "src/**/*.test.ts",
         "src/e2e/**",
         "scripts/*.ts"
@@ -49,28 +50,23 @@
     },
     "artifacts/quote-ai": {
       "entry": [
-        "src/main.tsx",
         "index.html",
         "scripts/*.ts",
         "server/*.mjs",
-        "vite.config.ts",
         "src/entry-server.tsx",
         "src/widget/widget.ts"
       ]
     },
-    "lib/*": {
+    "lib/db": {
+      "drizzle": false,
       "entry": [
-        "src/index.ts"
+        "drizzle.config.ts",
+        "scripts/*.ts"
       ]
     },
     "scripts": {
       "entry": [
         "src/*.ts"
-      ]
-    },
-    "lib/api-spec": {
-      "entry": [
-        "orval.config.ts"
       ]
     }
   }

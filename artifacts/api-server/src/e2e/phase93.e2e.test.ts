@@ -67,8 +67,6 @@ vi.mock("../stripeClient", () => ({
     },
     promotionCodes: { list: async () => ({ data: [] }) },
   }),
-  getStripePublishableKey: async () => "",
-  getStripeSecretKey: async () => "sk_test_walk",
 }));
 
 const { startServer, stopServer, createOrg, cleanupAll, adoptUserByEmail } = await import("./harness.js");

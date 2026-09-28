@@ -37,7 +37,7 @@ import { currentActorId } from "../lib/requestContext.js";
 
 const storage = new ObjectStorageService();
 
-export const SIGNING_LINK_DAYS = 30;
+const SIGNING_LINK_DAYS = 30;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -49,7 +49,7 @@ export function newRawToken(): string {
   return randomBytes(32).toString("base64url");
 }
 
-export async function nextContractNumber(userId: string): Promise<string> {
+async function nextContractNumber(userId: string): Promise<string> {
   const [row] = await db
     .insert(contractSequencesTable)
     .values({ userId, next: 2 })
@@ -94,7 +94,7 @@ export async function loadContract(id: string): Promise<{ contract: Contract; si
 type QuoteRow = typeof quotesTable.$inferSelect;
 type ProfileRow = typeof businessProfilesTable.$inferSelect;
 
-export function buildVariablesFromQuote(params: {
+function buildVariablesFromQuote(params: {
   quote: QuoteRow;
   profile: ProfileRow | undefined;
   client: typeof clientsTable.$inferSelect | undefined;

@@ -17,7 +17,7 @@ export type PdfMakeInstance = {
 const HELVETICA = { normal: "Helvetica", bold: "Helvetica-Bold", italics: "Helvetica-Oblique", bolditalics: "Helvetica-BoldOblique" };
 const TIMES = { normal: "Times-Roman", bold: "Times-Bold", italics: "Times-Italic", bolditalics: "Times-BoldItalic" };
 
-export const PDF_FONTS: Record<string, Record<string, string>> = {
+const PDF_FONTS: Record<string, Record<string, string>> = {
   Roboto: HELVETICA, // pdfmake's default font name, mapped onto the built-in Helvetica
   Helvetica: HELVETICA,
   Serif: TIMES, // contracts

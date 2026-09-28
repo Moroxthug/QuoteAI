@@ -16,7 +16,7 @@ function apiBase(): string {
   return FINANCEIT_ENVIRONMENT === "production" ? "https://financeit.ca/api/v3" : "https://sandbox.financeit.ca/api/v3";
 }
 
-export function financeitConfigured(): boolean {
+function financeitConfigured(): boolean {
   return !!FINANCEIT_APP_ID && !!FINANCEIT_APP_SECRET;
 }
 

@@ -17,7 +17,6 @@ Kinds: **required** (boot/core flows) · **recommended** (launch expectation, de
 | `QUOTEAI_BASE_URL` | ? |  | public origin used in emails/PDF links | api-server/src/lib/auth.ts, api-server/src/lib/baseUrl.ts |  |
 | `RESEND_API_KEY` | ? |  | every transactional email (auth, quotes, invoices, ops alerts) | api-server/src/lib/auth.ts, api-server/src/lib/email.ts, api-server/src/lib/emailUtils.ts (+4) |  |
 | `STRIPE_CONNECT_WEBHOOK_SECRET` | ? |  | POST /api/payments/connect/webhook signature (Phase 14 invoices paid by card) | api-server/src/app.ts |  |
-| `STRIPE_PUBLISHABLE_KEY` | ? |  | returned to the client for Checkout | api-server/src/stripeClient.ts |  |
 | `STRIPE_SECRET_KEY` | ? |  | subscriptions + Connect | api-server/src/account/service.ts, api-server/src/stripeClient.ts |  |
 | `STRIPE_WEBHOOK_SECRET` | ? |  | POST /api/payments/webhook signature | api-server/src/app.ts |  |
 | `SUPABASE_PRIVATE_BUCKET` | ? |  | private-assets (signed URLs) | api-server/src/lib/objectStorage.ts, api-server/scripts/backup.ts |  |

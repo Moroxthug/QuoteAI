@@ -94,7 +94,7 @@ export async function exchangeForLongLivedToken(shortLivedToken: string): Promis
 export type MetaPage = { id: string; name: string; access_token: string };
 
 /** The Pages the connected user manages, each with its own (effectively non-expiring, tied to the user token) Page access token. */
-export async function listPages(userAccessToken: string): Promise<MetaPage[]> {
+async function listPages(userAccessToken: string): Promise<MetaPage[]> {
   const data = await graphGet<{ data: MetaPage[] }>("/me/accounts", userAccessToken, { fields: "id,name,access_token" });
   return data.data;
 }

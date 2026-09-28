@@ -25,7 +25,7 @@ import {
 import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
 import type { CityIntelligence } from "./seo-intelligence.js";
 
-export type { CityIntelligence, SectorData, CityData };
+export type { SectorData, CityData };
 
 const BASE_URL = "https://quoteai.ca";
 

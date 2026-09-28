@@ -26,7 +26,7 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-export function quoteUnsubscribeUrl(token: string): string {
+function quoteUnsubscribeUrl(token: string): string {
   return `${getBaseUrl()}/api/public/quotes/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 

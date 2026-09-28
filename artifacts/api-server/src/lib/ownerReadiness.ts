@@ -14,7 +14,7 @@
 import type Stripe from "stripe";
 
 /** Every variable an owner item turns on, by Phase 99 item. Presence is all that is reported. */
-export const OWNER_VARS: Record<string, string[]> = {
+const OWNER_VARS: Record<string, string[]> = {
   "L-6": ["SENTRY_DSN", "VITE_SENTRY_DSN", "SENTRY_AUTH_TOKEN", "SENTRY_ORG", "SENTRY_PROJECT", "CRON_HEARTBEAT_URL", "OPS_ALERT_EMAIL"],
   // Phase 99: the whole catalog (scripts: stripe-catalog) — plans, one-off quotes, add-ons.
   "L-8": [
@@ -66,7 +66,7 @@ export const PRICE_VARS: Record<string, "month" | "year" | "once"> = {
   STRIPE_PRICE_EXTRA_SEAT_YEARLY: "year",
 };
 
-export type PriceCheck = {
+type PriceCheck = {
   set: boolean;
   ok: boolean;
   /** Why it is not ok, in words the owner can act on. */

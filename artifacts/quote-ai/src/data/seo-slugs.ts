@@ -49,7 +49,7 @@ export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
  * the one file the public entry bundle can afford to load eagerly: the header,
  * the footer and the language toggle all read it.
  */
-export const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
+const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
   { en: "/pricing", fr: "/fr/tarifs" },
   { en: "/pilot", fr: "/fr/pilote" },
   // Phase 95: the legal pages.

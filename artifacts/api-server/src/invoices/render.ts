@@ -1,5 +1,4 @@
 import type { Invoice, InvoiceParty, InvoicePayment } from "@workspace/db";
-import { PROVINCE_NAMES, isProvinceCode } from "@workspace/db";
 
 // ── Invoice rendering: strings + HTML ────────────────────────────────────────
 // The PDF (pdf.ts) and the public page / email share these labels so the
@@ -9,7 +8,7 @@ import { PROVINCE_NAMES, isProvinceCode } from "@workspace/db";
 
 export type Lang = "en" | "fr";
 
-export const I = {
+const I = {
   invoice: { en: "Invoice", fr: "Facture" },
   creditNote: { en: "Credit note", fr: "Note de crédit" },
   invoiceNo: { en: "Invoice No.", fr: "Facture n°" },
@@ -99,10 +98,6 @@ export function fmtDay(d: Date | string | null | undefined, lang: Lang): string 
 
 export function fmtQty(q: number, lang: Lang): string {
   return new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { maximumFractionDigits: 2 }).format(q);
-}
-
-export function provinceName(code: string | null | undefined, lang: Lang): string {
-  return code && isProvinceCode(code) ? PROVINCE_NAMES[code][lang] : code ?? "";
 }
 
 export function isCreditNote(inv: Pick<Invoice, "type">): boolean {

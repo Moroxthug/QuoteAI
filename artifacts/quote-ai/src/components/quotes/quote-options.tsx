@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export type TemplateId = "standard" | "arosio" | "mariagrazia";
 
-export function useTemplateChoices() {
+function useTemplateChoices() {
   const { t } = useLanguage();
   return [
     { id: "standard" as const, label: t("dashboard.new.template.standard.label"), desc: t("dashboard.new.template.standard.desc"), proOnly: false },

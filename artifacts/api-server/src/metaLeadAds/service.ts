@@ -26,7 +26,7 @@ export async function getMetaLeadAdsConnection(userId: string): Promise<MetaLead
   return conn ?? null;
 }
 
-export async function getMetaLeadAdsConnectionByPageId(pageId: string): Promise<MetaLeadAdsConnection | null> {
+async function getMetaLeadAdsConnectionByPageId(pageId: string): Promise<MetaLeadAdsConnection | null> {
   const [conn] = await db.select().from(metaLeadAdsConnectionsTable).where(eq(metaLeadAdsConnectionsTable.pageId, pageId));
   return conn ?? null;
 }

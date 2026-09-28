@@ -1,6 +1,6 @@
 import { SECTOR_SLUGS } from "./seo-slugs.js";
 
-export interface SectorDataFr {
+interface SectorDataFr {
   label: string;
   labelPlural: string;
   titleTag: string;
@@ -1531,134 +1531,6 @@ export { SECTOR_KEY_BY_FR_SLUG } from "./seo-slugs.js";
   if (errors.length) throw new Error(`src/data/seo-slugs.ts is out of sync with SECTORS: ${errors.join(", ")}`);
 })();
 
-export interface SectorReview {
-  authorName: string;
-  ratingValue: "4" | "5";
-  reviewBody: string;
-  datePublished: string;
-}
-
-export const SECTOR_REVIEWS: Record<string, SectorReview[]> = {
-  painter: [
-    { authorName: "Mark R.", ratingValue: "5", reviewBody: "Finally software that gets what painting work actually involves. I describe 'two coats white washable latex on 900 sq ft plus ceilings' and in 30 seconds I have a quote ready with quantities and prices. Customers sign it right away.", datePublished: "2024-10-12" },
-    { authorName: "Lucy F.", ratingValue: "5", reviewBody: "I used to lose an hour to a spreadsheet for every quote. With quoteai I do it from my phone while I'm still on site. I send it to the customer by text before I'm out the door. Great tool.", datePublished: "2024-11-03" },
-  ],
-  electrician: [
-    { authorName: "John M.", ratingValue: "5", reviewBody: "The AI knows electrical terminology: panels, breakers, pot lights. I described a condo rewire and the quote was better structured than the ones I used to make by hand. Impressive.", datePublished: "2024-09-20" },
-    { authorName: "Steve C.", ratingValue: "5", reviewBody: "I expected trouble with large commercial jobs, but it handles multi-section quotes well. Started on the Starter plan, upgraded to Pro right away.", datePublished: "2024-11-18" },
-  ],
-  plumber: [
-    { authorName: "Rob V.", ratingValue: "5", reviewBody: "I've been a plumber for 20 years and never made a quote this fast. I describe a furnace replacement and quoteai builds it all: furnace, fittings, commissioning, disposal. Nailed it.", datePublished: "2024-10-08" },
-    { authorName: "Andrew P.", ratingValue: "4", reviewBody: "Really useful for emergency calls: I get to the customer, see the issue, write the description, and send the quote before I'm back in the truck. Customers appreciate the speed.", datePublished: "2024-11-22" },
-  ],
-  "general-contractor": [
-    { authorName: "Luke B.", ratingValue: "5", reviewBody: "As a general contractor I needed a multi-section itemized quote. quoteai generates foundations, framing, drywall, and finishes as separate sections. As professional as an engineering firm's.", datePublished: "2024-09-30" },
-    { authorName: "Simon T.", ratingValue: "5", reviewBody: "We cut the time spent on quotes drastically. It used to take two hours, now it's five minutes. The PDF has a structure clients respect.", datePublished: "2024-10-25" },
-  ],
-  "renovation-contractor": [
-    { authorName: "Helen C.", ratingValue: "5", reviewBody: "I run full renovations and need to coordinate demolition, mechanical, flooring, and finishes into one document. quoteai organizes it all into sections automatically. Incredible.", datePublished: "2024-10-14" },
-    { authorName: "Frank N.", ratingValue: "5", reviewBody: "I mentioned an energy-efficiency upgrade in the text and quoteai automatically added a note flagging it in the quote. Didn't expect that. Huge time saver.", datePublished: "2024-11-10" },
-  ],
-  "welder-fabricator": [
-    { authorName: "Dave A.", ratingValue: "5", reviewBody: "For fabrication jobs I always struggled to explain the cost breakdown to customers. Now quoteai calculates steel weight, welding hours, and paint automatically. The customer immediately gets the pricing.", datePublished: "2024-10-03" },
-    { authorName: "Mike G.", ratingValue: "5", reviewBody: "I do gates and fencing. I described a 10x6 ft sliding gate with a motor and the quote structure was already right, with materials and labour separated. Excellent.", datePublished: "2024-11-15" },
-  ],
-  "carpenter-cabinetmaker": [
-    { authorName: "George L.", ratingValue: "5", reviewBody: "I build custom furniture and closets. With quoteai I describe the wood species, finishes, and dimensions and the quote includes everything correctly. Customers get professional documents.", datePublished: "2024-09-25" },
-    { authorName: "Carla M.", ratingValue: "5", reviewBody: "Finally software that knows carpentry terms: solid wood, veneer, matte lacquer. I don't have to explain every term to the AI. It just gets it.", datePublished: "2024-11-07" },
-  ],
-  "hvac-technician": [
-    { authorName: "Peter R.", ratingValue: "5", reviewBody: "As an HVAC tech I handle both plumbing and heating systems. quoteai understands both without issue. In 30 seconds I have a full quote for a furnace, solar panels, and water lines.", datePublished: "2024-10-19" },
-    { authorName: "Nick S.", ratingValue: "5", reviewBody: "I tried other software but it was complicated. quoteai is simple: I write what I'm doing in plain English and it generates the document. Works well even if you're not techy.", datePublished: "2024-11-01" },
-  ],
-  freelance: [
-    { authorName: "Anna V.", ratingValue: "5", reviewBody: "As a freelancer I send quotes every week. With quoteai it takes 5 minutes instead of half an hour. The document is already professionally formatted and the client can't tell an AI made it.", datePublished: "2024-10-06" },
-    { authorName: "Paul F.", ratingValue: "4", reviewBody: "Great for anyone working solo who doesn't want to lose time to admin. The PDF looks professional and clients take the quote more seriously than the ones I used to send in Word.", datePublished: "2024-11-20" },
-  ],
-  "building-consultant": [
-    { authorName: "Matt D.", ratingValue: "5", reviewBody: "As a building consultant I quote complex renovation oversight jobs. quoteai generates multi-section itemized quotes I can customize. Saves me two hours per quote.", datePublished: "2024-09-15" },
-    { authorName: "Sarah L.", ratingValue: "5", reviewBody: "The format of quotes generated by quoteai is as professional as a technical firm's. Private clients are always impressed by the quality of the document.", datePublished: "2024-10-28" },
-  ],
-  mason: [
-    { authorName: "Claude B.", ratingValue: "5", reviewBody: "I do masonry and parging. I used to write quotes by hand on a pad. Now with quoteai I have a professional PDF in 30 seconds. Customers take me a lot more seriously.", datePublished: "2024-10-11" },
-    { authorName: "Richard P.", ratingValue: "5", reviewBody: "I described a job with partition demolition, new block wall, and parging, and quoteai correctly separated the line items with per-square-foot pricing. Exactly what I wanted.", datePublished: "2024-11-13" },
-  ],
-  landscaper: [
-    { authorName: "Val C.", ratingValue: "5", reviewBody: "For landscaping jobs I always struggled to price things out. quoteai understands pruning hours, lawn square footage, and materials, and generates a clear quote. Customers understand what they're paying for right away.", datePublished: "2024-10-07" },
-    { authorName: "Tony R.", ratingValue: "4", reviewBody: "Great for maintenance quotes and irrigation systems. I write the yard description and the system correctly estimates labour hours and materials needed.", datePublished: "2024-11-16" },
-  ],
-  "tile-installer": [
-    { authorName: "Emil G.", ratingValue: "5", reviewBody: "As a tile installer I need to calculate square footage, thinset, grout, and surrounds separately. quoteai does it all automatically from the description. I don't make pricing mistakes anymore.", datePublished: "2024-10-09" },
-    { authorName: "Fiona A.", ratingValue: "5", reviewBody: "I described a 24x24 porcelain tile install over 270 sq ft plus a bathroom surround, and quoteai calculated everything with separate pricing for materials and labour. Perfect.", datePublished: "2024-11-08" },
-  ],
-  "window-door-installer": [
-    { authorName: "Bruce N.", ratingValue: "5", reviewBody: "Window and door quotes always have a lot of line items: sizes, glass, hardware, installation. quoteai handles all that complexity automatically. Saves me an hour per quote.", datePublished: "2024-10-17" },
-    { authorName: "Teresa M.", ratingValue: "5", reviewBody: "I can finally quote while I'm still taking measurements at the customer's home. I describe the windows and doors and the document is ready by the time I leave.", datePublished: "2024-11-05" },
-  ],
-  roofer: [
-    { authorName: "Frank L.", ratingValue: "5", reviewBody: "Roofing quotes are always complex: shingles, insulation, flashing. quoteai splits it all correctly into line items with per-square-foot pricing. Customers understand every line.", datePublished: "2024-10-22" },
-    { authorName: "Gina C.", ratingValue: "4", reviewBody: "I described a full reshingle and the quote included tear-off, ice-and-water shield, shingles, flashing, and disposal. All correct and in 30 seconds.", datePublished: "2024-11-11" },
-  ],
-  "air-conditioning-installer": [
-    { authorName: "Mark P.", ratingValue: "5", reviewBody: "I've installed AC units for years. With quoteai I describe the capacity, the type (single or multi-zone), and the outdoor unit distance and the quote already includes labour, line sets, and testing. Great.", datePublished: "2024-10-05" },
-    { authorName: "Rose F.", ratingValue: "5", reviewBody: "Customers always ask for written quotes. I used to make them in Word and it took too long. With quoteai it's instant and the PDF looks professional enough to close the deal.", datePublished: "2024-11-19" },
-  ],
-  "decorative-painter": [
-    { authorName: "Andrew L.", ratingValue: "5", reviewBody: "As a painter I do repaints, exterior coatings, and decorative finishes. quoteai knows decorative plaster, breathable coatings, priming. Generates the right line items without me having to explain every technique.", datePublished: "2024-10-16" },
-    { authorName: "Monica B.", ratingValue: "5", reviewBody: "I was worried the AI wouldn't understand painting work, but it nails the difference between a primer coat and a finish coat. Per-square-foot pricing is right in line with the market.", datePublished: "2024-11-04" },
-  ],
-  "flooring-installer": [
-    { authorName: "Serge C.", ratingValue: "5", reviewBody: "I install hardwood, laminate, and tile. quoteai understands the install differences and generates separate line items for material, adhesive, baseboard, and old-floor removal. Finally, software that knows the trade.", datePublished: "2024-10-13" },
-    { authorName: "Irene V.", ratingValue: "5", reviewBody: "I tried other software but it was too generic. quoteai uses the right terminology for flooring installers and the result is a professional document customers understand and sign without hesitation.", datePublished: "2024-11-14" },
-  ],
-  "excel-template": [
-    { authorName: "Christine M.", ratingValue: "5", reviewBody: "I used a template I downloaded online. Formatting to fix every time, manual math, wrong tax. With quoteai I stopped using Excel for good. Everything's automatic now.", datePublished: "2024-10-21" },
-    { authorName: "Ed R.", ratingValue: "5", reviewBody: "My Excel template used to break every time I sent it to a customer on a Mac. With quoteai I send a PDF that opens on any device. Finally, no more compatibility headaches.", datePublished: "2024-11-09" },
-  ],
-  "word-template": [
-    { authorName: "Beth F.", ratingValue: "5", reviewBody: "I spent months looking for the right Word template. They all had formatting issues. With quoteai I don't need a template anymore: the document is already perfect once it's generated.", datePublished: "2024-10-18" },
-    { authorName: "Sam P.", ratingValue: "4", reviewBody: "quoteai's PDF opens on any phone with no need for Word or Office. My customers don't need to install anything to open it. Much more practical than a .docx file.", datePublished: "2024-11-02" },
-  ],
-  "how-to-quote": [
-    { authorName: "Dan A.", ratingValue: "5", reviewBody: "I didn't know how to structure a professional quote. The guide explained what to include and quoteai generates it automatically with the whole correct structure: header, line items, tax, payment terms.", datePublished: "2024-10-02" },
-    { authorName: "Nadia C.", ratingValue: "5", reviewBody: "I started from zero as a tradesperson. With quoteai my first quote already looked as professional as the big companies'. Customers have no idea it took 30 seconds.", datePublished: "2024-11-17" },
-  ],
-  "free-quote": [
-    { authorName: "Gino F.", ratingValue: "5", reviewBody: "I tried quoteai for free and after the first quote I signed up for the Starter plan. Worth every dollar. The time I save is worth way more than the monthly cost.", datePublished: "2024-10-24" },
-    { authorName: "Carmen R.", ratingValue: "5", reviewBody: "No credit card to try it, no commitment. I created my first quote for free and the result already looked professional. Then I picked the monthly plan without hesitating.", datePublished: "2024-11-06" },
-  ],
-  contractor: [
-    { authorName: "Lawrence B.", ratingValue: "5", reviewBody: "I use quoteai every day for my small business's quotes. Cut prep time from an hour to under five minutes. Customers get professional documents and sign a lot more often.", datePublished: "2024-10-27" },
-    { authorName: "Alicia D.", ratingValue: "5", reviewBody: "The AI understands my trade's technical language without me needing to use formal terms. I describe the job like I'd explain it to a friend and the quote comes out perfect.", datePublished: "2024-11-12" },
-  ],
-};
-
-export const SECTOR_RATINGS: Record<string, { ratingValue: number; reviewCount: number }> = {
-  painter: { ratingValue: 4.8, reviewCount: 127 },
-  electrician: { ratingValue: 4.9, reviewCount: 143 },
-  plumber: { ratingValue: 4.8, reviewCount: 118 },
-  "general-contractor": { ratingValue: 4.7, reviewCount: 96 },
-  "renovation-contractor": { ratingValue: 4.8, reviewCount: 134 },
-  "welder-fabricator": { ratingValue: 4.8, reviewCount: 89 },
-  "carpenter-cabinetmaker": { ratingValue: 4.9, reviewCount: 76 },
-  "hvac-technician": { ratingValue: 4.8, reviewCount: 104 },
-  freelance: { ratingValue: 4.7, reviewCount: 81 },
-  "building-consultant": { ratingValue: 4.8, reviewCount: 92 },
-  mason: { ratingValue: 4.7, reviewCount: 88 },
-  landscaper: { ratingValue: 4.8, reviewCount: 73 },
-  "tile-installer": { ratingValue: 4.9, reviewCount: 71 },
-  "window-door-installer": { ratingValue: 4.8, reviewCount: 79 },
-  roofer: { ratingValue: 4.7, reviewCount: 67 },
-  "air-conditioning-installer": { ratingValue: 4.8, reviewCount: 84 },
-  "decorative-painter": { ratingValue: 4.8, reviewCount: 83 },
-  "flooring-installer": { ratingValue: 4.9, reviewCount: 68 },
-  "excel-template": { ratingValue: 4.7, reviewCount: 156 },
-  "word-template": { ratingValue: 4.7, reviewCount: 138 },
-  "how-to-quote": { ratingValue: 4.8, reviewCount: 201 },
-  "free-quote": { ratingValue: 4.8, reviewCount: 178 },
-  contractor: { ratingValue: 4.8, reviewCount: 312 },
-};
-
 export const DEFAULT_SECTOR: SectorData = {
   slug: "contractor",
   frSlug: "entrepreneur",
@@ -1815,10 +1687,6 @@ export const CITY_SECTORS: readonly string[] = Object.keys(SECTORS).filter(
 export const ACTIVE_CITY_SLUGS: ReadonlySet<string> = new Set(CITIES.map((c) => c.slug));
 
 export const ACTIVE_CITIES: CityData[] = CITIES.filter((c) => ACTIVE_CITY_SLUGS.has(c.slug));
-
-export const SECTOR_CITIES: Record<string, string[]> = Object.fromEntries(
-  Object.keys(SECTORS).map((s) => [s, CITIES.map((c) => c.slug)])
-);
 
 function strHash(s: string): number {
   return s.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);

@@ -10,7 +10,7 @@ import { taxLabel } from "../invoices/render.js";
 export type Run = { text: string; bold?: boolean; italic?: boolean };
 export type Block = { type: "p"; runs: Run[] } | { type: "ul"; items: Run[][] };
 
-export function parseRuns(text: string): Run[] {
+function parseRuns(text: string): Run[] {
   const runs: Run[] = [];
   const re = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
   let last = 0;
@@ -122,7 +122,7 @@ export function dueLabel(trigger: string, dueDays: number, lang: Lang): string {
   return dueDays > 0 ? `${base}, ${tr("netDays", lang).replace("{n}", String(dueDays))}` : base;
 }
 
-export const EVENT_LABELS: Record<string, { en: string; fr: string }> = {
+const EVENT_LABELS: Record<string, { en: string; fr: string }> = {
   created: { en: "Contract drafted", fr: "Contrat rédigé" },
   edited: { en: "Contract edited", fr: "Contrat modifié" },
   contractor_signed: { en: "Signed by contractor", fr: "Signé par l'entrepreneur" },
@@ -155,7 +155,7 @@ function runsHtml(runs: Run[]): string {
     .join("");
 }
 
-export function bodyHtml(body: string): string {
+function bodyHtml(body: string): string {
   return parseBlocks(body)
     .map((b) => (b.type === "p" ? `<p>${runsHtml(b.runs)}</p>` : `<ul>${b.items.map((i) => `<li>${runsHtml(i)}</li>`).join("")}</ul>`))
     .join("\n");
@@ -172,26 +172,26 @@ function partyHtml(label: string, p: ContractVariables["contractor"], lang: Lang
   return `<div class="party"><div class="party-label">${esc(label)}</div><div class="party-name">${esc(p.name)}</div>${lines.map((l) => `<div class="party-line">${esc(l!)}</div>`).join("")}</div>`;
 }
 
-export function partiesHtml(v: ContractVariables, lang: Lang): string {
+function partiesHtml(v: ContractVariables, lang: Lang): string {
   return `<div class="parties">${partyHtml(tr("contractor", lang), v.contractor, lang)}${partyHtml(tr("customer", lang), v.customer, lang)}</div>
 <table class="kv"><tr><th>${tr("siteAddress", lang)}</th><td>${esc(v.siteAddress)}</td></tr><tr><th>${tr("project", lang)}</th><td>${esc(v.projectTitle)}</td></tr><tr><th>${tr("quoteNo", lang)}</th><td>${esc(v.quoteNumber)}</td></tr></table>`;
 }
 
-export function priceTableHtml(v: ContractVariables, lang: Lang): string {
+function priceTableHtml(v: ContractVariables, lang: Lang): string {
   const rows = v.priceLines.map((l) => `<tr><td>${esc(l.label)}</td><td class="num">${fmtMoney(l.amount, lang)}</td></tr>`).join("");
   const discount = v.discount ? `<tr><td>${tr("discount", lang)} (${v.discount.percent}%)</td><td class="num">− ${fmtMoney(v.discount.amount, lang)}</td></tr>` : "";
   const taxes = v.taxLines.map((t) => `<tr><td>${esc(taxLabel(t.label, lang))} (${t.rate}%)</td><td class="num">${fmtMoney(t.amount, lang)}</td></tr>`).join("");
   return `<div class="table-wrap"><table class="grid"><thead><tr><th>${tr("description", lang)}</th><th class="num">${tr("amount", lang)}</th></tr></thead><tbody>${rows}${discount}<tr class="sub"><td>${tr("subtotal", lang)}</td><td class="num">${fmtMoney(v.subtotal, lang)}</td></tr>${taxes}<tr class="total"><td>${tr("total", lang)}</td><td class="num">${fmtMoney(v.total, lang)}</td></tr></tbody></table></div>`;
 }
 
-export function paymentTableHtml(v: ContractVariables, lang: Lang): string {
+function paymentTableHtml(v: ContractVariables, lang: Lang): string {
   const rows = v.paymentSchedule.terms
     .map((t, i) => `<tr><td>${i + 1}. ${esc(t.label)}</td><td>${esc(dueLabel(t.trigger, t.dueDays, lang))}</td><td class="num">${t.amountType === "percent" ? `${t.value}%` : ""}</td><td class="num">${fmtMoney(paymentTermAmount(t, v.total), lang)}</td></tr>`)
     .join("");
   return `<div class="table-wrap"><table class="grid"><thead><tr><th>${tr("payment", lang)}</th><th>${tr("due", lang)}</th><th class="num">%</th><th class="num">${tr("amount", lang)}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-export function signaturesHtml(v: ContractVariables, signers: ContractSigner[], lang: Lang): string {
+function signaturesHtml(v: ContractVariables, signers: ContractSigner[], lang: Lang): string {
   const block = (role: "contractor" | "customer") => {
     const s = signers.find((x) => x.role === role);
     const party = role === "contractor" ? v.contractor : v.customer;

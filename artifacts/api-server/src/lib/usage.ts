@@ -93,10 +93,6 @@ export function recordWhatsappUsageFromContext(): void {
   void recordUsageEvent({ userId, kind: "whatsapp_message", quantity: 1, unitCostCents: WHATSAPP_MESSAGE_COST_CENTS });
 }
 
-export function recordWhatsappUsage(userId: string): void {
-  void recordUsageEvent({ userId, kind: "whatsapp_message", quantity: 1, unitCostCents: WHATSAPP_MESSAGE_COST_CENTS });
-}
-
 /**
  * Rolls yesterday's raw usage_events into usage_daily_summary (one row per
  * user/date/kind). Idempotent — safe to re-run for the same day, since it

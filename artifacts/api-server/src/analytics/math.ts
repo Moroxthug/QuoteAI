@@ -3,7 +3,7 @@
 
 export type MonthKey = string; // "2026-09"
 
-export function monthKey(d: Date): MonthKey {
+function monthKey(d: Date): MonthKey {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
@@ -21,13 +21,13 @@ export function startOfWeekUtc(d: Date): Date {
   return x;
 }
 
-export function addDaysUtc(d: Date, n: number): Date {
+function addDaysUtc(d: Date, n: number): Date {
   const x = new Date(d);
   x.setUTCDate(x.getUTCDate() + n);
   return x;
 }
 
-export function isoDay(d: Date): string {
+function isoDay(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
@@ -258,7 +258,7 @@ export function budgetAlertLevel(costCents: number, budgetCents: number): Budget
 
 // ── Company: job risk flags ──────────────────────────────────────────────────
 
-export type RiskFlag = "over_budget" | "budget_burn" | "behind_schedule" | "overdue_invoices" | "billing_gap" | "unbilled_completion";
+type RiskFlag = "over_budget" | "budget_burn" | "behind_schedule" | "overdue_invoices" | "billing_gap" | "unbilled_completion";
 export type JobRiskInput = { id: string; name: string; status: string; subtotalCents: number; budgetCents: number; costCents: number; progressPercent: number; invoicedSubtotalCents: number; overdueCents: number; daysBehind: number; plannedEnd: Date | null; completedAt: Date | null };
 export type JobRisk = { id: string; name: string; flags: RiskFlag[]; score: number; detail: { overBudgetCents: number; burnPercent: number | null; daysBehind: number; overdueCents: number; billingGapCents: number } };
 

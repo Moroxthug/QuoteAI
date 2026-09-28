@@ -43,7 +43,6 @@ const MANIFEST: Record<string, Entry> = {
   SUPABASE_PRIVATE_BUCKET: { kind: "required", note: "private-assets (signed URLs)" },
   STRIPE_SECRET_KEY: { kind: "required", note: "subscriptions + Connect" },
   STRIPE_WEBHOOK_SECRET: { kind: "required", note: "POST /api/payments/webhook signature" },
-  STRIPE_PUBLISHABLE_KEY: { kind: "required", note: "returned to the client for Checkout" },
   STRIPE_CONNECT_WEBHOOK_SECRET: { kind: "required", note: "POST /api/payments/connect/webhook signature (Phase 14 invoices paid by card)" },
   STRIPE_PRICE_STARTER: { kind: "feature", feature: "selling plans", note: "Phase 99: monthly Stripe price id for Starter — `pnpm --filter @workspace/scripts stripe-catalog [-- --live]` creates the whole catalog and prints every STRIPE_PRICE_* line; unset = that plan says it cannot be bought right now" },
   STRIPE_PRICE_PRO: { kind: "feature", feature: "selling plans", note: "Phase 99: monthly Stripe price id for Pro" },

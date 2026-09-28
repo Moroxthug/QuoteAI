@@ -1,8 +1,6 @@
 import { authClient } from "@/lib/auth-client";
-import { useLocation } from "wouter";
-import { useEffect } from "react";
 
-export type AuthUser = {
+type AuthUser = {
   id: string;
   name: string;
   email: string;
@@ -21,18 +19,4 @@ export function useAuth() {
     user: (session?.user as AuthUser | null | undefined) ?? null,
     session,
   };
-}
-
-export function useRequireAuth() {
-  const { isLoaded, isSignedIn, isError } = useAuth();
-  const [, navigate] = useLocation();
-
-  useEffect(() => {
-    // A failed session check is not a sign-out — don't bounce to /sign-in on an outage.
-    if (isLoaded && !isSignedIn && !isError) {
-      navigate("/sign-in");
-    }
-  }, [isLoaded, isSignedIn, isError, navigate]);
-
-  return { isLoaded, isSignedIn };
 }

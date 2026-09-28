@@ -25,7 +25,7 @@ function apiBase(): string {
   return `https://${instance}-api.private.fin.ag/v3/${FLINKS_CUSTOMER_ID}`;
 }
 
-export function flinksConfigured(): boolean {
+function flinksConfigured(): boolean {
   return !!FLINKS_CUSTOMER_ID && !!FLINKS_INSTANCE;
 }
 

@@ -140,7 +140,7 @@ export const PLANS: PlanDef[] = [
 ];
 
 /** Phase 73: the public plan list carries the annual price (10 × monthly) and whether annual checkout is configured. */
-export function publicPlans() {
+function publicPlans() {
   const yearly = annualBillingAvailable();
   return PLANS.map((plan) => ({
     ...plan,

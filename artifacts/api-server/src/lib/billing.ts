@@ -12,12 +12,12 @@ export type BillingInterval = "month" | "year";
 export type SubscriptionTier = "monthly_starter" | "monthly_pro" | "monthly_business" | "monthly_elite";
 /** The plans with a published price and a checkout. Elite is custom: sold by the owner, one price per customer. */
 export type SelfServeTier = Exclude<SubscriptionTier, "monthly_elite">;
-export type OneShotPlan = "oneshot_watermark" | "oneshot_clean";
+type OneShotPlan = "oneshot_watermark" | "oneshot_clean";
 
-export const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"];
-export const SELF_SERVE_TIERS: readonly SelfServeTier[] = ["monthly_starter", "monthly_pro", "monthly_business"];
+const SUBSCRIPTION_TIERS: readonly SubscriptionTier[] = ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"];
+const SELF_SERVE_TIERS: readonly SelfServeTier[] = ["monthly_starter", "monthly_pro", "monthly_business"];
 
-export function isSubscriptionTier(id: unknown): id is SubscriptionTier {
+function isSubscriptionTier(id: unknown): id is SubscriptionTier {
   return typeof id === "string" && (SUBSCRIPTION_TIERS as readonly string[]).includes(id);
 }
 export function isSelfServeTier(id: unknown): id is SelfServeTier {

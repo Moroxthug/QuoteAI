@@ -46,7 +46,7 @@ import {
 const OPEN_INVOICE = ["sent", "viewed", "partially_paid", "overdue"] as const;
 
 /** Pre-tax value of a job: the contract subtotal (+ signed change orders, pre-tax) or the stored value backed out of tax. */
-export async function jobSubtotalCentsFor(project: Project): Promise<number> {
+async function jobSubtotalCentsFor(project: Project): Promise<number> {
   if (project.contractId) {
     const [contract] = await db.select({ variables: contractsTable.variables }).from(contractsTable).where(eq(contractsTable.id, project.contractId));
     if (contract) {

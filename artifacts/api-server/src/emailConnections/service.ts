@@ -8,7 +8,7 @@ export async function listEmailConnections(userId: string): Promise<EmailConnect
   return db.select().from(emailConnectionsTable).where(eq(emailConnectionsTable.userId, userId));
 }
 
-export async function getEmailConnection(userId: string, provider: EmailProvider): Promise<EmailConnection | null> {
+async function getEmailConnection(userId: string, provider: EmailProvider): Promise<EmailConnection | null> {
   const [conn] = await db
     .select()
     .from(emailConnectionsTable)

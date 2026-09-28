@@ -1,4 +1,4 @@
-export interface ParsedItem {
+interface ParsedItem {
   descrizione: string;
   um: string;
   quantita: number;
@@ -391,7 +391,7 @@ export function parseTabularComputoMetrico(text: string): { sections: TabularSec
 //    It extracts ACTUAL prices from the P.u. column and never discards voci.
 // ───────────────────────────────────────────────────────────────────────────────
 
-export interface NumberedVoce {
+interface NumberedVoce {
   descrizione: string;
   um: string;
   quantita: number;
@@ -576,142 +576,4 @@ export function parseNumberedComputoMetrico(text: string): {
   if (sections.length === 0 || totalVoci === 0) return null;
 
   return { sections, totalVoci };
-}
-
-// ───────────────────────────────────────────────────────────────────────────────
-// 4. Price estimation for tabular computo voci (deterministic, no AI)
-// ───────────────────────────────────────────────────────────────────────────────
-
-export function estimatePriceForVoce(categoria: string, descrizione: string, um: string): number {
-  const desc = descrizione.toLowerCase();
-  const cat = categoria.toLowerCase();
-  const unit = um.toLowerCase();
-
-  const basePrices: Record<string, number> = {
-    // Demolizioni
-    "demolizione": 45,
-    "scavo": 85,
-    "scrostamento": 28,
-    "rimozione": 40,
-    "demolizione tramezzi": 35,
-    "demolizione massetto": 35,
-    "demolizione solaio": 650,
-    "demolizione scala": 1800,
-    // Costruzioni / strutture
-    "ripristino": 45,
-    "intonaco": 42,
-    "guaina": 35,
-    "impermeabilizzazione": 40,
-    "polistirene": 32,
-    "membrana": 22,
-    "tubazione": 35,
-    "tnt": 20,
-    "rinterro": 30,
-    "formazione": 75,
-    "cls": 110,
-    "getto": 95,
-    "muretto": 280,
-    "soletta": 120,
-    "scalini": 1800,
-    "piastrellatura": 90,
-    "pavimentazione": 85,
-    "zoccolatura": 28,
-    "zoccolino": 22,
-    "rivestimento": 75,
-    "tramezzi": 65,
-    "massetto": 55,
-    "canaletta": 75,
-    // Ponteggio
-    "ponteggio": 28,
-    "noleggio": 22,
-    // Facciate / cappotto
-    "cappotto": 75,
-    "rasante": 35,
-    "intonachino": 30,
-    "grondaia": 22,
-    "pluviale": 180,
-    "davanzale": 320,
-    "soglia": 300,
-    "telaio": 1400,
-    "monoblocco": 1800,
-    "finestra": 900,
-    "porta": 1200,
-    "porta finestra": 1600,
-    // Balconi
-    "balcone": 2800,
-    // Verniciature
-    "verniciatura": 450,
-    "pulizia": 380,
-    "idropulizia": 25,
-    "trattamento": 35,
-    // Impianti
-    "colonna": 450,
-    "fognaria": 55,
-    "scarico": 40,
-    "elettrico": 550,
-    "idraulico": 350,
-    "riscaldamento": 2800,
-    "caldaia": 2200,
-    "termosifoni": 85,
-    "radiatore": 320,
-    "condizionamento": 1800,
-    "split": 1400,
-    "vespaio": 45,
-    "barriera": 35,
-    "igloo": 28,
-    // Generico
-    "opere": 60,
-    "lavori": 55,
-    "servizi": 50,
-    "messa in sicurezza": 120,
-    "apertura": 850,
-    "chiusura": 650,
-    "adeguamento": 75,
-    "rifacimento": 80,
-    "realizzazione": 70,
-    "posa": 65,
-    "installazione": 75,
-    "fornitura": 85,
-    "spostamento": 55,
-  };
-
-  for (const [key, price] of Object.entries(basePrices)) {
-    if (desc.includes(key)) return price;
-  }
-
-  if (cat.includes("demoliz")) return 40;
-  if (cat.includes("costruz")) return 70;
-  if (cat.includes("impiant")) return 450;
-  if (cat.includes("finitur")) return 55;
-  if (cat.includes("vernic")) return 400;
-  if (cat.includes("falegn")) return 120;
-  if (cat.includes("infiss")) return 1300;
-  if (cat.includes("strutture")) return 150;
-  if (cat.includes("muratura")) return 250;
-  if (cat.includes("chiusure")) return 900;
-
-  if (unit === "mq" || unit === "m2" || unit === "m²") return 65;
-  if (unit === "ml" || unit === "m" || unit === "mt" || unit === "mtr") return 35;
-  if (unit === "mc" || unit === "m3" || unit === "m³") return 55;
-  if (unit === "n." || unit === "n" || unit === "nr" || unit === "num" || unit === "numero") return 1200;
-  if (unit === "cpo" || unit === "corpo" || unit === "cad") return 1800;
-  if (unit === "kg" || unit === "q" || unit === "qli" || unit === "quint" || unit === "quintali") return 5;
-  if (unit === "ore" || unit === "h" || unit === "hh") return 55;
-  if (unit === "a.c." || unit === "a.c" || unit === "ac") return 2500;
-  if (unit === "pezzi" || unit === "pz" || unit === "pzz" || unit === "p" || unit === "pc" || unit === "pe") return 120;
-  if (unit === "unità" || unit === "u" || unit === "ud" || unit === "unit") return 120;
-  if (unit === "giorni" || unit === "gg") return 350;
-  if (unit === "settimane" || unit === "sett" || unit === "settim" || unit === "set") return 1800;
-  if (unit === "mesi" || unit === "mese") return 7200;
-  if (unit === "ann") return 86400;
-  if (unit === "ha") return 500;
-  if (unit === "km") return 80;
-  if (unit === "mld") return 3;
-  if (unit === "kw" || unit === "kwh" || unit === "kW" || unit === "kWh") return 200;
-  if (unit === "voce" || unit === "voc" || unit === "voci") return 150;
-  if (unit === "forfait" || unit === "forfett" || unit === "globale") return 2500;
-  if (unit === "€" || unit === "euro") return 1;
-  if (unit === "percento" || unit === "%") return 1;
-
-  return 80;
 }

@@ -76,7 +76,7 @@ export function invoiceToken(inv: Pick<Invoice, "id" | "userId">): string {
 }
 
 /** Sequential per company × year × kind: INV-2026-0042, CN-2026-0003. */
-export async function nextInvoiceNumber(userId: string, kind: "INV" | "CN" = "INV", now = new Date()): Promise<string> {
+async function nextInvoiceNumber(userId: string, kind: "INV" | "CN" = "INV", now = new Date()): Promise<string> {
   const year = now.getFullYear();
   const [row] = await db
     .insert(invoiceSequencesTable)
@@ -286,7 +286,7 @@ async function invoicedSubtotalCents(projectId: string): Promise<number> {
 }
 
 /** Pre-tax value of the job: contract subtotal + signed change orders. */
-export async function jobSubtotalCents(project: Project, ctx: InvoiceContext): Promise<number> {
+async function jobSubtotalCents(project: Project, ctx: InvoiceContext): Promise<number> {
   // Manual jobs store an incl.-tax value; back the province tax out of it.
   const base = ctx.contract ? ctx.contractSubtotalCents : Math.round(project.contractValueCents / (1 + getTaxProfile(ctx.province).totalRate / 100));
   const cos = await db.select({ s: changeOrdersTable.subtotalCents }).from(changeOrdersTable).where(and(eq(changeOrdersTable.projectId, project.id), eq(changeOrdersTable.status, "signed")));
@@ -549,7 +549,7 @@ export async function sendInvoice(params: { invoiceId: string; userId?: string; 
 // ── Payments ─────────────────────────────────────────────────────────────────
 
 /** Recomputes paid_cents + status from the payments table. */
-export async function refreshInvoiceStatus(invoiceId: string, now = new Date()): Promise<Invoice> {
+async function refreshInvoiceStatus(invoiceId: string, now = new Date()): Promise<Invoice> {
   const loaded = await loadInvoice(invoiceId);
   if (!loaded) throw new Error("Invoice not found");
   const inv = loaded.invoice;

@@ -6,7 +6,7 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 // only its SHA-256 hash is ever stored, the raw value is shown once.
 const KEY_PREFIX = "qak";
 
-export function hashApiKey(raw: string): string {
+function hashApiKey(raw: string): string {
   return createHash("sha256").update(raw).digest("hex");
 }
 

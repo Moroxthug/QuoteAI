@@ -24,11 +24,11 @@ async function requireAssistant(userId: string): Promise<{ ok: true } | { ok: fa
   return { ok: false, plan: minimumPlanFor("assistant") };
 }
 
-export function serializeMessage(m: AssistantMessage) {
+function serializeMessage(m: AssistantMessage) {
   return { id: m.id, role: m.role, content: m.content, toolCalls: m.toolCalls?.map((c) => ({ id: c.id, name: c.name })) ?? null, toolCallId: m.toolCallId, toolName: m.toolName, createdAt: m.createdAt.toISOString() };
 }
 
-export function serializeProposal(p: AssistantProposal) {
+function serializeProposal(p: AssistantProposal) {
   return { id: p.id, messageId: p.messageId, projectId: p.projectId, kind: p.kind, summary: p.summary, payload: p.payload, status: p.status, resultEntityType: p.resultEntityType, resultEntityId: p.resultEntityId, error: p.error, resolvedAt: p.resolvedAt?.toISOString() ?? null, createdAt: p.createdAt.toISOString() };
 }
 

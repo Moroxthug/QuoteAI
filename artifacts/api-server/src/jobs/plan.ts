@@ -16,7 +16,7 @@ import { addCalendarDays, nextWorkingDay, parseIsoDate } from "./dates.js";
 // setup.ts persists the plan and optionally lets the AI refine durations.
 
 
-export type PlannedMilestone = {
+type PlannedMilestone = {
   key: string;
   title: string;
   description: string;

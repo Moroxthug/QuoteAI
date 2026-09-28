@@ -4,7 +4,7 @@ export interface TocItem {
   id: string;
 }
 
-export function slugifyHeading(text: string): string {
+function slugifyHeading(text: string): string {
   return text
     .toLowerCase()
     .replace(/[àáâã]/g, "a")

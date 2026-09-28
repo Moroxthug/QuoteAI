@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@fontsource-variable/figtree": "^5.3.0",
-    "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-dialog": "^1.1.7",
     "@radix-ui/react-dropdown-menu": "^2.1.7",
@@ -59,15 +58,13 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-helmet-async": "^3.0.0",
-    "react-hook-form": "^7.55.0",
     "recharts": "^2.15.2",
     "tailwind-merge": "catalog:",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
     "tw-animate-css": "^1.4.0",
     "vite": "catalog:",
-    "wouter": "^3.3.5",
-    "zod": "catalog:"
+    "wouter": "catalog:"
   },
   "dependencies": {
     "@google-analytics/admin": "^9.2.0",

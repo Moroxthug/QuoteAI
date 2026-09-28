@@ -76,8 +76,3 @@ export function hasFeature(profile: ProfileLike, feature: ProductFeature): boole
   const plan = (profile?.plan ?? profile?.subscriptionPlan ?? "free") as PlanId;
   return (PLAN_FEATURES[plan] ?? PLAN_FEATURES.free).has(feature);
 }
-
-export function minimumPlanFor(feature: ProductFeature): PlanId {
-  for (const plan of PLAN_IDS) if (PLAN_FEATURES[plan].has(feature)) return plan;
-  return "monthly_elite";
-}

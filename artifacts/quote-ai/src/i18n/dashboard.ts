@@ -5,7 +5,7 @@
 // renders with raw keys.
 import { ensureStrings, getActiveLang } from "./registry";
 
-export function loadDashboardStrings(): Promise<void> {
+function loadDashboardStrings(): Promise<void> {
   return ensureStrings(getActiveLang(), ["dashboard"]);
 }
 

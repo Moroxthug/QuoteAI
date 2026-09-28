@@ -41,7 +41,7 @@ export function taxLinesFor(taxableCents: number, province: string | null | unde
   }));
 }
 
-export function sumLines(lines: InvoiceLine[]): number {
+function sumLines(lines: InvoiceLine[]): number {
   return lines.reduce((s, l) => s + l.amountCents, 0);
 }
 
@@ -132,7 +132,7 @@ export function balanceCents(inv: { totalCents: number; paidCents: number }): nu
 
 export type AgingBucket = "current" | "d1_30" | "d31_60" | "d61_90" | "d90_plus";
 
-export function agingBucket(dueDate: Date, now = new Date()): AgingBucket {
+function agingBucket(dueDate: Date, now = new Date()): AgingBucket {
   const days = Math.floor((now.getTime() - dueDate.getTime()) / 86_400_000);
   if (days <= 0) return "current";
   if (days <= 30) return "d1_30";

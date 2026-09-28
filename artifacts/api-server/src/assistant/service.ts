@@ -15,7 +15,7 @@ import {
   type AssistantProposal,
   type AssistantToolCall,
 } from "@workspace/db";
-import { and, asc, desc, eq, isNull, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, isNull } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { toIsoDate } from "../jobs/dates.js";
 import { TOOL_DEFINITIONS, PROPOSAL_TOOLS, runReadTool, validateProposal, type ToolContext } from "./tools.js";
@@ -197,7 +197,3 @@ export async function runAssistantTurn(params: {
   return { messages: newMessages, proposals: newProposals };
 }
 
-export async function proposalsByIds(userId: string, ids: string[]): Promise<AssistantProposal[]> {
-  if (!ids.length) return [];
-  return db.select().from(assistantProposalsTable).where(and(eq(assistantProposalsTable.userId, userId), inArray(assistantProposalsTable.id, ids)));
-}

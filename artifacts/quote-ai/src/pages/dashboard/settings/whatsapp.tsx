@@ -9,6 +9,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { NotAvailableNote } from "./shared";
+import { isNativeApp } from "@/lib/native/env";
+import { AppPlanNote } from "@/components/billing/upgrade-link";
 
 function WhatsappUpsellCard() {
   const { t } = useLanguage();
@@ -60,7 +62,7 @@ function WhatsappUpsellCard() {
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap gap-3 pt-1">
+          {isNativeApp ? <AppPlanNote /> : <div className="flex flex-wrap gap-3 pt-1">
             <button className="btn btn-navy btn-gradient gap-2"
               onClick={() => handleCheckout("monthly_pro")}
               disabled={loadingPlanId === "monthly_pro"}>
@@ -73,7 +75,7 @@ function WhatsappUpsellCard() {
               {loadingPlanId === "monthly_business" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
               {t("dashboard.settings.whatsappUpsell.upgradeToBusinessPrice")}
             </button>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

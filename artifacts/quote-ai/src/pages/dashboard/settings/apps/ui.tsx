@@ -10,6 +10,7 @@ import { planLabelOf } from "../plan";
 import { ActionRow, SettingsGroup } from "../ui";
 import { requiredPlanFor, type AppDef } from "./catalog";
 import type { AppStatus } from "./status";
+import { isNativeApp } from "@/lib/native/env";
 
 /**
  * The company's own mark from public/brands/, on a white tile, never
@@ -70,7 +71,7 @@ export function LockNote({ app }: { app: AppDef }) {
           <p className="app-lock-title">{t("apps.lock.title").replace("{plan}", plan)}</p>
           <p className="app-lock-sub">{plan === "Elite" ? t("apps.lock.eliteOnly") : t("apps.lock.andUp").replace("{plan}", plan)}</p>
         </div>
-        <Link href="/dashboard/settings/plan" className="btn btn-sm btn-outline-navy">{t("apps.lock.seePlans")}</Link>
+        {!isNativeApp && <Link href="/dashboard/settings/plan" className="btn btn-sm btn-outline-navy">{t("apps.lock.seePlans")}</Link>}
       </div>
     </SettingsGroup>
   );

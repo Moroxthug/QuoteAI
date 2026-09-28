@@ -21,6 +21,7 @@ import { formatCents } from "@/lib/jobs-api";
 import { invoicesApi, isOpenInvoice, type InvoiceDto, type AgingDto } from "@/lib/invoices-api";
 import { InvoiceStatusBadge, InvoiceTypeBadge } from "@/components/jobs/badges";
 import { NewInvoiceDialog } from "@/components/invoices/invoice-dialogs";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 const FILTERS = ["all", "draft", "open", "overdue", "paid", "void"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -78,7 +79,7 @@ export default function InvoicesPage() {
           <Receipt className="h-10 w-10 text-navy-300 mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-slate-800">{t("invoices.gatedTitle")}</h2>
           <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">{t("invoices.gatedDesc")}</p>
-          <Link href="/dashboard/billing" className="cta-link" style={{ justifyContent: "center", marginTop: 16 }}>{t("invoices.upgrade")}</Link>
+          <UpgradeLink className="cta-link" style={{ justifyContent: "center", marginTop: 16 }}>{t("invoices.upgrade")}</UpgradeLink>
         </div>
       ) : (
         <>

@@ -81,7 +81,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/[id].tsx"
       ],
-      "budget": 370
+      "budget": 374
     },
     {
       "name": "Money (invoices)",
@@ -133,7 +133,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/schedule.tsx"
       ],
-      "budget": 325
+      "budget": 329
     },
     {
       "name": "Crew (Team)",

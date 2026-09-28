@@ -106,6 +106,9 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import type { Lang } from "@/i18n/translations";
 import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isNativeApp } from "@/lib/native/env";
+import { isAppPath } from "@/lib/native/routes";
+import { NativeOutside } from "@/components/native-outside";
 import { isOnboardingSkipped } from "@/lib/onboarding-state";
 
 // The QueryClient (freshness rules, Phase 116) lives in lib/query-client.ts so
@@ -186,7 +189,7 @@ function DashboardApp() {
             <Route path="/dashboard/settings" component={SettingsPage} />
             {/* Phase 102: the old company profile page duplicated Settings → Company details. */}
             <Route path="/dashboard/profile" component={() => <Redirect to="/dashboard/settings/company" />} />
-            <Route path="/dashboard/billing" component={BillingPage} />
+            <Route path="/dashboard/billing" component={isNativeApp ? () => <Redirect to="/dashboard/settings/plan" replace /> : BillingPage} />
             <Route path="/dashboard/catalog" component={CatalogPage} />
             <Route path="/dashboard/clients/:id" component={ClientDetailPage} />
             <Route path="/dashboard/clients" component={ClientsPage} />
@@ -221,6 +224,10 @@ function DashboardApp() {
 
 
 function Router() {
+  // Phase 118: the phone app is the signed-in app and the way into it — any
+  // other page (Terms, Privacy, help, a client's link) opens on the website.
+  const [location] = useLocation();
+  if (isNativeApp && !isAppPath(location)) return <NativeOutside path={location} />;
   return (
     <Switch>
       {/* Public pages — paths from sitemap-routes.ts (shared with generate-sitemap.ts) */}

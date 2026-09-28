@@ -1,3 +1,5 @@
+// Phase 118: first — in the phone app this puts the API fetch in place before anything captures window.fetch.
+import "./lib/native/boot.ts";
 import { StrictMode } from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
@@ -7,6 +9,7 @@ import { initErrorTracking } from "./lib/error-tracking.ts";
 import { initPwa } from "./lib/pwa.ts";
 import { detectInitialLang } from "./i18n/detect.ts";
 import { ensureStrings } from "./i18n/registry.ts";
+import { isNativeApp } from "./lib/native/env.ts";
 
 initErrorTracking();
 initAnalytics();
@@ -60,4 +63,5 @@ void Promise.all([import("./App.tsx"), strings, restored]).then(([{ default: App
   } else {
     createRoot(rootEl).render(tree);
   }
+  if (isNativeApp) requestAnimationFrame(() => void import("./lib/native/shell.ts").then((m) => m.hideSplash()));
 });

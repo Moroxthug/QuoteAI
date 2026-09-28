@@ -3,13 +3,13 @@ import { z } from "zod";
 import { randomBytes, randomUUID } from "node:crypto";
 import { db, businessProfilesTable, organizationMembersTable, hasFeature, minimumPlanFor, TEAM_MEMBER_ROLES, type TeamMemberRole } from "@workspace/db";
 import { and, eq, ne } from "drizzle-orm";
-import { requireAuth, getUserId, getActorUserId, ACTIVE_ORG_COOKIE } from "../middlewares/authMiddleware.js";
+import { requireAuth, getUserId, getActorUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit, createNotification } from "../lib/notifications.js";
 import { hashToken } from "../contracts/service.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 import { seatCount } from "../team/seats.js";
-import { CODE_EMAIL_DOMAIN, cookieOpts } from "./team-members.js";
+import { CODE_EMAIL_DOMAIN, setActiveOrg } from "./team-members.js";
 
 // ── Phase 91: access codes ───────────────────────────────────────────────────
 // The other way into a company: the owner prints or texts a short code, the
@@ -157,7 +157,7 @@ router.post("/team/code/:code/redeem", codeLimiter, requireAuth, async (req, res
       .where(eq(organizationMembersTable.id, member.id));
     await writeAudit({ userId: member.ownerId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "access_code_redeemed", diff: { hint: member.accessCodeHint } });
     await createNotification({ userId: member.ownerId, type: "team_joined", title: `${res.locals.userName || email} joined with an access code`, link: "/dashboard/team" });
-    res.cookie(ACTIVE_ORG_COOKIE, member.ownerId, cookieOpts());
+    setActiveOrg(res, member.ownerId);
     res.json({ orgId: member.ownerId, role: member.role });
   } catch (err) {
     req.log.error({ err }, "Error redeeming access code");

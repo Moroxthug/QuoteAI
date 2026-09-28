@@ -11,6 +11,8 @@ import { moneyLocale } from "@/lib/money";
 import { PlanPicker, currentPlanPriceLabel } from "@/components/billing/plan-picker";
 import { LEGAL_ENTITY, isLegalEntityConfigured } from "@workspace/legal-entity";
 import { ActionRow, SettingsGroup, SettingsSection } from "./ui";
+import { isNativeApp } from "@/lib/native/env";
+import { AppPlanNote } from "@/components/billing/upgrade-link";
 
 export function planLabelOf(plan: string | null | undefined): string | null {
   return plan === "monthly_elite" ? "Elite" : plan === "monthly_business" ? "Business" : plan === "monthly_pro" ? "Pro" : plan === "monthly_starter" ? "Starter" : null;
@@ -29,7 +31,7 @@ export function PlanSection() {
     <SettingsSection title={t("settings.section.plan")} intro={canBill ? t("settings.intro.plan") : t("settings.intro.planMember")}>
       {canBill && <CurrentPlan />}
       <Usage />
-      {canBill && <ComparePlans />}
+      {canBill && (isNativeApp ? <SettingsGroup><div className="sgroup-pad"><AppPlanNote /></div></SettingsGroup> : <ComparePlans />)}
     </SettingsSection>
   );
 }
@@ -79,7 +81,7 @@ function CurrentPlan() {
   if (!sub?.isActive) {
     return (
       <SettingsGroup>
-        <ActionRow label={t("dashboard.billing.noActiveSubTitle")} help={t("dashboard.settings.billing.noActiveSubDesc")}>{syncButton}</ActionRow>
+        <ActionRow label={t("dashboard.billing.noActiveSubTitle")} help={isNativeApp ? t("settings.plan.noSubApp") : t("dashboard.settings.billing.noActiveSubDesc")}>{syncButton}</ActionRow>
       </SettingsGroup>
     );
   }
@@ -110,12 +112,12 @@ function CurrentPlan() {
           )}
         </div>
       )}
-      <ActionRow label={t("dashboard.billing.manageSubscription")} help={<>{t("dashboard.settings.billing.managedByStripeShort")}{isLegalEntityConfigured() && <> {t("dashboard.billing.receiptsIssuedBy").replace("{entity}", LEGAL_ENTITY.legalName)}</>}</>}>
+      {!isNativeApp && <ActionRow label={t("dashboard.billing.manageSubscription")} help={<>{t("dashboard.settings.billing.managedByStripeShort")}{isLegalEntityConfigured() && <> {t("dashboard.billing.receiptsIssuedBy").replace("{entity}", LEGAL_ENTITY.legalName)}</>}</>}>
         <button type="button" onClick={manage} disabled={createPortal.isPending} className="btn btn-outline-navy btn-sm gap-2">
           {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpRight className="h-4 w-4" />}
           {t("settings.plan.openStripe")}
         </button>
-      </ActionRow>
+      </ActionRow>}
       <ActionRow label={t("dashboard.settings.billing.undetectedSubTitle")} help={t("dashboard.settings.billing.undetectedSubDesc")}>{syncButton}</ActionRow>
     </SettingsGroup>
   );

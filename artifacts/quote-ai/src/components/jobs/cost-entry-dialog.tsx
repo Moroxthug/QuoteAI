@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { jobsApi, formatCents, type CostCategory, type CostEntryDto, type CostEntryEdit, type MilestoneDto } from "@/lib/jobs-api";
 import { runOrQueue } from "@/lib/offline/outbox";
+import { ApiImg } from "@/components/api-img";
 
 export const COST_CATEGORY_KEYS: CostCategory[] = ["materials", "labour", "subcontractor", "permits_fees", "equipment", "misc"];
 const TAX_KEYS = ["GST", "HST", "PST", "QST"] as const;
@@ -224,7 +225,7 @@ function ReceiptPreview({ docId }: { docId: string }) {
   }
   return (
     <a href={url} target="_blank" rel="noreferrer" title={t("jobs.costs.openReceipt")}>
-      <img src={url} alt="" onError={() => setFailed(true)} />
+      <ApiImg src={url} alt="" onError={() => setFailed(true)} />
     </a>
   );
 }

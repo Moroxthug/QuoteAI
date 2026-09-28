@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { isNativeApp } from "./native/env";
 
 // Phase 77 (docs/PILOT-LAUNCH-PLAN.md): the browser side of the PWA.
 // Registers public/sw.js, keeps one small store the UI can subscribe to
@@ -57,7 +58,8 @@ let initialized = false;
 export function initPwa(): void {
   if (initialized || typeof window === "undefined") return;
   initialized = true;
-  set({ standalone: isStandalone(), ios: isIos() });
+  // Phase 118: the phone app is installed by definition, and its files are on the phone (no service worker).
+  set({ standalone: isNativeApp || isStandalone(), ios: isIos() });
   window.addEventListener("online", () => set({ online: true }));
   window.addEventListener("offline", () => set({ online: false }));
   window.addEventListener("beforeinstallprompt", (e) => {
@@ -73,7 +75,7 @@ export function initPwa(): void {
   // The worker is registered on the production build (and when a dev
   // explicitly opts in): in dev it would cache Vite's transformed modules and
   // fight HMR.
-  if (!state.supported || !(import.meta.env.PROD || import.meta.env.VITE_ENABLE_SW === "1")) return;
+  if (isNativeApp || !state.supported || !(import.meta.env.PROD || import.meta.env.VITE_ENABLE_SW === "1")) return;
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js", { scope: "/" })

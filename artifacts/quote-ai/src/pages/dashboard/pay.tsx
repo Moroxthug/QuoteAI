@@ -18,6 +18,7 @@ import { useCan, useRole } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { formatCents, jobsApi } from "@/lib/jobs-api";
 import { teamApi } from "@/lib/team-api";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 import {
   payApi,
   EARNING_KINDS,
@@ -81,7 +82,7 @@ export default function PayPage() {
               <span className="qa-ic navy"><Lock className="h-4 w-4" /></span>
               <span className="text-sm text-slate-600">{t("pay.locked")}</span>
             </div>
-            <Link href="/dashboard/billing" className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></Link>
+            <UpgradeLink className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></UpgradeLink>
           </div>
         </section>
       )}

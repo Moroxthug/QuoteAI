@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sparkles, Send, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { assistantApi, type AssistantMessageDto, type ProposalDto } from "@/lib/assistant-api";
 import { MicButton } from "@/components/mic-button";
 import { ProposalCard, Markdownish } from "@/components/assistant/proposal-card";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 /**
  * Chat with the job assistant. `projectId` scopes the conversation to a job;
@@ -86,7 +86,7 @@ export function AssistantPanel({ projectId, className }: { projectId: string | n
         <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
         <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
         <p className="text-sm text-slate-600 mt-1 max-w-md mx-auto">{t("assistant.gatedDesc")}</p>
-        <Link href="/dashboard/billing" className="inline-block mt-4 text-sm font-semibold text-navy-700 hover:underline">{t("assistant.upgrade")}</Link>
+        <UpgradeLink className="inline-block mt-4 text-sm font-semibold text-navy-700 hover:underline">{t("assistant.upgrade")}</UpgradeLink>
       </div>
     );
   }

@@ -30,6 +30,9 @@ import { hasFeature } from "@/lib/plans";
 import type { PaymentSchedule } from "@/lib/payment-schedule";
 import { formatCad } from "@/lib/money";
 import { jobLimitToast } from "@/lib/plan-errors";
+import { isNativeApp } from "@/lib/native/env";
+import { AppPlanNote } from "@/components/billing/upgrade-link";
+import { ApiImg } from "@/components/api-img";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -957,7 +960,7 @@ const can = useCan();
               {/* Company header */}
               <div className="paper-head hide-phone">
                 <div>
-                  {companyLogoUrl && <img src={companyLogoUrl} alt={t("a11y.companyLogo")} decoding="async" />}
+                  {companyLogoUrl && <ApiImg src={companyLogoUrl} alt={t("a11y.companyLogo")} decoding="async" />}
                   <h2>{companyName}</h2>
                   {companyVat && <small>{t("dashboard.quoteDetail.taxIdLabel")} {companyVat}</small>}
                   {companyAddress && <small>{companyAddress}</small>}
@@ -1787,6 +1790,8 @@ const can = useCan();
           </DialogHeader>
 
           <DialogBody>
+            {/* Phase 118: the phone app sells nothing — it says so instead of the plan grid. */}
+            {isNativeApp ? <AppPlanNote /> : <>
             {/* If user is on Starter → show upgrade options */}
             {subscription?.isActive && subscription?.plan === "monthly_starter" ? (
               <>
@@ -1869,6 +1874,7 @@ const can = useCan();
                 </div>
               </>
             )}
+            </>}
           </DialogBody>
         </DialogContent>
       </Dialog>

@@ -174,6 +174,19 @@ const MANIFEST: Record<string, Entry> = {
   PRERENDER_SAMPLE: { kind: "local", note: "validate-prerender sample size" },
   BACKUP_PASSPHRASE: { kind: "local", note: "ops:backup encryption (also a GitHub Actions secret for the nightly backup)" },
   BACKUP_DATABASE_URL: { kind: "local", note: "GitHub Actions secret: the nightly backup source" },
+
+  // ── Phase 118: the phone app (artifacts/mobile, docs/RUNBOOKS.md "The phone app") ──
+  ANDROID_CERT_SHA256: { kind: "deferred", note: "Phase 118: comma list of the Android signing certificates' SHA-256 fingerprints (Play Console → App integrity). Set = the web build writes /.well-known/assetlinks.json and quoteai.ca/dashboard links open the installed app; unset = they open the website" },
+  APPLE_TEAM_ID: { kind: "deferred", note: "Phase 118/125: the Apple developer team id. Set = the web build writes /.well-known/apple-app-site-association (iOS Universal Links for /dashboard)" },
+  VITE_NATIVE: { kind: "platform", note: "Phase 118: set by vite.config.ts in --mode native (the phone app bundle); never set by hand" },
+  VITE_API_ORIGIN: { kind: "build", note: "Phase 118: the API the phone app's bundle talks to (vite --mode native); default https://quoteai.ca. Never set in Vercel" },
+  NATIVE_OUT_DIR: { kind: "local", note: "Phase 118: where vite --mode native writes (artifacts/mobile/www)" },
+  CAP_DEV: { kind: "local", note: "Phase 118: =1 lets a dev phone build talk to an http API (cleartext, mixed content). Never for a build that leaves the computer" },
+  JAVA_HOME: { kind: "local", note: "Phase 118: the JDK for the Android build (artifacts/mobile/scripts/gradle.ts falls back to Android Studio's)" },
+  ANDROID_HOME: { kind: "local", note: "Phase 118: the Android SDK (default %LOCALAPPDATA%/Android/Sdk)" },
+  ANDROID_SDK_ROOT: { kind: "local", note: "Phase 118: older name for ANDROID_HOME" },
+  LOCALAPPDATA: { kind: "platform", note: "Windows: where the Android SDK is by default" },
+  HOME: { kind: "platform", note: "the user's home directory" },
 };
 
 // ── Scan ────────────────────────────────────────────────────────────────────
@@ -186,6 +199,8 @@ const SCAN_DIRS = [
   "artifacts/quote-ai/vite.config.ts",
   "artifacts/quote-ai/server",
   "artifacts/quote-ai/scripts",
+  "artifacts/mobile/scripts",
+  "artifacts/mobile/capacitor.config.ts",
   "api",
   "lib/db/src",
   "lib/db/drizzle.config.ts",
@@ -193,7 +208,8 @@ const SCAN_DIRS = [
   "lib/integrations-openai-ai-server/src",
   "scripts/sentry-sourcemaps.mjs",
 ];
-const SKIP = /node_modules|\/dist\/|\.test\.|\/e2e\//;
+// " - Copy" files are stray duplicates on this machine, not code.
+const SKIP = /node_modules|\/dist\/|\.test\.|\/e2e\/| - Copy\./;
 
 function walk(p: string, out: string[]): void {
   const st = statSync(p);

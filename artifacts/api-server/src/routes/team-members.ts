@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Response } from "express";
 import { z } from "zod";
 import {
   db,
@@ -13,7 +13,7 @@ import {
 } from "@workspace/db";
 import { and, asc, eq, inArray, ne } from "drizzle-orm";
 import { seatCount } from "../team/seats.js";
-import { requireAuth, getUserId, getUserEmail, getActorUserId, ACTIVE_ORG_COOKIE, resolveActingOrg } from "../middlewares/authMiddleware.js";
+import { requireAuth, getUserId, getUserEmail, getActorUserId, ACTIVE_ORG_COOKIE, ACTIVE_ORG_HEADER, resolveActingOrg } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { writeAudit } from "../lib/notifications.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
@@ -33,8 +33,15 @@ const ORG_COOKIE_MAX_AGE_MS = 400 * 24 * 60 * 60 * 1000; // ~400 days, matches c
 
 const INVITABLE_ROLES = TEAM_MEMBER_ROLES.filter((r) => r !== "owner") as Exclude<TeamMemberRole, "owner">[];
 
-export function cookieOpts(): { httpOnly: true; sameSite: "lax"; secure: boolean; path: "/"; maxAge: number } {
+function cookieOpts(): { httpOnly: true; sameSite: "lax"; secure: boolean; path: "/"; maxAge: number } {
   return { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: ORG_COOKIE_MAX_AGE_MS };
+}
+
+/** The acting org for the browser (cookie) and the phone app (a header it keeps, Phase 118); null clears it. */
+export function setActiveOrg(res: Response, orgId: string | null): void {
+  if (orgId) res.cookie(ACTIVE_ORG_COOKIE, orgId, cookieOpts());
+  else res.clearCookie(ACTIVE_ORG_COOKIE, cookieOpts());
+  res.setHeader(ACTIVE_ORG_HEADER, orgId ?? "");
 }
 
 /** Phase 91: an access-code invitation has no email until someone redeems it. */
@@ -309,7 +316,7 @@ router.post("/team/invite/:token/accept", requireAuth, async (req, res) => {
       .where(eq(organizationMembersTable.id, member.id))
       .returning();
     await writeAudit({ userId: member.ownerId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "invite_accepted" });
-    res.cookie(ACTIVE_ORG_COOKIE, member.ownerId, cookieOpts());
+    setActiveOrg(res, member.ownerId);
     res.json({ member: serializeMember(updated!) });
   } catch (err) {
     req.log.error({ err }, "Error accepting team invite");
@@ -370,7 +377,7 @@ router.post("/team/pending-invites/:id/accept", requireAuth, async (req, res) =>
       .where(eq(organizationMembersTable.id, member.id))
       .returning();
     await writeAudit({ userId: member.ownerId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "invite_accepted", diff: { via: "signed_in_address" } });
-    res.cookie(ACTIVE_ORG_COOKIE, member.ownerId, cookieOpts());
+    setActiveOrg(res, member.ownerId);
     res.json({ member: serializeMember(updated!) });
   } catch (err) {
     req.log.error({ err }, "Error accepting pending invite");
@@ -416,7 +423,7 @@ router.post("/team/switch", requireAuth, async (req, res) => {
       res.status(403).json({ error: "FORBIDDEN", message: "You don't have access to that organization." });
       return;
     }
-    res.cookie(ACTIVE_ORG_COOKIE, orgId, cookieOpts());
+    setActiveOrg(res, orgId);
     res.json({ orgId, role });
   } catch (err) {
     req.log.error({ err }, "Error switching org");
@@ -442,7 +449,7 @@ router.post("/team/members/leave", requireAuth, async (req, res) => {
     }
     await db.delete(organizationMembersTable).where(eq(organizationMembersTable.id, member.id));
     await writeAudit({ userId: body.data.orgId, actorType: "user", actorId, entityType: "team_member", entityId: member.id, action: "left", diff: { email: member.invitedEmail } });
-    if (getUserId(res) === body.data.orgId) res.clearCookie(ACTIVE_ORG_COOKIE, cookieOpts());
+    if (getUserId(res) === body.data.orgId) setActiveOrg(res, null);
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Error leaving team");

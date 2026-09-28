@@ -27,6 +27,7 @@ import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobi
 import { PhoneNewButton, PhoneTabBar } from "@/components/layout/phone-nav";
 import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
 import { prefetchRoute } from "@/lib/route-chunks";
+import { ApiImg } from "@/components/api-img";
 
 // Phase 116: in the signed-in app, answers are saved to the device as they
 // arrive (lib/offline/query-cache.ts) — the public pages never load this.
@@ -349,7 +350,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const email = user?.email ?? "";
   // The account button is named by `name`: its visible initials stay the name's first letters so they are part of that name (label-in-name).
   const initials = name.slice(0, 2).toUpperCase();
-  const avatar = photo ? <img src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />;
+  const avatar = photo ? <ApiImg src={photo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : initials || <User className="h-3.5 w-3.5" />;
 
   const NavLinks = () => (
     <>

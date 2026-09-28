@@ -9,6 +9,7 @@ import { peopleApi } from "@/lib/people-api";
 import { teamMembersApi, type TeamMemberRole } from "@/lib/team-members-api";
 import { AccessCodesForm } from "@/components/team/access-codes";
 import { MARKETING_PLANS } from "@/data/pricing";
+import { isNativeApp } from "@/lib/native/env";
 
 // Phase 91: the last onboarding step. Either the plan picked on the pricing
 // page goes to checkout with the extra seats the company asked for, or — when
@@ -25,7 +26,8 @@ export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: strin
   const queryClient = useQueryClient();
   const onError = (e: Error & { code?: string }) => toast({ title: e.code === "SEAT_LIMIT" ? t("team.members.seatLimitTitle") : t("jobs.error"), description: e.message, variant: "destructive" });
   // Phase 99: Elite has no checkout (custom price), so an old ?plan=monthly_elite link lands here as "no plan yet".
-  const chosen = plan && (PLAN_IDS as readonly string[]).includes(plan) && plan !== "free" && plan !== "monthly_elite" ? (plan as PlanId) : null;
+  // Phase 118: the phone app has no checkout (a plan is bought on the website).
+  const chosen = !isNativeApp && plan && (PLAN_IDS as readonly string[]).includes(plan) && plan !== "free" && plan !== "monthly_elite" ? (plan as PlanId) : null;
   const profile = useQuery({ queryKey: ["onboarding-profile"], queryFn: () => apiRequest<{ features?: Record<string, boolean> }>("/api/business-profile") });
   const hasTeam = !!profile.data?.features?.team_accounts;
   // Phase 93: asked even before there is a plan — it says whether extra seats can be bought at all (a Stripe price exists).

@@ -6,6 +6,7 @@ import multer from "multer";
 import { db, quotesTable, businessProfilesTable, authUsersTable, emailEventsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { auth, getTrustedOrigins } from "./lib/auth";
+import { nativeAppCors, isNativeAppOrigin } from "./lib/nativeApp";
 import { PLANS } from "./routes/payments.js";
 import { addonQuantityOf, isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
 import { subscriptionChanged } from "./groups/service.js";
@@ -113,6 +114,10 @@ app.use(
     },
   }),
 );
+
+// Phase 118: the phone app's CORS (bearer, no cookies) — before the auth handler,
+// which answers its own requests before the general CORS middleware below.
+app.use(nativeAppCors());
 
 // ── Better Auth handler — must be before express.json() ──────────────────────
 // Use raw middleware to avoid Express 5 wildcard syntax issues
@@ -674,6 +679,11 @@ app.use(
     // page served by some local program on the user's machine call the API with
     // their cookies.
     const devLocalhost = process.env.NODE_ENV !== "production" && !!origin && /^https?:\/\/localhost(:\d+)?$/.test(origin);
+    // Phase 118: the phone app's origins were answered by nativeAppCors (no credentials).
+    if (isNativeAppOrigin(origin)) {
+      callback(null, { origin: false });
+      return;
+    }
     if (!origin || trustedOrigins.has(origin) || devLocalhost) {
       callback(null, { origin: true, credentials: true });
     } else {

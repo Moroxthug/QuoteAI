@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuoteAI</string>
+    <string name="title_activity_main">QuoteAI</string>
+    <string name="package_name">ca.quoteai.app</string>
+    <string name="custom_url_scheme">ca.quoteai.app</string>
+</resources>

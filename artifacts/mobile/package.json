@@ -1,0 +1,31 @@
+{
+  "name": "@workspace/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:web": "tsx ./scripts/build-web.ts",
+    "icons": "tsx ./scripts/icons.ts",
+    "sync": "pnpm run build:web && cap sync android",
+    "android:debug": "pnpm run sync && tsx ./scripts/gradle.ts assembleDebug",
+    "android:release": "pnpm run sync && tsx ./scripts/gradle.ts bundleRelease",
+    "open:android": "cap open android",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "catalog:",
+    "tsx": "catalog:"
+  },
+  "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/keyboard": "^8.0.5",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3"
+  }
+}

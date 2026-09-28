@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SettingsGroup, SettingsRow, SettingsSection, useSettingsDraft } from "./ui";
 import { EMAIL_RE, changed, orNull, useBusinessProfile, useSaveBusinessProfile } from "./data";
+import { isNativeApp } from "@/lib/native/env";
+import { ApiImg } from "@/components/api-img";
 
 const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
@@ -137,12 +139,12 @@ function LogoGroup({ logoUrl }: { logoUrl: string | null }) {
             <span className="srow-label">{t("dashboard.profile.logoProOnly.title")}</span>
             <p>{t("dashboard.settings.account.logoStarterDesc1")} {t("dashboard.settings.account.logoStarterDesc2")}</p>
           </div>
-          <div className="srow-act">
+          {!isNativeApp && <div className="srow-act">
             <button type="button" onClick={() => createPortal.mutate(undefined, { onSuccess: (r) => { window.open(r.url, "_blank"); } })} disabled={createPortal.isPending} className="btn btn-outline-navy btn-sm gap-2">
               {createPortal.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
               {t("dashboard.profile.logoProOnly.upgradeButton")}
             </button>
-          </div>
+          </div>}
         </div>
       </SettingsGroup>
     );
@@ -158,7 +160,7 @@ function LogoGroup({ logoUrl }: { logoUrl: string | null }) {
         <div className="srow-field slogo">
           <div className="slogo-box">
             {current ? (
-              <img src={current} alt={t("dashboard.profile.logo.altText")} />
+              <ApiImg src={current} alt={t("dashboard.profile.logo.altText")} />
             ) : (
               <span className="slogo-none"><ImageIcon className="h-5 w-5" aria-hidden="true" />{t("dashboard.profile.logo.none")}</span>
             )}

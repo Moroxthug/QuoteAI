@@ -15,6 +15,7 @@ import { scheduleApi, type ScheduleBlockDto, type ScheduleJobDto } from "@/lib/s
 import { BlockDialog, defaultShift, type BlockDraft } from "@/components/schedule/block-dialog";
 import { MilestoneChips, PhoneAgenda, type AgendaMode } from "@/components/schedule/phone-agenda";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 // ── Phase 75: /dashboard/schedule ───────────────────────────────────────────
 // Week view: one lane per worker (+ Unassigned), one column per day; a
@@ -172,7 +173,7 @@ export default function SchedulePage() {
             <Link href="/dashboard/schedule" className="chip chip-teal ag-only">{t("schedule.onlyJob")}: {filteredJob.name} <X className="h-3 w-3 ml-1" /></Link>
           )}
           {isLoading && <div className="space-y-3"><Skeleton className="h-24 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" /></div>}
-          {error && <div className="notice warn"><AlertTriangle /><div className="grow">{(error as Error & { code?: string }).code === "PLAN_REQUIRED" ? t("schedule.planRequired") : (error as Error).message}{(error as Error & { code?: string }).code === "PLAN_REQUIRED" && <> <Link href="/dashboard/billing" className="text-link">{t("schedule.upgrade")}</Link></>}</div></div>}
+          {error && <div className="notice warn"><AlertTriangle /><div className="grow">{(error as Error & { code?: string }).code === "PLAN_REQUIRED" ? t("schedule.planRequired") : (error as Error).message}{(error as Error & { code?: string }).code === "PLAN_REQUIRED" && <> <UpgradeLink className="text-link">{t("schedule.upgrade")}</UpgradeLink></>}</div></div>}
           {data && (
             <PhoneAgenda
               weekFrom={range.from}
@@ -219,7 +220,7 @@ export default function SchedulePage() {
         {isLoading && <div className="p-5 space-y-3"><Skeleton className="h-10 w-full rounded-[var(--radius-mk)]" /><Skeleton className="h-40 w-full rounded-[var(--radius-mk)]" /></div>}
         {error && (
           <div className="p-5">
-            <div className="notice warn"><AlertTriangle /><div className="grow">{(error as Error & { code?: string }).code === "PLAN_REQUIRED" ? t("schedule.planRequired") : (error as Error).message}{(error as Error & { code?: string }).code === "PLAN_REQUIRED" && <> <Link href="/dashboard/billing" className="text-link">{t("schedule.upgrade")}</Link></>}</div></div>
+            <div className="notice warn"><AlertTriangle /><div className="grow">{(error as Error & { code?: string }).code === "PLAN_REQUIRED" ? t("schedule.planRequired") : (error as Error).message}{(error as Error & { code?: string }).code === "PLAN_REQUIRED" && <> <UpgradeLink className="text-link">{t("schedule.upgrade")}</UpgradeLink></>}</div></div>
           </div>
         )}
         {data && view === "week" && (

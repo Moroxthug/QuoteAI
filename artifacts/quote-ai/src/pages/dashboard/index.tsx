@@ -48,6 +48,8 @@ import { MARKETING_PLANS } from "@/data/pricing";
 import { PaymentReturnNotice } from "@/components/billing/payment-return-notice";
 import { ForemanHome } from "@/components/crew/foreman-home";
 import { formatCadWhole } from "@/lib/money";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
+import { isNativeApp } from "@/lib/native/env";
 
 /* ─── plan helpers ─────────────────────────────────────────────────────────── */
 
@@ -166,10 +168,10 @@ const can = useCan();
           <div className="h-7 w-7 rounded-lg bg-navy-100 flex items-center justify-center"><Building2 className="h-3.5 w-3.5 text-navy-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-navy-700">{t("dashboard.index.onboarding.companyProfile")}</span>
         </Link>
-        <Link href="/dashboard/billing" className="card p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group">
+        <UpgradeLink className="card p-3 flex items-center gap-2.5 hover:border-amber-200 hover:bg-amber-50/30 transition-all group">
           <div className="h-7 w-7 rounded-lg bg-amber-100 flex items-center justify-center"><Crown className="h-3.5 w-3.5 text-amber-500" /></div>
           <span className="text-sm font-medium text-foreground group-hover:text-amber-700">{t("dashboard.index.onboarding.plansPricing")}</span>
-        </Link>
+        </UpgradeLink>
         {can("quotes", "edit") && (
           <Link href="/dashboard/new" className="card p-3 flex items-center gap-2.5 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group">
             <div className="h-7 w-7 rounded-lg bg-emerald-100 flex items-center justify-center"><Sparkles className="h-3.5 w-3.5 text-emerald-500" /></div>
@@ -216,9 +218,9 @@ const can = useCan();
           {t("dashboard.index.trial.createNow")}
         </Link>
       ) : (
-        <Link href="/dashboard/billing" className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold">
+        <UpgradeLink className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold">
           {t("dashboard.index.trial.subscribe")}
-        </Link>
+        </UpgradeLink>
       )}
     </div>
   );
@@ -757,7 +759,7 @@ function OwnerHome() {
             </div>
           </div>
 
-          {!subscription?.isActive && (
+          {!isNativeApp && !subscription?.isActive && (
             <div className="bg-gradient-to-r from-navy-50 to-teal-50 border border-navy-100 rounded-[var(--radius)] p-4 flex items-center justify-between gap-4 today-gap">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-lg bg-navy-100 flex items-center justify-center shrink-0">
@@ -768,13 +770,13 @@ function OwnerHome() {
                   <div className="text-xs text-muted-foreground mt-0.5">{t("dashboard.index.unlockAll.desc")}</div>
                 </div>
               </div>
-              <Link href="/dashboard/billing" className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold">
+              <UpgradeLink className="shrink-0 btn-gradient inline-flex h-8 items-center justify-center px-3 text-xs font-semibold">
                 {t("dashboard.index.unlockAll.cta")}
-              </Link>
+              </UpgradeLink>
             </div>
           )}
 
-          {subscription?.isActive && subscription?.plan === "monthly_starter" && (
+          {!isNativeApp && subscription?.isActive && subscription?.plan === "monthly_starter" && (
             <div className="today-gap"><StarterUpgradeCard /></div>
           )}
         </>

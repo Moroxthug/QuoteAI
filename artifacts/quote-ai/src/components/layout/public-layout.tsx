@@ -5,6 +5,7 @@ import { useScrolled } from "@/hooks/use-scrolled";
 import { cn } from "@/lib/utils";
 import { X, Send, CheckCircle2, Menu, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { isNativeApp } from "@/lib/native/env";
 import { useModalTrap } from "@/hooks/use-modal-trap";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useWhatsappAvailable } from "@/hooks/use-whatsapp-available";
@@ -161,6 +162,19 @@ function FooterCol({ title, folded, children }: { title: string; folded: boolean
 }
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
+  return isNativeApp ? <NativeAuthFrame>{children}</NativeAuthFrame> : <SiteLayout>{children}</SiteLayout>;
+}
+
+/** Phase 118: sign-in and sign-up in the phone app — the page alone, no site header, menu or footer. */
+function NativeAuthFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="native-auth text-foreground">
+      <main id="main" className="flex-1">{children}</main>
+    </div>
+  );
+}
+
+function SiteLayout({ children }: { children: React.ReactNode }) {
   const { isSignedIn } = useAuth();
   const { t, lang } = useLanguage();
   const scrolled = useScrolled(20);

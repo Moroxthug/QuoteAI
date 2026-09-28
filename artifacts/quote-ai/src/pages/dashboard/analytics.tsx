@@ -19,6 +19,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { ListRow } from "@/components/mobile/list-row";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { StatStrip } from "@/components/mobile/stat-strip";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 const formatCurrency = (v: number) => formatCadWhole(v);
 const QUOTE_STATUS_COLORS: Record<string, string> = { draft: SERIES.neutral, unlocked: SERIES.actual, pending: "#d97706" };
@@ -67,7 +68,7 @@ function GateCard() {
       <Sparkles className="h-10 w-10 text-navy-300 mx-auto mb-3" />
       <h3 className="font-bold text-slate-900">{t("analytics.gatedTitle")}</h3>
       <p className="text-sm text-slate-600 mt-1 max-w-lg mx-auto">{t("analytics.gatedDesc")}</p>
-      <Link href="/dashboard/billing" className="cta-link" style={{ justifyContent: "center", marginTop: 16 }}>{t("analytics.upgrade")}</Link>
+      <UpgradeLink className="cta-link" style={{ justifyContent: "center", marginTop: 16 }}>{t("analytics.upgrade")}</UpgradeLink>
     </div>
   );
 }

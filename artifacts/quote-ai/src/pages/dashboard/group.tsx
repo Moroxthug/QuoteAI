@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useSearch } from "wouter";
+import { useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
@@ -14,6 +14,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { formatCents } from "@/lib/jobs-api";
 import { groupApi, type GroupBillingDto, type GroupCompanyDto, type GroupCrewDto, type GroupPageDto } from "@/lib/group-api";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 // ── Phase 90: /dashboard/group ──────────────────────────────────────────────
 // Companies that belong together: one view across them, one catalog, one
@@ -95,7 +96,7 @@ function Locked() {
           <span className="qa-ic navy"><Lock className="h-4 w-4" /></span>
           <span className="text-sm text-slate-600">{t("group.locked")}</span>
         </div>
-        <Link href="/dashboard/billing" className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></Link>
+        <UpgradeLink className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></UpgradeLink>
       </div>
     </section>
   );

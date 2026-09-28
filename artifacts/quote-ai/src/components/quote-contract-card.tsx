@@ -7,6 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { contractsApi } from "@/lib/contracts-api";
 import { ContractStatusBadge } from "@/pages/dashboard/contracts/[id]";
+import { isNativeApp } from "@/lib/native/env";
 
 /**
  * Quote detail sidebar card: draft a contract from this quote, or jump to
@@ -48,9 +49,13 @@ export function QuoteContractCard({ quoteId, quoteStatus, hasContractsFeature }:
       </div>
       {!hasContractsFeature ? (
         <div className="act-list">
-          <Link href="/dashboard/settings/plan" className="add-dashed" style={{ padding: 10, fontSize: 13 }}>
-            <Lock /> {t("contracts.cardUpgrade")}
-          </Link>
+          {isNativeApp ? (
+            <p className="add-dashed m-0" style={{ padding: 10, fontSize: 13 }}><Lock /> {t("contracts.cardInPro")}</p>
+          ) : (
+            <Link href="/dashboard/settings/plan" className="add-dashed" style={{ padding: 10, fontSize: 13 }}>
+              <Lock /> {t("contracts.cardUpgrade")}
+            </Link>
+          )}
         </div>
       ) : isLoading ? (
         <ListSkeleton rows={1} amount={false} />

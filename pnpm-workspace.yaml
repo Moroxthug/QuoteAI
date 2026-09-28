@@ -1,6 +1,7 @@
 packages:
   - artifacts/api-server
   - artifacts/quote-ai
+  - artifacts/mobile
   - lib/*
   - lib/integrations/*
   - scripts

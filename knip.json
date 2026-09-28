@@ -7,8 +7,13 @@
     "artifacts/quote-ai/public/widget-test.js"
   ],
   "ignoreIssues": {
-    "artifacts/quote-ai/src/components/ui/**": ["exports", "types"],
-    "artifacts/quote-ai/src/lib/*-api.ts": ["types"]
+    "artifacts/quote-ai/src/components/ui/**": [
+      "exports",
+      "types"
+    ],
+    "artifacts/quote-ai/src/lib/*-api.ts": [
+      "types"
+    ]
   },
   "ignoreDependencies": [
     "prettier",
@@ -67,6 +72,19 @@
     "scripts": {
       "entry": [
         "src/*.ts"
+      ]
+    },
+    "artifacts/mobile": {
+      "entry": [
+        "scripts/*.ts"
+      ],
+      "ignoreDependencies": [
+        "@capacitor/app",
+        "@capacitor/keyboard",
+        "@capacitor/splash-screen",
+        "@capacitor/status-bar",
+        "@aparajita/capacitor-secure-storage",
+        "@capacitor/browser"
       ]
     }
   }

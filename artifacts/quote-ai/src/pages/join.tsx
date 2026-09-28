@@ -8,6 +8,7 @@ import { useDocumentTitle } from "@/hooks/use-document-title";
 import { useAuth } from "@/hooks/use-auth";
 import { Logo } from "@/components/logo";
 import { peopleApi } from "@/lib/people-api";
+import { ApiImg } from "@/components/api-img";
 
 /**
  * Phase 91: /join — the employee's first stop with an access code. Type the
@@ -84,7 +85,7 @@ export default function JoinPage() {
 
         {preview.data && (
           <div className="space-y-4 text-center">
-            {preview.data.logoUrl && <img src={preview.data.logoUrl} alt="" style={{ maxHeight: 48, margin: "0 auto" }} />}
+            {preview.data.logoUrl && <ApiImg src={preview.data.logoUrl} alt="" style={{ maxHeight: 48, margin: "0 auto" }} />}
             <p className="m-0" style={{ color: "var(--ink)" }}>
               {t("join.forCompany").replace("{company}", preview.data.companyName || "—").replace("{role}", t(`join.role.${preview.data.role}`))}
             </p>

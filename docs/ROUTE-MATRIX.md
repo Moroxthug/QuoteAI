@@ -14,12 +14,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 137 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 360 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 430 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
-| 482 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 524 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 566 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
+| 142 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 365 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 435 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
+| 487 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 529 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 571 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
 
 ## artifacts/api-server/src/routes/account.ts
 
@@ -732,18 +732,18 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 68 | GET | `/api/team/members` | session | team:view | — | none | — | n/a | — | — | — |
-| 96 | POST | `/api/team/members/invite` | session | team:full | — | zod | hasFeature(team_accounts) | n/a | — | — | — |
-| 165 | POST | `/api/team/members/:id/resend` | session | team:full | — | none | — | predicate | — | — | — |
-| 204 | PUT | `/api/team/members/:id` | session | team:full | — | zod | — | predicate | — | — | — |
-| 235 | DELETE | `/api/team/members/:id` | session | team:full | — | none | — | predicate | — | — | — |
-| 259 | GET | `/api/team/invite/:token` | none | — | invitePreviewLimiter | none | — | n/a | — | hash-lookup | — |
-| 284 | POST | `/api/team/invite/:token/accept` | session | — | — | none | — | NONE | — | hash-lookup | — |
-| 338 | GET | `/api/team/pending-invites` | session | — | — | none | — | n/a | — | — | — |
-| 354 | POST | `/api/team/pending-invites/:id/accept` | session | — | — | none | — | post-check | — | — | — |
-| 384 | GET | `/api/team/orgs` | session | — | — | none | — | n/a | — | — | — |
-| 406 | POST | `/api/team/switch` | session | — | — | zod | — | n/a | — | — | — |
-| 430 | POST | `/api/team/members/leave` | session | — | — | zod | — | n/a | — | — | — |
+| 75 | GET | `/api/team/members` | session | team:view | — | none | — | n/a | — | — | — |
+| 103 | POST | `/api/team/members/invite` | session | team:full | — | zod | hasFeature(team_accounts) | n/a | — | — | — |
+| 172 | POST | `/api/team/members/:id/resend` | session | team:full | — | none | — | predicate | — | — | — |
+| 211 | PUT | `/api/team/members/:id` | session | team:full | — | zod | — | predicate | — | — | — |
+| 242 | DELETE | `/api/team/members/:id` | session | team:full | — | none | — | predicate | — | — | — |
+| 266 | GET | `/api/team/invite/:token` | none | — | invitePreviewLimiter | none | — | n/a | — | hash-lookup | — |
+| 291 | POST | `/api/team/invite/:token/accept` | session | — | — | none | — | NONE | — | hash-lookup | — |
+| 345 | GET | `/api/team/pending-invites` | session | — | — | none | — | n/a | — | — | — |
+| 361 | POST | `/api/team/pending-invites/:id/accept` | session | — | — | none | — | post-check | — | — | — |
+| 391 | GET | `/api/team/orgs` | session | — | — | none | — | n/a | — | — | — |
+| 413 | POST | `/api/team/switch` | session | — | — | zod | — | n/a | — | — | — |
+| 437 | POST | `/api/team/members/leave` | session | — | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/team.ts
 

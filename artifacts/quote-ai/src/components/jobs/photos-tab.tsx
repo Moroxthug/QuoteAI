@@ -8,6 +8,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { jobsApi, type JobDetailDto, type JobPhotoDto } from "@/lib/jobs-api";
 import { runOrQueue, useOutbox, discard } from "@/lib/offline/outbox";
+import { ApiImg } from "@/components/api-img";
 
 /**
  * Photos tab (Phase 10): upload progress photos tied to the job (optionally
@@ -121,7 +122,7 @@ const can = useCan();
                 <div key={p.id} className={cn("photo", isSelected && "on")}>
                   <button type="button" className="photo-img" onClick={() => toggle(p.id)}>
                     {/* Phase 96: the grid loads the small copy; the original stays one request away for the lightbox-less view. */}
-                    <img src={jobsApi.photoThumbUrl(job.id, p.id)} alt={p.caption || p.fileName} loading="lazy" decoding="async" />
+                    <ApiImg src={jobsApi.photoThumbUrl(job.id, p.id)} alt={p.caption || p.fileName} loading="lazy" decoding="async" />
                   </button>
                   <button type="button" className={cn("chk", isSelected && "on")} onClick={() => toggle(p.id)} aria-pressed={isSelected} aria-label={t("jobs.m.selectPhoto").replace("{name}", p.caption || p.fileName)}>
                     {isSelected && <Check />}

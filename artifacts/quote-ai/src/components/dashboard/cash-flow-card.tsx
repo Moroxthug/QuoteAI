@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { formatCents } from "@/lib/jobs-api";
 import { cashFlowApi } from "@/lib/analytics-api";
 import { LegendRow, SERIES } from "@/components/charts";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 // Phase 115: recharts loads with the chart, not with Today (see ./cash-flow-chart.tsx).
 const CashFlowChart = lazy(() => import("./cash-flow-chart"));
@@ -36,7 +37,7 @@ export function CashFlowCard({ plan, isActive }: { plan: string | null | undefin
               <span className="block text-xs text-slate-500">{t("dashboard.cash.locked")}</span>
             </div>
           </div>
-          <Link href="/dashboard/billing" className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.cash.upgrade")} <ArrowRight className="chev" /></Link>
+          <UpgradeLink className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.cash.upgrade")} <ArrowRight className="chev" /></UpgradeLink>
         </div>
       </section>
     );

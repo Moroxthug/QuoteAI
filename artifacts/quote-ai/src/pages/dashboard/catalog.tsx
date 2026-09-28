@@ -40,6 +40,7 @@ import { ResponsiveTable, type Column } from "@/components/mobile/list-row";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { ActionSheet } from "@/components/mobile/action-sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { isNativeApp } from "@/lib/native/env";
 
 type SharedItem = CatalogItem & { shared?: boolean; sharedFrom?: string | null };
 
@@ -431,8 +432,8 @@ const can = useCan();
         <div className="card-empty" style={{ padding: "64px 22px" }}>
           <BookOpen />
           <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)", marginBottom: 6 }}>{t("dashboard.catalog.proOnly.title")}</h2>
-          <p style={{ maxWidth: 420, margin: "0 auto 18px" }}>{t("dashboard.catalog.proOnly.desc")}</p>
-          <button type="button" className="btn btn-sm btn-navy" onClick={() => window.location.href = "/dashboard/settings/plan"}>{t("dashboard.catalog.proOnly.cta")}</button>
+          <p style={{ maxWidth: 420, margin: "0 auto 18px" }}>{t(isNativeApp ? "dashboard.catalog.proOnly.descApp" : "dashboard.catalog.proOnly.desc")}</p>
+          {!isNativeApp && <button type="button" className="btn btn-sm btn-navy" onClick={() => window.location.href = "/dashboard/settings/plan"}>{t("dashboard.catalog.proOnly.cta")}</button>}
         </div>
       </div>
     );

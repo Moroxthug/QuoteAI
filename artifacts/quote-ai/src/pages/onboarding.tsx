@@ -19,6 +19,7 @@ import { WorkStepFields } from "@/components/onboarding/work-step";
 import { TeamStep } from "@/components/onboarding/team-step";
 import { peopleApi, type CompanySetup, type CompanyTrade } from "@/lib/people-api";
 import { teamMembersApi } from "@/lib/team-members-api";
+import { ApiImg } from "@/components/api-img";
 
 const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
@@ -193,7 +194,7 @@ export default function OnboardingPage() {
               <div className="stack" style={{ gap: 12 }}>
                 {pendingInvites.map((inv) => (
                   <section key={inv.id} className="card p-5 text-center stack" style={{ gap: 12 }} data-pending-invite="">
-                    {inv.logoUrl && <img src={inv.logoUrl} alt="" style={{ maxHeight: 44, margin: "0 auto" }} />}
+                    {inv.logoUrl && <ApiImg src={inv.logoUrl} alt="" style={{ maxHeight: 44, margin: "0 auto" }} />}
                     <p className="m-0" style={{ color: "var(--ink)" }}>
                       {t("onboarding.invite.body").replace("{company}", inv.companyName || "—").replace("{role}", t(`join.role.${inv.role}`))}
                     </p>

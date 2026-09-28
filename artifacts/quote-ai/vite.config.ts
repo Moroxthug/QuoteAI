@@ -114,16 +114,26 @@ const basePath = process.env.BASE_PATH ?? "/";
 const release = process.env.SENTRY_RELEASE ?? process.env.VERCEL_GIT_COMMIT_SHA ?? "";
 const emitSourcemaps = Boolean(process.env.SENTRY_AUTH_TOKEN);
 
-export default defineConfig(({ isSsrBuild }) => ({
-  base: basePath,
+// Phase 118: `vite build --mode native` is the phone app's bundle (artifacts/mobile
+// copies it into the Capacitor project). The flag is a build-time constant, so
+// every native-only branch is dropped from the website's bundle; the app talks
+// to the API at VITE_API_ORIGIN (the live site unless a dev build says otherwise).
+const NATIVE_API_ORIGIN = process.env.VITE_API_ORIGIN ?? "https://quoteai.ca";
+
+export default defineConfig(({ isSsrBuild, mode }) => {
+  const native = mode === "native";
+  return {
+  base: native ? "/" : basePath,
   define: {
     "import.meta.env.VITE_RELEASE": JSON.stringify(release),
+    "import.meta.env.VITE_NATIVE": JSON.stringify(native ? "1" : ""),
+    "import.meta.env.VITE_API_ORIGIN": JSON.stringify(native ? NATIVE_API_ORIGIN : ""),
   },
   plugins: [
     react(),
     tailwindcss(),
     i18nSplitPlugin(),
-    ...(isSsrBuild ? [] : [widgetPlugin(), chunkMapPlugin()]),
+    ...(isSsrBuild || native ? [] : [widgetPlugin(), chunkMapPlugin()]),
   ],
   resolve: {
     alias: {
@@ -138,10 +148,10 @@ export default defineConfig(({ isSsrBuild }) => ({
     noExternal: ["react-helmet-async"],
   },
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: native ? path.resolve(import.meta.dirname, process.env.NATIVE_OUT_DIR ?? "dist/native") : path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
     // Phase 77: scripts/build-sw.ts reads the chunk graph to precache the app shell.
-    manifest: !isSsrBuild,
+    manifest: !isSsrBuild && !native,
     chunkSizeWarningLimit: 500,
     sourcemap: emitSourcemaps && !isSsrBuild ? "hidden" : false,
     rollupOptions: {
@@ -208,4 +218,5 @@ export default defineConfig(({ isSsrBuild }) => ({
     host: "0.0.0.0",
     allowedHosts: true,
   },
-}));
+};
+});

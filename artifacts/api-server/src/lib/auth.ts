@@ -68,11 +68,20 @@ export function getTrustedOrigins(): string[] {
   return origins;
 }
 
+/**
+ * Phase 118: the origins of the phone app's WebView (Android serves the bundled
+ * app from https://localhost, iOS from capacitor://localhost). The app signs in
+ * with a bearer token and sends no cookies, so CORS answers these without
+ * credentials (app.ts); better-auth still checks a sign-in's Origin against its
+ * trusted list, so they are trusted there.
+ */
+export const NATIVE_APP_ORIGINS = ["https://localhost", "capacitor://localhost"];
+
 export const auth = betterAuth({
   secret,
   baseURL: getBaseURL(),
   basePath: "/api/auth",
-  trustedOrigins: getTrustedOrigins(),
+  trustedOrigins: [...getTrustedOrigins(), ...NATIVE_APP_ORIGINS],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { CatalogItem } from "@workspace/api-client-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { formatCad } from "@/lib/money";
+import { isNativeApp } from "@/lib/native/env";
 
 const UM_OPTIONS = ["mq", "ml", "mc", "cad", "ore", "kg", "a.c.", "pezzi", "kw", "lt", "t", "m", "%"];
 
@@ -305,10 +306,10 @@ export function PriceCatalogSection() {
       <div className="card card-empty" style={{ padding: "56px 22px" }}>
         <BookOpen />
         <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--navy)", marginBottom: 6 }}>{t("dashboard.catalog.proOnly.title")}</h2>
-        <p style={{ maxWidth: 440, margin: "0 auto 16px" }}>{t("dashboard.catalog.proOnly.desc")}</p>
-        <button type="button" onClick={() => window.location.href = "/dashboard/settings/plan"} className="btn btn-navy btn-sm">
+        <p style={{ maxWidth: 440, margin: "0 auto 16px" }}>{t(isNativeApp ? "dashboard.catalog.proOnly.descApp" : "dashboard.catalog.proOnly.desc")}</p>
+        {!isNativeApp && <button type="button" onClick={() => window.location.href = "/dashboard/settings/plan"} className="btn btn-navy btn-sm">
           {t("dashboard.catalog.proOnly.cta")}
-        </button>
+        </button>}
       </div>
     );
   }

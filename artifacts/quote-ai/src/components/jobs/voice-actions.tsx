@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Mic, Square, Camera, Loader2, Sparkles, RotateCcw, Send, ImageIcon, X } from "lucide-react";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -9,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { assistantApi, type ActionTurnDto, type ProposalDto } from "@/lib/assistant-api";
 import { ProposalCard, Markdownish } from "@/components/assistant/proposal-card";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 type Mode = "voice" | "photo";
 type Phase = "idle" | "working" | "result";
@@ -132,7 +132,7 @@ export function JobCaptureSheet({ jobId, mode, photo, onClose }: { jobId: string
               <Sparkles className="h-8 w-8 text-navy-300 mx-auto mb-2" />
               <h3 className="font-bold text-slate-900">{t("assistant.gatedTitle")}</h3>
               <p className="text-sm text-slate-600 mt-1">{t("voice.gatedDesc")}</p>
-              <Link href="/dashboard/billing" className="inline-block mt-3 text-sm font-semibold text-navy-700 hover:underline">{t("assistant.upgrade")}</Link>
+              <UpgradeLink className="inline-block mt-3 text-sm font-semibold text-navy-700 hover:underline">{t("assistant.upgrade")}</UpgradeLink>
             </div>
           ) : phase === "result" && turn ? (
             <div className="voice-result" data-testid="voice-result">

@@ -16,6 +16,7 @@ import { useCan, useRole } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { formatCents, jobsApi } from "@/lib/jobs-api";
 import { booksApi, type BankLineDto, type BooksOverviewDto, type CostCategory } from "@/lib/books-api";
+import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 // ── Phase 88: /dashboard/books ──────────────────────────────────────────────
 // The month-end close (what is not finished in QuoteAI for a month), the bank
@@ -63,7 +64,7 @@ export default function BooksPage() {
               <span className="qa-ic navy"><Lock className="h-4 w-4" /></span>
               <span className="text-sm text-slate-600">{t("books.locked")}</span>
             </div>
-            <Link href="/dashboard/billing" className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></Link>
+            <UpgradeLink className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></UpgradeLink>
           </div>
         </section>
       )}
@@ -244,7 +245,7 @@ function BankTab({ overview }: { overview: Overview }) {
       <section className="card">
         <div className="card-foot" style={{ borderTop: "none" }}>
           <div className="flex items-center gap-3 min-w-0"><span className="qa-ic navy"><Lock className="h-4 w-4" /></span><span className="text-sm text-slate-600">{t("books.bank.locked")}</span></div>
-          <Link href="/dashboard/billing" className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></Link>
+          <UpgradeLink className="cta-link" style={{ fontSize: 13.5 }}>{t("dashboard.calendar.upgrade")} <ArrowRight className="chev" /></UpgradeLink>
         </div>
       </section>
     );

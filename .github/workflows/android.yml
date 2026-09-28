@@ -1,0 +1,73 @@
+name: Android
+
+# Phase 118 (docs/APP-PLAN.md): the phone app is built on every push to main
+# and the APK is downloadable from the run (Actions → Android → the run →
+# Artifacts → quoteai-android). Install it on a phone to try the build: allow
+# "install unknown apps" for the browser or file manager you open it with.
+#
+# The debug APK is signed with the runner's throwaway debug key, so each run's
+# APK replaces the last only after uninstalling it. When the upload key exists
+# (Phase 123/124: ANDROID_KEYSTORE_BASE64 + ANDROID_KEYSTORE_PASSWORD +
+# ANDROID_KEY_ALIAS + ANDROID_KEY_PASSWORD secrets) a signed release bundle
+# (.aab, for Play) is built too.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "artifacts/mobile/**"
+      - "artifacts/quote-ai/src/lib/native/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+      ANDROID_VERSION_CODE: ${{ github.run_number }}
+      ANDROID_VERSION_NAME: 0.1.${{ github.run_number }}
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: pnpm install --frozen-lockfile
+      - name: Build the app's files and copy them into the Android project
+        run: pnpm --filter @workspace/mobile sync
+      - name: Debug APK
+        working-directory: artifacts/mobile/android
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - name: Signed release bundle (when the upload key is set)
+        if: ${{ env.HAS_KEY == 'true' }}
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        working-directory: artifacts/mobile/android
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+          rm -f "$RUNNER_TEMP/upload.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quoteai-android
+          path: |
+            artifacts/mobile/android/app/build/outputs/apk/debug/*.apk
+            artifacts/mobile/android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+          retention-days: 30

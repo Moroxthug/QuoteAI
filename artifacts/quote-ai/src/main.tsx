@@ -33,7 +33,18 @@ if (/^\/(dashboard|onboarding)(\/|$)/.test(pathname)) void ensureStrings(lang, [
 // The App chunk is loaded on demand (it is ~2/3 of the entry's JavaScript);
 // prerendered pages carry a <link rel="modulepreload"> for it
 // (scripts/prerender-seo.ts) so hydration does not wait on a second round trip.
-void Promise.all([import("./App.tsx"), strings]).then(([{ default: App }]) => {
+// Phase 116: the signed-in app opens to what it showed last time — the saved
+// answers are put back into the QueryClient before the first render (capped:
+// a slow disk shows the skeleton frame rather than holding it back).
+const RESTORE_CAP_MS = 400;
+const restored = /^\/dashboard(\/|$)/.test(pathname)
+  ? Promise.race([
+      Promise.all([import("./lib/query-client.ts"), import("./lib/offline/query-cache.ts")]).then(([{ queryClient }, { restoreQueryCache }]) => restoreQueryCache(queryClient)),
+      new Promise<void>((resolve) => setTimeout(resolve, RESTORE_CAP_MS)),
+    ]).catch(() => undefined)
+  : undefined;
+
+void Promise.all([import("./App.tsx"), strings, restored]).then(([{ default: App }]) => {
   const tree = (
     <StrictMode>
       <HelmetProvider>

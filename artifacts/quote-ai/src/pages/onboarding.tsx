@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { useUpdateBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace/api-client-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Building2, Upload, X, ImageIcon, ArrowRight, ArrowLeft, MapPin, Landmark, CalendarClock, Hammer, Users, Mail } from "lucide-react";
@@ -50,7 +51,7 @@ export default function OnboardingPage() {
   const joinInvite = useMutation({
     mutationFn: (id: string) => teamMembersApi.acceptPendingInvite(id),
     // A full load: the acting company changed (a cookie), and nothing cached belongs to the old one.
-    onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard/me?welcome=1"; },
+    onSuccess: () => { pointCacheAtOrg(null); queryClient.clear(); window.location.href = "/dashboard/me?welcome=1"; },
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
 

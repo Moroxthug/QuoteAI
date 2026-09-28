@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { ArrowRight, KeyRound, Loader2, XCircle } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
@@ -27,7 +28,7 @@ export default function JoinPage() {
   const redeem = useMutation({
     mutationFn: () => peopleApi.redeemCode(code),
     // A full load: the acting company changed (a cookie), and nothing cached belongs to the old one.
-    onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard/me?welcome=1"; },
+    onSuccess: () => { pointCacheAtOrg(null); queryClient.clear(); window.location.href = "/dashboard/me?welcome=1"; },
   });
 
   const submit = (e: React.FormEvent) => {

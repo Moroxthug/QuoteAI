@@ -18,10 +18,17 @@ import { SkipLink } from "@/components/a11y";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
+import { clearOutbox } from "@/lib/offline/outbox";
+import { wipeQueryCache, confirmOwner, pointCacheAtOrg, useCacheOwnerCheck, startPersisting } from "@/lib/offline/query-cache";
+import { queryClient as appQueryClient } from "@/lib/query-client";
 import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
 import { PhoneNewButton, PhoneTabBar } from "@/components/layout/phone-nav";
 import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
 import { prefetchRoute } from "@/lib/route-chunks";
+
+// Phase 116: in the signed-in app, answers are saved to the device as they
+// arrive (lib/offline/query-cache.ts) — the public pages never load this.
+startPersisting(appQueryClient);
 
 /** Section groupings for the sidebar rail — purely presentational, doesn't affect routing or access. */
 const NAV_GROUPS = ["overview", "sales", "delivery", "insights", "workspace"] as const;
@@ -55,7 +62,8 @@ function useNavItems() {
 async function signOut() {
   await authClient.signOut();
   // Phase 77: the service worker keeps API reads for offline use — not for the next person on this browser.
-  await clearOfflineCaches();
+  // Phase 116: nor the saved app data, nor anything still waiting to be sent.
+  await Promise.all([clearOfflineCaches(), wipeQueryCache(), clearOutbox()]);
   window.location.href = "/";
 }
 
@@ -91,7 +99,8 @@ function OrgSwitcherItems() {
   const { data } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
   const switchOrg = useMutation({
     mutationFn: (orgId: string) => teamMembersApi.switchOrg(orgId),
-    onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard"; },
+    // Phase 116: the next launch opens the new company's saved data, and the service worker drops the old one's.
+    onSuccess: async (r) => { pointCacheAtOrg(r.orgId); await clearOfflineCaches(); queryClient.clear(); window.location.href = "/dashboard"; },
   });
   const orgs = data?.items ?? [];
   if (orgs.length < 2) return null;
@@ -216,6 +225,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const can = useCan();
   const { isLoaded, isSignedIn, isError, user } = useAuth();
   const [location] = useLocation();
+  const queryClient = useQueryClient();
+  // Phase 116: data saved on this device by someone else is dropped before the frame draws any of it.
+  const cacheOwnerOk = useCacheOwnerCheck(queryClient, isLoaded && isSignedIn ? user?.id ?? null : null);
   // Phase 101: at 980 px and below the sidebar is gone (CSS) and the phone
   // tabs + More sheet take over — the hamburger drawer they replace hid twenty
   // links two taps away.
@@ -231,6 +243,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { data: orgsData } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
   // Phase 91: the person's own name and photo (the session copy goes stale after they change it).
   const { data: meData } = useQuery({ queryKey: ["me"], queryFn: peopleApi.me, staleTime: 5 * 60_000, enabled: !!isSignedIn });
+
+  // Phase 116: once the person and the active company are known, the cache is
+  // saved under them (lib/offline/query-cache.ts), and what the field needs
+  // with no signal is fetched while the phone is idle (lib/offline/warm.ts).
+  const activeOrgId = orgsData?.activeOrgId ?? null;
+  const ownerUser = isSignedIn && cacheOwnerOk ? user : null;
+  useEffect(() => {
+    if (!ownerUser || !activeOrgId) return;
+    confirmOwner(queryClient, { userId: ownerUser.id, orgId: activeOrgId }, { id: ownerUser.id, name: ownerUser.name, email: ownerUser.email, image: ownerUser.image ?? null });
+    // Its own chunk: the API clients it calls aren't needed to draw the first screen.
+    void import("@/lib/offline/warm").then((m) => m.warmOfflineSet(queryClient, can, !!isPro)).catch(() => undefined);
+  }, [ownerUser, activeOrgId, queryClient, can, isPro]);
 
   // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
   // name the tab after the section the user is in.
@@ -273,7 +297,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }, [isSignedIn, idleHrefs]);
 
   // Phase 115: the frame, not a spinner, while the session is checked.
-  if (!isLoaded) return <AppShellSkeleton />;
+  if (!isLoaded || !cacheOwnerOk) return <AppShellSkeleton />;
 
   // A failed session check (API down, cold 502) is not a sign-out: bouncing the
   // user to /sign-in loses their place and their unsaved work (Phase 66).

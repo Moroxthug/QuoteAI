@@ -1,6 +1,7 @@
 import { Switch, Route, Redirect, Router as WouterRouter, useLocation } from "wouter";
 import { useEffect, lazy, Suspense } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/query-client";
 import { RouteAnnouncer } from "@/components/a11y";
 import { ScrollManager } from "@/components/scroll-manager";
 import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
@@ -106,12 +107,8 @@ import { useGetBusinessProfile, getGetBusinessProfileQueryKey } from "@workspace
 import { useAuth } from "@/hooks/use-auth";
 import { isOnboardingSkipped } from "@/lib/onboarding-state";
 
-// Phase 77: TanStack pauses queries and mutations while navigator.onLine is
-// false ("online" network mode). Offline is a first-class state here — the
-// service worker answers cached reads and the outbox owns writes — so both run
-// regardless and fail fast (with the SW's OFFLINE stand-in) when there is
-// really nothing to talk to.
-const queryClient = new QueryClient({ defaultOptions: { queries: { networkMode: "always" }, mutations: { networkMode: "always" } } });
+// The QueryClient (freshness rules, Phase 116) lives in lib/query-client.ts so
+// main.tsx can fill it from the device before this module renders anything.
 // Phase 77: the offline outbox refreshes the affected queries after a replay.
 setOutboxQueryClient(queryClient);
 startOutbox();

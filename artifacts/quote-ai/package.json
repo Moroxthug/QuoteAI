@@ -20,7 +20,8 @@
     "gsc-inspect": "tsx ./scripts/gsc-inspect-urls.ts",
     "i18n-audit": "tsx ./scripts/i18n-audit.ts",
     "qa:lighthouse": "tsx ./scripts/lighthouse.ts",
-    "qa:bundle": "tsx ./scripts/bundle-budget.ts"
+    "qa:bundle": "tsx ./scripts/bundle-budget.ts",
+    "test": "tsx --test src/lib/offline/query-policy.test.ts"
   },
   "devDependencies": {
     "@fontsource-variable/figtree": "^5.3.0",

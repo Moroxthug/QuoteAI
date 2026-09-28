@@ -46,7 +46,7 @@ export default function ContractDetailPage() {
   const queryClient = useQueryClient();
   const locale = lang === "fr" ? frCA : enCA;
 
-  const { data, isLoading, error } = useQuery({ queryKey: ["contract", id], queryFn: () => contractsApi.get(id!), enabled: !!id });
+  const { data, isLoading } = useQuery({ queryKey: ["contract", id], queryFn: () => contractsApi.get(id!), enabled: !!id });
   const contract = data?.contract;
 
   const [editing, setEditing] = useState(false);
@@ -181,7 +181,7 @@ export default function ContractDetailPage() {
 
   // Phase 115: the hero (who, what, the total) and the document card, as they will sit.
   if (isLoading) return <DetailSkeleton strip={0} rows={8} />;
-  if (error || !contract || !vars) {
+  if (!contract || !vars) {
     return (
       <div className="card card-empty">
         <AlertTriangle style={{ color: "var(--yellow-dark)" }} />

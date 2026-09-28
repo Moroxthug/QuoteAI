@@ -18,6 +18,9 @@ function safeLocalPath(raw: string | null, fallback: string): string {
 export default function SignUpPage() {
   const { t, lang } = useLanguage();
   useDocumentTitle(`${t("signUp.title")} · QuoteAI`);
+  // Phase 116: whoever signs in next starts clean — the app data saved on this
+  // device by the last person (whose session ended) is dropped, never shown.
+  useEffect(() => { void import("@/lib/offline/query-cache").then((m) => m.wipeQueryCache()).catch(() => undefined); }, []);
   const search = useSearch();
   // Phase 91: a plan picked on the pricing page rides through sign-up to the end of onboarding (checkout with the seats chosen there).
   const params = new URLSearchParams(search);

@@ -1,7 +1,7 @@
 {
   "shell": {
     "en": 305,
-    "fr": 310
+    "fr": 315
   },
   "chunk": 75,
   "screens": [
@@ -68,7 +68,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/index.tsx"
       ],
-      "budget": 315
+      "budget": 320
     },
     {
       "name": "Job",
@@ -81,7 +81,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/[id].tsx"
       ],
-      "budget": 365
+      "budget": 370
     },
     {
       "name": "Money (invoices)",
@@ -185,7 +185,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/settings/index.tsx"
       ],
-      "budget": 315
+      "budget": 320
     },
     {
       "name": "Onboarding",

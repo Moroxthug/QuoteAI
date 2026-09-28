@@ -83,7 +83,7 @@ export default function JobDetailPage() {
   const [renaming, setRenaming] = useState(false);
   const tabsTop = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, error } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
+  const { data, isLoading } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
   // Phase 106: the number strip's margin is the analytics' projection (same request the Overview charts use).
   const { data: analytics } = useJobAnalytics(id!);
   // Phase 76: unread client replies drive the Messages tab badge.
@@ -152,7 +152,7 @@ export default function JobDetailPage() {
   ];
 
   if (isLoading) return <DetailSkeleton strip={4} tabs rows={4} />;
-  if (error || !data || !job) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
+  if (!data || !job) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { milestones, changeOrders, budgetTotalCents, costs, invoiceTotals } = data;
   const done = milestones.filter((m) => m.status === "completed").length;

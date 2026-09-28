@@ -36,7 +36,7 @@ export default function JobSetupPage() {
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
 
-  const { data, isLoading, error } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
+  const { data, isLoading } = useQuery({ queryKey: ["job", id], queryFn: () => jobsApi.get(id!), enabled: !!id });
 
   const [name, setName] = useState("");
   const [milestones, setMilestones] = useState<MilestoneDraft[]>([]);
@@ -109,7 +109,7 @@ export default function JobSetupPage() {
   const addMs = () => setMilestones((ms) => { const last = ms.at(-1); const s = last?.plannedEnd ? dayStr(addDays(parseDay(last.plannedEnd), 1)) : ""; return [...ms, { title: "", description: "", plannedStart: s, plannedEnd: s, paymentTermId: null, valueCents: 0, taskCount: 0, status: "planned" }]; });
 
   if (isLoading || (data && loadedFor === null)) return <DetailSkeleton strip={0} rows={6} />;
-  if (error || !data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
+  if (!data) return <div className="card card-empty">{t("jobs.notFound")} <Link href="/dashboard/jobs" className="text-link">{t("jobs.backToList")}</Link></div>;
 
   const { job } = data;
   const confirmed = job.setupStatus === "confirmed";

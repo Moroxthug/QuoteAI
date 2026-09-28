@@ -1,9 +1,12 @@
 // Phase 77: the smallest IndexedDB wrapper the outbox needs — one object
 // store, promise-based get/put/delete/getAll. Blobs (photos) are stored as-is.
+// Phase 116: a second store keeps the saved React Query cache, one record per
+// signed-in person and company (lib/offline/query-cache.ts).
 
 const DB_NAME = "quoteai-offline";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 export const OUTBOX_STORE = "outbox";
+export const QUERY_CACHE_STORE = "query-cache";
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -21,6 +24,7 @@ function open(): Promise<IDBDatabase> {
         const store = db.createObjectStore(OUTBOX_STORE, { keyPath: "id" });
         store.createIndex("createdAt", "createdAt");
       }
+      if (!db.objectStoreNames.contains(QUERY_CACHE_STORE)) db.createObjectStore(QUERY_CACHE_STORE, { keyPath: "key" });
     };
     req.onsuccess = () => {
       const db = req.result;
@@ -48,6 +52,11 @@ export async function idbGetAll<T>(store: string): Promise<T[]> {
   return request(db.transaction(store, "readonly").objectStore(store).getAll() as IDBRequest<T[]>);
 }
 
+export async function idbGet<T>(store: string, key: IDBValidKey): Promise<T | undefined> {
+  const db = await open();
+  return request(db.transaction(store, "readonly").objectStore(store).get(key) as IDBRequest<T | undefined>);
+}
+
 export async function idbPut<T>(store: string, value: T): Promise<void> {
   const db = await open();
   await request(db.transaction(store, "readwrite").objectStore(store).put(value));
@@ -56,4 +65,9 @@ export async function idbPut<T>(store: string, value: T): Promise<void> {
 export async function idbDelete(store: string, key: IDBValidKey): Promise<void> {
   const db = await open();
   await request(db.transaction(store, "readwrite").objectStore(store).delete(key));
+}
+
+export async function idbClear(store: string): Promise<void> {
+  const db = await open();
+  await request(db.transaction(store, "readwrite").objectStore(store).clear());
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
@@ -15,6 +15,9 @@ function safeLocalPath(raw: string | null, fallback: string): string {
 export default function SignInPage() {
   const { t } = useLanguage();
   useDocumentTitle(`${t("signIn.title")} · QuoteAI`);
+  // Phase 116: whoever signs in next starts clean — the app data saved on this
+  // device by the last person (whose session ended) is dropped, never shown.
+  useEffect(() => { void import("@/lib/offline/query-cache").then((m) => m.wipeQueryCache()).catch(() => undefined); }, []);
   const [, navigate] = useLocation();
   const search = useSearch();
   const nextPath = safeLocalPath(new URLSearchParams(search).get("next"), "/dashboard");

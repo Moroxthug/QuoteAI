@@ -2,6 +2,7 @@ import { localDay } from "@/lib/local-day";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Users, Clock, Wrench, Plus, KeyRound, Armchair, Trash2, Link2, Copy, Check, X, Download, Loader2, Pencil, UserX, UserCheck, Filter, UserPlus, RotateCw, MapPin, Wallet } from "lucide-react";
@@ -101,7 +102,7 @@ const can = useCan();
   // Phase 72: a member (not the owner) can take themself off this company.
   const { data: orgs } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
   const activeOrg = orgs?.items.find((o) => o.orgId === orgs.activeOrgId);
-  const leave = useMutation({ mutationFn: (orgId: string) => teamMembersApi.leave(orgId), onSuccess: () => { queryClient.clear(); window.location.href = "/dashboard"; }, onError });
+  const leave = useMutation({ mutationFn: (orgId: string) => teamMembersApi.leave(orgId), onSuccess: () => { pointCacheAtOrg(null); queryClient.clear(); window.location.href = "/dashboard"; }, onError });
 
   const members = data?.items ?? [];
   const seats = data?.seats;

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import type { QueryClient } from "@tanstack/react-query";
-import { idbSupported, idbGetAll, idbPut, idbDelete, OUTBOX_STORE } from "./db";
+import { idbSupported, idbGetAll, idbPut, idbDelete, idbClear, OUTBOX_STORE } from "./db";
 import { jobsApi, type CostCategory, type CostEntryEdit } from "../jobs-api";
 import { workerApi, type CrewTaskStatus, type FieldReportKind } from "../team-api";
 
@@ -124,6 +124,16 @@ async function remove(id: string) {
   if (idbSupported()) await idbDelete(OUTBOX_STORE, id);
   rows = rows.filter((r) => r.id !== id);
   emit();
+}
+
+/** Phase 116: on sign-out, nothing queued by this person is left for the next one on this device. */
+export async function clearOutbox(): Promise<void> {
+  if (flushTimer) clearTimeout(flushTimer);
+  flushTimer = null;
+  rows = [];
+  loaded = Promise.resolve();
+  emit();
+  if (idbSupported()) await idbClear(OUTBOX_STORE).catch(() => undefined);
 }
 
 export async function discard(id: string): Promise<void> {

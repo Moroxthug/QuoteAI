@@ -32,6 +32,8 @@ export function ActionSheet({
   trigger,
   plain,
   align = "end",
+  open: openProp,
+  onOpenChange,
 }: {
   /** Falsy entries are skipped, so conditions can sit inline. */
   actions: Array<SheetAction | false | null | undefined>;
@@ -42,10 +44,18 @@ export function ActionSheet({
   /** Borderless ⋯ (the top bar). */
   plain?: boolean;
   align?: "start" | "end";
+  /** Phase 120: opened from outside too (a long-pressed row). Phone sheet only. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const { t } = useLanguage();
   const phone = useMediaQuery("(max-width: 640px)");
-  const [open, setOpen] = useState(false);
+  const [openOwn, setOpenOwn] = useState(false);
+  const open = openProp ?? openOwn;
+  const setOpen = (v: boolean) => {
+    setOpenOwn(v);
+    onOpenChange?.(v);
+  };
   const [, navigate] = useLocation();
   const heading = title ?? t("mobile.moreActions");
   const visible = actions.filter((a): a is SheetAction => !!a);

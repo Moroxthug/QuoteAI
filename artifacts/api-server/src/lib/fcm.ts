@@ -13,7 +13,8 @@ import { createSign } from "node:crypto";
 
 export type FcmCredentials = { projectId: string; clientEmail: string; privateKey: string; tokenUri: string };
 
-export type FcmMessage = { title: string; body: string; link?: string | null; tag?: string | null };
+/** Phase 120: `category` (signatures, payments, …) lets an open app mark the good news with a haptic. */
+export type FcmMessage = { title: string; body: string; link?: string | null; tag?: string | null; category?: string | null };
 
 export type FcmDelivery = { ok: true; status: number } | { ok: false; status: number; gone: boolean; error: string };
 
@@ -75,7 +76,7 @@ function fcmPayload(token: string, message: FcmMessage) {
     message: {
       token,
       notification: { title: message.title, body: message.body },
-      data: { link: message.link ?? "/dashboard/notifications", ...(tag ? { tag } : {}) },
+      data: { link: message.link ?? "/dashboard/notifications", ...(tag ? { tag } : {}), ...(message.category ? { category: message.category } : {}) },
       android: { priority: "HIGH", notification: { channel_id: "default", ...(tag ? { tag } : {}) } },
       apns: { headers: { "apns-priority": "10", ...(tag ? { "apns-collapse-id": tag } : {}) }, payload: { aps: { sound: "default" } } },
     },

@@ -2,6 +2,7 @@ import * as React from "react"
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
+import { haptic } from "@/lib/haptics"
 
 /**
  * Radix AlertDialog on the locked `.modal*` vocabulary (see dialog.tsx).
@@ -26,16 +27,24 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content> & { size?: "sm" | "md" | "lg" }
->(({ className, size = "sm", ...props }, ref) => (
+>(({ className, size = "sm", ...props }, ref) => {
+  // Phase 120: a destructive confirm (its action is .btn-red) arrives with the warning haptic.
+  const setRef = React.useCallback((el: HTMLDivElement | null) => {
+    if (el?.querySelector(".btn-red")) haptic("warning")
+    if (typeof ref === "function") ref(el)
+    else if (ref) ref.current = el
+  }, [ref])
+  return (
   <AlertDialogPortal>
     <AlertDialogOverlay />
     <AlertDialogPrimitive.Content
-      ref={ref}
+      ref={setRef}
       className={cn("modal", size !== "md" && size, className)}
       {...props}
     />
   </AlertDialogPortal>
-))
+  )
+})
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
 
 const AlertDialogHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

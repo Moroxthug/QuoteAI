@@ -121,7 +121,7 @@ export async function forgetDeviceBeforeSignOut(): Promise<void> {
 }
 
 /** A notification that arrives while the app is open: shown as a toast with a way to the screen. */
-export type ForegroundPush = { title: string; body: string; link: string | null };
+export type ForegroundPush = { title: string; body: string; link: string | null; category: string | null };
 
 function linkOf(n: Pick<PushNotificationSchema, "data">): string | null {
   const link = (n.data as { link?: unknown } | undefined)?.link;
@@ -145,7 +145,7 @@ export async function startAppPush(opts: { go: (path: string) => void; onForegro
     opts.go(linkOf(notification) ?? "/dashboard/notifications");
   });
   await PushNotifications.addListener("pushNotificationReceived", (n) => {
-    opts.onForeground({ title: n.title ?? "", body: n.body ?? "", link: linkOf(n) });
+    opts.onForeground({ title: n.title ?? "", body: n.body ?? "", link: linkOf(n), category: typeof n.data?.category === "string" ? n.data.category : null });
   });
   if (Capacitor.getPlatform() === "android") {
     await PushNotifications.createChannel({ id: "default", name: language() === "fr" ? "Notifications" : "Notifications", description: "QuoteAI", importance: 4, visibility: 0 }).catch(() => undefined);

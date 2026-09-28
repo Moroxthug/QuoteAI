@@ -4,8 +4,9 @@ import { Link, useLocation, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
-import { Plus, Loader2, Sparkles } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { ListSkeleton } from "@/components/skeletons";
+import { EmptyState, ErrorState } from "@/components/states";
 import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -33,7 +34,7 @@ export default function JobsListPage() {
 const can = useCan();
   const locale = lang === "fr" ? frCA : enCA;
   const [, navigate] = useLocation();
-  const { data, isLoading } = useQuery({ queryKey: ["jobs"], queryFn: jobsApi.list });
+  const { data, isLoading, error, refetch } = useQuery({ queryKey: ["jobs"], queryFn: jobsApi.list });
   const [createOpen, setCreateOpen] = useState(false);
   const items = data?.items ?? [];
   const phone = useMediaQuery("(max-width: 640px)");
@@ -76,13 +77,10 @@ const can = useCan();
       <div className="card">
         {isLoading ? (
           <ListSkeleton rows={5} />
+        ) : error && !data ? (
+          <ErrorState onRetry={() => void refetch()} />
         ) : items.length === 0 ? (
-          <div className="text-center py-14 px-5">
-            <Sparkles className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
-            <h3 className="text-base font-medium text-foreground mb-1">{t("jobs.emptyTitle")}</h3>
-            <p className="text-sm text-muted-foreground mb-2">{t("jobs.emptyDesc")}</p>
-            <Link href="/dashboard/contracts" className="cta-link mx-auto">{t("jobs.goToContracts")}</Link>
-          </div>
+          <EmptyState art="jobs" title={t("states.jobs.empty")} action={<Link href="/dashboard/quotes" className="btn btn-sm btn-navy">{t("dashboard.nav.quotes")}</Link>} />
         ) : phone ? (
           // Phase 106: job · client and what's next / how far along / what it's worth.
           <ul className="lrows jlist" aria-label={t("jobs.title")}>

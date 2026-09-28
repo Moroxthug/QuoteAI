@@ -5,6 +5,7 @@ import { enCA, frCA } from "date-fns/locale";
 import { ArrowRight, Check, HardHat, Loader2, Lock, MapPin, OctagonAlert, Users } from "lucide-react";
 import { CardSkeleton } from "@/components/skeletons";
 import { SwipeRow } from "@/components/mobile/swipe-row";
+import { haptic } from "@/lib/haptics";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
@@ -150,6 +151,7 @@ export function HoursToApprove() {
   const approve = useMutation({
     mutationFn: (ids: string[]) => teamApi.approveMany(ids),
     onSuccess: (r) => {
+      haptic("success");
       queryClient.invalidateQueries({ queryKey: ["crew-today"] });
       toast({ title: `${r.approved} ${t("team.time.approvedToast")}` });
     },

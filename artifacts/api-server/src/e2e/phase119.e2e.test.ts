@@ -111,6 +111,8 @@ describe("App push through FCM (Phase 119)", () => {
     expect(msg.token).toBe(second);
     expect(msg.notification).toEqual({ title: "Quote accepted", body: "Dana accepted Q-1042" });
     expect(msg.data.link).toBe("/dashboard/quotes/abc");
+    // Phase 120: the category rides along, so an open app can mark a signature or a payment with a haptic.
+    expect(msg.data.category).toBe("signatures");
     expect(msg.android.notification.tag).toBe("quote:abc");
 
     // The assertion swapped for the access token is signed by the service account's key.

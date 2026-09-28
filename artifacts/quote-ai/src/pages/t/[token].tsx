@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { AlertTriangle, CalendarDays, Camera, Car, ChevronDown, ChevronRight, Clock, CloudUpload, Loader2, MapPin, MessageSquareText, Phone, Square, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DoneCheck, useDone } from "@/hooks/use-done";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { workerApi, type WorkerPageDto } from "@/lib/team-api";
@@ -132,6 +133,7 @@ export default function WorkerTimePage() {
   const [locationAsk, setLocationAsk] = useState<LocationPermission | null>(null);
   useEffect(() => { void locationPermission().then(setLocationAsk); }, []);
 
+  const clockedIn = useDone();
   const clockIn = useMutation({
     mutationFn: async () => {
       setLocating(true);
@@ -143,7 +145,8 @@ export default function WorkerTimePage() {
       const op = { kind: "worker.clockIn" as const, token: token!, projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at };
       return runOrQueue(op, { scope: token!, label: `${t("worker.clockIn")} · ${jobName(projectId)}` }, (clientRef) => workerApi.clockIn(token!, { projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at, clientRef }));
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["worker", token] }),
+    // Phase 120: the check (and the haptic) first, then the screen turns to "on the clock".
+    onSuccess: () => clockedIn.flash(() => void queryClient.invalidateQueries({ queryKey: ["worker", token] })),
   });
   const clockOut = useMutation({
     mutationFn: async (target: { entryId: string } | { entryClientRef: string }) => {
@@ -301,8 +304,8 @@ export default function WorkerTimePage() {
                   {locationOff && <p className="text-[11px] inline-flex items-center gap-1" style={{ color: "var(--yellow-dark)" }}><MapPin className="h-3 w-3" /> {t("worker.locationOff")}</p>}
                   {/* Phase 119: the why, in plain words, before the phone's own question. */}
                   {!locationOff && locationAsk === "prompt" && <p className="text-[11px] inline-flex items-start gap-1" style={{ color: "var(--muted-mk)" }}><MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {t("native.location.why")}</p>}
-                  <button type="button" className="btn btn-navy w-full w-big" disabled={!projectId || clockIn.isPending} onClick={() => clockIn.mutate()}>
-                    {clockIn.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Clock className="h-5 w-5" />} {locating && clockIn.isPending ? t("worker.locating") : t("worker.clockIn")}
+                  <button type="button" className={cn("btn btn-navy w-full w-big", clockedIn.on && "is-done")} disabled={!projectId || clockIn.isPending || clockedIn.on} onClick={() => clockIn.mutate()}>
+                    {clockedIn.on ? <DoneCheck /> : clockIn.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Clock className="h-5 w-5" />} {locating && clockIn.isPending ? t("worker.locating") : t("worker.clockIn")}
                   </button>
                 </>
               )}

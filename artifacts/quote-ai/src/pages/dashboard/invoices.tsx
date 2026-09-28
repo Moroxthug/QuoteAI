@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Receipt, Search, ChevronRight, Plus, AlertTriangle, Clock } from "lucide-react";
 import { ListSkeleton, StatStripSkeleton } from "@/components/skeletons";
+import { EmptyState, ErrorState, PlanLocked } from "@/components/states";
 import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { InvoiceListRow, invoiceStatusChip } from "@/components/invoices/invoice-list-row";
@@ -20,7 +21,7 @@ import { hasFeature } from "@/lib/plans";
 import { formatCents } from "@/lib/jobs-api";
 import { invoicesApi, isOpenInvoice, type InvoiceDto, type AgingDto } from "@/lib/invoices-api";
 import { InvoiceStatusBadge, InvoiceTypeBadge } from "@/components/jobs/badges";
-import { NewInvoiceDialog } from "@/components/invoices/invoice-dialogs";
+import { NewInvoiceDialog, RecordPaymentDialog } from "@/components/invoices/invoice-dialogs";
 import { UpgradeLink } from "@/components/billing/upgrade-link";
 
 const FILTERS = ["all", "draft", "open", "overdue", "paid", "void"] as const;
@@ -36,10 +37,11 @@ export default function InvoicesPage() {
   const locale = lang === "fr" ? frCA : enCA;
   const { data: profile } = useGetBusinessProfile();
   const gated = profile ? !hasFeature(profile as never, "invoicing") : false;
-  const { data, isLoading, error } = useQuery({ queryKey: ["invoices"], queryFn: invoicesApi.list, enabled: !gated, retry: false });
+  const { data, isLoading, error, refetch } = useQuery({ queryKey: ["invoices"], queryFn: invoicesApi.list, enabled: !gated, retry: false });
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
   const [newOpen, setNewOpen] = useState(false);
+  const [paying, setPaying] = useState<InvoiceDto | null>(null);
   // Phase 107: the phone New sheet opens the form with ?new=1 (then drops it, so Back does not reopen it).
   const query = useSearch();
   const [, navigate] = useLocation();
@@ -75,11 +77,8 @@ export default function InvoicesPage() {
       </div>
 
       {gated || (error as Error & { code?: string } | null)?.code === "PLAN_REQUIRED" ? (
-        <div className="card" style={{ padding: "40px 22px", textAlign: "center" }}>
-          <Receipt className="h-10 w-10 text-navy-300 mx-auto mb-3" />
-          <h2 className="text-lg font-semibold text-slate-800">{t("invoices.gatedTitle")}</h2>
-          <p className="text-slate-600 text-sm mt-1 max-w-md mx-auto">{t("invoices.gatedDesc")}</p>
-          <UpgradeLink className="cta-link" style={{ justifyContent: "center", marginTop: 16 }}>{t("invoices.upgrade")}</UpgradeLink>
+        <div className="card">
+          <PlanLocked title={t("invoices.gatedTitle")} body={t("invoices.gatedDesc")} action={<UpgradeLink className="btn btn-sm btn-navy">{t("invoices.upgrade")}</UpgradeLink>} />
         </div>
       ) : (
         <>
@@ -122,15 +121,17 @@ export default function InvoicesPage() {
 
             {isLoading ? (
               <ListSkeleton rows={6} />
+            ) : error && !data ? (
+              <ErrorState onRetry={() => void refetch()} />
             ) : items.length === 0 ? (
-              <div className="text-center py-14 px-5">
-                <Receipt className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
-                <h3 className="text-base font-medium text-foreground mb-1">{t("invoices.emptyTitle")}</h3>
-                <p className="text-sm text-muted-foreground">{t("invoices.emptyDesc")}</p>
-              </div>
+              filter !== "all" || search.trim() ? (
+                <EmptyState art="search" title={t("states.search.empty")} action={<button type="button" className="btn btn-sm btn-outline-navy" onClick={() => { setFilter("all"); setSearch(""); }}>{t("dashboard.quotesList.clearFilters")}</button>} />
+              ) : (
+                <EmptyState art="invoices" title={t("states.invoices.empty")} action={can("invoicing", "edit") ? <button type="button" className="btn btn-sm btn-navy" onClick={() => setNewOpen(true)}>{t("invoices.new")}</button> : undefined} />
+              )
             ) : phone ? (
               <ul className="lrows" aria-label={t("invoices.title")}>
-                {shown.map((inv) => <li key={inv.id}><InvoiceListRow inv={inv} locale={locale} /></li>)}
+                {shown.map((inv) => <li key={inv.id}><InvoiceListRow inv={inv} locale={locale} onRecord={can("invoicing", "edit") ? setPaying : undefined} /></li>)}
               </ul>
             ) : (
               <div className="tbl-wrap">
@@ -159,6 +160,7 @@ export default function InvoicesPage() {
       )}
 
       <NewInvoiceDialog open={newOpen} onOpenChange={setNewOpen} />
+      {paying && <RecordPaymentDialog invoice={paying} open onOpenChange={(v) => !v && setPaying(null)} />}
     </div>
   );
 }

@@ -37,6 +37,8 @@ const PricingPage = lazy(() => import("@/pages/pricing"));
 const PilotPage = lazy(() => import("@/pages/pilot"));
 // Phase 100: the calm-mobile primitives on fake data — dev server only (the import is dropped from production builds).
 const MobilePreview = import.meta.env.DEV ? lazy(() => import("@/dev/mobile-preview")) : null;
+// Phase 120: every state and gesture, for the phone sheets (dev only).
+const StatesCatalogue = import.meta.env.DEV ? lazy(() => import("@/dev/states-catalogue")) : null;
 const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const SignUpPage = lazy(() => import("@/pages/sign-up"));
@@ -271,6 +273,11 @@ function Router() {
       {MobilePreview && (
         <Route path="/dashboard/__preview" component={() => (
           <DashboardLayout><DashSuspense><MobilePreview /></DashSuspense></DashboardLayout>
+        )} />
+      )}
+      {StatesCatalogue && (
+        <Route path="/dashboard/__states" component={() => (
+          <DashboardLayout><DashSuspense><StatesCatalogue /></DashSuspense></DashboardLayout>
         )} />
       )}
       <Route path="/dashboard/*?" component={DashboardApp} />

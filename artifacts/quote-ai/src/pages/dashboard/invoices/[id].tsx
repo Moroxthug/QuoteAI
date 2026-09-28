@@ -14,6 +14,7 @@ import { useMobileHeader } from "@/components/mobile/mobile-page-header";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { DoneCheck, useDone } from "@/hooks/use-done";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { formatCents } from "@/lib/jobs-api";
@@ -310,9 +311,10 @@ function SendDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState(invoice.customer.email ?? "");
   useEffect(() => { if (open) { setMessage(""); setEmail(invoice.customer.email ?? ""); } }, [open, invoice]);
+  const done = useDone();
   const send = useMutation({
     mutationFn: () => invoicesApi.send(invoice.id, { message: message.trim() || undefined, customerEmail: email.trim() && email.trim() !== invoice.customer.email ? email.trim() : undefined }),
-    onSuccess: (res) => { onOpenChange(false); onDone(); toast({ title: res.resend ? t("invoices.resent") : t("invoices.sent"), description: email }); },
+    onSuccess: (res) => { toast({ title: res.resend ? t("invoices.resent") : t("invoices.sent"), description: email }); done.flash(() => { onOpenChange(false); onDone(); }); },
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   const scheduled = invoice.status === "draft" && !!invoice.scheduledFor && new Date(invoice.scheduledFor) > new Date();
@@ -321,7 +323,7 @@ function SendDialog({ invoice, open, onOpenChange, onDone }: { invoice: InvoiceD
       footer={<>
         <span className="foot-note">{t("invoices.sendHint")}</span>
         <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
-        <button type="button" className="btn btn-sm btn-navy" onClick={() => send.mutate()} disabled={send.isPending || !email.includes("@")}>{send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}{t("invoices.sendNow")}</button>
+        <button type="button" className={cn("btn btn-sm btn-navy", done.on && "is-done")} onClick={() => send.mutate()} disabled={send.isPending || done.on || !email.includes("@")}>{done.on ? <DoneCheck /> : send.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}{t("invoices.sendNow")}</button>
       </>}
     >
       {scheduled && <div className="notice warn"><AlertTriangle /><span className="grow">{t("invoices.sendEarlyWarning")}</span></div>}

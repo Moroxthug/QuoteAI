@@ -102,13 +102,13 @@ export async function removeDeviceToken(params: { memberUserId: string; installI
   return rows.length > 0;
 }
 
-async function sendToDevices(userId: string, message: PushMessage, wanted: (memberUserId: string) => boolean, summary: PushSendSummary): Promise<number> {
+async function sendToDevices(userId: string, message: PushMessage, wanted: (memberUserId: string) => boolean, summary: PushSendSummary, category?: PushCategory): Promise<number> {
   const creds = readFcmCredentials();
   if (!creds) return 0;
   const rows = (await db.select().from(deviceTokensTable).where(eq(deviceTokensTable.userId, userId))).filter((r) => wanted(r.memberUserId));
   await Promise.all(
     rows.map(async (row) => {
-      const result = await sendFcm(creds, row.token, { title: message.title, body: message.body, link: message.link, tag: message.tag });
+      const result = await sendFcm(creds, row.token, { title: message.title, body: message.body, link: message.link, tag: message.tag, category });
       if (result.ok) {
         summary.sent++;
         await db.update(deviceTokensTable).set({ lastUsedAt: new Date(), failedAt: null, failureCount: 0 }).where(eq(deviceTokensTable.id, row.id));
@@ -156,7 +156,7 @@ export async function sendPushToCompany(userId: string, message: PushMessage, op
   const summary: PushSendSummary = { sent: 0, failed: 0, removed: 0, skipped: null };
   const muting = opts.category ? await membersMuting(userId, opts.category) : new Set<string>();
   const wanted = (memberUserId: string) => (!opts.memberUserId || memberUserId === opts.memberUserId) && !muting.has(memberUserId);
-  const devices = await sendToDevices(userId, message, wanted, summary);
+  const devices = await sendToDevices(userId, message, wanted, summary, opts.category);
   const rows = keys ? (await listSubscriptions(userId)).filter((r) => wanted(r.memberUserId)) : [];
   if (rows.length === 0 && devices === 0) return { ...summary, skipped: "no_subscriptions" };
   await Promise.all(

@@ -1831,8 +1831,6 @@ button.chap-head:hover { background: var(--soft-2); }
   .modal .li-row.cols-5 .tot { grid-column: 3 / -1; align-self: center; }
   .modal .li-row + .li-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--soft); }
 }
-@keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes sheet-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(24px); } }
 
 /* Inside a modal the tablet collapse of the line-item grid (980px) is too early: the panel is at most 760px wide, so keep the full grid until the phone sheet takes over. */
 @media (max-width: 980px) and (min-width: 641px) {
@@ -3249,3 +3247,89 @@ html.native-app { -webkit-tap-highlight-color: transparent; overscroll-behavior-
 html.native-app .topbar, html.native-app .tabbar, html.native-app .btn, html.native-app button { -webkit-user-select: none; user-select: none; }
 /* Sign-in / sign-up in the app: the page alone, clear of the status bar. */
 .native-auth { min-height: 100dvh; display: flex; flex-direction: column; padding: calc(var(--safe-top) + 20px) max(var(--gutter-phone, 16px), var(--safe-right)) calc(var(--safe-bottom) + 20px) max(var(--gutter-phone, 16px), var(--safe-left)); background: #fff; }
+
+/* ── Phase 120: feels native — motion, gestures, states (docs/APP-DESIGN.md §3-4) ── */
+/* Page motion (lib/motion/page-motion.ts): in the app and an installed web app at
+   phone width, a new screen slides in over the old one (which drifts 28 % left
+   and dims), Back reverses it, a tab switch cross-fades. The tab bar and the top
+   bar are lifted out of the slide and stay put. */
+@media (max-width: 640px) {
+  html.page-motion .topbar { view-transition-name: topbar; }
+  html.page-motion .tabbar { view-transition-name: tabbar; }
+}
+::view-transition-group(tabbar), ::view-transition-old(tabbar), ::view-transition-new(tabbar), ::view-transition-group(topbar) { animation: none; }
+::view-transition-old(topbar), ::view-transition-new(topbar) { animation-duration: .16s; }
+html[data-nav="push"]::view-transition-old(root) { animation: vt-drift-out .3s cubic-bezier(.2, .8, .2, 1) both; }
+html[data-nav="push"]::view-transition-new(root) { animation: vt-slide-in .3s cubic-bezier(.2, .8, .2, 1) both; box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
+html[data-nav="pop"]::view-transition-old(root) { animation: vt-slide-out .26s cubic-bezier(.2, .8, .2, 1) both; z-index: 1; box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
+html[data-nav="pop"]::view-transition-new(root) { animation: vt-drift-in .26s cubic-bezier(.2, .8, .2, 1) both; }
+html[data-nav="tab"]::view-transition-old(root) { animation: vt-fade-out .16s ease both; }
+html[data-nav="tab"]::view-transition-new(root) { animation: vt-fade-in .16s ease both; }
+@keyframes vt-slide-in { from { transform: translateX(100%); } }
+@keyframes vt-slide-out { to { transform: translateX(100%); } }
+@keyframes vt-drift-out { to { transform: translateX(-28%); filter: brightness(.9); } }
+@keyframes vt-drift-in { from { transform: translateX(-28%); filter: brightness(.9); } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-nav]::view-transition-old(root) { animation: vt-fade-out .12s ease both; box-shadow: none; }
+  html[data-nav]::view-transition-new(root) { animation: vt-fade-in .12s ease both; box-shadow: none; }
+}
+/* The iOS edge swipe: the screen follows the finger; the one underneath arrives from the left. */
+html.edge-dragging body { background: var(--soft); }
+html.edge-dragging #main { box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
+#main.edge-arrive { animation: vt-drift-in .26s cubic-bezier(.2, .8, .2, 1); }
+@media (prefers-reduced-motion: reduce) { #main.edge-arrive { animation: vt-fade-in .12s ease; } }
+
+/* Sheets (lib/motion/sheet-drag.ts): rise 320 ms, scrim 220 ms, follow the finger. */
+@media (max-width: 640px) {
+  .modal[data-state="open"] { animation: sheet-in .32s cubic-bezier(.2, .9, .25, 1); }
+  .modal-scrim[data-state="open"] { animation-duration: .22s; }
+  .modal.drag-closed[data-state="closed"], .modal-scrim.drag-closed[data-state="closed"] { animation: none; }
+  .modal.sheet .sheet-grab { touch-action: none; }
+}
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes sheet-out { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .modal[data-state="open"] { animation: modal-fade .12s ease !important; }
+  .modal[data-state="closed"] { animation: modal-fade .12s ease reverse !important; }
+}
+
+/* Swipe row tones (components/mobile/swipe-row.tsx): the action's colour beneath. */
+.swipe-row.tone-teal .swipe-under { background: var(--teal-dark); }
+.swipe-row.tone-navy .swipe-under { background: var(--navy); }
+.swipe-under svg { transition: transform .15s var(--ease-mk); }
+.swipe-row.armed .swipe-under svg { transform: scale(1.15); }
+.swipe-top { transition: transform .32s cubic-bezier(.2, .9, .25, 1.15); }
+@media (prefers-reduced-motion: reduce) { .swipe-row.armed .swipe-under svg { transform: none; } }
+/* Held rows (hooks/use-long-press.ts): no text selection or callout under the thumb. */
+.lrow-split { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+/* The success moment (hooks/use-done.tsx): a check in the button for 900 ms. */
+.btn.is-done, .btn.is-done:disabled { background: var(--green-dark); border-color: var(--green-dark); color: #fff; opacity: 1; }
+.btn.is-done .done-check { animation: done-pop .3s cubic-bezier(.2, .9, .25, 1.4); }
+@keyframes done-pop { from { transform: scale(.4); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .btn.is-done .done-check { animation: none; } }
+
+/* States (components/states.tsx): a line drawing, one sentence, one button. */
+.state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 44px 22px 40px; max-width: 420px; margin: 0 auto; }
+.state.compact { padding: 24px 16px; }
+.state-art { width: 96px; height: 72px; color: var(--navy); margin-bottom: 10px; }
+.state.compact .state-art { width: 72px; height: 54px; margin-bottom: 4px; }
+.state-title { font-size: var(--fs-section, 17px); font-weight: 700; color: var(--navy); line-height: 1.35; text-wrap: balance; }
+.state-body { font-size: var(--fs-body, 15px); color: var(--muted-mk); line-height: 1.5; text-wrap: pretty; }
+.state-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 12px; }
+.state-watch { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); font-size: var(--fs-meta); font-weight: 700; color: var(--teal-dark); }
+.state-watch svg { width: 18px; height: 18px; }
+@media (max-width: 640px) {
+  .state { padding: 36px 8px 32px; }
+  .state-actions .btn { min-height: var(--tap); padding-inline: 22px; }
+}
+/* Text that fits (Phase 120, qa:visual --text): at the phone's largest text size
+   a label takes a second line instead of being cut. */
+@media (max-width: 640px) {
+  .ss-lbl { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+  .more-row-label { white-space: normal; overflow-wrap: anywhere; padding-block: 12px; line-height: 1.3; }
+  .ag-week-head { flex-wrap: wrap; row-gap: 4px; }
+  .ag-nav { margin-left: auto; }
+}

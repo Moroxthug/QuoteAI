@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { Plus, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,6 +50,31 @@ export function BottomTabBar({ tabs, label, onNew, newLabel, onTabClick }: { tab
     return () => document.documentElement.classList.remove("has-tabbar");
   }, []);
 
+  // Phase 120: at the phone's largest text size a long French label ("Aujourd'hui",
+  // "Soumissions") no longer fits its fifth of the screen. Like a native tab bar,
+  // the label shrinks to fit (down to 75 %) before it would be cut.
+  const nav = useRef<HTMLElement>(null);
+  const labelKey = tabs.map((tab) => tab.label).join("|");
+  useEffect(() => {
+    const el = nav.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const fit = () => {
+      for (const span of Array.from(el.querySelectorAll<HTMLElement>(".tabbar-link > span:not(.tabbar-badge)"))) {
+        span.style.fontSize = "";
+        const room = span.parentElement!.clientWidth - 8;
+        if (span.scrollWidth <= room) continue;
+        const size = parseFloat(getComputedStyle(span).fontSize);
+        span.style.fontSize = `${Math.max(size * 0.75, (size * room) / span.scrollWidth).toFixed(2)}px`;
+      }
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    for (const span of Array.from(el.querySelectorAll(".tabbar-link > span:not(.tabbar-badge)"))) ro.observe(span);
+    void document.fonts?.ready.then(fit);
+    return () => ro.disconnect();
+  }, [labelKey]);
+
   const mid = Math.ceil(tabs.length / 2);
   const cells = tabs.map((tab) => {
     const active = isActive(tab, location);
@@ -79,7 +104,7 @@ export function BottomTabBar({ tabs, label, onNew, newLabel, onTabClick }: { tab
   }
 
   return (
-    <nav className="tabbar" aria-label={label}>
+    <nav ref={nav} className="tabbar" aria-label={label}>
       {cells}
     </nav>
   );

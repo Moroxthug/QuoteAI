@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ListSkeleton } from "@/components/skeletons";
+import { EmptyState, ErrorState } from "@/components/states";
 import { useOptimisticMutation, patch } from "@/lib/optimistic";
 import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { useProgressiveList } from "@/hooks/use-progressive-list";
@@ -43,7 +44,7 @@ export default function QuotesList() {
     accepted: t("quotes.m.statusAccepted"),
     pending_payment: t("dashboard.quotesList.statusPending"),
   };
-  const { data: quotes, isLoading } = useListQuotes();
+  const { data: quotes, isLoading, error, refetch } = useListQuotes();
   const deleteQuote = useDeleteQuote();
   const duplicateQuote = useDuplicateQuote();
   const [searchTerm, setSearchTerm] = useState("");
@@ -186,23 +187,22 @@ export default function QuotesList() {
 
         {isLoading ? (
           <ListSkeleton rows={6} lead={phone ? false : "icon"} />
+        ) : error && !quotes ? (
+          <ErrorState onRetry={() => void refetch()} />
         ) : filteredQuotes.length === 0 ? (
-          <div className="text-center py-14 px-5">
-            <FileText className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
-            <h3 className="text-base font-medium text-foreground mb-1">{t("dashboard.quotesList.noQuotesFound")}</h3>
-            {searchTerm || statusFilter !== "all" ? (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">{t("dashboard.quotesList.noResultsForFilters")}</p>
-                <button type="button" className="cta-link mx-auto" onClick={() => { setSearchTerm(""); setStatusFilter("all"); }}>
-                  {t("dashboard.quotesList.clearFilters")}
-                </button>
-              </div>
-            ) : can("quotes", "edit") ? (
-              <Link href="/dashboard/new" className="btn btn-navy btn-sm">
-                {t("dashboard.quotesList.createFirstQuote")}
-              </Link>
-            ) : null}
-          </div>
+          searchTerm || statusFilter !== "all" ? (
+            <EmptyState
+              art="search"
+              title={t("states.search.empty")}
+              action={<button type="button" className="btn btn-sm btn-outline-navy" onClick={() => { setSearchTerm(""); setStatusFilter("all"); }}>{t("dashboard.quotesList.clearFilters")}</button>}
+            />
+          ) : (
+            <EmptyState
+              art="quotes"
+              title={t("states.quotes.empty")}
+              action={can("quotes", "edit") ? <Link href="/dashboard/new" className="btn btn-navy btn-sm">{t("dashboard.nav.newQuote")}</Link> : undefined}
+            />
+          )
         ) : phone ? (
           <ul className="lrows" aria-label={t("dashboard.quotesList.title")}>
             {shownQuotes.map(quote => {

@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { Search, Plus, Loader2, Send, Mail, Phone, MessageCircle, ArrowRight, MoreHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState, ErrorState } from "@/components/states";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -27,7 +28,7 @@ export default function LeadsListPage() {
   const locale = lang === "fr" ? frCA : enCA;
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["leads"], queryFn: () => leadsApi.list() });
+  const { data, isLoading, error, refetch } = useQuery({ queryKey: ["leads"], queryFn: () => leadsApi.list() });
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   // Phase 101: the phone New sheet opens this form with ?new=1 (then drops it, so Back does not reopen it).
@@ -141,8 +142,16 @@ export default function LeadsListPage() {
             </div>
           ))}
         </div>
+      ) : error && !data ? (
+        <div className="card"><ErrorState onRetry={() => void refetch()} /></div>
       ) : items.length === 0 ? (
-        <div className="card text-center py-16 text-slate-500">{t("leads.empty")}</div>
+        <div className="card">
+          {search.trim() ? (
+            <EmptyState art="search" title={t("states.search.empty")} action={<button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setSearch("")}>{t("dashboard.quotesList.clearFilters")}</button>} />
+          ) : (
+            <EmptyState art="leads" title={t("states.leads.empty")} action={can("leads", "edit") ? <button type="button" className="btn btn-sm btn-navy" onClick={() => setCreateOpen(true)}>{t("leads.newLead")}</button> : undefined} />
+          )}
+        </div>
       ) : (
         <>
         {phone && (

@@ -1,4 +1,5 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment, useState, type ReactNode } from "react";
+import { useLongPress } from "@/hooks/use-long-press";
 import { Link, useLocation } from "wouter";
 import { ChevronRight } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -149,10 +150,7 @@ export function ResponsiveTable<T>({
             />
           );
           return actions.length ? (
-            <li key={getKey(row)} className="lrow-split">
-              {item}
-              <RowMore actions={actions} label={rowActionsLabel?.(row)} />
-            </li>
+            <HoldRow key={getKey(row)} actions={actions} label={rowActionsLabel?.(row)}>{item}</HoldRow>
           ) : (
             <li key={getKey(row)}>{item}</li>
           );
@@ -186,5 +184,17 @@ export function ResponsiveTable<T>({
         </tbody>
       </table>
     </div>
+  );
+}
+
+/** Phase 120: a phone row with a ⋯ opens the same sheet when held. */
+function HoldRow({ children, actions, label }: { children: ReactNode; actions: Array<SheetAction | false | null | undefined>; label?: string }) {
+  const [open, setOpen] = useState(false);
+  const hold = useLongPress(() => setOpen(true));
+  return (
+    <li className="lrow-split" {...hold}>
+      {children}
+      <RowMore actions={actions} label={label} open={open} onOpenChange={setOpen} />
+    </li>
   );
 }

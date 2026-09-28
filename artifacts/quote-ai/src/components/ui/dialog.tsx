@@ -4,6 +4,7 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/i18n/LanguageContext"
+import { haptic } from "@/lib/haptics"
 
 /**
  * Radix Dialog wrapped in the locked `.modal*` vocabulary
@@ -55,11 +56,29 @@ const DialogContent = React.forwardRef<
   // app's dialogs) has none, so focus fell to <body>. Remember whatever had
   // focus when it opened and go back there instead.
   const opener = React.useRef<HTMLElement | null>(null)
+  // Phase 120: on a phone every dialog is a sheet, and a sheet follows the finger
+  // (lib/motion/sheet-drag.ts, loaded on phones only; ready well before a thumb is).
+  const detach = React.useRef<(() => void) | null>(null)
+  const setRef = React.useCallback((el: HTMLDivElement | null) => {
+    detach.current?.()
+    detach.current = null
+    if (el && !el.classList.contains("side") && window.matchMedia("(max-width: 640px)").matches) {
+      let gone = false
+      detach.current = () => { gone = true }
+      void import("@/lib/motion/sheet-drag").then((m) => {
+        if (!gone && el.isConnected) detach.current = m.attachSheetDrag(el)
+      }).catch(() => {})
+    }
+    // A destructive confirm (its action is .btn-red) arrives with the warning haptic.
+    if (el?.querySelector(".btn-red")) haptic("warning")
+    if (typeof ref === "function") ref(el)
+    else if (ref) ref.current = el
+  }, [ref])
   return (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
-      ref={ref}
+      ref={setRef}
       className={cn("modal", size !== "md" && size, tall && "tall", className)}
       onOpenAutoFocus={(e) => {
         opener.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null

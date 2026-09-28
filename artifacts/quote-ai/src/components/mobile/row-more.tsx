@@ -9,7 +9,7 @@ import { ActionSheet, type SheetAction } from "./action-sheet";
  * one button at the end of the row. Pair it with `hide-phone` on the
  * desktop buttons.
  */
-export function RowMore({ actions, label }: { actions: Array<SheetAction | false | null | undefined>; label?: string }) {
+export function RowMore({ actions, label, open, onOpenChange }: { actions: Array<SheetAction | false | null | undefined>; label?: string; /** Phase 120: a long press on the row opens it too. */ open?: boolean; onOpenChange?: (open: boolean) => void }) {
   const { t } = useLanguage();
   const heading = label ?? t("mobile.moreActions");
   if (!actions.some(Boolean)) return null;
@@ -18,6 +18,8 @@ export function RowMore({ actions, label }: { actions: Array<SheetAction | false
       <ActionSheet
         actions={actions}
         title={heading}
+        open={open}
+        onOpenChange={onOpenChange}
         trigger={<button type="button" className="ic-btn" aria-label={heading}><MoreHorizontal /></button>}
       />
     </span>

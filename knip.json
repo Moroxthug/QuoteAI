@@ -88,6 +88,7 @@
         "@capacitor-mlkit/document-scanner",
         "@capacitor/app-launcher",
         "@capacitor/camera",
+        "@capacitor/haptics",
         "@capacitor/filesystem",
         "@capacitor/geolocation",
         "@capacitor/push-notifications",

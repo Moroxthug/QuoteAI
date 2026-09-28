@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Loader2, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { DoneCheck, useDone } from "@/hooks/use-done";
+import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { LineItemSheet, QuoteLineRows, parseAmount } from "@/components/quotes/line-rows";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -183,14 +185,15 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
   useEffect(() => { if (open) { setAmount((invoice.balanceCents / 100).toFixed(2)); setMethod("etransfer"); setDate(localDay()); setReference(""); setReceipt(!!invoice.customer.email); } }, [open, invoice]);
 
   const cents = Math.round((Number(amount) || 0) * 100);
+  const done = useDone();
   const record = useMutation({
     mutationFn: () => invoicesApi.recordPayment(invoice.id, { amountCents: cents, method, date, reference: reference.trim() || undefined, sendReceipt: receipt }),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["invoice", invoice.id] });
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       if (invoice.projectId) queryClient.invalidateQueries({ queryKey: ["job", invoice.projectId] });
-      onOpenChange(false);
       toast({ title: res.invoice.status === "paid" ? t("invoices.paidToast") : t("invoices.paymentRecorded") });
+      done.flash(() => onOpenChange(false));
     },
     onError: (e: Error) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }),
   });
@@ -219,7 +222,7 @@ export function RecordPaymentDialog({ invoice, open, onOpenChange }: { invoice: 
         </DialogBody>
         <DialogFooter>
           <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => onOpenChange(false)}>{t("jobs.cancel")}</button>
-          <button type="button" className="btn btn-sm btn-green" disabled={cents <= 0 || record.isPending} onClick={() => record.mutate()}>{record.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.payment.save")}</button>
+          <button type="button" className={cn("btn btn-sm btn-green", done.on && "is-done")} disabled={cents <= 0 || record.isPending || done.on} onClick={() => record.mutate()}>{done.on ? <DoneCheck /> : record.isPending && <Loader2 className="h-4 w-4 animate-spin" />}{t("invoices.payment.save")}</button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

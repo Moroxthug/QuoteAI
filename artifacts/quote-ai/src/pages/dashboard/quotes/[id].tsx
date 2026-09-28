@@ -21,6 +21,7 @@ import { enCA, frCA } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import { DoneCheck, useDone } from "@/hooks/use-done";
 import { taxLineLabel } from "@/lib/tax-display";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
@@ -268,6 +269,7 @@ const can = useCan();
   };
 
   const sendPdfEmail = useSendQuotePdfEmail();
+  const sentDone = useDone();
 
   const handleSendEmail = () => {
     if (!id || !quote || !emailTo.trim()) return;
@@ -276,8 +278,8 @@ const can = useCan();
       data: { toEmail: emailTo.trim(), clientName: (quote.clientData as { nome?: string })?.nome || "" }
     }, {
       onSuccess: () => {
-        setIsEmailDialogOpen(false);
-        setEmailTo("");
+        // Phase 120: a check in the button (and the success haptic), then the sheet closes.
+        sentDone.flash(() => { setIsEmailDialogOpen(false); setEmailTo(""); });
         // Sending unlocks a draft (trial or subscription) — refresh status + trial counter.
         queryClient.invalidateQueries({ queryKey: getGetQuoteQueryKey(id) });
         queryClient.invalidateQueries({ queryKey: getGetTrialStatusQueryKey() });
@@ -1899,8 +1901,8 @@ const can = useCan();
           </DialogBody>
           <DialogFooter>
             <button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setIsEmailDialogOpen(false)}>{t("dashboard.quoteDetail.cancel")}</button>
-            <button type="button" className="btn btn-sm btn-navy" onClick={handleSendEmail} disabled={!emailTo.trim().includes("@") || sendPdfEmail.isPending}>
-              {sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+            <button type="button" className={cn("btn btn-sm btn-navy", sentDone.on && "is-done")} onClick={handleSendEmail} disabled={!emailTo.trim().includes("@") || sendPdfEmail.isPending || sentDone.on}>
+              {sentDone.on ? <DoneCheck /> : sendPdfEmail.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
               {t("dashboard.quoteDetail.send")}
             </button>
           </DialogFooter>

@@ -1,5 +1,6 @@
 import { transcribeAudio, TranscribeError } from "@/lib/speech";
 import { useCallback, useRef, useState } from "react";
+import { haptic } from "@/lib/haptics";
 
 const PREFERRED_MIME_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
 
@@ -91,6 +92,7 @@ export function useVoiceInput({ onTranscribed, onError, onRecorded, offlineTarge
 
       recorder.start();
       setIsRecording(true);
+      haptic("light");
     } catch {
       onError?.("Couldn't access the microphone. Check your browser permissions.");
       cleanupStream();
@@ -102,6 +104,7 @@ export function useVoiceInput({ onTranscribed, onError, onRecorded, offlineTarge
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
+    haptic("light");
   }, []);
 
   return { isRecording, isTranscribing, startRecording, stopRecording };

@@ -19,6 +19,7 @@
 //   pnpm --filter @workspace/api-server qa:visual -- --keep        # leave the account + servers up and print the token
 //   pnpm --filter @workspace/api-server qa:visual -- --screenshots=false --widths=1280,375   # axe-only pass
 //   E2E_NO_PURGE=1 pnpm … qa:visual -- --port=5198 --out=visual-quick --routes=…            # alongside a running sweep
+//   pnpm … qa:visual -- --lang=fr --widths=375 --text --out=visual-text                      # Phase 120: labels at the phone's largest text size
 //
 // Requires Google Chrome (playwright-core `channel: "chrome"`; set
 // QA_CHROME_PATH to point at another Chromium build).
@@ -69,6 +70,11 @@ const SCREENSHOTS = args.get("screenshots") !== "false";
 const KEEP = args.has("keep");
 // Phase 113: findings fail the run (exit 1); --gate=false only reports them (a baseline before a phase).
 const GATE = args.get("gate") !== "false";
+// Phase 120: "text that fits" — every font size on the page scaled as the phone's
+// largest standard text setting does (Android 130 %, iOS xxxLarge ~135 %;
+// `--text=2` for the accessibility sizes, Phase 122), then every label
+// (button, chip, pill, tab, field label, tab bar) checked for being cut off.
+const TEXT_SCALE = args.has("text") ? Number(args.get("text")) || 1.35 : 1;
 const PROVINCE = (args.get("province") ?? "ON") as "ON" | "QC";
 const VITE_PORT = Number(args.get("port") ?? 5197);
 // A second run alongside a full sweep needs its own port AND its own output dir (the run starts by wiping it).
@@ -375,6 +381,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/dashboard", session: "pro", name: "/dashboard (pro)" },
     // Phase 100: the calm-mobile primitives on fake data (dev-server route).
     dash("/dashboard/__preview"),
+    // Phase 120: every state (empty, loading, error, offline, no permission, plan-locked) and the gestures (dev-server route).
+    dash("/dashboard/__states"),
     dash("/dashboard/schedule"), dash("/dashboard/assistant"), dash("/dashboard/team"), dash("/dashboard/documents"), dash("/dashboard/archive"), dash("/dashboard/notifications"),
     // Phase 87: every tab of the Compliance page is its own page state.
     dash("/dashboard/compliance"), dash("/dashboard/compliance?tab=salesTax"), dash("/dashboard/compliance?tab=t5018"), dash("/dashboard/compliance?tab=reminders"),
@@ -525,7 +533,7 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
 // see, at phone width only. Phase 113 made them the gate: any of them fails
 // the run (exit 1), and every page has a height budget. Each names what it
 // found so the fix is obvious from the report alone.
-type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar";
+type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar" | "clipped-label";
 type PhoneWarning = { rule: PhoneRule; detail: string };
 const PHONE_WIDTH = 640;
 
@@ -540,6 +548,7 @@ const PHONE_BUDGETS: Array<{ match: RegExp; screens: number; why: string }> = [
   { match: /^\/dashboard\/contracts\/.+ agreement$/, screens: 10, why: "the contract's full agreement, unfolded on purpose [9.2]" },
   { match: /^\/dashboard\/quotes\/.+ edit/, screens: 8, why: "the 30-line showcase quote being edited, one row per line [7.0]" },
   { match: /^\/dashboard\/pay/, screens: 7, why: "the pay rules form [6.1 FR]" },
+  { match: /^\/dashboard\/__states$/, screens: 9, why: "Phase 120 dev gallery: every state and gesture, one after another [6.4]" },
   { match: /^\/(quotes\/[a-z-]+(\/[a-z-]+)?|fr\/soumissions\/[a-z-]+(\/[a-z-]+)?)\/?$/, screens: 17, why: "a long-form SEO trade article [16.3]" },
   { match: /^\/(mappa-sito|site-?map|plan-du-site)/, screens: 16, why: "the sitemap: one link per page [15.2]" },
   { match: /^\/(fr\/)?blog\/?$/, screens: 14, why: "the article index [12.9]" },
@@ -648,7 +657,47 @@ async function phoneRules(page: Page, width: number, r: RouteSpec): Promise<{ wa
     return bottom > top + 1 ? `content ends ${Math.round(bottom - top)}px under the tab bar` : null;
   });
   if (covered) found.push({ rule: "under-tabbar", detail: covered });
+  if (TEXT_SCALE !== 1) found.push(...(await clippedLabels(page)));
   return { warnings: found as PhoneWarning[], screens };
+}
+
+// Phase 120: the phone's text-size setting, as a WebView applies it — font
+// sizes grow, boxes that were sized for them don't. Sizes are read first and
+// written after, so nested text isn't scaled twice.
+async function scaleText(page: Page, scale: number) {
+  await page.evaluate((scale) => {
+    const all = Array.from(document.querySelectorAll<HTMLElement>("body, body *"));
+    const sizes = all.map((el) => parseFloat(getComputedStyle(el).fontSize));
+    all.forEach((el, i) => el.style.setProperty("font-size", `${(sizes[i]! * scale).toFixed(2)}px`, "important"));
+  }, scale);
+  await page.waitForTimeout(150);
+}
+
+// A label is cut off when its text is wider than its box and the box hides the
+// rest (ellipsis or overflow hidden), or when it spills out of its parent. List
+// titles and quiet lines truncate by design (one line, ellipsis) and are not labels.
+async function clippedLabels(page: Page): Promise<PhoneWarning[]> {
+  await page.evaluate("globalThis.__name = globalThis.__name || function (f) { return f }").catch(() => {});
+  const found = await page.evaluate(() => {
+    const out: string[] = [];
+    const LABELS = ".btn, button, [role='tab'], .pill, .chip, .tabbar-link span, label, .ss-lbl, .asheet-item span, .more-row-label, .state-title";
+    for (const el of Array.from(document.querySelectorAll<HTMLElement>(LABELS))) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0 || el.closest("[aria-hidden='true'], .sr-only, .lrow-title, .lrow-meta")) continue;
+      const text = (el.innerText ?? "").trim().replace(/s+/g, " ");
+      if (!text) continue;
+      const cs = getComputedStyle(el);
+      const hides = cs.overflowX !== "visible" || cs.textOverflow === "ellipsis";
+      const cut = hides && el.scrollWidth > el.clientWidth + 1;
+      const parent = el.parentElement?.getBoundingClientRect();
+      // A row of tabs that scrolls sideways is meant to run past its box; one that hides it is not.
+      const parentOverflow = el.parentElement ? getComputedStyle(el.parentElement).overflowX : "visible";
+      const spills = !hides && !!parent && r.right > parent.right + 2 && (parentOverflow === "hidden" || parentOverflow === "clip");
+      if (cut || spills) out.push(`${el.tagName.toLowerCase()} "${text.slice(0, 40)}" (${cut ? `${el.scrollWidth}px in ${el.clientWidth}px` : "spills out of its box"})`);
+    }
+    return Array.from(new Set(out)).slice(0, 12);
+  });
+  return found.map((detail) => ({ rule: "clipped-label" as const, detail }));
 }
 
 // [route, trigger selector, label] — the overlays a keyboard user meets.
@@ -697,6 +746,7 @@ async function checkPage(ctx: BrowserContext, base: string, r: RouteSpec, lang: 
       await r.drive(page);
       await settle(page);
     }
+    if (TEXT_SCALE !== 1 && width <= PHONE_WIDTH) await scaleText(page, TEXT_SCALE);
     result.title = await page.title();
     result.boundary = await page.evaluate(() => {
       const t = document.body.innerText;

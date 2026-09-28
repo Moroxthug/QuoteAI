@@ -1,10 +1,12 @@
 import { useListClients } from "@workspace/api-client-react";
 import { rowLink } from "@/lib/row-link";
 import { ListSkeleton } from "@/components/skeletons";
+import { EmptyState, ErrorState } from "@/components/states";
 import { usePrefetchOnPress } from "@/hooks/use-prefetch-on-press";
 import { useProgressiveList } from "@/hooks/use-progressive-list";
 import { Link, useLocation } from "wouter";
-import { Users, Search, Plus, ChevronRight } from "lucide-react";
+import { Search, Plus, ChevronRight, Phone } from "lucide-react";
+import { SwipeRow } from "@/components/mobile/swipe-row";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -16,7 +18,7 @@ const formatCurrency = (v: number, lang: string) =>
   new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(v);
 
 export default function ClientsPage() {
-  const { data: clients, isLoading } = useListClients();
+  const { data: clients, isLoading, error, refetch } = useListClients();
   const [search, setSearch] = useState("");
   const [, navigate] = useLocation();
   const { t, lang } = useLanguage();
@@ -69,22 +71,20 @@ export default function ClientsPage() {
 
         {isLoading ? (
           <ListSkeleton rows={6} lead="avatar" />
+        ) : error && !clients ? (
+          <ErrorState onRetry={() => void refetch()} />
         ) : filtered.length === 0 ? (
-          <div className="text-center py-14 px-5">
-            <Users className="mx-auto h-10 w-10 text-muted-foreground mb-3 opacity-20" />
-            <p className="font-semibold text-foreground">{t("clients.empty.title")}</p>
-            <p className="text-sm text-muted-foreground mt-1 mb-3">
-              {t("clients.empty.desc")}
-            </p>
-            <Link href="/dashboard/new" className="btn btn-navy btn-sm">{t("clients.empty.cta")}</Link>
-          </div>
+          search.trim() ? (
+            <EmptyState art="search" title={t("states.search.empty")} action={<button type="button" className="btn btn-sm btn-outline-navy" onClick={() => setSearch("")}>{t("dashboard.quotesList.clearFilters")}</button>} />
+          ) : (
+            <EmptyState art="clients" title={t("states.clients.empty")} action={<Link href="/dashboard/new" className="btn btn-navy btn-sm">{t("clients.empty.cta")}</Link>} />
+          )
         ) : phone ? (
           // Phase 107: who, where and how many quotes / what they are worth / active or prospect.
           <ul className="lrows" aria-label={t("clients.title")}>
             {shown.map((client) => {
               const active = client.unlockedCount > 0;
-              return (
-                <li key={client.id}>
+              const row = (
                   <ListRow
                     href={`/dashboard/clients/${client.id}`}
                     lead={<span className="avat" aria-hidden="true">{client.clientName.slice(0, 2)}</span>}
@@ -93,6 +93,12 @@ export default function ClientsPage() {
                     amount={formatCurrency(client.totalValue, lang)}
                     end={<span className={cn("chip", active ? "chip-green" : "chip-teal")}>{active ? t("clients.status.active") : t("clients.status.prospect")}</span>}
                   />
+              );
+              // Phase 120: swipe right to call (the client's page keeps the Call button).
+              const tel = client.phone?.replace(/[^\d+]/g, "");
+              return (
+                <li key={client.id}>
+                  {tel ? <SwipeRow label={t("clients.m.call")} icon={Phone} tone="teal" stays onSwipe={() => { window.location.href = `tel:${tel}`; }}>{row}</SwipeRow> : row}
                 </li>
               );
             })}

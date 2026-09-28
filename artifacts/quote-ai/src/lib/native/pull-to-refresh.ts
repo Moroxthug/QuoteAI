@@ -3,6 +3,8 @@
 // Refetches the queries on screen; the live feed (Phase 117) already keeps them
 // current, so this is for "I want to be sure".
 
+import { haptic } from "@/lib/haptics";
+
 const THRESHOLD = 72;
 const MAX = 110;
 
@@ -47,7 +49,10 @@ export function startPullToRefresh(refresh: () => Promise<unknown>): void {
     }
     pulled = Math.min(MAX, dy * 0.5);
     mark.style.transform = `translate(-50%, ${pulled}px) rotate(${pulled * 3}deg)`;
-    mark.classList.toggle("ready", pulled >= THRESHOLD * 0.5);
+    const ready = pulled >= THRESHOLD * 0.5;
+    // Phase 120: a light tap the moment letting go would refresh.
+    if (ready && !mark.classList.contains("ready")) haptic("light");
+    mark.classList.toggle("ready", ready);
   }, { passive: true });
 
   window.addEventListener("touchend", () => {

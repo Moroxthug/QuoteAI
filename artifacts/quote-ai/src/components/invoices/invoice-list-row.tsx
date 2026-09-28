@@ -1,6 +1,8 @@
 import { format } from "date-fns";
 import type { enCA } from "date-fns/locale";
+import { Banknote } from "lucide-react";
 import { ListRow } from "@/components/mobile/list-row";
+import { SwipeRow } from "@/components/mobile/swipe-row";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { formatCents } from "@/lib/jobs-api";
 import { isOpenInvoice, type InvoiceDto, type InvoiceStatus } from "@/lib/invoices-api";
@@ -17,8 +19,11 @@ export function invoiceStatusChip(status: InvoiceStatus): string {
  * Phase 107 — an invoice as a phone row: the client (or, on a client's own
  * page, the job), the number and when it is due or was paid, the amount (what
  * is still owed once part is paid) and the status.
+ *
+ * Phase 120: with `onRecord`, an invoice that is out and unpaid swipes right
+ * to record a payment (the sheet opens; the row stays).
  */
-export function InvoiceListRow({ inv, locale, showClient = true }: { inv: InvoiceDto; locale: typeof enCA; showClient?: boolean }) {
+export function InvoiceListRow({ inv, locale, showClient = true, onRecord }: { inv: InvoiceDto; locale: typeof enCA; showClient?: boolean; onRecord?: (inv: InvoiceDto) => void }) {
   const { t } = useLanguage();
   const open = isOpenInvoice(inv.status);
   const when = inv.status === "paid" && inv.paidAt ? `${t("invoices.paidOn")} ${format(new Date(inv.paidAt), "PP", { locale })}`
@@ -26,7 +31,7 @@ export function InvoiceListRow({ inv, locale, showClient = true }: { inv: Invoic
     : format(new Date(inv.issueDate), "PP", { locale });
   const partPaid = open && inv.paidCents > 0;
   const title = showClient ? inv.clientName || inv.number : inv.projectName || inv.title || inv.number;
-  return (
+  const row = (
     <ListRow
       href={`/dashboard/invoices/${inv.id}`}
       title={title}
@@ -35,4 +40,6 @@ export function InvoiceListRow({ inv, locale, showClient = true }: { inv: Invoic
       end={<span className={cn("chip", invoiceStatusChip(inv.status))}>{t(`invoices.status.${inv.status}`)}</span>}
     />
   );
+  if (!onRecord || !open || inv.status === "draft" || inv.type === "credit_note") return row;
+  return <SwipeRow label={t("invoices.recordPayment")} icon={Banknote} stays onSwipe={() => onRecord(inv)}>{row}</SwipeRow>;
 }

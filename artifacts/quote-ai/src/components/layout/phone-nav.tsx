@@ -19,6 +19,8 @@ import { teamMembersApi } from "@/lib/team-members-api";
 import { clearOfflineCaches } from "@/lib/pwa";
 import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { cn } from "@/lib/utils";
+import { haptic } from "@/lib/haptics";
+import { markNextNav } from "@/lib/motion/nav-mark";
 
 /**
  * Phase 101 — how you move around the dashboard on a phone or a tablet
@@ -116,6 +118,11 @@ export function PhoneTabBar({ navItems, moreProps }: { navItems: PhoneNavItem[];
 
   const onTabClick = useCallback((tab: TabItem, e: React.MouseEvent) => {
     const here = location + (search ? `?${search}` : "");
+    // Phase 120: another tab cross-fades in (not a slide) with the selection haptic.
+    if (!tabOwns(tab, location)) {
+      markNextNav("tab");
+      haptic("selection");
+    }
     if (tabOwns(tab, location)) {
       e.preventDefault();
       if (here !== tab.href) navigate(tab.href);

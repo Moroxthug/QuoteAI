@@ -272,6 +272,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // must be the server's, never the optimistic screen's), and what anyone else in the
   // company changes shows up here within a second or two.
   useEffect(() => watchServerData(queryClient), [queryClient]);
+  // Phase 120: screens slide like a phone app's, in the app and an installed web app (lib/motion/page-motion.ts).
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 640px)").matches && "startViewTransition" in document) void import("@/lib/motion/page-motion").then((m) => m.startPageMotion()).catch(() => {});
+  }, []);
   useEffect(() => {
     if (!ownerUser || !activeOrgId) return;
     // Its own chunk, like the warm-up: nothing on the first screen waits for it.

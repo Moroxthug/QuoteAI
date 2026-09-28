@@ -45,6 +45,7 @@ import {
 import { arAging, balanceCents, addDays, REMINDER_AFTER_DAYS, lineFrom } from "../invoices/math.js";
 import { renderInvoiceHtml, INVOICE_CSS } from "../invoices/render.js";
 import { sendInvoiceReminderEmail } from "../lib/emailInvoices.js";
+import { rejectStale } from "../lib/versioning.js";
 
 const router = Router();
 const sendLimiter = userRateLimiter({ windowMs: 60 * 60_000, max: 120, message: "Too many emails sent this hour" });
@@ -337,6 +338,7 @@ router.put("/invoices/:id", requireAuth, requirePermission("invoicing", "edit"),
     if (inv.status !== "draft") { res.status(400).json({ error: "IMMUTABLE", message: "Sent invoices cannot be edited. Void it and issue a new one, or add a credit note." }); return; }
     const body = editSchema.safeParse(req.body);
     if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
+    if (rejectStale(req, res, inv.updatedAt, () => serializeInvoice(inv))) return;
     const d = body.data;
     const updates: Partial<typeof invoicesTable.$inferInsert> = { autoSendAt: null }; // any edit cancels the review timer ("if not touched")
     if (d.title !== undefined) updates.title = d.title;

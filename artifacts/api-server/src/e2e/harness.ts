@@ -235,6 +235,8 @@ export async function cleanupUsers(userIds: string[]): Promise<void> {
   }
   // organization_members keys the org on owner_id.
   await db.execute(sql`delete from organization_members where owner_id in ${ids} or user_id in ${ids}`);
+  // Phase 117: the change feed keys the company on org_id (and the deletes above just wrote to it).
+  await db.execute(sql`delete from change_log where org_id in ${ids}`).catch(() => undefined);
   for (const id of userIds) await db.delete(authUsersTable).where(eq(authUsersTable.id, id));
   await deleteStorageForUsers(userIds);
   for (const id of userIds) created.delete(id);

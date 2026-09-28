@@ -21,6 +21,8 @@ import { eq, lt } from "drizzle-orm";
 import { automationBacklog, pingHeartbeat, recentAutomationFailures, sendOpsAlert } from "../lib/ops.js";
 import { captureException, flush } from "../lib/errorTracking.js";
 import { cronAuthorized } from "../lib/cronAuth.js";
+import { pruneIdempotencyKeys } from "../lib/idempotency.js";
+import { pruneChangeLog } from "./changes.js";
 
 const router = Router();
 
@@ -64,7 +66,9 @@ router.get("/cron/tick", async (req, res) => {
     // Roll up yesterday's (and today's, in case cron shifted) usage_events into the daily summary.
     const usage = await rollUpUsageForDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
     await rollUpUsageForDate(new Date());
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage };
+    // Phase 117: the change feed keeps 2 days, idempotency keys 7.
+    const syncPruned = { changes: await pruneChangeLog(), idempotencyKeys: await pruneIdempotencyKeys() };
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));

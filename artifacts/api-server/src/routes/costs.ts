@@ -24,6 +24,7 @@ import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.
 import { writeAudit } from "../lib/notifications.js";
 import { raiseAutomation } from "../lib/automation.js";
 import { logger } from "../lib/logger.js";
+import { rejectStale } from "../lib/versioning.js";
 import { parseIsoDate } from "../jobs/dates.js";
 import { readReceipt, normalizeReceipt, receiptDescription, RECEIPT_MIME_TYPES, type JobCandidate } from "../costs/receiptAi.js";
 import { costSummary, serializeCostEntry, nameMaps } from "../costs/service.js";
@@ -183,6 +184,7 @@ router.put("/jobs/:id/costs/:cid", requireAuth, requirePermission("costs", "edit
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
     }
+    if (rejectStale(req, res, entry.updatedAt, () => serializeCostEntry(entry))) return;
     const d = body.data;
     const updates: Partial<typeof costEntriesTable.$inferInsert> = {};
     // A receipt that landed on the wrong job (or none) can be moved.

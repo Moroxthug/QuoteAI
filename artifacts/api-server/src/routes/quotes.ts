@@ -54,6 +54,7 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 import { currentActorId } from "../lib/requestContext.js";
+import { rejectStale } from "../lib/versioning.js";
 
 const objectStorage = new ObjectStorageService();
 
@@ -1558,6 +1559,7 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
       res.status(403).json({ error: "Forbidden" });
       return;
     }
+    if (rejectStale(req, res, existing.updatedAt, () => serializeQuote(existing))) return;
 
     const updates: Partial<typeof existing> = {};
     const body = parsed.data;

@@ -65,6 +65,8 @@ export interface RouteRow {
 function walk(dir: string): string[] {
   const out: string[] = [];
   for (const name of readdirSync(dir)) {
+    // Stray Explorer duplicates ("jobs - Copy.ts") are not routes the app mounts.
+    if (name.includes(" - Copy")) continue;
     const p = path.join(dir, name);
     if (statSync(p).isDirectory()) out.push(...walk(p));
     else if (name.endsWith(".ts") && !name.endsWith(".test.ts") && !name.endsWith(".d.ts")) out.push(p);

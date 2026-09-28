@@ -51,6 +51,7 @@ import { logger } from "../lib/logger.js";
 import { permitCompletionBlock } from "../compliance/service.js";
 import { currentActorId } from "../lib/requestContext.js";
 import { ensureRoomForJob } from "../jobs/activeJobCap.js";
+import { rejectStale } from "../lib/versioning.js";
 
 const router = Router();
 const objectStorage = new ObjectStorageService();
@@ -88,12 +89,13 @@ function serializeMilestone(m: Milestone, tasks: (typeof projectTasksTable.$infe
     paymentAmountCents: m.paymentAmountCents,
     sourceChapter: m.sourceChapter,
     valueCents: m.valueCents,
+    updatedAt: m.updatedAt.toISOString(),
     tasks: tasks.filter((t) => t.milestoneId === m.id).map(serializeTask),
   };
 }
 
 function serializeTask(t: typeof projectTasksTable.$inferSelect) {
-  return { id: t.id, milestoneId: t.milestoneId, title: t.title, description: t.description, status: t.status, dueDate: toIsoDate(t.dueDate), sortOrder: t.sortOrder, addedFromFieldBy: t.createdByName };
+  return { id: t.id, milestoneId: t.milestoneId, title: t.title, description: t.description, status: t.status, dueDate: toIsoDate(t.dueDate), sortOrder: t.sortOrder, addedFromFieldBy: t.createdByName, updatedAt: t.updatedAt.toISOString() };
 }
 
 function serializeBudgetLine(b: CostBudgetLine) {
@@ -380,6 +382,7 @@ router.put("/jobs/:id", requireAuth, requirePermission("jobs", "edit"), async (r
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
     }
+    if (rejectStale(req, res, project.updatedAt, () => serializeProject(project))) return;
     const d = body.data;
     // Phase 87: a job with a permit still open (needed, applied, issued without its final inspection) cannot be completed.
     if (d.status === "completed" && project.status !== "completed") {
@@ -733,6 +736,7 @@ router.put("/jobs/:id/milestones/:mid", requireAuth, requirePermission("jobs", "
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
     }
+    if (rejectStale(req, res, owned.milestone.updatedAt, () => serializeMilestone(owned.milestone))) return;
     const d = body.data;
     const updates: Partial<typeof milestonesTable.$inferInsert> = {};
     if (d.title !== undefined) updates.title = d.title;
@@ -817,6 +821,12 @@ router.patch("/jobs/:id/tasks/:tid", requireAuth, requirePermission("jobs", "edi
       res.status(400).json({ error: "Invalid parameters", details: body.error });
       return;
     }
+    const [existing] = await db.select().from(projectTasksTable).where(and(eq(projectTasksTable.id, req.params.tid as string), eq(projectTasksTable.projectId, project.id)));
+    if (!existing) {
+      res.status(404).json({ error: "Task not found" });
+      return;
+    }
+    if (rejectStale(req, res, existing.updatedAt, () => serializeTask(existing))) return;
     const updates: Partial<typeof projectTasksTable.$inferInsert> = {};
     if (body.data.title !== undefined) updates.title = body.data.title;
     if (body.data.status !== undefined) updates.status = body.data.status;

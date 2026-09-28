@@ -18,7 +18,9 @@ import { SkipLink } from "@/components/a11y";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { OfflineBar } from "@/components/pwa/offline-bar";
 import { clearOfflineCaches } from "@/lib/pwa";
-import { clearOutbox } from "@/lib/offline/outbox";
+import { clearOutbox, queuedRows } from "@/lib/offline/outbox";
+import { toast } from "@/hooks/use-toast";
+import { watchServerData } from "@/lib/sync/versions";
 import { wipeQueryCache, confirmOwner, pointCacheAtOrg, useCacheOwnerCheck, startPersisting } from "@/lib/offline/query-cache";
 import { queryClient as appQueryClient } from "@/lib/query-client";
 import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
@@ -98,7 +100,12 @@ function OrgSwitcherItems() {
   const queryClient = useQueryClient();
   const { data } = useQuery({ queryKey: ["team-orgs"], queryFn: teamMembersApi.orgs, staleTime: 60_000 });
   const switchOrg = useMutation({
-    mutationFn: (orgId: string) => teamMembersApi.switchOrg(orgId),
+    mutationFn: async (orgId: string) => {
+      // Phase 117: queued changes belong to this company; they are sent before switching, never into the next one.
+      if ((await queuedRows()).some((r) => r.status !== "failed")) throw new Error(t("sync.switchBlocked"));
+      return teamMembersApi.switchOrg(orgId);
+    },
+    onError: (e: Error) => toast({ title: e.message, variant: "destructive" }),
     // Phase 116: the next launch opens the new company's saved data, and the service worker drops the old one's.
     onSuccess: async (r) => { pointCacheAtOrg(r.orgId); await clearOfflineCaches(); queryClient.clear(); window.location.href = "/dashboard"; },
   });
@@ -255,6 +262,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     // Its own chunk: the API clients it calls aren't needed to draw the first screen.
     void import("@/lib/offline/warm").then((m) => m.warmOfflineSet(queryClient, can, !!isPro)).catch(() => undefined);
   }, [ownerUser, activeOrgId, queryClient, can, isPro]);
+  // Phase 117: the server's answers are remembered from the start (an edit's base version
+  // must be the server's, never the optimistic screen's), and what anyone else in the
+  // company changes shows up here within a second or two.
+  useEffect(() => watchServerData(queryClient), [queryClient]);
+  useEffect(() => {
+    if (!ownerUser || !activeOrgId) return;
+    // Its own chunk, like the warm-up: nothing on the first screen waits for it.
+    let stop: (() => void) | null = null;
+    let cancelled = false;
+    void import("@/lib/sync/live").then((m) => { if (!cancelled) stop = m.startLiveUpdates(queryClient); }).catch(() => undefined);
+    return () => { cancelled = true; stop?.(); };
+  }, [ownerUser, activeOrgId, queryClient]);
 
   // Every dashboard route used to keep the marketing homepage <title> (Phase 66):
   // name the tab after the section the user is in.

@@ -8,6 +8,21 @@ import type { Lang } from "./translations";
 
 export const dashboardTranslations: Record<Lang, Record<string, string>> = {
   en: {
+    // Phase 117: sync II — conflicts, queued edits
+    "sync.switchBlocked": "Some changes in this company haven't been sent yet. Switch once they've gone, or discard them.",
+    "sync.op.jobEdit": "Job changed",
+    "sync.op.milestoneEdit": "Milestone changed",
+    "sync.op.taskAdd": "Task added",
+    "sync.op.taskEdit": "Task changed",
+    "sync.op.taskDelete": "Task deleted",
+    "sync.op.noteAdd": "Note added",
+    "sync.op.noteDelete": "Note deleted",
+    "sync.op.costEdit": "Cost changed",
+    "sync.op.costDelete": "Cost deleted",
+    "sync.op.quoteEdit": "Quote changed",
+    "sync.op.invoiceEdit": "Invoice changed",
+    "sync.op.scheduleEdit": "Schedule changed",
+    "sync.op.leadEdit": "Lead changed",
     "jobs.tab.assistant": "Assistant",
     "analytics.title": "Analytics",
     "analytics.subtitle": "Margin, receivables, cash flow and job health — plus your quote pipeline.",
@@ -4017,6 +4032,21 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
     "undo.leadMoved": "{name} moved to {stage}",
   },
   fr: {
+    // Phase 117 : synchro II — conflits, modifications en file
+    "sync.switchBlocked": "Des modifications de cette entreprise n'ont pas encore été envoyées. Changez d'entreprise une fois qu'elles sont parties, ou abandonnez-les.",
+    "sync.op.jobEdit": "Chantier modifié",
+    "sync.op.milestoneEdit": "Étape modifiée",
+    "sync.op.taskAdd": "Tâche ajoutée",
+    "sync.op.taskEdit": "Tâche modifiée",
+    "sync.op.taskDelete": "Tâche supprimée",
+    "sync.op.noteAdd": "Note ajoutée",
+    "sync.op.noteDelete": "Note supprimée",
+    "sync.op.costEdit": "Coût modifié",
+    "sync.op.costDelete": "Coût supprimé",
+    "sync.op.quoteEdit": "Soumission modifiée",
+    "sync.op.invoiceEdit": "Facture modifiée",
+    "sync.op.scheduleEdit": "Horaire modifié",
+    "sync.op.leadEdit": "Prospect modifié",
     "jobs.tab.assistant": "Assistant",
     "analytics.title": "Analytique",
     "analytics.subtitle": "Marge, comptes clients, flux de trésorerie et santé des chantiers — plus votre pipeline de soumissions.",

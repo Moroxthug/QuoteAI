@@ -15,6 +15,7 @@ import "./automations";
 import { logger } from "./lib/logger";
 import { ipRateLimiter } from "./lib/rateLimit";
 import { captureException, flush, installProcessHandlers, requestContext } from "./lib/errorTracking";
+import { idempotency } from "./lib/idempotency";
 
 // Phase 69: report unhandled rejections / uncaught exceptions before the
 // process (or the Vercel instance) goes down with them.
@@ -683,6 +684,8 @@ app.use(
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true }));
 
+// Phase 117: a mutating request with an Idempotency-Key is done at most once.
+app.use("/api", idempotency());
 app.use("/api", router);
 
 app.use(async (err: unknown, req: Request, res: Response, _next: NextFunction) => {

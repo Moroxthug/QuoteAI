@@ -1,7 +1,7 @@
 {
   "shell": {
-    "en": 305,
-    "fr": 315
+    "en": 309,
+    "fr": 318
   },
   "chunk": 75,
   "screens": [
@@ -16,7 +16,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/index.tsx"
       ],
-      "budget": 335
+      "budget": 341
     },
     {
       "name": "Quotes",
@@ -29,7 +29,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/quotes/index.tsx"
       ],
-      "budget": 310
+      "budget": 316
     },
     {
       "name": "Quote",
@@ -42,7 +42,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/quotes/[id].tsx"
       ],
-      "budget": 335
+      "budget": 342
     },
     {
       "name": "New quote",
@@ -55,7 +55,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/new.tsx"
       ],
-      "budget": 320
+      "budget": 327
     },
     {
       "name": "Jobs",
@@ -94,7 +94,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/invoices.tsx"
       ],
-      "budget": 320
+      "budget": 327
     },
     {
       "name": "Invoice",
@@ -107,7 +107,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/invoices/[id].tsx"
       ],
-      "budget": 320
+      "budget": 325
     },
     {
       "name": "Client",
@@ -120,7 +120,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/clients/[name].tsx"
       ],
-      "budget": 320
+      "budget": 325
     },
     {
       "name": "Schedule",
@@ -146,7 +146,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/team.tsx"
       ],
-      "budget": 330
+      "budget": 335
     },
     {
       "name": "Assistant",
@@ -159,7 +159,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/assistant.tsx"
       ],
-      "budget": 305
+      "budget": 312
     },
     {
       "name": "Notifications",
@@ -172,7 +172,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/notifications.tsx"
       ],
-      "budget": 305
+      "budget": 312
     },
     {
       "name": "Settings",
@@ -290,7 +290,7 @@
         "@strings",
         "src/pages/t/[token].tsx"
       ],
-      "budget": 225
+      "budget": 230
     }
   ]
 }

@@ -51,6 +51,7 @@ export function serializeCostEntry(c: CostEntry, extra?: { projectName?: string 
     aiExtraction: c.aiExtraction ?? null,
     confirmedAt: iso(c.confirmedAt),
     createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
   };
 }
 

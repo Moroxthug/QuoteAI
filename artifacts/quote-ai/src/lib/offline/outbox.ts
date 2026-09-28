@@ -3,6 +3,13 @@ import type { QueryClient } from "@tanstack/react-query";
 import { idbSupported, idbGetAll, idbPut, idbDelete, idbClear, OUTBOX_STORE } from "./db";
 import { jobsApi, type CostCategory, type CostEntryEdit } from "../jobs-api";
 import { workerApi, type CrewTaskStatus, type FieldReportKind } from "../team-api";
+import type { EditBase } from "../sync/protocol";
+import type { FieldConflict } from "../sync/merge";
+import { tempIdFor, TEMP_ID_RE } from "../sync/temp-id";
+import { rawFetch } from "../sync/raw-fetch";
+
+/** Phase 117: the replay of queued edits is its own chunk, loaded when there is one to send. */
+const syncCore = () => import("../sync/replay");
 
 // Phase 77 (docs/PILOT-LAUNCH-PLAN.md): the offline outbox.
 //
@@ -18,6 +25,15 @@ import { workerApi, type CrewTaskStatus, type FieldReportKind } from "../team-ap
 // A queue stops at the first network failure (everything after it waits); a
 // 4xx marks that op `failed` for the person to retry or discard, and the
 // queue moves on.
+//
+// Phase 117 (docs/APP-PLAN.md "Sync II"): one outbox for everything. The
+// `api` op is any edit in lib/sync/routes.ts, queued by the sync layer
+// (lib/sync/sync-fetch.ts) with its Idempotency-Key and, for versioned edits,
+// the version and values it was made against. On replay a row changed
+// elsewhere is merged field by field; when both sides changed the same field
+// the op becomes a `conflict` and waits for the person (keep mine / theirs)
+// without holding up the rest of the queue. A queued create's stand-in id
+// (`q_<op id>`) is swapped for the real one in the ops behind it.
 
 export type OutboxOp =
   | { kind: "worker.clockIn"; token: string; projectId: string; milestoneId: string | null; lat?: number; lng?: number; at: string }
@@ -31,9 +47,14 @@ export type OutboxOp =
   | { kind: "worker.task"; token: string; taskId: string; status: CrewTaskStatus }
   | { kind: "worker.addTask"; token: string; projectId: string; title: string }
   // Phase 89b: km or per diem logged on site.
-  | { kind: "worker.allowance"; token: string; allowanceKind: "mileage" | "per_diem"; quantity: number; date: string; projectId: string | null; note?: string };
+  | { kind: "worker.allowance"; token: string; allowanceKind: "mileage" | "per_diem"; quantity: number; date: string; projectId: string | null; note?: string }
+  // Phase 117: any edit the sync layer queued (lib/sync/routes.ts).
+  | { kind: "api"; method: string; path: string; body: string | null; key: string; base: EditBase | null };
 
-type OutboxStatus = "pending" | "failed";
+type OutboxStatus = "pending" | "failed" | "conflict";
+
+/** Both sides changed the same field(s): the person picks, per field. */
+export type OutboxConflict = { fields: FieldConflict[]; patch: Record<string, unknown>; current: Record<string, unknown>; version: string };
 
 export type OutboxRow = {
   /** Also the clientRef sent to the server. */
@@ -47,6 +68,7 @@ export type OutboxRow = {
   status: OutboxStatus;
   error: string | null;
   op: OutboxOp;
+  conflict?: OutboxConflict;
 };
 
 export type OutboxSnapshot = { rows: OutboxRow[]; syncing: boolean; supported: boolean; lastSyncedAt: string | null };
@@ -87,7 +109,7 @@ async function ensureLoaded(): Promise<void> {
   await loaded;
 }
 
-function newClientRef(): string {
+export function newClientRef(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 10)}-4000-8000-${Math.random().toString(16).slice(2, 14)}`;
 }
 
@@ -100,18 +122,25 @@ function isNetworkError(err: unknown): boolean {
 }
 
 function isRetryable(err: unknown): boolean {
-  const status = (err as { status?: number }).status ?? 0;
-  return status >= 500 || status === 429 || status === 408;
+  const { status = 0, code } = err as { status?: number; code?: string };
+  // 409 IDEMPOTENCY_IN_PROGRESS: the same op is still running on the server (an earlier attempt).
+  return status >= 500 || status === 429 || status === 408 || code === "IDEMPOTENCY_IN_PROGRESS";
 }
 
-export async function enqueue(op: OutboxOp, opts: { id?: string; scope: string; label: string }): Promise<OutboxRow> {
+export async function enqueue(op: OutboxOp, opts: { id?: string; scope: string; label: string; conflict?: OutboxConflict }): Promise<OutboxRow> {
   await ensureLoaded();
-  const row: OutboxRow = { id: opts.id ?? newClientRef(), scope: opts.scope, label: opts.label, createdAt: new Date().toISOString(), attempts: 0, status: "pending", error: null, op };
+  const row: OutboxRow = { id: opts.id ?? newClientRef(), scope: opts.scope, label: opts.label, createdAt: new Date().toISOString(), attempts: 0, status: opts.conflict ? "conflict" : "pending", error: null, op, conflict: opts.conflict };
   if (idbSupported()) await idbPut(OUTBOX_STORE, row);
   rows = [...rows.filter((r) => r.id !== row.id), row];
   emit();
-  if (typeof navigator === "undefined" || navigator.onLine) scheduleFlush(250);
+  if (!opts.conflict && (typeof navigator === "undefined" || navigator.onLine)) scheduleFlush(250);
   return row;
+}
+
+/** Phase 117: the queue as it stands (the sync layer keeps new edits behind older ones of the same job). */
+export async function queuedRows(): Promise<OutboxRow[]> {
+  await ensureLoaded();
+  return rows;
 }
 
 async function update(row: OutboxRow) {
@@ -141,14 +170,99 @@ export async function discard(id: string): Promise<void> {
   await remove(id);
 }
 
+/**
+ * Phase 117: the person chose, for each field both sides changed, whose value
+ * stays. Theirs everywhere (and nothing else left to send) drops the op;
+ * otherwise it is sent again on the version the server last reported.
+ */
+export async function resolveConflict(id: string, choice: Record<string, "mine" | "theirs">): Promise<void> {
+  await ensureLoaded();
+  const row = rows.find((r) => r.id === id);
+  if (!row || row.status !== "conflict" || !row.conflict || row.op.kind !== "api") return;
+  const { resolvePatch } = await syncCore();
+  const patch = resolvePatch(row.conflict.patch, row.conflict.fields, choice);
+  if (Object.keys(patch).length === 0) {
+    await remove(id);
+    invalidateFor(row.op);
+    return;
+  }
+  const op = { ...row.op, body: JSON.stringify(patch), key: newClientRef(), base: { version: row.conflict.version, values: row.conflict.current } };
+  await update({ ...row, op, status: "pending", attempts: 0, error: null, conflict: undefined });
+  scheduleFlush(0);
+}
+
 export async function retryFailed(scope?: string): Promise<void> {
   await ensureLoaded();
   for (const r of rows) if (r.status === "failed" && (!scope || r.scope === scope)) await update({ ...r, status: "pending", attempts: 0, error: null });
   scheduleFlush(0);
 }
 
-async function execute(row: OutboxRow): Promise<void> {
+/** Sends a queued edit. Resolves true when done, false when it became a conflict. */
+async function executeApi(row: OutboxRow, op: Extract<OutboxOp, { kind: "api" }>): Promise<boolean> {
+  const { sendEdit, matchRoute, recordServerData, rowIn } = await syncCore();
+  const outcome = await sendEdit({ method: op.method, path: op.path, body: op.body, key: op.key, base: op.base }, (path, init) => rawFetch(path, init), newClientRef);
+  const match = matchRoute(op.method, op.path.split("?")[0]!);
+  if (outcome.kind === "noop") {
+    if (match?.id) await rebaseBehind(row, match.id, outcome.current);
+    return true;
+  }
+  if (outcome.kind === "conflict") {
+    await update({ ...row, status: "conflict", error: null, conflict: { fields: outcome.fields, patch: outcome.patch, current: outcome.current, version: outcome.version } });
+    return false;
+  }
+  const res = outcome.response;
+  const body = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    const err = new Error(String(body.message || body.error || `Request failed (${res.status})`)) as Error & { status?: number; code?: string };
+    err.status = res.status;
+    err.code = typeof body.code === "string" ? body.code : typeof body.error === "string" ? body.error : undefined;
+    throw err;
+  }
+  recordServerData(body);
+  const realId = match?.route.createdId?.(body) ?? null;
+  if (realId) await swapTempId(tempIdFor(row.id), realId);
+  const saved = match?.id ? rowIn(body, match.id) : null;
+  if (saved && match?.id) await rebaseBehind(row, match.id, saved);
+  return true;
+}
+
+/** Later queued edits of the same row are now made against this answer (lib/sync/protocol.ts rebase). */
+async function rebaseBehind(done: OutboxRow, id: string, current: Record<string, unknown>) {
+  const { matchRoute, rebase } = await syncCore();
+  for (const r of rows) {
+    if (r.id === done.id || r.status === "conflict" || r.op.kind !== "api" || !r.op.base) continue;
+    if (matchRoute(r.op.method, r.op.path.split("?")[0]!)?.id !== id) continue;
+    const base = rebase(r.op.body, current);
+    if (base) await update({ ...r, op: { ...r.op, base } });
+  }
+}
+
+/** A queued create went through: the ops queued behind it now name the real row. */
+async function swapTempId(tempId: string, realId: string) {
+  for (const r of rows) {
+    if (r.op.kind !== "api") continue;
+    const op = r.op;
+    if (!op.path.includes(tempId) && !(op.body ?? "").includes(tempId)) continue;
+    await update({ ...r, op: { ...op, path: op.path.split(tempId).join(realId), body: op.body == null ? null : op.body.split(tempId).join(realId) } });
+  }
+}
+
+/** An op that names a row still waiting to be created (its create is queued ahead of it, or stuck). */
+function waitsOnCreate(row: OutboxRow): boolean {
+  if (row.op.kind !== "api") return false;
+  const text = `${row.op.path} ${row.op.body ?? ""}`;
+  const refs = text.match(TEMP_ID_RE) ?? [];
+  return refs.some((ref) => rows.some((r) => r.id !== row.id && tempIdFor(r.id) === ref));
+}
+
+async function execute(row: OutboxRow): Promise<boolean> {
   const { op } = row;
+  if (op.kind === "api") return executeApi(row, op);
+  await executeLegacy(row, op);
+  return true;
+}
+
+async function executeLegacy(row: OutboxRow, op: Exclude<OutboxOp, { kind: "api" }>): Promise<void> {
   switch (op.kind) {
     case "worker.clockIn":
       await workerApi.clockIn(op.token, { projectId: op.projectId, milestoneId: op.milestoneId, lat: op.lat, lng: op.lng, at: op.at, clientRef: row.id });
@@ -185,6 +299,14 @@ async function execute(row: OutboxRow): Promise<void> {
 
 function invalidateFor(op: OutboxOp) {
   if (!queryClient) return;
+  if (op.kind === "api") {
+    const qc = queryClient;
+    void syncCore().then(({ matchRoute, changeOf, affectsAny }) => {
+      const match = matchRoute(op.method, op.path.split("?")[0]!);
+      if (match) void qc.invalidateQueries({ predicate: affectsAny([changeOf(match)]) });
+    });
+    return;
+  }
   if (op.kind.startsWith("worker.")) {
     queryClient.invalidateQueries({ queryKey: ["worker", (op as { token: string }).token] });
     return;
@@ -206,10 +328,12 @@ export async function flush(): Promise<void> {
   syncing = true;
   emit();
   try {
-    for (const row of pending) {
+    for (const queued of pending) {
+      // Earlier ops in this pass may have rewritten this one (a create's real id).
+      const row = rows.find((r) => r.id === queued.id);
+      if (!row || row.status !== "pending" || waitsOnCreate(row)) continue;
       try {
-        await execute(row);
-        await remove(row.id);
+        if (await execute(row)) await remove(row.id);
         lastSyncedAt = new Date().toISOString();
         invalidateFor(row.op);
       } catch (err) {

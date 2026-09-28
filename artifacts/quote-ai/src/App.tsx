@@ -5,6 +5,7 @@ import { queryClient } from "@/lib/query-client";
 import { RouteAnnouncer } from "@/components/a11y";
 import { ScrollManager } from "@/components/scroll-manager";
 import { setOutboxQueryClient, startOutbox } from "@/lib/offline/outbox";
+import { installSyncFetch } from "@/lib/sync/install";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { pageLoaders } from "@/lib/route-chunks";
 import { withDashboardStrings } from "@/i18n/dashboard";
@@ -112,6 +113,8 @@ import { isOnboardingSkipped } from "@/lib/onboarding-state";
 // Phase 77: the offline outbox refreshes the affected queries after a replay.
 setOutboxQueryClient(queryClient);
 startOutbox();
+// Phase 117: every write goes through the sync layer (idempotency keys, versions, queue, merge).
+installSyncFetch();
 
 function OnboardingGuard({ children }: { children: React.ReactNode }) {
   const { userId, isLoaded } = useAuth();

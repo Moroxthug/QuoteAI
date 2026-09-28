@@ -4,6 +4,7 @@ import { db, leadsTable, leadEventsTable, businessProfilesTable, whatsappConnect
 import { and, desc, eq } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
+import { rejectStale } from "../lib/versioning.js";
 import { sendLeadFollowup } from "../lib/leadMessaging.js";
 import { automationSettingsFor, leadFollowupDays, stageDueAt } from "../lib/followupCadence.js";
 
@@ -112,6 +113,8 @@ router.patch("/leads/:id", requireAuth, requirePermission("leads", "edit"), asyn
       res.status(404).json({ error: "Not found" });
       return;
     }
+    const stale = () => ({ id: existing.id, status: existing.status, notes: existing.notes, preferredChannel: existing.preferredChannel, preferredLanguage: existing.preferredLanguage, updatedAt: existing.updatedAt.toISOString() });
+    if (rejectStale(req, res, existing.updatedAt, stale)) return;
     const d = body.data;
     const stopping = d.status && ["won", "lost", "unsubscribed"].includes(d.status);
     const [lead] = await db

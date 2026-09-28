@@ -66,6 +66,17 @@ ${button(url, fr ? "Confirmer mon adresse" : "Verify my email")}
   return { subject, html: shell(lang, subject, body, `&copy; ${year()} QuoteAI`) };
 }
 
+/** Phase 121: the phone app confirms the address with a code typed in the app (a link would open the browser). */
+export function verificationCodeEmail(lang: AccountEmailLang, name: string, code: string): { subject: string; html: string } {
+  const fr = lang === "fr";
+  const subject = fr ? `${code} est votre code QuoteAI` : `${code} is your QuoteAI code`;
+  const body = `<h1 style="margin:0 0 14px;font-size:21px;font-weight:700;color:${NAVY}">${fr ? "Votre code de confirmation" : "Your confirmation code"}</h1>
+<p style="margin:0">${hello(lang, name)}<br/>${fr ? "Entrez ce code dans l'application QuoteAI pour confirmer votre adresse :" : "Enter this code in the QuoteAI app to confirm your address:"}</p>
+<p style="margin:22px 0;font-size:32px;font-weight:800;letter-spacing:8px;color:${NAVY};font-variant-numeric:tabular-nums">${escapeHtml(code)}</p>
+<p style="margin:0;font-size:13px;color:${MUTED}">${fr ? "Le code est valide pendant 15 minutes. Vous n'avez pas créé de compte QuoteAI? Ignorez ce courriel." : "The code works for 15 minutes. Didn't create a QuoteAI account? You can ignore this email."}</p>`;
+  return { subject, html: shell(lang, subject, body, `&copy; ${year()} QuoteAI`) };
+}
+
 export function resetPasswordEmail(lang: AccountEmailLang, name: string, url: string): { subject: string; html: string } {
   const fr = lang === "fr";
   const subject = fr ? "Réinitialisez votre mot de passe – QuoteAI" : "Reset your password – QuoteAI";

@@ -1,4 +1,5 @@
 import { isNativeApp } from "./native/env";
+import { explainFirst } from "./permission-why";
 import { shrinkPhoto } from "./image-shrink";
 
 // Phase 119: "take a photo" / "snap a receipt" for both builds. In the phone
@@ -37,6 +38,8 @@ export async function openCapture(opts: {
     opts.input?.click();
     return;
   }
+  // Phase 121: one line of why before the phone asks for the camera (the gallery needs no permission).
+  if (opts.source !== "gallery" && !(await explainFirst("camera"))) return;
   try {
     const cam = await import("./native/camera");
     try {

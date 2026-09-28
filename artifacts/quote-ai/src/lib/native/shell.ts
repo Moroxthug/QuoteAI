@@ -51,7 +51,7 @@ export async function startShell(): Promise<void> {
 
   void App.addListener("backButton", ({ canGoBack }) => {
     if (closeTopLayer()) return;
-    if (canGoBack && !isRootScreen(window.location.pathname)) window.history.back();
+    if (canGoBack && !isRootScreen(window.location.pathname, window.location.search)) window.history.back();
     else void App.minimizeApp();
   });
 

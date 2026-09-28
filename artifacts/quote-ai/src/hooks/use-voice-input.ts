@@ -1,6 +1,7 @@
 import { transcribeAudio, TranscribeError } from "@/lib/speech";
 import { useCallback, useRef, useState } from "react";
 import { haptic } from "@/lib/haptics";
+import { explainFirst } from "@/lib/permission-why";
 
 const PREFERRED_MIME_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
 
@@ -68,6 +69,8 @@ export function useVoiceInput({ onTranscribed, onError, onRecorded, offlineTarge
       onError?.("Your browser doesn't support audio recording.");
       return;
     }
+    // Phase 121: in the app, one line of why before the phone asks for the microphone.
+    if (!(await explainFirst("microphone"))) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;

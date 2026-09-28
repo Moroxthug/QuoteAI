@@ -8,9 +8,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { isNativeApp } from "@/lib/native/env";
+import { biometricOn } from "@/lib/native/biometric-offer";
+import { signedOutPath } from "@/lib/first-run";
+import { PermissionWhy } from "@/components/native/permission-why";
 
 // Phase 119: "Share → QuoteAI" from another app; only the phone app's bundle has it.
 const ShareInbox = isNativeApp ? lazy(() => import("@/components/native/share-inbox")) : null;
+// Phase 121: fingerprint / face unlock (and its one-time offer) — the app only.
+const AppLock = isNativeApp ? lazy(() => import("@/components/native/app-lock")) : null;
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -343,7 +348,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   if (!isSignedIn) {
-    window.location.href = "/sign-in";
+    // Phase 121: the phone app's first time opens on the welcome.
+    window.location.href = signedOutPath(isNativeApp);
     return null;
   }
 
@@ -464,6 +470,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Phase 119: "Know the moment they accept?" after the first quote goes out. */}
         <PushAsk />
         {ShareInbox && <Suspense fallback={null}><ShareInbox /></Suspense>}
+        {/* Phase 121: a one-line why before the phone asks for the camera or the microphone. */}
+        <PermissionWhy />
+        {/* While the lock's chunk arrives, an opaque cover — nothing behind it shows first. */}
+        {AppLock && <Suspense fallback={biometricOn() ? <div className="app-lock" aria-hidden="true" /> : null}><AppLock onSignOut={signOut} /></Suspense>}
       </div>
       {phoneNav && (
         <PhoneTabBar

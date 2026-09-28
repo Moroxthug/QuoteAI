@@ -1,4 +1,8 @@
 import { askForPushAfter } from "@/components/pwa/push-ask";
+import { useAuth } from "@/hooks/use-auth";
+import { createdAtIso, elapsedLabel, firstQuoteStage, secondsSince, setFirstQuoteStage } from "@/lib/first-run";
+import { FirstQuoteCoach, FirstQuoteDone } from "@/components/first-run/first-quote";
+import { track } from "@/lib/analytics";
 import { saveFile } from "@/lib/save-file";
 import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
@@ -152,6 +156,14 @@ const can = useCan();
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [emailTo, setEmailTo] = useState("");
+  // Phase 121: step 2 of the guided first quote — check it, then send it to yourself.
+  const { userId, user } = useAuth();
+  const myEmail = user?.email ?? "";
+  // (From "compose" too: the first quote may have been built line by line, not written by AI.)
+  const [guide, setGuide] = useState(() => { const s = firstQuoteStage(userId); return s === "review" || s === "compose"; });
+  const [firstDone, setFirstDone] = useState<{ email: string; elapsed: string | null } | null>(null);
+  const skipGuide = () => { setFirstQuoteStage(userId, "done"); setGuide(false); };
+  const sendToMe = () => { setEmailTo(myEmail); setIsEmailDialogOpen(true); };
   const [isEditingClient, setIsEditingClient] = useState(false);
   const [clientName, setClientName] = useState("");
   const [clientAddress, setClientAddress] = useState("");
@@ -278,13 +290,21 @@ const can = useCan();
       data: { toEmail: emailTo.trim(), clientName: (quote.clientData as { nome?: string })?.nome || "" }
     }, {
       onSuccess: () => {
+        const to = emailTo.trim();
+        // Phase 121: the first quote went out — step 3, then (when that sheet closes) the notification ask.
+        const first = guide ? { email: to, elapsed: elapsedLabel(createdAtIso((user as { createdAt?: unknown } | null)?.createdAt), Date.now()) } : null;
+        if (first) {
+          setFirstQuoteStage(userId, "done");
+          setGuide(false);
+          track("first_quote_sent", { seconds: secondsSince((user as { createdAt?: unknown } | null)?.createdAt), toSelf: to.toLowerCase() === myEmail.toLowerCase(), app: isNativeApp });
+        }
         // Phase 120: a check in the button (and the success haptic), then the sheet closes.
-        sentDone.flash(() => { setIsEmailDialogOpen(false); setEmailTo(""); });
+        sentDone.flash(() => { setIsEmailDialogOpen(false); setEmailTo(""); if (first) setFirstDone(first); });
         // Sending unlocks a draft (trial or subscription) — refresh status + trial counter.
         queryClient.invalidateQueries({ queryKey: getGetQuoteQueryKey(id) });
         queryClient.invalidateQueries({ queryKey: getGetTrialStatusQueryKey() });
         toast({ title: t("dashboard.quoteDetail.emailSent"), description: fmt(t("dashboard.quoteDetail.emailSentDesc"), { email: emailTo.trim() }) });
-        askForPushAfter("quote_sent");
+        if (!first) askForPushAfter("quote_sent");
       },
       onError: (err: unknown) => {
         const status = (err as { status?: number })?.status;
@@ -784,7 +804,10 @@ const can = useCan();
   const startJob: Primary | null = jobId
     ? { label: t("quotes.m.openJob"), icon: Briefcase, href: `/dashboard/jobs/${jobId}` }
     : isOpen && can("jobs", "edit") ? { label: t("quotes.m.startJob"), icon: Hammer, onClick: handleAvviaCantiere, pending: avviandoCantiere } : null;
-  const sendAction: Primary | null = isOpen && canEdit
+  // Phase 121: a draft the account may send (trial or plan) is sent from here too — the server
+  // unlocks it on the way out, as a PDF download does. Before, a trial's first quote had no Send at all.
+  const sendableDraft = !isLocked && (quote.status === "draft" || quote.status === "pending_payment");
+  const sendAction: Primary | null = (isOpen || sendableDraft) && canEdit
     ? { label: sentAt ? t("quotes.m.sendAgain") : t("dashboard.quoteDetail.send"), icon: Send, onClick: () => setIsEmailDialogOpen(true), pending: sendPdfEmail.isPending }
     : null;
   const copyLink: Primary | null = isOpen ? { label: t("dashboard.quoteDetail.copyClientLink"), icon: Copy, onClick: handleCopyPublicLink } : null;
@@ -861,6 +884,19 @@ const can = useCan();
   return (
     <div className="animate-in fade-in duration-300 q-page" style={{ maxWidth: 1120, marginInline: "auto" }}>
       <Link href="/dashboard/quotes" className="back-link hide-phone"><ArrowLeft /> {t("dashboard.quoteDetail.backToList")}</Link>
+
+      {guide && !isEditMode && (
+        <FirstQuoteCoach
+          step={2}
+          title={t("firstRun.fq.reviewTitle")}
+          body={t("firstRun.fq.reviewBody")}
+          action={sendAction && myEmail ? (
+            <button type="button" className="btn btn-navy btn-sm" onClick={sendToMe} data-send-to-me=""><Mail className="h-4 w-4" /> {t("firstRun.fq.sendToMe")}</button>
+          ) : undefined}
+          onSkip={skipGuide}
+        />
+      )}
+      <FirstQuoteDone open={!!firstDone} email={firstDone?.email ?? ""} elapsed={firstDone?.elapsed ?? null} onClose={() => { setFirstDone(null); askForPushAfter("quote_sent"); }} />
 
       {/* Phase 105: who it's for, the total and where it stands first; one
           primary action (docked at the bottom on a phone), the rest in ⋯. */}
@@ -1892,6 +1928,9 @@ const can = useCan();
                 onChange={e => setEmailTo(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") handleSendEmail(); }}
               />
+              {myEmail && emailTo.trim().toLowerCase() !== myEmail.toLowerCase() && (
+                <button type="button" className="pill mt-2" onClick={() => setEmailTo(myEmail)} data-send-to-me-chip="">{t("firstRun.fq.sendToMeChip")}</button>
+              )}
               {quote?.clientData && (
                 <div className="field-hint">
                   {t("dashboard.quoteDetail.recipientPrefix")} <b style={{ color: "var(--navy)" }}>{(quote.clientData as { nome?: string })?.nome || t("dashboard.quoteDetail.clientFallback")}</b>

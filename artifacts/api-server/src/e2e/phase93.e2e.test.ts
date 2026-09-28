@@ -6,7 +6,7 @@
 // API), the way people arrive, each in their own browser with their own
 // address (and their own IP — the sign-up limiter is per IP):
 //
-//  A. a brand-new owner: sign-up form → verification email → all four
+//  A. a brand-new owner: sign-up form → verification email → all three
 //     onboarding steps → first quote → dashboard;
 //  B. an owner from /pricing who picked Pro and wants 4 logins: the plan and
 //     the 2 extra seats reach Stripe checkout (mocked at the SDK), and the
@@ -178,28 +178,34 @@ async function atStep(w: Walk, n: number, label: string) {
   await look(w, label);
 }
 
-/** Steps 1-3 of onboarding; returns once step 4 is on screen. */
+/**
+ * Phase 121's onboarding: 1 your work + province (it names the taxes), 2 the
+ * business (licence and e-transfer under "more details"), 3 the team (size,
+ * seats, crews) — returns with the team step on screen and its answers typed.
+ */
 async function onboard(w: Walk, opts: { company: string; seatsWanted: number; province: "ON" | "QC" }) {
-  await atStep(w, 1, "step1-company");
-  await w.page.fill("#companyName", opts.company);
-  await w.page.fill("#phone", "416 555 0199");
-  await w.page.fill("#address", "12 King St W, Toronto, ON");
-  await w.page.click(".card-foot .btn-navy");
-  await atStep(w, 2, "step2-work");
+  await atStep(w, 1, "step1-work");
   const trades = w.page.locator("fieldset").first().locator(".pill");
   await trades.nth(0).click();
   await trades.nth(2).click();
-  await w.page.fill("#setup-team", "8");
-  await w.page.fill("#setup-seats", String(opts.seatsWanted));
-  await w.page.locator("fieldset").nth(1).locator(".pill").first().click();
-  await look(w, "step2-filled");
-  await w.page.click(".card-foot .btn-navy");
-  await atStep(w, 3, "step3-province");
   await w.page.selectOption("#province", opts.province);
+  await expect.poll(async () => w.page.locator("[data-tax-hint]").textContent()).toMatch(opts.province === "QC" ? /QST|TVQ/ : /HST|TVH/);
+  await look(w, "step1-filled");
+  await w.page.click(".card-foot .btn-navy");
+  await atStep(w, 2, "step2-business");
+  await w.page.fill("#companyName", opts.company);
+  await w.page.fill("#phone", "416 555 0199");
+  await w.page.click("[data-more-details] summary");
+  await w.page.fill("#address", "12 King St W, Toronto, ON");
   await w.page.fill("#licence", opts.province === "QC" ? "RBQ 5555-1234-01" : "LIC-9393");
   await w.page.fill("#etransfer", "pay@walk.example.invalid");
+  await look(w, "step2-filled");
   await w.page.click(".card-foot .btn-navy");
-  await atStep(w, 4, "step4-team");
+  await atStep(w, 3, "step3-team");
+  await w.page.fill("#setup-team", "8");
+  await w.page.fill("#setup-seats", String(opts.seatsWanted));
+  await w.page.locator("fieldset").first().locator(".pill").first().click();
+  await look(w, "step3-filled");
 }
 
 async function profileOf(userId: string) {
@@ -227,7 +233,7 @@ afterAll(async () => {
 describe.each(COMBOS)("Phase 93 walk — %s @ %i px", (lang, width) => {
   const province = lang === "fr" ? "QC" : "ON";
 
-  test("A. a brand-new owner: sign-up, the four steps, the dashboard", async () => {
+  test("A. a brand-new owner: sign-up, the three steps, the first quote, the dashboard", async () => {
     const w = await open("A-owner", lang, width);
     const email = walkEmail("a", lang, width);
     await w.page.goto(`${h.FRONT}/sign-up`);
@@ -238,7 +244,9 @@ describe.each(COMBOS)("Phase 93 walk — %s @ %i px", (lang, width) => {
     await visible(w.page.locator(".notice.info"));
     await visible(w.page.locator(".notice.teal"));
     await w.page.locator("button.w-full.btn-outline-navy").click();
-    await w.page.waitForURL(/\/dashboard\/new/);
+    await w.page.waitForURL(/\/dashboard\/new\?first=1/);
+    // Phase 121: the guided first quote starts (step 1 of 3).
+    await visible(w.page.locator("[data-first-quote='1']"));
     await look(w, "first-quote");
     await w.page.goto(`${h.FRONT}/dashboard`);
     await settle(w.page);

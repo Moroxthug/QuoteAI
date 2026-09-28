@@ -14,6 +14,10 @@ import { useCan } from "@/hooks/use-role";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
 import { QuoteOptions, parseTarget } from "@/components/quotes/quote-options";
+import { useAuth } from "@/hooks/use-auth";
+import { examplesForTrades, firstQuoteStage, setFirstQuoteStage } from "@/lib/first-run";
+import { FirstQuoteCoach } from "@/components/first-run/first-quote";
+import { PROVINCE_NAMES, type ProvinceCode } from "@/lib/tax-profiles";
 
 function fmt(template: string, vars: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
@@ -31,14 +35,9 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 const MAX_DOC_SIZE_BYTES = MAX_DOC_SIZE_MB * 1024 * 1024;
 const MAX_ATTACHMENTS = 3;
 
-function getExamples(t: (key: string) => string) {
-  return [
-    { label: t("dashboard.new.examples.painter.label"), text: t("dashboard.new.examples.painter.text") },
-    { label: t("dashboard.new.examples.electrician.label"), text: t("dashboard.new.examples.electrician.text") },
-    { label: t("dashboard.new.examples.plumber.label"), text: t("dashboard.new.examples.plumber.text") },
-    { label: t("dashboard.new.examples.renovation.label"), text: t("dashboard.new.examples.renovation.text") },
-    { label: t("dashboard.new.examples.mason.label"), text: t("dashboard.new.examples.mason.text") },
-  ];
+// Phase 121: the examples for the company's own trades first (asked on the first run).
+function getExamples(t: (key: string) => string, trades: readonly string[] | undefined) {
+  return examplesForTrades(trades).map((key) => ({ label: t(`dashboard.new.examples.${key}.label`), text: t(`dashboard.new.examples.${key}.text`) }));
 }
 
 function getMaxPhotos(plan: string | null | undefined, isActive: boolean): number {
@@ -200,9 +199,9 @@ function ClientSelector({
 
 // ─── Main page ───────────────────────────────────────────────────────────────
 export default function NewQuote() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const can = useCan();
-  const EXAMPLES = getExamples(t);
+  const { userId } = useAuth();
   const [activeTab, setActiveTab] = useState<"ai" | "manual" | "listino">("ai");
 
   const [input, setInput] = useState("");
@@ -211,6 +210,13 @@ export default function NewQuote() {
   const [, setLocation] = useLocation();
   const createQuote = useCreateQuote();
   const { data: profile } = useGetBusinessProfile();
+  // Phase 91/121: the business-profile answer carries the sign-up answers and the province beyond the generated type.
+  const extra = profile as { companySetup?: { trades?: string[] }; province?: string | null } | undefined;
+  const EXAMPLES = getExamples(t, extra?.companySetup?.trades);
+  // Phase 121: step 1 of the guided first quote (started by onboarding's last step).
+  const [guide, setGuide] = useState(() => firstQuoteStage(userId) === "compose");
+  const skipGuide = () => { setFirstQuoteStage(userId, "done"); setGuide(false); };
+  const provinceName = extra?.province && extra.province in PROVINCE_NAMES ? PROVINCE_NAMES[extra.province as ProvinceCode][lang === "fr" ? "fr" : "en"] : null;
   const { data: subscription } = useGetSubscription();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -355,7 +361,11 @@ export default function NewQuote() {
         },
       },
       {
-        onSuccess: (quote) => { setLocation(`/dashboard/quotes/${quote.id}`); },
+        onSuccess: (quote) => {
+          // Phase 121: the guide follows the quote to its page (step 2: check it, send it to yourself).
+          if (guide) setFirstQuoteStage(userId, "review");
+          setLocation(`/dashboard/quotes/${quote.id}`);
+        },
         onError: (err: unknown) => {
           const e = err as { status?: number; data?: { error?: string; code?: string } };
           if (e.status === 429) {
@@ -437,6 +447,15 @@ export default function NewQuote() {
           <p className="sub">{t("dashboard.new.subtitle")}</p>
         </div>
       </div>
+
+      {guide && activeTab === "ai" && (
+        <FirstQuoteCoach
+          step={1}
+          title={t("firstRun.fq.composeTitle")}
+          body={provinceName ? t("firstRun.fq.composeBodyProvince").replace("{province}", provinceName) : t("firstRun.fq.composeBody")}
+          onSkip={skipGuide}
+        />
+      )}
 
       {/* ── Mode switch (Phase 105: one scrolling line, never wrapping) ── */}
       <ScrollTabs

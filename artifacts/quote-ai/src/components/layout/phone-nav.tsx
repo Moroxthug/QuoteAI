@@ -1,6 +1,7 @@
 import { scanOrQueueReceipt } from "@/lib/receipts";
 import { openCapture } from "@/lib/capture";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { isNativeApp } from "@/lib/native/env";
 import { ListSkeleton } from "@/components/skeletons";
 import { Link, useLocation, useSearch } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,9 @@ import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 import { markNextNav } from "@/lib/motion/nav-mark";
+
+// Phase 121: More → This app → fingerprint / face unlock (the app only; the row shows when the phone can).
+const BiometricRow = isNativeApp ? lazy(() => import("@/components/native/app-lock").then((m) => ({ default: m.BiometricRow }))) : null;
 
 /**
  * Phase 101 — how you move around the dashboard on a phone or a tablet
@@ -245,6 +249,8 @@ function MoreSheet({ open, onOpenChange, tabs, navItems, name, email, avatar, ca
               </section>
             );
           })}
+
+          {BiometricRow && <Suspense fallback={null}><BiometricRow /></Suspense>}
 
           <div className="more-card">
             <button type="button" className="more-row danger" onClick={onSignOut}>

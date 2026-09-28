@@ -42,6 +42,10 @@ const StatesCatalogue = import.meta.env.DEV ? lazy(() => import("@/dev/states-ca
 const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const SignUpPage = lazy(() => import("@/pages/sign-up"));
+// Phase 121: the phone app's first screen when nobody is signed in, and a crew member's way in.
+// (Their words travel with the app's strings: the app has them anyway, the website never links here.)
+const WelcomePage = lazy(withDashboardStrings(() => import("@/pages/welcome")));
+const WelcomeCrewPage = lazy(withDashboardStrings(() => import("@/pages/welcome").then((m) => ({ default: m.WelcomeCrewPage }))));
 const OnboardingPage = lazy(withDashboardStrings(() => import("@/pages/onboarding")));
 const PrivacyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsPage = lazy(() => import("@/pages/terms"));
@@ -266,6 +270,8 @@ function Router() {
       <Route path="/sign-up/:rest*" component={() => <PublicLayout><Suspense fallback={null}><SignUpPage /></Suspense></PublicLayout>} />
 
       <Route path="/onboarding" component={() => <Suspense fallback={null}><OnboardingPage /></Suspense>} />
+      <Route path="/welcome/crew" component={() => <Suspense fallback={null}><WelcomeCrewPage /></Suspense>} />
+      <Route path="/welcome" component={() => <Suspense fallback={null}><WelcomePage /></Suspense>} />
 
       {/* Dashboard (private, not indexed). Phase 115: one route for the whole
           signed-in app, so its layout stays mounted from page to page. */}

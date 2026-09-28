@@ -91,20 +91,18 @@ type Session = "public" | "owner" | "foreman" | "newcomer" | "invitee" | "pro";
 type RouteSpec = { path: string; session: Session; name?: string; drive?: (page: Page) => Promise<void> };
 
 // Phase 93: onboarding's steps 2-4 are only reachable by filling the steps before them, as a customer does.
-async function onboardTo(page: Page, step: 2 | 3 | 4) {
-  await page.fill("#companyName", "Sweep Renovations Ltd.");
+// Phase 121: 1 your work + province → 2 the business → 3 the team.
+async function onboardTo(page: Page, step: 2 | 3) {
+  await page.locator("fieldset").first().locator(".pill").first().click();
+  await page.selectOption("#province", "ON");
   await page.click(".card-foot .btn-navy");
   await page.waitForSelector('[data-step="2"]');
   if (step === 2) return;
-  await page.locator("fieldset").first().locator(".pill").first().click();
+  await page.fill("#companyName", "Sweep Renovations Ltd.");
+  await page.click(".card-foot .btn-navy");
+  await page.waitForSelector('[data-step="3"]', { timeout: 15_000 });
   await page.fill("#setup-seats", "4");
-  await page.locator("fieldset").nth(1).locator(".pill").first().click();
-  await page.click(".card-foot .btn-navy");
-  await page.waitForSelector('[data-step="3"]');
-  if (step === 3) return;
-  await page.selectOption("#province", "ON");
-  await page.click(".card-foot .btn-navy");
-  await page.waitForSelector('[data-step="4"]', { timeout: 15_000 });
+  await page.locator("fieldset").first().locator(".pill").first().click();
 }
 // Phase 101: opens a phone sheet when its trigger is on screen (the tab bar exists at 980 px and below).
 async function openPhoneSheet(page: Page, trigger: string, sheet: string) {
@@ -187,6 +185,8 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/provinces/british-columbia"), pub("/provinces/quebec"), pub("/fr/provinces/quebec"),
     pub("/help"), pub("/help/getting-started"),
     pub("/sign-in"), pub("/sign-up"), pub("/this-route-does-not-exist"),
+    // Phase 121: the phone app's first screen and a crew member's way in.
+    pub("/welcome"), pub("/welcome/crew"),
     pub(`/p/${s.longQuoteId}`), pub(`/i/${s.invoiceToken}`),
     // Phase 111: the client's side on a phone — the accept sheet, a quote with tiers, the signing steps, the portal.
     { path: `/p/${s.longQuoteId}`, session: "public", name: "/p accept sheet", drive: (p) => openPhoneSheet(p, ".action-bar [data-primary-action]", "[role=dialog] #nomeConferma") },
@@ -233,8 +233,7 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/onboarding", session: "newcomer", name: "/onboarding step 1 (newcomer)" },
     { path: "/onboarding", session: "newcomer", name: "/onboarding step 2 (newcomer)", drive: (p) => onboardTo(p, 2) },
     { path: "/onboarding", session: "newcomer", name: "/onboarding step 3 (newcomer)", drive: (p) => onboardTo(p, 3) },
-    { path: "/onboarding", session: "newcomer", name: "/onboarding step 4 (newcomer)", drive: (p) => onboardTo(p, 4) },
-    { path: "/onboarding?plan=monthly_pro", session: "newcomer", name: "/onboarding step 4 plan (newcomer)", drive: (p) => onboardTo(p, 4) },
+    { path: "/onboarding?plan=monthly_pro", session: "newcomer", name: "/onboarding step 3 plan (newcomer)", drive: (p) => onboardTo(p, 3) },
     { path: "/onboarding", session: "invitee", name: "/onboarding invitation (invitee)" },
     dash("/dashboard"), dash("/dashboard/new"), dash("/dashboard/quotes"), dash(`/dashboard/quotes/${s.longQuoteId}`), dash(`/dashboard/quotes/${s.quoteId}`),
     dash("/dashboard/analytics"), dash("/dashboard/billing"),

@@ -1,16 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, AlertCircle, Mail, CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
+import { isNativeApp } from "@/lib/native/env";
+import { withDashboardStrings } from "@/i18n/dashboard";
+import { offerBiometricAfterSignIn } from "@/lib/native/biometric-offer";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
   if (!raw) return fallback;
   if (/^\/[^/]/.test(raw) || raw === "/") return raw;
   return fallback;
 }
+
+// Phase 121: the email-code step exists only in the phone app (the website confirms by link).
+const EmailCode = isNativeApp ? lazy(withDashboardStrings(() => import("@/components/auth/email-code").then((m) => ({ default: m.EmailCode })))) : null;
 
 export default function SignInPage() {
   const { t } = useLanguage();
@@ -39,6 +45,9 @@ export default function SignInPage() {
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [twoFactorLoading, setTwoFactorLoading] = useState(false);
   const [useBackupCode, setUseBackupCode] = useState(false);
+  // Phase 121: in the phone app an address never confirmed is confirmed here, with a code.
+  const [codeStep, setCodeStep] = useState(false);
+  const signedIn = () => { offerBiometricAfterSignIn(); navigate(nextPath); };
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
@@ -53,14 +62,15 @@ export default function SignInPage() {
       if (result.error) {
         const msg = result.error.message ?? "";
         if (msg.toLowerCase().includes("not verified")) {
-          setError(t("signIn.errorNotVerified"));
+          if (isNativeApp) setCodeStep(true);
+          else setError(t("signIn.errorNotVerified"));
         } else {
           setError(msg || t("signIn.errorInvalidCredentials"));
         }
       } else if (result.data && "twoFactorRedirect" in result.data && result.data.twoFactorRedirect) {
         setTwoFactorMode(true);
       } else {
-        navigate(nextPath);
+        signedIn();
       }
     } catch {
       setError(t("signIn.errorConnection"));
@@ -80,7 +90,7 @@ export default function SignInPage() {
       if (result.error) {
         setError(result.error.message ?? t("signIn.errorInvalidCredentials"));
       } else {
-        navigate(nextPath);
+        signedIn();
       }
     } catch {
       setError(t("signIn.errorConnection"));
@@ -108,6 +118,18 @@ export default function SignInPage() {
     } finally {
       setResetLoading(false);
     }
+  }
+
+  if (codeStep && EmailCode) {
+    return (
+      <div className="auth-shell">
+        <div className="auth-card">
+          <div className="auth-card-body">
+            <Suspense fallback={null}><EmailCode email={email.trim()} onVerified={signedIn} onBack={() => { setCodeStep(false); setPassword(""); }} /></Suspense>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

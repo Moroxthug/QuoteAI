@@ -47,5 +47,8 @@ project(':capacitor-status-bar').projectDir = new File('../../../node_modules/.p
 include ':capawesome-capacitor-app-shortcuts'
 project(':capawesome-capacitor-app-shortcuts').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-app-s_53251cea54ff05bcfe36cc12ee067646/node_modules/@capawesome/capacitor-app-shortcuts/android')
 
+include ':capgo-capacitor-native-biometric'
+project(':capgo-capacitor-native-biometric').projectDir = new File('../../../node_modules/.pnpm/@capgo+capacitor-native-bio_82b752f6f5eb33c8f21731155e5891f6/node_modules/@capgo/capacitor-native-biometric/android')
+
 include ':capgo-capacitor-share-target'
 project(':capgo-capacitor-share-target').projectDir = new File('../../../node_modules/.pnpm/@capgo+capacitor-share-target@8.0.54_@capacitor+core@8.5.2/node_modules/@capgo/capacitor-share-target/android')

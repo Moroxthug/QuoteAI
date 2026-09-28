@@ -86,6 +86,7 @@
         "@aparajita/capacitor-secure-storage",
         "@capacitor/browser",
         "@capacitor-mlkit/document-scanner",
+        "@capgo/capacitor-native-biometric",
         "@capacitor/app-launcher",
         "@capacitor/camera",
         "@capacitor/haptics",

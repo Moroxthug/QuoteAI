@@ -37,6 +37,11 @@ export function identifyUser(id: string, props: Record<string, unknown>): void {
   loading?.then((ph) => ph?.identify(id, props)).catch(() => undefined);
 }
 
+/** Phase 121: a product moment worth counting (e.g. `first_quote_sent`); nothing when PostHog is off. */
+export function track(event: string, props: Record<string, unknown> = {}): void {
+  loading?.then((ph) => ph?.capture(event, props)).catch(() => undefined);
+}
+
 export function resetUser(): void {
   loading?.then((ph) => ph?.reset()).catch(() => undefined);
 }

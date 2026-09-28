@@ -1,12 +1,12 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { bearer, twoFactor } from "better-auth/plugins";
+import { bearer, twoFactor, emailOTP } from "better-auth/plugins";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable, accountDeletionsTable } from "@workspace/db";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
-import { requestLang, verificationEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
+import { requestLang, verificationEmail, verificationCodeEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
 import { recordSecurityAuditEvent } from "./auditLog";
 
 // Minimal, duplicate-of-`resolveActingOrg` org lookup — kept local rather than
@@ -77,6 +77,40 @@ export function getTrustedOrigins(): string[] {
  */
 export const NATIVE_APP_ORIGINS = ["https://localhost", "capacitor://localhost"];
 
+const fromNativeApp = (request: Request | undefined): boolean => {
+  const origin = request?.headers.get("origin");
+  return !!origin && NATIVE_APP_ORIGINS.includes(origin);
+};
+
+/**
+ * Phase 121: the phone app confirms a new address with a 6-digit code typed in
+ * the app, not a link — a link opens the browser, signs the person in there and
+ * leaves the app signed out. Only the two endpoints that confirm an address are
+ * served, and only for an account whose address is not confirmed yet: for a
+ * confirmed one a code would be a way in with the inbox alone (no password, no
+ * second factor), so nothing is sent and nothing is accepted.
+ */
+const EMAIL_OTP_PATHS = ["/email-otp/send-verification-otp", "/email-otp/verify-email"];
+const EMAIL_OTP_DISABLED = [
+  "/email-otp/check-verification-otp",
+  "/sign-in/email-otp",
+  "/email-otp/request-password-reset",
+  "/forget-password/email-otp",
+  "/email-otp/reset-password",
+  "/email-otp/request-email-change",
+  "/email-otp/change-email",
+];
+
+async function unverifiedUser(email: unknown): Promise<boolean> {
+  if (typeof email !== "string" || !email) return false;
+  const [row] = await db
+    .select({ emailVerified: authUsersTable.emailVerified })
+    .from(authUsersTable)
+    .where(eq(authUsersTable.email, email.trim().toLowerCase()))
+    .limit(1);
+  return !!row && !row.emailVerified;
+}
+
 export const auth = betterAuth({
   secret,
   baseURL: getBaseURL(),
@@ -92,8 +126,47 @@ export const auth = betterAuth({
       twoFactor: authTwoFactorTable,
     },
   }),
-  plugins: [bearer(), twoFactor({ issuer: "QuoteAI" })],
+  plugins: [
+    bearer(),
+    twoFactor({ issuer: "QuoteAI" }),
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 15 * 60,
+      allowedAttempts: 5,
+      storeOTP: "hashed",
+      disableSignUp: true,
+      async sendVerificationOTP({ email, otp, type }, ctx) {
+        if (type !== "email-verification") return;
+        if (!resend) {
+          logger.warn("RESEND_API_KEY not set — skipping verification code email");
+          return;
+        }
+        try {
+          const [user] = await db.select({ name: authUsersTable.name }).from(authUsersTable).where(eq(authUsersTable.email, email)).limit(1);
+          await resend.emails.send({
+            from: "QuoteAI <no-reply@quoteai.ca>",
+            to: [email],
+            ...verificationCodeEmail(requestLang(ctx?.request?.headers), user?.name ?? "", otp),
+          });
+        } catch (err) {
+          logger.error({ err }, "Failed to send verification code email");
+        }
+      },
+    }),
+  ],
+  disabledPaths: EMAIL_OTP_DISABLED,
   hooks: {
+    // Phase 121: codes only confirm an address that is not confirmed yet (see EMAIL_OTP_PATHS).
+    before: createAuthMiddleware(async (ctx) => {
+      if (!ctx.path || !EMAIL_OTP_PATHS.includes(ctx.path)) return undefined;
+      const body = (ctx.body ?? {}) as { email?: unknown; type?: unknown };
+      if (ctx.path === "/email-otp/send-verification-otp") {
+        if (body.type !== "email-verification" || !(await unverifiedUser(body.email))) return ctx.json({ success: true });
+        return undefined;
+      }
+      if (!(await unverifiedUser(body.email))) throw new APIError("BAD_REQUEST", { code: "INVALID_OTP", message: "Invalid OTP" });
+      return undefined;
+    }),
     // IMPORTANT: better-auth re-throws any non-APIError raised in an `after`
     // hook, which replaces the endpoint's real response with a 500 — so a bug
     // or transient DB error in this best-effort audit logging would turn a
@@ -183,6 +256,8 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     async sendVerificationEmail({ user, url }, request) {
       if (!resend) return;
+      // Phase 121: the phone app asks for a code instead (it would open this link in the browser).
+      if (fromNativeApp(request)) return;
       try {
         await resend.emails.send({
           from: "QuoteAI <no-reply@quoteai.ca>",

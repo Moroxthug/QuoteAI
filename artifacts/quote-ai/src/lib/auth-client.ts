@@ -1,12 +1,13 @@
 import { createAuthClient } from "better-auth/react";
-import { twoFactorClient } from "better-auth/client/plugins";
+import { twoFactorClient, emailOTPClient } from "better-auth/client/plugins";
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
 export const authClient = createAuthClient({
   baseURL: typeof window !== "undefined" ? window.location.origin : "",
   basePath: `${BASE}/api/auth`,
-  plugins: [twoFactorClient()],
+  // Phase 121: emailOTPClient — the phone app confirms a new address with a code (components/auth/email-code.tsx).
+  plugins: [twoFactorClient(), emailOTPClient()],
   // Phase 93: the verification, reset and welcome emails follow the language
   // the site is shown in (LanguageContext keeps <html lang> current).
   fetchOptions: {

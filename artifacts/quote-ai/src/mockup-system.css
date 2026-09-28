@@ -3333,3 +3333,67 @@ html.edge-dragging #main { box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
   .ag-week-head { flex-wrap: wrap; row-gap: 4px; }
   .ag-nav { margin-left: auto; }
 }
+
+/* ── Phase 121: first run — welcome, crew way in, guided first quote, app lock ── */
+.welcome { min-height: 100dvh; display: flex; flex-direction: column; background: #fff; padding: calc(12px + var(--safe-top)) 0 calc(16px + var(--safe-bottom)); max-width: 480px; margin-inline: auto; }
+.welcome-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; min-height: 48px; }
+.welcome-top-spacer { width: 44px; }
+.welcome-back { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; color: var(--navy); margin-left: -10px; }
+.welcome-back svg { width: 22px; height: 22px; }
+.welcome-lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; }
+.welcome-lang button { min-width: 44px; min-height: 36px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--muted-mk); }
+.welcome-lang button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.welcome-track { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.welcome-track::-webkit-scrollbar { display: none; }
+.welcome-slide { flex: 0 0 100%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px 28px 8px; }
+.welcome-art { width: 200px; height: 150px; color: var(--navy); margin-bottom: 28px; }
+.welcome-slide h2 { font-size: 26px; line-height: 1.2; font-weight: 800; color: var(--navy); margin: 0 0 10px; letter-spacing: -.01em; }
+.welcome-slide p { font-size: 16px; line-height: 1.5; color: var(--muted-mk); margin: 0; max-width: 340px; }
+.welcome-dots { display: flex; justify-content: center; gap: 2px; padding: 8px 0 12px; }
+.welcome-dots button { width: 28px; height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.welcome-dots button::before { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--line-2, #d3d6de); transition: width .2s; }
+.welcome-dots button.on::before { width: 20px; background: var(--navy); }
+.welcome-video { display: inline-flex; align-self: center; align-items: center; gap: 6px; color: var(--teal); font-weight: 600; font-size: 14px; min-height: 44px; }
+.welcome-video svg { width: 18px; height: 18px; }
+.welcome-actions { display: flex; flex-direction: column; gap: 10px; padding: 8px 16px 0; }
+.welcome-actions .btn { min-height: 48px; justify-content: center; font-size: 16px; }
+.welcome-crew-link { display: inline-flex; align-self: center; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; color: var(--teal); }
+.welcome-crew-link svg { width: 16px; height: 16px; }
+.welcome-crew-body { padding: 32px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+.welcome-crew-icon { width: 40px; height: 40px; color: var(--navy); }
+.welcome-crew-body h1 { font-size: 26px; font-weight: 800; color: var(--navy); margin: 6px 0 0; }
+.welcome-crew-body > p { font-size: 15px; line-height: 1.5; color: var(--muted-mk); margin: 0 0 12px; }
+.welcome-crew-body input { font-size: 16px; }
+.welcome-crew-hint, .welcome-crew-error { font-size: 13px; line-height: 1.45; margin: 8px 0 16px; color: var(--muted-mk); }
+.welcome-crew-error { color: var(--red); }
+.welcome-crew .btn { min-height: 48px; justify-content: center; }
+@media (min-width: 768px) { .welcome { min-height: auto; margin-block: 48px; border: 1px solid var(--line); border-radius: 22px; padding-block: 20px; } .welcome-track { min-height: 420px; } }
+
+.ob-skip { min-height: 44px; padding: 0 6px; font-size: 14px; font-weight: 600; color: var(--muted-mk); }
+.ob-more { border-top: 1px solid var(--line); margin-top: 4px; }
+.ob-more > summary { cursor: pointer; list-style: none; min-height: 48px; display: flex; align-items: center; padding: 0 20px; font-size: 14px; font-weight: 700; color: var(--teal); }
+.ob-more > summary::-webkit-details-marker { display: none; }
+.ob-more > summary::after { content: "+"; margin-left: auto; font-size: 18px; font-weight: 500; }
+.ob-more[open] > summary::after { content: "−"; }
+
+.fq-coach { border: 1px solid var(--teal); background: var(--teal-t); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+.fq-coach-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fq-coach-step { font-size: 11.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--teal-dark); }
+.fq-coach-skip { min-height: 36px; font-size: 13px; font-weight: 600; color: var(--muted-mk); margin: -8px -4px -8px 0; padding: 0 4px; }
+.fq-coach h2 { font-size: 17px; font-weight: 700; color: var(--navy); margin: 4px 0 4px; }
+.fq-coach p { font-size: 14.5px; line-height: 1.5; color: var(--ink); margin: 0; }
+.fq-coach-action { margin-top: 12px; }
+.fq-coach-action .btn { min-height: 44px; }
+
+.app-lock { position: fixed; inset: 0; z-index: 200; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); text-align: center; }
+.app-lock-icon { width: 48px; height: 48px; color: var(--navy); margin-top: 24px; }
+.app-lock h1 { font-size: 20px; font-weight: 800; color: var(--navy); margin: 0; }
+.app-lock .btn { min-height: 48px; min-width: 240px; justify-content: center; }
+.app-lock .auth-link { min-height: 44px; }
+
+.more-switch { width: 44px; height: 26px; border-radius: 999px; background: var(--line-2, #d3d6de); position: relative; flex: none; transition: background .15s; }
+.more-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s; }
+.more-switch.on { background: var(--green, #227a15); }
+.more-switch.on::after { transform: translateX(18px); }
+@media (prefers-reduced-motion: reduce) { .more-switch, .more-switch::after, .welcome-dots button::before { transition: none; } }
+.welcome-track:focus-visible { outline: 2px solid var(--teal); outline-offset: -2px; border-radius: 16px; }

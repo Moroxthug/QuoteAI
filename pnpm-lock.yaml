@@ -368,6 +368,9 @@ importers:
       '@capawesome/capacitor-app-shortcuts':
         specifier: ^8.0.2
         version: 8.0.2(@capacitor/core@8.5.2)
+      '@capgo/capacitor-native-biometric':
+        specifier: ^8.6.11
+        version: 8.6.11(@capacitor/core@8.5.2)
       '@capgo/capacitor-share-target':
         specifier: ^8.0.54
         version: 8.0.54(@capacitor/core@8.5.2)
@@ -414,6 +417,9 @@ importers:
       '@capawesome/capacitor-app-shortcuts':
         specifier: ^8.0.2
         version: 8.0.2(@capacitor/core@8.5.2)
+      '@capgo/capacitor-native-biometric':
+        specifier: ^8.6.11
+        version: 8.6.11(@capacitor/core@8.5.2)
       '@capgo/capacitor-share-target':
         specifier: ^8.0.54
         version: 8.0.54(@capacitor/core@8.5.2)
@@ -945,6 +951,11 @@ packages:
 
   '@capawesome/capacitor-app-shortcuts@8.0.2':
     resolution: {integrity: sha512-gvwF+oc+dvBDN88TI/MNUYEUpWoTdHP2ZRyZ5P1/nHOgw4vzU2LMflZg+Pi85I78Vx7tt+EX1JpsOYYJnX+v5w==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
+  '@capgo/capacitor-native-biometric@8.6.11':
+    resolution: {integrity: sha512-PF3uV1NSbqxtUW69e+GPKLJS6Zeo68tXGOlU6eJYkPicjfdyPZwwl+kzER14r9oKXKBP2MlZdHfYrIP+kbkjOw==}
     peerDependencies:
       '@capacitor/core': '>=8.0.0'
 
@@ -6143,6 +6154,10 @@ snapshots:
   '@capacitor/synapse@1.0.4': {}
 
   '@capawesome/capacitor-app-shortcuts@8.0.2(@capacitor/core@8.5.2)':
+    dependencies:
+      '@capacitor/core': 8.5.2
+
+  '@capgo/capacitor-native-biometric@8.6.11(@capacitor/core@8.5.2)':
     dependencies:
       '@capacitor/core': 8.5.2
 

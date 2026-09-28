@@ -21,7 +21,7 @@
     "i18n-audit": "tsx ./scripts/i18n-audit.ts",
     "qa:lighthouse": "tsx ./scripts/lighthouse.ts",
     "qa:bundle": "tsx ./scripts/bundle-budget.ts",
-    "test": "tsx --test src/lib/offline/query-policy.test.ts src/lib/sync/sync.test.ts src/lib/native/native.test.ts src/lib/motion/motion.test.ts"
+    "test": "tsx --test src/lib/offline/query-policy.test.ts src/lib/sync/sync.test.ts src/lib/native/native.test.ts src/lib/motion/motion.test.ts src/lib/first-run.test.ts"
   },
   "devDependencies": {
     "@aparajita/capacitor-secure-storage": "^8.0.1",
@@ -84,6 +84,7 @@
     "@capacitor/push-notifications": "^8.1.2",
     "@capacitor/share": "^8.0.2",
     "@capawesome/capacitor-app-shortcuts": "^8.0.2",
+    "@capgo/capacitor-native-biometric": "^8.6.11",
     "@capgo/capacitor-share-target": "^8.0.54",
     "@google-analytics/admin": "^9.2.0",
     "@google-analytics/data": "^6.1.0",

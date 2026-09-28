@@ -16,7 +16,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/index.tsx"
       ],
-      "budget": 345
+      "budget": 350
     },
     {
       "name": "Quotes",
@@ -55,7 +55,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/new.tsx"
       ],
-      "budget": 333
+      "budget": 337
     },
     {
       "name": "Jobs",
@@ -68,7 +68,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/index.tsx"
       ],
-      "budget": 327
+      "budget": 332
     },
     {
       "name": "Job",
@@ -81,7 +81,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/[id].tsx"
       ],
-      "budget": 379
+      "budget": 386
     },
     {
       "name": "Money (invoices)",
@@ -159,7 +159,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/assistant.tsx"
       ],
-      "budget": 316
+      "budget": 320
     },
     {
       "name": "Notifications",
@@ -185,7 +185,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/settings/index.tsx"
       ],
-      "budget": 326
+      "budget": 331
     },
     {
       "name": "Onboarding",
@@ -197,7 +197,7 @@
         "@dashboard-strings",
         "src/pages/onboarding.tsx"
       ],
-      "budget": 270
+      "budget": 278
     },
     {
       "name": "Home",

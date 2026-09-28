@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
-import { Link, useSearch } from "wouter";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { Link, useLocation, useSearch } from "wouter";
 import { Logo } from "@/components/logo";
 import { authClient } from "@/lib/auth-client";
 import { Eye, EyeOff, AlertCircle, Lock, Mail } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useDocumentTitle } from "@/hooks/use-document-title";
+import { isNativeApp } from "@/lib/native/env";
+import { withDashboardStrings } from "@/i18n/dashboard";
+import { offerBiometricAfterSignIn } from "@/lib/native/biometric-offer";
 
 function safeLocalPath(raw: string | null, fallback: string): string {
   if (!raw) return fallback;
@@ -14,6 +17,9 @@ function safeLocalPath(raw: string | null, fallback: string): string {
   } catch {}
   return fallback;
 }
+
+// Phase 121: the email-code step exists only in the phone app (the website confirms by link).
+const EmailCode = isNativeApp ? lazy(withDashboardStrings(() => import("@/components/auth/email-code").then((m) => ({ default: m.EmailCode })))) : null;
 
 export default function SignUpPage() {
   const { t, lang } = useLanguage();
@@ -34,6 +40,9 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verificationSent, setVerificationSent] = useState(false);
+  // Phase 121: in the phone app the address is confirmed with a code typed here (a link would open the browser).
+  const [codeStep, setCodeStep] = useState(false);
+  const [, navigate] = useLocation();
   // Phase 93: a way out when the email does not arrive (spam folder, a typo caught late).
   const [resend, setResend] = useState<"idle" | "sending" | "sent" | "error">("idle");
   async function resendVerification() {
@@ -76,6 +85,8 @@ export default function SignUpPage() {
         } else {
           setError(msg || t("signUp.errorSignUpFailed"));
         }
+      } else if (isNativeApp) {
+        setCodeStep(true);
       } else {
         setVerificationSent(true);
       }
@@ -134,7 +145,15 @@ export default function SignUpPage() {
             <Logo />
           </div>
 
-          {verificationSent ? (
+          {codeStep && EmailCode ? (
+            <Suspense fallback={null}>
+              <EmailCode
+                email={email.trim()}
+                onVerified={() => { offerBiometricAfterSignIn(); navigate(nextPath); }}
+                onBack={() => { setCodeStep(false); setPassword(""); }}
+              />
+            </Suspense>
+          ) : verificationSent ? (
             <div className="auth-center">
               <div className="flex justify-center mb-3"><Mail className="h-9 w-9" style={{ color: "var(--navy)" }} /></div>
               <h2 className="auth-title" style={{ marginBottom: 8 }}>{t("signUp.checkEmailTitle")}</h2>
@@ -232,7 +251,7 @@ export default function SignUpPage() {
           )}
         </div>
 
-        {!verificationSent && (
+        {!verificationSent && !codeStep && (
           <div className="auth-card-foot">
             <span>{t("signUp.alreadyHaveAccount")} </span>
             <Link href={nextPath !== "/onboarding" ? `/sign-in?next=${encodeURIComponent(nextPath)}` : "/sign-in"}>

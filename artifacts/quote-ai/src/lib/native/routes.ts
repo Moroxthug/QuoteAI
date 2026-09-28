@@ -6,7 +6,8 @@
 // clock in with the phone's location, photos from its camera — so the app
 // shows it and claims it (App Links: /dashboard and /t).
 
-const APP_PATHS = /^\/(dashboard|onboarding|sign-in|sign-up|join|team-invite|t\/[^/]+)(\/|$)/;
+// Phase 121: /welcome (and /welcome/crew) is the signed-out app's first screen.
+const APP_PATHS = /^\/(dashboard|onboarding|welcome|sign-in|sign-up|join|team-invite|t\/[^/]+)(\/|$)/;
 
 /** A path the app shows itself; anything else opens the app's home. */
 export function isAppPath(pathname: string): boolean {
@@ -27,9 +28,11 @@ export function appPathForLink(url: string, siteHosts: string[]): string | null 
 }
 
 /** Android back at one of these leaves the app instead of stepping back. */
-export function isRootScreen(pathname: string): boolean {
+export function isRootScreen(pathname: string, search = ""): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
-  return p === "/dashboard" || p === "/sign-in" || p === "/onboarding" || /^\/t\/[^/]+$/.test(p);
+  // Phase 121: sign-in opened from the welcome steps back to it.
+  if (p === "/sign-in" && new URLSearchParams(search).get("from") === "welcome") return false;
+  return p === "/dashboard" || p === "/welcome" || p === "/sign-in" || p === "/onboarding" || /^\/t\/[^/]+$/.test(p);
 }
 
 /** The website's homepage (a logo link, after sign-out) means the app's home, not a browser tab. */

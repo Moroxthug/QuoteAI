@@ -1,3 +1,4 @@
+import { PushAsk } from "@/components/pwa/push-ask";
 import { Link, useLocation } from "wouter";
 import { LayoutDashboard, FileText, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -5,7 +6,11 @@ import { teamMembersApi } from "@/lib/team-members-api";
 import { peopleApi } from "@/lib/people-api";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
+import { isNativeApp } from "@/lib/native/env";
+
+// Phase 119: "Share → QuoteAI" from another app; only the phone app's bundle has it.
+const ShareInbox = isNativeApp ? lazy(() => import("@/components/native/share-inbox")) : null;
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -452,6 +457,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main id="main" className="content"><OfflineBar />{children}</main>
+        {/* Phase 119: "Know the moment they accept?" after the first quote goes out. */}
+        <PushAsk />
+        {ShareInbox && <Suspense fallback={null}><ShareInbox /></Suspense>}
       </div>
       {phoneNav && (
         <PhoneTabBar

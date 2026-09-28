@@ -1,3 +1,4 @@
+import { transcribeAudio, TranscribeError } from "@/lib/speech";
 import { useCallback, useRef, useState } from "react";
 
 const PREFERRED_MIME_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
@@ -16,9 +17,16 @@ interface UseVoiceInputOptions {
   onError?: (message: string) => void;
   /** Phase 78: take the raw recording instead of transcribing it here (the on-site sheet posts it to /api/assistant/voice). */
   onRecorded?: (blob: Blob) => void | Promise<void>;
+  /**
+   * Phase 119: with no signal, keep the recording on the phone instead of
+   * failing — it is written out when the phone is back online and handed to
+   * the screen named here (lib/offline/dictation.ts). `onQueued` says so.
+   */
+  offlineTarget?: string;
+  onQueued?: () => void;
 }
 
-export function useVoiceInput({ onTranscribed, onError, onRecorded }: UseVoiceInputOptions) {
+export function useVoiceInput({ onTranscribed, onError, onRecorded, offlineTarget, onQueued }: UseVoiceInputOptions) {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -33,32 +41,25 @@ export function useVoiceInput({ onTranscribed, onError, onRecorded }: UseVoiceIn
   const transcribe = useCallback(async (blob: Blob) => {
     setIsTranscribing(true);
     try {
-      const formData = new FormData();
-      const ext = blob.type.includes("mp4") ? "mp4" : blob.type.includes("ogg") ? "ogg" : "webm";
-      formData.append("audio", blob, `recording.${ext}`);
-
-      const res = await fetch("/api/speech/transcribe", {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        onError?.(data.error || "Transcription failed. Please try again.");
-        return;
-      }
-      if (data.text && typeof data.text === "string" && data.text.trim()) {
-        onTranscribed(data.text.trim());
-      } else {
-        onError?.("Didn't catch that — try speaking more clearly.");
-      }
-    } catch {
-      onError?.("Connection error. Please try again.");
+      const run = () => transcribeAudio(blob);
+      let text: string | null;
+      if (offlineTarget) {
+        const { runOrQueue } = await import("@/lib/offline/outbox");
+        const r = await runOrQueue({ kind: "voice.dictation", target: offlineTarget, audio: blob }, { scope: "dictation", label: "Dictation" }, run);
+        if (r.queued) {
+          onQueued?.();
+          return;
+        }
+        text = r.result;
+      } else text = await run();
+      if (text) onTranscribed(text);
+      else onError?.("Didn't catch that — try speaking more clearly.");
+    } catch (err) {
+      onError?.(err instanceof TranscribeError ? err.message : "Connection error. Please try again.");
     } finally {
       setIsTranscribing(false);
     }
-  }, [onTranscribed, onError]);
+  }, [onTranscribed, onError, offlineTarget, onQueued]);
 
   const startRecording = useCallback(async () => {
     if (isRecording) return;

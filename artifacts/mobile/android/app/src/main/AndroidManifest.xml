@@ -25,7 +25,8 @@
 
             <!-- Phase 118: quoteai.ca/dashboard links open the app when it is installed
                  (verified by https://quoteai.ca/.well-known/assetlinks.json). Client links
-                 (/p, /sign, /i, /portal, /t, /join) are not claimed: they stay in the browser. -->
+                 (/p, /sign, /i, /portal, /join) are not claimed: they stay in the browser.
+                 Phase 119: a crew member's link (/t/…) opens the app too. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -34,6 +35,29 @@
                 <data android:host="quoteai.ca" />
                 <data android:host="www.quoteai.ca" />
                 <data android:pathPrefix="/dashboard" />
+                <data android:pathPrefix="/t/" />
+            </intent-filter>
+
+            <!-- Phase 119: Share → QuoteAI from another app (photos, PDFs, text). -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
             </intent-filter>
 
         </activity>
@@ -52,4 +76,26 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Phase 119: each asked for at the moment it is used, never at launch. -->
+    <!-- Notifications (Android 13+): after the first quote is sent, or from Notifications. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Job photos, receipts and documents. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Dictating a quote or a job note. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- Clock in: where the phone is at that moment, while the app is in use only. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+
+    <!-- Opening the job address in the phone's maps app (geo:) on Android 11+. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+    </queries>
 </manifest>

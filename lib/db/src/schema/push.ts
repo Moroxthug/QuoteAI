@@ -1,4 +1,5 @@
 import { pgTable, text, uuid, timestamp, integer, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // ── Phase 77: Web Push subscriptions (docs/PILOT-LAUNCH-PLAN.md) ────────────
 // One row per browser that opted in to push on the notifications page. The
@@ -33,3 +34,47 @@ export const pushSubscriptionsTable = pgTable(
 );
 
 export type PushSubscription = typeof pushSubscriptionsTable.$inferSelect;
+
+// ── Phase 119: the phone app's push tokens (docs/APP-PLAN.md) ───────────────
+// Beside the browser subscriptions: one row per installed app, holding the
+// Firebase Cloud Messaging token (FCM relays to APNs for iPhones). Same
+// ownership as push_subscriptions — the acting company plus the person — and
+// the same clean-up: an UNREGISTERED answer deletes the row, a failure streak
+// drops it. `installId` is the app's own id for itself, so a token that
+// rotates replaces its row instead of adding a second one.
+export const deviceTokensTable = pgTable(
+  "device_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    memberUserId: text("member_user_id").notNull(),
+    token: text("token").notNull(),
+    installId: text("install_id").notNull(),
+    platform: text("platform", { enum: ["android", "ios"] }).notNull(),
+    appVersion: text("app_version"),
+    language: text("language", { enum: ["en", "fr"] }).notNull().default("en"),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    failedAt: timestamp("failed_at", { withTimezone: true }),
+    failureCount: integer("failure_count").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("device_tokens_install_idx").on(t.installId), uniqueIndex("device_tokens_token_idx").on(t.token), index("device_tokens_user_idx").on(t.userId)],
+);
+
+export type DeviceToken = typeof deviceTokensTable.$inferSelect;
+
+// Phase 119: what each person wants on their phone. Per company and person
+// (like the rows above), a list of the push categories they turned off
+// (api-server lib/push.ts PUSH_CATEGORIES). No row = everything on. The bell
+// keeps every notification either way.
+export const pushPreferencesTable = pgTable(
+  "push_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    memberUserId: text("member_user_id").notNull(),
+    muted: text("muted").array().notNull().default(sql`'{}'::text[]`),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("push_preferences_member_idx").on(t.userId, t.memberUserId)],
+);

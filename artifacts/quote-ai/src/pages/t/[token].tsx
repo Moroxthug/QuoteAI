@@ -1,3 +1,7 @@
+import { openCapture } from "@/lib/capture";
+import { isNativeApp } from "@/lib/native/env";
+import { rememberCrewLink } from "@/lib/native/crew-link";
+import { currentPosition, locationPermission, type LocationPermission } from "@/lib/location";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,17 +25,8 @@ import { FieldReportCard } from "@/components/crew/field-report";
 import { TravelCard } from "@/components/crew/travel-card";
 import { ManualHoursForm, WorkerHoursList, isoDay } from "@/components/crew/worker-hours";
 
-/** Resolves to {lat, lng} or null — never rejects, since a clock-in must work even without location. */
-function getLocation(): Promise<{ lat: number; lng: number } | null> {
-  return new Promise((resolve) => {
-    if (!("geolocation" in navigator)) { resolve(null); return; }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => resolve(null),
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30_000 },
-    );
-  });
-}
+/** Resolves to {lat, lng} or null — never rejects, since a clock-in must work even without location. Phase 119: the phone's own location service in the app. */
+const getLocation = currentPosition;
 
 function elapsedLabel(sinceIso: string, now: number) {
   const ms = Math.max(0, now - new Date(sinceIso).getTime());
@@ -85,6 +80,12 @@ export default function WorkerTimePage() {
   const locale = lang === "fr" ? frCA : enCA;
   const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({ queryKey: ["worker", token], queryFn: () => workerApi.get(token!), enabled: !!token, retry: false });
+  // Phase 119: in the phone app this link becomes the crew member's home (and the Clock in shortcut); a dead link is forgotten.
+  useEffect(() => {
+    if (!isNativeApp || !token) return;
+    if (data) rememberCrewLink(`/t/${token}`);
+    else if ((error as { status?: number } | null)?.status === 404) rememberCrewLink(null);
+  }, [data, error, token]);
   useEffect(() => { if (data?.language) setLang(data.language); }, [data?.language, setLang]);
 
   const [projectId, setProjectId] = useState("");
@@ -128,12 +129,16 @@ export default function WorkerTimePage() {
 
   const jobName = (id: string) => data?.jobs.find((j) => j.id === id)?.name ?? "";
 
+  const [locationAsk, setLocationAsk] = useState<LocationPermission | null>(null);
+  useEffect(() => { void locationPermission().then(setLocationAsk); }, []);
+
   const clockIn = useMutation({
     mutationFn: async () => {
       setLocating(true);
       const loc = await getLocation();
       setLocating(false);
       setLocationOff(!loc);
+      void locationPermission().then(setLocationAsk);
       const at = new Date().toISOString();
       const op = { kind: "worker.clockIn" as const, token: token!, projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at };
       return runOrQueue(op, { scope: token!, label: `${t("worker.clockIn")} · ${jobName(projectId)}` }, (clientRef) => workerApi.clockIn(token!, { projectId, milestoneId: milestoneId || null, lat: loc?.lat, lng: loc?.lng, at, clientRef }));
@@ -294,6 +299,8 @@ export default function WorkerTimePage() {
                 <>
                   {clockIn.error && <p className="text-xs" role="alert" style={{ color: "var(--red)" }}>{(clockIn.error as Error).message}</p>}
                   {locationOff && <p className="text-[11px] inline-flex items-center gap-1" style={{ color: "var(--yellow-dark)" }}><MapPin className="h-3 w-3" /> {t("worker.locationOff")}</p>}
+                  {/* Phase 119: the why, in plain words, before the phone's own question. */}
+                  {!locationOff && locationAsk === "prompt" && <p className="text-[11px] inline-flex items-start gap-1" style={{ color: "var(--muted-mk)" }}><MapPin className="h-3 w-3 mt-0.5 shrink-0" /> {t("native.location.why")}</p>}
                   <button type="button" className="btn btn-navy w-full w-big" disabled={!projectId || clockIn.isPending} onClick={() => clockIn.mutate()}>
                     {clockIn.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Clock className="h-5 w-5" />} {locating && clockIn.isPending ? t("worker.locating") : t("worker.clockIn")}
                   </button>
@@ -340,7 +347,7 @@ export default function WorkerTimePage() {
           />
           {data.jobs.length > 0 && (
             <>
-              <button type="button" className="btn btn-outline-navy secondary" onClick={() => photoInput.current?.click()}>
+              <button type="button" className="btn btn-outline-navy secondary" onClick={() => void openCapture({ mode: "photo", input: photoInput.current, onFiles: ([f]) => { if (f) { setPhoto(f); setSheet("report"); } } })}>
                 <Camera className="h-4 w-4" /> {t("worker.m.photo")}
               </button>
               <button type="button" className="btn btn-navy" data-primary-action onClick={() => { setPhoto(null); setSheet("report"); }}>

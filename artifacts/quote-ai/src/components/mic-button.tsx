@@ -1,3 +1,4 @@
+import { useDictations } from "@/lib/offline/dictation";
 import { Mic, Loader2, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVoiceInput } from "@/hooks/use-voice-input";
@@ -7,19 +8,24 @@ import { useLanguage } from "@/i18n/LanguageContext";
 interface MicButtonProps {
   onTranscribed: (text: string) => void;
   disabled?: boolean;
+  /** Phase 119: record with no signal; the text arrives here once the phone is back online (lib/offline/dictation.ts). */
+  offlineTarget?: string;
 }
 
 /**
  * Voice-dictation trigger rendered as the composer's `.comp-mic` control
  * (dashboard home + new-quote AI tab). Recording state flips it to `.rec`.
  */
-export function MicButton({ onTranscribed, disabled }: MicButtonProps) {
+export function MicButton({ onTranscribed, disabled, offlineTarget }: MicButtonProps) {
   const { toast } = useToast();
   const { t } = useLanguage();
   const { isRecording, isTranscribing, startRecording, stopRecording } = useVoiceInput({
     onTranscribed,
     onError: message => toast({ title: t("mic.errorTitle"), description: message, variant: "destructive" }),
+    offlineTarget,
+    onQueued: () => toast({ title: t("offline.savedOnDevice"), description: t("native.voice.dictationQueued") }),
   });
+  useDictations(offlineTarget, onTranscribed);
 
   return (
     <button

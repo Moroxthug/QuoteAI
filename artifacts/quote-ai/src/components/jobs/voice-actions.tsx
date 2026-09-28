@@ -1,3 +1,5 @@
+import { openCapture } from "@/lib/capture";
+import { runOrQueue } from "@/lib/offline/outbox";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Mic, Square, Camera, Loader2, Sparkles, RotateCcw, Send, ImageIcon, X } from "lucide-react";
@@ -39,7 +41,7 @@ export function VoiceActions({ jobId }: { jobId: string }) {
 
   return (
     <>
-      <button type="button" className="btn btn-outline-navy secondary" onClick={() => fileRef.current?.click()} title={t("voice.photoHint")}>
+      <button type="button" className="btn btn-outline-navy secondary" onClick={() => void openCapture({ mode: "photo", input: fileRef.current, onFiles: ([f]) => { if (f) { setPhoto(f); setMode("photo"); } } })} title={t("voice.photoHint")}>
         <Camera className="h-4 w-4" /> {t("voice.photo")}
       </button>
       <button type="button" className="btn btn-navy" onClick={() => setMode("voice")} title={t("voice.dictateHint")} data-primary-action>
@@ -83,13 +85,21 @@ export function JobCaptureSheet({ jobId, mode, photo, onClose }: { jobId: string
   const fail = (e: ApiError) => { setError(e); setPhase("idle"); };
 
   const run = useMutation({
-    mutationFn: (input: { kind: "voice"; blob: Blob } | { kind: "text"; text: string } | { kind: "photo"; file: File; note: string }) => {
-      if (input.kind === "voice") return assistantApi.voice(jobId, input.blob, lang);
+    mutationFn: async (input: { kind: "voice"; blob: Blob } | { kind: "text"; text: string } | { kind: "photo"; file: File; note: string }): Promise<ActionTurnDto | null> => {
+      // Phase 119: with no signal the recording waits on the phone and becomes a job note once it is back online.
+      if (input.kind === "voice") {
+        const r = await runOrQueue({ kind: "job.voiceNote", jobId, audio: input.blob }, { scope: jobId, label: t("voice.title") }, () => assistantApi.voice(jobId, input.blob, lang));
+        return r.queued ? null : r.result;
+      }
       if (input.kind === "text") return assistantApi.action(jobId, input.text, lang);
       return assistantApi.photo(jobId, input.file, { note: input.note, language: lang });
     },
     onMutate: () => { setError(null); setPhase("working"); },
-    onSuccess: finish,
+    onSuccess: (result) => {
+      if (result) { finish(result); return; }
+      toast({ title: t("offline.savedOnDevice"), description: t("native.voice.queuedHint") });
+      onClose();
+    },
     onError: fail,
   });
 

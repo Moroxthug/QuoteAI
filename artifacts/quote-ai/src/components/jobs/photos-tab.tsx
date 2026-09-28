@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Upload, Loader2, Trash2, Share2, Check, ImageOff, CloudUpload } from "lucide-react";
+import { Upload, Loader2, Trash2, Share2, Check, ImageOff, CloudUpload, Camera, Images } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,8 @@ import { useCan } from "@/hooks/use-role";
 import { jobsApi, type JobDetailDto, type JobPhotoDto } from "@/lib/jobs-api";
 import { runOrQueue, useOutbox, discard } from "@/lib/offline/outbox";
 import { ApiImg } from "@/components/api-img";
+import { isNativeApp } from "@/lib/native/env";
+import { openCapture, shrinkAll, type CaptureSource } from "@/lib/capture";
 
 /**
  * Photos tab (Phase 10): upload progress photos tied to the job (optionally
@@ -34,7 +36,8 @@ const can = useCan();
 
   const upload = useMutation({
     // Phase 77: with no signal the file is kept on the device (IndexedDB) and uploaded on reconnect.
-    mutationFn: (file: File) => runOrQueue({ kind: "job.uploadPhoto", jobId: job.id, file, fileName: file.name }, { scope: job.id, label: `${t("jobs.photos.title")} · ${file.name}` }, (clientRef) => jobsApi.uploadPhoto(job.id, file, { clientRef })),
+    // Phase 119: made smaller on the phone first (long edge 2000 px) — a site with one bar of signal.
+    mutationFn: async (original: File) => { const [file] = await shrinkAll([original]); return runOrQueue({ kind: "job.uploadPhoto", jobId: job.id, file: file!, fileName: file!.name }, { scope: job.id, label: `${t("jobs.photos.title")} · ${file!.name}` }, (clientRef) => jobsApi.uploadPhoto(job.id, file!, { clientRef, fileName: file!.name })); },
     onSuccess: (r) => { queryClient.invalidateQueries({ queryKey }); if (r.queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); },
     onError: (e: Error) => toast({ title: t("jobs.photos.uploadError"), description: e.message, variant: "destructive" }),
   });
@@ -59,6 +62,8 @@ const can = useCan();
     Array.from(files).slice(0, 10).forEach((f) => upload.mutate(f));
   };
 
+  const snap = (source: CaptureSource) => void openCapture({ mode: "photo", source, multiple: true, onFiles: (files) => files.slice(0, 10).forEach((f) => upload.mutate(f)), onError });
+
   const toggle = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
 
   const milestoneTitle = (id: string | null) => (id ? milestones.find((m) => m.id === id)?.title ?? null : null);
@@ -82,7 +87,14 @@ const can = useCan();
       </div>
 
       <div className="act-body stack">
-        {can("jobs", "edit") && <div
+        {can("jobs", "edit") && isNativeApp && (
+          // Phase 119: in the app, the phone's camera or its photos (no file picker).
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" className="btn btn-navy" disabled={upload.isPending} onClick={() => snap("camera")}>{upload.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />} {t("native.capture.takePhoto")}</button>
+            <button type="button" className="btn btn-outline-navy" disabled={upload.isPending} onClick={() => snap("gallery")}><Images className="h-4 w-4" /> {t("native.capture.fromPhotos")}</button>
+          </div>
+        )}
+        {can("jobs", "edit") && !isNativeApp && <div
           className={cn("dropzone flush compact-phone", dragging && "on")}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}

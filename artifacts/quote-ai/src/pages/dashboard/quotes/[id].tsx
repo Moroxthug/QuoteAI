@@ -1,3 +1,5 @@
+import { askForPushAfter } from "@/components/pwa/push-ask";
+import { saveFile } from "@/lib/save-file";
 import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
 import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, useArchiveQuote, useDeleteQuote, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey, restoreQuote } from "@workspace/api-client-react";
@@ -231,18 +233,8 @@ const can = useCan();
 
   const downloadPdfFromUrl = async (pdfUrl: string, filename: string) => {
     try {
-      const fullUrl = pdfUrl.startsWith("/api") ? pdfUrl : `/api/storage${pdfUrl}`;
-      const response = await fetch(fullUrl, { credentials: "include" });
-      if (!response.ok) throw new Error("Download failed");
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      // Phase 119: in the phone app this opens the share sheet (lib/save-file.ts).
+      await saveFile(pdfUrl.startsWith("/api") ? pdfUrl : `/api/storage${pdfUrl}`, filename);
     } catch {
       toast({ title: t("dashboard.quoteDetail.error"), description: t("dashboard.quoteDetail.errorDownloadPdf"), variant: "destructive" });
     }
@@ -290,6 +282,7 @@ const can = useCan();
         queryClient.invalidateQueries({ queryKey: getGetQuoteQueryKey(id) });
         queryClient.invalidateQueries({ queryKey: getGetTrialStatusQueryKey() });
         toast({ title: t("dashboard.quoteDetail.emailSent"), description: fmt(t("dashboard.quoteDetail.emailSentDesc"), { email: emailTo.trim() }) });
+        askForPushAfter("quote_sent");
       },
       onError: (err: unknown) => {
         const status = (err as { status?: number })?.status;

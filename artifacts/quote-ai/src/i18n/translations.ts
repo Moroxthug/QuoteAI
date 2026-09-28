@@ -130,6 +130,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "offline.retry": "Retry",
     "offline.discard": "Discard",
     "offline.savedOnDevice": "Saved on this device",
+    // Phase 119: the crew page's location line (the rest is in the dashboard pack)
+    "native.location.why": "Clocking in notes where you are at that moment, to check it's the job site. Nothing is tracked after.",
     "offline.savedOnDeviceHint": "It will be sent as soon as you're back online.",
     "offline.offlineSince": "Offline — showing what was synced at {time}; changes will send when you're back.",
     "offline.offlineSinceQueued": "Offline — showing what was synced at {time}; {n} waiting to send.",
@@ -1505,6 +1507,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "offline.retry": "Réessayer",
     "offline.discard": "Abandonner",
     "offline.savedOnDevice": "Enregistré sur cet appareil",
+    // Phase 119: the crew page's location line (the rest is in the dashboard pack)
+    "native.location.why": "Le pointage note où vous êtes à ce moment, pour vérifier que c'est le chantier. Rien n'est suivi ensuite.",
     "offline.savedOnDeviceHint": "Il sera envoyé dès le retour du réseau.",
     "offline.offlineSince": "Hors ligne — affichage des données synchronisées à {time} ; vos modifications seront envoyées au retour du réseau.",
     "offline.offlineSinceQueued": "Hors ligne — données synchronisées à {time} ; {n} en attente d'envoi.",

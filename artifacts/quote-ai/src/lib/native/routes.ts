@@ -1,10 +1,12 @@
 // Phase 118: what the phone app shows. It is the signed-in app and the way
 // into it — no marketing site. Client links (/p quotes, /sign contracts,
-// /i invoices, /portal, /t crew time) stay in the browser: they are for the
-// contractor's clients and crews, and the app does not claim them (App Links /
-// Universal Links cover /dashboard only).
+// /i invoices, /portal) stay in the browser: they are for the contractor's
+// clients, and the app does not claim them.
+// Phase 119: a crew member's link (/t/<token>) is theirs to use in the app —
+// clock in with the phone's location, photos from its camera — so the app
+// shows it and claims it (App Links: /dashboard and /t).
 
-const APP_PATHS = /^\/(dashboard|onboarding|sign-in|sign-up|join|team-invite)(\/|$)/;
+const APP_PATHS = /^\/(dashboard|onboarding|sign-in|sign-up|join|team-invite|t\/[^/]+)(\/|$)/;
 
 /** A path the app shows itself; anything else opens the app's home. */
 export function isAppPath(pathname: string): boolean {
@@ -27,7 +29,7 @@ export function appPathForLink(url: string, siteHosts: string[]): string | null 
 /** Android back at one of these leaves the app instead of stepping back. */
 export function isRootScreen(pathname: string): boolean {
   const p = pathname.replace(/\/+$/, "") || "/";
-  return p === "/dashboard" || p === "/sign-in" || p === "/onboarding";
+  return p === "/dashboard" || p === "/sign-in" || p === "/onboarding" || /^\/t\/[^/]+$/.test(p);
 }
 
 /** The website's homepage (a logo link, after sign-out) means the app's home, not a browser tab. */

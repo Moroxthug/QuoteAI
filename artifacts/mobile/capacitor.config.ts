@@ -25,6 +25,9 @@ const config: CapacitorConfig = {
     Keyboard: { resize: "native", resizeOnFullScreen: true },
     // Edge to edge; the real insets reach the CSS as --safe-area-inset-* (mockup-system.css --safe-*).
     SystemBars: { insetsHandling: "css", initialViewportFitValueHint: "cover", style: "LIGHT" },
+    // Phase 119: a notification arriving while the app is open shows as the app's
+    // own toast (lib/native/foreground-toast.tsx), not a second system banner.
+    PushNotifications: { presentationOptions: ["badge"] },
   },
 };
 

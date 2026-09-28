@@ -521,6 +521,7 @@ export default function NewQuote() {
                 </span>
               )}
               <MicButton
+                offlineTarget="new-quote"
                 disabled={isAiSubmitting}
                 onTranscribed={text => setInput(prev => (prev.trim() ? `${prev.trim()} ${text}` : text))}
               />

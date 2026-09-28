@@ -27,6 +27,8 @@ export function installNativeFetch(): void {
     const org = activeOrgId();
     if (org && !headers.has("x-active-org")) headers.set("x-active-org", org);
     if (authCookie && path.startsWith("/api/auth/")) headers.set("x-auth-cookie", authCookie);
+    // Phase 119: the next person on this phone must not get this company's notifications.
+    if (SIGN_OUT.test(path) && token) await import("./push").then((p) => p.forgetDeviceBeforeSignOut()).catch(() => undefined);
     const request = input instanceof Request ? new Request(target, input) : target;
     const res = await original(request, { ...init, headers, credentials: "omit" });
     const next = res.headers.get("set-auth-token");

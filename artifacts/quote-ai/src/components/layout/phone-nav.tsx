@@ -1,3 +1,5 @@
+import { scanOrQueueReceipt } from "@/lib/receipts";
+import { openCapture } from "@/lib/capture";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ListSkeleton } from "@/components/skeletons";
 import { Link, useLocation, useSearch } from "wouter";
@@ -273,6 +275,12 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
   const jobForFile = useRef<string | null>(null);
 
   useEffect(() => { setOpen(false); setIntent(null); }, [location]);
+  // Phase 119: the app's "Snap a receipt" home-screen shortcut opens this flow (lib/native/shortcuts.ts).
+  useEffect(() => {
+    const on = (e: Event) => { if ((e as CustomEvent).detail === "receipt" && hasJobs && can("costs", "edit")) setIntent("receipt"); };
+    window.addEventListener("quoteai:new", on);
+    return () => window.removeEventListener("quoteai:new", on);
+  }, [hasJobs, can]);
 
   const { data: jobs, isLoading } = useQuery({ queryKey: ["jobs"], queryFn: jobsApi.list, enabled: intent !== null, staleTime: 30_000 });
   const openJobs = (jobs?.items ?? [])
@@ -280,12 +288,14 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
     .sort((a, b) => (a.status === "active" ? 0 : 1) - (b.status === "active" ? 0 : 1) || b.updatedAt.localeCompare(a.updatedAt));
 
   const scan = useMutation({
-    mutationFn: ({ file, jobId }: { file: File; jobId: string }) => jobsApi.scanReceipt(file, jobId),
+    // Phase 119: shrunk on the phone, and kept for later with no signal.
+    mutationFn: ({ file, jobId }: { file: File; jobId: string }) => scanOrQueueReceipt(file, jobId, `${t("mobile.new.receipt")} · ${file.name}`),
     onMutate: ({ jobId }) => setScanningJob(jobId),
-    onSuccess: (_r, { jobId }) => {
+    onSuccess: (r, { jobId }) => {
       queryClient.invalidateQueries({ queryKey: ["job", jobId] });
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
-      toast({ title: t("mobile.new.receiptSaved") });
+      if (r.queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") });
+      else toast({ title: t("mobile.new.receiptSaved") });
       setIntent(null);
       navigate(`/dashboard/jobs/${jobId}?tab=costs`);
     },
@@ -310,7 +320,8 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
   const pickJob = (jobId: string) => {
     if (intent === "receipt") {
       jobForFile.current = jobId;
-      fileRef.current?.click();
+      // Phase 119: in the app, the document scanner (edges found, page flattened).
+      void openCapture({ mode: "document", input: fileRef.current, onFiles: ([file]) => { if (file) scan.mutate({ file, jobId }); }, onError: (e) => toast({ title: t("jobs.error"), description: e.message, variant: "destructive" }) });
       return;
     }
     setIntent(null);

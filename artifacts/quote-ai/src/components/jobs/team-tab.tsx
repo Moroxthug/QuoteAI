@@ -1,3 +1,4 @@
+import { currentPosition } from "@/lib/location";
 import { localDay } from "@/lib/local-day";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -63,13 +64,13 @@ const can = useCan();
   });
   const setRadius = useMutation({ mutationFn: (v: number | null) => jobsApi.update(job.id, { geofenceRadiusMeters: v }), onSuccess: refresh, onError });
   const useMyLocation = () => {
-    if (!("geolocation" in navigator)) return;
     setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => { setLocating(false); setLocation.mutate({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }); },
-      () => setLocating(false),
-      { enableHighAccuracy: true, timeout: 8000 },
-    );
+    // Phase 119: the phone's location service in the app, the browser's on the website.
+    void currentPosition().then((pos) => {
+      setLocating(false);
+      if (pos) setLocation.mutate({ latitude: pos.lat, longitude: pos.lng });
+      else toast({ title: t("worker.locationOff"), variant: "destructive" });
+    });
   };
 
   const [name, setName] = useState("");

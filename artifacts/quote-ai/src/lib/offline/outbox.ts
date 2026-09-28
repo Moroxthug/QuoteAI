@@ -7,6 +7,7 @@ import type { EditBase } from "../sync/protocol";
 import type { FieldConflict } from "../sync/merge";
 import { tempIdFor, TEMP_ID_RE } from "../sync/temp-id";
 import { rawFetch } from "../sync/raw-fetch";
+import { transcribeAudio } from "../speech";
 
 /** Phase 117: the replay of queued edits is its own chunk, loaded when there is one to send. */
 const syncCore = () => import("../sync/replay");
@@ -48,6 +49,11 @@ export type OutboxOp =
   | { kind: "worker.addTask"; token: string; projectId: string; title: string }
   // Phase 89b: km or per diem logged on site.
   | { kind: "worker.allowance"; token: string; allowanceKind: "mileage" | "per_diem"; quantity: number; date: string; projectId: string | null; note?: string }
+  // Phase 119: a receipt snapped with no signal (read by the OCR when sent), a
+  // job note dictated on site, a dictation for the new-quote box.
+  | { kind: "job.scanReceipt"; jobId: string | null; file: Blob; fileName: string }
+  | { kind: "job.voiceNote"; jobId: string; audio: Blob }
+  | { kind: "voice.dictation"; target: string; audio: Blob }
   // Phase 117: any edit the sync layer queued (lib/sync/routes.ts).
   | { kind: "api"; method: string; path: string; body: string | null; key: string; base: EditBase | null };
 
@@ -294,6 +300,19 @@ async function executeLegacy(row: OutboxRow, op: Exclude<OutboxOp, { kind: "api"
     case "job.uploadPhoto":
       await jobsApi.uploadPhoto(op.jobId, op.file, { fileName: op.fileName, milestoneId: op.milestoneId, caption: op.caption, clientRef: row.id });
       return;
+    case "job.scanReceipt":
+      await jobsApi.scanReceipt(new File([op.file], op.fileName, { type: op.file.type }), op.jobId ?? undefined, { idempotencyKey: row.id });
+      return;
+    case "job.voiceNote": {
+      const text = await transcribeAudio(op.audio);
+      if (text) await jobsApi.addNote(op.jobId, { body: text }, { idempotencyKey: row.id });
+      return;
+    }
+    case "voice.dictation": {
+      const { deliverDictation } = await import("./dictation");
+      deliverDictation(op.target, await transcribeAudio(op.audio));
+      return;
+    }
   }
 }
 
@@ -307,6 +326,7 @@ function invalidateFor(op: OutboxOp) {
     });
     return;
   }
+  if (op.kind === "voice.dictation") return;
   if (op.kind.startsWith("worker.")) {
     queryClient.invalidateQueries({ queryKey: ["worker", (op as { token: string }).token] });
     return;
@@ -316,6 +336,7 @@ function invalidateFor(op: OutboxOp) {
   queryClient.invalidateQueries({ queryKey: ["job-photos", jobId] });
   queryClient.invalidateQueries({ queryKey: ["jobs"] });
   queryClient.invalidateQueries({ queryKey: ["costs-review"] });
+  if (op.kind === "job.voiceNote") queryClient.invalidateQueries({ queryKey: ["job-notes", jobId] });
 }
 
 /** Replays pending ops in order. Idempotent: a second call while one runs is a no-op. */

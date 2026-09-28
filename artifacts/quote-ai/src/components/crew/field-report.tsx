@@ -1,3 +1,5 @@
+import { openCapture } from "@/lib/capture";
+import { isNativeApp } from "@/lib/native/env";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -129,7 +131,7 @@ export function FieldReportCard({ token, jobs, defaultJobId, reports, bare, init
           <button type="button" className="absolute -top-2 -right-2 h-7 w-7 rounded-full inline-flex items-center justify-center" style={{ background: "var(--navy)", color: "#fff" }} aria-label={t("crew.removePhoto")} onClick={() => { setPhoto(null); if (fileInput.current) fileInput.current.value = ""; }}><X className="h-4 w-4" /></button>
         </div>
       ) : (
-        <label className="btn btn-outline-navy w-full cursor-pointer">
+        <label className="btn btn-outline-navy w-full cursor-pointer" onClick={(e) => { if (isNativeApp) { e.preventDefault(); void openCapture({ mode: "photo", onFiles: ([f]) => setPhoto(f ?? null) }); } }}>
           <Camera className="h-4 w-4" /> {t("crew.addPhoto")}
           <input ref={fileInput} type="file" accept="image/*" capture="environment" className="sr-only" onChange={(e) => setPhoto(e.target.files?.[0] ?? null)} />
         </label>

@@ -47,6 +47,15 @@ jobs:
           java-version: 21
           cache: gradle
       - run: pnpm install --frozen-lockfile
+      # Phase 119: the Firebase config for push (Firebase → Project settings →
+      # Your apps → Android ca.quoteai.app → google-services.json), pasted whole
+      # into the GOOGLE_SERVICES_JSON secret. Without it the app builds and runs
+      # and says notifications aren't set up.
+      - name: Firebase config (when the secret is set)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        if: ${{ env.GOOGLE_SERVICES_JSON != '' }}
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" > artifacts/mobile/android/app/google-services.json
       - name: Build the app's files and copy them into the Android project
         run: pnpm --filter @workspace/mobile sync
       - name: Debug APK

@@ -84,7 +84,16 @@
         "@capacitor/splash-screen",
         "@capacitor/status-bar",
         "@aparajita/capacitor-secure-storage",
-        "@capacitor/browser"
+        "@capacitor/browser",
+        "@capacitor-mlkit/document-scanner",
+        "@capacitor/app-launcher",
+        "@capacitor/camera",
+        "@capacitor/filesystem",
+        "@capacitor/geolocation",
+        "@capacitor/push-notifications",
+        "@capacitor/share",
+        "@capawesome/capacitor-app-shortcuts",
+        "@capgo/capacitor-share-target"
       ]
     }
   }

@@ -4,7 +4,7 @@ import { db, pushSubscriptionsTable } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId } from "../middlewares/authMiddleware";
 import { ipRateLimiter } from "../lib/rateLimit";
-import { isPushConfigured, pushPublicKey, saveSubscription, removeSubscription, sendPushToCompany } from "../lib/push";
+import { isPushConfigured, isAppPushConfigured, pushPublicKey, saveSubscription, removeSubscription, saveDeviceToken, removeDeviceToken, sendPushToCompany, mutedCategories, setMutedCategories, PUSH_CATEGORY_KEYS, type PushCategory } from "../lib/push";
 
 // ── Phase 77: Web Push subscriptions ─────────────────────────────────────────
 // The browser subscribes with the VAPID public key it fetches here, then hands
@@ -29,7 +29,7 @@ router.get("/push/config", requireAuth, async (req, res) => {
       const [row] = await db.select({ id: pushSubscriptionsTable.id }).from(pushSubscriptionsTable).where(and(eq(pushSubscriptionsTable.endpoint, endpoint), eq(pushSubscriptionsTable.memberUserId, getActorUserId(res))));
       subscribed = !!row;
     }
-    res.json({ configured: isPushConfigured(), publicKey: pushPublicKey(), subscribed });
+    res.json({ configured: isPushConfigured(), appConfigured: isAppPushConfigured(), publicKey: pushPublicKey(), subscribed });
   } catch (err) {
     req.log.error({ err }, "Error reading push config");
     res.status(500).json({ error: "Internal server error" });
@@ -72,10 +72,80 @@ router.delete("/push/subscriptions", requireAuth, async (req, res) => {
   }
 });
 
-// POST /api/push/test — a sample notification to the caller's own browsers.
+// ── Phase 119: the phone app registers its FCM token here ──────────────────
+const DeviceBody = z.object({
+  token: z.string().min(20).max(4096),
+  installId: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/),
+  platform: z.enum(["android", "ios"]),
+  appVersion: z.string().max(40).optional(),
+  language: z.enum(["en", "fr"]).optional(),
+});
+
+// POST /api/push/devices — register (or refresh) this installed app.
+router.post("/push/devices", requireAuth, async (req, res) => {
+  try {
+    if (!isAppPushConfigured()) {
+      res.status(503).json({ error: "NOT_CONFIGURED", message: "App notifications are not set up on this server yet." });
+      return;
+    }
+    const body = DeviceBody.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const row = await saveDeviceToken({ userId: getUserId(res), memberUserId: getActorUserId(res), ...body.data });
+    res.status(201).json({ id: row.id, createdAt: row.createdAt.toISOString() });
+  } catch (err) {
+    req.log.error({ err }, "Error saving device token");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// DELETE /api/push/devices — body { installId }: this app stops getting notifications.
+router.delete("/push/devices", requireAuth, async (req, res) => {
+  try {
+    const body = z.object({ installId: z.string().regex(/^[A-Za-z0-9_-]{16,64}$/) }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    const removed = await removeDeviceToken({ memberUserId: getActorUserId(res), installId: body.data.installId });
+    res.json({ success: true, removed });
+  } catch (err) {
+    req.log.error({ err }, "Error removing device token");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/push/preferences — the categories this person turned off, and every category there is.
+router.get("/push/preferences", requireAuth, async (req, res) => {
+  try {
+    res.json({ categories: PUSH_CATEGORY_KEYS, muted: await mutedCategories(getUserId(res), getActorUserId(res)) });
+  } catch (err) {
+    req.log.error({ err }, "Error reading push preferences");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// PUT /api/push/preferences — body { muted: [...] }: this person's choice for this company, on every device.
+router.put("/push/preferences", requireAuth, async (req, res) => {
+  try {
+    const body = z.object({ muted: z.array(z.enum(PUSH_CATEGORY_KEYS as [PushCategory, ...PushCategory[]])).max(PUSH_CATEGORY_KEYS.length) }).safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid parameters", details: body.error });
+      return;
+    }
+    res.json({ categories: PUSH_CATEGORY_KEYS, muted: await setMutedCategories(getUserId(res), getActorUserId(res), body.data.muted) });
+  } catch (err) {
+    req.log.error({ err }, "Error saving push preferences");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/push/test — a sample notification to the caller's own browsers and apps.
 router.post("/push/test", requireAuth, testLimiter, async (req, res) => {
   try {
-    if (!isPushConfigured()) {
+    if (!isPushConfigured() && !isAppPushConfigured()) {
       res.status(503).json({ error: "NOT_CONFIGURED", message: "Push notifications are not set up on this server yet." });
       return;
     }

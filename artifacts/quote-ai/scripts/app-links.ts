@@ -8,8 +8,9 @@
 //                        the upload key; a debug key for internal testing)
 //   APPLE_TEAM_ID        the Apple developer team id (Phase 125)
 // A file whose variable is unset is not written: links then open the website,
-// as they do today. Only /dashboard is claimed — client links (/p, /sign, /i,
-// /portal, /t, /join) always stay in the browser.
+// as they do today. Only /dashboard and (Phase 119) a crew member's /t link
+// are claimed — client links (/p, /sign, /i, /portal, /join) always stay in
+// the browser.
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -28,7 +29,7 @@ function assetLinks(fingerprints: string[]): unknown[] {
 function appleAppSiteAssociation(teamId: string): unknown {
   return {
     applinks: {
-      details: [{ appIDs: [`${teamId}.${APP_ID}`], components: [{ "/": "/dashboard" }, { "/": "/dashboard/*" }] }],
+      details: [{ appIDs: [`${teamId}.${APP_ID}`], components: [{ "/": "/dashboard" }, { "/": "/dashboard/*" }, { "/": "/t/*" }] }],
     },
   };
 }

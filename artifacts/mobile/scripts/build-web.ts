@@ -11,11 +11,15 @@ const root = path.resolve(import.meta.dirname, "..");
 const web = path.resolve(root, "../quote-ai");
 const www = path.join(root, "www");
 
+// Phase 119: push needs the Firebase config in the Android project; without
+// it the app is built to say notifications aren't set up instead of asking.
+const appPush = existsSync(path.join(root, "android/app/google-services.json"));
+
 execFileSync(process.platform === "win32" ? "pnpm.cmd" : "pnpm", ["exec", "vite", "build", "--config", "vite.config.ts", "--mode", "native"], {
   cwd: web,
   stdio: "inherit",
   shell: process.platform === "win32",
-  env: { ...process.env, NATIVE_OUT_DIR: www },
+  env: { ...process.env, NATIVE_OUT_DIR: www, VITE_APP_PUSH: appPush ? "1" : "" },
 });
 
 const WEBSITE_ONLY = ["og", "blog", "sw.js", "sitemap.xml", "robots.txt", "llms.txt", "widget-test.html", "widget-test.js", "manifest.webmanifest", "opengraph.jpg", ".well-known"];
@@ -34,4 +38,4 @@ if (!existsSync(path.join(www, "index.html"))) throw new Error("www/index.html m
 let bytes = 0;
 const walk = (d: string) => { for (const n of readdirSync(d)) { const p = path.join(d, n); const s = statSync(p); if (s.isDirectory()) walk(p); else bytes += s.size; } };
 walk(www);
-console.log(`www/ ready: ${(bytes / 1024 / 1024).toFixed(1)} MB, API ${process.env.VITE_API_ORIGIN ?? "https://quoteai.ca"}`);
+console.log(`www/ ready: ${(bytes / 1024 / 1024).toFixed(1)} MB, API ${process.env.VITE_API_ORIGIN ?? "https://quoteai.ca"}, push ${appPush ? "on" : "off (no google-services.json)"}`);

@@ -1,3 +1,5 @@
+import { scanOrQueueReceipt } from "@/lib/receipts";
+import { openCapture } from "@/lib/capture";
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Receipt, Upload, Loader2, Sparkles } from "lucide-react";
@@ -30,8 +32,12 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const scan = useMutation({
-    mutationFn: (file: File) => jobsApi.scanReceipt(file),
-    onSuccess: (r) => { queryClient.invalidateQueries({ queryKey: ["costs-review"] }); if (r.entry.projectId) queryClient.invalidateQueries({ queryKey: ["job", r.entry.projectId] }); setDialog({ open: true, entry: r.entry }); },
+    mutationFn: (file: File) => scanOrQueueReceipt(file, null, `${t("jobs.receipts.scan")} · ${file.name}`),
+    onSuccess: (res) => {
+      if (res.queued) { toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); return; }
+      const r = res.result;
+      queryClient.invalidateQueries({ queryKey: ["costs-review"] }); if (r.entry.projectId) queryClient.invalidateQueries({ queryKey: ["job", r.entry.projectId] }); setDialog({ open: true, entry: r.entry });
+    },
     onError: (e: Error & { code?: string }) => toast({ title: e.code === "PLAN_REQUIRED" ? t("jobs.planRequired") : t("jobs.error"), description: e.message, variant: "destructive" }),
   });
   const entries = data?.entries ?? [];
@@ -40,7 +46,7 @@ export function ReceiptQueue({ jobs }: { jobs: JobSummaryDto[] }) {
   const dialogEl = <CostEntryDialog jobId={dialog.entry?.projectId ?? null} entry={dialog.entry} milestones={[]} jobs={openJobs} open={dialog.open} onOpenChange={(v) => setDialog((d) => ({ ...d, open: v }))} />;
   const fileEl = <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) scan.mutate(f); e.target.value = ""; }} />;
   const scanButton = can("costs", "edit") && (
-    <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => fileInput.current?.click()}>
+    <button type="button" className="btn btn-sm btn-outline-navy" disabled={scan.isPending} onClick={() => void openCapture({ mode: "document", input: fileInput.current, onFiles: ([f]) => { if (f) scan.mutate(f); } })}>
       {scan.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} {scan.isPending ? t("jobs.costs.scanning") : t("jobs.receipts.scan")}
     </button>
   );

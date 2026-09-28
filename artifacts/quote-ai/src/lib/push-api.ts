@@ -3,12 +3,18 @@
 import { apiRequest as req, apiJson as json } from "./jobs-api";
 import { getServiceWorkerRegistration } from "./pwa";
 
-export type PushConfigDto = { configured: boolean; publicKey: string | null; subscribed: boolean };
+export type PushConfigDto = { configured: boolean; appConfigured?: boolean; publicKey: string | null; subscribed: boolean };
+
+/** Phase 119: the categories a person can turn off for their phone (api-server lib/push.ts PUSH_CATEGORIES). */
+export type PushCategory = "signatures" | "payments" | "messages" | "crew" | "budget" | "compliance";
+export type PushPreferencesDto = { categories: PushCategory[]; muted: PushCategory[] };
 
 export const pushApi = {
   config: (endpoint?: string | null) => req<PushConfigDto>(`/api/push/config${endpoint ? `?endpoint=${encodeURIComponent(endpoint)}` : ""}`),
   subscribe: (sub: PushSubscriptionJSON, language: "en" | "fr") => req<{ id: string }>("/api/push/subscriptions", { method: "POST", body: json({ endpoint: sub.endpoint, keys: sub.keys, language }) }),
   unsubscribe: (endpoint: string) => req<{ success: true; removed: boolean }>("/api/push/subscriptions", { method: "DELETE", body: json({ endpoint }) }),
+  preferences: () => req<PushPreferencesDto>("/api/push/preferences"),
+  setPreferences: (muted: PushCategory[]) => req<PushPreferencesDto>("/api/push/preferences", { method: "PUT", body: json({ muted }) }),
   test: (language: "en" | "fr") => req<{ sent: number; failed: number; removed: number; skipped: string | null }>("/api/push/test", { method: "POST", body: json({ language }) }),
 };
 

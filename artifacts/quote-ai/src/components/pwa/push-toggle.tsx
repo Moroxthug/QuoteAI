@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BellRing, Loader2, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { usePwa } from "@/lib/pwa";
 import { pushApi, pushSupported, currentSubscription, enablePush, disablePush } from "@/lib/push-api";
+import { isNativeApp } from "@/lib/native/env";
+import { PushPreferences } from "./push-preferences";
+
+// Phase 119: the phone app has its own switch (FCM, lib/native/push.ts); only its bundle loads it.
+const AppPushToggle = isNativeApp ? lazy(() => import("./app-push-toggle")) : null;
 
 /**
  * Phase 77: "Push notifications on this device" — one switch per browser.
@@ -13,6 +18,11 @@ import { pushApi, pushSupported, currentSubscription, enablePush, disablePush } 
  * refused in the browser.
  */
 export function PushToggle() {
+  if (AppPushToggle) return <Suspense fallback={null}><AppPushToggle /></Suspense>;
+  return <WebPushToggle />;
+}
+
+function WebPushToggle() {
   const { t, lang } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -86,7 +96,7 @@ export function PushToggle() {
         <div className="flex-1 min-w-0">
           <h2 className="text-sm font-bold" style={{ color: "var(--navy)" }}>{t("push.title")}</h2>
           <p className="text-xs mt-0.5" style={{ color: "var(--muted-mk)" }}>{hint}</p>
-          <p className="text-xs mt-1" style={{ color: "var(--faint)" }}>{t("push.types")}</p>
+          {!(config?.configured || config?.appConfigured) && <p className="text-xs mt-1" style={{ color: "var(--faint)" }}>{t("push.types")}</p>}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {enabled && canToggle && (
@@ -108,6 +118,8 @@ export function PushToggle() {
           </button>
         </div>
       </div>
+      {/* Phase 119: the person's choice for all their devices (this browser, the phone app). */}
+      {(config?.configured || config?.appConfigured) && <PushPreferences />}
     </section>
   );
 }

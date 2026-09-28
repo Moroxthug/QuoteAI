@@ -287,11 +287,11 @@ export const jobsApi = {
   updateCost: (id: string, cid: string, body: CostEntryEdit) => req<{ entry: CostEntryDto }>(`/api/jobs/${id}/costs/${cid}`, { method: "PUT", body: json(body) }),
   deleteCost: (id: string, cid: string) => req<{ success: true }>(`/api/jobs/${id}/costs/${cid}`, { method: "DELETE" }),
   reviewQueue: () => req<{ entries: CostEntryDto[] }>("/api/costs/review"),
-  scanReceipt: async (file: File, projectId?: string) => {
+  scanReceipt: async (file: File, projectId?: string, opts?: { idempotencyKey?: string }) => {
     const fd = new FormData();
     fd.append("file", file);
     if (projectId) fd.append("projectId", projectId);
-    const res = await fetch("/api/costs/receipts", { method: "POST", credentials: "include", body: fd });
+    const res = await fetch("/api/costs/receipts", { method: "POST", credentials: "include", body: fd, ...(opts?.idempotencyKey ? { headers: { "Idempotency-Key": opts.idempotencyKey } } : {}) });
     const body = (await res.json().catch(() => ({}))) as { entry: CostEntryDto; error?: string; message?: string; requiredPlan?: string };
     if (!res.ok) {
       const err = new Error(body.message || body.error || `Request failed (${res.status})`) as Error & { code?: string; requiredPlan?: string };
@@ -340,7 +340,8 @@ export const jobsApi = {
 
   // Notes (Phase 78)
   listNotes: (id: string) => req<{ notes: JobNoteDto[] }>(`/api/jobs/${id}/notes`),
-  addNote: (id: string, body: { body: string; milestoneId?: string | null }) => req<{ note: JobNoteDto }>(`/api/jobs/${id}/notes`, { method: "POST", body: json(body) }),
+  /** Phase 119: `idempotencyKey` when the outbox replays a note dictated offline — a lost answer never makes a second note. */
+  addNote: (id: string, body: { body: string; milestoneId?: string | null }, opts?: { idempotencyKey?: string }) => req<{ note: JobNoteDto }>(`/api/jobs/${id}/notes`, { method: "POST", body: json(body), ...(opts?.idempotencyKey ? { headers: { "Content-Type": "application/json", "Idempotency-Key": opts.idempotencyKey } } : {}) }),
   deleteNote: (id: string, noteId: string) => req<{ success: true }>(`/api/jobs/${id}/notes/${noteId}`, { method: "DELETE" }),
 };
 

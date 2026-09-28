@@ -182,6 +182,8 @@ const MANIFEST: Record<string, Entry> = {
   VITE_API_ORIGIN: { kind: "build", note: "Phase 118: the API the phone app's bundle talks to (vite --mode native); default https://quoteai.ca. Never set in Vercel" },
   NATIVE_OUT_DIR: { kind: "local", note: "Phase 118: where vite --mode native writes (artifacts/mobile/www)" },
   CAP_DEV: { kind: "local", note: "Phase 118: =1 lets a dev phone build talk to an http API (cleartext, mixed content). Never for a build that leaves the computer" },
+  FIREBASE_SERVICE_ACCOUNT: { kind: "deferred", note: "Phase 119: Sensitive. The Firebase service account JSON (raw or base64) — Firebase → Project settings → Service accounts → Generate new private key. Set = notifications reach the phone app through FCM (iPhones via the APNs key uploaded to Firebase); unset = the app says notifications aren't set up" },
+  VITE_APP_PUSH: { kind: "platform", note: "Phase 119: set by artifacts/mobile/scripts/build-web.ts when android/app/google-services.json exists (CI writes it from the GOOGLE_SERVICES_JSON secret); never set by hand" },
   JAVA_HOME: { kind: "local", note: "Phase 118: the JDK for the Android build (artifacts/mobile/scripts/gradle.ts falls back to Android Studio's)" },
   ANDROID_HOME: { kind: "local", note: "Phase 118: the Android SDK (default %LOCALAPPDATA%/Android/Sdk)" },
   ANDROID_SDK_ROOT: { kind: "local", note: "Phase 118: older name for ANDROID_HOME" },

@@ -1,3 +1,5 @@
+import { scanOrQueueReceipt } from "@/lib/receipts";
+import { openCapture } from "@/lib/capture";
 import { useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,15 +41,17 @@ const can = useCan();
   const del = useMutation({ mutationFn: (cid: string) => jobsApi.deleteCost(job.id, cid), onSuccess: refresh, onError });
   const confirm = useMutation({ mutationFn: (cid: string) => jobsApi.updateCost(job.id, cid, { status: "confirmed" }), onSuccess: () => { refresh(); toast({ title: t("jobs.costs.confirmedToast") }); }, onError });
   const scan = useMutation({
-    mutationFn: (file: File) => jobsApi.scanReceipt(file, job.id),
-    onSuccess: (r) => { refresh(); setDialog({ open: true, entry: r.entry }); },
+    // Phase 119: shrunk on the phone, and kept for later with no signal.
+    mutationFn: (file: File) => scanOrQueueReceipt(file, job.id, `${t("jobs.costs.dropTitle")} · ${file.name}`),
+    onSuccess: (r) => { refresh(); if (r.queued) toast({ title: t("offline.savedOnDevice"), description: t("offline.savedOnDeviceHint") }); else setDialog({ open: true, entry: r.result.entry }); },
     onError,
   });
 
-  const onFiles = (files: FileList | null) => {
-    if (!files || !files.length) return;
+  const onFiles = (files: FileList | null) => onFileList(files ? Array.from(files) : []);
+  const onFileList = (files: File[]) => {
+    if (!files.length) return;
     // One at a time keeps the review dialog meaningful; the rest queue up.
-    Array.from(files).slice(0, 10).forEach((f, i) => setTimeout(() => scan.mutate(f), i * 300));
+    files.slice(0, 10).forEach((f, i) => setTimeout(() => scan.mutate(f), i * 300));
   };
 
   const pending = costs.entries.filter((e) => e.status === "pending_review");
@@ -69,7 +73,7 @@ const can = useCan();
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={(e) => { e.preventDefault(); setDragging(false); onFiles(e.dataTransfer.files); }}
-          onClick={() => fileInput.current?.click()}
+          onClick={() => void openCapture({ mode: "document", input: fileInput.current, onFiles: (files) => onFileList(files), onError })}
         >
           <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple className="hidden" onChange={(e) => { onFiles(e.target.files); e.target.value = ""; }} />
           <div className="dz-ic">{scan.isPending ? <Loader2 className="animate-spin" /> : <Upload />}</div>

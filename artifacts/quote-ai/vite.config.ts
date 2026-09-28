@@ -128,6 +128,8 @@ export default defineConfig(({ isSsrBuild, mode }) => {
     "import.meta.env.VITE_RELEASE": JSON.stringify(release),
     "import.meta.env.VITE_NATIVE": JSON.stringify(native ? "1" : ""),
     "import.meta.env.VITE_API_ORIGIN": JSON.stringify(native ? NATIVE_API_ORIGIN : ""),
+    // Phase 119: set by artifacts/mobile/scripts/build-web.ts when the Android project has its google-services.json.
+    "import.meta.env.VITE_APP_PUSH": JSON.stringify(native && process.env.VITE_APP_PUSH === "1" ? "1" : ""),
   },
   plugins: [
     react(),

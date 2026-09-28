@@ -16,7 +16,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/index.tsx"
       ],
-      "budget": 341
+      "budget": 345
     },
     {
       "name": "Quotes",
@@ -68,7 +68,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/index.tsx"
       ],
-      "budget": 320
+      "budget": 327
     },
     {
       "name": "Job",
@@ -81,7 +81,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/[id].tsx"
       ],
-      "budget": 374
+      "budget": 379
     },
     {
       "name": "Money (invoices)",
@@ -159,7 +159,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/assistant.tsx"
       ],
-      "budget": 312
+      "budget": 316
     },
     {
       "name": "Notifications",
@@ -185,7 +185,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/settings/index.tsx"
       ],
-      "budget": 320
+      "budget": 326
     },
     {
       "name": "Onboarding",

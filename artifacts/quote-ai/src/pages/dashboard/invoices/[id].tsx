@@ -1,3 +1,4 @@
+import { saveFile } from "@/lib/save-file";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useLocation } from "wouter";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -75,7 +76,7 @@ export default function InvoiceDetailPage() {
     : open ? { label: t("invoices.recordPayment"), icon: Banknote, onClick: () => setPayOpen(true) }
     : null;
   const moreActions: Array<SheetAction | false> = [
-    { label: t("invoices.m.downloadPdf"), icon: Download, onSelect: () => { window.location.href = invoicesApi.pdfUrl(inv.id, true); } },
+    { label: t("invoices.m.downloadPdf"), icon: Download, onSelect: () => { void saveFile(invoicesApi.pdfUrl(inv.id, true)).catch(() => toast({ title: t("dashboard.quoteDetail.errorDownloadPdf"), variant: "destructive" })); } },
     isDraft && !editing && canEdit && { label: t("invoices.edit"), icon: Pencil, onSelect: () => setEditing(true) },
     open && !isCredit && canEdit && { label: t("invoices.resend"), icon: Send, onSelect: () => setSendOpen(true) },
     open && canEdit && !!inv.customer.email && { label: t("invoices.remind"), icon: BellRing, disabled: remind.isPending, onSelect: () => remind.mutate() },

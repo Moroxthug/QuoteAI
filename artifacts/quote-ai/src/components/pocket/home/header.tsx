@@ -45,7 +45,7 @@ export function HomeHeader({ name, photo }: { name: string; photo: React.ReactNo
         <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.15, fontWeight: 600, letterSpacing: "-0.035em", color: "var(--pk-ink)" }}>{greet}</h1>
       </div>
       <Link href="/dashboard/menu" className="pk-press" aria-label={unread > 0 ? t("pocket.home.menuUnread").replace("{n}", String(unread)) : t("pocket.home.menu")} style={{ position: "relative", width: 40, height: 40, flexShrink: 0, borderRadius: "50%", background: "#141416", color: "#ffffff", fontSize: 13, fontWeight: 600, marginTop: 2, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-        {photo ? <span style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", display: "block" }}>{photo}</span> : <span aria-hidden="true">{initialsOf(name)}</span>}
+        {photo ? <span style={{ width: 40, height: 40, borderRadius: "50%", overflow: "hidden", display: "block" }}>{photo}</span> : <span aria-hidden="true" className="pk-initials" data-i={initialsOf(name)} />}
         {unread > 0 && <span aria-hidden="true" style={{ position: "absolute", top: -1, right: -1, width: 10, height: 10, borderRadius: "50%", background: "#e4572e", border: "2px solid #f5f4f1" }} />}
       </Link>
     </header>

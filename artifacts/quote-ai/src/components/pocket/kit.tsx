@@ -77,7 +77,7 @@ export function Switch({ on, onChange, label, disabled }: { on: boolean; onChang
 
 /** Segmented control with the sliding white thumb. `size`: the cell height (30 Settings, 28 Home, 50 Quote). */
 export function Segmented<T extends string>({ options, value, onChange, label, width, size = 30, variant, renderOption }: {
-  options: { value: NoInfer<T>; label: string; sub?: string; style?: CSSProperties }[];
+  options: { value: NoInfer<T>; label: string; sub?: string; style?: CSSProperties; disabled?: boolean }[];
   value: T;
   onChange: (v: NoInfer<T>) => void;
   label: string;
@@ -93,7 +93,7 @@ export function Segmented<T extends string>({ options, value, onChange, label, w
     <div role="group" aria-label={label} className={cn("pk-seg", variant)} style={{ width, gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
       <span className="pk-seg-thumb" aria-hidden="true" style={{ width: `calc((100% - ${inset}px) / ${n})`, height: size, transform: `translateX(${i * 100}%)` }} />
       {options.map((o) => (
-        <button key={o.value} type="button" aria-pressed={o.value === value} style={{ height: size, ...o.style }} onClick={() => { if (o.value !== value) { haptic("selection"); onChange(o.value); } }}>
+        <button key={o.value} type="button" aria-pressed={o.value === value} disabled={o.disabled} style={{ height: size, ...o.style }} onClick={() => { if (o.value !== value) { haptic("selection"); onChange(o.value); } }}>
           {renderOption ? renderOption(o) : o.label}
         </button>
       ))}

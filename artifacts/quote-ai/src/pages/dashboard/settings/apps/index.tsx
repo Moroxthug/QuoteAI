@@ -65,10 +65,12 @@ function AppTile({ app, status, onOpen }: { app: AppDef; status: AppStatus; onOp
 }
 
 function AppGrid({ title, apps, statuses, onOpen }: { title: string; apps: AppDef[]; statuses: Record<AppId, AppStatus>; onOpen: (app: AppDef) => void }) {
+  // One level under the section heading, as SettingsGroup does.
+  const Heading = useSinglePane() ? "h2" : "h3";
   if (!apps.length) return null;
   return (
     <section className="app-group" aria-label={title}>
-      <h3 className="app-group-title">{title}</h3>
+      <Heading className="app-group-title">{title}</Heading>
       <ul className="app-grid">
         {apps.map((a) => <li key={a.id}><AppTile app={a} status={statuses[a.id]} onOpen={onOpen} /></li>)}
       </ul>
@@ -193,7 +195,7 @@ export function AppsSection() {
       )}
       {!loading && soon.length > 0 && (
         <section className="app-soon" aria-label={t("apps.group.soon")}>
-          <h3 className="app-group-title">{t("apps.group.soon")}</h3>
+          {single ? <h2 className="app-group-title">{t("apps.group.soon")}</h2> : <h3 className="app-group-title">{t("apps.group.soon")}</h3>}
           <ul>
             {soon.map((a) => (
               <li key={a.id}><BrandLogo app={a} /><span>{t(`apps.${a.id}.name`)}</span></li>

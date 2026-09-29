@@ -249,7 +249,7 @@ export function PocketQuote({ id }: { id: string }) {
         <div style={{ ...card, padding: "2px 0" }}>
           {lines.map(({ v, ci, vi }, i) => (
             <div key={`${ci}-${vi}`} style={{ padding: "13px 16px", display: "flex", flexDirection: "column", gap: 8, borderTop: i ? "1px solid #efeeea" : undefined }}>
-              <button type="button" disabled={!editable} onClick={() => setLineSheet({ ci, vi })} style={{ display: "flex", gap: 12, justifyContent: "space-between", alignItems: "baseline", border: 0, background: "transparent", padding: 0, textAlign: "left", fontFamily: "inherit", color: "inherit", cursor: editable ? "pointer" : "default" }}>
+              <button type="button" className="pk-line-btn" disabled={!editable} onClick={() => setLineSheet({ ci, vi })} style={{ display: "flex", gap: 12, justifyContent: "space-between", alignItems: "baseline", border: 0, background: "transparent", padding: 0, textAlign: "left", fontFamily: "inherit", color: "inherit", cursor: editable ? "pointer" : "default" }}>
                 <span style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.3 }}>{v.descrizione.split("\n")[0]}</span>
                 <span className="pk-num" style={{ fontSize: 14, fontWeight: 500, whiteSpace: "nowrap" }}>{money(Math.round(v.quantita * v.prezzoUnitario * 100), lang, true)}</span>
               </button>
@@ -296,7 +296,7 @@ export function PocketQuote({ id }: { id: string }) {
         <section className="pk-rise" style={{ padding: "22px 16px 0", animationDelay: "280ms" }}>
           <h2 style={{ margin: "0 4px 10px", fontSize: 15, fontWeight: 600, letterSpacing: "-0.02em" }}>{t("pocket.quote.sendBy")}</h2>
           <Segmented label={t("pocket.quote.sendChannel")} size={50} variant="big" value={channel} onChange={(v) => { setCh(v); setSent(false); }}
-            options={channels.map((c) => ({ value: c.value, label: c.label, sub: c.sub, style: c.value === "wa" || (c.value === "sms" && !smsOk) ? { opacity: 0.55 } : undefined }))}
+            options={channels.map((c) => ({ value: c.value, label: c.label, sub: c.sub, ...(c.value === "wa" || (c.value === "sms" && !smsOk) ? { style: { opacity: 0.55 }, disabled: true } : {}) }))}
             renderOption={(o) => (<span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}><span style={{ fontSize: 13, fontWeight: 500 }}>{o.label}</span><span className="pk-mono" style={{ fontSize: 10.5, opacity: 0.7 }}>{o.sub}</span></span>)} />
         </section>
       )}

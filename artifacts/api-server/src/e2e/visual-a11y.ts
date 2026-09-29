@@ -327,16 +327,16 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
       await openPhoneSheet(p, ".li-body .qline", "[role=dialog] .line-sheet");
     } },
     { path: "/dashboard/quotes", session: "owner", name: "/dashboard/quotes filter", drive: (p) => openPhoneSheet(p, ".qlist-bar .more-btn", "[role=dialog] .asheet-list") },
-    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} more`, drive: async (p) => {
+    { path: `/dashboard/quotes/${s.longQuoteId}?classic=1`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} more`, drive: async (p) => {
       await p.locator(".q-hero .more-btn").first().click();
       await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
     } },
-    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit`, drive: async (p) => {
+    { path: `/dashboard/quotes/${s.longQuoteId}?classic=1`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit`, drive: async (p) => {
       await p.locator(".q-hero .more-btn").first().click();
       await p.locator("[role=dialog] .asheet-item, [role=menuitem]").first().click();
       await p.waitForSelector(".edit-bar");
     } },
-    { path: `/dashboard/quotes/${s.longQuoteId}`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit line`, drive: async (p) => {
+    { path: `/dashboard/quotes/${s.longQuoteId}?classic=1`, session: "owner", name: `/dashboard/quotes/${s.longQuoteId} edit line`, drive: async (p) => {
       await p.locator(".q-hero .more-btn").first().click();
       await p.locator("[role=dialog] .asheet-item, [role=menuitem]").first().click();
       await p.waitForSelector(".edit-bar");
@@ -377,6 +377,14 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     { path: "/dashboard", session: "foreman", name: "/dashboard More sheet (foreman)", drive: (p) => openPhoneSheet(p, ".tabbar button.tabbar-link", ".more-sheet") },
     // Phase 104: Today's period switch (a sheet on a phone, a menu wider), and the home a Pro owner sees (no crew tier: no blockers or hours).
     { path: "/dashboard", session: "owner", name: "/dashboard period switch", drive: async (p) => {
+      // The Pocket phone home (Phase 145) switches the period in place: Week · Month · Quarter.
+      await p.waitForSelector(".pk-seg.tint button, .today-stats .more-btn");
+      const seg = p.locator(".pk-seg.tint button");
+      if (await seg.count()) {
+        await seg.last().click();
+        await p.waitForSelector('.pk-seg.tint button:last-of-type[aria-pressed="true"]');
+        return;
+      }
       await p.locator(".today-stats .more-btn").first().click();
       await p.waitForSelector("[role=dialog] .asheet-list, [role=menu]");
     } },

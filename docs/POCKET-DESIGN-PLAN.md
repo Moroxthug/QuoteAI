@@ -228,3 +228,8 @@ Turning it on for everyone is a one-line change: `pocketEnabled()` in `component
 - **2026-09-29, 152:**
   - `qa:bundle` is green after an 8 kB raise on the signed-in shell, recorded in `perf-budgets.json`. The Pocket quote, Settings, Home and the assistant load as their own chunks.
   - Canvas compared screen by screen against local renders of the canvas sources (`dc-runtime.js`). The sample data differs, so the comparison is structural, not pixel-exact.
+  - `qa:visual` at 375 EN: the first run had 798 findings, the second 53, all fixed:
+    - **Contrast.** The canvas's lightest greys were swapped for its secondary grey #6e6e76. On tinted fills (#f1f0ec, #e9e8e4, #f8e6e2) that grey only reaches 4.1–4.4:1, so it goes one step darker there (#636369). The amber status pill text is #8a5a10. The green confirm buttons use the canvas's dark green #1f7a45.
+    - **Touch targets.** Absolute `::after` margins make the tick, chips, quote lines and stepper 44 px, keeping their drawn size. Small buttons and inputs are also 44 px.
+    - **Screen readers.** Avatar initials are drawn from a `data-i` attribute via CSS, so the menu and crew buttons are read by their names. Unavailable send channels are disabled, and the canvas's 0.55 fade is kept. The integrations headings follow the pane level.
+    - The portal and schedule 500s in that run were Supabase connection drops, not code faults.

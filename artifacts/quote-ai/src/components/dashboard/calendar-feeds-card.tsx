@@ -14,6 +14,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCan } from "@/hooks/use-role";
 import { cn } from "@/lib/utils";
 import { calendarApi } from "@/lib/calendar-api";
+import { useSinglePane } from "@/pages/dashboard/settings/ui";
 
 const FEEDS_KEY = ["calendar-feeds"];
 const PUBLISH_KEY = ["calendar-publish"];
@@ -33,6 +34,8 @@ export function CalendarFeedsCard() {
   const { toast } = useToast();
   const can = useCan();
   const queryClient = useQueryClient();
+  // One level under the app detail's heading: h1 on a phone, h2 on the wide screen.
+  const Heading = useSinglePane() ? "h2" : "h3";
   const editable = can("integrations", "full");
 
   const feeds = useQuery({ queryKey: FEEDS_KEY, queryFn: () => calendarApi.feeds(), retry: false });
@@ -120,7 +123,7 @@ export function CalendarFeedsCard() {
       {/* ── Subscribed .ics feeds ─────────────────────────────────────────── */}
       <div className="flex items-start gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold">{t("dashboard.settings.calendarFeeds.title")}</h3>
+          <Heading className="text-sm font-semibold">{t("dashboard.settings.calendarFeeds.title")}</Heading>
           <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.calendarFeeds.desc")}</p>
         </div>
       </div>
@@ -199,7 +202,7 @@ export function CalendarFeedsCard() {
 
       {/* ── The published feed ────────────────────────────────────────────── */}
       <div className="pt-3 border-t" style={{ borderColor: "var(--soft)" }}>
-        <h3 className="text-sm font-semibold">{t("dashboard.settings.calendarPublish.title")}</h3>
+        <Heading className="text-sm font-semibold">{t("dashboard.settings.calendarPublish.title")}</Heading>
         <p className="text-xs text-muted-foreground mt-0.5">{t("dashboard.settings.calendarPublish.desc")}</p>
 
         {publishedUrl && (

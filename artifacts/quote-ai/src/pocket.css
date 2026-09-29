@@ -436,6 +436,21 @@ html.pocket :where(.content, .modal, .sheet) .btn-sm::after { content: ""; posit
 .pk-btn-link::after { content: ""; position: absolute; inset: -8px 0; }
 html.pocket .stabs .pill, html.pocket .pills .pill { min-height: 44px; }
 html.pocket a.text-link { display: inline-flex; align-items: center; min-height: 44px; }
+html.pocket :where(.content, .modal, .sheet) .btn-sm { min-width: 44px; }
+html.pocket :where(.content, .modal, .sheet) input.h-9 { height: 44px; }
+.pk-stepper > button { position: relative; }
+.pk-stepper > button::after { content: ""; position: absolute; inset: -5px; }
+.pk-line-btn { position: relative; }
+.pk-line-btn::after { content: ""; position: absolute; inset: -10px 0; }
+/* Initials drawn from an attribute, so a control's name ("Open menu") is all it says. */
+.pk-initials::before { content: attr(data-i); }
+
+/* ---------- Contrast on tinted fills (Phase 152) ----------
+   The canvas grey (#6e6e76) is 5:1 on white but 4.1–4.4:1 on the grey and pink fills; one
+   step darker there only. The same for the amber status pill, and white on the green button. */
+html.pocket :is(.app-soon-note, .chap-head > .let, .src.on > p, .src.on .chip, .ag-time > span, .th-row > span, .total .lrow-meta, .te-group > span) { color: #636369 !important; }
+html.pocket .doc-status.warn { color: #8a5a10; }
+html.pocket .btn-navy[style*="--green"] { background: var(--pk-ok) !important; }
 /* The assistant page's message box may shrink so its send button stays on screen. */
 html.pocket .chat-in input { min-width: 0; }
 

@@ -62,7 +62,8 @@ captures/
 .cxx/
 
 # Google Services (e.g. APIs or Firebase)
-# google-services.json
+# Phase 123: kept out of git - a local copy for local builds, the GOOGLE_SERVICES_JSON secret for CI.
+app/google-services.json
 
 # Freeline
 freeline.py

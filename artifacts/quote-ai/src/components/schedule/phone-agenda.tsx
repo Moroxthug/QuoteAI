@@ -211,7 +211,7 @@ export function PhoneAgenda({ weekFrom, day, onPickDay, onShiftWeek, onToday, mo
         {mode === "job" && byJob.map((g) => (
           <div key={g.id ?? "none"} className={cn("ag-group", !g.id && "muted")}>
             <div className="ag-group-head">
-              <h3>{g.id ? <Link href={`/dashboard/jobs/${g.id}`}>{g.name}</Link> : g.name}</h3>
+              <h3>{g.id ? <Link href={`/dashboard/jobs/${g.id}`} className="hit-x">{g.name}</Link> : g.name}</h3>
               {g.address && (
                 <a className="crew-job-addr" href={mapsUrl(g.address)} target="_blank" rel="noopener noreferrer"><MapPin aria-hidden="true" />{g.address}</a>
               )}

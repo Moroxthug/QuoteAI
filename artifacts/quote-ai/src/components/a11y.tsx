@@ -34,6 +34,26 @@ export function SkipLink({ targetId = "main" }: { targetId?: string }) {
   );
 }
 
+function focusHeading(h: HTMLElement) {
+  h.setAttribute("tabindex", "-1");
+  h.setAttribute("data-route-focus", "");
+  h.focus({ preventScroll: true });
+}
+
+/** The heading of the screen on show (a screen kept alive behind another is hidden). */
+function visibleHeading(): HTMLElement | null {
+  if (!document.querySelector("#main")) return document.querySelector<HTMLElement>("h1");
+  return Array.from(document.querySelectorAll<HTMLElement>("#main h1")).find((h) => h.getClientRects().length > 0 && !h.closest("[hidden], [inert], [aria-hidden='true']")) ?? null;
+}
+
+/** Move focus to the new screen's heading, unless the screen or an open sheet already holds it. */
+function shouldFocusHeading(active: Element | null): boolean {
+  if (document.querySelector('[role="dialog"], [role="alertdialog"]')) return false;
+  if (!active || active === document.body || !active.isConnected) return true;
+  const fieldOnScreen = active.matches("input, textarea, select, [contenteditable='true']") && !!active.closest("#main");
+  return !fieldOnScreen;
+}
+
 /**
  * A client-side navigation replaces the page in silence: the URL changes, the
  * DOM changes, and a screen reader — which announces a *document* load — says
@@ -52,11 +72,74 @@ export function RouteAnnouncer() {
       return;
     }
     setMessage("");
-    const timer = window.setTimeout(() => {
-      const h1 = document.querySelector("h1")?.textContent?.trim();
-      setMessage(h1 || document.title || location);
-    }, 250);
-    return () => window.clearTimeout(timer);
+    // Phase 122: focus follows the screen. The tapped link or tab is gone
+    // (or on another screen), so TalkBack / VoiceOver would start reading
+    // from the top of the page or from nowhere; on the new screen's heading
+    // it reads the title and continues with the content. Unless the screen
+    // took focus itself (a field it opened on) or a sheet is open.
+    //
+    // For up to 4 s it watches: a screen still loading shows a skeleton; a
+    // tab switch keeps the old screen up for a moment; a sheet that led here
+    // is still closing (and hands focus back to its button when it goes); a
+    // screen may draw its heading again when its data arrives. Each time the
+    // new screen is ready and focus is still where the navigation left it —
+    // the tapped control, the app's chrome, <body>, or a heading since
+    // replaced — it goes to the visible heading. Anything the person does
+    // on the new screen in the meantime wins.
+    const started = Date.now();
+    const origin = document.activeElement;
+    // The old screen can still be up when this runs (a tab switch renders in a transition): its heading is not the new one.
+    const before = visibleHeading();
+    const beforeText = before?.textContent;
+    let timer = 0;
+    let focused: HTMLElement | null = null;
+    let sheetAt = 0;
+    // A key or a tap after the screen changed is the person taking over (opening a menu, typing): stop there.
+    let acted = false;
+    const onAct = () => { acted = true; };
+    const stopWatching = () => {
+      document.removeEventListener("pointerdown", onAct, true);
+      document.removeEventListener("keydown", onAct, true);
+    };
+    document.addEventListener("pointerdown", onAct, true);
+    document.addEventListener("keydown", onAct, true);
+    const ours = (a: Element | null) => !a || a === document.body || !a.isConnected || a === origin || a === focused || !a.closest("#main");
+    const speak = (heading: HTMLElement | null) => setMessage(heading?.textContent?.trim() || document.title || location);
+    const settle = () => {
+      if (acted) {
+        stopWatching();
+        if (!focused) speak(visibleHeading());
+        return;
+      }
+      const main = document.querySelector("#main");
+      const heading = visibleHeading();
+      const loading = !!main?.querySelector("[class*='skel'], [aria-busy='true']");
+      const sheet = !!document.querySelector('[role="dialog"], [role="alertdialog"]');
+      if (sheet) sheetAt = Date.now();
+      // A slow phone can take a while to close the sheet and hand focus back: watch 1 s past it.
+      const over = (Date.now() - started >= 4000 && Date.now() - sheetAt >= 1000) || Date.now() - started >= 10_000;
+      const stale = heading === before && heading?.textContent === beforeText && Date.now() - started < 600;
+      if (heading && !loading && !sheet && !stale) {
+        const a = document.activeElement;
+        if (a !== heading) {
+          if (!ours(a)) return focused ? undefined : speak(heading); // the person has moved on
+          if (!shouldFocusHeading(a)) return speak(heading); // the screen focused a field
+          focusHeading(heading);
+          focused = heading;
+        }
+      }
+      if (over) {
+        stopWatching();
+        if (!focused) speak(heading);
+        return;
+      }
+      timer = window.setTimeout(settle, 100);
+    };
+    timer = window.setTimeout(settle, 150);
+    return () => {
+      window.clearTimeout(timer);
+      stopWatching();
+    };
   }, [location]);
 
   return (

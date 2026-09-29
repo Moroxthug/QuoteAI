@@ -1,6 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { rawFetch } from "./raw-fetch";
 import { affectsAny, type Change } from "./affects";
+import { isForeground, onForegroundChange } from "@/lib/app-state";
 
 // Phase 117 (docs/APP-PLAN.md "Sync II"): live on every device.
 //
@@ -44,7 +45,8 @@ export function startLiveUpdates(qc: QueryClient): () => void {
   let backoffMs = 0;
   let wakeTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const canRun = () => !stopped && document.visibilityState === "visible" && navigator.onLine;
+  // Phase 122: not behind another app either (lib/app-state.ts).
+  const canRun = () => !stopped && isForeground() && navigator.onLine;
 
   const apply = (feed: Feed) => {
     if (feed.reset) {
@@ -102,13 +104,13 @@ export function startLiveUpdates(qc: QueryClient): () => void {
     stopped = true;
     controller?.abort();
     if (wakeTimer) clearTimeout(wakeTimer);
-    document.removeEventListener("visibilitychange", wake);
+    offForeground();
     window.removeEventListener("online", wake);
     window.removeEventListener("offline", wake);
     stopCurrent = null;
   };
 
-  document.addEventListener("visibilitychange", wake);
+  const offForeground = onForegroundChange(wake);
   window.addEventListener("online", wake);
   window.addEventListener("offline", wake);
   stopCurrent = stop;

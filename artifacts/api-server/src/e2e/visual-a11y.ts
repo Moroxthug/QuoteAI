@@ -75,6 +75,9 @@ const GATE = args.get("gate") !== "false";
 // `--text=2` for the accessibility sizes, Phase 122), then every label
 // (button, chip, pill, tab, field label, tab bar) checked for being cut off.
 const TEXT_SCALE = args.has("text") ? Number(args.get("text")) || 1.35 : 1;
+// Phase 122: 44 px touch targets at phone width (`--targets=false` to skip).
+const RUN_TARGETS = args.get("targets") !== "false";
+const TARGET_MIN = 44;
 const PROVINCE = (args.get("province") ?? "ON") as "ON" | "QC";
 const VITE_PORT = Number(args.get("port") ?? 5197);
 // A second run alongside a full sweep needs its own port AND its own output dir (the run starts by wiping it).
@@ -532,7 +535,7 @@ async function gutter(page: Page, width: number): Promise<PageResult["gutter"]> 
 // see, at phone width only. Phase 113 made them the gate: any of them fails
 // the run (exit 1), and every page has a height budget. Each names what it
 // found so the fix is obvious from the report alone.
-type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar" | "clipped-label";
+type PhoneRule = "stacked-buttons" | "full-width-stat" | "wide-table" | "wrapping-tabs" | "tall-page" | "primary-offscreen" | "under-tabbar" | "clipped-label" | "small-target";
 type PhoneWarning = { rule: PhoneRule; detail: string };
 const PHONE_WIDTH = 640;
 
@@ -644,20 +647,89 @@ async function phoneRules(page: Page, width: number, r: RouteSpec): Promise<{ wa
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     const top = bar.getBoundingClientRect().top;
     let bottom = 0;
+    let last = "";
     for (const el of Array.from(document.querySelectorAll("#main *"))) {
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       if (r.height === 0 || cs.position === "fixed" || cs.visibility === "hidden") continue;
       // Docked things (the bar itself, the action bar, sheets) are over the page, not the end of it.
       if (el.closest("[role='dialog'], .action-bar, .tabbar")) continue;
-      bottom = Math.max(bottom, r.bottom);
+      if (r.bottom > bottom) { bottom = r.bottom; last = `${el.tagName.toLowerCase()}.${String((el as HTMLElement).className).split(" ").slice(0, 2).join(".")}`; }
     }
     window.scrollTo(0, 0);
-    return bottom > top + 1 ? `content ends ${Math.round(bottom - top)}px under the tab bar` : null;
+    return bottom > top + 1 ? `content ends ${Math.round(bottom - top)}px under the tab bar (${last})` : null;
   });
   if (covered) found.push({ rule: "under-tabbar", detail: covered });
-  if (TEXT_SCALE !== 1) found.push(...(await clippedLabels(page)));
+  if (TEXT_SCALE !== 1) {
+    // Phase 122: at a larger text size a page is taller and its primary action lower by design —
+    // the height budgets, "primary on screen one" and "a row of pills stays one line" are rules for the standard size.
+    for (let i = found.length - 1; i >= 0; i--) if (found[i]!.rule === "tall-page" || found[i]!.rule === "primary-offscreen" || found[i]!.rule === "wrapping-tabs") found.splice(i, 1);
+    found.push(...(await clippedLabels(page)));
+  }
+  if (RUN_TARGETS) found.push(...(await smallTargets(page)));
   return { warnings: found as PhoneWarning[], screens };
+}
+
+// Phase 122: every touch target at least 44 × 44 px (Apple's 44 pt, Android's
+// 48 dp rounded to what a finger reliably hits; WCAG 2.5.5). What counts is the
+// box that takes the tap: a checkbox or radio is its label's box, a field its
+// own. Exempt, as WCAG exempts them: a link inside a sentence (the line of text
+// sets its size), anything hidden from touch, the skip link, and a target with
+// no other target within 44 px of its centre (spacing makes up for size).
+async function smallTargets(page: Page): Promise<PhoneWarning[]> {
+  await page.evaluate("globalThis.__name = globalThis.__name || function (f) { return f }").catch(() => {});
+  const found = await page.evaluate((min) => {
+    const SEL = "a[href], button, input:not([type='hidden']), select, textarea, summary, [role='button'], [role='tab'], [role='switch'], [role='checkbox'], [role='radio'], [role='link'], [role='menuitem'], [tabindex]:not([tabindex='-1'])";
+    const label = (el: Element) => {
+      const cls = typeof (el as HTMLElement).className === "string" && (el as HTMLElement).className ? "." + (el as HTMLElement).className.trim().split(/\s+/).slice(0, 2).join(".") : "";
+      const text = ((el as HTMLElement).innerText || el.getAttribute("aria-label") || (el as HTMLInputElement).placeholder || "").trim().replace(/\s+/g, " ").slice(0, 28);
+      return `${el.tagName.toLowerCase()}${cls}${text ? ` "${text}"` : ""}`;
+    };
+    const vw = document.documentElement.clientWidth;
+    const inSentence = (el: Element) => {
+      if (el.tagName !== "A" || getComputedStyle(el).display !== "inline") return false;
+      const block = el.parentElement;
+      if (!block) return false;
+      const own = ((el as HTMLElement).innerText ?? "").trim().length;
+      return ((block as HTMLElement).innerText ?? "").trim().length > own + 12;
+    };
+    const boxes: Array<{ el: Element; r: DOMRect }> = [];
+    for (const el of Array.from(document.querySelectorAll(SEL))) {
+      if ((el as HTMLButtonElement).disabled || el.closest("[aria-hidden='true'], [inert], .sr-only, .skip-link")) continue;
+      if (el.closest("details:not([open])") && !el.closest("summary")) continue; // folded away, not tappable
+      let target: Element = el;
+      if (el.matches("input[type='checkbox'], input[type='radio']")) target = el.closest("label") ?? (el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`) : null) ?? el;
+      let r = target.getBoundingClientRect();
+      const cs = getComputedStyle(target);
+      if (r.width === 0 || r.height === 0) continue; // not drawn (a section hidden on phones)
+      // A tap area drawn wider than the control by an absolutely placed ::after
+      // (`.hit-x` in mockup-system.css) takes the tap too: measure that.
+      const after = getComputedStyle(target, "::after");
+      if (after.content !== "none" && after.content !== "normal" && after.position === "absolute" && cs.position !== "static") {
+        const px = (v: string) => (v.endsWith("px") ? parseFloat(v) : 0);
+        const top = Math.min(0, px(after.top)), left = Math.min(0, px(after.left)), right = Math.min(0, px(after.right)), bottom = Math.min(0, px(after.bottom));
+        r = new DOMRect(r.left + left, r.top + top, r.width - left - right, r.height - top - bottom);
+      }
+      if (r.width === 0 || r.height === 0 || cs.visibility === "hidden" || cs.pointerEvents === "none" || r.right < 0 || r.left > vw) continue;
+      // A control wrapped by a bigger one (an icon button inside a clickable row) takes the row's tap.
+      if (target !== el || !inSentence(el)) boxes.push({ el: target, r });
+    }
+    const out: string[] = [];
+    const seen = new Set<Element>();
+    for (const b of boxes) {
+      if (seen.has(b.el)) continue;
+      seen.add(b.el);
+      if (b.r.width >= min - 0.5 && b.r.height >= min - 0.5) continue;
+      const cx = b.r.left + b.r.width / 2, cy = b.r.top + b.r.height / 2;
+      // Spacing exception: no other target's box comes within half a finger of this one's centre.
+      const crowded = boxes.some((o) => o.el !== b.el && !o.el.contains(b.el) && !b.el.contains(o.el) &&
+        Math.max(o.r.left - cx, 0, cx - o.r.right) < min / 2 && Math.max(o.r.top - cy, 0, cy - o.r.bottom) < min / 2);
+      if (!crowded) continue;
+      out.push(`${label(b.el)} ${Math.round(b.r.width)}×${Math.round(b.r.height)}`);
+    }
+    return Array.from(new Set(out)).slice(0, 15);
+  }, TARGET_MIN);
+  return found.map((detail) => ({ rule: "small-target" as const, detail }));
 }
 
 // Phase 120: the phone's text-size setting, as a WebView applies it — font
@@ -683,7 +755,7 @@ async function clippedLabels(page: Page): Promise<PhoneWarning[]> {
     for (const el of Array.from(document.querySelectorAll<HTMLElement>(LABELS))) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0 || el.closest("[aria-hidden='true'], .sr-only, .lrow-title, .lrow-meta")) continue;
-      const text = (el.innerText ?? "").trim().replace(/s+/g, " ");
+      const text = (el.innerText ?? "").trim().replace(/\s+/g, " ");
       if (!text) continue;
       const cs = getComputedStyle(el);
       const hides = cs.overflowX !== "visible" || cs.textOverflow === "ellipsis";

@@ -8,6 +8,8 @@ import type { FieldConflict } from "../sync/merge";
 import { tempIdFor, TEMP_ID_RE } from "../sync/temp-id";
 import { rawFetch } from "../sync/raw-fetch";
 import { transcribeAudio } from "../speech";
+import { isForeground } from "../app-state";
+import { holdsForWifi, onConnectionChange } from "./data-saver";
 
 /** Phase 117: the replay of queued edits is its own chunk, loaded when there is one to send. */
 const syncCore = () => import("../sync/replay");
@@ -75,6 +77,8 @@ export type OutboxRow = {
   error: string | null;
   op: OutboxOp;
   conflict?: OutboxConflict;
+  /** Phase 122: a photo held for Wi-Fi that the person chose to send over the phone's data anyway. */
+  sendNow?: boolean;
 };
 
 export type OutboxSnapshot = { rows: OutboxRow[]; syncing: boolean; supported: boolean; lastSyncedAt: string | null };
@@ -169,6 +173,15 @@ export async function clearOutbox(): Promise<void> {
   loaded = Promise.resolve();
   emit();
   if (idbSupported()) await idbClear(OUTBOX_STORE).catch(() => undefined);
+}
+
+/** Phase 122: a photo waiting for Wi-Fi goes now, over the phone's data. */
+export async function sendNow(id: string): Promise<void> {
+  await ensureLoaded();
+  const row = rows.find((r) => r.id === id);
+  if (!row) return;
+  await update({ ...row, sendNow: true });
+  scheduleFlush(0);
 }
 
 export async function discard(id: string): Promise<void> {
@@ -344,7 +357,8 @@ export async function flush(): Promise<void> {
   if (syncing) return;
   await ensureLoaded();
   if (typeof navigator !== "undefined" && !navigator.onLine) return;
-  const pending = rows.filter((r) => r.status === "pending");
+  // Phase 122: photos held for Wi-Fi stay put (nothing waits on them).
+  const pending = rows.filter((r) => r.status === "pending" && !holdsForWifi(r));
   if (pending.length === 0) return;
   syncing = true;
   emit();
@@ -399,10 +413,13 @@ export function startOutbox(): void {
     if (document.visibilityState === "visible") scheduleFlush(0);
   });
   void ensureLoaded().then(() => scheduleFlush(1_000));
-  // Belt and braces for a queue that is stuck behind a retryable error.
+  // Belt and braces for a queue that is stuck behind a retryable error —
+  // only while the app is in front (Phase 122: coming back flushes anyway).
   setInterval(() => {
-    if (rows.some((r) => r.status === "pending") && !syncing) scheduleFlush(0);
+    if (isForeground() && rows.some((r) => r.status === "pending" && !holdsForWifi(r)) && !syncing) scheduleFlush(0);
   }, 45_000);
+  // Phase 122: photos held for Wi-Fi go the moment the phone joins one.
+  onConnectionChange(() => scheduleFlush(250));
 }
 
 export function useOutbox(scope?: string): OutboxSnapshot {
@@ -427,6 +444,8 @@ export function useOutbox(scope?: string): OutboxSnapshot {
 export async function runOrQueue<T>(op: OutboxOp, opts: { scope: string; label: string }, live: (clientRef: string) => Promise<T>): Promise<{ queued: true; row: OutboxRow } | { queued: false; result: T }> {
   const id = newClientRef();
   if (typeof navigator !== "undefined" && !navigator.onLine) return { queued: true, row: await enqueue(op, { id, ...opts }) };
+  // Phase 122: "Upload photos on Wi-Fi only" and the phone is on its data plan.
+  if (holdsForWifi({ op })) return { queued: true, row: await enqueue(op, { id, ...opts }) };
   try {
     return { queued: false, result: await live(id) };
   } catch (err) {

@@ -95,7 +95,9 @@
         "@capacitor/push-notifications",
         "@capacitor/share",
         "@capawesome/capacitor-app-shortcuts",
-        "@capgo/capacitor-share-target"
+        "@capgo/capacitor-share-target",
+        "@capacitor/network",
+        "@capacitor/text-zoom"
       ]
     }
   }

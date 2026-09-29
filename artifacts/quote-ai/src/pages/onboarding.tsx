@@ -382,7 +382,7 @@ export default function OnboardingPage() {
                   <button
                     type="button"
                     onClick={() => void handleSkip()}
-                    className="w-full text-center text-xs transition-colors py-1"
+                    className="w-full text-center text-xs transition-colors py-1 min-h-[44px]"
                     style={{ color: "var(--faint)" }}
                     disabled={isSaving}
                     data-skip-onboarding=""

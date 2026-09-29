@@ -110,7 +110,7 @@ export function WorkerToday({ token, jobs, canAddTasks, nowJobId }: { token: str
                     <div key={task.id} className="flex items-start gap-2.5 py-1">
                       {/* A task still in the outbox has no server id to tick yet. */}
                       <input id={id} type="checkbox" className="mt-0.5 h-5 w-5 shrink-0" checked={status === "done"} disabled={queued} onChange={(e) => void toggle(task.id, e.target.checked)} />
-                      <label htmlFor={id} className="text-sm leading-snug flex-1 min-w-0" style={{ color: status === "done" ? "var(--faint)" : "var(--ink)", textDecoration: status === "done" ? "line-through" : undefined }}>
+                      <label htmlFor={id} className="text-sm leading-snug flex-1 min-w-0 flex items-center min-h-[44px]" style={{ color: status === "done" ? "var(--faint)" : "var(--ink)", textDecoration: status === "done" ? "line-through" : undefined }}>
                         {task.title}
                         {task.milestoneTitle && <span className="block text-[11px]" style={{ color: "var(--faint)" }}>{task.milestoneTitle}</span>}
                         {task.addedBy && <span className="block text-[11px]" style={{ color: "var(--faint)" }}>{t("crew.addedBy").replace("{name}", task.addedBy)}</span>}

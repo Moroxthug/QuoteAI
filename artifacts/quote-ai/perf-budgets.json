@@ -42,7 +42,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/quotes/[id].tsx"
       ],
-      "budget": 348
+      "budget": 353
     },
     {
       "name": "New quote",
@@ -209,7 +209,7 @@
         "src/components/layout/public-layout.tsx",
         "src/pages/home.tsx"
       ],
-      "budget": 215
+      "budget": 220
     },
     {
       "name": "Home (FR)",
@@ -246,7 +246,7 @@
         "src/components/layout/public-layout.tsx",
         "src/pages/sign-in.tsx"
       ],
-      "budget": 195
+      "budget": 200
     },
     {
       "name": "Client quote",
@@ -257,7 +257,7 @@
         "@strings",
         "src/pages/p/[id].tsx"
       ],
-      "budget": 205
+      "budget": 210
     },
     {
       "name": "Client signing",

@@ -24,7 +24,8 @@ import { haptic } from "@/lib/haptics";
 import { markNextNav } from "@/lib/motion/nav-mark";
 
 // Phase 121: More → This app → fingerprint / face unlock (the app only; the row shows when the phone can).
-const BiometricRow = isNativeApp ? lazy(() => import("@/components/native/app-lock").then((m) => ({ default: m.BiometricRow }))) : null;
+// Phase 122: and photos on Wi-Fi only.
+const ThisAppGroup = isNativeApp ? lazy(() => import("@/components/native/this-app").then((m) => ({ default: m.ThisAppGroup }))) : null;
 
 /**
  * Phase 101 — how you move around the dashboard on a phone or a tablet
@@ -250,7 +251,7 @@ function MoreSheet({ open, onOpenChange, tabs, navItems, name, email, avatar, ca
             );
           })}
 
-          {BiometricRow && <Suspense fallback={null}><BiometricRow /></Suspense>}
+          {ThisAppGroup && <Suspense fallback={null}><ThisAppGroup /></Suspense>}
 
           <div className="more-card">
             <button type="button" className="more-row danger" onClick={onSignOut}>

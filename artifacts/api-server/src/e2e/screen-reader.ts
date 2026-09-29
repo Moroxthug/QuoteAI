@@ -23,6 +23,10 @@
 //                        total silence unless something announces it
 //   modal-semantics      an open drawer/dialog: role, name, focus inside,
 //                        Escape, and the page behind it out of reach
+//   reading-order        (Phase 122, phones) TalkBack and VoiceOver swipe
+//                        through the page in DOM order; a control that comes
+//                        later in the DOM but sits higher on a one-column
+//                        phone screen is read after what is below it
 //
 // Everything here is read-only apart from `.focus()` (restored afterwards) and
 // the interaction check, which opens a menu and closes it again.
@@ -39,7 +43,8 @@ export type SrRule =
   | "landmarks"
   | "table-headers"
   | "route-announcer"
-  | "modal-semantics";
+  | "modal-semantics"
+  | "reading-order";
 
 export type SrFinding = { rule: SrRule; target: string; detail: string };
 
@@ -58,6 +63,7 @@ export const SR_BLOCKING: ReadonlySet<SrRule> = new Set<SrRule>([
   "focus-visible",
   "positive-tabindex",
   "modal-semantics",
+  "reading-order",
 ]);
 
 // ── The static half: one pass inside the page ────────────────────────────────
@@ -99,6 +105,8 @@ export async function screenReaderAudit(page: Page, opts: { width: number }): Pr
       if (el.hasAttribute("disabled") || el.getAttribute("aria-disabled") === "true") return false;
       if ((el.getAttribute("tabindex") ?? "0") === "-1") return false;
       if (el.closest("[inert]")) return false;
+      // Inside a closed <details> (not its summary): not reachable, though Chrome still gives it a box (Phase 122).
+      if (el.closest("details:not([open])") && !el.closest("summary")) return false;
       const cs = getComputedStyle(el);
       if (cs.display === "none" || cs.visibility === "hidden") return false;
       const r = el.getBoundingClientRect();
@@ -281,6 +289,32 @@ export async function screenReaderAudit(page: Page, opts: { width: number }): Pr
       if (document.getElementById("root")) add("route-announcer", "body", "no polite live region announcing the page after a client-side navigation");
     } else if (announcer.getAttribute("aria-live") !== "polite") {
       add("route-announcer", "[data-route-announcer]", `aria-live="${announcer.getAttribute("aria-live")}" (expected polite)`);
+    }
+
+    // ── reading-order (phones) ───────────────────────────────────────────────
+    // Consecutive tabbables in DOM order, in the same column (they overlap
+    // sideways), where the later one is drawn a full row (> 24 px) above the
+    // earlier. Docked bars (fixed / sticky: the top bar, the tab bar, an action
+    // bar) are read where the DOM puts them on purpose and are left out, as are
+    // rows that scroll sideways (a chip rail) and open dialogs.
+    if (width <= 640) {
+      const docked = (el: Element) => {
+        for (let p: Element | null = el; p && p !== document.body; p = p.parentElement) {
+          const pos = getComputedStyle(p).position;
+          if (pos === "fixed" || pos === "sticky") return true;
+        }
+        return false;
+      };
+      const flow = tabbables.filter((el) => !docked(el) && !el.closest("[role='dialog']")).map((el) => ({ el, r: el.getBoundingClientRect() }));
+      let reported = 0;
+      for (let i = 1; i < flow.length && reported < 3; i++) {
+        const a = flow[i - 1]!, b = flow[i]!;
+        const sameColumn = b.r.left < a.r.right - 4 && a.r.left < b.r.right - 4;
+        if (sameColumn && b.r.bottom < a.r.top - 24) {
+          add("reading-order", sel(b.el), `"${nameOf(b.el).slice(0, 30)}" is read after ${sel(a.el)} "${nameOf(a.el).slice(0, 30)}" but drawn ${Math.round(a.r.top - b.r.top)}px above it`);
+          reported++;
+        }
+      }
     }
 
     return findings;

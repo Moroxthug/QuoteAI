@@ -48,7 +48,7 @@ export default function MappaSitoPage() {
 
       {/* Main Directory */}
       <section className="sec soft">
-        <div className="wrap" style={{ maxWidth: 1080 }}>
+        <div className="wrap sitemap" style={{ maxWidth: 1080 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
 
             {/* Section 1: Main Pages */}
@@ -162,13 +162,16 @@ export default function MappaSitoPage() {
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {sortedRegions.map((region) => {
                 const regionCities = citiesByRegion.get(region) || [];
                 return (
-                  <div key={region} style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 28 }}>
-                    <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)", marginBottom: 16 }}>{region}</h3>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", rowGap: 16, columnGap: 8, fontSize: 12.5 }}>
+                  // Phase 122: one fold per region — every city link a full tap target made the page 21 phone screens long.
+                  <details key={region} className="sm-region" style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 12 }}>
+                    <summary style={{ display: "flex", alignItems: "center", minHeight: 44, cursor: "pointer" }}>
+                      <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)" }}>{region} <span style={{ fontWeight: 600, color: "var(--faint)" }}>({regionCities.length})</span></h3>
+                    </summary>
+                    <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", rowGap: 16, columnGap: 8, fontSize: 12.5 }}>
                       {regionCities.map((city) => (
                         <div key={city.slug} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                           <span style={{ fontWeight: 700, color: "var(--navy)", borderBottom: "1px solid var(--soft)", paddingBottom: 2, marginBottom: 2 }}>{city.name}</span>
@@ -191,7 +194,7 @@ export default function MappaSitoPage() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </details>
                 );
               })}
             </div>

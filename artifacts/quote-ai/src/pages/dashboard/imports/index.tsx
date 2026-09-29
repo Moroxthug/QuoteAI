@@ -213,7 +213,7 @@ const can = useCan();
             spreadsheet in and get a 403 toast for their trouble. */}
         {!can("imports", "edit") && <p className="foot-note" style={{ padding: "6px 0 2px" }}>{t("roles.readOnly")}</p>}
         {can("imports", "edit") && (<>
-        <div className="src-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+        <div className="src-grid two">
           <button type="button" className={cn("src", source === "csv" && "on")} onClick={() => setSource("csv")}>
             <b>{t("imports.uploadSpreadsheet")}</b>
             <p>{t("imports.uploadSpreadsheetDesc")}</p>

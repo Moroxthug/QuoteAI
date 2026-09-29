@@ -20,6 +20,7 @@
     "qa:phone-sheets": "tsx src/e2e/phone-sheets.ts",
     "qa:pdf": "tsx src/e2e/pdf-matrix.ts",
     "qa:perf": "tsx src/e2e/api-perf.ts",
+    "qa:devices": "tsx src/e2e/device-lab.ts",
     "ops:backup": "tsx scripts/backup.ts",
     "ops:restore": "tsx scripts/restore.ts",
     "ops:rotate-token-key": "tsx scripts/rotate-token-key.ts",

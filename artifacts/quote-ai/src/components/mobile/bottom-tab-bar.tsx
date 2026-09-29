@@ -52,7 +52,9 @@ export function BottomTabBar({ tabs, label, onNew, newLabel, onTabClick }: { tab
 
   // Phase 120: at the phone's largest text size a long French label ("Aujourd'hui",
   // "Soumissions") no longer fits its fifth of the screen. Like a native tab bar,
-  // the label shrinks to fit (down to 75 %) before it would be cut.
+  // the label shrinks to fit before it would be cut. Phase 122: by a percentage
+  // of its own size (the phone's text zoom applies to px, so a px size would be
+  // zoomed again), down to 50 % — what "Soumissions" needs at 2× text (was 75 %).
   const nav = useRef<HTMLElement>(null);
   const labelKey = tabs.map((tab) => tab.label).join("|");
   useEffect(() => {
@@ -63,8 +65,7 @@ export function BottomTabBar({ tabs, label, onNew, newLabel, onTabClick }: { tab
         span.style.fontSize = "";
         const room = span.parentElement!.clientWidth - 8;
         if (span.scrollWidth <= room) continue;
-        const size = parseFloat(getComputedStyle(span).fontSize);
-        span.style.fontSize = `${Math.max(size * 0.75, (size * room) / span.scrollWidth).toFixed(2)}px`;
+        span.style.fontSize = `${Math.max(50, Math.floor((room / span.scrollWidth) * 100))}%`;
       }
     };
     fit();

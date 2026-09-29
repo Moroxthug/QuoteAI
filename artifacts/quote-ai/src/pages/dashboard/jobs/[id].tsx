@@ -657,7 +657,7 @@ function DocumentsTab({ data, locale }: { data: JobDetailDto; locale: typeof enC
         {docs.map((d) => (
           <div key={d.id} className="item-row">
             <span className="ic"><FileSignature /></span>
-            <div className="grow"><Link href={d.href} className="hover:underline"><b className="ttl">{d.title}</b></Link><span className="sub">{d.sub}</span></div>
+            <div className="grow"><Link href={d.href} className="hover:underline hit-x"><b className="ttl">{d.title}</b></Link><span className="sub">{d.sub}</span></div>
             {d.pdf && <a href={d.pdf} className="text-link"><Download /> PDF</a>}
           </div>
         ))}

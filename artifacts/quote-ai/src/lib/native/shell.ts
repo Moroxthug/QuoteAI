@@ -7,6 +7,8 @@ import { StatusBar, Style } from "@capacitor/status-bar";
 import { API_ORIGIN } from "./env";
 import { appPathForLink, isRootScreen } from "./routes";
 import { isApiFileLink, mapsQueryOf, nativeMapsUrl } from "./links";
+import { setAppActive } from "@/lib/app-state";
+import { setNativeConnection } from "@/lib/offline/data-saver";
 
 // Phase 118: the parts of the phone that are not the web page — the Android
 // back button, links that open the app, the status bar, the keyboard and the
@@ -115,6 +117,18 @@ export async function startShell(): Promise<void> {
       return openWindow(url, target, features);
     };
   }
+
+  // Phase 122: battery and data. Behind another app nothing polls (lib/app-state.ts);
+  // the phone says whether it is on Wi-Fi or its data plan (photos can wait for Wi-Fi).
+  void App.addListener("appStateChange", ({ isActive }) => setAppActive(isActive));
+  if (Capacitor.isNativePlatform()) {
+    void import("@capacitor/network").then(async ({ Network }) => {
+      setNativeConnection((await Network.getStatus()).connectionType);
+      void Network.addListener("networkStatusChange", (s) => setNativeConnection(s.connectionType));
+    }).catch(() => {});
+  }
+  // Phase 122: iOS's WebView ignores the phone's text size; Android's follows it already.
+  if (Capacitor.getPlatform() === "ios") void import("./text-size").then((m) => m.startTextSize()).catch(() => {});
 
   // The app is light (dark mode comes with the app's own palette): dark status-bar icons.
   void StatusBar.setStyle({ style: Style.Light }).catch(() => {});

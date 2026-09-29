@@ -96,8 +96,19 @@ export function initPwa(): void {
         });
       })
       .catch(() => undefined);
+    // Phase 122 (found by the device lab): reload only when one worker
+    // replaces another (an update, asked for here or in another tab). On a
+    // first visit the new worker also claims the page (clients.claim) — also
+    // a controllerchange — and reloading then threw away whatever had been
+    // started in the first seconds (a quote half typed) for nothing: the page
+    // already is the latest build.
+    let hadController = !!navigator.serviceWorker.controller;
     let reloading = false;
     navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadController) {
+        hadController = true;
+        return;
+      }
       if (reloading) return;
       reloading = true;
       window.location.reload();

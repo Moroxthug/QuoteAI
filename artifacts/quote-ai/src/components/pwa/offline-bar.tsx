@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useIsFetching } from "@tanstack/react-query";
-import { WifiOff, RefreshCw, AlertTriangle, CloudUpload, Trash2, RotateCcw, ChevronDown, ChevronUp, DownloadCloud, Check } from "lucide-react";
+import { WifiOff, RefreshCw, AlertTriangle, CloudUpload, Trash2, RotateCcw, ChevronDown, ChevronUp, DownloadCloud, Check, Wifi } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { usePwa, applyUpdate } from "@/lib/pwa";
-import { useOutbox, retryFailed, discard, flush, resolveConflict, type OutboxRow } from "@/lib/offline/outbox";
+import { useOutbox, retryFailed, discard, flush, resolveConflict, sendNow, type OutboxRow } from "@/lib/offline/outbox";
+import { useDataSaver, waitsForWifi } from "@/lib/offline/data-saver";
 import { formatCents } from "@/lib/money";
 import type { Lang } from "@/i18n/translations";
 import { useQueryCacheState } from "@/lib/offline/cache-state";
@@ -125,12 +126,16 @@ export function OfflineBar({ scope }: { scope?: string }) {
   const cache = useQueryCacheState();
   const outbox = useOutbox(scope);
   const [open, setOpen] = useState(false);
-  const pending = outbox.rows.filter((r) => r.status === "pending");
+  // Phase 122: photos kept for Wi-Fi are waiting on purpose, not stuck.
+  const saver = useDataSaver();
+  const held = (r: OutboxRow) => r.status === "pending" && waitsForWifi(r.op, { ...saver, sendNow: r.sendNow });
+  const onWifiHold = outbox.rows.filter(held);
+  const pending = outbox.rows.filter((r) => r.status === "pending" && !held(r));
   const failed = outbox.rows.filter((r) => r.status === "failed");
   const conflicts = outbox.rows.filter((r) => r.status === "conflict");
 
   // The app-wide bar (no scope) also carries the restored-data note.
-  if (pwa.online && pending.length === 0 && failed.length === 0 && conflicts.length === 0 && !pwa.updateReady) return scope ? null : <FreshnessNote />;
+  if (pwa.online && pending.length === 0 && failed.length === 0 && conflicts.length === 0 && onWifiHold.length === 0 && !pwa.updateReady) return scope ? null : <FreshnessNote />;
 
   const tone = failed.length > 0 || conflicts.length > 0 ? "danger" : !pwa.online ? "warn" : "info";
   const palette = tone === "danger" ? { bg: "var(--red-t, #fdece4)", fg: "var(--red)" } : tone === "warn" ? { bg: "var(--yellow-t, #fff4cc)", fg: "var(--yellow-dark)" } : { bg: "var(--teal-t, #e3f4f6)", fg: "var(--teal-dark)" };
@@ -154,6 +159,9 @@ export function OfflineBar({ scope }: { scope?: string }) {
     text = t("offline.syncing").replace("{n}", String(pending.length));
   } else if (pending.length > 0) {
     text = t("offline.waiting").replace("{n}", String(pending.length));
+  } else if (onWifiHold.length > 0) {
+    icon = <Wifi className="h-4 w-4 shrink-0" />;
+    text = t(onWifiHold.length === 1 ? "offline.wifiOne" : "offline.wifiMany").replace("{n}", String(onWifiHold.length));
   } else if (pwa.updateReady) {
     icon = <DownloadCloud className="h-4 w-4 shrink-0" />;
     text = t("offline.updateReady");
@@ -165,13 +173,13 @@ export function OfflineBar({ scope }: { scope?: string }) {
         {icon}
         <span className="flex-1 min-w-0 font-medium">{text}</span>
         {pwa.updateReady && failed.length === 0 && (
-          <button type="button" className="text-xs font-bold underline underline-offset-2" onClick={applyUpdate}>{t("offline.reload")}</button>
+          <button type="button" className="text-xs font-bold underline underline-offset-2 hit-44" onClick={applyUpdate}>{t("offline.reload")}</button>
         )}
         {pwa.online && pending.length > 0 && !outbox.syncing && (
-          <button type="button" className="text-xs font-bold underline underline-offset-2" onClick={() => void flush()}>{t("offline.syncNow")}</button>
+          <button type="button" className="text-xs font-bold underline underline-offset-2 hit-44" onClick={() => void flush()}>{t("offline.syncNow")}</button>
         )}
-        {(failed.length > 0 || pending.length > 0 || conflicts.length > 0) && (
-          <button type="button" aria-expanded={open} aria-label={t("offline.details")} className="p-1 rounded-md" onClick={() => setOpen((o) => !o)}>
+        {(failed.length > 0 || pending.length > 0 || conflicts.length > 0 || onWifiHold.length > 0) && (
+          <button type="button" aria-expanded={open} aria-label={t("offline.details")} className="hit-44 rounded-md" onClick={() => setOpen((o) => !o)}>
             {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
         )}
@@ -183,12 +191,15 @@ export function OfflineBar({ scope }: { scope?: string }) {
             <li key={r.id} className="flex items-center gap-2 pt-1.5 text-xs">
               <div className="flex-1 min-w-0">
                 <div className="truncate font-medium" style={{ color: "var(--ink)" }}>{r.label}</div>
-                <div className="truncate" style={{ color: r.status === "failed" ? "var(--red)" : "var(--muted-mk)" }}>{r.status === "failed" ? r.error ?? t("offline.refused") : t("offline.pendingItem")}</div>
+                <div className="truncate" style={{ color: r.status === "failed" ? "var(--red)" : "var(--muted-mk)" }}>{r.status === "failed" ? r.error ?? t("offline.refused") : held(r) ? t("offline.wifiItem") : t("offline.pendingItem")}</div>
               </div>
-              {r.status === "failed" && (
-                <button type="button" className="p-1" title={t("offline.retry")} aria-label={t("offline.retry")} style={{ color: "var(--navy)" }} onClick={() => void retryFailed(scope)}><RotateCcw className="h-3.5 w-3.5" /></button>
+              {held(r) && pwa.online && (
+                <button type="button" className="text-xs font-bold underline underline-offset-2 hit-44" style={{ color: "var(--navy)" }} onClick={() => void sendNow(r.id)}>{t("offline.syncNow")}</button>
               )}
-              <button type="button" className="p-1" title={t("offline.discard")} aria-label={t("offline.discard")} style={{ color: "var(--muted-mk)" }} onClick={() => void discard(r.id)}><Trash2 className="h-3.5 w-3.5" /></button>
+              {r.status === "failed" && (
+                <button type="button" className="hit-44" title={t("offline.retry")} aria-label={t("offline.retry")} style={{ color: "var(--navy)" }} onClick={() => void retryFailed(scope)}><RotateCcw className="h-3.5 w-3.5" /></button>
+              )}
+              <button type="button" className="hit-44" title={t("offline.discard")} aria-label={t("offline.discard")} style={{ color: "var(--muted-mk)" }} onClick={() => void discard(r.id)}><Trash2 className="h-3.5 w-3.5" /></button>
             </li>
           ))}
         </ul>

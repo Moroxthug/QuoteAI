@@ -87,9 +87,9 @@ export default function AppLock({ onSignOut }: { onSignOut: () => void }) {
   return (
     <>
       {locked && (
-        <div className="app-lock" role="dialog" aria-modal="true" aria-labelledby="app-lock-title" data-app-lock="">
+        <div className="bio-lock" role="dialog" aria-modal="true" aria-labelledby="app-lock-title" data-app-lock="">
           <Logo />
-          <Icon className="app-lock-icon" aria-hidden="true" />
+          <Icon className="bio-lock-icon" aria-hidden="true" />
           <h1 id="app-lock-title">{t("firstRun.bio.lockedTitle")}</h1>
           <button type="button" className="btn btn-navy" onClick={() => void unlock()} disabled={trying || !kind} data-primary-action>
             {t("firstRun.bio.unlockWith").replace("{method}", texts.name)}
@@ -117,7 +117,7 @@ export default function AppLock({ onSignOut }: { onSignOut: () => void }) {
   );
 }
 
-/** More → This app: the switch, shown only on a phone that can do it. */
+/** More → This app: the switch, shown only on a phone that can do it (the group is components/native/this-app.tsx). */
 export function BiometricRow() {
   const { t } = useLanguage();
   const [kind, setKind] = useState<BiometricKind | null>(null);
@@ -138,15 +138,10 @@ export function BiometricRow() {
     }
   };
   return (
-    <section className="more-group" aria-labelledby="more-g-app">
-      <h3 id="more-g-app">{t("firstRun.bio.thisApp")}</h3>
-      <div className="more-card">
-        <button type="button" className="more-row" role="switch" aria-checked={on} onClick={() => void toggle()} data-biometric-row="">
-          <Icon aria-hidden="true" />
-          <span className="more-row-label">{t("firstRun.bio.rowLabel").replace("{method}", texts.name)}</span>
-          <span className={on ? "more-switch on" : "more-switch"} aria-hidden="true" />
-        </button>
-      </div>
-    </section>
+    <button type="button" className="more-row" role="switch" aria-checked={on} onClick={() => void toggle()} data-biometric-row="">
+      <Icon aria-hidden="true" />
+      <span className="more-row-label">{t("firstRun.bio.rowLabel").replace("{method}", texts.name)}</span>
+      <span className={on ? "more-switch on" : "more-switch"} aria-hidden="true" />
+    </button>
   );
 }

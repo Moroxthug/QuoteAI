@@ -32,6 +32,9 @@ project(':capacitor-haptics').projectDir = new File('../../../node_modules/.pnpm
 include ':capacitor-keyboard'
 project(':capacitor-keyboard').projectDir = new File('../../../node_modules/.pnpm/@capacitor+keyboard@8.0.5_@capacitor+core@8.5.2/node_modules/@capacitor/keyboard/android')
 
+include ':capacitor-network'
+project(':capacitor-network').projectDir = new File('../../../node_modules/.pnpm/@capacitor+network@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/network/android')
+
 include ':capacitor-push-notifications'
 project(':capacitor-push-notifications').projectDir = new File('../../../node_modules/.pnpm/@capacitor+push-notifications@8.1.2_@capacitor+core@8.5.2/node_modules/@capacitor/push-notifications/android')
 
@@ -43,6 +46,9 @@ project(':capacitor-splash-screen').projectDir = new File('../../../node_modules
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../../../node_modules/.pnpm/@capacitor+status-bar@8.0.3_@capacitor+core@8.5.2/node_modules/@capacitor/status-bar/android')
+
+include ':capacitor-text-zoom'
+project(':capacitor-text-zoom').projectDir = new File('../../../node_modules/.pnpm/@capacitor+text-zoom@8.0.1_@capacitor+core@8.5.2/node_modules/@capacitor/text-zoom/android')
 
 include ':capawesome-capacitor-app-shortcuts'
 project(':capawesome-capacitor-app-shortcuts').projectDir = new File('../../../node_modules/.pnpm/@capawesome+capacitor-app-s_53251cea54ff05bcfe36cc12ee067646/node_modules/@capawesome/capacitor-app-shortcuts/android')

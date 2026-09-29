@@ -473,7 +473,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Phase 121: a one-line why before the phone asks for the camera or the microphone. */}
         <PermissionWhy />
         {/* While the lock's chunk arrives, an opaque cover — nothing behind it shows first. */}
-        {AppLock && <Suspense fallback={biometricOn() ? <div className="app-lock" aria-hidden="true" /> : null}><AppLock onSignOut={signOut} /></Suspense>}
+        {AppLock && <Suspense fallback={biometricOn() ? <div className="bio-lock" aria-hidden="true" /> : null}><AppLock onSignOut={signOut} /></Suspense>}
       </div>
       {phoneNav && (
         <PhoneTabBar

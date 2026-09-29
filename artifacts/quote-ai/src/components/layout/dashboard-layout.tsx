@@ -41,6 +41,7 @@ import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
 import { prefetchRoute } from "@/lib/route-chunks";
 import { ApiImg } from "@/components/api-img";
 import { signOut } from "@/lib/sign-out";
+import { applyTextScale } from "@/lib/text-scale";
 import type { SheetAction } from "@/components/mobile/action-sheet";
 
 // Phase 116: in the signed-in app, answers are saved to the device as they

@@ -1,4 +1,5 @@
 import { App } from "@capacitor/app";
+import { textScaleFactor } from "@/lib/text-scale";
 import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
 import { Keyboard } from "@capacitor/keyboard";
@@ -128,7 +129,8 @@ export async function startShell(): Promise<void> {
     }).catch(() => {});
   }
   // Phase 122: iOS's WebView ignores the phone's text size; Android's follows it already.
-  if (Capacitor.getPlatform() === "ios") void import("./text-size").then((m) => m.startTextSize()).catch(() => {});
+  // Pocket (Phase 149): on Android too once Settings → Text size is not the default.
+  if (Capacitor.getPlatform() === "ios" || textScaleFactor() !== 1) void import("./text-size").then((m) => m.startTextSize()).catch(() => {});
 
   // The app is light (dark mode comes with the app's own palette): dark status-bar icons.
   void StatusBar.setStyle({ style: Style.Light }).catch(() => {});

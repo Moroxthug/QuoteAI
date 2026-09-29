@@ -1,4 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
+import { usePocket } from "@/components/pocket/shell";
+import { PocketSettings } from "@/components/pocket/settings";
 import { Link, useLocation, useRoute, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -70,6 +72,8 @@ const LEGACY: Record<string, SectionId> = {
 };
 
 const settingsHref = (id: SectionId) => `/dashboard/settings/${id}`;
+/** Pocket: sections the canvas's Menu and Settings already lead to (Company profile, Taxes, Accounting in Menu; Export in Security). */
+const POCKET_OWN = new Set<SectionId>(["company", "taxes"]);
 
 /** Which sections this person sees: the same plan and permission gates the old tabs had. */
 function useVisibleSections() {
@@ -140,6 +144,7 @@ export default function SettingsPage() {
   const search = useSearch();
   const [, params] = useRoute<{ section: string }>("/dashboard/settings/:section");
   const single = useSinglePane();
+  const pocket = usePocket();
   const { visible, ready, plan } = useVisibleSections();
   const statuses = useStatuses(plan);
   const { reg, DraftProvider, ctx } = useDraftHost();
@@ -211,6 +216,9 @@ export default function SettingsPage() {
     [single, activeLabel, appLabel],
   );
   useMobileHeader(header);
+
+  // Pocket (Phase 149): on the phone layout the list is the canvas's Settings; each section opens as before.
+  if (pocket && !raw) return <PocketSettings sections={visible.filter((s) => !POCKET_OWN.has(s.id)).map((s) => ({ id: s.id, label: t(`settings.section.${s.id}`), href: settingsHref(s.id), status: statuses[s.id]?.text ?? null }))} />;
 
   const showList = !single || !raw;
   const showPane = !!active && (!single || !!raw);

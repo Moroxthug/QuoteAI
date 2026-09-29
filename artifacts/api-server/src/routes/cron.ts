@@ -23,6 +23,7 @@ import { captureException, flush } from "../lib/errorTracking.js";
 import { cronAuthorized } from "../lib/cronAuth.js";
 import { pruneIdempotencyKeys } from "../lib/idempotency.js";
 import { pruneChangeLog } from "./changes.js";
+import { runMorningBriefs } from "../today/brief.js";
 
 const router = Router();
 
@@ -120,6 +121,20 @@ router.get("/cron/evening", async (req, res) => {
     req.log.error({ err }, "Evening cron failed");
     await captureException(err, { mechanism: "cron", handled: false, level: "error", tags: { route: "GET /api/cron/evening" } });
     await sendOpsAlert("Evening cron failed", [`/api/cron/evening threw after ${Date.now() - startedAt} ms:`, err instanceof Error ? err.message : String(err), "", "Crew reminders for tomorrow were not sent; the morning tick sends a same-day catch-up."]);
+    await flush(1500);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// GET /api/cron/morning — Pocket (Phase 149): the 6:30 morning brief, every half hour from the
+// morning-brief GitHub workflow (each company gets it once, between 6:30 and 7:29 its time).
+router.get("/cron/morning", async (req, res) => {
+  if (!cronAuthorized(req, res)) return;
+  try {
+    res.json({ ok: true, ...(await runMorningBriefs()) });
+  } catch (err) {
+    req.log.error({ err }, "Morning brief cron failed");
+    await captureException(err, { mechanism: "cron", handled: false, level: "error", tags: { route: "GET /api/cron/morning" } });
     await flush(1500);
     res.status(500).json({ ok: false });
   }

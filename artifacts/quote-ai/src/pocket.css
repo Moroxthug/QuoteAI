@@ -265,6 +265,17 @@ html.pocket .page-head .sub { font-size: 12.5px; font-weight: 500; color: var(--
 /* Home sits under the floating bar with the canvas's 120 px of room. */
 html.pocket .content:has(> .pk-home), html.pocket .content:has(> div > .pk-home) { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
 
+/* ---------- Settings' voice orbs and the Quote's reveal (Phases 147, 149) ---------- */
+.pk-vo { position: relative; width: 48px; height: 48px; border-radius: 50%; overflow: hidden; animation: pk-morph 7s ease-in-out infinite; }
+.pk-vo i { position: absolute; width: 75%; height: 75%; border-radius: 50%; filter: blur(8px); mix-blend-mode: screen; }
+.pk-vo i:nth-child(1) { left: -12%; top: 0; animation: pk-m1 5s ease-in-out infinite; }
+.pk-vo i:nth-child(2) { right: -16%; bottom: -12%; animation: pk-m2 6s ease-in-out infinite; }
+.pk-vo i:nth-child(3) { right: -6%; top: -20%; animation: pk-m3 7s ease-in-out infinite; }
+.pk-vo::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.6), rgba(255,255,255,0) 42%); }
+.pk-vring { transition: box-shadow .35s, transform .35s var(--pk-ease); }
+.pk-reveal { animation: pk-reveal .5s var(--pk-ease) both; overflow: hidden; }
+@keyframes pk-reveal { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 60px; } }
+
 /* The app's own notes ("Updated just now") clear the floating bar. */
 html.pocket.has-pk-nav .fresh-note { bottom: calc(26px + 62px + 12px + env(safe-area-inset-bottom, 0px)); }
 

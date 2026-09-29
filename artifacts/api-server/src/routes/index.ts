@@ -61,6 +61,7 @@ import clientPortalRouter from "./client-portal";
 import pushRouter from "./push";
 import todayRouter from "./today";
 import weatherRouter from "./weather";
+import memberPrefsRouter from "./member-prefs";
 import changesRouter from "./changes";
 
 const router: IRouter = Router();
@@ -126,6 +127,7 @@ router.use(clientPortalRouter);
 router.use(pushRouter);
 router.use(todayRouter);
 router.use(weatherRouter);
+router.use(memberPrefsRouter);
 router.use(changesRouter);
 router.use("/v1/public", publicV1Router);
 

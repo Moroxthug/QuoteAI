@@ -6,6 +6,7 @@ import {
   jsonb,
   boolean,
   numeric,
+  date,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -116,6 +117,8 @@ export const businessProfilesTable = pgTable("business_profiles", {
   materialsMarkupPercent: numeric("materials_markup_percent", { precision: 5, scale: 2 }),
   quoteCopyToMe: boolean("quote_copy_to_me").notNull().default(false),
   units: text("units", { enum: ["imperial", "metric", "both"] }),
+  /** Pocket (Phase 149): the local day the 6:30 morning brief last went out (once a day). */
+  lastBriefDay: date("last_brief_day"),
   // ── Phase 10: review requests ────────────────────────────────────────────
   googleReviewUrl: text("google_review_url"), // Google Business Profile "write a review" link, set once in Settings
   // ── Phase 26: HomeStars link (no public partner API exists, so this is just a second manual review link) ──

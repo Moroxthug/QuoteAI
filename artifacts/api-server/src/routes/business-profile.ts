@@ -38,6 +38,11 @@ function serializeProfileExtras(profile: BusinessProfile | undefined) {
     licenceNumber: profile?.licenceNumber ?? null,
     etransferEmail: profile?.etransferEmail ?? null,
     defaultPaymentSchedule: profile?.defaultPaymentSchedule ?? null,
+    // Pocket (Phase 149): Settings → Quote defaults.
+    quoteValidDays: profile?.quoteValidDays ?? 30,
+    materialsMarkupPercent: profile?.materialsMarkupPercent != null ? Number(profile.materialsMarkupPercent) : 0,
+    quoteCopyToMe: profile?.quoteCopyToMe ?? false,
+    units: profile?.units ?? "both",
     // Phase 91: the sign-up answers.
     companySetup: profile?.companySetup ?? {},
     googleReviewUrl: profile?.googleReviewUrl ?? null,
@@ -60,6 +65,10 @@ const ProfileExtrasBody = z.object({
   homeStarsProfileUrl: z.string().url().max(500).nullable().optional(),
   sendReviewRequests: z.boolean().optional(),
   defaultPaymentSchedule: z.unknown().nullable().optional(),
+  quoteValidDays: z.number().int().min(1).max(365).optional(),
+  materialsMarkupPercent: z.number().min(0).max(100).optional(),
+  quoteCopyToMe: z.boolean().optional(),
+  units: z.enum(["imperial", "metric", "both"]).optional(),
   automationSettings: z
     .object({
       notifyOnQuoteAccepted: z.boolean().optional(),
@@ -178,6 +187,10 @@ router.put("/business-profile", requireAuth, requirePermission("settings", "edit
       ...(extras.homeStarsProfileUrl !== undefined && { homeStarsProfileUrl: extras.homeStarsProfileUrl?.trim() || null }),
       ...(extras.sendReviewRequests !== undefined && { sendReviewRequests: extras.sendReviewRequests }),
       ...(defaultPaymentSchedule !== undefined && { defaultPaymentSchedule }),
+      ...(extras.quoteValidDays !== undefined && { quoteValidDays: extras.quoteValidDays }),
+      ...(extras.materialsMarkupPercent !== undefined && { materialsMarkupPercent: extras.materialsMarkupPercent.toFixed(2) }),
+      ...(extras.quoteCopyToMe !== undefined && { quoteCopyToMe: extras.quoteCopyToMe }),
+      ...(extras.units !== undefined && { units: extras.units }),
       ...(extras.automationSettings !== undefined && {
         automationSettings: { ...(existing?.automationSettings ?? {}), ...extras.automationSettings },
       }),

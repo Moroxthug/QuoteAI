@@ -58,7 +58,7 @@ export function HomeCrew() {
             return (
               <button key={p.key} type="button" className="pk-press" onClick={() => { haptic("selection"); setWho(i); }} aria-pressed={onP} aria-label={`${p.name}, ${p.status}`}
                 style={{ border: 0, background: "transparent", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, padding: "2px 0", cursor: "pointer", fontFamily: "inherit" }}>
-                <span className="pk-av" style={{ width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#141416", background: "#f1ede4", boxShadow: RING[p.state].ring, transform: onP ? "scale(1.06)" : undefined }}>{initialsOf(p.name)}</span>
+                <span className="pk-av" aria-hidden="true" style={{ width: 44, height: 44, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#141416", background: "#f1ede4", boxShadow: RING[p.state].ring, transform: onP ? "scale(1.06)" : undefined }}>{initialsOf(p.name)}</span>
                 <span style={{ fontSize: 11.5, fontWeight: 500, color: onP ? "#141416" : "#6e6e76", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name.split(" ")[0]}</span>
               </button>
             );

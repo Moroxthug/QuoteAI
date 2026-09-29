@@ -255,7 +255,7 @@ export function PocketQuote({ id }: { id: string }) {
               </button>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <span style={{ fontSize: 12, color: "#6e6e76", lineHeight: 1.35 }}>{isFixed(v) ? (v.descrizione.split("\n")[1] ?? "") : `${money(Math.round(v.prezzoUnitario * 100), lang, true)} / ${v.um}`}</span>
-                {isFixed(v) || !editable ? <span className="pk-mono" style={{ fontSize: 11.5, color: "#8a8a90", flexShrink: 0 }}>{isFixed(v) ? t("pocket.quote.fixed") : `${v.quantita} ${v.um}`}</span> : stepperFor(v, ci, vi)}
+                {isFixed(v) || !editable ? <span className="pk-mono" style={{ fontSize: 11.5, color: "#6e6e76", flexShrink: 0 }}>{isFixed(v) ? t("pocket.quote.fixed") : `${v.quantita} ${v.um}`}</span> : stepperFor(v, ci, vi)}
               </div>
             </div>
           ))}

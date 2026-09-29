@@ -62,7 +62,7 @@ export function HomeToday() {
               </button>
               <Link href={i.href} style={{ flexGrow: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 1, padding: "2px 0", color: "inherit", textDecoration: "none" }}>
                 <span className={`pk-tt${i.done ? " done" : ""}`} style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.35 }}>{r.text}</span>
-                {r.meta && <span style={{ fontSize: 12, color: i.done ? "#b0afab" : r.tone === "urgent" ? "#c2371f" : r.tone === "soon" ? "#9a6412" : "#6e6e76" }}>{r.meta}</span>}
+                {r.meta && <span style={{ fontSize: 12, color: i.done ? "#6e6e76" : r.tone === "urgent" ? "#c2371f" : r.tone === "soon" ? "#9a6412" : "#6e6e76" }}>{r.meta}</span>}
               </Link>
             </div>
           );

@@ -80,7 +80,7 @@ export function HomeBusiness() {
           <circle className="pk-dot" cx={last[0]} cy={last[1]} r={4.5} fill="#ffffff" stroke="#e4572e" strokeWidth={2} />
         </svg>
         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }} aria-hidden="true">
-          {lab.map((l, i) => <span key={i} className="pk-mono" style={{ fontSize: 10.5, color: "#8a8a90" }}>{l}</span>)}
+          {lab.map((l, i) => <span key={i} className="pk-mono" style={{ fontSize: 10.5, color: "#6e6e76" }}>{l}</span>)}
         </div>
         <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1px solid #efeeea", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>

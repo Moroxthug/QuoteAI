@@ -142,7 +142,7 @@ export function Composer({ city }: { city: string | null }) {
           onChange={(e) => setText(e.target.value)}
           placeholder={t("pocket.home.placeholder")}
           disabled={phase !== "idle"}
-          style={{ display: "block", marginTop: 10, width: "100%", boxSizing: "border-box", height: 84, resize: "none", padding: "0 2px", border: 0, background: "transparent", color: "#ffffff", fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, letterSpacing: "-0.01em", outline: "none" }}
+          style={{ display: "block", marginTop: 10, width: "100%", boxSizing: "border-box", height: 84, resize: "none", padding: "0 2px", border: 0, background: "transparent", color: "#ffffff", fontFamily: "inherit", fontSize: 15, lineHeight: 1.5, letterSpacing: "-0.01em" }}
         />
 
         {phase === "idle" && (

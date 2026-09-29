@@ -42,9 +42,10 @@ html.pocket {
   --pk-dark: #151517;
   --pk-fab: #111113;
   --pk-text-2: #6e6e76;
-  --pk-text-3: #8a8a90;
-  --pk-text-4: #9a9aa0;
-  --pk-tab-off: #7a7a80;
+  /* The canvas's lightest greys (#8a8a90, #9a9aa0, #7a7a80) read below 4.5:1: its secondary grey instead (5:1). */
+  --pk-text-3: #6e6e76;
+  --pk-text-4: #6e6e76;
+  --pk-tab-off: #6e6e76;
   --pk-chev: #b0afab;
   --pk-body: #3c3c43;
   --pk-line: #efeeea;
@@ -178,7 +179,7 @@ html.pocket :where(button, a, [role="switch"], [role="radio"], input, textarea):
 /* ---------- segmented control (sliding white thumb) ---------- */
 .pk-seg { position: relative; display: grid; padding: 2px; border-radius: 10px; background: var(--pk-line); }
 .pk-seg-thumb { position: absolute; top: 2px; left: 2px; border-radius: 8px; background: #fff; box-shadow: var(--pk-shadow-thumb); transition: transform .45s var(--pk-ease); pointer-events: none; }
-.pk-seg > button { position: relative; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; color: var(--pk-text-2); transition: color .3s; cursor: pointer; font-family: inherit; padding: 0 4px; white-space: nowrap; }
+.pk-seg > button { position: relative; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; color: #66666d; transition: color .3s; cursor: pointer; font-family: inherit; padding: 0 4px; white-space: nowrap; }
 .pk-seg > button[aria-pressed="true"] { color: var(--pk-ink); }
 /* The Quote screen's big variant: 14 / 11 radius, 50 px cells, on #e9e8e4. */
 .pk-seg.big { padding: 3px; border-radius: 14px; background: var(--pk-fill-3); }
@@ -264,6 +265,8 @@ html.pocket .page-head .sub { font-size: 12.5px; font-weight: 500; color: var(--
 .pk-spin { animation: pk-spin .9s linear infinite; }
 @keyframes pk-spin { to { transform: rotate(360deg); } }
 .pk-bar-in { animation: pk-barin 2.4s var(--pk-ease-io) both; transform-origin: left; }
+.pk-ta { outline: none; }
+.pk-ta:focus-visible { outline: 2px solid var(--pk-accent); outline-offset: 4px; border-radius: 6px; }
 .pk-ta::placeholder { color: rgba(255,255,255,.4); }
 .pk-ta:disabled { opacity: 1; -webkit-text-fill-color: #ffffff; }
 .pk-slide { transition: transform .45s var(--pk-ease); }
@@ -273,7 +276,7 @@ html.pocket .page-head .sub { font-size: 12.5px; font-weight: 500; color: var(--
 .pk-chk path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .35s .05s var(--pk-ease-io); }
 .pk-chk.done path { stroke-dashoffset: 0; }
 .pk-tt { transition: color .35s, opacity .35s; }
-.pk-tt.done { color: #9a9aa0; text-decoration: line-through; text-decoration-color: #c4c3c0; }
+.pk-tt.done { color: #6e6e76; text-decoration: line-through; text-decoration-color: #c4c3c0; }
 .pk-draw { stroke-dasharray: 1; animation: pk-draw 1.4s .2s var(--pk-ease-io) both; transition: d .7s var(--pk-ease); }
 @keyframes pk-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 .pk-area { animation: pk-fadein 1s .9s both; transition: d .7s var(--pk-ease); }
@@ -398,7 +401,7 @@ html.pocket .field :where(input, select, textarea):focus { border-color: var(--p
 /* Section labels: the canvas's group label (12.5 / 500 grey), not shouted capitals. */
 html.pocket :where(.content, .modal, .sheet) .eyebrow { font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--pk-text-2); }
 /* Tabs: the canvas's segmented control look — a grey track, the chosen one white. */
-html.pocket .stabs .pill, html.pocket .pills .pill { border: 0; background: var(--pk-fill-3); color: var(--pk-text-2); font-size: 12.5px; font-weight: 500; border-radius: 10px; padding: 8px 12px; }
+html.pocket .stabs .pill, html.pocket .pills .pill { border: 0; background: var(--pk-fill-3); color: #66666d; font-size: 12.5px; font-weight: 500; border-radius: 10px; padding: 8px 12px; }
 html.pocket .stabs .pill:is([aria-selected="true"], [aria-pressed="true"], .on, .active), html.pocket .pills .pill:is([aria-pressed="true"], .on, .active) { background: #fff; color: var(--pk-ink); box-shadow: var(--pk-shadow-thumb); }
 html.pocket .stabs.sticky { background: var(--pk-bg); }
 /* Switches: the canvas's 50 × 30 ink switch. */
@@ -420,6 +423,21 @@ html.pocket .asheet-item.danger, html.pocket .asheet-item.danger svg { color: va
 html.pocket .sheet-grab { background: var(--pk-fill-4); }
 /* Notices: the canvas's quiet grey strip (Crew's detail strip). */
 html.pocket .notice { border: 0; border-radius: 14px; background: var(--pk-fill-5); color: var(--pk-body); }
+
+/* ---------- Touch targets (Phase 152: every target 44 × 44) ----------
+   The canvas's 22 px round tick and 32 px chips keep their drawn size; an invisible margin
+   around them makes the finger target 44 px. Tabs and small buttons grow to 44. */
+.pk-chk { position: relative; }
+.pk-chk::after { content: ""; position: absolute; inset: -11px; }
+html.pocket :where(.content, .modal, .sheet) .btn-sm { position: relative; }
+html.pocket :where(.content, .modal, .sheet) .btn-sm::after { content: ""; position: absolute; inset: -6px 0; }
+.pk-btn-chip, .pk-btn-link { position: relative; }
+.pk-btn-chip::after { content: ""; position: absolute; inset: -6px 0; }
+.pk-btn-link::after { content: ""; position: absolute; inset: -8px 0; }
+html.pocket .stabs .pill, html.pocket .pills .pill { min-height: 44px; }
+html.pocket a.text-link { display: inline-flex; align-items: center; min-height: 44px; }
+/* The assistant page's message box may shrink so its send button stays on screen. */
+html.pocket .chat-in input { min-width: 0; }
 
 /* The app's own notes ("Updated just now") clear the floating bar. */
 html.pocket.has-pk-nav .fresh-note { bottom: calc(26px + 62px + 12px + env(safe-area-inset-bottom, 0px)); }

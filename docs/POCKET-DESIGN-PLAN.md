@@ -187,12 +187,44 @@ Each is redone with only the parts above: grey page, white 22 px cards, section 
 
 ## Decisions (the owner's)
 
-1. **Appearance Light / Dark / Auto:** the canvas draws only light. Until dark artboards exist in the canvas, the control stays hidden.
-2. **Units ft / m / Both:** quotes are in the units the job was described in. The control will convert display units only.
-3. **"On the way / 14 min away":** needs live crew location while clocked out (Phase 119 location). Without it, a crew member who is scheduled but not clocked in shows as amber "Starts 7:30". Choose: build live location, or use the scheduled time.
-4. **Menu rows for screens the canvas's Menu doesn't list** (Invoices, Schedule, Leads, Contracts, Documents, Compliance, Archive, Group): proposed as rows in Money / Team / Business, using the same row part.
-5. **Plan card "N seats":** shown from the subscription; for plans with no seats the line shows only the renewal date.
+1. **Appearance Light / Dark / Auto:** the canvas draws only light. Until dark artboards exist in the canvas, the control stays hidden. *Open.*
+2. **Units ft / m / Both:** built as the units the quote writer uses (`business_profiles.units`). Both means as described.
+3. **"On the way / 14 min away":** needs live crew location while clocked out (Phase 119 location). Without it, a crew member who is scheduled but not clocked in shows as amber "Starts 7:30". Choose: build live location, or use the scheduled time. *Built as the scheduled time for now (amber "Starts 7:30"); open.*
+4. **Menu rows for screens the canvas's Menu doesn't list** (Invoices, Schedule, Leads, Contracts, Documents, Compliance, Archive, Group): proposed as rows in Money / Team / Business, using the same row part. *Built.*
+5. **Plan card "N seats":** shown from the subscription; for plans with no seats the line shows only the renewal date. *Built.*
+
+## Rollout switch
+
+Until the owner has checked it on a phone, Pocket is on in the **phone app** and the **dev server**. On the website it is on only for a browser that opened a page with `?pocket=1`; `?pocket=0` turns it off again. Live phone-web users keep the old screens.
+
+Turning it on for everyone is a one-line change: `pocketEnabled()` in `components/pocket/shell.tsx` returns true.
+
+## Owner items
+
+- **`CRON_SECRET` repository secret** in GitHub, with the same value as in Vercel. Without it the morning-brief workflow skips, so no 6:30 brief goes out.
+- **WhatsApp:** Send by → WhatsApp shows "not set up" until the WhatsApp templates are approved.
+- **Decisions 1 and 3 below** are still open.
 
 ## Build log
 
-(entries added as phases land)
+- **2026-09-29, 143–146, 148** (b875da9):
+  - Foundations: Geist and Geist Mono fonts, `pocket.css` tokens, the parts kit and the canvas's icons.
+  - The shell: floating tab bar with the assistant button, back and ⋯ header.
+  - Home: ECCC weather, composer, week schedule, Today checklist (`today_checks`, migration 0059), Business card (`/api/today/business`), Crew, Sites.
+  - Menu.
+- **2026-09-29, 147** (16f3cad):
+  - The quote screen.
+  - Send by SMS (`/api/quotes/:id/send-sms`), and the quote-viewed alert on first open.
+  - Quote validity, materials markup and units (migration 0060).
+  - Crew check-in push, and the views / checkins / brief notification kinds.
+- **2026-09-29, 149** (599f90b):
+  - Settings, every row real (`/api/me/preferences`, the new profile fields, text size).
+  - Morning brief: `/api/cron/morning`, migration 0061, and `.github/workflows/morning-brief.yml`.
+- **2026-09-29, 150** (53bc525): the assistant overlay. Live orb, voice with pause detection, spoken replies, proposals to confirm.
+- **2026-09-29, 151** (91aad81):
+  - Every other screen re-skinned onto the canvas's parts; the colour tokens remapped.
+  - Geist capped at 600 weight.
+  - Back to Menu on screens opened from it; welcome and sign-in in the app.
+- **2026-09-29, 152:**
+  - `qa:bundle` is green after an 8 kB raise on the signed-in shell, recorded in `perf-budgets.json`. The Pocket quote, Settings, Home and the assistant load as their own chunks.
+  - Canvas compared screen by screen against local renders of the canvas sources (`dc-runtime.js`). The sample data differs, so the comparison is structural, not pixel-exact.

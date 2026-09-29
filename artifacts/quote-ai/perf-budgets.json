@@ -1,7 +1,7 @@
 {
   "shell": {
-    "en": 314,
-    "fr": 324
+    "en": 322,
+    "fr": 332
   },
   "chunk": 75,
   "screens": [
@@ -16,7 +16,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/index.tsx"
       ],
-      "budget": 350
+      "budget": 358
     },
     {
       "name": "Quotes",
@@ -29,7 +29,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/quotes/index.tsx"
       ],
-      "budget": 323
+      "budget": 331
     },
     {
       "name": "Quote",
@@ -42,7 +42,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/quotes/[id].tsx"
       ],
-      "budget": 353
+      "budget": 361
     },
     {
       "name": "New quote",
@@ -55,7 +55,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/new.tsx"
       ],
-      "budget": 337
+      "budget": 345
     },
     {
       "name": "Jobs",
@@ -68,7 +68,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/index.tsx"
       ],
-      "budget": 332
+      "budget": 340
     },
     {
       "name": "Job",
@@ -81,7 +81,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/jobs/[id].tsx"
       ],
-      "budget": 386
+      "budget": 394
     },
     {
       "name": "Money (invoices)",
@@ -94,7 +94,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/invoices.tsx"
       ],
-      "budget": 336
+      "budget": 344
     },
     {
       "name": "Invoice",
@@ -107,7 +107,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/invoices/[id].tsx"
       ],
-      "budget": 331
+      "budget": 339
     },
     {
       "name": "Client",
@@ -120,7 +120,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/clients/[name].tsx"
       ],
-      "budget": 332
+      "budget": 340
     },
     {
       "name": "Schedule",
@@ -133,7 +133,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/schedule.tsx"
       ],
-      "budget": 335
+      "budget": 343
     },
     {
       "name": "Crew (Team)",
@@ -146,7 +146,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/team.tsx"
       ],
-      "budget": 341
+      "budget": 349
     },
     {
       "name": "Assistant",
@@ -159,7 +159,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/assistant.tsx"
       ],
-      "budget": 320
+      "budget": 328
     },
     {
       "name": "Notifications",
@@ -172,7 +172,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/notifications.tsx"
       ],
-      "budget": 318
+      "budget": 326
     },
     {
       "name": "Settings",
@@ -185,7 +185,7 @@
         "@dashboard-strings",
         "src/pages/dashboard/settings/index.tsx"
       ],
-      "budget": 331
+      "budget": 339
     },
     {
       "name": "Onboarding",
@@ -292,5 +292,6 @@
       ],
       "budget": 230
     }
-  ]
+  ],
+  "_pocket": "Pocket (docs/POCKET-DESIGN-PLAN.md, 2026-09-29): +8 kB on the signed-in shell and its screens for the owner-chosen design (EN/FR strings, pocket.css, the tab bar, header and icons). Home, quote, Settings and the assistant load as their own chunks."
 }

@@ -1,6 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
 import { usePocket } from "@/components/pocket/shell";
-import { PocketSettings } from "@/components/pocket/settings";
 import { Link, useLocation, useRoute, useSearch } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useGetSubscription } from "@workspace/api-client-react";
@@ -22,6 +21,8 @@ import { PROVINCE_TAX, useBusinessProfile } from "./data";
 import { APPS_HREF, appById } from "./apps/catalog";
 import { PlanSection, planLabelOf } from "./plan";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const PocketSettings = lazy(() => import("@/components/pocket/settings").then((m) => ({ default: m.PocketSettings })));
 
 // ── Phase 102: Settings as a settings area ───────────────────────────────────
 // /dashboard/settings/<section>. On a wide screen: the grouped list on the
@@ -218,7 +219,7 @@ export default function SettingsPage() {
   useMobileHeader(header);
 
   // Pocket (Phase 149): on the phone layout the list is the canvas's Settings; each section opens as before.
-  if (pocket && !raw) return <PocketSettings sections={visible.filter((s) => !POCKET_OWN.has(s.id)).map((s) => ({ id: s.id, label: t(`settings.section.${s.id}`), href: settingsHref(s.id), status: statuses[s.id]?.text ?? null }))} />;
+  if (pocket && !raw) return <Suspense fallback={null}><PocketSettings sections={visible.filter((s) => !POCKET_OWN.has(s.id)).map((s) => ({ id: s.id, label: t(`settings.section.${s.id}`), href: settingsHref(s.id), status: statuses[s.id]?.text ?? null }))} /></Suspense>;
 
   const showList = !single || !raw;
   const showPane = !!active && (!single || !!raw);

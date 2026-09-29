@@ -56,9 +56,9 @@ export function HomeSchedule() {
             const isT = dayKey(d) === dayKey(today);
             return (
               <button key={i} type="button" className="pk-press" onClick={() => { haptic("selection"); setSel(i); }} aria-pressed={on}
-                aria-label={t(n === 1 ? "pocket.home.dayBooked1" : "pocket.home.dayBooked").replace("{day}", d.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-US", { weekday: "long", month: "long", day: "numeric" })).replace("{n}", String(n))}
+                aria-label={`${dow(d)} ${d.getDate()}, ${t(n === 1 ? "pocket.home.dayBooked1" : "pocket.home.dayBooked").replace("{day}", d.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-US", { weekday: "long", month: "long", day: "numeric" })).replace("{n}", String(n))}`}
                 style={{ position: "relative", height: 56, border: 0, background: "transparent", borderRadius: 16, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2, cursor: "pointer", fontFamily: "inherit", padding: 0 }}>
-                <span className="pk-dayt" style={{ fontSize: 11, fontWeight: 500, color: on ? "rgba(255,255,255,.6)" : "#8a8a90" }}>{dow(d)}</span>
+                <span className="pk-dayt" style={{ fontSize: 11, fontWeight: 500, color: on ? "rgba(255,255,255,.6)" : "#6e6e76" }}>{dow(d)}</span>
                 <span className="pk-dayt pk-num" style={{ fontSize: 15, fontWeight: 600, color: on ? "#ffffff" : isT ? "#c2441f" : "#141416" }}>{d.getDate()}</span>
                 <span style={{ width: 4, height: 4, borderRadius: "50%", background: n ? (on ? "rgba(255,255,255,.7)" : "#c4c3c0") : "transparent" }} />
               </button>

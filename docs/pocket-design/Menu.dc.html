@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quoteAI — Menu</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:#e9e8e4;color:#141416;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+a{color:#141416;text-decoration:none}a:hover{color:#000}
+button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
+.mono{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:0}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.press{transition:transform .2s cubic-bezier(.16,1,.3,1),background-color .2s}
+.press:active{transform:scale(.97)}
+.row{transition:background-color .2s}
+.row:hover{background:#faf9f7}
+.row:active{background:#f1f0ec}
+.row .chev{transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.row:hover .chev{transform:translateX(3px)}
+.scroll-y{scrollbar-width:none}.scroll-y::-webkit-scrollbar{display:none}
+button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div class="scroll-y" style="width: 390px; height: 844px; background: #f5f4f1; overflow-y: auto; box-sizing: border-box; padding-bottom: 40px">
+
+<header style="padding: 8px 8px 0; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; height: 52px">
+<a href="Main.dc.html" class="press" aria-label="Back to home" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></a>
+<span></span><span></span>
+</header>
+
+<section class="rise" style="padding: 4px 16px 0">
+<a href="#" class="press" style="display: flex; align-items: center; gap: 14px; padding: 16px; background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04)">
+<span style="width: 52px; height: 52px; border-radius: 50%; background: #141416; color: #ffffff; font-size: 17px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">MR</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">Marco Rossi</span>
+<span style="font-size: 12.5px; color: #6e6e76">Rossi Renovations · Owner</span>
+</span>
+<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b0afab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+</a>
+<div style="margin-top: 10px; padding: 12px 16px; border-radius: 18px; background: #151517; color: #ffffff; display: flex; align-items: center; justify-content: space-between">
+<span style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px; font-weight: 500">Pro plan</span>
+<span style="font-size: 12px; color: rgba(255,255,255,.55)">Renews Oct 14 · 5 seats</span>
+</span>
+<a href="#" class="press" style="height: 32px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,.1); color: #ffffff; font-size: 12.5px; font-weight: 500; display: flex; align-items: center">Manage</a>
+</div>
+</section>
+
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+<section class="rise" style="padding: 22px 16px 0; {{g.delay}}">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">{{g.title}}</h2>
+<div style="background: #ffffff; border-radius: 20px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); overflow: hidden">
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
+<a href="{{r.href}}" class="row" style="display: flex; align-items: center; gap: 12px; padding: 0 14px; height: 52px">
+<span style="width: 30px; height: 30px; border-radius: 9px; background: #f1f0ec; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #141416">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{r.icon}}"></path></svg>
+</span>
+<span style="flex-grow: 1; font-size: 14px; font-weight: 500; align-self: stretch; display: flex; align-items: center; {{r.sep}}">{{r.label}}</span>
+<span style="font-size: 12.5px; align-self: stretch; display: flex; align-items: center; gap: 6px; {{r.valStyle}} {{r.sep}}">{{r.value}}<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b0afab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></span>
+</a>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 360ms">
+<button class="press" style="width: 100%; height: 50px; border-radius: 16px; border: 0; background: #ffffff; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); color: #c2371f; font-size: 14px; font-weight: 500">Sign out</button>
+<p class="mono" style="margin: 16px 0 0; text-align: center; font-size: 11px; color: #9a9aa0">quoteAI 1.0 · build 2026.09</p>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var I = {
+      building: 'M4 21V5l8-2v18M12 7l8 2v12M3 21h18M7.5 9h1M7.5 13h1M7.5 17h1M15.5 12h1M15.5 16h1',
+      tag: 'M3 12V4h8l10 10-8 8zM7.5 8h.01',
+      file: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
+      percent: 'M19 5 5 19M7 9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17 19.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z',
+      users: 'M9 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 20a6 6 0 0 1 12 0M16 5.5a3.5 3.5 0 0 1 0 6.5M18 14.5a6 6 0 0 1 3 5.5',
+      clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
+      card: 'M3 6h18v12H3zM3 10h18M7 15h3',
+      sync: 'M20 8a8 8 0 0 0-14.5-2M4 4v4h4M4 16a8 8 0 0 0 14.5 2M20 20v-4h-4',
+      gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 13.5l1.6 1-1.8 3.2-1.8-.6a7 7 0 0 1-2.2 1.3L14.8 21h-3.6l-.4-2.6a7 7 0 0 1-2.2-1.3l-1.8.6-1.8-3.2 1.6-1a7 7 0 0 1 0-3l-1.6-1 1.8-3.2 1.8.6a7 7 0 0 1 2.2-1.3L11.2 3h3.6l.4 2.6a7 7 0 0 1 2.2 1.3l1.8-.6 1.8 3.2-1.6 1a7 7 0 0 1 0 3z',
+      help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01',
+      bell: 'M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0'
+    };
+    var row = function (icon, label, value, href, accent) { return { icon: I[icon], label: label, value: value || '', href: href || '#', valStyle: accent ? 'color: #c2441f; font-weight: 500;' : 'color: #6e6e76;' }; };
+    var groups = [
+      { title: 'Business', rows: [row('building', 'Company profile', 'HST # on file'), row('tag', 'Price book', '212 items'), row('file', 'Quote templates', '4'), row('percent', 'Taxes', 'ON · 13%')] },
+      { title: 'Team', rows: [row('users', 'Crew and roles', '5 people'), row('clock', 'Timesheets', '1 to approve', '#', true)] },
+      { title: 'Money', rows: [row('card', 'Payments and payouts', 'Weekly'), row('sync', 'Accounting sync', 'Not connected')] },
+      { title: 'App', rows: [row('gear', 'Settings', '', 'Settings.dc.html'), row('bell', 'Notifications', '4 on', 'Settings.dc.html'), row('help', 'Help and support', '')] }
+    ].map(function (g, gi) {
+      return { title: g.title, delay: 'animation-delay: ' + (80 + gi * 60) + 'ms', rows: g.rows.map(function (r, i) { return Object.assign(r, { sep: i ? 'border-top: 1px solid #efeeea;' : '' }); }) };
+    });
+    return { groups: groups };
+  }
+}
+</script>
+</body>
+</html>

@@ -37,6 +37,7 @@ const PricingPage = lazy(() => import("@/pages/pricing"));
 const PilotPage = lazy(() => import("@/pages/pilot"));
 // Phase 100: the calm-mobile primitives on fake data — dev server only (the import is dropped from production builds).
 const MobilePreview = import.meta.env.DEV ? lazy(() => import("@/dev/mobile-preview")) : null;
+const PocketKit = import.meta.env.DEV ? lazy(() => import("@/dev/pocket-kit")) : null;
 // Phase 120: every state and gesture, for the phone sheets (dev only).
 const StatesCatalogue = import.meta.env.DEV ? lazy(() => import("@/dev/states-catalogue")) : null;
 const ProvincePage = lazy(() => import("@/pages/provinces/[slug]"));
@@ -95,6 +96,7 @@ const TeamInvitePage = lazy(() => import("@/pages/team-invite/[token]"));
 const DocumentsPage = lazy(pageLoaders.documents);
 const ArchivePage = lazy(pageLoaders.archive);
 const NotificationsPage = lazy(pageLoaders.notifications);
+const MenuPage = lazy(pageLoaders.menu);
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
 const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
@@ -220,6 +222,7 @@ function DashboardApp() {
             <Route path="/dashboard/documents" component={DocumentsPage} />
             <Route path="/dashboard/archive" component={ArchivePage} />
             <Route path="/dashboard/notifications" component={NotificationsPage} />
+            <Route path="/dashboard/menu" component={MenuPage} />
             <Route component={NotFound} />
           </Switch>
         </Suspense>
@@ -279,6 +282,11 @@ function Router() {
       {MobilePreview && (
         <Route path="/dashboard/__preview" component={() => (
           <DashboardLayout><DashSuspense><MobilePreview /></DashSuspense></DashboardLayout>
+        )} />
+      )}
+      {PocketKit && (
+        <Route path="/dashboard/__pocket" component={() => (
+          <DashboardLayout><DashSuspense><PocketKit /></DashSuspense></DashboardLayout>
         )} />
       )}
       {StatesCatalogue && (

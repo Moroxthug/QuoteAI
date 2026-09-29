@@ -32,6 +32,11 @@ export function useMobileHeader(override: HeaderOverride | null) {
   }, [set, override]);
 }
 
+/** Pocket (Phase 144): the shell draws the page's header itself. */
+export function useMobileHeaderOverride(): HeaderOverride | null {
+  return useContext(HeaderContext)?.override ?? null;
+}
+
 /**
  * Phase 100 — the phone top bar's left half: ‹ back (when the screen has a
  * parent), then the screen's title, then its ⋯. Hidden above 640 px (CSS),

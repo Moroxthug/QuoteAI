@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quoteAI — Home, full length</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:#e9e8e4;color:#141416;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+a{color:#141416;text-decoration:none}a:hover{color:#000}
+button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
+.mono{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:0}
+.num{font-variant-numeric:tabular-nums}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.press{transition:transform .2s cubic-bezier(.16,1,.3,1),background-color .25s,color .25s,box-shadow .3s,opacity .25s}
+.press:active{transform:scale(.95)}
+.row{transition:background-color .2s}
+.row:hover{background:#faf9f7}
+.slide{transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.dayt{transition:color .3s}
+.pulse::before,.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);animation:ring 1.8s cubic-bezier(.16,1,.3,1) infinite}
+.pulse::after{animation-delay:.9s}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(1.9);opacity:0}}
+.beat{animation:beat 2.2s ease-in-out infinite}
+@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(228,87,46,.35)}50%{box-shadow:0 0 0 6px rgba(228,87,46,0)}}
+.draw{stroke-dasharray:1;animation:draw 1.4s .2s cubic-bezier(.65,0,.35,1) both;transition:d .7s cubic-bezier(.16,1,.3,1)}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.area{animation:fadein 1s .9s both;transition:d .7s cubic-bezier(.16,1,.3,1)}
+@keyframes fadein{from{opacity:0}}
+.dot{transition:cx .7s cubic-bezier(.16,1,.3,1),cy .7s cubic-bezier(.16,1,.3,1)}
+.chk{transition:background-color .25s,border-color .25s,transform .2s cubic-bezier(.16,1,.3,1)}
+.chk:active{transform:scale(.85)}
+.chk path{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s .05s cubic-bezier(.65,0,.35,1)}
+.chk.done path{stroke-dashoffset:0}
+.tt{transition:color .35s,opacity .35s}
+.tt.done{color:#9a9aa0;text-decoration:line-through;text-decoration-color:#c4c3c0}
+.spin{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bar-in{animation:barin 2.4s cubic-bezier(.65,0,.35,1) both;transform-origin:left}
+@keyframes barin{from{transform:scaleX(0)}}
+.grow{animation:barin 1.2s .3s cubic-bezier(.16,1,.3,1) both;transform-origin:left}
+.ta{outline:none}
+.ta::placeholder{color:rgba(255,255,255,.4)}
+.av{transition:box-shadow .3s,transform .3s cubic-bezier(.16,1,.3,1)}
+.scroll-x{scrollbar-width:none}.scroll-x::-webkit-scrollbar{display:none}
+button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2px}
+.scroll-y{scrollbar-width:none}.scroll-y::-webkit-scrollbar{display:none}
+.home{transition:transform .75s cubic-bezier(.7,0,.2,1),border-radius .75s cubic-bezier(.7,0,.2,1),filter .75s;transform-origin:50% 90%}
+.mb{position:absolute;width:75%;height:75%;border-radius:50%;filter:blur(5px);mix-blend-mode:screen}
+.mb1{background:#ff6a3d;left:-10%;top:0;animation:m1 5s ease-in-out infinite}
+.mb2{background:#7ab8ff;right:-15%;bottom:-10%;animation:m2 6s ease-in-out infinite}
+.mb3{background:#ffb347;right:-5%;top:-20%;animation:m3 7s ease-in-out infinite}
+.mini-orb{background:#2a120c;animation:morph 6s ease-in-out infinite}
+.ai-fab:hover .mini-orb{transform:scale(1.08)}
+.mini-orb{transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.ai-in{animation:aiIn .8s cubic-bezier(.7,0,.2,1) both}
+.ai-out{animation:aiOut .65s cubic-bezier(.7,0,.2,1) both}
+@keyframes aiIn{from{clip-path:circle(31px at 343px 787px)}to{clip-path:circle(1000px at 343px 787px)}}
+@keyframes aiOut{from{clip-path:circle(1000px at 343px 787px)}to{clip-path:circle(31px at 343px 787px);opacity:.4}}
+.ai-amb{animation:amb 6s ease-in-out infinite alternate}
+@keyframes amb{from{transform:translateX(-6%) scale(1)}to{transform:translateX(6%) scale(1.15)}}
+.orb-pos{transition:transform .8s cubic-bezier(.16,1,.3,1)}
+.orb-pos.kb{transform:translateY(-268px) scale(.34)}
+.orb-enter.enter{animation:orbIn 1s .05s cubic-bezier(.7,0,.2,1) backwards}
+.orb-enter.leave{animation:orbOut .6s cubic-bezier(.7,0,.2,1) forwards}
+@keyframes orbIn{from{transform:translate(148px,399px) scale(.14)}}
+@keyframes orbOut{to{transform:translate(148px,399px) scale(.14);opacity:.6}}
+.orb-live{--amp:0}
+.orb-glow{position:absolute;inset:-50px;border-radius:50%;background:conic-gradient(from 0deg,#ff6a3d,#ffb347,#ff3d6e,#7ab8ff,#ff6a3d);filter:blur(46px);opacity:calc(.28 + var(--amp) * .55);transform:scale(calc(.9 + var(--amp) * .25));animation:spin 14s linear infinite}
+.orb{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#1c0c08;transform:scale(calc(1 + var(--amp) * .13));animation:morph 8s ease-in-out infinite;box-shadow:inset 0 -24px 48px rgba(0,0,0,.4),inset 0 12px 30px rgba(255,255,255,.12);transition:filter .6s}
+.blob{position:absolute;border-radius:50%;filter:blur(24px);mix-blend-mode:screen}
+.b1{width:78%;height:78%;left:-14%;top:4%;background:#ff6a3d;animation:m1 7s ease-in-out infinite}
+.b2{width:70%;height:70%;right:-18%;top:-16%;background:#ffb347;animation:m3 9s ease-in-out infinite}
+.b3{width:72%;height:72%;left:12%;bottom:-26%;background:#7ab8ff;animation:m2 8s ease-in-out infinite}
+.b4{width:60%;height:60%;right:-8%;bottom:-6%;background:#ff3d6e;opacity:.85;animation:m4 10s ease-in-out infinite}
+.b5{width:34%;height:34%;left:30%;top:26%;background:#fff1e0;opacity:.7;filter:blur(18px);animation:m2 6s ease-in-out infinite reverse}
+.orb-shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.5),rgba(255,255,255,0) 36%)}
+@keyframes morph{0%,100%{border-radius:50% 50% 50% 50%/50% 50% 50% 50%}33%{border-radius:53% 47% 51% 49%/47% 54% 46% 53%}66%{border-radius:47% 53% 48% 52%/53% 47% 53% 47%}}
+@keyframes m1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28%,18%) scale(1.15)}}
+@keyframes m2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-22%,-26%) scale(.9)}}
+@keyframes m3{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-30%,24%) scale(1.2)}}
+@keyframes m4{0%,100%{transform:translate(0,0)}50%{transform:translate(-34%,-12%) scale(1.1)}}
+.orb-live.think .blob{animation-duration:1.8s}
+.orb-live.think .orb{animation-duration:2.4s}
+.orb-live.think .orb-glow{animation-duration:3s}
+.orb-live.mute .orb{filter:saturate(.15) brightness(.55)}
+.orb-live.mute .orb-glow{opacity:.08}
+.orb-live.mute .blob{animation-play-state:paused}
+.glass{background:rgba(255,255,255,.09);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.ctl{animation:rise .8s .45s cubic-bezier(.16,1,.3,1) both}
+.kb-in{animation:rise .6s .15s cubic-bezier(.16,1,.3,1) both}
+.msg-in{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
+#ai-input::placeholder{color:rgba(255,255,255,.38)}
+.caret{display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:#ff6a3d;vertical-align:middle;animation:blink 1s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 2180px; background: #f5f4f1; position: relative; overflow: hidden">
+<div class="scroll-y home" style="height: 2180px; overflow: hidden; background: #f5f4f1; display: flex; flex-direction: column; padding-bottom: 120px; box-sizing: border-box; {{homeStyle}}">
+
+<header class="rise" style="padding: 18px 20px 0; display: flex; align-items: flex-start; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Tue, Sep 29<span style="width: 3px; height: 3px; border-radius: 50%; background: #b9b8b4"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z"></path><path d="M9 19.5l-.8 1.5M13 19.5l-.8 1.5M17 19.5l-.8 1.5"></path></svg>12°, rain after 3 pm</span>
+<h1 style="margin: 0; font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.035em; color: #141416">Good morning, Marco</h1>
+</div>
+<a href="Menu.dc.html" class="press" aria-label="Open menu" style="position: relative; width: 40px; height: 40px; border-radius: 50%; background: #141416; color: #ffffff; font-size: 13px; font-weight: 600; margin-top: 2px; display: flex; align-items: center; justify-content: center">MR<span style="position: absolute; top: -1px; right: -1px; width: 10px; height: 10px; border-radius: 50%; background: #e4572e; border: 2px solid #f5f4f1"></span></a>
+</header>
+
+<section class="rise" style="padding: 20px 16px 0; animation-delay: 70ms">
+<div style="background: #151517; border-radius: 26px; padding: 16px 16px 14px; color: #ffffff; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 20px 40px -12px rgba(20,20,22,.45)">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 2px">
+<span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.72)"><span class="beat" style="width: 7px; height: 7px; border-radius: 50%; background: #e4572e"></span>New quote</span>
+<span class="mono" style="font-size: 11px; color: rgba(255,255,255,.5)">ON · HST 13%</span>
+</div>
+<label for="job" class="vh">Describe the job</label>
+<textarea id="job" class="ta" style="display: block; margin-top: 10px; width: 100%; box-sizing: border-box; height: 84px; resize: none; padding: 0 2px; border: 0; background: transparent; color: #ffffff; font-family: inherit; font-size: 15px; line-height: 1.5; letter-spacing: -0.01em">Repaint 3 bedrooms and the hallway, two coats. Bath ceiling has water damage, cut out and skim coat first. We supply everything.</textarea>
+
+<sc-if value="{{isIdle}}" hint-placeholder-val="{{ true }}">
+<div style="margin-top: 12px; display: flex; align-items: center; gap: 8px">
+<button class="press" style="height: 34px; padding: 0 11px 0 4px; border-radius: 999px; border: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500"><span style="width: 26px; height: 26px; border-radius: 50%; background: #f1ede4; color: #141416; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">DW</span>Dana W.</button>
+<button class="press" aria-label="3 photos attached" style="height: 34px; padding: 0 11px; border-radius: 999px; border: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="3"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="m20 16-5-5-8 8"></path></svg>3</button>
+<span style="flex-grow: 1"></span>
+<button class="press {{micCls}}" onClick="{{toggleMic}}" aria-label="{{micLabel}}" aria-pressed="{{listening}}" style="{{micStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
+<button class="press" onClick="{{draft}}" aria-label="Draft quote" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #e4572e; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -4px rgba(228,87,46,.6)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+</div>
+</sc-if>
+
+<sc-if value="{{isWorking}}" hint-placeholder-val="{{ false }}">
+<div class="rise" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 9px">
+<sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; {{st.rowStyle}}">
+<span style="width: 16px; height: 16px; display: flex; align-items: center; justify-content: center">
+<sc-if value="{{st.isDone}}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></sc-if>
+<sc-if value="{{st.isActive}}" hint-placeholder-val="{{ false }}"><span class="spin" style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.2); border-top-color: #e4572e; box-sizing: border-box"></span></sc-if>
+<sc-if value="{{st.isWait}}" hint-placeholder-val="{{ true }}"><span style="width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.3)"></span></sc-if>
+</span>
+<span>{{st.label}}</span>
+</div>
+</sc-for>
+<div style="height: 2px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 3px"><div class="bar-in" style="height: 100%; background: #e4572e"></div></div>
+</div>
+</sc-if>
+
+<sc-if value="{{isReady}}" hint-placeholder-val="{{ false }}">
+<div class="rise" style="margin-top: 12px; border-radius: 18px; background: #ffffff; color: #141416; padding: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #1f7a45"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Draft ready</span>
+<span class="mono" style="font-size: 11px; color: #6e6e76">Q-2026-118</span>
+</div>
+<p class="num" style="margin: 8px 0 0; font-size: 32px; font-weight: 600; letter-spacing: -0.045em; line-height: 1">{{shownTotal}}</p>
+<p style="margin: 5px 0 0; font-size: 12px; color: #6e6e76">Incl. HST · 5 items · valid 30 days</p>
+<div style="margin-top: 12px; display: flex; flex-direction: column">
+<sc-for list="{{preview}}" as="li" hint-placeholder-count="3">
+<div class="rise" style="display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid #efeeea; font-size: 13px; {{li.delay}}">
+<span style="color: #3c3c43">{{li.name}}</span><span class="num" style="font-weight: 500">{{li.amt}}</span>
+</div>
+</sc-for>
+</div>
+<div style="margin-top: 12px; display: flex; gap: 8px">
+<a class="press" href="Quote.dc.html" style="flex-grow: 1; height: 44px; border-radius: 14px; background: #141416; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600">Review and send</a>
+<button class="press" onClick="{{reset}}" style="height: 44px; padding: 0 16px; border-radius: 14px; border: 0; background: #f1f0ec; color: #141416; font-size: 14px; font-weight: 500">Redo</button>
+</div>
+</div>
+</sc-if>
+</div>
+<p style="margin: 10px 4px 0; font-size: 12px; color: #6e6e76; min-height: 16px">{{micHint}}</p>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 140ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Schedule</h2>
+<a href="#" style="font-size: 13px; color: #6e6e76; display: flex; align-items: center; gap: 2px">September<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></a>
+</div>
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04)">
+<div style="position: relative; padding: 6px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 6px; left: 6px; width: calc((100% - 12px) / 7); height: 56px; border-radius: 16px; background: #141416; {{dayIndicator}}"></span>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<button class="press" onClick="{{d.pick}}" aria-pressed="{{d.on}}" aria-label="{{d.aria}}" style="position: relative; height: 56px; border: 0; background: transparent; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<span class="dayt" style="font-size: 11px; font-weight: 500; {{d.dowStyle}}">{{d.dow}}</span>
+<span class="dayt num" style="font-size: 15px; font-weight: 600; {{d.dateStyle}}">{{d.date}}</span>
+<span style="width: 4px; height: 4px; border-radius: 50%; {{d.dotStyle}}"></span>
+</button>
+</sc-for>
+</div>
+<div style="height: 1px; background: #efeeea; margin: 0 16px"></div>
+<sc-if value="{{hasAgenda}}" hint-placeholder-val="{{ true }}">
+<div style="padding: 6px 0 8px">
+<sc-for list="{{agenda}}" as="ev" hint-placeholder-count="3">
+<a href="#" class="row rise" style="display: grid; grid-template-columns: 44px 14px 1fr auto; column-gap: 10px; align-items: start; padding: 10px 16px; {{ev.delay}}">
+<span class="mono" style="font-size: 12px; color: #3c3c43; padding-top: 1px">{{ev.time}}</span>
+<span style="display: flex; justify-content: center; padding-top: 5px"><span style="width: 7px; height: 7px; border-radius: 50%; {{ev.dot}}"></span></span>
+<span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="font-size: 14px; font-weight: 500; color: #141416; line-height: 1.3">{{ev.title}}</span>
+<span style="font-size: 12px; color: #6e6e76">{{ev.place}}</span>
+</span>
+<span style="font-size: 11.5px; font-weight: 500; padding-top: 2px; {{ev.tagStyle}}">{{ev.tag}}</span>
+</a>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{noAgenda}}" hint-placeholder-val="{{ false }}">
+<div class="rise" style="padding: 18px 16px; display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 13.5px; color: #6e6e76">Nothing booked</span>
+<button class="press" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 0; background: #f1f0ec; color: #141416; font-size: 13px; font-weight: 500">Add visit</button>
+</div>
+</sc-if>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 210ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Today</h2>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #6e6e76"><span class="num">{{doneCount}}/{{taskCount}}</span><span style="width: 44px; height: 4px; border-radius: 4px; background: #e7e6e2; overflow: hidden; display: block"><span style="display: block; height: 100%; background: #141416; border-radius: 4px; transition: width .6s cubic-bezier(.16,1,.3,1); {{progressStyle}}"></span></span></span>
+</div>
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 4px 0">
+<sc-for list="{{tasks}}" as="t" hint-placeholder-count="6">
+<div class="row" style="display: flex; align-items: center; gap: 12px; padding: 9px 16px">
+<button class="chk {{t.cls}}" onClick="{{t.toggle}}" aria-pressed="{{t.done}}" aria-label="{{t.aria}}" style="width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; {{t.boxStyle}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5" pathLength="24"></path></svg></button>
+<span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding: 2px 0; border-bottom: 0">
+<span class="tt {{t.cls}}" style="font-size: 14px; font-weight: 500; line-height: 1.35">{{t.text}}</span>
+<span style="font-size: 12px; {{t.metaStyle}}">{{t.meta}}</span>
+</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 280ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Business</h2>
+<div role="group" aria-label="Period" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 156px; padding: 2px; border-radius: 10px; background: #e9e8e4">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: calc((100% - 4px) / 3); height: 28px; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(20,20,22,.12); {{periodIndicator}}"></span>
+<sc-for list="{{periods}}" as="p" hint-placeholder-count="3">
+<button onClick="{{p.pick}}" aria-pressed="{{p.on}}" class="dayt" style="position: relative; height: 28px; border: 0; background: transparent; font-size: 12px; font-weight: 500; {{p.style}}">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 16px 16px 14px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 12.5px; color: #6e6e76">Collected {{periodWord}}</span>
+<span class="num" style="font-size: 30px; font-weight: 600; letter-spacing: -0.045em; line-height: 1">{{collected}}</span>
+</div>
+<span class="num" style="font-size: 12.5px; font-weight: 500; color: #1f7a45; padding-bottom: 3px">↑ {{delta}} <span style="color: #6e6e76; font-weight: 400">{{deltaNote}}</span></span>
+</div>
+<svg width="326" height="112" viewBox="0 0 326 112" aria-label="{{chartLabel}}" role="img" style="display: block; margin-top: 16px; overflow: visible">
+<line x1="0" y1="8" x2="326" y2="8" stroke="#efeeea" stroke-dasharray="2 4"></line>
+<line x1="0" y1="56" x2="326" y2="56" stroke="#efeeea" stroke-dasharray="2 4"></line>
+<line x1="0" y1="104" x2="326" y2="104" stroke="#e7e6e2"></line>
+<path class="area" d="{{areaPath}}" fill="#e4572e" fill-opacity="0.07"></path>
+<path class="draw" d="{{linePath}}" pathLength="1" fill="none" stroke="#e4572e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle class="dot" cx="{{lastX}}" cy="{{lastY}}" r="4.5" fill="#ffffff" stroke="#e4572e" stroke-width="2"></circle>
+</svg>
+<div style="display: flex; justify-content: space-between; margin-top: 6px">
+<sc-for list="{{labels}}" as="l" hint-placeholder-count="6"><span class="mono" style="font-size: 10.5px; color: #8a8a90">{{l}}</span></sc-for>
+</div>
+<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #efeeea; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 11.5px; color: #6e6e76">Quotes won</span>
+<span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">{{winPct}}</span>
+<span style="height: 3px; border-radius: 3px; background: #efeeea; overflow: hidden; margin-top: 3px; width: 72px; display: block"><span class="grow" style="display: block; height: 100%; background: #141416; transition: width .6s cubic-bezier(.16,1,.3,1); {{winStyle}}"></span></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid #efeeea">
+<span style="font-size: 11.5px; color: #6e6e76">Outstanding</span>
+<span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">$9,870</span>
+<span style="font-size: 11.5px; color: #c2371f">$3,120 overdue</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid #efeeea">
+<span style="font-size: 11.5px; color: #6e6e76">Margin</span>
+<span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">{{margin}}</span>
+<span style="font-size: 11.5px; color: #6e6e76">after labour</span>
+</div>
+</div>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 0 0; animation-delay: 340ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Crew</h2>
+<span style="font-size: 12.5px; color: #6e6e76">3 on site · 1 en route</span>
+</div>
+<div style="margin: 0 16px; background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 14px 6px 12px">
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr))">
+<sc-for list="{{crew}}" as="w" hint-placeholder-count="5">
+<button class="press" onClick="{{w.pick}}" aria-pressed="{{w.on}}" aria-label="{{w.aria}}" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 2px 0">
+<span class="av" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #141416; background: #f1ede4; {{w.ring}}">{{w.ini}}</span>
+<span style="font-size: 11.5px; font-weight: 500; {{w.nameStyle}}">{{w.first}}</span>
+</button>
+</sc-for>
+</div>
+<div style="margin: 12px 10px 0; padding: 10px 12px; border-radius: 14px; background: #f7f6f3; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+<span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+<span style="font-size: 13px; font-weight: 500">{{sel.name}} <span style="color: #6e6e76; font-weight: 400">· {{sel.role}}</span></span>
+<span style="font-size: 12px; color: #6e6e76">{{sel.site}}</span>
+</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; white-space: nowrap; {{sel.stColor}}"><span style="width: 6px; height: 6px; border-radius: 50%; {{sel.dot}}"></span>{{sel.status}}</span>
+</div>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 400ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Sites</h2>
+<a href="#" style="font-size: 13px; color: #6e6e76">All 5</a>
+</div>
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 4px 0">
+<sc-for list="{{sites}}" as="s" hint-placeholder-count="3">
+<a href="#" class="row" style="display: flex; flex-direction: column; gap: 9px; padding: 12px 16px; {{s.sep}}">
+<span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+<span style="font-size: 14px; font-weight: 500">{{s.name}}</span>
+<span class="mono" style="font-size: 12px; color: #3c3c43">{{s.pctLabel}}</span>
+</span>
+<span style="height: 3px; border-radius: 3px; background: #efeeea; overflow: hidden; display: block"><span class="grow" style="display: block; height: 100%; border-radius: 3px; background: #141416; {{s.pctStyle}}"></span></span>
+<span style="display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: #6e6e76">
+<span>{{s.phase}}</span><span>{{s.crewLine}}</span>
+</span>
+</a>
+</sc-for>
+</div>
+</section>
+</div>
+
+<nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; align-items: center">
+<div style="flex-grow: 1; height: 62px; border-radius: 31px; background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 10px 30px -8px rgba(20,20,22,.22), 0 0 0 1px rgba(20,20,22,.06); padding: 5px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); box-sizing: border-box">
+<a href="#" aria-current="page" style="border-radius: 26px; background: #f1f0ec; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: #141416"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"></path></svg>Home</a>
+<a href="Quote.dc.html" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 13h7M9 17h5"></path></svg>Quotes</a>
+<a href="#" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a8 8 0 0 1 16 0"></path><path d="M3 16h18v3H3zM10 8.5V5h4v3.5"></path></svg>Jobs</a>
+<a href="#" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.5"></circle><path d="M3 20a6 6 0 0 1 12 0M16 5.5a3.5 3.5 0 0 1 0 6.5M18 14.5a6 6 0 0 1 3 5.5"></path></svg>Clients</a>
+</div>
+<button class="press ai-fab" aria-label="Open assistant" style="position: relative; width: 62px; height: 62px; flex-shrink: 0; border-radius: 50%; border: 0; background: #111113; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px -8px rgba(20,20,22,.55), 0 0 0 1px rgba(255,255,255,.06) inset; overflow: hidden">
+<span class="mini-orb" aria-hidden="true" style="position: relative; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; display: block">
+<span class="mb mb1"></span><span class="mb mb2"></span><span class="mb mb3"></span>
+<span style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.7), rgba(255,255,255,0) 45%)"></span>
+</span>
+</button>
+</nav>
+
+<sc-if value="{{aiShown}}" hint-placeholder-val="{{ false }}">
+<div class="ai-layer {{aiLayerCls}}" role="dialog" aria-modal="true" aria-label="Assistant" style="position: absolute; inset: 0; background: #09090b; color: #ffffff; overflow: hidden">
+<div aria-hidden="true" class="ai-amb" style="position: absolute; left: -20%; right: -20%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,106,61,.22), rgba(255,106,61,0))"></div>
+
+<div class="orb-pos {{orbPosCls}}" aria-hidden="true" style="position: absolute; left: 50%; top: 46%; width: 220px; height: 220px; margin: -110px 0 0 -110px">
+<div class="orb-enter {{orbEnterCls}}" style="position: absolute; inset: 0">
+<div ref="{{orbRef}}" class="orb-live {{orbMood}}" style="position: absolute; inset: 0">
+<div class="orb-glow"></div>
+<div class="orb">
+<span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span><span class="blob b5"></span>
+<span class="orb-shine"></span>
+</div>
+</div>
+</div>
+</div>
+
+<sc-if value="{{voiceMode}}" hint-placeholder-val="{{ true }}">
+<div class="ctl" style="position: absolute; left: 0; right: 0; bottom: 44px; display: flex; align-items: center; justify-content: center; gap: 28px">
+<button class="press glass" onClick="{{openKeyboard}}" aria-label="Type instead" style="width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="3"></rect><path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M8 14h8"></path></svg></button>
+<button class="press" onClick="{{toggleMute}}" aria-label="{{muteLabel}}" aria-pressed="{{muted}}" style="width: 76px; height: 76px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; {{muteStyle}}">
+<sc-if value="{{notMuted}}" hint-placeholder-val="{{ true }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></sc-if>
+<sc-if value="{{muted}}" hint-placeholder-val="{{ false }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M15 9.5V6a3 3 0 0 0-5.7-1.3M9 9v2a3 3 0 0 0 4.6 2.5M5.5 11a6.5 6.5 0 0 0 10.4 5.2M18.5 11a6.4 6.4 0 0 1-.6 2.7M12 17.5V21M4 4l16 16"></path></svg></sc-if>
+</button>
+<button class="press glass" onClick="{{closeAI}}" aria-label="Close assistant" style="width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+</sc-if>
+
+<sc-if value="{{kbMode}}" hint-placeholder-val="{{ false }}">
+<button class="press glass ctl" onClick="{{closeAI}}" aria-label="Close assistant" style="position: absolute; top: 16px; right: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+<div style="position: absolute; left: 0; right: 0; top: 190px; bottom: 104px; padding: 0 20px; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; overflow: hidden">
+<sc-for list="{{msgs}}" as="m" hint-placeholder-count="0">
+<sc-if value="{{m.mine}}" hint-placeholder-val="{{ true }}">
+<div class="msg-in" style="align-self: flex-end; max-width: 78%; padding: 10px 14px; border-radius: 20px 20px 6px 20px; background: rgba(255,255,255,.1); font-size: 14.5px; line-height: 1.45">{{m.text}}</div>
+</sc-if>
+<sc-if value="{{m.bot}}" hint-placeholder-val="{{ false }}">
+<div class="msg-in" style="align-self: flex-start; max-width: 88%; font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.9); text-wrap: pretty">{{m.text}}<sc-if value="{{m.streaming}}" hint-placeholder-val="{{ false }}"><span class="caret"></span></sc-if></div>
+</sc-if>
+</sc-for>
+</div>
+<div class="kb-in" style="position: absolute; left: 12px; right: 12px; bottom: 28px; display: flex; align-items: center; gap: 8px">
+<div class="glass" style="flex-grow: 1; height: 52px; border-radius: 26px; display: flex; align-items: center; padding: 0 6px 0 18px; gap: 6px">
+<label for="ai-input" class="vh">Message the assistant</label>
+<input id="ai-input" ref="{{inputRef}}" onKeyDown="{{onKey}}" autocomplete="off" placeholder="Ask anything, or describe a job" style="flex-grow: 1; min-width: 0; height: 40px; border: 0; background: transparent; color: #ffffff; font-family: inherit; font-size: 15px; outline: none; letter-spacing: -0.01em">
+<button class="press" onClick="{{sendMsg}}" aria-label="Send" style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 0; background: #e4572e; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+</div>
+<button class="press glass" onClick="{{backToVoice}}" aria-label="Back to voice" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"></path></svg></button>
+</div>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2180}}'>
+class Component extends DCLogic {
+  componentWillUnmount() { (this._t || []).forEach(clearTimeout); if (this._raf) cancelAnimationFrame(this._raf); this.stopOrb(); (this._at || []).forEach(clearTimeout); if (this._stream) clearInterval(this._stream); }
+  aiTimer(fn, ms) { this._at = this._at || []; this._at.push(setTimeout(fn, ms)); }
+  openAI() {
+    if (this.g('ai', 'closed') !== 'closed') return;
+    this.setState({ ai: 'open', aiMode: 'voice', muted: false, mood: 'listen', msgs: [] });
+    this._t0 = performance.now(); this._mood = 'listen';
+    this.startOrb();
+  }
+  closeAI() {
+    var self = this;
+    if (this.g('ai', 'closed') !== 'open') return;
+    if (this._stream) clearInterval(this._stream);
+    this.setState({ ai: 'closing' });
+    this.aiTimer(function () { self.stopOrb(); self.setState({ ai: 'closed', aiMode: 'voice' }); }, 640);
+  }
+  startOrb() {
+    var self = this, amp = 0;
+    this.stopOrb();
+    var loop = function (now) {
+      var t = (now - self._t0) / 1000, target = 0, mood = 'listen';
+      var voice = self.g('aiMode', 'voice') === 'voice', muted = self.g('muted', false), busy = self._busy;
+      if (busy) { mood = busy; }
+      else if (voice && !muted) {
+        var c = t % 9.5;
+        mood = c < 3.8 ? 'listen' : (c < 5.2 ? 'think' : 'speak');
+      } else { mood = muted ? 'mute' : 'idle'; }
+      if (mood === 'listen') target = 0.12 + 0.34 * Math.abs(Math.sin(t * 3.1) * Math.sin(t * 7.7)) + Math.random() * 0.06;
+      else if (mood === 'speak') target = 0.25 + 0.75 * Math.pow(Math.max(0, Math.sin(t * 8.6)), 2) * (0.55 + 0.45 * Math.sin(t * 1.9));
+      else if (mood === 'think') target = 0.1 + 0.05 * Math.sin(t * 6);
+      else if (mood === 'idle') target = 0.08 + 0.04 * Math.sin(t * 1.4);
+      amp += (target - amp) * 0.22;
+      if (self._orbEl) self._orbEl.style.setProperty('--amp', amp.toFixed(3));
+      if (mood !== self._mood) { self._mood = mood; self.setState({ mood: mood }); }
+      self._orbRaf = requestAnimationFrame(loop);
+    };
+    this._orbRaf = requestAnimationFrame(loop);
+  }
+  stopOrb() { if (this._orbRaf) cancelAnimationFrame(this._orbRaf); this._orbRaf = null; }
+  sendMsg() {
+    var self = this, el = this._inp;
+    var text = el ? el.value.trim() : '';
+    if (!text || this._busy) return;
+    el.value = '';
+    var low = text.toLowerCase();
+    var reply = /invoice|paid|owe|pay/.test(low) ? 'Tom and Lena Hart still owe $2,340.00 on INV-0412, nine days overdue. I can send them a friendly reminder by SMS now, with the payment link.'
+      : /quote|price|cost|estimate/.test(low) ? 'Drafted Q-2026-119 from that. Five line items, $1,865.10 including HST. It is in your quotes as a draft, ready for you to check before it goes out.'
+      : /tomorrow|schedule|when|book/.test(low) ? 'Tomorrow is Galloway Rd from 7:30 with Amara and Sofia, then the Harbourfront Dental estimate at 14:00. Nothing overlaps.'
+      : 'Done. I added it to today’s list and I’ll remind you at 2 pm if it is still open.';
+    var msgs = (this.g('msgs', [])).concat([{ id: Date.now(), mine: true, text: text }]);
+    this._busy = 'think';
+    this.setState({ msgs: msgs });
+    this.aiTimer(function () {
+      var words = reply.split(' '), i = 0, bot = { id: Date.now() + 1, mine: false, text: '', streaming: true };
+      self._busy = 'speak';
+      self.setState({ msgs: self.g('msgs', []).concat([bot]) });
+      self._stream = setInterval(function () {
+        i++;
+        var list = self.g('msgs', []).slice(), last = Object.assign({}, list[list.length - 1]);
+        last.text = words.slice(0, i).join(' ');
+        if (i >= words.length) { last.streaming = false; clearInterval(self._stream); self._busy = null; }
+        list[list.length - 1] = last;
+        self.setState({ msgs: list });
+      }, 55);
+    }, 1100);
+  }
+  g(k, d) { var v = this.state && this.state[k]; return v === undefined ? d : v; }
+  money(n) { return '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  startDraft() {
+    var self = this;
+    if (this.g('phase', 'idle') !== 'idle') return;
+    this._t = [];
+    this.setState({ phase: 'working', step: 0, listening: false });
+    [750, 1500, 2150].forEach(function (ms, i) { self._t.push(setTimeout(function () { self.setState({ step: i + 1 }); }, ms)); });
+    this._t.push(setTimeout(function () {
+      self.setState({ phase: 'ready', shown: 0 });
+      var start = performance.now(), T = 4131.05;
+      var tick = function (now) {
+        var p = Math.min(1, (now - start) / 1000), e = 1 - Math.pow(1 - p, 4);
+        self.setState({ shown: T * e });
+        if (p < 1) self._raf = requestAnimationFrame(tick);
+      };
+      self._raf = requestAnimationFrame(tick);
+    }, 2450));
+  }
+  smooth(pts) {
+    var f = function (n) { return n.toFixed(1); };
+    var d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      d += ' C' + [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]].map(f).join(' ');
+    }
+    return d;
+  }
+  renderVals() {
+    var self = this;
+    var phase = this.g('phase', 'idle'), step = this.g('step', 0), listening = this.g('listening', false);
+    var sel = this.g('day', 1), period = this.g('period', 'M'), who = this.g('who', 0);
+    var done = this.g('done', { 0: true, 1: true });
+
+    var steps = ['Reading the scope', 'Pricing at Toronto rates', 'Adding HST and terms'].map(function (l, i) {
+      var st = i < step ? 'done' : (i === step ? 'active' : 'wait');
+      return { label: l, isDone: st === 'done', isActive: st === 'active', isWait: st === 'wait', rowStyle: st === 'wait' ? 'color: rgba(255,255,255,.4)' : 'color: rgba(255,255,255,.92)' };
+    });
+    var preview = [
+      { name: 'Painting, 3 bedrooms + hall', amt: '$2,352.00' },
+      { name: 'Bath ceiling repair + skim', amt: '$640.00' },
+      { name: 'Primer, paint, protection', amt: '$663.80' }
+    ].map(function (x, i) { return Object.assign({}, x, { delay: 'animation-delay: ' + (200 + i * 90) + 'ms' }); });
+
+    var K = { site: '#141416', est: '#e4572e', walk: '#1f7a45', del: '#b7791f' };
+    var ev = function (time, k, title, place, tag) { return { time: time, dot: 'background: ' + K[k], title: title, place: place, tag: tag || '', tagStyle: tag === 'Next' ? 'color: #c2441f' : 'color: #6e6e76' }; };
+    var agendas = [
+      [ev('08:00', 'site', 'Galloway Rd, framing check', 'Amara, Sofia'), ev('13:00', 'del', 'Drywall delivery, 14 sheets', '48 Galloway Rd')],
+      [ev('07:30', 'site', 'Galloway Rd basement', 'Amara, Sofia, Jonah', 'On site'), ev('11:00', 'est', 'Estimate, Priya Nair', 'Kitchen backsplash · 212 Dovercourt Rd', 'Next'), ev('15:30', 'walk', 'Final walkthrough, Whitfield', '17 Castle Frank Cres')],
+      [ev('07:30', 'site', 'Galloway Rd basement', 'Amara, Sofia'), ev('14:00', 'est', 'Estimate, Harbourfront Dental', 'Queens Quay W')],
+      [ev('07:30', 'site', 'Galloway Rd, taping and mud', 'Amara, Sofia'), ev('10:00', 'walk', 'Permit inspection', '48 Galloway Rd')],
+      [ev('07:30', 'site', 'Galloway Rd, taping', 'Amara'), ev('10:00', 'del', 'Skip bin swap', '48 Galloway Rd')],
+      [], []
+    ];
+    var dows = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], dates = [28, 29, 30, 1, 2, 3, 4];
+    var days = dates.map(function (d, i) {
+      var on = i === sel, n = agendas[i].length;
+      return {
+        dow: dows[i], date: d, on: on, aria: dows[i] + ' ' + d + ', ' + n + ' booked',
+        dowStyle: on ? 'color: rgba(255,255,255,.6)' : 'color: #8a8a90',
+        dateStyle: on ? 'color: #ffffff' : (i === 1 ? 'color: #c2441f' : 'color: #141416'),
+        dotStyle: n ? (on ? 'background: rgba(255,255,255,.7)' : 'background: #c4c3c0') : 'background: transparent',
+        pick: function () { self.setState({ day: i }); }
+      };
+    });
+    var agenda = agendas[sel].map(function (e, i) { return Object.assign({}, e, { delay: 'animation-delay: ' + i * 60 + 'ms' }); });
+
+    var taskData = [
+      ['Confirm 11:00 with Priya Nair', 'Call · (647) 555-0142', ''],
+      ['Approve Luca’s timesheet', '38.5 h this week', ''],
+      ['Chase invoice INV-0412, Hart', '$2,340.00 · 9 days overdue', 'urgent'],
+      ['Pick up 14 sheets of 1/2" drywall', 'Supplier desk closes at 14:00', 'soon'],
+      ['Upload permit photos, Galloway Rd', 'Before Thursday inspection', ''],
+      ['Send revised quote to Harbourfront', 'Expires Friday', '']
+    ];
+    var doneCount = 0;
+    var tasks = taskData.map(function (t, i) {
+      var d = !!done[i]; if (d) doneCount++;
+      return {
+        text: t[0], meta: t[1], done: d, cls: d ? 'done' : '',
+        metaStyle: d ? 'color: #b0afab' : (t[2] === 'urgent' ? 'color: #c2371f' : (t[2] === 'soon' ? 'color: #9a6412' : 'color: #6e6e76')),
+        aria: (d ? 'Mark not done: ' : 'Mark done: ') + t[0],
+        boxStyle: d ? 'background: #141416; border: 1.5px solid #141416' : 'background: #ffffff; border: 1.5px solid #c9c8c4',
+        toggle: function () { var nd = Object.assign({}, self.g('done', { 0: true, 1: true })); nd[i] = !nd[i]; self.setState({ done: nd }); }
+      };
+    });
+
+    var P = {
+      W: { word: 'this week', total: '$11,460', delta: '8%', note: 'vs last week', vals: [7.2, 9.8, 8.1, 12.4, 10.6, 9.3, 10.6, 11.46], labels: ['Aug 3', '10', '17', '24', '31', 'Sep 7', '14', '21'], win: 58, margin: '33%' },
+      M: { word: 'in September', total: '$48,230', delta: '12%', note: 'vs Aug', vals: [31.2, 36.8, 42.1, 39.5, 43.0, 48.23], labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'], win: 62, margin: '34%' },
+      Q: { word: 'in Q3', total: '$130,730', delta: '19%', note: 'vs Q2', vals: [96.3, 84.7, 110.1, 130.73], labels: ['Q4 ’25', 'Q1', 'Q2', 'Q3'], win: 57, margin: '31%' }
+    };
+    var cur = P[period];
+    var mx = Math.max.apply(null, cur.vals), mn = Math.min.apply(null, cur.vals) * 0.85;
+    var W = 326, n = cur.vals.length;
+    var pts = cur.vals.map(function (v, i) { return [6 + i * ((W - 12) / (n - 1)), 10 + (1 - (v - mn) / (mx - mn)) * 90]; });
+    var line = this.smooth(pts);
+    var last = pts[pts.length - 1];
+    var pkeys = ['W', 'M', 'Q'];
+    var periods = [['W', 'Week'], ['M', 'Month'], ['Q', 'Quarter']].map(function (p) {
+      var on = p[0] === period;
+      return { label: p[1], on: on, style: on ? 'color: #141416' : 'color: #6e6e76', pick: function () { self.setState({ period: p[0] }); } };
+    });
+
+    var ST = {
+      on: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1f9d55', stColor: 'color: #1f7a45', dot: 'background: #1f9d55' },
+      way: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #d69524', stColor: 'color: #9a6412', dot: 'background: #d69524' },
+      off: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #dddcd8', stColor: 'color: #6e6e76', dot: 'background: #b0afab' }
+    };
+    var crewData = [
+      ['LB', 'Luca Bianchi', 'Painter, lead', 'On site 7:12', 'Whitfield bathroom · 17 Castle Frank Cres', 'on'],
+      ['AO', 'Amara Okafor', 'Drywall', 'On site 7:28', 'Galloway Rd basement', 'on'],
+      ['SM', 'Sofia Marin', 'Apprentice', 'On site 7:31', 'Galloway Rd basement', 'on'],
+      ['JR', 'Jonah Reyes', 'Electrician, sub', '14 min away', 'Heading to Galloway Rd', 'way'],
+      ['DP', 'Dev Patel', 'Carpenter', 'Off today', 'Back Thursday', 'off']
+    ];
+    var crew = crewData.map(function (w, i) {
+      var on = i === who, s = ST[w[5]];
+      return {
+        ini: w[0], first: w[1].split(' ')[0], on: on, aria: w[1] + ', ' + w[3],
+        ring: s.ring + (on ? '; transform: scale(1.06)' : ''),
+        nameStyle: on ? 'color: #141416' : 'color: #6e6e76',
+        pick: function () { self.setState({ who: i }); }
+      };
+    });
+    var sw = crewData[who], ss = ST[sw[5]];
+    var selW = { name: sw[1], role: sw[2], site: sw[4], status: sw[3], stColor: ss.stColor, dot: ss.dot };
+
+    var sites = [
+      { name: 'Galloway Rd basement', pct: 64, phase: 'Drywall · taping Thu', crewLine: 'Amara, Sofia, Jonah' },
+      { name: 'Whitfield bathroom', pct: 92, phase: 'Walkthrough 15:30', crewLine: 'Luca' },
+      { name: 'Harbourfront Dental', pct: 0, phase: 'Quote sent · starts Oct 10', crewLine: 'Not assigned' }
+    ].map(function (s, i) { return Object.assign({}, s, { pctLabel: s.pct + '%', pctStyle: 'width: ' + s.pct + '%', sep: i ? 'border-top: 1px solid #efeeea; margin: 0 0; ' : '' }); });
+
+    var ai = this.g('ai', 'closed'), aiMode = this.g('aiMode', 'voice'), muted = this.g('muted', false), mood = this.g('mood', 'listen');
+    if (!this._orbRef) this._orbRef = function (el) { self._orbEl = el; };
+    if (!this._inputRef) this._inputRef = function (el) { self._inp = el; };
+    var aiVals = {
+      aiShown: ai !== 'closed', aiLayerCls: ai === 'closing' ? 'ai-out' : 'ai-in',
+      orbEnterCls: ai === 'closing' ? 'leave' : 'enter', orbPosCls: aiMode === 'kb' && ai !== 'closing' ? 'kb' : '',
+      orbMood: mood, orbRef: this._orbRef, inputRef: this._inputRef,
+      homeStyle: ai === 'open' ? 'transform: scale(.92); border-radius: 38px; filter: brightness(.7)' : 'transform: none; border-radius: 0',
+      voiceMode: aiMode === 'voice', kbMode: aiMode === 'kb',
+      muted: muted, notMuted: !muted,
+      muteLabel: muted ? 'Unmute microphone' : 'Mute microphone',
+      muteStyle: muted ? 'background: rgba(255,90,70,.18); color: #ff8a70; box-shadow: inset 0 0 0 1px rgba(255,120,100,.35)' : 'background: #ffffff; color: #111113; box-shadow: 0 10px 30px -6px rgba(255,106,61,.45)',
+      msgs: this.g('msgs', []).map(function (m) { return { text: m.text, mine: m.mine, bot: !m.mine, streaming: !!m.streaming }; }),
+      openAI: function () { self.openAI(); },
+      closeAI: function () { self.closeAI(); },
+      toggleMute: function () { self.setState({ muted: !self.g('muted', false) }); },
+      openKeyboard: function () { self.setState({ aiMode: 'kb' }); self.aiTimer(function () { if (self._inp) self._inp.focus(); }, 450); },
+      backToVoice: function () { self._t0 = performance.now(); self.setState({ aiMode: 'voice', muted: false }); },
+      sendMsg: function () { self.sendMsg(); },
+      onKey: function (e) { if (e.key === 'Enter') { e.preventDefault(); self.sendMsg(); } }
+    };
+    return Object.assign(aiVals, {
+      isIdle: phase === 'idle', isWorking: phase === 'working', isReady: phase === 'ready',
+      listening: listening, micCls: listening ? 'pulse' : '',
+      micLabel: listening ? 'Stop dictation' : 'Dictate the job',
+      micHint: listening ? 'Listening. Talk like you would to your crew.' : (phase === 'idle' ? 'Type or tap the mic. Photos and client are attached.' : ''),
+      micStyle: 'position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; ' + (listening ? 'background: #ffffff; color: #141416' : 'background: rgba(255,255,255,.1); color: #ffffff'),
+      toggleMic: function () { self.setState({ listening: !self.g('listening', false) }); },
+      draft: function () { self.startDraft(); },
+      reset: function () { (self._t || []).forEach(clearTimeout); if (self._raf) cancelAnimationFrame(self._raf); self.setState({ phase: 'idle', step: 0, shown: 0 }); },
+      steps: steps, preview: preview, shownTotal: this.money(this.g('shown', 0)),
+      days: days, dayIndicator: 'transform: translateX(' + (sel * 100) + '%)', agenda: agenda, hasAgenda: agenda.length > 0, noAgenda: agenda.length === 0,
+      tasks: tasks, doneCount: doneCount, taskCount: tasks.length, progressStyle: 'width: ' + Math.round(doneCount / tasks.length * 100) + '%',
+      periods: periods, periodIndicator: 'transform: translateX(' + (pkeys.indexOf(period) * 100) + '%)',
+      periodWord: cur.word, collected: cur.total, delta: cur.delta, deltaNote: cur.note,
+      linePath: line, areaPath: line + ' L' + last[0].toFixed(1) + ' 104 L' + pts[0][0].toFixed(1) + ' 104 Z',
+      lastX: last[0].toFixed(1), lastY: last[1].toFixed(1), labels: cur.labels, chartLabel: 'Collected trend, latest ' + cur.total,
+      winPct: cur.win + '%', winStyle: 'width: ' + cur.win + '%', margin: cur.margin,
+      crew: crew, sel: selW, sites: sites
+    });
+  }
+}
+</script>
+</body>
+</html>

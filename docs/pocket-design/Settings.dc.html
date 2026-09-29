@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quoteAI — Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:#e9e8e4;color:#141416;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+a{color:#141416;text-decoration:none}a:hover{color:#000}
+button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
+.mono{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:0}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.press{transition:transform .2s cubic-bezier(.16,1,.3,1),background-color .25s,box-shadow .3s,color .25s}
+.press:active{transform:scale(.93)}
+.track{transition:background-color .3s}
+.knob{transition:transform .4s cubic-bezier(.34,1.4,.64,1)}
+.slide{transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.fade{transition:color .3s}
+.tick{animation:tick .35s cubic-bezier(.16,1,.3,1)}
+@keyframes tick{from{opacity:.3;transform:translateY(-3px)}}
+.card{background:#ffffff;border-radius:20px;box-shadow:0 1px 2px rgba(20,20,22,.04),0 0 0 1px rgba(20,20,22,.04);overflow:hidden}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:0 16px}
+.srow + .srow{border-top:1px solid #efeeea}
+.lbl{display:flex;flex-direction:column;gap:1px;padding:9px 0}
+.lbl b{font-size:14px;font-weight:500}
+.lbl small{font-size:12px;color:#6e6e76}
+.vo{position:relative;width:48px;height:48px;border-radius:50%;overflow:hidden;animation:morph 7s ease-in-out infinite}
+.vo i{position:absolute;width:75%;height:75%;border-radius:50%;filter:blur(8px);mix-blend-mode:screen}
+.vo i:nth-child(1){left:-12%;top:0;animation:m1 5s ease-in-out infinite}
+.vo i:nth-child(2){right:-16%;bottom:-12%;animation:m2 6s ease-in-out infinite}
+.vo i:nth-child(3){right:-6%;top:-20%;animation:m3 7s ease-in-out infinite}
+.vo::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.6),rgba(255,255,255,0) 42%)}
+.vring{transition:box-shadow .35s,transform .35s cubic-bezier(.16,1,.3,1)}
+@keyframes morph{0%,100%{border-radius:50%}33%{border-radius:53% 47% 51% 49%/47% 54% 46% 53%}66%{border-radius:47% 53% 48% 52%/53% 47% 53% 47%}}
+@keyframes m1{50%{transform:translate(28%,18%) scale(1.15)}}
+@keyframes m2{50%{transform:translate(-22%,-26%) scale(.9)}}
+@keyframes m3{50%{transform:translate(-30%,24%) scale(1.2)}}
+.scroll-y{scrollbar-width:none}.scroll-y::-webkit-scrollbar{display:none}
+button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1500px; background: #f5f4f1; box-sizing: border-box; padding-bottom: 40px">
+
+<header style="padding: 8px 8px 0; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; height: 52px">
+<a href="Menu.dc.html" class="press" aria-label="Back to menu" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></a>
+<span></span><span></span>
+</header>
+<h1 class="rise" style="margin: 2px 20px 0; font-size: 28px; font-weight: 600; letter-spacing: -0.04em">Settings</h1>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 60ms">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Assistant</h2>
+<div class="card">
+<div style="padding: 16px 16px 14px">
+<span style="font-size: 14px; font-weight: 500">Voice</span>
+<div role="radiogroup" aria-label="Assistant voice" style="margin-top: 14px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<sc-for list="{{voices}}" as="v" hint-placeholder-count="3">
+<button class="press" role="radio" onClick="{{v.pick}}" aria-checked="{{v.on}}" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 4px 0">
+<span class="vring" style="border-radius: 50%; padding: 3px; {{v.ring}}"><span class="vo" style="display: block; background: {{v.base}}"><i style="background: {{v.c1}}"></i><i style="background: {{v.c2}}"></i><i style="background: {{v.c3}}"></i></span></span>
+<span class="fade" style="font-size: 12.5px; font-weight: 500; {{v.nameStyle}}">{{v.name}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+<div class="srow" style="border-top: 1px solid #efeeea">
+<span class="lbl"><b>Language</b></span>
+<div role="group" aria-label="Language" style="position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 150px; padding: 2px; border-radius: 10px; background: #efeeea">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: calc((100% - 4px) / 2); height: 30px; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(20,20,22,.12); {{lang.ind}}"></span>
+<sc-for list="{{lang.opts}}" as="o" hint-placeholder-count="2"><button class="fade" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="position: relative; height: 30px; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; {{o.style}}">{{o.label}}</button></sc-for>
+</div>
+</div>
+<div class="srow">
+<span class="lbl"><b>Speak replies aloud</b><small>Mutes when your phone is on silent</small></span>
+<button class="press track" role="switch" onClick="{{t.speak.flip}}" aria-checked="{{t.speak.on}}" aria-label="Speak replies aloud" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{t.speak.track}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{t.speak.knob}}"></span></button>
+</div>
+<div class="srow">
+<span class="lbl"><b>Ask before sending</b><small>Quotes, invoices and messages to clients</small></span>
+<button class="press track" role="switch" onClick="{{t.confirm.flip}}" aria-checked="{{t.confirm.on}}" aria-label="Ask before sending" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{t.confirm.track}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{t.confirm.knob}}"></span></button>
+</div>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 120ms">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Quote defaults</h2>
+<div class="card">
+<a href="#" class="srow">
+<span class="lbl"><b>Province</b></span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #6e6e76">Ontario · HST 13%<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b0afab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></span>
+</a>
+<sc-for list="{{steppers}}" as="s" hint-placeholder-count="3">
+<div class="srow">
+<span class="lbl"><b>{{s.label}}</b><small>{{s.hint}}</small></span>
+<div style="display: flex; align-items: center; background: #f5f4f1; border-radius: 10px; padding: 2px; flex-shrink: 0">
+<button class="press" onClick="{{s.dec}}" aria-label="{{s.decLabel}}" style="width: 34px; height: 34px; border-radius: 8px; border: 0; background: transparent; color: #141416; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+<span class="mono" style="min-width: 58px; text-align: center; font-size: 12.5px">{{s.val}}</span>
+<button class="press" onClick="{{s.inc}}" aria-label="{{s.incLabel}}" style="width: 34px; height: 34px; border-radius: 8px; border: 0; background: transparent; color: #141416; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></button>
+</div>
+</div>
+</sc-for>
+<div class="srow">
+<span class="lbl"><b>Send me a copy</b><small>Every quote you send, by email</small></span>
+<button class="press track" role="switch" onClick="{{t.copy.flip}}" aria-checked="{{t.copy.on}}" aria-label="Send me a copy" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{t.copy.track}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{t.copy.knob}}"></span></button>
+</div>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 180ms">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Notifications</h2>
+<div class="card">
+<sc-for list="{{notifs}}" as="n" hint-placeholder-count="4">
+<div class="srow">
+<span class="lbl"><b>{{n.label}}</b><small>{{n.hint}}</small></span>
+<button class="press track" role="switch" onClick="{{n.flip}}" aria-checked="{{n.on}}" aria-label="{{n.label}}" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{n.track}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{n.knob}}"></span></button>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 240ms">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Display</h2>
+<div class="card">
+<sc-for list="{{segs}}" as="sg" hint-placeholder-count="3">
+<div class="srow">
+<span class="lbl"><b>{{sg.label}}</b></span>
+<div role="group" aria-label="{{sg.label}}" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 186px; padding: 2px; border-radius: 10px; background: #efeeea">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 2px; left: 2px; height: 30px; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(20,20,22,.12); {{sg.ind}}"></span>
+<sc-for list="{{sg.opts}}" as="o" hint-placeholder-count="3"><button class="fade" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="position: relative; height: 30px; border: 0; background: transparent; font-weight: 500; {{o.style}}">{{o.label}}</button></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+<p style="margin: 8px 4px 0; font-size: 12px; color: #6e6e76; line-height: 1.45">Larger text keeps every screen readable in bright sun and with gloves on.</p>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 300ms">
+<h2 style="margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Security</h2>
+<div class="card">
+<div class="srow">
+<span class="lbl"><b>Lock with Face ID</b><small>Required after 5 minutes away</small></span>
+<button class="press track" role="switch" onClick="{{t.faceid.flip}}" aria-checked="{{t.faceid.on}}" aria-label="Lock with Face ID" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{t.faceid.track}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{t.faceid.knob}}"></span></button>
+</div>
+<a href="#" class="srow">
+<span class="lbl"><b>Export my data</b></span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b0afab" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+</a>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1500}}'>
+class Component extends DCLogic {
+  g(k, d) { var v = this.state && this.state[k]; return v === undefined ? d : v; }
+  renderVals() {
+    var self = this;
+    var sw = function (key, def) {
+      var on = self.g(key, def);
+      return { on: on, track: on ? 'background: #141416' : 'background: #dddcd8', knob: on ? 'transform: translateX(20px)' : 'transform: translateX(0)', flip: function () { var o = {}; o[key] = !self.g(key, def); self.setState(o); } };
+    };
+    var voiceSel = this.g('voice', 0);
+    var voices = [
+      { name: 'Ember', base: '#2a120c', c1: '#ff6a3d', c2: '#7ab8ff', c3: '#ffb347' },
+      { name: 'Tide', base: '#08172a', c1: '#3d8bff', c2: '#6ef0d2', c3: '#b7a6ff' },
+      { name: 'Stone', base: '#1a1a1c', c1: '#c9c4ba', c2: '#8e8a84', c3: '#f4efe6' }
+    ].map(function (v, i) {
+      var on = i === voiceSel;
+      return Object.assign(v, { on: on, ring: on ? 'box-shadow: 0 0 0 2px #141416; transform: scale(1.04)' : 'box-shadow: 0 0 0 1px #e7e6e2', nameStyle: on ? 'color: #141416' : 'color: #6e6e76', pick: function () { self.setState({ voice: i }); } });
+    });
+    var seg = function (key, def, labels, width) {
+      var cur = self.g(key, def), n = labels.length;
+      return {
+        ind: 'width: calc((100% - 4px) / ' + n + '); transform: translateX(' + (cur * 100) + '%)',
+        opts: labels.map(function (l, i) { return { label: l, on: i === cur, style: (i === cur ? 'color: #141416' : 'color: #6e6e76') + '; font-size: ' + (Array.isArray(width) ? width[i] : 12.5) + 'px', pick: function () { var o = {}; o[key] = i; self.setState(o); } }; })
+      };
+    };
+    var lang = seg('lang', 0, ['English', 'Français']);
+    var stepper = function (key, def, step, min, max, unit, label, hint) {
+      var v = self.g(key, def);
+      return {
+        label: label, hint: hint, val: v + unit, decLabel: 'Decrease ' + label, incLabel: 'Increase ' + label,
+        dec: function () { var o = {}; o[key] = Math.max(min, self.g(key, def) - step); self.setState(o); },
+        inc: function () { var o = {}; o[key] = Math.min(max, self.g(key, def) + step); self.setState(o); }
+      };
+    };
+    var steppers = [
+      stepper('dep', 30, 5, 0, 50, '%', 'Deposit', 'Asked on acceptance'),
+      stepper('valid', 30, 5, 5, 90, ' days', 'Valid for', 'Then the quote expires'),
+      stepper('markup', 15, 1, 0, 40, '%', 'Materials markup', 'Added to supplier cost')
+    ];
+    var notifs = [
+      ['brief', true, 'Morning brief', 'At 6:30 · day, crew and weather'],
+      ['viewed', true, 'Quote viewed', 'When a client opens your quote'],
+      ['paid', true, 'Payment received', 'Deposits and invoices'],
+      ['checkin', false, 'Crew check-ins', 'Each arrival and departure on site']
+    ].map(function (n) { return Object.assign(sw(n[0], n[1]), { label: n[2], hint: n[3] }); });
+    var segs = [
+      Object.assign(seg('theme', 0, ['Light', 'Dark', 'Auto']), { label: 'Appearance' }),
+      Object.assign(seg('units', 0, ['ft, in', 'm, cm', 'Both']), { label: 'Units' }),
+      Object.assign(seg('size', 1, ['A', 'A', 'A'], [11, 13.5, 16]), { label: 'Text size' })
+    ];
+    return {
+      voices: voices, lang: lang, steppers: steppers, notifs: notifs, segs: segs,
+      t: { speak: sw('speak', true), confirm: sw('confirm', true), copy: sw('copy', false), faceid: sw('faceid', true) }
+    };
+  }
+}
+</script>
+</body>
+</html>

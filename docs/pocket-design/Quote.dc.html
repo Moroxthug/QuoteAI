@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>quoteAI — Quote draft</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:#e9e8e4;color:#141416;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+a{color:#141416;text-decoration:none}a:hover{color:#000}
+button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
+.mono{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:0}
+.num{font-variant-numeric:tabular-nums}
+.rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.press{transition:transform .2s cubic-bezier(.16,1,.3,1),background-color .25s,color .25s,box-shadow .3s}
+.press:active{transform:scale(.92)}
+.slide{transition:transform .45s cubic-bezier(.16,1,.3,1)}
+.knob{transition:transform .4s cubic-bezier(.34,1.4,.64,1)}
+.track{transition:background-color .3s}
+.fade{transition:color .3s}
+.reveal{animation:reveal .5s cubic-bezier(.16,1,.3,1) both;overflow:hidden}
+@keyframes reveal{from{opacity:0;max-height:0}to{opacity:1;max-height:60px}}
+button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1420px; background: #f5f4f1; position: relative; overflow: hidden">
+<div style="display: flex; flex-direction: column; padding-bottom: 130px">
+
+<header style="padding: 8px 8px 0; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; height: 52px">
+<a href="Main.dc.html" class="press" aria-label="Back to home" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"></path></svg></a>
+<span class="mono" style="text-align: center; font-size: 12px; color: #6e6e76">Q-2026-118</span>
+<button class="press" aria-label="More options" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #141416"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="18.5" cy="12" r="1.6"></circle></svg></button>
+</header>
+
+<section class="rise" style="padding: 8px 20px 0">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6e6e76"><span style="width: 6px; height: 6px; border-radius: 50%; background: #d69524"></span>Draft · valid until Oct 29</span>
+<h1 style="margin: 8px 0 0; font-size: 24px; line-height: 1.2; font-weight: 600; letter-spacing: -0.035em">Bedrooms and bath ceiling</h1>
+<div style="margin-top: 14px; display: flex; align-items: center; gap: 10px">
+<span style="width: 32px; height: 32px; border-radius: 50%; background: #f1ede4; font-size: 11.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">DW</span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 14px; font-weight: 500">Dana Whitfield</span>
+<span style="font-size: 12px; color: #6e6e76">17 Castle Frank Cres, Toronto</span>
+</span>
+<button class="press" style="height: 32px; padding: 0 12px; border-radius: 10px; border: 0; background: #ebeae6; color: #141416; font-size: 12.5px; font-weight: 500">Change</button>
+</div>
+</section>
+
+<section class="rise" style="padding: 20px 16px 0; animation-delay: 70ms">
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 14px 16px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h2 style="margin: 0; font-size: 13px; font-weight: 500; color: #6e6e76">Scope, as understood</h2>
+<button class="press" style="height: 28px; padding: 0 8px; border: 0; background: transparent; color: #c2441f; font-size: 12.5px; font-weight: 500">Edit</button>
+</div>
+<p style="margin: 6px 0 0; font-size: 14px; line-height: 1.5; color: #3c3c43; text-wrap: pretty">Walls and ceilings in 3 bedrooms and hallway, two coats. Bath ceiling cut out, patched, skim coated and stain-blocked before paint. Materials supplied.</p>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 140ms">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Line items</h2>
+<button class="press" style="height: 30px; padding: 0 4px; border: 0; background: transparent; color: #6e6e76; font-size: 13px">Add item</button>
+</div>
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 2px 0">
+<sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+<div style="padding: 13px 16px; display: flex; flex-direction: column; gap: 8px; {{it.sep}}">
+<div style="display: flex; gap: 12px; justify-content: space-between; align-items: baseline">
+<span style="font-size: 14px; font-weight: 500; line-height: 1.3">{{it.name}}</span>
+<span class="num" style="font-size: 14px; font-weight: 500; white-space: nowrap">{{it.amt}}</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 12px; color: #6e6e76; line-height: 1.35">{{it.detail}}</span>
+<sc-if value="{{it.adjustable}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; background: #f5f4f1; border-radius: 10px; padding: 2px; flex-shrink: 0">
+<button class="press" onClick="{{it.dec}}" aria-label="{{it.decLabel}}" style="width: 34px; height: 34px; border-radius: 8px; border: 0; background: transparent; color: #141416; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"></path></svg></button>
+<span class="mono" style="min-width: 66px; text-align: center; font-size: 12px">{{it.qtyLabel}}</span>
+<button class="press" onClick="{{it.inc}}" aria-label="{{it.incLabel}}" style="width: 34px; height: 34px; border-radius: 8px; border: 0; background: transparent; color: #141416; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"></path></svg></button>
+</div>
+</sc-if>
+<sc-if value="{{it.fixed}}" hint-placeholder-val="{{ true }}">
+<span class="mono" style="font-size: 11.5px; color: #8a8a90; flex-shrink: 0">fixed</span>
+</sc-if>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section class="rise" style="padding: 12px 16px 0; animation-delay: 210ms">
+<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 16px">
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #6e6e76"><span>Subtotal</span><span class="num" style="color: #141416">{{subtotal}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #6e6e76; margin-top: 8px"><span>HST, Ontario 13%</span><span class="num" style="color: #141416">{{tax}}</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 14px; border-top: 1px solid #efeeea"><span style="font-size: 14px; font-weight: 500">Total</span><span class="num" style="font-size: 28px; font-weight: 600; letter-spacing: -0.045em">{{total}}</span></div>
+</div>
+<div style="margin-top: 12px; background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 12px 16px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<span style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 14px; font-weight: 500">30% deposit on acceptance</span><span style="font-size: 12px; color: #6e6e76">Card or Interac e-Transfer</span></span>
+<button class="press track" role="switch" onClick="{{toggleDeposit}}" aria-checked="{{deposit}}" aria-label="30% deposit on acceptance" style="width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; {{trackStyle}}"><span class="knob" style="width: 26px; height: 26px; border-radius: 50%; background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,.18); {{knobStyle}}"></span></button>
+</div>
+<sc-if value="{{deposit}}" hint-placeholder-val="{{ true }}">
+<div class="reveal" style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #efeeea; font-size: 13px"><span style="color: #6e6e76">Due on acceptance</span><span class="num" style="font-weight: 500">{{depositAmt}}</span></div>
+</sc-if>
+</div>
+</section>
+
+<section class="rise" style="padding: 22px 16px 0; animation-delay: 280ms">
+<h2 style="margin: 0 4px 10px; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Send by</h2>
+<div role="group" aria-label="Send channel" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 3px; border-radius: 14px; background: #e9e8e4">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 3px; left: 3px; width: calc((100% - 6px) / 3); height: 50px; border-radius: 11px; background: #ffffff; box-shadow: 0 1px 3px rgba(20,20,22,.12); {{chIndicator}}"></span>
+<sc-for list="{{channels}}" as="c" hint-placeholder-count="3">
+<button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="fade" style="position: relative; height: 50px; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; {{c.style}}">
+<span style="font-size: 13px; font-weight: 500">{{c.label}}</span>
+<span class="mono" style="font-size: 10.5px; opacity: .7">{{c.to}}</span>
+</button>
+</sc-for>
+</div>
+</section>
+</div>
+
+<div style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px">
+<button class="press" style="height: 56px; padding: 0 20px; border-radius: 28px; border: 0; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px -8px rgba(20,20,22,.2), 0 0 0 1px rgba(20,20,22,.06); color: #141416; font-size: 14px; font-weight: 500">Preview</button>
+<button class="press" onClick="{{send}}" style="flex-grow: 1; height: 56px; border-radius: 28px; border: 0; color: #ffffff; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; {{sendStyle}}">{{sendLabel}}</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1420}}'>
+class Component extends DCLogic {
+  g(k, d) { var v = this.state && this.state[k]; return v === undefined ? d : v; }
+  money(n) { return '$' + n.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  renderVals() {
+    var self = this;
+    var qA = this.g('qA', 1120), qC = this.g('qC', 48), deposit = this.g('deposit', true), ch = this.g('ch', 1), sent = this.g('sent', false);
+    var set = function (k, v) { var o = {}; o[k] = v; o.sent = false; self.setState(o); };
+    var rows = [
+      { name: 'Painting, 3 bedrooms and hallway', detail: '$2.10 / sq ft · two coats', q: qA, unit: 'sq ft', price: 2.10, k: 'qA', step: 20, min: 100 },
+      { name: 'Bath ceiling water-damage repair', detail: 'Cut out, board, tape, skim', q: 1, price: 640, fixed: true },
+      { name: 'Stain-blocking primer', detail: '$1.85 / sq ft · one coat', q: qC, unit: 'sq ft', price: 1.85, k: 'qC', step: 4, min: 8 },
+      { name: 'Paint and sundries', detail: 'Supplied by Rossi Renovations', q: 1, price: 395, fixed: true },
+      { name: 'Floor protection and cleanup', detail: 'Drop sheets, daily sweep, final clean', q: 1, price: 180, fixed: true }
+    ];
+    var sub = 0;
+    var items = rows.map(function (r, i) {
+      var amt = Math.round(r.q * r.price * 100) / 100; sub += amt;
+      return {
+        name: r.name, detail: r.detail, amt: self.money(amt), adjustable: !r.fixed, fixed: !!r.fixed,
+        sep: i ? 'border-top: 1px solid #efeeea' : '',
+        qtyLabel: r.fixed ? '' : r.q.toLocaleString('en-CA') + ' ' + r.unit,
+        decLabel: 'Less ' + r.name, incLabel: 'More ' + r.name,
+        dec: function () { if (!r.fixed) set(r.k, Math.max(r.min, r.q - r.step)); },
+        inc: function () { if (!r.fixed) set(r.k, r.q + r.step); }
+      };
+    });
+    sub = Math.round(sub * 100) / 100;
+    var tax = Math.round(sub * 0.13 * 100) / 100, total = Math.round((sub + tax) * 100) / 100;
+    var channels = [['Email', 'dana.w@…'], ['SMS', '… 0121'], ['WhatsApp', '… 0121']].map(function (c, i) {
+      var on = i === ch;
+      return { label: c[0], to: c[1], on: on, style: on ? 'color: #141416' : 'color: #6e6e76', pick: function () { self.setState({ ch: i, sent: false }); } };
+    });
+    return {
+      items: items, subtotal: this.money(sub), tax: this.money(tax), total: this.money(total),
+      deposit: deposit, depositAmt: this.money(Math.round(total * 0.3 * 100) / 100),
+      toggleDeposit: function () { self.setState({ deposit: !self.g('deposit', true) }); },
+      trackStyle: deposit ? 'background: #141416' : 'background: #dddcd8',
+      knobStyle: deposit ? 'transform: translateX(20px)' : 'transform: translateX(0)',
+      channels: channels, chIndicator: 'transform: translateX(' + (ch * 100) + '%)',
+      send: function () { self.setState({ sent: true }); },
+      sendLabel: sent ? 'Sent to Dana' : 'Send ' + this.money(total),
+      sendStyle: sent ? 'background: #1f7a45; box-shadow: 0 10px 30px -8px rgba(31,122,69,.5)' : 'background: #141416; box-shadow: 0 10px 30px -8px rgba(20,20,22,.5)'
+    };
+  }
+}
+</script>
+</body>
+</html>

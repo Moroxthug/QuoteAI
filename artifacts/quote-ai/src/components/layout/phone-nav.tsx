@@ -22,6 +22,8 @@ import { pointCacheAtOrg } from "@/lib/offline/query-cache";
 import { cn } from "@/lib/utils";
 import { haptic } from "@/lib/haptics";
 import { markNextNav } from "@/lib/motion/nav-mark";
+import { MoreIcon } from "@/components/pocket/icons";
+import type { SheetAction } from "@/components/mobile/action-sheet";
 
 // Phase 121: More → This app → fingerprint / face unlock (the app only; the row shows when the phone can).
 // Phase 122: and photos on Wi-Fi only.
@@ -274,7 +276,7 @@ const FOREMAN_ORDER = ["receipt", "note", "job", "quote", "lead", "invoice"];
  * photo and a spoken note first ask which job, then open the camera (in the
  * same tap, so the browser allows it) or the recorder.
  */
-export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; hasInvoices?: boolean }) {
+export function PhoneNewButton({ hasJobs, hasInvoices, pocket, extra, withNew = true }: { hasJobs: boolean; hasInvoices?: boolean; /** Pocket (Phase 144): the header's ⋯, listing the screen's own actions first. */ pocket?: boolean; extra?: SheetAction[]; withNew?: boolean }) {
   const { t } = useLanguage();
   const can = useCan();
   const { role } = useRole();
@@ -326,10 +328,12 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
     hasInvoices && can("invoicing", "edit") && { key: "invoice", label: t("invoices.new"), icon: Receipt, run: () => navigate("/dashboard/invoices?new=1") },
     hasJobs && can("costs", "edit") && { key: "receipt", label: t("mobile.new.receipt"), icon: Camera, run: () => { setOpen(false); setIntent("receipt"); } },
     hasJobs && can("jobs", "edit") && { key: "note", label: t("mobile.new.note"), icon: Mic, run: () => { setOpen(false); setIntent("note"); } },
-  ].filter((a): a is { key: string; label: string; icon: LucideIcon; run: () => void } => !!a);
+  ].filter((a): a is { key: string; label: string; icon: LucideIcon; run: () => void } => !!a && withNew);
   // Phase 110: a foreman adds from the site — the receipt and the note first, a new job last.
   if (role === "foreman") actions.sort((a, b) => FOREMAN_ORDER.indexOf(a.key) - FOREMAN_ORDER.indexOf(b.key));
-  if (actions.length === 0) return null;
+  const own = (extra ?? []).map((a, i) => ({ key: `own-${i}`, label: a.label, icon: a.icon, danger: a.danger, disabled: a.disabled, run: () => (a.href ? navigate(a.href) : a.onSelect?.()) }));
+  const listed: Array<{ key: string; label: string; icon?: LucideIcon; danger?: boolean; disabled?: boolean; run: () => void }> = [...own, ...actions];
+  if (listed.length === 0) return null;
 
   const pickJob = (jobId: string) => {
     if (intent === "receipt") {
@@ -344,18 +348,24 @@ export function PhoneNewButton({ hasJobs, hasInvoices }: { hasJobs: boolean; has
 
   return (
     <>
-      <button type="button" className="tb-new" onClick={() => setOpen(true)} aria-label={t("mobile.new.title")} aria-haspopup="dialog" aria-expanded={open}>
-        <Plus aria-hidden="true" />
-      </button>
+      {pocket ? (
+        <button type="button" className="pk-icon-btn pk-press" onClick={() => setOpen(true)} aria-label={t("mobile.moreActions")} aria-haspopup="dialog" aria-expanded={open}>
+          <MoreIcon />
+        </button>
+      ) : (
+        <button type="button" className="tb-new" onClick={() => setOpen(true)} aria-label={t("mobile.new.title")} aria-haspopup="dialog" aria-expanded={open}>
+          <Plus aria-hidden="true" />
+        </button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sheet" hideClose aria-describedby={undefined}>
           <div className="sheet-grab" aria-hidden="true" />
-          <DialogTitle className="asheet-title">{t("mobile.new.title")}</DialogTitle>
+          <DialogTitle className={pocket ? "sr-only" : "asheet-title"}>{pocket ? t("mobile.moreActions") : t("mobile.new.title")}</DialogTitle>
           <div className="asheet-list">
-            {actions.map((a) => (
-              <button key={a.key} type="button" className="asheet-item" onClick={() => { setOpen(false); a.run(); }}>
-                <a.icon />
+            {listed.map((a) => (
+              <button key={a.key} type="button" className={cn("asheet-item", a.danger && "danger")} disabled={a.disabled} onClick={() => { setOpen(false); a.run(); }}>
+                {a.icon && <a.icon />}
                 <span>{a.label}</span>
               </button>
             ))}

@@ -1,0 +1,273 @@
+/*
+ * Pocket: the phone app's design, 1:1 from the owner's chosen Claude Design canvas
+ * "quoteAI Pocket CRM" (docs/POCKET-DESIGN-PLAN.md; sources pinned in docs/pocket-design/).
+ * Every value below is copied from those .dc.html files. Do not round, retint or
+ * "improve" them: the owner asked for that exact design.
+ *
+ * Scope: <html class="pocket">, set by the dashboard layout at the phone
+ * layout's width (≤ 980 px) and always in the phone app. The desktop site is untouched.
+ */
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist-mono-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html.pocket {
+  /* type */
+  --pk-font: Geist, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  --pk-mono: "Geist Mono", ui-monospace, monospace;
+  /* colour */
+  --pk-bg: #f5f4f1;
+  --pk-outer: #e9e8e4;
+  --pk-card: #ffffff;
+  --pk-ink: #141416;
+  --pk-dark: #151517;
+  --pk-fab: #111113;
+  --pk-text-2: #6e6e76;
+  --pk-text-3: #8a8a90;
+  --pk-text-4: #9a9aa0;
+  --pk-tab-off: #7a7a80;
+  --pk-chev: #b0afab;
+  --pk-body: #3c3c43;
+  --pk-line: #efeeea;
+  --pk-fill: #f1f0ec;
+  --pk-fill-2: #ebeae6;
+  --pk-fill-3: #e9e8e4;
+  --pk-fill-4: #e7e6e2;
+  --pk-fill-5: #f7f6f3;
+  --pk-hover: #faf9f7;
+  --pk-off: #dddcd8;
+  --pk-avatar: #f1ede4;
+  --pk-accent: #e4572e;
+  --pk-accent-text: #c2441f;
+  --pk-danger: #c2371f;
+  --pk-ok: #1f7a45;
+  --pk-ok-dot: #1f9d55;
+  --pk-warn: #d69524;
+  --pk-warn-text: #9a6412;
+  --pk-amber: #b7791f;
+  /* shadow */
+  --pk-shadow-card: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04);
+  --pk-shadow-float: 0 10px 30px -8px rgba(20,20,22,.22), 0 0 0 1px rgba(20,20,22,.06);
+  --pk-shadow-thumb: 0 1px 3px rgba(20,20,22,.12);
+  --pk-shadow-knob: 0 2px 5px rgba(0,0,0,.18);
+  /* motion */
+  --pk-ease: cubic-bezier(.16,1,.3,1);
+  --pk-ease-io: cubic-bezier(.65,0,.35,1);
+  --pk-ease-spring: cubic-bezier(.34,1.4,.64,1);
+
+  /* The rest of the app's own variables follow the design. */
+  --font-mk: var(--pk-font);
+  --app-font-sans: var(--pk-font);
+  --bg: var(--pk-bg);
+  --ink: var(--pk-ink);
+  --navy: var(--pk-ink);
+  --muted-mk: var(--pk-text-2);
+  --line: var(--pk-line);
+  background: var(--pk-bg);
+}
+html.pocket body {
+  font-family: var(--pk-font);
+  background: var(--pk-bg);
+  color: var(--pk-ink);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+}
+html.pocket button { letter-spacing: inherit; }
+html.pocket :where(button, a, [role="switch"], [role="radio"], input, textarea):focus-visible {
+  outline: 2px solid var(--pk-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- utilities (the canvas's own class names, prefixed) ---------- */
+.pk-mono { font-family: var(--pk-mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
+.pk-num { font-variant-numeric: tabular-nums; }
+.pk-rise { animation: pk-rise .9s var(--pk-ease) both; }
+@keyframes pk-rise { from { opacity: 0; transform: translateY(10px); } }
+.pk-press { transition: transform .2s var(--pk-ease), background-color .25s, color .25s, box-shadow .3s, opacity .25s; }
+.pk-press:active { transform: scale(.95); }
+.pk-row { transition: background-color .2s; }
+.pk-row:hover { background: var(--pk-hover); }
+.pk-row:active { background: var(--pk-fill); }
+.pk-row .pk-chev { transition: transform .3s var(--pk-ease); }
+.pk-row:hover .pk-chev { transform: translateX(3px); }
+.pk-grow { animation: pk-barin 1.2s .3s var(--pk-ease) both; transform-origin: left; }
+@keyframes pk-barin { from { transform: scaleX(0); } }
+.pk-noscroll { scrollbar-width: none; }
+.pk-noscroll::-webkit-scrollbar { display: none; }
+
+/* ---------- page ---------- */
+.pk-page { background: var(--pk-bg); min-height: 100%; padding-bottom: 40px; }
+.pk-section { padding: 22px 16px 0; }
+.pk-h1 { margin: 2px 20px 0; font-size: 28px; font-weight: 600; letter-spacing: -0.04em; color: var(--pk-ink); }
+/* Section head: 15 / 600 title, grey 13 link on the right (Home: Schedule, Today, Business, Sites). */
+.pk-sec-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px; }
+.pk-sec-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--pk-ink); }
+.pk-sec-link { font-size: 13px; color: var(--pk-text-2); display: flex; align-items: center; gap: 2px; text-decoration: none; }
+/* Group label: 12.5 / 500 grey over a card (Menu, Settings). */
+.pk-group-label { margin: 0 4px 8px; font-size: 12.5px; font-weight: 500; color: var(--pk-text-2); }
+
+/* ---------- card ---------- */
+.pk-card { background: var(--pk-card); border-radius: 22px; box-shadow: var(--pk-shadow-card); }
+.pk-card-20 { background: var(--pk-card); border-radius: 20px; box-shadow: var(--pk-shadow-card); overflow: hidden; }
+.pk-hair { height: 1px; background: var(--pk-line); }
+
+/* ---------- header: 44 px round back · centred mono title · ⋯ ---------- */
+.pk-header { padding: 8px 8px 0; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; height: 52px; box-sizing: content-box; }
+.pk-icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: var(--pk-ink); text-decoration: none; }
+.pk-header-title { text-align: center; font-size: 12px; color: var(--pk-text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- menu row: 30 px tile · label · value · chevron (Menu) ---------- */
+.pk-mrow { display: flex; align-items: center; gap: 12px; padding: 0 14px; min-height: 52px; color: var(--pk-ink); text-decoration: none; width: 100%; border: 0; background: transparent; font: inherit; text-align: left; }
+.pk-mrow-tile { width: 30px; height: 30px; border-radius: 9px; background: var(--pk-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--pk-ink); }
+.pk-mrow-label { flex-grow: 1; font-size: 14px; font-weight: 500; align-self: stretch; display: flex; align-items: center; }
+.pk-mrow-value { font-size: 12.5px; align-self: stretch; display: flex; align-items: center; gap: 6px; color: var(--pk-text-2); }
+.pk-mrow-value.accent { color: #c2441f; font-weight: 500; }
+.pk-mrow + .pk-mrow .pk-mrow-label, .pk-mrow + .pk-mrow .pk-mrow-value { border-top: 1px solid var(--pk-line); }
+
+/* ---------- settings row: label + hint · control (Settings) ---------- */
+.pk-srow { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 0 16px; color: var(--pk-ink); text-decoration: none; }
+.pk-srow + .pk-srow { border-top: 1px solid var(--pk-line); }
+.pk-lbl { display: flex; flex-direction: column; gap: 1px; padding: 9px 0; min-width: 0; }
+.pk-lbl b { font-size: 14px; font-weight: 500; }
+.pk-lbl small { font-size: 12px; color: var(--pk-text-2); }
+
+/* ---------- switch 50 × 30 ---------- */
+.pk-switch { width: 50px; height: 30px; border-radius: 999px; border: 0; padding: 2px; flex-shrink: 0; display: flex; background: var(--pk-off); transition: background-color .3s, transform .2s var(--pk-ease); cursor: pointer; }
+.pk-switch[aria-checked="true"] { background: var(--pk-ink); }
+.pk-switch:active { transform: scale(.93); }
+.pk-switch > span { width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: var(--pk-shadow-knob); transition: transform .4s var(--pk-ease-spring); }
+.pk-switch[aria-checked="true"] > span { transform: translateX(20px); }
+.pk-switch:disabled { opacity: .5; cursor: default; }
+
+/* ---------- segmented control (sliding white thumb) ---------- */
+.pk-seg { position: relative; display: grid; padding: 2px; border-radius: 10px; background: var(--pk-line); }
+.pk-seg-thumb { position: absolute; top: 2px; left: 2px; border-radius: 8px; background: #fff; box-shadow: var(--pk-shadow-thumb); transition: transform .45s var(--pk-ease); pointer-events: none; }
+.pk-seg > button { position: relative; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; color: var(--pk-text-2); transition: color .3s; cursor: pointer; font-family: inherit; padding: 0 4px; white-space: nowrap; }
+.pk-seg > button[aria-pressed="true"] { color: var(--pk-ink); }
+/* The Quote screen's big variant: 14 / 11 radius, 50 px cells, on #e9e8e4. */
+.pk-seg.big { padding: 3px; border-radius: 14px; background: var(--pk-fill-3); }
+.pk-seg.big .pk-seg-thumb { top: 3px; left: 3px; border-radius: 11px; }
+/* Home's period control: on #e9e8e4, 12 px labels. */
+.pk-seg.tint { background: var(--pk-fill-3); }
+.pk-seg.tint > button { font-size: 12px; }
+
+/* ---------- −/+ stepper ---------- */
+.pk-stepper { display: flex; align-items: center; background: var(--pk-bg); border-radius: 10px; padding: 2px; flex-shrink: 0; }
+.pk-stepper > button { width: 34px; height: 34px; border-radius: 8px; border: 0; background: transparent; color: var(--pk-ink); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.pk-stepper > button:disabled { opacity: .35; cursor: default; }
+.pk-stepper > span { min-width: 58px; text-align: center; font-size: 12.5px; }
+
+/* ---------- buttons ---------- */
+.pk-btn { height: 44px; border-radius: 14px; border: 0; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; padding: 0 16px; }
+.pk-btn-dark { background: var(--pk-ink); color: #fff; }
+.pk-btn-soft { background: var(--pk-fill); color: var(--pk-ink); font-weight: 500; }
+.pk-btn-chip { height: 32px; padding: 0 12px; border-radius: 10px; border: 0; background: var(--pk-fill-2); color: var(--pk-ink); font-size: 12.5px; font-weight: 500; font-family: inherit; display: inline-flex; align-items: center; cursor: pointer; text-decoration: none; }
+.pk-btn-link { height: 28px; padding: 0 8px; border: 0; background: transparent; color: #c2441f; font-size: 12.5px; font-weight: 500; font-family: inherit; cursor: pointer; }
+.pk-btn:disabled, .pk-btn-chip:disabled { opacity: .5; cursor: default; }
+/* The floating bar's pill (Quote: Preview · Send $X). */
+.pk-pill { height: 56px; border-radius: 28px; border: 0; font-family: inherit; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-decoration: none; }
+.pk-pill-dark { background: var(--pk-ink); color: #fff; box-shadow: 0 10px 30px -8px rgba(20,20,22,.5); }
+.pk-pill-ok { background: #1f7a45; color: #fff; box-shadow: 0 10px 30px -8px rgba(31,122,69,.5); }
+.pk-pill-glass { padding: 0 20px; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px -8px rgba(20,20,22,.2), 0 0 0 1px rgba(20,20,22,.06); color: var(--pk-ink); font-size: 14px; font-weight: 500; }
+
+/* ---------- avatar ---------- */
+.pk-avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 600; background: var(--pk-avatar); color: var(--pk-ink); overflow: hidden; }
+.pk-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.pk-avatar.dark { background: var(--pk-ink); color: #fff; }
+
+/* ---------- progress bar (3 px) ---------- */
+.pk-bar { height: 3px; border-radius: 3px; background: var(--pk-line); overflow: hidden; display: block; }
+.pk-bar > span { display: block; height: 100%; border-radius: 3px; background: var(--pk-ink); transition: width .6s var(--pk-ease); }
+
+/* ---------- floating pill tab bar + assistant button (Home) ---------- */
+.pk-nav { position: fixed; left: 16px; right: 16px; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 10px; align-items: center; z-index: 40; }
+.pk-tabs { flex-grow: 1; height: 62px; border-radius: 31px; background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: var(--pk-shadow-float); padding: 5px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); box-sizing: border-box; }
+.pk-tab { border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: var(--pk-tab-off); text-decoration: none; min-width: 0; }
+.pk-tab > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-tab[aria-current="page"] { background: var(--pk-fill); font-weight: 600; color: var(--pk-ink); }
+.pk-fab { position: relative; width: 62px; height: 62px; flex-shrink: 0; border-radius: 50%; border: 0; background: var(--pk-fab); display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px -8px rgba(20,20,22,.55), 0 0 0 1px rgba(255,255,255,.06) inset; overflow: hidden; cursor: pointer; }
+.pk-mini-orb { position: relative; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; display: block; background: #2a120c; animation: pk-morph 6s ease-in-out infinite; transition: transform .4s var(--pk-ease); }
+.pk-fab:hover .pk-mini-orb { transform: scale(1.08); }
+.pk-mb { position: absolute; width: 75%; height: 75%; border-radius: 50%; filter: blur(5px); mix-blend-mode: screen; }
+.pk-mb1 { background: #ff6a3d; left: -10%; top: 0; animation: pk-m1 5s ease-in-out infinite; }
+.pk-mb2 { background: #7ab8ff; right: -15%; bottom: -10%; animation: pk-m2 6s ease-in-out infinite; }
+.pk-mb3 { background: #ffb347; right: -5%; top: -20%; animation: pk-m3 7s ease-in-out infinite; }
+.pk-mini-orb::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.7), rgba(255,255,255,0) 45%); }
+@keyframes pk-morph { 0%, 100% { border-radius: 50%; } 33% { border-radius: 53% 47% 51% 49% / 47% 54% 46% 53%; } 66% { border-radius: 47% 53% 48% 52% / 53% 47% 53% 47%; } }
+@keyframes pk-m1 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(28%,18%) scale(1.15); } }
+@keyframes pk-m2 { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-22%,-26%) scale(.9); } }
+@keyframes pk-m3 { 0%, 100% { transform: translate(0,0) rotate(0); } 50% { transform: translate(-30%,24%) scale(1.2); } }
+/* Room for the floating bar (26 + 62 + breathing room, as the canvas's 120 px bottom padding). */
+html.pocket.has-pk-nav .content { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+
+/* ---------- the shell around every screen (Phase 144) ---------- */
+html.pocket .main { padding-top: env(safe-area-inset-top, 0px); background: var(--pk-bg); }
+html.pocket .content { padding: 0 max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
+/* Pocket screens own their gutters (sections pad 16, headers 20), as in the canvas. */
+html.pocket .content:has(> .pk-page), html.pocket .content:has(> div > .pk-page) { padding-left: 0; padding-right: 0; padding-bottom: 0; }
+/* No header row (a section screen with nothing in ⋯): the page starts where Home's header does. */
+html.pocket .content > :first-child:not(.pk-topbar):not(.pk-page) { margin-top: 18px; }
+/* A screen's title: Settings' 28 / 600 / −0.04em. */
+html.pocket .page-head h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.04em; color: var(--pk-ink); }
+html.pocket .page-head .sub { font-size: 12.5px; font-weight: 500; color: var(--pk-text-2); }
+/* The screen's buttons at the bottom: the Quote draft's floating bar (16 from the sides, 26 from the bottom, 56 px pills). */
+@media (max-width: 980px) {
+  html.pocket .action-bar { position: fixed; left: 16px; right: 16px; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); z-index: 55; display: flex; gap: 10px; padding: 0; background: transparent; border: 0; backdrop-filter: none; justify-content: stretch; }
+  html.pocket.has-pk-nav .action-bar { bottom: calc(26px + 62px + 10px + env(safe-area-inset-bottom, 0px)); }
+  html.pocket .action-bar > .btn { flex: 1; height: 56px; min-height: 56px; padding: 0 20px; border-radius: 28px; border: 0; font-family: var(--pk-font); font-size: 15px; font-weight: 600; letter-spacing: -0.01em; background: var(--pk-ink); color: #fff; box-shadow: 0 10px 30px -8px rgba(20,20,22,.5); }
+  html.pocket .action-bar > .btn.secondary, html.pocket .action-bar > .btn:not([data-primary-action]) { flex: 0 1 auto; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px -8px rgba(20,20,22,.2), 0 0 0 1px rgba(20,20,22,.06); color: var(--pk-ink); font-size: 14px; font-weight: 500; }
+  html.pocket .action-bar-spacer { display: block; height: calc(56px + 26px + 20px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- Home's motion, from the canvas (Phases 145–146) ---------- */
+.pk-beat { animation: pk-beat 2.2s ease-in-out infinite; }
+@keyframes pk-beat { 0%, 100% { box-shadow: 0 0 0 0 rgba(228,87,46,.35); } 50% { box-shadow: 0 0 0 6px rgba(228,87,46,0); } }
+.pk-pulse::before, .pk-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.6); animation: pk-ring 1.8s var(--pk-ease) infinite; }
+.pk-pulse::after { animation-delay: .9s; }
+@keyframes pk-ring { from { transform: scale(1); opacity: .9; } to { transform: scale(1.9); opacity: 0; } }
+.pk-spin { animation: pk-spin .9s linear infinite; }
+@keyframes pk-spin { to { transform: rotate(360deg); } }
+.pk-bar-in { animation: pk-barin 2.4s var(--pk-ease-io) both; transform-origin: left; }
+.pk-ta::placeholder { color: rgba(255,255,255,.4); }
+.pk-ta:disabled { opacity: 1; -webkit-text-fill-color: #ffffff; }
+.pk-slide { transition: transform .45s var(--pk-ease); }
+.pk-dayt { transition: color .3s; }
+.pk-chk { transition: background-color .25s, border-color .25s, transform .2s var(--pk-ease); }
+.pk-chk:active { transform: scale(.85); }
+.pk-chk path { stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset .35s .05s var(--pk-ease-io); }
+.pk-chk.done path { stroke-dashoffset: 0; }
+.pk-tt { transition: color .35s, opacity .35s; }
+.pk-tt.done { color: #9a9aa0; text-decoration: line-through; text-decoration-color: #c4c3c0; }
+.pk-draw { stroke-dasharray: 1; animation: pk-draw 1.4s .2s var(--pk-ease-io) both; transition: d .7s var(--pk-ease); }
+@keyframes pk-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.pk-area { animation: pk-fadein 1s .9s both; transition: d .7s var(--pk-ease); }
+@keyframes pk-fadein { from { opacity: 0; } }
+.pk-dot { transition: cx .7s var(--pk-ease), cy .7s var(--pk-ease); }
+.pk-av { transition: box-shadow .3s, transform .3s var(--pk-ease); }
+/* Home sits under the floating bar with the canvas's 120 px of room. */
+html.pocket .content:has(> .pk-home), html.pocket .content:has(> div > .pk-home) { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+
+/* The app's own notes ("Updated just now") clear the floating bar. */
+html.pocket.has-pk-nav .fresh-note { bottom: calc(26px + 62px + 12px + env(safe-area-inset-bottom, 0px)); }
+
+@media (prefers-reduced-motion: reduce) {
+  html.pocket * { animation: none !important; transition: none !important; }
+}

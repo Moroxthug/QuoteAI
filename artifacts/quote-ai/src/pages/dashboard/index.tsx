@@ -31,7 +31,8 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useClientMemory } from "@/hooks/use-client-memory";
 import type { SavedClient } from "@/hooks/use-client-memory";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, lazy, Suspense } from "react";
+import { usePocket } from "@/components/pocket/shell";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -629,9 +630,14 @@ function DashboardComposer() {
 
 /* ─── DashboardHome (default export) ────────────────────────────────────── */
 /** Phase 86: a foreman lands on the crew's day, not on the owner's sales dashboard with parts hidden. */
+// Pocket (docs/POCKET-DESIGN-PLAN.md): on the phone layout, the canvas's Home; its own chunk, so the desktop home doesn't carry it.
+const PocketHome = lazy(() => import("@/components/pocket/home"));
+
 export default function DashboardHome() {
   const { role } = useRole();
-  return role === "foreman" ? <ForemanHome /> : <OwnerHome />;
+  const phone = usePocket();
+  if (role === "foreman") return <ForemanHome />;
+  return phone ? <Suspense fallback={null}><PocketHome /></Suspense> : <OwnerHome />;
 }
 
 /** Phase 93: the monthly quote allowance from the pricing data (Pro was shown as "unlimited"; it is 60). */

@@ -6,7 +6,7 @@ import { teamMembersApi } from "@/lib/team-members-api";
 import { peopleApi } from "@/lib/people-api";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut } from "@/components/ui/command";
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { isNativeApp } from "@/lib/native/env";
 import { biometricOn } from "@/lib/native/biometric-offer";
 import { signedOutPath } from "@/lib/first-run";
@@ -35,9 +35,13 @@ import { wipeQueryCache, confirmOwner, pointCacheAtOrg, useCacheOwnerCheck, star
 import { queryClient as appQueryClient } from "@/lib/query-client";
 import { MobileHeaderProvider, MobilePageHeader } from "@/components/mobile/mobile-page-header";
 import { PhoneNewButton, PhoneTabBar } from "@/components/layout/phone-nav";
+import { PocketNav, PocketHeader, usePocketTabs, isTabRoot, NavShownProvider, usePocket } from "@/components/pocket/shell";
+import { useMobileHeaderOverride } from "@/components/mobile/mobile-page-header";
 import { AppShellSkeleton } from "@/components/layout/app-shell-skeleton";
 import { prefetchRoute } from "@/lib/route-chunks";
 import { ApiImg } from "@/components/api-img";
+import { signOut } from "@/lib/sign-out";
+import type { SheetAction } from "@/components/mobile/action-sheet";
 
 // Phase 116: in the signed-in app, answers are saved to the device as they
 // arrive (lib/offline/query-cache.ts) — the public pages never load this.
@@ -70,14 +74,6 @@ function useNavItems() {
     { href: "/dashboard/imports", labelKey: "dashboard.nav.imports", icon: UploadCloud, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
     { href: "/dashboard/settings", labelKey: "dashboard.nav.settings", icon: Settings, exact: false, proOnly: false, comingSoon: false, group: "workspace" },
   ].map(item => ({ ...item, label: t(item.labelKey), groupLabel: t(`dashboard.nav.group.${item.group}`) }));
-}
-
-async function signOut() {
-  await authClient.signOut();
-  // Phase 77: the service worker keeps API reads for offline use — not for the next person on this browser.
-  // Phase 116: nor the saved app data, nor anything still waiting to be sent.
-  await Promise.all([clearOfflineCaches(), wipeQueryCache(), clearOutbox()]);
-  window.location.href = "/";
 }
 
 /** Pages that are not in the sidebar but still need a name in the phone top bar. */
@@ -250,6 +246,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // tabs + More sheet take over — the hamburger drawer they replace hid twenty
   // links two taps away.
   const phoneNav = useMediaQuery("(max-width: 980px)");
+  const pocket = usePocket();
+  // Pocket (docs/POCKET-DESIGN-PLAN.md): the phone layout wears the owner's chosen design (src/pocket.css).
+  useEffect(() => {
+    document.documentElement.classList.toggle("pocket", pocket);
+    return () => document.documentElement.classList.remove("pocket");
+  }, [pocket]);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try { return localStorage.getItem("sidebar-collapsed") === "true"; } catch { return false; }
   });
@@ -330,6 +332,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timer);
   }, [isSignedIn, idleHrefs]);
 
+  // Phase 88: the books (the bank account, the month-end close) are the office's, not a foreman's.
+  // Phase 89: so is pay (wages) — costs:full.
+  // Phase 90: Group shows once there is something to group — a second company to switch to, or a group this one is in.
+  const hasGroupEntry = !!orgsData?.group || (orgsData?.items.length ?? 0) > 1;
+  const NAV_ITEMS = allNavItems.filter(item => (!item.proOnly || isPro) && (item.href !== "/dashboard/books" || can("invoicing", "full")) && (item.href !== "/dashboard/pay" || can("costs", "full")) && (item.href !== "/dashboard/group" || hasGroupEntry));
+  const navHrefs = NAV_ITEMS.map((i) => i.href).join(" ");
+  const navShown = useMemo(() => new Set(navHrefs.split(" ")), [navHrefs]);
+  const pocketTabs = usePocketTabs(navShown);
+
   // Phase 115: the frame, not a spinner, while the session is checked.
   if (!isLoaded || !cacheOwnerOk) return <AppShellSkeleton />;
 
@@ -353,11 +364,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  // Phase 88: the books (the bank account, the month-end close) are the office's, not a foreman's.
-  // Phase 89: so is pay (wages) — costs:full.
-  // Phase 90: Group shows once there is something to group — a second company to switch to, or a group this one is in.
-  const hasGroupEntry = !!orgsData?.group || (orgsData?.items.length ?? 0) > 1;
-  const NAV_ITEMS = allNavItems.filter(item => (!item.proOnly || isPro) && (item.href !== "/dashboard/books" || can("invoicing", "full")) && (item.href !== "/dashboard/pay" || can("costs", "full")) && (item.href !== "/dashboard/group" || hasGroupEntry));
   // Phase 80: roles below quotes:edit (foreman, viewer) never see the New quote entry points.
   const canNewQuote = can("quotes", "edit");
   const name = meData?.person.name || user?.name || user?.email?.split("@")[0] || "Account";
@@ -455,18 +461,29 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main column */}
       <div className="main">
-        <header className="topbar">
-          <MobilePageHeader title={sectionLabel ?? "QuoteAI"} backHref={backHref} backLabel={backHref ? sectionOf(backHref.split("?")[0]!) : undefined} />
-          <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
-          <div className="tb-right">
-            {phoneNav && <PhoneNewButton hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")} hasInvoices={NAV_ITEMS.some((i) => i.href === "/dashboard/invoices")} />}
-            {/* On a phone both live in More (its tab carries the unread count). */}
-            <NotificationsBell variant="topbar" side="bottom" align="end" />
-            <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{avatar}</button>} />
-          </div>
-        </header>
+        {pocket ? (
+          <PocketTop
+            location={location}
+            tabs={pocketTabs}
+            backHref={backHref}
+            backLabel={backHref ? t("mobile.backTo").replace("{section}", sectionOf(backHref.split("?")[0]!) ?? "") : t("mobile.back")}
+            hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")}
+            hasInvoices={NAV_ITEMS.some((i) => i.href === "/dashboard/invoices")}
+          />
+        ) : (
+          <header className="topbar">
+            <MobilePageHeader title={sectionLabel ?? "QuoteAI"} backHref={backHref} backLabel={backHref ? sectionOf(backHref.split("?")[0]!) : undefined} />
+            <QuickSearch navItems={NAV_ITEMS} canNewQuote={canNewQuote} />
+            <div className="tb-right">
+              {phoneNav && <PhoneNewButton hasJobs={NAV_ITEMS.some((i) => i.href === "/dashboard/jobs")} hasInvoices={NAV_ITEMS.some((i) => i.href === "/dashboard/invoices")} />}
+              {/* On a phone both live in More (its tab carries the unread count). */}
+              <NotificationsBell variant="topbar" side="bottom" align="end" />
+              <AccountMenu trigger={<button className="tb-avatar" type="button" aria-label={name}>{avatar}</button>} />
+            </div>
+          </header>
+        )}
 
-        <main id="main" className="content"><OfflineBar />{children}</main>
+        <main id="main" className="content"><OfflineBar /><NavShownProvider value={navShown}>{children}</NavShownProvider></main>
         {/* Phase 119: "Know the moment they accept?" after the first quote goes out. */}
         <PushAsk />
         {ShareInbox && <Suspense fallback={null}><ShareInbox /></Suspense>}
@@ -475,7 +492,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* While the lock's chunk arrives, an opaque cover — nothing behind it shows first. */}
         {AppLock && <Suspense fallback={biometricOn() ? <div className="bio-lock" aria-hidden="true" /> : null}><AppLock onSignOut={signOut} /></Suspense>}
       </div>
-      {phoneNav && (
+      {pocket && isTabRoot(location, pocketTabs) && <PocketNav tabs={pocketTabs} assistant={NAV_ITEMS.some((i) => i.href === "/dashboard/assistant")} />}
+      {phoneNav && !pocket && (
         <PhoneTabBar
           navItems={NAV_ITEMS}
           moreProps={{ navItems: NAV_ITEMS, name, email, avatar, canBilling: can("settings", "full"), onSignOut: signOut }}
@@ -484,4 +502,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     </div>
     </MobileHeaderProvider>
   );
+}
+
+/** Pocket (Phase 144): the phone's header row — none on Home (its own header is part of the page). */
+function PocketTop({ location, tabs, backHref, backLabel, hasJobs, hasInvoices }: { location: string; tabs: ReturnType<typeof usePocketTabs>; backHref: string | null; backLabel: string; hasJobs: boolean; hasInvoices: boolean }) {
+  const override = useMobileHeaderOverride();
+  if (location === "/dashboard") return null;
+  const back = override?.backHref !== undefined ? override.backHref : backHref;
+  const extra = (override?.actions ?? []).filter((a): a is SheetAction => !!a);
+  const root = isTabRoot(location, tabs);
+  const more = extra.length > 0 || root ? <PhoneNewButton pocket extra={extra} withNew={root} hasJobs={hasJobs} hasInvoices={hasInvoices} /> : null;
+  return <PocketHeader backHref={back} backLabel={backLabel} more={more} />;
 }

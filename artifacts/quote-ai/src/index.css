@@ -2,6 +2,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./mockup-system.css";
+@import "./pocket.css";
 @plugin "@tailwindcss/typography";
 
 /* Size-adjusted fallback — eliminates font-swap CLS by matching Arial metrics to Inter */

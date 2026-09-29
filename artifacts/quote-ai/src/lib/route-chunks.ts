@@ -35,6 +35,7 @@ export const pageLoaders = {
   documents: () => import("@/pages/dashboard/documents"),
   archive: () => import("@/pages/dashboard/archive"),
   notifications: () => import("@/pages/dashboard/notifications"),
+  menu: () => import("@/pages/dashboard/menu"),
   contracts: () => import("@/pages/dashboard/contracts/index"),
   contract: () => import("@/pages/dashboard/contracts/[id]"),
 } satisfies Record<string, Loader>;
@@ -71,6 +72,7 @@ const ROUTES: Array<[RegExp, Loader]> = [
   [/^\/dashboard\/documents$/, pageLoaders.documents],
   [/^\/dashboard\/archive$/, pageLoaders.archive],
   [/^\/dashboard\/notifications$/, pageLoaders.notifications],
+  [/^\/dashboard\/menu$/, pageLoaders.menu],
 ];
 
 const started = new Set<Loader>();

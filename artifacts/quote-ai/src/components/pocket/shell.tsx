@@ -9,7 +9,7 @@
  *
  * Tab memory (each tab reopens its last screen) is the phone navigation's, unchanged.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { isNativeApp } from "@/lib/native/env";
 import { Link, useLocation, useSearch } from "wouter";
@@ -20,6 +20,8 @@ import { markNextNav } from "@/lib/motion/nav-mark";
 import { restoreScrollOnNextVisit } from "@/components/scroll-manager";
 import { prefetchRoute } from "@/lib/route-chunks";
 import { TabClients, TabHome, TabJobs, TabQuotes, BackIcon } from "./icons";
+// Phase 150: the assistant layer is its own chunk, fetched on the first tap.
+const AssistantOverlay = lazy(() => import("./assistant").then((m) => ({ default: m.AssistantOverlay })));
 import type { SheetAction } from "@/components/mobile/action-sheet";
 
 type Tab = { href: string; label: string; Icon: (p: { on?: boolean }) => React.ReactElement; exact?: boolean; match?: string[] };
@@ -54,6 +56,7 @@ export function PocketNav({ tabs, assistant }: { tabs: Tab[]; assistant: boolean
   const { t } = useLanguage();
   const [location, navigate] = useLocation();
   const search = useSearch();
+  const [ai, setAi] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     document.documentElement.classList.add("has-pk-nav");
@@ -97,10 +100,11 @@ export function PocketNav({ tabs, assistant }: { tabs: Tab[]; assistant: boolean
         })}
       </div>
       {assistant && (
-        <Link href="/dashboard/assistant" className="pk-fab pk-press" aria-label={t("pocket.openAssistant")}>
+        <button type="button" className="pk-fab pk-press" aria-label={t("pocket.openAssistant")} aria-haspopup="dialog" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setAi({ x: r.left + r.width / 2, y: r.top + r.height / 2 }); haptic("light"); }}>
           <span className="pk-mini-orb" aria-hidden="true"><span className="pk-mb pk-mb1" /><span className="pk-mb pk-mb2" /><span className="pk-mb pk-mb3" /></span>
-        </Link>
+        </button>
       )}
+      {ai && <Suspense fallback={null}><AssistantOverlay open from={ai} onClose={() => setAi(null)} /></Suspense>}
     </nav>
   );
 }

@@ -276,6 +276,49 @@ html.pocket .content:has(> .pk-home), html.pocket .content:has(> div > .pk-home)
 .pk-reveal { animation: pk-reveal .5s var(--pk-ease) both; overflow: hidden; }
 @keyframes pk-reveal { from { opacity: 0; max-height: 0; } to { opacity: 1; max-height: 60px; } }
 
+/* ---------- The assistant (Phase 150), from the canvas's Home ---------- */
+html.pocket .main { transition: transform .75s cubic-bezier(.7,0,.2,1), border-radius .75s cubic-bezier(.7,0,.2,1), filter .75s; transform-origin: 50% 90%; }
+html.pocket.pk-ai-open .main { transform: scale(.92); border-radius: 38px; filter: brightness(.7); overflow: hidden; }
+html.pocket.pk-ai-open, html.pocket.pk-ai-open body { background: #0a0a0c; }
+.pk-ai { position: fixed; inset: 0; z-index: 70; background: #09090b; color: #ffffff; overflow: hidden; }
+.pk-ai-in { animation: pk-ai-in .8s cubic-bezier(.7,0,.2,1) both; }
+.pk-ai-out { animation: pk-ai-out .65s cubic-bezier(.7,0,.2,1) both; }
+@keyframes pk-ai-in { from { clip-path: circle(31px at var(--fx) var(--fy)); } to { clip-path: circle(150vmax at var(--fx) var(--fy)); } }
+@keyframes pk-ai-out { from { clip-path: circle(150vmax at var(--fx) var(--fy)); } to { clip-path: circle(31px at var(--fx) var(--fy)); opacity: .4; } }
+.pk-ai-amb { position: absolute; left: -20%; right: -20%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,106,61,.22), rgba(255,106,61,0)); animation: pk-amb 6s ease-in-out infinite alternate; }
+@keyframes pk-amb { from { transform: translateX(-6%) scale(1); } to { transform: translateX(6%) scale(1.15); } }
+.pk-orb-pos { position: absolute; left: 50%; top: 46%; width: 220px; height: 220px; margin: -110px 0 0 -110px; transition: transform .8s var(--pk-ease); }
+.pk-orb-pos.kb { transform: translateY(-268px) scale(.34); }
+.pk-orb-live { position: absolute; inset: 0; --amp: 0; }
+.pk-orb-glow { position: absolute; inset: -50px; border-radius: 50%; background: conic-gradient(from 0deg, var(--o1), var(--o3), #ff3d6e, var(--o2), var(--o1)); filter: blur(46px); opacity: calc(.28 + var(--amp) * .55); transform: scale(calc(.9 + var(--amp) * .25)); animation: pk-spin 14s linear infinite; }
+.pk-orb { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; background: var(--ob); transform: scale(calc(1 + var(--amp) * .13)); animation: pk-morph 8s ease-in-out infinite; box-shadow: inset 0 -24px 48px rgba(0,0,0,.4), inset 0 12px 30px rgba(255,255,255,.12); transition: filter .6s; }
+.pk-blob { position: absolute; border-radius: 50%; filter: blur(24px); mix-blend-mode: screen; }
+.pk-b1 { width: 78%; height: 78%; left: -14%; top: 4%; background: var(--o1); animation: pk-m1 7s ease-in-out infinite; }
+.pk-b2 { width: 70%; height: 70%; right: -18%; top: -16%; background: var(--o3); animation: pk-m3 9s ease-in-out infinite; }
+.pk-b3 { width: 72%; height: 72%; left: 12%; bottom: -26%; background: var(--o2); animation: pk-m2 8s ease-in-out infinite; }
+.pk-b4 { width: 60%; height: 60%; right: -8%; bottom: -6%; background: #ff3d6e; opacity: .85; animation: pk-m4 10s ease-in-out infinite; }
+.pk-b5 { width: 34%; height: 34%; left: 30%; top: 26%; background: #fff1e0; opacity: .7; filter: blur(18px); animation: pk-m2 6s ease-in-out infinite reverse; }
+@keyframes pk-m4 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-34%,-12%) scale(1.1); } }
+.pk-orb-shine { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,.5), rgba(255,255,255,0) 36%); }
+.pk-orb-live.think .pk-blob { animation-duration: 1.8s; }
+.pk-orb-live.think .pk-orb { animation-duration: 2.4s; }
+.pk-orb-live.think .pk-orb-glow { animation-duration: 3s; }
+.pk-orb-live.mute .pk-orb { filter: saturate(.15) brightness(.55); }
+.pk-orb-live.mute .pk-orb-glow { opacity: .08; }
+.pk-orb-live.mute .pk-blob { animation-play-state: paused; }
+.pk-orb-enter { position: absolute; inset: 0; }
+.pk-orb-enter.enter { animation: pk-orb-in 1s .05s cubic-bezier(.7,0,.2,1) backwards; }
+.pk-orb-enter.leave { animation: pk-orb-out .6s cubic-bezier(.7,0,.2,1) forwards; }
+@keyframes pk-orb-in { from { transform: translate(var(--ox), var(--oy)) scale(.14); } }
+@keyframes pk-orb-out { to { transform: translate(var(--ox), var(--oy)) scale(.14); opacity: .6; } }
+.pk-glass { background: rgba(255,255,255,.09); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.pk-ctl { animation: pk-rise .8s .45s var(--pk-ease) both; }
+.pk-kb-in { animation: pk-rise .6s .15s var(--pk-ease) both; }
+.pk-msg-in { animation: pk-rise .5s var(--pk-ease) both; }
+.pk-ai-input::placeholder { color: rgba(255,255,255,.38); }
+.pk-caret { display: inline-block; width: 7px; height: 7px; margin-left: 5px; border-radius: 50%; background: #ff6a3d; vertical-align: middle; animation: pk-blink 1s ease-in-out infinite; }
+@keyframes pk-blink { 50% { opacity: .25; } }
+
 /* The app's own notes ("Updated just now") clear the floating bar. */
 html.pocket.has-pk-nav .fresh-note { bottom: calc(26px + 62px + 12px + env(safe-area-inset-bottom, 0px)); }
 

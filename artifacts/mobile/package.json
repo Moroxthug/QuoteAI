@@ -10,7 +10,9 @@
     "android:debug": "pnpm run sync && tsx ./scripts/gradle.ts assembleDebug",
     "android:release": "pnpm run sync && tsx ./scripts/gradle.ts bundleRelease",
     "open:android": "cap open android",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "android:bundle": "tsx ./scripts/release.ts",
+    "upload-key": "tsx ./scripts/upload-key.ts"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.2",

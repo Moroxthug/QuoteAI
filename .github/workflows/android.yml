@@ -31,8 +31,7 @@ jobs:
     timeout-minutes: 30
     env:
       DATABASE_URL: postgres://ci:ci@localhost:5432/ci
-      ANDROID_VERSION_CODE: ${{ github.run_number }}
-      ANDROID_VERSION_NAME: 0.1.${{ github.run_number }}
+      # Phase 123: no version code here — build.gradle numbers every build by the minute (as the local android:bundle does).
       HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4

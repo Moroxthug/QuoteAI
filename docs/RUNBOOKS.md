@@ -1021,3 +1021,14 @@ Against a dev API from an emulator: `CAP_DEV=1 VITE_API_ORIGIN=http://10.0.2.2:5
 | The app still refreshes in the background | Only `isForeground()` gates timers — a new `setInterval` that talks to the server must ask it too |
 | The page reloads by itself a moment after the first visit | It must not any more: `lib/pwa.ts` reloads only when one service worker replaces another (an update), not when the first one claims the page |
 | A full-screen white "QuoteAI is locked"-style cover on the website | The fingerprint lock is `.bio-lock` (Phase 122); `.app-lock` is the Settings → Apps plan note — never give either class to something else |
+
+## 58. Google Play: the upload key and a release bundle (Phase 123, started 2026-09-28)
+
+**How it fits** — Play keeps the key that signs what phones install (**Play App Signing**, on by default for a new app). We sign uploads with our **upload key**: `~/.quoteai-keys/quoteai-upload.jks` + `upload.properties` (the password), made once by `pnpm --filter @workspace/mobile upload-key` (refuses to overwrite) — never in the repo; back both files up in a password manager. Upload certificate SHA-256 `6F:2B:6E:58:22:1E:83:E3:0B:35:B4:BB:39:6E:8E:B4:00:F5:44:9E:B9:64:1B:F5:7E:EF:3F:C5:E6:C2:B8:3C`. `pnpm --filter @workspace/mobile android:bundle [-- 1.0.0]` builds the app against https://quoteai.ca and writes the signed `artifacts/mobile/android/app/build/outputs/bundle/release/app-release.aab`. Every build's **version code is the minutes since 2026-01-01 UTC** (build.gradle; CI uses the same rule), so a new build is always accepted as newer. CI builds the same signed bundle on every push once the `ANDROID_KEYSTORE_BASE64` / `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_ALIAS` / `ANDROID_KEY_PASSWORD` secrets exist. Push notifications are off in a build without `google-services.json` (Firebase, M-6).
+
+| Symptom | What to check |
+|---|---|
+| Play refuses the upload: "version code already used" | Two builds in the same minute — build again |
+| Play refuses the upload: "signed with the wrong key" | The bundle wasn't signed with the registered upload key — `keytool -printcert -jarfile app-release.aab` must show the SHA-256 above. Lost key → Play Console → Test and release → App integrity → request an upload key reset |
+| `/dashboard` links open the browser, not the app | After the first upload: Play Console → App integrity → App signing → copy the **app signing key** SHA-256 (and the upload key's) into `ANDROID_CERT_SHA256` in Vercel, comma-separated, and redeploy (§53) |
+| Testers see "item not found" on the opt-in link | They must accept the invitation with the same Google account the phone uses, and the release must be rolled out on the track |

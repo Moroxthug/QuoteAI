@@ -8,6 +8,7 @@ import { trackEvent } from "./telemetry.js";
 import { linkQuoteToClient } from "./clients.js";
 import { resolveQuoteTaxRate } from "./tax.js";
 import { recordAiUsage } from "./usage.js";
+import { qt, resolveQuoteLanguage } from "../quotes/i18n.js";
 import { currentActorId } from "./requestContext.js";
 
 const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
@@ -206,7 +207,8 @@ function parseAiResponse(content: string, rawInput: string, profile: typeof busi
 
   return {
     rawInput,
-    titoloPreventivoRiga1: aiData.titolo_riga1 ?? "Project Quote & Itemized Estimate",
+    // Phase 123: the fallback title in the company's language (was always English, also on Quebec quotes).
+    titoloPreventivoRiga1: aiData.titolo_riga1 ?? qt("defaultTitle", resolveQuoteLanguage({ province: profile?.province })),
     titoloPreventivoRiga2: aiData.titolo_riga2 ?? "",
     numeroPreventivoData: aiData.numero_preventivo_data ?? "",
     clientData: { nome: aiData.cliente?.nome ?? "", indirizzo: aiData.cliente?.indirizzo ?? "" },

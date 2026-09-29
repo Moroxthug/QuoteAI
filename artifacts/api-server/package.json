@@ -27,7 +27,9 @@
     "ops:preflight": "tsx scripts/preflight.ts",
     "ops:owner-check": "tsx scripts/owner-check.ts",
     "ops:rehearse": "tsx scripts/rehearse.ts",
-    "ops:legal-packet": "tsx scripts/legal-packet.ts"
+    "ops:legal-packet": "tsx scripts/legal-packet.ts",
+    "store:shots": "tsx src/e2e/store-shots.ts",
+    "store:art": "tsx src/e2e/store-art.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",

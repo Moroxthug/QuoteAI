@@ -120,6 +120,23 @@ const emitSourcemaps = Boolean(process.env.SENTRY_AUTH_TOKEN);
 // to the API at VITE_API_ORIGIN (the live site unless a dev build says otherwise).
 const NATIVE_API_ORIGIN = process.env.VITE_API_ORIGIN ?? "https://quoteai.ca";
 
+// Phase 123: the phone app carries no analytics tag. index.html loads Google
+// Analytics for the website; in the app it would be a tracking SDK (Play's Data
+// safety, Apple's App Tracking Transparency) that the privacy story says the
+// app doesn't have. Dropped from the app's page, and the build fails if it survives.
+function nativeHtmlPlugin(): Plugin {
+  return {
+    name: "quoteai-native-html",
+    transformIndexHtml(html) {
+      const out = html
+        .replace(/[ \t]*<!--\s*Google tag[\s\S]*?-->\s*/g, "")
+        .replace(/[ \t]*<script\b[^>]*>(?:(?!<\/script>)[\s\S])*?(?:googletagmanager|gtag\()[\s\S]*?<\/script>\s*/g, "");
+      if (/googletagmanager|gtag\(/.test(out)) throw new Error("native build: the Google Analytics tag is still in index.html");
+      return out;
+    },
+  };
+}
+
 export default defineConfig(({ isSsrBuild, mode }) => {
   const native = mode === "native";
   return {
@@ -136,6 +153,7 @@ export default defineConfig(({ isSsrBuild, mode }) => {
     tailwindcss(),
     i18nSplitPlugin(),
     ...(isSsrBuild || native ? [] : [widgetPlugin(), chunkMapPlugin()]),
+    ...(native ? [nativeHtmlPlugin()] : []),
   ],
   resolve: {
     alias: {

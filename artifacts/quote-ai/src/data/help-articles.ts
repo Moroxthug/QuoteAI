@@ -455,6 +455,43 @@ export const HELP_ARTICLES: HelpArticle[] = [
       ),
     ],
   },
+  {
+    // Phase 123: the account-deletion page Google Play (and Apple) ask for — reachable without the app.
+    // The numbers are ACCOUNT_DELETION_GRACE_DAYS and ACCOUNT_RETENTION_YEARS (lib/db/src/schema/account.ts).
+    slug: "delete-your-account",
+    category: "start",
+    title: { en: "Delete your account and data", fr: "Supprimer votre compte et vos données" },
+    summary: {
+      en: "How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.",
+      fr: "Comment supprimer votre compte QuoteAI depuis l'application ou le site, ce qui est effacé, ce que la loi nous oblige à conserver, et comment changer d'avis dans les 7 jours.",
+    },
+    updatedAt: "2026-09-28",
+    readingTimeMin: 2,
+    blocks: [
+      h("Delete it yourself", "Supprimez-le vous-même"),
+      steps([
+        ["Sign in — in the QuoteAI app, or at quoteai.ca on any browser (you don't need the app).", "Connectez-vous — dans l'application QuoteAI, ou sur quoteai.ca dans n'importe quel navigateur (l'application n'est pas nécessaire)."],
+        ["Open Settings → Sign-in & security, then Delete account at the bottom.", "Ouvrez Paramètres → Connexion et sécurité, puis Supprimer le compte en bas de la page."],
+        ["Type DELETE and your password to confirm. You are signed out everywhere right away.", "Tapez SUPPRIMER et votre mot de passe pour confirmer. Vous êtes déconnecté partout immédiatement."],
+      ]),
+      note(
+        "Want a copy first? Settings → Sign-in & security → Export my data emails you a ZIP with every quote, client, contract, job, invoice, photo and document.",
+        "Vous voulez une copie d'abord? Paramètres → Connexion et sécurité → Exporter mes données vous envoie par courriel un ZIP avec chaque soumission, client, contrat, chantier, facture, photo et document.",
+      ),
+      h("What happens", "Ce qui se passe"),
+      bullets([
+        ["You have 7 days to change your mind: the confirmation email has a cancel link. After that, deletion is final.", "Vous avez 7 jours pour changer d'avis : le courriel de confirmation contient un lien d'annulation. Ensuite, la suppression est définitive."],
+        ["If the account owns a company: the subscription is cancelled, connected services (calendar, accounting, WhatsApp, bank) are disconnected, and every quote, client, job, photo and document is erased. Team members lose access the same day.", "Si le compte possède une entreprise : l'abonnement est annulé, les services connectés (agenda, comptabilité, WhatsApp, banque) sont déconnectés, et chaque soumission, client, chantier, photo et document est effacé. Les membres de l'équipe perdent l'accès le même jour."],
+        ["If you are a team member: your login is removed and you are taken off every team. The companies' own data is not affected.", "Si vous êtes membre d'une équipe : votre connexion est supprimée et vous êtes retiré de chaque équipe. Les données des entreprises ne sont pas touchées."],
+        ["The legal exception: signed contracts and issued invoices are kept for 7 years, unlinked from your profile, because the CRA and Revenu Québec require it — then deleted.", "L'exception légale : les contrats signés et les factures émises sont conservés 7 ans, dissociés de votre profil, parce que l'ARC et Revenu Québec l'exigent — puis supprimés."],
+      ]),
+      h("Can't sign in?", "Impossible de vous connecter?"),
+      p(
+        "Email privacy@quoteai.ca from the address on the account and ask for it to be deleted. We confirm it is you, then delete it the same way.",
+        "Écrivez à privacy@quoteai.ca depuis l'adresse du compte et demandez sa suppression. Nous confirmons que c'est bien vous, puis nous le supprimons de la même façon.",
+      ),
+    ],
+  },
 ];
 
 export function findHelpArticle(slug: string): HelpArticle | undefined {

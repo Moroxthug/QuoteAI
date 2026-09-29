@@ -47,6 +47,9 @@ const restored = /^\/dashboard(\/|$)/.test(pathname)
     ]).catch(() => undefined)
   : undefined;
 
+// Pocket (Phase 151): the phone app wears the chosen design everywhere, its welcome and sign-in too.
+if (isNativeApp) document.documentElement.classList.add("pocket");
+
 void Promise.all([import("./App.tsx"), strings, restored]).then(([{ default: App }]) => {
   const tree = (
     <StrictMode>

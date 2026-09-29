@@ -1,5 +1,5 @@
 import { PushAsk } from "@/components/pwa/push-ask";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { LayoutDashboard, FileText, BarChart3, Settings, ChevronLeft, ChevronRight, Plus, LogOut, User, CreditCard, Building2, ChevronDown, BookOpen, Users, Receipt, Briefcase, FolderOpen, FileSignature, HardHat, Sparkles, Check, Target, UploadCloud, Search, Archive, CalendarDays, Landmark, BookCheck, Wallet, Network } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { teamMembersApi } from "@/lib/team-members-api";
@@ -250,8 +250,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pocket = usePocket();
   // Pocket (docs/POCKET-DESIGN-PLAN.md): the phone layout wears the owner's chosen design (src/pocket.css).
   useEffect(() => {
-    document.documentElement.classList.toggle("pocket", pocket);
-    return () => document.documentElement.classList.remove("pocket");
+    document.documentElement.classList.toggle("pocket", pocket || isNativeApp);
+    return () => { if (!isNativeApp) document.documentElement.classList.remove("pocket"); };
   }, [pocket]);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     try { return localStorage.getItem("sidebar-collapsed") === "true"; } catch { return false; }
@@ -508,10 +508,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 /** Pocket (Phase 144): the phone's header row — none on Home (its own header is part of the page). */
 function PocketTop({ location, tabs, backHref, backLabel, hasJobs, hasInvoices }: { location: string; tabs: ReturnType<typeof usePocketTabs>; backHref: string | null; backLabel: string; hasJobs: boolean; hasInvoices: boolean }) {
   const override = useMobileHeaderOverride();
-  if (location === "/dashboard") return null;
-  const back = override?.backHref !== undefined ? override.backHref : backHref;
-  const extra = (override?.actions ?? []).filter((a): a is SheetAction => !!a);
+  const search = useSearch();
+  // Screens that draw the canvas's own header: Home, Menu, Settings, the quote.
+  if (location === "/dashboard" || location === "/dashboard/menu" || location === "/dashboard/settings" || (/^\/dashboard\/quotes\/[^/]+$/.test(location) && !new URLSearchParams(search).has("classic"))) return null;
   const root = isTabRoot(location, tabs);
+  // A screen opened from Menu goes back to Menu.
+  const back = override?.backHref !== undefined ? override.backHref : backHref ?? (root ? null : "/dashboard/menu");
+  const extra = (override?.actions ?? []).filter((a): a is SheetAction => !!a);
   const more = extra.length > 0 || root ? <PhoneNewButton pocket extra={extra} withNew={root} hasJobs={hasJobs} hasInvoices={hasInvoices} /> : null;
   return <PocketHeader backHref={back} backLabel={backLabel} more={more} />;
 }

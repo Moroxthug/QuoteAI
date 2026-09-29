@@ -8,11 +8,12 @@
  * layout's width (≤ 980 px) and always in the phone app. The desktop site is untouched.
  */
 
+/* Declared 300–600: the canvas never goes heavier, so the app's older 700/800 rules render at 600. */
 @font-face {
   font-family: 'Geist';
   font-style: normal;
   font-display: swap;
-  font-weight: 100 900;
+  font-weight: 300 600;
   src: url('/fonts/geist-latin-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
@@ -81,6 +82,23 @@ html.pocket {
   --navy: var(--pk-ink);
   --muted-mk: var(--pk-text-2);
   --line: var(--pk-line);
+  /* The old palette's accents, as the canvas's: ink, the one orange, its green/amber/red. */
+  --soft: var(--pk-fill);
+  --soft-2: var(--pk-fill-3);
+  --faint: var(--pk-text-3);
+  --purple: var(--pk-ink);
+  --purple-t: var(--pk-fill);
+  --teal: var(--pk-accent);
+  --teal-dark: #c2441f;
+  --teal-t: #fbe9e3;
+  --green: var(--pk-ok-dot);
+  --green-dark: var(--pk-ok);
+  --green-t: #e6f2ea;
+  --yellow: var(--pk-warn);
+  --yellow-dark: var(--pk-warn-text);
+  --yellow-t: #f7eedc;
+  --red: var(--pk-danger);
+  --red-t: #f8e6e2;
   background: var(--pk-bg);
 }
 html.pocket body {
@@ -318,6 +336,90 @@ html.pocket.pk-ai-open, html.pocket.pk-ai-open body { background: #0a0a0c; }
 .pk-ai-input::placeholder { color: rgba(255,255,255,.38); }
 .pk-caret { display: inline-block; width: 7px; height: 7px; margin-left: 5px; border-radius: 50%; background: #ff6a3d; vertical-align: middle; animation: pk-blink 1s ease-in-out infinite; }
 @keyframes pk-blink { 50% { opacity: .25; } }
+
+/* ==========================================================================
+   Phase 151 — every other screen, from the canvas's parts only.
+   The app's shared classes (mockup-system.css) take the canvas's card, row, button, status,
+   bar, field, tab and sheet. Nothing is added; what a screen shows stays as it is.
+   ========================================================================== */
+/* Type: nothing is heavier than 600 anywhere (the Geist face above is declared 300–600, so a 700/800 rule renders at 600). */
+html.pocket :where(.content, .modal, .sheet) :where(h1, h2, h3, h4, b, strong, th, .lrow-title, .lrow-amt, .stat-card .val) { letter-spacing: -0.02em; }
+html.pocket :where(.content, .modal) { font-weight: 400; }
+/* Cards: white, 22 px, the canvas's hairline shadow — no border. */
+html.pocket .card { border: 0; border-radius: 22px; box-shadow: var(--pk-shadow-card); }
+html.pocket .card-head { border-bottom-color: var(--pk-line); padding: 16px; }
+html.pocket .card-head h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; color: var(--pk-ink); }
+html.pocket .card-head .sub { font-size: 12px; font-weight: 400; color: var(--pk-text-2); }
+html.pocket .stat-card .lbl { font-size: 11.5px; font-weight: 400; color: var(--pk-text-2); }
+html.pocket .stat-card .val { font-size: 17px; font-weight: 600; letter-spacing: -0.03em; color: var(--pk-ink); }
+html.pocket .stat-card .delta { font-size: 11.5px; font-weight: 500; color: var(--pk-ok); }
+html.pocket .stat-card .delta.neg { color: var(--pk-danger); }
+/* Rows: the canvas's list rows — 14 / 500 title, 12 grey meta, #b0afab chevron, hairline between. */
+html.pocket .lrow { border-top-color: var(--pk-line); padding: 12px 16px; transition: background-color .2s; }
+html.pocket .lrow:hover { background: var(--pk-hover); }
+html.pocket .lrow:active { background: var(--pk-fill); }
+html.pocket .lrow-title { font-size: 14px; font-weight: 500; color: var(--pk-ink); }
+html.pocket .lrow-meta { font-size: 12px; font-weight: 400; color: var(--pk-text-2); }
+html.pocket .lrow-amt { font-size: 14px; font-weight: 500; color: var(--pk-ink); }
+html.pocket .lrow-chev, html.pocket .more-row-chev { color: var(--pk-chev); }
+/* Status: the canvas's dot and words ("● Draft · valid until"), not a coloured pill. */
+html.pocket .chip { background: transparent !important; color: var(--pk-text-2) !important; padding: 0; gap: 6px; font-size: 12px; font-weight: 500; border-radius: 0; }
+html.pocket .chip::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #b0afab; flex: none; }
+html.pocket .chip-green::before { background: var(--pk-ok-dot); }
+html.pocket .chip-teal::before { background: var(--pk-accent); }
+html.pocket .chip-yellow::before { background: var(--pk-warn); }
+html.pocket .chip-red::before { background: var(--pk-danger); }
+html.pocket .chip-red { color: var(--pk-danger) !important; }
+html.pocket .chip-new { color: var(--pk-ink) !important; }
+html.pocket .chip-new::before { background: var(--pk-accent); }
+/* Bars: 3 px ink on the hairline. */
+html.pocket .pbar { height: 3px; border-radius: 3px; background: var(--pk-line); }
+html.pocket .pbar i { background: var(--pk-ink); border-radius: 3px; }
+/* Icon tiles: the Menu's 9 px grey tile with an ink icon. */
+html.pocket :where(.qa-ic, .rq-ic, .ic.warn, .ny-ic) { background: var(--pk-fill) !important; color: var(--pk-ink) !important; border-radius: 9px; }
+/* Buttons: the canvas's 44 px, 14 px-radius dark button and grey secondary; chips 32 px. */
+html.pocket :where(.content, .modal, .sheet) .btn { border-radius: 14px; padding: 0 16px; min-height: 44px; font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+html.pocket :where(.content, .modal, .sheet) .btn-sm { min-height: 32px; padding: 0 12px; border-radius: 10px; font-size: 12.5px; font-weight: 500; }
+html.pocket .btn-navy { background: var(--pk-ink); color: #fff; }
+html.pocket .btn-navy:hover { background: #000; }
+html.pocket .btn-outline-navy { border: 0; background: var(--pk-fill); color: var(--pk-ink); font-weight: 500; }
+html.pocket .btn-outline-navy:hover { background: var(--pk-fill-2); }
+html.pocket .btn-white { background: #fff; color: var(--pk-ink); box-shadow: var(--pk-shadow-card); }
+html.pocket .text-link, html.pocket .cta-link { color: #c2441f; font-weight: 500; }
+/* The bottom bar's ⋯ beside the pill: the canvas's frosted 56 px round. */
+@media (max-width: 980px) {
+  html.pocket .action-bar .more-btn { width: 56px; height: 56px; border-radius: 28px; border: 0; background: rgba(255,255,255,.85); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px -8px rgba(20,20,22,.2), 0 0 0 1px rgba(20,20,22,.06); }
+}
+/* Fields: 12 px radius, the canvas's greys; labels as group labels. */
+html.pocket .field label, html.pocket .auth-field label { font-size: 12.5px; font-weight: 500; color: var(--pk-text-2); }
+html.pocket :where(.field, .modal, .sheet, .content) :where(input:not([type="checkbox"]):not([type="radio"]):not(.pk-ai-input), select, textarea).inp,
+html.pocket .field :where(input, select, textarea) { border: 1px solid var(--pk-fill-4); border-radius: 12px; font-size: 14px; background: #fff; color: var(--pk-ink); }
+html.pocket .field :where(input, select, textarea):focus { border-color: var(--pk-ink); box-shadow: none; }
+/* Section labels: the canvas's group label (12.5 / 500 grey), not shouted capitals. */
+html.pocket :where(.content, .modal, .sheet) .eyebrow { font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--pk-text-2); }
+/* Tabs: the canvas's segmented control look — a grey track, the chosen one white. */
+html.pocket .stabs .pill, html.pocket .pills .pill { border: 0; background: var(--pk-fill-3); color: var(--pk-text-2); font-size: 12.5px; font-weight: 500; border-radius: 10px; padding: 8px 12px; }
+html.pocket .stabs .pill:is([aria-selected="true"], [aria-pressed="true"], .on, .active), html.pocket .pills .pill:is([aria-pressed="true"], .on, .active) { background: #fff; color: var(--pk-ink); box-shadow: var(--pk-shadow-thumb); }
+html.pocket .stabs.sticky { background: var(--pk-bg); }
+/* Switches: the canvas's 50 × 30 ink switch. */
+html.pocket .tgl { width: 50px; height: 30px; background: var(--pk-off); }
+html.pocket .tgl::after { top: 2px; left: 2px; width: 26px; height: 26px; box-shadow: var(--pk-shadow-knob); transition: transform .4s var(--pk-ease-spring); }
+html.pocket .tgl.on { background: var(--pk-ink); }
+html.pocket .tgl.on::after { transform: translateX(20px); }
+html.pocket .more-switch.on { background: var(--pk-ink); }
+/* Sheets and dialogs: white, 22 px, the canvas's type. */
+html.pocket .modal { border: 0; border-radius: 22px; }
+html.pocket .modal-head { border-bottom-color: var(--pk-line); }
+html.pocket .modal-head h2 { font-size: 17px; font-weight: 600; letter-spacing: -0.03em; color: var(--pk-ink); }
+html.pocket .modal-head .sub { font-size: 12.5px; font-weight: 400; color: var(--pk-text-2); }
+html.pocket .modal-foot { border-top-color: var(--pk-line); }
+html.pocket .modal-scrim { background: rgba(20,20,22,.4); }
+html.pocket .asheet-item { font-size: 14px; font-weight: 500; color: var(--pk-ink); min-height: 52px; }
+html.pocket .asheet-item svg { color: var(--pk-text-2); }
+html.pocket .asheet-item.danger, html.pocket .asheet-item.danger svg { color: var(--pk-danger); }
+html.pocket .sheet-grab { background: var(--pk-fill-4); }
+/* Notices: the canvas's quiet grey strip (Crew's detail strip). */
+html.pocket .notice { border: 0; border-radius: 14px; background: var(--pk-fill-5); color: var(--pk-body); }
 
 /* The app's own notes ("Updated just now") clear the floating bar. */
 html.pocket.has-pk-nav .fresh-note { bottom: calc(26px + 62px + 12px + env(safe-area-inset-bottom, 0px)); }

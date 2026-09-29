@@ -74,6 +74,8 @@ export const pushPreferencesTable = pgTable(
     userId: text("user_id").notNull(),
     memberUserId: text("member_user_id").notNull(),
     muted: text("muted").array().notNull().default(sql`'{}'::text[]`),
+    /** Pocket (Phase 149): kinds that start off (crew check-ins), turned on. */
+    enabled: text("enabled").array().notNull().default(sql`'{}'::text[]`),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("push_preferences_member_idx").on(t.userId, t.memberUserId)],

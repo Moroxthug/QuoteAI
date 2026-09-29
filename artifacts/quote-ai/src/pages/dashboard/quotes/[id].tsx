@@ -6,6 +6,8 @@ import { track } from "@/lib/analytics";
 import { saveFile } from "@/lib/save-file";
 import { localDay } from "@/lib/local-day";
 import { Link, useParams, useSearch } from "wouter";
+import { usePocket } from "@/components/pocket/shell";
+import { PocketQuote } from "@/components/pocket/quote";
 import { useGetQuote, useGetBusinessProfile, useGenerateQuotePdf, useGetPlans, useUpdateQuote, useCreateCheckoutSession, useVerifyPayment, useGetSubscription, useUnlockQuoteWithSubscription, useCreateCustomerPortalSession, useRegenerateQuote, useDuplicateQuote, useUpgradeToCapitolatoPro, useGenerateQuotePdfPro, useGetTrialStatus, useListClients, useSendQuotePdfEmail, useListQuoteVariants, useCreateQuoteVariant, useUpdateQuoteVariant, useDeleteQuoteVariant, useArchiveQuote, useDeleteQuote, getGetQuoteQueryKey, getVerifyPaymentQueryKey, getListQuotesQueryKey, getGetTrialStatusQueryKey, getListQuoteVariantsQueryKey, restoreQuote } from "@workspace/api-client-react";
 import { showUndoToast } from "@/lib/optimistic";
 import { DetailSkeleton } from "@/components/skeletons";
@@ -59,7 +61,16 @@ type EditCapitolo = {
   voci: EditVoce[];
 };
 
+// Pocket (Phase 147): on the phone layout the canvas's Quote draft; ?classic=1 (its ⋯ → Full editor) is this page.
 export default function QuoteDetail() {
+  const pocket = usePocket();
+  const { id } = useParams();
+  const classic = new URLSearchParams(useSearch()).get("classic") === "1";
+  if (pocket && !classic && id) return <PocketQuote id={id} />;
+  return <ClassicQuoteDetail />;
+}
+
+function ClassicQuoteDetail() {
   const { t, lang } = useLanguage();
 const can = useCan();
   const dateLocale = lang === "fr" ? frCA : enCA;

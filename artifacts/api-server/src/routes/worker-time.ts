@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { sendPushToCompany } from "../lib/push";
 import { z } from "zod";
 import {
   db,
@@ -351,6 +352,8 @@ router.post("/t/:token/entries", writeLimiter, async (req, res) => {
     if (already.length <= 1) {
       await createNotification({ userId: r.worker.userId, type: "time_entry_submitted", title: r.language === "fr" ? `${r.worker.name} a saisi des heures` : `${r.worker.name} logged hours`, body: r.language === "fr" ? `${d.hours} h sur ${job.name} — à approuver dans Équipe.` : `${d.hours} h on ${job.name} — approve them under Team.`, link: "/dashboard/team?tab=time", entityType: "time_entry", entityId: entry!.id });
     }
+    // Pocket (Phase 149): Settings → Notifications → Crew check-ins (off until turned on); the phone only, not the bell.
+    void sendPushToCompany(r.worker.userId, { title: r.language === "fr" ? `${r.worker.name} est arrivé·e` : `${r.worker.name} is on site`, body: job.name, link: "/dashboard/team", tag: `checkin:${entry!.id}` }, { category: "checkins" }).catch(() => undefined);
     res.status(201).json({ entry: serializeOwnEntry(entry!, job.name, milestoneId ? (job.milestones.find((m) => m.id === milestoneId)?.title ?? null) : null) });
   } catch (err) {
     req.log.error({ err }, "Error saving worker time entry");
@@ -474,6 +477,7 @@ async function clockOutEntry(r: WorkerCtx, entry: typeof timeEntriesTable.$infer
   await db.update(collaboratorsTable).set({ lastTimeEntryAt: now }).where(eq(collaboratorsTable.id, r.worker.id));
   if (overwrite) await auditOffline(r.worker, entry.id, "offline_overwrite", { field: "clockOutAt", ...overwrite, at: clockOutAt.toISOString(), hours, receivedAt: now.toISOString() }, req);
   else if (at.value && now.getTime() - at.value.getTime() > OFFLINE_AUDIT_LAG_MS) await auditOffline(r.worker, entry.id, "offline_sync", { field: "clockOutAt", at: at.value.toISOString(), receivedAt: now.toISOString() }, req);
+  if (!overwrite) void sendPushToCompany(r.worker.userId, { title: r.language === "fr" ? `${r.worker.name} est parti·e` : `${r.worker.name} left the site`, body: `${job?.name ?? ""} · ${hours.toFixed(1)} h`, link: "/dashboard/team", tag: `checkin:${entry.id}` }, { category: "checkins" }).catch(() => undefined);
   const dayKey = toIsoDate(localDayFor(new Date(), r.province));
   const already = await db.select({ id: timeEntriesTable.id }).from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), eq(timeEntriesTable.enteredBy, "worker"), gte(timeEntriesTable.createdAt, new Date(`${dayKey}T00:00:00Z`)))).limit(2);
   if (already.length <= 1 && !overwrite) {

@@ -29,7 +29,15 @@ const PUSH_CATEGORIES = {
   budget: ["budget_alert", "budget_exceeded"],
   // Phase 87: a filing deadline or a licence renewal coming up
   compliance: ["compliance_due"],
+  // Pocket (Phase 149, Settings → Notifications): a client opened a quote; a crew member arrived or
+  // left a site (off until turned on); the 6:30 morning brief.
+  views: ["quote_viewed"],
+  checkins: ["crew_checkin"],
+  brief: ["morning_brief"],
 } as const satisfies Record<string, readonly string[]>;
+
+/** Kinds that are off until the person turns them on (stored in push_preferences.enabled). */
+export const PUSH_DEFAULT_OFF: ReadonlySet<string> = new Set(["checkins"]);
 
 export type PushCategory = keyof typeof PUSH_CATEGORIES;
 export const PUSH_CATEGORY_KEYS = Object.keys(PUSH_CATEGORIES) as PushCategory[];
@@ -128,25 +136,31 @@ async function sendToDevices(userId: string, message: PushMessage, wanted: (memb
   return rows.length;
 }
 
-/** The categories one person turned off for this company. */
+/** Whether a kind is off for someone: listed in muted, or off by default and not turned on. */
+const isMuted = (row: { muted: string[]; enabled: string[] } | undefined, c: string) => (PUSH_DEFAULT_OFF.has(c) ? !(row?.enabled ?? []).includes(c) : (row?.muted ?? []).includes(c));
+
+/** The categories one person has off for this company (the default-off ones unless turned on). */
 export async function mutedCategories(userId: string, memberUserId: string): Promise<PushCategory[]> {
-  const [row] = await db.select({ muted: pushPreferencesTable.muted }).from(pushPreferencesTable).where(and(eq(pushPreferencesTable.userId, userId), eq(pushPreferencesTable.memberUserId, memberUserId)));
-  return (row?.muted ?? []).filter((c): c is PushCategory => c in PUSH_CATEGORIES);
+  const [row] = await db.select({ muted: pushPreferencesTable.muted, enabled: pushPreferencesTable.enabled }).from(pushPreferencesTable).where(and(eq(pushPreferencesTable.userId, userId), eq(pushPreferencesTable.memberUserId, memberUserId)));
+  return PUSH_CATEGORY_KEYS.filter((c) => isMuted(row, c));
 }
 
 export async function setMutedCategories(userId: string, memberUserId: string, muted: PushCategory[]): Promise<PushCategory[]> {
-  const unique = [...new Set(muted)].filter((c) => c in PUSH_CATEGORIES);
+  const off = new Set(muted.filter((c) => c in PUSH_CATEGORIES));
+  const mutedRow = [...off].filter((c) => !PUSH_DEFAULT_OFF.has(c));
+  const enabled = [...PUSH_DEFAULT_OFF].filter((c) => !off.has(c as PushCategory));
   await db
     .insert(pushPreferencesTable)
-    .values({ userId, memberUserId, muted: unique })
-    .onConflictDoUpdate({ target: [pushPreferencesTable.userId, pushPreferencesTable.memberUserId], set: { muted: unique, updatedAt: new Date() } });
-  return unique;
+    .values({ userId, memberUserId, muted: mutedRow, enabled })
+    .onConflictDoUpdate({ target: [pushPreferencesTable.userId, pushPreferencesTable.memberUserId], set: { muted: mutedRow, enabled, updatedAt: new Date() } });
+  return PUSH_CATEGORY_KEYS.filter((c) => off.has(c));
 }
 
-/** The people (member ids) of a company who turned this category off. */
-async function membersMuting(userId: string, category: PushCategory): Promise<Set<string>> {
-  const rows = await db.select({ memberUserId: pushPreferencesTable.memberUserId, muted: pushPreferencesTable.muted }).from(pushPreferencesTable).where(eq(pushPreferencesTable.userId, userId));
-  return new Set(rows.filter((r) => r.muted.includes(category)).map((r) => r.memberUserId));
+/** Whether a member of a company has this category off (people with no row get the defaults). */
+async function mutingTest(userId: string, category: PushCategory): Promise<(memberUserId: string) => boolean> {
+  const rows = await db.select({ memberUserId: pushPreferencesTable.memberUserId, muted: pushPreferencesTable.muted, enabled: pushPreferencesTable.enabled }).from(pushPreferencesTable).where(eq(pushPreferencesTable.userId, userId));
+  const byMember = new Map(rows.map((r) => [r.memberUserId, r]));
+  return (memberUserId) => isMuted(byMember.get(memberUserId), category);
 }
 
 /** Sends one message to every subscribed browser and installed app of a company (optionally only one member's, or leaving out the people who muted its category). Never throws. */
@@ -154,8 +168,8 @@ export async function sendPushToCompany(userId: string, message: PushMessage, op
   const keys = readPushKeys();
   if (!keys && !isAppPushConfigured()) return { sent: 0, failed: 0, removed: 0, skipped: "not_configured" };
   const summary: PushSendSummary = { sent: 0, failed: 0, removed: 0, skipped: null };
-  const muting = opts.category ? await membersMuting(userId, opts.category) : new Set<string>();
-  const wanted = (memberUserId: string) => (!opts.memberUserId || memberUserId === opts.memberUserId) && !muting.has(memberUserId);
+  const muted = opts.category ? await mutingTest(userId, opts.category) : () => false;
+  const wanted = (memberUserId: string) => (!opts.memberUserId || memberUserId === opts.memberUserId) && !muted(memberUserId);
   const devices = await sendToDevices(userId, message, wanted, summary, opts.category);
   const rows = keys ? (await listSubscriptions(userId)).filter((r) => wanted(r.memberUserId)) : [];
   if (rows.length === 0 && devices === 0) return { ...summary, skipped: "no_subscriptions" };

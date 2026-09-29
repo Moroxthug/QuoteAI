@@ -4,6 +4,7 @@ import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
 import { db, quotesTable, projectsTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
+import { sendSms } from "../lib/sms.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { quoteLanguageFor, qt, fmtQuoteDate, fmtQty } from "../quotes/i18n.js";
 import { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } from "../quotes/pdf.js";
@@ -209,6 +210,54 @@ function serializeQuoteVariant(v: VariantRow, province: string | null = null) {
   };
 }
 
+/**
+ * Sending is what makes a quote leave the account, so it unlocks the quote exactly like a PDF
+ * download does: subscribers unlock with their plan, trial users spend one trial download,
+ * everyone else must pay. Only a draft is ever touched — an accepted quote stays accepted.
+ * False: the quote can't be sent (402).
+ */
+async function unlockToSend(quote: QuoteRow, profile: typeof businessProfilesTable.$inferSelect | undefined | null, log: Parameters<typeof tryTrialUnlock>[2]): Promise<boolean> {
+  if (quote.status === "draft" || quote.status === "pending_payment") {
+    if (profile?.subscriptionStatus === "active") {
+      await db.update(quotesTable).set({ status: "unlocked", unlockedWithPlan: profile.subscriptionPlan ?? null }).where(eq(quotesTable.id, quote.id));
+      quote.status = "unlocked";
+      return true;
+    }
+    if (await tryTrialUnlock(quote, profile ?? null, log)) {
+      quote.status = "unlocked";
+      return true;
+    }
+    return false;
+  }
+  return quote.status === "unlocked" || quote.status === "accepted";
+}
+
+/** After a quote went out by SMS: who sent it, when, and the follow-up sequence (as the email path). */
+async function markSent(quote: QuoteRow, profile: typeof businessProfilesTable.$inferSelect, clientData: QuoteClientData | null) {
+  const sender = currentActorId();
+  if (sender && !quote.sentByUserId) {
+    await db.update(quotesTable).set({ sentByUserId: sender }).where(and(eq(quotesTable.id, quote.id), isNull(quotesTable.sentByUserId)));
+  }
+  if (quote.status === "accepted" || quote.unsubscribedAt) return;
+  await db.update(quotesTable).set({
+    sentAt: quote.sentAt ?? new Date(),
+    followUpStage: 0,
+    nextFollowUpAt: stageDueAt(quoteFollowupDays(profile.automationSettings), 0),
+    ...(clientData ? { clientData } : {}),
+  }).where(eq(quotesTable.id, quote.id));
+  if (clientData) await linkQuoteToClient({ ...quote, clientData }, profile.province ?? null, { applyDefaultTerms: false });
+}
+
+/** Pocket (Phase 149): the materials markup and the units from Settings → Quote defaults, as instructions to the quote writer. */
+function quoteDefaultsContext(profile: { materialsMarkupPercent?: string | null; units?: string | null } | undefined): { role: "system"; content: string }[] {
+  const out: { role: "system"; content: string }[] = [];
+  const markup = Number(profile?.materialsMarkupPercent ?? 0);
+  if (markup > 0) out.push({ role: "system", content: `MATERIALS MARKUP: price every material and supply at the supplier's cost plus ${markup}% (the contractor's markup). Labour is priced as usual. Do not show the markup as a separate line.` });
+  if (profile?.units === "metric") out.push({ role: "system", content: "UNITS: use metric units for every quantity (m, m², m³, kg), never feet or square feet." });
+  else if (profile?.units === "imperial") out.push({ role: "system", content: "UNITS: use imperial units for every quantity (ft, sq ft, lin ft, cu yd, lb), never metres." });
+  return out;
+}
+
 export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], variants?: VariantRow[]) {
   const tot = Number(q.totale);
   const province = normalizeProvince(q.province) ?? normalizeProvince((q.clientData as QuoteClientData | null)?.province) ?? null;
@@ -245,6 +294,9 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     acceptedByName: q.acceptedByName ?? null,
     acceptedAt: q.acceptedAt?.toISOString() ?? null,
     sentAt: q.sentAt?.toISOString() ?? null,
+    /** Pocket (Phase 147): days valid from when it is sent (null: 30), and when the client first opened it. */
+    validDays: q.validDays ?? null,
+    firstViewedAt: q.firstViewedAt?.toISOString() ?? null,
     pdfUrl: q.pdfUrl ?? null,
     rawInput: q.rawInput,
     pdfDownloadedAt: q.pdfDownloadedAt?.toISOString() ?? null,
@@ -488,6 +540,10 @@ router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallL
         subscriptionStatus: businessProfilesTable.subscriptionStatus,
         trialStartedAt: businessProfilesTable.trialStartedAt,
         province: businessProfilesTable.province,
+        // Pocket (Phase 149): Settings → Quote defaults.
+        quoteValidDays: businessProfilesTable.quoteValidDays,
+        materialsMarkupPercent: businessProfilesTable.materialsMarkupPercent,
+        units: businessProfilesTable.units,
       })
       .from(businessProfilesTable)
       .where(eq(businessProfilesTable.userId, userId));
@@ -829,6 +885,7 @@ Write all output text in English.`
           ...(targetTotalContext ? [{ role: "system" as const, content: targetTotalContext }] : []),
           ...(templateStyleContext ? [{ role: "system" as const, content: templateStyleContext }] : []),
           ...(imagesContext ? [{ role: "system" as const, content: imagesContext }] : []),
+          ...quoteDefaultsContext(profile),
           {
             role: "user",
             content: hasImages
@@ -1159,6 +1216,7 @@ Write all output text in English.`
           userId,
           createdByUserId: currentActorId(),
           rawInput,
+          validDays: profile?.quoteValidDays ?? null,
           clientData: resolvedClientData,
           companySnapshot: resolvedSnapshot,
           descrizioneGenerale: aiData.descrizione_generale ?? "",
@@ -1832,24 +1890,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
 
     const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
 
-    // Sending is what makes a quote leave the account, so it unlocks the
-    // quote exactly like a PDF download does: subscribers unlock with their
-    // plan, trial users spend one trial download, everyone else must pay.
-    // Only a draft is ever touched — an accepted quote stays accepted.
-    if (quote.status === "draft" || quote.status === "pending_payment") {
-      if (profile?.subscriptionStatus === "active") {
-        await db
-          .update(quotesTable)
-          .set({ status: "unlocked", unlockedWithPlan: profile.subscriptionPlan ?? null })
-          .where(eq(quotesTable.id, id));
-        quote.status = "unlocked";
-      } else if (await tryTrialUnlock(quote, profile ?? null, req.log)) {
-        quote.status = "unlocked";
-      } else {
-        res.status(402).json({ error: "Unlock the quote to send it via email", code: "PAYMENT_REQUIRED" });
-        return;
-      }
-    } else if (quote.status !== "unlocked" && quote.status !== "accepted") {
+    if (!(await unlockToSend(quote, profile, req.log))) {
       res.status(402).json({ error: "Unlock the quote to send it via email", code: "PAYMENT_REQUIRED" });
       return;
     }
@@ -1878,6 +1919,13 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
       replyTo: profile?.email ?? null,
       publicUrl: quote.status === "unlocked" || quote.status === "accepted" ? `${getBaseUrl()}/p/${quote.id}` : null,
     });
+    // Pocket (Phase 149): Settings → Send me a copy — the same email, to the company's own address.
+    if (profile?.quoteCopyToMe && profile.email && profile.email.trim().toLowerCase() !== toEmail.trim().toLowerCase()) {
+      await sendQuotePdfEmail({
+        toEmail: profile.email, userId, companyName, clientName: clientName || (quote.clientData as QuoteClientData)?.nome || "", lang, quoteNumber: numeroData, totale: totaleFormatted,
+        pdfBuffer, filename, companyLogoUrl: profile.logoUrl ?? null, replyTo: null, publicUrl: `${getBaseUrl()}/p/${quote.id}`,
+      }).catch((err) => req.log.warn({ err }, "Quote copy to the company not sent"));
+    }
 
     // Phase 95: the first person to send it is credited if the client accepts.
     const sender = currentActorId();
@@ -1911,6 +1959,44 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
     req.log.error({ err }, "Error sending quote PDF email");
     const message = err instanceof Error ? err.message : "Error sending the email";
     res.status(500).json({ error: message });
+  }
+});
+
+// POST /api/quotes/:id/send-sms { toPhone } — Pocket (Phase 147): Send by → SMS. The quote's
+// page link by text (the company's SMS line, lib/sms.ts), with the same unlock and follow-ups as email.
+router.post("/quotes/:id/send-sms", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const id = req.params.id as string;
+    const body = z.object({ toPhone: z.string().min(7).max(30) }).safeParse(req.body ?? {});
+    if (!body.success) { res.status(400).json({ error: "A phone number is required" }); return; }
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote) { res.status(404).json({ error: "Not found" }); return; }
+    if (quote.userId !== userId) { res.status(403).json({ error: "Forbidden" }); return; }
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    if (!profile) { res.status(409).json({ error: "Set up the company first", code: "NO_PROFILE" }); return; }
+    if (!(await unlockToSend(quote, profile, req.log))) {
+      res.status(402).json({ error: "Unlock the quote to send it", code: "PAYMENT_REQUIRED" });
+      return;
+    }
+    const lang = await quoteLanguageFor(quote);
+    const companyName = (quote.companySnapshot as QuoteCompanySnapshot | null)?.companyName || profile.companyName || "";
+    const total = fmtQty(Number(quote.totale), lang);
+    const text = lang === "fr"
+      ? `${companyName} : votre soumission (${total} $). Consultez-la et acceptez-la ici :`
+      : `${companyName}: your quote (${total}). View and accept it here:`;
+    const sms = await sendSms({ profile, to: body.data.toPhone, body: `${text} ${getBaseUrl()}/p/${quote.id}`, lang, purpose: "quote_send", relatedEntityType: "quote", relatedEntityId: quote.id });
+    if (!sms.ok) {
+      res.status(sms.reason === "not_configured" ? 409 : 422).json({ error: "The text could not be sent", code: "SMS_" + String(sms.reason ?? "failed").toUpperCase() });
+      return;
+    }
+    const existing = (quote.clientData as QuoteClientData | null) ?? null;
+    const clientData = existing && !existing.phone ? { ...existing, phone: body.data.toPhone.trim() } : existing;
+    await markSent(quote, profile, clientData !== existing ? clientData : null);
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error sending quote SMS");
+    res.status(500).json({ error: "Error sending the text" });
   }
 });
 

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db, quotesTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, leadsTable, leadEventsTable, incentivesCatalogTable, normalizeProvince, quoteTaxLines } from "@workspace/db";
-import { eq, or, isNull, inArray } from "drizzle-orm";
+import { and, eq, or, isNull, inArray } from "drizzle-orm";
+import { createNotification } from "../lib/notifications.js";
 import { catalogOwnerIds } from "../groups/service.js";
 import { inferInterventionCategories, matchIncentivesForQuote } from "../incentives/matching.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -633,6 +634,16 @@ router.get("/public/quotes/:id", quoteViewLimiter, async (req, res) => {
       .from(quoteVariantsTable)
       .where(eq(quoteVariantsTable.quoteId, id))
       .orderBy(quoteVariantsTable.position);
+
+    // Pocket (Phase 149): the first time the client opens it, the company hears ("Quote viewed").
+    // The app's own Preview passes ?preview=1 and doesn't count.
+    if (!quote.firstViewedAt && req.query.preview !== "1") {
+      const [first] = await db.update(quotesTable).set({ firstViewedAt: new Date() }).where(and(eq(quotesTable.id, id), isNull(quotesTable.firstViewedAt))).returning({ id: quotesTable.id });
+      if (first) {
+        const client = (quote.clientData as QuoteClientData | null)?.nome?.trim() || "Your client";
+        void createNotification({ userId: quote.userId, type: "quote_viewed", title: `${client} opened quote ${quote.numeroPreventivoData ?? ""}`.trim(), body: "They're reading it now — a good moment to call.", link: `/dashboard/quotes/${quote.id}`, entityType: "quote", entityId: quote.id }).catch(() => undefined);
+      }
+    }
 
     // Phase 76: "see everything" — the client portal, when the quote is linked to a client with an email.
     const portalUrl = await portalLinkForClient(quote.clientId);

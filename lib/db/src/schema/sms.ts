@@ -18,6 +18,8 @@ export type SmsStatus = (typeof SMS_STATUSES)[number];
 export const SMS_PURPOSES = [
   "lead_followup",
   "quote_followup",
+  // Pocket (Phase 147): the quote sent by text from the phone's Send by → SMS.
+  "quote_send",
   "contract_reminder",
   "invoice_reminder",
   "on_my_way",

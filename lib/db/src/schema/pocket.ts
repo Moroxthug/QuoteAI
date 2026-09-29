@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, timestamp, date, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, timestamp, date, index, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
 
 // ── Pocket (docs/POCKET-DESIGN-PLAN.md, Phase 146): the Home's "Today" list ──
 // The list is made of what already needs the person (api-server today/service.ts
@@ -27,3 +27,27 @@ export const todayChecksTable = pgTable(
 );
 
 export type TodayCheck = typeof todayChecksTable.$inferSelect;
+
+// ── Pocket (Phase 149): a person's own app choices, per company and person ──
+export type MemberPrefs = {
+  /** The assistant's voice (Settings → Assistant → Voice). */
+  voice?: "ember" | "tide" | "stone";
+  /** Speak the assistant's replies aloud. Default on. */
+  speak?: boolean;
+  /** The assistant asks before sending quotes, invoices and messages to clients. Default on. */
+  confirmSend?: boolean;
+  /** The app's language, when chosen here. */
+  language?: "en" | "fr";
+};
+
+export const memberPreferencesTable = pgTable(
+  "member_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").notNull(),
+    memberUserId: text("member_user_id").notNull(),
+    prefs: jsonb("prefs").$type<MemberPrefs>().notNull().default({}),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("member_preferences_member_idx").on(t.userId, t.memberUserId)],
+);

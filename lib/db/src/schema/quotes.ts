@@ -77,6 +77,10 @@ export const quotesTable = pgTable("quotes", {
   id: uuid("id").defaultRandom().primaryKey(),
   /** Set when the quote PDF is first emailed to the client — drives Phase 21's follow-up reminder sequence. */
   sentAt: timestamp("sent_at", { withTimezone: true }),
+  /** Pocket (Phase 147): days the quote stays valid, from the company default when written (null: 30). */
+  validDays: integer("valid_days"),
+  /** When the client first opened the quote page (the "Quote viewed" notification). */
+  firstViewedAt: timestamp("first_viewed_at", { withTimezone: true }),
   /** How many follow-up sequence steps have fired; 0 = none sent yet. Mirrors leadsTable's pattern. */
   followUpStage: integer("follow_up_stage").notNull().default(0),
   nextFollowUpAt: timestamp("next_follow_up_at", { withTimezone: true }),

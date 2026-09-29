@@ -5,6 +5,7 @@ import {
   integer,
   jsonb,
   boolean,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -110,6 +111,11 @@ export const businessProfilesTable = pgTable("business_profiles", {
   licenceNumber: text("licence_number"), // RBQ (QC), HCRA (ON builders), municipal licence, etc.
   etransferEmail: text("etransfer_email"), // where customers send Interac e-Transfers
   defaultPaymentSchedule: jsonb("default_payment_schedule").$type<PaymentSchedule | null>(),
+  /** Pocket (Phase 149): Settings → Quote defaults. Null = the defaults (30 days, no markup, metric+imperial as written). */
+  quoteValidDays: integer("quote_valid_days"),
+  materialsMarkupPercent: numeric("materials_markup_percent", { precision: 5, scale: 2 }),
+  quoteCopyToMe: boolean("quote_copy_to_me").notNull().default(false),
+  units: text("units", { enum: ["imperial", "metric", "both"] }),
   // ── Phase 10: review requests ────────────────────────────────────────────
   googleReviewUrl: text("google_review_url"), // Google Business Profile "write a review" link, set once in Settings
   // ── Phase 26: HomeStars link (no public partner API exists, so this is just a second manual review link) ──

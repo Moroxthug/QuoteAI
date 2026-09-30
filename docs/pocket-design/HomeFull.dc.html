@@ -9,27 +9,52 @@
 <x-dc>
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700&amp;display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:#e9e8e4;color:#141416;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
-a{color:#141416;text-decoration:none}a:hover{color:#000}
+/* status: word + colour + shape. Shape = where it is in the flow */
+.st{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px 0 7px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;position:relative;letter-spacing:-0.005em}
+.st::before{content:"";flex-shrink:0;width:12px;height:12px;background:currentColor;-webkit-mask:var(--si) center/contain no-repeat;mask:var(--si) center/contain no-repeat}
+.st-ok{background:var(--ok-soft);color:var(--ok);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cmask%20id%3D%22m%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M7.4%2012.4l3.1%203.1%206.1-6.4%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fmask%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2211%22%20mask%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E")}
+.st-warn{background:rgba(214,149,36,.14);color:var(--warn);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%207.4V12l3%202%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.st-bad{background:var(--bad-soft);color:var(--bad);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cmask%20id%3D%22m%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M12%206.8v6.4%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2217%22%20r%3D%221.7%22%20fill%3D%22%23000%22%2F%3E%3C%2Fmask%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2211%22%20mask%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E")}
+.st-acc{background:var(--acc-soft);color:var(--acc-soft-t);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%206.2A5.8%205.8%200%200%201%2012%2017.8Z%22%2F%3E%3C%2Fsvg%3E")}
+.st-info{background:var(--info-soft);color:var(--info);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%2012V6.2A5.8%205.8%200%200%201%2017.8%2012Z%22%2F%3E%3C%2Fsvg%3E")}
+.st-mute{background:var(--sunk);color:var(--muted);--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%223.6%203.6%22%2F%3E%3C%2Fsvg%3E")}
+.st-plain{background:transparent;padding:0;height:18px}
+.st.si-draft{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%223.6%203.6%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-q1{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%2012V6.2A5.8%205.8%200%200%201%2017.8%2012Z%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-q2{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%206.2A5.8%205.8%200%200%201%2012%2017.8Z%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-q3{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%2012V6.2A5.8%205.8%200%201%201%206.2%2012Z%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-check{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cmask%20id%3D%22m%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M7.4%2012.4l3.1%203.1%206.1-6.4%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fmask%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2211%22%20mask%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-alert{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cmask%20id%3D%22m%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M12%206.8v6.4%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2217%22%20r%3D%221.7%22%20fill%3D%22%23000%22%2F%3E%3C%2Fmask%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2211%22%20mask%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-x{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cmask%20id%3D%22m%22%3E%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M8.6%208.6l6.8%206.8M15.4%208.6l-6.8%206.8%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fmask%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%2211%22%20mask%3D%22url%28%23m%29%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-clock{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%207.4V12l3%202%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-pause{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Crect%20x%3D%228.6%22%20y%3D%228%22%20width%3D%222.4%22%20height%3D%228%22%20rx%3D%221%22%2F%3E%3Crect%20x%3D%2213%22%20y%3D%228%22%20width%3D%222.4%22%20height%3D%228%22%20rx%3D%221%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-off{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229.2%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M6.3%2017.7L17.7%206.3%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-dot{--si:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%225.5%22%2F%3E%3C%2Fsvg%3E")}
+.st.si-live::before{-webkit-mask:none;mask:none;width:7px;height:7px;margin:0 2.5px;border-radius:50%;animation:stlive 2.2s cubic-bezier(.16,1,.3,1) infinite}
+@keyframes stlive{0%{box-shadow:0 0 0 0 currentColor}70%,100%{box-shadow:0 0 0 5px transparent}}
+.tag{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:8px;font-size:11.5px;font-weight:600;background:var(--sunk);color:var(--t2);white-space:nowrap}
+.tag-acc{background:var(--acc-soft);color:var(--acc-soft-t)}
+body{margin:0;font-family:Geist,-apple-system,"SF Pro Text","Segoe UI",sans-serif;background:var(--sunk);color:var(--ink);-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+a{color:var(--ink);text-decoration:none}a:hover{color:#000}
 button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
-.mono{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;letter-spacing:0}
-.num{font-variant-numeric:tabular-nums}
+.mono{font-family:Manrope,-apple-system,"SF Pro Text",sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:0;font-weight:500}
+.num{font-family:Manrope,-apple-system,"SF Pro Display",sans-serif;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .rise{animation:rise .9s cubic-bezier(.16,1,.3,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 .press{transition:transform .2s cubic-bezier(.16,1,.3,1),background-color .25s,color .25s,box-shadow .3s,opacity .25s}
 .press:active{transform:scale(.95)}
 .row{transition:background-color .2s}
-.row:hover{background:#faf9f7}
+.row:hover{background:var(--soft)}
 .slide{transition:transform .45s cubic-bezier(.16,1,.3,1)}
 .dayt{transition:color .3s}
 .pulse::before,.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);animation:ring 1.8s cubic-bezier(.16,1,.3,1) infinite}
 .pulse::after{animation-delay:.9s}
 @keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(1.9);opacity:0}}
 .beat{animation:beat 2.2s ease-in-out infinite}
-@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(228,87,46,.35)}50%{box-shadow:0 0 0 6px rgba(228,87,46,0)}}
+@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(106,47,191,.35)}50%{box-shadow:0 0 0 6px rgba(106,47,191,0)}}
 .draw{stroke-dasharray:1;animation:draw 1.4s .2s cubic-bezier(.65,0,.35,1) both;transition:d .7s cubic-bezier(.16,1,.3,1)}
 @keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 .area{animation:fadein 1s .9s both;transition:d .7s cubic-bezier(.16,1,.3,1)}
@@ -40,7 +65,7 @@ button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
 .chk path{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s .05s cubic-bezier(.65,0,.35,1)}
 .chk.done path{stroke-dashoffset:0}
 .tt{transition:color .35s,opacity .35s}
-.tt.done{color:#9a9aa0;text-decoration:line-through;text-decoration-color:#c4c3c0}
+.tt.done{color:var(--faint);text-decoration:line-through;text-decoration-color:#c4c3c0}
 .spin{animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .bar-in{animation:barin 2.4s cubic-bezier(.65,0,.35,1) both;transform-origin:left}
@@ -50,14 +75,18 @@ button{font-family:inherit;cursor:pointer;letter-spacing:inherit}
 .ta::placeholder{color:rgba(255,255,255,.4)}
 .av{transition:box-shadow .3s,transform .3s cubic-bezier(.16,1,.3,1)}
 .scroll-x{scrollbar-width:none}.scroll-x::-webkit-scrollbar{display:none}
-button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2px}
+button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .scroll-y{scrollbar-width:none}.scroll-y::-webkit-scrollbar{display:none}
 .home{transition:transform .75s cubic-bezier(.7,0,.2,1),border-radius .75s cubic-bezier(.7,0,.2,1),filter .75s;transform-origin:50% 90%}
 .mb{position:absolute;width:75%;height:75%;border-radius:50%;filter:blur(5px);mix-blend-mode:screen}
-.mb1{background:#ff6a3d;left:-10%;top:0;animation:m1 5s ease-in-out infinite}
-.mb2{background:#7ab8ff;right:-15%;bottom:-10%;animation:m2 6s ease-in-out infinite}
-.mb3{background:#ffb347;right:-5%;top:-20%;animation:m3 7s ease-in-out infinite}
-.mini-orb{background:#2a120c;animation:morph 6s ease-in-out infinite}
+.mb1{background:#7b3fe4;left:-10%;top:0;animation:m1 5s ease-in-out infinite}
+.mb2{background:#6ec8f5;right:-15%;bottom:-10%;animation:m2 6s ease-in-out infinite}
+.mb3{background:#4c9de5;right:-5%;top:-20%;animation:m3 7s ease-in-out infinite}
+.swirl{animation:spin 18s linear infinite;display:block}
+.ai-fab .swirl{position:relative}
+.fab-halo{position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(139,92,246,.35),rgba(139,92,246,0) 62%);animation:halo 3.2s ease-in-out infinite}
+@keyframes halo{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1.05)}}
+.mini-orb{background:#160e36;animation:morph 6s ease-in-out infinite}
 .ai-fab:hover .mini-orb{transform:scale(1.08)}
 .mini-orb{transition:transform .4s cubic-bezier(.16,1,.3,1)}
 .ai-in{animation:aiIn .8s cubic-bezier(.7,0,.2,1) both}
@@ -73,14 +102,14 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 @keyframes orbIn{from{transform:translate(148px,399px) scale(.14)}}
 @keyframes orbOut{to{transform:translate(148px,399px) scale(.14);opacity:.6}}
 .orb-live{--amp:0}
-.orb-glow{position:absolute;inset:-50px;border-radius:50%;background:conic-gradient(from 0deg,#ff6a3d,#ffb347,#ff3d6e,#7ab8ff,#ff6a3d);filter:blur(46px);opacity:calc(.28 + var(--amp) * .55);transform:scale(calc(.9 + var(--amp) * .25));animation:spin 14s linear infinite}
-.orb{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#1c0c08;transform:scale(calc(1 + var(--amp) * .13));animation:morph 8s ease-in-out infinite;box-shadow:inset 0 -24px 48px rgba(0,0,0,.4),inset 0 12px 30px rgba(255,255,255,.12);transition:filter .6s}
+.orb-glow{position:absolute;inset:-50px;border-radius:50%;background:conic-gradient(from 0deg,#7b3fe4,#4c9de5,#4f46e5,#6ec8f5,#7b3fe4);filter:blur(46px);opacity:calc(.28 + var(--amp) * .55);transform:scale(calc(.9 + var(--amp) * .25));animation:spin 14s linear infinite}
+.orb{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:#120b2e;transform:scale(calc(1 + var(--amp) * .13));animation:morph 8s ease-in-out infinite;box-shadow:inset 0 -24px 48px rgba(0,0,0,.4),inset 0 12px 30px rgba(255,255,255,.12);transition:filter .6s}
 .blob{position:absolute;border-radius:50%;filter:blur(24px);mix-blend-mode:screen}
-.b1{width:78%;height:78%;left:-14%;top:4%;background:#ff6a3d;animation:m1 7s ease-in-out infinite}
-.b2{width:70%;height:70%;right:-18%;top:-16%;background:#ffb347;animation:m3 9s ease-in-out infinite}
-.b3{width:72%;height:72%;left:12%;bottom:-26%;background:#7ab8ff;animation:m2 8s ease-in-out infinite}
-.b4{width:60%;height:60%;right:-8%;bottom:-6%;background:#ff3d6e;opacity:.85;animation:m4 10s ease-in-out infinite}
-.b5{width:34%;height:34%;left:30%;top:26%;background:#fff1e0;opacity:.7;filter:blur(18px);animation:m2 6s ease-in-out infinite reverse}
+.b1{width:78%;height:78%;left:-14%;top:4%;background:#7b3fe4;animation:m1 7s ease-in-out infinite}
+.b2{width:70%;height:70%;right:-18%;top:-16%;background:#4c9de5;animation:m3 9s ease-in-out infinite}
+.b3{width:72%;height:72%;left:12%;bottom:-26%;background:#6ec8f5;animation:m2 8s ease-in-out infinite}
+.b4{width:60%;height:60%;right:-8%;bottom:-6%;background:#4f46e5;opacity:.85;animation:m4 10s ease-in-out infinite}
+.b5{width:34%;height:34%;left:30%;top:26%;background:var(--acc-soft);opacity:.7;filter:blur(18px);animation:m2 6s ease-in-out infinite reverse}
 .orb-shine{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.5),rgba(255,255,255,0) 36%)}
 @keyframes morph{0%,100%{border-radius:50% 50% 50% 50%/50% 50% 50% 50%}33%{border-radius:53% 47% 51% 49%/47% 54% 46% 53%}66%{border-radius:47% 53% 48% 52%/53% 47% 53% 47%}}
 @keyframes m1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(28%,18%) scale(1.15)}}
@@ -98,108 +127,132 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 .kb-in{animation:rise .6s .15s cubic-bezier(.16,1,.3,1) both}
 .msg-in{animation:rise .5s cubic-bezier(.16,1,.3,1) both}
 #ai-input::placeholder{color:rgba(255,255,255,.38)}
-.caret{display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:#ff6a3d;vertical-align:middle;animation:blink 1s ease-in-out infinite}
+.caret{display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:#7b3fe4;vertical-align:middle;animation:blink 1s ease-in-out infinite}
 @keyframes blink{50%{opacity:.25}}
+.ti{width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 1px 2px rgba(20,20,22,.14);transition:filter .45s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1),opacity .45s}
+.ti::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.3),rgba(255,255,255,0) 60%)}
+.ti svg{position:relative;z-index:1;display:block}
+.ti.off{filter:grayscale(.9) brightness(1.08);opacity:.62}
+nav a:hover .ti.off{filter:grayscale(.35);opacity:.9;transform:translateY(-1px)}
+nav a:active .ti{transform:scale(.9)}
+.tic{display:block;overflow:visible;transition:filter .45s cubic-bezier(.16,1,.3,1),opacity .45s,transform .35s cubic-bezier(.16,1,.3,1)}
+.tic.off{filter:grayscale(1);opacity:.5}
+nav a:hover .tic.off{filter:grayscale(.3);opacity:.85;transform:translateY(-1px)}
+nav a:active .tic{transform:scale(.88)}
+.th{--ground:#f5f4f1;--card:#ffffff;--sunk:#efeeea;--soft:#f7f6f3;--ink:#141416;--inv:#141416;--on-inv:#ffffff;--t2:#3c3c43;--muted:#6e6e76;--faint:#8a8a90;--line:#efeeea;--line2:#e2e1dc;--ring:rgba(20,20,22,.05);--acc:#6a2fbf;--acc-t:#5e2ab0;--acc-soft:#efe9ff;--acc-soft-t:#3d1a86;--ok:#1f7a45;--ok-dot:#1f9d55;--ok-soft:#e8f3ee;--warn:#9a6412;--warn-dot:#d69524;--bad:#c2371f;--bad-soft:#fbf1ee;--info-soft:#e7f0fa;--info:#1f4f86;--av:#f1ede4;--glass:rgba(255,255,255,.84);--track-off:#dddcd8;--shadow:rgba(20,20,22,.22);--scrim:rgba(20,20,22,.2);color-scheme:light;background-color:var(--ground);color:var(--ink);transition:background-color .45s}
+.th[data-theme="dark"]{--ground:#0c0c0e;--card:#18181b;--sunk:#26262b;--soft:#1f1f23;--ink:#f3f2ef;--inv:#f3f2ef;--on-inv:#141416;--t2:#d0cfd5;--muted:#a09fa7;--faint:#7c7b83;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--ring:rgba(255,255,255,.07);--acc:#8b5cf6;--acc-t:#bda6ff;--acc-soft:rgba(139,92,246,.2);--acc-soft-t:#d8caff;--ok:#62d498;--ok-dot:#34c375;--ok-soft:rgba(52,195,117,.16);--warn:#f2b660;--warn-dot:#e9a53a;--bad:#ff7d68;--bad-soft:rgba(255,125,104,.13);--info-soft:rgba(63,134,208,.2);--info:#9cc8f6;--av:#2d2a26;--glass:rgba(28,28,32,.8);--track-off:#3b3b41;--shadow:rgba(0,0,0,.6);--scrim:rgba(0,0,0,.45);color-scheme:dark}
+.th[data-theme="dark"] .chk svg,.th[data-theme="dark"] .p-check svg{stroke:#141416}
+.th[data-theme="dark"] svg line{stroke:rgba(255,255,255,.08)}
+.th[data-theme="dark"] .shim{background:linear-gradient(90deg,#26262b 0%,#34343a 50%,#26262b 100%);background-size:200% 100%}
+.th[data-theme="dark"] .mi,.th[data-theme="dark"] .ti{box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 1px 2px rgba(0,0,0,.5)}
+.th[data-theme="dark"] input::placeholder,.th[data-theme="dark"] textarea::placeholder{color:#6f6e76}
+.th .knob{background:#ffffff !important}
+.aib-send{color:var(--on-inv) !important}
+.wx-cloud{transform-box:fill-box;transform-origin:center;animation:wxfloat 4.5s ease-in-out infinite}
+.wx-drop{transform-box:fill-box;animation:wxrain 1.4s cubic-bezier(.4,0,.6,1) infinite}
+.wx-d2{animation-delay:.45s}.wx-d3{animation-delay:.9s}
+@keyframes wxfloat{0%,100%{transform:translate(0,0)}50%{transform:translate(.5px,-.6px)}}
+@keyframes wxrain{0%{transform:translate(0,-1.5px);opacity:0}20%{opacity:1}100%{transform:translate(-.9px,2.4px);opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </helmet>
-<div style="width: 390px; height: 2180px; background: #f5f4f1; position: relative; overflow: hidden">
-<div class="scroll-y home" style="height: 2180px; overflow: hidden; background: #f5f4f1; display: flex; flex-direction: column; padding-bottom: 120px; box-sizing: border-box; {{homeStyle}}">
+<div class="th" data-theme="{{theme}}" style="width: 390px; height: 2180px; background: var(--ground); position: relative; overflow: hidden">
+<div class="scroll-y home" style="height: 2180px; overflow: hidden; background: var(--ground); display: flex; flex-direction: column; padding-bottom: 120px; box-sizing: border-box; {{homeStyle}}">
 
 <header class="rise" style="padding: 18px 20px 0; display: flex; align-items: flex-start; justify-content: space-between">
 <div style="display: flex; flex-direction: column; gap: 4px">
-<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: #6e6e76">Tue, Sep 29<span style="width: 3px; height: 3px; border-radius: 50%; background: #b9b8b4"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z"></path><path d="M9 19.5l-.8 1.5M13 19.5l-.8 1.5M17 19.5l-.8 1.5"></path></svg>12°, rain after 3 pm</span>
-<h1 style="margin: 0; font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.035em; color: #141416">Good morning, Marco</h1>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 500; color: var(--muted)">Tue, Sep 29<span style="width: 3px; height: 3px; border-radius: 50%; background: #b9b8b4"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path class="wx-cloud" d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z"></path><path class="wx-drop" d="M9 18.6l-.8 1.5"></path><path class="wx-drop wx-d2" d="M13 18.6l-.8 1.5"></path><path class="wx-drop wx-d3" d="M17 18.6l-.8 1.5"></path></svg>12°, rain after 3 pm</span>
+<h1 style="margin: 0; font-size: 24px; line-height: 1.15; font-weight: 600; letter-spacing: -0.035em; color: var(--ink)">Good morning, Marco</h1>
 </div>
-<a href="Menu.dc.html" class="press" aria-label="Open menu" style="position: relative; width: 40px; height: 40px; border-radius: 50%; background: #141416; color: #ffffff; font-size: 13px; font-weight: 600; margin-top: 2px; display: flex; align-items: center; justify-content: center">MR<span style="position: absolute; top: -1px; right: -1px; width: 10px; height: 10px; border-radius: 50%; background: #e4572e; border: 2px solid #f5f4f1"></span></a>
+<a href="Menu.dc.html" class="press" aria-label="Open menu" style="position: relative; width: 40px; height: 40px; border-radius: 50%; background: var(--inv); color: var(--on-inv); font-size: 13.5px; font-weight: 600; margin-top: 2px; display: flex; align-items: center; justify-content: center">MR<span style="position: absolute; top: -1px; right: -1px; width: 10px; height: 10px; border-radius: 50%; background: var(--acc); border: 2px solid var(--ground)"></span></a>
 </header>
 
 <section class="rise" style="padding: 20px 16px 0; animation-delay: 70ms">
 <div style="background: #151517; border-radius: 26px; padding: 16px 16px 14px; color: #ffffff; box-shadow: 0 1px 0 rgba(255,255,255,.06) inset, 0 20px 40px -12px rgba(20,20,22,.45)">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 2px">
-<span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.72)"><span class="beat" style="width: 7px; height: 7px; border-radius: 50%; background: #e4572e"></span>New quote</span>
-<span class="mono" style="font-size: 11px; color: rgba(255,255,255,.5)">ON · HST 13%</span>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.72)"><span class="beat" style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc)"></span>New quote</span>
+<span class="mono" style="font-size: 11.5px; color: rgba(255,255,255,.5)">ON · HST 13%</span>
 </div>
 <label for="job" class="vh">Describe the job</label>
 <textarea id="job" class="ta" style="display: block; margin-top: 10px; width: 100%; box-sizing: border-box; height: 84px; resize: none; padding: 0 2px; border: 0; background: transparent; color: #ffffff; font-family: inherit; font-size: 15px; line-height: 1.5; letter-spacing: -0.01em">Repaint 3 bedrooms and the hallway, two coats. Bath ceiling has water damage, cut out and skim coat first. We supply everything.</textarea>
 
 <sc-if value="{{isIdle}}" hint-placeholder-val="{{ true }}">
 <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px">
-<button class="press" style="height: 34px; padding: 0 11px 0 4px; border-radius: 999px; border: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500"><span style="width: 26px; height: 26px; border-radius: 50%; background: #f1ede4; color: #141416; font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">DW</span>Dana W.</button>
+<button class="press" style="height: 34px; padding: 0 11px 0 4px; border-radius: 999px; border: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500"><span style="width: 26px; height: 26px; border-radius: 50%; background: var(--av); color: var(--ink); font-size: 10.5px; font-weight: 600; display: flex; align-items: center; justify-content: center">DW</span>Dana W.</button>
 <button class="press" aria-label="3 photos attached" style="height: 34px; padding: 0 11px; border-radius: 999px; border: 0; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="3"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="m20 16-5-5-8 8"></path></svg>3</button>
 <span style="flex-grow: 1"></span>
 <button class="press {{micCls}}" onClick="{{toggleMic}}" aria-label="{{micLabel}}" aria-pressed="{{listening}}" style="{{micStyle}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></button>
-<button class="press" onClick="{{draft}}" aria-label="Draft quote" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: #e4572e; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -4px rgba(228,87,46,.6)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+<button class="press" onClick="{{draft}}" aria-label="Draft quote" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--acc); color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px -4px rgba(106,47,191,.6)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
 </div>
 </sc-if>
 
 <sc-if value="{{isWorking}}" hint-placeholder-val="{{ false }}">
 <div class="rise" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-direction: column; gap: 9px">
 <sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
-<div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; {{st.rowStyle}}">
+<div style="display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; {{st.rowStyle}}">
 <span style="width: 16px; height: 16px; display: flex; align-items: center; justify-content: center">
 <sc-if value="{{st.isDone}}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg></sc-if>
-<sc-if value="{{st.isActive}}" hint-placeholder-val="{{ false }}"><span class="spin" style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.2); border-top-color: #e4572e; box-sizing: border-box"></span></sc-if>
+<sc-if value="{{st.isActive}}" hint-placeholder-val="{{ false }}"><span class="spin" style="width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.2); border-top-color: #6a2fbf; box-sizing: border-box"></span></sc-if>
 <sc-if value="{{st.isWait}}" hint-placeholder-val="{{ true }}"><span style="width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.3)"></span></sc-if>
 </span>
 <span>{{st.label}}</span>
 </div>
 </sc-for>
-<div style="height: 2px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 3px"><div class="bar-in" style="height: 100%; background: #e4572e"></div></div>
+<div style="height: 2px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 3px"><div class="bar-in" style="height: 100%; background: var(--acc)"></div></div>
 </div>
 </sc-if>
 
 <sc-if value="{{isReady}}" hint-placeholder-val="{{ false }}">
-<div class="rise" style="margin-top: 12px; border-radius: 18px; background: #ffffff; color: #141416; padding: 16px">
+<div class="rise" style="margin-top: 12px; border-radius: 18px; background: var(--card); color: var(--ink); padding: 16px">
 <div style="display: flex; align-items: center; justify-content: space-between">
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #1f7a45"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Draft ready</span>
-<span class="mono" style="font-size: 11px; color: #6e6e76">Q-2026-118</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: var(--ok)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"></path></svg>Draft ready</span>
+<span class="mono" style="font-size: 11.5px; color: var(--muted)">Q-2026-118</span>
 </div>
-<p class="num" style="margin: 8px 0 0; font-size: 32px; font-weight: 600; letter-spacing: -0.045em; line-height: 1">{{shownTotal}}</p>
-<p style="margin: 5px 0 0; font-size: 12px; color: #6e6e76">Incl. HST · 5 items · valid 30 days</p>
+<p class="num" style="margin: 8px 0 0; font-size: 32px; font-weight: 600; letter-spacing: -0.035em; line-height: 1">{{shownWhole}}<span style="font-size: 21px; font-weight: 600; color: var(--faint); letter-spacing: -0.01em">{{shownCents}}</span></p>
+<p style="margin: 5px 0 0; font-size: 12.5px; color: var(--muted)">Incl. HST · 5 items · valid 30 days</p>
 <div style="margin-top: 12px; display: flex; flex-direction: column">
 <sc-for list="{{preview}}" as="li" hint-placeholder-count="3">
-<div class="rise" style="display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid #efeeea; font-size: 13px; {{li.delay}}">
-<span style="color: #3c3c43">{{li.name}}</span><span class="num" style="font-weight: 500">{{li.amt}}</span>
+<div class="rise" style="display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; {{li.delay}}">
+<span style="color: var(--t2)">{{li.name}}</span><span class="num" style="font-weight: 500">{{li.amt}}</span>
 </div>
 </sc-for>
 </div>
 <div style="margin-top: 12px; display: flex; gap: 8px">
-<a class="press" href="Quote.dc.html" style="flex-grow: 1; height: 44px; border-radius: 14px; background: #141416; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600">Review and send</a>
-<button class="press" onClick="{{reset}}" style="height: 44px; padding: 0 16px; border-radius: 14px; border: 0; background: #f1f0ec; color: #141416; font-size: 14px; font-weight: 500">Redo</button>
+<a class="press" href="Quote.dc.html" style="flex-grow: 1; height: 44px; border-radius: 14px; background: var(--inv); color: var(--on-inv); display: flex; align-items: center; justify-content: center; font-size: 14.5px; font-weight: 600">Review and send</a>
+<button class="press" onClick="{{reset}}" style="height: 44px; padding: 0 16px; border-radius: 14px; border: 0; background: var(--sunk); color: var(--ink); font-size: 14.5px; font-weight: 500">Redo</button>
 </div>
 </div>
 </sc-if>
 </div>
-<p style="margin: 10px 4px 0; font-size: 12px; color: #6e6e76; min-height: 16px">{{micHint}}</p>
+<p style="margin: 10px 4px 0; font-size: 12.5px; color: var(--muted); min-height: 16px">{{micHint}}</p>
 </section>
 
 <section class="rise" style="padding: 22px 16px 0; animation-delay: 140ms">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Schedule</h2>
-<a href="#" style="font-size: 13px; color: #6e6e76; display: flex; align-items: center; gap: 2px">September<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></a>
+<a href="#" style="font-size: 13.5px; color: var(--muted); display: flex; align-items: center; gap: 2px">September<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg></a>
 </div>
-<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04)">
+<div style="background: var(--card); border-radius: 22px; box-shadow: 0 1px 2px var(--ring), 0 0 0 1px var(--ring)">
 <div style="position: relative; padding: 6px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
-<span class="slide" aria-hidden="true" style="position: absolute; top: 6px; left: 6px; width: calc((100% - 12px) / 7); height: 56px; border-radius: 16px; background: #141416; {{dayIndicator}}"></span>
+<span class="slide" aria-hidden="true" style="position: absolute; top: 6px; left: 6px; width: calc((100% - 12px) / 7); height: 56px; border-radius: 16px; background: var(--inv); {{dayIndicator}}"></span>
 <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
 <button class="press" onClick="{{d.pick}}" aria-pressed="{{d.on}}" aria-label="{{d.aria}}" style="position: relative; height: 56px; border: 0; background: transparent; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
-<span class="dayt" style="font-size: 11px; font-weight: 500; {{d.dowStyle}}">{{d.dow}}</span>
+<span class="dayt" style="font-size: 11.5px; font-weight: 500; {{d.dowStyle}}">{{d.dow}}</span>
 <span class="dayt num" style="font-size: 15px; font-weight: 600; {{d.dateStyle}}">{{d.date}}</span>
 <span style="width: 4px; height: 4px; border-radius: 50%; {{d.dotStyle}}"></span>
 </button>
 </sc-for>
 </div>
-<div style="height: 1px; background: #efeeea; margin: 0 16px"></div>
+<div style="height: 1px; background: var(--sunk); margin: 0 16px"></div>
 <sc-if value="{{hasAgenda}}" hint-placeholder-val="{{ true }}">
 <div style="padding: 6px 0 8px">
 <sc-for list="{{agenda}}" as="ev" hint-placeholder-count="3">
 <a href="#" class="row rise" style="display: grid; grid-template-columns: 44px 14px 1fr auto; column-gap: 10px; align-items: start; padding: 10px 16px; {{ev.delay}}">
-<span class="mono" style="font-size: 12px; color: #3c3c43; padding-top: 1px">{{ev.time}}</span>
+<span class="mono" style="font-size: 12.5px; color: var(--t2); padding-top: 1px">{{ev.time}}</span>
 <span style="display: flex; justify-content: center; padding-top: 5px"><span style="width: 7px; height: 7px; border-radius: 50%; {{ev.dot}}"></span></span>
 <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
-<span style="font-size: 14px; font-weight: 500; color: #141416; line-height: 1.3">{{ev.title}}</span>
-<span style="font-size: 12px; color: #6e6e76">{{ev.place}}</span>
+<span style="font-size: 14.5px; font-weight: 500; color: var(--ink); line-height: 1.3">{{ev.title}}</span>
+<span style="font-size: 12.5px; color: var(--muted)">{{ev.place}}</span>
 </span>
 <span style="font-size: 11.5px; font-weight: 500; padding-top: 2px; {{ev.tagStyle}}">{{ev.tag}}</span>
 </a>
@@ -208,8 +261,8 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 </sc-if>
 <sc-if value="{{noAgenda}}" hint-placeholder-val="{{ false }}">
 <div class="rise" style="padding: 18px 16px; display: flex; align-items: center; justify-content: space-between">
-<span style="font-size: 13.5px; color: #6e6e76">Nothing booked</span>
-<button class="press" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 0; background: #f1f0ec; color: #141416; font-size: 13px; font-weight: 500">Add visit</button>
+<span style="font-size: 13.5px; color: var(--muted)">Nothing booked</span>
+<button class="press" style="height: 34px; padding: 0 12px; border-radius: 10px; border: 0; background: var(--sunk); color: var(--ink); font-size: 13.5px; font-weight: 500">Add visit</button>
 </div>
 </sc-if>
 </div>
@@ -218,15 +271,15 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 <section class="rise" style="padding: 22px 16px 0; animation-delay: 210ms">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Today</h2>
-<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #6e6e76"><span class="num">{{doneCount}}/{{taskCount}}</span><span style="width: 44px; height: 4px; border-radius: 4px; background: #e7e6e2; overflow: hidden; display: block"><span style="display: block; height: 100%; background: #141416; border-radius: 4px; transition: width .6s cubic-bezier(.16,1,.3,1); {{progressStyle}}"></span></span></span>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted)"><span class="num">{{doneCount}}/{{taskCount}}</span><span style="width: 44px; height: 4px; border-radius: 4px; background: var(--sunk); overflow: hidden; display: block"><span style="display: block; height: 100%; background: var(--inv); border-radius: 4px; transition: width .6s cubic-bezier(.16,1,.3,1); {{progressStyle}}"></span></span></span>
 </div>
-<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 4px 0">
+<div style="background: var(--card); border-radius: 22px; box-shadow: 0 1px 2px var(--ring), 0 0 0 1px var(--ring); padding: 4px 0">
 <sc-for list="{{tasks}}" as="t" hint-placeholder-count="6">
 <div class="row" style="display: flex; align-items: center; gap: 12px; padding: 9px 16px">
 <button class="chk {{t.cls}}" onClick="{{t.toggle}}" aria-pressed="{{t.done}}" aria-label="{{t.aria}}" style="width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; {{t.boxStyle}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5" pathLength="24"></path></svg></button>
 <span style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; padding: 2px 0; border-bottom: 0">
-<span class="tt {{t.cls}}" style="font-size: 14px; font-weight: 500; line-height: 1.35">{{t.text}}</span>
-<span style="font-size: 12px; {{t.metaStyle}}">{{t.meta}}</span>
+<span class="tt {{t.cls}}" style="font-size: 14.5px; font-weight: 500; line-height: 1.35">{{t.text}}</span>
+<span style="font-size: 12.5px; {{t.metaStyle}}">{{t.meta}}</span>
 </span>
 </div>
 </sc-for>
@@ -236,47 +289,47 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 <section class="rise" style="padding: 22px 16px 0; animation-delay: 280ms">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Business</h2>
-<div role="group" aria-label="Period" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 156px; padding: 2px; border-radius: 10px; background: #e9e8e4">
-<span class="slide" aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: calc((100% - 4px) / 3); height: 28px; border-radius: 8px; background: #ffffff; box-shadow: 0 1px 3px rgba(20,20,22,.12); {{periodIndicator}}"></span>
+<div role="group" aria-label="Period" style="position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 156px; padding: 2px; border-radius: 10px; background: var(--sunk)">
+<span class="slide" aria-hidden="true" style="position: absolute; top: 2px; left: 2px; width: calc((100% - 4px) / 3); height: 28px; border-radius: 8px; background: var(--card); box-shadow: 0 1px 3px rgba(20,20,22,.12); {{periodIndicator}}"></span>
 <sc-for list="{{periods}}" as="p" hint-placeholder-count="3">
-<button onClick="{{p.pick}}" aria-pressed="{{p.on}}" class="dayt" style="position: relative; height: 28px; border: 0; background: transparent; font-size: 12px; font-weight: 500; {{p.style}}">{{p.label}}</button>
+<button onClick="{{p.pick}}" aria-pressed="{{p.on}}" class="dayt" style="position: relative; height: 28px; border: 0; background: transparent; font-size: 12.5px; font-weight: 500; {{p.style}}">{{p.label}}</button>
 </sc-for>
 </div>
 </div>
-<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 16px 16px 14px">
+<div style="background: var(--card); border-radius: 22px; box-shadow: 0 1px 2px var(--ring), 0 0 0 1px var(--ring); padding: 16px 16px 14px">
 <div style="display: flex; align-items: flex-end; justify-content: space-between">
 <div style="display: flex; flex-direction: column; gap: 4px">
-<span style="font-size: 12.5px; color: #6e6e76">Collected {{periodWord}}</span>
-<span class="num" style="font-size: 30px; font-weight: 600; letter-spacing: -0.045em; line-height: 1">{{collected}}</span>
+<span style="font-size: 12.5px; color: var(--muted)">Collected {{periodWord}}</span>
+<span class="num" style="font-size: 30px; font-weight: 600; letter-spacing: -0.035em; line-height: 1">{{collected}}</span>
 </div>
-<span class="num" style="font-size: 12.5px; font-weight: 500; color: #1f7a45; padding-bottom: 3px">↑ {{delta}} <span style="color: #6e6e76; font-weight: 400">{{deltaNote}}</span></span>
+<span class="num" style="font-size: 12.5px; font-weight: 500; color: var(--ok); padding-bottom: 3px">↑ {{delta}} <span style="color: var(--muted); font-weight: 400">{{deltaNote}}</span></span>
 </div>
 <svg width="326" height="112" viewBox="0 0 326 112" aria-label="{{chartLabel}}" role="img" style="display: block; margin-top: 16px; overflow: visible">
 <line x1="0" y1="8" x2="326" y2="8" stroke="#efeeea" stroke-dasharray="2 4"></line>
 <line x1="0" y1="56" x2="326" y2="56" stroke="#efeeea" stroke-dasharray="2 4"></line>
 <line x1="0" y1="104" x2="326" y2="104" stroke="#e7e6e2"></line>
-<path class="area" d="{{areaPath}}" fill="#e4572e" fill-opacity="0.07"></path>
-<path class="draw" d="{{linePath}}" pathLength="1" fill="none" stroke="#e4572e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-<circle class="dot" cx="{{lastX}}" cy="{{lastY}}" r="4.5" fill="#ffffff" stroke="#e4572e" stroke-width="2"></circle>
+<path class="area" d="{{areaPath}}" fill="#6a2fbf" fill-opacity="0.07"></path>
+<path class="draw" d="{{linePath}}" pathLength="1" fill="none" stroke="#6a2fbf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle class="dot" cx="{{lastX}}" cy="{{lastY}}" r="4.5" fill="#ffffff" stroke="#6a2fbf" stroke-width="2"></circle>
 </svg>
 <div style="display: flex; justify-content: space-between; margin-top: 6px">
-<sc-for list="{{labels}}" as="l" hint-placeholder-count="6"><span class="mono" style="font-size: 10.5px; color: #8a8a90">{{l}}</span></sc-for>
+<sc-for list="{{labels}}" as="l" hint-placeholder-count="6"><span class="mono" style="font-size: 10.5px; color: var(--faint)">{{l}}</span></sc-for>
 </div>
-<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #efeeea; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
 <div style="display: flex; flex-direction: column; gap: 3px">
-<span style="font-size: 11.5px; color: #6e6e76">Quotes won</span>
+<span style="font-size: 11.5px; color: var(--muted)">Quotes won</span>
 <span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">{{winPct}}</span>
-<span style="height: 3px; border-radius: 3px; background: #efeeea; overflow: hidden; margin-top: 3px; width: 72px; display: block"><span class="grow" style="display: block; height: 100%; background: #141416; transition: width .6s cubic-bezier(.16,1,.3,1); {{winStyle}}"></span></span>
+<span style="height: 3px; border-radius: 3px; background: var(--sunk); overflow: hidden; margin-top: 3px; width: 72px; display: block"><span class="grow" style="display: block; height: 100%; background: var(--inv); transition: width .6s cubic-bezier(.16,1,.3,1); {{winStyle}}"></span></span>
 </div>
-<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid #efeeea">
-<span style="font-size: 11.5px; color: #6e6e76">Outstanding</span>
+<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid var(--line)">
+<span style="font-size: 11.5px; color: var(--muted)">Outstanding</span>
 <span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">$9,870</span>
-<span style="font-size: 11.5px; color: #c2371f">$3,120 overdue</span>
+<span style="font-size: 11.5px; color: var(--bad)">$3,120 overdue</span>
 </div>
-<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid #efeeea">
-<span style="font-size: 11.5px; color: #6e6e76">Margin</span>
+<div style="display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid var(--line)">
+<span style="font-size: 11.5px; color: var(--muted)">Margin</span>
 <span class="num" style="font-size: 17px; font-weight: 600; letter-spacing: -0.03em">{{margin}}</span>
-<span style="font-size: 11.5px; color: #6e6e76">after labour</span>
+<span style="font-size: 11.5px; color: var(--muted)">after labour</span>
 </div>
 </div>
 </div>
@@ -285,23 +338,23 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 <section class="rise" style="padding: 22px 0 0; animation-delay: 340ms">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 20px 10px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Crew</h2>
-<span style="font-size: 12.5px; color: #6e6e76">3 on site · 1 en route</span>
+<span style="font-size: 12.5px; color: var(--muted)">3 on site · 1 en route</span>
 </div>
-<div style="margin: 0 16px; background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 14px 6px 12px">
+<div style="margin: 0 16px; background: var(--card); border-radius: 22px; box-shadow: 0 1px 2px var(--ring), 0 0 0 1px var(--ring); padding: 14px 6px 12px">
 <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr))">
 <sc-for list="{{crew}}" as="w" hint-placeholder-count="5">
 <button class="press" onClick="{{w.pick}}" aria-pressed="{{w.on}}" aria-label="{{w.aria}}" style="border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 2px 0">
-<span class="av" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #141416; background: #f1ede4; {{w.ring}}">{{w.ini}}</span>
+<span class="av" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13.5px; font-weight: 600; color: var(--ink); background: var(--av); {{w.ring}}">{{w.ini}}</span>
 <span style="font-size: 11.5px; font-weight: 500; {{w.nameStyle}}">{{w.first}}</span>
 </button>
 </sc-for>
 </div>
-<div style="margin: 12px 10px 0; padding: 10px 12px; border-radius: 14px; background: #f7f6f3; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+<div style="margin: 12px 10px 0; padding: 10px 12px; border-radius: 14px; background: var(--soft); display: flex; align-items: center; justify-content: space-between; gap: 10px">
 <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
-<span style="font-size: 13px; font-weight: 500">{{sel.name}} <span style="color: #6e6e76; font-weight: 400">· {{sel.role}}</span></span>
-<span style="font-size: 12px; color: #6e6e76">{{sel.site}}</span>
+<span style="font-size: 13.5px; font-weight: 500">{{sel.name}} <span style="color: var(--muted); font-weight: 400">· {{sel.role}}</span></span>
+<span style="font-size: 12.5px; color: var(--muted)">{{sel.site}}</span>
 </span>
-<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; white-space: nowrap; {{sel.stColor}}"><span style="width: 6px; height: 6px; border-radius: 50%; {{sel.dot}}"></span>{{sel.status}}</span>
+<span class="st st-plain {{sel.stCls}}">{{sel.status}}</span>
 </div>
 </div>
 </section>
@@ -309,17 +362,17 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 <section class="rise" style="padding: 22px 16px 0; animation-delay: 400ms">
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px">
 <h2 style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em">Sites</h2>
-<a href="#" style="font-size: 13px; color: #6e6e76">All 5</a>
+<a href="#" style="font-size: 13.5px; color: var(--muted)">All 5</a>
 </div>
-<div style="background: #ffffff; border-radius: 22px; box-shadow: 0 1px 2px rgba(20,20,22,.04), 0 0 0 1px rgba(20,20,22,.04); padding: 4px 0">
+<div style="background: var(--card); border-radius: 22px; box-shadow: 0 1px 2px var(--ring), 0 0 0 1px var(--ring); padding: 4px 0">
 <sc-for list="{{sites}}" as="s" hint-placeholder-count="3">
 <a href="#" class="row" style="display: flex; flex-direction: column; gap: 9px; padding: 12px 16px; {{s.sep}}">
 <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
-<span style="font-size: 14px; font-weight: 500">{{s.name}}</span>
-<span class="mono" style="font-size: 12px; color: #3c3c43">{{s.pctLabel}}</span>
+<span style="font-size: 14.5px; font-weight: 500">{{s.name}}</span>
+<span class="mono" style="font-size: 12.5px; color: var(--t2)">{{s.pctLabel}}</span>
 </span>
-<span style="height: 3px; border-radius: 3px; background: #efeeea; overflow: hidden; display: block"><span class="grow" style="display: block; height: 100%; border-radius: 3px; background: #141416; {{s.pctStyle}}"></span></span>
-<span style="display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: #6e6e76">
+<span style="height: 3px; border-radius: 3px; background: var(--sunk); overflow: hidden; display: block"><span class="grow" style="display: block; height: 100%; border-radius: 3px; background: var(--inv); {{s.pctStyle}}"></span></span>
+<span style="display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--muted)">
 <span>{{s.phase}}</span><span>{{s.crewLine}}</span>
 </span>
 </a>
@@ -329,23 +382,21 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 </div>
 
 <nav aria-label="Main" style="position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 10px; align-items: center">
-<div style="flex-grow: 1; height: 62px; border-radius: 31px; background: rgba(255,255,255,.82); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 10px 30px -8px rgba(20,20,22,.22), 0 0 0 1px rgba(20,20,22,.06); padding: 5px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); box-sizing: border-box">
-<a href="#" aria-current="page" style="border-radius: 26px; background: #f1f0ec; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 600; color: #141416"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"></path></svg>Home</a>
-<a href="Quote.dc.html" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 13h7M9 17h5"></path></svg>Quotes</a>
-<a href="#" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a8 8 0 0 1 16 0"></path><path d="M3 16h18v3H3zM10 8.5V5h4v3.5"></path></svg>Jobs</a>
-<a href="#" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 10.5px; font-weight: 500; color: #7a7a80"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.5"></circle><path d="M3 20a6 6 0 0 1 12 0M16 5.5a3.5 3.5 0 0 1 0 6.5M18 14.5a6 6 0 0 1 3 5.5"></path></svg>Clients</a>
+<div style="flex-grow: 1; height: 62px; border-radius: 31px; background: var(--glass); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 10px 30px -8px rgba(20,20,22,.22), 0 0 0 1px var(--ring); padding: 5px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); box-sizing: border-box">
+<a href="SmartHome.dc.html" aria-current="page" style="border-radius: 26px; background: var(--sunk); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10.5px; font-weight: 600; color: var(--ink)"><svg class="tic" width="25" height="25" viewBox="5.6 5.6 18.8 18.8" aria-hidden="true"><defs><linearGradient id="tgHome" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A083F3"></stop><stop offset="1" stop-color="#6A2FBF"></stop></linearGradient></defs><path d="M19.5 8.6a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0Z" fill="url(#tgHome)" fill-opacity="0.4"></path><path d="M15 6.8L23.2 13.5V21.6A1.6 1.6 0 0 1 21.6 23.2H8.4A1.6 1.6 0 0 1 6.8 21.6V13.5ZM12.6 23.2V17.8A1.6 1.6 0 0 1 14.2 16.2H15.8A1.6 1.6 0 0 1 17.4 17.8V23.2Z" fill="url(#tgHome)" fill-rule="evenodd"></path></svg>Home</a>
+<a href="Quotes.dc.html" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10.5px; font-weight: 500; color: var(--faint)"><svg class="tic off" width="25" height="25" viewBox="5.6 5.6 18.8 18.8" aria-hidden="true"><defs><linearGradient id="tgQuotes" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#98A1F6"></stop><stop offset="1" stop-color="#4F57D6"></stop></linearGradient></defs><path d="M19.400000000000002 21.8a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0Z" fill="url(#tgQuotes)" fill-opacity="0.4"></path><path d="M11.2 6.8h7a3 3 0 0 1 3 3v10.399999999999999a3 3 0 0 1 -3 3h-7a3 3 0 0 1 -3 -3v-10.399999999999999a3 3 0 0 1 3 -3ZM12.25 11h4.9a1.05 1.05 0 0 1 1.05 1.05v0.0a1.05 1.05 0 0 1 -1.05 1.05h-4.9a1.05 1.05 0 0 1 -1.05 -1.05v-0.0a1.05 1.05 0 0 1 1.05 -1.05ZM12.25 15h2.4999999999999996a1.05 1.05 0 0 1 1.05 1.05v0.0a1.05 1.05 0 0 1 -1.05 1.05h-2.4999999999999996a1.05 1.05 0 0 1 -1.05 -1.05v-0.0a1.05 1.05 0 0 1 1.05 -1.05Z" fill="url(#tgQuotes)" fill-rule="evenodd"></path></svg>Quotes</a>
+<a href="Jobs.dc.html" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10.5px; font-weight: 500; color: var(--faint)"><svg class="tic off" width="25" height="25" viewBox="5.6 5.6 18.8 18.8" aria-hidden="true"><defs><linearGradient id="tgJobs" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4C06C"></stop><stop offset="1" stop-color="#D07A1E"></stop></linearGradient></defs><path d="M20.400000000000002 8.8a1.9 1.9 0 1 0 3.8 0a1.9 1.9 0 1 0 -3.8 0Z" fill="url(#tgJobs)" fill-opacity="0.4"></path><path d="M15 6.6L21 20.4H9ZM13.25 13.6h3.5a1.15 1.15 0 0 1 1.15 1.15v0.0a1.15 1.15 0 0 1 -1.15 1.15h-3.5a1.15 1.15 0 0 1 -1.15 -1.15v-0.0a1.15 1.15 0 0 1 1.15 -1.15Z" fill="url(#tgJobs)" fill-rule="evenodd"></path><path d="M8.0 20.6h14.0a1.4 1.4 0 0 1 1.4 1.4v0.0a1.4 1.4 0 0 1 -1.4 1.4h-14.0a1.4 1.4 0 0 1 -1.4 -1.4v-0.0a1.4 1.4 0 0 1 1.4 -1.4Z" fill="url(#tgJobs)" fill-opacity="0.7"></path></svg>Jobs</a>
+<a href="Clients.dc.html" style="border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 10.5px; font-weight: 500; color: var(--faint)"><svg class="tic off" width="25" height="25" viewBox="5.6 5.6 18.8 18.8" aria-hidden="true"><defs><linearGradient id="tgClients" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86CFA6"></stop><stop offset="1" stop-color="#2F8A5C"></stop></linearGradient></defs><path d="M15.6 12.4a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0Z" fill="url(#tgClients)" fill-opacity="0.45"></path><path d="M6.4 23.2A5.9 5.9 0 0 1 18.2 23.2Z" fill="url(#tgClients)" fill-opacity="0.75"></path><path d="M8.4 11.2a3.9 3.9 0 1 0 7.8 0a3.9 3.9 0 1 0 -7.8 0Z" fill="url(#tgClients)"></path></svg>Clients</a>
 </div>
-<button class="press ai-fab" aria-label="Open assistant" style="position: relative; width: 62px; height: 62px; flex-shrink: 0; border-radius: 50%; border: 0; background: #111113; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px -8px rgba(20,20,22,.55), 0 0 0 1px rgba(255,255,255,.06) inset; overflow: hidden">
-<span class="mini-orb" aria-hidden="true" style="position: relative; width: 30px; height: 30px; border-radius: 50%; overflow: hidden; display: block">
-<span class="mb mb1"></span><span class="mb mb2"></span><span class="mb mb3"></span>
-<span style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.7), rgba(255,255,255,0) 45%)"></span>
-</span>
+<button class="press ai-fab" aria-label="Open assistant" style="position: relative; width: 62px; height: 62px; flex-shrink: 0; border-radius: 50%; border: 0; padding: 0; background: var(--card); display: block; box-shadow: 0 12px 28px -8px rgba(106,47,191,.6), 0 0 0 1px var(--ring)">
+<span class="fab-halo" aria-hidden="true"></span>
+<svg class="swirl" width="62" height="62" viewBox="0 0 100 100" aria-hidden="true" style="position: relative"><defs><linearGradient id="qmFab" x1="0" y1="0.62" x2="1" y2="0.38"><stop offset="0" stop-color="#6A2FBF"></stop><stop offset="1" stop-color="#4A8EDB"></stop></linearGradient></defs><path fill="url(#qmFab)" fill-rule="evenodd" d="M50 0A50 50 0 1 1 50 100A50 50 0 1 1 50 0ZM50 34.82A15.18 15.18 0 1 0 50 65.18A15.18 15.18 0 1 0 50 34.82ZM69.51 61.21A25.01 25.01 0 0 1 38.53 91.61A41.30 41.30 0 0 0 69.51 61.21ZM55.86 71.72A25.01 25.01 0 0 1 12.47 71.31A41.30 41.30 0 0 0 55.86 71.72ZM38.79 69.51A25.01 25.01 0 0 1 8.39 38.53A41.30 41.30 0 0 0 38.79 69.51ZM28.28 55.86A25.01 25.01 0 0 1 28.69 12.47A41.30 41.30 0 0 0 28.28 55.86ZM30.49 38.79A25.01 25.01 0 0 1 61.47 8.39A41.30 41.30 0 0 0 30.49 38.79ZM44.14 28.28A25.01 25.01 0 0 1 87.53 28.69A41.30 41.30 0 0 0 44.14 28.28ZM61.21 30.49A25.01 25.01 0 0 1 91.61 61.47A41.30 41.30 0 0 0 61.21 30.49ZM71.72 44.14A25.01 25.01 0 0 1 71.31 87.53A41.30 41.30 0 0 0 71.72 44.14Z"></path></svg>
 </button>
 </nav>
 
 <sc-if value="{{aiShown}}" hint-placeholder-val="{{ false }}">
 <div class="ai-layer {{aiLayerCls}}" role="dialog" aria-modal="true" aria-label="Assistant" style="position: absolute; inset: 0; background: #09090b; color: #ffffff; overflow: hidden">
-<div aria-hidden="true" class="ai-amb" style="position: absolute; left: -20%; right: -20%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,106,61,.22), rgba(255,106,61,0))"></div>
+<div aria-hidden="true" class="ai-amb" style="position: absolute; left: -20%; right: -20%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(closest-side, rgba(106,47,191,.22), rgba(106,47,191,0))"></div>
 
 <div class="orb-pos {{orbPosCls}}" aria-hidden="true" style="position: absolute; left: 50%; top: 46%; width: 220px; height: 220px; margin: -110px 0 0 -110px">
 <div class="orb-enter {{orbEnterCls}}" style="position: absolute; inset: 0">
@@ -360,7 +411,10 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 </div>
 
 <sc-if value="{{voiceMode}}" hint-placeholder-val="{{ true }}">
-<div class="ctl" style="position: absolute; left: 0; right: 0; bottom: 44px; display: flex; align-items: center; justify-content: center; gap: 28px">
+<div class="ctl" aria-hidden="true" style="position: absolute; top: 26px; left: 0; right: 0; display: flex; justify-content: center">
+<svg class="swirl" width="26" height="26" viewBox="0 0 100 100" style="opacity: .9"><path fill="#ffffff" fill-rule="evenodd" d="M50 0A50 50 0 1 1 50 100A50 50 0 1 1 50 0ZM50 34.82A15.18 15.18 0 1 0 50 65.18A15.18 15.18 0 1 0 50 34.82ZM69.51 61.21A25.01 25.01 0 0 1 38.53 91.61A41.30 41.30 0 0 0 69.51 61.21ZM55.86 71.72A25.01 25.01 0 0 1 12.47 71.31A41.30 41.30 0 0 0 55.86 71.72ZM38.79 69.51A25.01 25.01 0 0 1 8.39 38.53A41.30 41.30 0 0 0 38.79 69.51ZM28.28 55.86A25.01 25.01 0 0 1 28.69 12.47A41.30 41.30 0 0 0 28.28 55.86ZM30.49 38.79A25.01 25.01 0 0 1 61.47 8.39A41.30 41.30 0 0 0 30.49 38.79ZM44.14 28.28A25.01 25.01 0 0 1 87.53 28.69A41.30 41.30 0 0 0 44.14 28.28ZM61.21 30.49A25.01 25.01 0 0 1 91.61 61.47A41.30 41.30 0 0 0 61.21 30.49ZM71.72 44.14A25.01 25.01 0 0 1 71.31 87.53A41.30 41.30 0 0 0 71.72 44.14Z"></path></svg>
+</div>
+<div class="ctl"style="position: absolute; left: 0; right: 0; bottom: 44px; display: flex; align-items: center; justify-content: center; gap: 28px">
 <button class="press glass" onClick="{{openKeyboard}}" aria-label="Type instead" style="width: 56px; height: 56px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="3"></rect><path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M8 14h8"></path></svg></button>
 <button class="press" onClick="{{toggleMute}}" aria-label="{{muteLabel}}" aria-pressed="{{muted}}" style="width: 76px; height: 76px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; {{muteStyle}}">
 <sc-if value="{{notMuted}}" hint-placeholder-val="{{ true }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"></path></svg></sc-if>
@@ -386,7 +440,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 <div class="glass" style="flex-grow: 1; height: 52px; border-radius: 26px; display: flex; align-items: center; padding: 0 6px 0 18px; gap: 6px">
 <label for="ai-input" class="vh">Message the assistant</label>
 <input id="ai-input" ref="{{inputRef}}" onKeyDown="{{onKey}}" autocomplete="off" placeholder="Ask anything, or describe a job" style="flex-grow: 1; min-width: 0; height: 40px; border: 0; background: transparent; color: #ffffff; font-family: inherit; font-size: 15px; outline: none; letter-spacing: -0.01em">
-<button class="press" onClick="{{sendMsg}}" aria-label="Send" style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 0; background: #e4572e; color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
+<button class="press" onClick="{{sendMsg}}" aria-label="Send" style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 0; background: var(--acc); color: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></button>
 </div>
 <button class="press glass" onClick="{{backToVoice}}" aria-label="Back to voice" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; color: #ffffff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"></path></svg></button>
 </div>
@@ -395,7 +449,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #e4572e;outline-offset:2p
 </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2180}}'>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":390,"height":2180}}'>
 class Component extends DCLogic {
   componentWillUnmount() { (this._t || []).forEach(clearTimeout); if (this._raf) cancelAnimationFrame(this._raf); this.stopOrb(); (this._at || []).forEach(clearTimeout); if (this._stream) clearInterval(this._stream); }
   aiTimer(fn, ms) { this._at = this._at || []; this._at.push(setTimeout(fn, ms)); }
@@ -491,6 +545,12 @@ class Component extends DCLogic {
     return d;
   }
   renderVals() {
+    var __v = this.renderVals0();
+    var DARK_DEFAULT = false;
+    __v.theme = (this.props.dark !== undefined ? this.props.dark : DARK_DEFAULT) ? 'dark' : 'light';
+    return __v;
+  }
+  renderVals0() {
     var self = this;
     var phase = this.g('phase', 'idle'), step = this.g('step', 0), listening = this.g('listening', false);
     var sel = this.g('day', 1), period = this.g('period', 'M'), who = this.g('who', 0);
@@ -506,8 +566,8 @@ class Component extends DCLogic {
       { name: 'Primer, paint, protection', amt: '$663.80' }
     ].map(function (x, i) { return Object.assign({}, x, { delay: 'animation-delay: ' + (200 + i * 90) + 'ms' }); });
 
-    var K = { site: '#141416', est: '#e4572e', walk: '#1f7a45', del: '#b7791f' };
-    var ev = function (time, k, title, place, tag) { return { time: time, dot: 'background: ' + K[k], title: title, place: place, tag: tag || '', tagStyle: tag === 'Next' ? 'color: #c2441f' : 'color: #6e6e76' }; };
+    var K = { site: '#141416', est: '#6a2fbf', walk: '#1f7a45', del: '#b7791f' };
+    var ev = function (time, k, title, place, tag) { return { time: time, dot: 'background: ' + K[k], title: title, place: place, tag: tag || '', tagStyle: tag === 'Next' ? 'color: var(--acc-t)' : 'color: var(--muted)' }; };
     var agendas = [
       [ev('08:00', 'site', 'Galloway Rd, framing check', 'Amara, Sofia'), ev('13:00', 'del', 'Drywall delivery, 14 sheets', '48 Galloway Rd')],
       [ev('07:30', 'site', 'Galloway Rd basement', 'Amara, Sofia, Jonah', 'On site'), ev('11:00', 'est', 'Estimate, Priya Nair', 'Kitchen backsplash · 212 Dovercourt Rd', 'Next'), ev('15:30', 'walk', 'Final walkthrough, Whitfield', '17 Castle Frank Cres')],
@@ -521,9 +581,9 @@ class Component extends DCLogic {
       var on = i === sel, n = agendas[i].length;
       return {
         dow: dows[i], date: d, on: on, aria: dows[i] + ' ' + d + ', ' + n + ' booked',
-        dowStyle: on ? 'color: rgba(255,255,255,.6)' : 'color: #8a8a90',
-        dateStyle: on ? 'color: #ffffff' : (i === 1 ? 'color: #c2441f' : 'color: #141416'),
-        dotStyle: n ? (on ? 'background: rgba(255,255,255,.7)' : 'background: #c4c3c0') : 'background: transparent',
+        dowStyle: on ? 'color: var(--on-inv); opacity: .6' : 'color: var(--faint)',
+        dateStyle: on ? 'color: var(--on-inv)' : (i === 1 ? 'color: var(--acc-t)' : 'color: var(--ink)'),
+        dotStyle: n ? (on ? 'background: var(--on-inv); opacity: .7' : 'background: #c4c3c0') : 'background: transparent',
         pick: function () { self.setState({ day: i }); }
       };
     });
@@ -542,9 +602,9 @@ class Component extends DCLogic {
       var d = !!done[i]; if (d) doneCount++;
       return {
         text: t[0], meta: t[1], done: d, cls: d ? 'done' : '',
-        metaStyle: d ? 'color: #b0afab' : (t[2] === 'urgent' ? 'color: #c2371f' : (t[2] === 'soon' ? 'color: #9a6412' : 'color: #6e6e76')),
+        metaStyle: d ? 'color: var(--faint)' : (t[2] === 'urgent' ? 'color: var(--bad)' : (t[2] === 'soon' ? 'color: var(--warn)' : 'color: var(--muted)')),
         aria: (d ? 'Mark not done: ' : 'Mark done: ') + t[0],
-        boxStyle: d ? 'background: #141416; border: 1.5px solid #141416' : 'background: #ffffff; border: 1.5px solid #c9c8c4',
+        boxStyle: d ? 'background: var(--inv); border: 1.5px solid var(--ink)' : 'background: var(--card); border: 1.5px solid var(--line2)',
         toggle: function () { var nd = Object.assign({}, self.g('done', { 0: true, 1: true })); nd[i] = !nd[i]; self.setState({ done: nd }); }
       };
     });
@@ -563,13 +623,13 @@ class Component extends DCLogic {
     var pkeys = ['W', 'M', 'Q'];
     var periods = [['W', 'Week'], ['M', 'Month'], ['Q', 'Quarter']].map(function (p) {
       var on = p[0] === period;
-      return { label: p[1], on: on, style: on ? 'color: #141416' : 'color: #6e6e76', pick: function () { self.setState({ period: p[0] }); } };
+      return { label: p[1], on: on, style: on ? 'color: var(--ink)' : 'color: var(--muted)', pick: function () { self.setState({ period: p[0] }); } };
     });
 
     var ST = {
-      on: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #1f9d55', stColor: 'color: #1f7a45', dot: 'background: #1f9d55' },
-      way: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #d69524', stColor: 'color: #9a6412', dot: 'background: #d69524' },
-      off: { ring: 'box-shadow: 0 0 0 2px #ffffff, 0 0 0 3.5px #dddcd8', stColor: 'color: #6e6e76', dot: 'background: #b0afab' }
+      on: { ring: 'box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px #1f9d55', stColor: 'color: var(--ok)', stCls: 'st-ok si-live', dot: 'background: var(--ok-dot)' },
+      way: { ring: 'box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px #d69524', stColor: 'color: var(--warn)', stCls: 'st-warn si-q1', dot: 'background: var(--warn-dot)' },
+      off: { ring: 'box-shadow: 0 0 0 2px var(--card), 0 0 0 3.5px var(--line2)', stColor: 'color: var(--muted)', stCls: 'st-mute si-off', dot: 'background: var(--faint)' }
     };
     var crewData = [
       ['LB', 'Luca Bianchi', 'Painter, lead', 'On site 7:12', 'Whitfield bathroom · 17 Castle Frank Cres', 'on'],
@@ -583,18 +643,18 @@ class Component extends DCLogic {
       return {
         ini: w[0], first: w[1].split(' ')[0], on: on, aria: w[1] + ', ' + w[3],
         ring: s.ring + (on ? '; transform: scale(1.06)' : ''),
-        nameStyle: on ? 'color: #141416' : 'color: #6e6e76',
+        nameStyle: on ? 'color: var(--ink)' : 'color: var(--muted)',
         pick: function () { self.setState({ who: i }); }
       };
     });
     var sw = crewData[who], ss = ST[sw[5]];
-    var selW = { name: sw[1], role: sw[2], site: sw[4], status: sw[3], stColor: ss.stColor, dot: ss.dot };
+    var selW = { name: sw[1], role: sw[2], site: sw[4], status: sw[3], stColor: ss.stColor, stCls: ss.stCls, dot: ss.dot };
 
     var sites = [
       { name: 'Galloway Rd basement', pct: 64, phase: 'Drywall · taping Thu', crewLine: 'Amara, Sofia, Jonah' },
       { name: 'Whitfield bathroom', pct: 92, phase: 'Walkthrough 15:30', crewLine: 'Luca' },
       { name: 'Harbourfront Dental', pct: 0, phase: 'Quote sent · starts Oct 10', crewLine: 'Not assigned' }
-    ].map(function (s, i) { return Object.assign({}, s, { pctLabel: s.pct + '%', pctStyle: 'width: ' + s.pct + '%', sep: i ? 'border-top: 1px solid #efeeea; margin: 0 0; ' : '' }); });
+    ].map(function (s, i) { return Object.assign({}, s, { pctLabel: s.pct + '%', pctStyle: 'width: ' + s.pct + '%', sep: i ? 'border-top: 1px solid var(--line); margin: 0 0; ' : '' }); });
 
     var ai = this.g('ai', 'closed'), aiMode = this.g('aiMode', 'voice'), muted = this.g('muted', false), mood = this.g('mood', 'listen');
     if (!this._orbRef) this._orbRef = function (el) { self._orbEl = el; };
@@ -607,7 +667,7 @@ class Component extends DCLogic {
       voiceMode: aiMode === 'voice', kbMode: aiMode === 'kb',
       muted: muted, notMuted: !muted,
       muteLabel: muted ? 'Unmute microphone' : 'Mute microphone',
-      muteStyle: muted ? 'background: rgba(255,90,70,.18); color: #ff8a70; box-shadow: inset 0 0 0 1px rgba(255,120,100,.35)' : 'background: #ffffff; color: #111113; box-shadow: 0 10px 30px -6px rgba(255,106,61,.45)',
+      muteStyle: muted ? 'background: rgba(255,90,70,.18); color: #ff8a70; box-shadow: inset 0 0 0 1px rgba(255,120,100,.35)' : 'background: var(--card); color: var(--ink); box-shadow: 0 10px 30px -6px rgba(106,47,191,.45)',
       msgs: this.g('msgs', []).map(function (m) { return { text: m.text, mine: m.mine, bot: !m.mine, streaming: !!m.streaming }; }),
       openAI: function () { self.openAI(); },
       closeAI: function () { self.closeAI(); },
@@ -622,11 +682,11 @@ class Component extends DCLogic {
       listening: listening, micCls: listening ? 'pulse' : '',
       micLabel: listening ? 'Stop dictation' : 'Dictate the job',
       micHint: listening ? 'Listening. Talk like you would to your crew.' : (phase === 'idle' ? 'Type or tap the mic. Photos and client are attached.' : ''),
-      micStyle: 'position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; ' + (listening ? 'background: #ffffff; color: #141416' : 'background: rgba(255,255,255,.1); color: #ffffff'),
+      micStyle: 'position: relative; width: 44px; height: 44px; border-radius: 50%; border: 0; display: flex; align-items: center; justify-content: center; ' + (listening ? 'background: var(--card); color: var(--ink)' : 'background: rgba(255,255,255,.1); color: #ffffff'),
       toggleMic: function () { self.setState({ listening: !self.g('listening', false) }); },
       draft: function () { self.startDraft(); },
       reset: function () { (self._t || []).forEach(clearTimeout); if (self._raf) cancelAnimationFrame(self._raf); self.setState({ phase: 'idle', step: 0, shown: 0 }); },
-      steps: steps, preview: preview, shownTotal: this.money(this.g('shown', 0)),
+      steps: steps, preview: preview, shownWhole: this.money(this.g('shown', 0)).slice(0, -3), shownCents: this.money(this.g('shown', 0)).slice(-3),
       days: days, dayIndicator: 'transform: translateX(' + (sel * 100) + '%)', agenda: agenda, hasAgenda: agenda.length > 0, noAgenda: agenda.length === 0,
       tasks: tasks, doneCount: doneCount, taskCount: tasks.length, progressStyle: 'width: ' + Math.round(doneCount / tasks.length * 100) + '%',
       periods: periods, periodIndicator: 'transform: translateX(' + (pkeys.indexOf(period) * 100) + '%)',

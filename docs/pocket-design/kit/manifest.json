@@ -1,0 +1,1142 @@
+{
+ "AccountantView": {
+  "title": "Accountant view",
+  "H": 1960,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"accessEnded\"],\"default\":\"default\"},"
+ },
+ "Analytics": {
+  "title": "Analytics",
+  "H": 3180,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"locked\"],\"default\":\"default\"},"
+ },
+ "Archive": {
+  "title": "Archive",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},"
+ },
+ "AssistantActivity": {
+  "title": "Assistant · activity",
+  "H": 2000,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\"],\"default\":\"default\"},"
+ },
+ "AssistantPermissions": {
+  "title": "Assistant · permissions",
+  "H": 2090,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readonly\",\"offline\"],\"default\":\"default\"},"
+ },
+ "AssistantProposals": {
+  "title": "Assistant · proposals",
+  "H": 2200,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\",\"readonly\",\"locked\"],\"default\":\"default\"},"
+ },
+ "Books": {
+  "title": "Books",
+  "H": 1750,
+  "tab": null,
+  "props": ""
+ },
+ "ChangeOrder": {
+  "title": "Change order CO-3",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"describe\",\"review\",\"sent\",\"signed\"],\"default\":\"describe\"},"
+ },
+ "Client": {
+  "title": "Client",
+  "H": 1760,
+  "tab": null,
+  "props": ""
+ },
+ "ClientDeposit": {
+  "title": "Client · pay deposit",
+  "H": 2020,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"pay\",\"eTransfer\",\"paid\",\"declined\"],\"default\":\"pay\"},"
+ },
+ "ClientInvoice": {
+  "title": "Client · Invoice",
+  "H": 1900,
+  "tab": null,
+  "props": ""
+ },
+ "ClientQuote": {
+  "title": "Client · Quote",
+  "H": 2300,
+  "tab": null,
+  "props": ""
+ },
+ "ClientSign": {
+  "title": "Client · Sign",
+  "H": 2080,
+  "tab": null,
+  "props": ""
+ },
+ "Clients": {
+  "title": "Clients",
+  "H": 844,
+  "tab": "Clients",
+  "props": ""
+ },
+ "ClientsFR": {
+  "title": "Clients (FR)",
+  "H": 844,
+  "tab": "Clients",
+  "props": "",
+  "lang": "fr"
+ },
+ "CompanyPicker": {
+  "title": "Choose company",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"opening\",\"removed\"],\"default\":\"default\"},"
+ },
+ "Compliance": {
+  "title": "Compliance",
+  "H": 2380,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"accountant\",\"empty\"],\"default\":\"default\"},"
+ },
+ "Components": {
+  "title": "Components",
+  "H": 8230,
+  "tab": null,
+  "props": ""
+ },
+ "Contract": {
+  "title": "Contract",
+  "H": 2140,
+  "tab": null,
+  "props": ""
+ },
+ "Contracts": {
+  "title": "Contracts",
+  "H": 1120,
+  "tab": null,
+  "props": ""
+ },
+ "CrewExpired": {
+  "title": "Crew · link expired",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"expired\",\"replaced\",\"invalid\",\"offline\"],\"default\":\"expired\"},"
+ },
+ "CrewHours": {
+  "title": "Crew · hours by hand",
+  "H": 1320,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"submitted\",\"offline\"],\"default\":\"default\"},"
+ },
+ "CrewMap": {
+  "title": "Crew map",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"locked\"],\"default\":\"default\"},"
+ },
+ "CrewNow": {
+  "title": "Crew · Now",
+  "H": 1800,
+  "tab": null,
+  "props": ""
+ },
+ "CrewTravel": {
+  "title": "Crew · travel",
+  "H": 1600,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"perDiem\",\"offline\"],\"default\":\"default\"},"
+ },
+ "CustomizeHome": {
+  "title": "Customize home",
+  "H": 1780,
+  "tab": null,
+  "props": ""
+ },
+ "Documents": {
+  "title": "Documents",
+  "H": 1640,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},"
+ },
+ "Dunning": {
+  "title": "Subscription payment",
+  "H": 2240,
+  "tab": null,
+  "props": "\"role\":{\"editor\":\"enum\",\"options\":[\"owner\",\"teammate\"],\"default\":\"owner\"},"
+ },
+ "EmailQuote": {
+  "title": "Email · quote sent",
+  "H": 2520,
+  "tab": null,
+  "props": "\"lang\":{\"editor\":\"enum\",\"options\":[\"en\",\"fr\"],\"default\":\"en\"},"
+ },
+ "Feedback": {
+  "title": "Send feedback",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"compose\",\"sending\",\"sent\",\"offline\"],\"default\":\"compose\"},"
+ },
+ "FirstQuote": {
+  "title": "Your first quote",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"describe\",\"check\",\"send\",\"done\"],\"default\":\"describe\"},"
+ },
+ "ForemanHome": {
+  "title": "Home (foreman)",
+  "H": 844,
+  "tab": "Home",
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"clockedOut\",\"offline\"],\"default\":\"default\"},"
+ },
+ "ForgotPassword": {
+  "title": "Reset password",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"request\",\"requestOffline\",\"sent\",\"newPassword\",\"linkExpired\",\"done\"],\"default\":\"request\"},"
+ },
+ "Group": {
+  "title": "Group",
+  "H": 1420,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"locked\"],\"default\":\"default\"},"
+ },
+ "HelpCentre": {
+  "title": "Help",
+  "H": 2610,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"search\",\"noresults\",\"offline\"],\"default\":\"default\"},"
+ },
+ "Imports": {
+  "title": "Imports",
+  "H": 1200,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"source\",\"mapping\",\"importing\",\"done\"],\"default\":\"source\"},"
+ },
+ "Integration": {
+  "title": "QuickBooks Online",
+  "H": 2060,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"connected\",\"error\",\"notConnected\"],\"default\":\"connected\"},"
+ },
+ "Integrations": {
+  "title": "Connected apps",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"firstTime\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "Inventory": {
+  "title": "Materials",
+  "H": 1840,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"empty\",\"offline\",\"readOnly\",\"locked\"],\"default\":\"default\"},"
+ },
+ "Invites": {
+  "title": "Pending invitations",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"single\",\"multiple\",\"picker\",\"wrongAccount\",\"expired\"],\"default\":\"single\"},"
+ },
+ "Invoice": {
+  "title": "Invoice INV-0412",
+  "H": 2010,
+  "tab": null,
+  "props": ""
+ },
+ "InvoiceFR": {
+  "title": "Facture INV-0412 (FR)",
+  "H": 2040,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "InvoiceXL": {
+  "title": "Invoice (large text)",
+  "H": 4620,
+  "tab": null,
+  "props": ""
+ },
+ "Invoices": {
+  "title": "Invoices",
+  "H": 1720,
+  "tab": null,
+  "props": ""
+ },
+ "InvoicesFR": {
+  "title": "Factures (FR)",
+  "H": 1990,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "Job": {
+  "title": "Basement finish",
+  "H": 2600,
+  "tab": null,
+  "props": ""
+ },
+ "JobSetup": {
+  "title": "Job setup",
+  "H": 1760,
+  "tab": null,
+  "props": ""
+ },
+ "Jobs": {
+  "title": "Jobs",
+  "H": 844,
+  "tab": "Jobs",
+  "props": ""
+ },
+ "JobsFR": {
+  "title": "Travaux (FR)",
+  "H": 844,
+  "tab": "Jobs",
+  "props": "",
+  "lang": "fr"
+ },
+ "JoinCode": {
+  "title": "Join with a code",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"empty\",\"typing\",\"invalid\",\"crew\",\"foreman\"],\"default\":\"typing\"},"
+ },
+ "Leads": {
+  "title": "Leads",
+  "H": 1440,
+  "tab": null,
+  "props": ""
+ },
+ "LeadsFR": {
+  "title": "Pistes (FR)",
+  "H": 1440,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "LiveLocation": {
+  "title": "Crew · share location",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"ask\",\"on\",\"off\"],\"default\":\"ask\"},"
+ },
+ "MessageTemplates": {
+  "title": "Message templates",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"offline\",\"readOnly\",\"locked\"],\"default\":\"default\"},"
+ },
+ "NewQuote": {
+  "title": "New quote",
+  "H": 2040,
+  "tab": null,
+  "props": ""
+ },
+ "NewQuoteFR": {
+  "title": "Nouvelle soumission (FR)",
+  "H": 2040,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "Notifications": {
+  "title": "Notifications",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"list\",\"optin\"],\"default\":\"list\"},"
+ },
+ "Onboarding": {
+  "title": "Set up",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"1\",\"2\",\"3\"],\"default\":\"1\"},"
+ },
+ "OnboardingFR": {
+  "title": "Configuration (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"1\",\"2\",\"3\"],\"default\":\"1\"},",
+  "lang": "fr"
+ },
+ "Pay": {
+  "title": "Pay",
+  "H": 1880,
+  "tab": null,
+  "props": ""
+ },
+ "Portal": {
+  "title": "Client · Portal",
+  "H": 1680,
+  "tab": null,
+  "props": ""
+ },
+ "PriceBook": {
+  "title": "Price book",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},"
+ },
+ "PriceCheck": {
+  "title": "Price check",
+  "H": 1800,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"noHistory\"],\"default\":\"default\"},"
+ },
+ "Profile": {
+  "title": "Profile",
+  "H": 1640,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"offline\"],\"default\":\"default\"},"
+ },
+ "QuoteEditor": {
+  "title": "Quote editor",
+  "H": 3250,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "Quotes": {
+  "title": "Quotes",
+  "H": 844,
+  "tab": "Quotes",
+  "props": ""
+ },
+ "QuotesFR": {
+  "title": "Soumissions (FR)",
+  "H": 844,
+  "tab": "Quotes",
+  "props": "",
+  "lang": "fr"
+ },
+ "QuotesXL": {
+  "title": "Quotes (large text)",
+  "H": 3840,
+  "tab": "Quotes",
+  "props": ""
+ },
+ "RoleHomes": {
+  "title": "Role homes",
+  "H": 844,
+  "tab": "Home",
+  "props": "\"role\":{\"editor\":\"enum\",\"options\":[\"officeManager\",\"estimator\",\"projectManager\",\"dispatcher\",\"bookkeeper\",\"safety\"],\"default\":\"estimator\"},"
+ },
+ "Schedule": {
+  "title": "Schedule",
+  "H": 844,
+  "tab": null,
+  "props": ""
+ },
+ "ScheduleFR": {
+  "title": "Horaire (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "Search": {
+  "title": "Search",
+  "H": 844,
+  "tab": null,
+  "props": ""
+ },
+ "ServiceCalls": {
+  "title": "Warranty and service",
+  "H": 2000,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SetCompany": {
+  "title": "Company details",
+  "H": 1540,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"unsaved\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SetInvoices": {
+  "title": "Invoices and payments",
+  "H": 1960,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"stripeNotConnected\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SetMessaging": {
+  "title": "SMS and WhatsApp",
+  "H": 2300,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"whatsappNotConnected\",\"textsUsedUp\"],\"default\":\"default\"},"
+ },
+ "SetPlan": {
+  "title": "Plan and billing",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"paymentFailed\",\"downgraded\",\"member\"],\"default\":\"default\"},"
+ },
+ "SetQuotes": {
+  "title": "Quotes and follow-ups",
+  "H": 1680,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SetRoles": {
+  "title": "Roles",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\",\"locked\"],\"default\":\"default\"},"
+ },
+ "SetSecurity": {
+  "title": "Sign-in and security",
+  "H": 1880,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"twoStepOff\",\"deleteScheduled\"],\"default\":\"default\"},"
+ },
+ "SetTaxes": {
+  "title": "Taxes",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SetWidget": {
+  "title": "Website widget",
+  "H": 2330,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"notInstalled\"],\"default\":\"default\"},"
+ },
+ "SignIn": {
+  "title": "Sign in",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"wrong\",\"unverified\",\"offline\",\"expired\",\"cancelled\"],\"default\":\"default\"},"
+ },
+ "SignUp": {
+  "title": "Create account",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"emailTaken\",\"weakPassword\",\"closed\"],\"default\":\"default\"},"
+ },
+ "SubPortal": {
+  "title": "Subcontractor portal",
+  "H": 1600,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"expired\"],\"default\":\"default\"},"
+ },
+ "Supplier": {
+  "title": "Home Depot Pro",
+  "H": 1700,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"offline\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "Suppliers": {
+  "title": "Suppliers",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"empty\",\"offline\",\"readOnly\"],\"default\":\"default\"},"
+ },
+ "SystemStates": {
+  "title": "System states",
+  "H": 5140,
+  "tab": null,
+  "props": ""
+ },
+ "Tablet": {
+  "title": "Tablet · two columns",
+  "H": 1024,
+  "tab": null,
+  "props": "",
+  "width": 1366
+ },
+ "Team": {
+  "title": "Team",
+  "H": 1860,
+  "tab": null,
+  "props": ""
+ },
+ "TeamFR": {
+  "title": "Équipe (FR)",
+  "H": 1920,
+  "tab": null,
+  "props": "",
+  "lang": "fr"
+ },
+ "Teammate": {
+  "title": "Teammate",
+  "H": 1860,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readonly\",\"deactivated\",\"nolink\"],\"default\":\"default\"},"
+ },
+ "TextMessages": {
+  "title": "Texts to clients",
+  "H": 1960,
+  "tab": null,
+  "props": "\"channel\":{\"editor\":\"enum\",\"options\":[\"sms\",\"whatsapp\"],\"default\":\"sms\"},\"lang\":{\"editor\":\"enum\",\"options\":[\"en\",\"fr\"],\"default\":\"en\"},"
+ },
+ "TwoStep": {
+  "title": "Two-step check",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"wrong\",\"locked\",\"backup\",\"verified\"],\"default\":\"default\"},"
+ },
+ "Unsubscribe": {
+  "title": "Unsubscribe",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"choose\",\"done\",\"resubscribed\"],\"default\":\"choose\"},"
+ },
+ "Verify": {
+  "title": "Verify email",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"empty\",\"typing\",\"wrong\",\"locked\",\"verified\"],\"default\":\"empty\"},"
+ },
+ "VideoPlayer": {
+  "title": "Video player",
+  "H": 844,
+  "tab": null,
+  "props": "\"video\":{\"editor\":\"enum\",\"options\":[\"quotes\",\"overview\"],\"default\":\"quotes\"},\"state\":{\"editor\":\"enum\",\"options\":[\"playing\",\"paused\",\"buffering\",\"offline\"],\"default\":\"playing\"},"
+ },
+ "Welcome": {
+  "title": "Welcome",
+  "H": 844,
+  "tab": null,
+  "props": ""
+ },
+ "WhatsNew": {
+  "title": "What’s new",
+  "H": 844,
+  "tab": null,
+  "props": ""
+ },
+ "WidgetForm": {
+  "title": "Website lead form",
+  "H": 1100,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"form\",\"photos\",\"contact\",\"working\",\"done\",\"unavailable\"],\"default\":\"form\"},"
+ },
+ "WelcomeFR": {
+  "title": "Bienvenue (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "",
+  "src": "WelcomeFR",
+  "lang": "fr"
+ },
+ "SignInFR": {
+  "title": "Connexion (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"wrong\",\"unverified\",\"offline\",\"expired\",\"cancelled\"],\"default\":\"default\"},",
+  "src": "SignInFR",
+  "lang": "fr"
+ },
+ "SignUpFR": {
+  "title": "Créer un compte (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"emailTaken\",\"weakPassword\",\"closed\"],\"default\":\"default\"},",
+  "src": "SignUpFR",
+  "lang": "fr"
+ },
+ "VerifyFR": {
+  "title": "Vérifier le courriel (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"empty\",\"typing\",\"wrong\",\"locked\",\"verified\"],\"default\":\"empty\"},",
+  "src": "VerifyFR",
+  "lang": "fr"
+ },
+ "TwoStepFR": {
+  "title": "Vérification en deux étapes (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"wrong\",\"locked\",\"backup\",\"verified\"],\"default\":\"default\"},",
+  "src": "TwoStepFR",
+  "lang": "fr"
+ },
+ "ForgotPasswordFR": {
+  "title": "Mot de passe oublié (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"request\",\"requestOffline\",\"sent\",\"newPassword\",\"linkExpired\",\"done\"],\"default\":\"request\"},",
+  "src": "ForgotPasswordFR",
+  "lang": "fr"
+ },
+ "InvitesFR": {
+  "title": "Invitations en attente (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"single\",\"multiple\",\"picker\",\"wrongAccount\",\"expired\"],\"default\":\"single\"},",
+  "src": "InvitesFR",
+  "lang": "fr"
+ },
+ "JoinCodeFR": {
+  "title": "Rejoindre avec un code (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"empty\",\"typing\",\"invalid\",\"crew\",\"foreman\"],\"default\":\"typing\"},",
+  "src": "JoinCodeFR",
+  "lang": "fr"
+ },
+ "CompanyPickerFR": {
+  "title": "Choisir une entreprise (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"opening\",\"removed\"],\"default\":\"default\"},",
+  "src": "CompanyPickerFR",
+  "lang": "fr"
+ },
+ "FirstQuoteFR": {
+  "title": "Votre première soumission (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"describe\",\"check\",\"send\",\"done\"],\"default\":\"describe\"},",
+  "src": "FirstQuoteFR",
+  "lang": "fr"
+ },
+ "SubPortalFR": {
+  "title": "Portail des sous-traitants (FR)",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"expired\"],\"default\":\"default\"},",
+  "src": "SubPortalFR",
+  "lang": "fr"
+ },
+ "ContractFR": {
+  "title": "Contrat (FR)",
+  "H": 2140,
+  "tab": null,
+  "props": "",
+  "src": "ContractFR",
+  "lang": "fr"
+ },
+ "ContractsFR": {
+  "title": "Contrats (FR)",
+  "H": 1120,
+  "tab": null,
+  "props": "",
+  "src": "ContractsFR",
+  "lang": "fr"
+ },
+ "ClientFR": {
+  "title": "Client (FR)",
+  "H": 1760,
+  "tab": null,
+  "props": "",
+  "src": "ClientFR",
+  "lang": "fr"
+ },
+ "QuoteEditorFR": {
+  "title": "Éditeur de soumission (FR)",
+  "H": 3340,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "QuoteEditorFR",
+  "lang": "fr"
+ },
+ "PriceCheckFR": {
+  "title": "Vérification des prix (FR)",
+  "H": 1890,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"noHistory\"],\"default\":\"default\"},",
+  "src": "PriceCheckFR",
+  "lang": "fr"
+ },
+ "ChangeOrderFR": {
+  "title": "Ordre de changement (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"describe\",\"review\",\"sent\",\"signed\"],\"default\":\"describe\"},",
+  "src": "ChangeOrderFR",
+  "lang": "fr"
+ },
+ "PriceBookFR": {
+  "title": "Liste de prix (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},",
+  "src": "PriceBookFR",
+  "lang": "fr"
+ },
+ "SearchFR": {
+  "title": "Recherche (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "",
+  "src": "SearchFR",
+  "lang": "fr"
+ },
+ "JobFR": {
+  "title": "Chantier (FR)",
+  "H": 2700,
+  "tab": null,
+  "props": "",
+  "src": "JobFR",
+  "lang": "fr"
+ },
+ "JobSetupFR": {
+  "title": "Préparation du chantier (FR)",
+  "H": 1800,
+  "tab": null,
+  "props": "",
+  "src": "JobSetupFR",
+  "lang": "fr"
+ },
+ "ForemanHomeFR": {
+  "title": "Accueil, contremaître (FR)",
+  "H": 844,
+  "tab": "Home",
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"clockedOut\",\"offline\"],\"default\":\"default\"},",
+  "src": "ForemanHomeFR",
+  "lang": "fr"
+ },
+ "CrewNowFR": {
+  "title": "Équipe, maintenant (FR)",
+  "H": 1850,
+  "tab": null,
+  "props": "",
+  "src": "CrewNowFR",
+  "lang": "fr"
+ },
+ "CrewMapFR": {
+  "title": "Carte de l’équipe (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"locked\"],\"default\":\"default\"},",
+  "src": "CrewMapFR",
+  "lang": "fr"
+ },
+ "CrewHoursFR": {
+  "title": "Équipe, heures à la main (FR)",
+  "H": 1360,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"submitted\",\"offline\"],\"default\":\"default\"},",
+  "src": "CrewHoursFR",
+  "lang": "fr"
+ },
+ "CrewTravelFR": {
+  "title": "Équipe, déplacements (FR)",
+  "H": 1620,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"perDiem\",\"offline\"],\"default\":\"default\"},",
+  "src": "CrewTravelFR",
+  "lang": "fr"
+ },
+ "CrewExpiredFR": {
+  "title": "Équipe, lien expiré (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"expired\",\"replaced\",\"invalid\",\"offline\"],\"default\":\"expired\"},",
+  "src": "CrewExpiredFR",
+  "lang": "fr"
+ },
+ "LiveLocationFR": {
+  "title": "Équipe, partage de position (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"ask\",\"on\",\"off\"],\"default\":\"ask\"},",
+  "src": "LiveLocationFR",
+  "lang": "fr"
+ },
+ "ServiceCallsFR": {
+  "title": "Garantie et service (FR)",
+  "H": 2200,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "ServiceCallsFR",
+  "lang": "fr"
+ },
+ "BooksFR": {
+  "title": "Comptabilité (FR)",
+  "H": 1780,
+  "tab": null,
+  "props": "",
+  "src": "BooksFR",
+  "lang": "fr"
+ },
+ "PayFR": {
+  "title": "Paie (FR)",
+  "H": 1920,
+  "tab": null,
+  "props": "",
+  "src": "PayFR",
+  "lang": "fr"
+ },
+ "DunningFR": {
+  "title": "Paiement de l’abonnement (FR)",
+  "H": 2340,
+  "tab": null,
+  "props": "\"role\":{\"editor\":\"enum\",\"options\":[\"owner\",\"teammate\"],\"default\":\"owner\"},",
+  "src": "DunningFR",
+  "lang": "fr"
+ },
+ "AccountantViewFR": {
+  "title": "Accès comptable (FR)",
+  "H": 2020,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"accessEnded\"],\"default\":\"default\"},",
+  "src": "AccountantViewFR",
+  "lang": "fr"
+ },
+ "GroupFR": {
+  "title": "Groupe (FR)",
+  "H": 1420,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"locked\"],\"default\":\"default\"},",
+  "src": "GroupFR",
+  "lang": "fr"
+ },
+ "ComplianceFR": {
+  "title": "Conformité (FR)",
+  "H": 2490,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"accountant\",\"empty\"],\"default\":\"default\"},",
+  "src": "ComplianceFR",
+  "lang": "fr"
+ },
+ "InventoryFR": {
+  "title": "Matériaux (FR)",
+  "H": 1970,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"empty\",\"offline\",\"readOnly\",\"locked\"],\"default\":\"default\"},",
+  "src": "InventoryFR",
+  "lang": "fr"
+ },
+ "SuppliersFR": {
+  "title": "Fournisseurs (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"empty\",\"offline\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SuppliersFR",
+  "lang": "fr"
+ },
+ "SupplierFR": {
+  "title": "Fournisseur (FR)",
+  "H": 1800,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"offline\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SupplierFR",
+  "lang": "fr"
+ },
+ "SetCompanyFR": {
+  "title": "Profil de l’entreprise (FR)",
+  "H": 1540,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"unsaved\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SetCompanyFR",
+  "lang": "fr"
+ },
+ "SetInvoicesFR": {
+  "title": "Factures et paiements (FR)",
+  "H": 1960,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"stripeNotConnected\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SetInvoicesFR",
+  "lang": "fr"
+ },
+ "SetMessagingFR": {
+  "title": "Textos et WhatsApp (FR)",
+  "H": 2300,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"whatsappNotConnected\",\"textsUsedUp\"],\"default\":\"default\"},",
+  "src": "SetMessagingFR",
+  "lang": "fr"
+ },
+ "SetPlanFR": {
+  "title": "Forfait et facturation (FR)",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"paymentFailed\",\"downgraded\",\"member\"],\"default\":\"default\"},",
+  "src": "SetPlanFR",
+  "lang": "fr"
+ },
+ "SetQuotesFR": {
+  "title": "Soumissions et relances (FR)",
+  "H": 1680,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SetQuotesFR",
+  "lang": "fr"
+ },
+ "SetRolesFR": {
+  "title": "Rôles (FR)",
+  "H": 1760,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\",\"locked\"],\"default\":\"default\"},",
+  "src": "SetRolesFR",
+  "lang": "fr"
+ },
+ "SetSecurityFR": {
+  "title": "Connexion et sécurité (FR)",
+  "H": 1880,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"twoStepOff\",\"deleteScheduled\"],\"default\":\"default\"},",
+  "src": "SetSecurityFR",
+  "lang": "fr"
+ },
+ "SetTaxesFR": {
+  "title": "Taxes (FR)",
+  "H": 1720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "SetTaxesFR",
+  "lang": "fr"
+ },
+ "SetWidgetFR": {
+  "title": "Widget pour site Web (FR)",
+  "H": 2330,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"notInstalled\"],\"default\":\"default\"},",
+  "src": "SetWidgetFR",
+  "lang": "fr"
+ },
+ "IntegrationsFR": {
+  "title": "Applications connectées (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"firstTime\",\"readOnly\"],\"default\":\"default\"},",
+  "src": "IntegrationsFR",
+  "lang": "fr"
+ },
+ "IntegrationFR": {
+  "title": "QuickBooks Online (FR)",
+  "H": 2060,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"connected\",\"error\",\"notConnected\"],\"default\":\"connected\"},",
+  "src": "IntegrationFR",
+  "lang": "fr"
+ },
+ "AssistantActivityFR": {
+  "title": "Assistant, activité (FR)",
+  "H": 2090,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\"],\"default\":\"default\"},",
+  "src": "AssistantActivityFR",
+  "lang": "fr"
+ },
+ "AssistantPermissionsFR": {
+  "title": "Assistant, autorisations (FR)",
+  "H": 2140,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readonly\",\"offline\"],\"default\":\"default\"},",
+  "src": "AssistantPermissionsFR",
+  "lang": "fr"
+ },
+ "AssistantProposalsFR": {
+  "title": "Assistant, propositions (FR)",
+  "H": 2200,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\",\"offline\",\"readonly\",\"locked\"],\"default\":\"default\"},",
+  "src": "AssistantProposalsFR",
+  "lang": "fr"
+ },
+ "AnalyticsFR": {
+  "title": "Analyses (FR)",
+  "H": 3230,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"loading\",\"locked\"],\"default\":\"default\"},",
+  "src": "AnalyticsFR",
+  "lang": "fr"
+ },
+ "DocumentsFR": {
+  "title": "Documents (FR)",
+  "H": 1640,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},",
+  "src": "DocumentsFR",
+  "lang": "fr"
+ },
+ "ImportsFR": {
+  "title": "Importations (FR)",
+  "H": 1200,
+  "tab": null,
+  "props": "\"step\":{\"editor\":\"enum\",\"options\":[\"source\",\"mapping\",\"importing\",\"done\"],\"default\":\"source\"},",
+  "src": "ImportsFR",
+  "lang": "fr"
+ },
+ "ArchiveFR": {
+  "title": "Archives (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"empty\"],\"default\":\"default\"},",
+  "src": "ArchiveFR",
+  "lang": "fr"
+ },
+ "CustomizeHomeFR": {
+  "title": "Personnaliser l’accueil (FR)",
+  "H": 1780,
+  "tab": null,
+  "props": "",
+  "src": "CustomizeHomeFR",
+  "lang": "fr"
+ },
+ "RoleHomesFR": {
+  "title": "Accueils par rôle (FR)",
+  "H": 844,
+  "tab": "Home",
+  "props": "\"role\":{\"editor\":\"enum\",\"options\":[\"officeManager\",\"estimator\",\"projectManager\",\"dispatcher\",\"bookkeeper\",\"safety\"],\"default\":\"estimator\"},",
+  "src": "RoleHomesFR",
+  "lang": "fr"
+ },
+ "TeammateFR": {
+  "title": "Coéquipier (FR)",
+  "H": 1860,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"readonly\",\"deactivated\",\"nolink\"],\"default\":\"default\"},",
+  "src": "TeammateFR",
+  "lang": "fr"
+ },
+ "NotificationsFR": {
+  "title": "Notifications (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"list\",\"optin\"],\"default\":\"list\"},",
+  "src": "NotificationsFR",
+  "lang": "fr"
+ },
+ "SystemStatesFR": {
+  "title": "États du système (FR)",
+  "H": 5420,
+  "tab": null,
+  "props": "",
+  "src": "SystemStatesFR",
+  "lang": "fr"
+ },
+ "HelpCentreFR": {
+  "title": "Aide (FR)",
+  "H": 2720,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"default\",\"search\",\"noresults\",\"offline\"],\"default\":\"default\"},",
+  "src": "HelpCentreFR",
+  "lang": "fr"
+ },
+ "VideoPlayerFR": {
+  "title": "Lecteur vidéo (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"video\":{\"editor\":\"enum\",\"options\":[\"quotes\",\"overview\"],\"default\":\"quotes\"},\"state\":{\"editor\":\"enum\",\"options\":[\"playing\",\"paused\",\"buffering\",\"offline\"],\"default\":\"playing\"},",
+  "src": "VideoPlayerFR",
+  "lang": "fr"
+ },
+ "FeedbackFR": {
+  "title": "Envoyer un commentaire (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "\"state\":{\"editor\":\"enum\",\"options\":[\"compose\",\"sending\",\"sent\",\"offline\"],\"default\":\"compose\"},",
+  "src": "FeedbackFR",
+  "lang": "fr"
+ },
+ "WhatsNewFR": {
+  "title": "Nouveautés (FR)",
+  "H": 844,
+  "tab": null,
+  "props": "",
+  "src": "WhatsNewFR",
+  "lang": "fr"
+ },
+ "TabletFR": {
+  "title": "Tablette (FR)",
+  "H": 1024,
+  "tab": null,
+  "props": "",
+  "width": 1366,
+  "src": "TabletFR",
+  "lang": "fr"
+ }
+}

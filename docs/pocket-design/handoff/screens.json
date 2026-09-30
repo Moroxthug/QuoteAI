@@ -1,0 +1,2451 @@
+{
+ "count": 92,
+ "screens": [
+  {
+   "id": "CrewMap",
+   "title": "Crew map",
+   "section": "Home and assistant",
+   "sectionId": "home",
+   "route": "/crew-map",
+   "board": "CrewMap.dc.html",
+   "night": "CrewMapDark.dc.html",
+   "french": "CrewMapFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "SetPlan",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "CustomizeHome",
+   "title": "Customize home",
+   "section": "Home and assistant",
+   "sectionId": "home",
+   "route": "/customize-home",
+   "board": "CustomizeHome.dc.html",
+   "night": "CustomizeHomeDark.dc.html",
+   "french": "CustomizeHomeFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1780
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "RoleHomes",
+    "SetRoles"
+   ]
+  },
+  {
+   "id": "ForemanHome",
+   "title": "Home (foreman)",
+   "section": "Home and assistant",
+   "sectionId": "home",
+   "route": "/foreman-home",
+   "board": "ForemanHome.dc.html",
+   "night": "ForemanHomeDark.dc.html",
+   "french": "ForemanHomeFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Home",
+   "states": {
+    "state": [
+     "default",
+     "clockedOut",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "Clients",
+    "CrewHours",
+    "CrewNow",
+    "Job",
+    "Jobs",
+    "Menu",
+    "Quotes",
+    "Schedule",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "RoleHomes",
+   "title": "Role homes",
+   "section": "Home and assistant",
+   "sectionId": "home",
+   "route": "/role-homes",
+   "board": "RoleHomes.dc.html",
+   "night": "RoleHomesDark.dc.html",
+   "french": "RoleHomesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Home",
+   "states": {
+    "role": [
+     "officeManager",
+     "estimator",
+     "projectManager",
+     "dispatcher",
+     "bookkeeper",
+     "safety"
+    ]
+   },
+   "linksTo": [
+    "Analytics",
+    "Books",
+    "ChangeOrder",
+    "Clients",
+    "Compliance",
+    "CrewMap",
+    "CustomizeHome",
+    "Documents",
+    "Job",
+    "Jobs",
+    "Menu",
+    "NewQuote",
+    "Notifications",
+    "Quotes",
+    "Schedule",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "SmartHome",
+   "title": "Smart Home",
+   "section": "Home and assistant",
+   "sectionId": "home",
+   "route": "/smart-home",
+   "board": "SmartHome.dc.html",
+   "night": "SmartHomeDark.dc.html",
+   "french": "SmartHomeFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Home",
+   "states": {},
+   "linksTo": [
+    "Books",
+    "Clients",
+    "CrewMap",
+    "Invoices",
+    "Jobs",
+    "Leads",
+    "Menu",
+    "Quote",
+    "Quotes",
+    "Schedule"
+   ]
+  },
+  {
+   "id": "Client",
+   "title": "Client",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/client",
+   "board": "Client.dc.html",
+   "night": "ClientDark.dc.html",
+   "french": "ClientFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1760
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Clients",
+    "NewQuote",
+    "Quote"
+   ]
+  },
+  {
+   "id": "Clients",
+   "title": "Clients",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/clients",
+   "board": "Clients.dc.html",
+   "night": "ClientsDark.dc.html",
+   "french": "ClientsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Clients",
+   "states": {},
+   "linksTo": [
+    "Client",
+    "Jobs",
+    "NewQuote",
+    "Quotes",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Contract",
+   "title": "Contract",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/contract",
+   "board": "Contract.dc.html",
+   "night": "ContractDark.dc.html",
+   "french": "ContractFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2140
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Contracts",
+    "Quote"
+   ]
+  },
+  {
+   "id": "Contracts",
+   "title": "Contracts",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/contracts",
+   "board": "Contracts.dc.html",
+   "night": "ContractsDark.dc.html",
+   "french": "ContractsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1120
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Contract",
+    "Menu"
+   ]
+  },
+  {
+   "id": "Leads",
+   "title": "Leads",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/leads",
+   "board": "Leads.dc.html",
+   "night": "LeadsDark.dc.html",
+   "french": "LeadsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1440
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Client",
+    "Menu",
+    "NewQuote",
+    "Quote"
+   ]
+  },
+  {
+   "id": "NewQuote",
+   "title": "New quote",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/new-quote",
+   "board": "NewQuote.dc.html",
+   "night": "NewQuoteDark.dc.html",
+   "french": "NewQuoteFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2040
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Quote",
+    "Quotes"
+   ]
+  },
+  {
+   "id": "PriceCheck",
+   "title": "Price check",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/price-check",
+   "board": "PriceCheck.dc.html",
+   "night": "PriceCheckDark.dc.html",
+   "french": "PriceCheckFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1800
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "loading",
+     "noHistory"
+    ]
+   },
+   "linksTo": [
+    "QuoteEditor"
+   ]
+  },
+  {
+   "id": "Quote",
+   "title": "Quote draft",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/quote",
+   "board": "Quote.dc.html",
+   "night": "QuoteDark.dc.html",
+   "french": "QuoteFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1420
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "QuoteEditor",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "QuoteEditor",
+   "title": "Quote editor",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/quote-editor",
+   "board": "QuoteEditor.dc.html",
+   "night": "QuoteEditorDark.dc.html",
+   "french": "QuoteEditorFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 3250
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Client",
+    "ClientQuote",
+    "Contract",
+    "PriceBook",
+    "PriceCheck",
+    "Quote"
+   ]
+  },
+  {
+   "id": "Quotes",
+   "title": "Quotes",
+   "section": "Sales",
+   "sectionId": "sales",
+   "route": "/quotes",
+   "board": "Quotes.dc.html",
+   "night": "QuotesDark.dc.html",
+   "french": "QuotesFR.dc.html",
+   "largeText": "QuotesXL.dc.html",
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Quotes",
+   "states": {},
+   "linksTo": [
+    "Clients",
+    "Jobs",
+    "NewQuote",
+    "Quote",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "ChangeOrder",
+   "title": "Change order CO-3",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/change-order",
+   "board": "ChangeOrder.dc.html",
+   "night": "ChangeOrderDark.dc.html",
+   "french": "ChangeOrderFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "describe",
+     "review",
+     "sent",
+     "signed"
+    ]
+   },
+   "linksTo": [
+    "Job"
+   ]
+  },
+  {
+   "id": "Inventory",
+   "title": "Materials",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/inventory",
+   "board": "Inventory.dc.html",
+   "night": "InventoryDark.dc.html",
+   "french": "InventoryFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1840
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "loading",
+     "empty",
+     "offline",
+     "readOnly",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "Menu",
+    "SetPlan",
+    "Supplier"
+   ]
+  },
+  {
+   "id": "Job",
+   "title": "Basement finish",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/job",
+   "board": "Job.dc.html",
+   "night": "JobDark.dc.html",
+   "french": "JobFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2600
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "ChangeOrder",
+    "Jobs",
+    "Schedule"
+   ]
+  },
+  {
+   "id": "JobSetup",
+   "title": "Job setup",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/job-setup",
+   "board": "JobSetup.dc.html",
+   "night": "JobSetupDark.dc.html",
+   "french": "JobSetupFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1760
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Jobs"
+   ]
+  },
+  {
+   "id": "Jobs",
+   "title": "Jobs",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/jobs",
+   "board": "Jobs.dc.html",
+   "night": "JobsDark.dc.html",
+   "french": "JobsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": "Jobs",
+   "states": {},
+   "linksTo": [
+    "Clients",
+    "Job",
+    "JobSetup",
+    "Quotes",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Schedule",
+   "title": "Schedule",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/schedule",
+   "board": "Schedule.dc.html",
+   "night": "ScheduleDark.dc.html",
+   "french": "ScheduleFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Job",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "ServiceCalls",
+   "title": "Warranty and service",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/service-calls",
+   "board": "ServiceCalls.dc.html",
+   "night": "ServiceCallsDark.dc.html",
+   "french": "ServiceCallsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2000
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty",
+     "offline",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Job",
+    "Jobs"
+   ]
+  },
+  {
+   "id": "Supplier",
+   "title": "Home Depot Pro",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/supplier",
+   "board": "Supplier.dc.html",
+   "night": "SupplierDark.dc.html",
+   "french": "SupplierFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1700
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "offline",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "PriceCheck",
+    "Suppliers"
+   ]
+  },
+  {
+   "id": "Suppliers",
+   "title": "Suppliers",
+   "section": "Jobs",
+   "sectionId": "jobs",
+   "route": "/suppliers",
+   "board": "Suppliers.dc.html",
+   "night": "SuppliersDark.dc.html",
+   "french": "SuppliersFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "loading",
+     "empty",
+     "offline",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Inventory",
+    "Menu",
+    "Supplier"
+   ]
+  },
+  {
+   "id": "AccountantView",
+   "title": "Accountant view",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/accountant-view",
+   "board": "AccountantView.dc.html",
+   "night": "AccountantViewDark.dc.html",
+   "french": "AccountantViewFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1960
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "accessEnded"
+    ]
+   },
+   "linksTo": [
+    "CompanyPicker",
+    "Compliance"
+   ]
+  },
+  {
+   "id": "Books",
+   "title": "Books",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/books",
+   "board": "Books.dc.html",
+   "night": "BooksDark.dc.html",
+   "french": "BooksFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1750
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Invoices",
+    "Menu",
+    "Team"
+   ]
+  },
+  {
+   "id": "Compliance",
+   "title": "Compliance",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/compliance",
+   "board": "Compliance.dc.html",
+   "night": "ComplianceDark.dc.html",
+   "french": "ComplianceFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2380
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "accountant",
+     "empty"
+    ]
+   },
+   "linksTo": [
+    "Menu",
+    "SetTaxes"
+   ]
+  },
+  {
+   "id": "Group",
+   "title": "Group",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/group",
+   "board": "Group.dc.html",
+   "night": "GroupDark.dc.html",
+   "french": "GroupFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1420
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "Menu",
+    "SetPlan",
+    "Team"
+   ]
+  },
+  {
+   "id": "Invoice",
+   "title": "Invoice INV-0412",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/invoice",
+   "board": "Invoice.dc.html",
+   "night": "InvoiceDark.dc.html",
+   "french": "InvoiceFR.dc.html",
+   "largeText": "InvoiceXL.dc.html",
+   "frame": {
+    "w": 390,
+    "h": 2010
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Invoices"
+   ]
+  },
+  {
+   "id": "Invoices",
+   "title": "Invoices",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/invoices",
+   "board": "Invoices.dc.html",
+   "night": "InvoicesDark.dc.html",
+   "french": "InvoicesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1720
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Dunning",
+    "Invoice",
+    "Menu"
+   ]
+  },
+  {
+   "id": "Pay",
+   "title": "Pay",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/pay",
+   "board": "Pay.dc.html",
+   "night": "PayDark.dc.html",
+   "french": "PayFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1880
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Menu",
+    "Team"
+   ]
+  },
+  {
+   "id": "Team",
+   "title": "Team",
+   "section": "Money and team",
+   "sectionId": "money",
+   "route": "/team",
+   "board": "Team.dc.html",
+   "night": "TeamDark.dc.html",
+   "french": "TeamFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1860
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Menu",
+    "Teammate"
+   ]
+  },
+  {
+   "id": "ClientDeposit",
+   "title": "Client · pay deposit",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/client-deposit",
+   "board": "ClientDeposit.dc.html",
+   "night": "ClientDepositDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2020
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "pay",
+     "eTransfer",
+     "paid",
+     "declined"
+    ]
+   },
+   "linksTo": [
+    "ClientQuote",
+    "Portal"
+   ]
+  },
+  {
+   "id": "ClientInvoice",
+   "title": "Client · Invoice",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/client-invoice",
+   "board": "ClientInvoice.dc.html",
+   "night": "ClientInvoiceDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1900
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Portal"
+   ]
+  },
+  {
+   "id": "ClientQuote",
+   "title": "Client · Quote",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/client-quote",
+   "board": "ClientQuote.dc.html",
+   "night": "ClientQuoteDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2300
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "ClientDeposit"
+   ]
+  },
+  {
+   "id": "ClientSign",
+   "title": "Client · Sign",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/client-sign",
+   "board": "ClientSign.dc.html",
+   "night": "ClientSignDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2080
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Portal"
+   ]
+  },
+  {
+   "id": "CrewExpired",
+   "title": "Crew · link expired",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/crew-expired",
+   "board": "CrewExpired.dc.html",
+   "night": "CrewExpiredDark.dc.html",
+   "french": "CrewExpiredFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "expired",
+     "replaced",
+     "invalid",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "CrewNow"
+   ]
+  },
+  {
+   "id": "CrewHours",
+   "title": "Crew · hours by hand",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/crew-hours",
+   "board": "CrewHours.dc.html",
+   "night": "CrewHoursDark.dc.html",
+   "french": "CrewHoursFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1320
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "submitted",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "CrewNow"
+   ]
+  },
+  {
+   "id": "CrewNow",
+   "title": "Crew · Now",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/crew-now",
+   "board": "CrewNow.dc.html",
+   "night": "CrewNowDark.dc.html",
+   "french": "CrewNowFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1800
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": []
+  },
+  {
+   "id": "CrewTravel",
+   "title": "Crew · travel",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/crew-travel",
+   "board": "CrewTravel.dc.html",
+   "night": "CrewTravelDark.dc.html",
+   "french": "CrewTravelFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1600
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "perDiem",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "CrewNow"
+   ]
+  },
+  {
+   "id": "EmailQuote",
+   "title": "Email · quote sent",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/email-quote",
+   "board": "EmailQuote.dc.html",
+   "night": "EmailQuoteDark.dc.html",
+   "french": null,
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2520
+   },
+   "tabBar": null,
+   "states": {
+    "lang": [
+     "en",
+     "fr"
+    ]
+   },
+   "linksTo": [
+    "ClientInvoice",
+    "ClientQuote",
+    "Unsubscribe"
+   ]
+  },
+  {
+   "id": "LiveLocation",
+   "title": "Crew · share location",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/live-location",
+   "board": "LiveLocation.dc.html",
+   "night": "LiveLocationDark.dc.html",
+   "french": "LiveLocationFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "ask",
+     "on",
+     "off"
+    ]
+   },
+   "linksTo": [
+    "CrewNow"
+   ]
+  },
+  {
+   "id": "Portal",
+   "title": "Client · Portal",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/portal",
+   "board": "Portal.dc.html",
+   "night": "PortalDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1680
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "ClientInvoice",
+    "ClientQuote",
+    "ClientSign"
+   ]
+  },
+  {
+   "id": "SubPortal",
+   "title": "Subcontractor portal",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/sub-portal",
+   "board": "SubPortal.dc.html",
+   "night": "SubPortalDark.dc.html",
+   "french": "SubPortalFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1600
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "expired"
+    ]
+   },
+   "linksTo": []
+  },
+  {
+   "id": "TextMessages",
+   "title": "Texts to clients",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/text-messages",
+   "board": "TextMessages.dc.html",
+   "night": "TextMessagesDark.dc.html",
+   "french": null,
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1960
+   },
+   "tabBar": null,
+   "states": {
+    "channel": [
+     "sms",
+     "whatsapp"
+    ],
+    "lang": [
+     "en",
+     "fr"
+    ]
+   },
+   "linksTo": [
+    "ClientQuote",
+    "Unsubscribe"
+   ]
+  },
+  {
+   "id": "Unsubscribe",
+   "title": "Unsubscribe",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/unsubscribe",
+   "board": "Unsubscribe.dc.html",
+   "night": "UnsubscribeDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "choose",
+     "done",
+     "resubscribed"
+    ]
+   },
+   "linksTo": []
+  },
+  {
+   "id": "WidgetForm",
+   "title": "Website lead form",
+   "section": "Crew and clients",
+   "sectionId": "outside",
+   "route": "/widget-form",
+   "board": "WidgetForm.dc.html",
+   "night": "WidgetFormDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1100
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "form",
+     "photos",
+     "contact",
+     "working",
+     "done",
+     "unavailable"
+    ]
+   },
+   "linksTo": []
+  },
+  {
+   "id": "CompanyPicker",
+   "title": "Choose company",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/company-picker",
+   "board": "CompanyPicker.dc.html",
+   "night": "CompanyPickerDark.dc.html",
+   "french": "CompanyPickerFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "loading",
+     "opening",
+     "removed"
+    ]
+   },
+   "linksTo": [
+    "JoinCode",
+    "SignIn"
+   ]
+  },
+  {
+   "id": "FirstQuote",
+   "title": "Your first quote",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/first-quote",
+   "board": "FirstQuote.dc.html",
+   "night": "FirstQuoteDark.dc.html",
+   "french": "FirstQuoteFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "describe",
+     "check",
+     "send",
+     "done"
+    ]
+   },
+   "linksTo": [
+    "QuoteEditor",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "ForgotPassword",
+   "title": "Reset password",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/forgot-password",
+   "board": "ForgotPassword.dc.html",
+   "night": "ForgotPasswordDark.dc.html",
+   "french": "ForgotPasswordFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "request",
+     "requestOffline",
+     "sent",
+     "newPassword",
+     "linkExpired",
+     "done"
+    ]
+   },
+   "linksTo": [
+    "SetSecurity",
+    "SignIn",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Invites",
+   "title": "Pending invitations",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/invites",
+   "board": "Invites.dc.html",
+   "night": "InvitesDark.dc.html",
+   "french": "InvitesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "single",
+     "multiple",
+     "picker",
+     "wrongAccount",
+     "expired"
+    ]
+   },
+   "linksTo": [
+    "ForemanHome",
+    "JoinCode",
+    "Onboarding",
+    "SignIn",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "JoinCode",
+   "title": "Join with a code",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/join-code",
+   "board": "JoinCode.dc.html",
+   "night": "JoinCodeDark.dc.html",
+   "french": "JoinCodeFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "empty",
+     "typing",
+     "invalid",
+     "crew",
+     "foreman"
+    ]
+   },
+   "linksTo": [
+    "CrewNow",
+    "SignIn",
+    "SignUp",
+    "Welcome"
+   ]
+  },
+  {
+   "id": "Onboarding",
+   "title": "Set up",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/onboarding",
+   "board": "Onboarding.dc.html",
+   "night": "OnboardingDark.dc.html",
+   "french": "OnboardingFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "1",
+     "2",
+     "3"
+    ]
+   },
+   "linksTo": [
+    "SmartHome",
+    "Verify"
+   ]
+  },
+  {
+   "id": "SignIn",
+   "title": "Sign in",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/sign-in",
+   "board": "SignIn.dc.html",
+   "night": "SignInDark.dc.html",
+   "french": "SignInFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "wrong",
+     "unverified",
+     "offline",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "linksTo": [
+    "ForgotPassword",
+    "JoinCode",
+    "SignUp",
+    "Verify",
+    "Welcome"
+   ]
+  },
+  {
+   "id": "SignUp",
+   "title": "Create account",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/sign-up",
+   "board": "SignUp.dc.html",
+   "night": "SignUpDark.dc.html",
+   "french": "SignUpFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "emailTaken",
+     "weakPassword",
+     "closed"
+    ]
+   },
+   "linksTo": [
+    "SignIn",
+    "Verify",
+    "Welcome"
+   ]
+  },
+  {
+   "id": "TwoStep",
+   "title": "Two-step check",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/two-step",
+   "board": "TwoStep.dc.html",
+   "night": "TwoStepDark.dc.html",
+   "french": "TwoStepFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "wrong",
+     "locked",
+     "backup",
+     "verified"
+    ]
+   },
+   "linksTo": [
+    "SignIn",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Verify",
+   "title": "Verify email",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/verify",
+   "board": "Verify.dc.html",
+   "night": "VerifyDark.dc.html",
+   "french": "VerifyFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "empty",
+     "typing",
+     "wrong",
+     "locked",
+     "verified"
+    ]
+   },
+   "linksTo": [
+    "Onboarding",
+    "SignIn",
+    "Welcome"
+   ]
+  },
+  {
+   "id": "Welcome",
+   "title": "Welcome",
+   "section": "Getting in",
+   "sectionId": "getting-in",
+   "route": "/welcome",
+   "board": "Welcome.dc.html",
+   "night": "WelcomeDark.dc.html",
+   "french": "WelcomeFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "JoinCode",
+    "SignIn",
+    "SignUp"
+   ]
+  },
+  {
+   "id": "Feedback",
+   "title": "Send feedback",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/feedback",
+   "board": "Feedback.dc.html",
+   "night": "FeedbackDark.dc.html",
+   "french": "FeedbackFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "compose",
+     "sending",
+     "sent",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "Job"
+   ]
+  },
+  {
+   "id": "HelpCentre",
+   "title": "Help",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/help-centre",
+   "board": "HelpCentre.dc.html",
+   "night": "HelpCentreDark.dc.html",
+   "french": "HelpCentreFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2610
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "search",
+     "noresults",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "Feedback",
+    "Menu",
+    "VideoPlayer"
+   ]
+  },
+  {
+   "id": "Menu",
+   "title": "Menu",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/menu",
+   "board": "Menu.dc.html",
+   "night": "MenuDark.dc.html",
+   "french": "MenuFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Analytics",
+    "Archive",
+    "AssistantProposals",
+    "Books",
+    "Compliance",
+    "Contracts",
+    "CrewMap",
+    "Documents",
+    "Feedback",
+    "Group",
+    "HelpCentre",
+    "Imports",
+    "Integrations",
+    "Inventory",
+    "Invoices",
+    "Leads",
+    "Notifications",
+    "Pay",
+    "PriceBook",
+    "Profile",
+    "Schedule",
+    "ServiceCalls",
+    "SetCompany",
+    "SetTaxes",
+    "Settings",
+    "SmartHome",
+    "Suppliers",
+    "Team",
+    "WhatsNew"
+   ]
+  },
+  {
+   "id": "Notifications",
+   "title": "Notifications",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/notifications",
+   "board": "Notifications.dc.html",
+   "night": "NotificationsDark.dc.html",
+   "french": "NotificationsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "list",
+     "optin"
+    ]
+   },
+   "linksTo": [
+    "Contract",
+    "Invoice",
+    "Job",
+    "Quote",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Profile",
+   "title": "Profile",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/profile",
+   "board": "Profile.dc.html",
+   "night": "ProfileDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1640
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "Menu",
+    "Notifications",
+    "SetSecurity",
+    "SignIn"
+   ]
+  },
+  {
+   "id": "Search",
+   "title": "Search",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/search",
+   "board": "Search.dc.html",
+   "night": "SearchDark.dc.html",
+   "french": "SearchFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Client",
+    "Invoice",
+    "Job",
+    "Menu",
+    "Notifications",
+    "Quote",
+    "Settings",
+    "SmartHome",
+    "Team"
+   ]
+  },
+  {
+   "id": "Settings",
+   "title": "Settings",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/settings",
+   "board": "Settings.dc.html",
+   "night": "SettingsDark.dc.html",
+   "french": "SettingsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2000
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "AssistantPermissions",
+    "CustomizeHome",
+    "HelpCentre",
+    "Integrations",
+    "Menu",
+    "MessageTemplates",
+    "SetCompany",
+    "SetInvoices",
+    "SetMessaging",
+    "SetPlan",
+    "SetQuotes",
+    "SetRoles",
+    "SetSecurity",
+    "SetTaxes",
+    "SetWidget"
+   ]
+  },
+  {
+   "id": "Teammate",
+   "title": "Teammate",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/teammate",
+   "board": "Teammate.dc.html",
+   "night": "TeammateDark.dc.html",
+   "french": "TeammateFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1860
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readonly",
+     "deactivated",
+     "nolink"
+    ]
+   },
+   "linksTo": [
+    "Compliance",
+    "CrewHours",
+    "Job",
+    "Team"
+   ]
+  },
+  {
+   "id": "VideoPlayer",
+   "title": "Video player",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/video-player",
+   "board": "VideoPlayer.dc.html",
+   "night": "VideoPlayerDark.dc.html",
+   "french": "VideoPlayerFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "video": [
+     "quotes",
+     "overview"
+    ],
+    "state": [
+     "playing",
+     "paused",
+     "buffering",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "NewQuote",
+    "Quotes",
+    "SignUp",
+    "Welcome"
+   ]
+  },
+  {
+   "id": "WhatsNew",
+   "title": "What’s new",
+   "section": "Menu and settings",
+   "sectionId": "account",
+   "route": "/whats-new",
+   "board": "WhatsNew.dc.html",
+   "night": "WhatsNewDark.dc.html",
+   "french": "WhatsNewFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "HelpCentre",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "Integration",
+   "title": "QuickBooks Online",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/integration",
+   "board": "Integration.dc.html",
+   "night": "IntegrationDark.dc.html",
+   "french": "IntegrationFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2060
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "connected",
+     "error",
+     "notConnected"
+    ]
+   },
+   "linksTo": [
+    "Integrations"
+   ]
+  },
+  {
+   "id": "Integrations",
+   "title": "Connected apps",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/integrations",
+   "board": "Integrations.dc.html",
+   "night": "IntegrationsDark.dc.html",
+   "french": "IntegrationsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "firstTime",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Imports",
+    "Integration",
+    "Settings"
+   ]
+  },
+  {
+   "id": "MessageTemplates",
+   "title": "Message templates",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/message-templates",
+   "board": "MessageTemplates.dc.html",
+   "night": "MessageTemplatesDark.dc.html",
+   "french": "built-in EN/FR switch",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1720
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "offline",
+     "readOnly",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "SetMessaging"
+   ]
+  },
+  {
+   "id": "SetCompany",
+   "title": "Company details",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-company",
+   "board": "SetCompany.dc.html",
+   "night": "SetCompanyDark.dc.html",
+   "french": "SetCompanyFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1540
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "unsaved",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetInvoices",
+   "title": "Invoices and payments",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-invoices",
+   "board": "SetInvoices.dc.html",
+   "night": "SetInvoicesDark.dc.html",
+   "french": "SetInvoicesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1960
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "stripeNotConnected",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Integration",
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetMessaging",
+   "title": "SMS and WhatsApp",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-messaging",
+   "board": "SetMessaging.dc.html",
+   "night": "SetMessagingDark.dc.html",
+   "french": "SetMessagingFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2300
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "whatsappNotConnected",
+     "textsUsedUp"
+    ]
+   },
+   "linksTo": [
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetPlan",
+   "title": "Plan and billing",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-plan",
+   "board": "SetPlan.dc.html",
+   "night": "SetPlanDark.dc.html",
+   "french": "SetPlanFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1720
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "paymentFailed",
+     "downgraded",
+     "member"
+    ]
+   },
+   "linksTo": [
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetQuotes",
+   "title": "Quotes and follow-ups",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-quotes",
+   "board": "SetQuotes.dc.html",
+   "night": "SetQuotesDark.dc.html",
+   "french": "SetQuotesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1680
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetRoles",
+   "title": "Roles",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-roles",
+   "board": "SetRoles.dc.html",
+   "night": "SetRolesDark.dc.html",
+   "french": "SetRolesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1720
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readOnly",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "CustomizeHome",
+    "RoleHomes",
+    "SetPlan",
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetSecurity",
+   "title": "Sign-in and security",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-security",
+   "board": "SetSecurity.dc.html",
+   "night": "SetSecurityDark.dc.html",
+   "french": "SetSecurityFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1880
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "twoStepOff",
+     "deleteScheduled"
+    ]
+   },
+   "linksTo": [
+    "ForgotPassword",
+    "Settings",
+    "TwoStep"
+   ]
+  },
+  {
+   "id": "SetTaxes",
+   "title": "Taxes",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-taxes",
+   "board": "SetTaxes.dc.html",
+   "night": "SetTaxesDark.dc.html",
+   "french": "SetTaxesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1720
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readOnly"
+    ]
+   },
+   "linksTo": [
+    "Books",
+    "Client",
+    "Settings"
+   ]
+  },
+  {
+   "id": "SetWidget",
+   "title": "Website widget",
+   "section": "Settings pages",
+   "sectionId": "settings-pages",
+   "route": "/set-widget",
+   "board": "SetWidget.dc.html",
+   "night": "SetWidgetDark.dc.html",
+   "french": "SetWidgetFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2330
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "notInstalled"
+    ]
+   },
+   "linksTo": [
+    "Leads",
+    "Settings"
+   ]
+  },
+  {
+   "id": "AssistantActivity",
+   "title": "Assistant · activity",
+   "section": "Assistant",
+   "sectionId": "assistant",
+   "route": "/assistant-activity",
+   "board": "AssistantActivity.dc.html",
+   "night": "AssistantActivityDark.dc.html",
+   "french": "AssistantActivityFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2000
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "AssistantPermissions",
+    "AssistantProposals",
+    "Invoice",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "AssistantPermissions",
+   "title": "Assistant · permissions",
+   "section": "Assistant",
+   "sectionId": "assistant",
+   "route": "/assistant-permissions",
+   "board": "AssistantPermissions.dc.html",
+   "night": "AssistantPermissionsDark.dc.html",
+   "french": "AssistantPermissionsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2090
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "readonly",
+     "offline"
+    ]
+   },
+   "linksTo": [
+    "AssistantActivity",
+    "AssistantProposals",
+    "Settings",
+    "SmartHome"
+   ]
+  },
+  {
+   "id": "AssistantProposals",
+   "title": "Assistant · proposals",
+   "section": "Assistant",
+   "sectionId": "assistant",
+   "route": "/assistant-proposals",
+   "board": "AssistantProposals.dc.html",
+   "night": "AssistantProposalsDark.dc.html",
+   "french": "AssistantProposalsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2200
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty",
+     "offline",
+     "readonly",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "AssistantActivity",
+    "AssistantPermissions",
+    "Invoice",
+    "Schedule",
+    "SetPlan",
+    "SmartHome",
+    "Supplier"
+   ]
+  },
+  {
+   "id": "Analytics",
+   "title": "Analytics",
+   "section": "Insights and workspace",
+   "sectionId": "workspace",
+   "route": "/analytics",
+   "board": "Analytics.dc.html",
+   "night": "AnalyticsDark.dc.html",
+   "french": "AnalyticsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 3180
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "loading",
+     "locked"
+    ]
+   },
+   "linksTo": [
+    "Client",
+    "Clients",
+    "Invoice",
+    "Job",
+    "Jobs",
+    "Leads",
+    "Menu",
+    "Quotes",
+    "Team"
+   ]
+  },
+  {
+   "id": "Archive",
+   "title": "Archive",
+   "section": "Insights and workspace",
+   "sectionId": "workspace",
+   "route": "/archive",
+   "board": "Archive.dc.html",
+   "night": "ArchiveDark.dc.html",
+   "french": "ArchiveFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty"
+    ]
+   },
+   "linksTo": [
+    "Menu",
+    "Quotes"
+   ]
+  },
+  {
+   "id": "Documents",
+   "title": "Documents",
+   "section": "Insights and workspace",
+   "sectionId": "workspace",
+   "route": "/documents",
+   "board": "Documents.dc.html",
+   "night": "DocumentsDark.dc.html",
+   "french": "DocumentsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1640
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty"
+    ]
+   },
+   "linksTo": [
+    "Job",
+    "Menu",
+    "PriceBook"
+   ]
+  },
+  {
+   "id": "Imports",
+   "title": "Imports",
+   "section": "Insights and workspace",
+   "sectionId": "workspace",
+   "route": "/imports",
+   "board": "Imports.dc.html",
+   "night": "ImportsDark.dc.html",
+   "french": "ImportsFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 1200
+   },
+   "tabBar": null,
+   "states": {
+    "step": [
+     "source",
+     "mapping",
+     "importing",
+     "done"
+    ]
+   },
+   "linksTo": [
+    "Clients",
+    "Menu"
+   ]
+  },
+  {
+   "id": "PriceBook",
+   "title": "Price book",
+   "section": "Insights and workspace",
+   "sectionId": "workspace",
+   "route": "/price-book",
+   "board": "PriceBook.dc.html",
+   "night": "PriceBookDark.dc.html",
+   "french": "PriceBookFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 844
+   },
+   "tabBar": null,
+   "states": {
+    "state": [
+     "default",
+     "empty"
+    ]
+   },
+   "linksTo": [
+    "Imports",
+    "Menu"
+   ]
+  },
+  {
+   "id": "Components",
+   "title": "Components",
+   "section": "System",
+   "sectionId": "system",
+   "route": "/components",
+   "board": "Components.dc.html",
+   "night": "ComponentsDark.dc.html",
+   "french": null,
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 8230
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Quote",
+    "Quotes"
+   ]
+  },
+  {
+   "id": "Dunning",
+   "title": "Subscription payment",
+   "section": "System",
+   "sectionId": "system",
+   "route": "/dunning",
+   "board": "Dunning.dc.html",
+   "night": "DunningDark.dc.html",
+   "french": "DunningFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 2240
+   },
+   "tabBar": null,
+   "states": {
+    "role": [
+     "owner",
+     "teammate"
+    ]
+   },
+   "linksTo": [
+    "SetPlan",
+    "Teammate"
+   ]
+  },
+  {
+   "id": "SystemStates",
+   "title": "System states",
+   "section": "System",
+   "sectionId": "system",
+   "route": "/system-states",
+   "board": "SystemStates.dc.html",
+   "night": "SystemStatesDark.dc.html",
+   "french": "SystemStatesFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 390,
+    "h": 5140
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": []
+  },
+  {
+   "id": "Tablet",
+   "title": "Tablet · two columns",
+   "section": "System",
+   "sectionId": "system",
+   "route": "/tablet",
+   "board": "Tablet.dc.html",
+   "night": "TabletDark.dc.html",
+   "french": "TabletFR.dc.html",
+   "largeText": null,
+   "frame": {
+    "w": 1366,
+    "h": 1024
+   },
+   "tabBar": null,
+   "states": {},
+   "linksTo": [
+    "Client",
+    "Clients",
+    "Invoices",
+    "Job",
+    "Jobs",
+    "Menu",
+    "NewQuote",
+    "Profile",
+    "Quotes",
+    "Schedule",
+    "SmartHome"
+   ]
+  }
+ ]
+}

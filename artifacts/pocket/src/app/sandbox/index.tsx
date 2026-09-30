@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { BoardGroup, BoardHeader, SandboxSwitches } from "@/ui/sandbox";
+import { ButtonsSection } from "@/ui/board/Buttons";
 
 export default function Sandbox() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function Sandbox() {
         <BoardHeader title={t("sandbox.title")} intro={t("sandbox.intro")} />
         <SandboxSwitches />
         <Link href="/sandbox/foundations"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Link>
+        <ButtonsSection />
         <Text> </Text>
       </ScrollView>
     </Screen>

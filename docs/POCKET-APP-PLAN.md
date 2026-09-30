@@ -18,10 +18,18 @@ Phase numbers continue the repo's sequence. Each phase maps to a phase in `hando
   - Crew location is shared only while clocked in (LiveLocation).
   - Plans and billing link out to quoteai.ca; there are no prices in the app.
 
-## Questions for the owner
-1. **Manrope weight for digits inside 400 body text.** The tokens bundle Manrope 500/600/700 only. Proposal: 500.
-2. **The Light/Night/Auto override** lives in Settings (handoff Phase 5). Proposal: a temporary switch on the sandbox until Settings exists.
-3. **Menu is a Phase 5 screen**, but Home links to it from Phase 2. Proposal: build Menu with Phase 2.
+## Owner answers (2026-09-30)
+1. **Digit weight matches the text around it:** Geist 400 → Manrope 400, 500 → 500, 600 → 600. Bundle Manrope 400–700 (now in COMPONENTS §1).
+2. **Light / Night / Auto switch:** on `/sandbox` only, defaulting to Auto (follow the phone). It moves to Settings in Phase 5 and never goes on a real screen.
+3. **Menu is built in Phase 2.** Every row or link to a later-phase screen stays visible exactly as designed, and routes to one shared **Coming soon** screen: the normal back header, that screen's real title, and one short line. This covers:
+   - Menu rows to later screens;
+   - the Jobs tab;
+   - Home's links to Jobs, Schedule, Books and Crew map;
+   - Quote editor's links to Contract and Price book;
+   - Invoices' link to Dunning.
+
+   Rows are never hidden, and later screens are never built early. (The owner said BUILD-PLAN and COMPONENTS were updated with this; the files on disk only have the digit-weight change, so this plan is the record.)
+4. **The design pack is committed** as its own commit (c4b8649). `.gitattributes` marks the boards `-diff linguist-generated`.
 
 ## Phase 153: The Expo project (handoff Phase 0, part 1)
 **Project and dependencies**
@@ -51,7 +59,7 @@ Phase numbers continue the repo's sequence. Each phase maps to a phase in `hando
   - the 16 grounds, with dusk as default and its lilac fade drawn fixed to the screen behind content;
   - `muted` switching to #66666e on the fade grounds.
 - **Fonts** (§1):
-  - Geist 400/500/600 and Manrope 500/600/700 bundled.
+  - Geist 400/500/600 and Manrope 400/500/600/700 bundled; digits take the weight of the text around them.
   - `Text` splits digit runs (`/[0-9$%+−°]+(?:[.,  ][0-9]+)*/`) into nested Manrope runs.
   - `Num` for standalone figures, with tabular figures.
   - Number inputs are Manrope throughout.
@@ -101,3 +109,4 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
 
 ## Build log
 - **2026-09-30:** the owner chose Expo. `CLAUDE.md` was written at the repo root (the brief's project context, where things are, and the reading rules). This plan was written.
+- **2026-09-30:** owner answers recorded (digit weight, sandbox-only theme switch, the Coming soon rule, the design pack committed as c4b8649).

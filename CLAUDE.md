@@ -25,6 +25,11 @@ Expo + TypeScript, expo-router, react-native-reanimated, react-native-svg, expo-
 - Touch targets ≥ 44, Dynamic Type supported, reduced motion respected, every icon button labelled.
 - Client-facing pages (client quote, sign, invoice, deposit, portal, subcontractor portal, website form, unsubscribe) are web pages, not app screens.
 
+## Owner rulings (2026-09-30)
+- Digits take the weight of the text around them: Geist 400 → Manrope 400, 500 → 500, 600 → 600.
+- The Light/Night/Auto switch lives only on /sandbox (default Auto) until Settings is built in phase 5.
+- Links to screens from a later phase stay visible exactly as designed and open one shared "Coming soon" screen: back header, the real title, one short line. Never hide the row; never build the later screen early.
+
 ## How to verify a screen
 Open the matching .dc.html board next to the running app (light, night, FR). Build every state listed for it in SCREENS.md. Check every link against navigation.json. Tick the checklist at the end of BUILD-PLAN.md.
 

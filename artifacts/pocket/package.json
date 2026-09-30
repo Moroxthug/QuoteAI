@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "lint:tokens": "node scripts/lint-tokens.mjs",
-    "test": "node --test --experimental-strip-types src/**/*.test.ts"
+    "test": "node --test --experimental-strip-types src/lib/*.test.ts src/ui/*.test.ts",
+    "sync:design": "node scripts/sync-design.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/geist": "0.4.2",

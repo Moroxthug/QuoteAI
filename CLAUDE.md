@@ -36,7 +36,7 @@ Open the matching .dc.html board next to the running app (light, night, FR). Bui
 ## Where things are
 - The plan and build log for this app: docs/POCKET-APP-PLAN.md.
 - Read in full, in this order (about 13k tokens together): docs/pocket-design/handoff/README.md, COMPONENTS.md, BUILD-PLAN.md, CLAUDE-CODE-BRIEF.md, tokens/tokens.ts.
-- The Expo app: artifacts/pocket/ (UI kit in src/ui). The rest of the monorepo is the existing product:
+- The Expo app: artifacts/pocket/ (UI kit in src/ui). It is NOT in the pnpm workspace: `cd artifacts/pocket && npm install --before=<a day ago>`. Metro maps `@workspace/api-client-react` to lib/ and pins react / react-query to the app's copies (metro.config.js). Dev: launch config `pocket-web` (Expo web on 8091, API on 5088), plus the Android emulator. The rest of the monorepo is the existing product:
   - artifacts/api-server: the Express API the app talks to (better-auth bearer token).
   - lib/api-client-react + lib/api-zod: the generated API hooks and types, shared with the app.
   - artifacts/quote-ai: the quoteai.ca web app, where the client-facing pages live (styled with handoff/tokens/tokens.css).

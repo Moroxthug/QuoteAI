@@ -6,7 +6,7 @@ Phase numbers continue the repo's sequence. Each phase maps to a phase in `hando
 
 ## Decisions
 - **Stack (owner, 2026-09-30):** a new Expo app, as the handoff brief recommends, not the Capacitor app.
-- **Where:** `artifacts/pocket/` in this pnpm workspace. It reuses:
+- **Where:** `artifacts/pocket/`, outside the pnpm workspace, with its own npm install (`package-lock.json`). Metro skips pnpm's Windows junctions, so a pnpm-installed Expo app can't resolve its dependencies; this also keeps Expo out of Vercel's web/API install. Install with `npm install --before=<a day ago>`, matching the workspace's one-day `minimumReleaseAge`. It reuses:
   - the existing API, unchanged;
   - the generated hooks and types (`lib/api-client-react`, `lib/api-zod`), whose base URL is configurable;
   - better-auth's bearer token, kept in `expo-secure-store`.
@@ -110,3 +110,10 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
 ## Build log
 - **2026-09-30:** the owner chose Expo. `CLAUDE.md` was written at the repo root (the brief's project context, where things are, and the reading rules). This plan was written.
 - **2026-09-30:** owner answers recorded (digit weight, sandbox-only theme switch, the Coming soon rule, the design pack committed as c4b8649).
+- **2026-09-30, 153 (in progress):**
+  - Expo SDK 57 (React 19.2.3, RN 0.86), expo-router in `src/app`, and i18n (en-CA / fr-CA from the phone's locale).
+  - `tokens.ts` copied from the handoff, and the `lint:tokens` check (colours anywhere, sizes in screens).
+  - The shared API hooks with the bearer token in SecureStore.
+  - Checked on Expo web at 390×844: it signs in, shows the company through `useGetBusinessProfile` in EN and FR, and has one React in the bundle.
+  - Moved out of the pnpm workspace after Metro couldn't follow pnpm's junctions.
+  - Left for 153: run it on an Android emulator. No system image is installed yet (~1.5 GB download, waiting on the owner's OK).

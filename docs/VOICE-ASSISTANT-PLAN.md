@@ -1,5 +1,7 @@
 # QuoteAI — Roles, and the assistant you talk to (Phases 132-142)
 
+> **Superseded 2026-09-30.** The Stitch designs are dropped. The assistant is built exactly as the Claude Design boards show it (AssistantProposals, AssistantActivity, AssistantPermissions, HomeAI, the orb): Phase 128 in `docs/POCKET-APP-PLAN.md`. Nothing in this plan is to be built from here.
+
 Written 2026-09-27. Turns the existing assistant (a text chat on the job page and `/dashboard/assistant`) into one assistant for the whole app: open it from anywhere, talk or type, it talks back, and it can do the work — brief you on the day, send a quote or invoice, text a client, change a job, start a call — within limits the owner sets.
 
 It starts with **roles** (Phase 132): every kind of person in a Canadian contracting company gets the home screen, tabs, data and assistant that fit their job, and arranges their own home within what their role allows.

@@ -1,5 +1,7 @@
 # Pocket design plan: the phone app, built 1:1 from the chosen design
 
+> **Superseded 2026-09-30.** The phone app is now the Expo app in `docs/POCKET-APP-PLAN.md` (Phase 123 onward), from the final design pack in `docs/pocket-design/`. This plan (143–152) put an earlier canvas into the web app's phone view and is history.
+
 Source of truth: the Claude Design canvas **"quoteAI Pocket CRM"**, https://claude.ai/artifact/63hx7iusy5TVEybpZ6s49c. It has five artboards, each 390 px wide: Home (844), Quote draft (1420), Menu (844), Settings (1500), and Home full length (2180).
 
 A pinned copy of its sources lives in `docs/pocket-design/` (see Phase 143). Every value in the app is taken from those files.

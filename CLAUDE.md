@@ -34,7 +34,7 @@ Expo + TypeScript, expo-router, react-native-reanimated, react-native-svg, expo-
 Open the matching .dc.html board next to the running app (light, night, FR). Build every state listed for it in SCREENS.md. Check every link against navigation.json. Tick the checklist at the end of BUILD-PLAN.md.
 
 ## Where things are
-- The plan and build log for this app: docs/POCKET-APP-PLAN.md.
+- The plan and build log for this app: docs/POCKET-APP-PLAN.md (Phase 123 onward). docs/APP-PLAN.md 123–131, docs/VOICE-ASSISTANT-PLAN.md (Stitch) and docs/POCKET-DESIGN-PLAN.md are superseded: never build from them. The assistant is built exactly as its Claude Design boards show.
 - Read in full, in this order (about 13k tokens together): docs/pocket-design/handoff/README.md, COMPONENTS.md, BUILD-PLAN.md, CLAUDE-CODE-BRIEF.md, tokens/tokens.ts.
 - The Expo app: artifacts/pocket/ (UI kit in src/ui). It is NOT in the pnpm workspace: `cd artifacts/pocket && npm install --before=<a day ago>`. Metro maps `@workspace/api-client-react` to lib/ and pins react / react-query to the app's copies (metro.config.js). Dev: launch config `pocket-web` (Expo web on 8091, API on 5088), plus the Android emulator. The rest of the monorepo is the existing product:
   - artifacts/api-server: the Express API the app talks to (better-auth bearer token).

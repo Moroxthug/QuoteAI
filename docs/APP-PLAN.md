@@ -1,5 +1,7 @@
 # QuoteAI — The app, and the videos that teach it (Phases 114-131)
 
+> **Superseded 2026-09-30 from Phase 123 on.** The owner moved the app to Expo, built from the final Claude Design boards: see `docs/POCKET-APP-PLAN.md`, where Phase 123 onward is the new design (the old 123–131 are folded into it: beta and release pipeline in 123, store releases in 129, videos in 130). Phases 114–122 below are history.
+
 Written 2026-09-26. Continues `MOBILE-AND-APP-PLAN.md`: **Track A (Phases 100-113)** makes every screen calm on a phone and rebuilds Settings and Integrations; this document is what comes after it:
 
 - **Track B — The app (Phases 114-126).** QuoteAI on Google Play and the App Store: designed before it is built, instant to open, in sync across every device in real time, working with no signal, and released without a Mac.

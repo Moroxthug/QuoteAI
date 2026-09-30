@@ -18,7 +18,7 @@ Each phase maps to a phase in `handoff/BUILD-PLAN.md`, and a phase is done only 
   - the generated hooks and types (`lib/api-client-react`, `lib/api-zod`), whose base URL is configurable;
   - better-auth's bearer token, kept in `expo-secure-store`.
 - **Same Play listing:** application id `ca.quoteai.app`, signed with the same upload key, and a version code above the Capacitor build's (391623). Expo builds replace the Capacitor one as updates on the same tracks.
-- **Closed test:** the 14 days with 12 testers (personal Play account, D-3) run on the listing, not a build. The owner starts it now with the current build, and Expo builds replace it on the same track.
+- **Closed test:** started by the owner (2026-09-30). Only Expo builds go to testers. Don't raise it again.
 - **Push:** `expo-notifications` with the native FCM token (`getDevicePushTokenAsync`), so the server's FCM sender stays as it is.
 - **The web:** the client-facing pages (client quote, sign, invoice, deposit, portal, subcontractor portal, website form, unsubscribe) stay in `artifacts/quote-ai`, re-styled with `handoff/tokens/tokens.css`. The logged-in web dashboard is not part of this plan.
 - **Design answers to earlier open questions:**
@@ -103,7 +103,6 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
 - the first Expo build is on the test track.
 
 ## Owner items
-- **Now:** start the Play closed test (12 testers, 14 days) with the current build.
 - **Before 129:**
   - an Expo account (for EAS iOS builds);
   - the Apple developer account.

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, clientsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
+import { companyNameForUser, pickLang, unsubscribeDonePage, unsubscribeMessagePage } from "../lib/unsubscribePage.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
@@ -14,14 +15,14 @@ const unsubscribeLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "
 router.get("/public/clients/unsubscribe", unsubscribeLimiter, async (req, res) => {
   const token = String(req.query.token ?? "");
   if (!token) {
-    res.status(400).send("Missing unsubscribe link.");
+    res.status(400).send(unsubscribeMessagePage(pickLang(req), "missing"));
     return;
   }
 
   try {
     const [client] = await db.select().from(clientsTable).where(eq(clientsTable.marketingUnsubscribeToken, token));
     if (!client) {
-      res.status(404).send("This unsubscribe link is no longer valid.");
+      res.status(404).send(unsubscribeMessagePage(pickLang(req), "invalid"));
       return;
     }
 
@@ -29,13 +30,10 @@ router.get("/public/clients/unsubscribe", unsubscribeLimiter, async (req, res) =
       await db.update(clientsTable).set({ marketingUnsubscribedAt: new Date() }).where(eq(clientsTable.id, client.id));
     }
 
-    res.status(200).send(`<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;text-align:center;padding:48px;">
-      <h2>You've been unsubscribed</h2>
-      <p>You won't receive any more review requests or shared photos from us. This doesn't affect quotes, contracts, or invoices we send you.</p>
-    </body></html>`);
+    res.status(200).send(unsubscribeDonePage({ lang: pickLang(req, client.preferredLanguage), kind: "marketing", company: await companyNameForUser(client.userId) }));
   } catch (err) {
     logger.error({ err }, "Client marketing unsubscribe failed");
-    res.status(500).send("Something went wrong. Please try again later.");
+    res.status(500).send(unsubscribeMessagePage(pickLang(req), "error"));
   }
 });
 

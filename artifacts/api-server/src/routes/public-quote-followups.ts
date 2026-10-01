@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, quotesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
+import { companyNameForUser, pickLang, unsubscribeDonePage, unsubscribeMessagePage } from "../lib/unsubscribePage.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
@@ -13,14 +14,14 @@ const unsubscribeLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "
 router.get("/public/quotes/unsubscribe", unsubscribeLimiter, async (req, res) => {
   const token = String(req.query.token ?? "");
   if (!token) {
-    res.status(400).send("Missing unsubscribe link.");
+    res.status(400).send(unsubscribeMessagePage(pickLang(req), "missing"));
     return;
   }
 
   try {
     const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.unsubscribeToken, token));
     if (!quote) {
-      res.status(404).send("This unsubscribe link is no longer valid.");
+      res.status(404).send(unsubscribeMessagePage(pickLang(req), "invalid"));
       return;
     }
 
@@ -31,13 +32,10 @@ router.get("/public/quotes/unsubscribe", unsubscribeLimiter, async (req, res) =>
         .where(eq(quotesTable.id, quote.id));
     }
 
-    res.status(200).send(`<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;text-align:center;padding:48px;">
-      <h2>You've been unsubscribed</h2>
-      <p>You won't receive any more reminders about this quote.</p>
-    </body></html>`);
+    res.status(200).send(unsubscribeDonePage({ lang: pickLang(req), kind: "reminders", company: quote.companySnapshot?.companyName ?? "" }));
   } catch (err) {
     logger.error({ err }, "Quote follow-up unsubscribe failed");
-    res.status(500).send("Something went wrong. Please try again later.");
+    res.status(500).send(unsubscribeMessagePage(pickLang(req), "error"));
   }
 });
 

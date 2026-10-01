@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db, leadsTable, leadEventsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
+import { companyNameForUser, pickLang, unsubscribeDonePage, unsubscribeMessagePage } from "../lib/unsubscribePage.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
@@ -13,14 +14,14 @@ const unsubscribeLimiter = ipRateLimiter({ windowMs: 60_000, max: 30, message: "
 router.get("/public/leads/unsubscribe", unsubscribeLimiter, async (req, res) => {
   const token = String(req.query.token ?? "");
   if (!token) {
-    res.status(400).send("Missing unsubscribe link.");
+    res.status(400).send(unsubscribeMessagePage(pickLang(req), "missing"));
     return;
   }
 
   try {
     const [lead] = await db.select().from(leadsTable).where(eq(leadsTable.unsubscribeToken, token));
     if (!lead) {
-      res.status(404).send("This unsubscribe link is no longer valid.");
+      res.status(404).send(unsubscribeMessagePage(pickLang(req), "invalid"));
       return;
     }
 
@@ -32,13 +33,10 @@ router.get("/public/leads/unsubscribe", unsubscribeLimiter, async (req, res) => 
       await db.insert(leadEventsTable).values({ leadId: lead.id, userId: lead.userId, type: "unsubscribed", payload: {} });
     }
 
-    res.status(200).send(`<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;text-align:center;padding:48px;">
-      <h2>You've been unsubscribed</h2>
-      <p>You won't receive any more follow-up messages from us.</p>
-    </body></html>`);
+    res.status(200).send(unsubscribeDonePage({ lang: pickLang(req, lead.preferredLanguage), kind: "followups", company: await companyNameForUser(lead.userId) }));
   } catch (err) {
     logger.error({ err }, "Lead unsubscribe failed");
-    res.status(500).send("Something went wrong. Please try again later.");
+    res.status(500).send(unsubscribeMessagePage(pickLang(req), "error"));
   }
 });
 

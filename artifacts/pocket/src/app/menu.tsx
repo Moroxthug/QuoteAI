@@ -24,7 +24,7 @@ type RowDef = { key: string; icon: IconName; tone: Tone; built?: BuiltScreen };
 const GROUPS: { key: string; rows: RowDef[] }[] = [
   { key: "business", rows: [
     { key: "company", icon: "building", tone: "violet" }, { key: "priceBook", icon: "tag", tone: "lilac" },
-    { key: "leads", icon: "funnel", tone: "clay" }, { key: "contracts", icon: "pen", tone: "indigo" },
+    { key: "leads", icon: "funnel", tone: "clay" }, { key: "contracts", icon: "pen", tone: "indigo", built: "Contracts" },
     { key: "compliance", icon: "shield", tone: "sage", built: "Compliance" }, { key: "taxes", icon: "percent", tone: "azure" } ] },
   { key: "team", rows: [
     { key: "crew", icon: "users", tone: "sage" }, { key: "timesheets", icon: "clock", tone: "teal" },

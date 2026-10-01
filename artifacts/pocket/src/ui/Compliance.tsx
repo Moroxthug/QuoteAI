@@ -10,7 +10,7 @@ import { Num, Text } from "./Text";
 import { useTheme, type ColorName } from "./theme";
 
 /** The three numbers: label, figure (red when it needs you) and a line under it, with hairlines between. */
-export function KpiThree({ items }: { items: { label: string; value: string; sub: string; tone?: ColorName }[] }) {
+export function KpiThree({ items }: { items: { label: string; value: string; sub: string; tone?: ColorName; /** The line under the figure takes a colour (Contracts: amber while one is yours, green when signed). */ subTone?: ColorName }[] }) {
   const { colors } = useTheme();
   return (
     <Card style={{ flexDirection: "row", paddingVertical: 14, paddingHorizontal: 4 }}>
@@ -18,7 +18,7 @@ export function KpiThree({ items }: { items: { label: string; value: string; sub
         <View key={i} accessible accessibilityLabel={`${k.label}, ${k.value}, ${k.sub}`} style={{ flex: 1, minWidth: 0, gap: 3, paddingHorizontal: 12, borderLeftWidth: i > 0 ? 1 : 0, borderLeftColor: colors.line }}>
           <Text size={11.5} color="muted">{k.label}</Text>
           <Num size={19} weight={600} tracking={-0.03} color={k.tone ?? "ink"}>{k.value}</Num>
-          <Text size={11.5} color="muted" numberOfLines={1}>{k.sub}</Text>
+          <Text size={11.5} color={k.subTone ?? "muted"} numberOfLines={1}>{k.sub}</Text>
         </View>
       ))}
     </Card>

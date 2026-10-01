@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db, contractsTable, contractSignersTable, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
@@ -27,7 +27,27 @@ async function requireContractsFeature(userId: string): Promise<{ ok: true } | {
   return { ok: false, plan: minimumPlanFor("contracts") };
 }
 
-function serializeContract(c: typeof contractsTable.$inferSelect, signers: (typeof contractSignersTable.$inferSelect)[] = [], events: { id: string; type: string; actor: string; createdAt: Date; detail: unknown }[] = []) {
+/** The phone's list: one small row per contract, with none of the document (a company can have hundreds). */
+function serializeContractRow(c: typeof contractsTable.$inferSelect, viewedAt: Date | null) {
+  return {
+    id: c.id,
+    quoteId: c.quoteId,
+    kind: c.kind,
+    contractNumber: c.contractNumber,
+    status: c.status,
+    title: c.kind === "change_order" ? c.document.title : c.variables.projectTitle,
+    customerName: c.variables.customer.name,
+    contractValueCents: c.contractValueCents,
+    sentAt: c.sentAt?.toISOString() ?? null,
+    viewedAt: viewedAt?.toISOString() ?? null,
+    signedAt: c.signedAt?.toISOString() ?? null,
+    voidedAt: c.voidedAt?.toISOString() ?? null,
+    expiresAt: c.expiresAt?.toISOString() ?? null,
+    createdAt: c.createdAt.toISOString(),
+  };
+}
+
+function serializeContract(c: typeof contractsTable.$inferSelect, signers: (typeof contractSignersTable.$inferSelect)[] = [], events: { id: string; type: string; actor: string; createdAt: Date; detail: unknown }[] = [], withSignatures = false) {
   return {
     id: c.id,
     quoteId: c.quoteId,
@@ -69,6 +89,8 @@ function serializeContract(c: typeof contractsTable.$inferSelect, signers: (type
       viewedAt: s.viewedAt?.toISOString() ?? null,
       declinedAt: s.declinedAt?.toISOString() ?? null,
       declineReason: s.declineReason,
+      /** Only on the single contract (the typed name or the drawn image), to show the signature. */
+      ...(withSignatures && s.status === "signed" ? { signatureData: s.signatureData } : null),
     })),
     events: events.map((e) => ({ id: e.id, type: e.type, actor: e.actor, detail: e.detail, createdAt: e.createdAt.toISOString() })),
   };
@@ -79,7 +101,12 @@ router.get("/contracts", requireAuth, async (req, res) => {
   try {
     const userId = getUserId(res);
     const rows = await db.select().from(contractsTable).where(and(eq(contractsTable.userId, userId), isNull(contractsTable.archivedAt))).orderBy(desc(contractsTable.createdAt)).limit(200);
-    res.json({ items: rows.map((c) => serializeContract(c)) });
+    if (req.query.lean !== "1") { res.json({ items: rows.map((c) => serializeContract(c)) }); return; }
+    const seen = rows.length
+      ? await db.select({ contractId: contractSignersTable.contractId, viewedAt: contractSignersTable.viewedAt }).from(contractSignersTable).where(and(inArray(contractSignersTable.contractId, rows.map((c) => c.id)), eq(contractSignersTable.role, "customer")))
+      : [];
+    const viewedAt = new Map(seen.map((s) => [s.contractId, s.viewedAt]));
+    res.json({ items: rows.map((c) => serializeContractRow(c, viewedAt.get(c.id) ?? null)) });
   } catch (err) {
     req.log.error({ err }, "Error listing contracts");
     res.status(500).json({ error: "Internal server error" });
@@ -155,7 +182,7 @@ router.post("/contracts/from-quote/:quoteId", requireAuth, requirePermission("co
     }
     const { contract, created } = await createContractFromQuote({ userId, quoteId: req.params.quoteId as string, language: body.data.language, province: body.data.province, actor: "contractor" });
     const loaded = await loadContract(contract.id);
-    res.status(created ? 201 : 200).json({ contract: serializeContract(contract, loaded?.signers, loaded?.events), created });
+    res.status(created ? 201 : 200).json({ contract: serializeContract(contract, loaded?.signers, loaded?.events, true), created });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error";
     if (message === "Quote not found") {
@@ -182,7 +209,7 @@ router.get("/contracts/:id", requireAuth, async (req, res) => {
       return;
     }
     res.json({
-      contract: serializeContract(loaded.contract, loaded.signers, loaded.events),
+      contract: serializeContract(loaded.contract, loaded.signers, loaded.events, true),
       html: renderContractHtml({ document: loaded.contract.document, variables: loaded.contract.variables, signers: loaded.signers, status: loaded.contract.status, createdAt: loaded.contract.createdAt, embedded: true }),
       css: CONTRACT_CSS,
     });
@@ -259,7 +286,7 @@ router.put("/contracts/:id", requireAuth, requirePermission("contracts", "edit")
 
     const fresh = await loadContract(loaded.contract.id);
     res.json({
-      contract: serializeContract(updated!, fresh?.signers, fresh?.events),
+      contract: serializeContract(updated!, fresh?.signers, fresh?.events, true),
       html: renderContractHtml({ document: updated!.document, variables: updated!.variables, signers: fresh?.signers ?? [], status: updated!.status, createdAt: updated!.createdAt, embedded: true }),
     });
   } catch (err) {
@@ -315,7 +342,7 @@ router.post("/contracts/:id/sign", requireAuth, requirePermission("contracts", "
     // If the customer had already signed (contractor countersigning), execute.
     await finalizeContract(loaded.contract.id);
     const fresh = await loadContract(loaded.contract.id);
-    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events) });
+    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events, true) });
   } catch (err) {
     req.log.error({ err }, "Error signing contract");
     res.status(500).json({ error: "Internal server error" });
@@ -329,7 +356,7 @@ router.post("/contracts/:id/send", requireAuth, requirePermission("contracts", "
     const body = z.object({ message: z.string().max(1000).optional(), toEmail: z.string().email().max(254).optional() }).safeParse(req.body ?? {});
     const { contract } = await sendContractToCustomer({ contractId: req.params.id as string, userId, message: body.success ? body.data.message : undefined, toEmail: body.success ? body.data.toEmail : undefined, ip: req.ip, userAgent: req.headers["user-agent"] });
     const fresh = await loadContract(contract.id);
-    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events) });
+    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events, true) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error";
     if (message === "SIGN_FIRST") {
@@ -373,7 +400,7 @@ router.post("/contracts/:id/void", requireAuth, requirePermission("contracts", "
     await logContractEvent({ contractId: loaded.contract.id, type: "voided", actor: "contractor", detail: { reason }, ip: req.ip, userAgent: req.headers["user-agent"] });
     await writeAudit({ userId, actorType: "user", actorId: userId, entityType: "contract", entityId: loaded.contract.id, action: "voided", diff: { reason } });
     const fresh = await loadContract(loaded.contract.id);
-    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events) });
+    res.json({ contract: serializeContract(fresh!.contract, fresh!.signers, fresh!.events, true) });
   } catch (err) {
     req.log.error({ err }, "Error voiding contract");
     res.status(500).json({ error: "Internal server error" });

@@ -144,7 +144,7 @@ export default function Quote() {
   };
 
   const primary = accepted
-    ? { label: quote.jobId ? t("quote.openJob") : t("quote.startJob"), run: () => router.push(screenHref("JobSetup", t("quote.startJob"))), done: false }
+    ? { label: quote.jobId ? t("quote.openJob") : t("quote.startJob"), run: () => router.push(quote.jobId ? screenHref("Job", t("quote.openJob"), { id: quote.jobId }) : screenHref("JobSetup", t("quote.startJob"), { quoteId: id! })), done: false }
     : { label: sent ? t("quote.sentTo", { name: firstName }) : t("quote.send", { total: m(live.totale) }), run: () => void sendNow(), done: sent };
 
   const lines: QuoteLine[] = caps.flatMap((c, ci) => c.voci.map((v, vi) => {

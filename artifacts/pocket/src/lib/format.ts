@@ -72,3 +72,10 @@ export function relativeWhen(at: Date, now: Date, locale: Locale): string {
   if (days > 1 && days < 7) return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(at);
   return shortDate(at, locale);
 }
+
+/** "Oct 5 – 7" / "5 – 7 oct." inside a month, else "Oct 5 – Nov 2" / "5 oct. – 2 nov."; one day alone when they match. */
+export function dateRange(a: Date, b: Date, locale: Locale): string {
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()) return shortDate(a, locale);
+  if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()) return locale === "fr-CA" ? `${a.getDate()} – ${shortDate(b, locale)}` : `${shortDate(a, locale)} – ${b.getDate()}`;
+  return `${shortDate(a, locale)} – ${shortDate(b, locale)}`;
+}

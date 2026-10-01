@@ -88,7 +88,7 @@ export default function Quotes() {
     switch (s) {
       case "draft": return [go("send", t("quotes.actions.send"), "send", "azure", "info", quote), dup(t("quotes.actions.duplicate"))];
       case "sent": case "viewed": case "expiring": return [go("follow", t("quotes.actions.followUp"), "chat", "violet", "acc", quote), arch];
-      case "accepted": return [go("deposit", t("quotes.actions.invoiceDeposit"), "receipt", "amber", "warn", screenHref("Invoices", t("menu.rows.invoices.label"))), go("job", t("quotes.actions.startJob"), "cone", "amber", "ok", screenHref("JobSetup", t("quotes.actions.startJob")))];
+      case "accepted": return [go("deposit", t("quotes.actions.invoiceDeposit"), "receipt", "amber", "warn", screenHref("Invoices", t("menu.rows.invoices.label"))), go("job", t("quotes.actions.startJob"), "cone", "amber", "ok", screenHref("JobSetup", t("quotes.actions.startJob"), { quoteId: q.id }))];
       case "declined": return [dup(t("quotes.actions.revive")), arch];
       case "expired": return [dup(t("quotes.actions.renew")), arch];
     }
@@ -98,7 +98,7 @@ export default function Quotes() {
     switch (s) {
       case "draft": return { label: t("quotes.actions.send"), onPress: () => open(q.id) };
       case "sent": case "viewed": case "expiring": return { label: t("quotes.actions.followUp"), onPress: () => open(q.id) };
-      case "accepted": return { label: t("quotes.actions.startJob"), onPress: () => router.push(screenHref("JobSetup", t("quotes.actions.startJob"))) };
+      case "accepted": return { label: t("quotes.actions.startJob"), onPress: () => router.push(screenHref("JobSetup", t("quotes.actions.startJob"), { quoteId: q.id })) };
       case "declined": return { label: t("quotes.actions.revive"), onPress: () => duplicate.mutate({ id: q.id } as never, { onSuccess: () => { toast({ message: t("quotes.done.duplicated") }); void refresh(); }, onError: fail }) };
       case "expired": return { label: t("quotes.actions.renew"), onPress: () => duplicate.mutate({ id: q.id } as never, { onSuccess: () => { toast({ message: t("quotes.done.duplicated") }); void refresh(); }, onError: fail }) };
     }

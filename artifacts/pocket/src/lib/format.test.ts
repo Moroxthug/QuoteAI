@@ -39,3 +39,12 @@ test("relativeWhen: minutes, hours, today, yesterday, weekday, date", async () =
   assert.equal(relativeWhen(new Date(2026, 8, 12, 9, 0), now, "en-CA"), "Sep 12");
   assert.equal(relativeWhen(new Date(2026, 8, 12, 9, 0), now, "fr-CA"), "12 sept.");
 });
+
+test("a date range drops the repeated month", async () => {
+  const { dateRange } = await import("./format.ts");
+  const d = (m: number, day: number) => new Date(2026, m - 1, day, 12);
+  assert.equal(dateRange(d(10, 5), d(10, 7), "en-CA"), "Oct 5 – 7");
+  assert.equal(dateRange(d(10, 5), d(10, 7), "fr-CA"), "5 – 7 oct.");
+  assert.equal(dateRange(d(10, 30), d(11, 2), "en-CA"), "Oct 30 – Nov 2");
+  assert.equal(dateRange(d(10, 5), d(10, 5), "en-CA"), "Oct 5");
+});

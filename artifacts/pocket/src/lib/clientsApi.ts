@@ -13,6 +13,6 @@ export const clientsApi = {
   portal: (id: string) => api<PortalStatus>(`/api/clients/${encodeURIComponent(id)}/portal`),
   invite: (id: string) => api<{ success: boolean; invitedAt: string; url: string }>(`/api/clients/${encodeURIComponent(id)}/portal/invite`, { method: "POST", body: {} }),
   messages: (id: string) => api<{ messages: PortalMessage[] }>(`/api/clients/${encodeURIComponent(id)}/messages`),
-  send: (id: string, body: string) => api<unknown>(`/api/clients/${encodeURIComponent(id)}/messages`, { method: "POST", body: { body } }),
+  send: (id: string, body: string, jobId?: string) => api<unknown>(`/api/clients/${encodeURIComponent(id)}/messages`, { method: "POST", body: { body, ...(jobId ? { jobId } : null) } }),
   remind: (invoiceId: string) => api<unknown>(`/api/invoices/${encodeURIComponent(invoiceId)}/remind`, { method: "POST", body: {} }),
 };

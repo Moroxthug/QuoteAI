@@ -15,9 +15,21 @@ import { initialsOf } from "@/lib/invites";
 import { dateOnly } from "@/lib/jobs";
 import { figures, jobWindow, milestoneCounts, segments, TAB_ORDER, type JobTab } from "@/lib/jobPage";
 import { jobsApi } from "@/lib/jobsApi";
+import { addJobPhoto } from "@/lib/jobPhotos";
+import { useDictation } from "@/lib/newQuoteInput";
 import { screenHref } from "@/lib/nav";
 import { useSession } from "@/lib/useSession";
+import { ChangeOrders } from "@/jobTabs/ChangeOrders";
+import { Costs } from "@/jobTabs/Costs";
+import { Invoices } from "@/jobTabs/Invoices";
+import { Ask } from "@/jobTabs/Ask";
+import { Documents } from "@/jobTabs/Documents";
+import { Messages } from "@/jobTabs/Messages";
 import { Overview } from "@/jobTabs/Overview";
+import { Photos } from "@/jobTabs/Photos";
+import { RecordSheet } from "@/jobTabs/RecordSheet";
+import { Schedule } from "@/jobTabs/Schedule";
+import { Team } from "@/jobTabs/Team";
 import { PrimaryContext, type Primary } from "@/jobTabs/primary";
 import { ActionBar, ACTION_BAR_SPACE } from "@/ui/ActionBar";
 import { Avatar } from "@/ui/Avatar";
@@ -55,7 +67,9 @@ export default function Job() {
   const [menu, setMenu] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [name, setName] = useState("");
+  const [record, setRecord] = useState(false);
   const [omw, setOmw] = useState<"idle" | "busy" | "sent">("idle");
+  const dictation = useDictation();
   const d = q.data;
   const setPrimaryStable = useCallback((p: Primary | null) => setPrimary(p), []);
   const win = useMemo(() => (d ? jobWindow(d) : null), [d]);
@@ -106,6 +120,19 @@ export default function Job() {
     }
   };
 
+  const addPhoto = async () => {
+    const r = await addJobPhoto(job.id);
+    if (r === "ok") { void client.invalidateQueries({ queryKey: ["job-photos", job.id] }); setTab("photos"); toast({ message: j("quick.photoAdded") }); }
+    else if (r !== "cancelled") toast({ message: r === "denied" ? j("quick.denied") : r === "unavailable" ? j("quick.unavailable") : j("quick.photoFailed") });
+  };
+  const voice = async () => {
+    const r = await dictation.toggle();
+    if (!r) return;
+    if (!r.ok) { toast({ message: r.problem === "denied" ? j("quick.denied") : r.problem === "unavailable" ? j("quick.unavailable") : j("quick.voiceFailed") }); return; }
+    if (!r.text.trim()) { toast({ message: j("quick.voiceFailed") }); return; }
+    try { await jobsApi.addNote(job.id, r.text.trim()); void client.invalidateQueries({ queryKey: ["job-notes", job.id] }); toast({ message: j("quick.voiceSaved") }); } catch { toast({ message: j("failed") }); }
+  };
+
   const setStatus = async (s: "active" | "suspended" | "completed") => {
     setMenu(false);
     try { await jobsApi.setStatus(job.id, s); refresh(); } catch (e) { toast({ message: e instanceof ApiFailure && e.status === 409 ? e.message : j("failed") }); }
@@ -122,7 +149,17 @@ export default function Job() {
 
   const tabs = TAB_ORDER.map((k) => ({ key: k, label: j(`tabs.${k}`) }));
   const primaryLabel = primary?.label ?? j(`primary.${tab === "inv" ? "invNone" : tab === "photos" ? "photos" : tab}`);
-  const content = tab === "overview" ? <Overview d={d} id={job.id} locale={locale} /> : (
+  const onRecord = () => setRecord(true);
+  const content = tab === "overview" ? <Overview d={d} id={job.id} locale={locale} onRecord={onRecord} />
+    : tab === "schedule" ? <Schedule d={d} id={job.id} locale={locale} onRecord={onRecord} />
+    : tab === "co" ? <ChangeOrders d={d} id={job.id} locale={locale} />
+    : tab === "costs" ? <Costs d={d} id={job.id} locale={locale} />
+    : tab === "inv" ? <Invoices d={d} id={job.id} locale={locale} />
+    : tab === "team" ? <Team d={d} id={job.id} locale={locale} />
+    : tab === "photos" ? <Photos id={job.id} locale={locale} />
+    : tab === "msg" ? <Messages d={d} id={job.id} locale={locale} />
+    : tab === "docs" ? <Documents d={d} id={job.id} locale={locale} onTab={(k) => setTab(k)} />
+    : tab === "ask" ? <Ask /> : (
     <Section pt={22} px={16}><Card padded><Text size={13.5} color="muted">{j(`tabs.${tab}`)}</Text></Card></Section>
   );
 
@@ -143,14 +180,15 @@ export default function Job() {
           <Section delay={90} pt={12} pb={20} px={16}>
             <QuickTiles items={[
               { key: "omw", icon: "send", tone: "teal", label: omw === "sent" ? j("quick.omwSent") : j("quick.omw"), onPress: () => void sendOmw(), busy: omw === "busy" },
-              { key: "photo", icon: "camera", tone: "indigo", label: j("quick.photo"), onPress: () => setTab("photos") },
-              { key: "voice", icon: "mic", tone: "violet", label: j("quick.voice"), onPress: () => setTab("overview") },
+              { key: "photo", icon: "camera", tone: "indigo", label: j("quick.photo"), onPress: () => void addPhoto() },
+              { key: "voice", icon: "mic", tone: "violet", label: dictation.state === "listening" ? j("quick.listening") : dictation.state === "busy" ? j("quick.writing") : j("quick.voice"), onPress: () => void voice(), busy: dictation.state === "busy" },
             ]} />
           </Section>
           <JobTabs tabs={tabs} active={tab} onChange={(k) => setTab(k as JobTab)} label={j("tabsLabel")} />
           <View>{content}</View>
         </ScrollView>
 
+        <RecordSheet id={job.id} open={record} onClose={() => setRecord(false)} />
         <Sheet open={menu} onClose={() => setMenu(false)} label={j("more")} closeLabel={t("close")}>
           <SheetTitle>{job.name}</SheetTitle>
           <MenuList>

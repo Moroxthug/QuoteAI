@@ -28,12 +28,12 @@ export type ChangeOrderRow = {
 
 export type CostEntry = {
   id: string; projectId: string | null; milestoneId: string | null; milestoneTitle: string | null; category: CostCategory; vendor: string; description: string; date: string;
-  subtotalCents: number; taxCents: number; totalCents: number; status: "pending" | "confirmed"; source: string; createdBy: string; sourceDocumentId: string | null; confirmedAt: string | null; createdAt: string;
+  subtotalCents: number; taxCents: number; totalCents: number; status: "pending_review" | "confirmed"; source: string; aiExtraction?: { confidence?: "high" | "medium" | "low" } | null; createdBy: string; sourceDocumentId: string | null; confirmedAt: string | null; createdAt: string;
 };
 
 export type TimeEntryRow = {
   id: string; workerId: string; workerName?: string; projectId: string | null; milestoneId: string | null; date: string; hours: number; note?: string; status: string;
-  clockInAt?: string | null; clockOutAt?: string | null; costCents?: number;
+  clockInAt?: string | null; clockOutAt?: string | null; costCents?: number; geofenceFlagged?: boolean; enteredBy?: string;
 };
 
 export type Assignment = { id: string; collaboratorId: string; roleInProject: string; collaboratorName: string; collaboratorRole: string; collaboratorHourlyRate: number | null; workerType: string; active: boolean };

@@ -19,7 +19,7 @@ export const en = {
     margin: "Projected margin", onTarget: "{{amount}} · on target", offTarget: "{{amount}} · below target",
   },
   quick: {
-    omw: "On my way", omwSent: "ETA sent", photo: "Add photo", voice: "Voice note",
+    omw: "On my way", omwSent: "ETA sent", photo: "Add photo", voice: "Voice note", listening: "Tap to stop", writing: "Writing it down…", voiceSaved: "Voice note saved", voiceFailed: "Couldn’t catch that. Try again.", photoAdded: "Photo added",
     noClient: "This job has no client to text.", noPhone: "This client has no phone number on file.", omwFailed: "Couldn’t send the text. Try again.", optedOut: "This client asked not to get texts.",
     photoFailed: "Couldn’t add the photo. Try again.", unavailable: "This isn’t available on this phone yet.", denied: "Allow the camera or microphone to do this.",
   },
@@ -67,20 +67,21 @@ export const en = {
     status: { draft: "Draft", sent: "Waiting", signed: "Signed", declined: "Declined", voided: "Voided", toSign: "To sign" }, meta: "{{number}} · {{days}} · {{when}}", signedOn: "signed {{date}}", sentOn: "sent {{date}}", draftOn: "drafted {{date}}", new: "New change order", empty: "No change orders yet." },
   costs: {
     scan: "Scan a receipt", scanSub: "Vendor, tax and category read for you", review: "To review", receipts_one: "{{count}} receipt", receipts_other: "{{count}} receipts", doneLead: "All receipts confirmed.", doneBody: "Costs are up to date.",
-    confirm: "Confirm", confirmed: "Confirmed", entries: "Entries", byCategory: "By category", budget: "Budget vs actual", used: "{{pct}} used", sure: "{{pct}} sure", noEntries: "No costs yet.",
+    confirm: "Confirm", confirmed: "Confirmed", entries: "Entries", byCategory: "By category", budget: "Budget vs actual", used: "{{pct}} used", confidence: { high: "sure", medium: "fairly sure", low: "check it" }, takePhoto: "Take a photo", choosePhoto: "Choose a photo", scanTitle: "Scan a receipt", reading: "Reading the receipt…", noEntries: "No costs yet.",
     entryMeta: "{{category}} · {{source}} · {{date}}", source: { receipt: "Receipt", time: "Time", bank: "Bank line", manual: "Manual", equipment: "Equipment use", travel: "Travel", other: "Other" },
     scanned: "Receipt added. Check it under To review.", scanFailed: "Couldn’t read that receipt. Try again.",
   },
   inv: {
     invoiced: "Invoiced", invoices_one: "{{count}} invoice", invoices_other: "{{count}} invoices", collected: "Collected", paid_one: "{{count}} paid", paid_other: "{{count}} paid", outstanding: "Outstanding", lateBy_one: "{{number}} · {{count}} day late", lateBy_other: "{{number}} · {{count}} days late", none: "Nothing owed",
-    toInvoice: "Still to invoice", termsLeft_one: "{{count}} term left", termsLeft_other: "{{count}} terms left", plan: "Billing plan", fromContract: "From the contract", create: "Create", manual: "Manual invoice",
+    term: "Term {{n}}", toInvoice: "Still to invoice", termsLeft_one: "{{count}} term left", termsLeft_other: "{{count}} terms left", plan: "Billing plan", fromContract: "From the contract", create: "Create", manual: "Manual invoice",
     status: { paid: "Paid", late: "Late", draft: "Draft", open: "Open", held: "Held", sent: "Sent", partial: "Partly paid" }, dueWhenDone: "{{pct}} · due when the milestone is done", paidOn: "{{pct}} · {{number}} · paid {{date}}", dueOn: "{{pct}} · {{number}} · due {{date}}", draftMeta: "{{pct}} · {{number}} draft", daysLate_one: "{{count}} day late", daysLate_other: "{{count}} days late",
     holdback: "Holdback release", created: "Invoice drafted", createFailed: "Couldn’t create it. Try again.", noPlan: "No billing plan yet. It comes from a signed contract.",
   },
   team: {
     hours: "Hours to approve", approveAll: "Approve all", approve: "Approve", approved: "Approved", hoursNone: "No hours waiting.", log: "Log hours", assigned: "Assigned", assign: "Assign", onThisJob: "on this job", noCrew: "Nobody is assigned yet.",
     location: "Job-site location", locationSub: "{{address}} · {{radius}} m radius for clock-in", locationNone: "Not set yet", locationNoAddress: "No address",
-    hoursMeta: "{{date}} · {{from}} – {{to}}", hoursMetaNoClock: "{{date}} · typed in", offSite: "{{date}} · {{distance}} off site", hoursUnit: "{{count}} h",
+    logTitle: "Log hours", who: "Who worked", hoursField: "Hours", dateField: "Date", noteField: "Note (optional)", saveHours: "Save hours", hoursSaved: "Hours saved", assignTitle: "Assign to this job", assignNone: "Everyone is already on this job.", assigned2: "Added to the job", removeFrom: "Remove {{name}} from this job", radiusTitle: "Clock-in radius", radiusSub: "The crew can clock in within this distance of the site.", radiusSave: "Save radius", radiusNoPin: "The site pin isn’t set yet. Set it on the website to turn on clock-in checks.", radiusSaved: "Radius saved", planNeeded: "Time tracking comes with a higher plan.",
+    hoursMeta: "{{date}} · {{from}} – {{to}}", hoursMetaNoClock: "{{date}} · typed in", offSite: "{{date}} · outside the site radius", hoursUnit: "{{count}} h",
   },
   photos: { count_one: "{{count}} photo", count_other: "{{count}} photos", selected: "{{count}} of {{total}} selected", select: "Select", clear: "Clear", deleteSelected: "Delete selected", empty: "No photos yet.", share: "Share {{count}} with the client", shared: "Sent to the client", shareFailed: "Couldn’t send them. Try again.", photoFrom: "Photo from {{date}}", deleted: "Deleted" },
   msg: { portal: "Client portal", portalSub: "Your client sees quotes, invoices and photos here", copy: "Copy link", copied: "Copied", opened: "{{name}} opened it {{when}}", notOpened: "Not opened yet", noPortal: "The client portal isn’t on for this job.", composeLabel: "Message", composePlaceholder: "Message {{name}}", send: "Send", empty: "No messages yet.", read: "Read", yesterday: "Yesterday", today: "Today" },
@@ -107,7 +108,8 @@ export const fr: typeof en = {
     margin: "Marge prévue", onTarget: "{{amount}} · dans la cible", offTarget: "{{amount}} · sous la cible", // owner (last)
   },
   quick: {
-    omw: "En route", omwSent: "Heure envoyée", photo: "Ajouter une photo", voice: "Note vocale",
+    omw: "En route", omwSent: "Heure envoyée", photo: "Ajouter une photo", voice: "Note vocale", listening: "Touchez pour arrêter", writing: "Je note…", voiceSaved: "Note vocale enregistrée", voiceFailed: "Je n’ai pas compris. Réessayez.", photoAdded: "Photo ajoutée", // owner (last five)
+   
     noClient: "Ce chantier n’a pas de client à texter.", noPhone: "Ce client n’a pas de numéro de téléphone.", omwFailed: "Impossible d’envoyer le texto. Réessayez.", optedOut: "Ce client a demandé de ne plus recevoir de textos.", // owner
     photoFailed: "Impossible d’ajouter la photo. Réessayez.", unavailable: "Pas encore disponible sur ce téléphone.", denied: "Autorisez la caméra ou le micro pour le faire.", // owner
   },
@@ -155,20 +157,21 @@ export const fr: typeof en = {
     status: { draft: "Brouillon", sent: "En attente", signed: "Signé", declined: "Refusé", voided: "Annulé", toSign: "À signer" }, meta: "{{number}} · {{days}} · {{when}}", signedOn: "signé le {{date}}", sentOn: "envoyé le {{date}}", draftOn: "préparé le {{date}}", new: "Nouvel ordre de changement", empty: "Aucun ordre de changement." },
   costs: {
     scan: "Numériser un reçu", scanSub: "Fournisseur, taxes et catégorie lus pour vous", review: "À vérifier", receipts_one: "{{count}} reçu", receipts_other: "{{count}} reçus", doneLead: "Tous les reçus sont confirmés.", doneBody: "Les coûts sont à jour.",
-    confirm: "Confirmer", confirmed: "Confirmé", entries: "Entrées", byCategory: "Par catégorie", budget: "Budget et réel", used: "{{pct}} utilisé", sure: "sûr à {{pct}}", noEntries: "Aucun coût pour l’instant.",
+    confirm: "Confirmer", confirmed: "Confirmé", entries: "Entrées", byCategory: "Par catégorie", budget: "Budget et réel", used: "{{pct}} utilisé", confidence: { high: "sûr", medium: "assez sûr", low: "à vérifier" }, takePhoto: "Prendre une photo", choosePhoto: "Choisir une photo", scanTitle: "Numériser un reçu", reading: "Lecture du reçu…", noEntries: "Aucun coût pour l’instant.",
     entryMeta: "{{category}} · {{source}} · {{date}}", source: { receipt: "Reçu", time: "Temps", bank: "Relevé bancaire", manual: "Manuel", equipment: "Utilisation", travel: "Déplacements", other: "Autre" },
     scanned: "Reçu ajouté. Vérifiez-le sous À vérifier.", scanFailed: "Impossible de lire ce reçu. Réessayez.", // owner
   },
   inv: {
     invoiced: "Facturé", invoices_one: "{{count}} facture", invoices_other: "{{count}} factures", collected: "Encaissé", paid_one: "{{count}} payée", paid_other: "{{count}} payées", outstanding: "Solde dû", lateBy_one: "{{number}} · {{count}} jour de retard", lateBy_other: "{{number}} · {{count}} jours de retard", none: "Rien à payer", // owner (last)
-    toInvoice: "Reste à facturer", termsLeft_one: "{{count}} étape restante", termsLeft_other: "{{count}} étapes restantes", plan: "Plan de facturation", fromContract: "Tiré du contrat", create: "Créer", manual: "Facture manuelle",
+    term: "Étape {{n}}", toInvoice: "Reste à facturer", termsLeft_one: "{{count}} étape restante", termsLeft_other: "{{count}} étapes restantes", plan: "Plan de facturation", fromContract: "Tiré du contrat", create: "Créer", manual: "Facture manuelle",
     status: { paid: "Payée", late: "En retard", draft: "Brouillon", open: "Ouverte", held: "Retenue", sent: "Envoyée", partial: "Partiellement payée" }, dueWhenDone: "{{pct}} · due à la fin de l’étape", paidOn: "{{pct}} · {{number}} · payée le {{date}}", dueOn: "{{pct}} · {{number}} · due le {{date}}", draftMeta: "{{pct}} · {{number}} brouillon", daysLate_one: "{{count}} j de retard", daysLate_other: "{{count}} j de retard",
     holdback: "Libération de la retenue", created: "Facture préparée", createFailed: "Impossible de la créer. Réessayez.", noPlan: "Pas encore de plan de facturation. Il vient d’un contrat signé.", // owner
   },
   team: {
     hours: "Heures à approuver", approveAll: "Tout approuver", approve: "Approuver", approved: "Approuvées", hoursNone: "Aucune heure en attente.", log: "Saisir des heures", assigned: "Affectés", assign: "Affecter", onThisJob: "sur ce chantier", noCrew: "Personne n’est affecté pour l’instant.",
+    logTitle: "Saisir des heures", who: "Qui a travaillé", hoursField: "Heures", dateField: "Date", noteField: "Note (facultatif)", saveHours: "Enregistrer les heures", hoursSaved: "Heures enregistrées", assignTitle: "Affecter à ce chantier", assignNone: "Tout le monde est déjà sur ce chantier.", assigned2: "Ajouté au chantier", removeFrom: "Retirer {{name}} de ce chantier", radiusTitle: "Rayon de pointage", radiusSub: "L’équipe peut pointer à cette distance du chantier.", radiusSave: "Enregistrer le rayon", radiusNoPin: "L’emplacement du chantier n’est pas défini. Définissez-le sur le site web pour activer la vérification du pointage.", radiusSaved: "Rayon enregistré", planNeeded: "Le suivi du temps vient avec un forfait supérieur.", // owner
     location: "Emplacement du chantier", locationSub: "{{address}} · rayon de {{radius}} m pour pointer", locationNone: "Pas encore défini", locationNoAddress: "Aucune adresse",
-    hoursMeta: "{{date}} · {{from}} – {{to}}", hoursMetaNoClock: "{{date}} · saisi à la main", offSite: "{{date}} · à {{distance}} du chantier", hoursUnit: "{{count}} h",
+    hoursMeta: "{{date}} · {{from}} – {{to}}", hoursMetaNoClock: "{{date}} · saisi à la main", offSite: "{{date}} · hors du rayon du chantier", hoursUnit: "{{count}} h",
   },
   photos: { count_one: "{{count}} photo", count_other: "{{count}} photos", selected: "{{count}} sur {{total}} sélectionnées", select: "Sélectionner", clear: "Effacer", deleteSelected: "Supprimer la sélection", empty: "Aucune photo.", share: "Partager {{count}} avec le client", shared: "Envoyé au client", shareFailed: "Impossible de les envoyer. Réessayez.", photoFrom: "Photo du {{date}}", deleted: "Supprimé" },
   msg: { portal: "Portail client", portalSub: "Votre client y voit soumissions, factures et photos", copy: "Copier le lien", copied: "Copié", opened: "{{name}} l’a ouvert {{when}}", notOpened: "Pas encore ouvert", noPortal: "Le portail client n’est pas activé pour ce chantier.", composeLabel: "Message", composePlaceholder: "Écrire à {{name}}", send: "Envoyer", empty: "Aucun message.", read: "Lu", yesterday: "Hier", today: "Aujourd’hui" },

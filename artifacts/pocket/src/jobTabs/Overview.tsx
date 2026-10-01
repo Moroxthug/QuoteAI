@@ -30,12 +30,12 @@ import { Status, type StatusShape, type StatusTone } from "@/ui/Status";
 import { Num, Text } from "@/ui/Text";
 import { usePrimary } from "./primary";
 
-type Props = { d: JobDetail; id: string; locale: Locale };
+type Props = { d: JobDetail; id: string; locale: Locale; onRecord: () => void };
 
 const KIND: Record<Report["kind"], { tone: StatusTone; shape: StatusShape }> = { blocker: { tone: "warn", shape: "clock" }, materials: { tone: "info", shape: "dot" }, note: { tone: "mute", shape: "dot" } };
 const PERMIT_KINDS = ["building", "electrical", "plumbing", "gas", "hvac", "demolition", "other"];
 
-export function Overview({ d, id, locale }: Props) {
+export function Overview({ d, id, locale, onRecord }: Props) {
   const { t } = useTranslation();
   const j = (k: string, o?: Record<string, unknown>) => t(`job.${k}`, o) as string;
   const toast = useToast();
@@ -60,7 +60,7 @@ export function Overview({ d, id, locale }: Props) {
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
 
-  usePrimary({ label: j("primary.overview"), run: () => setNoteOpen(true) });
+  usePrimary({ label: j("primary.overview"), run: onRecord });
 
   const m = (cents: number, withCents = false) => money(cents / 100, locale, { cents: withCents });
   const pct = (n: number) => (locale === "fr-CA" ? `${n} %` : `${n}%`);

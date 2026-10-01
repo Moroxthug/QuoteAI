@@ -45,10 +45,11 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   );
 }
 
-export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun" | "phone" | "text" | "mail" | "grip";
+export type GlyphName = "lock" | "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun" | "phone" | "text" | "mail" | "grip";
 
 type Stroke = { w: number; round?: boolean };
 const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.ReactNode }> = {
+  lock: { stroke: { w: 2.2, round: true }, draw: () => (<><Rect x="5" y="11" width="14" height="9" rx="2" /><Path d="M8 11V8a4 4 0 0 1 8 0v3" /></>) },
   back: { stroke: { w: 2, round: true }, draw: () => <Path d="m15 5-7 7 7 7" /> },
   close: { stroke: { w: 2.2 }, draw: () => <Path d="M6 6l12 12M18 6 6 18" /> },
   chevron: { stroke: { w: 2, round: true }, draw: () => <Path d="m9 6 6 6-6 6" /> },

@@ -27,6 +27,7 @@ export type ProductFeature =
   | "public_api"
   | "gmail_send"
   | "wave_sync"
+  | "inventory"
   | "flinks_bank_feed"
   | "meta_lead_ads"
   | "multi_entity"
@@ -34,7 +35,7 @@ export type ProductFeature =
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const BUSINESS: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "gmail_send", "wave_sync"];
+const BUSINESS: ProductFeature[] = [...PRO, "team_time", "inventory", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "gmail_send", "wave_sync"];
 const ELITE: ProductFeature[] = [...BUSINESS, "financeit", "public_api", "flinks_bank_feed", "meta_lead_ads", "google_lsa", "multi_entity"];
 
 export const SEATS_INCLUDED: Record<PlanId, number> = {

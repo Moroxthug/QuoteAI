@@ -11,6 +11,7 @@ import * as pay from "./pay.ts";
 import * as accountant from "./accountant.ts";
 import * as compliance from "./compliance.ts";
 import * as contracts from "./contracts.ts";
+import * as priceBook from "./priceBook.ts";
 
 /** Dotted paths of every string, with plural suffixes folded (`open_one`, `open_other` → `open`). */
 function paths(v: unknown, prefix = ""): string[] {
@@ -20,7 +21,7 @@ function paths(v: unknown, prefix = ""): string[] {
   return [];
 }
 
-for (const [name, ns] of Object.entries({ crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts })) {
+for (const [name, ns] of Object.entries({ crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts, priceBook })) {
   test(`${name}: French has every English string, and no extras`, () => {
     const en = new Set(paths(ns.en));
     const fr = new Set(paths(ns.fr));
@@ -30,7 +31,7 @@ for (const [name, ns] of Object.entries({ crew, foreman, team, crewMap, serviceC
 }
 
 test("plural strings come in pairs", () => {
-  const all = JSON.stringify([crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts]);
+  const all = JSON.stringify([crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts, priceBook]);
   const keys = [...all.matchAll(/"([a-zA-Z]+)_one"/g)].map((m) => m[1]);
   for (const k of keys) assert.ok(all.includes(`"${k}_other"`), `${k}_other`);
 });

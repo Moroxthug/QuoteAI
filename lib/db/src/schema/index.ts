@@ -54,3 +54,4 @@ export * from "./groups";
 export * from "./people";
 export * from "./sync";
 export * from "./pocket";
+export * from "./materials";

@@ -169,6 +169,19 @@ export const suppliersTable = pgTable("suppliers", {
   contactInfo: text("contact_info").notNull().default(""),
   email: text("email"),
   phone: text("phone"),
+  /** Pocket 127.6 (Suppliers, Supplier): the rep, how the company pays, the terms and the notes. */
+  repName: text("rep_name"),
+  repRole: text("rep_role"),
+  /** "account" is billed monthly; "counter" is paid at the counter (receipts only). */
+  kind: text("kind", { enum: ["account", "counter"] }).notNull().default("account"),
+  accountNo: text("account_no"),
+  terms: text("terms"),
+  proDiscountPct: numeric("pro_discount_pct", { precision: 5, scale: 2 }),
+  address: text("address"),
+  delivers: text("delivers"),
+  hours: text("hours"),
+  notes: text("notes"),
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

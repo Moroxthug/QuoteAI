@@ -20,6 +20,7 @@ export const PRODUCT_FEATURES = [
   "costs", // Phase 3: cost tracking + receipt AI
   "invoicing", // Phase 4
   "team_time", // Phase 3: workers, time entries, equipment
+  "inventory", // Pocket 127.6: stock in the shop, the truck and on site, with reorders
   "assistant", // Phase 5: job AI assistant
   "analytics_pro", // Phase 5: margin / AR / cash flow
   "team_accounts", // Phase 7: multi-user team accounts (invite logins, roles)
@@ -39,7 +40,7 @@ export type ProductFeature = (typeof PRODUCT_FEATURES)[number];
 
 const STARTER: ProductFeature[] = ["quotes", "quote_email", "acceptance_notifications"];
 const PRO: ProductFeature[] = [...STARTER, "catalog", "contracts", "jobs", "costs", "invoicing", "team_accounts"];
-const BUSINESS: ProductFeature[] = [...PRO, "team_time", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "gmail_send", "wave_sync"];
+const BUSINESS: ProductFeature[] = [...PRO, "team_time", "inventory", "assistant", "analytics_pro", "quickbooks_sync", "calendar_sync", "invoice_card_payments", "gmail_send", "wave_sync"];
 const ELITE: ProductFeature[] = [...BUSINESS, "financeit", "public_api", "flinks_bank_feed", "meta_lead_ads", "google_lsa", "multi_entity"];
 
 /** Seats included in each plan's base price (Phase 7 §3.5) — extra seats are a plan add-on, enforced at invite time. */

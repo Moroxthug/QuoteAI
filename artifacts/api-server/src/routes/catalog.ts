@@ -2,8 +2,11 @@ import { Router } from "express";
 import multer from "multer";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
-import { db, priceCatalogItemsTable, quotesTable, businessProfilesTable } from "@workspace/db";
-import { eq, and, inArray } from "drizzle-orm";
+import { db, priceCatalogItemsTable, quotesTable, businessProfilesTable, PRICE_ITEM_KINDS } from "@workspace/db";
+import { eq, and, inArray, desc, isNull } from "drizzle-orm";
+import { getActorRole } from "../middlewares/authMiddleware";
+import { roleCan } from "../middlewares/requirePermission.js";
+import { itemKey, kindOf, monthUse, priceChange, startOfMonth, usageOf } from "../materials/priceBook.js";
 import { catalogOwnerIds } from "../groups/service.js";
 import type { QuoteChapter } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
@@ -20,9 +23,15 @@ const catalogFields = {
   prezzoUnitario: z.number().finite().min(-10_000_000).max(10_000_000),
   note: z.string().max(2000).optional(),
 };
-const CatalogItemSchema = CreateCatalogItemBody.extend(catalogFields);
+// Pocket 127.6: what kind of item it is, what it costs the company, and an assembly's parts.
+const priceBookFields = {
+  kind: z.enum(PRICE_ITEM_KINDS).optional(),
+  unitCost: z.number().finite().min(0).max(10_000_000).nullable().optional(),
+  parts: z.array(z.object({ name: z.string().trim().min(1).max(200), amount: z.number().finite().min(0).max(10_000_000) })).max(50).nullable().optional(),
+};
+const CatalogItemSchema = CreateCatalogItemBody.extend({ ...catalogFields, ...priceBookFields });
 const BulkCatalogSchema = z.array(BulkCreateCatalogItemsBodyItem.extend(catalogFields)).max(5000);
-const CatalogUpdateSchema = UpdateCatalogItemBody.extend({ nome: catalogFields.nome.optional(), categoria: z.string().max(200).nullable().optional(), um: catalogFields.um.optional(), prezzoUnitario: catalogFields.prezzoUnitario.optional(), note: z.string().max(2000).nullable().optional() });
+const CatalogUpdateSchema = UpdateCatalogItemBody.extend({ ...priceBookFields, nome: catalogFields.nome.optional(), categoria: z.string().max(200).nullable().optional(), um: catalogFields.um.optional(), prezzoUnitario: catalogFields.prezzoUnitario.optional(), note: z.string().max(2000).nullable().optional() });
 
 const router = Router();
 
@@ -84,6 +93,11 @@ function serializeItem(item: typeof priceCatalogItemsTable.$inferSelect, shared?
     um: item.um,
     prezzoUnitario: Number(item.prezzoUnitario),
     note: item.note ?? null,
+    kind: kindOf(item.kind, item.um),
+    unitCost: item.unitCost == null ? null : Number(item.unitCost),
+    previousPrice: item.previousPrice == null ? null : Number(item.previousPrice),
+    priceChangedAt: item.priceChangedAt ? item.priceChangedAt.toISOString() : null,
+    parts: Array.isArray(item.parts) ? item.parts : null,
     createdAt: item.createdAt.toISOString(),
     updatedAt: item.updatedAt.toISOString(),
   };
@@ -108,6 +122,38 @@ router.get("/catalog", requireAuth, async (req, res) => {
   }
 });
 
+// Pocket 127.6 (PriceBook): the items with where each was last used, and the three numbers on top. The company's own items only (a group's
+// shared items are listed by GET /catalog).
+router.get("/catalog/overview", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const now = new Date();
+    const items = await db.select().from(priceCatalogItemsTable).where(eq(priceCatalogItemsTable.userId, userId)).orderBy(priceCatalogItemsTable.nome);
+    const quotes = await db
+      .select({ createdAt: quotesTable.createdAt, capitoli: quotesTable.capitoli })
+      .from(quotesTable)
+      .where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt)))
+      .orderBy(desc(quotesTable.createdAt))
+      .limit(1000);
+    const usage = usageOf(quotes, now);
+    const out = items.map((i) => ({ ...serializeItem(i), lastUsedAt: usage.get(itemKey(i.nome))?.lastUsedAt ?? null }));
+    const month = monthUse(quotes, new Set(items.map((i) => itemKey(i.nome))), now);
+    const since = startOfMonth(now);
+    res.json({
+      canEdit: roleCan(getActorRole(res), "quotes", "edit"),
+      items: out,
+      assemblies: out.filter((i) => i.kind === "assembly").length,
+      usedThisMonth: month.lines,
+      usedInQuotes: month.quotes,
+      pricesChanged: items.filter((i) => i.priceChangedAt && i.priceChangedAt >= since).length,
+      changedSince: since.toISOString().slice(0, 10),
+    });
+  } catch (err) {
+    req.log.error({ err }, "Error loading the price book");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
@@ -116,7 +162,7 @@ router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async 
       res.status(400).json({ error: "nome, um, and prezzoUnitario are required", details: parsed.error });
       return;
     }
-    const { nome, categoria, um, prezzoUnitario, note } = parsed.data;
+    const { nome, categoria, um, prezzoUnitario, note, kind, unitCost, parts } = parsed.data;
 
     const [created] = await db
       .insert(priceCatalogItemsTable)
@@ -127,6 +173,9 @@ router.post("/catalog", requireAuth, requirePermission("quotes", "edit"), async 
         um: um.trim(),
         prezzoUnitario: String(prezzoUnitario),
         note: note?.trim() || null,
+        kind: kind ?? null,
+        unitCost: unitCost == null ? null : String(unitCost),
+        parts: parts ?? null,
       })
       .returning();
 
@@ -352,9 +401,18 @@ router.put("/catalog/:id", requireAuth, requirePermission("quotes", "edit"), asy
       res.status(400).json({ error: "Invalid parameters", details: parsed.error });
       return;
     }
-    const { nome, categoria, um, prezzoUnitario, note } = parsed.data;
+    const { nome, categoria, um, prezzoUnitario, note, kind, unitCost, parts } = parsed.data;
 
     const updates: Partial<typeof priceCatalogItemsTable.$inferInsert> = {};
+    if (kind !== undefined) updates.kind = kind;
+    if (unitCost !== undefined) updates.unitCost = unitCost === null ? null : String(unitCost);
+    if (parts !== undefined) updates.parts = parts;
+    if (prezzoUnitario !== undefined) {
+      // The old price is kept with the date, so the price book can say "Price changed" and "was $3.10".
+      const [before] = await db.select({ p: priceCatalogItemsTable.prezzoUnitario }).from(priceCatalogItemsTable).where(and(eq(priceCatalogItemsTable.id, id), eq(priceCatalogItemsTable.userId, userId)));
+      const change = before ? priceChange(Number(before.p), prezzoUnitario, new Date()) : null;
+      if (change) { updates.previousPrice = String(change.previousPrice); updates.priceChangedAt = change.priceChangedAt; }
+    }
     if (nome !== undefined) updates.nome = nome.trim();
     if (categoria !== undefined) updates.categoria = categoria?.trim() || null;
     if (um !== undefined) updates.um = um.trim();

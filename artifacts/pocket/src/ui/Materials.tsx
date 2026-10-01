@@ -188,10 +188,12 @@ export function Spark({ points, color }: { points: number[]; color: ColorName })
   const pts = points.map((v, i) => [2 + i * (60 / Math.max(1, points.length - 1)), mx === mn ? 14 : 24 - ((v - mn) / rg) * 20] as const);
   const last = pts[pts.length - 1]!;
   return (
-    <Svg width={64} height={28} viewBox="0 0 64 28" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexShrink: 0 }}>
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexShrink: 0 }}>
+    <Svg width={64} height={28} viewBox="0 0 64 28">
       <Polyline points={pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ")} fill="none" stroke={colors[color]} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
       <Circle cx={last[0]} cy={last[1]} r={2.6} fill={colors[color]} />
     </Svg>
+    </View>
   );
 }
 

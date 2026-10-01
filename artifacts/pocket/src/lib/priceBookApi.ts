@@ -6,5 +6,6 @@ export type NewItem = { nome: string; um: string; prezzoUnitario: number; kind: 
 
 export const priceBookApi = {
   overview: () => api<BookOverview>("/api/catalog/overview"),
+  update: (id: string, body: { prezzoUnitario?: number; unitCost?: number | null }) => api<BookItem>(`/api/catalog/${encodeURIComponent(id)}`, { method: "PUT", body }),
   add: (body: NewItem) => api<BookItem>("/api/catalog", { method: "POST", body }),
 };

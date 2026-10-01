@@ -302,7 +302,7 @@ router.get("/suppliers/:id", requireAuth, async (req, res) => {
     const prices = priceHistory(priceSeries(mine.map((c) => ({ at: c.date, lines: c.lines }))), now);
 
     // A price that went up at this supplier while the price book still has the old one: offer to bring the book up to date.
-    let nudge: null | { itemId: string; itemName: string; supplierPrice: number; bookPrice: number; newPrice: number; newCost: number | null; changePct: number; quoteId: string | null } = null;
+    let nudge: null | { itemId: string; itemName: string; supplierPrice: number; bookPrice: number; newPrice: number; newCost: number | null; changePct: number; quoteId: string | null; openQuotes: number } = null;
     for (const p of prices) {
       if (!p.when || p.changePct <= 0.05) continue;
       const item = book.find((b) => kindOf(b.kind, b.um) === "material" && sameItem(b.nome, p.name) && Number(b.prezzoUnitario) < p.to - 0.004);
@@ -312,9 +312,11 @@ router.get("/suppliers/:id", requireAuth, async (req, res) => {
       // Keep the margin in dollars when the book knows what the item costs.
       const newPrice = cost == null ? p.to : Math.round((bookPrice + (p.to - cost)) * 100) / 100;
       const key = itemKey(item.nome);
-      const recent = await db.select({ id: quotesTable.id, capitoli: quotesTable.capitoli }).from(quotesTable).where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt))).orderBy(desc(quotesTable.createdAt)).limit(200);
-      const quote = recent.find((q) => (q.capitoli ?? []).some((ch) => (ch.voci ?? []).some((v) => v?.descrizione && itemKey(v.descrizione) === key)));
-      nudge = { itemId: item.id, itemName: item.nome, supplierPrice: p.to, bookPrice, newPrice, newCost: cost == null ? null : p.to, changePct: p.changePct, quoteId: quote?.id ?? null };
+      // The quotes still open (not accepted or declined) that have a line like it: the price check of the newest one is what "See quotes" opens.
+      const recent = await db.select({ id: quotesTable.id, capitoli: quotesTable.capitoli }).from(quotesTable)
+        .where(and(eq(quotesTable.userId, userId), isNull(quotesTable.archivedAt), isNull(quotesTable.declinedAt), isNull(quotesTable.acceptedAt))).orderBy(desc(quotesTable.createdAt)).limit(200);
+      const open = recent.filter((q) => (q.capitoli ?? []).some((ch) => (ch.voci ?? []).some((v) => v?.descrizione && itemKey(v.descrizione) === key)));
+      nudge = { itemId: item.id, itemName: item.nome, supplierPrice: p.to, bookPrice, newPrice, newCost: cost == null ? null : p.to, changePct: p.changePct, quoteId: open[0]?.id ?? null, openQuotes: open.length };
       break;
     }
 

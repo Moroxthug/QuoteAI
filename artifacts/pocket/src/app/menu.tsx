@@ -6,7 +6,6 @@ import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useGetBusinessProfile, useGetSubscription } from "@workspace/api-client-react";
 import { useQuery } from "@tanstack/react-query";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { team } from "@/lib/api";
 import { initialsOf } from "@/lib/invites";
 import { builtHref, comingSoonHref, type BuiltScreen } from "@/lib/nav";
@@ -15,12 +14,11 @@ import { useSession } from "@/lib/useSession";
 import { Header } from "@/ui/Header";
 import type { IconName, Tone } from "@/ui/Icon";
 import { Icon } from "@/ui/Icon";
-import { Section, Stack } from "@/ui/Layout";
+import { ScrollPage, Section, Stack } from "@/ui/Layout";
 import { MenuGroup, MenuIdentity, MenuPlanHead, MenuQuick, MenuSignOut } from "@/ui/Menu";
 import { MenuList, MenuRow } from "@/ui/Row";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
-import { ScrollView } from "react-native";
 
 type RowDef = { key: string; icon: IconName; tone: Tone; built?: BuiltScreen };
 const GROUPS: { key: string; rows: RowDef[] }[] = [
@@ -46,7 +44,6 @@ const GROUPS: { key: string; rows: RowDef[] }[] = [
 
 export default function Menu() {
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
   const { status, user, signOut } = useSession();
   const profile = useGetBusinessProfile({ query: { enabled: status === "in" || status === "offline", retry: false } } as never);
   const sub = useGetSubscription({ query: { enabled: status === "in" || status === "offline", retry: false } } as never);
@@ -65,7 +62,7 @@ export default function Menu() {
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 44 + insets.bottom }}>
+      <ScrollPage bottom={44}>
         <Header title="" backLabel={t("menu.back")} onBack={() => (router.canGoBack() ? router.back() : router.replace("/home"))}
           moreLabel={t("menu.settings")} moreGlyph="gear" onMore={() => later(t("menu.rows.settings.label"))} />
         <Section>
@@ -100,7 +97,7 @@ export default function Menu() {
           <MenuSignOut label={t("menu.signOut")} onPress={() => void signOut().then(() => router.replace("/"))} />
           <Stack pt={16} align="center"><Text size={11.5} color="faint">{t("menu.build", { version })}</Text></Stack>
         </Section>
-      </ScrollView>
+      </ScrollPage>
     </Screen>
   );
 }

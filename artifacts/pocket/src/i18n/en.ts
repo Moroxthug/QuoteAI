@@ -238,6 +238,13 @@ export const en = {
       undo: "Undo",
       again: "Again",
     },
+    people: {
+      title: "People",
+      avatars: "Avatars · photo, initials, company logo",
+      photo: "Profile photo",
+      rings: "Avatar row with status rings",
+      presence: { on: "On site", later: "Later today", off: "Off" },
+    },
   },
   dev: {
     session: "Signed in: {{company}}",

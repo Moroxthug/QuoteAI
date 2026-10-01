@@ -16,6 +16,7 @@ import { StatusSection } from "@/ui/board/Status";
 import { RowsSection } from "@/ui/board/Rows";
 import { NumbersSection } from "@/ui/board/Numbers";
 import { FeedbackSection } from "@/ui/board/Feedback";
+import { PeopleSection } from "@/ui/board/People";
 
 /** The board's sections, in its order. */
 const SECTIONS: [string, ComponentType][] = [
@@ -27,6 +28,7 @@ const SECTIONS: [string, ComponentType][] = [
   ["Rows", RowsSection],
   ["Numbers", NumbersSection],
   ["Feedback", FeedbackSection],
+  ["People", PeopleSection],
 ];
 
 export default function Sandbox() {

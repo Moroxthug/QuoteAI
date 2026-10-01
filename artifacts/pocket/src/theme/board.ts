@@ -12,4 +12,7 @@ export const board = {
   /** SVG mask values for the status shapes' cut-outs (white keeps, black cuts), not colours on screen. */
   maskKeep: "#fff",
   maskCut: "#000",
+  /** The photo placeholder (.cp-photo: linear-gradient(145deg, #93B8F6, #4D72D9)). */
+  photoFrom: "#93b8f6",
+  photoTo: "#4d72d9",
 } as const;

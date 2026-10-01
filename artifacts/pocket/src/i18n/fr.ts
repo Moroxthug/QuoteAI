@@ -253,6 +253,13 @@ export const fr: Dict = {
       undo: "Annuler",
       again: "Encore", // owner
     },
+    people: {
+      title: "Personnes", // owner
+      avatars: "Avatars · photo, initiales, logo de l’entreprise", // owner
+      photo: "Photo de profil", // owner
+      rings: "Rangée d’avatars avec anneaux de statut", // owner
+      presence: { on: "Sur place", later: "Plus tard aujourd’hui", off: "Congé" }, // Sur place, Congé: CrewMapFR / SmartHomeFR; later: owner
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

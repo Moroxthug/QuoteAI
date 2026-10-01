@@ -326,6 +326,37 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
   }
 });
 
+// POST /api/t/:token/location — { lat, lng } — the worker has chosen to share where they are while on the clock. Only an open clock-in counts; the row is deleted at clock-out.
+router.post("/t/:token/location", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) { res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" }); return; }
+    const body = z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }).safeParse(req.body);
+    if (!body.success) { res.status(400).json({ error: "Invalid parameters" }); return; }
+    const [open] = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.workerId, r.worker.id), isNotNull(timeEntriesTable.clockInAt), isNull(timeEntriesTable.clockOutAt)));
+    if (!open) { res.status(409).json({ error: "NOT_ON_THE_CLOCK" }); return; }
+    await db.insert(crewLocationsTable).values({ workerId: r.worker.id, userId: r.worker.userId, projectId: open.projectId, lat: body.data.lat, lng: body.data.lng })
+      .onConflictDoUpdate({ target: crewLocationsTable.workerId, set: { projectId: open.projectId, lat: body.data.lat, lng: body.data.lng, updatedAt: new Date() } });
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error saving the crew location");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/t/:token/location/stop — the worker turned sharing off: the row goes at once.
+router.post("/t/:token/location/stop", writeLimiter, async (req, res) => {
+  try {
+    const r = await resolveWorker(req.params.token as string);
+    if (!r || r.expired) { res.status(r?.expired ? 410 : 404).json({ error: r?.expired ? "EXPIRED" : "INVALID" }); return; }
+    await db.delete(crewLocationsTable).where(eq(crewLocationsTable.workerId, r.worker.id));
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error stopping the crew location");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // POST /api/t/:token/entries
 router.post("/t/:token/entries", writeLimiter, async (req, res) => {
   try {
@@ -469,6 +500,7 @@ async function clockOutEntry(r: WorkerCtx, entry: typeof timeEntriesTable.$infer
   const at = parseAt(d.at, now);
   if (!at.ok) return { status: 400, body: { error: "BAD_TIMESTAMP", message: "The clock-out time must be within the last 7 days." } };
   if (!entry.clockInAt) return { status: 409, body: { error: "NOT_OPEN", message: "This entry isn't a currently open clock-in." } };
+  await db.delete(crewLocationsTable).where(eq(crewLocationsTable.workerId, r.worker.id)); // sharing ends with the clock
   const clockOutAt = at.value ?? now;
   if (clockOutAt.getTime() < entry.clockInAt.getTime()) return { status: 400, body: { error: "BEFORE_CLOCK_IN", message: "Clock-out is before the clock-in." } };
   const jobs = await workerJobs(r.worker);

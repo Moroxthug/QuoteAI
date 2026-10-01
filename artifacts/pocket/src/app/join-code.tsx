@@ -115,9 +115,8 @@ export default function JoinCode() {
       client.clear();
       await savePendingJoinCode("");
       await refresh();
-      // Crew land on Crew · Now and foremen on their Home: screens of a later phase, so the shared Coming soon one.
-      const title = kindForRole(r.role) === "foreman" ? t("joinCode.comingSoon.foremanHome") : t("joinCode.comingSoon.crewNow");
-      router.replace({ pathname: "/coming-soon", params: { title } });
+      // A foreman lands on their Home; the other roles on the ordinary Home. (A crew worker has no account: they pair with the six-character crew code.)
+      router.replace(kindForRole(r.role) === "foreman" ? "/foreman-home" : "/home");
     } catch (e) {
       setJoining(false);
       const p = e instanceof ApiFailure ? codeProblem(e) : "failed";
@@ -233,6 +232,7 @@ export default function JoinCode() {
             <Text size={14.5} color="muted">{t("joinCode.emailInvite")}</Text>
             <TextLink label={t("joinCode.signIn")} size={14.5} weight={600} color="ink" onPress={() => router.push("/sign-in")} />
           </Stack>
+          <Stack pt={10}><TextLink label={t("crew.pair.link")} size={14.5} weight={600} color="ink" onPress={() => router.push("/crew-pair")} /></Stack>
         </Section>
       </AuthBody>
     </Screen>

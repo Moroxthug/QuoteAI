@@ -163,7 +163,8 @@ export function SelectField({ label, value, onPress, chevron = true, mono, error
   );
 }
 
-export function CodeField({ label, value, onChange, length = 6, error, disabled, autoFocus }: { label: string; value: string; onChange: (v: string) => void; length?: number; error?: string; disabled?: boolean; autoFocus?: boolean }) {
+/** `letters`: the code holds letters and digits (the crew pairing code), so the keyboard is the ordinary one. */
+export function CodeField({ label, value, onChange, length = 6, error, disabled, autoFocus, letters }: { label: string; value: string; onChange: (v: string) => void; length?: number; error?: string; disabled?: boolean; autoFocus?: boolean; letters?: boolean }) {
   const { colors } = useTheme();
   const input = useRef<TextInput>(null);
   const half = Math.ceil(length / 2);
@@ -190,9 +191,11 @@ export function CodeField({ label, value, onChange, length = 6, error, disabled,
         <TextInput
           ref={input}
           value={value}
-          onChangeText={(t) => onChange(t.replace(/\D/g, "").slice(0, length))}
+          onChangeText={(t) => onChange(t.replace(letters ? /[^A-Za-z0-9]/g : /\D/g, "").slice(0, length))}
           maxLength={length}
-          keyboardType="number-pad"
+          keyboardType={letters ? "default" : "number-pad"}
+          autoCapitalize={letters ? "characters" : undefined}
+          autoCorrect={letters ? false : undefined}
           textContentType="oneTimeCode"
           autoComplete={Platform.OS === "android" ? "sms-otp" : "one-time-code"}
           editable={!disabled}

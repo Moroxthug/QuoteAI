@@ -8,7 +8,7 @@ import { useTheme, type ColorName } from "./theme";
 import { geist, manrope, type Weight } from "./fonts";
 import { splitDigits } from "./digits";
 
-export type Size = (typeof tokens.type.scale)[number] | 34 | 44;
+export type Size = (typeof tokens.type.scale)[number] | 34 | 44 | 50;
 
 export type TextProps = Omit<RNTextProps, "style"> & {
   size?: Size;

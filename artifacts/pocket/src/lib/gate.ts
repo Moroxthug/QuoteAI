@@ -15,11 +15,12 @@ export type GateInput = {
   hasActiveOrg: boolean;
 };
 
-export type GateRoute = "/home" | "/company-picker" | "/invites" | "/onboarding";
+export type GateRoute = "/home" | "/foreman-home" | "/company-picker" | "/invites" | "/onboarding";
 
 export function decideRoute({ orgs, invites, companyName, setupSkipped, hasActiveOrg }: GateInput): GateRoute {
   const owns = orgs.some((o) => o.isOwn);
-  if (orgs.length > 0 && !owns && orgs.length === 1) return "/home";
+  // A foreman who only joined a company has their own Home (phase 126).
+  if (orgs.length > 0 && !owns && orgs.length === 1) return orgs[0]!.role === "foreman" ? "/foreman-home" : "/home";
   if (orgs.length > 1 && !hasActiveOrg) return "/company-picker";
   if (!owns && invites.length > 0) return "/invites";
   if (!(orgs.length > 0 && !owns) && companyName === "" && !setupSkipped) return "/onboarding";

@@ -23,6 +23,12 @@ export const BUILT = {
   Job: "/job",
   ChangeOrder: "/change-order",
   Schedule: "/schedule",
+  ForemanHome: "/foreman-home",
+  CrewNow: "/crew-now",
+  CrewHours: "/crew-hours",
+  CrewTravel: "/crew-travel",
+  LiveLocation: "/live-location",
+  CrewExpired: "/crew-expired",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

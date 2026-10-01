@@ -4,6 +4,9 @@ import type { OrgDto } from "./api";
 /** What the phone remembers about a company between visits, to tell when access was taken away and to show "Last opened". */
 export type KnownOrg = { orgId: string; companyName: string; role: OrgDto["role"]; lastOpened?: string };
 
+/** Where the phone keeps the companies it has seen (the picker and the accountant view both write it). */
+export const KNOWN_KEY = "quoteai.knownCompanies";
+
 export type PickerRow = { org: KnownOrg; gone: boolean };
 
 /** The current list plus the remembered companies that are no longer in it (removed). */
@@ -23,6 +26,16 @@ export function initialSelection(rows: PickerRow[], activeOrgId: string | null):
   if (stored) return stored.org.orgId;
   const dated = open.filter((r) => r.org.lastOpened).sort((a, b) => (b.org.lastOpened ?? "").localeCompare(a.org.lastOpened ?? ""));
   return (dated[0] ?? open[0]!).org.orgId;
+}
+
+/** The remembered list after a visit to `activeId`: the current companies (the open one dated now), then the remembered ones that are gone, kept so a removal can still be told. */
+export function mergeKnown(known: KnownOrg[], current: OrgDto[], activeId: string | null, now: Date): KnownOrg[] {
+  const byId = new Map(known.map((k) => [k.orgId, k]));
+  const here = new Set(current.map((o) => o.orgId));
+  return [
+    ...current.map((o) => ({ orgId: o.orgId, companyName: o.companyName, role: o.role, lastOpened: o.orgId === activeId ? now.toISOString() : byId.get(o.orgId)?.lastOpened })),
+    ...known.filter((k) => !here.has(k.orgId)),
+  ];
 }
 
 export function parseKnown(raw: string | null): KnownOrg[] {

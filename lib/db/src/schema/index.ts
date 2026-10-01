@@ -46,6 +46,7 @@ export * from "./push";
 export * from "./field-reports";
 export * from "./crew-locations";
 export * from "./service-calls";
+export * from "./accountant";
 export * from "./compliance";
 export * from "./books";
 export * from "./pay";

@@ -30,7 +30,7 @@ export async function api<T>(path: string, init?: { method?: "GET" | "POST" | "P
   return body as T;
 }
 
-export type TeamRole = "admin" | "office" | "foreman" | "viewer";
+export type TeamRole = "admin" | "office" | "foreman" | "viewer" | "accountant";
 export type OrgDto = { orgId: string; companyName: string; role: "owner" | TeamRole; isOwn: boolean };
 export type PendingInviteDto = { id: string; companyName: string; role: TeamRole; logoUrl: string | null };
 export type CodePreviewDto = { code: string; companyName: string; role: TeamRole; logoUrl: string | null };

@@ -11,6 +11,12 @@ test("a new owner with no company name goes to setup", () => assert.equal(decide
 test("skipping setup is remembered", () => assert.equal(decideRoute({ ...base, companyName: "", setupSkipped: true }), "/home"));
 test("someone who only joined a company goes Home, never to setup", () => assert.equal(decideRoute({ ...base, orgs: [{ ...other, role: "office" as const }], companyName: "" }), "/home"));
 test("a foreman who only joined a company goes to the foreman Home", () => assert.equal(decideRoute({ ...base, orgs: [other], companyName: "" }), "/foreman-home"));
+test("an accountant who only joined a company goes to the accountant view", () => assert.equal(decideRoute({ ...base, orgs: [{ ...other, role: "accountant" as const }], companyName: "" }), "/accountant-view"));
+test("with several companies, the accountant view opens when the chosen one is theirs as accountant", () => {
+  const books = { ...other, role: "accountant" as const };
+  assert.equal(decideRoute({ ...base, orgs: [own, books], activeOrgId: "u2" }), "/accountant-view");
+  assert.equal(decideRoute({ ...base, orgs: [own, books], activeOrgId: "u1" }), "/home");
+});
 test("two companies and none chosen: choose", () => assert.equal(decideRoute({ ...base, orgs: [own, other], hasActiveOrg: false }), "/company-picker"));
 test("two companies and one chosen: Home", () => assert.equal(decideRoute({ ...base, orgs: [own, other] }), "/home"));
 test("a waiting invitation is offered before setup", () => {

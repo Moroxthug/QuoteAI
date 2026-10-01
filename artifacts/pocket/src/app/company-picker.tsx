@@ -11,7 +11,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import i18n from "@/i18n";
 import { ApiFailure, team } from "@/lib/api";
-import { initialSelection, isRemoval, parseKnown, pickerRows, remember, type KnownOrg } from "@/lib/companyPicker";
+import { initialSelection, isRemoval, KNOWN_KEY, parseKnown, pickerRows, remember, type KnownOrg } from "@/lib/companyPicker";
 import { shortDate, time, type Locale } from "@/lib/format";
 import { initialsOf } from "@/lib/invites";
 import { kvGet, kvSet } from "@/lib/kv";
@@ -30,7 +30,6 @@ import { Switch } from "@/ui/Switch";
 import { Text } from "@/ui/Text";
 import { AuthBody } from "@/ui/Auth";
 
-const KNOWN_KEY = "quoteai.knownCompanies";
 const REMEMBER_KEY = "quoteai.rememberCompany";
 const TINTS: AvatarTint[] = [2, 4, 3, 1];
 

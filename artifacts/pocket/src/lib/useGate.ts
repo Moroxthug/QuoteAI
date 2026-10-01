@@ -34,5 +34,6 @@ export function useGate(): Gate {
     companyName: profile.data?.companyName ?? "",
     setupSkipped,
     hasActiveOrg: !!hasActiveOrg,
+    activeOrgId: orgs.data?.activeOrgId ?? null,
   });
 }

@@ -6,7 +6,7 @@ export const en = {
   back: "Back to home",
   settings: "Settings",
   changePhoto: "Change photo",
-  role: { owner: "Owner", admin: "Admin", office: "Office", foreman: "Foreman", viewer: "Viewer" },
+  role: { owner: "Owner", admin: "Admin", office: "Office", foreman: "Foreman", viewer: "Viewer", accountant: "Accountant" },
   yourPlan: "Your plan",
   renews: "Renews {{date}}",
   plan: "Plan",
@@ -52,7 +52,7 @@ export const fr: typeof en = {
   back: "Retour à l’accueil",
   settings: "Réglages",
   changePhoto: "Changer la photo",
-  role: { owner: "Propriétaire", admin: "Administrateur", office: "Bureau", foreman: "Contremaître", viewer: "Lecture seule" }, // owner
+  role: { owner: "Propriétaire", admin: "Administrateur", office: "Bureau", foreman: "Contremaître", viewer: "Lecture seule", accountant: "Comptable" }, // owner
   yourPlan: "Votre forfait",
   renews: "Renouvelé le {{date}}",
   plan: "Forfait",

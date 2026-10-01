@@ -543,6 +543,36 @@ router.delete("/team/time-entries/:tid", requireAuth, requirePermission("jobs", 
   }
 });
 
+/** The approved hours of a period, one line per entry with a totals block per worker (the payroll summary file). Shared with the accountant's export. */
+export async function payrollSummaryCsv(userId: string, fromDay: string, toDay: string): Promise<string> {
+  const from = parseIsoDate(fromDay)!;
+  const to = new Date(parseIsoDate(toDay)!.getTime() + 86_400_000);
+  const rows = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.status, "approved"), gte(timeEntriesTable.date, from), lt(timeEntriesTable.date, to))).orderBy(asc(timeEntriesTable.workerId), asc(timeEntriesTable.date));
+  const names = await nameMaps({ projectIds: rows.map((r) => r.projectId), workerIds: rows.map((r) => r.workerId) });
+  const workers = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.userId, userId));
+  const wtype = new Map(workers.map((w) => [w.id, w.workerType]));
+  const esc = (v: string | number) => (typeof v === "number" ? v.toString() : `"${v.replace(/"/g, '""')}"`);
+  const money = (c: number) => (c / 100).toFixed(2);
+  const lines: string[] = [["Worker", "Type", "Job", "Date", "Hours", "Overtime h", "Holiday h", "Rate (CAD/h)", "Premium (CAD)", "Gross (CAD)", "Burden %", "Burden (CAD)", "Labour cost (CAD)", "Note"].map(esc).join(",")];
+  const totals = new Map<string, { hours: number; overtime: number; holiday: number; premium: number; gross: number; burden: number; total: number }>();
+  for (const r of rows) {
+    const hours = Number(r.hours);
+    const overtime = Number(r.overtimeHours) + Number(r.doubleHours);
+    const holiday = Number(r.holidayHours);
+    const gross = Math.round(hours * r.rateCentsSnapshot) + r.premiumCents;
+    const total = labourCostCents(hours, r.rateCentsSnapshot, Number(r.burdenPercentSnapshot), r.premiumCents);
+    const burden = total - gross;
+    lines.push([names.worker.get(r.workerId) ?? "", wtype.get(r.workerId) ?? "", names.project.get(r.projectId) ?? "", toIsoDate(r.date) ?? "", hours.toFixed(2), overtime.toFixed(2), holiday.toFixed(2), money(r.rateCentsSnapshot), money(r.premiumCents), money(gross), Number(r.burdenPercentSnapshot).toFixed(2), money(burden), money(total), r.note].map(esc).join(","));
+    const t = totals.get(r.workerId) ?? { hours: 0, overtime: 0, holiday: 0, premium: 0, gross: 0, burden: 0, total: 0 };
+    t.hours += hours; t.overtime += overtime; t.holiday += holiday; t.premium += r.premiumCents; t.gross += gross; t.burden += burden; t.total += total;
+    totals.set(r.workerId, t);
+  }
+  lines.push("");
+  lines.push(["Worker totals", "", "", "", "Hours", "Overtime h", "Holiday h", "", "Premium (CAD)", "Gross (CAD)", "", "Burden (CAD)", "Labour cost (CAD)", ""].map(esc).join(","));
+  for (const [wid, t] of totals) lines.push([names.worker.get(wid) ?? "", wtype.get(wid) ?? "", "", "", t.hours.toFixed(2), t.overtime.toFixed(2), t.holiday.toFixed(2), "", money(t.premium), money(t.gross), "", money(t.burden), money(t.total), ""].map(esc).join(","));
+  return `\uFEFF${lines.join("\r\n")}`;
+}
+
 // GET /api/team/payroll-summary.csv?from=&to= — approved hours per worker per job, one line per entry.
 // Phase 89: wages, so the office's (costs:full) and the plan's (team_time) — it
 // answered anyone signed in to the company. Overtime and the premium now show;
@@ -557,34 +587,10 @@ router.get("/team/payroll-summary.csv", requireAuth, requirePermission("costs", 
       res.status(400).json({ error: "from and to (YYYY-MM-DD) are required" });
       return;
     }
-    const from = parseIsoDate(q.data.from)!;
-    const to = new Date(parseIsoDate(q.data.to)!.getTime() + 86_400_000);
-    const rows = await db.select().from(timeEntriesTable).where(and(eq(timeEntriesTable.userId, userId), eq(timeEntriesTable.status, "approved"), gte(timeEntriesTable.date, from), lt(timeEntriesTable.date, to))).orderBy(asc(timeEntriesTable.workerId), asc(timeEntriesTable.date));
-    const names = await nameMaps({ projectIds: rows.map((r) => r.projectId), workerIds: rows.map((r) => r.workerId) });
-    const workers = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.userId, userId));
-    const wtype = new Map(workers.map((w) => [w.id, w.workerType]));
-    const esc = (v: string | number) => (typeof v === "number" ? v.toString() : `"${v.replace(/"/g, '""')}"`);
-    const money = (c: number) => (c / 100).toFixed(2);
-    const lines: string[] = [["Worker", "Type", "Job", "Date", "Hours", "Overtime h", "Holiday h", "Rate (CAD/h)", "Premium (CAD)", "Gross (CAD)", "Burden %", "Burden (CAD)", "Labour cost (CAD)", "Note"].map(esc).join(",")];
-    const totals = new Map<string, { hours: number; overtime: number; holiday: number; premium: number; gross: number; burden: number; total: number }>();
-    for (const r of rows) {
-      const hours = Number(r.hours);
-      const overtime = Number(r.overtimeHours) + Number(r.doubleHours);
-      const holiday = Number(r.holidayHours);
-      const gross = Math.round(hours * r.rateCentsSnapshot) + r.premiumCents;
-      const total = labourCostCents(hours, r.rateCentsSnapshot, Number(r.burdenPercentSnapshot), r.premiumCents);
-      const burden = total - gross;
-      lines.push([names.worker.get(r.workerId) ?? "", wtype.get(r.workerId) ?? "", names.project.get(r.projectId) ?? "", toIsoDate(r.date) ?? "", hours.toFixed(2), overtime.toFixed(2), holiday.toFixed(2), money(r.rateCentsSnapshot), money(r.premiumCents), money(gross), Number(r.burdenPercentSnapshot).toFixed(2), money(burden), money(total), r.note].map(esc).join(","));
-      const t = totals.get(r.workerId) ?? { hours: 0, overtime: 0, holiday: 0, premium: 0, gross: 0, burden: 0, total: 0 };
-      t.hours += hours; t.overtime += overtime; t.holiday += holiday; t.premium += r.premiumCents; t.gross += gross; t.burden += burden; t.total += total;
-      totals.set(r.workerId, t);
-    }
-    lines.push("");
-    lines.push(["Worker totals", "", "", "", "Hours", "Overtime h", "Holiday h", "", "Premium (CAD)", "Gross (CAD)", "", "Burden (CAD)", "Labour cost (CAD)", ""].map(esc).join(","));
-    for (const [wid, t] of totals) lines.push([names.worker.get(wid) ?? "", wtype.get(wid) ?? "", "", "", t.hours.toFixed(2), t.overtime.toFixed(2), t.holiday.toFixed(2), "", money(t.premium), money(t.gross), "", money(t.burden), money(t.total), ""].map(esc).join(","));
+    const csv = await payrollSummaryCsv(userId, q.data.from, q.data.to);
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", `attachment; filename="payroll-summary-${q.data.from}-${q.data.to}.csv"`);
-    res.send(`\uFEFF${lines.join("\r\n")}`);
+    res.send(csv);
   } catch (err) {
     req.log.error({ err }, "Error exporting payroll summary");
     res.status(500).json({ error: "Internal server error" });

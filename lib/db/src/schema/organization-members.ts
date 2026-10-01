@@ -8,7 +8,7 @@ import { z } from "zod/v4";
 // §3). This table just maps other auth_user rows onto that owner id with a
 // role, so every existing userId-keyed table and query stays untouched.
 
-export const TEAM_MEMBER_ROLES = ["owner", "admin", "office", "foreman", "viewer"] as const;
+export const TEAM_MEMBER_ROLES = ["owner", "admin", "office", "foreman", "viewer", "accountant"] as const;
 export type TeamMemberRole = (typeof TEAM_MEMBER_ROLES)[number];
 
 export const TEAM_MEMBER_STATUSES = ["invited", "active", "suspended"] as const;

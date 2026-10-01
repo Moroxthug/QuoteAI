@@ -10,7 +10,7 @@ import type { TeamMemberRole } from "@/lib/team-members-api";
 // each person types one at /join and creates their own login. The codes are
 // shown once: the server keeps only a hash and the last four characters.
 
-const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "admin"];
+const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "accountant", "admin"];
 
 function joinUrl(): string {
   return `${window.location.origin}/join`;

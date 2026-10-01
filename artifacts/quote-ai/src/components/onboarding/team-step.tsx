@@ -17,7 +17,7 @@ import { isNativeApp } from "@/lib/native/env";
 // here, by email or with access codes. Crews on site never need a seat.
 
 const SEAT_CENTS = 1500; // display only; matches scripts/src/stripe-catalog.ts
-const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "admin"];
+const ROLES: TeamMemberRole[] = ["office", "foreman", "viewer", "accountant", "admin"];
 const PLAN_NAMES: Record<PlanId, string> = { free: "Free", monthly_starter: "Starter", monthly_pro: "Pro", monthly_business: "Business", monthly_elite: "Elite" };
 
 export function TeamStep({ plan, seatsWanted, fieldCrew, onDone }: { plan: string | null; seatsWanted: number | undefined; fieldCrew: boolean | undefined; onDone: () => void }) {

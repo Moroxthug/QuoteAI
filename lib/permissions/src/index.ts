@@ -5,7 +5,7 @@
 // surfaces gaps. Owner/admin always pass; the matrix only exists to hold back
 // office/foreman/viewer from actions their role shouldn't reach.
 
-export const TEAM_MEMBER_ROLES = ["owner", "admin", "office", "foreman", "viewer"] as const;
+export const TEAM_MEMBER_ROLES = ["owner", "admin", "office", "foreman", "viewer", "accountant"] as const;
 export type TeamMemberRole = (typeof TEAM_MEMBER_ROLES)[number];
 
 export type PermissionArea = "quotes" | "contracts" | "jobs" | "costs" | "invoicing" | "team" | "analytics" | "settings" | "leads" | "integrations" | "security" | "imports";
@@ -19,6 +19,8 @@ export const PERMISSION_MATRIX: Record<TeamMemberRole, Record<PermissionArea, Pe
   office: { quotes: "full", contracts: "edit", jobs: "full", costs: "full", invoicing: "full", team: "view", analytics: "view", settings: "view", leads: "full", integrations: "view", security: "view", imports: "edit" },
   foreman: { quotes: "view", contracts: "view", jobs: "edit", costs: "edit", invoicing: "view", team: "view", analytics: "view", settings: "view", leads: "view", integrations: "view", security: "view", imports: "view" },
   viewer: { quotes: "view", contracts: "view", jobs: "view", costs: "view", invoicing: "view", team: "view", analytics: "view", settings: "view", leads: "view", integrations: "view", security: "view", imports: "view" },
+  // Pocket 127.3: the company's accountant reads the books and compliance (nothing is changed from this role). Same reach as a viewer.
+  accountant: { quotes: "view", contracts: "view", jobs: "view", costs: "view", invoicing: "view", team: "view", analytics: "view", settings: "view", leads: "view", integrations: "view", security: "view", imports: "view" },
 };
 
 export function roleCan(role: TeamMemberRole, area: PermissionArea, action: PermissionAction): boolean {

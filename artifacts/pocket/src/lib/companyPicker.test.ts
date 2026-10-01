@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { initialSelection, isRemoval, parseKnown, pickerRows, remember } from "./companyPicker.ts";
+import { initialSelection, isRemoval, mergeKnown, parseKnown, pickerRows, remember } from "./companyPicker.ts";
 
 const cur = [
   { orgId: "a", companyName: "Rossi Renovations", role: "owner" as const, isOwn: true },
@@ -37,4 +37,12 @@ test("isRemoval", () => {
   assert.equal(isRemoval({ status: 403 }), true);
   assert.equal(isRemoval({ status: 404 }), true);
   assert.equal(isRemoval({ status: 500 }), false);
+});
+
+test("mergeKnown dates the open company and keeps the ones that are gone", () => {
+  const now = new Date("2026-10-01T12:00:00Z");
+  const known = [{ orgId: "b", companyName: "Rossi Commercial", role: "foreman", lastOpened: "2026-09-21T10:00:00Z" }, { orgId: "c", companyName: "Harbourfront", role: "accountant" }];
+  const merged = mergeKnown(known, cur, "a", now);
+  assert.deepEqual(merged.map((k) => [k.orgId, k.lastOpened]), [["a", "2026-10-01T12:00:00.000Z"], ["b", "2026-09-21T10:00:00Z"], ["c", undefined]]);
+  assert.equal(merged[2]!.role, "accountant");
 });

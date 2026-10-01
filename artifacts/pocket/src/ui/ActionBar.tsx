@@ -18,9 +18,9 @@ import { useTheme } from "./theme";
 
 export const ACTION_BAR_SPACE = 120;
 
-export function ActionBar({ label, onPress, moreLabel, onMore, secondary, onSecondary, icon, disabled, busy, done }: {
+export function ActionBar({ label, onPress, moreLabel, onMore, secondary, onSecondary, icon, disabled, busy, done, quiet }: {
   label: string; onPress: () => void; moreLabel: string; onMore?: () => void; /** A word on the glass button instead of "more". */ secondary?: string; onSecondary?: () => void;
-  icon?: ReactNode; disabled?: boolean; busy?: boolean; /** The action is finished: the button turns green. */ done?: boolean;
+  icon?: ReactNode; disabled?: boolean; busy?: boolean; /** The action is finished: the button turns green. */ done?: boolean; /** Nothing to do now ("Waiting for Dana"): `sunk`, muted, no shadow, as Contract.dc.html draws it. */ quiet?: boolean;
 }) {
   const { colors, scheme } = useTheme();
   const bottom = useFloatBottom();
@@ -37,9 +37,9 @@ export function ActionBar({ label, onPress, moreLabel, onMore, secondary, onSeco
         </Press>
       </View>
       <Press onPress={onPress} disabled={disabled || busy} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ busy: !!busy, disabled: !!disabled }}
-        style={{ flexGrow: 1, flexShrink: 1, height: 56, borderRadius: 28, backgroundColor: done ? colors["ok-dot"] : colors.inv, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.4 : 1, boxShadow: shadow("float", colors) }}>
+        style={{ flexGrow: 1, flexShrink: 1, height: 56, borderRadius: 28, backgroundColor: done ? colors["ok-dot"] : quiet ? colors.sunk : colors.inv, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, opacity: disabled ? 0.4 : 1, boxShadow: quiet ? undefined : shadow("float", colors) }}>
         {icon}
-        <Text size={15} weight={600} color={done ? undefined : "on-inv"} tint={done ? board.white : undefined} numberOfLines={1}>{label}</Text>
+        <Text size={15} weight={600} color={done ? undefined : quiet ? "muted" : "on-inv"} tint={done ? board.white : undefined} numberOfLines={1}>{label}</Text>
       </Press>
     </View>
   );

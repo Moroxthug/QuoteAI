@@ -70,6 +70,8 @@ type InputProps = Omit<TextInputProps, "style" | "editable" | "placeholderTextCo
   disabled?: boolean;
   numeric?: boolean;
   weight?: Weight;
+  /** A long text field stops growing here and scrolls inside (a sheet can't scroll). */
+  maxHeight?: number;
   /** Show the focus ring without focus (the board's "focused" sample). */
   forceFocused?: boolean;
 };
@@ -85,7 +87,7 @@ function useFocus(props: Pick<TextInputProps, "onFocus" | "onBlur">) {
   };
 }
 
-export function TextField({ label, error, disabled, numeric, weight, forceFocused, multiline, onFocus, onBlur, ...rest }: InputProps) {
+export function TextField({ label, error, disabled, numeric, weight, forceFocused, multiline, maxHeight, onFocus, onBlur, ...rest }: InputProps) {
   const { colors } = useTheme();
   const placeholder = usePlaceholder();
   const { focused, handlers } = useFocus({ onFocus, onBlur });
@@ -107,7 +109,7 @@ export function TextField({ label, error, disabled, numeric, weight, forceFocuse
           inputText(colors, { numeric, weight }),
           {
             // Multi-line: rows=3 at a 1.45 leading (22) plus 12 above and below.
-            minHeight: multiline ? 3 * 22 + 24 : 46, paddingHorizontal: 14,
+            minHeight: multiline ? 3 * 22 + 24 : 46, maxHeight, paddingHorizontal: 14,
             paddingVertical: multiline ? 12 : 0, lineHeight: multiline ? 22 : undefined,
           },
           noOutline,

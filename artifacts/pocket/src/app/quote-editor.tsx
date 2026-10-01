@@ -274,7 +274,7 @@ export default function QuoteEditor() {
             <Section delay={200} pt={22} px={16}>
               <Card>
                 <MenuList>
-                  <MenuRow icon={<Icon name="doc" tone="violet" size={28} />} title={t("qe.extras.contract")} sub={t("qe.extras.contractSub")} onPress={() => router.push(screenHref("Contract", t("qe.extras.contract")))} />
+                  <MenuRow icon={<Icon name="doc" tone="violet" size={28} />} title={t("qe.extras.contract")} sub={t("qe.extras.contractSub")} onPress={() => router.push(screenHref("Contract", t("qe.extras.contract"), { quoteId: quote.id }))} />
                   <MenuRow icon={<Icon name="file" tone="stone" size={28} />} title={t("qe.extras.pdf")} sub={quote.pdfDownloadedAt ? t("qe.extras.pdfLocked") : quote.templateId && quote.templateId !== "standard" ? t("qe.extras.pdfPro") : t("qe.extras.pdfSub")} chevron={false}
                     onPress={!quote.pdfDownloadedAt ? () => void saveQuote({ templateId: quote.templateId && quote.templateId !== "standard" ? "standard" : "arosio" }) : undefined} />
                   <MenuRow icon={<Icon name="orb" tone="violet" size={28} />} title={t("qe.extras.redo")} sub={t("qe.extras.redoSub")} chevron={false} onPress={!quote.pdfDownloadedAt ? () => { setRedoText(""); setRedoOpen(true); } : undefined} />

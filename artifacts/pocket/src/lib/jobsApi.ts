@@ -13,6 +13,14 @@ export type CrewDay = {
   blockers?: { id: string; projectId: string; projectName: string | null; authorName: string | null; body: string; createdAt: string }[];
 };
 
+export type FieldReport = { id: string; projectId: string; projectName: string | null; milestoneId: string | null; workerId: string | null; authorName: string | null; kind: "note" | "blocker" | "materials"; body: string; photoId: string | null; materialsCents: number | null; resolvedAt: string | null; resolvedByName: string | null; resolutionNote: string | null; createdAt: string };
+
+export type Permit = { id: string; projectId: string; kind: string; title: string; authority: string; referenceNumber: string; url: string | null; status: "needed" | "applied" | "issued" | "closed" | "not_required"; open: boolean; appliedAt: string | null; issuedAt: string | null; inspectionAt: string | null; expiresAt: string | null; closedAt: string | null; notes: string };
+
+export type JobNote = { id: string; projectId: string; milestoneId: string | null; photoId: string | null; body: string; source: string; authorName: string | null; createdAt: string };
+
+export type SchedBlock = { id: string; projectId: string | null; projectName: string | null; projectAddress: string | null; milestoneId: string | null; milestoneTitle: string | null; collaboratorId: string | null; collaboratorName: string | null; title: string; label: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string; conflicts: string[]; updatedAt: string };
+
 export const jobsApi = {
   list: () => api<JobsResponse>("/api/jobs"),
   get: (id: string) => api<JobDetail>(`/api/jobs/${encodeURIComponent(id)}`),
@@ -21,6 +29,20 @@ export const jobsApi = {
   saveSetup: (id: string, body: ReturnType<typeof setupBody>) => api<JobDetail>(`/api/jobs/${encodeURIComponent(id)}/setup`, { method: "PUT", body }),
   confirmSetup: (id: string, body: ReturnType<typeof setupBody>) => api<JobDetail>(`/api/jobs/${encodeURIComponent(id)}/setup/confirm`, { method: "POST", body }),
   regenerateSetup: (id: string) => api<JobDetail>(`/api/jobs/${encodeURIComponent(id)}/setup/regenerate`, { method: "POST", body: {} }),
+  fieldReports: (id: string) => api<{ reports: FieldReport[] }>(`/api/jobs/${encodeURIComponent(id)}/field-reports`),
+  resolveReport: (id: string, note?: string) => api<{ report: FieldReport }>(`/api/field-reports/${encodeURIComponent(id)}/resolve`, { method: "POST", body: note ? { note } : {} }),
+  permits: (id: string) => api<{ permits: Permit[]; province: string | null }>(`/api/jobs/${encodeURIComponent(id)}/permits`),
+  addPermit: (id: string, body: { title: string; kind?: string; authority?: string; status?: Permit["status"] }) => api<{ permits: Permit[] }>(`/api/jobs/${encodeURIComponent(id)}/permits`, { method: "POST", body }),
+  notes: (id: string) => api<{ notes: JobNote[] }>(`/api/jobs/${encodeURIComponent(id)}/notes`),
+  addNote: (id: string, body: string) => api<{ note: JobNote }>(`/api/jobs/${encodeURIComponent(id)}/notes`, { method: "POST", body: { body } }),
+  onMyWay: (id: string, lang: "en" | "fr", etaMinutes?: number) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/sms/on-my-way`, { method: "POST", body: { lang, ...(etaMinutes ? { etaMinutes } : null) } }),
+  schedule: (from: Date, to: Date, projectId?: string) => api<{ blocks: SchedBlock[] }>(`/api/schedule?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}${projectId ? `&projectId=${encodeURIComponent(projectId)}` : ""}`),
+  setTask: (id: string, taskId: string, status: "todo" | "in_progress" | "done") => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/tasks/${encodeURIComponent(taskId)}`, { method: "PATCH", body: { status } }),
+  addTask: (id: string, title: string, milestoneId: string | null) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/tasks`, { method: "POST", body: { title, milestoneId } }),
+  setMilestone: (id: string, milestoneId: string, status: "planned" | "in_progress" | "completed" | "skipped") => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/milestones/${encodeURIComponent(milestoneId)}`, { method: "PUT", body: { status } }),
+  setStatus: (id: string, status: "planning" | "active" | "suspended" | "completed") => api<unknown>(`/api/jobs/${encodeURIComponent(id)}`, { method: "PUT", body: { status } }),
+  archive: (id: string) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/archive`, { method: "POST", body: {} }),
+  rename: (id: string, name: string) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}`, { method: "PUT", body: { name } }),
   crewToday: () => api<CrewDay>("/api/crew/today"),
   resolveBlocker: (id: string) => api<unknown>(`/api/field-reports/${encodeURIComponent(id)}/resolve`, { method: "POST", body: {} }),
 };

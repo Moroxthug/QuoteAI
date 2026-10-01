@@ -29,3 +29,8 @@ export function time(d: Date, locale: Locale): string {
   }
   return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(d);
 }
+
+/** "Tue Sep 29" / "mar. 29 sept." (date fields; the boards drop Intl's comma in English) */
+export function dayDate(d: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, { weekday: "short", month: "short", day: "numeric" }).format(d).replace(/,/g, "");
+}

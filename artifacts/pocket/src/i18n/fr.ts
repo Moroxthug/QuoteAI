@@ -110,6 +110,34 @@ export const fr: Dict = {
         { label: "Tout à la fin", sub: "Une facture à la fin des travaux" }, // owner
       ],
     },
+    inputs: {
+      title: "Champs", // owner
+      text: "Texte · actif", // owner
+      company: "Rossi Renovations",
+      email: "Courriel",
+      emailValue: "marco@rossireno.ca",
+      phone: "Téléphone",
+      phoneHint: "(416) 555-0100",
+      money: "Montant", // owner
+      currency: "$",
+      cad: "CAD",
+      unit: "Nombre avec unité", // owner
+      sqft: "pi²", // FR-BRIEF glossary
+      multi: "Plusieurs lignes", // owner
+      note: "Deux couches aux plafonds, réparer d’abord la fissure au-dessus du bain.", // owner
+      select: "Liste", // owner
+      foreman: "Contremaître",
+      date: "Date",
+      time: "Heure",
+      code: "Code à 6 chiffres", // VerifyFR
+      emailError: "Courriel · erreur", // owner
+      badEmail: "marco@rossireno",
+      badEmailMsg: "Ajoutez la fin de l’adresse, comme .ca ou .com", // owner
+      disabled: "Désactivé", // owner
+      hst: "TVH 13 %",
+      search: "Rechercher",
+      searchHint: "Rechercher par client ou chantier", // TabletFR
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

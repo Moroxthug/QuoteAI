@@ -144,3 +144,9 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - Metro now ignores " - Copy" files (an old placeholder copy in lib/ made the crawler fail with EINVAL).
   - The .dc.html boards need the Claude Design runtime (`support.js`, not in the repo) to fill their `{{ }}` data; without it they show only static markup. Compare against their CSS and script data instead.
   - Dev-menu Reload on Android crashes in expo-ui's native teardown (`clearAllContentOriginsImpl`); relaunch the app instead.
+- **2026-09-30, 123.3 Inputs** (owner chose to finish 123 before starting 124):
+  - `Field` (label, error line), `TextField` (focus / error / disabled / multi-line), `AffixField` (money and unit), `SelectField` (select, date, time), `CodeField` (one real input under the boxes, so paste and SMS autofill work), `Search`.
+  - Number fields (money, units, phone, codes) are Manrope throughout; `dayDate` gives "Tue Sep 29" / "mar. 29 sept.".
+  - Android draws no box shadow on a `TextInput`: the ring sits on a wrapping view.
+  - The board's night placeholder (#6f6e76) is in `src/theme/board.ts`.
+  - Checked against the board on Expo web (light, night, FR, typing in the code boxes) and on the emulator.

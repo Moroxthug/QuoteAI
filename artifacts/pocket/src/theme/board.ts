@@ -5,4 +5,6 @@ export const board = {
   white: "#ffffff",
   /** .cp-sw .knob */
   knobShadow: "0 2px 6px rgba(0,0,0,.2)",
+  /** Input and textarea placeholders at night (.th[data-theme="dark"] input::placeholder); light uses `faint`. */
+  placeholderDark: "#6f6e76",
 } as const;

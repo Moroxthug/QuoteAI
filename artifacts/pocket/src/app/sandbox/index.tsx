@@ -9,6 +9,7 @@ import { BoardGroup, BoardHeader, SandboxSwitches } from "@/ui/sandbox";
 import { ButtonsSection } from "@/ui/board/Buttons";
 import { ChipsSection } from "@/ui/board/Chips";
 import { ControlsSection } from "@/ui/board/Controls";
+import { InputsSection } from "@/ui/board/Inputs";
 
 export default function Sandbox() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export default function Sandbox() {
         <ButtonsSection />
         <ChipsSection />
         <ControlsSection />
+        <InputsSection />
         <Text> </Text>
       </ScrollView>
     </Screen>

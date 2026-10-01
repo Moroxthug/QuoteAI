@@ -22,6 +22,7 @@ export const BUILT = {
   JobSetup: "/job-setup",
   Job: "/job",
   ChangeOrder: "/change-order",
+  Schedule: "/schedule",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

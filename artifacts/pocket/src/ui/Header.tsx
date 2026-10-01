@@ -8,7 +8,7 @@ import { Glyph } from "./Icon";
 import { Press } from "./motion";
 import { Text } from "./Text";
 
-export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" | "close" | "search" | "plus" | "gear"; label: string; onPress?: () => void }) {
+export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" | "close" | "search" | "plus" | "gear" | "chevron"; label: string; onPress?: () => void }) {
   return (
     <Press onPress={onPress} accessibilityRole="button" accessibilityLabel={label}
       style={{ width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" }}>

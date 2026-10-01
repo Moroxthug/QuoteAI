@@ -19,9 +19,14 @@ export type Permit = { id: string; projectId: string; kind: string; title: strin
 
 export type JobNote = { id: string; projectId: string; milestoneId: string | null; photoId: string | null; body: string; source: string; authorName: string | null; createdAt: string };
 
-export type SchedBlock = { id: string; projectId: string | null; projectName: string | null; projectAddress: string | null; milestoneId: string | null; milestoneTitle: string | null; collaboratorId: string | null; collaboratorName: string | null; title: string; label: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string; conflicts: string[]; updatedAt: string };
+export type SchedBlock = {
+  reminderSentAt?: string | null; id: string; projectId: string | null; projectName: string | null; projectAddress: string | null; milestoneId: string | null; milestoneTitle: string | null; collaboratorId: string | null; collaboratorName: string | null; title: string; label: string | null; startsAt: string; endsAt: string; allDay: boolean; notes: string; conflicts: string[]; updatedAt: string };
 
 export type JobPhoto = { id: string; projectId: string; milestoneId: string | null; fileName: string; fileSize: number; mimeType: string; caption: string; sortOrder: number; sharedAt: string | null; createdAt: string; hasThumb: boolean };
+
+export type SchedWorker = { id: string; name: string; role: string; hasPhone: boolean; hasEmail: boolean };
+export type SchedJob = { id: string; name: string; address: string; status: string; milestones: { id: string; title: string; status: string; plannedStart: string | null; plannedEnd: string | null }[] };
+export type BlockBody = { projectId?: string | null; milestoneId?: string | null; collaboratorId?: string | null; title?: string; startsAt: string; endsAt: string; allDay?: boolean; notes?: string };
 
 export const jobsApi = {
   list: () => api<JobsResponse>("/api/jobs"),
@@ -38,7 +43,7 @@ export const jobsApi = {
   notes: (id: string) => api<{ notes: JobNote[] }>(`/api/jobs/${encodeURIComponent(id)}/notes`),
   addNote: (id: string, body: string) => api<{ note: JobNote }>(`/api/jobs/${encodeURIComponent(id)}/notes`, { method: "POST", body: { body } }),
   onMyWay: (id: string, lang: "en" | "fr", etaMinutes?: number) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/sms/on-my-way`, { method: "POST", body: { lang, ...(etaMinutes ? { etaMinutes } : null) } }),
-  schedule: (from: Date, to: Date, projectId?: string) => api<{ blocks: SchedBlock[] }>(`/api/schedule?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}${projectId ? `&projectId=${encodeURIComponent(projectId)}` : ""}`),
+  schedule: (from: Date, to: Date, projectId?: string) => api<{ blocks: SchedBlock[]; workers: SchedWorker[]; jobs: SchedJob[] }>(`/api/schedule?from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}${projectId ? `&projectId=${encodeURIComponent(projectId)}` : ""}`),
   setTask: (id: string, taskId: string, status: "todo" | "in_progress" | "done") => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/tasks/${encodeURIComponent(taskId)}`, { method: "PATCH", body: { status } }),
   addTask: (id: string, title: string, milestoneId: string | null) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/tasks`, { method: "POST", body: { title, milestoneId } }),
   setMilestone: (id: string, milestoneId: string, status: "planned" | "in_progress" | "completed" | "skipped") => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/milestones/${encodeURIComponent(milestoneId)}`, { method: "PUT", body: { status } }),
@@ -52,6 +57,9 @@ export const jobsApi = {
   confirmCost: (id: string, costId: string) => api<unknown>(`/api/jobs/${encodeURIComponent(id)}/costs/${encodeURIComponent(costId)}`, { method: "PUT", body: { status: "confirmed" } }),
   /** Drafts the invoice for a payment term whose milestone is done. */
   invoiceTerm: (id: string, milestoneId: string) => api<{ invoice: { id: string; number: string }; created: boolean }>(`/api/jobs/${encodeURIComponent(id)}/invoices`, { method: "POST", body: { kind: "term", milestoneId } }),
+  addBlock: (body: BlockBody) => api<{ block: SchedBlock }>("/api/schedule/blocks", { method: "POST", body }),
+  saveBlock: (id: string, body: Partial<BlockBody>) => api<{ block: SchedBlock }>(`/api/schedule/blocks/${encodeURIComponent(id)}`, { method: "PUT", body }),
+  deleteBlock: (id: string) => api<unknown>(`/api/schedule/blocks/${encodeURIComponent(id)}`, { method: "DELETE" }),
   crewToday: () => api<CrewDay>("/api/crew/today"),
   resolveBlocker: (id: string) => api<unknown>(`/api/field-reports/${encodeURIComponent(id)}/resolve`, { method: "POST", body: {} }),
 };

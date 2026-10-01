@@ -151,12 +151,14 @@ async function signFrom(page: Page, contractId: string, step: "review" | "code" 
     .set({ otpVerifiedAt: verified ? new Date() : null, otpHash: null, otpAttempts: 0, status: verified ? "verified" : "viewed" })
     .where(and(eq(contractSignersTable.contractId, contractId), eq(contractSignersTable.role, "customer")));
   await page.reload();
-  await page.waitForSelector(".doc-head");
+  await page.waitForSelector(".cp-head");
   if (step === "review") return;
+  // Pocket 125.10: the steps are cards on the page, not sheets. The code step asks for a code and shows the boxes; the signature step is already open.
+  if (verified) { await page.waitForSelector("#sign-full-name"); return; }
   const primary = page.locator("[data-primary-action]").first();
   if (!(await primary.isVisible().catch(() => false))) return;
   await primary.click();
-  await page.waitForSelector(verified ? "[role=dialog] #sign-full-name" : '[role=dialog] input[autocomplete="one-time-code"]');
+  await page.waitForSelector('input[autocomplete="one-time-code"]');
 }
 /** Phase 111: the portal signed out (the gate) or signed in on one section (by tab position: home, quotes, contracts, invoices, photos, messages). */
 async function portalAt(page: Page, p: { token: string; session: string }, section: number | null) {

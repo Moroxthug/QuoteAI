@@ -1,6 +1,6 @@
 // /sandbox mirrors docs/pocket-design/Components.dc.html section by section (phase 123.3 fills
 // the sections, one component at a time).
-import { ScrollView } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/ui/Screen";
@@ -15,7 +15,7 @@ export default function Sandbox() {
       <ScrollView>
         <BoardHeader title={t("sandbox.title")} intro={t("sandbox.intro")} />
         <SandboxSwitches />
-        <Link href="/sandbox/foundations"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Link>
+        <Link href="/sandbox/foundations" asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Pressable></Link>
         <ButtonsSection />
         <Text> </Text>
       </ScrollView>

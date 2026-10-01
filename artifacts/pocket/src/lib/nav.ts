@@ -24,6 +24,7 @@ export const BUILT = {
   ChangeOrder: "/change-order",
   Schedule: "/schedule",
   Team: "/team",
+  CrewMap: "/crew-map",
   Teammate: "/teammate",
   ForemanHome: "/foreman-home",
   CrewNow: "/crew-now",

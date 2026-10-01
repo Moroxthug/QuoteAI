@@ -20,6 +20,11 @@ export function shortDate(d: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric" }).format(d);
 }
 
+/** "Sep 2027" / "sept. 2027" when the year is not this year's, else "Sep 29": long-lived dates (a warranty) say the year. */
+export function dateWithYear(d: Date, now: Date, locale: Locale): string {
+  return d.getFullYear() === now.getFullYear() ? shortDate(d, locale) : new Intl.DateTimeFormat(locale, { month: "short", year: "numeric" }).format(d);
+}
+
 /** "2:30 p.m." / "14 h 30" */
 export function time(d: Date, locale: Locale): string {
   if (locale === "fr-CA") {

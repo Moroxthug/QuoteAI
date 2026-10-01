@@ -75,6 +75,12 @@ router.get("/compliance/overview", requireAuth, requirePermission("invoicing", "
     const today = todayFor(profile?.province);
     const deadlines = await deadlinesWithStatus(userId, profile, addDays(today, -183), addDays(today, 460));
     const reminders = await db.select().from(complianceRemindersTable).where(eq(complianceRemindersTable.userId, userId)).orderBy(asc(complianceRemindersTable.dueDate));
+    // Pocket 127.4: what was filed lately and how this year went (the calendar above keeps only filed periods that are still ahead).
+    const yearStart = `${today.slice(0, 4)}-01-01`;
+    const past = (await deadlinesWithStatus(userId, profile, yearStart < addDays(today, -183) ? yearStart : addDays(today, -183), addDays(today, 460))).filter((d) => d.state === "filed");
+    const filedDay = (d: { filedAt: string | null }) => (d.filedAt ?? "").slice(0, 10);
+    const thisYear = past.filter((d) => filedDay(d) >= yearStart);
+    const filedRecent = [...past].sort((x, y) => (filedDay(y) < filedDay(x) ? -1 : 1)).slice(0, 6);
     res.json({
       enabled: true,
       today,
@@ -82,6 +88,8 @@ router.get("/compliance/overview", requireAuth, requirePermission("invoicing", "
       registrations: registrations(profile ?? null),
       // Old, filed periods are history, not work: keep the unfiled late ones and everything from today on.
       deadlines: deadlines.filter((d) => d.dueDate >= today || d.state !== "filed").map((d) => ({ ...d, url: d.kind === "t5018" ? T5018_URL : AUTHORITY_URL[d.authority] })),
+      filed: filedRecent.map((d) => ({ ...d, url: d.kind === "t5018" ? T5018_URL : AUTHORITY_URL[d.authority] })),
+      filedThisYear: { count: thisYear.length, onTime: thisYear.filter((d) => filedDay(d) <= d.dueDate).length },
       reminders: reminders.map((r) => serializeReminder(r, today)),
       presets: presetsFor(profile?.province ?? null),
     });

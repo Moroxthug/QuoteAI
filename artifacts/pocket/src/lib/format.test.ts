@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { dayDate, money, shortDate, time } from "./format.ts";
+import { dayDate, money, shortDate, splitMoney, time } from "./format.ts";
 
 // fr-CA thousands: COMPONENTS §1 says a narrow no-break space, CLDR's fr-CA gives a no-break
 // space. The rule is "use Intl, never build the string", so either passes.
@@ -47,4 +47,14 @@ test("a date range drops the repeated month", async () => {
   assert.equal(dateRange(d(10, 5), d(10, 7), "fr-CA"), "5 – 7 oct.");
   assert.equal(dateRange(d(10, 30), d(11, 2), "en-CA"), "Oct 30 – Nov 2");
   assert.equal(dateRange(d(10, 5), d(10, 5), "en-CA"), "Oct 5");
+});
+
+test("splitMoney: the cents come apart from the rest", () => {
+  const en = splitMoney(6212, "en-CA");
+  assert.equal(en.whole + en.cents, money(6212, "en-CA"));
+  assert.equal(en.cents, ".00");
+  const fr = splitMoney(6212, "fr-CA");
+  assert.equal(fr.whole + fr.cents, money(6212, "fr-CA"));
+  assert.ok(fr.cents.startsWith(",00"));
+  assert.ok(!fr.whole.includes(","));
 });

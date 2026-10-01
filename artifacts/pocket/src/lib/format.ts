@@ -84,3 +84,11 @@ export function dateRange(a: Date, b: Date, locale: Locale): string {
   if (a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth()) return locale === "fr-CA" ? `${a.getDate()} – ${shortDate(b, locale)}` : `${shortDate(a, locale)} – ${b.getDate()}`;
   return `${shortDate(a, locale)} – ${shortDate(b, locale)}`;
 }
+
+/** An amount split where the board shrinks the cents: "$6,212" + ".00" / "6 212" + ",00 $". */
+export function splitMoney(amount: number, locale: Locale): { whole: string; cents: string } {
+  const parts = new Intl.NumberFormat(locale, { style: "currency", currency: "CAD", currencyDisplay: "narrowSymbol", minimumFractionDigits: 2, maximumFractionDigits: 2 }).formatToParts(amount);
+  const at = parts.findIndex((p) => p.type === "decimal");
+  if (at < 0) return { whole: parts.map((p) => p.value).join(""), cents: "" };
+  return { whole: parts.slice(0, at).map((p) => p.value).join(""), cents: parts.slice(at).map((p) => p.value).join("") };
+}

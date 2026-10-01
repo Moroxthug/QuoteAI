@@ -44,7 +44,7 @@ import {
 } from "../invoices/service.js";
 import { arAging, balanceCents, addDays, REMINDER_AFTER_DAYS, lineFrom } from "../invoices/math.js";
 import { renderInvoiceHtml, INVOICE_CSS } from "../invoices/render.js";
-import { sendInvoiceReminderEmail } from "../lib/emailInvoices.js";
+import { sendInvoiceReminderEmail, sendPaymentReceiptEmail } from "../lib/emailInvoices.js";
 import { rejectStale } from "../lib/versioning.js";
 
 const router = Router();
@@ -471,6 +471,42 @@ router.post("/invoices/:id/remind", requireAuth, requirePermission("invoicing", 
   } catch (err) {
     req.log.error({ err }, "Error sending reminder");
     fail(res, err, "Could not send the reminder");
+  }
+});
+
+// POST /api/invoices/:id/receipt — email the customer a receipt for the latest payment (the phone's "Send receipt")
+router.post("/invoices/:id/receipt", requireAuth, requirePermission("invoicing", "edit"), sendLimiter, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const loaded = await loadInvoice(req.params.id as string);
+    if (!loaded || loaded.invoice.userId !== userId) { res.status(404).json({ error: "Not found" }); return; }
+    const inv = loaded.invoice;
+    const last = [...loaded.payments].filter((p) => !p.creditNoteId).sort((a, b) => b.date.getTime() - a.date.getTime() || b.createdAt.getTime() - a.createdAt.getTime())[0];
+    if (!last) { res.status(400).json({ error: "NO_PAYMENT", message: "There is no payment to send a receipt for." }); return; }
+    const toEmail = (inv.customer.email ?? "").trim();
+    if (!toEmail.includes("@")) { res.status(400).json({ error: "CUSTOMER_EMAIL_MISSING", message: "The customer has no email address." }); return; }
+    const [senderProfile] = await db.select({ email: businessProfilesTable.email }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, inv.userId));
+    await sendPaymentReceiptEmail({
+      toEmail,
+      userId: inv.userId,
+      customerName: inv.customer.name,
+      companyName: inv.contractor.name,
+      number: inv.number,
+      totalCents: inv.totalCents,
+      balanceCents: balanceCents(inv),
+      dueDate: inv.dueDate,
+      publicUrl: publicInvoiceUrl(invoiceToken(inv)),
+      language: inv.language as "en" | "fr",
+      etransferEmail: inv.paymentInstructions.etransferEmail ?? null,
+      paidCents: last.amountCents,
+      paidOn: last.date,
+      replyTo: senderProfile?.email ?? null,
+    });
+    await logInvoiceEvent({ invoiceId: inv.id, type: "receipt_sent", actor: "contractor", detail: { to: toEmail, manual: true }, ip: req.ip });
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error sending receipt");
+    fail(res, err, "Could not send the receipt");
   }
 });
 

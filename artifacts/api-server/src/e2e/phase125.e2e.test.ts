@@ -3,12 +3,14 @@
 //  - opening the public quote page records firstViewedAt (not for the app's own preview);
 //  - a client can decline a sent quote (with or without a reason): recorded, follow-ups stopped,
 //    the company notified, idempotent; a draft is not found; an accepted quote answers 409;
-//  - sending the quote again clears the decline.
+//  - sending the quote again clears the decline;
+//  - (125.6) POST /api/invoices/:id/receipt emails the latest payment's receipt, and only when there is a payment.
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { db, quotesTable, clientsTable, invoicesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { startServer, stopServer, createOrg, seedQuote, cleanupUsers, api, type TestUser } from "./harness.js";
+import { emailsTo } from "./mailbox.js";
 
 let org: TestUser;
 let baseUrl = "";
@@ -169,5 +171,38 @@ describe("phase 125: Not included and the recommended option", () => {
     expect(list.filter((v) => v.recommended).map((v) => v.label)).toEqual(["Good"]);
     const pub = (await publicGet(`/api/public/quotes/${q.id}?preview=1`)).body.quote.variants as { label: string; recommended: boolean }[];
     expect(pub.find((v) => v.label === "Good")?.recommended).toBe(true);
+  });
+});
+
+describe("phase 125.6: the phone's Send receipt", () => {
+  test("a receipt goes for the latest payment, once there is one; another company's invoice is not found", async () => {
+    const address = `e2e-p1256-${randomUUID().slice(0, 8)}@example.invalid`;
+    const [c] = await db.insert(clientsTable).values({ userId: org.userId, name: "Receipt Client", email: address, preferredLanguage: "en", dedupKey: `p1256-${randomUUID()}` }).returning();
+    const created = await org.api("/api/invoices", { body: { clientId: c!.id, lines: [{ description: "Deck boards", quantity: 1, unitCents: 100_000 }], dueDays: 15 } });
+    expect(created.status, JSON.stringify(created.body)).toBe(201);
+    const id = created.body.invoice.id as string;
+    expect((await org.api(`/api/invoices/${id}/send`, { body: {} })).status).toBe(200);
+
+    // no payment yet: nothing to send a receipt for
+    const none = await org.api(`/api/invoices/${id}/receipt`, { body: {} });
+    expect(none.status).toBe(400);
+    expect(none.body.error).toBe("NO_PAYMENT");
+
+    const paid = await org.api(`/api/invoices/${id}/payments`, { body: { amountCents: 40_000, method: "cash", sendReceipt: false } });
+    expect(paid.status, JSON.stringify(paid.body)).toBe(201);
+    const before = emailsTo(address).length;
+    const ok = await org.api(`/api/invoices/${id}/receipt`, { body: {} });
+    expect(ok.status, JSON.stringify(ok.body)).toBe(200);
+    await expect.poll(() => emailsTo(address).length).toBe(before + 1);
+    expect(emailsTo(address).at(-1)!.subject).toContain("Receipt");
+    const events = (await org.api(`/api/invoices/${id}`)).body.events as { type: string }[];
+    expect(events.some((e) => e.type === "receipt_sent")).toBe(true);
+
+    const other = await createOrg();
+    try {
+      expect((await other.api(`/api/invoices/${id}/receipt`, { body: {} })).status).toBe(404);
+    } finally {
+      await cleanupUsers([other.userId]);
+    }
   });
 });

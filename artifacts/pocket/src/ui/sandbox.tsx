@@ -35,6 +35,27 @@ export function BoardCaption({ children }: { children: ReactNode }) {
   return <Text size={11.5} color="faint" style={{ paddingLeft: 4 }}>{children}</Text>;
 }
 
+/**
+ * The board's .cp-row: min 60, padding 12×16, gap 12; a 15/500 title over a 12.5 muted line, the
+ * control on the right. `lead` puts a 44 control on the left (padding-left 6); `stacked` puts the
+ * control under the text (gap 10, padding-bottom 16).
+ */
+export function BoardRow({ title, sub, children, leading, lead, stacked }: { title: string; sub?: string; children?: ReactNode; leading?: ReactNode; lead?: boolean; stacked?: boolean }) {
+  return (
+    <View style={{
+      flexDirection: stacked ? "column" : "row", alignItems: stacked ? "stretch" : "center", gap: stacked ? 10 : 12,
+      paddingVertical: 12, paddingHorizontal: 16, paddingLeft: lead ? 6 : 16, paddingBottom: stacked ? 16 : 12, minHeight: 60,
+    }}>
+      {leading}
+      <View style={{ flexGrow: 1, flexShrink: 1, gap: 2 }}>
+        <Text weight={500}>{title}</Text>
+        {sub ? <Text size={12.5} color="muted" leading={1.35}>{sub}</Text> : null}
+      </View>
+      {children}
+    </View>
+  );
+}
+
 function Opt({ on, label, onPress }: { on: boolean; label: string; onPress: () => void }) {
   const { colors } = useTheme();
   return (

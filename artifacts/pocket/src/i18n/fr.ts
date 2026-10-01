@@ -61,6 +61,55 @@ export const fr: Dict = {
       fab: "Barre d’action flottante",
       more: "Plus d’actions"
     },
+    // Filters from QuotesFR, tabs from JobFR (Aperçu, Horaire, Équipe, Coûts, Photos, Permis),
+    // Peinture from NewQuoteFR; the rest is owner.
+    chips: {
+      title: "Puces", // owner
+      withCounts: "Filtres avec compteurs", // owner
+      filter: "Filtrer", // owner
+      f: { all: "Toutes", draft: "Brouillons", waiting: "En attente", accepted: "Acceptées", closed: "Fermées" },
+      states: "États des puces", // owner
+      default: "Par défaut",
+      selected: "Sélectionnée", // owner
+      painting: "Peinture",
+      disabled: "Désactivée", // owner
+      addTrade: "Ajouter un métier", // owner
+      tabStrip: "Onglets internes", // owner
+      tabs: { overview: "Aperçu", schedule: "Horaire", crew: "Équipe", costs: "Coûts", photos: "Photos", reports: "Rapports", money: "Argent", permits: "Permis" }, // Rapports, Argent: owner
+    },
+    // Appearance from SettingsFR; "Tout à la fin" from NewQuoteFR; the rest is owner.
+    controls: {
+      title: "Contrôles", // owner
+      group1: "Interrupteur, compteur, segments", // owner
+      deposit: "Rappels d’acompte", // owner
+      on: "Activé", // owner
+      text: "Texter le client", // owner
+      off: "Désactivé", // owner
+      card: "Paiements par carte", // owner
+      disabled: "Désactivé", // owner
+      valid: "Soumission valide pendant", // owner (SetQuotesFR: Valide pendant)
+      stepper: "Compteur", // owner
+      days_one: "{{count}} jour",
+      days_other: "{{count}} jours",
+      fewer: "Moins de jours", // owner
+      more: "Plus de jours", // owner
+      appearance: "Apparence",
+      segmented: "Segments", // owner
+      group2: "Case à cocher et coche ronde", // owner
+      checks: {
+        a: { label: "Inclure les matériaux", sub: "Case à cocher · cochée" }, // owner
+        b: { label: "Afficher les heures sur la soumission", sub: "Case à cocher · non cochée" }, // owner
+        t: { label: "Gypse tiré", sub: "Coche ronde · tâche faite" }, // owner
+        z: { label: "Visite finale", sub: "Désactivée" }, // Visite finale: SmartHomeFR
+      },
+      group3: "Liste à choix unique", // owner
+      schedule: "Calendrier de paiement", // owner
+      radios: [
+        { label: "50 % d’acompte, 50 % à la fin", sub: "Le plus courant pour les petits travaux" }, // owner
+        { label: "30 / 40 / 30", sub: "Acompte, mi-parcours, fin des travaux" }, // owner
+        { label: "Tout à la fin", sub: "Une facture à la fin des travaux" }, // owner
+      ],
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

@@ -13,6 +13,12 @@ const API_CLIENT = path.resolve(__dirname, "../../lib/api-client-react");
 
 config.watchFolders = [...(config.watchFolders ?? []), API_CLIENT];
 
+// The repo is full of stray " - Copy" files, some of them OneDrive placeholders that make
+// Metro's crawler fail with EINVAL on readlink. Nothing imports them.
+const COPIES = / - Copy(\.[^\\/]*)?$/;
+const blockList = config.resolver.blockList;
+config.resolver.blockList = [...(Array.isArray(blockList) ? blockList : blockList ? [blockList] : []), COPIES];
+
 const SINGLETONS = ["react", "react-dom", "react-native", "@tanstack/react-query"];
 const fromApp = path.join(__dirname, "package.json");
 

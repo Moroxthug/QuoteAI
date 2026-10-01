@@ -135,3 +135,12 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - First native build took 34 min (later builds are cached).
   - The sandbox runs on the emulator; Metro is on 8081, reached through `adb reverse tcp:8081 tcp:8081`.
   - If the emulator freezes (adb commands hang): kill `qemu-system-x86_64`, then cold boot it with `-no-snapshot -gpu swiftshader_indirect`.
+- **2026-09-30, 123.3 Chips and Controls:**
+  - Chips: `Chip` (count, check/plus glyph, selected, disabled), `ChipStrip`, `ChipWrap`, and the inner `Tabs` strip (underline over the hairline).
+  - Controls: `Switch` (spring knob, fading track), `Stepper`, `Segmented` (sliding thumb), `Checkbox` (square and round tick), `RadioRow`, plus `Card` / `Hairline`.
+  - `src/theme/board.ts` holds the two board values tokens.json doesn't name (white knob, knob shadow).
+  - French from QuotesFR / JobFR / NewQuoteFR / SettingsFR where the boards have it; the rest is marked `// owner`.
+  - Checked on Expo web (light, night, FR; every control tapped) and on the emulator.
+  - Metro now ignores " - Copy" files (an old placeholder copy in lib/ made the crawler fail with EINVAL).
+  - The .dc.html boards need the Claude Design runtime (`support.js`, not in the repo) to fill their `{{ }}` data; without it they show only static markup. Compare against their CSS and script data instead.
+  - Dev-menu Reload on Android crashes in expo-ui's native teardown (`clearAllContentOriginsImpl`); relaunch the app instead.

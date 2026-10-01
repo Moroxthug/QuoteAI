@@ -72,9 +72,9 @@ const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.Re
 };
 
 /** A stroke glyph. `weight` overrides the board's stroke width where a board draws it heavier (e.g. plus 2.4, check 3.2). */
-export function Glyph({ name, size = 20, color = "ink", weight }: { name: GlyphName; size?: number; color?: ColorName; weight?: number }) {
+export function Glyph({ name, size = 20, color = "ink", tint, weight }: { name: GlyphName; size?: number; color?: ColorName; /** A board value outside the theme (board.white). */ tint?: string; weight?: number }) {
   const { colors } = useTheme();
-  const c = colors[color];
+  const c = tint ?? colors[color];
   const spec = GLYPHS[name];
   const s = spec.stroke;
   return (

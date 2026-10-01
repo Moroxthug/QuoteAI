@@ -40,6 +40,14 @@
       ],
       "expo-sharing",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "quoteAI checks where you are when you clock in or out, and shares it with your company only while you are on the clock.",
+          "isAndroidBackgroundLocationEnabled": false,
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "quoteAI uses your photos so you can attach pictures of the job to a quote.",

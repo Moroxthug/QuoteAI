@@ -87,7 +87,12 @@ async function resolveWorker(tokenParam: string) {
   const [rawToken = "", asWorkerId] = (tokenParam ?? "").split("~");
   if (!rawToken || rawToken.length < 20 || rawToken.length > 200) return null;
   const [owner] = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.timeTokenHash, hashToken(rawToken)));
-  if (!owner || !owner.active) return null;
+  if (!owner) {
+    // A link a newer one replaced says so, rather than "invalid".
+    const [old] = await db.select({ id: collaboratorsTable.id, name: collaboratorsTable.name }).from(collaboratorsTable).where(eq(collaboratorsTable.replacedTokenHash, hashToken(rawToken)));
+    return old ? { expired: true as const, replaced: true as const, worker: old } : null;
+  }
+  if (!owner.active) return null;
   let worker = owner;
   if (asWorkerId && asWorkerId !== owner.id) {
     const other = (await linkedWorkers(owner)).find((w) => w.id === asWorkerId);
@@ -259,6 +264,24 @@ async function ownReports(worker: { id: string }) {
   return serializeReports(rows);
 }
 
+// POST /api/crew/request-link — { token } — public. A phone whose link stopped working asks the company for a new one: the owner is notified with the
+// worker's name. The old (expired or replaced) link is enough to say who is asking; an unknown one is not.
+router.post("/crew/request-link", writeLimiter, async (req, res) => {
+  try {
+    const body = z.object({ token: z.string().min(20).max(200) }).safeParse(req.body);
+    const r = body.success ? await resolveWorker(body.data.token) : null;
+    if (!r) { res.status(404).json({ error: "INVALID" }); return; }
+    const w = r.worker as { id: string; name: string; userId?: string };
+    const userId = w.userId ?? (await db.select({ userId: collaboratorsTable.userId }).from(collaboratorsTable).where(eq(collaboratorsTable.id, w.id)))[0]?.userId;
+    if (!userId) { res.status(404).json({ error: "INVALID" }); return; }
+    await createNotification({ userId, type: "crew_link_requested", title: `${w.name} needs a new crew link`, body: "Make a pairing code for them under Team.", link: "/dashboard/team", entityType: "worker", entityId: w.id });
+    res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Error requesting a new crew link");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // GET /api/t/:token
 router.get("/t/:token", viewLimiter, async (req, res) => {
   try {
@@ -268,7 +291,7 @@ router.get("/t/:token", viewLimiter, async (req, res) => {
       return;
     }
     if (r.expired) {
-      res.status(410).json({ error: "EXPIRED", workerName: r.worker.name });
+      res.status(410).json({ error: "replaced" in r && r.replaced ? "REPLACED" : "EXPIRED", workerName: r.worker.name });
       return;
     }
     const lang = r.language === "fr" ? "fr" : "en";

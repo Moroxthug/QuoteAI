@@ -125,6 +125,11 @@ export const collaboratorsTable = pgTable("collaborators", {
   /** SHA-256 of the raw magic-link token; null until an invite link is issued. */
   timeTokenHash: text("time_token_hash"),
   timeTokenExpiresAt: timestamp("time_token_expires_at", { withTimezone: true }),
+  /** Pocket 126: a short code the admin hands over; swapped once for the link token above. Hashed, 7 days. */
+  pairingCodeHash: text("pairing_code_hash"),
+  pairingCodeExpiresAt: timestamp("pairing_code_expires_at", { withTimezone: true }),
+  /** The link token a newer one replaced, so an old link can say "replaced" rather than "invalid". */
+  replacedTokenHash: text("replaced_token_hash"),
   lastTimeEntryAt: timestamp("last_time_entry_at", { withTimezone: true }),
   /** Phase 86b: may add tasks from the site. Opt-in per worker — the office decides whom it trusts with the list. */
   canAddTasks: boolean("can_add_tasks").notNull().default(false),

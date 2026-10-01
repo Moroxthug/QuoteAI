@@ -118,6 +118,7 @@ function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeo
   return {
     id: quote.id,
     numeroPreventivoData: quote.numeroPreventivoData,
+    version: quote.version,
     titoloPreventivoRiga1: quote.titoloPreventivoRiga1,
     titoloPreventivoRiga2: quote.titoloPreventivoRiga2,
     descrizioneGenerale: quote.descrizioneGenerale,

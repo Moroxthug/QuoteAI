@@ -24,7 +24,7 @@ import { useSession } from "@/lib/useSession";
 import { ActionBar, ACTION_BAR_SPACE } from "@/ui/ActionBar";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
-import { Empty, Skeleton, useToast } from "@/ui/Feedback";
+import { Banner, Empty, Skeleton, useToast } from "@/ui/Feedback";
 import { TextField } from "@/ui/Field";
 import { Header } from "@/ui/Header";
 import { Section, ScrollPage, Stack } from "@/ui/Layout";
@@ -181,6 +181,7 @@ export default function Quote() {
         onSecondary={() => void Linking.openURL(`${link}?preview=1`)} onMore={() => setMoreOpen(true)} />}>
       {header(number)}
       <ScrollPage bottom={ACTION_BAR_SPACE}>
+        {quote.revisionOpen ? <Section pt={4} pb={12} px={16}><Banner tone="acc" icon="sync" iconTone="violet" lead={t("qe.banner.version", { n: quote.version ?? 2 })}>{t("qe.banner.versionBody", { name: quote.clientData.nome?.split(" ")[0] ?? "" })}</Banner></Section> : null}
         <Section>
           <QuoteHead status={<Status plain tone={st.tone} shape={st.shape}>{t(`quote.status.${state}`)}</Status>} valid={accepted ? t("quote.acceptedOn", { date: shortDate(new Date(quote.acceptedAt ?? now), locale) }) : t("quote.validUntil", { date: validDate })}
             title={title} avatar={<Avatar initials={initialsOf(cd.nome)} tint={tintFor(cd.nome)} size={32} />} client={cd.nome} address={[cd.indirizzo, cd.city].filter(Boolean).join(", ") || undefined}

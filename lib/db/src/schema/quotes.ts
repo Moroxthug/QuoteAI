@@ -85,6 +85,10 @@ export const quotesTable = pgTable("quotes", {
   declinedAt: timestamp("declined_at", { withTimezone: true }),
   /** Pocket (Phase 125): what the price does not include ("Not included"), one short line each. */
   exclusions: text("exclusions").array().notNull().default([]),
+  /** Pocket (Phase 125): the version the client sees (1, 2, ...). A sent quote that is edited becomes the next version; the old one is kept in quote_versions. */
+  version: integer("version").notNull().default(1),
+  /** True from the first edit of a sent quote until it is sent again: further edits go into the same new version. */
+  revisionOpen: boolean("revision_open").notNull().default(false),
   declinedReason: text("declined_reason"),
   /** How many follow-up sequence steps have fired; 0 = none sent yet. Mirrors leadsTable's pattern. */
   followUpStage: integer("follow_up_stage").notNull().default(0),
@@ -210,3 +214,17 @@ export type Quote = typeof quotesTable.$inferSelect;
 export type QuoteAttachment = typeof quoteAttachmentsTable.$inferSelect;
 export type InsertQuoteVariant = z.infer<typeof insertQuoteVariantSchema>;
 export type QuoteVariant = typeof quoteVariantsTable.$inferSelect;
+
+/**
+ * Pocket (Phase 125): what a quote looked like before a sent version was edited. One row per replaced version;
+ * the live row in quotes is always the newest version. snapshot holds the fields the client could see.
+ */
+export const quoteVersionsTable = pgTable("quote_versions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  quoteId: uuid("quote_id").notNull().references(() => quotesTable.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull(),
+  version: integer("version").notNull(),
+  total: numeric("total", { precision: 12, scale: 2 }).notNull().default("0"),
+  snapshot: jsonb("snapshot").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

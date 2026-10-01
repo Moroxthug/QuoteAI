@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
-import { db, quotesTable, projectsTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
+import { db, quotesTable, projectsTable, quoteAttachmentsTable, quoteVariantsTable, quoteVersionsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { sendSms, quoteSentSmsBody } from "../lib/sms.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
@@ -53,6 +53,7 @@ import { loadPriceReferences, priceCheckChapters, repriceChapters } from "../quo
 import { writeAudit } from "../lib/notifications.js";
 import { z } from "zod";
 import { raiseAutomation } from "../lib/automation.js";
+import { snapshotOf, startsNewVersion } from "../quotes/versions.js";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 import { currentActorId } from "../lib/requestContext.js";
@@ -243,6 +244,7 @@ async function markSent(quote: QuoteRow, profile: typeof businessProfilesTable.$
   if (quote.status === "accepted" || quote.unsubscribedAt) return;
   await db.update(quotesTable).set({
     sentAt: quote.sentAt ?? new Date(),
+    revisionOpen: false,
     declinedAt: null,
     declinedReason: null,
     followUpStage: 0,
@@ -298,6 +300,8 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     acceptedByName: q.acceptedByName ?? null,
     acceptedAt: q.acceptedAt?.toISOString() ?? null,
     sentAt: q.sentAt?.toISOString() ?? null,
+    version: q.version,
+    revisionOpen: q.revisionOpen,
     /** Pocket (Phase 147): days valid from when it is sent (null: 30), and when the client first opened it. */
     validDays: q.validDays ?? null,
     firstViewedAt: q.firstViewedAt?.toISOString() ?? null,
@@ -1737,6 +1741,14 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
       return;
     }
 
+    // Pocket (Phase 125): editing a quote the client already has makes the next version; the replaced one is kept.
+    const contentKeys: (keyof typeof updates)[] = ["capitoli", "items", "sconto", "exclusions", "condizioniPagamento", "paymentSchedule", "descrizioneGenerale", "titoloPreventivoRiga1", "titoloPreventivoRiga2", "note", "totale", "subtotale", "clientData"];
+    if (contentKeys.some((k) => updates[k] !== undefined) && startsNewVersion(existing)) {
+      await db.insert(quoteVersionsTable).values({ quoteId: id, userId, version: existing.version, total: String(existing.totale), snapshot: snapshotOf(existing) });
+      updates.version = existing.version + 1;
+      updates.revisionOpen = true;
+    }
+
     const [updated] = await db
       .update(quotesTable)
       .set(updates)
@@ -1774,6 +1786,22 @@ router.delete("/quotes/:id", requireAuth, requirePermission("quotes", "full"), a
     res.status(204).end();
   } catch (err) {
     req.log.error({ err }, "Error deleting quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/quotes/:id/versions: the versions the client has been sent before the current one, newest first.
+router.get("/quotes/:id/versions", requireAuth, requirePermission("quotes", "view"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id } = GetQuoteParams.parse(req.params);
+    const [existing] = await db.select({ userId: quotesTable.userId, version: quotesTable.version, revisionOpen: quotesTable.revisionOpen }).from(quotesTable).where(eq(quotesTable.id, id));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+    if (existing.userId !== userId) { res.status(403).json({ error: "Forbidden" }); return; }
+    const rows = await db.select().from(quoteVersionsTable).where(eq(quoteVersionsTable.quoteId, id)).orderBy(desc(quoteVersionsTable.version));
+    res.json({ current: existing.version, revisionOpen: existing.revisionOpen, versions: rows.map((r) => ({ version: r.version, total: Number(r.total), replacedAt: r.createdAt.toISOString(), snapshot: r.snapshot })) });
+  } catch (err) {
+    req.log.error({ err }, "Error listing quote versions");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -2007,6 +2035,7 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
         .update(quotesTable)
         .set({
           sentAt: quote.sentAt ?? new Date(),
+          revisionOpen: false,
           declinedAt: null,
           declinedReason: null,
           followUpStage: 0,

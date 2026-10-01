@@ -45,6 +45,7 @@ interface PublicQuoteVariant {
 interface PublicQuote {
   id: string;
   numeroPreventivoData: string | null;
+  version?: number;
   titoloPreventivoRiga1: string | null;
   titoloPreventivoRiga2: string | null;
   descrizioneGenerale: string;
@@ -456,7 +457,7 @@ export default function PublicQuotePage() {
 
         <section className="cp-rise" style={{ padding: "22px 20px 0", animationDelay: "40ms" }}>
           <span className="cp-mono" style={{ fontSize: 12.5, color: "var(--muted)" }}>
-            {t("publicQuote.quoteFallback")}{quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""}
+            {t("publicQuote.quoteFallback")}{quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""}{(quote.version ?? 1) > 1 ? ` · ${t("publicQuote.updatedVersion").replace("{n}", String(quote.version))}` : ""}
           </span>
           {title && <h1 className="cp-h1" style={{ marginTop: 8 }}>{title}</h1>}
           {quote.clientData?.nome && (

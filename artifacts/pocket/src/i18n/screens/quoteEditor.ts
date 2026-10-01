@@ -13,7 +13,9 @@ export const en = {
     locked: "This quote is final.",
     lockedBody: "It was accepted or its PDF was downloaded, so it can’t be changed.",
     seen: "{{name}} has seen this.",
-    seenBody: "Changes you save show on the same link.",
+    seenBody: "If you change it, it becomes version {{next}}. The version they have is kept, and you send the new one when you are ready.",
+    version: "Version {{n}} is not sent yet",
+    versionBody: "{{name}} still has the earlier version. Send it again so they see the update.",
   },
   priceCheck: { title: "Price check", against: "Against your price book and receipts", inRange: "Every line in range", toCheck_one: "{{count}} to check", toCheck_other: "{{count}} to check", ok: "In range", none: "No price data yet" },
   lineItems: "Line items",
@@ -70,7 +72,9 @@ export const fr: typeof en = {
     locked: "Cette soumission est définitive.", // owner
     lockedBody: "Elle a été acceptée ou son PDF a été téléchargé : elle ne peut plus être modifiée.", // owner
     seen: "{{name}} l’a déjà vue.",
-    seenBody: "Les changements enregistrés s’affichent sur le même lien.", // owner
+    seenBody: "Si vous la modifiez, elle devient la version {{next}}. La version qu’il a est conservée et vous envoyez la nouvelle quand vous voulez.", // owner
+    version: "La version {{n}} n’est pas encore envoyée", // owner
+    versionBody: "{{name}} a encore la version précédente. Renvoyez-la pour qu’il voie la mise à jour.", // owner
   },
   priceCheck: { title: "Vérification des prix", against: "D’après votre liste de prix et vos reçus", inRange: "Toutes les lignes dans la norme", toCheck_one: "{{count}} à vérifier", toCheck_other: "{{count}} à vérifier", ok: "Dans la norme", none: "Aucune donnée de prix pour l’instant" }, // owner: against, none
   lineItems: "Lignes de la soumission",

@@ -19,6 +19,9 @@ export type QuoteFull = {
   titoloPreventivoRiga1: string | null;
   titoloPreventivoRiga2: string | null;
   numeroPreventivoData: string | null;
+  /** The version the client sees (2 after a sent quote was edited); revisionOpen: edited since it was last sent. */
+  version?: number;
+  revisionOpen?: boolean;
   subtotale: number;
   ivaPercentuale: number;
   ivaValore: number;

@@ -192,7 +192,7 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/welcome"), pub("/welcome/crew"),
     pub(`/p/${s.longQuoteId}`), pub(`/i/${s.invoiceToken}`),
     // Phase 111: the client's side on a phone — the accept sheet, a quote with tiers, the signing steps, the portal.
-    { path: `/p/${s.longQuoteId}`, session: "public", name: "/p accept sheet", drive: (p) => openPhoneSheet(p, ".action-bar [data-primary-action]", "[role=dialog] #nomeConferma") },
+    { path: `/p/${s.longQuoteId}`, session: "public", name: "/p accept card", drive: async (p) => { await p.locator("#nomeConferma").scrollIntoViewIfNeeded(); } },
     pub(`/p/${s.tieredQuoteId}`),
     ...(s.signToken
       ? [

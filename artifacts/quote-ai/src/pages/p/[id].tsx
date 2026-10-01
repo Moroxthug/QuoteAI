@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "wouter";
-import { CheckCircle2, XCircle, Loader2, FileX, Hammer, Landmark, Gift, ExternalLink, LayoutDashboard } from "lucide-react";
+import { Loader2, FileX, ExternalLink, Download, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Logo } from "@/components/logo";
 import { useDocumentTitle } from "@/hooks/use-document-title";
 import { taxLineLabel } from "@/lib/tax-display";
-import { cn } from "@/lib/utils";
-import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
+import { ClientHeader, Glyph, StatusPill, BigMoney, useClientTheme, initialsOf, money as euro } from "@/components/client/kit";
 import { BottomSheet } from "@/components/mobile/bottom-sheet";
 
 type PublicTaxLine = { code: string; label: string; rate: number; amount: number };
@@ -71,9 +69,6 @@ interface PublicQuote {
   variants: PublicQuoteVariant[];
 }
 
-function euro(value: string | number, lang: "en" | "fr" = "en") {
-  return Number(value).toLocaleString(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" });
-}
 
 type FinanceitEstimate = { monthlyPayment: number; termMonths: number; apr: number };
 type FinanceitApplicationStatusDto = { status: string; applicationLink: string };
@@ -149,52 +144,50 @@ function FinancingWidget({ quoteId }: { quoteId: string }) {
 
   if (!checked || !available) return null;
 
+  const statusKey = application ? FINANCEIT_STATUS_KEYS[application.status] : undefined;
   return (
-    <div className="card mb-6" style={{ borderColor: "var(--yellow-t)", background: "var(--yellow-t)" }}>
-      <div className="p-5 sm:p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Landmark className="h-4 w-4" style={{ color: "var(--yellow-dark)" }} />
-          <p className="text-sm font-semibold" style={{ color: "var(--navy)" }}>{t("publicQuote.financing.title")}</p>
-        </div>
-        <p className="text-xs mb-4" style={{ color: "var(--muted-mk)" }}>{t("publicQuote.financing.subtitle")}</p>
-
-        {application ? (
-          <div className="space-y-2">
-            {FINANCEIT_STATUS_KEYS[application.status] && (
-              <p className="text-xs" style={{ color: "var(--ink)" }}>{t(FINANCEIT_STATUS_KEYS[application.status])}</p>
-            )}
-            {application.status === "sent" && (
-              <button className="btn btn-outline-navy btn-sm" onClick={() => { window.location.href = application.applicationLink; }}>
+    <section className="cp-section-t cp-rise" style={{ animationDelay: "210ms" }}>
+      <div className="cp-card">
+        <div className="cp-lrow" style={{ paddingTop: 14, paddingBottom: 14 }}>
+          <Glyph name="bank" tone="indigo" />
+          <span className="cp-lt">
+            <b style={{ whiteSpace: "normal" }}>{t("publicQuote.financing.title")}</b>
+            <small style={{ whiteSpace: "normal" }}>
+              {application && statusKey ? t(statusKey) : estimate ? (
+                <>
+                  {t("publicQuote.financing.estimateLabel")} <span className="cp-num" style={{ color: "var(--ink)", fontWeight: 600 }}>{euro(estimate.monthlyPayment, lang)}</span>
+                  {t("publicQuote.financing.perMonth")} · <span className="cp-num">{estimate.termMonths}</span> {t("publicQuote.financing.termMonths")}
+                </>
+              ) : t("publicQuote.financing.subtitle")}
+            </small>
+          </span>
+          {application ? (
+            application.status === "sent" && (
+              <button type="button" className="cp-btn cp-btn-sm cp-btn-s cp-press" onClick={() => { window.location.href = application.applicationLink; }}>
                 {t("publicQuote.financing.continueApplication")}
               </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {estimate ? (
-              <div className="text-sm" style={{ color: "var(--ink)" }}>
-                <span className="text-lg font-bold">{euro(estimate.monthlyPayment, lang)}</span>
-                <span style={{ color: "var(--muted-mk)" }}>{t("publicQuote.financing.perMonth")}</span>
-                <span className="text-xs ml-2" style={{ color: "var(--faint)" }}>({estimate.termMonths} {t("publicQuote.financing.termMonths")})</span>
-              </div>
-            ) : (
-              <button className="btn btn-outline-navy btn-sm gap-2" onClick={handleEstimate} disabled={loadingEstimate}>
-                {loadingEstimate ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {t("publicQuote.financing.getEstimate")}
-              </button>
-            )}
-            {error && <p className="text-xs" style={{ color: "var(--red)" }}>{error}</p>}
-            <div>
-              <button onClick={handleApply} disabled={applying} className="btn btn-navy btn-sm">
-                {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Landmark className="h-4 w-4" />}
+            )
+          ) : !estimate && (
+            <button type="button" className="cp-btn cp-btn-sm cp-btn-s cp-press" onClick={handleEstimate} disabled={loadingEstimate}>
+              {loadingEstimate ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {t("cp.quote.checkRate")}
+            </button>
+          )}
+        </div>
+        {!application && (estimate || error) && (
+          <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+            {error && <p className="cp-err" role="alert">{error}</p>}
+            {estimate && (
+              <button type="button" onClick={handleApply} disabled={applying} className="cp-btn cp-btn-md cp-btn-p cp-btn-w cp-press">
+                {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {t("publicQuote.financing.applyButton")}
               </button>
-            </div>
-            <p className="text-[11px]" style={{ color: "var(--faint)" }}>{t("publicQuote.financing.disclaimer")}</p>
+            )}
+            <p className="cp-note">{t("publicQuote.financing.disclaimer")}</p>
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -241,61 +234,49 @@ function RebatesWidget({ quoteId }: { quoteId: string }) {
   if (!checked || incentives.length === 0) return null;
 
   return (
-    <div className="card mb-6" style={{ borderColor: "var(--green-t)", background: "var(--green-t)" }}>
-      <div className="p-5 sm:p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Gift className="h-4 w-4" style={{ color: "var(--green-dark)" }} />
-          <p className="text-sm font-semibold" style={{ color: "var(--navy)" }}>{t("publicQuote.rebates.title")}</p>
+    <section className="cp-section-t cp-rise" style={{ animationDelay: "200ms" }}>
+      <div className="cp-card">
+        <div className="cp-lrow" style={{ alignItems: "flex-start", paddingTop: 14, paddingBottom: 10 }}>
+          <Glyph name="gift" tone="rose" />
+          <span className="cp-lt">
+            <b style={{ whiteSpace: "normal" }}>{t("publicQuote.rebates.title")}</b>
+            <small style={{ whiteSpace: "normal" }}>{t("publicQuote.rebates.subtitle")}</small>
+          </span>
         </div>
-        <p className="text-xs mb-4" style={{ color: "var(--muted-mk)" }}>{t("publicQuote.rebates.subtitle")}</p>
-
-        <div className="space-y-3">
-          {incentives.map((inc) => {
-            const amount = inc.massimaleContributo
-              ? euro(inc.massimaleContributo, lang)
-              : inc.percentualeMassima
-                ? `${Number(inc.percentualeMassima)}%`
-                : null;
-            return (
-              <div key={inc.id} className="rounded-lg p-3" style={{ border: "1px solid var(--green-t)", background: "#fff" }}>
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{inc.titolo}</p>
-                  {amount && (
-                    <span className="chip chip-green shrink-0">
-                      {t("publicQuote.rebates.upTo")} {amount}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs mt-1" style={{ color: "var(--muted-mk)" }}>{inc.descrizione}</p>
-                <div className="flex items-center gap-3 mt-2">
-                  {inc.incomeTested && (
-                    <span className="text-[11px] font-medium" style={{ color: "var(--yellow-dark)" }}>{t("publicQuote.rebates.incomeTested")}</span>
-                  )}
-                  {inc.fonteUfficialeUrl && (
-                    <a
-                      href={inc.fonteUfficialeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-medium hover:underline"
-                      style={{ color: "var(--green-dark)" }}
-                    >
-                      {t("publicQuote.rebates.learnMore")} <ExternalLink className="h-3 w-3" />
-                    </a>
-                  )}
-                </div>
+        {incentives.map((inc) => {
+          const amount = inc.massimaleContributo
+            ? euro(inc.massimaleContributo, lang)
+            : inc.percentualeMassima
+              ? `${Number(inc.percentualeMassima)}%`
+              : null;
+          return (
+            <div key={inc.id} className="cp-lrow" style={{ alignItems: "flex-start", flexDirection: "column", gap: 4 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8, width: "100%" }}>
+                <b style={{ fontSize: 14.5, fontWeight: 500 }}>{inc.titolo}</b>
+                {amount && <span className="cp-st cp-st-ok si-check" style={{ flexShrink: 0 }}>{t("publicQuote.rebates.upTo")} <span className="cp-num">{amount}</span></span>}
               </div>
-            );
-          })}
-        </div>
-        <p className="text-[11px] mt-3" style={{ color: "var(--faint)" }}>{t("publicQuote.rebates.disclaimer")}</p>
+              <small style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.4 }}>{inc.descrizione}</small>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 20 }}>
+                {inc.incomeTested && <span className="cp-st cp-st-warn si-alert">{t("publicQuote.rebates.incomeTested")}</span>}
+                {inc.fonteUfficialeUrl && (
+                  <a href={inc.fonteUfficialeUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 12.5, fontWeight: 500, textDecoration: "underline", textUnderlineOffset: 3 }}>
+                    {t("publicQuote.rebates.learnMore")} <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        <p className="cp-note" style={{ padding: "4px 16px 14px" }}>{t("publicQuote.rebates.disclaimer")}</p>
       </div>
-    </div>
+    </section>
   );
 }
 
 export default function PublicQuotePage() {
   const { t, lang, setLang } = useLanguage();
   const { id } = useParams();
+  useClientTheme();
   const [quote, setQuote] = useState<PublicQuote | null>(null);
   /** Phase 76: the client portal link, when the quote is linked to a client with an email. */
   const [portalUrl, setPortalUrl] = useState<string | null>(null);
@@ -399,25 +380,24 @@ export default function PublicQuotePage() {
 
   if (loading) {
     return (
-      <div className="doc-shell min-h-[70vh] flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--navy)" }} />
+      <div className="cp-page" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Loader2 className="h-6 w-6 animate-spin" style={{ color: "var(--muted)" }} />
       </div>
     );
   }
 
   if (notFound || !quote) {
     return (
-      <div className="doc-shell min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-        <FileX className="h-10 w-10 mb-4" style={{ color: "var(--line)" }} />
-        <h1 className="text-lg font-semibold" style={{ color: "var(--navy)" }}>{t("publicQuote.notAvailableTitle")}</h1>
-        <p className="text-sm mt-1 max-w-sm" style={{ color: "var(--muted-mk)" }}>
-          {t("publicQuote.notAvailableBody")}
-        </p>
+      <div className="cp-page" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "0 24px" }}>
+        <FileX className="h-10 w-10 mb-4" style={{ color: "var(--faint)" }} />
+        <h1 style={{ fontSize: 19, fontWeight: 600, letterSpacing: "-0.03em" }}>{t("publicQuote.notAvailableTitle")}</h1>
+        <p className="cp-sub" style={{ marginTop: 6, maxWidth: 320 }}>{t("publicQuote.notAvailableBody")}</p>
       </div>
     );
   }
 
   const isAccepted = quote.status === "accepted";
+  const isDeclined = !isAccepted && !!quote.declinedAt;
   const tiers = quote.variants || [];
   const hasTiers = tiers.length > 1;
   const activeVariant = hasTiers ? (tiers.find((v) => v.id === selectedVariantId) ?? tiers[0]) : null;
@@ -428,274 +408,278 @@ export default function PublicQuotePage() {
   const displayIvaValore = activeVariant ? activeVariant.ivaValore : quote.ivaValore;
   const displayTaxLines = (activeVariant ? activeVariant.taxLines : quote.taxLines) ?? [];
   const displayTotale = activeVariant ? activeVariant.totale : quote.totale;
+  // The board's "+$420 / Base price" line: each option against the recommended one (else the first).
+  const basePrice = Number((tiers.find((v) => v.recommended) ?? tiers[0])?.totale ?? 0);
 
   const companyName = quote.companySnapshot?.companyName || t("publicQuote.quoteFallback");
+  const phone = quote.companySnapshot?.phone;
+  const title = quote.titoloPreventivoRiga2 || quote.titoloPreventivoRiga1;
   return (
     // Phase 83: the page an outsider is most likely to meet with a screen
     // reader had no landmark at all to jump into.
-    <main id="main" className={cn("doc-shell pb-16", !isAccepted && "doc-docked")}>
-      {/* Phase 67: a customer document, not a marketing page — the same sticky
-          doc header the invoice and signing pages use, no site nav or footer. */}
-      <header className="doc-head">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <div className="text-xs truncate" style={{ color: "var(--muted-mk)" }}>{t("publicInvoice.from")} <strong style={{ color: "var(--ink)" }}>{companyName}</strong></div>
-            <div className="text-sm font-semibold truncate" style={{ color: "var(--navy)" }}>{t("publicQuote.quoteFallback")}{quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""}</div>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <button type="button" className="btn btn-outline-navy btn-sm doc-lang" onClick={() => setLang(lang === "fr" ? "en" : "fr")} aria-label={lang === "fr" ? "English" : "Français"}>{lang === "fr" ? "EN" : "FR"}</button>
-            <Logo className="h-6" />
-          </div>
-        </div>
-      </header>
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 max-w-2xl">
-      {/* Phase 111: once accepted, that is the first thing the client sees — not a banner under the document. */}
-      {isAccepted && (
-        <div className="doc-banner ok text-left p-4 sm:p-5 mb-5 flex items-start gap-3" role="status">
-          <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--green-dark)" }} />
-          <div>
-            <p className="text-sm font-semibold">{t("publicQuote.acceptedTitle")}</p>
-            <p className="text-xs mt-0.5">
-              {t("publicQuote.confirmedByPrefix")} {quote.acceptedByName}
-              {quote.acceptedAt && (
-                <> {t("publicQuote.confirmedOnPrefix")} {format(
-                  new Date(quote.acceptedAt),
-                  lang === "fr" ? `d MMMM yyyy '${t("publicQuote.confirmedAtPrefix")}' HH:mm` : `MMMM d, yyyy '${t("publicQuote.confirmedAtPrefix")}' HH:mm`,
-                  { locale: lang === "fr" ? frCA : enCA }
-                )}</>
-              )}.
-            </p>
-          </div>
-        </div>
-      )}
+    <main id="main" className="cp-page">
+      <div className="cp-col cp-pad">
+        <ClientHeader company={companyName} from={t("publicInvoice.from")} />
 
-      {!isAccepted && quote.declinedAt && (
-        <div className="doc-banner text-left p-4 sm:p-5 mb-5 flex items-start gap-3" role="status">
-          <XCircle className="h-5 w-5 shrink-0 mt-0.5" style={{ color: "var(--muted-mk)" }} />
-          <div>
-            <p className="text-sm font-semibold">{t("publicQuote.declinedTitle")}</p>
-            <p className="text-xs mt-0.5">{t("publicQuote.declinedBody")}</p>
+        {/* Phase 111: once accepted, that is the first thing the client sees. */}
+        {isAccepted && (
+          <div className="cp-rise" style={{ padding: "14px 16px 0" }}>
+            <div className="cp-banner cp-b-ok" role="status" style={{ alignItems: "center" }}>
+              <Glyph name="check" tone="sage" size={24} />
+              <div>
+                <b>{t("publicQuote.acceptedTitle")}</b>
+                <div style={{ marginTop: 2 }}>
+                  {t("publicQuote.confirmedByPrefix")} {quote.acceptedByName}
+                  {quote.acceptedAt && (
+                    <> {t("publicQuote.confirmedOnPrefix")} {format(
+                      new Date(quote.acceptedAt),
+                      lang === "fr" ? `d MMMM yyyy '${t("publicQuote.confirmedAtPrefix")}' HH:mm` : `MMMM d, yyyy '${t("publicQuote.confirmedAtPrefix")}' HH:mm`,
+                      { locale: lang === "fr" ? frCA : enCA }
+                    )}</>
+                  )}.
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
-
-      <div className="text-center mb-5 sm:mb-8">
-        <div className="eyebrow mb-2">
-          {quote.companySnapshot?.companyName || t("publicQuote.quoteFallback")}
-        </div>
-        <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>
-          {quote.titoloPreventivoRiga2 || quote.titoloPreventivoRiga1}
-        </h1>
-        {quote.numeroPreventivoData && (
-          <p className="text-sm mt-1" style={{ color: "var(--faint)" }}>{quote.numeroPreventivoData}</p>
         )}
-      </div>
 
-      {/* Phase 111: the options side by side at every width (they stacked into three full-width buttons on a phone). */}
-      {hasTiers && (
-        <div className="mb-5 sm:mb-6">
-          <p className="pq-tiers-label">{isAccepted ? t("publicQuote.tiers.chosen") : t("publicQuote.tiers.choose")}</p>
-          <div className="pq-tiers" role="group" aria-label={t("publicQuote.tiers.choose")} style={{ gridTemplateColumns: `repeat(${Math.min(tiers.length, 3)}, minmax(0, 1fr))` }}>
-            {tiers.map((tier) => {
-              const isSelected = tier.id === activeVariant?.id;
-              const isWinner = isAccepted && quote.acceptedVariantId === tier.id;
-              return (
-                <button
-                  key={tier.id}
-                  type="button"
-                  onClick={() => !isAccepted && setSelectedVariantId(tier.id)}
-                  disabled={isAccepted}
-                  aria-pressed={isSelected}
-                  className={cn("pq-tier", isSelected && "on", isAccepted && !isWinner && "dim")}
-                >
-                  <span className="pq-tier-top">
-                    <span className="pq-tier-name">{tier.label}</span>
-                    {tier.recommended && !isAccepted && <span className="pq-tier-rec">{t("publicQuote.tiers.recommended")}</span>}
-                    {isWinner && <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: "var(--green-dark)" }} />}
-                  </span>
-                  {tier.description && <span className="pq-tier-desc hide-phone">{tier.description}</span>}
-                  <span className="pq-tier-total">{euro(tier.totale, lang)}</span>
-                </button>
-              );
-            })}
+        {isDeclined && (
+          <div className="cp-rise" style={{ padding: "14px 16px 0" }}>
+            <div className="cp-banner cp-b-info" role="status">
+              <div>
+                <b>{t("publicQuote.declinedTitle")}</b>
+                <div style={{ marginTop: 2 }}>{t("publicQuote.declinedBody")}</div>
+              </div>
+            </div>
           </div>
-          {activeVariant?.description && <p className="pq-tier-note show-phone">{activeVariant.description}</p>}
-        </div>
-      )}
+        )}
 
-      <div className="card mb-6" style={{ boxShadow: "var(--shadow-card)" }}>
-        <div className="p-5 sm:p-6">
+        <section className="cp-rise" style={{ padding: "22px 20px 0", animationDelay: "40ms" }}>
+          <span className="cp-mono" style={{ fontSize: 12.5, color: "var(--muted)" }}>
+            {t("publicQuote.quoteFallback")}{quote.numeroPreventivoData ? ` ${quote.numeroPreventivoData}` : ""}
+          </span>
+          {title && <h1 className="cp-h1" style={{ marginTop: 8 }}>{title}</h1>}
           {quote.clientData?.nome && (
-            <div className="mb-4 pb-4" style={{ borderBottom: "1px solid var(--soft)" }}>
-              <div className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--faint)" }}>
-                {t("publicQuote.clientLabel")}
-              </div>
-              <div className="text-sm font-medium" style={{ color: "var(--ink)" }}>{quote.clientData.nome}</div>
-              {quote.clientData.indirizzo && (
-                <div className="text-xs" style={{ color: "var(--muted-mk)" }}>{quote.clientData.indirizzo}</div>
-              )}
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {(displayCapitoli || []).map((cap) => (
-              <div key={cap.lettera}>
-                <div className="flex items-start justify-between gap-3 text-sm font-semibold mb-1.5" style={{ color: "var(--ink)" }}>
-                  <span>{cap.lettera}. {cap.titolo}</span>
-                  <span className="shrink-0">{euro(cap.subtotale, lang)}</span>
-                </div>
-                <div className="space-y-1">
-                  {cap.voci.map((v, i) => (
-                    <div key={i} className="flex items-start justify-between gap-3 text-xs" style={{ color: "var(--muted-mk)" }}>
-                      <span>{v.descrizione} ({v.quantita} {v.um})</span>
-                      <span className="shrink-0">{euro(v.totale, lang)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 pt-4 space-y-1" style={{ borderTop: "1px solid var(--soft)" }}>
-            <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
-              <span>{t("publicQuote.subtotal")}</span>
-              <span>{euro(displaySubtotale, lang)}</span>
-            </div>
-            {displaySconto && displaySconto.percentuale > 0 && (
-              <>
-                <div className="flex justify-between text-sm" style={{ color: "var(--green-dark)" }}>
-                  <span>{t("publicQuote.discount")} ({displaySconto.percentuale}%)</span>
-                  <span>−{euro(Number(displaySubtotale) - displaySconto.importoScontato, lang)}</span>
-                </div>
-                <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
-                  <span>{t("publicQuote.discountedSubtotal")}</span>
-                  <span>{euro(displaySconto.importoScontato, lang)}</span>
-                </div>
-              </>
-            )}
-            {displayTaxLines.length === 0 ? (
-              <div className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
-                <span>{t("publicQuote.tax")} ({displayIvaPercentuale}%)</span>
-                <span>{euro(displayIvaValore, lang)}</span>
-              </div>
-            ) : displayTaxLines.map((line) => (
-              <div key={line.code} className="flex justify-between text-sm" style={{ color: "var(--muted-mk)" }}>
-                <span>{taxLineLabel(line, lang, t("publicQuote.tax"))}</span>
-                <span>{euro(line.amount, lang)}</span>
-              </div>
-            ))}
-            <div className="flex justify-between text-base font-bold pt-1" style={{ color: "var(--navy)" }}>
-              <span>{t("publicQuote.total")}</span>
-              <span>{euro(displayTotale, lang)}</span>
-            </div>
-          </div>
-
-          {(quote.exclusions?.length ?? 0) > 0 && (
-            <div className="mt-4 pt-4" style={{ borderTop: "1px solid var(--soft)" }}>
-              <div className="text-[10px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: "var(--faint)" }}>{t("publicQuote.notIncluded")}</div>
-              <ul className="text-xs space-y-1 pl-4 m-0" style={{ color: "var(--muted-mk)", listStyle: "disc" }}>
-                {quote.exclusions!.map((x, i) => <li key={i}>{x}</li>)}
-              </ul>
-            </div>
-          )}
-
-          {quote.note && (
-            <p className="text-xs mt-4 pt-4" style={{ color: "var(--faint)", borderTop: "1px solid var(--soft)" }}>{quote.note}</p>
-          )}
-        </div>
-      </div>
-
-      <RebatesWidget quoteId={quote.id} />
-      <FinancingWidget quoteId={quote.id} />
-
-      {!isAccepted && (
-        <>
-          {/* On a phone the sheet says this; the card is for a computer, where Accept sits under it. */}
-          <div className="card p-5 sm:p-6 hide-phone">
-            <h2 className="text-sm font-semibold mb-1" style={{ color: "var(--navy)" }}>{t("publicQuote.acceptTitle")}</h2>
-            <p className="text-xs m-0" style={{ color: "var(--muted-mk)" }}>{t("publicQuote.acceptSubtitle")}</p>
-          </div>
-          {/* Phase 111: Accept within thumb reach on a phone (docked), under the card on a computer. */}
-          <div className="mt-3">
-            <StickyActionBar label={t("publicQuote.acceptTitle")}>
-              <span className="pq-bar-total">
-                <small>{activeVariant ? activeVariant.label : t("publicQuote.total")}</small>
-                {euro(displayTotale, lang)}
-              </span>
-              <button type="button" className="btn btn-navy" data-primary-action onClick={() => { setError(null); setAcceptOpen(true); }}>
-                <Hammer className="h-4 w-4" /> {t("publicQuote.acceptButton")}
-              </button>
-            </StickyActionBar>
-          </div>
-          <BottomSheet
-            open={acceptOpen}
-            onOpenChange={(o) => { if (!accepting) setAcceptOpen(o); }}
-            title={t("publicQuote.acceptTitle")}
-            description={t("publicQuote.acceptSubtitle")}
-            footer={
-              <button type="button" onClick={handleAccept} disabled={!nomeConferma.trim() || accepting || (hasTiers && !selectedVariantId)} className="btn btn-navy w-full">
-                {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Hammer className="h-4 w-4" />}
-                {t("publicQuote.acceptButton")}
-              </button>
-            }
-          >
-            <div className="pq-sum">
-              <span>{activeVariant ? `${activeVariant.label} · ${t("publicQuote.total")}` : t("publicQuote.total")}</span>
-              <b>{euro(displayTotale, lang)}</b>
-            </div>
-            <div className="field">
-              <label htmlFor="nomeConferma">{t("publicQuote.fullNameLabel")}</label>
-              <input
-                id="nomeConferma"
-                value={nomeConferma}
-                onChange={(e) => setNomeConferma(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") void handleAccept(); }}
-                placeholder={t("publicQuote.fullNamePlaceholder")}
-                autoComplete="name"
-                autoCapitalize="words"
-                enterKeyHint="done"
-              />
-            </div>
-            {error && <p className="text-xs m-0" role="alert" style={{ color: "var(--red)" }}>{error}</p>}
-          </BottomSheet>
-          {!quote.declinedAt && (
-            <p className="text-center mt-4 mb-0">
-              <button type="button" className="underline text-xs" style={{ color: "var(--muted-mk)", background: "none", border: 0, padding: 12, cursor: "pointer" }} onClick={() => { setError(null); setDeclineOpen(true); }}>{t("publicQuote.declineLink")}</button>
+            <p className="cp-sub" style={{ marginTop: 8 }}>
+              {t("cp.quote.for")} {quote.clientData.nome}{quote.clientData.indirizzo ? ` · ${quote.clientData.indirizzo}` : ""}
             </p>
           )}
-          <BottomSheet
-            open={declineOpen}
-            onOpenChange={(o) => { if (!declining) setDeclineOpen(o); }}
-            title={t("publicQuote.declineTitle")}
-            description={t("publicQuote.declineSubtitle")}
-            footer={
-              <button type="button" onClick={handleDecline} disabled={declining} className="btn btn-outline-navy w-full">
-                {declining ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                {t("publicQuote.declineButton")}
-              </button>
-            }
-          >
-            <div className="field">
-              <label htmlFor="declineReason">{t("publicQuote.declineReasonLabel")}</label>
-              <textarea id="declineReason" rows={3} maxLength={500} value={declineReason} onChange={(e) => setDeclineReason(e.target.value)} placeholder={t("publicQuote.declineReasonPlaceholder")} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+            {isAccepted ? <StatusPill tone="ok">{t("cp.quote.statusAccepted")}</StatusPill>
+              : isDeclined ? <StatusPill tone="bad" shape="x">{t("cp.quote.statusDeclined")}</StatusPill>
+              : <StatusPill tone="info">{t("cp.quote.statusOpen")}</StatusPill>}
+          </div>
+        </section>
+
+        <section className="cp-rise" style={{ padding: "18px 16px 0", animationDelay: "80ms" }}>
+          <div className="cp-card" style={{ padding: 18 }}>
+            <span className="cp-sub">{t("cp.quote.totalWith")}</span>
+            <div style={{ marginTop: 4 }}><BigMoney value={Number(displayTotale)} lang={lang} /></div>
+          </div>
+        </section>
+
+        {/* Phase 111: the options at every width, as the board's radio cards. */}
+        {hasTiers && (
+          <section className="cp-rise" style={{ padding: "24px 16px 0", animationDelay: "120ms" }}>
+            <div className="cp-sh">
+              <h2>{isAccepted ? t("publicQuote.tiers.chosen") : t("publicQuote.tiers.choose")}</h2>
+              {!isAccepted && <span className="cp-lnk">{t("cp.quote.pickOne")}</span>}
             </div>
-            {error && <p className="text-xs m-0" role="alert" style={{ color: "var(--red)" }}>{error}</p>}
-          </BottomSheet>
-        </>
-      )}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }} role="radiogroup" aria-label={t("publicQuote.tiers.choose")}>
+              {tiers.map((tier) => {
+                const on = tier.id === activeVariant?.id;
+                const isWinner = isAccepted && quote.acceptedVariantId === tier.id;
+                const diff = Number(tier.totale) - basePrice;
+                return (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => !isAccepted && setSelectedVariantId(tier.id)}
+                    disabled={isAccepted}
+                    className="cp-press"
+                    style={{ width: "100%", border: 0, textAlign: "left", background: "var(--card)", borderRadius: 20, padding: 16, display: "flex", gap: 14, alignItems: "flex-start", boxShadow: on ? "0 0 0 2px var(--ink)" : "0 0 0 1px var(--ring)", opacity: isAccepted && !isWinner ? 0.5 : 1, color: "inherit" }}
+                  >
+                    <span aria-hidden="true" style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, marginTop: 1, display: "flex", alignItems: "center", justifyContent: "center", background: on ? "var(--inv)" : "transparent", boxShadow: on ? "none" : "inset 0 0 0 1.6px var(--line2)" }}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--on-inv)", transform: on ? "scale(1)" : "scale(0)", transition: "transform .3s cubic-bezier(.34,1.4,.64,1)" }} />
+                    </span>
+                    <span style={{ flexGrow: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                        <b style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em" }}>{tier.label}</b>
+                        {tier.recommended && !isAccepted && <span className="cp-st cp-st-acc">{t("publicQuote.tiers.recommended")}</span>}
+                      </span>
+                      {tier.description && <span className="cp-sub" style={{ lineHeight: 1.45 }}>{tier.description}</span>}
+                    </span>
+                    <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
+                      <span className="cp-num" style={{ fontSize: 16, fontWeight: 600, letterSpacing: "-0.02em" }}>{euro(tier.totale, lang)}</span>
+                      <span style={{ fontSize: 11.5, color: "var(--muted)" }}>
+                        {Math.abs(diff) < 0.005 ? t("cp.quote.basePrice") : `${diff > 0 ? "+" : "−"}${euro(Math.abs(diff), lang)}`}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
-      {portalUrl && (
-        <a href={portalUrl} className="card p-4 mt-6 flex items-center gap-3 text-sm no-underline" style={{ boxShadow: "var(--shadow-card)" }}>
-          <LayoutDashboard className="h-5 w-5 shrink-0" style={{ color: "var(--navy)" }} />
-          <span className="grow" style={{ color: "var(--ink)" }}><b style={{ color: "var(--navy)" }}>{t("portalLink.title").replace("{company}", quote.companySnapshot?.companyName || "")}</b><span className="block text-xs" style={{ color: "var(--muted-mk)" }}>{t("portalLink.desc")}</span></span>
-          <span className="btn btn-sm btn-outline-navy">{t("portalLink.open")}</span>
-        </a>
-      )}
+        <section className="cp-rise" style={{ padding: "24px 16px 0", animationDelay: "160ms" }}>
+          <div className="cp-sh">
+            <h2>{t("cp.quote.included")}</h2>
+            {activeVariant && <span className="cp-lnk">{activeVariant.label}</span>}
+          </div>
+          <div className="cp-card" style={{ overflow: "hidden" }}>
+            {(displayCapitoli || []).map((cap, ci) => (
+              <div key={cap.lettera}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, padding: "12px 16px 8px", background: "var(--soft)", borderTop: ci ? "1px solid var(--line2)" : undefined }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 600 }}>{cap.titolo}</span>
+                  <span className="cp-num" style={{ fontSize: 12.5, color: "var(--muted)" }}>{euro(cap.subtotale, lang)}</span>
+                </div>
+                {cap.voci.map((v, i) => (
+                  <div key={i} style={{ padding: "12px 16px", display: "flex", gap: 12, justifyContent: "space-between", alignItems: "flex-start", borderTop: "1px solid var(--line)" }}>
+                    <span style={{ display: "flex", flexDirection: "column", gap: 3, minWidth: 0 }}>
+                      <span style={{ fontSize: 14.5, fontWeight: 500, lineHeight: 1.3 }}>{v.descrizione}</span>
+                      <span style={{ fontSize: 12.5, color: "var(--muted)", lineHeight: 1.35 }}>{v.quantita} {v.um}</span>
+                    </span>
+                    <span className="cp-num" style={{ fontSize: 14.5, fontWeight: 500, whiteSpace: "nowrap" }}>{euro(v.totale, lang)}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div style={{ padding: "14px 16px 16px", borderTop: "1px solid var(--line2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, color: "var(--muted)" }}>
+                <span>{t("publicQuote.subtotal")}</span>
+                <span className="cp-num" style={{ color: "var(--ink)" }}>{euro(displaySubtotale, lang)}</span>
+              </div>
+              {displaySconto && displaySconto.percentuale > 0 && (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, color: "var(--ok)", marginTop: 8 }}>
+                    <span>{t("publicQuote.discount")} (<span className="cp-num">{displaySconto.percentuale}%</span>)</span>
+                    <span className="cp-num">−{euro(Number(displaySubtotale) - displaySconto.importoScontato, lang)}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, color: "var(--muted)", marginTop: 8 }}>
+                    <span>{t("publicQuote.discountedSubtotal")}</span>
+                    <span className="cp-num" style={{ color: "var(--ink)" }}>{euro(displaySconto.importoScontato, lang)}</span>
+                  </div>
+                </>
+              )}
+              {displayTaxLines.length === 0 ? (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, color: "var(--muted)", marginTop: 8 }}>
+                  <span>{t("publicQuote.tax")} (<span className="cp-num">{displayIvaPercentuale}%</span>)</span>
+                  <span className="cp-num" style={{ color: "var(--ink)" }}>{euro(displayIvaValore, lang)}</span>
+                </div>
+              ) : displayTaxLines.map((line) => (
+                <div key={line.code} style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, color: "var(--muted)", marginTop: 8 }}>
+                  <span>{taxLineLabel(line, lang, t("publicQuote.tax"))}</span>
+                  <span className="cp-num" style={{ color: "var(--ink)" }}>{euro(line.amount, lang)}</span>
+                </div>
+              ))}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line)" }}>
+                <span style={{ fontSize: 14.5, fontWeight: 600 }}>{t("publicQuote.total")}</span>
+                <span className="cp-num" style={{ fontSize: 21, fontWeight: 600, letterSpacing: "-0.03em" }}>{euro(displayTotale, lang)}</span>
+              </div>
+            </div>
+            {(quote.exclusions?.length ?? 0) > 0 && (
+              <div style={{ padding: "14px 16px 16px", borderTop: "1px solid var(--line2)" }}>
+                <div style={{ fontSize: 13.5, fontWeight: 600 }}>{t("publicQuote.notIncluded")}</div>
+                <ul style={{ margin: "8px 0 0", paddingLeft: 18, listStyle: "disc", fontSize: 13.5, color: "var(--muted)", lineHeight: 1.45 }}>
+                  {quote.exclusions!.map((x, i) => <li key={i}>{x}</li>)}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
 
-      <p className="text-center text-xs mt-8" style={{ color: "var(--muted-mk)" }}>
-        <a href="https://quoteai.ca" className="underline">{t("publicQuote.generatedWith")}</a>
-      </p>
-    </div>
+        {quote.note && (
+          <section className="cp-section-t cp-rise" style={{ animationDelay: "190ms" }}>
+            <div className="cp-card" style={{ padding: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span className="cp-av" aria-hidden="true" style={{ width: 34, height: 34, background: "var(--warn-soft)", color: "var(--warn)" }}>{initialsOf(companyName)}</span>
+                <b style={{ fontSize: 14.5, fontWeight: 600 }}>{companyName}</b>
+              </div>
+              <p style={{ margin: "10px 0 0", fontSize: 14.5, lineHeight: 1.55, color: "var(--t2)", textWrap: "pretty" as const, whiteSpace: "pre-line" }}>{quote.note}</p>
+            </div>
+          </section>
+        )}
+
+        <RebatesWidget quoteId={quote.id} />
+        <FinancingWidget quoteId={quote.id} />
+
+        {!isAccepted && (
+          <section className="cp-section cp-rise" id="accept" style={{ animationDelay: "250ms" }}>
+            <div className="cp-card" style={{ padding: 18 }}>
+              <h2 style={{ fontSize: 19, fontWeight: 600, letterSpacing: "-0.03em" }}>{t("publicQuote.acceptTitle")}</h2>
+              <p className="cp-sub" style={{ marginTop: 6 }}>{activeVariant ? <>{activeVariant.label} · <span className="cp-num">{euro(displayTotale, lang)}</span></> : t("publicQuote.acceptSubtitle")}</p>
+              <div className="cp-field" style={{ marginTop: 16 }}>
+                <label htmlFor="nomeConferma">{t("publicQuote.fullNameLabel")}</label>
+                <input
+                  id="nomeConferma"
+                  value={nomeConferma}
+                  onChange={(e) => setNomeConferma(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") void handleAccept(); }}
+                  placeholder={t("publicQuote.fullNamePlaceholder")}
+                  autoComplete="name"
+                  autoCapitalize="words"
+                  enterKeyHint="done"
+                />
+              </div>
+              <p className="cp-note" style={{ margin: "10px 2px 0" }}>{t("cp.quote.legal")}</p>
+              {error && !declineOpen && <p className="cp-err" role="alert" style={{ margin: "10px 2px 0" }}>{error}</p>}
+              <button type="button" onClick={handleAccept} data-primary-action disabled={!nomeConferma.trim() || accepting || (hasTiers && !selectedVariantId)} className="cp-btn cp-btn-lg cp-btn-p cp-btn-w cp-press" style={{ marginTop: 14 }}>
+                {accepting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {t("publicQuote.acceptButton")} · <span className="cp-num">{euro(displayTotale, lang)}</span>
+              </button>
+            </div>
+            {!quote.declinedAt && (
+              <p style={{ textAlign: "center", marginTop: 4 }}>
+                <button type="button" className="cp-link" onClick={() => { setError(null); setDeclineOpen(true); }}>{t("publicQuote.declineLink")}</button>
+              </p>
+            )}
+            <BottomSheet
+              open={declineOpen}
+              onOpenChange={(o) => { if (!declining) setDeclineOpen(o); }}
+              title={t("publicQuote.declineTitle")}
+              description={t("publicQuote.declineSubtitle")}
+              footer={
+                <button type="button" onClick={handleDecline} disabled={declining} className="cp-btn cp-btn-md cp-btn-s cp-btn-w">
+                  {declining ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {t("publicQuote.declineButton")}
+                </button>
+              }
+            >
+              <div className="cp-field">
+                <label htmlFor="declineReason">{t("publicQuote.declineReasonLabel")}</label>
+                <textarea id="declineReason" rows={3} maxLength={500} value={declineReason} onChange={(e) => setDeclineReason(e.target.value)} placeholder={t("publicQuote.declineReasonPlaceholder")} />
+              </div>
+              {error && <p className="cp-err" role="alert">{error}</p>}
+            </BottomSheet>
+          </section>
+        )}
+
+        <section className="cp-rise" style={{ padding: "16px 16px 0", animationDelay: "280ms" }}>
+          {quote.pdfUrl && (
+            <a href={quote.pdfUrl} target="_blank" rel="noopener noreferrer" className="cp-btn cp-btn-s cp-btn-w cp-press">
+              <Download width={18} height={18} aria-hidden="true" />{t("publicInvoice.downloadPdf")}
+            </a>
+          )}
+          {portalUrl && (
+            <a href={portalUrl} className="cp-card cp-lrow cp-press" style={{ marginTop: 12, textDecoration: "none" }}>
+              <Glyph name="doc" tone="indigo" />
+              <span className="cp-lt">
+                <b>{t("portalLink.title").replace("{company}", quote.companySnapshot?.companyName || "")}</b>
+                <small>{t("portalLink.desc")}</small>
+              </span>
+              <span className="cp-vh">{t("portalLink.open")}</span>
+              <ChevronRight width={18} height={18} aria-hidden="true" style={{ color: "var(--faint)", flexShrink: 0 }} />
+            </a>
+          )}
+          <p style={{ margin: "18px 0 0", textAlign: "center", fontSize: 12.5, color: "var(--muted)", lineHeight: 1.6 }}>
+            {phone && <>{t("cp.quote.questions")} <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="cp-num" style={{ color: "var(--ink)", fontWeight: 500 }}>{phone}</a><br /></>}
+            <a href="https://quoteai.ca" style={{ color: "var(--faint)" }}>{t("cp.quote.sentWith")}</a>
+          </p>
+        </section>
+      </div>
     </main>
   );
 }

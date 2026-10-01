@@ -144,3 +144,30 @@ describe("phase 125: clients overview", () => {
     }
   });
 });
+
+describe("phase 125: Not included and the recommended option", () => {
+  test("exclusions are saved on the quote, reach the client page, and are trimmed and limited", async () => {
+    const q = await seedQuote(org.userId, { status: "unlocked" });
+    const put = await org.api(`/api/quotes/${q.id}`, { method: "PUT", body: { exclusions: ["  Moving appliances  ", "Electrical past cover plates"] } });
+    expect(put.status).toBe(200);
+    expect(put.body.exclusions).toEqual(["Moving appliances", "Electrical past cover plates"]);
+    expect((await org.api(`/api/quotes/${q.id}`)).body.exclusions).toHaveLength(2);
+    expect((await publicGet(`/api/public/quotes/${q.id}?preview=1`)).body.quote.exclusions).toEqual(["Moving appliances", "Electrical past cover plates"]);
+    expect((await org.api(`/api/quotes/${q.id}`, { method: "PUT", body: { exclusions: ["x".repeat(301)] } })).status).toBe(400);
+    expect((await org.api(`/api/quotes/${q.id}`, { method: "PUT", body: { exclusions: [] } })).body.exclusions).toEqual([]);
+  });
+
+  test("only one option is recommended at a time", async () => {
+    const q = await seedQuote(org.userId, { status: "unlocked" });
+    const a = await org.api(`/api/quotes/${q.id}/variants`, { method: "POST", body: { label: "Good" } });
+    const b = await org.api(`/api/quotes/${q.id}/variants`, { method: "POST", body: { label: "Better" } });
+    expect(a.status).toBe(201);
+    expect(a.body.recommended).toBe(false);
+    expect((await org.api(`/api/quotes/${q.id}/variants/${b.body.id}`, { method: "PUT", body: { recommended: true } })).body.recommended).toBe(true);
+    await org.api(`/api/quotes/${q.id}/variants/${a.body.id}`, { method: "PUT", body: { recommended: true } });
+    const list = (await org.api(`/api/quotes/${q.id}/variants`)).body.variants as { label: string; recommended: boolean }[];
+    expect(list.filter((v) => v.recommended).map((v) => v.label)).toEqual(["Good"]);
+    const pub = (await publicGet(`/api/public/quotes/${q.id}?preview=1`)).body.quote.variants as { label: string; recommended: boolean }[];
+    expect(pub.find((v) => v.label === "Good")?.recommended).toBe(true);
+  });
+});

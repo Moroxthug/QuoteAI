@@ -83,6 +83,8 @@ export const quotesTable = pgTable("quotes", {
   firstViewedAt: timestamp("first_viewed_at", { withTimezone: true }),
   /** Pocket (Phase 125): when the client declined the quote on its page, and the reason they gave (optional). Cleared when the quote is sent again. */
   declinedAt: timestamp("declined_at", { withTimezone: true }),
+  /** Pocket (Phase 125): what the price does not include ("Not included"), one short line each. */
+  exclusions: text("exclusions").array().notNull().default([]),
   declinedReason: text("declined_reason"),
   /** How many follow-up sequence steps have fired; 0 = none sent yet. Mirrors leadsTable's pattern. */
   followUpStage: integer("follow_up_stage").notNull().default(0),
@@ -172,6 +174,8 @@ export const quoteVariantsTable = pgTable("quote_variants", {
   /** Freeform label, typically "Good" / "Better" / "Best" but not constrained to those three. */
   label: text("label").notNull().default(""),
   description: text("description").notNull().default(""),
+  /** Pocket (Phase 125): the option the contractor recommends (at most one per quote). */
+  recommended: boolean("recommended").notNull().default(false),
   /** Display order, 0-based. */
   position: integer("position").notNull().default(0),
   items: jsonb("items").$type<QuoteItem[]>().notNull().default([]),

@@ -392,6 +392,12 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
       // Payment conditions
       ...condizioniContent,
 
+      // Not included
+      ...(Array.isArray(quote.exclusions) && quote.exclusions.length > 0 ? [
+        { text: qt("notIncluded", lang), style: "sectionHeading", margin: [0, 14, 0, 4] as [number, number, number, number] },
+        { ul: quote.exclusions.map((x: string) => ({ text: x, fontSize: 8, color: "#333" })), margin: [0, 0, 0, 0] as [number, number, number, number] },
+      ] as Content[] : []),
+
       // Note
       ...(quote.note ? [
         { text: qt("note", lang), style: "sectionHeading", margin: [0, 14, 0, 4] as [number, number, number, number] },

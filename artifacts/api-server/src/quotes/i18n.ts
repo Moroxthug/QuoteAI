@@ -57,6 +57,7 @@ const Q = {
   paymentTerms: { en: "PAYMENT TERMS", fr: "MODALITÉS DE PAIEMENT" },
   nb: { en: "N.B. ANY REQUESTED WORK NOT INCLUDED IN THIS QUOTE MUST BE QUOTED AND PAID FOR SEPARATELY.", fr: "N.B. TOUT TRAVAIL DEMANDÉ QUI N'EST PAS INCLUS DANS CETTE SOUMISSION FERA L'OBJET D'UNE SOUMISSION ET D'UN PAIEMENT DISTINCTS." },
   note: { en: "NOTE", fr: "NOTE" },
+  notIncluded: { en: "NOT INCLUDED", fr: "NON INCLUS" },
   acceptance: { en: "QUOTE ACCEPTANCE", fr: "ACCEPTATION DE LA SOUMISSION" },
   acceptanceText: { en: "The undersigned, having reviewed this quote, accepts the terms indicated above and authorizes the work to proceed.", fr: "Le soussigné, ayant pris connaissance de la présente soumission, en accepte les conditions et autorise l'exécution des travaux." },
   dateAndLocation: { en: "Date and Location", fr: "Date et lieu" },

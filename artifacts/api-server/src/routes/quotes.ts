@@ -8,7 +8,7 @@ import { sendSms } from "../lib/sms.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { quoteLanguageFor, qt, fmtQuoteDate, fmtQty } from "../quotes/i18n.js";
 import { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } from "../quotes/pdf.js";
-import { eq, desc, count, sum, sql, and, avg, isNull, inArray } from "drizzle-orm";
+import { eq, desc, count, sum, sql, and, avg, isNull, inArray, ne } from "drizzle-orm";
 import { catalogOwnerIds } from "../groups/service.js";
 import { getTrialStatus, PLANS } from "./payments.js";
 import {
@@ -194,6 +194,7 @@ function serializeQuoteVariant(v: VariantRow, province: string | null = null) {
     quoteId: v.quoteId,
     label: v.label,
     description: v.description,
+    recommended: v.recommended ?? false,
     position: v.position,
     items: Array.isArray(v.items) ? v.items : [],
     capitoli: Array.isArray(v.capitoli) ? v.capitoli : [],
@@ -301,6 +302,7 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     firstViewedAt: q.firstViewedAt?.toISOString() ?? null,
     declinedAt: q.declinedAt?.toISOString() ?? null,
     declinedReason: q.declinedReason ?? null,
+    exclusions: Array.isArray(q.exclusions) ? q.exclusions : [],
     pdfUrl: q.pdfUrl ?? null,
     rawInput: q.rawInput,
     pdfDownloadedAt: q.pdfDownloadedAt?.toISOString() ?? null,
@@ -1468,6 +1470,12 @@ router.put("/quotes/:id/variants/:variantId", requireAuth, requirePermission("qu
     }
     const body = parsed.data;
     const updates: Partial<typeof existing> = {};
+    // Not in the generated body: which option the contractor recommends (one per quote).
+    const rec = z.object({ recommended: z.boolean().optional() }).safeParse(req.body ?? {});
+    if (rec.success && rec.data.recommended !== undefined) {
+      updates.recommended = rec.data.recommended;
+      if (rec.data.recommended) await db.update(quoteVariantsTable).set({ recommended: false }).where(and(eq(quoteVariantsTable.quoteId, id), ne(quoteVariantsTable.id, variantId)));
+    }
     if (body.label !== undefined) updates.label = body.label;
     if (body.description !== undefined) updates.description = body.description;
     if (body.items) updates.items = body.items as QuoteItem[];
@@ -1664,12 +1672,13 @@ router.put("/quotes/:id", requireAuth, requirePermission("quotes", "edit"), asyn
 
     // Phase 0 fields are not in the generated UpdateQuoteBody (which strips
     // unknown keys), so they are validated here; the schedule's shape by its own schema below.
-    const extras = z.object({ province: z.string().max(40).nullable().optional(), paymentSchedule: z.unknown().optional() }).safeParse(req.body);
+    const extras = z.object({ province: z.string().max(40).nullable().optional(), paymentSchedule: z.unknown().optional(), exclusions: z.array(z.string().trim().min(1).max(300)).max(30).optional() }).safeParse(req.body);
     if (!extras.success) {
       res.status(400).json({ error: "Invalid province code", details: extras.error });
       return;
     }
     const rawBody = extras.data;
+    if (rawBody.exclusions !== undefined) updates.exclusions = rawBody.exclusions;
     if (rawBody.province !== undefined) {
       const p = rawBody.province === null ? null : normalizeProvince(rawBody.province);
       if (rawBody.province !== null && !p) {

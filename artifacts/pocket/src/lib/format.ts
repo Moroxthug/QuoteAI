@@ -34,3 +34,8 @@ export function time(d: Date, locale: Locale): string {
 export function dayDate(d: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale, { weekday: "short", month: "short", day: "numeric" }).format(d).replace(/,/g, "");
 }
+
+/** A sentence that ends on an abbreviation ("… at 9:12 a.m." + ".") keeps one full stop. */
+export function sentence(s: string): string {
+  return s.replace(/\.\.$/, ".");
+}

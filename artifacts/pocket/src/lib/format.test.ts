@@ -19,3 +19,9 @@ test("dates and times", () => {
   assert.equal(dayDate(d, "fr-CA"), "mar. 29 sept.");
   assert.match(time(d, "fr-CA"), /^14\s?h\s?30$/);
 });
+
+test("sentence: one full stop after a.m.", async () => {
+  const { sentence } = await import("./format.ts");
+  assert.equal(sentence("Twice today, last at 9:12 a.m.."), "Twice today, last at 9:12 a.m.");
+  assert.equal(sentence("Done."), "Done.");
+});

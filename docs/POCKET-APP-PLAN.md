@@ -160,3 +160,9 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - `SwipeRow`: drag (gesture handler) or tap; snaps past half the actions or on a flick; 450 ms `out`; `locked` for an expanded row; each action is also a screen-reader custom action.
   - Gotcha: gesture callbacks run on the UI thread; build easings once outside them (`easing()` inside `onEnd` crashed the drag on Android). A Tap gesture needs `maxDistance` or a drag also counts as a tap.
   - Checked on Expo web (light, night, FR) and on the emulator (tap, drag open, drag closed).
+- **2026-09-30, 123.3 Numbers and Feedback:**
+  - Numbers: `StatStrip`, `KpiTile` / `KpiGrid`, `Progress` (grows in from the left, 1.2 s after 0.2 s; still under reduced motion), `ProgressRow` / `ProgressList`.
+  - Feedback: `Banner` (5 tones), `Empty` (also the error state), `Skeleton` (shimmer band, still under reduced motion), `Toast`, and `ToastHost` / `useToast` in the root layout (104 above the bottom, slides in, hides after 3 s).
+  - `sentence()` in format.ts keeps one full stop after "a.m." ("last at 9:12 a.m.").
+  - `/sandbox?only=<Section>` shows one section; the emulator opens it with `adb shell am start -a android.intent.action.VIEW -d "quoteai:///sandbox?only=Rows" ca.quoteai.app`. Don't flood the emulator with adb swipes (40 quick swipes made Android report the app as not responding).
+  - Checked on the emulator in light, night and FR (the toast's slide and 3 s hide included).

@@ -222,6 +222,37 @@ export const fr: Dict = {
       hart: "Budget Hart", // owner
       deck: "Budget de la terrasse", // owner
     },
+    feedback: {
+      title: "Rétroaction", // owner
+      banners: "Bandeaux", // owner
+      viewed: "Priya a consulté la soumission.", // owner (SmartHomeFR: « a consulté sa soumission »)
+      viewedMore: "Deux fois aujourd’hui, la dernière à {{time}}.", // owner
+      offline: "Vous êtes hors ligne.", // AssistantActivityFR
+      offlineMore: "Ce que vous enregistrez est gardé sur ce téléphone.", // owner
+      deposit: "Dépôt reçu.", // owner (glossary: deposit = dépôt)
+      depositMore: "{{amount}} de Tom & Lena Hart.", // owner
+      overdue_one: "INV-0412 a {{count}} jour de retard.", // owner
+      overdue_other: "INV-0412 a {{count}} jours de retard.", // owner
+      overdueMore: "Un rappel part demain.", // owner
+      drafted_one: "quoteAI a préparé {{count}} article.", // owner
+      drafted_other: "quoteAI a préparé {{count}} articles.", // owner
+      draftedMore: "Vérifiez les prix avant d’envoyer.", // owner
+      empty: "État vide", // owner
+      noQuotes: "Aucune soumission pour l’instant", // owner
+      noQuotesBody: "Décrivez les travaux à voix haute et quoteAI rédige la première version.", // owner
+      newQuote: "Nouvelle soumission",
+      watch: "Voir comment",
+      error: "État d’erreur", // owner
+      didntLoad: "Le chargement a échoué", // owner
+      didntLoadBody: "Vérifiez votre connexion et réessayez.", // owner
+      retry: "Réessayer",
+      loading: "Chargement · liste, bande de chiffres, carte", // owner
+      toast: "Message avec Annuler", // owner
+      archived: "Soumission Q-2026-110 archivée", // owner
+      restored: "Remise dans Soumissions", // owner
+      undo: "Annuler",
+      again: "Encore", // owner
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

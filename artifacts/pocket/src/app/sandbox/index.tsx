@@ -1,7 +1,9 @@
-// /sandbox mirrors docs/pocket-design/Components.dc.html section by section (phase 123.3 fills
-// the sections, one component at a time).
+// /sandbox mirrors docs/pocket-design/Components.dc.html section by section.
+// `/sandbox?only=Rows` shows one section under the switches (for checking a part on a device
+// without scrolling the whole board).
+import type { ComponentType } from "react";
 import { Pressable, ScrollView } from "react-native";
-import { Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
@@ -13,22 +15,31 @@ import { InputsSection } from "@/ui/board/Inputs";
 import { StatusSection } from "@/ui/board/Status";
 import { RowsSection } from "@/ui/board/Rows";
 import { NumbersSection } from "@/ui/board/Numbers";
+import { FeedbackSection } from "@/ui/board/Feedback";
+
+/** The board's sections, in its order. */
+const SECTIONS: [string, ComponentType][] = [
+  ["Buttons", ButtonsSection],
+  ["Chips", ChipsSection],
+  ["Controls", ControlsSection],
+  ["Inputs", InputsSection],
+  ["Status", StatusSection],
+  ["Rows", RowsSection],
+  ["Numbers", NumbersSection],
+  ["Feedback", FeedbackSection],
+];
 
 export default function Sandbox() {
   const { t } = useTranslation();
+  const { only } = useLocalSearchParams<{ only?: string }>();
+  const shown = SECTIONS.filter(([name]) => !only || name.toLowerCase() === only.toLowerCase());
   return (
     <Screen>
       <ScrollView>
         <BoardHeader title={t("sandbox.title")} intro={t("sandbox.intro")} />
         <SandboxSwitches />
         <Link href="/sandbox/foundations" asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Pressable></Link>
-        <ButtonsSection />
-        <ChipsSection />
-        <ControlsSection />
-        <InputsSection />
-        <StatusSection />
-        <RowsSection />
-        <NumbersSection />
+        {shown.map(([name, Section]) => <Section key={name} />)}
         <Text> </Text>
       </ScrollView>
     </Screen>

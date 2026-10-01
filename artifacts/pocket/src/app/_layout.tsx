@@ -10,6 +10,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { setToken } from "@/lib/session";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
+import { ToastHost } from "@/ui/Feedback";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +37,9 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <QueryClientProvider client={client}>
-            <Stack screenOptions={{ headerShown: false }} />
+            <ToastHost>
+              <Stack screenOptions={{ headerShown: false }} />
+            </ToastHost>
           </QueryClientProvider>
         </ThemeProvider>
       </SafeAreaProvider>

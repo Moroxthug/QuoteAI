@@ -12,7 +12,7 @@ export class ApiFailure extends Error {
   }
 }
 
-export async function api<T>(path: string, init?: { method?: "GET" | "POST" | "PUT" | "DELETE"; body?: unknown }): Promise<T> {
+export async function api<T>(path: string, init?: { method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; body?: unknown }): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_ORIGIN}${path}`, {

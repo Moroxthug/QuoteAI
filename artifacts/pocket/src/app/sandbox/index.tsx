@@ -5,6 +5,7 @@ import type { ComponentType } from "react";
 import { Pressable, ScrollView } from "react-native";
 import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { openFeedback, sentryOn } from "@/lib/sentry";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
 import { BoardGroup, BoardHeader, SandboxSwitches } from "@/ui/sandbox";
@@ -45,6 +46,7 @@ export default function Sandbox() {
         <Link href="/sandbox/foundations" asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Pressable></Link>
         {/* Typed routes pick up new screens on the next Metro start. */}
         <Link href={"/sandbox/motion" as Href} asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.motionLink")} →`} /></Pressable></Link>
+        {sentryOn ? <Pressable accessibilityRole="button" onPress={openFeedback}><BoardGroup label={`${t("sandbox.feedback")} →`} /></Pressable> : null}
         {shown.map(([name, Section]) => <Section key={name} />)}
         <Text> </Text>
       </ScrollView>

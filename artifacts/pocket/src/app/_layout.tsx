@@ -1,4 +1,5 @@
 import "@/i18n";
+import { withSentry } from "@/lib/sentry";
 import { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import * as Linking from "expo-linking";
@@ -14,7 +15,7 @@ import { ToastHost } from "@/ui/Feedback";
 
 void SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayout() {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } }));
   const [fontsLoaded, fontError] = useFonts(fontFiles);
   const url = Linking.useLinkingURL();
@@ -46,3 +47,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default withSentry(RootLayout);

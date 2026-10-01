@@ -12,6 +12,7 @@ export const fr: Dict = {
     typeScale: "Échelle typographique", // owner
     icons: "Icônes", // owner
     grounds: "Arrière-plans", // owner
+    feedback: "Envoyer un commentaire", // FeedbackFR
     motionLink: "Mouvement", // owner
     motion: {
       title: "Mouvement", // owner

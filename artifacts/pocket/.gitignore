@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Firebase config (push), copied from the Firebase console; never committed
+/google-services.json

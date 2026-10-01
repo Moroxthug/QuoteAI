@@ -10,11 +10,13 @@
     "typecheck": "tsc --noEmit",
     "lint:tokens": "node scripts/lint-tokens.mjs",
     "test": "node --test --experimental-strip-types src/lib/*.test.ts src/ui/*.test.ts",
-    "sync:design": "node scripts/sync-design.mjs"
+    "sync:design": "node scripts/sync-design.mjs",
+    "release:android": "node scripts/release-android.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/geist": "0.4.2",
     "@expo-google-fonts/manrope": "0.4.2",
+    "@sentry/react-native": "~7.11.0",
     "@tanstack/react-query": "5.90.21",
     "expo": "~57.0.25",
     "expo-blur": "~57.0.3",

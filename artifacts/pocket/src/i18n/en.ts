@@ -8,6 +8,7 @@ export const en = {
     typeScale: "Type scale",
     icons: "Icons",
     grounds: "Backgrounds",
+    feedback: "Send feedback",
     motionLink: "Motion",
     motion: {
       title: "Motion",

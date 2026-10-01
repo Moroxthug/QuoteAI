@@ -1,7 +1,7 @@
 // COMPONENTS §24 motion helpers. `Press`: every tappable scales to .96 over 200 ms with the
 // `out` easing (tokens.motion.press). Reduced motion: no scaling.
-import { useEffect, type ReactNode } from "react";
-import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
+import { useEffect, useState, type ReactNode } from "react";
+import { Pressable, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import { tokens } from "@/theme/tokens";
 
@@ -57,3 +57,24 @@ export function Rise({ delay = 0, children, style }: { delay?: number; children?
   const anim = useAnimatedStyle(() => ({ opacity: t.value, transform: [{ translateY: (1 - t.value) * tokens.motion.rise.from.translateY }] }));
   return <Animated.View style={[style, anim]}>{children}</Animated.View>;
 }
+
+/**
+ * The boards' `.fold` (grid-template-rows 0fr → 1fr): a region that grows from nothing to its own
+ * height while it fades in, 450 ms with the `expand` easing; closed it takes no room and is hidden
+ * from touch and screen readers. Reduced motion: it switches at once.
+ */
+export function Fold({ open, children }: { open: boolean; children: ReactNode }) {
+  const reduced = useReducedMotion();
+  const [h, setH] = useState(0);
+  const t = useSharedValue(open ? 1 : 0);
+  useEffect(() => {
+    t.value = withTiming(open ? 1 : 0, { duration: reduced ? 0 : tokens.motion.expand.height.duration, easing: FOLD });
+  }, [open, reduced, t]);
+  const box = useAnimatedStyle(() => ({ height: h ? h * t.value : open ? undefined : 0, opacity: t.value, overflow: "hidden" }));
+  return (
+    <Animated.View style={box} pointerEvents={open ? "auto" : "none"} importantForAccessibility={open ? "auto" : "no-hide-descendants"} accessibilityElementsHidden={!open}>
+      <View onLayout={(e) => setH(e.nativeEvent.layout.height)} style={{ position: "absolute", left: 0, right: 0, top: 0 }}>{children}</View>
+    </Animated.View>
+  );
+}
+const FOLD = easing("expand");

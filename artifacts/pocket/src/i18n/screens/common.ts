@@ -10,13 +10,7 @@ export const en = {
     emailPlaceholder: "you@company.ca",
     passwordPlaceholder: "8 characters or more",
   },
-  home: {
-    title: "Home",
-    greeting: "Welcome, {{name}}",
-    emptyTitle: "Nothing here yet",
-    emptyBody: "Your quotes, jobs and money will show up here. Home arrives in the next update.",
-    signOut: "Sign out",
-  },
+  close: "Close",
   tabs: { main: "Main", orb: "Open assistant", orbSoon: "The assistant arrives in a later update", home: "Home", quotes: "Quotes", jobs: "Jobs", clients: "Clients" },
   comingSoon: {
     line: "This screen is coming in a later update.",
@@ -34,13 +28,7 @@ export const fr: typeof en = {
     emailPlaceholder: "vous@entreprise.ca",
     passwordPlaceholder: "8 caractères ou plus",
   },
-  home: {
-    title: "Accueil",
-    greeting: "Bienvenue, {{name}}",
-    emptyTitle: "Rien ici pour le moment",
-    emptyBody: "Vos soumissions, chantiers et finances apparaîtront ici. L’accueil arrive dans la prochaine mise à jour.",
-    signOut: "Se déconnecter",
-  },
+  close: "Fermer",
   tabs: { main: "Principal", orb: "Ouvrir l’assistant", orbSoon: "L’assistant arrive dans une prochaine mise à jour", home: "Accueil", quotes: "Soumissions", jobs: "Travaux", clients: "Clients" }, // owner
   comingSoon: {
     line: "Cet écran arrive dans une prochaine mise à jour.",

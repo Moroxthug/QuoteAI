@@ -4,6 +4,7 @@
 // tap the scrim to close. Reduced motion: it appears and goes without sliding.
 import { useEffect, useState, type ReactNode } from "react";
 import { Modal, Pressable, View, useWindowDimensions } from "react-native";
+import { Text } from "./Text";
 import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
@@ -73,5 +74,14 @@ export function Sheet({ open, onClose, label, closeLabel, children }: { open: bo
         </GestureDetector>
       </GestureHandlerRootView>
     </Modal>
+  );
+}
+
+/** The sheet's title: 19/600, padding 6 20 12. */
+export function SheetTitle({ children }: { children: string }) {
+  return (
+    <View style={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: 12 }}>
+      <Text size={19} weight={600} tracking={-0.02} accessibilityRole="header">{children}</Text>
+    </View>
   );
 }

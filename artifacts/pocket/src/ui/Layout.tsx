@@ -2,7 +2,7 @@
 // screen lays itself out with these: the board's own paddings and gaps go in as props
 // (`<Section px={20} pt={26} gap={14}>`), never as style objects.
 import type { ReactNode } from "react";
-import { ScrollView, View, type ViewStyle } from "react-native";
+import { Pressable, ScrollView, View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Rise } from "./motion";
 
@@ -54,4 +54,9 @@ export function ScrollPage({ children, bottom = 0 }: { children: ReactNode; bott
       {children}
     </ScrollView>
   );
+}
+
+/** A transparent layer over its parent that closes what is open when tapped (the dimmed rest of Home under the quote bar). */
+export function TapAway({ label, onPress }: { label: string; onPress: () => void }) {
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }} />;
 }

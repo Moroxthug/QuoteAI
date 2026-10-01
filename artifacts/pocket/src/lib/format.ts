@@ -49,3 +49,8 @@ export function weekdayShort(d: Date, locale: Locale): string {
 export function monthLong(d: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale, { month: "long" }).format(d);
 }
+
+/** The Home header's date: "Tue, Sep 29" / "mar. 29 sept." */
+export function headerDate(d: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, { weekday: "short", month: "short", day: "numeric" }).format(d);
+}

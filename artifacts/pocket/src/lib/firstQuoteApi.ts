@@ -38,10 +38,12 @@ export const firstQuoteApi = {
   profile: () => run(() => api<Profile>("/api/business-profile")),
 
   /** The AI writes and prices the job (multipart, like the web). The company's details go in as the quote's letterhead. */
-  create: (rawInput: string, profile: Profile | null) =>
+  create: (rawInput: string, profile: Profile | null, opts?: { clientData?: Record<string, string>; budget?: number | null }) =>
     run(async () => {
       const form = new FormData();
       form.append("rawInput", rawInput);
+      if (opts?.clientData) form.append("clientData", JSON.stringify(opts.clientData));
+      if (opts?.budget) form.append("targetTotalEur", String(opts.budget));
       if (profile) {
         const snapshot = {
           companyName: profile.companyName || "",

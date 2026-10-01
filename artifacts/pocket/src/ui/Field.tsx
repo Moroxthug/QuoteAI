@@ -25,7 +25,7 @@ export function usePlaceholder(): string {
 }
 
 // No browser focus outline on web: the ring is drawn by the box shadow.
-export const noOutline = Platform.OS === "web" ? ({ outlineWidth: 0 } satisfies TextStyle) : null;
+export const noOutline = Platform.OS === "web" ? ({ outlineWidth: 0, outlineStyle: "none" } as unknown as TextStyle) : null;
 
 function ring(colors: Colors, state: { focused?: boolean; error?: boolean }): string {
   if (state.error) return `0 0 0 1.5px ${colors.bad}`;

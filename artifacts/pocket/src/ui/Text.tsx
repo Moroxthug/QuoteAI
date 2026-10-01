@@ -14,6 +14,8 @@ export type TextProps = Omit<RNTextProps, "style"> & {
   size?: Size;
   weight?: Weight;
   color?: ColorName;
+  /** A board value outside the theme (a white that stays white at night: board.white); wins over `color`. */
+  tint?: string;
   /** Letter-spacing in em, as the design gives it. */
   tracking?: number;
   /** Line height as a multiple of the size. */
@@ -40,7 +42,7 @@ function base({ size = 15, weight = 400, tracking = -0.01, leading, align, opaci
 
 export function Text(props: TextProps) {
   const { colors } = useTheme();
-  const { size, weight = 400, color = "ink", tracking, leading, align, opacity, style, children, ...rest } = props;
+  const { size, weight = 400, color = "ink", tint, tracking, leading, align, opacity, style, children, ...rest } = props;
   const words = geist(weight);
   const digits = manrope(weight);
   const parts = Children.toArray(children).map((child, i) => {
@@ -56,7 +58,7 @@ export function Text(props: TextProps) {
     );
   });
   return (
-    <RNText {...rest} style={[base(props, colors[color]), { fontFamily: words }, style]}>
+    <RNText {...rest} style={[base(props, tint ?? colors[color]), { fontFamily: words }, style]}>
       {parts}
     </RNText>
   );
@@ -64,9 +66,9 @@ export function Text(props: TextProps) {
 
 export function Num(props: TextProps) {
   const { colors } = useTheme();
-  const { size, weight = 600, color = "ink", tracking = 0, leading, align, opacity, style, children, ...rest } = props;
+  const { size, weight = 600, color = "ink", tint, tracking = 0, leading, align, opacity, style, children, ...rest } = props;
   return (
-    <RNText {...rest} style={[base({ ...props, tracking }, colors[color]), { fontFamily: manrope(weight), fontVariant: ["tabular-nums"] }, style]}>
+    <RNText {...rest} style={[base({ ...props, tracking }, tint ?? colors[color]), { fontFamily: manrope(weight), fontVariant: ["tabular-nums"] }, style]}>
       {children}
     </RNText>
   );

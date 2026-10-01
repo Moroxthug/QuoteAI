@@ -45,7 +45,7 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   );
 }
 
-export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera";
+export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun";
 
 type Stroke = { w: number; round?: boolean };
 const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.ReactNode }> = {
@@ -71,6 +71,13 @@ const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.Re
   eye: { stroke: { w: 1.8, round: true }, draw: () => (<><Path d="M2.5 12C4.5 7.8 8 5.5 12 5.5s7.5 2.3 9.5 6.5c-2 4.2-5.5 6.5-9.5 6.5S4.5 16.2 2.5 12Z" /><Circle cx="12" cy="12" r="3" /></>) },
   eyeOff: { stroke: { w: 1.8, round: true }, draw: () => <Path d="M3 3l18 18M10.6 5.6A10 10 0 0 1 12 5.5c4 0 7.5 2.3 9.5 6.5a12.6 12.6 0 0 1-2.8 3.8M6.2 6.9C4.7 8.1 3.4 9.9 2.5 12c2 4.2 5.5 6.5 9.5 6.5 1.7 0 3.3-.4 4.7-1.2M9.9 9.9a3 3 0 0 0 4.2 4.2" /> },
   gear: { stroke: { w: 1.8, round: true }, draw: () => (<><Circle cx="12" cy="12" r="3" /><Path d="M19.4 13.5l1.6 1-1.8 3.2-1.8-.6a7 7 0 0 1-2.2 1.3L14.8 21h-3.6l-.4-2.6a7 7 0 0 1-2.2-1.3l-1.8.6-1.8-3.2 1.6-1a7 7 0 0 1 0-3l-1.6-1 1.8-3.2 1.8.6a7 7 0 0 1 2.2-1.3L11.2 3h3.6l.4 2.6a7 7 0 0 1 2.2 1.3l1.8-.6 1.8 3.2-1.6 1a7 7 0 0 1 0 3z" /></>) },
+  arrowUp: { stroke: { w: 2.3, round: true }, draw: () => <Path d="M12 19V5M6 11l6-6 6 6" /> },
+  dollar: { stroke: { w: 1.8, round: true }, draw: () => <Path d="M12 3v18M16.5 7.5c-.7-1.3-2.4-2-4.5-2-2.6 0-4.3 1.3-4.3 3.1 0 4.4 9 2.3 9 6.8 0 1.9-1.8 3.2-4.6 3.2-2.3 0-4.1-.9-4.8-2.4" /> },
+  photo: { stroke: { w: 1.8, round: true }, draw: () => (<><Rect x="3.5" y="5" width="17" height="14" rx="3" /><Circle cx="9" cy="10" r="1.6" /><Path d="m20 16-5-5-8 8" /></>) },
+  user: { stroke: { w: 1.8, round: true }, draw: () => (<><Circle cx="12" cy="8" r="3.6" /><Path d="M5 20a7 7 0 0 1 14 0" /></>) },
+  cloud: { stroke: { w: 1.8, round: true }, draw: () => <Path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z" /> },
+  cloudRain: { stroke: { w: 1.8, round: true }, draw: () => (<><Path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z" /><Path d="M9 18.6l-.8 1.5M13 18.6l-.8 1.5M17 18.6l-.8 1.5" /></>) },
+  sun: { stroke: { w: 1.8, round: true }, draw: () => (<><Circle cx="12" cy="12" r="4" /><Path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" /></>) },
   camera: { stroke: { w: 2.2, round: true }, draw: () => (<><Path d="M4 8h3l2-3h6l2 3h3v11H4z" /><Circle cx="12" cy="13" r="3.2" /></>) },
   mic: { stroke: { w: 2, round: true }, draw: () => (<><Rect x="9" y="3" width="6" height="11" rx="3" /><Path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></>) },
 };

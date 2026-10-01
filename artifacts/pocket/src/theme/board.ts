@@ -29,4 +29,15 @@ export const board = {
   /** The two-step orb halo (.ts-orb::before: rgba(163,135,244,.38) → 0) and the reset-password done orb halo (rgba(152,213,178,.45) → 0). */
   twoStepGlow: "rgba(163,135,244,.38)",
   resetOkGlow: "rgba(152,213,178,.45)",
+  /** SmartHome: the AI quote bar (.aib): resting shadow, and open the violet ring and halo. */
+  aibShadow: "0 0 0 1px var(--ring), 0 10px 26px -14px rgba(20,20,22,.25)",
+  aibOpenShadow: "0 0 0 1px rgba(106,47,191,.26), 0 0 0 6px rgba(106,47,191,.06), 0 30px 60px -22px rgba(20,20,22,.34)",
+  /** The client chip's avatar (.chip-av) and the build bar's logo gradient (.paper-bar span). */
+  chipAvatar: "#3d1a86",
+  logoFrom: "#6a2fbf",
+  logoTo: "#4a8edb",
+  /** The weather widget's rain bars and cloud (#3f86d0), and the 7-day strip's rain tint. */
+  rain: "#3f86d0",
+  /** A tick on a green round (.ny-tick / .p-check) is white in both themes. */
+  checkWhite: "#ffffff",
 } as const;

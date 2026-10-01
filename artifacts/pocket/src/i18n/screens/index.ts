@@ -16,6 +16,7 @@ import * as leads from "./leads";
 import * as jobs from "./jobs";
 import * as jobSetup from "./jobSetup";
 import * as job from "./job";
+import * as changeOrder from "./changeOrder";
 import * as quotes from "./quotes";
 import * as menu from "./menu";
 import * as joinCode from "./joinCode";
@@ -26,5 +27,5 @@ import * as twoStep from "./twoStep";
 import * as verify from "./verify";
 import * as welcome from "./welcome";
 
-export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en, menu: menu.en, quotes: quotes.en, home: home.en, widgets: widgets.en, clients: clients.en, quote: quote.en, invoices: invoices.en, leads: leads.en, jobs: jobs.en, jobSetup: jobSetup.en, job: job.en, qe: quoteEditor.en, pc: priceCheck.en, nq: newQuote.en };
-export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr, menu: menu.fr, quotes: quotes.fr, home: home.fr, widgets: widgets.fr, clients: clients.fr, quote: quote.fr, invoices: invoices.fr, leads: leads.fr, jobs: jobs.fr, jobSetup: jobSetup.fr, job: job.fr, qe: quoteEditor.fr, pc: priceCheck.fr, nq: newQuote.fr };
+export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en, menu: menu.en, quotes: quotes.en, home: home.en, widgets: widgets.en, clients: clients.en, quote: quote.en, invoices: invoices.en, leads: leads.en, jobs: jobs.en, jobSetup: jobSetup.en, job: job.en, co: changeOrder.en, qe: quoteEditor.en, pc: priceCheck.en, nq: newQuote.en };
+export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr, menu: menu.fr, quotes: quotes.fr, home: home.fr, widgets: widgets.fr, clients: clients.fr, quote: quote.fr, invoices: invoices.fr, leads: leads.fr, jobs: jobs.fr, jobSetup: jobSetup.fr, job: job.fr, co: changeOrder.fr, qe: quoteEditor.fr, pc: priceCheck.fr, nq: newQuote.fr };

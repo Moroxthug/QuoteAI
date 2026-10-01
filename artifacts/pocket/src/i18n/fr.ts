@@ -192,6 +192,36 @@ export const fr: Dict = {
       group4: "Libellé de groupe", // owner
       earlier: "Plus tôt ce mois-ci", // owner
     },
+    numbers: {
+      title: "Chiffres", // owner
+      strip: "Bande de chiffres", // owner
+      waiting: "En attente",
+      quotes_one: "{{count}} soumission",
+      quotes_other: "{{count}} soumissions",
+      won: "Gagné ce mois-ci", // SmartHomeFR
+      accepted_one: "{{count}} acceptée",
+      accepted_other: "{{count}} acceptées",
+      winRate: "Taux de réussite",
+      pts_one: "↑ {{count}} pt", // owner
+      pts_other: "↑ {{count}} pts", // owner
+      tiles: "Tuiles d’indicateurs", // owner
+      collected: "Encaissé en septembre",
+      vsAugust: "↑ {{pct}} vs août",
+      overdue: "En retard",
+      invoices_one: "{{count}} facture",
+      invoices_other: "{{count}} factures",
+      crewHours: "Heures de l’équipe", // owner
+      hours: "{{n}} h",
+      thisWeek: "cette semaine",
+      activeJobs: "Chantiers actifs",
+      starts_one: "{{count}} commence le {{date}}", // owner
+      starts_other: "{{count}} commencent le {{date}}", // owner
+      progress: "Progression", // owner
+      basement: "Finition du sous-sol",
+      hallway: "Plancher du corridor", // owner
+      hart: "Budget Hart", // owner
+      deck: "Budget de la terrasse", // owner
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

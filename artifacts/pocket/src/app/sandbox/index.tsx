@@ -12,6 +12,7 @@ import { ControlsSection } from "@/ui/board/Controls";
 import { InputsSection } from "@/ui/board/Inputs";
 import { StatusSection } from "@/ui/board/Status";
 import { RowsSection } from "@/ui/board/Rows";
+import { NumbersSection } from "@/ui/board/Numbers";
 
 export default function Sandbox() {
   const { t } = useTranslation();
@@ -27,6 +28,7 @@ export default function Sandbox() {
         <InputsSection />
         <StatusSection />
         <RowsSection />
+        <NumbersSection />
         <Text> </Text>
       </ScrollView>
     </Screen>

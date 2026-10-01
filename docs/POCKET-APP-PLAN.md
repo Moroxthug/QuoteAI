@@ -62,7 +62,7 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
 - i18n (en-CA / fr-CA), with `tokens.ts` copied from the handoff.
 - `lint:tokens`: no colour outside `tokens.ts`, no typed sizes in screens.
 - The shared API hooks with the bearer token.
-- Still to do: running on the Android emulator (image downloading).
+- Android emulator: done 2026-09-30. The `pocket_pixel` AVD (Android 36, Play Store image) runs the dev build (`expo run:android`, NDK 27.1). Code changes reload in seconds.
 
 ### 123.2 Theme, fonts, icons
 - **Theme** (COMPONENTS §3):
@@ -121,3 +121,17 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - Checked on Expo web at 390×844: it signs in, shows the company through `useGetBusinessProfile` in EN and FR, and has one React in the bundle.
   - Moved out of the pnpm workspace after Metro couldn't follow pnpm's junctions.
 - **2026-09-30:** the owner renumbered: Phase 123 onward is the new design. The old APP-PLAN 123–131, VOICE-ASSISTANT-PLAN 132–142 (Stitch) and POCKET-DESIGN-PLAN 143–152 are superseded. The emulator setup (command-line tools + Android 36 image) started.
+- **2026-09-30, 123.2:**
+  - Theme: light/dark, Auto/Light/Dark, and the 16 grounds with dusk's fixed fade.
+  - Fonts: Geist + Manrope with the digit rule at matching weights.
+  - Intl formats for en-CA / fr-CA.
+  - Icons: 69 icons × 13 tones (checked against `icons/preview.png`), plus the board's stroke glyphs.
+  - `sync:design`, and `/sandbox/foundations`.
+- **2026-09-30, 123.3 Buttons:**
+  - 5 kinds × 4 states, 4 sizes, the small row and the floating action bar.
+  - Matched side by side with the board on Expo web, then confirmed on the Android emulator.
+- **2026-09-30, Android dev loop:**
+  - SDK command-line tools, an Android 36 image, the `pocket_pixel` AVD, NDK 27.1 and CMake 3.22 installed.
+  - First native build took 34 min (later builds are cached).
+  - The sandbox runs on the emulator; Metro is on 8081, reached through `adb reverse tcp:8081 tcp:8081`.
+  - If the emulator freezes (adb commands hang): kill `qemu-system-x86_64`, then cold boot it with `-no-snapshot -gpu swiftshader_indirect`.

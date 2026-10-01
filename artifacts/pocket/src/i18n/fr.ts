@@ -166,6 +166,32 @@ export const fr: Dict = {
         permits: { name: "Permis", needed: "À demander", applied: "Demandé", issued: "Délivré", closed: "Fermé", notRequired: "Non requis" },
       },
     },
+    rows: {
+      title: "Rangées", // owner
+      group1: "En-tête de section avec un lien, rangées de liste", // owner
+      thisWeek: "Cette semaine",
+      seeAll: "Tout voir",
+      dana: "Dana Whitfield",
+      danaMeta: "Aujourd’hui · Chambres et plafond de salle de bain", // QuotesFR (job name)
+      inv: "INV-0412 · Tom & Lena Hart",
+      due: "Échue le {{date}}", // InvoicesFR
+      overdue_one: "{{count}} jour de retard",
+      overdue_other: "{{count}} jours de retard",
+      basement: "Finition du sous-sol",
+      basementMeta: "48 Galloway Rd · étape du gypse", // owner
+      group2: "Actions par glissement · touchez la rangée", // owner
+      priya: "Priya Nair",
+      priyaMeta: "Consultée il y a 2 h · Dosseret de cuisine",
+      archive: "Archiver",
+      delete: "Supprimer",
+      group3: "Rangées de menu", // owner
+      company: "Profil de l’entreprise",
+      companySub: "Logo, numéro de TVH, adresse",
+      taxes: "Taxes",
+      hst: "TVH 13 %",
+      group4: "Libellé de groupe", // owner
+      earlier: "Plus tôt ce mois-ci", // owner
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

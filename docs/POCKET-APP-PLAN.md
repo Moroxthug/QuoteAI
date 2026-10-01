@@ -155,3 +155,8 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - The board's seven status sets (quotes, invoices, jobs, contracts, leads, crew and time, permits) are on `/sandbox`. French from the FR boards where they have the word; the rest is marked `// owner`.
   - `src/theme/board.ts`: the warn tint (tokens.json has no `warn-soft`) and the SVG mask values.
   - The board's status rows need its runtime, so they were checked by filling them with the board's own data in the browser; the sandbox wraps row for row the same. Checked in light, night, FR and on the emulator.
+- **2026-09-30, 123.3 Rows** (owner: finish all of 123 before 124):
+  - `SectionHeader`, `ListRow` / `RowBody` / `RowList` (full-width hairlines), `MenuRow` / `MenuList` (hairlines inset 56), `GroupLabel`, `RowChevron`, `Avatar` (5 tints).
+  - `SwipeRow`: drag (gesture handler) or tap; snaps past half the actions or on a flick; 450 ms `out`; `locked` for an expanded row; each action is also a screen-reader custom action.
+  - Gotcha: gesture callbacks run on the UI thread; build easings once outside them (`easing()` inside `onEnd` crashed the drag on Android). A Tap gesture needs `maxDistance` or a drag also counts as a tap.
+  - Checked on Expo web (light, night, FR) and on the emulator (tap, drag open, drag closed).

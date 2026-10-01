@@ -69,7 +69,7 @@ export async function autoMatchLine(userId: string, tx: Pick<FlinksTransaction, 
 }
 
 type BankMatchDto =
-  | { kind: "cost"; id: string; label: string; date: string; amountCents: number; status: string; projectId: string | null; projectName: string | null }
+  | { kind: "cost"; id: string; label: string; date: string; amountCents: number; status: string; projectId: string | null; projectName: string | null; /** Made from the bank line itself ("Record as a cost"), not matched to a cost that was already there. */ fromBankLine: boolean }
   | { kind: "payment"; id: string; invoiceId: string; invoiceNumber: string; customer: string; date: string; amountCents: number; method: string };
 
 export type BankLineDto = {
@@ -87,7 +87,7 @@ async function hydrate(userId: string, rows: FlinksTransaction[]): Promise<BankL
   const paymentIds = rows.map((r) => r.matchedInvoicePaymentId).filter((x): x is string => !!x);
   const costs = costIds.length
     ? await db
-        .select({ id: costEntriesTable.id, vendor: costEntriesTable.vendor, description: costEntriesTable.description, date: costEntriesTable.date, totalCents: costEntriesTable.totalCents, status: costEntriesTable.status, projectId: costEntriesTable.projectId, projectName: projectsTable.name })
+        .select({ id: costEntriesTable.id, vendor: costEntriesTable.vendor, description: costEntriesTable.description, date: costEntriesTable.date, totalCents: costEntriesTable.totalCents, status: costEntriesTable.status, source: costEntriesTable.source, projectId: costEntriesTable.projectId, projectName: projectsTable.name })
         .from(costEntriesTable)
         .leftJoin(projectsTable, eq(projectsTable.id, costEntriesTable.projectId))
         .where(and(eq(costEntriesTable.userId, userId), inArray(costEntriesTable.id, costIds)))
@@ -105,7 +105,7 @@ async function hydrate(userId: string, rows: FlinksTransaction[]): Promise<BankL
     let match: BankMatchDto | null = null;
     const c = r.matchedCostEntryId ? costById.get(r.matchedCostEntryId) : undefined;
     const p = r.matchedInvoicePaymentId ? payById.get(r.matchedInvoicePaymentId) : undefined;
-    if (c) match = { kind: "cost", id: c.id, label: c.vendor || c.description || "", date: c.date.toISOString(), amountCents: c.totalCents, status: c.status, projectId: c.projectId, projectName: c.projectName ?? null };
+    if (c) match = { kind: "cost", id: c.id, label: c.vendor || c.description || "", date: c.date.toISOString(), amountCents: c.totalCents, status: c.status, projectId: c.projectId, projectName: c.projectName ?? null, fromBankLine: c.source === "bank_feed" };
     else if (p) match = { kind: "payment", id: p.id, invoiceId: p.invoiceId, invoiceNumber: p.number, customer: p.customer?.name ?? "", date: p.date.toISOString(), amountCents: p.amountCents, method: p.method };
     // A match whose target was deleted (FK set null) reads as unmatched, which is what it now is.
     const status = r.matchStatus === "matched" && !match ? "unmatched" : r.matchStatus;

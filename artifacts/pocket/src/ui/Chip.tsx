@@ -14,7 +14,7 @@ import { useTheme } from "./theme";
 export type ChipProps = {
   label: string;
   selected?: boolean;
-  count?: number;
+  count?: number | string;
   /** Leading stroke glyph: `check` (13, 3) or `plus` (14, 2.4) on the board. */
   glyph?: GlyphName;
   disabled?: boolean;

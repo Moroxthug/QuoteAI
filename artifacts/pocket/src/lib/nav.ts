@@ -33,6 +33,7 @@ export const BUILT = {
   CrewTravel: "/crew-travel",
   LiveLocation: "/live-location",
   CrewExpired: "/crew-expired",
+  Books: "/books",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

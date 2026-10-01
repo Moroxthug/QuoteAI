@@ -82,7 +82,24 @@ type PriceCheckFinding = {
   deltaTotal: number;
 };
 
-export type PriceCheck = { checkedAt: string; thresholdPct: number; linesChecked: number; findings: PriceCheckFinding[]; deltaTotal: number };
+/** Every priced line and how it compares (the phone's Price check shows all of them, not only the flagged ones). */
+export type PriceCheckLine = {
+  chapter: string;
+  index: number;
+  description: string;
+  um: string;
+  quantita: number;
+  quotedUnitPrice: number;
+  /** The company's own reference for this line, or null when nothing matched. */
+  referenceUnitPrice: number | null;
+  referenceName: string | null;
+  source: "catalog" | "receipts" | null;
+  sampleCount: number | null;
+  changePct: number | null;
+  verdict: "low" | "high" | "in_range" | "no_data";
+};
+
+export type PriceCheck = { checkedAt: string; thresholdPct: number; linesChecked: number; findings: PriceCheckFinding[]; deltaTotal: number; lines: PriceCheckLine[] };
 
 function bestReference(description: string, um: string, refs: PriceReference[]): PriceReference | null {
   const tokens = nameTokens(description);
@@ -105,21 +122,24 @@ function bestReference(description: string, um: string, refs: PriceReference[]):
 /** Pure: which lines drift from their reference by ≥ threshold. */
 export function priceCheckChapters(capitoli: QuoteChapter[], refs: PriceReference[], now = new Date()): PriceCheck {
   const findings: PriceCheckFinding[] = [];
+  const lines: PriceCheckLine[] = [];
   let linesChecked = 0;
   for (const cap of capitoli) {
     cap.voci.forEach((v, index) => {
       if (!(v.prezzoUnitario > 0)) return;
       linesChecked++;
       const ref = bestReference(v.descrizione, v.um, refs);
-      if (!ref) return;
+      const base = { chapter: cap.lettera, index, description: v.descrizione, um: v.um, quantita: v.quantita, quotedUnitPrice: v.prezzoUnitario };
+      if (!ref) { lines.push({ ...base, referenceUnitPrice: null, referenceName: null, source: null, sampleCount: null, changePct: null, verdict: "no_data" }); return; }
       const changePct = Math.round(((ref.unitPrice - v.prezzoUnitario) / v.prezzoUnitario) * 1000) / 10;
+      lines.push({ ...base, referenceUnitPrice: ref.unitPrice, referenceName: ref.name, source: ref.source, sampleCount: ref.sampleCount, changePct, verdict: Math.abs(changePct) < PRICE_CHECK_THRESHOLD_PCT ? "in_range" : changePct > 0 ? "low" : "high" });
       if (Math.abs(changePct) < PRICE_CHECK_THRESHOLD_PCT) return;
       const deltaTotal = Math.round((ref.unitPrice - v.prezzoUnitario) * v.quantita * 100) / 100;
       findings.push({ chapter: cap.lettera, index, description: v.descrizione, um: v.um, quantita: v.quantita, quotedUnitPrice: v.prezzoUnitario, referenceUnitPrice: ref.unitPrice, referenceName: ref.name, referenceUnit: ref.unit, source: ref.source, sampleCount: ref.sampleCount, vendor: ref.vendor, changePct, deltaTotal });
     });
   }
   const deltaTotal = Math.round(findings.reduce((s, f) => s + f.deltaTotal, 0) * 100) / 100;
-  return { checkedAt: now.toISOString(), thresholdPct: PRICE_CHECK_THRESHOLD_PCT, linesChecked, findings, deltaTotal };
+  return { checkedAt: now.toISOString(), thresholdPct: PRICE_CHECK_THRESHOLD_PCT, linesChecked, findings, deltaTotal, lines };
 }
 
 /** Pure: fold receipt samples (newest first) into one reference per work type; below MIN_SAMPLES the type is skipped. */

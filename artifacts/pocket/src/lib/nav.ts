@@ -12,6 +12,8 @@ export const BUILT = {
   Clients: "/clients",
   Client: "/client",
   Quote: "/quote",
+  QuoteEditor: "/quote-editor",
+  PriceCheck: "/price-check",
   Invoices: "/invoices",
   Invoice: "/invoice",
   Leads: "/leads",

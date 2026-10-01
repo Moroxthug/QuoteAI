@@ -73,3 +73,24 @@ test("priceCheck — findings and reprice", () => {
   assert.equal(same.sconto, null);
   assert.equal(same.totale, 2552);
 });
+
+test("priceCheck: every priced line is listed with its verdict (low, high, in range, no data)", () => {
+  const refs: PriceReference[] = [
+    { key: "c1", name: "Tile install", unit: "sq ft", unitPrice: 20, source: "catalog", sampleCount: 0, vendor: null },
+    { key: "c2", name: "Grout supply", unit: "sq ft", unitPrice: 10, source: "receipts", sampleCount: 5, vendor: null },
+    { key: "c3", name: "Cement board", unit: "sq ft", unitPrice: 6.2, source: "catalog", sampleCount: 0, vendor: null },
+  ];
+  const caps = [{ lettera: "A", titolo: "Work", subtotale: 0, voci: [
+    { descrizione: "Tile install", um: "sq ft", quantita: 10, prezzoUnitario: 18, totale: 180 },
+    { descrizione: "Grout supply", um: "sq ft", quantita: 10, prezzoUnitario: 14, totale: 140 },
+    { descrizione: "Cement board", um: "sq ft", quantita: 10, prezzoUnitario: 6.25, totale: 62.5 },
+    { descrizione: "Mystery item", um: "ea", quantita: 1, prezzoUnitario: 50, totale: 50 },
+    { descrizione: "Free line", um: "ea", quantita: 1, prezzoUnitario: 0, totale: 0 },
+  ] }];
+  const r = priceCheckChapters(caps as never, refs);
+  assert.equal(r.linesChecked, 4);
+  assert.deepEqual(r.lines.map((l) => [l.index, l.verdict]), [[0, "low"], [1, "high"], [2, "in_range"], [3, "no_data"]]);
+  assert.equal(r.lines[3]!.referenceUnitPrice, null);
+  assert.equal(r.lines[0]!.referenceUnitPrice, 20);
+  assert.equal(r.findings.length, 2);
+});

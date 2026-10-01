@@ -17,14 +17,14 @@ import { easing, Press } from "./motion";
 import { Num, Text } from "./Text";
 import { useTheme } from "./theme";
 
-export function QuoteHead({ status, valid, title, avatar, client, address, changeLabel, onChange }: {
-  status: ReactNode; valid: string; title: string; avatar: ReactNode; client: string; address?: string; changeLabel?: string; onChange?: () => void;
+export function QuoteHead({ status, valid, title, titleNode, avatar, client, address, changeLabel, onChange }: {
+  status: ReactNode; valid: string; title: string; /** An editable title replaces the plain one. */ titleNode?: ReactNode; avatar: ReactNode; client: string; address?: string; changeLabel?: string; onChange?: () => void;
 }) {
   const { colors } = useTheme();
   return (
     <View style={{ paddingTop: 8, paddingHorizontal: 20 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>{status}<Text size={12.5} color="muted">{valid}</Text></View>
-      <Text size={24} weight={600} tracking={-0.035} leading={1.2} accessibilityRole="header" style={{ marginTop: 8 }}>{title}</Text>
+      {titleNode ?? <Text size={24} weight={600} tracking={-0.035} leading={1.2} accessibilityRole="header" style={{ marginTop: 8 }}>{title}</Text>}
       <View style={{ marginTop: 14, flexDirection: "row", alignItems: "center", gap: 10 }}>
         {avatar}
         <View style={{ flexGrow: 1, flexShrink: 1, gap: 1 }}>

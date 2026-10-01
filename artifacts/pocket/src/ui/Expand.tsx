@@ -106,10 +106,14 @@ type Props = {
   variant?: "card" | "row";
   /** The list a `row` belongs to: when one of its rows opens, the others fade to 45 %. */
   list?: string;
+  /** Under the open body, always shown (Invoices: Paid this month and Drafts, full width). */
+  foot?: ReactNode;
+  /** Pushes the chevron down to line up with a figure in the head (a `card`'s default is the top). */
+  chevronTop?: number;
   children: ReactNode;
 };
 
-export function ExpandCard({ id, label, head, variant = "card", list, children }: Props) {
+export function ExpandCard({ id, label, head, variant = "card", list, foot, chevronTop, children }: Props) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
   const group = useContext(GroupCtx);
@@ -164,7 +168,7 @@ export function ExpandCard({ id, label, head, variant = "card", list, children }
       <Press onPress={toggle} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ expanded: open }}
         style={{ flexDirection: "row", alignItems: "flex-start", gap: 8, padding: row ? 0 : 16, paddingRight: row ? 16 : 16 }}>
         <View style={{ flex: 1, minWidth: 0 }}>{head}</View>
-        <View style={{ paddingTop: row ? 12 : 0 }}><Chevron open={open} /></View>
+        <View style={{ paddingTop: row ? 12 : chevronTop ?? 0 }}><Chevron open={open} /></View>
       </Press>
       <Animated.View style={[{ overflow: "hidden" }, body]}>
         <View onLayout={(e) => setBodyH(e.nativeEvent.layout.height)} style={{ position: "absolute", left: 0, right: 0, top: 0 }}>
@@ -173,6 +177,7 @@ export function ExpandCard({ id, label, head, variant = "card", list, children }
           </Animated.View>
         </View>
       </Animated.View>
+      {foot}
     </Animated.View>
   );
 }

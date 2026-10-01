@@ -32,7 +32,7 @@ export function Segmented({ options, value, onChange, label }: { options: string
         const on = i === value;
         return (
           // 32 drawn inside the 36 track; the track's padding and a 4 pt slop make the 44 tap.
-          <Pressable key={o} onPress={() => onChange(i)} accessibilityRole="radio" accessibilityState={{ checked: on }} hitSlop={{ top: 6, bottom: 6 }}
+          <Pressable key={o} onPress={() => onChange(i)} accessibilityRole="radio" accessibilityLabel={o} accessibilityState={{ checked: on }} hitSlop={{ top: 6, bottom: 6 }}
             style={{ flex: 1, height: inner, alignItems: "center", justifyContent: "center" }}>
             <Text size={13.5} weight={on ? 600 : 500} color={on ? "ink" : "muted"} numberOfLines={1}>{o}</Text>
           </Pressable>

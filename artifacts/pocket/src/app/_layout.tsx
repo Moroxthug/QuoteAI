@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { setToken } from "@/lib/session";
+import { SessionProvider } from "@/lib/useSession";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
 import { ToastHost } from "@/ui/Feedback";
@@ -20,7 +21,7 @@ function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontFiles);
   const url = Linking.useLinkingURL();
 
-  // Development only: `quoteai:///?devToken=…` stores a local test token (the real sign-in is phase 124).
+  // Development only: `quoteai:///?devToken=…` stores a local test token (a shortcut; the real sign-in is /sign-in).
   useEffect(() => {
     if (!__DEV__ || !url) return;
     const token = Linking.parse(url).queryParams?.devToken;
@@ -38,9 +39,11 @@ function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <QueryClientProvider client={client}>
-            <ToastHost>
-              <Stack screenOptions={{ headerShown: false }} />
-            </ToastHost>
+            <SessionProvider>
+              <ToastHost>
+                <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
+              </ToastHost>
+            </SessionProvider>
           </QueryClientProvider>
         </ThemeProvider>
       </SafeAreaProvider>

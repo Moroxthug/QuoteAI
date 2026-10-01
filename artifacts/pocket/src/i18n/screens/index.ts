@@ -1,0 +1,16 @@
+// One file of strings per screen so each can be built on its own; en.ts / fr.ts spread these in.
+import * as common from "./common";
+import * as companyPicker from "./companyPicker";
+import * as firstQuote from "./firstQuote";
+import * as forgot from "./forgot";
+import * as invites from "./invites";
+import * as joinCode from "./joinCode";
+import * as onboarding from "./onboarding";
+import * as signIn from "./signIn";
+import * as signUp from "./signUp";
+import * as twoStep from "./twoStep";
+import * as verify from "./verify";
+import * as welcome from "./welcome";
+
+export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en };
+export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr };

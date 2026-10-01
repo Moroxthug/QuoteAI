@@ -36,4 +36,26 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   return resolve(shared ? { ...context, originModulePath: fromApp } : context, moduleName, platform);
 };
 
+// Web preview only: the browser is a different origin from the API, and the API answers CORS
+// preflights for better-auth's routes only to the phone app's own origin. With API_PROXY_TARGET set
+// (the pocket-web launch config), /api/* goes through Metro to the API, so the page and the API
+// share one origin. The phone builds never set it.
+const target = process.env.API_PROXY_TARGET;
+if (target) {
+  const http = require("node:http");
+  const url = new URL(target);
+  config.server = {
+    ...config.server,
+    enhanceMiddleware: (middleware) => (req, res, next) => {
+      if (!req.url.startsWith("/api/")) return middleware(req, res, next);
+      const proxied = http.request({ host: url.hostname, port: url.port, path: req.url, method: req.method, headers: { ...req.headers, host: url.host } }, (up) => {
+        res.writeHead(up.statusCode ?? 502, up.headers);
+        up.pipe(res);
+      });
+      proxied.on("error", () => { res.statusCode = 502; res.end(); });
+      req.pipe(proxied);
+    },
+  };
+}
+
 module.exports = config;

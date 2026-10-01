@@ -33,7 +33,7 @@ function bannerColors(tone: BannerTone, colors: Colors): { bg: string; fg: Color
   }
 }
 
-export function Banner({ tone, icon, iconTone, lead, children }: { tone: BannerTone; icon: IconName; iconTone: Tone; /** The key phrase, in 600. */ lead: string; children?: string }) {
+export function Banner({ tone, icon, iconTone, lead, children, link, onLink }: { tone: BannerTone; icon: IconName; iconTone: Tone; /** The key phrase, in 600. */ lead: string; children?: string; /** An underlined 600 link at the end of the text ("Enter the code"). */ link?: string; onLink?: () => void }) {
   const { colors } = useTheme();
   const c = bannerColors(tone, colors);
   return (
@@ -43,6 +43,7 @@ export function Banner({ tone, icon, iconTone, lead, children }: { tone: BannerT
       <Text size={13.5} leading={1.4} color={c.fg} style={{ flexShrink: 1, flexGrow: 1 }}>
         <Text size={13.5} leading={1.4} weight={600} color={c.fg}>{lead}</Text>
         {children ? ` ${children}` : null}
+        {link ? <Text size={13.5} leading={1.4} weight={600} color={c.fg} accessibilityRole="link" onPress={onLink} style={{ textDecorationLine: "underline" }}>{` ${link}`}</Text> : null}
       </Text>
     </View>
   );

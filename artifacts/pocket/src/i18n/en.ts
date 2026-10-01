@@ -1,5 +1,8 @@
+import { screensEn } from "./screens";
+
 // English (en-CA). Keys are grouped by screen; French mirrors every key in fr.ts.
 export const en = {
+  ...screensEn,
   sandbox: {
     title: "Components",
     intro: "Every piece the app is built from, with its states. Tap the controls to try them.",

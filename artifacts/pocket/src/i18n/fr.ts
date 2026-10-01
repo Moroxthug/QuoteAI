@@ -2,8 +2,10 @@
 // The Components board has no French version: the sandbox strings marked "owner" wait for
 // the owner's wording (appearance labels come from SettingsFR.dc.html).
 import type { Dict } from "./en";
+import { screensFr } from "./screens";
 
 export const fr: Dict = {
+  ...screensFr,
   sandbox: {
     title: "Composants", // owner
     intro: "Chaque pièce de l’app, avec ses états. Touchez les contrôles pour les essayer.", // owner

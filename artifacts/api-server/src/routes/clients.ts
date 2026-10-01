@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { requireAuth, getUserId, getActorRole } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
-import { db, quotesTable, clientsTable, businessProfilesTable, normalizeProvince } from "@workspace/db";
+import { db, quotesTable, clientsTable, businessProfilesTable, clientDedupKey, normalizeProvince } from "@workspace/db";
 import { eq, and, sql, desc } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
 import { loadDetail, loadOverview } from "../clients/overview.js";
@@ -117,6 +117,32 @@ const clientDetailsBody = z.object({
   notes: z.string().max(5000).optional(),
   type: z.enum(["individual", "business"]).optional(),
   preferredLanguage: z.enum(["en", "fr"]).optional(),
+});
+
+
+// POST /api/clients: add a client without a quote (the phone's "Add client"). The same person (name, email
+// and phone as the dedup key) is not added twice: the existing record comes back with 200.
+router.post("/clients", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const body = clientDetailsBody.safeParse(req.body ?? {});
+    if (!body.success || !body.data.name) { res.status(400).json({ error: "Invalid parameters", message: "A client needs a name." }); return; }
+    const d = body.data;
+    if (d.email && !d.email.includes("@")) { res.status(400).json({ error: "Invalid parameters", message: "That email address doesn't look right." }); return; }
+    const dedupKey = clientDedupKey({ name: d.name, email: d.email, phone: d.phone });
+    const [created] = await db.insert(clientsTable).values({
+      userId, name: d.name!, email: d.email || null, phone: d.phone || null, address: d.address || null, city: d.city || null,
+      province: d.province ? normalizeProvince(d.province) ?? d.province.toUpperCase().slice(0, 2) : null, postalCode: d.postalCode || null,
+      notes: d.notes ?? "", type: d.type ?? "individual", preferredLanguage: d.preferredLanguage ?? "en", dedupKey,
+    }).onConflictDoNothing().returning({ id: clientsTable.id });
+    const id = created?.id ?? (await db.select({ id: clientsTable.id }).from(clientsTable).where(and(eq(clientsTable.userId, userId), eq(clientsTable.dedupKey, dedupKey))))[0]?.id;
+    if (!id) { res.status(500).json({ error: "Internal server error" }); return; }
+    const detail = await loadDetail(userId, getActorRole(res), await profileOf(userId), id);
+    res.status(created ? 201 : 200).json(detail);
+  } catch (err) {
+    logger.error({ err }, "Error adding a client");
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.put("/clients/:id/details", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {

@@ -120,6 +120,18 @@ describe("phase 125: clients overview", () => {
     expect((await org.api(`/api/clients/${c!.id}/details`, { method: "PUT", body: { email: "not-an-email" } })).status).toBe(400);
   });
 
+  test("adding a client does not add the same person twice", async () => {
+    const body = { name: "Jordan Leblanc", email: "jordan@example.invalid", phone: "4165550100", address: "4 Main St", city: "Toronto", province: "ON" };
+    const first = await org.api("/api/clients", { method: "POST", body });
+    expect(first.status).toBe(201);
+    expect(first.body.client).toMatchObject({ name: "Jordan Leblanc", status: "prospect", quoteCount: 0 });
+    const again = await org.api("/api/clients", { method: "POST", body });
+    expect(again.status).toBe(200);
+    expect(again.body.client.id).toBe(first.body.client.id);
+    expect((await org.api("/api/clients", { method: "POST", body: { email: "x@y.ca" } })).status).toBe(400);
+    expect((await org.api("/api/clients", { method: "POST", body: { name: "Bad", email: "nope" } })).status).toBe(400);
+  });
+
   test("another company's client is not found, and a bad id is a 404", async () => {
     const other = await createOrg();
     try {

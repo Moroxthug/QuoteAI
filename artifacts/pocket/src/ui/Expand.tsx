@@ -231,3 +231,9 @@ export function XcActions({ link, onLink, main, onMain, mainDone }: { link: stri
     </View>
   );
 }
+
+/** Whether the card `id` is the one open on this screen (a swipe row locks itself while its card is open). */
+export function useExpandOpen(id: string): boolean {
+  const group = useContext(GroupCtx);
+  return !!group && group.openId === id;
+}

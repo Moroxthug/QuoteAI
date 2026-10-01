@@ -39,3 +39,13 @@ export function dayDate(d: Date, locale: Locale): string {
 export function sentence(s: string): string {
   return s.replace(/\.\.$/, ".");
 }
+
+/** "Fri" / "ven." */
+export function weekdayShort(d: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(d);
+}
+
+/** "September" / "septembre" */
+export function monthLong(d: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(locale, { month: "long" }).format(d);
+}

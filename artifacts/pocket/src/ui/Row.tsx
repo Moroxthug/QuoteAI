@@ -113,3 +113,13 @@ export function MenuList({ children }: { children: ReactNode }) {
 export function GroupLabel({ children }: { children: string }) {
   return <Text size={12.5} color="muted" style={{ paddingHorizontal: 4 }}>{children}</Text>;
 }
+
+/** The board's .sw-hint under the first list: a left arrow and a 12 muted line, centred. */
+export function SwipeHint({ children }: { children: string }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 10 }}>
+      <Glyph name="back" size={14} color="muted" />
+      <Text size={12.5} color="muted">{children}</Text>
+    </View>
+  );
+}

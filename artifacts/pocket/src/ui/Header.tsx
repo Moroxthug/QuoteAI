@@ -1,6 +1,7 @@
 // COMPONENTS §7 (.hdr): 52 tall, padding 8 8 0, three columns: a 44 back button, a centred title
 // 15/600 (−0.02em, one line with ellipsis), a 44 "more" button. Tab screens use PageTitle
 // (.ptitle 30/600, −0.045em, 1.1) instead. Icon buttons always carry a label.
+import type { ReactNode } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Glyph } from "./Icon";
@@ -29,4 +30,15 @@ export function Header({ title, onBack, backLabel, onMore, moreLabel, moreGlyph 
 
 export function PageTitle({ children }: { children: string }) {
   return <Text size={30} weight={600} tracking={-0.045} leading={1.1} accessibilityRole="header">{children}</Text>;
+}
+
+/** A tab screen's top: the large page title on the left and its actions on the right (padding 18 12 0 20 below the status bar). */
+export function TabHeader({ title, children }: { title: string; children?: ReactNode }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 18 + insets.top, paddingLeft: 20, paddingRight: 12 }}>
+      <PageTitle>{title}</PageTitle>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>{children}</View>
+    </View>
+  );
 }

@@ -1,7 +1,7 @@
-// Where the app's links go. A screen from a later phase isn't built yet, but its row or link
-// stays on screen exactly as designed (owner ruling 2026-09-30) and opens the one shared
-// "Coming soon" screen with that screen's real title. When a phase builds the screen, its
-// entry moves from LATER to BUILT and nothing else changes.
+// Where the app's links go. A screen from a later step or phase isn't built yet, but its row or
+// link stays on screen exactly as designed (owner ruling 2026-09-30) and opens the one shared
+// "Coming soon" screen with that screen's real title. Building a screen = adding it to BUILT;
+// every link to it already goes through `screenHref`, so nothing else changes.
 import type { Href } from "expo-router";
 
 /** Screens built so far, by the design's screen name. */
@@ -9,14 +9,24 @@ export const BUILT = {
   Menu: "/menu",
   SmartHome: "/home",
   Quotes: "/quotes",
-  Clients: "/clients",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;
+export type ScreenName = BuiltScreen | (string & {});
 
 /** The Coming soon screen for a later screen, titled with its already-translated name. */
 export function comingSoonHref(title: string): Href {
   return { pathname: "/coming-soon", params: { title } } as Href;
+}
+
+/**
+ * A link to the design's screen `name`: its route when built (with `params`), else Coming soon
+ * titled `title` (already translated).
+ */
+export function screenHref(name: ScreenName, title: string, params?: Record<string, string>): Href {
+  const route = (BUILT as Record<string, string>)[name];
+  if (!route) return comingSoonHref(title);
+  return (params ? { pathname: route, params } : route) as Href;
 }
 
 export function builtHref(screen: BuiltScreen): Href {

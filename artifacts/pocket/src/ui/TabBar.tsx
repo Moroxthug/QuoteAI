@@ -36,7 +36,7 @@ export function useFloatBottom() {
 
 /** CSS grayscale(1) on each gradient stop (the inactive tab icon), and ids made unique per use. */
 function tabXml(xml: string, on: boolean, suffix: string): string {
-  let s = xml.replace(/id="([^"]+)"/g, `id="$1${suffix}"`).replace(/url\(#([^)]+)\)/g, `url(#$1${suffix})`);
+  let s = xml.replace(/ aria-hidden="true"/, "").replace(/id="([^"]+)"/g, `id="$1${suffix}"`).replace(/url\(#([^)]+)\)/g, `url(#$1${suffix})`);
   if (!on) {
     s = s.replace(/stop-color="#([0-9a-fA-F]{6})"/g, (_m, hex: string) => {
       const n = parseInt(hex, 16);

@@ -21,10 +21,11 @@ function Value({ children }: { children: string }) {
   return <Num size={19} weight={600} tracking={-0.03}>{children}</Num>;
 }
 
-export function StatStrip({ items }: { items: Figure[] }) {
+/** The figures of a StatStrip without the card, for a head that sits inside another card (an expandable one). */
+export function Figures({ items }: { items: Figure[] }) {
   const { colors } = useTheme();
   return (
-    <Card style={{ flexDirection: "row", paddingVertical: 14, paddingHorizontal: 4 }}>
+    <View style={{ flexDirection: "row" }}>
       {items.map((k, i) => (
         <View key={i} accessible accessibilityLabel={[k.label, k.value, k.sub].filter(Boolean).join(", ")}
           style={{ flex: 1, minWidth: 0, gap: 3, paddingHorizontal: 12, borderLeftWidth: i > 0 ? 1 : 0, borderLeftColor: colors.line }}>
@@ -33,6 +34,14 @@ export function StatStrip({ items }: { items: Figure[] }) {
           {k.sub ? <Text size={11.5} color={k.subTone ?? "muted"}>{k.sub}</Text> : null}
         </View>
       ))}
+    </View>
+  );
+}
+
+export function StatStrip({ items }: { items: Figure[] }) {
+  return (
+    <Card style={{ paddingVertical: 14, paddingHorizontal: 4 }}>
+      <Figures items={items} />
     </Card>
   );
 }
@@ -107,5 +116,20 @@ export function ProgressList({ children }: { children: ReactNode }) {
         </Fragment>
       ))}
     </Card>
+  );
+}
+
+/** The board's .jx-stats: equal tiles (`soft`, radius 14, padding 10 12) with a 11.5 muted label over a 15/600 figure, inside an open card. */
+export function MiniFigures({ items }: { items: { label: string; value: string }[] }) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flexDirection: "row", gap: 8, marginTop: 10 }}>
+      {items.map((k) => (
+        <View key={k.label} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 10, paddingHorizontal: 12, borderRadius: 14, backgroundColor: colors.soft }}>
+          <Text size={11.5} color="muted">{k.label}</Text>
+          <Num size={15} weight={600} tracking={-0.02}>{k.value}</Num>
+        </View>
+      ))}
+    </View>
   );
 }

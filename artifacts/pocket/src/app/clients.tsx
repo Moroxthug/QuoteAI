@@ -134,7 +134,7 @@ export default function Clients() {
           </>
         )}
       </ExpandScrollView>
-      <AddClientSheet open={adding} onClose={() => setAdding(false)} onAdded={(id) => { setAdding(false); void q.refetch(); openClient(id); }} />
+      <AddClientSheet open={adding} onClose={() => setAdding(false)} onAdded={(r) => { setAdding(false); void q.refetch(); openClient(r.client.id); }} />
     </TabScreen>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { clientsApi } from "@/lib/clientsApi";
-import { canSaveDetails, type Details } from "@/lib/clients";
+import { canSaveDetails, type ClientDetail, type Details } from "@/lib/clients";
 import { Button } from "@/ui/Button";
 import { FormBody } from "@/ui/Clients";
 import { TextField } from "@/ui/Field";
@@ -12,7 +12,7 @@ import { Sheet, SheetTitle } from "@/ui/Sheet";
 
 const EMPTY: Details = { name: "", email: "", phone: "", address: "", city: "", province: "", postalCode: "", notes: "" };
 
-export function AddClientSheet({ open, onClose, onAdded }: { open: boolean; onClose: () => void; onAdded: (id: string) => void }) {
+export function AddClientSheet({ open, onClose, onAdded }: { open: boolean; onClose: () => void; onAdded: (d: ClientDetail) => void }) {
   const { t } = useTranslation();
   const toast = useToast();
   const [d, setD] = useState<Details>(EMPTY);
@@ -29,7 +29,7 @@ export function AddClientSheet({ open, onClose, onAdded }: { open: boolean; onCl
       const r = await clientsApi.add(body);
       setD(EMPTY);
       toast({ message: t("clients.addSheet.done") });
-      onAdded(r.client.id);
+      onAdded(r);
     } catch {
       toast({ message: t("clients.addSheet.failed") });
     } finally {

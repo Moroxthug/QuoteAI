@@ -17,6 +17,7 @@ export const en = {
     emptyBody: "Your quotes, jobs and money will show up here. Home arrives in the next update.",
     signOut: "Sign out",
   },
+  tabs: { main: "Main", orb: "Open assistant", orbSoon: "The assistant arrives in a later update", home: "Home", quotes: "Quotes", jobs: "Jobs", clients: "Clients" },
   comingSoon: {
     line: "This screen is coming in a later update.",
     back: "Back",
@@ -40,6 +41,7 @@ export const fr: typeof en = {
     emptyBody: "Vos soumissions, chantiers et finances apparaîtront ici. L’accueil arrive dans la prochaine mise à jour.",
     signOut: "Se déconnecter",
   },
+  tabs: { main: "Principal", orb: "Ouvrir l’assistant", orbSoon: "L’assistant arrive dans une prochaine mise à jour", home: "Accueil", quotes: "Soumissions", jobs: "Travaux", clients: "Clients" }, // owner
   comingSoon: {
     line: "Cet écran arrive dans une prochaine mise à jour.",
     back: "Retour",

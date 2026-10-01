@@ -45,7 +45,7 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   );
 }
 
-export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff";
+export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera";
 
 type Stroke = { w: number; round?: boolean };
 const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.ReactNode }> = {
@@ -70,6 +70,8 @@ const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.Re
   play: { stroke: { w: 1.8 }, draw: (c) => (<><Circle cx="12" cy="12" r="9" /><Path d="M10.2 8.8v6.4l5-3.2z" fill={c} stroke="none" /></>) },
   eye: { stroke: { w: 1.8, round: true }, draw: () => (<><Path d="M2.5 12C4.5 7.8 8 5.5 12 5.5s7.5 2.3 9.5 6.5c-2 4.2-5.5 6.5-9.5 6.5S4.5 16.2 2.5 12Z" /><Circle cx="12" cy="12" r="3" /></>) },
   eyeOff: { stroke: { w: 1.8, round: true }, draw: () => <Path d="M3 3l18 18M10.6 5.6A10 10 0 0 1 12 5.5c4 0 7.5 2.3 9.5 6.5a12.6 12.6 0 0 1-2.8 3.8M6.2 6.9C4.7 8.1 3.4 9.9 2.5 12c2 4.2 5.5 6.5 9.5 6.5 1.7 0 3.3-.4 4.7-1.2M9.9 9.9a3 3 0 0 0 4.2 4.2" /> },
+  gear: { stroke: { w: 1.8, round: true }, draw: () => (<><Circle cx="12" cy="12" r="3" /><Path d="M19.4 13.5l1.6 1-1.8 3.2-1.8-.6a7 7 0 0 1-2.2 1.3L14.8 21h-3.6l-.4-2.6a7 7 0 0 1-2.2-1.3l-1.8.6-1.8-3.2 1.6-1a7 7 0 0 1 0-3l-1.6-1 1.8-3.2 1.8.6a7 7 0 0 1 2.2-1.3L11.2 3h3.6l.4 2.6a7 7 0 0 1 2.2 1.3l1.8-.6 1.8 3.2-1.6 1a7 7 0 0 1 0 3z" /></>) },
+  camera: { stroke: { w: 2.2, round: true }, draw: () => (<><Path d="M4 8h3l2-3h6l2 3h3v11H4z" /><Circle cx="12" cy="13" r="3.2" /></>) },
   mic: { stroke: { w: 2, round: true }, draw: () => (<><Rect x="9" y="3" width="6" height="11" rx="3" /><Path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></>) },
 };
 

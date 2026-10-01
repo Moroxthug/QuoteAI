@@ -7,7 +7,7 @@ import { Glyph } from "./Icon";
 import { Press } from "./motion";
 import { Text } from "./Text";
 
-export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" | "close" | "search" | "plus"; label: string; onPress?: () => void }) {
+export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" | "close" | "search" | "plus" | "gear"; label: string; onPress?: () => void }) {
   return (
     <Press onPress={onPress} accessibilityRole="button" accessibilityLabel={label}
       style={{ width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" }}>
@@ -16,13 +16,13 @@ export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" |
   );
 }
 
-export function Header({ title, onBack, backLabel, onMore, moreLabel }: { title: string; onBack?: () => void; backLabel: string; onMore?: () => void; moreLabel?: string }) {
+export function Header({ title, onBack, backLabel, onMore, moreLabel, moreGlyph = "more" }: { title: string; onBack?: () => void; backLabel: string; onMore?: () => void; moreLabel?: string; moreGlyph?: "more" | "gear" }) {
   const insets = useSafeAreaInsets(); // the header sits below the status bar
   return (
     <View style={{ flexDirection: "row", alignItems: "center", minHeight: 52 + insets.top, paddingTop: 8 + insets.top, paddingHorizontal: 8 }}>
       <View style={{ width: 44 }}>{onBack ? <IconButton glyph="back" label={backLabel} onPress={onBack} /> : null}</View>
       <Text weight={600} tracking={-0.02} align="center" numberOfLines={1} accessibilityRole="header" style={{ flex: 1 }}>{title}</Text>
-      <View style={{ width: 44 }}>{onMore && moreLabel ? <IconButton glyph="more" label={moreLabel} onPress={onMore} /> : null}</View>
+      <View style={{ width: 44 }}>{onMore && moreLabel ? <IconButton glyph={moreGlyph} label={moreLabel} onPress={onMore} /> : null}</View>
     </View>
   );
 }

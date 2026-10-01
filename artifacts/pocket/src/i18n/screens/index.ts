@@ -4,6 +4,7 @@ import * as companyPicker from "./companyPicker";
 import * as firstQuote from "./firstQuote";
 import * as forgot from "./forgot";
 import * as invites from "./invites";
+import * as menu from "./menu";
 import * as joinCode from "./joinCode";
 import * as onboarding from "./onboarding";
 import * as signIn from "./signIn";
@@ -12,5 +13,5 @@ import * as twoStep from "./twoStep";
 import * as verify from "./verify";
 import * as welcome from "./welcome";
 
-export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en };
-export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr };
+export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en, menu: menu.en };
+export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr, menu: menu.fr };

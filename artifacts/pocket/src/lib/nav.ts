@@ -12,6 +12,9 @@ export const BUILT = {
   Clients: "/clients",
   Client: "/client",
   Quote: "/quote",
+  Invoices: "/invoices",
+  Invoice: "/invoice",
+  Leads: "/leads",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

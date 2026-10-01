@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { canSaveDetails, changedDetails, contactLine, contactLinks, formatPhone, matchesClientFilter, matchesClientSearch, owingClients, tintFor, topClients, wonOf, yearTrend, type ClientRow } from "./clients.ts";
+import { peekRows, canSaveDetails, changedDetails, contactLine, contactLinks, formatPhone, matchesClientFilter, matchesClientSearch, owingClients, tintFor, topClients, wonOf, yearTrend, type ClientRow } from "./clients.ts";
 
 const row = (o: Partial<ClientRow> = {}): ClientRow => ({
   id: "c", name: "Tom & Lena Hart", type: "individual", email: "lena@x.ca", phone: "4165550148", address: "48 Galloway Rd", city: "Scarborough", province: "ON", status: "active",
@@ -74,4 +74,19 @@ test("edits send only what changed, empty clears", () => {
   assert.ok(canSaveDetails(before));
   assert.ok(!canSaveDetails({ ...before, name: " " }));
   assert.ok(!canSaveDetails({ ...before, email: "nope" }));
+});
+
+test("an open client card: late invoice, running job, latest quotes, four rows at most", () => {
+  const now = new Date("2026-09-29T15:00:00Z");
+  const d = {
+    quotes: [1, 2, 3].map((n) => ({ id: "q" + n, number: "Q-" + n, title: "Job " + n, description: "d", totalCents: n * 100, status: "draft", createdAt: "", sentAt: null, firstViewedAt: null, acceptedAt: n === 1 ? "2026-09-01T00:00:00Z" : null, declinedAt: null, validDays: null })),
+    invoices: [{ id: "i1", number: "INV-1", type: "progress", status: "overdue", totalCents: 500, paidCents: 0, balanceCents: 500, issueDate: "", dueDate: "", projectName: null, daysLate: 9 }, { id: "i2", number: "INV-2", type: "progress", status: "paid", totalCents: 1, paidCents: 1, balanceCents: 0, issueDate: "", dueDate: "", projectName: null, daysLate: 0 }],
+    jobs: [{ id: "j1", name: "Basement", status: "active", address: "", progressPercent: 64, contractValueCents: 9, plannedStart: null, plannedEnd: null, completedAt: null }, { id: "j2", name: "Done", status: "completed", address: "", progressPercent: 100, contractValueCents: 1, plannedStart: null, plannedEnd: null, completedAt: "2026-01-01" }],
+    worstOverdue: { id: "i1", number: "INV-1", balanceCents: 500, daysLate: 9, canRemind: true },
+  };
+  const rows = peekRows(d, now);
+  assert.deepEqual(rows.map((r) => r.type), ["invoice", "job", "quote", "quote"]);
+  assert.equal((rows[0] as { canRemind: boolean }).canRemind, true);
+  assert.equal((rows[2] as { state: string }).state, "accepted");
+  assert.deepEqual(peekRows({ quotes: [], invoices: null, jobs: null, worstOverdue: null }, now), []);
 });

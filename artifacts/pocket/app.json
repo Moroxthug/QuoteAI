@@ -31,7 +31,21 @@
       "expo-localization",
       "expo-secure-store",
       "@sentry/react-native",
-      "./plugins/with-release.js"
+      "./plugins/with-release.js",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "quoteAI uses the microphone so you can describe a job out loud and have it turned into a quote."
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "quoteAI uses your photos so you can attach pictures of the job to a quote.",
+          "cameraPermission": "quoteAI uses the camera so you can photograph the job for a quote."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

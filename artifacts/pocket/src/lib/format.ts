@@ -54,3 +54,21 @@ export function monthLong(d: Date, locale: Locale): string {
 export function headerDate(d: Date, locale: Locale): string {
   return new Intl.DateTimeFormat(locale, { weekday: "short", month: "short", day: "numeric" }).format(d);
 }
+
+/**
+ * When something happened, the way the boards say it: "12 min ago", "2 h ago", "today", "Mon" within the week,
+ * else "Sep 12" ("il y a 2 h", "aujourd’hui", "lun.", "12 sept."). `now` is passed in so it is testable.
+ */
+export function relativeWhen(at: Date, now: Date, locale: Locale): string {
+  const fr = locale === "fr-CA";
+  const mins = Math.round((now.getTime() - at.getTime()) / 60_000);
+  const ago = (n: number, unit: "min" | "h") => (fr ? `il y a ${n} ${unit}` : `${n} ${unit} ago`);
+  if (mins >= 0 && mins < 60) return ago(Math.max(1, mins), "min");
+  const sameDay = at.getFullYear() === now.getFullYear() && at.getMonth() === now.getMonth() && at.getDate() === now.getDate();
+  if (sameDay && mins >= 0) return mins < 60 * 12 ? ago(Math.round(mins / 60), "h") : fr ? "aujourd’hui" : "today";
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const days = Math.round((startOfDay(now) - startOfDay(at)) / 86_400_000);
+  if (days === 1) return fr ? "hier" : "yesterday";
+  if (days > 1 && days < 7) return new Intl.DateTimeFormat(locale, { weekday: "short" }).format(at);
+  return shortDate(at, locale);
+}

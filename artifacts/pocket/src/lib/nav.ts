@@ -9,6 +9,8 @@ export const BUILT = {
   Menu: "/menu",
   SmartHome: "/home",
   Quotes: "/quotes",
+  Clients: "/clients",
+  Client: "/client",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

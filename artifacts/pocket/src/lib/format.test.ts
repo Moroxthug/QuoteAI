@@ -25,3 +25,17 @@ test("sentence: one full stop after a.m.", async () => {
   assert.equal(sentence("Twice today, last at 9:12 a.m.."), "Twice today, last at 9:12 a.m.");
   assert.equal(sentence("Done."), "Done.");
 });
+
+test("relativeWhen: minutes, hours, today, yesterday, weekday, date", async () => {
+  const { relativeWhen } = await import("./format.ts");
+  const now = new Date(2026, 8, 29, 15, 0); // Tue Sep 29, 3 pm
+  assert.equal(relativeWhen(new Date(2026, 8, 29, 14, 48), now, "en-CA"), "12 min ago");
+  assert.equal(relativeWhen(new Date(2026, 8, 29, 13, 0), now, "en-CA"), "2 h ago");
+  assert.equal(relativeWhen(new Date(2026, 8, 29, 13, 0), now, "fr-CA"), "il y a 2 h");
+  assert.equal(relativeWhen(new Date(2026, 8, 29, 1, 0), now, "en-CA"), "today");
+  assert.equal(relativeWhen(new Date(2026, 8, 28, 20, 0), now, "fr-CA"), "hier");
+  assert.equal(relativeWhen(new Date(2026, 8, 28, 20, 0), now, "en-CA"), "yesterday");
+  assert.equal(relativeWhen(new Date(2026, 8, 25, 9, 0), now, "en-CA"), "Fri");
+  assert.equal(relativeWhen(new Date(2026, 8, 12, 9, 0), now, "en-CA"), "Sep 12");
+  assert.equal(relativeWhen(new Date(2026, 8, 12, 9, 0), now, "fr-CA"), "12 sept.");
+});

@@ -64,3 +64,17 @@ export function canRemind(i: InvoiceDto, now: Date): boolean {
   if (!i.lastReminderAt) return true;
   return now.getTime() - new Date(i.lastReminderAt).getTime() >= 3 * DAY;
 }
+
+export type InvoiceTone = { tone: "ok" | "warn" | "bad" | "acc" | "info" | "mute"; shape: "check" | "alert" | "draft" | "q1" | "q2" | "clock" | "off" };
+
+/** The word, colour and shape an invoice shows: late wins over its stored status, because the date is what counts on screen. */
+export function invoiceLook(status: InvoiceStatus, daysLateNow: number): { word: InvoiceStatus | "late"; look: InvoiceTone } {
+  if (status === "paid") return { word: "paid", look: { tone: "ok", shape: "check" } };
+  if (status === "void") return { word: "void", look: { tone: "mute", shape: "off" } };
+  if (status === "draft") return { word: "draft", look: { tone: "mute", shape: "draft" } };
+  if (daysLateNow > 0 || status === "overdue") return { word: "late", look: { tone: "bad", shape: "alert" } };
+  if (status === "partially_paid") return { word: "partially_paid", look: { tone: "warn", shape: "clock" } };
+  if (status === "pending_confirmation") return { word: "pending_confirmation", look: { tone: "warn", shape: "clock" } };
+  if (status === "viewed") return { word: "viewed", look: { tone: "acc", shape: "q2" } };
+  return { word: "sent", look: { tone: "info", shape: "q1" } };
+}

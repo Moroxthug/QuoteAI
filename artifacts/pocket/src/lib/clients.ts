@@ -1,5 +1,7 @@
 // The Clients tab and the Client screen: what the server's overview sends (routes/clients.ts, clients/overview.ts)
 // and the rules that turn it into what the boards show (clients.test.ts).
+import { quoteState, type QuoteState } from "./quotes.ts";
+
 export type ActivityKind = "quote_drafted" | "quote_sent" | "quote_viewed" | "quote_accepted" | "quote_declined" | "invoice_sent" | "invoice_reminded" | "invoice_paid" | "job_started";
 export type LastActivity = { kind: ActivityKind; at: string; ref: string | null };
 
@@ -114,4 +116,24 @@ export function changedDetails(before: Details, after: Details): Partial<Record<
 
 export function canSaveDetails(d: Details): boolean {
   return d.name.trim().length > 0 && (d.email.trim() === "" || d.email.includes("@"));
+}
+
+export type PeekRow =
+  | { type: "invoice"; id: string; number: string; amountCents: number; daysLate: number; canRemind: boolean }
+  | { type: "job"; id: string; name: string; progressPercent: number; valueCents: number }
+  | { type: "quote"; id: string; number: string | null; title: string; amountCents: number; state: QuoteState };
+
+/** What a client's open card shows: the late invoice first, the running job, then the latest quotes (4 rows at most). */
+export function peekRows(d: Pick<ClientDetail, "quotes" | "invoices" | "jobs" | "worstOverdue">, now: Date): PeekRow[] {
+  const rows: PeekRow[] = [];
+  for (const i of (d.invoices ?? []).filter((x) => x.daysLate > 0 && x.balanceCents > 0 && x.status !== "paid" && x.status !== "void" && x.type !== "credit_note").slice(0, 2)) {
+    rows.push({ type: "invoice", id: i.id, number: i.number, amountCents: i.balanceCents, daysLate: i.daysLate, canRemind: d.worstOverdue?.id === i.id && d.worstOverdue.canRemind });
+  }
+  for (const j of (d.jobs ?? []).filter((x) => !x.completedAt && x.status !== "completed" && x.status !== "cancelled").slice(0, 1)) {
+    rows.push({ type: "job", id: j.id, name: j.name, progressPercent: j.progressPercent, valueCents: j.contractValueCents });
+  }
+  for (const q of d.quotes.slice(0, 2)) {
+    rows.push({ type: "quote", id: q.id, number: q.number, title: q.title && q.title !== "Project Quote & Itemized Estimate" ? q.title : q.description.split("\n")[0]!.slice(0, 60), amountCents: q.totalCents, state: quoteState({ status: q.acceptedAt ? "accepted" : "draft", sentAt: q.sentAt, acceptedAt: q.acceptedAt, firstViewedAt: q.firstViewedAt, declinedAt: q.declinedAt, validDays: q.validDays }, now) });
+  }
+  return rows.slice(0, 4);
 }

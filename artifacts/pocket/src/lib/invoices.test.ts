@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { canRemind, daysLate, daysUntilDue, openByUrgency, type InvoiceDto } from "./invoices.ts";
+import { invoiceLook, canRemind, daysLate, daysUntilDue, openByUrgency, type InvoiceDto } from "./invoices.ts";
 
 const now = new Date("2026-09-29T15:00:00Z");
 const day = (n: number) => new Date(now.getTime() + n * 86_400_000).toISOString();
@@ -33,4 +33,13 @@ test("a reminder needs an email and a quiet three days", () => {
   assert.equal(canRemind(inv({ customer: { name: "x" } }), now), false);
   assert.equal(canRemind(inv({ lastReminderAt: day(-1) }), now), false);
   assert.equal(canRemind(inv({ lastReminderAt: day(-4) }), now), true);
+});
+
+test("the look of an invoice", () => {
+  assert.deepEqual(invoiceLook("paid", 0), { word: "paid", look: { tone: "ok", shape: "check" } });
+  assert.equal(invoiceLook("sent", 9).word, "late");
+  assert.equal(invoiceLook("overdue", 0).word, "late");
+  assert.equal(invoiceLook("draft", 30).word, "draft");
+  assert.equal(invoiceLook("partially_paid", 0).look.tone, "warn");
+  assert.equal(invoiceLook("viewed", 0).look.shape, "q2");
 });

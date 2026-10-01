@@ -45,7 +45,7 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   );
 }
 
-export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun";
+export type GlyphName = "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun" | "phone" | "text" | "mail";
 
 type Stroke = { w: number; round?: boolean };
 const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.ReactNode }> = {
@@ -78,6 +78,9 @@ const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.Re
   cloud: { stroke: { w: 1.8, round: true }, draw: () => <Path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z" /> },
   cloudRain: { stroke: { w: 1.8, round: true }, draw: () => (<><Path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19 8.5 3.8 3.8 0 0 1 17.5 16z" /><Path d="M9 18.6l-.8 1.5M13 18.6l-.8 1.5M17 18.6l-.8 1.5" /></>) },
   sun: { stroke: { w: 1.8, round: true }, draw: () => (<><Circle cx="12" cy="12" r="4" /><Path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" /></>) },
+  phone: { stroke: { w: 2, round: true }, draw: () => <Path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" /> },
+  text: { stroke: { w: 2, round: true }, draw: () => <Path d="M4 5h16v11H9l-5 4z" /> },
+  mail: { stroke: { w: 2, round: true }, draw: () => (<><Rect x="3" y="5" width="18" height="14" rx="2" /><Path d="m4 7 8 6 8-6" /></>) },
   camera: { stroke: { w: 2.2, round: true }, draw: () => (<><Path d="M4 8h3l2-3h6l2 3h3v11H4z" /><Circle cx="12" cy="13" r="3.2" /></>) },
   mic: { stroke: { w: 2, round: true }, draw: () => (<><Rect x="9" y="3" width="6" height="11" rx="3" /><Path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></>) },
 };

@@ -150,3 +150,8 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - Android draws no box shadow on a `TextInput`: the ring sits on a wrapping view.
   - The board's night placeholder (#6f6e76) is in `src/theme/board.ts`.
   - Checked against the board on Expo web (light, night, FR, typing in the code boxes) and on the emulator.
+- **2026-09-30, 123.3 Status:**
+  - `Status` (6 tones × 12 shapes, drawn from the board's mask SVGs; plain variant; the live dot pulses every 2.2 s unless reduced motion is on), `Tag` (plain and accent).
+  - The board's seven status sets (quotes, invoices, jobs, contracts, leads, crew and time, permits) are on `/sandbox`. French from the FR boards where they have the word; the rest is marked `// owner`.
+  - `src/theme/board.ts`: the warn tint (tokens.json has no `warn-soft`) and the SVG mask values.
+  - The board's status rows need its runtime, so they were checked by filling them with the board's own data in the browser; the sandbox wraps row for row the same. Checked in light, night, FR and on the emulator.

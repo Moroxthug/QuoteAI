@@ -10,6 +10,7 @@ import { ButtonsSection } from "@/ui/board/Buttons";
 import { ChipsSection } from "@/ui/board/Chips";
 import { ControlsSection } from "@/ui/board/Controls";
 import { InputsSection } from "@/ui/board/Inputs";
+import { StatusSection } from "@/ui/board/Status";
 
 export default function Sandbox() {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export default function Sandbox() {
         <ChipsSection />
         <ControlsSection />
         <InputsSection />
+        <StatusSection />
         <Text> </Text>
       </ScrollView>
     </Screen>

@@ -138,6 +138,34 @@ export const fr: Dict = {
       search: "Rechercher",
       searchHint: "Rechercher par client ou chantier", // TabletFR
     },
+    status: {
+      title: "Statuts", // owner
+      shapesLabel: "Formes : l’icône dit où on en est, la couleur dit comment ça va", // owner
+      shapes: { notSent: "Pas encore envoyé", onItsWay: "En route", seen: "Vu, à mi-chemin", nearly: "Presque fini", done: "Fait", now: "En cours", waiting: "En attente", paused: "En pause", needsYou: "À traiter", stopped: "Arrêté", inactive: "Plus actif" }, // owner
+      plainLabel: "Simple, pour les rangées denses et les en-têtes · Étiquettes, pour les rôles", // owner
+      viewedAgo: "Consultée il y a 2 h", // owner
+      expiresFri: "Expire ven.", // owner
+      onSite: "Sur place", // CrewMapFR
+      foreman: "Contremaître",
+      admin: "Admin", // owner
+      hst: "TVH 13 %",
+      groups: {
+        // QuotesFR / ClientsFR
+        quotes: { name: "Soumissions", draft: "Brouillon", sent: "Envoyée", viewed: "Consultée", accepted: "Acceptée", declined: "Refusée", expired: "Expirée" },
+        // InvoicesFR; awaiting and void: owner
+        invoices: { name: "Factures", draft: "Brouillon", scheduled: "Planifiée", sent: "Envoyée", viewed: "Consultée", awaiting: "En attente de confirmation", partial: "Payée en partie", paid: "Payée", overdue: "En retard", void: "Annulée" },
+        // JobsFR
+        jobs: { name: "Travaux", planning: "En planification", active: "En cours", hold: "En pause", completed: "Terminé" },
+        // ContractsFR; declined and expired: owner
+        contracts: { name: "Contrats", draft: "Brouillon", sent: "Envoyé", viewed: "Consulté", signed: "Signé", declined: "Refusé", voided: "Annulé", expired: "Expiré" },
+        // SmartHomeFR / LeadsFR (Contacté, Gagnée); the rest: owner
+        leads: { name: "Demandes", new: "Nouvelle", contacted: "Contactée", quoted: "Soumission envoyée", won: "Gagnée", lost: "Perdue", unsubscribed: "Désabonnée" },
+        // CrewMapFR / CrewHoursFR / SmartHomeFR; rejected: owner
+        crew: { name: "Équipe et heures", onSite: "Sur place", enRoute: "En route", off: "Congé", toApprove: "À approuver", approved: "Approuvées", rejected: "Refusées" },
+        // JobFR (Délivré); the rest: owner
+        permits: { name: "Permis", needed: "À demander", applied: "Demandé", issued: "Délivré", closed: "Fermé", notRequired: "Non requis" },
+      },
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

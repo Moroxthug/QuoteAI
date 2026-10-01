@@ -23,6 +23,8 @@ export const BUILT = {
   Job: "/job",
   ChangeOrder: "/change-order",
   Schedule: "/schedule",
+  Team: "/team",
+  Teammate: "/teammate",
   ForemanHome: "/foreman-home",
   CrewNow: "/crew-now",
   CrewHours: "/crew-hours",

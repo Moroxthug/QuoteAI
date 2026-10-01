@@ -17,4 +17,6 @@ export const board = {
   photoTo: "#4d72d9",
   /** The live mic's halo (.cp-mic.live::before: rgba(139,92,246,.35) → 0). */
   micHalo: "#8b5cf6",
+  /** The assistant orb's shadow (.ai-fab on the screen boards). */
+  orbShadow: "0 12px 28px -8px rgba(106,47,191,.6), 0 0 0 1px var(--ring)",
 } as const;

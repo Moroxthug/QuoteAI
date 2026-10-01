@@ -1,8 +1,8 @@
 // COMPONENTS §24 motion helpers. `Press`: every tappable scales to .96 over 200 ms with the
 // `out` easing (tokens.motion.press). Reduced motion: no scaling.
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import { tokens } from "@/theme/tokens";
 
 /** "cubic-bezier(.16,1,.3,1)" → Easing.bezier(.16, 1, .3, 1) */
@@ -39,4 +39,21 @@ export function Press({ style, children, forcePressed, onPressIn, onPressOut, di
       {children}
     </AnimatedPressable>
   );
+}
+
+const RISE = easing("out");
+
+/**
+ * COMPONENTS §24 "Rise": a section enters from 10 below, opacity 0 → 1, over 800 ms with the
+ * `out` easing. Stagger sections 40 to 80 ms apart with `delay`. Reduced motion: no movement.
+ */
+export function Rise({ delay = 0, children, style }: { delay?: number; children?: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const reduced = useReducedMotion();
+  const t = useSharedValue(reduced ? 1 : 0);
+  useEffect(() => {
+    if (reduced) { t.value = 1; return; }
+    t.value = withDelay(delay, withTiming(1, { duration: tokens.motion.rise.duration, easing: RISE }));
+  }, [reduced, delay, t]);
+  const anim = useAnimatedStyle(() => ({ opacity: t.value, transform: [{ translateY: (1 - t.value) * tokens.motion.rise.from.translateY }] }));
+  return <Animated.View style={[style, anim]}>{children}</Animated.View>;
 }

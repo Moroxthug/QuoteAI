@@ -12,6 +12,41 @@ export const fr: Dict = {
     typeScale: "Échelle typographique", // owner
     icons: "Icônes", // owner
     grounds: "Arrière-plans", // owner
+    motionLink: "Mouvement", // owner
+    motion: {
+      title: "Mouvement", // owner
+      back: "Retour",
+      more: "Plus d’actions",
+      list: "Rangées dépliables dans une liste · touchez une rangée", // owner
+      single: "Carte dépliable", // owner
+      swipe: "Rangée à glisser · tirez vers la gauche", // owner
+      sheetLabel: "Feuille", // owner
+      openSheet: "Ouvrir une feuille", // owner
+      sheetTitle: "Calendrier de paiement", // owner
+      close: "Fermer",
+      done: "Terminé",
+      main: "Principal", // owner
+      orb: "Ouvrir l’assistant",
+      orbSoon: "L’assistant arrive à la phase 128", // owner
+      tabs: { home: "Accueil", quotes: "Soumissions", jobs: "Travaux", clients: "Clients" }, // COMPONENTS §8
+      next: "Prochaine étape", // owner
+      reminder: "Envoyer un rappel", // owner
+      reminderSub: "Consultée deux fois, pas encore signée", // owner
+      send: "Envoyer",
+      sent: "Envoyé",
+      deposit: "Dépôt à la signature", // owner
+      depositSub: "50 % du total", // owner
+      open: "Ouvrir la soumission", // owner
+      openAll: "Ouvrir Soumissions", // owner
+      call: "Appeler",
+      calling: "Appel en cours…",
+      glance: "En attente des clients", // owner
+      q: [
+        { client: "Dana Whitfield", no: "Q-2026-119", job: "Chambres et plafond de salle de bain", status: "Consultée" },
+        { client: "Priya Nair", no: "Q-2026-118", job: "Dosseret de cuisine", status: "Envoyée" },
+        { client: "Tom & Lena Hart", no: "Q-2026-117", job: "Finition du sous-sol", status: "Acceptée" },
+      ],
+    },
     digits: "Envoyée il y a 6 jours · 4 131,05 $ · 13 % · 14 h 30", // owner
   },
   // board: owner review (no ComponentsFR board; Aperçu, Modifier, Envoyer, Nouvelle soumission, Mot de passe oublié come from FR boards)

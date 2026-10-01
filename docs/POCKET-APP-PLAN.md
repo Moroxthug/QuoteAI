@@ -170,3 +170,8 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - People: `Avatar` (photo or the board's placeholder, `me`, 5 tints, presence rings), `CompanyLogo`, `PresenceLegend`.
   - Voice: `MicButton` (idle, live with the breathing halo, busy with the three dots), `LevelMeter` (7 bars, offsets as on the board). Still under reduced motion.
   - Every section of `Components.dc.html` is now on `/sandbox`, checked on the emulator in light, night and FR.
+- **2026-09-30, 123.4 Motion:**
+  - `Header` / `IconButton` / `PageTitle` (the header clears the status bar), `Rise` (motion.tsx), `Sheet` (slides up over the scrim, drag down or tap the scrim to close), `ExpandCard` with `ExpandScrollView` / `ExpandGroup` (height + content fade + floating pop + rows rising in turn; one open per screen; a `row` in a `list` detaches and dims only its own list; scrolls itself into view), `XcRow` / `XcButton` / `XcCaption` / `XcDivider` / `XcActions`, `TabBar` + `AssistantOrb` (glass bar, greyscale inactive icons, the orb's 18 s swirl and 3.2 s halo).
+  - `Screen` takes `floating` (tab bar, action bar) and wraps the content in expo-blur's `BlurTargetView`, which Android needs for a real blur (`blurMethod="dimezisBlurViewSdk31Plus"`).
+  - `/sandbox/motion` puts them on one screen. Checked on the emulator: expand/close, one open at a time, the sheet's drag-to-close, light, night, FR.
+  - Typed routes: the Metro started from the repo root writes new files into `.expo/types/router.d.ts` with broken Windows paths, so a new route needs `as Href` until Metro restarts.

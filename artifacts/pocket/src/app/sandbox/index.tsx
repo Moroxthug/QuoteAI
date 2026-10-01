@@ -3,7 +3,7 @@
 // without scrolling the whole board).
 import type { ComponentType } from "react";
 import { Pressable, ScrollView } from "react-native";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/ui/Screen";
 import { Text } from "@/ui/Text";
@@ -43,6 +43,8 @@ export default function Sandbox() {
         <BoardHeader title={t("sandbox.title")} intro={t("sandbox.intro")} />
         <SandboxSwitches />
         <Link href="/sandbox/foundations" asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Pressable></Link>
+        {/* Typed routes pick up new screens on the next Metro start. */}
+        <Link href={"/sandbox/motion" as Href} asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.motionLink")} →`} /></Pressable></Link>
         {shown.map(([name, Section]) => <Section key={name} />)}
         <Text> </Text>
       </ScrollView>

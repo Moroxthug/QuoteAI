@@ -2981,6 +2981,7 @@ a.w-now-row:hover { background: var(--soft); }
 .pq-tier:disabled { cursor: default; }
 .pq-tier-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .pq-tier-name { font-size: 14px; font-weight: 800; color: var(--navy); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pq-tier-rec { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--green-dark); background: var(--green-t); border-radius: 999px; padding: 2px 7px; white-space: nowrap; }
 .pq-tier-desc { font-size: 12.5px; font-weight: 600; color: var(--muted-mk); line-height: 1.4; }
 .pq-tier-total { margin-top: auto; padding-top: 4px; font-size: 18px; font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .pq-tier-note { margin-top: 10px; text-align: center; font-size: var(--fs-meta); font-weight: 600; color: var(--muted-mk); }

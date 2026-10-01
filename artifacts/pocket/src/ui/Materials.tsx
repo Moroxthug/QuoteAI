@@ -217,3 +217,16 @@ export function TwoCols({ children }: { children: [ReactNode, ReactNode] }) {
     </View>
   );
 }
+
+/** A label with a line under it on the left and a control on the right (the reorder quantity and a count): the words give way when they run long. */
+export function LabelRow({ title, sub, children }: { title: string; sub?: string; children: ReactNode }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <View style={{ flexGrow: 1, flexShrink: 1, minWidth: 0, gap: 2 }}>
+        <Text size={14.5} weight={500}>{title}</Text>
+        {sub ? <Text size={12.5} color="muted">{sub}</Text> : null}
+      </View>
+      {children}
+    </View>
+  );
+}

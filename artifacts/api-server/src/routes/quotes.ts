@@ -4,7 +4,7 @@ import { requirePermission } from "../middlewares/requirePermission.js";
 import multer from "multer";
 import { db, quotesTable, projectsTable, quoteAttachmentsTable, quoteVariantsTable, businessProfilesTable, priceCatalogItemsTable, priceIntelligenceTable, uploadedDocumentsTable, quoteClientDataSchema, quoteCompanySnapshotSchema, paymentScheduleSchema, derivePaymentScheduleFromText, validatePaymentSchedule, paymentScheduleToText, normalizeProvince, getTaxProfile, quoteTaxLines } from "@workspace/db";
 import { getBaseUrl } from "../lib/baseUrl.js";
-import { sendSms } from "../lib/sms.js";
+import { sendSms, quoteSentSmsBody } from "../lib/sms.js";
 import { resolveQuoteTaxRate } from "../lib/tax.js";
 import { quoteLanguageFor, qt, fmtQuoteDate, fmtQty } from "../quotes/i18n.js";
 import { generateQuotePdfBuffer, generateCapitolatoPdfBuffer } from "../quotes/pdf.js";
@@ -2005,11 +2005,8 @@ router.post("/quotes/:id/send-sms", requireAuth, requirePermission("quotes", "ed
       return;
     }
     const lang = await quoteLanguageFor(quote);
-    const companyName = (quote.companySnapshot as QuoteCompanySnapshot | null)?.companyName || profile.companyName || "";
-    const total = fmtQty(Number(quote.totale), lang);
-    const text = lang === "fr"
-      ? `${companyName} : votre soumission (${total} $). Consultez-la et acceptez-la ici :`
-      : `${companyName}: your quote (${total}). View and accept it here:`;
+    const clientName = (quote.clientData as QuoteClientData | null)?.nome ?? "";
+    const text = quoteSentSmsBody({ lang, clientName, job: quote.titoloPreventivoRiga2 || quote.titoloPreventivoRiga1 });
     const sms = await sendSms({ profile, to: body.data.toPhone, body: `${text} ${getBaseUrl()}/p/${quote.id}`, lang, purpose: "quote_send", relatedEntityType: "quote", relatedEntityId: quote.id });
     if (!sms.ok) {
       res.status(sms.reason === "not_configured" ? 409 : 422).json({ error: "The text could not be sent", code: "SMS_" + String(sms.reason ?? "failed").toUpperCase() });

@@ -115,6 +115,22 @@ export function composeSms(params: { profile: Pick<BusinessProfile, "companyName
   return `${identity}: ${body}${footer}`;
 }
 
+/**
+ * Pocket 125.10: the quote-sent text, worded as the TextMessages board has it ("Hi Harpreet, your quote for
+ * the fence and deck staining is ready:" and the link). The sender's name and number come from composeSms'
+ * identity line, so the body no longer repeats the company. The job is cut to 40 characters so the link
+ * that follows is never the part a long body loses.
+ */
+export function quoteSentSmsBody(params: { lang: Lang; clientName?: string | null; job?: string | null }): string {
+  const first = (params.clientName ?? "").trim().split(/\s+/)[0] ?? "";
+  const job = (params.job ?? "").replace(/\s+/g, " ").trim();
+  const shortJob = job.length > 40 ? `${job.slice(0, 37).trimEnd()}...` : job;
+  if (params.lang === "fr") {
+    return `${first ? `Bonjour ${first}` : "Bonjour"}, votre soumission${shortJob ? ` pour ${shortJob}` : ""} est prête :`;
+  }
+  return `${first ? `Hi ${first}` : "Hi there"}, your quote${shortJob ? ` for ${shortJob}` : ""} is ready:`;
+}
+
 async function isOptedOut(phone: string): Promise<boolean> {
   const [row] = await db.select({ id: smsOptOutsTable.id }).from(smsOptOutsTable).where(eq(smsOptOutsTable.phone, phone)).limit(1);
   return !!row;

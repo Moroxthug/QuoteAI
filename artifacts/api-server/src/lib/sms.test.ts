@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { composeSms, formatPhone, isSmsConfigured, normalizePhone, smsFromNumberHint, smsSegments, twilioSignature, verifyTwilioSignature } from "./sms.js";
+import { composeSms, formatPhone, isSmsConfigured, normalizePhone, smsFromNumberHint, smsSegments, twilioSignature, verifyTwilioSignature, quoteSentSmsBody } from "./sms.js";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -83,5 +83,21 @@ describe("Twilio config + signature", () => {
     expect(verifyTwilioSignature(undefined, url, params)).toBe(false);
     vi.stubEnv("TWILIO_AUTH_TOKEN", "");
     expect(verifyTwilioSignature(expected, url, params)).toBe(false);
+  });
+});
+
+describe("quoteSentSmsBody (TextMessages board wording)", () => {
+  it("greets by first name and names the job (EN)", () => {
+    expect(quoteSentSmsBody({ lang: "en", clientName: "Harpreet Singh", job: "Fence and deck staining" })).toBe("Hi Harpreet, your quote for Fence and deck staining is ready:");
+  });
+  it("is in French (FR)", () => {
+    expect(quoteSentSmsBody({ lang: "fr", clientName: "Harpreet Singh", job: "Teinture de clôture" })).toBe("Bonjour Harpreet, votre soumission pour Teinture de clôture est prête :");
+  });
+  it("falls back without a name or a job, and keeps the identity line and STOP footer around it", () => {
+    expect(quoteSentSmsBody({ lang: "en" })).toBe("Hi there, your quote is ready:");
+    const out = composeSms({ profile: { companyName: "Acme Reno Inc.", phone: "6135550100" }, body: `${quoteSentSmsBody({ lang: "en", clientName: "Sam", job: "x".repeat(80) })} https://quoteai.ca/p/abc`, lang: "en" });
+    expect(out.startsWith("Acme Reno Inc. ((613) 555-0100): Hi Sam, your quote for ")).toBe(true);
+    expect(out).toContain("https://quoteai.ca/p/abc");
+    expect(out.endsWith("Reply STOP to opt out.")).toBe(true);
   });
 });

@@ -14,6 +14,8 @@ import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
 import { previewLines, taxName } from "@/lib/quoteBar";
 import { useSession } from "@/lib/useSession";
+import { useCollectedWidget, useFollowupsWidget, useOwedWidget, useQuotesWidget, useTasksWidget, useWeatherWidget, type WidgetEntry } from "@/home/widgets";
+import { WidgetRow } from "@/ui/Widgets";
 import { useToast } from "@/ui/Feedback";
 import { HomeHeader, QuickAddGrid, type QuickTile } from "@/ui/Home";
 import type { GlyphName } from "@/ui/Icon";
@@ -56,6 +58,14 @@ export default function SmartHome() {
       data: Object.fromEntries(Object.entries({ nome: c.clientName, indirizzo: c.indirizzo ?? "", email: c.email ?? "", phone: c.phone ?? "", city: c.city ?? "", province: c.province ?? "", postalCode: c.postalCode ?? "" }).filter(([, v]) => v)) as Record<string, string>,
     }));
   }, [clients.data]);
+
+  const tasksW = useTasksWidget(signedIn);
+  const weatherW = useWeatherWidget(signedIn);
+  const collectedW = useCollectedWidget(signedIn);
+  const owedW = useOwedWidget(signedIn);
+  const followW = useFollowupsWidget(needs.data?.items);
+  const quotesW = useQuotesWidget(signedIn);
+  const widgetRows = (["today", "money", "sales", "field"] as const).map((row) => ({ row, items: ([tasksW, weatherW, collectedW, owedW, followW, quotesW].filter(Boolean) as WidgetEntry[]).filter((w) => w.row === row) })).filter((r) => r.items.length > 0);
 
   if (status === "out") return <Redirect href="/" />;
 
@@ -100,6 +110,11 @@ export default function SmartHome() {
           <Section delay={110}>
             <NeedsYou cards={needs.isPending && !needs.data ? [] : cards} title={t("home.needs.title")} hint={t("home.needs.hint")} hintDone={t("home.needs.hintDone")} emptyTitle={t("home.needs.allClear")} emptyBody={t("home.needs.allClearBody")} />
           </Section>
+          {widgetRows.map((r, i) => (
+            <Section key={r.row} delay={140 + i * 70}>
+              <WidgetRow title={t(`widgets.rows.${r.row}`)} ids={r.items.map((w) => w.id)}>{r.items.map((w) => w.node)}</WidgetRow>
+            </Section>
+          ))}
           <Section delay={360} pt={22} row justify="center">
             <Button kind="secondary" size="sm" label={t("home.edit")} onPress={() => router.push(screenHref("CustomizeHome", t("home.edit")))} />
           </Section>

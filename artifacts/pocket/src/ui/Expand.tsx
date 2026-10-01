@@ -237,3 +237,8 @@ export function useExpandOpen(id: string): boolean {
   const group = useContext(GroupCtx);
   return !!group && group.openId === id;
 }
+
+/** The id of the card open on this screen, or null (the widget rows lock their sideways scroll while one is open). */
+export function useOpenCardId(): string | null {
+  return useContext(GroupCtx)?.openId ?? null;
+}

@@ -52,6 +52,7 @@ import { createManualQuote, ManualQuoteBodySchema, manualQuoteBodyError } from "
 import { loadPriceReferences, priceCheckChapters, repriceChapters } from "../quotes/priceCheck.js";
 import { writeAudit } from "../lib/notifications.js";
 import { z } from "zod";
+import { raiseAutomation } from "../lib/automation.js";
 import { randomUUID } from "crypto";
 import { extractFromPdf, extractFromDocx, extractFromXlsx } from "../lib/extractDocument.js";
 import { currentActorId } from "../lib/requestContext.js";
@@ -1773,6 +1774,43 @@ router.delete("/quotes/:id", requireAuth, requirePermission("quotes", "full"), a
     res.status(204).end();
   } catch (err) {
     req.log.error({ err }, "Error deleting quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/quotes/:id/mark-won: the client said yes outside the page (a call, a text, in person), so the company
+// records it. Same effect as the client accepting online: status accepted, follow-ups stop, the "quote.accepted"
+// automations run. Only a sent quote can be marked; with Good / Better / Best options the chosen one is required.
+router.post("/quotes/:id/mark-won", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const { id } = DeleteQuoteParams.parse(req.params);
+    const body = z.object({ variantId: z.string().max(100).optional() }).safeParse(req.body ?? {});
+    if (!body.success) { res.status(400).json({ error: "Invalid parameters" }); return; }
+    const [existing] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!existing) { res.status(404).json({ error: "Not found" }); return; }
+    if (existing.userId !== userId) { res.status(403).json({ error: "Forbidden" }); return; }
+    if (existing.status === "accepted") { res.json(serializeQuote(existing)); return; }
+    if (existing.status !== "unlocked") { res.status(400).json({ error: "Send the quote before marking it won." }); return; }
+    const variants = await db.select().from(quoteVariantsTable).where(eq(quoteVariantsTable.quoteId, id)).orderBy(quoteVariantsTable.position);
+    let variantUpdates: Partial<typeof existing> = {};
+    let acceptedVariantId: string | null = null;
+    if (variants.length > 0) {
+      const chosen = variants.find((v) => v.id === body.data.variantId) ?? (variants.length === 1 ? variants[0] : undefined);
+      if (!chosen) { res.status(400).json({ error: "Select one of the options first." }); return; }
+      acceptedVariantId = chosen.id;
+      variantUpdates = { items: chosen.items, capitoli: chosen.capitoli, sconto: chosen.sconto, condizioniPagamento: chosen.condizioniPagamento, subtotale: chosen.subtotale, ivaPercentuale: chosen.ivaPercentuale, ivaValore: chosen.ivaValore, totale: chosen.totale };
+    }
+    const [updated] = await db
+      .update(quotesTable)
+      .set({ ...variantUpdates, status: "accepted", acceptedAt: new Date(), acceptedByName: `Marked won by ${getUserName(res)}`, acceptedIp: null, acceptedVariantId, declinedAt: null, declinedReason: null, nextFollowUpAt: null })
+      .where(and(eq(quotesTable.id, id), eq(quotesTable.status, "unlocked")))
+      .returning();
+    if (!updated) { res.status(409).json({ error: "This quote just changed. Reload it." }); return; }
+    await raiseAutomation({ event: "quote.accepted", userId, entityType: "quote", entityId: updated.id, payload: { acceptedByName: updated.acceptedByName, markedByCompany: true } });
+    res.json(serializeQuote(updated));
+  } catch (err) {
+    req.log.error({ err }, "Error marking quote won");
     res.status(500).json({ error: "Internal server error" });
   }
 });

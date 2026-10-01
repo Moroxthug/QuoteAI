@@ -71,6 +71,8 @@ export default function Quote() {
   const [clientOpen, setClientOpen] = useState(false);
   const [clientTerm, setClientTerm] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
+  const [wonOpen, setWonOpen] = useState(false);
+  const [wonBusy, setWonBusy] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const quote = q.data;
   const clients = useListClients({ query: { queryKey: ["/api/clients"], enabled: clientOpen } } as never);
@@ -240,11 +242,19 @@ export default function Quote() {
         <Stack pt={16} />
       </Sheet>
 
+      <Sheet open={wonOpen} onClose={() => setWonOpen(false)} label={t("quote.confirmWon.title")} closeLabel={t("close")}>
+        <SheetTitle>{t("quote.confirmWon.title")}</SheetTitle>
+        <Stack px={20} pt={6} gap={16} pb={12}>
+          <Text color="muted" leading={1.45}>{t("quote.confirmWon.body")}</Text>
+          <Button label={t("quote.confirmWon.confirm")} busy={wonBusy && t("quote.confirmWon.confirm")} block onPress={() => { setWonBusy(true); quoteApi.markWon(quote.id).then((q) => { client.setQueryData(["quote", quote.id], q); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); setWonOpen(false); toast({ message: t("quote.confirmWon.done") }); }).catch(() => toast({ message: t("quote.confirmWon.failed") })).finally(() => setWonBusy(false)); }} />
+        </Stack>
+      </Sheet>
       <Sheet open={moreOpen} onClose={() => setMoreOpen(false)} label={t("quote.more")} closeLabel={t("close")}>
         <MenuList>
           <MenuRow icon={<Icon name="pen" tone="indigo" size={28} />} title={t("quote.actions.editor")} onPress={() => { setMoreOpen(false); router.push(screenHref("QuoteEditor", t("quote.actions.editor"), { id: quote.id })); }} />
           <MenuRow icon={<Icon name="link" tone="sky" size={28} />} title={t("quote.actions.copyLink")} chevron={false} onPress={() => { setMoreOpen(false); void (Platform.OS === "web" && navigator.clipboard ? navigator.clipboard.writeText(link) : Clipboard.setStringAsync(link)).then(() => toast({ message: t("quote.actions.linkCopied") })); }} />
           <MenuRow icon={<Icon name="ruler" tone="amber" size={28} />} title={t("quote.actions.priceCheck")} onPress={() => { setMoreOpen(false); router.push(screenHref("PriceCheck", t("quote.actions.priceCheck"), { id: quote.id })); }} />
+          {state !== "draft" && state !== "accepted" ? <MenuRow icon={<Icon name="check" tone="sage" size={28} />} title={t("quote.actions.markWon")} chevron={false} onPress={() => { setMoreOpen(false); setWonOpen(true); }} /> : null}
           <MenuRow icon={<Icon name="doc" tone="slate" size={28} />} title={t("quote.actions.duplicate")} chevron={false} onPress={() => { setMoreOpen(false); void quoteApi.duplicate(quote.id).then((d) => { toast({ message: t("quote.toast.duplicated") }); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); router.replace(screenHref("Quote", t("quote.actions.editor"), { id: d.id })); }).catch(() => toast({ message: t("quote.toast.saveFailed") })); }} />
           <MenuRow icon={<Icon name="box" tone="stone" size={28} />} title={t("quote.actions.archive")} chevron={false} onPress={() => { setMoreOpen(false); void quoteApi.archive(quote.id).then(() => { toast({ message: t("quote.toast.archived") }); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); back(); }).catch(() => toast({ message: t("quote.toast.saveFailed") })); }} />
         </MenuList>

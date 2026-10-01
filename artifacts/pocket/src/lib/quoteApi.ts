@@ -89,6 +89,7 @@ export const quoteApi = {
   updateVariant: (id: string, variantId: string, body: VariantUpdate) => api<Variant>(`/api/quotes/${enc(id)}/variants/${enc(variantId)}`, { method: "PUT", body }),
   removeVariant: (id: string, variantId: string) => api<unknown>(`/api/quotes/${enc(id)}/variants/${enc(variantId)}`, { method: "DELETE" }),
   regenerate: (id: string, newDescription: string) => api<QuoteFull>(`/api/quotes/${enc(id)}/regenerate`, { method: "POST", body: { newDescription, keepClientData: true } }),
+  markWon: (id: string, variantId?: string) => api<QuoteFull>(`/api/quotes/${enc(id)}/mark-won`, { method: "POST", body: variantId ? { variantId } : {} }),
   duplicate: (id: string) => api<QuoteFull>(`/api/quotes/${enc(id)}/duplicate`, { method: "POST", body: {} }),
   archive: (id: string) => api<QuoteFull>(`/api/quotes/${enc(id)}/archive`, { method: "POST", body: {} }),
   restore: (id: string) => api<QuoteFull>(`/api/quotes/${enc(id)}/restore`, { method: "POST", body: {} }),

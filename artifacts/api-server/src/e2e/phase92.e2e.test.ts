@@ -184,7 +184,8 @@ describe("Phase 92 — the embed widget", () => {
       const cs = getComputedStyle(el);
       return { bg: cs.backgroundColor, size: cs.fontSize, font: cs.fontFamily };
     });
-    expect(look.bg).toBe("rgb(16, 16, 49)");
+    // Pocket 125.10: the main button is the design's ink (#141416) unless the site passes data-color.
+    expect(look.bg).toBe("rgb(20, 20, 22)");
     expect(look.size).toBe("15px");
     expect(look.font).not.toMatch(/Comic/);
 

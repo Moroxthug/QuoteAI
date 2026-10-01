@@ -110,10 +110,12 @@ type Props = {
   foot?: ReactNode;
   /** Pushes the chevron down to line up with a figure in the head (a `card`'s default is the top). */
   chevronTop?: number;
+  /** The glance card's board spacing (padding 14 4, a 28 chevron column, body inset 12): room for three figures across. */
+  compact?: boolean;
   children: ReactNode;
 };
 
-export function ExpandCard({ id, label, head, variant = "card", list, foot, chevronTop, children }: Props) {
+export function ExpandCard({ id, label, head, variant = "card", list, foot, chevronTop, compact, children }: Props) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
   const group = useContext(GroupCtx);
@@ -166,13 +168,13 @@ export function ExpandCard({ id, label, head, variant = "card", list, foot, chev
   return (
     <Animated.View ref={node} style={[shape, outer]}>
       <Press onPress={toggle} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ expanded: open }}
-        style={{ flexDirection: "row", alignItems: "flex-start", gap: 8, padding: row ? 0 : 16, paddingRight: row ? 16 : 16 }}>
+        style={compact && !row ? { flexDirection: "row", alignItems: "flex-start", paddingVertical: 14, paddingHorizontal: 4 } : { flexDirection: "row", alignItems: "flex-start", gap: 8, padding: row ? 0 : 16, paddingRight: row ? 16 : 16 }}>
         <View style={{ flex: 1, minWidth: 0 }}>{head}</View>
-        <View style={{ paddingTop: row ? 12 : chevronTop ?? 0 }}><Chevron open={open} /></View>
+        <View style={{ paddingTop: row ? 12 : chevronTop ?? 0, ...(compact && !row ? { width: 28, alignItems: "center" } : null) }}><Chevron open={open} /></View>
       </Press>
       <Animated.View style={[{ overflow: "hidden" }, body]}>
         <View onLayout={(e) => setBodyH(e.nativeEvent.layout.height)} style={{ position: "absolute", left: 0, right: 0, top: 0 }}>
-          <Animated.View style={[{ paddingHorizontal: 16, paddingBottom: 16 }, inner]}>
+          <Animated.View style={[compact && !row ? { paddingHorizontal: 12, paddingBottom: 2 } : { paddingHorizontal: 16, paddingBottom: 16 }, inner]}>
             {Children.toArray(children).map((c, i) => <RowIn key={i} index={i} open={open}>{c}</RowIn>)}
           </Animated.View>
         </View>

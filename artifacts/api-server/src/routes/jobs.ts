@@ -20,6 +20,8 @@ import {
   whatsappConnectionsTable,
   jobPhotosTable,
   jobNotesTable,
+  costEntriesTable,
+  invoicesTable,
   hasFeature,
   minimumPlanFor,
   PROJECT_STATUSES,
@@ -50,7 +52,7 @@ import { syncMilestoneToCalendar, removeMilestoneFromCalendar, removeMilestonesF
 import { logger } from "../lib/logger.js";
 import { permitCompletionBlock } from "../compliance/service.js";
 import { currentActorId } from "../lib/requestContext.js";
-import { ensureRoomForJob } from "../jobs/activeJobCap.js";
+import { activeJobUsage, ensureRoomForJob } from "../jobs/activeJobCap.js";
 import { rejectStale } from "../lib/versioning.js";
 
 const router = Router();
@@ -162,7 +164,23 @@ router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, 
     const clientIds = [...new Set(projects.map((p) => p.clientId).filter((x): x is string => !!x))];
     const clients: { id: string; name: string }[] = clientIds.length ? await db.select({ id: clientsTable.id, name: clientsTable.name }).from(clientsTable).where(inArray(clientsTable.id, clientIds)) : [];
     const milestones: Milestone[] = ids.length ? await db.select().from(milestonesTable).where(inArray(milestonesTable.projectId, ids)).orderBy(asc(milestonesTable.sortOrder)) : [];
-    const assignments: { projectId: string }[] = ids.length ? await db.select({ projectId: projectAssignmentsTable.projectId }).from(projectAssignmentsTable).where(inArray(projectAssignmentsTable.projectId, ids)) : [];
+    const assignments: { projectId: string; collaboratorId: string; name: string }[] = ids.length
+      ? await db.select({ projectId: projectAssignmentsTable.projectId, collaboratorId: projectAssignmentsTable.collaboratorId, name: collaboratorsTable.name }).from(projectAssignmentsTable).innerJoin(collaboratorsTable, eq(collaboratorsTable.id, projectAssignmentsTable.collaboratorId)).where(inArray(projectAssignmentsTable.projectId, ids))
+      : [];
+    // Money per job for the Jobs tab: invoiced (not drafts or void), confirmed costs, and receipts still to review.
+    const invoiced = new Map<string, number>();
+    if (ids.length) for (const inv of await db.select({ projectId: invoicesTable.projectId, totalCents: invoicesTable.totalCents, status: invoicesTable.status }).from(invoicesTable).where(and(inArray(invoicesTable.projectId, ids), isNull(invoicesTable.archivedAt)))) {
+      if (!inv.projectId || inv.status === "void" || inv.status === "draft") continue;
+      invoiced.set(inv.projectId, (invoiced.get(inv.projectId) ?? 0) + inv.totalCents);
+    }
+    const costs = new Map<string, { confirmed: number; pendingCount: number; pendingCents: number }>();
+    if (ids.length) for (const c of await db.select({ projectId: costEntriesTable.projectId, status: costEntriesTable.status, totalCents: costEntriesTable.totalCents }).from(costEntriesTable).where(inArray(costEntriesTable.projectId, ids))) {
+      if (!c.projectId) continue;
+      const row = costs.get(c.projectId) ?? { confirmed: 0, pendingCount: 0, pendingCents: 0 };
+      if (c.status === "confirmed") row.confirmed += c.totalCents;
+      else { row.pendingCount += 1; row.pendingCents += c.totalCents; }
+      costs.set(c.projectId, row);
+    }
     const clientName = new Map(clients.map((c) => [c.id, c.name]));
     const items = projects.map((p) => {
       const ms = milestones.filter((m) => m.projectId === p.id);
@@ -174,9 +192,15 @@ router.get("/jobs", requireAuth, requirePermission("jobs", "view"), async (req, 
         milestonesDone: ms.filter((m) => m.status === "completed").length,
         nextMilestone: next ? { id: next.id, title: next.title, plannedEnd: toIsoDate(next.plannedEnd) } : null,
         crewCount: assignments.filter((a) => a.projectId === p.id).length,
+        crew: assignments.filter((a) => a.projectId === p.id).map((a) => ({ id: a.collaboratorId, name: a.name })),
+        invoicedCents: invoiced.get(p.id) ?? 0,
+        costCents: costs.get(p.id)?.confirmed ?? 0,
+        pendingReceiptCount: costs.get(p.id)?.pendingCount ?? 0,
+        pendingReceiptCents: costs.get(p.id)?.pendingCents ?? 0,
       };
     });
-    res.json({ items });
+    const usage = await activeJobUsage(userId);
+    res.json({ items, jobLimit: usage.limit, openJobs: usage.active });
   } catch (err) {
     req.log.error({ err }, "Error listing jobs");
     res.status(500).json({ error: "Internal server error" });

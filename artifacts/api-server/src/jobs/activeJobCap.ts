@@ -11,7 +11,7 @@ import type { Response } from "express";
 import { db, projectsTable, businessProfilesTable, activeJobLimit } from "@workspace/db";
 import { and, eq, isNull, ne, sql } from "drizzle-orm";
 
-async function activeJobUsage(orgId: string, excludeJobId?: string): Promise<{ limit: number | null; active: number }> {
+export async function activeJobUsage(orgId: string, excludeJobId?: string): Promise<{ limit: number | null; active: number }> {
   const [profile] = await db
     .select({ subscriptionPlan: businessProfilesTable.subscriptionPlan, subscriptionStatus: businessProfilesTable.subscriptionStatus, featureFlags: businessProfilesTable.featureFlags })
     .from(businessProfilesTable)

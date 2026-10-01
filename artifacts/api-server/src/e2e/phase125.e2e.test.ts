@@ -1,12 +1,13 @@
-// Phase 125 (docs/POCKET-APP-PLAN.md): what the phone's Quotes list needs from the server.
+// Phase 125 (docs/POCKET-APP-PLAN.md): what the phone's Quotes list and Clients screens need from the server.
 //  - GET /api/quotes returns the quote number, validDays, firstViewedAt and declinedAt;
 //  - opening the public quote page records firstViewedAt (not for the app's own preview);
 //  - a client can decline a sent quote (with or without a reason): recorded, follow-ups stopped,
 //    the company notified, idempotent; a draft is not found; an accepted quote answers 409;
 //  - sending the quote again clears the decline.
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
-import { db, quotesTable } from "@workspace/db";
+import { db, quotesTable, clientsTable, invoicesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import { startServer, stopServer, createOrg, seedQuote, cleanupUsers, api, type TestUser } from "./harness.js";
 
 let org: TestUser;
@@ -86,5 +87,48 @@ describe("phase 125: quote list fields and decline", () => {
     const list = await api("/api/notifications", { token: org.token });
     const items: { type: string; title: string }[] = list.body?.items ?? list.body ?? [];
     expect(items.some((n) => n.type === "quote_declined" && n.title.includes("Marchetti Bakery"))).toBe(true);
+  });
+});
+
+describe("phase 125: clients overview", () => {
+  test("a client carries what they bought, owe and did last; detail joins quotes and invoices; edits stick", async () => {
+    const [c] = await db.insert(clientsTable).values({ userId: org.userId, name: "Tom & Lena Hart", email: "lena@example.invalid", phone: "4165550148", address: "48 Galloway Rd", city: "Scarborough", province: "ON", dedupKey: `tom & lena hart|lena@example.invalid|${randomUUID()}` }).returning();
+    const q = await seedQuote(org.userId, { status: "accepted", clientName: "Tom & Lena Hart" });
+    await db.update(quotesTable).set({ clientId: c!.id, acceptedAt: new Date(Date.now() - 2 * 86_400_000) }).where(eq(quotesTable.id, q.id));
+    await db.insert(invoicesTable).values({
+      userId: org.userId, number: "INV-P125-1", type: "progress", status: "overdue", province: "ON", clientId: c!.id, issueDate: new Date(Date.now() - 30 * 86_400_000), dueDate: new Date(Date.now() - 9 * 86_400_000),
+      contractor: { name: "Co" }, customer: { name: "Tom & Lena Hart", email: "lena@example.invalid" }, lines: [], subtotalCents: 200_000, taxableCents: 200_000, taxCents: 26_000, totalCents: 226_000, sentAt: new Date(Date.now() - 30 * 86_400_000),
+    });
+
+    const list = await org.api("/api/clients/overview");
+    expect(list.status).toBe(200);
+    const row = list.body.items.find((r: { id: string }) => r.id === c!.id);
+    expect(row).toMatchObject({ name: "Tom & Lena Hart", status: "active", overdueCount: 1, owedCents: 226_000 });
+    expect(row.lifetimeCents).toBeGreaterThan(0);
+    expect(list.body.stats.total).toBeGreaterThanOrEqual(1);
+
+    const detail = await org.api(`/api/clients/${c!.id}/overview`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.quotes.map((x: { id: string }) => x.id)).toContain(q.id);
+    expect(detail.body.invoices[0]).toMatchObject({ number: "INV-P125-1", daysLate: 9 });
+    expect(detail.body.worstOverdue).toMatchObject({ number: "INV-P125-1", canRemind: true });
+
+    const put = await org.api(`/api/clients/${c!.id}/details`, { method: "PUT", body: { notes: "Use the side door.", phone: "4165550199" } });
+    expect(put.status).toBe(200);
+    expect(put.body.client.notes).toBe("Use the side door.");
+    expect(put.body.client.phone).toBe("4165550199");
+    expect((await org.api(`/api/clients/${c!.id}/details`, { method: "PUT", body: { email: "not-an-email" } })).status).toBe(400);
+  });
+
+  test("another company's client is not found, and a bad id is a 404", async () => {
+    const other = await createOrg();
+    try {
+      const [oc] = await db.insert(clientsTable).values({ userId: other.userId, name: "Not Yours", dedupKey: `not yours||${randomUUID()}` }).returning();
+      expect((await org.api(`/api/clients/${oc!.id}/overview`)).status).toBe(404);
+      expect((await org.api(`/api/clients/${oc!.id}/details`, { method: "PUT", body: { notes: "x" } })).status).toBe(404);
+      expect((await org.api("/api/clients/not-an-id/overview")).status).toBe(404);
+    } finally {
+      await cleanupUsers([other.userId]);
+    }
   });
 });

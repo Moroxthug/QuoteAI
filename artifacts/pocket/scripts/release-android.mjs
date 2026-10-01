@@ -2,11 +2,13 @@
 //
 //   npm run release:android              # version name 0.1.0.<version code>
 //   npm run release:android -- 1.0.0     # a version name of your choosing
+//   npm run release:android -- --no-prebuild   # retry Gradle without regenerating android/
 //
 // Reads the Play upload key from ~/.quoteai-keys/upload.properties (the same key as the
 // Capacitor app, docs/RUNBOOKS.md "The phone app"), regenerates android/ with
 // `expo prebuild` (plugins/with-release.js writes the signing and the version code), and
-// runs Gradle's bundleRelease with Android Studio's JDK when JAVA_HOME is unset. The bundle
+// runs Gradle's bundleRelease with Android Studio's JDK and the standard SDK folder when
+// JAVA_HOME / ANDROID_HOME are unset. The bundle
 // lands in android/app/build/outputs/bundle/release/app-release.aab.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
@@ -27,6 +29,7 @@ const kv = Object.fromEntries(
 const versionCode = Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 60_000);
 const versionName = process.argv.slice(2).find((a) => /^\d+\.\d+\.\d+/.test(a)) ?? `0.1.0.${versionCode}`;
 const studioJdk = "C:/Program Files/Android/Android Studio/jbr";
+const sdk = process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Android", "Sdk") : "";
 const env = {
   ...process.env,
   ANDROID_KEYSTORE_PATH: kv.storeFile,
@@ -39,11 +42,13 @@ const env = {
   // Source maps go to Sentry only when its auth token is set (and the DSN, EXPO_PUBLIC_SENTRY_DSN).
   ...(!process.env.SENTRY_AUTH_TOKEN ? { SENTRY_DISABLE_AUTO_UPLOAD: "true" } : {}),
   ...(!process.env.JAVA_HOME && process.platform === "win32" && existsSync(studioJdk) ? { JAVA_HOME: studioJdk } : {}),
+  // prebuild clears android/local.properties, so point Gradle at the SDK.
+  ...(!process.env.ANDROID_HOME && sdk && existsSync(sdk) ? { ANDROID_HOME: sdk } : {}),
 };
 
 const win = process.platform === "win32";
-execFileSync(win ? "npx.cmd" : "npx", ["expo", "prebuild", "--platform", "android", "--no-install"], { cwd: root, stdio: "inherit", env, shell: win });
-execFileSync(path.join(root, "android", win ? "gradlew.bat" : "gradlew"), ["bundleRelease", "--no-daemon"], { cwd: path.join(root, "android"), stdio: "inherit", env, shell: win });
+if (!process.argv.includes("--no-prebuild")) execFileSync(win ? "npx.cmd" : "npx", ["expo", "prebuild", "--platform", "android", "--no-install"], { cwd: root, stdio: "inherit", env, shell: win });
+execFileSync(path.join(root, "android", win ? "gradlew.bat" : "gradlew"), ["bundleRelease", "--no-daemon", "--max-workers=2"], { cwd: path.join(root, "android"), stdio: "inherit", env, shell: win });
 
 const aab = path.join(root, "android/app/build/outputs/bundle/release/app-release.aab");
 console.log(`\nSigned bundle: ${aab} (${(statSync(aab).size / 1e6).toFixed(1)} MB), version code ${versionCode}, version ${versionName}.`);

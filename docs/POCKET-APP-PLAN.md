@@ -175,3 +175,15 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - `Screen` takes `floating` (tab bar, action bar) and wraps the content in expo-blur's `BlurTargetView`, which Android needs for a real blur (`blurMethod="dimezisBlurViewSdk31Plus"`).
   - `/sandbox/motion` puts them on one screen. Checked on the emulator: expand/close, one open at a time, the sheet's drag-to-close, light, night, FR.
   - Typed routes: the Metro started from the repo root writes new files into `.expo/types/router.d.ts` with broken Windows paths, so a new route needs `as Href` until Metro restarts.
+- **2026-10-01, 123.4 Release pipeline:**
+  - `npm run release:android` (scripts/release-android.mjs): `expo prebuild`, then Gradle `bundleRelease` signed with the Play upload key from `~/.quoteai-keys/upload.properties` (same key as the Capacitor app). `-- --no-prebuild` retries Gradle without regenerating android/; Gradle runs with `--max-workers=2` (worker daemons timed out with the emulator and two Metros running).
+  - `plugins/with-release.js` writes the signing and the version code (minutes since 2026-01-01 UTC, the Capacitor rule) into the generated build.gradle.
+  - Firebase: `google-services.json` copied from the Capacitor project (ignored by git), `android.googleServicesFile` in app.json.
+  - Sentry: `@sentry/react-native` 7.11 (`src/lib/sentry.ts`), inert until `EXPO_PUBLIC_SENTRY_DSN` is set at build time; source-map upload only with `SENTRY_AUTH_TOKEN`. Testers' "Send feedback" (Sentry's feedback form) shows on /sandbox when Sentry is on.
+  - **First signed bundle built:** version code 393560 (above 391623), 75 MB, signed with the upload certificate `6F:2B:6E:…:B8:3C`. Not installed on the emulator (it would replace the dev build).
+  - Metro now ignores android/ and ios/ (the release build's files stalled the 8081 watcher; it was restarted).
+
+**Phase 123 status (2026-10-01):** everything the assistant can do is built. The "done" line still needs the owner:
+- upload `artifacts/pocket/android/app/build/outputs/bundle/release/app-release.aab` to the closed-test track (Play Console → Testing → Closed testing → Create new release) and through Internal app sharing;
+- confirm the expand card and swipe row feel right at 60 fps on a real phone;
+- optional now, needed before 125: a Sentry DSN for a React Native project (`EXPO_PUBLIC_SENTRY_DSN`, plus `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT` for readable stack traces).

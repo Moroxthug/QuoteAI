@@ -17,7 +17,11 @@ config.watchFolders = [...(config.watchFolders ?? []), API_CLIENT];
 // Metro's crawler fail with EINVAL on readlink. Nothing imports them.
 const COPIES = / - Copy(\.[^\\/]*)?$/;
 const blockList = config.resolver.blockList;
-config.resolver.blockList = [...(Array.isArray(blockList) ? blockList : blockList ? [blockList] : []), COPIES];
+// The generated native projects (android/, ios/): a release build writes thousands of files
+// there, which stalled Metro's watcher. Metro never needs them.
+const escaped = __dirname.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\\|\//g, "[\\\\/]");
+const NATIVE = new RegExp(`^${escaped}[\\\\/](android|ios)[\\\\/]`);
+config.resolver.blockList = [...(Array.isArray(blockList) ? blockList : blockList ? [blockList] : []), COPIES, NATIVE];
 
 const SINGLETONS = ["react", "react-dom", "react-native", "@tanstack/react-query"];
 const fromApp = path.join(__dirname, "package.json");

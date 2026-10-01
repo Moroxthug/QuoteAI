@@ -2,6 +2,7 @@
 // make: POST /api/quotes (the AI writes and prices it), GET /api/quotes/:id, the price check, and
 // POST /api/quotes/:id/send-pdf-email. The generated hooks don't cover the multipart create with
 // the app's fetch, so these go through lib/api.ts and the wrapped fetch.
+import { Platform } from "react-native";
 import { ApiFailure, api } from "./api";
 import { API_ORIGIN } from "./session";
 import type { QuoteLike } from "./firstQuote";
@@ -15,6 +16,19 @@ export type Profile = {
   companyName?: string | null; vatNumber?: string | null; address?: string | null; phone?: string | null; email?: string | null; logoUrl?: string | null;
   province?: string | null;
 };
+
+/** A photo (or document) to attach to the AI quote: the picker's uri, a name and its mime type. */
+export type AttachFile = { uri: string; name: string; type: string };
+
+// React Native's FormData takes {uri, name, type}; the web's takes the file's bytes.
+async function appendFile(form: FormData, field: string, f: AttachFile) {
+  if (Platform.OS === "web") {
+    const blob = await (await fetch(f.uri)).blob();
+    form.append(field, new Blob([blob], { type: f.type }), f.name);
+  } else {
+    form.append(field, { uri: f.uri, name: f.name, type: f.type } as unknown as Blob);
+  }
+}
 
 function problemOf(e: unknown): FirstQuoteProblem {
   if (e instanceof ApiFailure) {
@@ -38,12 +52,14 @@ export const firstQuoteApi = {
   profile: () => run(() => api<Profile>("/api/business-profile")),
 
   /** The AI writes and prices the job (multipart, like the web). The company's details go in as the quote's letterhead. */
-  create: (rawInput: string, profile: Profile | null, opts?: { clientData?: Record<string, string>; budget?: number | null }) =>
+  create: (rawInput: string, profile: Profile | null, opts?: { clientData?: Record<string, string>; budget?: number | null; templateId?: string; files?: AttachFile[] }) =>
     run(async () => {
       const form = new FormData();
       form.append("rawInput", rawInput);
       if (opts?.clientData) form.append("clientData", JSON.stringify(opts.clientData));
       if (opts?.budget) form.append("targetTotalEur", String(opts.budget));
+      if (opts?.templateId && opts.templateId !== "standard") form.append("templateId", opts.templateId);
+      for (const f of opts?.files ?? []) await appendFile(form, "images", f);
       if (profile) {
         const snapshot = {
           companyName: profile.companyName || "",

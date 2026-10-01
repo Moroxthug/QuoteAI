@@ -12,6 +12,7 @@ export const BUILT = {
   Clients: "/clients",
   Client: "/client",
   Quote: "/quote",
+  NewQuote: "/new-quote",
   QuoteEditor: "/quote-editor",
   PriceCheck: "/price-check",
   Invoices: "/invoices",

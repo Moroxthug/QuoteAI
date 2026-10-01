@@ -9,6 +9,7 @@ import * as clients from "./clients";
 import * as quote from "./quote";
 import * as quoteEditor from "./quoteEditor";
 import * as priceCheck from "./priceCheck";
+import * as newQuote from "./newQuote";
 import * as invites from "./invites";
 import * as invoices from "./invoices";
 import * as leads from "./leads";
@@ -22,5 +23,5 @@ import * as twoStep from "./twoStep";
 import * as verify from "./verify";
 import * as welcome from "./welcome";
 
-export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en, menu: menu.en, quotes: quotes.en, home: home.en, widgets: widgets.en, clients: clients.en, quote: quote.en, invoices: invoices.en, leads: leads.en, qe: quoteEditor.en, pc: priceCheck.en };
-export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr, menu: menu.fr, quotes: quotes.fr, home: home.fr, widgets: widgets.fr, clients: clients.fr, quote: quote.fr, invoices: invoices.fr, leads: leads.fr, qe: quoteEditor.fr, pc: priceCheck.fr };
+export const screensEn = { ...common.en, welcome: welcome.en, signIn: signIn.en, signUp: signUp.en, verify: verify.en, twoStep: twoStep.en, forgot: forgot.en, invites: invites.en, joinCode: joinCode.en, companyPicker: companyPicker.en, onboarding: onboarding.en, firstQuote: firstQuote.en, menu: menu.en, quotes: quotes.en, home: home.en, widgets: widgets.en, clients: clients.en, quote: quote.en, invoices: invoices.en, leads: leads.en, qe: quoteEditor.en, pc: priceCheck.en, nq: newQuote.en };
+export const screensFr = { ...common.fr, welcome: welcome.fr, signIn: signIn.fr, signUp: signUp.fr, verify: verify.fr, twoStep: twoStep.fr, forgot: forgot.fr, invites: invites.fr, joinCode: joinCode.fr, companyPicker: companyPicker.fr, onboarding: onboarding.fr, firstQuote: firstQuote.fr, menu: menu.fr, quotes: quotes.fr, home: home.fr, widgets: widgets.fr, clients: clients.fr, quote: quote.fr, invoices: invoices.fr, leads: leads.fr, qe: quoteEditor.fr, pc: priceCheck.fr, nq: newQuote.fr };

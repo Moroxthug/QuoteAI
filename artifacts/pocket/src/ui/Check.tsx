@@ -30,7 +30,7 @@ export function Checkbox({ checked, onChange, label, round, disabled }: { checke
   );
 }
 
-function RadioDot({ on }: { on: boolean }) {
+export function RadioDot({ on }: { on: boolean }) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
   const p = useSharedValue(on ? 1 : 0);

@@ -77,6 +77,16 @@ export function getTrustedOrigins(): string[] {
  */
 export const NATIVE_APP_ORIGINS = ["https://localhost", "capacitor://localhost"];
 
+/**
+ * Phase 124: the phone app's password-reset deep link. better-auth sends the
+ * emailed link through /reset-password/:token?callbackURL=quoteai://forgot-password
+ * and only redirects (and only accepts the request's redirectTo) when that URL
+ * matches a trusted origin. A custom-scheme pattern matches the scheme AND the
+ * host part exactly, so only this one deep link is trusted, nothing else under
+ * quoteai://.
+ */
+export const NATIVE_APP_SCHEMES = ["quoteai://forgot-password"];
+
 const fromNativeApp = (request: Request | undefined): boolean => {
   const origin = request?.headers.get("origin");
   return !!origin && NATIVE_APP_ORIGINS.includes(origin);
@@ -115,7 +125,7 @@ export const auth = betterAuth({
   secret,
   baseURL: getBaseURL(),
   basePath: "/api/auth",
-  trustedOrigins: [...getTrustedOrigins(), ...NATIVE_APP_ORIGINS],
+  trustedOrigins: [...getTrustedOrigins(), ...NATIVE_APP_ORIGINS, ...NATIVE_APP_SCHEMES],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {

@@ -33,9 +33,11 @@ type RowProps = Omit<TextInputProps, "style" | "placeholderTextColor" | "editabl
   numeric?: boolean;
   disabled?: boolean;
   first?: boolean;
+  /** The label turns `bad` (.su-bad label) and the input is marked invalid. */
+  invalid?: boolean;
 };
 
-export const FormRow = forwardRef<TextInput, RowProps>(function FormRow({ icon, tone, label, trailing, numeric, disabled, first, onFocus, onBlur, ...rest }, ref) {
+export const FormRow = forwardRef<TextInput, RowProps>(function FormRow({ icon, tone, label, trailing, numeric, disabled, first, invalid, onFocus, onBlur, ...rest }, ref) {
   const { colors, scheme } = useTheme();
   const placeholder = usePlaceholder();
   const [focused, setFocused] = useState(false);
@@ -45,12 +47,13 @@ export const FormRow = forwardRef<TextInput, RowProps>(function FormRow({ icon, 
       <View style={{ flexDirection: "row", alignItems: "center", gap: 13, minHeight: 62, paddingVertical: 10, paddingLeft: 16, paddingRight: 14, backgroundColor: focused ? colors.soft : "transparent", opacity: disabled ? 0.5 : 1 }}>
         <Icon name={icon} tone={tone} size={24} />
         <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-          <Text size={12.5} color="muted" importantForAccessibility="no">{label}</Text>
+          <Text size={12.5} color={invalid ? "bad" : "muted"} importantForAccessibility="no">{label}</Text>
           <TextInput
             {...rest}
             ref={ref}
             editable={!disabled}
             accessibilityLabel={label}
+            aria-invalid={invalid}
             placeholderTextColor={scheme === "dark" ? board.placeholderDark : placeholder}
             onFocus={(e) => { setFocused(true); onFocus?.(e); }}
             onBlur={(e) => { setFocused(false); onBlur?.(e); }}

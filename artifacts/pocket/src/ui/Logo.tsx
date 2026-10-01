@@ -1,0 +1,44 @@
+// The quoteAI wordmark (the board's inline <svg class="logo" viewBox="0 0 405.36 100">): the ring
+// mark and the lettering, both in the violet to blue gradient. At night the board brightens the
+// whole logo (.th[data-theme="dark"] .logo{filter:brightness(1.4) saturate(1.1)}); here the gradient
+// stops are lightened by 1.4 instead.
+import { useId } from "react";
+import Svg, { Defs, G, LinearGradient, Path, Stop } from "react-native-svg";
+import { welcomeBoard } from "@/theme/welcomeBoard";
+import { useTheme } from "./theme";
+
+const W = 405.36;
+const H = 100;
+const MARK = "M50 0A50 50 0 1 1 50 100A50 50 0 1 1 50 0ZM50 34.82A15.18 15.18 0 1 0 50 65.18A15.18 15.18 0 1 0 50 34.82ZM69.51 61.21A25.01 25.01 0 0 1 38.53 91.61A41.30 41.30 0 0 0 69.51 61.21ZM55.86 71.72A25.01 25.01 0 0 1 12.47 71.31A41.30 41.30 0 0 0 55.86 71.72ZM38.79 69.51A25.01 25.01 0 0 1 8.39 38.53A41.30 41.30 0 0 0 38.79 69.51ZM28.28 55.86A25.01 25.01 0 0 1 28.69 12.47A41.30 41.30 0 0 0 28.28 55.86ZM30.49 38.79A25.01 25.01 0 0 1 61.47 8.39A41.30 41.30 0 0 0 30.49 38.79ZM44.14 28.28A25.01 25.01 0 0 1 87.53 28.69A41.30 41.30 0 0 0 44.14 28.28ZM61.21 30.49A25.01 25.01 0 0 1 91.61 61.47A41.30 41.30 0 0 0 61.21 30.49ZM71.72 44.14A25.01 25.01 0 0 1 71.31 87.53A41.30 41.30 0 0 0 71.72 44.14Z";
+const WORD = "M291 -562Q350 -562 395.5 -539.5Q441 -517 469 -482V-554H610V264H469V-76Q441 -40 394 -16Q347 8 288 8Q218 8 159.5 -28.5Q101 -65 67 -130Q33 -195 33 -278Q33 -361 67.5 -425.5Q102 -490 161 -526Q220 -562 291 -562ZM322 -440Q285 -440 251.5 -421Q218 -402 197 -365.5Q176 -329 176 -278Q176 -227 197 -189.5Q218 -152 251.5 -133Q285 -114 322 -114Q360 -114 393.5 -133Q427 -152 448 -189Q469 -226 469 -277Q469 -328 448 -365Q427 -402 393.5 -421Q360 -440 322 -440Z M1310.9 -554V0H1169.9V-70Q1142.9 -34 1099.4 -13.5Q1055.9 7 1004.9 7Q939.9 7 889.9 -20.5Q839.9 -48 811.4 -101.5Q782.9 -155 782.9 -229V-554H922.9V-249Q922.9 -183 955.9 -147.5Q988.9 -112 1045.9 -112Q1103.9 -112 1136.9 -147.5Q1169.9 -183 1169.9 -249V-554Z M1454.8 -277Q1454.8 -362 1492.3 -427Q1529.8 -492 1594.8 -527.5Q1659.8 -563 1739.8 -563Q1819.8 -563 1884.8 -527.5Q1949.8 -492 1987.3 -427Q2024.8 -362 2024.8 -277Q2024.8 -192 1986.3 -127Q1947.8 -62 1882.3 -26.5Q1816.8 9 1735.8 9Q1655.8 9 1591.8 -26.5Q1527.8 -62 1491.3 -127Q1454.8 -192 1454.8 -277ZM1880.8 -277Q1880.8 -356 1839.3 -398.5Q1797.8 -441 1737.8 -441Q1677.8 -441 1637.3 -398.5Q1596.8 -356 1596.8 -277Q1596.8 -198 1636.3 -155.5Q1675.8 -113 1735.8 -113Q1773.8 -113 1807.3 -131.5Q1840.8 -150 1860.8 -187Q1880.8 -224 1880.8 -277Z M2331.7 -439V-171Q2331.7 -143 2345.2 -130.5Q2358.7 -118 2390.7 -118H2455.7V0H2367.7Q2190.7 0 2190.7 -172V-439H2124.7V-554H2190.7V-691H2331.7V-554H2455.7V-439Z M3108.7 -235H2703.7Q2708.7 -175 2745.7 -141Q2782.7 -107 2836.7 -107Q2914.7 -107 2947.7 -174H3098.7Q3074.7 -94 3006.7 -42.5Q2938.7 9 2839.7 9Q2759.7 9 2696.2 -26.5Q2632.7 -62 2597.2 -127Q2561.7 -192 2561.7 -277Q2561.7 -363 2596.7 -428Q2631.7 -493 2694.7 -528Q2757.7 -563 2839.7 -563Q2918.7 -563 2981.2 -529Q3043.7 -495 3078.2 -432.5Q3112.7 -370 3112.7 -289Q3112.7 -259 3108.7 -235ZM2967.7 -329Q2966.7 -383 2928.7 -415.5Q2890.7 -448 2835.7 -448Q2783.7 -448 2748.2 -416.5Q2712.7 -385 2704.7 -329Z M3683.6 -133H3405.6L3359.6 0H3212.6L3463.6 -699H3626.6L3877.6 0H3729.6ZM3645.6 -245 3544.6 -537 3443.6 -245Z M4152.5 -698V0H4012.5V-698Z";
+
+function lift(hex: string, k: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (sh: number) => Math.min(255, Math.round(((n >> sh) & 255) * k)).toString(16).padStart(2, "0");
+  return `#${ch(16)}${ch(8)}${ch(0)}`;
+}
+
+export function Logo({ width = 104, label = "quoteAI" }: { width?: number; label?: string }) {
+  const { scheme } = useTheme();
+  const id = useId().replace(/:/g, "");
+  const k = scheme === "dark" ? 1.4 : 1;
+  const c = (hex: string) => lift(hex, k);
+  return (
+    <Svg width={width} height={(width * H) / W} viewBox={`0 0 ${W} ${H}`} accessibilityRole="image" accessibilityLabel={label} role="img" aria-label={label}>
+      <Defs>
+        <LinearGradient id={`m${id}`} x1="0" y1="0.62" x2="1" y2="0.38">
+          <Stop offset="0" stopColor={c(welcomeBoard.logo.markFrom)} />
+          <Stop offset="1" stopColor={c(welcomeBoard.logo.markTo)} />
+        </LinearGradient>
+        <LinearGradient id={`w${id}`} gradientUnits="userSpaceOnUse" x1="33" y1="0" x2="4152" y2="0">
+          <Stop offset="0" stopColor={c(welcomeBoard.logo.wordFrom)} />
+          <Stop offset="1" stopColor={c(welcomeBoard.logo.wordTo)} />
+        </LinearGradient>
+      </Defs>
+      <Path fill={`url(#m${id})`} fillRule="evenodd" d={MARK} />
+      <G transform="translate(130.36 21.43) scale(0.06676) translate(-33 699)">
+        <Path fill={`url(#w${id})`} d={WORD} />
+      </G>
+    </Svg>
+  );
+}

@@ -48,7 +48,7 @@ if (target) {
     ...config.server,
     enhanceMiddleware: (middleware) => (req, res, next) => {
       if (!req.url.startsWith("/api/")) return middleware(req, res, next);
-      const proxied = http.request({ host: url.hostname, port: url.port, path: req.url, method: req.method, headers: { ...req.headers, host: url.host } }, (up) => {
+      const proxied = http.request({ host: url.hostname, port: url.port, path: req.url, method: req.method, headers: { ...req.headers, host: url.host, origin: "https://localhost" } }, (up) => {
         res.writeHead(up.statusCode ?? 502, up.headers);
         up.pipe(res);
       });

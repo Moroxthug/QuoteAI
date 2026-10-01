@@ -19,7 +19,7 @@ export async function sendPortalOtpEmail(params: { toEmail: string; code: string
     lang,
     headerTitle: t.title,
     headerSub: t.sub,
-    bodyHtml: `<p>${t.body}</p><div style="text-align:center;margin:24px 0;"><span style="display:inline-block;font-size:34px;letter-spacing:10px;font-weight:800;color:#4c1d95;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:14px 26px;">${params.code}</span></div>`,
+    bodyHtml: `<p>${t.body}</p><div style="text-align:center;margin:24px 0;"><span class="code">${params.code}</span></div>`,
     footer: t.footer,
   });
   await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });

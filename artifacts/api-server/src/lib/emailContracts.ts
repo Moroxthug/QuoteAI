@@ -17,39 +17,92 @@ export function escapeHtml(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+/** The board's initials mark ("RR" for Rossi Renovations). */
+function brandInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "Q";
+  return ((parts[0]![0] ?? "") + (parts.length > 1 ? (parts[parts.length - 1]![0] ?? "") : "")).toUpperCase();
+}
+
+/**
+ * Pocket 125.10: the one layout every client email shares, from the EmailQuote board
+ * (docs/pocket-design/EmailQuote.dc.html): a quiet ground, one white card (22 radius), the
+ * company's mark and name, the message, a tile for the figures, one full-width ink button.
+ * Tokens are handoff/tokens/tokens.css as literals (email clients have no custom properties);
+ * night follows the reader's setting where the client supports it. Digits are Manrope and
+ * words Geist where the client loads web fonts (Apple Mail); elsewhere the system font.
+ * `accent` is accepted for old callers and ignored: the board has one button colour.
+ */
 export function shell(params: { lang: EmailLang; headerTitle: string; headerSub: string; bodyHtml: string; footer: string; accent?: string; logoUrl?: string | null; logoAlt?: string }): string {
-  const accent = params.accent ?? "linear-gradient(135deg,#7c3aed,#06b6d4)";
-  const logoUrl = params.logoUrl || LOGO_URL;
+  const base = getBaseUrl();
+  const brand = params.logoAlt ?? "QuoteAI";
+  const brandHtml = params.logoUrl
+    ? `<img src="${params.logoUrl}" alt="" width="34" height="34" style="display:block;width:34px;height:34px;border-radius:10px;object-fit:cover" />`
+    : brand === "QuoteAI"
+      ? `<img src="${LOGO_URL}" alt="" height="28" style="display:block;height:28px;width:auto" />`
+      : `<span class="mark">${escapeHtml(brandInitials(brand))}</span>`;
+  const brandName = brand === "QuoteAI" && !params.logoUrl ? "" : `<td class="brand-t">${escapeHtml(brand)}</td>`;
   return `<!DOCTYPE html>
 <html lang="${params.lang === "fr" ? "fr-CA" : "en-CA"}">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="supported-color-schemes" content="light dark" />
 <title>${escapeHtml(params.headerTitle)}</title>
 <style>
-  body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
-  .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }
-  .header { background:${accent}; padding:32px 40px; text-align:center; }
-  .header img { height:36px; }
-  .header h1 { color:white; font-size:20px; font-weight:700; margin:16px 0 4px; }
-  .header p { color:rgba(255,255,255,0.88); font-size:14px; margin:0; }
-  .body { padding:32px 40px; font-size:15px; color:#1a1a2e; line-height:1.6; }
-  .box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:18px 22px; margin:22px 0; font-size:14px; }
-  .row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #ede9fe; }
-  .row:last-child { border-bottom:none; font-weight:700; color:#7c3aed; font-size:16px; }
-  .label { color:#6b7280; }
-  .cta { text-align:center; margin:28px 0 8px; }
-  .btn { display:inline-block; background:linear-gradient(135deg,#7c3aed,#06b6d4); color:white !important; font-size:15px; font-weight:600; padding:14px 34px; border-radius:10px; text-decoration:none; }
-  .muted { font-size:12.5px; color:#6b7280; text-align:center; }
-  .msg { border-left:3px solid #c4b5fd; padding:8px 14px; color:#374151; font-style:italic; margin:18px 0; white-space:pre-wrap; }
-  .footer { background:#f9fafb; padding:20px 40px; text-align:center; font-size:12px; color:#9ca3af; border-top:1px solid #f3f4f6; }
+  @font-face { font-family:'QDigits'; src:url('${base}/fonts/manrope-digits.woff2') format('woff2'); font-weight:200 800; unicode-range:U+0030-0039,U+0024,U+0025,U+002B,U+2212,U+00B0; }
+  @font-face { font-family:'Geist'; src:url('${base}/fonts/geist-latin-wght-normal.woff2') format('woff2'); font-weight:300 600; }
+  body { margin:0; padding:0; background:#f2f2f8; color:#141416; font-family:QDigits,Geist,-apple-system,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrapper { max-width:560px; margin:0 auto; padding:24px 16px 32px; }
+  .card { background:#ffffff; border:1px solid #efeeea; border-radius:22px; padding:22px 20px 20px; }
+  .mark { display:block; width:34px; height:34px; border-radius:10px; background:#141416; color:#ffffff; font-size:12.5px; font-weight:600; letter-spacing:-0.02em; line-height:34px; text-align:center; }
+  .brand-t { padding-left:10px; font-size:15px; font-weight:600; letter-spacing:-0.02em; color:#141416; }
+  h1 { margin:20px 0 4px; font-size:21px; line-height:1.25; font-weight:600; letter-spacing:-0.03em; color:#141416; }
+  .sub { margin:0; font-size:13.5px; color:#6e6e76; }
+  .body { padding-top:14px; font-size:15px; line-height:1.55; color:#3c3c43; }
+  .body p { margin:0 0 12px; }
+  .box { background:#f7f6f3; border:1px solid #efeeea; border-radius:18px; padding:16px; margin:18px 0; font-size:13.5px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid #e2e1dc; }
+  .row:first-child { padding-top:0; }
+  .row:last-child { border-bottom:none; padding-bottom:0; margin-top:4px; font-weight:600; color:#141416; font-size:17px; letter-spacing:-0.02em; }
+  .label { color:#6e6e76; font-weight:400; font-size:13.5px; letter-spacing:-0.01em; }
+  .cta { margin:16px 0 4px; }
+  .btn { display:block; background:#141416; color:#ffffff !important; font-size:16px; font-weight:600; letter-spacing:-0.01em; text-align:center; padding:17px 24px; border-radius:17px; text-decoration:none; }
+  .muted { font-size:12.5px; color:#6e6e76; text-align:center; }
+  .msg { border-left:3px solid #dcdbe9; padding:8px 14px; color:#3c3c43; margin:18px 0; white-space:pre-wrap; }
+  .code { display:inline-block; font-size:32px; letter-spacing:10px; font-weight:600; color:#141416; background:#f7f6f3; border:1px solid #e2e1dc; border-radius:14px; padding:14px 26px; }
+  .file { display:block; margin-top:12px; padding:12px 14px; border:1px solid #e2e1dc; border-radius:18px; font-size:13.5px; font-weight:500; color:#141416; }
+  .file small { display:block; margin-top:2px; font-size:11.5px; font-weight:400; color:#6e6e76; }
+  .footer { margin-top:20px; padding-top:16px; border-top:1px solid #efeeea; text-align:center; font-size:12.5px; line-height:1.55; color:#8a8a90; }
+  .footer a { color:#6e6e76; text-decoration:underline; }
+  @media (prefers-color-scheme: dark) {
+    body, .wrapper { background:#0c0c0e !important; color:#f3f2ef !important; }
+    .card { background:#18181b !important; border-color:#26262b !important; }
+    .mark { background:#f3f2ef !important; color:#141416 !important; }
+    .brand-t, h1, .row:last-child, .file { color:#f3f2ef !important; }
+    .sub, .label, .muted, .file small { color:#a09fa7 !important; }
+    .body { color:#d0cfd5 !important; }
+    .box { background:#1f1f23 !important; border-color:#26262b !important; }
+    .row { border-bottom-color:#2e2e34 !important; }
+    .btn { background:#f3f2ef !important; color:#141416 !important; }
+    .msg { border-left-color:#3b3b41 !important; color:#d0cfd5 !important; }
+    .code { background:#1f1f23 !important; border-color:#2e2e34 !important; color:#f3f2ef !important; }
+    .file { border-color:#2e2e34 !important; }
+    .footer { border-top-color:#26262b !important; color:#7c7b83 !important; }
+    .footer a { color:#a09fa7 !important; }
+  }
 </style>
 </head>
 <body>
 <div class="wrapper">
-  <div class="header"><img src="${logoUrl}" alt="${escapeHtml(params.logoAlt ?? "QuoteAI")}" /><h1>${escapeHtml(params.headerTitle)}</h1><p>${escapeHtml(params.headerSub)}</p></div>
-  <div class="body">${params.bodyHtml}</div>
-  <div class="footer">${params.footer}</div>
+  <div class="card">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse"><tr><td style="vertical-align:middle">${brandHtml}</td>${brandName}</tr></table>
+    <h1>${escapeHtml(params.headerTitle)}</h1>
+    <p class="sub">${escapeHtml(params.headerSub)}</p>
+    <div class="body">${params.bodyHtml}</div>
+    <div class="footer">${params.footer}</div>
+  </div>
 </div>
 </body>
 </html>`;
@@ -125,7 +178,7 @@ export async function sendContractOtpEmail(params: { toEmail: string; code: stri
     lang,
     headerTitle: t.title,
     headerSub: t.sub,
-    bodyHtml: `<p>${t.body}</p><div style="text-align:center;margin:24px 0;"><span style="display:inline-block;font-size:34px;letter-spacing:10px;font-weight:800;color:#4c1d95;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;padding:14px 26px;">${params.code}</span></div>`,
+    bodyHtml: `<p>${t.body}</p><div style="text-align:center;margin:24px 0;"><span class="code">${params.code}</span></div>`,
     footer: t.footer,
   });
   await resendOrThrow().emails.send({ from: FROM, to: [params.toEmail], subject: t.subject, html });

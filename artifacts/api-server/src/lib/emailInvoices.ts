@@ -65,7 +65,7 @@ export async function sendInvoiceEmail(params: Common & { pdfBuffer: Buffer; mes
       };
   const html = shell({
     lang,
-    accent: cn ? "linear-gradient(135deg,#0f766e,#06b6d4)" : undefined,
+    logoAlt: params.companyName,
     headerTitle: t.title,
     headerSub: t.sub,
     bodyHtml: `<p>${t.body}</p>${params.message ? `<div class="msg">${escapeHtml(params.message)}</div>` : ""}${summaryBox(params, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`,
@@ -100,7 +100,7 @@ export async function sendInvoiceReminderEmail(params: Common & { daysOverdue: n
         btn: "View invoice & pay", subject: `Reminder — invoice ${params.number} (${cad(params.balanceCents, lang)})`, footer: `Sent through QuoteAI on behalf of ${company}.`,
         invoice: "Invoice", due: "Was due", total: "Total", balance: "Balance due", etransfer: "Interac e-Transfer to",
       };
-  const html = shell({ lang, accent: "linear-gradient(135deg,#d97706,#f97316)", headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox(params, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
+  const html = shell({ lang, logoAlt: params.companyName, headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox(params, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
   await sendCustomerEmail({
     userId: params.userId,
     toEmail: params.toEmail,
@@ -130,6 +130,6 @@ export async function sendPaymentReceiptEmail(params: Common & { paidCents: numb
         btn: "View invoice", subject: settled ? `Receipt — invoice ${params.number} paid` : `Receipt — ${cad(params.paidCents, lang)} payment on invoice ${params.number}`, footer: `Sent through QuoteAI on behalf of ${company}.`,
         invoice: "Invoice", due: "Due", total: "Total", balance: "Balance", etransfer: "Interac e-Transfer to",
       };
-  const html = shell({ lang, accent: "linear-gradient(135deg,#059669,#06b6d4)", headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox({ ...params, etransferEmail: settled ? null : params.etransferEmail }, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
+  const html = shell({ lang, logoAlt: params.companyName, headerTitle: t.title, headerSub: t.sub, bodyHtml: `<p>${t.body}</p>${summaryBox({ ...params, etransferEmail: settled ? null : params.etransferEmail }, t)}<div class="cta"><a class="btn" href="${params.publicUrl}">${t.btn}</a></div>`, footer: t.footer });
   await sendCustomerEmail({ userId: params.userId, toEmail: params.toEmail, fromDisplayName: params.companyName, replyTo: params.replyTo, subject: t.subject, html });
 }

@@ -2,6 +2,7 @@ import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
 import { getBaseUrl } from "./baseUrl";
 import { sendCustomerEmail } from "./connectedEmailSend.js";
+import { shell } from "./emailContracts.js";
 
 // Gmail and most webmail clients strip data: URI images from HTML emails,
 // so the logo must be a real hosted URL rather than an inline base64 SVG.
@@ -235,7 +236,11 @@ const QUOTE_EMAIL_COPY = {
   },
 } as const;
 
-function buildQuoteEmailHtml(params: {
+// Pocket 125.10: the quote-sent email from the EmailQuote board: the company's mark and name, the
+// greeting, a tile with the quote number and the total, one full-width "View your quote" button, the
+// attached PDF as a file row. (The board's option list, deposit and validity are not on this email:
+// the server does not hand them to it.)
+export function buildQuoteEmailHtml(params: {
   lang?: "en" | "fr";
   companyName: string;
   clientName: string;
@@ -243,71 +248,38 @@ function buildQuoteEmailHtml(params: {
   totale: string;
   publicUrl?: string | null;
   logoUrl?: string | null;
+  pdf?: { filename: string; bytes: number } | null;
 }): string {
   const companyName = escapeHtml(params.companyName);
   const clientName = escapeHtml(params.clientName);
   const { quoteNumber, totale, publicUrl } = params;
-  const c = QUOTE_EMAIL_COPY[params.lang ?? "en"];
-  const logoUrl = params.logoUrl || LOGO_URL;
+  const lang = params.lang ?? "en";
+  const c = QUOTE_EMAIL_COPY[lang];
+  const amount = Number(totale);
+  const totalText = Number.isFinite(amount) ? new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(amount) : c.money(totale);
+  const kb = params.pdf ? Math.max(1, Math.round(params.pdf.bytes / 1024)) : 0;
   const ctaHtml = publicUrl
     ? `<div class="cta"><a class="btn" href="${publicUrl}">${c.view}</a></div>
-    <p style="font-size:13px;color:#6b7280;text-align:center;margin-top:-12px;">${c.viewHint}</p>`
+    <p class="muted" style="margin-top:10px">${c.viewHint}</p>`
     : "";
-  return `<!DOCTYPE html>
-<html lang="${params.lang === "fr" ? "fr-CA" : "en-CA"}">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>${c.title(companyName)}</title>
-<style>
-  body { margin:0; padding:0; background:#f5f3ff; font-family:system-ui,-apple-system,sans-serif; }
-  .wrapper { max-width:560px; margin:32px auto; background:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(124,58,237,0.08); }
-  .header { background:linear-gradient(135deg,#7c3aed,#06b6d4); padding:32px 40px; text-align:center; }
-  .header img { height:36px; }
-  .header h1 { color:white; font-size:20px; font-weight:700; margin:16px 0 4px; }
-  .header p { color:rgba(255,255,255,0.85); font-size:14px; margin:0; }
-  .body { padding:32px 40px; }
-  .greeting { font-size:16px; color:#1a1a2e; margin-bottom:20px; line-height:1.6; }
-  .quote-box { background:#f5f3ff; border:1px solid #ede9fe; border-radius:12px; padding:20px 24px; margin:24px 0; }
-  .quote-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #ede9fe; font-size:14px; }
-  .quote-row:last-child { border-bottom:none; font-weight:700; color:#7c3aed; font-size:16px; }
-  .quote-label { color:#6b7280; }
-  .cta { text-align:center; margin:28px 0; }
-  .btn { display:inline-block; background:linear-gradient(135deg,#7c3aed,#06b6d4); color:white; font-size:15px; font-weight:600; padding:13px 32px; border-radius:10px; text-decoration:none; }
-  .footer { background:#f9fafb; padding:20px 40px; text-align:center; font-size:12px; color:#9ca3af; border-top:1px solid #f3f4f6; }
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="header">
-    <img src="${logoUrl}" alt="${companyName}" />
-    <h1>${c.ready}</h1>
-    <p>${c.sent(companyName)}</p>
-  </div>
-  <div class="body">
-    <p class="greeting">${c.greeting(clientName, companyName)}</p>
-
-    <div class="quote-box">
-      <div class="quote-row">
-        <span class="quote-label">${c.quote}</span>
-        <span><strong>${quoteNumber}</strong></span>
-      </div>
-      <div class="quote-row">
-        <span class="quote-label">${c.total}</span>
-        <span>${c.money(totale)}</span>
-      </div>
+  const fileHtml = params.pdf
+    ? `<span class="file">${escapeHtml(params.pdf.filename)}<small>PDF · ${kb} KB</small></span>`
+    : "";
+  return shell({
+    lang,
+    headerTitle: c.ready,
+    headerSub: c.sent(params.companyName),
+    logoUrl: params.logoUrl,
+    logoAlt: params.companyName,
+    bodyHtml: `<p>${c.greeting(clientName, companyName)}</p>
+    <div class="box">
+      <div class="row"><span class="label">${c.quote}</span><span><strong>${escapeHtml(quoteNumber)}</strong></span></div>
+      <div class="row"><span class="label">${c.total}</span><span>${totalText}</span></div>
     </div>
-    ${ctaHtml}
-
-    <p style="font-size:13px;color:#6b7280;text-align:center;">${c.generated} <a href="https://quoteai.ca" style="color:#7c3aed;">QuoteAI</a></p>
-  </div>
-  <div class="footer">
-    ${companyName}<br/>
-    ${c.footer}
-  </div>
-</div>
-</body>
-</html>`;
+    ${ctaHtml}${fileHtml}
+    <p class="muted" style="margin-top:16px">${c.generated} <a href="https://quoteai.ca" style="color:inherit">QuoteAI</a></p>`,
+    footer: `${companyName}<br/>${c.footer}`,
+  });
 }
 
 // Phase 92: the widget speaks the visitor's language, so the receipt does too.
@@ -487,6 +459,7 @@ export async function sendQuotePdfEmail(params: {
         totale: params.totale,
         publicUrl: params.publicUrl ?? null,
         logoUrl: params.companyLogoUrl ?? null,
+        pdf: { filename: params.filename, bytes: params.pdfBuffer.length },
       }),
       attachments: [
         {

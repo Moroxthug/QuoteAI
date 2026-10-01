@@ -136,6 +136,14 @@ html.cp {
 .cp-err { font-size: 12.5px; color: var(--bad); }
 .cp-note { font-size: 12.5px; color: var(--faint); line-height: 1.45; }
 
+.cp-tabs { display: flex; gap: 22px; padding: 0 20px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.cp-tabs::-webkit-scrollbar { display: none; }
+.cp-tab { position: relative; display: inline-flex; align-items: center; height: 44px; border: 0; background: transparent; font-size: 14.5px; font-weight: 500; color: var(--muted); white-space: nowrap; flex-shrink: 0; padding: 0; }
+.cp-tab.on { color: var(--ink); font-weight: 600; }
+.cp-tab.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: var(--ink); }
+.cp-badge { margin-left: 6px; display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--acc-soft); color: var(--acc-soft-t); font-size: 11px; font-weight: 600; }
+.cp-grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; border-radius: 18px; overflow: hidden; }
+.cp-photo { position: relative; display: block; width: 100%; aspect-ratio: 1; border: 0; padding: 0; background: var(--sunk); overflow: hidden; }
 .cp-bar { display: block; height: 4px; border-radius: 4px; background: var(--sunk); overflow: hidden; }
 .cp-bar > span { display: block; height: 100%; border-radius: 4px; background: var(--inv); }
 

@@ -165,8 +165,8 @@ async function portalAt(page: Page, p: { token: string; session: string }, secti
   const key = `qai_portal_session:${p.token.slice(0, 16)}`;
   await page.evaluate(([k, v]) => { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch {} }, [key, section === null ? "" : p.session] as const);
   await page.reload();
-  if (section === null) { await page.waitForSelector("main .card"); return; }
-  const tabs = page.locator("[data-portal-tabs] button, .pills.scroll button");
+  if (section === null) { await page.waitForSelector("main .cp-card"); return; }
+  const tabs = page.locator("[data-portal-tabs] button");
   await tabs.first().waitFor();
   if (section > 0) await tabs.nth(section).click();
   await page.waitForTimeout(150);

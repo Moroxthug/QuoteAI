@@ -44,6 +44,7 @@ export * from "./schedule";
 export * from "./portal";
 export * from "./push";
 export * from "./field-reports";
+export * from "./crew-locations";
 export * from "./compliance";
 export * from "./books";
 export * from "./pay";

@@ -21,7 +21,7 @@ import { createNotification, writeAudit } from "../lib/notifications.js";
 import { distanceMeters } from "../lib/geo.js";
 import { blockLabel } from "../schedule/service.js";
 import multer from "multer";
-import { FIELD_REPORT_KINDS, fieldReportsTable, projectTasksTable } from "@workspace/db";
+import { FIELD_REPORT_KINDS, crewLocationsTable, fieldReportsTable, projectTasksTable } from "@workspace/db";
 import { photoUpload } from "../jobs/photos.js";
 import { addFieldTask, blocksOnDay, createFieldReport, FieldReportError, localToday, serializeReports, siteContacts, tasksForJobs } from "../crew/service.js";
 import { workerChanges } from "../crew/changes.js";

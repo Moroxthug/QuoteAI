@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db, businessProfilesTable, fieldReportsTable, projectsTable, hasFeature, minimumPlanFor } from "@workspace/db";
+import { db, businessProfilesTable, collaboratorsTable, crewLocationsTable, fieldReportsTable, projectsTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { and, desc, eq } from "drizzle-orm";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
@@ -28,6 +28,26 @@ router.get("/crew/today", requireAuth, requirePermission("jobs", "view"), async 
     res.json({ enabled: true, ...(await crewToday(userId, profile?.province ?? null)) });
   } catch (err) {
     req.log.error({ err }, "Error loading the crew's day");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/crew/locations — who is sharing where they are, right now (on the clock and allowed it). Positions older than 12 hours are left out.
+router.get("/crew/locations", requireAuth, requirePermission("jobs", "view"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+    if (!hasFeature(profile, "team_time")) { res.json({ enabled: false, requiredPlan: minimumPlanFor("team_time") }); return; }
+    const rows = await db
+      .select({ workerId: crewLocationsTable.workerId, name: collaboratorsTable.name, role: collaboratorsTable.role, projectId: crewLocationsTable.projectId, projectName: projectsTable.name, lat: crewLocationsTable.lat, lng: crewLocationsTable.lng, updatedAt: crewLocationsTable.updatedAt })
+      .from(crewLocationsTable)
+      .innerJoin(collaboratorsTable, eq(collaboratorsTable.id, crewLocationsTable.workerId))
+      .leftJoin(projectsTable, eq(projectsTable.id, crewLocationsTable.projectId))
+      .where(eq(crewLocationsTable.userId, userId));
+    const cutoff = Date.now() - 12 * 3_600_000;
+    res.json({ enabled: true, items: rows.filter((x) => x.updatedAt.getTime() >= cutoff).map((x) => ({ ...x, updatedAt: x.updatedAt.toISOString() })) });
+  } catch (err) {
+    req.log.error({ err }, "Error loading crew locations");
     res.status(500).json({ error: "Internal server error" });
   }
 });

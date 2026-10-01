@@ -272,6 +272,22 @@ router.post("/team/workers/:wid/pairing-code", requireAuth, requirePermission("t
 
 const pairLimiter = ipRateLimiter({ windowMs: 15 * 60_000, max: 20, message: "Too many attempts. Try again in a few minutes." });
 
+// GET /api/crew/pair/:code — public. Who the code is for, without using it up (the phone shows the company before it joins).
+router.get("/crew/pair/:code", pairLimiter, async (req, res) => {
+  try {
+    const code = normalizePairingCode(String(req.params.code ?? ""));
+    if (!code) { res.status(404).json({ error: "INVALID" }); return; }
+    const [w] = await db.select().from(collaboratorsTable).where(eq(collaboratorsTable.pairingCodeHash, hashToken(code)));
+    if (!w || !w.active) { res.status(404).json({ error: "INVALID" }); return; }
+    if (!w.pairingCodeExpiresAt || w.pairingCodeExpiresAt < new Date()) { res.status(410).json({ error: "EXPIRED", workerName: w.name }); return; }
+    const [profile] = await db.select({ companyName: businessProfilesTable.companyName }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, w.userId));
+    res.json({ workerName: w.name, companyName: profile?.companyName ?? "" });
+  } catch (err) {
+    req.log.error({ err }, "Error previewing the pairing code");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // POST /api/crew/pair — { code } — public. The phone swaps a pairing code for the worker's link token (the crew screens run on it).
 router.post("/crew/pair", pairLimiter, async (req, res) => {
   try {

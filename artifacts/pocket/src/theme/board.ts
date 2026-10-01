@@ -15,4 +15,6 @@ export const board = {
   /** The photo placeholder (.cp-photo: linear-gradient(145deg, #93B8F6, #4D72D9)). */
   photoFrom: "#93b8f6",
   photoTo: "#4d72d9",
+  /** The live mic's halo (.cp-mic.live::before: rgba(139,92,246,.35) → 0). */
+  micHalo: "#8b5cf6",
 } as const;

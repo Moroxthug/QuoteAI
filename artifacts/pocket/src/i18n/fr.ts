@@ -260,6 +260,13 @@ export const fr: Dict = {
       rings: "Rangée d’avatars avec anneaux de statut", // owner
       presence: { on: "Sur place", later: "Plus tard aujourd’hui", off: "Congé" }, // Sur place, Congé: CrewMapFR / SmartHomeFR; later: owner
     },
+    voice: {
+      title: "Voix", // owner
+      group: "Bouton micro · touchez pour changer", // owner
+      idle: { title: "En attente", sub: "Touchez pour décrire les travaux", aria: "Commencer la dictée" }, // owner
+      live: { title: "À l’écoute", sub: "Le niveau suit votre voix · touchez pour arrêter", aria: "Arrêter la dictée" }, // title, aria: boards (À l’écoute…, Arrêter la dictée); sub: owner
+      busy: { title: "Transcription", sub: "Vos mots deviennent des lignes", aria: "Transcription en cours" }, // owner
+    },
   },
   dev: {
     session: "Connecté : {{company}}",

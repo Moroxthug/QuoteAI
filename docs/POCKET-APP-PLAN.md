@@ -166,3 +166,7 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
   - `sentence()` in format.ts keeps one full stop after "a.m." ("last at 9:12 a.m.").
   - `/sandbox?only=<Section>` shows one section; the emulator opens it with `adb shell am start -a android.intent.action.VIEW -d "quoteai:///sandbox?only=Rows" ca.quoteai.app`. Don't flood the emulator with adb swipes (40 quick swipes made Android report the app as not responding).
   - Checked on the emulator in light, night and FR (the toast's slide and 3 s hide included).
+- **2026-09-30, 123.3 People and Voice (123.3 complete):**
+  - People: `Avatar` (photo or the board's placeholder, `me`, 5 tints, presence rings), `CompanyLogo`, `PresenceLegend`.
+  - Voice: `MicButton` (idle, live with the breathing halo, busy with the three dots), `LevelMeter` (7 bars, offsets as on the board). Still under reduced motion.
+  - Every section of `Components.dc.html` is now on `/sandbox`, checked on the emulator in light, night and FR.

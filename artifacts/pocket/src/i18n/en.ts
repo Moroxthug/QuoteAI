@@ -245,6 +245,13 @@ export const en = {
       rings: "Avatar row with status rings",
       presence: { on: "On site", later: "Later today", off: "Off" },
     },
+    voice: {
+      title: "Voice",
+      group: "Mic button · tap to cycle",
+      idle: { title: "Idle", sub: "Tap to describe the job", aria: "Start voice input" },
+      live: { title: "Listening", sub: "Level follows your voice · tap to stop", aria: "Stop listening" },
+      busy: { title: "Transcribing", sub: "Turning your words into line items", aria: "Transcribing" },
+    },
   },
   dev: {
     session: "Signed in: {{company}}",

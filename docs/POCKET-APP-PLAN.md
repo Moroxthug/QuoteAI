@@ -187,3 +187,4 @@ Every screen follows the per-screen checklist at the end of `handoff/BUILD-PLAN.
 - upload `artifacts/pocket/android/app/build/outputs/bundle/release/app-release.aab` to the closed-test track (Play Console → Testing → Closed testing → Create new release) and through Internal app sharing;
 - confirm the expand card and swipe row feel right at 60 fps on a real phone;
 - optional now, needed before 125: a Sentry DSN for a React Native project (`EXPO_PUBLIC_SENTRY_DSN`, plus `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT` for readable stack traces).
+- **2026-10-01, owner:** Phase 123 is closed. The first Expo bundle (393560) went up to Play. The 60 fps feel check moves to the real screens ("will have to see them on the real deal"). **Next: Phase 124 (Getting in), in a new session.**

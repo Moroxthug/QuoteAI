@@ -1849,6 +1849,22 @@ components:
           format: date-time
           nullable: true
           description: When the quote was last emailed to the client (Phase 105 picks the primary action from it).
+        validDays:
+          type: integer
+          nullable: true
+          description: Days the quote stays valid after it is sent (null means 30).
+        firstViewedAt:
+          type: string
+          nullable: true
+          description: When the client first opened the quote page.
+        declinedAt:
+          type: string
+          nullable: true
+          description: When the client declined the quote on its page.
+        declinedReason:
+          type: string
+          nullable: true
+          description: The reason the client gave when declining, if any.
         jobId:
           type: string
           nullable: true
@@ -1931,6 +1947,26 @@ components:
         sentAt:
           type: string
           nullable: true
+        validDays:
+          type: integer
+          nullable: true
+          description: Days the quote stays valid after it is sent (null means 30).
+        firstViewedAt:
+          type: string
+          nullable: true
+          description: When the client first opened the quote page.
+        declinedAt:
+          type: string
+          nullable: true
+          description: When the client declined the quote on its page.
+        declinedReason:
+          type: string
+          nullable: true
+          description: The reason the client gave when declining, if any.
+        numeroPreventivoData:
+          type: string
+          nullable: true
+          description: The quote number, for example Q-2026-119.
         lineItemCount:
           type: integer
         subtotale:

@@ -18,7 +18,7 @@ import { logger } from "./logger";
  */
 const PUSH_CATEGORIES = {
   // Signatures
-  signatures: ["quote_accepted", "contract_signed", "contract_declined", "change_order_signed"],
+  signatures: ["quote_accepted", "quote_declined", "contract_signed", "contract_declined", "change_order_signed"],
   // Payments
   payments: ["paid", "payment_recorded", "invoice_payment_reported", "etransfer_reported", "invoice_overdue", "milestone_payment_due"],
   // Conversations that need the contractor

@@ -196,6 +196,14 @@ export interface Quote {
   acceptedAt?: string | null;
   /** When the quote was last emailed to the client (Phase 105 picks the primary action from it). */
   sentAt?: string | null;
+  /** Days the quote stays valid after it is sent (null means 30). */
+  validDays?: number | null;
+  /** When the client first opened the quote page. */
+  firstViewedAt?: string | null;
+  /** When the client declined the quote on its page. */
+  declinedAt?: string | null;
+  /** The reason the client gave when declining, if any. */
+  declinedReason?: string | null;
   /** The job started from this quote, on GET /quotes/{id} only (Phase 105). */
   jobId?: string | null;
   pdfUrl?: string | null;
@@ -232,6 +240,16 @@ export interface QuoteSummary {
   /** The quote heading (titoloPreventivoRiga1), Phase 105. */
   title?: string | null;
   sentAt?: string | null;
+  /** Days the quote stays valid after it is sent (null means 30). */
+  validDays?: number | null;
+  /** When the client first opened the quote page. */
+  firstViewedAt?: string | null;
+  /** When the client declined the quote on its page. */
+  declinedAt?: string | null;
+  /** The reason the client gave when declining, if any. */
+  declinedReason?: string | null;
+  /** The quote number, for example Q-2026-119. */
+  numeroPreventivoData?: string | null;
   lineItemCount: number;
   subtotale: number;
   ivaValore: number;

@@ -12,7 +12,7 @@ import { getListQuotesQueryKey, useArchiveQuote, useDuplicateQuote, useListQuote
 import { money, monthLong, shortDate, weekdayShort, type Locale } from "@/lib/format";
 import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
-import { FILTER_ORDER, daysLeft, glance, groupOf, jobLine, matchesFilter, matchesSearch, quoteNumber, quoteState, validUntil, type QuoteFilter, type QuoteLike, type QuoteGroup, type QuoteState } from "@/lib/quotes";
+import { FILTER_ORDER, daysLeft, glance, groupOf, jobLine, matchesFilter, matchesSearch, quoteNumber, quoteState, validUntil, type QuoteFilter, type QuoteGroup, type QuoteState } from "@/lib/quotes";
 import { useSession } from "@/lib/useSession";
 import { Avatar, type AvatarTint } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -36,10 +36,12 @@ const STATUS: Record<QuoteState, { tone: StatusTone; shape: StatusShape }> = {
   draft: { tone: "mute", shape: "draft" },
   sent: { tone: "info", shape: "q1" },
   expiring: { tone: "warn", shape: "clock" },
+  viewed: { tone: "acc", shape: "q2" },
   accepted: { tone: "ok", shape: "check" },
+  declined: { tone: "bad", shape: "x" },
   expired: { tone: "mute", shape: "off" },
 };
-const numOf = (q: QuoteSummary) => quoteNumber(q as unknown as QuoteLike); // the list does not carry the number yet
+const numOf = (q: QuoteSummary) => quoteNumber(q);
 const TINTS: AvatarTint[] = [1, 2, 3, 4, 5];
 
 export default function Quotes() {
@@ -85,8 +87,9 @@ export default function Quotes() {
     const quote = screenHref("Quote", t("quotes.actions.openQuote"), { id: q.id });
     switch (s) {
       case "draft": return [go("send", t("quotes.actions.send"), "send", "azure", "info", quote), dup(t("quotes.actions.duplicate"))];
-      case "sent": case "expiring": return [go("follow", t("quotes.actions.followUp"), "chat", "violet", "acc", quote), arch];
+      case "sent": case "viewed": case "expiring": return [go("follow", t("quotes.actions.followUp"), "chat", "violet", "acc", quote), arch];
       case "accepted": return [go("deposit", t("quotes.actions.invoiceDeposit"), "receipt", "amber", "warn", screenHref("Invoices", t("menu.rows.invoices.label"))), go("job", t("quotes.actions.startJob"), "cone", "amber", "ok", screenHref("JobSetup", t("quotes.actions.startJob")))];
+      case "declined": return [dup(t("quotes.actions.revive")), arch];
       case "expired": return [dup(t("quotes.actions.renew")), arch];
     }
   };
@@ -94,8 +97,9 @@ export default function Quotes() {
   const mainFor = (q: QuoteSummary, s: QuoteState): { label: string; onPress: () => void } => {
     switch (s) {
       case "draft": return { label: t("quotes.actions.send"), onPress: () => open(q.id) };
-      case "sent": case "expiring": return { label: t("quotes.actions.followUp"), onPress: () => open(q.id) };
+      case "sent": case "viewed": case "expiring": return { label: t("quotes.actions.followUp"), onPress: () => open(q.id) };
       case "accepted": return { label: t("quotes.actions.startJob"), onPress: () => router.push(screenHref("JobSetup", t("quotes.actions.startJob"))) };
+      case "declined": return { label: t("quotes.actions.revive"), onPress: () => duplicate.mutate({ id: q.id } as never, { onSuccess: () => { toast({ message: t("quotes.done.duplicated") }); void refresh(); }, onError: fail }) };
       case "expired": return { label: t("quotes.actions.renew"), onPress: () => duplicate.mutate({ id: q.id } as never, { onSuccess: () => { toast({ message: t("quotes.done.duplicated") }); void refresh(); }, onError: fail }) };
     }
   };
@@ -110,13 +114,18 @@ export default function Quotes() {
       out.push(first(t("quotes.detail.drafted", { date: d(q.createdAt) }), t("quotes.detail.draftedSub"), { ...STATUS.draft, word: t("quotes.detail.notSent") }));
       out.push(<XcRow key="items" title={t("quotes.detail.items", { count: q.lineItemCount })} sub={t("quotes.detail.itemsSub", { amount: m(q.subtotale) })} right={<Num size={14.5} weight={600}>{m(q.totale)}</Num>} />);
       out.push(<XcRow key="valid" title={t("quotes.detail.valid")} sub={t("quotes.detail.validSub")} />);
+    } else if (s === "declined") {
+      out.push(first(t("quotes.detail.declinedOn", { date: d(q.declinedAt ?? q.updatedAt) }), q.declinedReason?.trim() || t("quotes.detail.noReason"), { ...STATUS.declined, word: t("quotes.status.declined") }));
+      if (q.sentAt) out.push(<XcRow key="sent" title={t("quotes.detail.sent", { date: d(q.sentAt) })} sub={q.clientData.email ? t("quotes.detail.sentTo", { email: q.clientData.email }) : t("quotes.detail.sentBy")} />);
+      out.push(<XcRow key="total" title={t("quotes.detail.total", { amount: m(q.totale) })} sub={t("quotes.detail.totalSub")} />);
     } else if (s === "accepted") {
       out.push(first(t("quotes.detail.acceptedOn", { date: d(q.acceptedAt ?? q.updatedAt) }), t("quotes.detail.totalSub"), { ...STATUS.accepted, word: t("quotes.status.accepted") }));
       out.push(<XcRow key="total" title={t("quotes.detail.total", { amount: m(q.totale) })} sub={t("quotes.detail.items", { count: q.lineItemCount })} />);
     } else {
-      const until = validUntil(q.sentAt!);
+      const until = validUntil(q.sentAt!, q.validDays);
       const left = daysLeft(until, now);
       out.push(first(t("quotes.detail.sent", { date: d(q.sentAt!) }), q.clientData.email ? t("quotes.detail.sentTo", { email: q.clientData.email }) : t("quotes.detail.sentBy")));
+      if (q.firstViewedAt && s !== "expired") out.push(<XcRow key="viewed" title={t("quotes.detail.viewed", { date: d(q.firstViewedAt) })} sub={t("quotes.detail.viewedSub")} right={<Status plain tone="acc" shape="q2">{t("quotes.status.viewed")}</Status>} />);
       if (s === "expired") out.push(<XcRow key="exp" title={t("quotes.detail.expiredOn", { date: shortDate(until, locale) })} sub={t("quotes.detail.expiredSub")} right={<Status plain tone="mute" shape="off">{t("quotes.status.expired")}</Status>} />);
       else out.push(<XcRow key="until" title={s === "expiring" ? t("quotes.detail.expires", { date: `${weekdayShort(until, locale)} ${shortDate(until, locale)}` }) : t("quotes.detail.until", { date: shortDate(until, locale) })}
         sub={t("quotes.detail.left", { count: left })} right={s === "expiring" ? <Status plain tone="warn" shape="clock">{t("quotes.status.expiring", { day: weekdayShort(until, locale) })}</Status> : undefined} />);
@@ -127,7 +136,7 @@ export default function Quotes() {
 
   const meta = (q: QuoteSummary, s: QuoteState) => {
     const when = s === "draft" ? t("quotes.jobMeta.today") : s === "accepted" ? t("quotes.jobMeta.accepted", { date: shortDate(new Date(q.acceptedAt ?? q.updatedAt), locale) })
-      : s === "expired" ? t("quotes.jobMeta.expired", { date: shortDate(validUntil(q.sentAt!), locale) }) : t("quotes.jobMeta.sent", { date: shortDate(new Date(q.sentAt!), locale) });
+      : s === "declined" ? t("quotes.jobMeta.declined", { date: shortDate(new Date(q.declinedAt ?? q.updatedAt), locale) }) : s === "expired" ? t("quotes.jobMeta.expired", { date: shortDate(validUntil(q.sentAt!, q.validDays), locale) }) : t("quotes.jobMeta.sent", { date: shortDate(new Date(q.sentAt!), locale) });
     return [s === "draft" ? "" : when, jobLine(q), numOf(q)].filter(Boolean).join(" · ");
   };
 
@@ -159,7 +168,7 @@ export default function Quotes() {
                 ]} />}>
                 <XcDivider />
                 <XcCaption>{t("quotes.waitingLongest")}</XcCaption>
-                {rows.filter((r) => r.state === "sent" || r.state === "expiring").sort((a, b) => +new Date(a.q.sentAt!) - +new Date(b.q.sentAt!)).slice(0, 5).map((r, i) => (
+                {rows.filter((r) => r.state === "sent" || r.state === "viewed" || r.state === "expiring").sort((a, b) => +new Date(a.q.sentAt!) - +new Date(b.q.sentAt!)).slice(0, 5).map((r, i) => (
                   <XcRow key={r.q.id} first={i === 0} title={r.q.clientData.nome} sub={jobLine(r.q)}
                     right={<><Num size={14.5} weight={600}>{m(r.q.totale)}</Num><XcButton label={t("quotes.actions.followUp")} onPress={() => open(r.q.id)} /></>} />
                 ))}
@@ -183,7 +192,7 @@ export default function Quotes() {
                       <QuoteRow key={q.id} id={q.id} swiped={swiped === q.id} onSwipe={(o) => setSwiped(o ? q.id : null)} actions={actionsFor(q, state)}
                         label={`${q.clientData.nome}${numOf(q) ? `, ${numOf(q)}` : ""}`}
                         head={<RowBody leading={<Avatar initials={initialsOf(q.clientData.nome)} tint={TINTS[i % TINTS.length]} />} title={q.clientData.nome} meta={meta(q, state)}
-                          trailing={<><Num size={14.5} weight={600}>{m(q.totale)}</Num><Status tone={STATUS[state].tone} shape={STATUS[state].shape}>{state === "expiring" ? t("quotes.status.expiring", { day: weekdayShort(validUntil(q.sentAt!), locale) }) : t(`quotes.status.${state}`)}</Status></>} />}>
+                          trailing={<><Num size={14.5} weight={600}>{m(q.totale)}</Num><Status tone={STATUS[state].tone} shape={STATUS[state].shape}>{state === "expiring" ? t("quotes.status.expiring", { day: weekdayShort(validUntil(q.sentAt!, q.validDays), locale) }) : t(`quotes.status.${state}`)}</Status></>} />}>
                         <XcDivider />
                         <XcCaption>{q.descrizioneGenerale.split("\n")[0].slice(0, 90) || jobLine(q)}</XcCaption>
                         {detail(q, state)}

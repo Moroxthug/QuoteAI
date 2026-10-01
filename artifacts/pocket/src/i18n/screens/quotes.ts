@@ -14,8 +14,8 @@ export const en = {
   filter: "Filter",
   filters: { all: "All", draft: "Drafts", waiting: "Waiting", accepted: "Accepted", closed: "Closed" },
   groups: { week: "This week", earlier: "Earlier" },
-  status: { draft: "Draft", sent: "Sent", expiring: "Expires {{day}}", accepted: "Accepted", expired: "Expired" },
-  jobMeta: { today: "Today", sent: "Sent {{date}}", accepted: "Accepted {{date}}", expired: "Expired {{date}}", drafted: "Drafted {{date}}" },
+  status: { draft: "Draft", sent: "Sent", viewed: "Viewed", declined: "Declined", expiring: "Expires {{day}}", accepted: "Accepted", expired: "Expired" },
+  jobMeta: { today: "Today", declined: "Declined {{date}}", sent: "Sent {{date}}", accepted: "Accepted {{date}}", expired: "Expired {{date}}", drafted: "Drafted {{date}}" },
   swipeHint: "Swipe a row left for quick actions",
   empty: { title: "No quotes match", body: "Try another name, or clear the filter to see every quote.", clear: "Clear search" },
   none: { title: "No quotes yet", body: "Describe a job and the quote is written for you.", action: "New quote" },
@@ -26,11 +26,13 @@ export const en = {
     sent: "Sent {{date}}", sentTo: "To {{email}}", sentBy: "By email",
     until: "Valid until {{date}}", left_one: "{{count}} day left", left_other: "{{count}} days left",
     expires: "Expires {{date}}",
+    viewed: "Opened {{date}}", viewedSub: "Not signed yet",
+    declinedOn: "Declined {{date}}", noReason: "No reason given",
     signed: "Signed by {{name}}", acceptedOn: "Accepted {{date}}",
     expiredOn: "Expired {{date}}", expiredSub: "No reply in 30 days",
     total: "Total {{amount}}", totalSub: "Tax included",
   },
-  actions: { send: "Send", duplicate: "Duplicate", followUp: "Follow up", archive: "Archive", invoiceDeposit: "Invoice deposit", startJob: "Start job", renew: "Renew", openQuote: "Open quote" },
+  actions: { send: "Send", duplicate: "Duplicate", followUp: "Follow up", archive: "Archive", invoiceDeposit: "Invoice deposit", startJob: "Start job", renew: "Renew", revive: "Revive", openQuote: "Open quote" },
   done: { duplicated: "Duplicated as a draft", archived: "Archived", undo: "Undo", restored: "Restored", failed: "Couldn’t do that. Try again." },
   loadFailed: { title: "Couldn’t load your quotes", body: "Check your connection and try again.", retry: "Try again" },
   offline: "You’re offline. Showing the last quotes this phone saw.",
@@ -49,8 +51,8 @@ export const fr: typeof en = {
   filter: "Filtrer",
   filters: { all: "Toutes", draft: "Brouillons", waiting: "En attente", accepted: "Acceptées", closed: "Fermées" },
   groups: { week: "Cette semaine", earlier: "Plus tôt" }, // owner
-  status: { draft: "Brouillon", sent: "Envoyée", expiring: "Expire {{day}}", accepted: "Acceptée", expired: "Expirée" },
-  jobMeta: { today: "Aujourd’hui", sent: "Envoyée le {{date}}", accepted: "Acceptée le {{date}}", expired: "Expirée le {{date}}", drafted: "Rédigée le {{date}}" },
+  status: { draft: "Brouillon", sent: "Envoyée", viewed: "Consultée", declined: "Refusée", expiring: "Expire {{day}}", accepted: "Acceptée", expired: "Expirée" },
+  jobMeta: { today: "Aujourd’hui", declined: "Refusée le {{date}}", sent: "Envoyée le {{date}}", accepted: "Acceptée le {{date}}", expired: "Expirée le {{date}}", drafted: "Rédigée le {{date}}" },
   swipeHint: "Glissez une ligne vers la gauche pour les actions rapides",
   empty: { title: "Aucune soumission trouvée", body: "Essayez un autre nom, ou retirez le filtre pour voir toutes les soumissions.", clear: "Effacer la recherche" },
   none: { title: "Aucune soumission pour l’instant", body: "Décrivez un chantier et la soumission est rédigée pour vous.", action: "Nouvelle soumission" }, // owner
@@ -61,11 +63,13 @@ export const fr: typeof en = {
     sent: "Envoyée le {{date}}", sentTo: "À {{email}}", sentBy: "Par courriel",
     until: "Valide jusqu’au {{date}}", left_one: "Encore {{count}} jour", left_other: "Encore {{count}} jours",
     expires: "Expire le {{date}}",
+    viewed: "Ouverte le {{date}}", viewedSub: "Pas encore signée",
+    declinedOn: "Refusée le {{date}}", noReason: "Aucune raison donnée",
     signed: "Signée par {{name}}", acceptedOn: "Acceptée le {{date}}",
     expiredOn: "Expirée le {{date}}", expiredSub: "Aucune réponse en 30 jours", // owner
     total: "Total {{amount}}", totalSub: "Taxes comprises", // owner
   },
-  actions: { send: "Envoyer", duplicate: "Dupliquer", followUp: "Relancer", archive: "Archiver", invoiceDeposit: "Facturer l’acompte", startJob: "Lancer les travaux", renew: "Renouveler", openQuote: "Ouvrir la soumission" }, // owner: openQuote
+  actions: { send: "Envoyer", duplicate: "Dupliquer", followUp: "Relancer", archive: "Archiver", invoiceDeposit: "Facturer l’acompte", startJob: "Lancer les travaux", renew: "Renouveler", revive: "Réactiver", openQuote: "Ouvrir la soumission" }, // owner: openQuote
   done: { duplicated: "Dupliquée en brouillon", archived: "Archivée", undo: "Annuler", restored: "Rétablie", failed: "Impossible. Réessayez." }, // owner
   loadFailed: { title: "Impossible de charger vos soumissions", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner
   offline: "Hors ligne. Les dernières soumissions vues sur ce téléphone s’affichent.", // owner

@@ -135,6 +135,7 @@ function toPublicQuote(quote: typeof quotesTable.$inferSelect, variants?: (typeo
     pdfUrl: quote.pdfUrl,
     status: quote.status,
     acceptedAt: quote.acceptedAt,
+    declinedAt: quote.declinedAt ?? null,
     acceptedByName: quote.acceptedByName,
     acceptedVariantId: quote.acceptedVariantId ?? null,
     variants: variants?.map((v) => toPublicVariant(v, province)) ?? [],
@@ -753,6 +754,48 @@ router.post("/public/quotes/:id/accept", quoteAcceptLimiter, async (req, res) =>
     res.json({ success: true, quote: toPublicQuote(updated, variants) });
   } catch (err) {
     logger.error({ err }, "Error accepting public quote");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/public/quotes/:id/decline: the end client says no (Pocket, Phase 125). Records when and
+// the optional reason, stops the follow-up reminders and tells the company. Idempotent; an accepted
+// quote cannot be declined. Sending the quote again clears it.
+const MAX_DECLINE_REASON_LENGTH = 500;
+router.post("/public/quotes/:id/decline", quoteAcceptLimiter, async (req, res) => {
+  try {
+    const id = req.params.id as string;
+    const parsed = z.object({ reason: z.string().max(MAX_DECLINE_REASON_LENGTH).optional() }).safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ error: "That reason is too long." });
+      return;
+    }
+    const [quote] = await db.select().from(quotesTable).where(eq(quotesTable.id, id));
+    if (!quote || (quote.status !== "unlocked" && quote.status !== "accepted")) {
+      res.status(404).json({ error: "Quote not found." });
+      return;
+    }
+    if (quote.status === "accepted") {
+      res.status(409).json({ error: "This quote was already accepted." });
+      return;
+    }
+    const variants = await db.select().from(quoteVariantsTable).where(eq(quoteVariantsTable.quoteId, id)).orderBy(quoteVariantsTable.position);
+    if (quote.declinedAt) {
+      res.json({ success: true, quote: toPublicQuote(quote, variants) });
+      return;
+    }
+    const reason = (parsed.data.reason ?? "").trim() || null;
+    const [updated] = await db.update(quotesTable)
+      .set({ declinedAt: new Date(), declinedReason: reason, nextFollowUpAt: null })
+      .where(and(eq(quotesTable.id, id), isNull(quotesTable.declinedAt)))
+      .returning();
+    if (updated) {
+      const client = (quote.clientData as QuoteClientData | null)?.nome?.trim() || "Your client";
+      void createNotification({ userId: quote.userId, type: "quote_declined", title: `${client} declined quote ${quote.numeroPreventivoData ?? ""}`.trim(), body: reason ?? "No reason given. A short call often reopens it.", link: `/dashboard/quotes/${quote.id}`, entityType: "quote", entityId: quote.id }).catch(() => undefined);
+    }
+    res.json({ success: true, quote: toPublicQuote(updated ?? quote, variants) });
+  } catch (err) {
+    logger.error({ err }, "Error declining public quote");
     res.status(500).json({ error: "Internal server error" });
   }
 });

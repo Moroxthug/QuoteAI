@@ -241,6 +241,8 @@ async function markSent(quote: QuoteRow, profile: typeof businessProfilesTable.$
   if (quote.status === "accepted" || quote.unsubscribedAt) return;
   await db.update(quotesTable).set({
     sentAt: quote.sentAt ?? new Date(),
+    declinedAt: null,
+    declinedReason: null,
     followUpStage: 0,
     nextFollowUpAt: stageDueAt(quoteFollowupDays(profile.automationSettings), 0),
     ...(clientData ? { clientData } : {}),
@@ -297,6 +299,8 @@ export function serializeQuote(q: QuoteRow, attachments?: AttachmentRow[], varia
     /** Pocket (Phase 147): days valid from when it is sent (null: 30), and when the client first opened it. */
     validDays: q.validDays ?? null,
     firstViewedAt: q.firstViewedAt?.toISOString() ?? null,
+    declinedAt: q.declinedAt?.toISOString() ?? null,
+    declinedReason: q.declinedReason ?? null,
     pdfUrl: q.pdfUrl ?? null,
     rawInput: q.rawInput,
     pdfDownloadedAt: q.pdfDownloadedAt?.toISOString() ?? null,
@@ -412,6 +416,11 @@ router.get("/quotes", requireAuth, async (req, res) => {
         status: quotesTable.status,
         acceptedAt: quotesTable.acceptedAt,
         sentAt: quotesTable.sentAt,
+        validDays: quotesTable.validDays,
+        firstViewedAt: quotesTable.firstViewedAt,
+        declinedAt: quotesTable.declinedAt,
+        declinedReason: quotesTable.declinedReason,
+        number: quotesTable.numeroPreventivoData,
         pdfUrl: quotesTable.pdfUrl,
         capitolatoPro: quotesTable.capitolatoPro,
         templateId: quotesTable.templateId,
@@ -437,6 +446,11 @@ router.get("/quotes", requireAuth, async (req, res) => {
         status: q.status,
         acceptedAt: q.acceptedAt?.toISOString() ?? null,
         sentAt: q.sentAt?.toISOString() ?? null,
+        validDays: q.validDays ?? null,
+        firstViewedAt: q.firstViewedAt?.toISOString() ?? null,
+        declinedAt: q.declinedAt?.toISOString() ?? null,
+        declinedReason: q.declinedReason ?? null,
+        numeroPreventivoData: q.number ?? null,
         pdfUrl: q.pdfUrl ?? null,
         capitolatoPro: q.capitolatoPro ?? false,
         templateId: q.templateId ?? "standard",
@@ -1946,6 +1960,8 @@ router.post("/quotes/:id/send-pdf-email", requireAuth, requirePermission("quotes
         .update(quotesTable)
         .set({
           sentAt: quote.sentAt ?? new Date(),
+          declinedAt: null,
+          declinedReason: null,
           followUpStage: 0,
           nextFollowUpAt: stageDueAt(quoteFollowupDays(profile?.automationSettings), 0),
           ...(clientData && clientData !== existingClient ? { clientData } : {}),

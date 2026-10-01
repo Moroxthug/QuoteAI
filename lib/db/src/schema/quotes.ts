@@ -81,6 +81,9 @@ export const quotesTable = pgTable("quotes", {
   validDays: integer("valid_days"),
   /** When the client first opened the quote page (the "Quote viewed" notification). */
   firstViewedAt: timestamp("first_viewed_at", { withTimezone: true }),
+  /** Pocket (Phase 125): when the client declined the quote on its page, and the reason they gave (optional). Cleared when the quote is sent again. */
+  declinedAt: timestamp("declined_at", { withTimezone: true }),
+  declinedReason: text("declined_reason"),
   /** How many follow-up sequence steps have fired; 0 = none sent yet. Mirrors leadsTable's pattern. */
   followUpStage: integer("follow_up_stage").notNull().default(0),
   nextFollowUpAt: timestamp("next_follow_up_at", { withTimezone: true }),

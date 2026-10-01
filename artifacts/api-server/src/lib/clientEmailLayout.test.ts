@@ -10,7 +10,7 @@ vi.mock("./emailUtils.js", () => ({
 }));
 vi.mock("./gmailSendClient.js", () => ({ sendGmailMessage: vi.fn() }));
 
-const { shell } = await import("./emailContracts.js");
+const { shell, messageEmail } = await import("./emailContracts.js");
 const { buildQuoteEmailHtml } = await import("./email.js");
 
 describe("client email layout (EmailQuote board)", () => {
@@ -51,5 +51,15 @@ describe("client email layout (EmailQuote board)", () => {
     expect(html).toContain("quoteai-logo.png");
     expect(html).toContain("Payment reminder");
     expect(html).not.toContain("linear-gradient");
+  });
+
+  it("follow-ups, review requests and photo shares use the same card, with who sent it and how to stop in the footer", () => {
+    const html = messageEmail({ lang: "fr", companyName: "Rossi Renovations", clientName: "Dana", title: "Dernier suivi", bodyHtml: "<p>Bonjour le monde</p>", identificationHtml: "<div>Envoyé par: <strong>Rossi Renovations</strong></div>", unsubscribeHtml: '<div>Vous ne souhaitez plus recevoir ces messages ? <a href="https://x/u">Se désabonner</a></div>' });
+    expect(html).toContain("Bonjour Dana,");
+    expect(html).toContain("<h1>Dernier suivi</h1>");
+    expect(html).toContain('<span class="mark">RR</span>');
+    expect(html).toContain("Envoyé par:");
+    expect(html).toContain("Se désabonner");
+    expect(html).not.toContain("#2563eb");
   });
 });

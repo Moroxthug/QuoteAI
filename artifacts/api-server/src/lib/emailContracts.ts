@@ -76,6 +76,8 @@ export function shell(params: { lang: EmailLang; headerTitle: string; headerSub:
   .file small { display:block; margin-top:2px; font-size:11.5px; font-weight:400; color:#6e6e76; }
   .footer { margin-top:20px; padding-top:16px; border-top:1px solid #efeeea; text-align:center; font-size:12.5px; line-height:1.55; color:#8a8a90; }
   .footer a { color:#6e6e76; text-decoration:underline; }
+  .body a { color:#141416; text-decoration:underline; text-underline-offset:2px; }
+  .body a.btn { text-decoration:none; }
   @media (prefers-color-scheme: dark) {
     body, .wrapper { background:#0c0c0e !important; color:#f3f2ef !important; }
     .card { background:#18181b !important; border-color:#26262b !important; }
@@ -91,6 +93,8 @@ export function shell(params: { lang: EmailLang; headerTitle: string; headerSub:
     .file { border-color:#2e2e34 !important; }
     .footer { border-top-color:#26262b !important; color:#7c7b83 !important; }
     .footer a { color:#a09fa7 !important; }
+    .body a { color:#f3f2ef !important; }
+    .body a.btn { color:#141416 !important; }
   }
 </style>
 </head>
@@ -106,6 +110,23 @@ export function shell(params: { lang: EmailLang; headerTitle: string; headerSub:
 </div>
 </body>
 </html>`;
+}
+
+/**
+ * Pocket 125.10: a follow-up, review request or photo share, in the same card as every other client email:
+ * the company's mark and name, "Hi Dana,", the message, and (in the footer) who sent it and how to stop.
+ */
+export function messageEmail(params: { lang: EmailLang; companyName: string; logoUrl?: string | null; clientName: string; title: string; bodyHtml: string; identificationHtml: string; unsubscribeHtml: string }): string {
+  const greeting = params.lang === "fr" ? `Bonjour ${escapeHtml(params.clientName)},` : `Hi ${escapeHtml(params.clientName)},`;
+  return shell({
+    lang: params.lang,
+    logoUrl: params.logoUrl,
+    logoAlt: params.companyName || "QuoteAI",
+    headerTitle: params.title,
+    headerSub: "",
+    bodyHtml: `<p>${greeting}</p>${params.bodyHtml}`,
+    footer: `${params.identificationHtml}${params.unsubscribeHtml}`,
+  });
 }
 
 function cad(n: number, lang: EmailLang): string {

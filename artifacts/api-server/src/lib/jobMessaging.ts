@@ -1,4 +1,5 @@
 import { brandedResend } from "./emailUtils.js";
+import { messageEmail } from "./emailContracts.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import { DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile, type Client } from "@workspace/db";
@@ -37,7 +38,7 @@ function identificationBlockHtml(profile: BusinessProfile, lang: "en" | "fr"): s
   const contact = [profile.phone, profile.email].filter(Boolean).map(escapeHtml).join(" · ");
   const label = lang === "fr" ? "Envoyé par" : "Sent by";
   return `
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.6;">
+    <div style="margin-bottom:8px">
       <div>${label}: <strong>${company}</strong></div>
       ${address ? `<div>${address}</div>` : ""}
       ${contact ? `<div>${contact}</div>` : ""}
@@ -51,25 +52,22 @@ function unsubscribeHtml(token: string, lang: "en" | "fr"): string {
     : "Don't want to hear from us again?";
   const link = lang === "fr" ? "Se désabonner" : "Unsubscribe";
   return `
-    <div style="margin-top:8px;font-size:12px;color:#6b7280;">
-      ${text} <a href="${url}" style="color:#2563eb;">${link}</a>
+    <div>
+      ${text} <a href="${url}">${link}</a>
     </div>`;
 }
 
 function wrapEmailHtml(params: { clientName: string; profile: BusinessProfile; lang: "en" | "fr"; unsubscribeToken: string; subject: string; bodyHtml: string }): string {
-  const greeting = params.lang === "fr" ? `Bonjour ${escapeHtml(params.clientName)},` : `Hi ${escapeHtml(params.clientName)},`;
-  const logo = params.profile.logoUrl ? `<img src="${escapeHtml(params.profile.logoUrl)}" alt="" style="max-height:40px;margin-bottom:16px;" />` : "";
-  return `<!DOCTYPE html>
-<html><body style="font-family:Arial,sans-serif;background:#f9fafb;padding:24px;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:8px;padding:32px;">
-    ${logo}
-    <p style="font-size:16px;color:#111827;">${greeting}</p>
-    <h2 style="font-size:18px;color:#111827;">${escapeHtml(params.subject)}</h2>
-    ${params.bodyHtml}
-    ${identificationBlockHtml(params.profile, params.lang)}
-    ${unsubscribeHtml(params.unsubscribeToken, params.lang)}
-  </div>
-</body></html>`;
+  return messageEmail({
+    lang: params.lang,
+    companyName: params.profile.companyName,
+    logoUrl: params.profile.logoUrl || null,
+    clientName: params.clientName,
+    title: params.subject,
+    bodyHtml: params.bodyHtml,
+    identificationHtml: identificationBlockHtml(params.profile, params.lang),
+    unsubscribeHtml: unsubscribeHtml(params.unsubscribeToken, params.lang),
+  });
 }
 
 async function sendEmail(params: { to: string; profile: BusinessProfile; subject: string; html: string; unsubscribeToken: string }): Promise<{ ok: true } | { ok: false; reason: string }> {
@@ -128,9 +126,9 @@ export async function sendJobReviewRequest(params: {
 
   if (!client.email) return { ok: false, reason: "no_email" };
   const homeStarsLine = homeStarsUrl
-    ? `<p style="font-size:14px;color:#374151;line-height:1.6;">${lang === "fr" ? "Vous préférez HomeStars ?" : "Prefer HomeStars?"} <a href="${homeStarsUrl}" style="color:#2563eb;">${escapeHtml(homeStarsUrl)}</a></p>`
+    ? `<p>${lang === "fr" ? "Vous préférez HomeStars ?" : "Prefer HomeStars?"} <a href="${homeStarsUrl}">${escapeHtml(homeStarsUrl)}</a></p>`
     : "";
-  const bodyHtml = `<p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body.split(reviewUrl)[0] ?? "")}<a href="${reviewUrl}" style="color:#2563eb;">${escapeHtml(reviewUrl)}</a></p>${homeStarsLine}`;
+  const bodyHtml = `<p>${escapeHtml(body.split(reviewUrl)[0] ?? "")}<a href="${reviewUrl}">${escapeHtml(reviewUrl)}</a></p>${homeStarsLine}`;
   const html = wrapEmailHtml({ clientName: client.name, profile, lang, unsubscribeToken: client.marketingUnsubscribeToken, subject, bodyHtml });
   const result = await sendEmail({ to: client.email, profile, subject, html, unsubscribeToken: client.marketingUnsubscribeToken });
   return result.ok ? { ok: true, channel: "email" } : result;
@@ -166,11 +164,11 @@ export async function sendJobPhotoShare(params: {
     .map((u, i) => {
       const thumb = params.thumbUrls?.[i] ?? null;
       return thumb
-        ? `<div style="margin:8px 0;"><a href="${u}" style="color:#2563eb;"><img src="${thumb}" alt="" width="240" style="display:block;max-width:100%;height:auto;border-radius:8px;border:1px solid #e5e7eb;" /></a></div>`
-        : `<div style="margin:8px 0;"><a href="${u}" style="color:#2563eb;">${escapeHtml(u)}</a></div>`;
+        ? `<div style="margin:8px 0;"><a href="${u}"><img src="${thumb}" alt="" width="240" style="display:block;max-width:100%;height:auto;border-radius:8px;border:1px solid #e5e7eb;" /></a></div>`
+        : `<div style="margin:8px 0;"><a href="${u}">${escapeHtml(u)}</a></div>`;
     })
     .join("");
-  const bodyHtml = `<p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body)}</p>${links}`;
+  const bodyHtml = `<p>${escapeHtml(body)}</p>${links}`;
   const html = wrapEmailHtml({ clientName: client.name, profile, lang, unsubscribeToken: client.marketingUnsubscribeToken, subject, bodyHtml });
   const result = await sendEmail({ to: client.email, profile, subject, html, unsubscribeToken: client.marketingUnsubscribeToken });
   return result.ok ? { ok: true, channel: "email" } : result;

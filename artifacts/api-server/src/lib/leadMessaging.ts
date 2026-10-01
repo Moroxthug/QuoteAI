@@ -1,4 +1,5 @@
 import { brandedResend } from "./emailUtils.js";
+import { messageEmail } from "./emailContracts.js";
 import { logger } from "./logger.js";
 import { getBaseUrl } from "./baseUrl.js";
 import { DEFAULT_AUTOMATION_SETTINGS, type BusinessProfile, type Lead } from "@workspace/db";
@@ -42,7 +43,7 @@ function identificationBlockHtml(profile: BusinessProfile, lang: "en" | "fr"): s
   const contact = [profile.phone, profile.email].filter(Boolean).map(escapeHtml).join(" · ");
   const label = lang === "fr" ? "Envoyé par" : "Sent by";
   return `
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.6;">
+    <div style="margin-bottom:8px">
       <div>${label}: <strong>${company}</strong></div>
       ${address ? `<div>${address}</div>` : ""}
       ${contact ? `<div>${contact}</div>` : ""}
@@ -56,8 +57,8 @@ function unsubscribeHtml(token: string, lang: "en" | "fr"): string {
     : "Don't want to hear from us again?";
   const link = lang === "fr" ? "Se désabonner" : "Unsubscribe";
   return `
-    <div style="margin-top:8px;font-size:12px;color:#6b7280;">
-      ${text} <a href="${url}" style="color:#2563eb;">${link}</a>
+    <div>
+      ${text} <a href="${url}">${link}</a>
     </div>`;
 }
 
@@ -78,19 +79,16 @@ function followupCopy(stage: number, lang: "en" | "fr"): { subject: string; body
 
 function buildFollowupEmailHtml(params: { clientName: string; profile: BusinessProfile; stage: number; lang: "en" | "fr"; unsubscribeToken: string }): string {
   const { subject, body } = followupCopy(params.stage, params.lang);
-  const greeting = params.lang === "fr" ? `Bonjour ${escapeHtml(params.clientName)},` : `Hi ${escapeHtml(params.clientName)},`;
-  const logo = params.profile.logoUrl ? `<img src="${escapeHtml(params.profile.logoUrl)}" alt="" style="max-height:40px;margin-bottom:16px;" />` : "";
-  return `<!DOCTYPE html>
-<html><body style="font-family:Arial,sans-serif;background:#f9fafb;padding:24px;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:8px;padding:32px;">
-    ${logo}
-    <p style="font-size:16px;color:#111827;">${greeting}</p>
-    <h2 style="font-size:18px;color:#111827;">${escapeHtml(subject)}</h2>
-    <p style="font-size:14px;color:#374151;line-height:1.6;">${escapeHtml(body)}</p>
-    ${identificationBlockHtml(params.profile, params.lang)}
-    ${unsubscribeHtml(params.unsubscribeToken, params.lang)}
-  </div>
-</body></html>`;
+  return messageEmail({
+    lang: params.lang,
+    companyName: params.profile.companyName,
+    logoUrl: params.profile.logoUrl || null,
+    clientName: params.clientName,
+    title: subject,
+    bodyHtml: `<p>${escapeHtml(body)}</p>`,
+    identificationHtml: identificationBlockHtml(params.profile, params.lang),
+    unsubscribeHtml: unsubscribeHtml(params.unsubscribeToken, params.lang),
+  });
 }
 
 export type LeadFollowupResult =

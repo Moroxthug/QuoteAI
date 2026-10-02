@@ -205,6 +205,43 @@ router.post("/assistant/voice", requireAuth, requirePermission("jobs", "edit"), 
   }
 });
 
+// POST /api/assistant/listen multipart { audio, language? } — the assistant layer's voice view: speech to text (Groq Whisper), nothing else; the text is then sent like a typed message
+router.post("/assistant/listen", requireAuth, requirePermission("jobs", "view"), chatLimiter, single(audioUpload, "audio"), async (req, res) => {
+  try {
+    const gate = await requireAssistant(getUserId(res));
+    if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan }); return; }
+    const fields = z.object({ language: z.enum(["en", "fr"]).optional() }).safeParse(req.body ?? {});
+    const file = req.file;
+    if (!fields.success || !file) { res.status(400).json({ error: "No audio file provided" }); return; }
+    const uploadable = await toFile(file.buffer, file.originalname || "recording.m4a", { type: file.mimetype.split(";")[0]!.trim() });
+    const out = await openai.audio.transcriptions.create({ file: uploadable, model: "whisper-large-v3-turbo", language: langOf(req, fields.data.language), response_format: "json" }, { timeout: 30_000 });
+    recordVoiceUsage(getUserId(res), file.size);
+    const text = (out.text ?? "").trim();
+    if (!text) { res.status(422).json({ error: "EMPTY_TRANSCRIPT", message: "Didn't catch that." }); return; }
+    res.json({ text });
+  } catch (err) {
+    req.log.error({ err }, "Assistant listen failed");
+    res.status(502).json({ error: "TRANSCRIPTION_FAILED", message: "Could not transcribe that. Try again or type it." });
+  }
+});
+
+// POST /api/assistant/speak { text, language? } — the reply read aloud (Groq text to speech, WAV). Groq has no French voice: French answers 422 and the app just shows the text.
+router.post("/assistant/speak", requireAuth, requirePermission("jobs", "view"), chatLimiter, async (req, res) => {
+  try {
+    const gate = await requireAssistant(getUserId(res));
+    if (!gate.ok) { res.status(403).json({ error: "PLAN_REQUIRED", requiredPlan: gate.plan }); return; }
+    const body = z.object({ text: z.string().trim().min(1).max(1500), language: z.enum(["en", "fr"]).optional() }).safeParse(req.body);
+    if (!body.success) { res.status(400).json({ error: "Invalid parameters", details: body.error }); return; }
+    if (langOf(req, body.data.language) !== "en") { res.status(422).json({ error: "LANGUAGE_UNSUPPORTED" }); return; }
+    const out = await openai.audio.speech.create({ model: "canopylabs/orpheus-v1-english", voice: "hannah", input: body.data.text, response_format: "wav" } as never, { timeout: 30_000 });
+    res.setHeader("Content-Type", "audio/wav");
+    res.send(Buffer.from(await out.arrayBuffer()));
+  } catch (err) {
+    req.log.error({ err }, "Assistant speak failed");
+    res.status(502).json({ error: "SPEECH_FAILED" });
+  }
+});
+
 // POST /api/assistant/photo multipart { photo, projectId, note?, milestoneId?, language? } — photo saved to the gallery, then looked at
 router.post("/assistant/photo", requireAuth, requirePermission("jobs", "edit"), actionLimiter, single(photoUpload, "photo"), async (req, res) => {
   try {

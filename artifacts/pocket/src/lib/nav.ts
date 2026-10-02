@@ -56,6 +56,8 @@ export const BUILT = {
   SetWidget: "/set-widget",
   Archive: "/archive",
   Imports: "/imports",
+  Integrations: "/integrations",
+  Integration: "/integration",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

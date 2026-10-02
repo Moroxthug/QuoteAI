@@ -1,6 +1,6 @@
 // SmartHome.dc.html: the greeting and weather, the AI quote bar, Needs you, the widget rows, Edit Home.
 // This is the app's Home tab. The widget rows are built in the next step (125.3b).
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Linking, View } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
 import { previewLines, taxName } from "@/lib/quoteBar";
 import { useSession } from "@/lib/useSession";
+import { checkWhatsNew } from "@/lib/whatsNewSync";
 import { useCollectedWidget, useFollowupsWidget, useOwedWidget, useQuotesWidget, useTasksWidget, useWeatherWidget, type WidgetEntry } from "@/home/widgets";
 import { WidgetRow } from "@/ui/Widgets";
 import { useToast } from "@/ui/Feedback";
@@ -40,6 +41,8 @@ export default function SmartHome() {
   const [barOpen, setBarOpen] = useState(false);
   const [text, setText] = useState("");
   const [quickOpen, setQuickOpen] = useState(false);
+  // After an update the "What's new" sheet opens once over Home (never on a first install).
+  useEffect(() => { if (status === "in") void checkWhatsNew().then((show) => { if (show) router.push(screenHref("WhatsNew", "")); }); }, [status]);
 
   const needs = useQuery({ queryKey: ["home-needs"], queryFn: homeApi.needsYou, enabled: signedIn, retry: 1, refetchInterval: 120_000 });
   const weather = useQuery({ queryKey: ["home-weather"], queryFn: homeApi.weather, enabled: signedIn, retry: false, staleTime: 15 * 60_000 });

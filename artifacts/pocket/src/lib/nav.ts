@@ -59,6 +59,7 @@ export const BUILT = {
   Integrations: "/integrations",
   Integration: "/integration",
   Feedback: "/feedback",
+  WhatsNew: "/whats-new",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

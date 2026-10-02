@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { forgetRestriction } from "../roles/enforce.js";
 import { z } from "zod";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db, authUsersTable, businessProfilesTable, collaboratorsTable, memberJobRolesTable, organizationMembersTable, effectivePlan, JOB_ROLES, SENSITIVE_KEYS, type JobRole, type SensitiveOverrides } from "@workspace/db";
@@ -84,6 +85,7 @@ router.put("/job-roles/members/:userId", requireAuth, requirePermission("team", 
     const overrides = cleanOverrides(role, role === row?.jobRole || !body.data.jobRole ? wanted : body.data.sensitive ?? {});
     await db.insert(memberJobRolesTable).values({ orgId, memberUserId: target, jobRole: role, sensitive: overrides, updatedBy: getActorUserId(res) })
       .onConflictDoUpdate({ target: [memberJobRolesTable.orgId, memberJobRolesTable.memberUserId], set: { jobRole: role, sensitive: overrides, updatedBy: getActorUserId(res), updatedAt: new Date() } });
+    forgetRestriction(orgId, target);
     await recordSecurityAuditEvent({ orgId, actorUserId: getActorUserId(res), action: "job_role.changed", entityType: "member", entityId: target });
     res.json({ jobRole: role, overrides, sensitive: effectiveSensitive(role, overrides) });
   } catch (err) {

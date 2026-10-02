@@ -15,10 +15,13 @@ export type UnsubscribeKind = "reminders" | "followups" | "marketing";
 type Lang = "en" | "fr";
 
 const TEXT: Record<Lang, {
-  from: string; unsubscribed: string; stillTitle: string; still: string; sentWith: string; invalid: string; missing: string; error: string;
+  changed: string; resub: string; again: string; from: string; unsubscribed: string; stillTitle: string; still: string; sentWith: string; invalid: string; missing: string; error: string;
   title: Record<UnsubscribeKind, string>; sub: Record<UnsubscribeKind, string>;
 }> = {
   en: {
+    changed: "Changed your mind?",
+    resub: "Resubscribe",
+    again: "You’re subscribed again.",
     from: "From",
     unsubscribed: "Unsubscribed",
     stillTitle: "Invoices still arrive.",
@@ -31,6 +34,9 @@ const TEXT: Record<Lang, {
     sub: { reminders: "You won't receive any more reminders about this quote.", followups: "You won't receive any more follow-up messages from us.", marketing: "You won't receive any more review requests or shared photos from us." },
   },
   fr: {
+    changed: "Vous avez changé d’avis?",
+    resub: "Me réabonner",
+    again: "Vous êtes de nouveau abonné.",
     from: "De la part de",
     unsubscribed: "Désabonné",
     stillTitle: "Les factures arrivent toujours.",
@@ -87,6 +93,7 @@ h1{margin:16px 0 0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing
 .st{display:inline-flex;align-items:center;gap:5px;height:24px;margin-top:14px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:600;background:var(--sunk);color:var(--muted)}
 .note{width:100%;margin-top:20px;padding-top:16px;border-top:1px solid var(--line);text-align:left;font-size:13.5px;color:var(--t2);line-height:1.45}.note b{font-weight:600}
 .msg{margin:40px 16px 0;padding:20px;background:var(--card);border-radius:22px;box-shadow:0 0 0 1px var(--ring);text-align:center;font-size:14.5px;color:var(--t2)}
+.again{width:100%;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;color:var(--muted)}.again button{margin-top:10px;height:44px;padding:0 18px;border:0;border-radius:13px;background:var(--sunk);color:var(--ink);font:inherit;font-size:14.5px;font-weight:500;cursor:pointer}
 .foot{margin:24px 16px 0;text-align:center;font-size:12.5px;color:var(--faint)}
 `;
 
@@ -98,11 +105,18 @@ function shell(lang: Lang, company: string, body: string): string {
 }
 
 /** The "you are unsubscribed" page. */
-export function unsubscribeDonePage(opts: { lang: Lang; kind: UnsubscribeKind; company?: string }): string {
+export function unsubscribeDonePage(opts: { lang: Lang; kind: UnsubscribeKind; company?: string; resubscribe?: { action: string } }): string {
   const T = TEXT[opts.lang];
   const check = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
   const off = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m6 18 12-12"/></svg>`;
-  return shell(opts.lang, opts.company ?? "", `<div class="card" role="status"><span class="disc">${check}</span><h1>${escapeHtml(T.title[opts.kind])}</h1><p class="sub">${escapeHtml(T.sub[opts.kind])}</p><span class="st">${off}${escapeHtml(T.unsubscribed)}</span><div class="note"><b>${escapeHtml(T.stillTitle)}</b> ${escapeHtml(T.still)}</div></div>`);
+  return shell(opts.lang, opts.company ?? "", `<div class="card" role="status"><span class="disc">${check}</span><h1>${escapeHtml(T.title[opts.kind])}</h1><p class="sub">${escapeHtml(T.sub[opts.kind])}</p><span class="st">${off}${escapeHtml(T.unsubscribed)}</span><div class="note"><b>${escapeHtml(T.stillTitle)}</b> ${escapeHtml(T.still)}</div>${opts.resubscribe ? `<form class="again" method="post" action="${escapeHtml(opts.resubscribe.action)}">${escapeHtml(T.changed)}<br><button type="submit">${escapeHtml(T.resub)}</button></form>` : ""}</div>`);
+}
+
+/** The page after Resubscribe: the board's "resubscribed" state. */
+export function resubscribedPage(opts: { lang: Lang; company?: string }): string {
+  const T = TEXT[opts.lang];
+  const check = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
+  return shell(opts.lang, opts.company ?? "", `<div class="card" role="status"><span class="disc">${check}</span><h1>${escapeHtml(T.again)}</h1></div>`);
 }
 
 /** A plain refusal (missing or stale link, or a server error) in the same shell. */

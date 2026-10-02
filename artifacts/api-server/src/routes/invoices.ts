@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireSensitive } from "../roles/enforce.js";
 import { z } from "zod";
 import {
   db,
@@ -416,7 +417,7 @@ router.post("/invoices/:id/restore", requireAuth, requirePermission("invoicing",
 // ── Send / remind / PDF ──────────────────────────────────────────────────────
 
 // POST /api/invoices/:id/send
-router.post("/invoices/:id/send", requireAuth, requirePermission("invoicing", "edit"), sendLimiter, async (req, res) => {
+router.post("/invoices/:id/send", requireAuth, requirePermission("invoicing", "edit"), requireSensitive("sendInvoices"), sendLimiter, async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireInvoicing(userId);

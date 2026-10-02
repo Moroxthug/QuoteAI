@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireSensitive } from "../roles/enforce.js";
 import { z } from "zod";
 import {
   db,
@@ -503,7 +504,7 @@ router.put("/team/time-entries/:tid", requireAuth, requirePermission("jobs", "ed
 // Phase 86: `jobs:edit`, the same bar as approving one entry through PUT above —
 // it was `jobs:full`, so a foreman could approve a week of hours one row at a
 // time but not with the "approve all" button next to them.
-router.post("/team/time-entries/approve", requireAuth, requirePermission("jobs", "edit"), async (req, res) => {
+router.post("/team/time-entries/approve", requireAuth, requirePermission("jobs", "edit"), requireSensitive("approveTime"), async (req, res) => {
   try {
     const userId = getUserId(res);
     const gate = await requireTeamFeature(userId);

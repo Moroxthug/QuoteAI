@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, clientsTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { logger } from "../lib/logger.js";
-import { companyNameForUser, pickLang, unsubscribeDonePage, unsubscribeMessagePage } from "../lib/unsubscribePage.js";
+import { companyNameForUser, pickLang, unsubscribeDonePage, resubscribedPage, unsubscribeMessagePage } from "../lib/unsubscribePage.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
 
 const router = Router();
@@ -30,9 +30,24 @@ router.get("/public/clients/unsubscribe", unsubscribeLimiter, async (req, res) =
       await db.update(clientsTable).set({ marketingUnsubscribedAt: new Date() }).where(eq(clientsTable.id, client.id));
     }
 
-    res.status(200).send(unsubscribeDonePage({ lang: pickLang(req, client.preferredLanguage), kind: "marketing", company: await companyNameForUser(client.userId) }));
+    res.status(200).send(unsubscribeDonePage({ lang: pickLang(req, client.preferredLanguage), kind: "marketing", company: await companyNameForUser(client.userId), resubscribe: { action: `resubscribe?token=${encodeURIComponent(token)}` } }));
   } catch (err) {
     logger.error({ err }, "Client marketing unsubscribe failed");
+    res.status(500).send(unsubscribeMessagePage(pickLang(req), "error"));
+  }
+});
+
+// Changed your mind: review requests and shared photos can reach this client again.
+router.post("/public/clients/resubscribe", unsubscribeLimiter, async (req, res) => {
+  const token = String(req.query.token ?? "");
+  if (!token) { res.status(400).send(unsubscribeMessagePage(pickLang(req), "missing")); return; }
+  try {
+    const [client] = await db.select().from(clientsTable).where(eq(clientsTable.marketingUnsubscribeToken, token));
+    if (!client) { res.status(404).send(unsubscribeMessagePage(pickLang(req), "invalid")); return; }
+    if (client.marketingUnsubscribedAt) await db.update(clientsTable).set({ marketingUnsubscribedAt: null }).where(eq(clientsTable.id, client.id));
+    res.status(200).send(resubscribedPage({ lang: pickLang(req, client.preferredLanguage), company: await companyNameForUser(client.userId) }));
+  } catch (err) {
+    logger.error({ err }, "Client marketing resubscribe failed");
     res.status(500).send(unsubscribeMessagePage(pickLang(req), "error"));
   }
 });

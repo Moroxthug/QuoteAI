@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { applyRestriction } from "../roles/enforce.js";
 import { fromNodeHeaders } from "better-auth/node";
 import { auth } from "../lib/auth";
 import { db, businessProfilesTable, organizationMembersTable, type TeamMemberRole } from "@workspace/db";
@@ -92,6 +93,7 @@ export async function requireAuth<P = Record<string, string>>(req: Request<P>, r
     res.locals.actorRole = role;
     res.locals.userEmail = session.user.email;
     res.locals.userName = session.user.name;
+    await applyRestriction(res, orgId, session.user.id, role);
     // Phase 91: the rest of the request knows who is acting (created_by, audit rows).
     runWithActor({ actorUserId: session.user.id, orgId }, () => next());
   } catch {

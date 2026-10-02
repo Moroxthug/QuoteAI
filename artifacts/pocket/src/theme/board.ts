@@ -5,6 +5,11 @@ export const board = {
   brandColours: { violet: "#6A2FBF", harbour: "#1F4F86", forest: "#1F7A45", brick: "#B4462B", teal: "#1E7F80", charcoal: "#2B2B30" },
   /** The notification opt-in sheet's halo (.nt-stage::before: rgba(163,135,244,.32) → 0). */
   pushHalo: "#a387f4",
+  /** The website widget preview (SetWidget): the form on a white or dark page, whatever the app's own theme. */
+  widgetSurface: {
+    light: { bg: "#ffffff", fg: "#141416", input: "#f3f2ef", inputFg: "#8a8a90", chip: "#f3f2ef", chipFg: "#3c3c43" },
+    dark: { bg: "#1b1b1f", fg: "#f3f2ef", input: "#2a2a30", inputFg: "#9d9ca4", chip: "#2a2a30", chipFg: "#d0cfd5" },
+  },
   /** The WhatsApp preview bubble (.mt-bub.wa). */
   waBubble: "#1f7a45",
   /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */

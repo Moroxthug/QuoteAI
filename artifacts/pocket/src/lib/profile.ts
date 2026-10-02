@@ -26,7 +26,7 @@ export type PocketSettings = { tax?: TaxPage; quotes?: QuotesPage; invoices?: In
 export type Profile = {
   userId: string; companyName: string; vatNumber: string | null; address: string | null; logoUrl: string | null; phone: string | null; email: string | null;
   province: string | null; taxProfile?: { province: string; totalRate: number; components: { code: string; label: string; rate: number }[] } | null; gstHstNumber: string | null; qstNumber: string | null; pstNumber: string | null; licenceNumber: string | null; etransferEmail: string | null;
-  legalName: string | null; wsibNumber: string | null; website: string | null; brandColor: string | null; docLanguage: "en" | "fr" | null;
+  apiKey?: string | null; legalName: string | null; wsibNumber: string | null; website: string | null; brandColor: string | null; docLanguage: "en" | "fr" | null;
   defaultPaymentSchedule: PaymentSchedule | null; quoteValidDays: number; materialsMarkupPercent: number; quoteCopyToMe: boolean; units: "imperial" | "metric" | "both";
   googleReviewUrl: string | null; homeStarsProfileUrl: string | null; sendReviewRequests: boolean;
   automationSettings: Automation; pocketSettings: PocketSettings; plan: string; features: Record<string, boolean>;

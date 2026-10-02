@@ -101,3 +101,5 @@ export const changedCount = (role: JobRole, now: Record<SensitiveKey, boolean>):
 
 /** "Carla" for one, "Amara, Sofia and 2 more" for four: the names are given, the "and N more" wording is the caller's. */
 export const firstName = (name: string): string => name.trim().split(/\s+/)[0] ?? "";
+
+export const isJobRole = (v: unknown): v is JobRole => typeof v === "string" && (ROLE_KEYS as string[]).includes(v);

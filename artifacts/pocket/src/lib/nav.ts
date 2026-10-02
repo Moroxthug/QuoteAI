@@ -69,6 +69,8 @@ export const BUILT = {
   VideoPlayer: "/video-player",
   Dunning: "/dunning",
   SetRoles: "/set-roles",
+  CustomizeHome: "/customize-home",
+  RoleHomes: "/role-homes",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

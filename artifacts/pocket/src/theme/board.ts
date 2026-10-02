@@ -5,6 +5,8 @@ export const board = {
   brandColours: { violet: "#6A2FBF", harbour: "#1F4F86", forest: "#1F7A45", brick: "#B4462B", teal: "#1E7F80", charcoal: "#2B2B30" },
   /** The notification opt-in sheet's halo (.nt-stage::before: rgba(163,135,244,.32) → 0). */
   pushHalo: "#a387f4",
+  /** The WhatsApp preview bubble (.mt-bub.wa). */
+  waBubble: "#1f7a45",
   /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */
   voiceOrbs: {
     ember: { base: "#160e36", glow: ["#7b3fe4", "#6ec8f5", "#4c9de5"] },

@@ -52,6 +52,7 @@ export const BUILT = {
   SetSecurity: "/set-security",
   SetPlan: "/set-plan",
   SetMessaging: "/set-messaging",
+  MessageTemplates: "/message-templates",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

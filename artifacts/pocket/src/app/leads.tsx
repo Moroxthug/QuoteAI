@@ -5,6 +5,7 @@
 // What the server doesn't hold, so the screen doesn't show it: photos, a per-lead drafted reply (the standard
 // 3-step follow-up text goes out), visits, review requests and the "Referral" source (see the build log).
 import { useMemo, useState } from "react";
+import { RoleTabs } from "@/ui/TabShell";
 import { Linking } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -215,7 +216,7 @@ export default function Leads() {
   };
 
   return (
-    <Screen>
+    <Screen floating={<RoleTabs active="leads" />}>
       <Header title="" backLabel={t("leads.back")} onBack={back} moreLabel={t("leads.more")} onMore={() => undefined} />
       <ExpandScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Section row align="flex-end" justify="space-between" gap={12} pt={2} px={16}>

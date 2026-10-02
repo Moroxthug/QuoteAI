@@ -16,14 +16,17 @@ import Svg, { Circle, Defs, RadialGradient, Stop, SvgXml } from "react-native-sv
 import { board } from "@/theme/board";
 import { svgs } from "@/theme/svgs";
 import { tokens } from "@/theme/tokens";
+import { TABS } from "@/lib/jobRoles";
+import { Icon, type IconName, type Tone } from "./Icon";
 import { Press } from "./motion";
 import { useBlurTarget } from "./Screen";
 import { cssShadow, shadow } from "./shadow";
 import { Text } from "./Text";
 import { useTheme } from "./theme";
 
-export type TabKey = "home" | "quotes" | "jobs" | "clients";
-const TAB_SVG: Record<TabKey, string> = { home: svgs.tabHome, quotes: svgs.tabQuotes, jobs: svgs.tabJobs, clients: svgs.tabClients };
+export type TabKey = string;
+/** The four tabs the app started with keep their drawn icons; any other tab a role gives (Schedule, Books...) uses its gradient icon from the same set. */
+const TAB_SVG: Record<string, string> = { home: svgs.tabHome, quotes: svgs.tabQuotes, jobs: svgs.tabJobs, clients: svgs.tabClients };
 
 /** Bottom space a tab screen leaves so content can scroll clear of the bar. */
 export const TAB_BAR_SPACE = 120;
@@ -50,11 +53,12 @@ function tabXml(xml: string, on: boolean, suffix: string): string {
 
 function Tab({ k, label, active, onPress }: { k: TabKey; label: string; active: boolean; onPress: () => void }) {
   const { colors } = useTheme();
-  const xml = useMemo(() => tabXml(TAB_SVG[k], active, active ? "On" : "Off"), [k, active]);
+  const drawn = TAB_SVG[k];
+  const xml = useMemo(() => (drawn ? tabXml(drawn, active, active ? "On" : "Off") : ""), [drawn, active]);
   return (
     <Press onPress={onPress} accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected: active }}
       style={{ flex: 1, minWidth: 0, borderRadius: 26, backgroundColor: active ? colors.sunk : "transparent", alignItems: "center", justifyContent: "center", gap: 4 }}>
-      <View style={{ opacity: active ? 1 : 0.5 }}><SvgXml xml={xml} width={25} height={25} /></View>
+      <View style={{ opacity: active ? 1 : 0.5 }}>{drawn ? <SvgXml xml={xml} width={25} height={25} /> : <Icon name={(TABS[k]?.icon ?? "doc") as IconName} tone={(TABS[k]?.tone ?? "slate") as Tone} size={25} />}</View>
       <Text size={10.5} weight={active ? 600 : 500} color={active ? "ink" : "muted"} numberOfLines={1} allowFontScaling={false}>{label}</Text>
     </Press>
   );
@@ -94,8 +98,8 @@ export function AssistantOrb({ label, onPress }: { label: string; onPress?: () =
   );
 }
 
-export function TabBar({ active, onTab, labels, orbLabel, onOrb, label }: {
-  active: TabKey; onTab: (k: TabKey) => void; labels: Record<TabKey, string>;
+export function TabBar({ active, onTab, labels, orbLabel, onOrb, label, keys = ["home", "quotes", "jobs", "clients"] }: {
+  active: TabKey; onTab: (k: TabKey) => void; labels: Record<TabKey, string>; /** The bar's tabs in order (Home and three). */ keys?: readonly TabKey[];
   orbLabel: string; onOrb?: () => void; /** The bar's name for screen readers ("Main"). */ label: string;
 }) {
   const { colors, scheme } = useTheme();
@@ -108,7 +112,7 @@ export function TabBar({ active, onTab, labels, orbLabel, onOrb, label }: {
         <BlurView intensity={40} tint={scheme === "dark" ? "dark" : "light"} blurTarget={target ?? undefined} blurMethod={target ? "dimezisBlurViewSdk31Plus" : "none"}
           style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 31, overflow: "hidden" }} />
         <View style={{ flex: 1, flexDirection: "row", borderRadius: 31, padding: 5, backgroundColor: colors.glass }}>
-          {(["home", "quotes", "jobs", "clients"] as const).map((k) => <Tab key={k} k={k} label={labels[k]} active={active === k} onPress={() => onTab(k)} />)}
+          {keys.map((k) => <Tab key={k} k={k} label={labels[k]} active={active === k} onPress={() => onTab(k)} />)}
         </View>
       </View>
       <AssistantOrb label={orbLabel} onPress={onOrb} />

@@ -4,6 +4,7 @@
 // Not drawn, for want of data: the board's "per sheet" unit under the price (receipt lines carry no unit), the "Forward by email" way to upload (the
 // app has no inbound address for documents yet) and the Company folder's "WSIB, insurance" (it holds every file not filed under a job).
 import { useEffect, useMemo, useState } from "react";
+import { RoleTabs } from "@/ui/TabShell";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -143,7 +144,7 @@ export default function Documents() {
   const folders = data ? foldersOf(data) : [];
 
   return (
-    <Screen>
+    <Screen floating={<RoleTabs active="docs" />}>
       <Header title="" backLabel={t("back")} onBack={back} moreLabel={t("more")} />
       <ScrollPage bottom={50}>
         <Section px={20} pt={4} row align="center" justify="space-between" gap={12}>

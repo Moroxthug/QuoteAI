@@ -3,6 +3,7 @@
 // each stands. Subcontractors bill travel on their own invoice, so they don't see this. With no signal it is kept on the phone and sent later.
 // Not built: "Use map distance" (no map in the app yet) and the receipt photo (the server takes a claim without one).
 import { useState } from "react";
+import { RoleTabs } from "@/ui/TabShell";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
@@ -104,7 +105,7 @@ export default function CrewTravel() {
     a.status === "approved" || a.status === "paid" ? { tone: "ok", shape: "check", word: c(`travel.status.${a.status}`) } : a.status === "rejected" ? { tone: "bad", shape: "alert", word: c("travel.status.rejected") } : { tone: "warn", shape: "clock", word: c("travel.status.submitted") };
 
   return (
-    <Screen>
+    <Screen floating={<RoleTabs active="travel" />}>
       {header}
       <ScrollPage bottom={40}>
         <CrewHeader company={company} initials={initialsOf(company)} switchLabel={c("switchCompany")} worker={initialsOf(view.worker.name)} tint={tintFor(view.worker.name)} workerLabel={view.worker.name} />

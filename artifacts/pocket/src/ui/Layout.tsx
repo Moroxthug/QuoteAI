@@ -5,6 +5,7 @@ import type { ReactNode, Ref } from "react";
 import { Pressable, ScrollView, View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Rise } from "./motion";
+import { useTabInset } from "./Screen";
 
 export type Space = {
   /** Horizontal padding. */
@@ -49,8 +50,9 @@ export function Spacer({ h }: { h?: number }) {
 /** The page's scroller. `bottom` is the board's bottom padding (44 on plain pages, TAB_BAR_SPACE under the tab bar); the phone's own bar is added. */
 export function ScrollPage({ children, bottom = 0, scrollRef, sticky }: { children: ReactNode; bottom?: number; /** To scroll to a place on the page. */ scrollRef?: Ref<ScrollView>; /** Indexes of the children that stick under the header (the tab strip). */ sticky?: number[] }) {
   const insets = useSafeAreaInsets();
+  const bar = useTabInset();
   return (
-    <ScrollView ref={scrollRef} stickyHeaderIndices={sticky} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: bottom + insets.bottom }}>
+    <ScrollView ref={scrollRef} stickyHeaderIndices={sticky} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: bottom + insets.bottom + bar }}>
       {children}
     </ScrollView>
   );

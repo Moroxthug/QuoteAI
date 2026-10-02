@@ -5,6 +5,7 @@
 // Not on the board but needed by real data: groups "Paid earlier" and "Void". The board's "Job 64% done" / "Pays in 14 days" and the
 // "Delivered" marks need data the server does not give the list, so those lines are left out (see lib/invoices.ts).
 import { useMemo, useState, type ReactElement, type ReactNode } from "react";
+import { RoleTabs } from "@/ui/TabShell";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -241,7 +242,7 @@ export default function Invoices() {
   const remindMain = remindedAll > 0 ? t("list.remindedAll", { count: remindedAll }) : t("list.remindAll", { count: lateList.length });
 
   return (
-    <Screen>
+    <Screen floating={<RoleTabs active="invoices" />}>
       <Header title="" backLabel={t("back")} onBack={back} moreLabel={t("more")} onMore={() => setMoreOpen(true)} />
       <ExpandScrollView contentContainerStyle={{ paddingBottom: LIST_BOTTOM + insets.bottom }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Section px={20} pt={4} row align="center" justify="space-between" gap={12}>

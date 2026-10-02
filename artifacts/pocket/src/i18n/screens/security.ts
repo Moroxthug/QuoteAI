@@ -1,5 +1,15 @@
 // SetSecurity (SetSecurity.dc.html and SetSecurityFR). French follows the board; the rest is my own wording, to review.
 export const en = {
+  two: {
+    title: "Two-step verification", back: "Back",
+    off: { lead: "Two-step is off.", body: "Add a second step so a stolen password is not enough." },
+    on: { lead: "Two-step is on.", body: "You enter a code from your authenticator app when you sign in on a new device." },
+    password: "Your password", start: "Continue", keyTitle: "Add quoteAI to your authenticator app", keyBody: "Open your authenticator app (Google Authenticator, Microsoft Authenticator, 1Password) and add this key, or tap the button on this phone.",
+    key: "Key", open: "Open authenticator app", copy: "Copy key", copied: "Copied.", codesTitle: "Backup codes", codesBody: "Keep these somewhere safe. Each one works once if you lose your phone.", codesCopy: "Copy codes",
+    confirmTitle: "Enter the 6-digit code", confirm: "Turn on", code: "Code", turnOff: "Turn off two-step", newCodes: "Get new backup codes", newCodesNote: "The old codes stop working.", done: "Two-step is on.",
+    problems: { wrong: "That didn’t work. Check it and try again.", offline: "You’re offline. Try again when you’re back online.", failed: "Couldn’t do that. Try again." },
+    offDone: "Two-step is off.", needPassword: "Enter your password to continue.",
+  },
   back: "Back", title: "Sign-in and security", lede: "{{name}} · {{email}}",
   readOnly: { lead: "View only.", body: "Your role can see these settings but not change them. Ask the owner." },
   closing: { lead: "Account closes on {{date}}.", body: "Your team can still work until then. Nothing is erased before that date." },
@@ -38,6 +48,16 @@ export const en = {
 };
 
 export const fr: typeof en = {
+  two: {
+    title: "Vérification en deux étapes", back: "Retour",
+    off: { lead: "La vérification en deux étapes est désactivée.", body: "Ajoutez une seconde étape pour qu’un mot de passe volé ne suffise pas." },
+    on: { lead: "La vérification en deux étapes est activée.", body: "Vous entrez un code de votre appli d’authentification quand vous vous connectez sur un nouvel appareil." },
+    password: "Votre mot de passe", start: "Continuer", keyTitle: "Ajoutez quoteAI à votre appli d’authentification", keyBody: "Ouvrez votre appli d’authentification (Google Authenticator, Microsoft Authenticator, 1Password) et ajoutez cette clé, ou touchez le bouton sur ce téléphone.",
+    key: "Clé", open: "Ouvrir l’appli d’authentification", copy: "Copier la clé", copied: "Copié.", codesTitle: "Codes de secours", codesBody: "Gardez-les en lieu sûr. Chacun fonctionne une fois si vous perdez votre téléphone.", codesCopy: "Copier les codes",
+    confirmTitle: "Entrez le code à 6 chiffres", confirm: "Activer", code: "Code", turnOff: "Désactiver la vérification", newCodes: "Obtenir de nouveaux codes de secours", newCodesNote: "Les anciens codes cessent de fonctionner.", done: "La vérification en deux étapes est activée.",
+    problems: { wrong: "Ça n’a pas fonctionné. Vérifiez et réessayez.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", failed: "Impossible de le faire. Réessayez." },
+    offDone: "La vérification en deux étapes est désactivée.", needPassword: "Entrez votre mot de passe pour continuer.",
+  },
   back: "Retour", title: "Connexion et sécurité", lede: "{{name}} · {{email}}",
   readOnly: { lead: "Consultation seulement.", body: "Votre rôle permet de voir ces réglages, mais pas de les modifier. Demandez au propriétaire." },
   closing: { lead: "Fermeture du compte le {{date}}.", body: "Votre équipe peut travailler d’ici là. Rien n’est effacé avant cette date." },

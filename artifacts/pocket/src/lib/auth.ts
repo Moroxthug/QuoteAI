@@ -85,6 +85,11 @@ export const auth = {
     return result(raw, (b) => ({ twoStep: b.twoFactorRedirect === true }));
   },
 
+  /** Starts two-step: the key for the authenticator app and the backup codes. It is only on once the first code has been confirmed (verifyTotp). */
+  twoStepEnable: async (password: string) => result(await call("/two-factor/enable", { password }), (b) => ({ uri: String(b.totpURI ?? ""), codes: Array.isArray(b.backupCodes) ? (b.backupCodes as unknown[]).map(String) : [] })),
+  twoStepDisable: async (password: string) => result(await call("/two-factor/disable", { password }), nothing),
+  /** New backup codes; the old ones stop working. */
+  twoStepCodes: async (password: string) => result(await call("/two-factor/generate-backup-codes", { password }), (b) => ({ codes: Array.isArray(b.backupCodes) ? (b.backupCodes as unknown[]).map(String) : [] })),
   verifyTotp: async (code: string) => result(await call("/two-factor/verify-totp", { code }), nothing),
   verifyBackupCode: async (code: string) => result(await call("/two-factor/verify-backup-code", { code }), nothing),
 

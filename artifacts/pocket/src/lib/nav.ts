@@ -55,6 +55,7 @@ export const BUILT = {
   Settings: "/settings",
   Profile: "/profile",
   SetSecurity: "/set-security",
+  SetTwoStep: "/set-two-step",
   SetPlan: "/set-plan",
   SetMessaging: "/set-messaging",
   MessageTemplates: "/message-templates",

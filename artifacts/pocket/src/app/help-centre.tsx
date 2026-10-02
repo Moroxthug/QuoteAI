@@ -14,6 +14,9 @@ import { ARTICLES, categoryName, countsByTopic, findBySlug, popular, related, se
 import { comingSoonHref, screenHref } from "@/lib/nav";
 import { API_ORIGIN } from "@/lib/session";
 import { clock, VIDEOS } from "@/lib/videos";
+
+/** Only the videos that exist are listed; the other four appear when they are made (Phase 130). */
+const SHOWN_VIDEOS = VIDEOS.filter((v) => v.playable);
 import { useSession } from "@/lib/useSession";
 import { Card, Hairline } from "@/ui/Card";
 import { Banner, Empty, useToast } from "@/ui/Feedback";
@@ -122,9 +125,9 @@ export default function HelpCentre() {
               </TopicGrid>
             </Section>
             <Section delay={130} pt={22}>
-              <WideHeader><SectionHeader title={t("videos")} link={t("videoCount", { count: num(VIDEOS.length, locale) })} /></WideHeader>
+              <WideHeader><SectionHeader title={t("videos")} link={t("videoCount", { count: num(SHOWN_VIDEOS.length, locale) })} /></WideHeader>
               <VideoStrip>
-                {VIDEOS.map((v) => {
+                {SHOWN_VIDEOS.map((v) => {
                   const info = tr(`hc.video.${v.id}`, { returnObjects: true }) as unknown as string[];
                   return <VideoCard key={v.id} icon={v.icon} tone={v.tone} title={info[0]!} topic={info[1]!} length={offline ? t("video.offline") : clock(v.secs)} label={t("video.watch", { title: info[0], dur: clock(v.secs) })}
                     onPress={() => (v.playable ? router.push(screenHref("VideoPlayer", "", { video: v.id })) : router.push(comingSoonHref(info[0]!)))} />;

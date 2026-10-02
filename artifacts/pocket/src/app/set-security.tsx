@@ -135,7 +135,7 @@ export default function SetSecurity() {
         <SetTitle title={t("title")} lede={t("lede", { name: user?.name ?? "", email: user?.email ?? "" })} />
         {!canEdit && !loading ? <InlineBanner><Banner tone="info" icon="lock" iconTone="slate" lead={t("readOnly.lead")}>{t("readOnly.body")}</Banner></InlineBanner> : null}
         {closesOn ? <InlineBanner><Banner tone="bad" icon="warn" iconTone="rose" lead={t("closing.lead", { date: closesOn })}>{t("closing.body")}</Banner></InlineBanner> : null}
-        {dev && !twoStep ? <InlineBanner><Banner tone="warn" icon="shield" iconTone="amber" lead={t("twoOff.lead")} link={t("twoOff.link")} onLink={() => soon(t("sign.setup.label"))}>{t("twoOff.body")}</Banner></InlineBanner> : null}
+        {dev && !twoStep ? <InlineBanner><Banner tone="warn" icon="shield" iconTone="amber" lead={t("twoOff.lead")} link={t("twoOff.link")} onLink={() => router.push(screenHref("SetTwoStep", t("sign.setup.label")))}>{t("twoOff.body")}</Banner></InlineBanner> : null}
 
         {loading ? (
           <Section pt={16} px={16} gap={14}><Skeleton height={200} radius={22} /><Skeleton height={160} radius={22} /></Section>
@@ -149,8 +149,8 @@ export default function SetSecurity() {
                 <SetRow icon="face" tone="slate" label={t("sign.face.label")} sub={t("sign.face.sub")} control={<Switch value={false} onChange={() => toast({ message: t("sign.face.soon") })} label={t("sign.face.label")} />} />
                 <SetRow icon="shield" tone="indigo" label={t("sign.two.label")} sub={twoStep ? t("sign.two.on") : t("sign.two.off")} control={<RowStatus tone={twoStep ? "ok" : "warn"} shape={twoStep ? "check" : "alert"}>{twoStep ? t("sign.two.onWord") : t("sign.two.offWord")}</RowStatus>} />
                 {twoStep
-                  ? <SetRow icon="list" tone="stone" label={t("sign.backup.label")} sub={t("sign.backup.sub")} control={<SetValue value="" chevron />} onPress={() => soon(t("sign.backup.label"))} />
-                  : <SetRow icon="shield" tone="amber" label={t("sign.setup.label")} sub={t("sign.setup.sub")} control={<SetValue value="" chevron />} onPress={() => soon(t("sign.setup.label"))} />}
+                  ? <SetRow icon="list" tone="stone" label={t("sign.backup.label")} sub={t("sign.backup.sub")} control={<SetValue value="" chevron />} onPress={() => router.push(screenHref("SetTwoStep", t("sign.backup.label")))} />
+                  : <SetRow icon="shield" tone="amber" label={t("sign.setup.label")} sub={t("sign.setup.sub")} control={<SetValue value="" chevron />} onPress={() => router.push(screenHref("SetTwoStep", t("sign.setup.label")))} />}
               </SetGroup>
             </Section>
 

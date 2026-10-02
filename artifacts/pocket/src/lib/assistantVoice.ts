@@ -1,5 +1,5 @@
 // The assistant layer's voice (HomeAI.dc.html): record what the person says, send it to the server (Groq Whisper, POST /api/assistant/listen), and read the answer aloud (Groq text to speech,
-// POST /api/assistant/speak, English only: Groq has no French voice, so a French answer is only shown). Not covered by node tests (native modules).
+// POST /api/assistant/speak, English). Groq has no French voice, and a failed Groq voice should not leave the answer silent, so those are read by the phone's own voice (expo-speech). Not covered by node tests (native modules).
 import { Platform } from "react-native";
 import { API_ORIGIN } from "./session";
 import { uploadFile } from "./jobUpload";
@@ -14,12 +14,21 @@ export async function listen(uri: string, language: "en" | "fr"): Promise<Heard>
   return { ok: false, problem: r.status === 0 ? "offline" : r.status === 403 ? "plan" : r.status === 422 ? "empty" : "failed" };
 }
 
-/** Reads `text` aloud. Resolves when it has finished (or at once when there is no voice for the language or the server cannot make one). */
+/** The phone's own voice: French, or English when Groq's voice is not available. Resolves when it has finished. */
+async function speakOnDevice(text: string, language: "en" | "fr"): Promise<void> {
+  const Speech = await import("expo-speech");
+  await new Promise<void>((done) => {
+    Speech.speak(text, { language: language === "fr" ? "fr-CA" : "en-CA", onDone: () => done(), onStopped: () => done(), onError: () => done() });
+    setTimeout(done, 90_000);
+  });
+}
+
+/** Reads `text` aloud. Resolves when it has finished. */
 export async function speak(text: string, language: "en" | "fr", onStart?: () => void): Promise<void> {
-  if (language !== "en") return;
-  let res: Response;
-  try { res = await fetch(`${API_ORIGIN}/api/assistant/speak`, { method: "POST", headers: { "content-type": "application/json", accept: "audio/wav" }, body: JSON.stringify({ text, language }) }); } catch { return; }
-  if (!res.ok) return;
+  if (language !== "en") { onStart?.(); return speakOnDevice(text, language); }
+  let res: Response | null = null;
+  try { res = await fetch(`${API_ORIGIN}/api/assistant/speak`, { method: "POST", headers: { "content-type": "application/json", accept: "audio/wav" }, body: JSON.stringify({ text, language }) }); } catch { res = null; }
+  if (!res || !res.ok) { onStart?.(); return speakOnDevice(text, language); }
   const bytes = new Uint8Array(await res.arrayBuffer());
   let uri: string;
   if (Platform.OS === "web") {

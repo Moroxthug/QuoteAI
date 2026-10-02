@@ -1,3 +1,4 @@
+import { fillTemplate, savedTemplate } from "./savedTemplates.js";
 import { brandedResend } from "./emailUtils.js";
 import { messageEmail } from "./emailContracts.js";
 import { logger } from "./logger.js";
@@ -141,10 +142,13 @@ export async function sendQuoteFollowup(params: {
   const totale = new Intl.NumberFormat(lang === "fr" ? "fr-CA" : "en-CA", { style: "currency", currency: "CAD" }).format(Number(quote.totale));
   const publicUrl = `${getBaseUrl()}/p/${quote.id}`;
   const { subject } = followupCopy(stage, lang, quoteNumber, totale);
+  // Pocket 128.4: the saved wording for this stage (f1, f2, f3), with its slots filled.
+  const saved = savedTemplate(profile.pocketSettings, `f${Math.min(stage, 2) + 1}`, lang);
+  const savedBody = saved ? fillTemplate(saved, { first: (clientData?.nome ?? "").trim().split(/\s+/)[0] ?? "", job: quote.titoloPreventivoRiga2?.trim() || "", link: publicUrl, amount: totale, me: "", co: companyName }) : null;
 
   const channels: ("email" | "sms")[] = [];
   if (smsTo) {
-    const sms = await sendSms({ profile, to: smsTo, body: `${subject} ${publicUrl}`, lang, purpose: "quote_followup", relatedEntityType: "quote", relatedEntityId: quote.id });
+    const sms = await sendSms({ profile, to: smsTo, body: savedBody ? (savedBody.includes(publicUrl) ? savedBody : `${savedBody} ${publicUrl}`) : `${subject} ${publicUrl}`, lang, purpose: "quote_followup", relatedEntityType: "quote", relatedEntityId: quote.id });
     if (sms.ok) channels.push("sms");
     else logger.warn({ quoteId: quote.id, reason: sms.reason }, "Quote follow-up SMS not sent");
   }

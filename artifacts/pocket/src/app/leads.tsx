@@ -145,9 +145,10 @@ export default function Leads() {
   };
 
   const open = (l: Lead) => (l.clientId ? router.push(screenHref("Client", t("clients.title"), { id: l.clientId })) : undefined);
-  const makeQuote = (l: Lead) => router.push(l.quoteId && stageOf(l) === "quoted"
-    ? screenHref("Quote", t("leads.actions.openQuote"), { id: l.quoteId })
-    : screenHref("NewQuote", t("leads.actions.makeQuote"), { leadId: l.id, name: l.name }));
+  const makeQuote = (l: Lead) => {
+    if (l.quoteId && stageOf(l) === "quoted") router.push(screenHref("Quote", t("leads.actions.openQuote"), { id: l.quoteId }));
+    else router.push(screenHref("NewQuote", t("leads.actions.makeQuote"), { leadId: l.id, name: l.name }));
+  };
   const contact = (l: Lead): { label: string; url: string } | null =>
     l.phone ? { label: t("leads.actions.call"), url: `tel:${l.phone.replace(/[^\d+]/g, "")}` } : l.email ? { label: t("leads.actions.email"), url: `mailto:${l.email}` } : null;
 

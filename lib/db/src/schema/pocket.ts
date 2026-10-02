@@ -39,6 +39,8 @@ export type MemberPrefs = {
   /** The app's language, when chosen here. */
   language?: "en" | "fr";
   /** Pocket 128.3 (Profile): the person's job title and mobile, and the signature they drew (SVG path data in a 330 x 92 box) for quotes and contracts. */
+  /** Pocket 128.7 (CustomizeHome): the person's own arrangement of their home: the order of its sections, which are shown, their three tabs and the density. */
+  home?: { order?: string[]; on?: Record<string, boolean>; tabs?: string[]; density?: 0 | 1 };
   jobTitle?: string;
   mobile?: string;
   signature?: string;

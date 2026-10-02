@@ -234,7 +234,7 @@ export default function AssistantProposals() {
           <>
             <Button size="md" label={t("p.approve")} grow disabled={!canApprove} onPress={() => approve([s])} />
             {message ? <Button size="md" kind="secondary" label={t("p.edit")} disabled={!canApprove} onPress={() => { setDrafts((d) => ({ ...d, [s.id]: d[s.id] ?? p.draft ?? "" })); setEditing(s.id); }} />
-              : <Button size="md" kind="secondary" label={t("p.edit")} disabled={!canApprove} onPress={() => router.push(s.kind === "order" && p.supplierId ? screenHref("Supplier", p.supplierName ?? "", { id: p.supplierId }) : screenHref("Schedule", t("p.channel.move")))} />}
+              : <Button size="md" kind="secondary" label={t("p.edit")} disabled={!canApprove} onPress={() => { if (s.kind === "order" && p.supplierId) router.push(screenHref("Supplier", p.supplierName ?? "", { id: p.supplierId })); else router.push(screenHref("Schedule", t("p.channel.move"))); }} />}
             <Button size="md" kind="ghost" label={t("p.dismiss")} disabled={!canApprove} onPress={() => void dismiss(s)} />
           </>
         )}>

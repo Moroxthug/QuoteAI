@@ -4,6 +4,11 @@
 // every link to it already goes through `screenHref`, so nothing else changes.
 import type { Href } from "expo-router";
 
+/** A route this file built. Not `Href` on purpose: expo-router's own type is a union of every route, and past about 250 routes TypeScript cannot combine two of them (`a ? screenHref(x) : screenHref(y)`).
+ *  Every route comes from BUILT or the Coming soon screen, so nothing is lost. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AppHref = any;
+
 /** Screens built so far, by the design's screen name. */
 export const BUILT = {
   Menu: "/menu",
@@ -63,6 +68,7 @@ export const BUILT = {
   HelpCentre: "/help-centre",
   VideoPlayer: "/video-player",
   Dunning: "/dunning",
+  SetRoles: "/set-roles",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",
@@ -77,7 +83,7 @@ export type BuiltScreen = keyof typeof BUILT;
 export type ScreenName = BuiltScreen | (string & {});
 
 /** The Coming soon screen for a later screen, titled with its already-translated name. */
-export function comingSoonHref(title: string): Href {
+export function comingSoonHref(title: string): AppHref {
   return { pathname: "/coming-soon", params: { title } } as Href;
 }
 
@@ -85,12 +91,12 @@ export function comingSoonHref(title: string): Href {
  * A link to the design's screen `name`: its route when built (with `params`), else Coming soon
  * titled `title` (already translated).
  */
-export function screenHref(name: ScreenName, title: string, params?: Record<string, string>): Href {
+export function screenHref(name: ScreenName, title: string, params?: Record<string, string>): AppHref {
   const route = (BUILT as Record<string, string>)[name];
   if (!route) return comingSoonHref(title);
   return (params ? { pathname: route, params } : route) as Href;
 }
 
-export function builtHref(screen: BuiltScreen): Href {
+export function builtHref(screen: BuiltScreen): AppHref {
   return BUILT[screen] as Href;
 }

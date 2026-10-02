@@ -1,0 +1,81 @@
+// SetRoles, CustomizeHome and the role homes (SetRoles.dc.html, CustomizeHome.dc.html, RoleHomes.dc.html and their French). French follows the boards; the sections and tabs they don't
+// draw (the owner's, the foreman's, the crew's) are my own wording, to review.
+export const en = {
+  back: "Back", close: "Close", loadFailed: { title: "Couldn’t load the roles", body: "Check your connection and try again.", retry: "Try again" },
+  title: "Roles", sub_other: "Settings · Team · {{count}} people", sub_one: "Settings · Team · {{count}} person",
+  readOnly: { lead: "View only.", body: "Your role can see roles but not change them. Ask the owner." },
+  locked: { lead: "Role homes are included in Business.", body: "On Pro everyone gets the owner’s home. Plans can’t be changed in the app.", action: "See plans" },
+  roles: "Roles", andMore: "{{names}} and {{count}} more", defaults: "{{role}} defaults",
+  access: { owner: "Owner", office: "Office", viewer: "Viewer", foreman: "Foreman", link: "Link" },
+  accessSub: { owner: "Everything, including plan and security", office: "Quotes, jobs, costs and invoicing", viewer: "Read-only, plus certificates and incidents", foreman: "Jobs and costs on site, the rest read-only", link: "Personal link, no sign-in" },
+  accessLabel: "Access", homeOrder: "Home, in this order", tabsLabel: "Tabs", edit: "Edit",
+  own: { label: "Let people change their home", sub: "They can hide or reorder, not add locked items" }, preview: { label: "Preview this home", sub: "See what {{name}} sees" },
+  sensitive: { title: "Sensitive access", person: "Person", keys: { payRates: "See pay rates", margins: "See margins and costs", approveTime: "Approve time", sendInvoices: "Send invoices" },
+    changed: "Changed · {{role}} default is {{state}}", isDefault: "{{role}} default", on: "on", off: "off", changedN: "{{count}} changed", foot: "Owners always have all four. Every change is saved in Activity with who made it.", ownerFixed: "The owner always has every switch." },
+  role: {
+    owner: "Owner", officeManager: "Office manager", estimator: "Estimator", projectManager: "Project manager", dispatcher: "Dispatcher", bookkeeper: "Bookkeeper", safety: "Safety coordinator", foreman: "Foreman", crew: "Crew",
+  },
+  toast: { saved: "Saved.", failed: "Couldn’t save that.", offline: "You’re offline. Try again when you’re back online.", noAccess: "Only the owner can change roles.", plan: "Role homes are included in Business." },
+  tab: { home: "Home", quotes: "Quotes", leads: "Leads", clients: "Clients", jobs: "Jobs", schedule: "Schedule", invoices: "Invoices", map: "Crew map", docs: "Documents", books: "Books", pay: "Pay", team: "Team", hours: "Hours", photos: "Photos", travel: "Travel", empty: "Empty" },
+  sec: {
+    needs: ["Needs you", "Approvals and replies"], money: ["Money", "Collected and owed"], quotes: ["Quotes to write", "Drafts and requests"], crew: ["Crew", "Who is where"], today: ["Today", "Visits and deliveries"], week: ["This week", "The week at a glance"],
+    visits: ["Site visits", "Today and tomorrow"], win: ["Win rate", "Last 4 months"], waiting: ["Waiting on clients", "Sent and viewed quotes"], weather: ["Site weather", "Rain and cold alerts"], leads: ["New leads", "From your website and calls"],
+    atRisk: ["At risk", "Jobs behind or blocked"], activeJobs: ["Active jobs", "How far along each is"], budget: ["Budget vs actual", "Costs against the budget"], changeOrders: ["Change orders", "Waiting and signed"],
+    crewNow: ["Crew now", "Who is sharing their location"], unassigned: ["Not assigned", "Work that needs a person"], tomorrow: ["Tomorrow", "Visits and deliveries"],
+    reconcile: ["To reconcile", "Bank lines to match"], receipts: ["Receipts", "Waiting for you"], hst: ["HST", "This period’s return"], comingUp: ["Coming up", "Remittances and deadlines"],
+    certificates: ["Certificates expiring", "Expired and ending soon"], incidents: ["Incidents", "Lost time and near misses"], toolbox: ["Toolbox talks", "Sign-offs"], inspections: ["Site inspections", "Walk-throughs"],
+    clock: ["Clock", "Your hours"], blockers: ["Blockers", "What is stopping the work"], crewToday: ["Crew today", "Who is on site"], tasks: ["Tasks", "What is open"], tasksToday: ["Today’s tasks", "What is on for today"], reports: ["Your reports", "Notes and photos you sent"],
+  },
+  home: {
+    title: "Your home", lede: "{{name}} · {{role}}", saved: { lead: "Saved.", body: "Your home and tabs are updated on this phone and the web." }, sections: "Sections", shown: "{{shown}} of {{total}} shown", hidden: "Hidden",
+    reorder: "Reorder {{name}}", show: "Show {{name}}", up: "Move up", down: "Move down", locked: { label: "Money and margins", sub: "Not part of your role", tag: "Office" },
+    tabsTitle: "Tabs", tabCount: "{{count}} of 4", navLabel: "Tab bar preview", full: "Four tabs is the most. Remove one to add another.", notRole: "{{name}}, not part of your role",
+    density: "Density", densities: ["Comfortable", "Compact"], densityNote: ["Bigger figures. About 3 sections fit on one screen.", "Smaller cards. About 5 sections fit on one screen."],
+    reset: { label: "Reset to {{role}} defaults", sub: "Set by the owner" }, roleDefaults: { label: "Role defaults", sub: "Settings · Team · Roles" }, save: "Save", savedLabel: "Saved", locked2: "The owner has turned this off for your role.",
+  },
+  rh: {
+    seeAll: "See all", books: "Books", schedule: "Schedule", quotes: "Quotes", analytics: "Analytics", jobs: "Jobs", activeN: "{{count}} active", all: "All", map: "Map", compliance: "Compliance", log: "Log",
+    nothing: "Nothing here yet.", custom: "Customize home", customSub: "Tabs: {{tabs}}", good: "Good morning, {{name}}", hidden: "Pay rates are hidden for your role.", noMargins: "You can see money but not margins. Ask the owner to change it.",
+    notBuilt: "Nothing tracked here yet.", openAction: "Open",
+  },
+};
+
+export const fr: typeof en = {
+  back: "Retour", close: "Fermer", loadFailed: { title: "Impossible de charger les rôles", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" },
+  title: "Rôles", sub_other: "Réglages · Équipe · {{count}} personnes", sub_one: "Réglages · Équipe · {{count}} personne",
+  readOnly: { lead: "Consultation seulement.", body: "Votre rôle permet de voir les rôles, mais pas de les modifier. Demandez au propriétaire." },
+  locked: { lead: "Les accueils par rôle sont inclus avec Business.", body: "Avec Pro, tout le monde a l’accueil du propriétaire. Le forfait ne peut pas être modifié dans l’app.", action: "Voir les forfaits" },
+  roles: "Rôles", andMore: "{{names}} et {{count}} autres", defaults: "Réglages {{role}}",
+  access: { owner: "Propriétaire", office: "Bureau", viewer: "Lecteur", foreman: "Contremaître", link: "Lien" },
+  accessSub: { owner: "Tout, y compris forfait et sécurité", office: "Soumissions, chantiers, coûts et facturation", viewer: "Lecture seule, plus certificats et incidents", foreman: "Chantiers et coûts sur place, le reste en lecture", link: "Lien personnel, sans connexion" },
+  accessLabel: "Accès", homeOrder: "Accueil, dans cet ordre", tabsLabel: "Onglets", edit: "Modifier",
+  own: { label: "Laisser chacun modifier son accueil", sub: "Masquer ou réordonner, sans ajouter d’éléments verrouillés" }, preview: { label: "Aperçu de cet accueil", sub: "Voir ce que voit {{name}}" },
+  sensitive: { title: "Accès sensibles", person: "Personne", keys: { payRates: "Voir les taux horaires", margins: "Voir marges et coûts", approveTime: "Approuver les heures", sendInvoices: "Envoyer des factures" },
+    changed: "Modifié · le réglage {{role}} est {{state}}", isDefault: "Réglage {{role}}", on: "activé", off: "désactivé", changedN: "{{count}} modifié(s)", foot: "Le propriétaire a toujours les quatre. Chaque changement est consigné dans l’Activité avec son auteur.", ownerFixed: "Le propriétaire a toujours tous les réglages." },
+  role: {
+    owner: "Propriétaire", officeManager: "Gestionnaire de bureau", estimator: "Estimateur", projectManager: "Chargé de projet", dispatcher: "Répartiteur", bookkeeper: "Commis comptable", safety: "Coordonnateur SST", foreman: "Contremaître", crew: "Équipe",
+  },
+  toast: { saved: "Enregistré.", failed: "Impossible d’enregistrer.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", noAccess: "Seul le propriétaire peut modifier les rôles.", plan: "Les accueils par rôle sont inclus avec Business." },
+  tab: { home: "Accueil", quotes: "Soumissions", leads: "Demandes", clients: "Clients", jobs: "Travaux", schedule: "Horaire", invoices: "Factures", map: "Carte", docs: "Documents", books: "Comptes", pay: "Paie", team: "Équipe", hours: "Heures", photos: "Photos", travel: "Trajets", empty: "Vide" },
+  sec: {
+    needs: ["À traiter", "Approbations et réponses"], money: ["Argent", "Encaissé et dû"], quotes: ["Soumissions à rédiger", "Brouillons et demandes"], crew: ["Équipe", "Qui est où"], today: ["Aujourd’hui", "Visites et livraisons"], week: ["Cette semaine", "La semaine en un coup d’œil"],
+    visits: ["Visites de chantier", "Aujourd’hui et demain"], win: ["Taux de réussite", "4 derniers mois"], waiting: ["En attente des clients", "Envoyées et consultées"], weather: ["Météo des chantiers", "Alertes pluie et froid"], leads: ["Nouvelles demandes", "De votre site Web et des appels"],
+    atRisk: ["À risque", "Chantiers en retard ou bloqués"], activeJobs: ["Chantiers actifs", "Où en est chacun"], budget: ["Budget et réel", "Coûts par rapport au budget"], changeOrders: ["Ordres de changement", "En attente et signés"],
+    crewNow: ["Équipe en ce moment", "Qui partage sa position"], unassigned: ["Non assignés", "Travaux sans personne"], tomorrow: ["Demain", "Visites et livraisons"],
+    reconcile: ["À rapprocher", "Lignes bancaires à associer"], receipts: ["Reçus", "En attente de vous"], hst: ["TVH", "La déclaration de la période"], comingUp: ["À venir", "Remises et échéances"],
+    certificates: ["Certificats à renouveler", "Expirés et bientôt échus"], incidents: ["Incidents", "Temps perdu et quasi-accidents"], toolbox: ["Causeries sécurité", "Signatures"], inspections: ["Inspections de chantier", "Visites de contrôle"],
+    clock: ["Pointage", "Vos heures"], blockers: ["Blocages", "Ce qui arrête le travail"], crewToday: ["Équipe du jour", "Qui est sur place"], tasks: ["Tâches", "Ce qui est ouvert"], tasksToday: ["Tâches du jour", "Ce qui est prévu aujourd’hui"], reports: ["Vos rapports", "Notes et photos envoyées"],
+  },
+  home: {
+    title: "Votre accueil", lede: "{{name}} · {{role}}", saved: { lead: "Enregistré.", body: "Votre accueil et vos onglets sont à jour sur ce téléphone et sur le Web." }, sections: "Sections", shown: "{{shown}} sur {{total}} affichées", hidden: "Masquée",
+    reorder: "Réordonner {{name}}", show: "Afficher {{name}}", up: "Monter", down: "Descendre", locked: { label: "Argent et marges", sub: "Hors de votre rôle", tag: "Bureau" },
+    tabsTitle: "Onglets", tabCount: "{{count}} sur 4", navLabel: "Aperçu de la barre d’onglets", full: "Quatre onglets au maximum. Retirez-en un pour en ajouter un autre.", notRole: "{{name}}, hors de votre rôle",
+    density: "Densité", densities: ["Confortable", "Compacte"], densityNote: ["Chiffres plus gros. Environ 3 sections tiennent sur un écran.", "Cartes plus petites. Environ 5 sections tiennent sur un écran."],
+    reset: { label: "Revenir aux réglages {{role}}", sub: "Définis par le propriétaire" }, roleDefaults: { label: "Réglages par rôle", sub: "Réglages · Équipe · Rôles" }, save: "Enregistrer", savedLabel: "Enregistré", locked2: "Le propriétaire a désactivé cela pour votre rôle.",
+  },
+  rh: {
+    seeAll: "Tout voir", books: "Comptabilité", schedule: "Horaire", quotes: "Soumissions", analytics: "Analyses", jobs: "Travaux", activeN: "{{count}} actifs", all: "Tous", map: "Carte", compliance: "Conformité", log: "Registre",
+    nothing: "Rien pour l’instant.", custom: "Personnaliser l’accueil", customSub: "Onglets : {{tabs}}", good: "Bonjour, {{name}}", hidden: "Les taux horaires sont masqués pour votre rôle.", noMargins: "Vous voyez l’argent, mais pas les marges. Demandez au propriétaire de changer cela.",
+    notBuilt: "Rien de suivi ici pour l’instant.", openAction: "Ouvrir",
+  },
+};

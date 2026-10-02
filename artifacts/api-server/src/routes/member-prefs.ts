@@ -14,7 +14,7 @@ import { requireAuth, getUserId, getActorUserId } from "../middlewares/authMiddl
 
 const router = Router();
 
-const DEFAULTS: Required<Pick<MemberPrefs, "voice" | "speak" | "confirmSend">> & Pick<MemberPrefs, "language" | "jobTitle" | "mobile" | "signature"> = { voice: "ember", speak: true, confirmSend: true, language: undefined };
+const DEFAULTS: Required<Pick<MemberPrefs, "voice" | "speak" | "confirmSend">> & Pick<MemberPrefs, "language" | "jobTitle" | "mobile" | "signature" | "home"> = { voice: "ember", speak: true, confirmSend: true, language: undefined };
 
 const Body = z.object({
   voice: z.enum(["ember", "tide", "stone"]).optional(),
@@ -24,6 +24,7 @@ const Body = z.object({
   jobTitle: z.string().trim().max(80).optional(),
   mobile: z.string().trim().max(40).optional(),
   signature: z.string().max(20_000).optional(),
+  home: z.object({ order: z.array(z.string().max(30)).max(40).optional(), on: z.record(z.string().max(30), z.boolean()).optional(), tabs: z.array(z.string().max(20)).max(4).optional(), density: z.union([z.literal(0), z.literal(1)]).optional() }).strict().optional(),
 });
 
 async function read(userId: string, memberUserId: string): Promise<MemberPrefs> {

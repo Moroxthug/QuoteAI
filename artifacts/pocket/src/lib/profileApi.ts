@@ -3,7 +3,7 @@ import { api } from "./api";
 import { uploadFile, type UploadFile } from "./jobUpload";
 import type { Profile, ProfilePatch } from "./profile";
 
-export type MemberPrefs = { voice?: "ember" | "tide" | "stone"; speak?: boolean; confirmSend?: boolean; language?: "en" | "fr"; jobTitle?: string; mobile?: string; signature?: string };
+export type MemberPrefs = { voice?: "ember" | "tide" | "stone"; speak?: boolean; confirmSend?: boolean; language?: "en" | "fr"; jobTitle?: string; mobile?: string; signature?: string; home?: { order?: string[]; on?: Record<string, boolean>; tabs?: string[]; density?: 0 | 1 } };
 export type Numbers = { made: number; sent: number; won: number; wonPercent: number | null; invoicedCents: number; jobs: number; activeJobs: number };
 export type MyNumbers = { period: "month" | "quarter" | "year"; now: Numbers; before: Numbers; months: { month: string; sent: number; won: number; invoicedCents: number }[] };
 export type PushPrefs = { categories: string[]; muted: string[] };

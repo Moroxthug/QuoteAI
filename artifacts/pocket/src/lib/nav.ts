@@ -46,6 +46,8 @@ export const BUILT = {
   Documents: "/documents",
   Group: "/group",
   Analytics: "/analytics",
+  Notifications: "/notifications",
+  Search: "/search",
   AssistantProposals: "/assistant-proposals",
   AssistantActivity: "/assistant-activity",
   AssistantPermissions: "/assistant-permissions",

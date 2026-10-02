@@ -1,6 +1,8 @@
 // Values Components.dc.html uses that tokens.json doesn't name. Kept here (src/theme) so
 // src/ui stays free of typed colours; sync:design doesn't touch this file.
 export const board = {
+  /** The notification opt-in sheet's halo (.nt-stage::before: rgba(163,135,244,.32) → 0). */
+  pushHalo: "#a387f4",
   /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */
   voiceOrbs: {
     ember: { base: "#160e36", glow: ["#7b3fe4", "#6ec8f5", "#4c9de5"] },

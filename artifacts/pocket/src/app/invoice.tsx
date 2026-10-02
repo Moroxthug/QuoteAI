@@ -20,6 +20,7 @@ import {
 } from "@/lib/invoices";
 import { invoicesApi, type InvoiceFull } from "@/lib/invoicesApi";
 import { screenHref } from "@/lib/nav";
+import { useRememberOpened } from "@/lib/recents";
 import { useSession } from "@/lib/useSession";
 import { ActionBar, ACTION_BAR_SPACE } from "@/ui/ActionBar";
 import { Avatar } from "@/ui/Avatar";
@@ -69,6 +70,7 @@ export default function Invoice() {
   const [remOn, setRemOn] = useState<boolean | null>(null);
   const [autoOpened, setAutoOpened] = useState(false);
   const data = q.data;
+  useRememberOpened(data ? { type: "invoices", id: data.invoice.id, title: data.invoice.number, sub: data.invoice.clientName ?? data.invoice.customer?.name ?? "" } : null);
   const inv = data?.invoice;
 
   const balance = inv?.balanceCents ?? 0;

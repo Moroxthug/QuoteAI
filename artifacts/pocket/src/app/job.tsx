@@ -18,6 +18,7 @@ import { jobsApi } from "@/lib/jobsApi";
 import { addJobPhoto } from "@/lib/jobPhotos";
 import { useDictation } from "@/lib/newQuoteInput";
 import { screenHref } from "@/lib/nav";
+import { useRememberOpened } from "@/lib/recents";
 import { useSession } from "@/lib/useSession";
 import { ChangeOrders } from "@/jobTabs/ChangeOrders";
 import { Costs } from "@/jobTabs/Costs";
@@ -71,6 +72,7 @@ export default function Job() {
   const [omw, setOmw] = useState<"idle" | "busy" | "sent">("idle");
   const dictation = useDictation();
   const d = q.data;
+  useRememberOpened(d ? { type: "jobs", id: d.job.id, title: d.job.name, sub: d.job.address } : null);
   const setPrimaryStable = useCallback((p: Primary | null) => setPrimary(p), []);
   const win = useMemo(() => (d ? jobWindow(d) : null), [d]);
   if (status === "out") return <Redirect href="/" />;

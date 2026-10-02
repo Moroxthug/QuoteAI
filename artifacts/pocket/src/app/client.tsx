@@ -14,6 +14,7 @@ import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
 import { invoiceLook } from "@/lib/invoices";
 import { quoteState, type QuoteState } from "@/lib/quotes";
+import { useRememberOpened } from "@/lib/recents";
 import { useSession } from "@/lib/useSession";
 import { ActionBar, ACTION_BAR_SPACE } from "@/ui/ActionBar";
 import { Avatar } from "@/ui/Avatar";
@@ -55,6 +56,7 @@ export default function Client() {
   const [editing, setEditing] = useState(false);
   const [reminded, setReminded] = useState(false);
   const now = new Date();
+  useRememberOpened(q.data ? { type: "clients", id: q.data.client.id, title: q.data.client.name, sub: [q.data.client.address, q.data.client.city].filter(Boolean).join(", ") } : null);
   if (status === "out") return <Redirect href="/" />;
 
   const back = () => (router.canGoBack() ? router.back() : router.replace(screenHref("Clients", t("clients.title"))));

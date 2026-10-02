@@ -38,7 +38,7 @@ const GROUPS: { key: string; rows: RowDef[] }[] = [
     { key: "imports", icon: "sync", tone: "sky" }, { key: "archive", icon: "box", tone: "slate" }, { key: "group", icon: "users", tone: "lilac", built: "Group" } ] },
   { key: "app", rows: [
     { key: "assistant", icon: "orb", tone: "violet", built: "AssistantProposals" }, { key: "settings", icon: "gear", tone: "slate" },
-    { key: "notifications", icon: "bell", tone: "sky" }, { key: "help", icon: "help", tone: "stone" },
+    { key: "notifications", icon: "bell", tone: "sky", built: "Notifications" }, { key: "help", icon: "help", tone: "stone" },
     { key: "whatsNew", icon: "gift", tone: "clay" }, { key: "feedback", icon: "chat", tone: "azure" } ] },
 ];
 

@@ -54,6 +54,7 @@ export const BUILT = {
   SetMessaging: "/set-messaging",
   MessageTemplates: "/message-templates",
   SetWidget: "/set-widget",
+  Archive: "/archive",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

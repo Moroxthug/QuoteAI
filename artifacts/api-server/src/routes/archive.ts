@@ -2,6 +2,8 @@ import { Router } from "express";
 import { db, quotesTable, clientsTable, invoicesTable, contractsTable, projectsTable, type QuoteClientData } from "@workspace/db";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
+import { requirePermission } from "../middlewares/requirePermission.js";
+import { archiveOverview } from "../archive/overview.js";
 
 const router = Router();
 
@@ -72,6 +74,30 @@ router.get("/archive", requireAuth, async (req, res) => {
     res.json({ items });
   } catch (err) {
     req.log.error({ err }, "Error listing archive");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/archive/overview — the same five kinds with what a row shows (Pocket 128.5): whose, what it was, how it ended, what it was worth.
+router.get("/archive/overview", requireAuth, async (req, res) => {
+  try {
+    res.json({ items: await archiveOverview(getUserId(res)) });
+  } catch (err) {
+    req.log.error({ err }, "Error reading the archive overview");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// POST /api/archive/clients/:id/restore — a client brings itself back from the archive (the other kinds have their own restore).
+router.post("/archive/clients/:id/restore", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
+  try {
+    const id = String(req.params.id ?? "");
+    if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(404).json({ error: "Not found" }); return; }
+    const [row] = await db.update(clientsTable).set({ archivedAt: null, archivedByName: null }).where(and(eq(clientsTable.id, id), eq(clientsTable.userId, getUserId(res)))).returning({ id: clientsTable.id });
+    if (!row) { res.status(404).json({ error: "Not found" }); return; }
+    res.json({ restored: true });
+  } catch (err) {
+    req.log.error({ err }, "Error restoring a client");
     res.status(500).json({ error: "Internal server error" });
   }
 });

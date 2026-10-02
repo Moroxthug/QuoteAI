@@ -101,6 +101,11 @@ export function pageOf<K extends "tax" | "quotes" | "invoices">(p: Pick<Profile,
   return (p?.pocketSettings?.[key] ?? {}) as NonNullable<PocketSettings[K]>;
 }
 
+/** A page the server keeps as sent (messaging, templates, widget): one value is read with its default. */
+export function extraPage(p: Pick<Profile, "pocketSettings"> | null | undefined, key: string): Record<string, unknown> {
+  return (p?.pocketSettings?.[key] ?? {}) as Record<string, unknown>;
+}
+
 export type BrandKey = "violet" | "harbour" | "forest" | "brick" | "teal" | "charcoal";
 /** The brand colours the board offers (SetCompany swatches) are in theme/board.ts (src/ui stays free of typed colours); the first is the violet of the app. */
 export const BRAND_KEYS: BrandKey[] = ["violet", "harbour", "forest", "brick", "teal", "charcoal"];

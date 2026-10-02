@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db, businessProfilesTable, smsMessagesTable, DEFAULT_AUTOMATION_SETTINGS } from "@workspace/db";
+import { db, businessProfilesTable, smsMessagesTable, smsOptOutsTable, DEFAULT_AUTOMATION_SETTINGS } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
@@ -108,6 +108,18 @@ router.get("/sms/messages", requireAuth, requirePermission("settings", "view"), 
     res.json({ items: rows.map((r) => ({ ...r, phone: formatPhone(r.phone) })) });
   } catch (err) {
     req.log.error({ err }, "SMS messages error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// GET /api/sms/opt-outs — the numbers that stopped this company's texts (a STOP reply, or asked by hand): Settings → SMS and WhatsApp → "Opted out".
+router.get("/sms/opt-outs", requireAuth, requirePermission("settings", "view"), async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const rows = await db.select({ phone: smsOptOutsTable.phone, source: smsOptOutsTable.source, at: smsOptOutsTable.optedOutAt }).from(smsOptOutsTable).where(eq(smsOptOutsTable.userId, userId)).orderBy(desc(smsOptOutsTable.optedOutAt)).limit(200);
+    res.json({ items: rows.map((r) => ({ phone: formatPhone(r.phone), e164: r.phone, source: r.source, at: r.at.toISOString() })) });
+  } catch (err) {
+    req.log.error({ err }, "SMS opt-outs error");
     res.status(500).json({ error: "Internal server error" });
   }
 });

@@ -10,6 +10,8 @@ export const board = {
     light: { bg: "#ffffff", fg: "#141416", input: "#f3f2ef", inputFg: "#8a8a90", chip: "#f3f2ef", chipFg: "#3c3c43" },
     dark: { bg: "#1b1b1f", fg: "#f3f2ef", input: "#2a2a30", inputFg: "#9d9ca4", chip: "#2a2a30", chipFg: "#d0cfd5" },
   },
+  /** VideoPlayer: the dark stage whatever the app's theme is (.vp-*). */
+  player: { stage: "#0c0c0e", frame: "#141418", fg: "#f3f2ef", dim: "rgba(255,255,255,.62)", track: "rgba(255,255,255,.22)", border: "rgba(255,255,255,.35)", caption: "rgba(0,0,0,.72)", scrim: "rgba(12,12,14,.45)", card: "rgba(255,255,255,.94)", cardInk: "#141416", cardMuted: "#6e6e76", cardOk: "#1f7a45", wave: "#8b5cf6", cloud: "#92c8f3", glowA: "rgba(139,92,246,.42)", glowB: "rgba(56,189,160,.22)" },
   /** The WhatsApp preview bubble (.mt-bub.wa). */
   waBubble: "#1f7a45",
   /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */

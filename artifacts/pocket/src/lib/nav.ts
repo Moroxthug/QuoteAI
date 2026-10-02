@@ -43,6 +43,7 @@ export const BUILT = {
   Suppliers: "/suppliers",
   Supplier: "/supplier",
   Inventory: "/inventory",
+  Documents: "/documents",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

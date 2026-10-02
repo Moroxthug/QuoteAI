@@ -1,15 +1,22 @@
 import { Router } from "express";
 import multer from "multer";
-import { requireAuth, getUserId } from "../middlewares/authMiddleware";
-import { requirePermission } from "../middlewares/requirePermission.js";
+import { requireAuth, getUserId, getActorRole } from "../middlewares/authMiddleware";
+import { requirePermission, roleCan } from "../middlewares/requirePermission.js";
+import { kindOf } from "../materials/priceBook.js";
+import { almostReady, changedIn, docState, readOf, storePrices, topMover, type CostLines } from "../materials/documents.js";
+import { priceHistory, priceSeries, sameItem } from "../materials/suppliers.js";
 import {
   db,
+  clientsTable,
+  costEntriesTable,
+  priceCatalogItemsTable,
+  projectsTable,
   uploadedDocumentsTable,
   priceIntelligenceTable,
   priceIntelligenceAlertsTable,
   extractedDocumentDataSchema,
 } from "@workspace/db";
-import { eq, and, desc, avg, min, max, count, sql, isNull, isNotNull } from "drizzle-orm";
+import { eq, and, desc, avg, min, max, count, sql, isNull, isNotNull, inArray, gte } from "drizzle-orm";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { randomUUID } from "crypto";
@@ -305,6 +312,95 @@ router.post(
     }
   }
 );
+
+// GET /api/documents/overview — Pocket 127.7: the Documents screen. Prices are read from the cost entries the AI read (receipts and supplier
+// invoices); the list is the documents the company has uploaded (receipts, and old quotes read for prices), each with what was read from it.
+router.get("/documents/overview", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const now = new Date();
+    const since = new Date(now.getTime() - 190 * 86_400_000);
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const purposes = ["receipt", "price_intelligence"] as const;
+    const [docs, costRows, book, jobs] = await Promise.all([
+      db.select().from(uploadedDocumentsTable).where(and(eq(uploadedDocumentsTable.userId, userId), inArray(uploadedDocumentsTable.purpose, [...purposes]))).orderBy(desc(uploadedDocumentsTable.createdAt)).limit(500),
+      db.select({ vendor: costEntriesTable.vendor, date: costEntriesTable.date, ai: costEntriesTable.aiExtraction }).from(costEntriesTable)
+        .where(and(eq(costEntriesTable.userId, userId), gte(costEntriesTable.date, since), inArray(costEntriesTable.category, ["materials", "equipment", "misc"]))).orderBy(desc(costEntriesTable.date)).limit(3000),
+      db.select().from(priceCatalogItemsTable).where(eq(priceCatalogItemsTable.userId, userId)),
+      db.select({ id: projectsTable.id, name: projectsTable.name, status: projectsTable.status, clientId: projectsTable.clientId }).from(projectsTable).where(eq(projectsTable.userId, userId)).orderBy(desc(projectsTable.createdAt)).limit(300),
+    ]);
+
+    const costs: CostLines[] = costRows.map((r) => ({
+      vendor: r.vendor, date: r.date,
+      lines: Array.isArray(r.ai?.lines) ? r.ai!.lines.map((l) => ({ description: String(l.description ?? ""), unitPrice: typeof l.unitPrice === "number" ? l.unitPrice : null })) : [],
+    }));
+    const series = priceSeries(costs.map((c) => ({ at: c.date, lines: c.lines })));
+    const moved = priceHistory(series, now, 6, 200).filter((p) => p.when);
+
+    // The biggest mover, with who charges what and the price book's old price.
+    const top = topMover(series, now);
+    let trend = null as null | { name: string; from: number; to: number; changePct: number; points: number[]; invoices: number; stores: { name: string; at: string; price: number }[]; nudge: null | { itemId: string; bookPrice: number; newPrice: number; newCost: number | null } };
+    if (top) {
+      const item = top.changePct > 0.05 ? book.find((b) => kindOf(b.kind, b.um) === "material" && sameItem(b.nome, top.name) && Number(b.prezzoUnitario) < top.to - 0.004) : undefined;
+      let nudge = null as null | { itemId: string; bookPrice: number; newPrice: number; newCost: number | null };
+      if (item) {
+        const cost = item.unitCost == null ? null : Number(item.unitCost);
+        const bookPrice = Number(item.prezzoUnitario);
+        nudge = { itemId: item.id, bookPrice, newPrice: cost == null ? top.to : Math.round((bookPrice + (top.to - cost)) * 100) / 100, newCost: cost == null ? null : top.to };
+      }
+      trend = {
+        name: top.name, from: top.from, to: top.to, changePct: top.changePct, points: top.points,
+        invoices: costs.filter((c) => c.lines.some((l) => sameItem(l.description, top.name))).length,
+        stores: storePrices(costs, top.name), nudge,
+      };
+    }
+
+    // Key materials: the items with a price history, the latest store and the number of invoices behind it.
+    const materials = priceHistory(series, now, 6, 4).map((p) => {
+      const mine = costs.filter((c) => c.lines.some((l) => sameItem(l.description, p.name)));
+      return { name: p.name, store: mine[0]?.vendor.trim() ?? "", invoices: mine.length, price: p.to, changePct: p.changePct, points: p.points };
+    });
+
+    const names = new Map(jobs.map((j) => [j.id, j.name]));
+    const clientIds = [...new Set(jobs.map((j) => j.clientId).filter((x): x is string => !!x))];
+    const clients = clientIds.length ? new Map((await db.select({ id: clientsTable.id, name: clientsTable.name }).from(clientsTable).where(inArray(clientsTable.id, clientIds))).map((c) => [c.id, c.name])) : new Map<string, string>();
+
+    const movedNames = moved.map((m) => m.name);
+    const list = docs.slice(0, 12).map((d) => {
+      const r = readOf(d.extractedData);
+      return {
+        id: d.id, name: r.vendor || d.fileName, fileName: d.fileName, at: d.createdAt.toISOString(), state: docState(d.status, r.unread), prices: r.prices, unread: r.unread,
+        changed: changedIn(r.names, movedNames), projectId: d.projectId, projectName: d.projectId ? names.get(d.projectId) ?? null : null, kind: d.purpose === "receipt" ? "receipt" : "quote",
+      };
+    });
+    const perJob = new Map<string, number>();
+    let company = 0;
+    for (const d of docs) {
+      if (d.projectId && names.has(d.projectId)) perJob.set(d.projectId, (perJob.get(d.projectId) ?? 0) + 1);
+      else company++;
+    }
+    const folders = [...perJob.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id, count]) => {
+      const j = jobs.find((x) => x.id === id)!;
+      return { id, name: j.name, clientName: j.clientId ? clients.get(j.clientId) ?? null : null, count };
+    });
+    const canUpload = roleCan(getActorRole(res), "costs", "edit");
+    res.json({
+      canUpload,
+      files: docs.length,
+      readThisMonth: docs.filter((d) => d.status === "done" && d.createdAt >= monthStart).length,
+      trend,
+      almost: almostReady(series),
+      materials,
+      docs: list,
+      folders,
+      company,
+      fileUnder: jobs.filter((j) => j.status === "planning" || j.status === "active").slice(0, 6).map((j) => ({ id: j.id, name: j.name })),
+    });
+  } catch (err) {
+    logger.error({ err }, "Error building the documents overview");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // GET /api/documents/price-summary
 router.get("/documents/price-summary", requireAuth, async (req, res) => {

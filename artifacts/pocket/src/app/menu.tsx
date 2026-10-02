@@ -33,7 +33,7 @@ const GROUPS: { key: string; rows: RowDef[] }[] = [
     { key: "invoices", icon: "doc", tone: "azure" }, { key: "books", icon: "bank", tone: "sage", built: "Books" },
     { key: "analytics", icon: "bars", tone: "violet" }, { key: "integrations", icon: "sync", tone: "clay" } ] },
   { key: "workspace", rows: [
-    { key: "documents", icon: "file", tone: "indigo" }, { key: "materials", icon: "box", tone: "amber", built: "Inventory" },
+    { key: "documents", icon: "file", tone: "indigo", built: "Documents" }, { key: "materials", icon: "box", tone: "amber", built: "Inventory" },
     { key: "suppliers", icon: "building", tone: "stone", built: "Suppliers" }, { key: "service", icon: "star", tone: "teal" },
     { key: "imports", icon: "sync", tone: "sky" }, { key: "archive", icon: "box", tone: "slate" }, { key: "group", icon: "users", tone: "lilac" } ] },
   { key: "app", rows: [
@@ -77,7 +77,7 @@ export default function Menu() {
         <Section delay={60} px={16} pt={12}>
           <MenuQuick items={[
             { icon: "building", tone: "violet", label: t("menu.quick.company"), onPress: () => later(t("menu.rows.company.label")) },
-            { icon: "doc", tone: "indigo", label: t("menu.quick.documents"), onPress: () => later(t("menu.rows.documents.label")) },
+            { icon: "doc", tone: "indigo", label: t("menu.quick.documents"), onPress: () => router.push(builtHref("Documents") as Href) },
             { icon: "gift", tone: "clay", label: t("menu.quick.invite"), onPress: () => later(t("menu.rows.crew.label")) },
           ]} />
         </Section>

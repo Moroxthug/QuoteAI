@@ -45,6 +45,7 @@ export const BUILT = {
   Inventory: "/inventory",
   Documents: "/documents",
   Group: "/group",
+  Analytics: "/analytics",
 } as const;
 
 export type BuiltScreen = keyof typeof BUILT;

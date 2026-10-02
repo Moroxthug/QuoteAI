@@ -123,7 +123,7 @@ export type CompanyAnalytics = {
 
 export async function companyAnalytics(userId: string, opts: { months?: number; now?: Date } = {}): Promise<CompanyAnalytics> {
   const now = opts.now ?? new Date();
-  const months = Math.min(24, Math.max(3, opts.months ?? 6));
+  const months = Math.min(48, Math.max(3, opts.months ?? 6));
   const since = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - months + 1, 1));
   const [projects, invoices, costs] = await Promise.all([
     db.select().from(projectsTable).where(eq(projectsTable.userId, userId)).orderBy(desc(projectsTable.createdAt)).limit(500),

@@ -37,6 +37,7 @@ import * as help from "./help.ts";
 import * as video from "./video.ts";
 import * as dunning from "./dunning.ts";
 import * as jobRoles from "./jobRoles.ts";
+import * as assistantChat from "./assistantChat.ts";
 
 /** Dotted paths of every string, with plural suffixes folded (`open_one`, `open_other` → `open`). */
 function paths(v: unknown, prefix = ""): string[] {
@@ -46,7 +47,7 @@ function paths(v: unknown, prefix = ""): string[] {
   return [];
 }
 
-for (const [name, ns] of Object.entries({ crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts, priceBook, suppliers, inventory, documents, group, analytics, assistant, notifications, settings, settingsPages, profile, security, plan, messaging, templates, widget, archive, imports, integrations, quickbooks, feedback, whatsNew, help, video, dunning, jobRoles })) {
+for (const [name, ns] of Object.entries({ crew, foreman, team, crewMap, serviceCalls, books, pay, accountant, compliance, contracts, priceBook, suppliers, inventory, documents, group, analytics, assistant, notifications, settings, settingsPages, profile, security, plan, messaging, templates, widget, archive, imports, integrations, quickbooks, feedback, whatsNew, help, video, dunning, jobRoles, assistantChat })) {
   test(`${name}: French has every English string, and no extras`, () => {
     const en = new Set(paths(ns.en));
     const fr = new Set(paths(ns.fr));

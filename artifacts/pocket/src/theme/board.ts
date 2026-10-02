@@ -20,6 +20,8 @@ export const board = {
     tide: { base: "#08172a", glow: ["#3d8bff", "#6ef0d2", "#b7a6ff"] },
     stone: { base: "#1a1a1c", glow: ["#c9c4ba", "#8e8a84", "#f4efe6"] },
   },
+  /** HomeAI's assistant layer (.ai-layer, .orb, .glass): a near-black ground in both themes, the live orb's base and four blobs, glass buttons, the two bubbles and the muted look. */
+  assistantLayer: { ground: "#09090b", ambient: "rgba(106,47,191,.22)", orbBase: "#120b2e", blobs: ["#7b3fe4", "#4c9de5", "#6ec8f5", "#4f46e5"], shine: "rgba(255,255,255,.5)", glass: "rgba(255,255,255,.09)", glassRing: "rgba(255,255,255,.08)", mine: "rgba(255,255,255,.1)", bot: "rgba(255,255,255,.9)", placeholder: "rgba(255,255,255,.38)", muteBg: "rgba(255,90,70,.18)", muteFg: "#ff8a70", muteRing: "rgba(255,120,100,.35)", micShadow: "0 10px 30px -6px rgba(106,47,191,.45)", sendBg: "#6a2fbf" },
   /** Switch knob and the round tick's mark: white in both themes (.th .knob, .cp-box.rd.on). */
   white: "#ffffff",
   /** .cp-sw .knob */

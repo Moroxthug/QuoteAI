@@ -71,6 +71,7 @@ export const BUILT = {
   SetRoles: "/set-roles",
   CustomizeHome: "/customize-home",
   RoleHomes: "/role-homes",
+  Assistant: "/assistant",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

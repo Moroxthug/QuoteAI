@@ -47,7 +47,7 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   );
 }
 
-export type GlyphName = "lock" | "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun" | "phone" | "text" | "mail" | "grip";
+export type GlyphName = "lock" | "back" | "close" | "chevron" | "chevronDown" | "plus" | "minus" | "search" | "more" | "check" | "alert" | "play" | "mic" | "eye" | "eyeOff" | "gear" | "camera" | "arrowUp" | "dollar" | "photo" | "user" | "cloud" | "cloudRain" | "sun" | "phone" | "text" | "mail" | "grip" | "micOff" | "keyboard" | "wave";
 
 type Stroke = { w: number; round?: boolean };
 const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.ReactNode }> = {
@@ -87,6 +87,9 @@ const GLYPHS: Record<GlyphName, { stroke?: Stroke; draw: (c: string) => React.Re
   grip: { draw: (c) => (<>{[6, 12, 18].map((y) => [9, 15].map((x) => <Circle key={`${x}-${y}`} cx={x} cy={y} r={1.6} fill={c} />))}</>) },
   camera: { stroke: { w: 2.2, round: true }, draw: () => (<><Path d="M4 8h3l2-3h6l2 3h3v11H4z" /><Circle cx="12" cy="13" r="3.2" /></>) },
   mic: { stroke: { w: 2, round: true }, draw: () => (<><Rect x="9" y="3" width="6" height="11" rx="3" /><Path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></>) },
+  micOff: { stroke: { w: 1.9, round: true }, draw: () => <Path d="M15 9.5V6a3 3 0 0 0-5.7-1.3M9 9v2a3 3 0 0 0 4.6 2.5M5.5 11a6.5 6.5 0 0 0 10.4 5.2M18.5 11a6.4 6.4 0 0 1-.6 2.7M12 17.5V21M4 4l16 16" /> },
+  keyboard: { stroke: { w: 1.7, round: true }, draw: () => (<><Rect x="2.5" y="6" width="19" height="12" rx="3" /><Path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M8 14h8" /></>) },
+  wave: { stroke: { w: 1.9, round: true }, draw: () => <Path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4" /> },
 };
 
 /** A stroke glyph. `weight` overrides the board's stroke width where a board draws it heavier (e.g. plus 2.4, check 3.2). */

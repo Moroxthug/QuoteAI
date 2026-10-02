@@ -1,10 +1,11 @@
 import { Router } from "express";
 import multer from "multer";
-import { requireAuth } from "../middlewares/authMiddleware";
+import { requireAuth, getUserId } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { openai, toFile } from "@workspace/integrations-openai-ai-server";
 import { logger } from "../lib/logger.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
+import { recordVoiceUsage } from "../lib/usage.js";
 
 const speechLimiter = userRateLimiter({
   windowMs: 60 * 60 * 1000,
@@ -70,6 +71,7 @@ router.post(
         response_format: "json",
       });
 
+      recordVoiceUsage(getUserId(res), file.size);
       res.json({ text: transcription.text });
     } catch (err) {
       logger.error({ err }, "Error transcribing audio");

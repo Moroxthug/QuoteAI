@@ -3,6 +3,7 @@
 // whole logo (.th[data-theme="dark"] .logo{filter:brightness(1.4) saturate(1.1)}); here the gradient
 // stops are lightened by 1.4 instead.
 import { useId } from "react";
+import { View } from "react-native";
 import Svg, { Defs, G, LinearGradient, Path, Stop } from "react-native-svg";
 import { welcomeBoard } from "@/theme/welcomeBoard";
 import { useTheme } from "./theme";
@@ -40,5 +41,25 @@ export function Logo({ width = 104, label = "quoteAI" }: { width?: number; label
         <Path fill={`url(#w${id})`} d={WORD} />
       </G>
     </Svg>
+  );
+}
+
+/** The ring mark alone (the assistant's swirl in a header, `.swirl`): the same gradient, brightened at night. */
+export function Swirl({ size = 22 }: { size?: number }) {
+  const { scheme } = useTheme();
+  const id = useId().replace(/:/g, "");
+  const k = scheme === "dark" ? 1.4 : 1;
+  return (
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Defs>
+        <LinearGradient id={`s${id}`} x1="0" y1="0.62" x2="1" y2="0.38">
+          <Stop offset="0" stopColor={lift(welcomeBoard.logo.markFrom, k)} />
+          <Stop offset="1" stopColor={lift(welcomeBoard.logo.markTo, k)} />
+        </LinearGradient>
+      </Defs>
+      <Path fill={`url(#s${id})`} fillRule="evenodd" d={MARK} />
+    </Svg>
+    </View>
   );
 }

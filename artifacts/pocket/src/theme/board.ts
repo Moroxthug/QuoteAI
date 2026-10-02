@@ -1,6 +1,12 @@
 // Values Components.dc.html uses that tokens.json doesn't name. Kept here (src/theme) so
 // src/ui stays free of typed colours; sync:design doesn't touch this file.
 export const board = {
+  /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */
+  voiceOrbs: {
+    ember: { base: "#160e36", glow: ["#7b3fe4", "#6ec8f5", "#4c9de5"] },
+    tide: { base: "#08172a", glow: ["#3d8bff", "#6ef0d2", "#b7a6ff"] },
+    stone: { base: "#1a1a1c", glow: ["#c9c4ba", "#8e8a84", "#f4efe6"] },
+  },
   /** Switch knob and the round tick's mark: white in both themes (.th .knob, .cp-box.rd.on). */
   white: "#ffffff",
   /** .cp-sw .knob */

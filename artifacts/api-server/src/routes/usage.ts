@@ -32,6 +32,7 @@ router.get("/usage/summary", requireAuth, async (req, res) => {
       email: { quantity: 0, costCents: 0 },
       storage_bytes: { quantity: 0, costCents: 0 },
       sms: { quantity: 0, costCents: 0 },
+      voice_seconds: { quantity: 0, costCents: 0 },
     };
     for (const row of rows) {
       totals[row.kind].quantity += Number(row.quantity);

@@ -98,25 +98,40 @@ export function Skeleton({ width = "100%", height, radius = 6 }: { width?: Dimen
 }
 
 /** The toast pill itself (also used inline on the board). */
-export function Toast({ message, action, onAction }: { message: string; action?: string; onAction?: () => void }) {
+export function Toast({ message, lead, action, onAction, countdown }: { message: string; /** The bold start of the message ("Approved."). */ lead?: string; action?: string; onAction?: () => void; /** A 2 pt line along the bottom that runs out over this many ms (the assistant's 10 s window to undo). */ countdown?: number }) {
   const { colors } = useTheme();
+  const reduced = useReducedMotion();
+  const run = useSharedValue(1);
+  useEffect(() => {
+    if (!countdown) return;
+    run.value = reduced ? 0 : withTiming(0, { duration: countdown, easing: Easing.linear });
+  }, [countdown, reduced, run]);
+  const bar = useAnimatedStyle(() => ({ transform: [{ scaleX: run.value }] }));
   return (
     <View accessibilityRole="alert" accessibilityLiveRegion="polite"
       style={{
         flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44, borderRadius: 18, paddingVertical: 8, paddingRight: 8, paddingLeft: 16,
-        backgroundColor: colors.inv, boxShadow: cssShadow("0 14px 34px -12px var(--shadow)", colors),
+        backgroundColor: colors.inv, overflow: "hidden", boxShadow: cssShadow("0 14px 34px -12px var(--shadow)", colors),
       }}>
-      <Text size={14.5} color="on-inv" style={{ flexGrow: 1, flexShrink: 1 }}>{message}</Text>
+      <Text size={14.5} color="on-inv" style={{ flexGrow: 1, flexShrink: 1 }}>
+        {lead ? <Text size={14.5} weight={600} color="on-inv">{`${lead} `}</Text> : null}
+        {message}
+      </Text>
       {action ? (
         <Press onPress={onAction} accessibilityRole="button" style={{ height: 40, minWidth: 44, paddingHorizontal: 12, borderRadius: 12, justifyContent: "center", opacity: 0.9 }}>
           <Text size={14.5} weight={600} color="on-inv">{action}</Text>
         </Press>
       ) : null}
+      {countdown ? (
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, overflow: "hidden" }}>
+          <Animated.View style={[{ height: 2, backgroundColor: colors["on-inv"], opacity: 0.35, transformOrigin: "left" }, bar]} />
+        </View>
+      ) : null}
     </View>
   );
 }
 
-type ToastMsg = { message: string; action?: string; onAction?: () => void };
+type ToastMsg = { message: string; lead?: string; action?: string; onAction?: () => void; /** How long it stays, in ms (3 s). */ duration?: number; /** Shows the line that runs out over `duration`. */ countdown?: boolean };
 const ToastCtx = createContext<(t: ToastMsg) => void>(() => {});
 
 /** Show a toast: `const toast = useToast(); toast({ message, action: t("undo"), onAction })`. */
@@ -140,7 +155,7 @@ export function ToastHost({ children }: { children: ReactNode }) {
     setMsg(m);
     y.value = 1;
     y.value = withTiming(0, { duration: reduced ? 0 : tokens.motion.segmentThumb.duration, easing: SLIDE });
-    timer.current = setTimeout(hide, 3000);
+    timer.current = setTimeout(hide, m.duration ?? 3000);
   }, [hide, reduced, y]);
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   const style = useAnimatedStyle(() => ({ opacity: 1 - y.value, transform: [{ translateY: y.value * 24 }] }));
@@ -149,7 +164,7 @@ export function ToastHost({ children }: { children: ReactNode }) {
       {children}
       {msg ? (
         <Animated.View pointerEvents="box-none" style={[{ position: "absolute", left: 16, right: 16, bottom: 104 }, style]}>
-          <Toast message={msg.message} action={msg.action} onAction={() => { msg.onAction?.(); hide(); }} />
+          <Toast message={msg.message} lead={msg.lead} action={msg.action} onAction={() => { msg.onAction?.(); hide(); }} countdown={msg.countdown ? msg.duration ?? 3000 : undefined} />
         </Animated.View>
       ) : null}
     </ToastCtx.Provider>

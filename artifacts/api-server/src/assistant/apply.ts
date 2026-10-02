@@ -27,6 +27,7 @@ import { recomputeProgress } from "../jobs/setup.js";
 import { parseIsoDate } from "../jobs/dates.js";
 import { createChangeOrder } from "../jobs/changeOrders.js";
 import { roleCan, type PermissionAction, type PermissionArea } from "../middlewares/requirePermission.js";
+import { assistantEnabled, logActivity } from "./company.js";
 import { draftDepositInvoice, draftFinalInvoice, draftHoldbackReleaseInvoice, draftMilestoneInvoice, buildInvoiceContext, sendInvoice, recordPayment } from "../invoices/service.js";
 
 const FEATURE_FOR: Record<AssistantProposal["kind"], ProductFeature> = {
@@ -66,6 +67,15 @@ export async function confirmProposal(params: { userId: string; proposalId: stri
   try {
     const out = await execute(proposal, params.userId, params.ip ?? null, params.actorName ?? "");
     const [updated] = await db.update(assistantProposalsTable).set({ status: "confirmed", resultEntityType: out.entityType, resultEntityId: out.entityId, resolvedAt: new Date() }).where(eq(assistantProposalsTable.id, proposal.id)).returning();
+    // Pocket 128.1: what the person asked the assistant to do is written down in Activity, and a cost it added can be taken back.
+    if (assistantEnabled(profile)) {
+      const moneyKinds: AssistantProposal["kind"][] = ["cost_entry", "invoice", "send_invoice", "record_payment"];
+      await logActivity({
+        userId: params.userId, kind: proposal.kind === "cost_entry" ? "cost" : proposal.kind === "record_payment" ? "payment" : proposal.kind === "invoice" || proposal.kind === "send_invoice" ? "invoice" : proposal.kind === "task" ? "task" : proposal.kind === "milestone_update" || proposal.kind === "change_order" ? "job" : "note",
+        title: proposal.summary, params: {}, who: params.actorName || "You", whoKind: "you", category: moneyKinds.includes(proposal.kind) ? "money" : "jobs",
+        undo: proposal.kind === "cost_entry" ? "undo" : "none", undoData: proposal.kind === "cost_entry" ? { entity: "cost", id: out.entityId } : {}, entityType: out.entityType, entityId: out.entityId,
+      });
+    }
     return { proposal: updated!, ...out };
   } catch (err) {
     const message = (err as Error).message || "Could not apply the proposal";

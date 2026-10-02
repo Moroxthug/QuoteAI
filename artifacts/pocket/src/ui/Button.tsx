@@ -11,7 +11,7 @@ import { Press } from "./motion";
 import { Text, type Size } from "./Text";
 import { useTheme, type ColorName } from "./theme";
 
-export type ButtonKind = "primary" | "secondary" | "destructive" | "accent" | "link";
+export type ButtonKind = "primary" | "secondary" | "destructive" | "accent" | "link" | "ghost";
 export type ButtonSize = "sm" | "md" | "default" | "lg";
 
 const SIZES: Record<ButtonSize, { height: number; radius: number; font: Size; pad: number }> = {
@@ -31,6 +31,8 @@ function kindColors(kind: ButtonKind, c: Record<ColorName, string>): { bg: strin
     case "destructive": return { bg: c["bad-soft"], fg: c.bad };
     case "accent": return { bg: c.acc, fg: WHITE };
     case "link": return { bg: "transparent", fg: c["acc-t"] };
+    // The assistant's "Dismiss" (.ap-ghost): no fill, muted text.
+    case "ghost": return { bg: "transparent", fg: c.muted };
   }
 }
 

@@ -7,6 +7,7 @@ import { openai, toFile } from "@workspace/integrations-openai-ai-server";
 import { requireAuth, getUserId, getActorRole, getUserName } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
+import { recordVoiceUsage } from "../lib/usage.js";
 import { getOrCreateConversation, loadConversation, clearConversation, runAssistantTurn, type Lang } from "../assistant/service.js";
 import { confirmProposal, dismissProposal, ProposalError } from "../assistant/apply.js";
 import { photoUpload, serializePhoto, storeJobPhoto } from "../jobs/photos.js";
@@ -190,6 +191,7 @@ router.post("/assistant/voice", requireAuth, requirePermission("jobs", "edit"), 
       const uploadable = await toFile(file.buffer, file.originalname || "recording.webm", { type: file.mimetype });
       const out = await openai.audio.transcriptions.create({ file: uploadable, model: "whisper-large-v3-turbo", language, response_format: "json" }, { timeout: 30_000 });
       transcript = (out.text ?? "").trim();
+      recordVoiceUsage(getUserId(res), file.size);
     } catch (err) {
       req.log.error({ err }, "On-site transcription failed");
       res.status(502).json({ error: "TRANSCRIPTION_FAILED", message: "Could not transcribe that. Try again or type it." });

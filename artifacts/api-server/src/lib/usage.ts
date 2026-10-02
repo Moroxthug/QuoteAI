@@ -135,3 +135,15 @@ export async function rollUpUsageForDate(date: Date): Promise<{ rows: number }> 
 
   return { rows: rows.length };
 }
+
+/**
+ * What a spoken recording costs the company's voice minutes. Whisper's reply carries no length, so it is worked out from the file's size: a phone's
+ * voice recording is about 4 KB a second (32 kbit/s). Never under 1 second or over 5 minutes (the upload limit).
+ */
+export function estimateAudioSeconds(bytes: number): number {
+  return Math.min(300, Math.max(1, Math.round(bytes / 4000)));
+}
+
+export function recordVoiceUsage(userId: string, bytes: number): void {
+  void recordUsageEvent({ userId, kind: "voice_seconds", quantity: estimateAudioSeconds(bytes) });
+}

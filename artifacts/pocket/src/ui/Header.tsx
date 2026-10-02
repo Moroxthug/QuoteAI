@@ -17,12 +17,19 @@ export function IconButton({ glyph, label, onPress }: { glyph: "back" | "more" |
   );
 }
 
-export function Header({ title, onBack, backLabel, onMore, moreLabel, moreGlyph = "more", subtle }: { title: string; /** A reference (a quote number), not a name: 12.5 muted instead of 15/600. */ subtle?: boolean; onBack?: () => void; backLabel: string; onMore?: () => void; moreLabel?: string; moreGlyph?: "more" | "gear" }) {
+export function Header({ title, titleIcon, onBack, backLabel, onMore, moreLabel, moreGlyph = "more", subtle }: { title: string; /** A mark before the title (the assistant's swirl). */ titleIcon?: ReactNode; /** A reference (a quote number), not a name: 12.5 muted instead of 15/600. */ subtle?: boolean; onBack?: () => void; backLabel: string; onMore?: () => void; moreLabel?: string; moreGlyph?: "more" | "gear" }) {
   const insets = useSafeAreaInsets(); // the header sits below the status bar
   return (
     <View style={{ flexDirection: "row", alignItems: "center", minHeight: 52 + insets.top, paddingTop: 8 + insets.top, paddingHorizontal: 8 }}>
       <View style={{ width: 44 }}>{onBack ? <IconButton glyph="back" label={backLabel} onPress={onBack} /> : null}</View>
-      <Text size={subtle ? 12.5 : undefined} weight={subtle ? 400 : 600} color={subtle ? "muted" : "ink"} tracking={subtle ? 0 : -0.02} align="center" numberOfLines={1} accessibilityRole="header" style={{ flex: 1 }}>{title}</Text>
+      {titleIcon ? (
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          {titleIcon}
+          <Text weight={600} tracking={-0.02} numberOfLines={1} accessibilityRole="header" style={{ flexShrink: 1 }}>{title}</Text>
+        </View>
+      ) : (
+        <Text size={subtle ? 12.5 : undefined} weight={subtle ? 400 : 600} color={subtle ? "muted" : "ink"} tracking={subtle ? 0 : -0.02} align="center" numberOfLines={1} accessibilityRole="header" style={{ flex: 1 }}>{title}</Text>
+      )}
       <View style={{ width: 44 }}>{onMore && moreLabel ? <IconButton glyph={moreGlyph} label={moreLabel} onPress={onMore} /> : null}</View>
     </View>
   );

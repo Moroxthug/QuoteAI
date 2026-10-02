@@ -119,10 +119,10 @@ export function Status({ tone, shape, children, plain }: { tone: StatusTone; sha
   );
 }
 
-export function Tag({ children, accent }: { children: string; accent?: boolean }) {
+export function Tag({ children, accent, onCard }: { children: string; accent?: boolean; /** On a `sunk` box the tag takes the card colour (the assistant's "It will text" label). */ onCard?: boolean }) {
   const { colors } = useTheme();
   return (
-    <View style={{ alignSelf: "flex-start", justifyContent: "center", minHeight: 24, paddingHorizontal: 9, borderRadius: 8, backgroundColor: accent ? colors["acc-soft"] : colors.sunk }}>
+    <View style={{ alignSelf: "flex-start", justifyContent: "center", minHeight: 24, paddingHorizontal: 9, borderRadius: 8, backgroundColor: accent ? colors["acc-soft"] : onCard ? colors.card : colors.sunk }}>
       <Text size={11.5} weight={600} color={accent ? "acc-soft-t" : "t2"} numberOfLines={1}>{children}</Text>
     </View>
   );

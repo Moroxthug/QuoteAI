@@ -21,6 +21,7 @@ export * from "./jobs";
 export * from "./costs";
 export * from "./invoices";
 export * from "./assistant";
+export * from "./assistant-company";
 export * from "./organization-members";
 export * from "./usage";
 export * from "./leads";

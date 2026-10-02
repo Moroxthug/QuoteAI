@@ -14,6 +14,7 @@ export const USAGE_EVENT_KINDS = [
   "email",
   "storage_bytes",
   "sms",
+  "voice_seconds",
 ] as const;
 export type UsageEventKind = (typeof USAGE_EVENT_KINDS)[number];
 

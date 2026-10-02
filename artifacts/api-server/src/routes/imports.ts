@@ -22,6 +22,9 @@ import { ensureClientForQuote } from "../lib/clients.js";
 import { logger } from "../lib/logger.js";
 import { parseSpreadsheet } from "../imports/parseSpreadsheet.js";
 import { readImportedQuotePdf } from "../imports/quoteImportAi.js";
+import { readSheet } from "../imports/readSheet.js";
+import { planClientRows, type ClientRow } from "../imports/clientRows.js";
+import { z } from "zod";
 import { currentActorId } from "../lib/requestContext.js";
 
 // ── Phase 14: data migration / import ────────────────────────────────────────
@@ -212,6 +215,65 @@ router.post(
     }
   },
 );
+
+// POST /api/imports/sheet — multipart { file } (CSV or XLSX) → { fileName, headers, rows, total }: what the phone maps to clients or price items. Nothing is stored.
+router.post(
+  "/imports/sheet",
+  requireAuth,
+  requirePermission("imports", "edit"),
+  importLimiter,
+  (req, res, next) => {
+    spreadsheetUpload.single("file")(req, res, (err) => {
+      if (err instanceof multer.MulterError || err instanceof Error) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      next(err);
+    });
+  },
+  (req, res) => {
+    const file = req.file;
+    if (!file) { res.status(400).json({ error: "No file provided" }); return; }
+    const sheet = readSheet(file.buffer);
+    if (!sheet) { res.status(400).json({ error: "Could not read that file. Check it's a CSV or Excel file with a header row and at least one row." }); return; }
+    res.json({ fileName: file.originalname, ...sheet });
+  },
+);
+
+const ClientRowsBody = z.object({
+  rows: z.array(z.object({
+    row: z.number().int().min(1),
+    name: z.string().max(200),
+    phone: z.string().max(60).optional(),
+    email: z.string().max(200).optional(),
+    address: z.string().max(300).optional(),
+    notes: z.string().max(2000).optional(),
+  })).max(5000),
+});
+
+// POST /api/imports/clients — { rows } → the rows that were clean are added at once; those that look like a client you have, and those with a mistake, come back for the person to decide.
+router.post("/imports/clients", requireAuth, requirePermission("imports", "edit"), importLimiter, async (req, res) => {
+  try {
+    const userId = getUserId(res);
+    const body = ClientRowsBody.safeParse(req.body);
+    if (!body.success) { res.status(400).json({ error: "Invalid rows" }); return; }
+    const existing = await db.select({ id: clientsTable.id, name: clientsTable.name, email: clientsTable.email, phone: clientsTable.phone, dedupKey: clientsTable.dedupKey }).from(clientsTable).where(eq(clientsTable.userId, userId));
+    const plan = planClientRows(body.data.rows as ClientRow[], existing);
+    let added = 0;
+    for (let i = 0; i < plan.clean.length; i += 200) {
+      const chunk = plan.clean.slice(i, i + 200);
+      const inserted = await db.insert(clientsTable).values(chunk.map((r) => ({
+        userId, name: r.name, email: r.email?.trim() || null, phone: r.phone?.trim() || null, address: r.address?.trim() || null, notes: r.notes?.trim() || "",
+        dedupKey: clientDedupKey({ name: r.name, email: r.email, phone: r.phone }),
+      }))).onConflictDoNothing().returning({ id: clientsTable.id });
+      added += inserted.length;
+    }
+    res.status(201).json({ added, matches: plan.matches, errors: plan.errors, skipped: plan.skipped + (plan.clean.length - added) });
+  } catch (err) {
+    req.log.error({ err }, "Error importing clients");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // POST /api/imports/pdf — multipart { files[] } (up to 20 PDFs) → one candidate per PDF, AI-read
 router.post(

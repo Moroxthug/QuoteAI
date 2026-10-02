@@ -38,6 +38,10 @@ export type MemberPrefs = {
   confirmSend?: boolean;
   /** The app's language, when chosen here. */
   language?: "en" | "fr";
+  /** Pocket 128.3 (Profile): the person's job title and mobile, and the signature they drew (SVG path data in a 330 x 92 box) for quotes and contracts. */
+  jobTitle?: string;
+  mobile?: string;
+  signature?: string;
 };
 
 export const memberPreferencesTable = pgTable(

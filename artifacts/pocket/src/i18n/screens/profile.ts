@@ -1,0 +1,36 @@
+// Profile (Profile.dc.html and ProfileFR). French follows the board; (owner) = my own wording, to review; (new) = not on the board.
+export const en = {
+  back: "Back", retry: "Try again", close: "Close", title: "Profile", photo: "Change photo", photoSoon: "Profile photos aren’t available yet.",
+  loadFailed: { title: "Couldn’t load your profile", body: "Check your connection and try again." },
+  offline: { lead: "No connection.", body: "Changes stay on this phone and sync later." },
+  numbers: { title: "My numbers", period: "Period", periods: ["Month", "Quarter", "Year"], month: "Month", sent: "Sent", won: "Won", invoiced: "Invoiced" },
+  k: { made: "Quotes made", sent: "Sent", won: "Won", invoiced: "Invoiced", hours: "Hours", jobs: "Jobs" },
+  sub: { onMonth: "{{arrow}} {{n}} on {{label}}", sameAs: "Same as {{label}}", ofMade: "{{pct}}% of made", pts: "{{arrow}} {{n}} pts", pct: "{{arrow}} {{n}}%", hours: "Not tracked", active: "{{count}} active now", none: "None sent yet" },
+  details: "Details", f: { name: "Full name", title: "Job title", phone: "Mobile", email: "Email" }, emailNote: "Your sign-in email. To change it, contact support.",
+  lang: { label: "Language", sub: "App, quotes and emails to you", en: "English", fr: "Français" },
+  sig: { title: "Signature for quotes", redraw: "Redraw", draw: "Draw your signature", alt: "Your signature", on: "Added to quotes and contracts", none: "Not drawn yet", save: "Save", clear: "Clear", cancel: "Cancel", sheet: "Draw your signature", sheetSub: "Use your finger, on the line", saved: "Signature saved" },
+  notif: { label: "Notifications", sub: "{{on}} of {{total}} kinds on" }, sec: { label: "Sign-in and security", sub: "Password, two-step, sessions" },
+  signOut: "Sign out", saved: "Profile saved", save: "Save changes", saveOff: "Save on this phone", discard: "Discard changes",
+  out: { q: "Sign out of quoteAI?", sub: "Your work stays in {{company}}. Sign in again any time.", unsentBody: "They’re lost if you sign out now.", unsent_one: "{{count}} change not sent yet.", unsent_other: "{{count}} changes not sent yet.", cancel: "Cancel" },
+  toast: { failed: "Couldn’t save that.", offline: "You’re offline. Try again when you’re back online.", nameFailed: "Couldn’t change your name." },
+  foot: "{{email}} · v{{version}}",
+  role: { owner: "Owner", admin: "Admin", office: "Office", foreman: "Foreman", viewer: "Viewer", accountant: "Accountant" },
+};
+
+export const fr: typeof en = {
+  back: "Retour", retry: "Réessayer", close: "Fermer", title: "Profil", photo: "Changer la photo", photoSoon: "Les photos de profil ne sont pas encore offertes.",
+  loadFailed: { title: "Impossible de charger votre profil", body: "Vérifiez votre connexion et réessayez." },
+  offline: { lead: "Pas de connexion.", body: "Les changements restent sur ce téléphone." },
+  numbers: { title: "Mes chiffres", period: "Période", periods: ["Mois", "Trimestre", "Année"], month: "Mois", sent: "Envoyées", won: "Gagnées", invoiced: "Facturé" },
+  k: { made: "Soumissions", sent: "Envoyées", won: "Gagnées", invoiced: "Facturé", hours: "Heures", jobs: "Chantiers" },
+  sub: { onMonth: "{{arrow}} {{n}} sur {{label}}", sameAs: "Pareil que {{label}}", ofMade: "{{pct}} % des faites", pts: "{{arrow}} {{n}} pts", pct: "{{arrow}} {{n}} %", hours: "Non suivies", active: "{{count}} actifs en ce moment", none: "Aucune envoyée" },
+  details: "Coordonnées", f: { name: "Nom complet", title: "Poste", phone: "Cellulaire", email: "Courriel" }, emailNote: "Votre courriel de connexion. Pour le changer, contactez le soutien.",
+  lang: { label: "Langue", sub: "Appli, soumissions et courriels", en: "English", fr: "Français" },
+  sig: { title: "Signature des soumissions", redraw: "Refaire", draw: "Dessiner votre signature", alt: "Votre signature", on: "Ajoutée aux soumissions et contrats", none: "Pas encore dessinée", save: "Enregistrer", clear: "Effacer", cancel: "Annuler", sheet: "Dessinez votre signature", sheetSub: "Du doigt, sur la ligne", saved: "Signature enregistrée" },
+  notif: { label: "Notifications", sub: "{{on}} types sur {{total}} activés" }, sec: { label: "Connexion et sécurité", sub: "Mot de passe, deux étapes, sessions" },
+  signOut: "Se déconnecter", saved: "Profil enregistré", save: "Enregistrer", saveOff: "Enregistrer sur ce téléphone", discard: "Annuler les changements",
+  out: { q: "Se déconnecter de quoteAI?", sub: "Votre travail reste dans {{company}}. Reconnectez-vous quand vous voulez.", unsentBody: "Ils seront perdus si vous vous déconnectez.", unsent_one: "{{count}} changement non envoyé.", unsent_other: "{{count}} changements non envoyés.", cancel: "Annuler" },
+  toast: { failed: "Impossible d’enregistrer.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", nameFailed: "Impossible de changer votre nom." },
+  foot: "{{email}} · v{{version}}",
+  role: { owner: "Propriétaire", admin: "Administrateur", office: "Bureau", foreman: "Contremaître", viewer: "Lecture seule", accountant: "Comptable" },
+};

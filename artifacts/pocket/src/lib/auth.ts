@@ -99,6 +99,9 @@ export const auth = {
 
   signOut: async () => result(await call("/sign-out", {}), nothing),
 
+  /** Changes the signed-in person's name (and photo, as an address or a data URL). */
+  updateUser: async (patch: { name?: string; image?: string }) => result(await call("/update-user", patch), nothing),
+
   async session(): Promise<AuthResult<{ id: string; name: string; email: string; image: string | null } | null>> {
     const raw = await call("/get-session", undefined, "GET");
     return result(raw, (b) => {

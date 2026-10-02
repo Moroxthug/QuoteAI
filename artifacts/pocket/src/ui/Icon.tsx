@@ -9,7 +9,9 @@ import icons from "@/theme/icons.json";
 import tones from "@/theme/tones.json";
 import { useTheme, type ColorName } from "./theme";
 
-export type IconName = keyof typeof icons.glyphs;
+/** Glyphs the screens' boards draw that the handoff's icons.json doesn't carry (Settings → Text size: a letter A with a dot). */
+const EXTRA_GLYPHS = { text: { d1: "M12 8L17 21.5H14.8L13.8 18.6H10.2L9.2 21.5H7Z", d2: "M17.5 18.8a2.7 2.7 0 1 0 5.4 0a2.7 2.7 0 1 0 -5.4 0Z", d3: "M0 0Z" } } as const;
+export type IconName = keyof typeof icons.glyphs | keyof typeof EXTRA_GLYPHS;
 
 // Android / iOS accessibility props; react-native-svg passes them to the DOM on web.
 const a11y = (label?: string) => (Platform.OS === "web" ? {} : { accessible: !!label, accessibilityLabel: label, importantForAccessibility: label ? ("yes" as const) : ("no-hide-descendants" as const) });
@@ -26,7 +28,7 @@ export function Icon({ name, tone = "violet", size = 28, label }: { name: IconNa
   const id = useId().replace(/:/g, "");
   const t = tones[tone];
   const k = scheme === "dark" ? 1.15 : 1;
-  const g = icons.glyphs[name] as { d1: string; d2: string; d3: string };
+  const g = (name in EXTRA_GLYPHS ? EXTRA_GLYPHS[name as keyof typeof EXTRA_GLYPHS] : icons.glyphs[name as keyof typeof icons.glyphs]) as { d1: string; d2: string; d3: string };
   const layers: [string, number][] = [
     [g.d3, 0.35],
     [g.d2, 0.6],

@@ -272,15 +272,15 @@ export function ValueLink({ value, onPress, label, disabled }: { value: string; 
 
 const ORBS = board.voiceOrbs;
 
-/** `.pm-orb`: a 26 voice orb, a dark ground with three soft glows; the chosen one gets a ring in `ink`. */
-function VoiceOrb({ voice, on }: { voice: keyof typeof ORBS; on: boolean }) {
+/** `.pm-orb` (26) and `.vo` (48): a voice orb, a dark ground with three soft glows; on the Permissions board the chosen one gets a ring in `ink`, in Settings its picker draws the ring. */
+export function VoiceOrb({ voice, on, size = 26, ring = true }: { voice: keyof typeof ORBS; on?: boolean; size?: number; ring?: boolean }) {
   const { colors } = useTheme();
   const id = useId().replace(/:/g, "");
   const o = ORBS[voice];
   const spots: [number, number][] = [[6.6, 9.8], [20.4, 19.4], [17.8, 4.6]];
   return (
-    <View style={{ width: 26, height: 26, borderRadius: 13, overflow: "hidden", boxShadow: on ? `0 0 0 2px ${colors.card}, 0 0 0 3.5px ${colors.ink}` : `0 0 0 1px ${colors.line2}` }}>
-      <Svg width={26} height={26} viewBox="0 0 26 26">
+    <View style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", boxShadow: !ring ? undefined : on ? `0 0 0 2px ${colors.card}, 0 0 0 3.5px ${colors.ink}` : `0 0 0 1px ${colors.line2}` }}>
+      <Svg width={size} height={size} viewBox="0 0 26 26">
         <Defs>
           {o.glow.map((c, i) => (
             <RadialGradient key={c} id={`${id}${i}`} cx="50%" cy="50%" r="50%">

@@ -1,6 +1,8 @@
 // Values Components.dc.html uses that tokens.json doesn't name. Kept here (src/theme) so
 // src/ui stays free of typed colours; sync:design doesn't touch this file.
 export const board = {
+  /** SetCompany's brand colours for quotes and invoices (the swatches, in the board's order); what is saved is the hex. */
+  brandColours: { violet: "#6A2FBF", harbour: "#1F4F86", forest: "#1F7A45", brick: "#B4462B", teal: "#1E7F80", charcoal: "#2B2B30" },
   /** The notification opt-in sheet's halo (.nt-stage::before: rgba(163,135,244,.32) → 0). */
   pushHalo: "#a387f4",
   /** The three assistant voices as AssistantPermissions draws them (.pm-orb: a dark ground and three glows). */

@@ -27,12 +27,12 @@ export type TextProps = Omit<RNTextProps, "style"> & {
   children?: ReactNode;
 };
 
-function base({ size = 15, weight = 400, tracking = -0.01, leading, align, opacity }: TextProps, color: string): TextStyle {
+function base({ size = 15, weight = 400, tracking = -0.01, leading, align, opacity }: TextProps, color: string, scale = 1): TextStyle {
   return {
-    fontSize: size,
+    fontSize: size * scale,
     color,
-    letterSpacing: tracking * size,
-    lineHeight: leading ? Math.round(leading * size) : undefined,
+    letterSpacing: tracking * size * scale,
+    lineHeight: leading ? Math.round(leading * size * scale) : undefined,
     textAlign: align,
     opacity,
     fontWeight: undefined,
@@ -41,7 +41,7 @@ function base({ size = 15, weight = 400, tracking = -0.01, leading, align, opaci
 }
 
 export function Text(props: TextProps) {
-  const { colors } = useTheme();
+  const { colors, textScale } = useTheme();
   const { size, weight = 400, color = "ink", tint, tracking, leading, align, opacity, style, children, ...rest } = props;
   const words = geist(weight);
   const digits = manrope(weight);
@@ -58,17 +58,17 @@ export function Text(props: TextProps) {
     );
   });
   return (
-    <RNText {...rest} style={[base(props, tint ?? colors[color]), { fontFamily: words }, style]}>
+    <RNText {...rest} style={[base(props, tint ?? colors[color], textScale), { fontFamily: words }, style]}>
       {parts}
     </RNText>
   );
 }
 
 export function Num(props: TextProps) {
-  const { colors } = useTheme();
+  const { colors, textScale } = useTheme();
   const { size, weight = 600, color = "ink", tint, tracking = 0, leading, align, opacity, style, children, ...rest } = props;
   return (
-    <RNText {...rest} style={[base({ ...props, tracking }, tint ?? colors[color]), { fontFamily: manrope(weight), fontVariant: ["tabular-nums"] }, style]}>
+    <RNText {...rest} style={[base({ ...props, tracking }, tint ?? colors[color], textScale), { fontFamily: manrope(weight), fontVariant: ["tabular-nums"] }, style]}>
       {children}
     </RNText>
   );

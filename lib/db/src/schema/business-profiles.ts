@@ -86,6 +86,9 @@ export type CompanySetup = {
   completedAt?: string;
 };
 
+/** Choices the Settings pages save by page; each page's keys are validated where they are written. */
+export type PocketSettings = Record<string, Record<string, unknown>>;
+
 export const businessProfilesTable = pgTable("business_profiles", {
   userId: text("user_id").primaryKey(),
   companyName: text("company_name").notNull().default(""),
@@ -117,6 +120,14 @@ export const businessProfilesTable = pgTable("business_profiles", {
   materialsMarkupPercent: numeric("materials_markup_percent", { precision: 5, scale: 2 }),
   quoteCopyToMe: boolean("quote_copy_to_me").notNull().default(false),
   units: text("units", { enum: ["imperial", "metric", "both"] }),
+  /** Pocket 128.3 (SetCompany): the legal name (company_name is the operating name), the WSIB firm number, the website, the colour on documents and the language of quotes and invoices. */
+  legalName: text("legal_name"),
+  wsibNumber: text("wsib_number"),
+  website: text("website"),
+  brandColor: text("brand_color"),
+  docLanguage: text("doc_language", { enum: ["en", "fr"] }),
+  /** Pocket 128.3 to 128.5 (the Settings pages): choices by page (tax, quotes, invoices, messaging, widget…), validated by routes/business-profile.ts. */
+  pocketSettings: jsonb("pocket_settings").$type<PocketSettings>().notNull().default({}),
   /** Pocket (Phase 149): the local day the 6:30 morning brief last went out (once a day). */
   lastBriefDay: date("last_brief_day"),
   // ── Phase 10: review requests ────────────────────────────────────────────

@@ -37,7 +37,7 @@ const GROUPS: { key: string; rows: RowDef[] }[] = [
     { key: "suppliers", icon: "building", tone: "stone", built: "Suppliers" }, { key: "service", icon: "star", tone: "teal" },
     { key: "imports", icon: "sync", tone: "sky" }, { key: "archive", icon: "box", tone: "slate" }, { key: "group", icon: "users", tone: "lilac", built: "Group" } ] },
   { key: "app", rows: [
-    { key: "assistant", icon: "orb", tone: "violet", built: "AssistantProposals" }, { key: "settings", icon: "gear", tone: "slate" },
+    { key: "assistant", icon: "orb", tone: "violet", built: "AssistantProposals" }, { key: "settings", icon: "gear", tone: "slate", built: "Settings" },
     { key: "notifications", icon: "bell", tone: "sky", built: "Notifications" }, { key: "help", icon: "help", tone: "stone" },
     { key: "whatsNew", icon: "gift", tone: "clay" }, { key: "feedback", icon: "chat", tone: "azure" } ] },
 ];
@@ -64,10 +64,10 @@ export default function Menu() {
     <Screen>
       <ScrollPage bottom={44}>
         <Header title="" backLabel={t("menu.back")} onBack={() => (router.canGoBack() ? router.back() : router.replace("/home"))}
-          moreLabel={t("menu.settings")} moreGlyph="gear" onMore={() => later(t("menu.rows.settings.label"))} />
+          moreLabel={t("menu.settings")} moreGlyph="gear" onMore={() => router.push(builtHref("Settings") as Href)} />
         <Section>
           <MenuIdentity initials={user ? initialsOf(user.name) : ""} name={user?.name ?? ""} sub={[company, role].filter(Boolean).join(" · ")}
-            photoLabel={t("menu.changePhoto")} onPhoto={() => later(t("menu.rows.settings.label"))} onName={() => later(user?.name ?? "")} />
+            photoLabel={t("menu.changePhoto")} onPhoto={() => router.push(builtHref("Profile") as Href)} onName={() => router.push(builtHref("Profile") as Href)} />
         </Section>
         {planName ? (
           <Section delay={50} px={16} pt={22}>

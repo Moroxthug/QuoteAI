@@ -10,7 +10,7 @@ import { shadow } from "./shadow";
 import { Text } from "./Text";
 import { useTheme } from "./theme";
 
-export function Segmented({ options, value, onChange, label }: { options: string[]; value: number; onChange: (i: number) => void; label: string }) {
+export function Segmented({ options, value, onChange, label, labels }: { options: string[]; value: number; onChange: (i: number) => void; label: string; /** What a screen reader says for each option when it is a symbol (the three "A"s of Text size). */ labels?: string[] }) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
   const [width, setWidth] = useState(0);
@@ -32,7 +32,7 @@ export function Segmented({ options, value, onChange, label }: { options: string
         const on = i === value;
         return (
           // 32 drawn inside the 36 track; the track's padding and a 4 pt slop make the 44 tap.
-          <Pressable key={o} onPress={() => onChange(i)} accessibilityRole="radio" accessibilityLabel={o} accessibilityState={{ checked: on }} hitSlop={{ top: 6, bottom: 6 }}
+          <Pressable key={`${i}-${o}`} onPress={() => onChange(i)} accessibilityRole="radio" accessibilityLabel={labels?.[i] ?? o} accessibilityState={{ checked: on }} hitSlop={{ top: 6, bottom: 6 }}
             style={{ flex: 1, height: inner, alignItems: "center", justifyContent: "center" }}>
             <Text size={13.5} weight={on ? 600 : 500} color={on ? "ink" : "muted"} numberOfLines={1}>{o}</Text>
           </Pressable>

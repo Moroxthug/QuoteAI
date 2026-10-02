@@ -32,6 +32,12 @@ function serializeProfileExtras(profile: BusinessProfile | undefined) {
   return {
     province,
     taxProfile: province ? getTaxProfile(province) : null,
+    legalName: profile?.legalName ?? null,
+    wsibNumber: profile?.wsibNumber ?? null,
+    website: profile?.website ?? null,
+    brandColor: profile?.brandColor ?? null,
+    docLanguage: profile?.docLanguage ?? null,
+    pocketSettings: profile?.pocketSettings ?? {},
     gstHstNumber: profile?.gstHstNumber ?? null,
     qstNumber: profile?.qstNumber ?? null,
     pstNumber: profile?.pstNumber ?? null,
@@ -54,7 +60,35 @@ function serializeProfileExtras(profile: BusinessProfile | undefined) {
   };
 }
 
+// Pocket 128.3 to 128.5: what the Settings pages save by page. A page the server knows is checked key by key; any other page is kept as sent, small.
+const bool = z.boolean();
+const PocketSections = z.object({
+  tax: z.object({ byJobProvince: bool, split: bool, showAs: z.enum(["line", "included"]), perLine: bool, showNumber: bool, exempt: z.array(z.object({ clientId: z.string().max(80), reason: z.enum(["rebate", "exempt"]) })).max(50) }).partial().strict(),
+  quotes: z.object({ goodBetterBest: bool, acceptanceEmail: bool, terms: z.string().max(4000), followupMessages: z.array(z.string().max(1000)).max(5), followupOn: z.array(bool).max(5), followupDays: z.array(z.number().int().min(1).max(365)).max(5) }).partial().strict(),
+  invoices: z.object({
+    numberPrefix: z.string().max(12), nextNumber: z.number().int().min(1).max(999999), terms: z.enum(["receipt", "net15", "net30"]), sendDelayDays: z.number().int().min(0).max(7),
+    reminderBefore: bool, reminderDue: bool, reminderAfter: bool, reminderBy: z.enum(["email", "sms", "both"]),
+    payEtransfer: bool, payCheque: bool, chequePayableTo: z.string().max(200),
+    holdbackOn: bool, holdbackPercent: z.number().min(0).max(20), holdbackReleaseDays: z.number().int().min(0).max(365),
+    lateFeeOn: bool, lateFeeRate: z.number().min(0.5).max(5), lateFeeAfterDays: z.number().int().min(0).max(60),
+  }).partial().strict(),
+}).partial();
+const PocketSettingsBody = z.record(z.string().max(40), z.record(z.string().max(60), z.unknown())).superRefine((v, ctx) => {
+  if (JSON.stringify(v).length > 20_000) ctx.addIssue({ code: "custom", message: "Too large" });
+  for (const key of ["tax", "quotes", "invoices"] as const) {
+    if (v[key] === undefined) continue;
+    const r = PocketSections.shape[key].unwrap().safeParse(v[key]);
+    if (!r.success) ctx.addIssue({ code: "custom", message: `Invalid ${key}`, path: [key] });
+  }
+});
+
 const ProfileExtrasBody = z.object({
+  legalName: z.string().max(200).nullable().optional(),
+  wsibNumber: z.string().max(40).nullable().optional(),
+  website: z.string().max(200).nullable().optional(),
+  brandColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+  docLanguage: z.enum(["en", "fr"]).nullable().optional(),
+  pocketSettings: PocketSettingsBody.optional(),
   province: z.string().nullable().optional(),
   gstHstNumber: z.string().max(40).nullable().optional(),
   qstNumber: z.string().max(40).nullable().optional(),
@@ -178,6 +212,15 @@ router.put("/business-profile", requireAuth, requirePermission("settings", "edit
       ...(body.phone !== undefined && { phone: body.phone }),
       ...(body.email !== undefined && { email: body.email }),
       ...(province !== undefined && { province }),
+      ...(extras.legalName !== undefined && { legalName: extras.legalName?.trim() || null }),
+      ...(extras.wsibNumber !== undefined && { wsibNumber: extras.wsibNumber?.trim() || null }),
+      ...(extras.website !== undefined && { website: extras.website?.trim() || null }),
+      ...(extras.brandColor !== undefined && { brandColor: extras.brandColor }),
+      ...(extras.docLanguage !== undefined && { docLanguage: extras.docLanguage }),
+      ...(extras.pocketSettings !== undefined && {
+        // A page changes only the keys it sends.
+        pocketSettings: Object.fromEntries([...new Set([...Object.keys(existing?.pocketSettings ?? {}), ...Object.keys(extras.pocketSettings)])].map((k) => [k, { ...(existing?.pocketSettings?.[k] ?? {}), ...(extras.pocketSettings![k] ?? {}) }])),
+      }),
       ...(extras.gstHstNumber !== undefined && { gstHstNumber: extras.gstHstNumber?.trim() || null }),
       ...(extras.qstNumber !== undefined && { qstNumber: extras.qstNumber?.trim() || null }),
       ...(extras.pstNumber !== undefined && { pstNumber: extras.pstNumber?.trim() || null }),

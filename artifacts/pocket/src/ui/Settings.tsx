@@ -132,7 +132,7 @@ export function SetValue({ value, mono, chevron }: { value: string; mono?: boole
 
 /** A button in a row's control slot (Connect, Change). */
 export function SetButton({ label, kind = "secondary", onPress, disabled }: { label: string; kind?: "primary" | "secondary"; onPress: () => void; disabled?: boolean }) {
-  return <Button size="sm" kind={kind} label={label} onPress={onPress} disabled={disabled} />;
+  return <View style={{ alignSelf: "center", flexShrink: 0 }}><Button size="sm" kind={kind} label={label} onPress={onPress} disabled={disabled} /></View>;
 }
 
 /** `.set-in`: a row's field: the label 12.5 muted over the value 15, in the same card as the other rows. */

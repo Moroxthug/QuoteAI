@@ -210,7 +210,7 @@ export function TermsField({ label, value, onChange, onBlur, disabled }: { label
 
 /** A status pill in a row's control slot. */
 export function RowStatus({ tone, shape, children }: { tone: StatusTone; shape?: StatusShape; children: string }) {
-  return <Status tone={tone} shape={shape}>{children}</Status>;
+  return <View style={{ alignSelf: "center", flexShrink: 0 }}><Status tone={tone} shape={shape}>{children}</Status></View>;
 }
 
 export function InlineBanner({ children }: { children: ReactNode }) {

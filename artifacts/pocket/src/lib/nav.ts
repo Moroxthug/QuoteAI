@@ -49,6 +49,7 @@ export const BUILT = {
   Notifications: "/notifications",
   Settings: "/settings",
   Profile: "/profile",
+  SetSecurity: "/set-security",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

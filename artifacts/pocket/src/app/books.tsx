@@ -2,7 +2,6 @@
 // fixed, or is marked N/A for the month) and the bank lines to match, record as a cost or ignore. Reads /api/books/*.
 // Not built: the server has no "not needed" mark, so N/A is kept on this phone; no "sends it to QuickBooks" on close (the close is a lock and a record).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RoleTabs } from "@/ui/TabShell";
 import { ScrollView, View, type LayoutChangeEvent } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -233,7 +232,7 @@ export default function Books() {
   const choose = (fn: () => Promise<unknown>, done: string) => { const l = pick; setPick(null); if (l) void run(l.id, fn, done); };
 
   return (
-    <Screen floating={<RoleTabs active="books" />}>
+    <Screen>
       <Header title="" backLabel={m("back")} onBack={back} moreLabel={m("more")} onMore={() => setMenu(true)} />
       <ScrollPage bottom={48} scrollRef={scroll}>
         <Section px={20} gap={6}>

@@ -5,7 +5,6 @@
 // Not built: the board's weather row and the client's phone row (the schedule's data has neither), "Message crew" (no way to text a crew member yet: the
 // action is "Move"). States built: loading, can't load, offline, plan (the board needs Pro).
 import { useMemo, useState } from "react";
-import { RoleTabs, useIsTab } from "@/ui/TabShell";
 import { Linking } from "react-native";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -43,7 +42,6 @@ type Draft = { id?: string; workerId: string | null; jobId: string | null; miles
 type Picking = "worker" | "job" | "milestone" | null;
 
 export default function Schedule() {
-  const isTab = useIsTab("schedule");
   const { t, i18n } = useTranslation();
   const c = (k: string, o?: Record<string, unknown>) => t(`sch.${k}`, o) as string;
   const locale: Locale = i18n.language === "fr" ? "fr-CA" : "en-CA";
@@ -151,7 +149,7 @@ export default function Schedule() {
   const dMilestone = dJob?.milestones.find((m) => m.id === d?.milestoneId);
 
   return (
-    <Screen floating={isTab ? <RoleTabs active="schedule" /> : <ActionBar label={c("addBlock")} onPress={() => setDraft(blank(people[0]?.id ?? null, 13, 15))} moreLabel={c("more")} />}>
+    <Screen floating={<ActionBar label={c("addBlock")} onPress={() => setDraft(blank(people[0]?.id ?? null, 13, 15))} moreLabel={c("more")} />}>
       <Header title="" backLabel={c("back")} onBack={back} moreLabel={c("more")} onMore={() => undefined} />
       <ExpandScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: ACTION_BAR_SPACE }}>
         <Section row align="center" justify="space-between" pt={6} px={20}>

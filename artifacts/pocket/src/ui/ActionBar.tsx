@@ -4,6 +4,7 @@
 // The primary turns solid green (`ok-dot`) once its action is done ("Sent to Dana"), as Quote.dc.html draws it.
 // Put it in Screen's `floating`; leave ACTION_BAR_SPACE at the bottom of the content.
 import type { ReactNode } from "react";
+import { useBarVisible } from "@/lib/barStore";
 import { View } from "react-native";
 import { BlurView } from "expo-blur";
 import { board } from "@/theme/board";
@@ -23,7 +24,7 @@ export function ActionBar({ label, onPress, moreLabel, onMore, secondary, onSeco
   icon?: ReactNode; disabled?: boolean; busy?: boolean; /** The action is finished: the button turns green. */ done?: boolean; /** Nothing to do now ("Waiting for Dana"): `sunk`, muted, no shadow, as Contract.dc.html draws it. */ quiet?: boolean;
 }) {
   const { colors, scheme } = useTheme();
-  const bottom = useFloatBottom();
+  const bottom = useFloatBottom() + (useBarVisible() ? 72 : 0);
   const target = useBlurTarget();
   const word = !!secondary;
   return (

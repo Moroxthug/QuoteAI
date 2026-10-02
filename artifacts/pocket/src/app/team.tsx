@@ -2,7 +2,6 @@
 // for the crew phone), the time entries to approve (swipe: approve or reject), equipment, and the team members with seats, invites and access codes.
 // Not built: a worker's certificates (the server holds none) and "today" on a worker's row (the Teammate screen has the week).
 import { useMemo, useState, type ReactNode } from "react";
-import { RoleTabs } from "@/ui/TabShell";
 import { Linking } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -143,7 +142,7 @@ export default function Team() {
   };
 
   return (
-    <Screen floating={<RoleTabs active="team" />}>
+    <Screen>
       <Header title="" backLabel={m("back")} onBack={() => (router.canGoBack() ? router.back() : router.replace("/menu"))} />
       <ExpandScrollView contentContainerStyle={{ paddingBottom: ACTION_BAR_SPACE }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Section px={20}><PageTitle>{m("title")}</PageTitle></Section>

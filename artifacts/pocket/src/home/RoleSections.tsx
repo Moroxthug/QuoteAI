@@ -6,6 +6,8 @@ import { router } from "expo-router";
 import { SECTIONS } from "@/lib/jobRoles";
 import { screenHref } from "@/lib/nav";
 import { RoleLine, RoleSection } from "@/ui/RoleSection";
+import { WidgetRow } from "@/ui/Widgets";
+import { Section } from "@/ui/Layout";
 import type { IconName, Tone } from "@/ui/Icon";
 import type { WidgetEntry } from "./widgets";
 
@@ -28,9 +30,12 @@ export function RoleSections({ sections, entries, needs }: { sections: { key: st
         const go = GO[s.key] ?? ["Notifications", "notifications"];
         const open = () => router.push(screenHref(go[0]!, name[0] ?? ""));
         const mine = entries.filter((e) => (WIDGETS[s.key] ?? []).includes(e.id));
+        // What the app already has for a section is drawn exactly as on Home (the cards that open in place); only a section with nothing behind it is a plain card that opens its screen.
+        if (s.key === "needs") return <Section key={s.key}>{needs}</Section>;
+        if (mine.length) return <Section key={s.key}><WidgetRow title={name[0] ?? s.key} ids={mine.map((e) => e.id)}>{mine.map((e) => e.node)}</WidgetRow></Section>;
         return (
           <RoleSection key={s.key} icon={def.icon as IconName} tone={def.tone as Tone} title={name[0] ?? s.key} sub={name[1] ?? ""} link={t("jr.rh.seeAll")} onLink={open}>
-            {s.key === "needs" ? needs : mine.length ? mine.map((e) => e.node) : <RoleLine>{t("jr.rh.notBuilt")}</RoleLine>}
+            <RoleLine>{t("jr.rh.notBuilt")}</RoleLine>
           </RoleSection>
         );
       })}

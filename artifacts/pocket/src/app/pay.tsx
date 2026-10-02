@@ -3,7 +3,6 @@
 // not a payroll engine. Not built: pay day (the data has none), a vacation-pay line (the provider adds it), custom holidays (the web app adds them),
 // and the board's "Connected" labels on Wagepoint and QuickBooks Payroll (they are import files).
 import { useMemo, useState } from "react";
-import { RoleTabs } from "@/ui/TabShell";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -399,7 +398,7 @@ export default function Pay() {
   const editCopy = edit === "vacation" || edit === "km" || edit === "perDiem" || edit === "holidays" || edit === "codes" || edit === "format" ? m(`rules.edit.${edit}.title`) : "";
 
   return (
-    <Screen floating={<RoleTabs active="pay" />}>
+    <Screen>
       <Header title="" backLabel={m("back")} onBack={back} moreLabel={m("more")} onMore={ready ? () => setMenu(true) : undefined} />
       <ScrollPage bottom={48} sticky={ready ? [1] : undefined}>
         <Section px={20} gap={6} pb={14}>

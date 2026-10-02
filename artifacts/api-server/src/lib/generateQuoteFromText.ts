@@ -10,32 +10,29 @@ import { resolveQuoteTaxRate } from "./tax.js";
 import { recordAiUsage } from "./usage.js";
 import { qt, resolveQuoteLanguage } from "../quotes/i18n.js";
 import { currentActorId } from "./requestContext.js";
+import { correctionMessage, isWholeBuilding, quoteProblems } from "./quoteSanity.js";
 
 const AI_PROMPT = `You are an expert consultant for professional quotes for the Canadian market (tradespeople, construction, building systems, technical services).
 
 You must turn a free-form description into a professional ECONOMIC ANALYSIS AND PRICED BILL OF QUANTITIES, structured into chapters, consistent with 2026 Canadian market prices.
 
 FUNDAMENTAL RULES:
-1. Realistic 2026 Canadian market prices:
-   - COMPLETE "TURNKEY" RENOVATION (Whole house/apartment):
-     A complete renovation includes demolition, new building systems (electrical/plumbing), subfloor/screed, flooring, painting, and any windows/doors. Real total costs per sqm are:
-     * Economy/Basic tier: $600 - $850 CAD/sqm (e.g. for 145 sqm the total should be between $87,000 and $123,000)
-     * Mid/Standard tier: $850 - $1,200 CAD/sqm (e.g. for 145 sqm the total should be between $123,000 and $174,000)
-     * High-end/Luxury tier: $1,200 - $1,800+ CAD/sqm (e.g. for 145 sqm the total exceeds $174,000)
-     If the user requests a "complete renovation" without specifying a tier, use the Mid tier as a reference (about $950-1,050 CAD/sqm) and generate detailed line items (demolition, structural/masonry work, building systems, finishes, general labour support) that, added together, consistently reach this overall amount.
-   - COMPLETE BATHROOM REMODEL: $8,000 - $15,000 CAD (demolition, plumbing rework, fixtures, faucets/taps, tile installation).
-   - COMPLETE KITCHEN REMODEL: $8,000 - $16,000 CAD (construction and plumbing work).
-   - COMPLETE ELECTRICAL SYSTEM: $120 - $180 CAD per code-compliant outlet/light point, or roughly $8,000 - $15,000 CAD for an average home (about $90-110 CAD/sqm).
-   - HEATING/PLUMBING SYSTEM: $8,000 - $18,000 CAD depending on size (piping, manifolds, boiler/heat pump).
-   - DEMOLITION AND REMOVAL: $35 - $70 CAD/sqm (removal of flooring, subfloor, partition walls, including disposal/haul-away).
-   - FLOORING AND TILE INSTALLATION: $40 - $70 CAD/sqm (materials excluded). SUBFLOOR/SCREED: $35 - $55 CAD/sqm.
-   - PAINTER: $25-40 CAD/sqm for standard two-coat painting, $45-70 CAD/sqm for specialty work or wall skim-coating/prep.
-   - HOURLY LABOUR RATES:
-     * general labourer/mason: $45-75 CAD/hour
-     * electrician: $65-110 CAD/hour
-     * plumber: $70-120 CAD/hour
-     * carpenter/joiner: $55-95 CAD/hour
-     * painter: $40-65 CAD/hour
+1. Realistic 2026 Canadian market prices (CAD, labour AND materials, before tax; price the real work, never a token amount):
+   - SCALE FIRST. Work out the TOTAL FLOOR AREA before pricing anything: area per floor x number of floors, the basement counts as a floor. "N sqm on each floor" or "4 floors, each with N sqm" means N x 4. Every quantity in the quote (flooring, painting, drywall, electrical, plumbing, demolition...) must come from that total area, not from one floor. A building of 1,000 sqm or more is priced like the large project it is.
+   - WHOLE-BUILDING GUT RENOVATION (demolition, new structure repairs, roofing, new electrical and plumbing from scratch, heating, insulation, drywall, flooring, painting, kitchens, bathrooms, cleanup). Total per sqm of floor area, before tax:
+     * Basic: $1,600 - $2,200 CAD/sqm   * Standard: $2,200 - $3,200 CAD/sqm   * High-end: $3,200 - $4,500+ CAD/sqm
+     In Vancouver, Toronto and other high-cost cities use the upper half of each range. If the person does not name a tier, use Standard. The subtotal MUST land inside the range for the total floor area (for example 1,368 sqm at Standard in Vancouver is about $3.0M - $4.4M). Do not return a lower total because the project is large: a large building costs more, not less per sqm.
+   - TYPICAL SHARE OF A GUT RENOVATION TOTAL (so no trade is wildly out of proportion): site setup, permits and protection 2-4%; demolition and haul-away 4-6%; structure and framing repairs 8-14%; roofing 4-7%; windows and doors 5-8%; electrical 8-11%; plumbing 8-11%; heating, ventilation and cooling 6-9%; insulation and drywall 8-11%; flooring 6-10%; kitchens and bathrooms 12-20%; interior and exterior painting 3-6%; finish carpentry and trim 3-6%; final cleanup 1-2%; project management, overhead and profit 10-15%. Painting is never more than about 6% of a gut renovation and cleanup never more than 2%.
+   - UNIT PRICES (labour and standard materials, Canada 2026): demolition and haul-away $60 - $140 CAD/sqm of floor area; structural and framing repairs $150 - $400 CAD/sqm affected; roofing $270 - $480 CAD/sqm of roof area; full electrical rewire $120 - $200 CAD/sqm of floor area (or $150 - $220 per device); full plumbing rough-in and fixtures $120 - $220 CAD/sqm of floor area; heating and ventilation $90 - $180 CAD/sqm; insulation and drywall, taped and finished $90 - $160 CAD/sqm of floor area; flooring supplied and installed $90 - $220 CAD/sqm; interior painting of a whole building (walls, ceilings, trim, two coats) $30 - $60 CAD/sqm of floor area; final cleanup $8 - $15 CAD/sqm.
+   - COMPLETE BATHROOM REMODEL: $18,000 - $40,000 CAD each (half bath $10,000 - $22,000). COMPLETE KITCHEN REMODEL: $30,000 - $90,000 CAD (cabinets, counters, plumbing and electrical rework, appliances excluded unless asked).
+   - SMALL JOBS keep small totals: painting one room $600 - $1,800; a single tap or fixture replaced $150 - $600; the unit prices above apply to whole buildings, not to a single room.
+   - HOURLY LABOUR RATES (Canada, 2026):
+     * general labourer: $50-80 CAD/hour
+     * electrician: $85-130 CAD/hour
+     * plumber: $90-140 CAD/hour
+     * carpenter/joiner: $70-110 CAD/hour
+     * painter: $50-80 CAD/hour
+   - BEFORE YOU ANSWER, CHECK: (a) subtotal divided by total floor area is inside the range above; (b) no chapter exceeds its typical share by more than 1.5x; (c) every line's quantity x unit price equals its total; (d) a chapter that normally costs the most (structure, systems, finishes) is not smaller than painting or cleanup.
 2. If specific details are missing: make realistic assumptions, do NOT ask for clarification
 3. Organize the work into logical CHAPTERS (A, B, C, D, …) with professional titles
 4. Each chapter contains detailed work LINE ITEMS with professional units of measure (sqm, linear m, cubic m, kg, hours, lump sum, pieces, each, kW, etc.)
@@ -298,24 +295,45 @@ export async function buildQuoteFromAI({
   });
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: process.env.AI_MODEL ?? (hasImages ? "gpt-4o" : "gpt-4o-mini"),
-      max_completion_tokens: 8192,
+    // A whole-building job needs the larger model and room to work the quantities out; small jobs stay on the fast one.
+    const big = isWholeBuilding(rawInput) || rawInput.length > 700;
+    const baseMessages = [
+      { role: "system" as const, content: AI_PROMPT },
+      { role: "system" as const, content: REGIONAL_PRICING_GUIDANCE },
+      { role: "system" as const, content: DESCRIPTION_QUALITY_GUIDANCE },
+      ...(catalogContext ? [{ role: "system" as const, content: catalogContext }] : []),
+      ...(pastContext ? [{ role: "system" as const, content: pastContext }] : []),
+      ...(useCapitolato ? [{ role: "system" as const, content: CAPITOLATO_CONTEXT }] : []),
+      { role: "user" as const, content: userContent },
+    ];
+    const ask = (messages: typeof baseMessages) => openai.chat.completions.create({
+      model: process.env.AI_MODEL ?? (hasImages || big ? "gpt-4o" : "gpt-4o-mini"),
+      max_completion_tokens: big ? 16000 : 8192,
       temperature: 0.3,
-      messages: [
-        { role: "system", content: AI_PROMPT },
-        { role: "system", content: REGIONAL_PRICING_GUIDANCE },
-        { role: "system", content: DESCRIPTION_QUALITY_GUIDANCE },
-        ...(catalogContext ? [{ role: "system" as const, content: catalogContext }] : []),
-        ...(pastContext ? [{ role: "system" as const, content: pastContext }] : []),
-        ...(useCapitolato ? [{ role: "system" as const, content: CAPITOLATO_CONTEXT }] : []),
-        { role: "user", content: userContent },
-      ],
-    });
+      ...(big ? { reasoning_effort: "medium" } : {}),
+      messages,
+    } as never);
+
+    let completion = await ask(baseMessages);
+    let content = completion.choices[0]?.message?.content ?? "{}";
+
+    // Pocket 128.11: if the quote is out of proportion (painting a third of a house, a total far under the per-sqm range), say so once and let the model redo it.
+    try {
+      const first = parseAiResponse(content, rawInput, profile, templateId);
+      const problems = quoteProblems(rawInput, first.capitoli.map((c) => ({ titolo: c.titolo, subtotale: Number(c.subtotale) || 0 })), Number(first.subtotale) || 0);
+      if (problems.length > 0) {
+        log.warn({ userId, problems }, "Quote out of proportion: asking the model to correct it once");
+        trackEvent(userId, "quote_generation_corrected", { problems: problems.length });
+        const retry = await ask([...baseMessages, { role: "assistant" as const, content }, { role: "user" as const, content: correctionMessage(problems, rawInput) }] as typeof baseMessages);
+        const again = retry.choices[0]?.message?.content;
+        if (again) { completion = retry; content = again; }
+      }
+    } catch (err) {
+      log.warn({ err }, "Quote sanity check could not run");
+    }
 
     const latencyMs = Date.now() - startTime;
     const usage = completion.usage;
-    const content = completion.choices[0]?.message?.content ?? "{}";
 
     try {
       const result = parseAiResponse(content, rawInput, profile, templateId);

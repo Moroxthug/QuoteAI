@@ -2,7 +2,6 @@
 // a break, why it is by hand and a note; the total shows as you go and it goes to the office for approval. With no signal it is kept on the phone and sent later.
 // Below, this week's hours with where each stands (approved, to approve, off site at clock-in, sent back). States: default, sent, saved on phone (offline).
 import { useState } from "react";
-import { RoleTabs } from "@/ui/TabShell";
 import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
@@ -97,7 +96,7 @@ export default function CrewHours() {
   const where = (e: CrewEntry) => (e.geofenceFlagged ? e.projectName ?? "" : e.note ? e.note.split(" · ")[0]! : e.clockInAt ? c("hours.clocked") : e.projectName ?? "");
 
   return (
-    <Screen floating={<RoleTabs active="hours" />}>
+    <Screen>
       <Header title="" backLabel={c("back")} onBack={() => (router.canGoBack() ? router.back() : router.replace("/crew-now"))} />
       <ScrollPage bottom={40}>
         <CrewHeader company={company} initials={initialsOf(company)} switchLabel={c("switchCompany")} worker={initialsOf(view.worker.name)} tint={tintFor(view.worker.name)} workerLabel={view.worker.name} />

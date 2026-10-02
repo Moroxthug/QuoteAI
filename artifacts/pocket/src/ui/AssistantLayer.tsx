@@ -1,7 +1,7 @@
 // HomeAI.dc.html's assistant layer: the live orb (a dark ball of four slow blobs and a shine that swells with what it is doing), the glass round buttons, the two bubbles and the message bar. Dark in both themes.
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { ScrollView, TextInput, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedKeyboard, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withTiming, type SharedValue } from "react-native-reanimated";
 import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 import { ampFor, type Mood } from "@/lib/assistantChat";
 import { board } from "@/theme/board";
@@ -113,6 +113,36 @@ export function MessageBar({ value, onChange, onSend, placeholder, sendLabel, fi
       </Press>
     </View>
   );
+}
+
+/** HomeAI's aiIn / aiOut: the layer opens as a circle growing from the orb in the tab bar (31 across) to cover the screen, and closes back into it. `progress` runs 0 to 1; the content keeps its place on the screen while the circle grows. */
+export function Reveal({ progress, cx, cy, width, height, children }: { progress: SharedValue<number>; cx: number; cy: number; width: number; height: number; children: ReactNode }) {
+  const max = Math.hypot(width, height);
+  const outer = useAnimatedStyle(() => {
+    const r = 31 + (max - 31) * progress.value;
+    return { position: "absolute", left: cx - r, top: cy - r, width: 2 * r, height: 2 * r, borderRadius: r, opacity: 0.4 + 0.6 * Math.min(1, progress.value * 4) };
+  });
+  const inner = useAnimatedStyle(() => {
+    const r = 31 + (max - 31) * progress.value;
+    return { position: "absolute", left: r - cx, top: r - cy, width, height };
+  });
+  return <Animated.View style={[{ overflow: "hidden" }, outer]}><Animated.View style={inner}>{children}</Animated.View></Animated.View>;
+}
+
+/** The controls' `.ctl` rise: they fade up 10 after the orb has landed (0.45 s in, 0.8 s long). */
+export function Rise({ children, delay = 450 }: { children: ReactNode; delay?: number }) {
+  const reduced = useReducedMotion();
+  const p = useSharedValue(reduced ? 1 : 0);
+  useEffect(() => { if (!reduced) p.value = withDelay(delay, withTiming(1, { duration: 800, easing: Easing.bezier(0.16, 1, 0.3, 1) })); }, [reduced, delay, p]);
+  const st = useAnimatedStyle(() => ({ opacity: p.value, transform: [{ translateY: 10 * (1 - p.value) }] }));
+  return <Animated.View style={[{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }, st]} pointerEvents="box-none">{children}</Animated.View>;
+}
+
+/** Lifts what sits at the foot of the layer (the message bar and the messages) above the phone's keyboard, which does not resize the screen on its own. */
+export function KeyboardLift({ children }: { children: ReactNode }) {
+  const kb = useAnimatedKeyboard();
+  const st = useAnimatedStyle(() => ({ position: "absolute", top: 0, left: 0, right: 0, bottom: kb.height.value }));
+  return <Animated.View style={st} pointerEvents="box-none">{children}</Animated.View>;
 }
 
 /** The layer's ground and the soft violet glow at its foot. */

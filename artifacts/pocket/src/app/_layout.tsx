@@ -1,6 +1,7 @@
 import "@/i18n";
 import { withSentry } from "@/lib/sentry";
 import { useEffect, useState } from "react";
+import { View } from "react-native";
 import { Stack } from "expo-router";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
@@ -13,6 +14,7 @@ import { SessionProvider } from "@/lib/useSession";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
 import { ToastHost } from "@/ui/Feedback";
+import { GlobalTabBar } from "@/ui/GlobalTabBar";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -41,7 +43,10 @@ function RootLayout() {
           <QueryClientProvider client={client}>
             <SessionProvider>
               <ToastHost>
-                <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
+                <View style={{ flex: 1 }}>
+                  <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
+                  <GlobalTabBar />
+                </View>
               </ToastHost>
             </SessionProvider>
           </QueryClientProvider>

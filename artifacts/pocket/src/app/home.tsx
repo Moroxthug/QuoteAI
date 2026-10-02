@@ -54,7 +54,7 @@ export default function SmartHome() {
   const unread = useQuery({ queryKey: ["home-unread"], queryFn: homeApi.unread, enabled: signedIn, retry: false, staleTime: 60_000 });
 
   const jr = useJobRole();
-  const roleHome = jr.me.included && (jr.role !== "owner" || !!jr.prefs);
+  const roleHome = jr.me.included && (jr.role !== "owner" || !!jr.prefs?.order);
   const now = useMemo(() => new Date(), []);
   const first = user?.name.trim().split(/\s+/)[0] ?? "";
   const w = weather.data?.weather ?? null;

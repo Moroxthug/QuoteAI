@@ -2,7 +2,6 @@
 // "Crew today" with filter chips and a row per person (call, text). States: default, empty (nobody sharing), locked (the plan lacks time tracking: plans are on quoteai.ca).
 // Not built: "On the way" with the route and minutes-away (no travel data on the server), site pins (jobs carry no coordinates); the panel stays one height with a more/less grab.
 import { useMemo, useState } from "react";
-import { RoleTabs } from "@/ui/TabShell";
 import { Linking, ScrollView, View } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -63,7 +62,7 @@ export default function CrewMap() {
   const back = () => (router.canGoBack() ? router.back() : router.replace("/menu"));
 
   return (
-    <Screen floating={<RoleTabs active="map" />}>
+    <Screen>
       <View style={{ flex: 1 }}>
         <CrewMapSurface markers={markers} selected={sel} onPick={(id) => { setSel(id); setOpen(false); }} onSize={(w, h) => setSize({ w, h })} label={c("mapLabel")} />
         <MapTop>

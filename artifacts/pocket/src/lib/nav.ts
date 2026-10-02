@@ -50,6 +50,7 @@ export const BUILT = {
   Settings: "/settings",
   Profile: "/profile",
   SetSecurity: "/set-security",
+  SetPlan: "/set-plan",
   SetCompany: "/set-company",
   SetTaxes: "/set-taxes",
   SetQuotes: "/set-quotes",

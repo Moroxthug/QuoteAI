@@ -292,10 +292,10 @@ type Totals = CompanyAnalytics["totals"];
 
 export type GroupOverview = {
   months: number;
-  companies: { orgId: string; companyName: string; province: string | null; totals: Totals; aging: CompanyAnalytics["aging"]; activeJobs: number }[];
+  companies: { orgId: string; companyName: string; province: string | null; totals: Totals; aging: CompanyAnalytics["aging"]; activeJobs: number; series: { month: string; invoicedCents: number; costCents: number }[] }[];
   excluded: { orgId: string; companyName: string; role: TeamMemberRole | null }[];
   consolidated: { invoicedCents: number; collectedCents: number; costCents: number; marginCents: number; marginPercent: number | null; outstandingCents: number; overdueCents: number; pipelineCents: number; activeJobs: number };
-  intercompany: { invoicedCents: number; costCents: number; lines: { fromOrgId: string; toOrgId: string; kind: "invoice" | "cost"; count: number; cents: number }[] };
+  intercompany: { invoicedCents: number; costCents: number; byMonth: { month: string; invoicedCents: number; costCents: number }[]; lines: { fromOrgId: string; toOrgId: string; kind: "invoice" | "cost"; count: number; cents: number }[] };
   series: { month: string; invoicedCents: number; collectedCents: number; costCents: number }[];
   aging: CompanyAnalytics["aging"];
   cashFlow: { week: string; netCents: number; cumulativeCents: number }[];
@@ -325,11 +325,18 @@ export async function groupOverview(actorId: string, state: GroupState, opts: { 
   };
   let icInvoiced = 0;
   let icCost = 0;
+  const icMonths = new Map<string, { month: string; invoicedCents: number; costCents: number }>();
+  const icMonth = (d: Date) => {
+    const month = d.toISOString().slice(0, 7);
+    let m = icMonths.get(month);
+    if (!m) { m = { month, invoicedCents: 0, costCents: 0 }; icMonths.set(month, m); }
+    return m;
+  };
   if (included.length) {
     const ids = included.map((c) => c.userId);
     const [invoices, costs] = await Promise.all([
-      db.select({ userId: invoicesTable.userId, type: invoicesTable.type, status: invoicesTable.status, totalCents: invoicesTable.totalCents, customer: invoicesTable.customer }).from(invoicesTable).where(and(inArray(invoicesTable.userId, ids), gte(invoicesTable.issueDate, since))),
-      db.select({ userId: costEntriesTable.userId, vendor: costEntriesTable.vendor, totalCents: costEntriesTable.totalCents, status: costEntriesTable.status }).from(costEntriesTable).where(and(inArray(costEntriesTable.userId, ids), gte(costEntriesTable.date, since))),
+      db.select({ userId: invoicesTable.userId, type: invoicesTable.type, status: invoicesTable.status, totalCents: invoicesTable.totalCents, customer: invoicesTable.customer, issueDate: invoicesTable.issueDate }).from(invoicesTable).where(and(inArray(invoicesTable.userId, ids), gte(invoicesTable.issueDate, since))),
+      db.select({ userId: costEntriesTable.userId, vendor: costEntriesTable.vendor, totalCents: costEntriesTable.totalCents, status: costEntriesTable.status, date: costEntriesTable.date }).from(costEntriesTable).where(and(inArray(costEntriesTable.userId, ids), gte(costEntriesTable.date, since))),
     ]);
     for (const i of invoices) {
       if (i.status === "void" || i.status === "draft") continue;
@@ -337,6 +344,7 @@ export async function groupOverview(actorId: string, state: GroupState, opts: { 
       if (!to) continue;
       const cents = i.type === "credit_note" ? -Math.abs(i.totalCents) : i.totalCents;
       icInvoiced += cents;
+      icMonth(i.issueDate).invoicedCents += cents;
       add(i.userId, to, "invoice", cents);
     }
     for (const c of costs) {
@@ -344,6 +352,7 @@ export async function groupOverview(actorId: string, state: GroupState, opts: { 
       const from = matchGroupCompany({ name: c.vendor }, keys, c.userId);
       if (!from) continue;
       icCost += c.totalCents;
+      icMonth(c.date).costCents += c.totalCents;
       add(from, c.userId, "cost", c.totalCents);
     }
   }
@@ -368,7 +377,7 @@ export async function groupOverview(actorId: string, state: GroupState, opts: { 
 
   return {
     months,
-    companies: perCompany.map(({ c, a }) => ({ orgId: c.userId, companyName: c.companyName, province: c.province, totals: a.totals, aging: a.aging, activeJobs: a.jobs.active })),
+    companies: perCompany.map(({ c, a }) => ({ orgId: c.userId, companyName: c.companyName, province: c.province, totals: a.totals, aging: a.aging, activeJobs: a.jobs.active, series: a.months.map((m) => ({ month: m.month, invoicedCents: m.invoicedCents, costCents: m.costCents })) })),
     excluded,
     consolidated: {
       invoicedCents,
@@ -381,7 +390,7 @@ export async function groupOverview(actorId: string, state: GroupState, opts: { 
       pipelineCents: sum("pipelineCents"),
       activeJobs: perCompany.reduce((s, p) => s + p.a.jobs.active, 0),
     },
-    intercompany: { invoicedCents: icInvoiced, costCents: icCost, lines: [...lines.values()] },
+    intercompany: { invoicedCents: icInvoiced, costCents: icCost, byMonth: [...icMonths.values()].sort((a, b) => a.month.localeCompare(b.month)), lines: [...lines.values()] },
     series,
     aging,
     cashFlow,

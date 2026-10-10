@@ -84,13 +84,6 @@ export const en = {
     all: "All tasks",
     failed: "Couldn’t update the list. Try again.",
   },
-  weather: {
-    name: "Site weather",
-    dry: "Dry all day",
-    note: "Plan exterior work before {{time}}",
-    noteNone: "Good conditions for outdoor work",
-    feels: "Where your crews work",
-  },
 };
 
 export const fr: typeof en = {
@@ -175,12 +168,5 @@ export const fr: typeof en = {
     unmark: "Marquer non fait : {{text}}", // owner
     all: "Toutes les tâches", // owner
     failed: "Impossible de mettre la liste à jour. Réessayez.", // owner
-  },
-  weather: {
-    name: "Météo des chantiers",
-    dry: "Sec toute la journée", // owner
-    note: "Prévoyez les travaux extérieurs avant {{time}}",
-    noteNone: "Bonnes conditions pour le travail à l’extérieur", // owner
-    feels: "Là où travaillent vos équipes", // owner
   },
 };

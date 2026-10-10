@@ -4,15 +4,17 @@
 // person's initials (a 10 violet dot when notifications are waiting) that opens the Menu.
 // QuickAddGrid: the Quick add sheet's 3 x 2 tiles (radius 18, ring): a 32 icon, the name 13.5/500 and
 // a muted 11.5 line.
+import type { ReactNode } from "react";
 import { View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Glyph, Icon, type GlyphName, type IconName, type Tone } from "./Icon";
 import { Press } from "./motion";
 import { Text } from "./Text";
 import { useTheme } from "./theme";
 
-export function HomeHeader({ date, weather, weatherGlyph, greeting, quickLabel, onQuick, menuLabel, onMenu, initials, unread, unreadLabel }: {
-  date: string; weather?: string; weatherGlyph?: GlyphName; greeting: string; quickLabel: string; onQuick: () => void;
+export function HomeHeader({ date, weather, weatherIcon, greeting, quickLabel, onQuick, menuLabel, onMenu, initials, unread, unreadLabel }: {
+  date: string; weather?: string; weatherIcon?: ReactNode; greeting: string; quickLabel: string; onQuick: () => void;
   menuLabel: string; onMenu: () => void; initials: string; unread?: boolean; unreadLabel?: string;
 }) {
   const { colors } = useTheme();
@@ -23,11 +25,11 @@ export function HomeHeader({ date, weather, weatherGlyph, greeting, quickLabel, 
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <Text size={12.5} weight={500} color="muted">{date}</Text>
           {weather ? (
-            <>
+            <Animated.View entering={FadeIn.duration(400)} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
               <View style={{ width: 3, height: 3, borderRadius: 2, backgroundColor: colors.faint }} />
-              {weatherGlyph ? <Glyph name={weatherGlyph} size={14} color="muted" weight={1.8} /> : null}
+              {weatherIcon}
               <Text size={12.5} weight={500} color="muted">{weather}</Text>
-            </>
+            </Animated.View>
           ) : null}
         </View>
         <Text size={24} weight={600} tracking={-0.035} leading={1.15} accessibilityRole="header">{greeting}</Text>

@@ -1,29 +1,26 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db, businessProfilesTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
-import { siteFor, weatherAt, zoneOf } from "../weather/service.js";
+import { weatherToday } from "../weather/today.js";
 
-// ── Pocket, Phase 145: the weather line on the phone's Home ─────────────────
-// GET /api/weather/today[?lat&lon] — the company's forecast site from its
-// address, else from the phone's position. `{ weather: null }` when neither
-// finds one or ECCC is unreachable: the header then shows the date alone.
+// ── Pocket 129: weather for job sites (docs/pocket-design/handoff/WEATHER.md) ───────────────────
+// GET /api/v1/weather/today[?lang=en|fr] — the sites with a visit today (up to 4, busiest first; the company address when nothing is scheduled),
+// each with now, the hours, seven days and the words for the day as keys the app turns into English or French. Each place is asked of the
+// weather source once every 30 minutes. Any signed-in person of the company may read it.
 
 const router = Router();
 
-router.get("/weather/today", requireAuth, async (req, res) => {
+router.get("/v1/weather/today", requireAuth, async (req, res) => {
   try {
-    const q = z.object({ lat: z.coerce.number().min(41).max(84).optional(), lon: z.coerce.number().min(-142).max(-52).optional() }).safeParse(req.query);
-    const pos = q.success && q.data.lat != null && q.data.lon != null ? { lat: q.data.lat, lon: q.data.lon } : undefined;
-    const [profile] = await db.select({ address: businessProfilesTable.address, province: businessProfilesTable.province }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, getUserId(res)));
-    const site = await siteFor(profile?.address ?? null, profile?.province ?? null, pos).catch(() => null);
-    const weather = site ? await weatherAt(site, zoneOf(profile?.province ?? null)).catch(() => null) : null;
-    res.setHeader("Cache-Control", "private, max-age=900");
-    res.json({ weather });
+    const q = z.object({ lang: z.enum(["en", "fr"]).optional() }).safeParse(req.query);
+    const header = String(req.headers["accept-language"] ?? "").toLowerCase();
+    const lang = (q.success && q.data.lang) || (header.startsWith("fr") ? "fr" : "en");
+    const out = await weatherToday({ userId: getUserId(res), lang });
+    res.setHeader("Cache-Control", "private, max-age=300");
+    res.json(out);
   } catch (err) {
-    req.log.error({ err }, "Error loading weather");
-    res.json({ weather: null });
+    req.log.error({ err }, "Error loading the weather");
+    res.status(502).json({ error: "WEATHER_UNAVAILABLE", message: "The weather could not be loaded right now." });
   }
 });
 

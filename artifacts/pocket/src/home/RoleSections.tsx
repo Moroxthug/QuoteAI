@@ -18,7 +18,7 @@ const GO: Record<string, [string, string]> = {
   clock: ["CrewHours", "hours"], blockers: ["Jobs", "jobs"], crewToday: ["CrewNow", "crew"], tasks: ["Jobs", "jobs"], tasksToday: ["CrewHours", "hours"], reports: ["Documents", "docs"], crew: ["Crew", "crew"],
   needs: ["Notifications", "notifications"], money: ["Invoices", "invoices"], quotes: ["Quotes", "quotes"], waiting: ["Quotes", "quotes"], today: ["Schedule", "schedule"], week: ["Schedule", "schedule"], weather: ["Schedule", "schedule"],
 };
-const WIDGETS: Record<string, string[]> = { money: ["collected", "owed"], quotes: ["quotes"], waiting: ["followups"], today: ["tasks"], week: ["tasks"], weather: ["weather"] };
+const WIDGETS: Record<string, string[]> = { money: ["collected", "owed"], quotes: ["quotes"], waiting: ["followups"], today: ["tasks"], week: ["week", "tasks"], weather: ["weather"] };
 
 export function RoleSections({ sections, entries, needs }: { sections: { key: string; on: boolean }[]; entries: WidgetEntry[]; needs: ReactNode }) {
   const { t } = useTranslation();

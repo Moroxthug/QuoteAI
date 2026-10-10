@@ -60,6 +60,11 @@ const MANIFEST: Record<string, Entry> = {
   PILOT_PROMO_CODE: { kind: "feature", feature: "Pilot programme", note: "Phase 81: the customer-facing Stripe promotion code for the BC/ON/QC pilot (e.g. PILOT2026). Create the coupon + promotion code in the Stripe dashboard first. Set = /pilot shows the code and Checkout applies it automatically; unset = /pilot honestly says no code is running and Checkout falls back to Stripe's own promo box" },
   ADMIN_EMAIL: { kind: "required", note: "comma list; /api/admin/* access and default recipient of ops alerts" },
   GROQ_API_KEY: { kind: "required", note: "the AI provider in production (OpenAI-compatible); without any AI key every AI feature takes its fallback" },
+  WEATHERKIT_TEAM_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "Pocket 129: your Apple Developer Team ID. With the next three, Home weather comes from Apple WeatherKit; without them it comes from Environment and Climate Change Canada (free, no key)" },
+  WEATHERKIT_SERVICE_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Services ID registered for WeatherKit (e.g. ca.quoteai.weather)" },
+  WEATHERKIT_KEY_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Key ID of the WeatherKit .p8 key" },
+  WEATHERKIT_PRIVATE_KEY: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The text of the .p8 file (newlines may be written as \n)" },
+  WEATHER_PROVIDER: { kind: "feature", feature: "Weather", note: "Optional: mock | eccc | weatherkit to force a source (mock is for development and screenshots only)" },
   SESSION_SECRET: { kind: "legacy", note: "read by lib/auth for the pre-better-auth cookie; kept set, harmless" },
 
   // ── Recommended for launch (Phase 69) ──

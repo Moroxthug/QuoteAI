@@ -9,7 +9,13 @@ import { businessProfilesTable, db, deviceTokensTable, pushSubscriptionsTable, s
 import { sendPushToCompany } from "../lib/push.js";
 import { timeZoneForProvince } from "../jobs/dates.js";
 import { localMidnight } from "./business.js";
-import { siteFor, weatherAt } from "../weather/service.js";
+import { siteFor } from "../weather/geo.js";
+import { forecastCached, getProvider } from "../weather/provider.js";
+
+const WORDS: Record<string, { en: string; fr: string }> = {
+  clear: { en: "clear", fr: "dégagé" }, partly_cloudy: { en: "partly cloudy", fr: "partiellement nuageux" }, cloudy: { en: "cloudy", fr: "nuageux" }, rain: { en: "rain", fr: "pluie" },
+  showers: { en: "showers", fr: "averses" }, snow: { en: "snow", fr: "neige" }, sleet: { en: "sleet", fr: "verglas" }, fog: { en: "fog", fr: "brouillard" }, thunder: { en: "thunderstorms", fr: "orages" },
+};
 import { logger } from "../lib/logger.js";
 
 const DAY_MS = 86_400_000;
@@ -42,7 +48,8 @@ export async function runMorningBriefs(now = new Date()): Promise<{ sent: number
         .from(scheduleBlocksTable).where(and(eq(scheduleBlocksTable.userId, userId), gte(scheduleBlocksTable.startsAt, from), lt(scheduleBlocksTable.startsAt, to)));
       const crew = new Set(blocks.map((b) => b.collaboratorId).filter(Boolean)).size;
       const site = await siteFor(p.address, p.province).catch(() => null);
-      const wx = site ? await weatherAt(site, zone).catch(() => null) : null;
+      const f = site ? await forecastCached(getProvider(), site.lat, site.lon, zone).catch(() => null) : null;
+      const wx = f ? { tempC: f.now.tempC, condition: WORDS[f.now.condition] ?? { en: "", fr: "" } } : null;
       const fr = p.province === "QC";
       const first = blocks.map((b) => b.startsAt).sort((a, b) => a.getTime() - b.getTime())[0];
       const at = first ? new Intl.DateTimeFormat(fr ? "fr-CA" : "en-CA", { timeZone: zone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(first) : null;

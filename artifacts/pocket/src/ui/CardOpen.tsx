@@ -95,15 +95,17 @@ export function useCardOpenActive(): boolean {
 }
 
 /** A card that opens full screen. `collapsed(false)` is the card; `collapsed(true)` the same top part inside the page, followed by `expanded`. */
-export function OpenableCard({ id, label, hint, collapsed, expanded, style, children }: { id: string; label: string; hint?: string; collapsed: (inPage: boolean) => ReactNode; expanded: ReactNode; style?: object; children?: ReactNode }) {
+export function OpenableCard({ id, label, hint, collapsed, expanded, style, children, openable = true }: { id: string; label: string; hint?: string; collapsed: (inPage: boolean) => ReactNode; expanded: ReactNode; style?: object; children?: ReactNode; /** False while there is nothing to open (the weather is loading or unavailable): the card is just a card, so a button inside it is not nested in another. */ openable?: boolean }) {
   const api = useContext(Ctx);
   const ref = useRef<View>(null);
   useEffect(() => { publish(id, { collapsed, expanded, label }); }); // every render, so the page is never behind the card
   return (
     <View ref={ref} collapsable={false} style={style}>
-      <Press onPress={() => api.open(id, ref)} accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} accessibilityState={{ expanded: api.openId === id }}>
-        {collapsed(false)}
-      </Press>
+      {openable ? (
+        <Press onPress={() => api.open(id, ref)} accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} accessibilityState={{ expanded: api.openId === id }}>
+          {collapsed(false)}
+        </Press>
+      ) : collapsed(false)}
       {children}
     </View>
   );

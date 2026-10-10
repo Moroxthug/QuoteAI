@@ -66,7 +66,6 @@ export const en = {
     waiting: { titleCall: "Call {{name}}", titleOpen: "Follow up with {{name}}", sub: "{{job}} · {{amount}}", status_one: "Sent {{count}} day ago", status_other: "Sent {{count}} days ago", button: "Call", buttonOpen: "Open", done: "Done" },
     remindFailed: "Couldn’t send the reminder. Try again.",
   },
-  weather: { rain: "rain after {{time}}", snow: "snow after {{time}}", storm: "storm after {{time}}" },
   edit: "Edit Home",
   quickTiles: {
     receipt: { label: "Receipt", sub: "Snap it, we file it" },
@@ -144,7 +143,6 @@ export const fr: typeof en = {
     waiting: { titleCall: "Appeler {{name}}", titleOpen: "Relancer {{name}}", sub: "{{job}} · {{amount}}", status_one: "Envoyée il y a {{count}} jour", status_other: "Envoyée il y a {{count}} jours", button: "Appeler", buttonOpen: "Ouvrir", done: "Fait" }, // owner
     remindFailed: "Impossible d’envoyer le rappel. Réessayez.", // owner
   },
-  weather: { rain: "pluie après {{time}}", snow: "neige après {{time}}", storm: "orage après {{time}}" }, // owner
   edit: "Modifier l’accueil",
   quickTiles: {
     receipt: { label: "Reçu", sub: "Une photo, on le classe" },

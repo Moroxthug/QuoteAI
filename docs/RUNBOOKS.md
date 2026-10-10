@@ -1032,3 +1032,12 @@ Against a dev API from an emulator: `CAP_DEV=1 VITE_API_ORIGIN=http://10.0.2.2:5
 | Play refuses the upload: "signed with the wrong key" | The bundle wasn't signed with the registered upload key — `keytool -printcert -jarfile app-release.aab` must show the SHA-256 above. Lost key → Play Console → Test and release → App integrity → request an upload key reset |
 | `/dashboard` links open the browser, not the app | After the first upload: Play Console → App integrity → App signing → copy the **app signing key** SHA-256 (and the upload key's) into `ANDROID_CERT_SHA256` in Vercel, comma-separated, and redeploy (§53) |
 | Testers see "item not found" on the opt-in link | They must accept the invitation with the same Google account the phone uses, and the release must be rolled out on the track |
+
+## Weather on the phone's Home (Pocket 129)
+
+Home shows weather for job sites (header line, Site weather widget, rain days in This week). One endpoint, `GET /api/v1/weather/today`, behind a `WeatherProvider` interface (`artifacts/api-server/src/weather/`). Each place is asked of the source once every 30 minutes.
+
+- **Source:** unset, it is Environment and Climate Change Canada (free, no key, Open Government Licence, Canada only; the credit "Environment and Climate Change Canada" is shown). With the four Apple values set it is **Apple WeatherKit** (500,000 calls a month are included with the Apple Developer Program). `WEATHER_PROVIDER=mock|eccc|weatherkit` forces one (mock is the board's numbers, for development and screenshots).
+- **Apple setup (once):** developer.apple.com > Certificates, Identifiers & Profiles > Identifiers: register an App ID with the WeatherKit capability and a Services ID (for example `ca.quoteai.weather`) with WeatherKit enabled; Keys: create a key with WeatherKit and download the `.p8` once. Set in Vercel: `WEATHERKIT_TEAM_ID` (Membership page), `WEATHERKIT_SERVICE_ID` (the Services ID), `WEATHERKIT_KEY_ID`, `WEATHERKIT_PRIVATE_KEY` (the whole `.p8` text; `\n` may stand for newlines).
+- **Attribution (required by Apple):** the response carries `attribution` (the mark and the legal link, fetched from WeatherKit's attribution service); the open Site weather page shows it under the last site and Settings shows "Weather data sources". Check Apple's current guidelines before launch.
+- **Job-site coordinates:** a job's latitude and longitude are saved the first time the weather needs them, from the city in its address (the ECCC list of about 850 forecast sites); a precise point set on the job is never overwritten.

@@ -919,7 +919,7 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 15 | GET | `/api/weather/today` | session | — | — | zod | — | n/a | — | — | — |
+| 13 | GET | `/api/v1/weather/today` | session | — | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/whatsapp.ts
 

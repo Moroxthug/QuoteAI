@@ -49,7 +49,7 @@ export function WidgetRow({ title, ids, children }: { title: string; /** The ids
 }
 
 /** One widget: the collapsed card (`children`) and, on the full-screen page it opens into, `expanded`. */
-export function WidgetCard({ id, label, left, right, children, expanded }: { id: string; label: string; left: string; right?: string; children: ReactNode; expanded: ReactNode }) {
+export function WidgetCard({ id, label, left, right, children, expanded, openable = true }: { id: string; label: string; left: string; right?: string; children: ReactNode; expanded: ReactNode; openable?: boolean }) {
   const { colors } = useTheme();
   const collapsed = (inPage: boolean) => (
     <View style={inPage ? undefined : { flexDirection: "row", alignItems: "flex-start", gap: 8, padding: 16 }}>
@@ -60,11 +60,11 @@ export function WidgetCard({ id, label, left, right, children, expanded }: { id:
         </View>
         {children}
       </View>
-      {inPage ? null : <Glyph name="chevron" size={14} color="faint" />}
+      {inPage || !openable ? null : <Glyph name="chevron" size={14} color="faint" />}
     </View>
   );
   return (
-    <OpenableCard id={id} label={label} collapsed={collapsed} expanded={expanded}
+    <OpenableCard id={id} label={label} collapsed={collapsed} expanded={expanded} openable={openable}
       style={{ width: CARD_W, borderRadius: tokens.radius.card, backgroundColor: colors.card, boxShadow: cssShadow(tokens.shadow.ring, colors) }} />
   );
 }

@@ -285,38 +285,3 @@ export function useTasksWidget(enabled: boolean): WidgetEntry | null {
   };
 }
 
-// ── Site weather (today) ───────────────────────────────────────────────────
-
-export function useWeatherWidget(enabled: boolean): WidgetEntry | null {
-  const { t, i18n } = useTranslation();
-  const locale = useLocale();
-  const q = useQuery({ queryKey: ["home-weather"], queryFn: homeApi.weather, enabled, retry: false, staleTime: 15 * 60_000 });
-  const w = q.data?.weather;
-  if (!w || w.tempC == null) return null;
-  const cond = i18n.language === "fr" ? w.condition.fr : w.condition.en;
-  const next = w.next ? t(`home.weather.${w.next.kind}`, { time: time(new Date(w.next.at), locale) }) : t("widgets.weather.dry");
-  const glyph = w.kind === "clear" ? "sun" : w.next || w.kind === "rain" ? "cloudRain" : "cloud";
-  const note = w.next ? t("widgets.weather.note", { time: time(new Date(w.next.at), locale) }) : t("widgets.weather.noteNone");
-  return {
-    id: "weather", row: "today",
-    node: (
-      <WidgetCard key="weather" id="weather" label={t("widgets.weather.name")} left={t("widgets.weather.name")} right={w.site}
-        expanded={
-          <>
-            <XcDivider />
-            <XcRow first title={w.site} sub={`${Math.round(w.tempC)}° · ${cond}`} right={<Status plain tone={w.next ? "warn" : "ok"} shape={w.next ? "clock" : "check"}>{next}</Status>} />
-            <Text size={12.5} color="muted" style={{ marginTop: 6 }}>{note}</Text>
-          </>
-        }>
-        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-          <View style={{ flexDirection: "row", alignItems: "baseline", gap: 8 }}>
-            <Num size={34} weight={600} tracking={-0.04} leading={1.1}>{`${Math.round(w.tempC)}°`}</Num>
-            <Text size={13.5} weight={500}>{w.next ? next.charAt(0).toUpperCase() + next.slice(1) : cond}</Text>
-          </View>
-          <Glyph name={glyph as "sun"} size={34} tint={board.rain} weight={1.6} />
-        </View>
-        <WidgetFoot>{note}</WidgetFoot>
-      </WidgetCard>
-    ),
-  };
-}

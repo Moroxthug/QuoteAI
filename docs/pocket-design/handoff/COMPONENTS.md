@@ -35,8 +35,56 @@ Bottom sheet for input and choices only (pickers, Quick add, confirmations, Edit
 - In a list, the open row detaches: 8pt outside the list edges, its own radius 22 and shadow, other rows fade to 45%.
 - Only one card open per screen; opening another closes the first. The opened card scrolls itself into view.
 - Inside: a hairline, optional caption, up to 5 rows (title 14.5/500, context 12.5 muted, plain status, one 34pt action), optional 3 mini figures, then one primary action (44, `inv`) and one "Open …" link button (44, `sunk`). Anything longer belongs on the full page.
-- Home widgets: the open card locks its row (no sideways swipe) and widens to the full 358.
+- Home widget cards don't expand in place. They open full screen (6b).
 - Reduced motion: it opens instantly.
+
+### 6b. Card opens full screen (Home widgets)
+Reference board: `SmartHomeOpen.dc.html` (and `SmartHomeOpenDark`). Tap any Home card there to feel it. This replaces the earlier "magnify pop" proposal (`SmartHomeMagnify`), which is not to be built.
+
+**Open (540ms, easing `cubic-bezier(.32,.72,0,1)`, no overshoot)**
+- The card itself becomes the page, as a container transform. Measure the card's on-screen rect, then render the full-screen page on top, starting exactly over the card:
+  - translate to the card's x/y;
+  - scale = card width ÷ screen width;
+  - clipped to the card's height;
+  - corner radius 22.
+- From there it animates to fill the screen: translate 0, scale 1, no clip, corner radius 0. The card's top part (title, big figure, chart) is the same content at the same place, so it reads as one object growing.
+- The page shows the card's collapsed content, then its expanded content (the same "Inside" content as §6).
+- The expanded content fades in and rises from 14pt below. It starts at 35% of the duration and uses the `out` easing.
+- **Top bar:** sticky, 56 tall, page background.
+  - A back button on the left: chevron plus "Home", 16/500, `acc-t`, 44 hit area.
+  - A grab handle, 36×5 in `line2`, centred 6pt from the top.
+  - The bar fades in from 8pt above, starting at 50% of the duration.
+- **Behind the page:**
+  - Home scales to .94 and takes 34pt corners.
+  - A scrim `rgba(10,10,14,.32)` fades in.
+  - The tab bar and orb slide down 30pt and fade out over 70% of the duration.
+  - The backdrop behind the shrunk Home is black, in both themes.
+
+**Close (440ms, same easing):** the back button or the Android back gesture. The page shrinks back into the card's current rect, the reverse of opening. The expanded content fades out in the first 35%. Home, the scrim and the tab bar return.
+
+**Swipe down to close:**
+- Works only when the page is scrolled to the top. Use a pan gesture that hands off to the scroll view.
+- While dragging:
+  - the page follows the finger at 0.85× and scales down to .86 at 400pt;
+  - its corners grow from 12 to about 34+;
+  - the scrim fades to 20%;
+  - Home behind scales from .94 to .98.
+- Release past 110pt: close from where the page is (440ms) into the card's slot.
+- Release under 110pt: spring back to full screen (420ms, `cubic-bezier(.34,1.3,.64,1)`).
+
+**Rules**
+- One open at a time. While it's open, Home doesn't scroll and its carousels don't swipe.
+- The page scrolls inside itself, with 60 bottom padding. There's no tab bar on it.
+- Re-measure the card's rect at close time: it may have moved if Home re-rendered.
+- Reduced motion: open and close are instant fades (150ms). No scale and no Home push-back.
+- Accessibility: the page is a modal (`accessibilityViewIsModal` on iOS, `importantForAccessibility` on Android). Focus moves to the back button on open and returns to the card on close.
+
+**React Native implementation**
+- Use Reanimated 3 and react-native-gesture-handler.
+- Measure the card with `measure()` on press, then mount an absolutely positioned overlay (a Portal above the tab bar) and drive it with shared values: translateX/Y, scale, clip height and radius. Use a masked or `overflow: hidden` view with an animated height for the clip.
+- Scale Home's root view, not each card.
+- Don't use expo-router screen transitions or experimental shared-element libraries for this. It must run on the UI thread at 60fps on a mid-range Android phone.
+- Test on a real device in phase 0.
 
 ### 7. Header
 52 tall: a 44 back button on the left, a centred title 15/600 (ellipsis), and a 44 "more" button on the right. Tab screens use a large page title (30/600) instead.

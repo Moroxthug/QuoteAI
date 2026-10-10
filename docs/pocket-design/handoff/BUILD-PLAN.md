@@ -18,7 +18,7 @@ The trade-off: the floating pop and the glass tab bar need care to feel native. 
 
 **Done when:**
 - The sandbox matches `Components.dc.html` side by side, in light, night and French.
-- The expand card and swipe row feel right on a real phone at 60fps.
+- The expand card, the full-screen card open (§6b, including swipe down to close) and the swipe row feel right on a real phone at 60fps.
 - Every digit on the sandbox is Manrope.
 - Nothing is hard-coded: search the code for hex colours outside `tokens.ts`; there should be none.
 
@@ -31,14 +31,14 @@ The trade-off: the floating pop and the glass tab bar need care to feel native. 
 - Every state on the boards is reachable: wrong code, locked, expired link, email taken, weak password, offline.
 
 ## Phase 2: Quote to cash (the product)
-**App screens (11):** SmartHome, Quotes, NewQuote, Quote, QuoteEditor, PriceCheck, Clients, Client, Leads, Invoices, Invoice.
+**App screens (12):** SmartHome, Menu, Quotes, NewQuote, Quote, QuoteEditor, PriceCheck, Clients, Client, Leads, Invoices, Invoice. Menu comes here because Home opens it.
 
 **Web and messages (7):** ClientQuote, ClientSign, ClientInvoice, ClientDeposit, Portal as web pages on quoteai.ca; EmailQuote and TextMessages as email and SMS templates. All of these have their own EN/FR switch.
 
 **Done when:**
 - A contractor can describe a job by voice, get a quote, send it, and the client can open, accept and sign it on the web and pay a deposit.
 - The contractor then invoices and records payment.
-- Home shows the live numbers.
+- Home shows the live numbers, including live weather for a real site address (see `WEATHER.md`).
 - This is the first build worth giving to real contractors.
 
 ## Phase 3: Jobs and crew
@@ -61,9 +61,9 @@ The trade-off: the floating pop and the glass tab bar need care to feel native. 
 - The price book feeds quotes.
 
 ## Phase 5: Assistant, settings and account
-**Screens (31):**
+**Screens (30):**
 - Assistant and personalisation: AssistantProposals, AssistantActivity, AssistantPermissions, Notifications, Search, CustomizeHome, RoleHomes.
-- Menu and settings: Menu, Settings, Profile, SetCompany, SetInvoices, SetMessaging, SetPlan, SetQuotes, SetRoles, SetSecurity, SetTaxes, SetWidget, Integrations, Integration, MessageTemplates, Imports, Archive.
+- Settings: Settings, Profile, SetCompany, SetInvoices, SetMessaging, SetPlan, SetQuotes, SetRoles, SetSecurity, SetTaxes, SetWidget, Integrations, Integration, MessageTemplates, Imports, Archive.
 - Help and account: HelpCentre, VideoPlayer, Feedback, WhatsNew, Dunning.
 - Web: WidgetForm (lead form for the contractor's website), Unsubscribe.
 
@@ -80,6 +80,9 @@ The trade-off: the floating pop and the glass tab bar need care to feel native. 
 - Offline behaves as SystemStates shows.
 - A native Quebec speaker has reviewed the French.
 - Store screenshots and the app icon are made in both languages.
+
+## Links to screens from a later phase
+Some screens link ahead. Home links to Jobs, Schedule, Books and Crew map; the tab bar has Jobs; Menu links to about 25 later screens; Quote editor links to Contract and Price book; Invoices links to Dunning. Keep every entry point visible exactly as designed and route it to one shared "Coming soon" placeholder screen: the normal back header, the screen's real title, and a short line. Don't hide rows and don't build later screens early. When a phase lands, its routes replace the placeholder, and `navigation.json` is the check that every link is wired.
 
 ## Checklist for every screen (put it in the PR template)
 - [ ] Matches the board in light and night, EN and FR (open the `.dc.html` side by side)

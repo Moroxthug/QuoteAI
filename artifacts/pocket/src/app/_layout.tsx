@@ -2,7 +2,7 @@ import "@/i18n";
 import { withSentry } from "@/lib/sentry";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Stack } from "expo-router";
+import { DefaultTheme, Stack, ThemeProvider as NavThemeProvider } from "expo-router";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
@@ -14,9 +14,14 @@ import { SessionProvider } from "@/lib/useSession";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
 import { ToastHost } from "@/ui/Feedback";
+import { CardOpenProvider } from "@/ui/CardOpen";
 import { GlobalTabBar } from "@/ui/GlobalTabBar";
+import { board } from "@/theme/board";
 
 void SplashScreen.preventAutoHideAsync();
+
+/** The navigator paints no ground of its own: every screen has its own, and the black behind a pushed-back Home (COMPONENTS §6b) has to show through. */
+const NAV_THEME = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: "transparent" } };
 
 function RootLayout() {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } }));
@@ -43,10 +48,14 @@ function RootLayout() {
           <QueryClientProvider client={client}>
             <SessionProvider>
               <ToastHost>
-                <View style={{ flex: 1 }}>
-                  <Stack screenOptions={{ headerShown: false, animation: "fade" }} />
-                  <GlobalTabBar />
-                </View>
+                <CardOpenProvider>
+                  <View style={{ flex: 1, backgroundColor: board.cardOpen.backdrop }}>
+                    <NavThemeProvider value={NAV_THEME}>
+                      <Stack screenOptions={{ headerShown: false, animation: "fade", contentStyle: { backgroundColor: "transparent" } }} />
+                    </NavThemeProvider>
+                    <GlobalTabBar />
+                  </View>
+                </CardOpenProvider>
               </ToastHost>
             </SessionProvider>
           </QueryClientProvider>

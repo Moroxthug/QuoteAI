@@ -31,6 +31,7 @@ import { Button } from "@/ui/Button";
 import { Sheet, SheetTitle } from "@/ui/Sheet";
 import { TAB_BAR_SPACE } from "@/ui/TabBar";
 import { TabScreen } from "@/ui/TabShell";
+import { PushBack, useCardOpenActive } from "@/ui/CardOpen";
 
 const WEATHER_GLYPH: Record<TodayWeather["kind"], GlyphName> = { clear: "sun", cloud: "cloud", rain: "cloudRain", snow: "cloudRain", storm: "cloudRain", fog: "cloud" };
 
@@ -53,6 +54,7 @@ export default function SmartHome() {
   const clients = useListClients({ query: { queryKey: ["/api/clients"], enabled: signedIn, retry: false } } as never);
   const unread = useQuery({ queryKey: ["home-unread"], queryFn: homeApi.unread, enabled: signedIn, retry: false, staleTime: 60_000 });
 
+  const cardOpen = useCardOpenActive();
   const jr = useJobRole();
   const roleHome = jr.me.included && (jr.role !== "owner" || !!jr.prefs?.order);
   const now = useMemo(() => new Date(), []);
@@ -101,8 +103,9 @@ export default function SmartHome() {
   }));
 
   return (
+    <PushBack>
     <TabScreen active="home">
-      <ExpandScrollView contentContainerStyle={{ paddingBottom: TAB_BAR_SPACE }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ExpandScrollView scrollEnabled={!cardOpen} contentContainerStyle={{ paddingBottom: TAB_BAR_SPACE }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Section>
           <HomeHeader date={headerDate(now, locale)} weather={weatherLine} weatherGlyph={w ? WEATHER_GLYPH[w.kind] : undefined}
             greeting={first ? t(`home.greeting.${greetingFor(now)}`, { name: first }) : t(`home.greetingNoName.${greetingFor(now)}`)}
@@ -140,6 +143,7 @@ export default function SmartHome() {
         <QuickAddGrid tiles={tiles} />
       </Sheet>
     </TabScreen>
+    </PushBack>
   );
 }
 

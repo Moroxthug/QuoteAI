@@ -11,9 +11,12 @@ import { BUILT, screenHref } from "@/lib/nav";
 import { barOf, TAB_SCREEN } from "@/lib/roleTabs";
 import { useJobRole } from "@/lib/useJobRole";
 import { useSession } from "@/lib/useSession";
+import Animated from "react-native-reanimated";
+import { useBarSlide } from "./CardOpen";
 import { TabBar } from "./TabBar";
 
 export function GlobalTabBar() {
+  const slide = useBarSlide();
   const { t } = useTranslation();
   const path = usePathname();
   const { status } = useSession();
@@ -40,5 +43,5 @@ export function GlobalTabBar() {
     if (typeof href === "object" && href.pathname === "/coming-soon") router.push(href);
     else router.replace(href);
   };
-  return <TabBar active={active} onTab={go} labels={labels} keys={bar} label={t("tabs.main")} orbLabel={t("tabs.orb")} onOrb={() => router.push(screenHref("Assistant", t("tabs.orb")))} />;
+  return <Animated.View pointerEvents="box-none" style={[{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }, slide]}><TabBar active={active} onTab={go} labels={labels} keys={bar} label={t("tabs.main")} orbLabel={t("tabs.orb")} onOrb={() => router.push(screenHref("Assistant", t("tabs.orb")))} /></Animated.View>;
 }

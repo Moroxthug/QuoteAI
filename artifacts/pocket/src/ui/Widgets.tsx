@@ -3,23 +3,22 @@
 // stretches to 16 x 5 `ink` over .4 s) over a sideways snap row of cards (342 wide, 10 apart, 16 side
 // padding, the next card peeking). WidgetCard: radius 22, `card` with the ring, min height 198, padding
 // 16 18; the top line is a label on the left and a context on the right (12.5 muted). Tapping the card
-// opens it in place (ExpandCard): the row locks, the card widens to 358, its neighbours fade out and what
-// is below moves down. Only one is open on the screen.
+// opens it FULL SCREEN (COMPONENTS §6b, ui/CardOpen.tsx): the card grows into a page, Home is pushed back,
+// and the row does not swipe while it is open. Only one is open.
 import { useEffect, useState, type ReactNode } from "react";
 import { ScrollView, View } from "react-native";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Circle, Path } from "react-native-svg";
 import { board } from "@/theme/board";
 import { tokens } from "@/theme/tokens";
-import { ExpandCard, useExpandOpen, useOpenCardId } from "./Expand";
-import { easing } from "./motion";
+import { OpenableCard, useCardOpenActive } from "./CardOpen";
+import { Glyph } from "./Icon";
+import { cssShadow } from "./shadow";
 import { Num, Text } from "./Text";
 import { useTheme } from "./theme";
 
 const CARD_W = 342;
-const OPEN_W = 358;
 const GAP = 10;
-const WIDTH = easing("expand");
 
 function Dot({ on }: { on: boolean }) {
   const { colors } = useTheme();
@@ -32,8 +31,7 @@ function Dot({ on }: { on: boolean }) {
 
 export function WidgetRow({ title, ids, children }: { title: string; /** The ids of the row's cards, to know whether one of them is open. */ ids: string[]; children: ReactNode }) {
   const [at, setAt] = useState(0);
-  const open = useOpenCardId();
-  const locked = !!open && ids.includes(open);
+  const locked = useCardOpenActive();
   const count = ids.length;
   return (
     <View style={{ paddingTop: 24 }}>
@@ -50,31 +48,24 @@ export function WidgetRow({ title, ids, children }: { title: string; /** The ids
   );
 }
 
-/** One widget: the collapsed card (`children`) and, opened in place, `expanded`. */
+/** One widget: the collapsed card (`children`) and, on the full-screen page it opens into, `expanded`. */
 export function WidgetCard({ id, label, left, right, children, expanded }: { id: string; label: string; left: string; right?: string; children: ReactNode; expanded: ReactNode }) {
-  const open = useExpandOpen(id);
-  const anyOpen = useOpenCardId();
-  const reduced = useReducedMotion();
-  const w = useSharedValue(CARD_W);
-  const show = useSharedValue(1);
-  useEffect(() => { w.value = withTiming(open ? OPEN_W : CARD_W, { duration: reduced ? 0 : tokens.motion.expand.height.duration, easing: WIDTH }); }, [open, reduced, w]);
-  const faded = !!anyOpen && !open;
-  useEffect(() => { show.value = withTiming(faded ? 0 : 1, { duration: reduced ? 0 : 300 }); }, [faded, reduced, show]);
-  const a = useAnimatedStyle(() => ({ width: w.value, opacity: show.value }));
-  return (
-    <Animated.View style={a} pointerEvents={faded ? "none" : "auto"}>
-      <ExpandCard id={id} label={label} head={
-        <View style={{ minHeight: open ? 0 : 150, paddingRight: 30 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
-            <Text size={12.5} color="muted" numberOfLines={1} style={{ flexShrink: 1 }}>{left}</Text>
-            {right ? <Text size={12.5} color="muted" numberOfLines={1} style={{ flexShrink: 0 }}>{right}</Text> : null}
-          </View>
-          {children}
+  const { colors } = useTheme();
+  const collapsed = (inPage: boolean) => (
+    <View style={inPage ? undefined : { flexDirection: "row", alignItems: "flex-start", gap: 8, padding: 16 }}>
+      <View style={{ flex: 1, minWidth: 0, minHeight: inPage ? 0 : 150, paddingRight: inPage ? 0 : 6 }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
+          <Text size={12.5} color="muted" numberOfLines={1} style={{ flexShrink: 1 }}>{left}</Text>
+          {right ? <Text size={12.5} color="muted" numberOfLines={1} style={{ flexShrink: 0 }}>{right}</Text> : null}
         </View>
-      }>
-        {expanded}
-      </ExpandCard>
-    </Animated.View>
+        {children}
+      </View>
+      {inPage ? null : <Glyph name="chevron" size={14} color="faint" />}
+    </View>
+  );
+  return (
+    <OpenableCard id={id} label={label} collapsed={collapsed} expanded={expanded}
+      style={{ width: CARD_W, borderRadius: tokens.radius.card, backgroundColor: colors.card, boxShadow: cssShadow(tokens.shadow.ring, colors) }} />
   );
 }
 

@@ -11,7 +11,7 @@ export default function ContattiPage() {
       "@context": "https://schema.org",
       "@type": "ContactPage",
       name: "QuoteAI Contact",
-      url: "https://quoteai.ca/contatti/",
+      url: "https://quoteai.ca/contact/",
       description: "Contact the QuoteAI team for support, product questions, or sales information.",
       mainEntity: {
         "@type": "Organization",
@@ -48,7 +48,7 @@ export default function ContattiPage() {
       <SeoHead
         title={t("contact.seoTitle")}
         description={t("contact.seoDescription")}
-        canonical="https://quoteai.ca/contatti/"
+        canonical="https://quoteai.ca/contact/"
         jsonLd={jsonLd}
       />
 

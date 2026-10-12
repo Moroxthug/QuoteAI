@@ -182,7 +182,7 @@ function routes(s: import("./fixtures.js").Showcase): RouteSpec[] {
     pub("/"), pub("/fr"), pub("/whatsapp"), pub("/blog"), pub("/blog/categoria/advice"),
     pub("/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026"),
     pub("/quotes/painter"), pub("/quotes/painter/toronto"), pub("/fr/soumissions/peintre"), pub("/fr/soumissions/peintre/montreal"),
-    pub("/chi-siamo"), pub("/contatti"), pub("/privacy-policy"), pub("/terms"), pub("/mappa-sito"),
+    pub("/about"), pub("/contact"), pub("/privacy-policy"), pub("/terms"), pub("/site-map"),
     // Phase 95: the legal pages in French.
     pub("/fr/confidentialite"), pub("/fr/conditions"),
     // Phase 82: the pages Phases 70/81 added were never in this sweep.
@@ -562,7 +562,7 @@ const PHONE_BUDGETS: Array<{ match: RegExp; screens: number; why: string }> = [
   { match: /^\/dashboard\/pay/, screens: 7, why: "the pay rules form [6.1 FR]" },
   { match: /^\/dashboard\/__states$/, screens: 9, why: "Phase 120 dev gallery: every state and gesture, one after another [6.4]" },
   { match: /^\/(quotes\/[a-z-]+(\/[a-z-]+)?|fr\/soumissions\/[a-z-]+(\/[a-z-]+)?)\/?$/, screens: 17, why: "a long-form SEO trade article [16.3]" },
-  { match: /^\/(mappa-sito|site-?map|plan-du-site)/, screens: 16, why: "the sitemap: one link per page [15.2]" },
+  { match: /^\/(site-map|mappa-sito|site-?map|plan-du-site)/, screens: 16, why: "the sitemap: one link per page [15.2]" },
   { match: /^\/(fr\/)?blog\/?$/, screens: 14, why: "the article index [12.9]" },
 ];
 function phoneBudget(path: string, session: Session): { screens: number; why: string } {

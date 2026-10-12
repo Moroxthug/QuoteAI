@@ -8,8 +8,8 @@ quoteai (https://quoteai.ca) è pensato per il mercato italiano: terminologia te
 
 - [Home](https://quoteai.ca/): panoramica del prodotto, benefici, prezzi e demo di un preventivo generato dall'AI.
 - [Blog & Approfondimenti](https://quoteai.ca/blog/): guide pratiche su preventivazione, prezzi di mercato e gestione cantieri.
-- [Chi siamo](https://quoteai.ca/chi-siamo/): missione, team e filosofia di prodotto.
-- [Contatti](https://quoteai.ca/contatti/): canali di supporto e collaborazioni.
+- [Chi siamo](https://quoteai.ca/about/): missione, team e filosofia di prodotto.
+- [Contatti](https://quoteai.ca/contact/): canali di supporto e collaborazioni.
 - [WhatsApp](https://quoteai.ca/whatsapp/): genera preventivi direttamente dalla chat WhatsApp Business.
 
 ## Settori coperti

@@ -37,13 +37,13 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/chi-siamo/</loc>
+    <loc>https://quoteai.ca/about/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/contatti/</loc>
+    <loc>https://quoteai.ca/contact/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
@@ -61,7 +61,7 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/mappa-sito/</loc>
+    <loc>https://quoteai.ca/site-map/</loc>
     <lastmod>2026-09-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -2505,6 +2505,12 @@
   <url>
     <loc>https://quoteai.ca/help/integrations-and-imports/</loc>
     <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/help/delete-your-account/</loc>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

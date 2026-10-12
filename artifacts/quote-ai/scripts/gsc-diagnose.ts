@@ -12,7 +12,7 @@ const urls = [
   "https://quoteai.ca/quotes/general-contractor/brescia/",
   "https://quoteai.ca/blog/privacy/",
   "https://quoteai.ca/privacy/",
-  "https://quoteai.ca/chi-siamo/",
+  "https://quoteai.ca/about/",
 ];
 
 async function main() {

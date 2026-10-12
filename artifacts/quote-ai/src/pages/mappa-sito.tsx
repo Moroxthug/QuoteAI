@@ -27,7 +27,7 @@ export default function MappaSitoPage() {
       "@type": "WebPage",
       name: "Sitemap | QuoteAI",
       description: "Full sitemap for QuoteAI. Find all static pages, blog articles, and guides for tradespeople and professionals across Canadian cities.",
-      url: "https://quoteai.ca/mappa-sito/",
+      url: "https://quoteai.ca/site-map/",
     }
   ];
 
@@ -36,7 +36,7 @@ export default function MappaSitoPage() {
       <SeoHead
         title={t("sitemap.seoTitle")}
         description={t("sitemap.seoDescription")}
-        canonical="https://quoteai.ca/mappa-sito/"
+        canonical="https://quoteai.ca/site-map/"
         jsonLd={jsonLd}
       />
 
@@ -69,12 +69,12 @@ export default function MappaSitoPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/chi-siamo/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
+                  <Link href="/about/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.aboutUs")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contatti/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
+                  <Link href="/contact/" className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                     {t("sitemap.contactSupport")}
                   </Link>
                 </li>

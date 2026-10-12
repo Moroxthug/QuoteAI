@@ -37,7 +37,7 @@ export default function ChiSiamoPage() {
       <SeoHead
         title={t("about.seoTitle")}
         description={t("about.seoDescription")}
-        canonical="https://quoteai.ca/chi-siamo/"
+        canonical="https://quoteai.ca/about/"
         jsonLd={jsonLd}
       />
 
@@ -116,7 +116,7 @@ export default function ChiSiamoPage() {
             <Link href="/sign-up/" className="btn btn-navy">
               {t("about.ctaStartFree")} <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/contatti/" className="btn btn-outline-navy">
+            <Link href="/contact/" className="btn btn-outline-navy">
               {t("about.ctaContactUs")}
             </Link>
           </div>

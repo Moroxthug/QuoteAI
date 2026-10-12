@@ -12,6 +12,9 @@
     }
   },
   "redirects": [
+    { "source": "/chi-siamo/?", "destination": "/about/", "permanent": true },
+    { "source": "/contatti/?", "destination": "/contact/", "permanent": true },
+    { "source": "/mappa-sito/?", "destination": "/site-map/", "permanent": true },
     {
       "source": "/((?!api/)(?!.*\\.)[^/]+(?:/[^/]+)*)",
       "destination": "/$1/",

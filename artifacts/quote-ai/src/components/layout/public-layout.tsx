@@ -336,8 +336,8 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             ))}
           </FooterCol>
           <FooterCol title={t("footer.company")} folded={phone}>
-            <Link href="/chi-siamo/">{t("footer.aboutUs")}</Link>
-            <Link href="/contatti/">{t("footer.contact")}</Link>
+            <Link href="/about/">{t("footer.aboutUs")}</Link>
+            <Link href="/contact/">{t("footer.contact")}</Link>
             <Link href="/blog/">{t("footer.newsroom")}</Link>
             <Link href="/#reviews">{t("footer.reviews")}</Link>
           </FooterCol>
@@ -346,7 +346,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <button onClick={() => setSupportOpen(true)}>{t("support.contactSupport")}</button>
             <Link href={localizedPath("/privacy-policy/", lang)}>{t("footer.privacyPolicy")}</Link>
             <Link href={localizedPath("/terms/", lang)}>{t("footer.terms")}</Link>
-            <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>
+            <Link href="/site-map/">{t("footer.sitemap")}</Link>
           </FooterCol>
         </div>
         <div className="wrap"><p className="ft-fine">{t("footer.fine")}</p></div>
@@ -357,7 +357,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
           <div className="ft-legal">
             <Link href={localizedPath("/privacy-policy/", lang)}>{t("footer.privacyPolicy")}</Link>
             <Link href={localizedPath("/terms/", lang)}>{t("footer.terms")}</Link>
-            <Link href="/mappa-sito/">{t("footer.sitemap")}</Link>
+            <Link href="/site-map/">{t("footer.sitemap")}</Link>
           </div>
           <LanguageToggle variant="dark" />
         </div>

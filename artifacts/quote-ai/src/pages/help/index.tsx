@@ -101,7 +101,7 @@ export default function HelpIndexPage() {
             <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>{t("help.stillStuckTitle")}</h2>
             <p style={{ fontSize: 13.5, color: "var(--muted-mk)" }}>{t("help.stillStuckBody")}</p>
           </div>
-          <Link href="/contatti/" className="btn btn-navy btn-sm">{t("help.contactUs")}</Link>
+          <Link href="/contact/" className="btn btn-navy btn-sm">{t("help.contactUs")}</Link>
         </section>
       </div>
     </div>

@@ -399,3 +399,7 @@ Built, with the mock first as the spec says, then the real source:
 - **Differences from the board, on purpose:** the mock's hours are two hours apart (7, 9 ... 21) so that the first 50 % hour is 3 pm, which is what the board's header and advice say (its own bars and slots would make it 1 pm); the bar and slot labels therefore read 7, 9, 11 ... rather than 7, 8, 10, 11 ...
 - **Not on a board (marked):** the advice "Exterior work fits after {time}" (rain now, ending later), "snowing until", the no-rain week footer "No rain this week." and the "Weather to plan around" row wording (the board's rows are assistant proposals, phase 5). Snow, sleet, fog and thunder use the cloud-with-drops or plain cloud glyph the app already has.
 - **NOT verified:** live Apple WeatherKit (no Apple credentials exist here): the token, request and mapping are unit-tested only. Live weather for a real address was checked with the ECCC source (Ottawa: 4°, 24 hourly hours, a 7-day outlook). The weather on a phone was not seen.
+
+### 129.2 Phone-test fixes (2026-10-12)
+- Open Home cards no longer run under the phone's status bar: the open card's top bar, grab handle and content start below the safe-area top inset (`ui/CardOpen.tsx`).
+- Weather showed "unavailable" for a company with a province but no address and nothing scheduled today. The company fallback now uses the province's main city (`weather/geo.ts` `provinceCity`, used by `today.ts`), so Home always has weather once a province is set. A company with no province and no address still has none.

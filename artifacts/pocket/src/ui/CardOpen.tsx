@@ -13,6 +13,7 @@ import { AccessibilityInfo, BackHandler, findNodeHandle, Platform, View, useWind
 import { Gesture, GestureDetector, ScrollView as GestureScrollView } from "react-native-gesture-handler";
 import Animated, { Easing, makeMutable, runOnJS, useAnimatedScrollHandler, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { barSlide, CLOSE_MS, closedGeom, dragGeom, HOME_RADIUS, HOME_SCALE, lerpGeom, OPEN_MS, openGeom, shouldClose, SPRING_MS, type Geom, type Rect } from "@/lib/cardOpen";
 import { board } from "@/theme/board";
 import { Glyph } from "./Icon";
@@ -114,6 +115,7 @@ export function OpenableCard({ id, label, hint, collapsed, expanded, style, chil
 export function CardOpenProvider({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const { width: W, height: H } = useWindowDimensions();
+  const top = useSafeAreaInsets().top;
   const [session, setSession] = useState<Session | null>(null);
   const sessionRef = useRef<Session | null>(null);
   const busy = useRef(false);
@@ -255,15 +257,15 @@ export function CardOpenProvider({ children }: { children: ReactNode }) {
           <Animated.View style={panel} accessibilityViewIsModal importantForAccessibility="yes" {...(Platform.OS === "web" ? { role: "dialog" as const } : {})} accessibilityLabel={c.label}>
             <View style={{ position: "absolute", top: 0, left: 0, width: W, height: H, backgroundColor: colors.card }}>
               <GestureDetector gesture={Gesture.Simultaneous(pan, native)}>
-                <AnimatedScroll onScroll={onScroll} scrollEventThrottle={16} bounces={false} overScrollMode="never" showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 56, paddingBottom: 60 }}>
+                <AnimatedScroll onScroll={onScroll} scrollEventThrottle={16} bounces={false} overScrollMode="never" showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ paddingTop: 56 + top, paddingBottom: 60 }}>
                   <View style={{ paddingHorizontal: 16, paddingTop: 0 }}>
                     {c.collapsed(true)}
                     <Animated.View style={bodyStyle}>{c.expanded}</Animated.View>
                   </View>
                 </AnimatedScroll>
               </GestureDetector>
-              <Animated.View style={[{ position: "absolute", top: 0, left: 0, right: 0, height: 56, backgroundColor: colors.card, flexDirection: "row", alignItems: "center", paddingHorizontal: 8 }, barStyle]}>
-                <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: "50%", top: 6, width: 36, height: 5, marginLeft: -18, borderRadius: 5, backgroundColor: colors.line2 }} />
+              <Animated.View style={[{ position: "absolute", top: 0, left: 0, right: 0, height: 56 + top, paddingTop: top, backgroundColor: colors.card, flexDirection: "row", alignItems: "center", paddingHorizontal: 8 }, barStyle]}>
+                <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: "50%", top: top + 6, width: 36, height: 5, marginLeft: -18, borderRadius: 5, backgroundColor: colors.line2 }} />
                 <View ref={backRef} collapsable={false}>
                   <Press onPress={close} accessibilityRole="button" accessibilityLabel={t("tabs.home")} style={{ height: 44, paddingRight: 10, paddingLeft: 4, flexDirection: "row", alignItems: "center", gap: 2 }}>
                     <Glyph name="back" size={22} color="acc-t" weight={2.2} />

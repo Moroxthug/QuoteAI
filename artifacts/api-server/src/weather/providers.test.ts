@@ -1,4 +1,5 @@
 import { createVerify, generateKeyPairSync } from "node:crypto";
+import { provinceCity } from "./geo.js";
 import { describe, expect, it } from "vitest";
 import { conditionOfCode, forecastFrom as ecccForecast, periodDates } from "./eccc.js";
 import { clearForecastCache, forecastCached, getProvider } from "./provider.js";
@@ -90,4 +91,10 @@ describe("the provider and its 30-minute cache", () => {
     expect(getProvider({ WEATHERKIT_TEAM_ID: "a", WEATHERKIT_SERVICE_ID: "b", WEATHERKIT_KEY_ID: "c" } as NodeJS.ProcessEnv).name).toBe("eccc");
     expect(getProvider({ WEATHERKIT_TEAM_ID: "a", WEATHERKIT_SERVICE_ID: "b", WEATHERKIT_KEY_ID: "c", WEATHERKIT_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----" } as NodeJS.ProcessEnv).name).toBe("weatherkit");
   });
+});
+
+it("a province without an address gets its main city", () => {
+  expect(provinceCity("BC")?.en).toMatch(/Vancouver/);
+  expect(provinceCity("QC")?.en).toMatch(/Montr/);
+  expect(provinceCity(null)).toBeNull();
 });

@@ -41,4 +41,15 @@ export async function siteFor(address: string | null, province: string | null, p
 }
 
 
+const MAIN: Record<string, string> = { BC: "Vancouver", AB: "Calgary", SK: "Regina", MB: "Winnipeg", ON: "Toronto", QC: "Montréal", NB: "Fredericton", NS: "Halifax", PE: "Charlottetown", NL: "St. John's", YT: "Whitehorse", NT: "Yellowknife", NU: "Iqaluit" };
+
+/** A company with a province but no address (or an address no city is found in): the province's main city, so Home still has weather. */
+export function provinceCity(province: string | null): Site | null {
+  const p = (province ?? "").toUpperCase();
+  const want = MAIN[p];
+  if (!want) return null;
+  const f = (s: string) => fold(s).replace(/[^a-z0-9]+/g, " ").trim();
+  return SITES.find((s) => s.prov === p && f(s.en.split(" (")[0]!) === f(want)) ?? SITES.find((s) => s.prov === p) ?? null;
+}
+
 export { timeZoneForProvince as zoneOf } from "../jobs/dates.js";

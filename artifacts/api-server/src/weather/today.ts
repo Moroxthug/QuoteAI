@@ -1,6 +1,6 @@
 import { and, asc, eq, gt, isNotNull, lt } from "drizzle-orm";
 import { db, businessProfilesTable, projectsTable, scheduleBlocksTable } from "@workspace/db";
-import { siteFor, zoneOf, type Site } from "./geo.js";
+import { provinceCity, siteFor, zoneOf, type Site } from "./geo.js";
 import { attributionOf, forecastCached, getProvider } from "./provider.js";
 import { localDate, summarize } from "./summary.js";
 import { addDays, zonedIso } from "./time.js";
@@ -73,7 +73,7 @@ export async function weatherToday({ userId, lang, provider = getProvider() }: T
     places.push({ siteId: c.projectId, name: c.name, area: city ? cityName(city) : "", crew: c.crew.size, lat, lng });
   }
   if (places.length === 0) {
-    const city = await siteFor(profile?.address ?? null, profile?.province ?? null).catch(() => null);
+    const city = (await siteFor(profile?.address ?? null, profile?.province ?? null).catch(() => null)) ?? provinceCity(profile?.province ?? null);
     if (city) places.push({ siteId: "company", name: cityName(city), area: cityName(city), crew: 0, lat: city.lat, lng: city.lon, isCompany: true });
   }
 

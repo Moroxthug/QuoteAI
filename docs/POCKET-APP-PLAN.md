@@ -403,3 +403,8 @@ Built, with the mock first as the spec says, then the real source:
 ### 129.2 Phone-test fixes (2026-10-12)
 - Open Home cards no longer run under the phone's status bar: the open card's top bar, grab handle and content start below the safe-area top inset (`ui/CardOpen.tsx`).
 - Weather showed "unavailable" for a company with a province but no address and nothing scheduled today. The company fallback now uses the province's main city (`weather/geo.ts` `provinceCity`, used by `today.ts`), so Home always has weather once a province is set. A company with no province and no address still has none.
+
+### 129.3 Operator alert: no more daily "2 dead automation runs" (2026-10-13)
+- The daily "[QuoteAI ops] 2 dead / 0 failed" email was two runs from 6 Oct that no retry could fix: a lead follow-up with no email address (an e2e test account) and a QuickBooks payment sync for a customer whose QuickBooks was not connected.
+- A follow-up with no email (lead and quote) now ends as a skipped success instead of five failed attempts (`automations/leadFollowup.ts`, `quoteFollowup.ts`).
+- `PermanentFailure` (`lib/automation.ts`): the QuickBooks and Wave "not connected" errors die at once, are reported as warnings, and stay visible to the customer's retry button. The operator alert leaves them out (`lib/ops.ts` `customerFixable`).

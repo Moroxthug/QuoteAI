@@ -27,6 +27,17 @@ export function registerAutomation(event: AutomationEvent, handler: AutomationHa
   handlers.set(event, list);
 }
 
+/**
+ * A failure that retrying cannot fix (an accounting app that is not connected): the run is dead at once, without five pointless attempts,
+ * and it is the customer's to fix (the app offers a retry once they reconnect), so it is not an operator alert (see ops.ts).
+ */
+export class PermanentFailure extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "PermanentFailure";
+  }
+}
+
 const BACKOFF_MINUTES = [5, 15, 60, 240, 1440];
 
 function nextAttemptDate(attempts: number): Date {
@@ -105,7 +116,8 @@ async function executeRun(run: AutomationRun): Promise<void> {
     logger.info({ event: run.event, runId: run.id }, "Automation succeeded");
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    const exhausted = claimed.attempts >= claimed.maxAttempts;
+    const permanent = err instanceof PermanentFailure;
+    const exhausted = permanent || claimed.attempts >= claimed.maxAttempts;
     await db
       .update(automationRunsTable)
       .set({
@@ -119,7 +131,7 @@ async function executeRun(run: AutomationRun): Promise<void> {
     // Phase 69: every failed attempt is an issue in error tracking (grouped by
     // event + error); a dead run is fatal because nothing will retry it.
     await captureException(err, {
-      level: exhausted ? "fatal" : "error",
+      level: permanent ? "warning" : exhausted ? "fatal" : "error",
       mechanism: "automation",
       tags: { automation_event: run.event, automation_status: exhausted ? "dead" : "failed", attempt: claimed.attempts },
       extra: { runId: run.id, idempotencyKey: run.idempotencyKey, entityType: run.entityType, entityId: run.entityId },

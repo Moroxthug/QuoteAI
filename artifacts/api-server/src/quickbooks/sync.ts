@@ -1,4 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
+import { PermanentFailure } from "../lib/automation.js";
 import {
   db,
   quickbooksSyncLogTable,
@@ -77,7 +78,7 @@ async function logSync(params: {
 
 async function tokenFor(userId: string): Promise<Token> {
   const token = await getValidAccessToken(userId);
-  if (!token) throw new Error("QuickBooks not connected or token refresh failed");
+  if (!token) throw new PermanentFailure("QuickBooks not connected or token refresh failed");
   return token;
 }
 

@@ -26,13 +26,16 @@ export type OpsHealth = {
   problems: string[];
 };
 
+/** Dead runs the customer fixes (reconnecting an accounting app), not the operator: left out of the operator alert. */
+const customerFixable = sql`coalesce(${automationRunsTable.lastError}, '') not like '%not connected or token refresh failed%'`;
+
 /** Automation runs that will never run again (dead) or are waiting on a retry that is already overdue (failed). */
 export async function automationBacklog(): Promise<{ failed: number; dead: number }> {
   const since = new Date(Date.now() - 7 * 24 * 3_600_000);
   const [row] = await db
     .select({
       failed: sql<number>`count(*) filter (where ${automationRunsTable.status} = 'failed' and ${automationRunsTable.nextAttemptAt} <= now())`,
-      dead: sql<number>`count(*) filter (where ${automationRunsTable.status} = 'dead' and ${automationRunsTable.finishedAt} >= ${since})`,
+      dead: sql<number>`count(*) filter (where ${automationRunsTable.status} = 'dead' and ${automationRunsTable.finishedAt} >= ${since} and ${customerFixable})`,
     })
     .from(automationRunsTable)
     .where(and(gte(automationRunsTable.updatedAt, since), sql`${automationRunsTable.status} in ('failed', 'dead')`));
@@ -83,7 +86,7 @@ export async function recentAutomationFailures(since: Date, limit = 20) {
       updatedAt: automationRunsTable.updatedAt,
     })
     .from(automationRunsTable)
-    .where(and(sql`${automationRunsTable.status} in ('failed', 'dead')`, gte(automationRunsTable.updatedAt, since)))
+    .where(and(sql`${automationRunsTable.status} in ('failed', 'dead')`, gte(automationRunsTable.updatedAt, since), customerFixable))
     .orderBy(desc(automationRunsTable.updatedAt))
     .limit(limit);
 }

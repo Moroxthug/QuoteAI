@@ -1,3 +1,4 @@
+import { PermanentFailure } from "../lib/automation.js";
 import { db, waveSyncLogTable, type Invoice, type CostEntry } from "@workspace/db";
 import { getValidAccessToken, markSynced, getWaveConnection } from "./service.js";
 import { createMoneyTransaction, getOrCreateCustomer } from "../lib/waveClient.js";
@@ -41,7 +42,7 @@ export async function syncInvoiceToWave(invoice: Invoice, userId: string): Promi
     if (!connection.incomeAccount) throw new Error("No Wave income account set — pick one in Settings → Integrations");
 
     const token = await getValidAccessToken(userId);
-    if (!token) throw new Error("Wave not connected or token refresh failed");
+    if (!token) throw new PermanentFailure("Wave not connected or token refresh failed");
 
     // Phase 88: the Wave customer is remembered per client, so a renamed or re-typed customer is not created twice.
     const linkType = invoice.clientId ? "client" : "customer_name";
@@ -83,7 +84,7 @@ export async function syncCostEntryToWave(entry: CostEntry, userId: string): Pro
     if (!accountRef) throw new Error(`No Wave expense account mapped for category "${entry.category}" — set it in Settings → Integrations`);
 
     const token = await getValidAccessToken(userId);
-    if (!token) throw new Error("Wave not connected or token refresh failed");
+    if (!token) throw new PermanentFailure("Wave not connected or token refresh failed");
 
     const amount = (entry.totalCents / 100).toFixed(2);
     const transaction = await createMoneyTransaction(token.accessToken, token.businessId, {

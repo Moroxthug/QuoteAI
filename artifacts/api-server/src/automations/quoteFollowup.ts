@@ -31,6 +31,8 @@ registerAutomation("quote.followup_due", async (run) => {
   const result = await sendQuoteFollowup({ quote, profile, stage: quote.followUpStage });
 
   if (!result.ok) {
+    // Nobody to write to (no email on the quote): retrying cannot change that.
+    if (result.reason === "no_email") return { skipped: "no_email" };
     throw new Error(`Quote follow-up send failed: ${result.reason}`);
   }
 

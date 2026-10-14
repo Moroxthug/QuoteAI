@@ -32,6 +32,8 @@ registerAutomation("lead.followup_due", async (run) => {
 
   if (!result.ok) {
     await db.insert(leadEventsTable).values({ leadId: lead.id, userId: lead.userId, type: "message_failed", payload: { stage: lead.followUpStage, reason: result.reason } });
+    // Nobody to write to (no email on the lead): retrying cannot change that.
+    if (result.reason === "no_email") return { skipped: "no_email" };
     throw new Error(`Lead follow-up send failed: ${result.reason}`);
   }
 

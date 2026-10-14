@@ -7,7 +7,8 @@
 // that grows in from the left over 1.2 s after 0.2 s with the `out` easing, on first view.
 // ProgressRow: label 13.5 and the figure Num 600 in its tone over the bar, gap 8, padding 14 16.
 import { Children, Fragment, useEffect, type ReactNode } from "react";
-import { View } from "react-native";
+import { PixelRatio, View } from "react-native";
+import { effectiveScale, stacksAt } from "@/lib/textScale";
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 import { tokens } from "@/theme/tokens";
 import { Card, Hairline } from "./Card";
@@ -23,7 +24,23 @@ function Value({ children }: { children: string }) {
 
 /** The figures of a StatStrip without the card, for a head that sits inside another card (an expandable one). */
 export function Figures({ items }: { items: Figure[] }) {
-  const { colors } = useTheme();
+  const { colors, textScale } = useTheme();
+  // Largest text: three narrow columns would break words in two, so the figures stack, label then value, one under the other.
+  const stack = stacksAt(effectiveScale(textScale, PixelRatio.getFontScale()));
+  if (stack) {
+    return (
+      <View>
+        {items.map((k, i) => (
+          <View key={i} accessible accessibilityLabel={[k.label, k.value, k.sub].filter(Boolean).join(", ")}
+            style={{ gap: 3, paddingHorizontal: 12, paddingVertical: 10, borderTopWidth: i > 0 ? 1 : 0, borderTopColor: colors.line }}>
+            <Text size={11.5} color="muted">{k.label}</Text>
+            <Value>{k.value}</Value>
+            {k.sub ? <Text size={11.5} color={k.subTone ?? "muted"}>{k.sub}</Text> : null}
+          </View>
+        ))}
+      </View>
+    );
+  }
   return (
     <View style={{ flexDirection: "row" }}>
       {items.map((k, i) => (

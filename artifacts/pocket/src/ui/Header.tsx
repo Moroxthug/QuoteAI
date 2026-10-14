@@ -36,16 +36,16 @@ export function Header({ title, titleIcon, onBack, backLabel, onMore, moreLabel,
 }
 
 export function PageTitle({ children }: { children: string }) {
-  return <Text size={30} weight={600} tracking={-0.045} leading={1.1} accessibilityRole="header">{children}</Text>;
+  return <Text size={30} weight={600} tracking={-0.045} leading={1.1} accessibilityRole="header" style={{ flexShrink: 1 }}>{children}</Text>;
 }
 
 /** A tab screen's top: the large page title on the left and its actions on the right (padding 18 12 0 20 below the status bar). */
 export function TabHeader({ title, children }: { title: string; children?: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 18 + insets.top, paddingLeft: 20, paddingRight: 12 }}>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", rowGap: 4, paddingTop: 18 + insets.top, paddingLeft: 20, paddingRight: 12 }}>
       <PageTitle>{title}</PageTitle>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>{children}</View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>{children}</View>
     </View>
   );
 }

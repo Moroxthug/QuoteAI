@@ -60,7 +60,7 @@ export const fr: typeof en = {
   },
   glanceRows: {
     done: "{{pct}} d’avancement",
-    ready: "Prêt à facturer : {{name}}", readySub: "{{pct}} d’avancement · {{invoiced}} facturé", // owner
+    ready: "Prêt à facturer : {{name}}", readySub: "{{pct}} d’avancement · {{invoiced}} facturé", // owner
     toInvoice: "À facturer", invoice: "Facturer",
     clash: "{{name}} est réservé deux fois, de {{from}} à {{to}}", clashSub: "{{a}} et {{b}}", clashWord: "Conflit", fix: "Corriger",
   },
@@ -70,14 +70,14 @@ export const fr: typeof en = {
   receipts: { title_one: "{{count}} reçu à vérifier", title_other: "{{count}} reçus à vérifier", sub: "{{job}} · {{amount}}" },
   setup: { meta: "Plan IA prêt à vérifier", action: "Vérifier" }, // owner
   meta: {
-    next: "Ensuite : {{title}}, {{date}}", nextNoDate: "Ensuite : {{title}}", running: "En cours", // owner
+    next: "Ensuite : {{title}}, {{date}}", nextNoDate: "Ensuite : {{title}}", running: "En cours", // owner
     starts: "Du {{start}} au {{end}}", startsOnly: "Début le {{start}}", noDates: "Pas encore de dates", // owner
     onHold: "En pause", finished: "Terminé le {{date}}",
   },
   crew: { onSite: "{{count}} sur place" },
   caps: { onSite: "Aujourd’hui sur le chantier", today: "Aujourd’hui", before: "Avant le début", waiting: "Pourquoi c’est en attente", after: "Après les travaux" },
   row: {
-    onSite: "Sur place", since: "Depuis {{time}}", onTrack: "Dans les temps", late: "En retard", next: "Ensuite : {{title}}", // owner (late, since)
+    onSite: "Sur place", since: "Depuis {{time}}", onTrack: "Dans les temps", late: "En retard", next: "Ensuite : {{title}}", // owner (late, since)
     blocker: "Bloquant", flagged: "Signalé par {{name}} à {{time}}", flaggedNoName: "Signalé à {{time}}", resolve: "Régler", resolved: "Réglé", // owner
     booked: "Équipe réservée", bookedSub: "{{names}}", noCrew: "Pas encore d’équipe", noCrewSub: "Ajoutez des gens dans le chantier", // owner
     waiting: "En attente", waitingSub: "En pause depuis le {{date}}", // owner

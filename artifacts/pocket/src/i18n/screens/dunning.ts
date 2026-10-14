@@ -47,7 +47,7 @@ export const fr: typeof en = {
     w: ["Voir chaque soumission, chantier et facture", "Les clients peuvent payer les factures ouvertes", "Liens d’équipe, pointage et photos", "Exporter vos données"], p: ["Fonctions de votre ancien forfait", "Accès des coéquipiers", "Assistant et rappels automatiques"],
   },
   s4: {
-    title: "Passage au forfait Gratuit", day: "Tout de suite", cap: "Soumissions seulement. Tout le reste est conservé.", lead: "Vous êtes maintenant au forfait Gratuit.", body: "Chantiers, factures et équipe sont conservés. Le forfait ne se change pas dans l’appli.", link: "quoteai.ca",
+    title: "Passage au forfait Gratuit", day: "Tout de suite", cap: "Soumissions seulement. Tout le reste est conservé.", lead: "Vous êtes maintenant au forfait Gratuit.", body: "Chantiers, factures et équipe sont conservés. Le forfait ne se change pas dans l’app.", link: "quoteai.ca",
     quotes: ["Soumissions", "Limite du forfait Gratuit", "Disponibles"], jobs: ["Chantiers et factures", "Consulter et exporter", "Conservés"], team: "Coéquipiers", teamPaused: "En pause", teamOwner: "Les accès de l’équipe sont suspendus", teamMember: "Votre accès est suspendu",
   },
   s5: { title: "Paiement réglé", day: "En tout temps", cap: "Retour à la normale en une minute, à n’importe quelle étape.", lead: "Paiement mis à jour.", body: "Tout est revenu, comme vous l’aviez laissé." },

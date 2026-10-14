@@ -40,7 +40,7 @@ export const fr: typeof en = {
     empty: { title: "Vous êtes à jour", body: "Les soumissions consultées, les paiements et les nouvelles de l’équipe s’affichent ici.", action: "Tout voir" },
     loadFailed: { title: "Impossible de charger vos notifications", body: "Vérifiez votre connexion et réessayez." },
     ask: {
-      label: "Activer les notifications", title: "Savoir dès qu’ils acceptent ?", body: "Nous vous avertissons quand une soumission est consultée, signée ou payée. Le reste se choisit dans les réglages.", on: "Activer les notifications", later: "Plus tard",
+      label: "Activer les notifications", title: "Savoir dès qu’ils acceptent ?", body: "Nous vous avertissons quand une soumission est consultée, signée ou payée. Le reste se choisit dans les réglages.", on: "Activer les notifications", later: "Plus tard",
       app: "quoteAI", now: "maintenant", sampleTitle: "Dana Whitfield a accepté votre soumission", sampleBody: "Chambres et plafond de salle de bain ·",
       denied: "Les notifications sont désactivées pour quoteAI. Activez-les dans les réglages de votre téléphone.", unavailable: "Ce téléphone ne peut pas encore afficher les notifications de l’app.",
     },
@@ -51,7 +51,7 @@ export const fr: typeof en = {
     types: { all: "Tout", quotes: "Soumissions", clients: "Clients", jobs: "Chantiers", invoices: "Factures", pages: "Pages" },
     recentSearches: "Recherches récentes", clearRecent: "Effacer", opened: "Ouverts récemment", seeAll: "Tout voir",
     kind: { quotes: "Soumission", clients: "Client", jobs: "Chantier", invoices: "Facture" },
-    none: { title: "Aucun résultat pour « {{q}} »", body: "Essayez un nom de client, une adresse ou un numéro comme Q-2026-118.", action: "Effacer la recherche" },
+    none: { title: "Aucun résultat pour « {{q}} »", body: "Essayez un nom de client, une adresse ou un numéro comme Q-2026-118.", action: "Effacer la recherche" },
     loadFailed: { title: "Impossible de tout charger pour la recherche", body: "Vérifiez votre connexion et réessayez." },
     partial: { lead: "Certaines listes n’ont pas pu se charger.", body: "Des résultats peuvent manquer." },
     quoteSub: "{{number}} · {{job}}", jobSub: "{{client}} · {{detail}}", jobProgress: "{{pct}}", jobFinished: "terminé le {{date}}", jobStarts: "débute le {{date}}", jobWaiting: "en attente de la météo",

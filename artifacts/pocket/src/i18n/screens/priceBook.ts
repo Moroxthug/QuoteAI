@@ -49,7 +49,7 @@ export const fr: typeof en = {
   unit: { sqft: "pi²", linft: "pi lin.", hour: "heure", each: "unité", day: "jour" },
   yourCost: "Votre coût",
   rowLabel: "{{name}}, {{rate}} {{unit}}", openParts: "Voir le détail de {{name}}",
-  empty: { title: "Rien ne s’appelle « {{q}} »", body: "Ajoutez-le maintenant, il sera prêt pour votre prochaine soumission.", add: "Ajouter « {{q}} »" },
+  empty: { title: "Rien ne s’appelle « {{q}} »", body: "Ajoutez-le maintenant, il sera prêt pour votre prochaine soumission.", add: "Ajouter « {{q}} »" },
   none: { title: "Votre liste de prix est vide", body: "Ajoutez ce que vous soumissionnez le plus. Ce sera prêt à votre prochaine soumission.", action: "Ajouter" },
   import: { title: "Importer des prix", sub: "Anciennes soumissions, photo, PDF ou CSV" },
   loadFailed: { title: "Impossible de charger votre liste de prix", body: "Vérifiez votre connexion et réessayez." },

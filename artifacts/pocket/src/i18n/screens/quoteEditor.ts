@@ -70,7 +70,7 @@ export const fr: typeof en = {
     readOnly: "Votre rôle permet de consulter, mais pas de modifier.",
     readOnlyBody: "Demandez à {{name}} de modifier les prix.",
     locked: "Cette soumission est définitive.", // owner
-    lockedBody: "Elle a été acceptée ou son PDF a été téléchargé : elle ne peut plus être modifiée.", // owner
+    lockedBody: "Elle a été acceptée ou son PDF a été téléchargé : elle ne peut plus être modifiée.", // owner
     seen: "{{name}} l’a déjà vue.",
     seenBody: "Si vous la modifiez, elle devient la version {{next}}. La version qu’il a est conservée et vous envoyez la nouvelle quand vous voulez.", // owner
     version: "La version {{n}} n’est pas encore envoyée", // owner
@@ -90,9 +90,9 @@ export const fr: typeof en = {
   newLine: "Nouvelle ligne",
   book: { search: "Rechercher dans la liste de prix", used: "{{unit}}", none: "Rien dans votre liste de prix ne correspond.", empty: "Votre liste de prix est vide.", open: "Ouvrir la liste de prix", add: "Ajouter {{name}}", perUnit: "par {{unit}}" },
   subtotal: "Sous-total",
-  discount: "Remise ({{pct}} %)",
+  discount: "Remise ({{pct}} %)",
   tax: "Taxes",
-  taxTag: "{{rate}} %",
+  taxTag: "{{rate}} %",
   total: "Total",
   same: "Identique à l’envoi initial", // owner
   deltaUp: "+{{amount}} depuis l’envoi initial", // owner
@@ -103,16 +103,16 @@ export const fr: typeof en = {
   addExclusion: "Ajouter un élément non inclus",
   addExclusionLabel: "Ajouter une exclusion",
   add: "Ajouter",
-  remove: "Retirer : {{text}}", // owner
-  options: { title: "Bon, meilleur, excellent", offer: "Offrir trois options", one: "Un seul prix. Activez pour offrir jusqu’à trois options.", pick: "{{name}} en choisit une en acceptant. Meilleur reprend les lignes ci-dessus.", recommended: "Recommandée", recommend: "Recommander", edit: "Modifier", linesAbove: "Lignes ci-dessus", good: "Bon", better: "Meilleur", best: "Excellent", add: "Ajouter une option", editLines: "Modifier les lignes", name: "Nom", sub: "Une ligne à son sujet", save: "Enregistrer", maxThree: "Trois options au maximum.", removeOne: "Retirer l’option", turnOffTitle: "Revenir à un seul prix ?", turnOffBody: "Les autres options sont retirées. La soumission garde ses propres lignes.", turnOff: "Retirer les options", keep: "Garder les options" }, // owner (from add)
-  schedule: { title: "Calendrier des paiements", addsUp: "Total du calendrier", ok: "Correct", over: "Plus de 100 %", overBy: "Dépassement de {{pct}} %.", overBody: "Réduisez le dépôt ou l’étape.", lower: "Réduire : {{what}}", raise: "Augmenter : {{what}}", holdback: "Retenir {{pct}} %", holdbackSub: "Selon la Loi sur la construction", holdbackLabel: "Retenue de {{pct}} %", rest: "Le reste, au cent près", foot: "Carte ou virement Interac · payable dans {{days}} jours",
+  remove: "Retirer : {{text}}", // owner
+  options: { title: "Bon, meilleur, excellent", offer: "Offrir trois options", one: "Un seul prix. Activez pour offrir jusqu’à trois options.", pick: "{{name}} en choisit une en acceptant. Meilleur reprend les lignes ci-dessus.", recommended: "Recommandée", recommend: "Recommander", edit: "Modifier", linesAbove: "Lignes ci-dessus", good: "Bon", better: "Meilleur", best: "Excellent", add: "Ajouter une option", editLines: "Modifier les lignes", name: "Nom", sub: "Une ligne à son sujet", save: "Enregistrer", maxThree: "Trois options au maximum.", removeOne: "Retirer l’option", turnOffTitle: "Revenir à un seul prix ?", turnOffBody: "Les autres options sont retirées. La soumission garde ses propres lignes.", turnOff: "Retirer les options", keep: "Garder les options" }, // owner (from add)
+  schedule: { title: "Calendrier des paiements", addsUp: "Total du calendrier", ok: "Correct", over: "Plus de 100 %", overBy: "Dépassement de {{pct}} %.", overBody: "Réduisez le dépôt ou l’étape.", lower: "Réduire : {{what}}", raise: "Augmenter : {{what}}", holdback: "Retenir {{pct}} %", holdbackSub: "Selon la Loi sur la construction", holdbackLabel: "Retenue de {{pct}} %", rest: "Le reste, au cent près", foot: "Carte ou virement Interac · payable dans {{days}} jours",
     when: { on_signing: "À la signature", milestone: "À l’étape", on_completion: "À la fin des travaux", days_after_signing: "{{n}} jours après la signature", holdback_release: "Après la période de retenue" }, deposit: "Dépôt", completion: "À la fin des travaux" }, // owner: when.*
-  extras: { pdf: "Mise en page du PDF", pdfSub: "Standard", pdfPro: "Professionnelle", pdfLocked: "Verrouillée après le téléchargement du PDF", redo: "Refaire avec l’IA", redoSub: "Nouvelles consignes, vos prix sont conservés", contract: "Rédiger le contrat avec l’IA", contractSub: "Reprend ces conditions et le calendrier", redoTitle: "Qu’est-ce qui doit changer ?", redoLabel: "Nouvelles consignes", redoGo: "Refaire la soumission", redoBusy: "Refonte…", redoFailed: "Impossible de refaire la soumission. Réessayez." }, // owner: after contractSub
+  extras: { pdf: "Mise en page du PDF", pdfSub: "Standard", pdfPro: "Professionnelle", pdfLocked: "Verrouillée après le téléchargement du PDF", redo: "Refaire avec l’IA", redoSub: "Nouvelles consignes, vos prix sont conservés", contract: "Rédiger le contrat avec l’IA", contractSub: "Reprend ces conditions et le calendrier", redoTitle: "Qu’est-ce qui doit changer ?", redoLabel: "Nouvelles consignes", redoGo: "Refaire la soumission", redoBusy: "Refonte…", redoFailed: "Impossible de refaire la soumission. Réessayez." }, // owner: after contractSub
   preview: "Aperçu",
   send: "Envoyer {{total}}",
   sentTo: "Envoyée à {{name}}",
   fixSchedule: "Corriger les paiements",
-  save: { saving: "Enregistrement…", saved: "Enregistré", failed: "Impossible d’enregistrer. Réessayez.", offline: "Vous êtes hors ligne. Vos changements restent sur cet écran : réessayez avec du signal." }, // owner
+  save: { saving: "Enregistrement…", saved: "Enregistré", failed: "Impossible d’enregistrer. Réessayez.", offline: "Vous êtes hors ligne. Vos changements restent sur cet écran : réessayez avec du signal." }, // owner
   loadFailed: { title: "Impossible de charger cette soumission", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner
   notFound: { title: "Soumission introuvable", body: "Elle a peut-être été archivée ou retirée." }, // owner
 };

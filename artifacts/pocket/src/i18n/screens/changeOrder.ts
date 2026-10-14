@@ -46,7 +46,7 @@ export const fr: typeof en = {
   stepsLabel: "Étapes de l’ordre de changement",
   steps: { describe: "Description", review: "Révision", sent: "Envoi", signed: "Signature" },
   describe: {
-    title: "Qu’est-ce qui change ?", how: "Comment le décrire", talk: "Dicter", type: "Écrire",
+    title: "Qu’est-ce qui change ?", how: "Comment le décrire", talk: "Dicter", type: "Écrire",
     tapToTalk: "Touchez pour parler", listening: "J’écoute…", gotIt: "Compris", sayIt: "Dites ce que le client a demandé", addMore: "Touchez le micro pour en ajouter",
     start: "Commencer l’enregistrement", stop: "Arrêter l’enregistrement", describeLabel: "Décrivez le changement", titleLabel: "Titre vu par le client", titlePlaceholder: "4 encastrés, salle familiale",
     write: "Rédiger l’ordre de changement", writing: "Rédaction…", // owner
@@ -58,7 +58,7 @@ export const fr: typeof en = {
     days_one: "+{{count}} jour", days_other: "+{{count}} jours", noDays: "Aucun changement", daysLess_one: "{{count}} jour", daysLess_other: "{{count}} jours",
     lines: "Lignes", addLine: "Ajouter une ligne", subtotal: "Sous-total", tax: "Taxes", // owner (the board names the province tax, TVH 13 %)
     total: "Total de l’ordre de changement",
-    lineSheet: "Ligne", lineDescription: "De quoi s’agit-il", lineQty: "Quantité", lineUnit: "Unité", linePrice: "Prix l’unité", lineSave: "Enregistrer la ligne", lineDelete: "Retirer cette ligne", // owner
+    lineSheet: "Ligne", lineDescription: "De quoi s’agit-il", lineQty: "Quantité", lineUnit: "Unité", linePrice: "Prix unitaire", lineSave: "Enregistrer la ligne", lineDelete: "Retirer cette ligne", // owner
     scheduleTitle: "Échéancier", addsDays_one: "Ajoute {{count}} jour ouvrable", addsDays_other: "Ajoute {{count}} jours ouvrables", addsNone: "Ne change pas l’échéancier", lessDay: "Moins", moreDay: "Plus", // owner (last three)
     billed: "Facturation", billNext: "Ajouter à la prochaine facture d’étape", billNextSub: "Avec la prochaine facture d’étape",
     sendTo: "Envoyer à", noEmail: "Ce client n’a pas de courriel. Ajoutez-en un sur sa fiche d’abord.", email: "Courriel", // owner (noEmail)

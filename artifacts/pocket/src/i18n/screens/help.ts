@@ -21,14 +21,14 @@ export const fr: typeof en = {
   offline: { lead: "Vous êtes hors ligne.", body: "Les articles déjà ouverts restent accessibles. Les vidéos et le clavardage exigent une connexion." },
   searchLabel: "Rechercher dans l’aide", searchPlaceholder: "Rechercher, p. ex. dépôt", clear: "Effacer la recherche",
   results: "Résultats", found_one: "{{count}} trouvé", found_other: "{{count}} trouvés",
-  none: { title: "Rien sur « {{q}} » pour l’instant", body: "Posez-nous la question, nous répondrons ici, souvent en quelques minutes.", action: "Demander au soutien" },
+  none: { title: "Rien sur « {{q}} » pour l’instant", body: "Posez-nous la question, nous répondrons ici, souvent en quelques minutes.", action: "Demander au soutien" },
   popular: "Populaires", topics: "Sujets", articles_one: "{{count}} article", articles_other: "{{count}} articles", videos: "Vidéos", videoCount: "{{count}} courtes vidéos",
   topic: { start: "Premiers pas", quotes: "Soumissions", contracts: "Contrats et signature électronique", jobs: "Travaux", money: "Factures et paiements", team: "Équipe", growth: "Prospects et intégrations" },
   video: {
     quotes: ["Votre première soumission", "Soumissions"], overview: ["quoteAI en 60 secondes", "Aperçu"], jobs: ["Lancer un chantier depuis une soumission", "Travaux"], crew: ["Le premier jour de votre équipe", "Équipe"], etransfer: ["Être payé par virement Interac", "Factures"], qbo: ["Connecter QuickBooks", "Intégrations"],
-    watch: "Regarder : {{title}}, {{dur}}", offline: "Hors ligne",
+    watch: "Regarder : {{title}}, {{dur}}", offline: "Hors ligne",
   },
-  talk: { title: "Nous joindre", chat: ["Clavarder avec nous", "Répond en général en 5 min", "Connexion requise", "En ligne", "Hors ligne"], email: ["Courriel", "support@quoteai.ca · réponse en 1 jour"], call: ["Téléphone", "1-855-786-8324"], problem: ["Signaler un problème", "Envoyez une capture d’écran et une note"], hours: "Lignes ouvertes du lun. au ven., 8 h à 20 h HE. English too." },
-  article: { back: "Retour à l’aide", read: "{{count}} min de lecture · Mis à jour le {{date}}", helpful: "Cet article vous a-t-il aidé ?", yes: "Oui", no: "Non", thanks: "Merci de nous l’avoir dit.", sorry: "Désolé. Voulez-vous parler à quelqu’un ?", chat: "Clavarder avec le soutien", missing: "Dites-nous ce qui manque", related: "Articles connexes", gone: "Cet article n’est plus là." },
+  talk: { title: "Nous joindre", chat: ["Clavarder avec nous", "Répond en général en 5 min", "Connexion requise", "En ligne", "Hors ligne"], email: ["Courriel", "support@quoteai.ca · réponse en 1 jour"], call: ["Téléphone", "1-855-786-8324"], problem: ["Signaler un problème", "Envoyez une capture d’écran et une note"], hours: "Lignes ouvertes du lun. au ven., 8 h à 20 h HE. Aussi en anglais." },
+  article: { back: "Retour à l’aide", read: "{{count}} min de lecture · Mis à jour le {{date}}", helpful: "Cet article vous a-t-il aidé ?", yes: "Oui", no: "Non", thanks: "Merci de nous l’avoir dit.", sorry: "Désolé. Voulez-vous parler à quelqu’un ?", chat: "Clavarder avec le soutien", missing: "Dites-nous ce qui manque", related: "Articles connexes", gone: "Cet article n’est plus là." },
   failed: "Impossible de l’ouvrir.",
 };

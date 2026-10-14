@@ -95,17 +95,17 @@ export const en = {
 };
 
 export const fr: typeof en = {
-  title: "Pistes",
+  title: "Demandes",
   back: "Retour",
   more: "Plus d’actions",
-  due_one: "{{open}} piste ouverte · {{due}} suivis aujourd’hui",
-  due_other: "{{open}} pistes ouvertes · {{due}} suivis aujourd’hui",
-  dueNone_one: "{{open}} piste ouverte · aucun suivi aujourd’hui", // owner
-  dueNone_other: "{{open}} pistes ouvertes · aucun suivi aujourd’hui", // owner
-  dueOne_one: "{{open}} piste ouverte · 1 suivi aujourd’hui", // owner
-  dueOne_other: "{{open}} pistes ouvertes · 1 suivi aujourd’hui", // owner
-  add: "Nouvelle piste",
-  stageLabel: "Étape de la piste",
+  due_one: "{{open}} demande ouverte · {{due}} suivis aujourd’hui",
+  due_other: "{{open}} demandes ouvertes · {{due}} suivis aujourd’hui",
+  dueNone_one: "{{open}} demande ouverte · aucun suivi aujourd’hui", // owner
+  dueNone_other: "{{open}} demandes ouvertes · aucun suivi aujourd’hui", // owner
+  dueOne_one: "{{open}} demande ouverte · 1 suivi aujourd’hui", // owner
+  dueOne_other: "{{open}} demandes ouvertes · 1 suivi aujourd’hui", // owner
+  add: "Nouvelle demande",
+  stageLabel: "Étape de la demande",
   stages: { new: "Nouvelles", contacted: "Contactées", quoted: "En soumission", won: "Gagnées", lost: "Perdues" },
   won: "Gagnée",
   followUp: "Suivi",
@@ -146,10 +146,10 @@ export const fr: typeof en = {
   notice: {
     sentMoved: "Envoyé {{via}}. {{name}} passe à {{stage}}.",
     sent: "Suivi envoyé à {{name}} {{via}}.",
-    lost: "{{name}} : piste déplacée dans Perdues.",
-    reopened: "{{name}} : piste remise dans {{stage}}.", // owner
-    added: "{{name}} : piste ajoutée aux Nouvelles. Premier suivi {{when}}.",
-    addedNoFollow: "{{name}} : piste ajoutée aux Nouvelles.", // owner
+    lost: "{{name}} : demande déplacée dans Perdues.",
+    reopened: "{{name}} : demande remise dans {{stage}}.", // owner
+    added: "{{name}} : demande ajoutée aux Nouvelles. Premier suivi {{when}}.",
+    addedNoFollow: "{{name}} : demande ajoutée aux Nouvelles.", // owner
     undo: "Annuler",
     at: "{{day}} à {{time}}",
     today: "aujourd’hui",
@@ -159,7 +159,7 @@ export const fr: typeof en = {
     saveFailed: "Enregistrement impossible. Réessayez.", // owner
   },
   form: {
-    title: "Nouvelle piste",
+    title: "Nouvelle demande",
     close: "Fermer",
     name: "Nom",
     namePlaceholder: "Nom complet",
@@ -175,15 +175,15 @@ export const fr: typeof en = {
     save: "Enregistrer",
     saving: "Enregistrement", // owner
   },
-  connect: { title: "Recevez vos pistes automatiquement", sub: "Formulaire du site, Facebook, Instagram, Google Services locaux", action: "Connecter" },
+  connect: { title: "Recevez vos demandes automatiquement", sub: "Formulaire du site, Facebook, Instagram, Google Services locaux", action: "Connecter" },
   empty: {
-    new: { title: "Aucune nouvelle piste", body: "Les nouvelles demandes de votre site, de vos publicités ou d’un appel arrivent ici." }, // owner
-    contacted: { title: "Aucune piste en attente de réponse", body: "Les pistes que vous avez relancées s’affichent ici." }, // owner
-    quoted: { title: "Aucune piste en soumission", body: "Les pistes à qui vous avez envoyé une soumission s’affichent ici." }, // owner
-    won: { title: "Aucune piste gagnée", body: "Les pistes devenues des chantiers restent ici." }, // owner
-    lost: { title: "Aucune piste perdue", body: "Les pistes marquées perdues restent ici, pour les relancer la saison prochaine." },
+    new: { title: "Aucune nouvelle demande", body: "Les nouvelles demandes de votre site, de vos publicités ou d’un appel arrivent ici." }, // owner
+    contacted: { title: "Aucune demande en attente de réponse", body: "Les demandes que vous avez relancées s’affichent ici." }, // owner
+    quoted: { title: "Aucune demande en soumission", body: "Les demandes pour lesquelles vous avez envoyé une soumission s’affichent ici." }, // owner
+    won: { title: "Aucune demande gagnée", body: "Les demandes devenues des chantiers restent ici." }, // owner
+    lost: { title: "Aucune demande perdue", body: "Les demandes marquées perdues restent ici, pour les relancer la saison prochaine." },
   },
-  none: { title: "Aucune piste pour l’instant", body: "Les demandes de votre site et de vos publicités arrivent ici, ou ajoutez-en une reçue par téléphone.", action: "Nouvelle piste" }, // owner
-  offline: "Vous êtes hors ligne. Voici les pistes de votre dernière visite.", // owner
-  loadFailed: { title: "Impossible de charger vos pistes", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner
+  none: { title: "Aucune demande pour l’instant", body: "Les demandes de votre site et de vos publicités arrivent ici, ou ajoutez-en une reçue par téléphone.", action: "Nouvelle demande" }, // owner
+  offline: "Vous êtes hors ligne. Voici les demandes de votre dernière visite.", // owner
+  loadFailed: { title: "Impossible de charger vos demandes", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner
 };

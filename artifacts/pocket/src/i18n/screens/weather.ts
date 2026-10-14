@@ -25,7 +25,7 @@ export const fr: typeof en = {
   adv: { exterior_before: "Prévoyez les travaux extérieurs avant {{time}}", exterior_after: "Les travaux extérieurs passent mieux après {{time}}", inside_only: "Travail intérieur seulement aujourd’hui", good_exterior: "Bonne journée pour les travaux extérieurs" },
   card: "Météo des chantiers, {{place}}, {{temp}}, {{summary}}", bar: "{{hour}} h, {{prob}} pour cent de probabilité de précipitations",
   site: { crew_one: "{{count}} personne sur place", crew_other: "{{count}} personnes sur place", slot: "{{hour}} h, {{temp}}, {{prob}} pour cent", feelsOpen: "Ouvrir", open: "Ouvrir l’horaire" },
-  attribution: { legal: "Sources des données météo", eccc: "Données météo : {{name}}" },
+  attribution: { legal: "Sources des données météo", eccc: "Données météo : {{name}}" },
   about: { label: "Données météo", sub: "D’où viennent les prévisions" },
   week: {
     name: "Cette semaine", visits_one: "{{count}} visite", visits_other: "{{count}} visites", rain: "Pluie {{days}}.", and: " et ", fits: "L’extérieur passe mieux {{day}}.", noRain: "Pas de pluie cette semaine.", plan: "Météo à prévoir",

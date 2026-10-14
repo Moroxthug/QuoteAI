@@ -30,5 +30,5 @@ export const fr: typeof en = {
   noMatch: { title: "Aucun résultat dans les archives", body: "Essayez un nom de client ou un numéro comme Q-2026-110.", clear: "Effacer la recherche" },
   none: { title: "Rien d’archivé", body: "Les soumissions, chantiers et clients archivés attendent ici jusqu’à ce que vous les rameniez.", action: "Aller aux soumissions" },
   loadFailed: { title: "Impossible de charger les archives", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" },
-  toast: { restored: "est de retour dans les {{plural}}", deleted: "supprimé pour de bon", undo: "Annuler", failed: "Impossible de le faire.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", noAccess: "Votre rôle ne le permet pas.", cantDelete: "Celui-ci ne peut pas être supprimé : il a des paiements ou un historique." },
+  toast: { restored: "est de retour dans les {{plural}}", deleted: "supprimé pour de bon", undo: "Annuler", failed: "Impossible de le faire.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", noAccess: "Votre rôle ne le permet pas.", cantDelete: "Celui-ci ne peut pas être supprimé : il a des paiements ou un historique." },
 };

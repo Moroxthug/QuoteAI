@@ -73,7 +73,7 @@ export const fr: typeof en = {
     pay: { label: "Paie" },
     invoices: { label: "Factures" },
     books: { label: "Comptabilité" },
-    analytics: { label: "Analyses", sub: "Revenus, taux de conclusion, marges" },
+    analytics: { label: "Analyses", sub: "Revenus, taux de réussite, marges" },
     integrations: { label: "Applications connectées" },
     documents: { label: "Documents", sub: "Factures fournisseurs et historique des prix" },
     materials: { label: "Matériaux" },

@@ -23,7 +23,7 @@ export const fr: typeof en = {
   paid: "Payée",
   create: "Créer un compte",
   have: "J’ai déjà un compte",
-  crewQ: "Membre d’une équipe?",
+  crewQ: "Membre d’une équipe ?",
   crewA: "Rejoignez-la",
   tour: "Voir la visite guidée de 60 secondes",
   tourTitle: "Lecteur vidéo",

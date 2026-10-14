@@ -105,7 +105,7 @@ export const fr: typeof en = {
     characters_other: "{{count}} caractères",
     mic: "Décrire à voix haute",
     micOff: "La dictée n’est pas encore prête. Écrivez les travaux pour le moment.",
-    try: "Essayez : repeindre une chambre de 12×14, deux couches",
+    try: "Essayez : repeindre une chambre de 12×14, deux couches",
     trySample: "Repeindre une chambre de 12×14, deux couches. Murs seulement, boucher quelques trous de clous, couleur pâle sur du beige.",
     write: "Rédiger ma soumission",
     writing: "Rédaction de votre soumission…",

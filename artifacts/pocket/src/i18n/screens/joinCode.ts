@@ -47,10 +47,10 @@ export const fr: typeof en = {
   codeLabel: "Code d’équipe",
   looking: "Recherche du code…",
   paste: "Coller le code",
-  emailInvite: "Invité par courriel?",
+  emailInvite: "Invité par courriel ?",
   signIn: "Se connecter",
   found: {
-    title: "Est-ce votre équipe?",
+    title: "Est-ce votre équipe ?",
     code: "Code",
     joinAs: "Votre rôle",
     nameOnList: "Votre nom dans la liste de l’équipe",

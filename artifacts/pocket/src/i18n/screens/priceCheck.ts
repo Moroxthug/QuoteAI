@@ -44,9 +44,9 @@ export const fr: typeof en = {
   headline: { checking: "Vérification des prix", allApplied: "Toutes les suggestions sont appliquées", allInRange: "Tous les prix sont dans la norme", noHistory: "Rien à comparer pour l’instant", // owner
     toLook_one: "{{count}} prix à regarder", toLook_other: "{{count}} prix à regarder" },
   basis: { checking: "Comparaison avec votre liste de prix et vos reçus.", based_one: "D’après {{count}} prix de votre liste de prix et de vos reçus.", based_other: "D’après {{count}} prix de votre liste de prix et de vos reçus.", none: "Rien à comparer pour l’instant." }, // owner
-  thin: { lead: "Pas encore d’historique de prix.", body: "Ajoutez des articles à votre liste de prix ou numérisez des reçus de fournisseurs : les prix seront comparés." }, // owner
+  thin: { lead: "Pas encore d’historique de prix.", body: "Ajoutez des articles à votre liste de prix ou numérisez des reçus de fournisseurs : les prix seront comparés." }, // owner
   total: { ifAll: "Total si vous appliquez tout", newTotal: "Nouveau total, taxes incluses", asQuoted: "Tel que soumis", change: "Écart", lines: "Lignes vérifiées" }, // owner
-  legend: { band: "À moins de {{pct}} % de votre prix", reference: "Votre prix", you: "Cette soumission", suggested: "Suggéré" },
+  legend: { band: "À moins de {{pct}} % de votre prix", reference: "Votre prix", you: "Cette soumission", suggested: "Suggéré" },
   verdict: { low: "Bas", high: "Haut", in_range: "Dans la norme", no_data: "Données insuffisantes", applied: "Appliqué" },
   rate: "{{price}} / {{unit}}",
   qty: "{{qty}} {{unit}}",
@@ -70,9 +70,9 @@ export const fr: typeof en = {
   inRangeCount_other: "{{count}} autres lignes sont dans la norme",
   noDataCount_one: "{{count}} ligne n’a rien à comparer",
   noDataCount_other: "{{count}} lignes n’ont rien à comparer",
-  footnote: "Vos prix, votre décision. Ceci ne fait que comparer : rien ne change tant que vous n’appliquez pas. Les références viennent de votre liste de prix et de la moyenne de vos derniers reçus.",
+  footnote: "Vos prix, votre décision. Ceci ne fait que comparer : rien ne change tant que vous n’appliquez pas. Les références viennent de votre liste de prix et de la moyenne de vos derniers reçus.",
   toast: { applied: "Prix mis à jour", failed: "Impossible de mettre les prix à jour. Réessayez.", locked: "Cette soumission ne peut plus être modifiée.", offline: "Vous êtes hors ligne. Réessayez avec du signal." },
   loadFailed: { title: "Impossible de vérifier les prix", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" },
   notFound: { title: "Soumission introuvable", body: "Elle a peut-être été archivée ou retirée." },
-  locked: "Cette soumission est définitive : ses prix ne peuvent plus changer. La comparaison est affichée à titre de référence.",
+  locked: "Cette soumission est définitive : ses prix ne peuvent plus changer. La comparaison est affichée à titre de référence.",
 };

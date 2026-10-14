@@ -63,15 +63,15 @@ export const fr: typeof en = {
   lineItems: "Postes",
   addItem: "Ajouter un poste",
   fixed: "fixe",
-  less: "Moins : {{what}}", // owner
-  moreOf: "Plus : {{what}}", // owner
+  less: "Moins : {{what}}", // owner
+  moreOf: "Plus : {{what}}", // owner
   subtotal: "Sous-total",
-  discount: "Remise ({{pct}} %)", // owner
+  discount: "Remise ({{pct}} %)", // owner
   tax: "Taxes", // owner
-  taxLine: "{{name}} {{rate}} %",
-  taxLineProvince: "{{name}}, {{province}} {{rate}} %",
+  taxLine: "{{name}} {{rate}} %",
+  taxLineProvince: "{{name}}, {{province}} {{rate}} %",
   total: "Total",
-  deposit: "Dépôt de {{pct}} % à l’acceptation",
+  deposit: "Dépôt de {{pct}} % à l’acceptation",
   depositSub: "Carte ou virement Interac",
   depositLabel: "Dépôt à l’acceptation", // owner
   dueOnAcceptance: "Dû à l’acceptation",
@@ -89,13 +89,13 @@ export const fr: typeof en = {
   startJob: "Lancer les travaux",
   openJob: "Ouvrir le chantier", // owner
   accepted: { by: "Acceptée par {{name}}" }, // owner
-  ask: { titleEmail: "Où l’envoyer ?", titleSms: "Quel numéro ?", email: "Courriel du client", phone: "Cellulaire du client", send: "Envoyer", cancel: "Annuler", invalidEmail: "Cette adresse courriel semble incorrecte.", invalidPhone: "Entrez un numéro de cellulaire à 10 chiffres." }, // owner
+  ask: { titleEmail: "Où l’envoyer ?", titleSms: "Quel numéro ?", email: "Courriel du client", phone: "Cellulaire du client", send: "Envoyer", cancel: "Annuler", invalidEmail: "Cette adresse courriel semble incorrecte.", invalidPhone: "Entrez un numéro de cellulaire à 10 chiffres." }, // owner
   scopeSheet: { title: "Portée", label: "Ce que comprend le travail", save: "Enregistrer" }, // owner
   clientSheet: { title: "Changer de client", search: "Rechercher un client", none: "Aucun client trouvé", add: "Ajouter un nouveau client" }, // owner
   actions: { markWon: "Marquer comme gagnée", editor: "Ouvrir l’éditeur", copyLink: "Copier le lien", linkCopied: "Lien copié", duplicate: "Dupliquer", archive: "Archiver", priceCheck: "Vérifier les prix", openPdf: "Télécharger le PDF", delete: "Supprimer" }, // owner
-  toast: { saved: "Enregistré", saveFailed: "Impossible d’enregistrer la modification. Réessayez.", sendFailed: "Impossible de l’envoyer. Réessayez.", smsFailed: "Le texto n’est pas parti. Vérifiez le numéro.", unlock: "Cette soumission demande un forfait actif avant d’être envoyée.", duplicated: "Dupliquée en brouillon", archived: "Archivée", offline: "Vous êtes hors ligne. Votre changement reste sur cet écran : réessayez avec du signal.", noAccess: "Votre rôle ne permet pas de modifier les soumissions." }, // owner
+  toast: { saved: "Enregistré", saveFailed: "Impossible d’enregistrer la modification. Réessayez.", sendFailed: "Impossible de l’envoyer. Réessayez.", smsFailed: "Le texto n’est pas parti. Vérifiez le numéro.", unlock: "Cette soumission demande un forfait actif avant d’être envoyée.", duplicated: "Dupliquée en brouillon", archived: "Archivée", offline: "Vous êtes hors ligne. Votre changement reste sur cet écran : réessayez avec du signal.", noAccess: "Votre rôle ne permet pas de modifier les soumissions." }, // owner
   loadFailed: { title: "Impossible de charger cette soumission", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner
   notFound: { title: "Soumission introuvable", body: "Elle a peut-être été archivée ou retirée." }, // owner
-  confirmWon: { title: "Marquer cette soumission comme gagnée ?", body: "À utiliser quand le client a dit oui hors de la page : appel, texto ou contrat papier. Aucune signature n’est requise. Les relances s’arrêtent.", confirm: "Marquer comme gagnée", done: "Marquée comme gagnée", failed: "Impossible de la marquer comme gagnée. Ouvrez la soumission et réessayez." }, // owner
-  confirmSend: { title: "Envoyer cette soumission ?", body: "Le client reçoit un lien pour la lire, l’accepter et la signer.", confirm: "Envoyer" }, // owner
+  confirmWon: { title: "Marquer cette soumission comme gagnée ?", body: "À utiliser quand le client a dit oui hors de la page : appel, texto ou contrat papier. Aucune signature n’est requise. Les relances s’arrêtent.", confirm: "Marquer comme gagnée", done: "Marquée comme gagnée", failed: "Impossible de la marquer comme gagnée. Ouvrez la soumission et réessayez." }, // owner
+  confirmSend: { title: "Envoyer cette soumission ?", body: "Le client reçoit un lien pour la lire, l’accepter et la signer.", confirm: "Envoyer" }, // owner
 };

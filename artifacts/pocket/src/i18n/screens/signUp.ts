@@ -47,7 +47,7 @@ export const fr: typeof en = {
   terms: "Conditions d’utilisation",
   and: "et la",
   privacy: "Politique de confidentialité",
-  have: "Déjà un compte?",
+  have: "Déjà un compte ?",
   signIn: "Se connecter",
   strength: {
     0: { word: "", note: "Au moins 8 caractères." },

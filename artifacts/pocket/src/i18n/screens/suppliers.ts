@@ -82,7 +82,7 @@ export const fr: typeof en = {
   form: {
     addTitle: "Ajouter un fournisseur", editTitle: "Modifier le fournisseur", name: "Nom", category: "Ce qu’ils vendent", categoryOther: "Autre chose", categoryPh: "Construction, peinture, bois…", kind: "Mode de paiement",
     kindAccount: "Compte", kindCounter: "Au comptoir", repName: "Représentant", repRole: "Rôle", phone: "Téléphone", email: "Courriel", accountNo: "Numéro de compte", terms: "Modalités", termsPh: "Net 30",
-    discount: "Prix Pro, % de rabais", address: "Adresse", delivers: "Livraison", deliversPh: "Livraison lun. au sam.", hours: "Heures", notes: "Notes", add: "Ajouter le fournisseur", save: "Enregistrer", saving: "Enregistrement…",
+    discount: "Prix Pro, % de rabais", address: "Adresse", delivers: "Livraison", deliversPh: "Livraison lun. au sam.", hours: "Heures", notes: "Notes", add: "Ajouter le fournisseur", save: "Enregistrer", saving: "Enregistrement…",
   },
   toast: { added: "Fournisseur ajouté", saved: "Enregistré", failed: "Impossible d’enregistrer. Réessayez.", noAccess: "Votre rôle ne peut pas modifier les fournisseurs.", archived: "{{name}} archivé", updated: "Liste de prix mise à jour", undone: "Rétabli" },
   page: {
@@ -91,10 +91,10 @@ export const fr: typeof en = {
     readOnly: { lead: "Consultation seulement.", body: "Votre rôle peut voir ce fournisseur, mais pas le modifier." },
     tagAccount: "Compte", tagCounter: "Au comptoir",
     call: "Appeler", callName: "Appeler {{name}}", email: "Courriel", directions: "Itinéraire", noPhone: "Pas encore de numéro", noEmail: "Pas encore de courriel", noAddress: "Pas encore d’adresse",
-    account: "Compte et modalités", spentMonth: "Dépensé ce mois‑ci", terms: "Modalités", pro: "Prix Pro", proOff: "−{{pct}} %", year: "Cette année", dash: "–",
+    account: "Compte et modalités", spentMonth: "Dépensé ce mois‑ci", terms: "Modalités", pro: "Prix Pro", proOff: "−{{pct}} %", year: "Cette année", dash: "–",
     prices: "Historique des prix", last6: "6 derniers mois", noChange: "Stable", noPrices: { title: "Pas encore d’historique de prix", body: "Les prix s’affichent ici quand deux reçus de ce fournisseur indiquent le même article." },
     nudge: {
-      lead: "{{item}} a augmenté de {{pct}} %.", body: "Votre liste de prix utilise encore {{price}}.", bodyQuotes_one: "Votre liste de prix utilise encore {{price}}, et {{count}} soumission ouverte l’inclut.",
+      lead: "{{item}} a augmenté de {{pct}} %.", body: "Votre liste de prix utilise encore {{price}}.", bodyQuotes_one: "Votre liste de prix utilise encore {{price}}, et {{count}} soumission ouverte l’inclut.",
       bodyQuotes_other: "Votre liste de prix utilise encore {{price}}, et {{count}} soumissions ouvertes l’incluent.", update: "Passer à {{price}}", seeQuotes: "Voir les soumissions",
       done: "Liste de prix mise à jour.", doneBody: "Les nouvelles soumissions utilisent {{price}}.", undo: "Annuler",
     },
@@ -107,7 +107,7 @@ export const fr: typeof en = {
     notes: "Notes",
     menu: { edit: "Modifier le fournisseur", editSub: "Contacts, compte et modalités", share: "Partager la liste de commande", shareSub: "Texto ou courriel de ce qu’il vous faut", shareNone: "Rien sur la liste de commande", archive: "Archiver le fournisseur", archiveSub: "Conserve les commandes et reçus passés" },
     shareHeading: "Commande pour {{supplier}}",
-    confirm: { title: "Archiver {{name}} ?", body: "Il quitte votre liste. Les commandes et reçus passés restent.", yes: "Archiver", no: "Le garder" },
+    confirm: { title: "Archiver {{name}} ?", body: "Il quitte votre liste. Les commandes et reçus passés restent.", yes: "Archiver", no: "Le garder" },
     soon: { suppliers: "Fournisseurs" },
   },
 };

@@ -35,7 +35,7 @@ export const fr: typeof en = {
     pillUp: "+{{pct}}", pillDown: "−{{pct}}", pillFlat: "Stable", chart: "Prix de {{from}} à {{to}}",
     update: "Adopter {{price}}", keep: "Garder {{price}}", updated: "Liste de prix mise à jour à {{price}}", kept: "{{price}} gardé · rappel le mois prochain", undo: "Annuler",
   },
-  almost: { title: "{{name}} : prix presque prêts", sub: "{{have}} factures sur {{need}} reçues" },
+  almost: { title: "{{name}} : prix presque prêts", sub: "{{have}} factures sur {{need}} reçues" },
   key: { title: "Matériaux clés", link: "Liste de prix", same: "Stable", sub_one: "{{store}} · {{count}} facture", sub_other: "{{store}} · {{count}} factures", subNone: "{{count}} factures" },
   read: {
     title: "Lus par l’IA", count: "{{count}} ce mois-ci", Read: "Lu", Reading: "Lecture", Check: "À vérifier",

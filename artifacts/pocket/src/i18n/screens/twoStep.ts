@@ -34,7 +34,7 @@ export const fr: typeof en = {
   backupLabel: "Code de secours",
   backupPlaceholder: "xxxxx-xxxxx",
   checking: "Vérification du code…",
-  wrong: { lead: "Code incorrect.", tries_one: "Essais restants : {{count}}", tries_other: "Essais restants : {{count}}" },
+  wrong: { lead: "Code incorrect.", tries_one: "Essais restants : {{count}}", tries_other: "Essais restants : {{count}}" },
   done: "Identité confirmée",
   locked: { lead: "Trop d’essais.", text: "Attendez 10 min ou utilisez un code de secours." },
   ended: { lead: "Cette connexion a expiré.", text: "Retournez vous connecter.", link: "Retour à la connexion" },

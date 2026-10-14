@@ -18,12 +18,12 @@ export const en = {
 
 export const fr: typeof en = {
   close: "Fermer la vidéo", offline: "Cette vidéo exige une connexion", offlineSub: "Les étapes de l’aide fonctionnent hors ligne.", retry: "Réessayer", loading: "Chargement", play: "Lecture", pause: "Pause", back10: "Reculer de 10 secondes", fwd10: "Avancer de 10 secondes",
-  position: "Position", captions: "Sous-titres", speed: "Vitesse de lecture {{speed}}", speedTitle: "Vitesse", ccOn: "Français · English disponible", ccOff: "Désactivés", chapters: "Chapitres", playing: "En lecture", paused: "En pause", watched: "Vu", chapter: "Chapitre {{n}} : {{title}}",
+  position: "Position", captions: "Sous-titres", speed: "Vitesse de lecture {{speed}}", speedTitle: "Vitesse", ccOn: "Français · English disponible", ccOff: "Désactivés", chapters: "Chapitres", playing: "En lecture", paused: "En pause", watched: "Vu", chapter: "Chapitre {{n}} : {{title}}",
   v: {
     quotes: {
       head: "Voir comment", title: "Votre première soumission", topic: "Soumissions", sub: "Décrivez les travaux de vive voix et envoyez une soumission détaillée avec TVH, du début à la fin.", cta: "Essayer maintenant",
-      scene: ["Description des travaux", "Ligne 3 sur 7", "Gypse, 3 pièces", "2 480,00 $", "TVH de 13 % ajoutée"],
-      ch: [["Nouvelle soumission", "Touchez Nouvelle soumission dans l’onglet Soumissions."], ["Décrire les travaux", "Dites-le comme au client : trois chambres, les plafonds aussi."], ["Vérifier les lignes", "Chaque ligne est détaillée. Touchez-en une pour changer le prix."], ["L’envoyer", "Envoyez par texto ou par courriel, et voyez quand le client l’ouvre."]],
+      scene: ["Description des travaux", "Ligne 3 sur 7", "Gypse, 3 pièces", "2 480,00 $", "TVH de 13 % ajoutée"],
+      ch: [["Nouvelle soumission", "Touchez Nouvelle soumission dans l’onglet Soumissions."], ["Décrire les travaux", "Dites-le comme au client : trois chambres, les plafonds aussi."], ["Vérifier les lignes", "Chaque ligne est détaillée. Touchez-en une pour changer le prix."], ["L’envoyer", "Envoyez par texto ou par courriel, et voyez quand le client l’ouvre."]],
     },
     overview: {
       head: "quoteAI en 60 secondes", title: "quoteAI en 60 secondes", topic: "Aperçu", sub: "D’une note vocale à une facture payée, en une minute.", cta: "Commencer",

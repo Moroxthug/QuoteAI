@@ -35,7 +35,7 @@ export const en = {
 };
 
 export const fr: typeof en = {
-  back: "Retour au menu", retry: "Réessayer", close: "Fermer", title: "Réglages", searchLabel: "Rechercher dans les réglages", searchPlaceholder: "Rechercher dans les réglages", noMatch: "Aucun réglage ne correspond à « {{q}} ».",
+  back: "Retour au menu", retry: "Réessayer", close: "Fermer", title: "Réglages", searchLabel: "Rechercher dans les réglages", searchPlaceholder: "Rechercher dans les réglages", noMatch: "Aucun réglage ne correspond à « {{q}} ».",
   loadFailed: { title: "Impossible de charger vos réglages", body: "Vérifiez votre connexion et réessayez." },
   viewOnly: { lead: "Lecture seule.", body: "Votre rôle peut voir ces réglages, mais pas les modifier. Demandez au propriétaire." },
   g: { assistant: "Assistant", company: "Entreprise", team: "Équipe et applications", quote: "Soumissions par défaut", notifications: "Notifications", display: "Affichage", security: "Sécurité", account: "Compte" },
@@ -43,7 +43,7 @@ export const fr: typeof en = {
   lang: { label: "Langue", sub: "Réponses et soumissions", en: "English", fr: "Français" },
   speak: { label: "Lire les réponses à voix haute", sub: "Muet si le téléphone est en silencieux" },
   confirm: { label: "Demander avant d’envoyer", sub: "Soumissions, factures, messages clients" },
-  company: { label: "Coordonnées de l’entreprise", sub: "Logo, numéros de {{tax}} et WSIB" },
+  company: { label: "Coordonnées de l’entreprise", sub: "Logo, numéros de {{tax}} et CSPAAT" },
   taxes: { label: "Taxes" }, invoices: { label: "Factures et paiements", sub: "Modalités, rappels, virement Interac", net: { receipt: "À la réception", net15: "Net 15 j", net30: "Net 30 j" } }, quotes: { label: "Soumissions et suivis", sub: "Validité, messages de suivi" },
   templates: { label: "Modèles de messages", sub: "Suivis, rappels, avis" }, messaging: { label: "Texto et WhatsApp", on: "Activé", off: "Désactivé" }, widget: { label: "Widget pour site Web", sub: "Formulaire de demande pour votre site" },
   roles: { label: "Rôles", sub: "Par défaut et accès à la paie" }, apps: { label: "Applications connectées", sub: "QuickBooks, Google Agenda, Gmail" },

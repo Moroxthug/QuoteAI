@@ -51,7 +51,7 @@ export const fr = {
   kpi: { late: "En retard", lateNone: "Tout est à jour", next: "30 prochains jours", nextNone: "Rien à venir", filed: "Réglées en {{year}}", onTime: "Dans les délais", someOnTime: "{{count}} dans les délais" },
   hst: {
     title: "Déclaration {{tax}}, {{period}}", sub: "{{range}} · échéance le {{date}}", subFiled: "{{range}} · produite le {{date}}", net: "Taxe nette à verser", refund: "Remboursement net", collected: "Taxe perçue", credits: "Crédits de taxe", days: "Jours restants",
-    worksheet: "Télécharger la feuille", markFiled: "Marquer produite", undoFiled: "Annuler « produite »", loading: "Calcul en cours…", noSheet: "Impossible de calculer la feuille.",
+    worksheet: "Télécharger la feuille", markFiled: "Marquer produite", undoFiled: "Annuler « produite »", loading: "Calcul en cours…", noSheet: "Impossible de calculer la feuille.",
   },
   period: { month: "{{month}}", quarter: "T{{n}}", range: "{{start}} – {{end}}", year: "exercice terminé le {{end}}" },
   calendar: { title: "Calendrier", link: "90 prochains jours", aria: "Échéances sur une ligne du temps", mark: "{{title}}, {{date}}", in_one: "{{date}} · dans {{count}} jour", in_other: "{{date}} · dans {{count}} jours", today: "{{date}} · aujourd’hui", ago_one: "{{date}} · il y a {{count}} jour", ago_other: "{{date}} · il y a {{count}} jours" },
@@ -73,7 +73,7 @@ export const fr = {
   menu: { add: "Ajouter un rappel", addSub: "Assurance, permis, indemnisation des accidents du travail", settings: "Réglages des taxes", settingsSub: "Comment et quand vous produisez vos déclarations" },
   sheet: {
     title: "Ajouter un rappel", from: "Partir de", name: "De quoi s’agit-il", namePh: "Renouvellement de l’assurance responsabilité", due: "Échéance", repeat: "Se répète", save: "Enregistrer le rappel", saving: "Enregistrement",
-    kind: { insurance: "Assurance", licence: "Permis", workers_comp: "CNESST / WSIB", other: "Autre" },
+    kind: { insurance: "Assurance", licence: "Permis", workers_comp: "CNESST / CSPAAT", other: "Autre" },
     rec: { none: "Une fois", monthly: "Chaque mois", quarterly: "Chaque trimestre", annual: "Chaque année" }, prev: "Mois précédent", next: "Mois suivant",
   },
 };

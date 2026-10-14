@@ -26,7 +26,7 @@ export const fr: typeof en = {
   codeLabel: "Code à 6 chiffres",
   checking: "Vérification du code…",
   wrongLead: "Code incorrect.",
-  wrongTries: "Essais restants : {{count}}",
+  wrongTries: "Essais restants : {{count}}",
   verified: "Courriel vérifié",
   titleVerified: "Compte vérifié",
   subVerified: "Ensuite, quelques questions pour adapter les soumissions à votre entreprise.",

@@ -64,7 +64,7 @@ export const fr: typeof en = {
     wait: "Renvoyer dans {{sec}} s",
     again: "Renvoyer le lien",
     other: "Utiliser un autre courriel",
-    spam: "Rien reçu? Vérifiez vos courriels indésirables.",
+    spam: "Rien reçu ? Vérifiez vos courriels indésirables.",
     openMail: "Ouvrir l’app de courriel",
   },
   newPassword: {

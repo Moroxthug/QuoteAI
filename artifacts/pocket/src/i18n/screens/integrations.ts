@@ -41,7 +41,7 @@ export const fr: typeof en = {
   state: { connected: "Connecté", attention: "Action requise", paused: "En pause", none: "Non connecté" },
   connect: "Connecter", opening: "Ouverture…", soon: "Bientôt", plan: "Inclus avec {{plan}}", planNote: "Les forfaits ne se modifient pas dans l’app. Voyez-les sur quoteai.ca.",
   empty: { title: "Aucune application de ce nom", body: "Essayez un autre nom, ou dites-nous quelle application vous utilisez et nous l’examinerons." },
-  suggest: { title: "Une application manque ?", sub: "Dites-nous laquelle vous utilisez", thanks: "Merci, c’est noté", thanksSub: "Nous écrirons au propriétaire si on l’ajoute", subject: "Application à connecter à quoteAI" },
+  suggest: { title: "Une application manque ?", sub: "Dites-nous laquelle vous utilisez", thanks: "Merci, c’est noté", thanksSub: "Nous écrirons au propriétaire si on l’ajoute", subject: "Application à connecter à quoteAI" },
   trademark: "Les noms d’applications sont des marques de leurs propriétaires. quoteAI n’est ni affilié à eux ni approuvé par eux.",
   apps: {
     qbo: { name: "QuickBooks Online", desc: "Factures, paiements et coûts vont dans vos livres avec les codes de taxe", sug: "Factures et paiements dans vos livres" },

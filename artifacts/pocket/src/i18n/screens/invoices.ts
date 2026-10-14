@@ -224,7 +224,7 @@ export const fr: typeof en = {
     glance: "À recevoir et ancienneté",
     outstanding: "À recevoir",
     overdue: "{{amount}} en retard",
-    aging: "Ancienneté : {{buckets}}",
+    aging: "Ancienneté : {{buckets}}",
     buckets: { current: "Non échu", d1_30: "1 à 30 jours", d31_60: "31 à 60 jours", d61_90: "61 à 90 jours", d90_plus: "Plus de 90 jours" },
     paidMonth: "Payé ce mois-ci",
     payments_one: "{{count}} paiement",
@@ -283,7 +283,7 @@ export const fr: typeof en = {
   },
   done: {
     reminded: "Rappel envoyé",
-    remindedMany: "Rappels envoyés : {{count}}",
+    remindedMany: "Rappels envoyés : {{count}}",
     sent: "Facture envoyée",
     deleted: "Brouillon supprimé",
     archived: "Facture archivée",
@@ -297,7 +297,7 @@ export const fr: typeof en = {
     nobody: "Aucune facture en retard ne peut être relancée pour l’instant.",
     unlock: "Votre forfait n’inclut pas la facturation.",
   }, // owner (all of done)
-  confirmDelete: { title: "Supprimer ce brouillon ?", body: "{{number}} pour {{client}} sera retirée. Cette action est irréversible.", action: "Supprimer le brouillon", cancel: "Annuler" }, // owner
+  confirmDelete: { title: "Supprimer ce brouillon ?", body: "{{number}} pour {{client}} sera retirée. Cette action est irréversible.", action: "Supprimer le brouillon", cancel: "Annuler" }, // owner
   detail: {
     sent: "Envoyée le {{date}}",
     sentTo: "Par courriel à {{email}}",
@@ -421,7 +421,7 @@ export const fr: typeof en = {
     void: "Annuler la facture", voidSub: "Garde le numéro, annule le montant",
     cancel: "Annuler",
   },
-  confirmVoid: { title: "Annuler cette facture ?", body: "{{number}} garde son numéro et le montant est annulé. Cette action est irréversible.", action: "Annuler la facture", cancel: "Garder la facture" }, // owner
+  confirmVoid: { title: "Annuler cette facture ?", body: "{{number}} garde son numéro et le montant est annulé. Cette action est irréversible.", action: "Annuler la facture", cancel: "Garder la facture" }, // owner
   toast: { saved: "Paiement enregistré", linkCopied: "Lien copié", pdfFailed: "Impossible de télécharger le PDF.", voided: "Facture annulée", archived: "Facture archivée", resent: "Facture renvoyée", noLink: "Cette facture n’a pas encore de lien pour le client." }, // owner
   notFound: { title: "Facture introuvable", body: "Elle a peut-être été archivée ou retirée." }, // owner
   loadFailed: { title: "Impossible de charger cette facture", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner

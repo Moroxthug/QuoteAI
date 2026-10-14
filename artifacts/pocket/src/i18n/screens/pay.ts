@@ -107,7 +107,7 @@ export const fr = {
   },
   export: {
     button: "Exporter la période", again: "Exporter de nouveau", working: "Exportation", sheet: "Exporter vers", last: "Dernier utilisé",
-    done: "Fichier prêt : {{name}}", failed: "Impossible de créer le fichier. Réessayez.",
+    done: "Fichier prêt : {{name}}", failed: "Impossible de créer le fichier. Réessayez.",
     banner: "Exporté pour {{target}}", bannerBody_one: "· {{count}} employé, {{amount}}", bannerBody_other: "· {{count}} employés, {{amount}}",
     targets: {
       generic: { label: "Fichier CSV", sub: "Tout logiciel de paie ou tableur" },
@@ -143,7 +143,7 @@ export const fr = {
   },
   subs: { title: "Sous-traitants", link: "Hors paie", sub: "{{role}} · {{hours}} h", subHours: "{{hours}} h", bills: "Sur facture" },
   jobs: {
-    labour: "Coût de la main-d’œuvre", hours: "Heures", overtime: "{{hours}} en heures sup.", byJob: "Par chantier", burden: "Charges {{pct}} %", noJob: "Aucun chantier",
+    labour: "Coût de la main-d’œuvre", hours: "Heures", overtime: "{{hours}} en heures sup.", byJob: "Par chantier", burden: "Charges {{pct}} %", noJob: "Aucun chantier",
     cells: { hours: "Heures", overtime: "Heures sup.", straight: "Taux normal", premium: "Majoration", burden: "Charges", travel: "Déplacement" },
     emptyTitle: "Pas encore de main-d’œuvre", emptyBody: "Les heures approuvées s’affichent ici par chantier.",
   },
@@ -159,8 +159,8 @@ export const fr = {
     saved: "Règles enregistrées", savedRecount: "Règles enregistrées · heures depuis le {{date}} recalculées", failed: "Impossible d’enregistrer les règles. Réessayez.", undone: "Retour à l’état précédent",
     holidaysTitle: "Fériés, vacances et déplacements",
     rows: {
-      stat: { label: "Jours fériés", sub: "{{province}} · prochain : {{name}}, {{date}}", subNone: "{{province}}", value: "{{count}} par an" },
-      vacation: { label: "Paie de vacances", sub: "Ce que votre fournisseur de paie ajoute", value: "{{pct}} %", none: "Non défini" },
+      stat: { label: "Jours fériés", sub: "{{province}} · prochain : {{name}}, {{date}}", subNone: "{{province}}", value: "{{count}} par an" },
+      vacation: { label: "Paie de vacances", sub: "Ce que votre fournisseur de paie ajoute", value: "{{pct}} %", none: "Non défini" },
       km: { label: "Taux de déplacement", sub: "Véhicule personnel, par kilomètre", value: "{{amount}}/km" },
       perDiem: { label: "Indemnité journalière", sub: "Par jour d’absence", value: "{{amount}}/jour", none: "Non défini" },
     },

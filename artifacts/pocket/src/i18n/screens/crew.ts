@@ -67,7 +67,7 @@ export const en = {
 };
 
 export const fr: typeof en = {
-  back: "Retour", close: "Fermer", switchCompany: "Changer d’entreprise", more: "Plus : heures à la main, déplacements", photo: "Prendre une photo", report: "Rapport",
+  back: "Retour", close: "Fermer", switchCompany: "Changer d’entreprise", more: "Plus : heures à la main, déplacements", photo: "Prendre une photo", report: "Rapport",
   greet: "Bonjour {{name}}", greetNight: "Bonjour {{name}}", dateRole: "{{date}} · {{role}}",
   changes: { title: "Ce qui a changé", gotIt: "Compris", shiftAdded: "Nouveau quart", shiftChanged: "Un quart a changé", shiftRemoved: "Un quart a été retiré", taskAdded: "Nouvelle tâche aujourd’hui", taskChanged: "Une tâche a changé", taskDone: "Une tâche a été cochée", answer: "{{by}} a répondu à votre blocage",
     shiftSub: "{{label}}, {{when}}", taskSub: "{{title}} · {{job}}", answerSub: "{{answer}}", someone: "Le bureau" },
@@ -77,13 +77,13 @@ export const fr: typeof en = {
     clockedIn: "Arrivée pointée", clockedOut: "Départ pointé", matched: "{{time}} · position confirmée", noFix: "{{time}} · position non vérifiée", offSite: "{{time}} · hors du rayon du chantier", queued: "{{time}} · gardé sur votre téléphone", // owner (last three)
     locationNote: "La position est vérifiée seulement à l’arrivée et au départ", noJob: "Pas encore de chantier où pointer", alreadyIn: "Vous êtes déjà pointé", failed: "Impossible de le faire. Réessayez.", noSignal: "Pas de réseau. C’est gardé sur votre téléphone et part plus tard.", // owner
     gate: "Code de la barrière", gateSub: "Touchez pour afficher", phase: "Étape", change: "Changer", directions: "Itinéraire", call: "Appeler {{name}}", siteLead: "Chef de chantier", noPhone: "Pas de numéro",
-    pickJob: "Choisir un chantier", pickJobSub: "Sur quel chantier êtes-vous?", // owner
+    pickJob: "Choisir un chantier", pickJobSub: "Sur quel chantier êtes-vous ?", // owner
   },
-  tasks: { title: "Tâches du jour", add: "Ajouter une tâche", addTitle: "Ajouter une tâche", addPlaceholder: "Qu’y a-t-il à faire?", addSave: "Ajouter", new: "Nouveau", none: "Aucune tâche aujourd’hui", done: "Fait", fromSite: "Ajoutée par {{name}}", allDone: "Tout est fait. Beau travail." }, // owner (several)
+  tasks: { title: "Tâches du jour", add: "Ajouter une tâche", addTitle: "Ajouter une tâche", addPlaceholder: "Qu’y a-t-il à faire ?", addSave: "Ajouter", new: "Nouveau", none: "Aucune tâche aujourd’hui", done: "Fait", fromSite: "Ajoutée par {{name}}", allDone: "Tout est fait. Beau travail." }, // owner (several)
   upcoming: { title: "À venir", thisWeek: "Cette semaine", none: "Rien de prévu dans les deux prochaines semaines", allDay: "Toute la journée" },
   reports: { title: "Vos rapports", today: "Aujourd’hui", none: "Rien d’envoyé aujourd’hui",
     update: "Suivi", blocker: "Blocage", materials: "Matériaux", kindLabel: "Type de rapport",
-    updateLabel: "Qu’avez-vous fait?", blockerLabel: "Qu’est-ce qui vous bloque?", materialsLabel: "Autre chose à noter?",
+    updateLabel: "Qu’avez-vous fait ?", blockerLabel: "Qu’est-ce qui vous bloque ?", materialsLabel: "Autre chose à noter ?",
     updatePh: "Mur du fond posé, je commence les joints dans la chambre", blockerPh: "Il manque 4 feuilles de gypse ½ po pour le corridor", materialsPh: "Acheté au Home Depot, Warden Ave",
     sendUpdate: "Envoyer le suivi", sendBlocker: "Envoyer le blocage", sendMaterials: "Envoyer les matériaux", what: "Quoi", whatPh: "Ruban treillis, 2 rouleaux", spent: "Dépensé", job: "Chantier",
     addPhoto: "Ajouter une photo", removePhoto: "Retirer la photo", answered: "Répondu", sent: "Envoyé", pending: "À synchroniser", failed: "Échec", sentSub: "Envoyé au bureau", pendingSub: "Gardée sur votre téléphone, part dès qu’il y a du réseau", failedSub: "Pas envoyé. Touchez pour réessayer",
@@ -124,8 +124,8 @@ export const fr: typeof en = {
     or: "ou entrer avec un code", codeHint: "Code de 6 caractères de {{who}}", codeBad: "Ce code n’a pas fonctionné. Vérifiez avec {{who}}, il a peut-être changé.", codeExpired: "Ce code a expiré. Demandez-en un nouveau à {{who}}.", join: "Entrer", joining: "Connexion…",
     call: "Appeler {{who}}", saved: "Vos heures, photos et rapports sont gardés par l’entreprise. Rien n’est perdu.", theOffice: "le bureau", yourCompany: "votre entreprise", unknownCompany: "votre entreprise",
   },
-  pair: { title: "Rejoignez votre équipe", sub: "Entrez le code que votre patron vous a donné. Il sert une fois et dure une semaine.", found: "Bonjour {{name}}", foundSub: "Vous rejoignez {{company}}.", joinAs: "Rejoindre {{company}}", noAccount: "Pas de mot de passe. Ce téléphone reste connecté.", other: "Ce n’est pas vous?", back: "Retour", // owner (all)
-    link: "Dans une équipe? Entrez votre code d’équipe", foremanLink: "Un code d’équipe plutôt?" },
+  pair: { title: "Rejoignez votre équipe", sub: "Entrez le code que votre patron vous a donné. Il sert une fois et dure une semaine.", found: "Bonjour {{name}}", foundSub: "Vous rejoignez {{company}}.", joinAs: "Rejoindre {{company}}", noAccount: "Pas de mot de passe. Ce téléphone reste connecté.", other: "Ce n’est pas vous ?", back: "Retour", // owner (all)
+    link: "Dans une équipe ? Entrez votre code d’équipe", foremanLink: "Un code d’équipe plutôt ?" },
   offline: "Vous êtes hors ligne. Voici ce que ce téléphone a vu en dernier.", // owner
   queued_one: "{{count}} chose attend d’être envoyée", queued_other: "{{count}} choses attendent d’être envoyées", // owner
   loadFailed: { title: "Impossible de charger le travail du jour", body: "Vérifiez votre connexion et réessayez.", retry: "Réessayer" }, // owner

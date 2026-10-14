@@ -100,7 +100,7 @@ export const fr: typeof en = {
   modes: { ai: "Rédiger avec l’IA", manual: "Manuelle", priceList: "Liste de prix" }, // owner (the mode names)
   ai: {
     describeLabel: "Décrivez les travaux",
-    placeholder: "Décrivez les travaux : pièces, dimensions, matériaux, ce qui est inclus.",
+    placeholder: "Décrivez les travaux : pièces, dimensions, matériaux, ce qui est inclus.",
     photos: "Photos", photosLabel: "Ajouter des photos",
     pdf: "PDF", pdfLabel: "Ajouter un PDF", pdfSoon: "Joindre un PDF", // owner (pdfSoon)
     sheet: "Tableur", sheetLabel: "Ajouter un tableur", sheetSoon: "Joindre un tableur", // owner (sheet, sheetSoon)
@@ -119,13 +119,13 @@ export const fr: typeof en = {
     },
     examples: "Partir d’un exemple", examplesLabel: "Exemples par métier",
     example: {
-      painting: { name: "Peinture", text: "Repeindre 3 chambres et le corridor, environ 1 120 pi² de murs et plafonds, deux couches. Le plafond de la salle de bain a un dégât d’eau : découper et réparer. Peinture fournie." },
+      painting: { name: "Peinture", text: "Repeindre 3 chambres et le corridor, environ 1 120 pi² de murs et plafonds, deux couches. Le plafond de la salle de bain a un dégât d’eau : découper et réparer. Peinture fournie." },
       drywall: { name: "Gypse", text: "Poser, tirer les joints et plâtrer une salle familiale de 600 pi² au sous-sol, finition niveau 4, un caisson autour du conduit." },
       flooring: { name: "Planchers", text: "Enlever le tapis dans 2 chambres (320 pi²) et poser des lattes de vinyle à clic avec de nouvelles plinthes." },
       decks: { name: "Patios", text: "Laver à pression et teindre un patio en cèdre de 14 pi sur 16 pi avec 30 pi de garde-corps, deux couches semi-transparentes." },
-      bathrooms: { name: "Salles de bain", text: "Refaire au complet une salle de bain de 5 pi sur 8 pi : bain remplacé par une douche ouverte, céramique au sol et aux murs, nouvelle vanité et toilette." },
+      bathrooms: { name: "Salles de bain", text: "Refaire au complet une salle de bain de 5 pi sur 8 pi : bain remplacé par une douche ouverte, céramique au sol et aux murs, nouvelle vanité et toilette." },
       kitchens: { name: "Cuisines", text: "Peindre 24 portes et caissons d’armoires, nouvelles poignées et un dosseret en céramique métro d’environ 30 pi²." },
-      basements: { name: "Sous-sols", text: "Finir un sous-sol de 750 pi² : charpente, isolation, gypse, lumières encastrées, plancher de vinyle et préparation pour une salle de bain 3 pièces." },
+      basements: { name: "Sous-sols", text: "Finir un sous-sol de 750 pi² : charpente, isolation, gypse, lumières encastrées, plancher de vinyle et préparation pour une salle de bain 3 pièces." },
     },
     options: "Options", layout: "Mise en page du PDF", layouts: { standard: "Standard", professional: "Professionnelle", elegant: "Élégante" },
     target: "Montant visé", targetHelp: "L’IA établit ses prix en fonction", targetPlaceholder: "Facultatif",
@@ -141,7 +141,7 @@ export const fr: typeof en = {
   writing: {
     title: "Rédaction de votre soumission", ready: "Votre soumission est prête",
     sub: "Pour {{client}} · mise en page {{layout}}", subNoClient: "Mise en page {{layout}}", newClientName: "un nouveau client",
-    steps: { reading: "Lecture de votre description", measuring: "Mesure des pièces et des quantités", pricing: "Prix tirés de votre liste de prix", tax: "Ajout de la {{tax}}, {{province}} {{rate}} %", taxGeneric: "Ajout de vos taxes de vente", layout: "Mise en page du PDF" },
+    steps: { reading: "Lecture de votre description", measuring: "Mesure des pièces et des quantités", pricing: "Prix tirés de votre liste de prix", tax: "Ajout de la {{tax}}, {{province}} {{rate}} %", taxGeneric: "Ajout de vos taxes de vente", layout: "Mise en page du PDF" },
     lines_one: "{{count}} ligne", lines_other: "{{count}} lignes", chapters_one: "{{count}} section", chapters_other: "{{count}} sections", summary: "{{lines}} en {{chapters}}",
     untitled: "Votre nouvelle soumission", restart: "Recommencer", stepDone: "Terminé", stepNow: "En cours", stepLater: "À venir", // owner
   },
@@ -164,8 +164,8 @@ export const fr: typeof en = {
     addLine: "Ajouter une ligne", addChapter: "Ajouter une section", subtotal: "Sous-total",
     taxes: "Taxes et totaux", province: "Province", exempt: "Exonéré de taxes", exemptSub: "Nécessite le numéro d’exemption du client", exemptWord: "Exonéré", taxWord: "Taxe",
     terms: "Modalités de paiement", termsLabel: "Modalités de paiement",
-    term: { deposit30: "Acompte de 30 %, solde à la fin des travaux", half: "50 % maintenant, 50 % à la fin", completion: "Tout à la fin des travaux", net15: "Net 15 jours" },
-    notes: "Notes pour le client", notesPlaceholder: "Ce qu’il faut savoir : accès, stationnement, animaux, couleurs à choisir",
+    term: { deposit30: "Acompte de 30 %, solde à la fin des travaux", half: "50 % maintenant, 50 % à la fin", completion: "Tout à la fin des travaux", net15: "Net 15 jours" },
+    notes: "Notes pour le client", notesPlaceholder: "Ce qu’il faut savoir : accès, stationnement, animaux, couleurs à choisir",
     save: "Enregistrer et prévisualiser", saving: "Enregistrement…", needLine: "Ajoutez au moins une ligne pour enregistrer.", // owner (saving, needLine)
   },
   sheets: { clientSearch: "Rechercher dans vos clients", clientTitle: "Choisir un client", noClient: "Aucun client pour l’instant", noClientSub: "Vous pourrez en ajouter un plus tard", provinceTitle: "Province" }, // owner
@@ -182,6 +182,6 @@ export const fr: typeof en = {
     build_one: "Créer avec {{count}} article", build_other: "Créer avec {{count}} articles", addToStart: "Ajoutez des articles", chapter: "Portée des travaux", // owner (chapter)
   },
   tax: { hst: "TVH", gst: "TPS", gstQst: "TPS + TVQ", gstPst: "TPS + TVP", gstRst: "TPS + TVD" }, // owner (all but TVH)
-  taxLine: "{{tax}}, {{province}} {{rate}} %",
+  taxLine: "{{tax}}, {{province}} {{rate}} %",
   provinceValue: "{{province}} · {{tax}}",
 };

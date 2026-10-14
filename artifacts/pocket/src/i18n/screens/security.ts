@@ -51,9 +51,9 @@ export const fr: typeof en = {
   two: {
     title: "Vérification en deux étapes", back: "Retour",
     off: { lead: "La vérification en deux étapes est désactivée.", body: "Ajoutez une seconde étape pour qu’un mot de passe volé ne suffise pas." },
-    on: { lead: "La vérification en deux étapes est activée.", body: "Vous entrez un code de votre appli d’authentification quand vous vous connectez sur un nouvel appareil." },
-    password: "Votre mot de passe", start: "Continuer", keyTitle: "Ajoutez quoteAI à votre appli d’authentification", keyBody: "Ouvrez votre appli d’authentification (Google Authenticator, Microsoft Authenticator, 1Password) et ajoutez cette clé, ou touchez le bouton sur ce téléphone.",
-    key: "Clé", open: "Ouvrir l’appli d’authentification", copy: "Copier la clé", copied: "Copié.", codesTitle: "Codes de secours", codesBody: "Gardez-les en lieu sûr. Chacun fonctionne une fois si vous perdez votre téléphone.", codesCopy: "Copier les codes",
+    on: { lead: "La vérification en deux étapes est activée.", body: "Vous entrez un code de votre application d’authentification quand vous vous connectez sur un nouvel appareil." },
+    password: "Votre mot de passe", start: "Continuer", keyTitle: "Ajoutez quoteAI à votre application d’authentification", keyBody: "Ouvrez votre application d’authentification (Google Authenticator, Microsoft Authenticator, 1Password) et ajoutez cette clé, ou touchez le bouton sur ce téléphone.",
+    key: "Clé", open: "Ouvrir l’application d’authentification", copy: "Copier la clé", copied: "Copié.", codesTitle: "Codes de secours", codesBody: "Gardez-les en lieu sûr. Chacun fonctionne une fois si vous perdez votre téléphone.", codesCopy: "Copier les codes",
     confirmTitle: "Entrez le code à 6 chiffres", confirm: "Activer", code: "Code", turnOff: "Désactiver la vérification", newCodes: "Obtenir de nouveaux codes de secours", newCodesNote: "Les anciens codes cessent de fonctionner.", done: "La vérification en deux étapes est activée.",
     problems: { wrong: "Ça n’a pas fonctionné. Vérifiez et réessayez.", offline: "Vous êtes hors ligne. Réessayez une fois reconnecté.", failed: "Impossible de le faire. Réessayez." },
     offDone: "La vérification en deux étapes est désactivée.", needPassword: "Entrez votre mot de passe pour continuer.",
@@ -73,7 +73,7 @@ export const fr: typeof en = {
   },
   devices: {
     title: "Appareils connectés", on: "{{browser}} sur {{system}}", here: "Ce téléphone", hereSub: "Connecté en ce moment", active: "Actif", signOut: "Déconnecter", unknown: "Un autre appareil",
-    foot: "Un appareil inconnu ? Déconnectez-le et changez votre mot de passe.", footOut: "Déconnecté de {{what}}.", all: "Déconnecter partout ailleurs", only: "Seul ce téléphone est connecté", everyone: "tous les autres appareils",
+    foot: "Un appareil inconnu ? Déconnectez-le et changez votre mot de passe.", footOut: "Déconnecté de {{what}}.", all: "Déconnecter partout ailleurs", only: "Seul ce téléphone est connecté", everyone: "tous les autres appareils",
     when: { now: "à l’instant", min_one: "il y a {{count}} min", min_other: "il y a {{count}} min", hour_one: "il y a {{count}} h", hour_other: "il y a {{count}} h" },
   },
   activity: { title: "Activité récente", login: "Nouvelle connexion", twoOn: "Deux étapes activées", twoOff: "Deux étapes désactivées", signedOut: "Appareil déconnecté", signedOutAll: "Déconnecté partout ailleurs", here: "Sur ce téléphone" },

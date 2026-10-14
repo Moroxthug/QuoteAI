@@ -84,7 +84,7 @@ export const fr: typeof en = {
   add: "Ajouter un client", // owner
   more: "Plus d’actions",
   glance: "Clients en un coup d’œil", // owner
-  kpi: { active: "Actifs", lifetime: "Valeur totale", owed: "À recevoir", jobsRunning_one: "{{count}} chantier en cours", jobsRunning_other: "{{count}} chantiers en cours", thisYear: "↑ {{pct}} % cette année", lastYear: "↓ {{pct}} % cette année", overdue_one: "{{count}} en retard", overdue_other: "{{count}} en retard" },
+  kpi: { active: "Actifs", lifetime: "Valeur totale", owed: "À recevoir", jobsRunning_one: "{{count}} chantier en cours", jobsRunning_other: "{{count}} chantiers en cours", thisYear: "↑ {{pct}} % cette année", lastYear: "↓ {{pct}} % cette année", overdue_one: "{{count}} en retard", overdue_other: "{{count}} en retard" },
   owedToYou: "À recevoir", // owner
   topClients: "Meilleurs clients", // owner
   nudge: "Relancer", // owner
@@ -129,7 +129,7 @@ export const fr: typeof en = {
     more: "Plus d’actions",
     since: "Client depuis {{date}}",
     notFound: { title: "Client introuvable", body: "Il a peut-être été retiré." }, // owner
-    stats: { won: "Soumissions gagnées", wonOf: "{{won}} sur {{of}}", rate: "{{pct}} % de réussite", noRate: "Rien d’envoyé", total: "Valeur totale", since: "Depuis {{date}}", owed: "Dû", late_one: "{{count}} jour de retard", late_other: "{{count}} jours de retard", none: "Tout est payé", jobs: "Chantiers", running_one: "{{count}} en cours", running_other: "{{count}} en cours", noJobs: "Aucun", done: "{{pct}} % terminé" },
+    stats: { won: "Soumissions gagnées", wonOf: "{{won}} sur {{of}}", rate: "{{pct}} % de réussite", noRate: "Rien d’envoyé", total: "Valeur totale", since: "Depuis {{date}}", owed: "Dû", late_one: "{{count}} jour de retard", late_other: "{{count}} jours de retard", none: "Tout est payé", jobs: "Chantiers", running_one: "{{count}} en cours", running_other: "{{count}} en cours", noJobs: "Aucun", done: "{{pct}} % terminé" },
     banner_other: "{{number}} a {{count}} jours de retard.", banner_one: "{{number}} a {{count}} jour de retard.", bannerAmount: "{{amount}} à recevoir.",
     remind: "Envoyer un rappel", reminded: "Rappel envoyé", remindFailed: "Impossible d’envoyer le rappel. Réessayez.", // owner
     details: "Détails", edit: "Modifier",

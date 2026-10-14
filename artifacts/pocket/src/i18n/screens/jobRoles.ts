@@ -75,7 +75,7 @@ export const fr: typeof en = {
   },
   rh: {
     seeAll: "Tout voir", books: "Comptabilité", schedule: "Horaire", quotes: "Soumissions", analytics: "Analyses", jobs: "Travaux", activeN: "{{count}} actifs", all: "Tous", map: "Carte", compliance: "Conformité", log: "Registre",
-    nothing: "Rien pour l’instant.", custom: "Personnaliser l’accueil", customSub: "Onglets : {{tabs}}", good: "Bonjour, {{name}}", hidden: "Les taux horaires sont masqués pour votre rôle.", noMargins: "Vous voyez l’argent, mais pas les marges. Demandez au propriétaire de changer cela.",
+    nothing: "Rien pour l’instant.", custom: "Personnaliser l’accueil", customSub: "Onglets : {{tabs}}", good: "Bonjour, {{name}}", hidden: "Les taux horaires sont masqués pour votre rôle.", noMargins: "Vous voyez l’argent, mais pas les marges. Demandez au propriétaire de changer cela.",
     notBuilt: "Rien de suivi ici pour l’instant.", openAction: "Ouvrir",
   },
 };

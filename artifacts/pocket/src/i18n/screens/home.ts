@@ -91,9 +91,9 @@ export const fr: typeof en = {
     describePlaceholder: "Décrivez les travaux comme vous le diriez sur le chantier",
     collapse: "Réduire",
     client: "Client",
-    clientSet: "Client : {{name}}",
+    clientSet: "Client : {{name}}",
     budget: "Budget",
-    budgetSet: "Budget : {{amount}}",
+    budgetSet: "Budget : {{amount}}",
     photos: "Ajouter des photos",
     dictate: "Dicter",
     stopDictation: "Arrêter la dictée", // owner
@@ -122,7 +122,7 @@ export const fr: typeof en = {
     review: "Vérifier et envoyer",
     edit: "Modifier",
     problem: {
-      offline: "Vous êtes hors ligne. Votre description est conservée : réessayez avec du signal.", // owner
+      offline: "Vous êtes hors ligne. Votre description est conservée : réessayez avec du signal.", // owner
       quota: "Vous avez utilisé les soumissions du mois. Il y en a d’autres sur quoteai.ca.", // owner
       cannot: "Ce n’est pas assez pour établir un prix. Ajoutez quoi, où et quelle taille.", // owner
       unlock: "Cette soumission demande un forfait actif. Vérifiez-le sur quoteai.ca.", // owner

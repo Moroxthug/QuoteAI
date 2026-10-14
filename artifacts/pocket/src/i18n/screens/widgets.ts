@@ -94,8 +94,8 @@ export const fr: typeof en = {
     inMonth: "Encaissé en {{month}}",
     thisWeek: "Encaissé cette semaine", // owner
     thisQuarter: "Encaissé ce trimestre", // owner
-    up: "↑ {{pct}} %",
-    down: "↓ {{pct}} %",
+    up: "↑ {{pct}} %",
+    down: "↓ {{pct}} %",
     periods: ["Semaine", "Mois", "Trimestre"],
     periodLabel: "Période",
     won: "Soumissions gagnées",
@@ -130,7 +130,7 @@ export const fr: typeof en = {
   },
   quotes: {
     name: "Soumissions",
-    won: "{{pct}} % gagnées",
+    won: "{{pct}} % gagnées",
     drafts: "Brouillons",
     sent: "Envoyées",
     viewed: "Consultées",
@@ -164,8 +164,8 @@ export const fr: typeof en = {
     of: "{{done}} sur {{total}}",
     nothing: "Rien sur la liste du jour", // owner
     nothingBody: "Les tâches et échéances du jour apparaissent ici.", // owner
-    mark: "Marquer fait : {{text}}", // owner
-    unmark: "Marquer non fait : {{text}}", // owner
+    mark: "Marquer fait : {{text}}", // owner
+    unmark: "Marquer non fait : {{text}}", // owner
     all: "Toutes les tâches", // owner
     failed: "Impossible de mettre la liste à jour. Réessayez.", // owner
   },

@@ -38,7 +38,7 @@ export const fr: Dict = {
       send: "Envoyer",
       sent: "Envoyé",
       deposit: "Dépôt à la signature", // owner
-      depositSub: "50 % du total", // owner
+      depositSub: "50 % du total", // owner
       open: "Ouvrir la soumission", // owner
       openAll: "Ouvrir Soumissions", // owner
       call: "Appeler",
@@ -50,7 +50,7 @@ export const fr: Dict = {
         { client: "Tom & Lena Hart", no: "Q-2026-117", job: "Finition du sous-sol", status: "Acceptée" },
       ],
     },
-    digits: "Envoyée il y a 6 jours · 4 131,05 $ · 13 % · 14 h 30", // owner
+    digits: "Envoyée il y a 6 jours · 4 131,05 $ · 13 % · 14 h 30", // owner
   },
   // board: owner review (no ComponentsFR board; Aperçu, Modifier, Envoyer, Nouvelle soumission, Mot de passe oublié come from FR boards)
   board: {
@@ -82,10 +82,10 @@ export const fr: Dict = {
       },
       link: {
         name: "Lien",
-        label: "Mot de passe oublié ?",
+        label: "Mot de passe oublié ?",
         busy: "Ouverture"
       },
-      sizes: "Tailles : petit 36, moyen 44, par défaut 50, grand 54",
+      sizes: "Tailles : petit 36, moyen 44, par défaut 50, grand 54",
       small: "Petit",
       medium: "Moyen",
       defaultSize: "Par défaut",
@@ -143,7 +143,7 @@ export const fr: Dict = {
       group3: "Liste à choix unique", // owner
       schedule: "Calendrier de paiement", // owner
       radios: [
-        { label: "50 % d’acompte, 50 % à la fin", sub: "Le plus courant pour les petits travaux" }, // owner
+        { label: "50 % d’acompte, 50 % à la fin", sub: "Le plus courant pour les petits travaux" }, // owner
         { label: "30 / 40 / 30", sub: "Acompte, mi-parcours, fin des travaux" }, // owner
         { label: "Tout à la fin", sub: "Une facture à la fin des travaux" }, // owner
       ],
@@ -172,13 +172,13 @@ export const fr: Dict = {
       badEmail: "marco@rossireno",
       badEmailMsg: "Ajoutez la fin de l’adresse, comme .ca ou .com", // owner
       disabled: "Désactivé", // owner
-      hst: "TVH 13 %",
+      hst: "TVH 13 %",
       search: "Rechercher",
       searchHint: "Rechercher par client ou chantier", // TabletFR
     },
     status: {
       title: "Statuts", // owner
-      shapesLabel: "Formes : l’icône dit où on en est, la couleur dit comment ça va", // owner
+      shapesLabel: "Formes : l’icône dit où on en est, la couleur dit comment ça va", // owner
       shapes: { notSent: "Pas encore envoyé", onItsWay: "En route", seen: "Vu, à mi-chemin", nearly: "Presque fini", done: "Fait", now: "En cours", waiting: "En attente", paused: "En pause", needsYou: "À traiter", stopped: "Arrêté", inactive: "Plus actif" }, // owner
       plainLabel: "Simple, pour les rangées denses et les en-têtes · Étiquettes, pour les rôles", // owner
       viewedAgo: "Consultée il y a 2 h", // owner
@@ -186,7 +186,7 @@ export const fr: Dict = {
       onSite: "Sur place", // CrewMapFR
       foreman: "Contremaître",
       admin: "Admin", // owner
-      hst: "TVH 13 %",
+      hst: "TVH 13 %",
       groups: {
         // QuotesFR / ClientsFR
         quotes: { name: "Soumissions", draft: "Brouillon", sent: "Envoyée", viewed: "Consultée", accepted: "Acceptée", declined: "Refusée", expired: "Expirée" },
@@ -226,7 +226,7 @@ export const fr: Dict = {
       company: "Profil de l’entreprise",
       companySub: "Logo, numéro de TVH, adresse",
       taxes: "Taxes",
-      hst: "TVH 13 %",
+      hst: "TVH 13 %",
       group4: "Libellé de groupe", // owner
       earlier: "Plus tôt ce mois-ci", // owner
     },
@@ -307,7 +307,7 @@ export const fr: Dict = {
     },
   },
   dev: {
-    session: "Connecté : {{company}}",
+    session: "Connecté : {{company}}",
     noSession: "Non connecté",
   },
 };

@@ -39,7 +39,7 @@ export const fr: typeof en = {
   rememberSub: "Modifiable en tout temps dans le menu",
   next: "Continuer",
   opening: "Ouverture de {{company}}…",
-  another: "Nouvelle entreprise?",
+  another: "Nouvelle entreprise ?",
   enterCode: "Entrer un code",
   problem: {
     offline: { lead: "Aucune connexion.", text: "Pour choisir une entreprise, il faut Internet." },

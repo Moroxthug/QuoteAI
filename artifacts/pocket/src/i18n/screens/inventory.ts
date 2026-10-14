@@ -66,14 +66,14 @@ export const fr: typeof en = {
   fab: { count: "Compter le stock", review: "Revoir la commande · {{n}}" },
   dest: { shop: "Atelier", pickup: "Cueillette" },
   sheet: {
-    title: "Recommander", sub: "{{name}} · {{n}} restant", quantity: "Quantité", why: "Suggéré pour revenir à deux fois le seuil de commande", whyOther: "Suggéré : {{n}}",
+    title: "Recommander", sub: "{{name}} · {{n}} restant", quantity: "Quantité", why: "Suggéré pour revenir à deux fois le seuil de commande", whyOther: "Suggéré : {{n}}",
     supplier: "Fournisseur", deliver: "Livrer à", fewer: "Moins", more: "Plus", add: "Ajouter {{total}} à la commande", addNoPrice: "Ajouter à la commande", update: "Enregistrer", saving: "Enregistrement…",
     tag: { best: "Meilleur prix", up: "Hausse {{pct}} %", last: "Dernier prix" }, optionSub: "{{delivers}} · {{terms}}", counter: "Payé au comptoir", noPrice: "Pas encore de prix", noSuppliers: "Aucun fournisseur. Ajoutez-en un dans Fournisseurs.",
     priceEach: "{{price}} l’unité",
   },
   count: {
     title: "Compter le stock", pick: "Choisissez quoi compter", add: "Ajouter un matériau", addSub: "Quelque chose de nouveau à suivre", rowSub: "{{n}} {{unit}}", shop: "À l’atelier", truck: "Dans le camion",
-    save: "Enregistrer le compte", all: "Tous les articles", fewer: "Moins : {{place}}", more: "Plus : {{place}}", noItems: "Rien à compter pour l’instant.",
+    save: "Enregistrer le compte", all: "Tous les articles", fewer: "Moins : {{place}}", more: "Plus : {{place}}", noItems: "Rien à compter pour l’instant.",
   },
   add: { title: "Ajouter un matériau", name: "Nom", namePh: "Par exemple, gypse ½ po", unit: "Unité, au pluriel", unitPh: "feuilles", par: "Commander sous", shop: "À l’atelier maintenant", save: "Ajouter", saving: "Ajout…" },
   menu: { suppliers: "Fournisseurs", suppliersSub: "Où vous achetez", count: "Compter le stock", countSub: "Mettre à jour chaque emplacement", add: "Ajouter un matériau", addSub: "Quelque chose de nouveau à suivre" },

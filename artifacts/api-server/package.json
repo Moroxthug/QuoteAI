@@ -54,7 +54,7 @@
     "pdfmake": "^0.3.7",
     "pino": "^9",
     "pino-http": "^10",
-    "posthog-node": "^5.40.0",
+    "posthog-node": "^5.54.1",
     "resend": "^6.12.2",
     "sharp": "0.35.4",
     "stripe": "^22.1.0",

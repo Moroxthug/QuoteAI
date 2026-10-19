@@ -15,7 +15,7 @@
     "upload-key": "tsx ./scripts/upload-key.ts"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.5.2",
+    "@capacitor/cli": "^8.5.3",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "catalog:",
     "tsx": "catalog:"

@@ -17,12 +17,19 @@ import { ToastHost } from "@/ui/Feedback";
 import { CardOpenProvider } from "@/ui/CardOpen";
 import { GlobalTabBar } from "@/ui/GlobalTabBar";
 import { FreeQuotesGate } from "@/ui/FreeQuotes";
+import { usePlayBillingBoot } from "@/lib/usePlayBilling";
 import { board } from "@/theme/board";
 
 void SplashScreen.preventAutoHideAsync();
 
 /** The navigator paints no ground of its own: every screen has its own, and the black behind a pushed-back Home (COMPONENTS §6b) has to show through. */
 const NAV_THEME = { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: "transparent" } };
+
+/** Android: connect to Google Play once signed in, and finish any purchase left open. Renders nothing. */
+function PlayBillingBoot() {
+  usePlayBillingBoot();
+  return null;
+}
 
 function RootLayout() {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } }));
@@ -56,6 +63,7 @@ function RootLayout() {
                     </NavThemeProvider>
                     <GlobalTabBar />
                     <FreeQuotesGate />
+                    <PlayBillingBoot />
                   </View>
                 </CardOpenProvider>
               </ToastHost>

@@ -31,6 +31,7 @@
       "expo-localization",
       "expo-secure-store",
       "@sentry/react-native",
+      "expo-iap",
       "./plugins/with-release.js",
       [
         "expo-audio",

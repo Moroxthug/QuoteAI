@@ -1,6 +1,6 @@
 // SetPlan.dc.html. Plan and billing: the plan and its state (with the date it renews), a meter for each thing it counts this month (logins, quotes or open jobs, receipt
 // scans, texts), what it includes (a lock and the tier's tag for what it doesn't), the billing rows and the card that sends the owner to quoteai.ca. Nothing is bought or
-// changed here. States: default, a plan below Business (the locked list), usage only (a member), loading and can't load.
+// changed here, except on Android (Phase 135): there the owner's "managed on quoteai.ca" card is replaced by the Google Play plans (ui/PlayPlans, not on the board). States: default, a plan below Business (the locked list), usage only (a member), loading and can't load.
 // Not built yet: "Payment failed" and "Changed Sep 14" (the server doesn't keep a failed payment or when the plan last changed: the failed payment arrives with Dunning),
 // the card's brand and last four digits, and the names under the logins meter.
 import { Redirect, router } from "expo-router";
@@ -10,6 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { dayFromKey } from "@/lib/assistant";
 import { number as num, shortDate, type Locale } from "@/lib/format";
+import { playBillingAvailable } from "@/lib/usePlayBilling";
+import { PlayPlans } from "@/ui/PlayPlans";
 import { PLANS_URL, featureRows, meterOf, type Meter } from "@/lib/plan";
 import { screenHref } from "@/lib/nav";
 import { useRole } from "@/lib/useRole";
@@ -101,7 +103,11 @@ export default function SetPlan() {
                     <SetRow first={!o.active} icon="receipt" tone="stone" label={t("bill.receipts")} sub={t("bill.receiptsSub", { email: user?.email ?? "" })} control={<SetValue value={o.interval === "year" ? t("bill.yearly") : t("bill.monthly")} />} />
                   </SetGroup>
                 </Section>
-                <Section delay={240} pt={18} px={16}><WebCard title={t("web.title")} sub={t("web.sub")} button={t("web.open")} onOpen={open} /></Section>
+                {playBillingAvailable() ? (
+                  <Section delay={240}><PlayPlans /></Section>
+                ) : (
+                  <Section delay={240} pt={18} px={16}><WebCard title={t("web.title")} sub={t("web.sub")} button={t("web.open")} onOpen={open} /></Section>
+                )}
               </>
             ) : (
               <Section delay={190} pt={18} px={16}><WebCard title={t("web.title")} sub={t("web.subMember")} button={t("web.open")} onOpen={open} /></Section>

@@ -11,6 +11,7 @@ import { closeFreeQuotesGate, useFreeQuotesGate } from "@/lib/freeQuotesGate";
 import { number, type Locale } from "@/lib/format";
 import { screenHref } from "@/lib/nav";
 import { useAllowance } from "@/lib/useAllowance";
+import { playBillingAvailable } from "@/lib/usePlayBilling";
 import { Button } from "./Button";
 import { Banner } from "./Feedback";
 import { Stack } from "./Layout";
@@ -69,7 +70,7 @@ export function FreeQuotesGate() {
         <View style={{ gap: 10, paddingTop: 4, paddingBottom: 16 }}>
           <Button label={t("locked.plans")} block onPress={() => { closeFreeQuotesGate(); toPlans(t("locked.soon")); }} />
           <Button kind="secondary" label={t("locked.later")} block onPress={closeFreeQuotesGate} />
-          <Text size={12.5} color="muted" align="center">{t("locked.note")}</Text>
+          {playBillingAvailable() ? null : <Text size={12.5} color="muted" align="center">{t("locked.note")}</Text>}
         </View>
       </View>
     </Sheet>

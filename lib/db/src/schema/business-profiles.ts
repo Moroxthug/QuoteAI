@@ -100,6 +100,8 @@ export const businessProfilesTable = pgTable("business_profiles", {
   stripeCustomerId: text("stripe_customer_id"),
   subscriptionPlan: text("subscription_plan"),
   subscriptionStatus: text("subscription_status"),
+  /** Phase 133: subscribed at the $19 launch price, kept for life (founding customer). */
+  foundingPrice: boolean("founding_price").notNull().default(false),
   subscriptionInterval: text("subscription_interval"), // Phase 73: "month" | "year" — the tier stays in subscription_plan
   subscriptionPeriodEnd: timestamp("subscription_period_end", { withTimezone: true }),
   /** Phase 90: set when the plan above is paid by this group company's subscription (one bill), not by this profile's own. */

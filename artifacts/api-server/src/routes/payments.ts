@@ -13,7 +13,8 @@ const CheckoutBodySchema = CreateCheckoutSessionBody.extend({ extraSeats: z.numb
 const ChangePlanBodySchema = ChangePlanBody.extend({ interval: ChangePlanBody.shape.interval.optional() });
 import { getUncachableStripeClient } from "../stripeClient";
 import { logger } from "../lib/logger";
-import { addonPriceIdFor, annualBillingAvailable, isSelfServeTier, planItemOf, planPriceIdFor, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval } from "../lib/billing";
+import { currentLaunchOffer } from "../lib/launchPrice";
+import { addonPriceIdFor, annualBillingAvailable, launchStarterPriceId, isSelfServeTier, planItemOf, planPriceIdFor, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
 
 const TRIAL_DAYS = 7;
@@ -140,20 +141,32 @@ export const PLANS: PlanDef[] = [
 ];
 
 /** Phase 73: the public plan list carries the annual price (10 × monthly) and whether annual checkout is configured. */
-function publicPlans() {
+async function publicPlans() {
   const yearly = annualBillingAvailable();
-  return PLANS.map((plan) => ({
+  // Phase 133: while the launch offer runs, Starter is $19 (monthly only: the annual price would cost more than twelve launch months) and says how many spots are left.
+  const offer = await currentLaunchOffer();
+  return PLANS.map((plan) => {
+  const launchOn = plan.id === "monthly_starter" && offer.active;
+  return {
     ...plan,
+    price: launchOn ? offer.launchPriceCents / 100 : plan.price,
+    ...(plan.id === "monthly_starter" ? { launch: { active: offer.active, standardPrice: offer.standardPriceCents / 100, remaining: offer.remaining, limit: offer.limit } } : {}),
     custom: plan.custom ?? false,
-    yearlyPrice: plan.interval && plan.price !== null ? yearlyPriceFor(plan.price) : null,
-    yearlyAvailable: !!plan.interval && !plan.custom && yearly,
+    yearlyPrice: plan.interval && plan.price !== null && !launchOn ? yearlyPriceFor(plan.price) : null,
+    yearlyAvailable: !!plan.interval && !plan.custom && yearly && !launchOn,
     /** Phase 99: false when this deployment has no Stripe price for the plan (the button says so instead of failing). */
-    checkoutAvailable: !plan.custom && planPriceIdFor(plan.id) !== null,
-  }));
+    checkoutAvailable: !plan.custom && (launchOn ? launchStarterPriceId() !== null : planPriceIdFor(plan.id) !== null),
+  };
+  });
 }
 
-router.get("/payments/plans", (_req, res) => {
-  res.json(publicPlans());
+router.get("/payments/plans", async (_req, res) => {
+  try {
+    res.json(await publicPlans());
+  } catch (err) {
+    logger.error({ err }, "Plans listing failed");
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 /**
@@ -230,6 +243,12 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
     // Phase 73: annual cadence picks the yearly price for the same tier.
     const interval: BillingInterval = parsed.data.interval ?? "month";
     let priceId = planPriceIdFor(plan.id);
+    // Phase 133: a new Starter subscriber at the launch price pays $19 and is a founding customer (kept for life).
+    let launch = false;
+    if (plan.id === "monthly_starter" && interval === "month") {
+      const launchId = launchStarterPriceId();
+      if (launchId && (await currentLaunchOffer()).active) { priceId = launchId; launch = true; }
+    }
     if (!priceId) {
       logger.error({ planType }, "No Stripe price configured for this plan (STRIPE_PRICE_* — run the stripe-catalog script)");
       res.status(503).json({ error: "PLAN_UNAVAILABLE", message: "This plan cannot be bought right now" });
@@ -290,6 +309,7 @@ router.post("/payments/checkout", requireAuth, requirePermission("settings", "fu
         quoteId: quoteId ?? "",
         planType,
         interval: plan.interval ? interval : "",
+        launch: launch ? "1" : "",
         hasWatermark: String(plan.hasWatermark),
         extraSeats: String(extraSeats),
         ...(discounts ? { pilotPromo: pilotPromoCode()! } : {}),

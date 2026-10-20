@@ -1,3 +1,4 @@
+import { isLaunchPrice } from "./lib/billing.js";
 import { recordStripeBillingEvent, type StripeEventLike } from "./lib/growth.js";
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
@@ -239,6 +240,7 @@ app.post(
           subscriptionPlan: isActive ? planType : null,
           subscriptionStatus: isActive ? "active" : "cancelled",
           subscriptionInterval: isActive ? resolved.interval : null,
+          foundingPrice: isActive && isLaunchPrice(price),
         })
         .onConflictDoUpdate({
           target: businessProfilesTable.userId,
@@ -247,6 +249,7 @@ app.post(
             subscriptionPlan: isActive ? planType : null,
             subscriptionStatus: isActive ? "active" : "cancelled",
             subscriptionInterval: isActive ? resolved.interval : null,
+            foundingPrice: isActive && isLaunchPrice(price),
           },
         });
 
@@ -290,6 +293,7 @@ app.post(
               subscriptionPlan: planType,
               subscriptionStatus: "active",
               subscriptionInterval: interval,
+              foundingPrice: session.metadata?.launch === "1",
             })
             .onConflictDoUpdate({
               target: businessProfilesTable.userId,
@@ -298,6 +302,7 @@ app.post(
                 subscriptionPlan: planType,
                 subscriptionStatus: "active",
                 subscriptionInterval: interval,
+                foundingPrice: session.metadata?.launch === "1",
               },
             });
           logger.info({ userId, planType }, "Subscription activated via checkout webhook");
@@ -350,7 +355,7 @@ app.post(
         if (sub.customer) {
           await db
             .update(businessProfilesTable)
-            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null, extraSeats: 0 })
+            .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null, extraSeats: 0, foundingPrice: false })
             .where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
           const [cancelled] = await db.select({ userId: businessProfilesTable.userId }).from(businessProfilesTable).where(eq(businessProfilesTable.stripeCustomerId, sub.customer as string));
           if (cancelled) await subscriptionChanged(cancelled.userId, false, { ended: true });

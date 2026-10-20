@@ -1,3 +1,4 @@
+import { freeQuotesUsedBody, isBlocked, quoteAllowance } from "../lib/freeQuotes.js";
 import { Router } from "express";
 import { requireAuth, getUserId, getUserName } from "../middlewares/authMiddleware";
 import { requirePermission } from "../middlewares/requirePermission.js";
@@ -589,6 +590,12 @@ router.post("/quotes", requireAuth, requirePermission("quotes", "edit"), aiCallL
       }
     }
     // ─────────────────────────────────────────────────────────────────────────
+
+    // Phase 133: the free-quote hook. Off until FREE_QUOTES_ENFORCED=1 (the day an in-app purchase exists); the apps read the same numbers from GET /api/me/allowance.
+    {
+      const allowance = await quoteAllowance(userId);
+      if (isBlocked(allowance)) { res.status(402).json(freeQuotesUsedBody(allowance)); return; }
+    }
 
     const fields = CreateQuoteFields.safeParse(req.body ?? {});
     if (!fields.success) {
@@ -2093,6 +2100,12 @@ router.post("/quotes/:id/send-sms", requireAuth, requirePermission("quotes", "ed
 router.post("/quotes/:id/duplicate", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    // Phase 133: the free-quote hook. Off until FREE_QUOTES_ENFORCED=1 (the day an in-app purchase exists); the apps read the same numbers from GET /api/me/allowance.
+    {
+      const allowance = await quoteAllowance(userId);
+      if (isBlocked(allowance)) { res.status(402).json(freeQuotesUsedBody(allowance)); return; }
+    }
+
     const id = req.params.id as string;
 
     const [original] = await db
@@ -2567,6 +2580,12 @@ router.post("/quotes/:id/generate-pdf-pro", requireAuth, requirePermission("quot
 router.post("/quotes/manual", requireAuth, requirePermission("quotes", "edit"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    // Phase 133: the free-quote hook. Off until FREE_QUOTES_ENFORCED=1 (the day an in-app purchase exists); the apps read the same numbers from GET /api/me/allowance.
+    {
+      const allowance = await quoteAllowance(userId);
+      if (isBlocked(allowance)) { res.status(402).json(freeQuotesUsedBody(allowance)); return; }
+    }
+
     const body = ManualQuoteBodySchema.safeParse(req.body ?? {});
     if (!body.success) {
       res.status(400).json({ error: manualQuoteBodyError(body.error), details: body.error });

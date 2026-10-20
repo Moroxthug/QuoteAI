@@ -64,6 +64,10 @@ const MANIFEST: Record<string, Entry> = {
   WEATHERKIT_SERVICE_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Services ID registered for WeatherKit (e.g. ca.quoteai.weather)" },
   WEATHERKIT_KEY_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Key ID of the WeatherKit .p8 key" },
   WEATHERKIT_PRIVATE_KEY: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The text of the .p8 file (newlines may be written as \n)" },
+  STRIPE_PRICE_STARTER_LAUNCH: { kind: "feature", feature: "Launch price", note: "Phase 133: the $19 Starter launch price id (metadata quoteai_launch=1); unset = no launch offer, Starter stays $29" },
+  FREE_QUOTES_ENFORCED: { kind: "feature", feature: "Free quotes", note: "Phase 133: set to 1 to block new quotes after the free ones (switch on the day Play Billing exists); unset = counting only" },
+  FREE_QUOTES_LIMIT: { kind: "feature", feature: "Free quotes", note: "Phase 133: free quotes per company on no paid plan (default 3)" },
+  LAUNCH_CUSTOMER_LIMIT: { kind: "feature", feature: "Launch price", note: "Phase 133: paying customers after which Starter goes from $19 to $29 for new customers (default 100)" },
   WEATHER_PROVIDER: { kind: "feature", feature: "Weather", note: "Optional: mock | eccc | weatherkit to force a source (mock is for development and screenshots only)" },
   SESSION_SECRET: { kind: "legacy", note: "read by lib/auth for the pre-better-auth cookie; kept set, harmless" },
 

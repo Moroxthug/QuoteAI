@@ -2,6 +2,10 @@ import { Router } from "express";
 import { z } from "zod";
 import { requireAuth, getUserId } from "../middlewares/authMiddleware.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
+import { eq } from "drizzle-orm";
+import { db, businessProfilesTable } from "@workspace/db";
+import { currentLaunchOffer } from "../lib/launchPrice.js";
+import { quoteAllowance } from "../lib/freeQuotes.js";
 import { isTrackedEvent, recordAttribution, trackGrowth } from "../lib/growth.js";
 
 const router = Router();
@@ -35,6 +39,21 @@ router.post("/growth/attribution", requireAuth, async (req, res) => {
   const a = await recordAttribution(userId, body.data);
   trackGrowth({ event: "signup_completed", userId, anonId: body.data.anonId, source: a.source, platform: a.platform });
   res.status(204).end();
+});
+
+// GET /api/me/allowance: what the apps need for the free-quote counter and the launch price: quotes used and left, whether running out blocks, the launch offer and whether this company is a founding customer.
+router.get("/me/allowance", requireAuth, async (_req, res) => {
+  try {
+    const userId = getUserId(res);
+    const [freeQuotes, launch, [profile]] = await Promise.all([
+      quoteAllowance(userId),
+      currentLaunchOffer(),
+      db.select({ founding: businessProfilesTable.foundingPrice }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId)),
+    ]);
+    res.json({ freeQuotes, launch, founding: profile?.founding ?? false });
+  } catch {
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 export default router;

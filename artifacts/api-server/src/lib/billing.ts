@@ -56,6 +56,19 @@ export function planPriceIdFor(planId: string): string | null {
   return clean((monthlyPriceIds() as Record<string, string | undefined>)[planId]);
 }
 
+/** Phase 133: the $19 launch price of Starter (docs/GROWTH-PLAN.md); null = not created on this deployment, so the launch offer is off. */
+export function launchStarterPriceId(): string | null {
+  return clean(process.env.STRIPE_PRICE_STARTER_LAUNCH);
+}
+
+/** True for the launch price (by id or by its quoteai_launch tag): the subscription is a founding one. */
+export function isLaunchPrice(price: PriceLike): boolean {
+  if (!price) return false;
+  const id = typeof price === "string" ? price : price.id;
+  if (id && launchStarterPriceId() === id) return true;
+  return typeof price !== "string" && price.metadata?.quoteai_launch === "1";
+}
+
 export function yearlyPriceIdFor(tier: SubscriptionTier): string | null {
   return isSelfServeTier(tier) ? clean(yearlyPriceIds()[tier]) : null;
 }
@@ -79,6 +92,7 @@ export function resolvePrice(price: PriceLike): { tier: SubscriptionTier; interv
   if (!price) return null;
   const id = typeof price === "string" ? price : price.id;
   if (id) {
+    if (launchStarterPriceId() === id) return { tier: "monthly_starter", interval: "month" };
     for (const tier of SELF_SERVE_TIERS) {
       if (yearlyPriceIdFor(tier) === id) return { tier, interval: "year" };
       if (planPriceIdFor(tier) === id) return { tier, interval: "month" };

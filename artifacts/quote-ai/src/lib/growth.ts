@@ -49,7 +49,7 @@ const post = (path: string, body: unknown): void => {
 
 /** Keeps the first visit's tags (later visits never overwrite them) and reports the landing view once per browser session. Call once at start-up. */
 export function captureLanding(): void {
-  if (typeof window === "undefined" || isNativeApp()) return;
+  if (typeof window === "undefined" || isNativeApp) return;
   const q = new URLSearchParams(window.location.search);
   const ref = q.get("ref") ?? undefined; // a referral link: quoteai.ca/?ref=CODE
   if (!read<Stored>(KEY)) {
@@ -76,7 +76,7 @@ export function captureLanding(): void {
 
 /** Right after sign-up: the saved tags go to the company, once (the server also ignores a second attempt). */
 export function reportAttributionOnce(userId: string): void {
-  if (typeof window === "undefined" || isNativeApp()) return;
+  if (typeof window === "undefined" || isNativeApp) return;
   if (read<string>(SENT) === userId) return;
   write(SENT, userId);
   const s = read<Stored>(KEY) ?? {};

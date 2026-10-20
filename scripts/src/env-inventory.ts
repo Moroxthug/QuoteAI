@@ -67,6 +67,8 @@ const MANIFEST: Record<string, Entry> = {
   STRIPE_PRICE_STARTER_LAUNCH: { kind: "feature", feature: "Launch price", note: "Phase 133: the $19 Starter launch price id (metadata quoteai_launch=1); unset = no launch offer, Starter stays $29" },
   FREE_QUOTES_ENFORCED: { kind: "feature", feature: "Free quotes", note: "Phase 133: set to 1 to block new quotes after the free ones (switch on the day Play Billing exists); unset = counting only" },
   FREE_QUOTES_LIMIT: { kind: "feature", feature: "Free quotes", note: "Phase 133: free quotes per company on no paid plan (default 3)" },
+  LIFECYCLE_EMAILS_ENABLED: { kind: "feature", feature: "Lifecycle emails", note: "Phase 134: set to 1 to send the sign-up nurture sequence (welcome, first quote, free quotes, inactivity, win-back) from the cron tick; unset = nothing is sent. Run LIFECYCLE_DRY_RUN=1 first. Needs migration 0077 applied" },
+  LIFECYCLE_DRY_RUN: { kind: "feature", feature: "Lifecycle emails", note: "Phase 134: set to 1 to log which lifecycle emails WOULD go out (user id and message key only) and send/record nothing; works even while LIFECYCLE_EMAILS_ENABLED is unset" },
   LAUNCH_CUSTOMER_LIMIT: { kind: "feature", feature: "Launch price", note: "Phase 133: paying customers after which Starter goes from $19 to $29 for new customers (default 100)" },
   WEATHER_PROVIDER: { kind: "feature", feature: "Weather", note: "Optional: mock | eccc | weatherkit to force a source (mock is for development and screenshots only)" },
   SESSION_SECRET: { kind: "legacy", note: "read by lib/auth for the pre-better-auth cookie; kept set, harmless" },

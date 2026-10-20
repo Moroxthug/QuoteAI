@@ -1185,3 +1185,31 @@ router.post("/admin/automations/:id/retry", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Phase 134: lifecycle emails at a glance (owner only, behind requireAdmin like every /admin route): what went out per message in the last 30 days,
+// who opted out, whether it is switched on, and what the last cron tick that ran it reported.
+router.get("/admin/lifecycle/summary", async (_req, res) => {
+  try {
+    const since = new Date(Date.now() - 30 * 24 * 3_600_000);
+    const perKey = (await db.execute<{ message_key: string; n: string | number }>(sql`select message_key, count(*) as n from lifecycle_sends where sent_at >= ${since} group by message_key order by message_key`)).rows;
+    const [totals] = (await db.execute<{ last_sent_at: string | null; opted_out_total: string | number; opted_out_30d: string | number }>(sql`
+      select (select max(sent_at) from lifecycle_sends) as last_sent_at,
+             (select count(*) from business_profiles where marketing_emails_opt_out) as opted_out_total,
+             (select count(*) from business_profiles where marketing_emails_opt_out and marketing_opt_out_at >= ${since}) as opted_out_30d`)).rows;
+    const [tick] = (await db.execute<{ finished_at: string | null; lifecycle: unknown }>(sql`select finished_at, result -> 'lifecycle' as lifecycle from cron_ticks where result ? 'lifecycle' order by started_at desc limit 1`)).rows;
+    const sentByKey = Object.fromEntries(perKey.map((r) => [r.message_key, Number(r.n)]));
+    res.json({
+      enabled: process.env.LIFECYCLE_EMAILS_ENABLED === "1",
+      dryRun: process.env.LIFECYCLE_DRY_RUN === "1",
+      windowDays: 30,
+      sentByKey,
+      sentTotal: Object.values(sentByKey).reduce((a, b) => a + b, 0),
+      optOuts: { total: Number(totals?.opted_out_total ?? 0), last30Days: Number(totals?.opted_out_30d ?? 0) },
+      lastSentAt: totals?.last_sent_at ?? null,
+      lastTick: tick ? { finishedAt: tick.finished_at, lifecycle: tick.lifecycle } : null,
+    });
+  } catch (err) {
+    logger.error({ err }, "Error reading lifecycle summary");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});

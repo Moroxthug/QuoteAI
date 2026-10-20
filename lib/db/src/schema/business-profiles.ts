@@ -147,6 +147,9 @@ export const businessProfilesTable = pgTable("business_profiles", {
   /** Phase 91: what the company told us at sign-up. */
   companySetup: jsonb("company_setup").$type<CompanySetup>().notNull().default({}),
   featureFlags: jsonb("feature_flags").$type<FeatureFlags>().notNull().default({}),
+  /** Phase 134: opted out of lifecycle (nurture) emails; stops the whole sequence. Account emails are unaffected. */
+  marketingEmailsOptOut: boolean("marketing_emails_opt_out").notNull().default(false),
+  marketingOptOutAt: timestamp("marketing_opt_out_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

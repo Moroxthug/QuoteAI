@@ -11,12 +11,12 @@ import type { Request } from "express";
  * the board's channel choice and "Resubscribe" are not offered here.
  */
 
-export type UnsubscribeKind = "reminders" | "followups" | "marketing";
+export type UnsubscribeKind = "reminders" | "followups" | "marketing" | "lifecycle";
 type Lang = "en" | "fr";
 
 const TEXT: Record<Lang, {
   changed: string; resub: string; again: string; from: string; unsubscribed: string; stillTitle: string; still: string; sentWith: string; invalid: string; missing: string; error: string;
-  title: Record<UnsubscribeKind, string>; sub: Record<UnsubscribeKind, string>;
+  title: Record<UnsubscribeKind, string>; sub: Record<UnsubscribeKind, string>; accountStillTitle: string; accountStill: string;
 }> = {
   en: {
     changed: "Changed your mind?",
@@ -30,8 +30,10 @@ const TEXT: Record<Lang, {
     invalid: "This unsubscribe link is no longer valid.",
     missing: "Missing unsubscribe link.",
     error: "Something went wrong. Please try again later.",
-    title: { reminders: "No more reminders by email", followups: "No more follow-ups by email", marketing: "No more review requests or photos by email" },
-    sub: { reminders: "You won't receive any more reminders about this quote.", followups: "You won't receive any more follow-up messages from us.", marketing: "You won't receive any more review requests or shared photos from us." },
+    title: { reminders: "No more reminders by email", followups: "No more follow-ups by email", marketing: "No more review requests or photos by email", lifecycle: "No more tips and reminders by email" },
+    sub: { reminders: "You won't receive any more reminders about this quote.", followups: "You won't receive any more follow-up messages from us.", marketing: "You won't receive any more review requests or shared photos from us.", lifecycle: "You won't receive any more tips or reminders from QuoteAI. You can switch them back on below." },
+    accountStillTitle: "Account emails still arrive.",
+    accountStill: "Sign-in, security and billing messages are not part of this.",
   },
   fr: {
     changed: "Vous avez changé d’avis?",
@@ -45,8 +47,10 @@ const TEXT: Record<Lang, {
     invalid: "Ce lien de désabonnement n'est plus valide.",
     missing: "Lien de désabonnement manquant.",
     error: "Une erreur s'est produite. Veuillez réessayer plus tard.",
-    title: { reminders: "Plus de rappels par courriel", followups: "Plus de relances par courriel", marketing: "Plus de demandes d'avis ni de photos par courriel" },
-    sub: { reminders: "Vous ne recevrez plus de rappels au sujet de cette soumission.", followups: "Vous ne recevrez plus de messages de relance de notre part.", marketing: "Vous ne recevrez plus de demandes d'avis ni de photos partagées de notre part." },
+    title: { reminders: "Plus de rappels par courriel", followups: "Plus de relances par courriel", marketing: "Plus de demandes d'avis ni de photos par courriel", lifecycle: "Plus de conseils ni de rappels par courriel" },
+    sub: { reminders: "Vous ne recevrez plus de rappels au sujet de cette soumission.", followups: "Vous ne recevrez plus de messages de relance de notre part.", marketing: "Vous ne recevrez plus de demandes d'avis ni de photos partagées de notre part.", lifecycle: "Vous ne recevrez plus de conseils ni de rappels de QuoteAI. Vous pouvez les réactiver ci-dessous." },
+    accountStillTitle: "Les courriels de compte arrivent toujours.",
+    accountStill: "Les messages de connexion, de sécurité et de facturation n'en font pas partie.",
   },
 };
 
@@ -109,7 +113,7 @@ export function unsubscribeDonePage(opts: { lang: Lang; kind: UnsubscribeKind; c
   const T = TEXT[opts.lang];
   const check = `<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
   const off = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m6 18 12-12"/></svg>`;
-  return shell(opts.lang, opts.company ?? "", `<div class="card" role="status"><span class="disc">${check}</span><h1>${escapeHtml(T.title[opts.kind])}</h1><p class="sub">${escapeHtml(T.sub[opts.kind])}</p><span class="st">${off}${escapeHtml(T.unsubscribed)}</span><div class="note"><b>${escapeHtml(T.stillTitle)}</b> ${escapeHtml(T.still)}</div>${opts.resubscribe ? `<form class="again" method="post" action="${escapeHtml(opts.resubscribe.action)}">${escapeHtml(T.changed)}<br><button type="submit">${escapeHtml(T.resub)}</button></form>` : ""}</div>`);
+  return shell(opts.lang, opts.company ?? "", `<div class="card" role="status"><span class="disc">${check}</span><h1>${escapeHtml(T.title[opts.kind])}</h1><p class="sub">${escapeHtml(T.sub[opts.kind])}</p><span class="st">${off}${escapeHtml(T.unsubscribed)}</span><div class="note"><b>${escapeHtml(opts.kind === "lifecycle" ? T.accountStillTitle : T.stillTitle)}</b> ${escapeHtml(opts.kind === "lifecycle" ? T.accountStill : T.still)}</div>${opts.resubscribe ? `<form class="again" method="post" action="${escapeHtml(opts.resubscribe.action)}">${escapeHtml(T.changed)}<br><button type="submit">${escapeHtml(T.resub)}</button></form>` : ""}</div>`);
 }
 
 /** The page after Resubscribe: the board's "resubscribed" state. */

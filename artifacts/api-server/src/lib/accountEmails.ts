@@ -25,7 +25,7 @@ const INK = "#1f2937";
 const MUTED = "#6b7280";
 const LOGO_URL = () => `${getBaseUrl()}/quoteai-logo.png`;
 
-function shell(lang: AccountEmailLang, title: string, body: string, footer: string): string {
+export function shell(lang: AccountEmailLang, title: string, body: string, footer: string): string {
   return `<!DOCTYPE html>
 <html lang="${lang}">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>${escapeHtml(title)}</title></head>
@@ -43,7 +43,7 @@ function shell(lang: AccountEmailLang, title: string, body: string, footer: stri
 </html>`;
 }
 
-function button(url: string, label: string): string {
+export function button(url: string, label: string): string {
   return `<table cellpadding="0" cellspacing="0" role="presentation" style="margin:24px auto"><tr><td align="center" style="border-radius:999px;background:${NAVY}">
 <a href="${url}" style="display:inline-block;color:#fff;font-size:15px;font-weight:600;padding:13px 30px;border-radius:999px;text-decoration:none">${escapeHtml(label)}</a>
 </td></tr></table>`;

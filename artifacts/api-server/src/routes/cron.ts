@@ -24,6 +24,7 @@ import { cronAuthorized } from "../lib/cronAuth.js";
 import { pruneIdempotencyKeys } from "../lib/idempotency.js";
 import { pruneChangeLog } from "./changes.js";
 import { runMorningBriefs } from "../today/brief.js";
+import { runLifecycleIfDue } from "../lifecycle/service.js";
 
 const router = Router();
 
@@ -69,7 +70,12 @@ router.get("/cron/tick", async (req, res) => {
     await rollUpUsageForDate(new Date());
     // Phase 117: the change feed keeps 2 days, idempotency keys 7.
     const syncPruned = { changes: await pruneChangeLog(), idempotencyKeys: await pruneIdempotencyKeys() };
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned };
+    // Phase 134: lifecycle emails. Its own guard (off unless LIFECYCLE_EMAILS_ENABLED=1, at most hourly); it never throws, and a failure here cannot stop the work around it.
+    const lifecycle = await runLifecycleIfDue().catch((err: unknown) => {
+      req.log.error({ err }, "Lifecycle step failed");
+      return { ran: false, failed: 1 };
+    });
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned, lifecycle };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));
@@ -121,6 +127,19 @@ router.get("/cron/evening", async (req, res) => {
     req.log.error({ err }, "Evening cron failed");
     await captureException(err, { mechanism: "cron", handled: false, level: "error", tags: { route: "GET /api/cron/evening" } });
     await sendOpsAlert("Evening cron failed", [`/api/cron/evening threw after ${Date.now() - startedAt} ms:`, err instanceof Error ? err.message : String(err), "", "Crew reminders for tomorrow were not sent; the morning tick sends a same-day catch-up."]);
+    await flush(1500);
+    res.status(500).json({ ok: false });
+  }
+});
+
+// GET /api/cron/lifecycle — Phase 134: the lifecycle emails on their own, for a scheduler that calls hourly (sends only 8:00 to 20:00 in each company's time zone).
+router.get("/cron/lifecycle", async (req, res) => {
+  if (!cronAuthorized(req, res)) return;
+  try {
+    res.json({ ok: true, ...(await runLifecycleIfDue()) });
+  } catch (err) {
+    req.log.error({ err }, "Lifecycle cron failed");
+    await captureException(err, { mechanism: "cron", handled: false, level: "error", tags: { route: "GET /api/cron/lifecycle" } });
     await flush(1500);
     res.status(500).json({ ok: false });
   }

@@ -71,6 +71,7 @@ const AnalyticsPage = lazy(pageLoaders.analytics);
 // The admin and onboarding pages are dashboard roots of their own (no dashboard
 // layout above them), so they bring the dashboard strings with them.
 const AdminPage = lazy(withDashboardStrings(() => import("@/pages/admin")));
+const AdminHqPage = lazy(() => import("@/pages/admin-hq"));
 const ClientsPage = lazy(pageLoaders.clients);
 const LeadsListPage = lazy(pageLoaders.leads);
 const ImportsPage = lazy(pageLoaders.imports);
@@ -279,6 +280,8 @@ function Router() {
       {/* Dashboard (private, not indexed). Phase 115: one route for the whole
           signed-in app, so its layout stays mounted from page to page. */}
       <Route path="/dashboard/admin" component={() => <DashSuspense><AdminPage /></DashSuspense>} />
+      <Route path="/dashboard/admin/hq" component={() => <DashSuspense><AdminHqPage /></DashSuspense>} />
+      <Route path="/admin/hq" component={() => <DashSuspense><AdminHqPage /></DashSuspense>} />
       {MobilePreview && (
         <Route path="/dashboard/__preview" component={() => (
           <DashboardLayout><DashSuspense><MobilePreview /></DashSuspense></DashboardLayout>

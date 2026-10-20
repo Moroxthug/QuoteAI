@@ -774,6 +774,10 @@ export default function AdminPage() {
           </div>
         </div>
 
+        <Link href="/dashboard/admin/hq" className="ml-auto mr-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-navy-600 text-white shadow-sm text-xs font-semibold hover:bg-navy-700 transition-all">
+          <BarChart3 className="h-3.5 w-3.5" />
+          Owner HQ
+        </Link>
         <button
           onClick={loadBaseData}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-100 bg-white shadow-sm text-xs text-slate-500 hover:text-slate-800 transition-all font-medium"

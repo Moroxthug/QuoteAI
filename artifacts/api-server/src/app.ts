@@ -1,3 +1,4 @@
+import { recordStripeBillingEvent, type StripeEventLike } from "./lib/growth.js";
 import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -253,6 +254,14 @@ app.post(
       // Phase 90: a paying group company's covered companies follow it; a covered company that now pays for itself leaves the group bill.
       await subscriptionChanged(userId, isActive);
       return { userId, planType, isActive };
+    }
+
+    // Phase 131: every payment, refund, dispute and subscription change goes in the owner's books once (the HQ reads them); never blocks the business logic below.
+    {
+      const raw = event.data.object as unknown as { lines?: { data?: Array<{ price?: Parameters<typeof resolvePrice>[0] }> }; items?: { data?: Array<{ price?: Parameters<typeof resolvePrice>[0] }> } };
+      const priceOnEvent = (raw.lines?.data ?? raw.items?.data)?.[0]?.price;
+      const resolvedPrice = priceOnEvent ? resolvePrice(priceOnEvent) : null;
+      void recordStripeBillingEvent(event as unknown as StripeEventLike, resolvedPrice ? { plan: resolvedPrice.tier, interval: resolvedPrice.interval } : undefined);
     }
 
     try {

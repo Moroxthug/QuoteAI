@@ -22,6 +22,7 @@ const violations = (filter: (r: RouteRow) => boolean, list: Allow[]) => rows.fil
 // ── Rule 1: every route without requireAuth/requireApiKey/requireAdmin is deliberately public ──
 
 const PUBLIC_ROUTES: Allow[] = [
+  { match: /^POST \/api\/growth\/track$/, reason: "Phase 131: funnel events from the website and the app before an account exists — fixed event list, small body, IP rate limited, always 204, no data returned" },
   { match: /^POST \/api\/(payments\/(connect-)?webhook|webhooks\/(financeit|resend)|whatsapp\/webhook|meta-lead-ads\/webhook|sms\/webhook)$/, reason: "inbound provider webhook — signature verified (Rule 7)" },
   { match: /^GET \/api\/(whatsapp|meta-lead-ads)\/webhook$/, reason: "Meta hub.challenge verification handshake (hub.verify_token checked)" },
   { match: /^GET \/api\/whatsapp\/available$/, reason: "Phase 100: one boolean (is WhatsApp configured on this server) for the marketing pages — no account data" },
@@ -49,6 +50,7 @@ const PUBLIC_ROUTES: Allow[] = [
 // ── Rule 2: every mutating session route names a permission ──────────────────
 
 const PERMISSIONLESS_MUTATIONS: Allow[] = [
+  { match: /^POST \/api\/growth\/attribution$/, reason: "Phase 131: a person tells us once where they came from, right after sign-up; writes only their own attribution row (insert once, never overwritten), no company data" },
   { match: /^POST \/api\/notifications\/read$/, reason: "marks the actor's own notifications read — any role" },
   { match: /^POST \/api\/storage\/uploads\/request-url$/, reason: "signed upload URL scoped to the acting org; the consuming route enforces its own permission" },
   { match: /^POST \/api\/team\/invite\/:token\/accept$/, reason: "the invitee is joining — has no role in the org yet" },

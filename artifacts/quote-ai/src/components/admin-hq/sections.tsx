@@ -361,7 +361,7 @@ export function FunnelSection({ o }: { o: HqOverview }) {
                   <span className="font-medium text-slate-900">{i + 1}. {FUNNEL_LABELS[f.stage] ?? label(f.stage)}</span>
                   <span className="tabular-nums text-slate-700">
                     <strong className="text-slate-900">{count(f.count)}</strong>
-                    {i > 0 && <span className="ml-2 text-xs">{f.rateFromPrevious == null ? `conversion: ${NOT_ENOUGH}` : `${percent(f.rateFromPrevious)} of previous stage`}</span>}
+                    {i > 0 && <span className="ml-2 text-xs">{f.rateFromPrevious == null ? `conversion: ${NOT_ENOUGH}` : `${percent(f.rateFromPrevious)} of ${f.stage === "paying" ? "signups" : "previous stage"}`}</span>}
                   </span>
                 </div>
                 <div aria-hidden className="mt-1 h-3 rounded-full bg-slate-100">

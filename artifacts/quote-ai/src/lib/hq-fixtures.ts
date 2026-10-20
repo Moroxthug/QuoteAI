@@ -23,9 +23,9 @@ export const demoOverview = (range: HqRange): HqOverview => ({
     { stage: "paying", count: 63, rateFromPrevious: 0.8873 },
   ],
   sources: [
-    { source: "google_organic", signups: 141, paying: 24, revenueCents: 45_600, spendCents: 0, cacCents: 0 },
+    { source: "google_organic", signups: 141, paying: 24, revenueCents: 45_600, spendCents: 0, cacCents: null },
     { source: "facebook", signups: 88, paying: 15, revenueCents: 28_500, spendCents: 12_000, cacCents: 800 },
-    { source: "referral", signups: 52, paying: 12, revenueCents: 22_800, spendCents: 0, cacCents: 0 },
+    { source: "referral", signups: 52, paying: 12, revenueCents: 22_800, spendCents: 0, cacCents: null },
     { source: "google_ads", signups: 64, paying: 8, revenueCents: 15_200, spendCents: 18_000, cacCents: 2_250 },
     { source: "unknown", signups: 67, paying: 4, revenueCents: 7_600, spendCents: 0, cacCents: null },
   ],

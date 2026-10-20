@@ -21,7 +21,7 @@ Expo + TypeScript, expo-router, react-native-reanimated, react-native-svg, expo-
 - Light and night themes; light ground defaults to "dusk". Follow the system setting unless overridden in Settings.
 - Status = word + colour + shape (the status pill component). Never a coloured dot alone.
 - Read in place (expandable cards, one open per screen), choose in a sheet, work on a full page.
-- No prices, plans or purchases in the app. Plan and billing screens link out to quoteai.ca.
+- No prices, plans or purchases in the app, EXCEPT on Android, where the owner ruled (2026-10-19) that Google Play Billing is built: Canada is not a Google billing-choice market, so in-app subscriptions must use Play Billing. There the plans screen shows the price Google Play returns, and Play handles payment, cancellation and refunds. Never link or steer to a web payment page from the Android app; iOS (later) follows Apple's rules. Plan and billing screens on other platforms link out to quoteai.ca.
 - Touch targets ≥ 44, Dynamic Type supported, reduced motion respected, every icon button labelled.
 - Client-facing pages (client quote, sign, invoice, deposit, portal, subcontractor portal, website form, unsubscribe) are web pages, not app screens.
 

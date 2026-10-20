@@ -1,7 +1,7 @@
 import { pgTable, text, timestamp, uuid, index, unique } from "drizzle-orm/pg-core";
 
 // Phase 134 (docs/GROWTH-PLAN.md): which lifecycle email went to whom. UNIQUE (user_id, message_key) = each message at most once per user, ever.
-export const LIFECYCLE_MESSAGE_KEYS = ["welcome", "day1_no_quote", "first_quote_done", "free_quotes_low", "free_quotes_used", "day7_inactive", "win_back"] as const;
+export const LIFECYCLE_MESSAGE_KEYS = ["day1_no_quote", "first_quote_done", "free_quotes_low", "free_quotes_used", "day7_inactive", "win_back"] as const;
 export type LifecycleMessageKey = (typeof LIFECYCLE_MESSAGE_KEYS)[number];
 
 export const lifecycleSendsTable = pgTable(

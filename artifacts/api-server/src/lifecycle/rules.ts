@@ -1,7 +1,7 @@
 // Phase 134: which lifecycle email (if any) is due for one person right now. Pure: no database, no clock, no env.
 // Rules in one place: docs/GROWTH-PLAN.md "Build log" (134).
 
-export const LIFECYCLE_KEYS = ["welcome", "day1_no_quote", "first_quote_done", "free_quotes_low", "free_quotes_used", "day7_inactive", "win_back"] as const;
+export const LIFECYCLE_KEYS = ["day1_no_quote", "first_quote_done", "free_quotes_low", "free_quotes_used", "day7_inactive", "win_back"] as const;
 export type LifecycleKey = (typeof LIFECYCLE_KEYS)[number];
 
 export type LifecycleState = {
@@ -67,10 +67,7 @@ export function dueMessages(s: LifecycleState, now: Date): LifecycleKey | null {
 
   const want = (key: LifecycleKey, ok: boolean): LifecycleKey | null => (ok && !sent.has(key) ? key : null);
 
-  // welcome: right after sign-up (not for an old account the day the switch is turned on).
-  const welcome = want("welcome", age >= 0 && age <= 3 * DAY);
-  if (welcome) return welcome;
-
+  // No welcome here: the account welcome email (accountEmails.welcomeEmail, sent at sign-up) is the first message.
   // first quote made, none emailed to a client yet: give them an hour to finish it, then nudge.
   const firstQuote = want("first_quote_done", s.quoteCount >= 1 && s.sentQuoteCount === 0 && s.firstQuoteAt !== null && since(s.firstQuoteAt) >= HOUR && since(s.firstQuoteAt) <= 14 * DAY);
   if (firstQuote) return firstQuote;

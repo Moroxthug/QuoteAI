@@ -53,30 +53,6 @@ function copyFor(i: LifecycleEmailInput): Copy {
   const offer = offerLine(i.offer, i.lang);
   const extra = offer ? [offer] : [];
   switch (i.key) {
-    case "welcome":
-      return fr
-        ? {
-            subject: "Bienvenue sur QuoteAI : votre première soumission en 5 minutes",
-            preheader: "Décrivez un chantier, QuoteAI prépare la soumission.",
-            heading: "Votre compte est prêt",
-            paragraphs: [
-              "Merci de vous être inscrit. Pour commencer, pas besoin de tout configurer.",
-              "Décrivez un chantier, au clavier ou à la voix, et QuoteAI prépare une soumission détaillée avec les taxes de votre province. Vous la relisez, puis vous l'envoyez à votre client.",
-            ],
-            cta: "Faire ma première soumission",
-            ctaPath: "/dashboard/new",
-          }
-        : {
-            subject: "Welcome to QuoteAI: your first quote in 5 minutes",
-            preheader: "Describe a job and QuoteAI drafts the quote.",
-            heading: "Your account is ready",
-            paragraphs: [
-              "Thanks for signing up. You do not need to set everything up first.",
-              "Describe a job, typed or spoken, and QuoteAI drafts an itemized quote with your province's taxes. You check it, then send it to your client.",
-            ],
-            cta: "Make my first quote",
-            ctaPath: "/dashboard/new",
-          };
     case "day1_no_quote":
       return fr
         ? {

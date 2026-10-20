@@ -40,33 +40,27 @@ describe("quiet hours", () => {
   });
   it("does not send at night, and the same instant can be fine in another zone", () => {
     const night = new Date("2026-10-20T02:00:00Z"); // 22:00 Toronto, 19:00 Vancouver
-    expect(dueMessages(state(), night)).toBeNull();
-    expect(dueMessages(state({ timeZone: "America/Vancouver" }), night)).toBe("welcome");
+    expect(dueMessages(state({ signupAt: ago(30 * H) }), night)).toBeNull();
+    expect(dueMessages(state({ timeZone: "America/Vancouver", signupAt: ago(30 * H) }), night)).toBe("day1_no_quote");
   });
 });
 
-describe("welcome", () => {
-  it("is due right after sign-up", () => expect(dueMessages(state(), NOW)).toBe("welcome"));
-  it("is not sent to an account that signed up long ago", () => expect(dueMessages(state({ signupAt: ago(5 * D) }), NOW)).not.toBe("welcome"));
-  it("goes to paid accounts too", () => expect(dueMessages(state({ paid: true, freeLeft: null }), NOW)).toBe("welcome"));
-});
-
 describe("day1_no_quote", () => {
-  const base = { sentKeys: ["welcome"], lastSentAt: ago(25 * H), signupAt: ago(26 * H) };
+  const base = { sentKeys: [], lastSentAt: ago(25 * H), signupAt: ago(26 * H) };
   it("is due 24 h after sign-up with zero quotes", () => expect(dueMessages(state(base), NOW)).toBe("day1_no_quote"));
   it("waits for 24 h", () => expect(dueMessages(state({ ...base, signupAt: ago(20 * H), lastSentAt: ago(19 * H) }), NOW)).toBeNull());
   it("is not due once a quote exists", () => expect(dueMessages(state({ ...base, quoteCount: 1, sentQuoteCount: 1, freeLeft: 2, firstQuoteAt: ago(3 * H) }), NOW)).toBeNull());
 });
 
 describe("first_quote_done", () => {
-  const base = { sentKeys: ["welcome"], lastSentAt: ago(30 * H), quoteCount: 1, freeLeft: 2, firstQuoteAt: ago(2 * H) };
+  const base = { sentKeys: [], lastSentAt: ago(30 * H), quoteCount: 1, freeLeft: 2, firstQuoteAt: ago(2 * H) };
   it("nudges when a quote exists and none was sent", () => expect(dueMessages(state(base), NOW)).toBe("first_quote_done"));
   it("gives an hour to finish first", () => expect(dueMessages(state({ ...base, firstQuoteAt: ago(20 * 60_000) }), NOW)).toBeNull());
   it("is not needed once a quote was sent to a client", () => expect(dueMessages(state({ ...base, sentQuoteCount: 1 }), NOW)).toBeNull());
 });
 
 describe("free quotes", () => {
-  const base = { sentKeys: ["welcome", "first_quote_done"], lastSentAt: ago(30 * H), signupAt: ago(3 * D), lastActivityAt: ago(H), quoteCount: 2, sentQuoteCount: 1, firstQuoteAt: ago(2 * D) };
+  const base = { sentKeys: ["first_quote_done"], lastSentAt: ago(30 * H), signupAt: ago(3 * D), lastActivityAt: ago(H), quoteCount: 2, sentQuoteCount: 1, firstQuoteAt: ago(2 * D) };
   it("free_quotes_low at exactly 1 left", () => expect(dueMessages(state({ ...base, freeLeft: 1 }), NOW)).toBe("free_quotes_low"));
   it("not at 2 left", () => expect(dueMessages(state({ ...base, freeLeft: 2 }), NOW)).toBeNull());
   it("free_quotes_used at 0 left", () => expect(dueMessages(state({ ...base, freeLeft: 0 }), NOW)).toBe("free_quotes_used"));
@@ -82,7 +76,7 @@ describe("free quotes", () => {
 });
 
 describe("inactivity", () => {
-  const base = { signupAt: ago(20 * D), sentKeys: ["welcome", "day1_no_quote"], lastSentAt: ago(15 * D), quoteCount: 1, sentQuoteCount: 1, freeLeft: 2, firstQuoteAt: ago(19 * D) };
+  const base = { signupAt: ago(20 * D), sentKeys: ["day1_no_quote"], lastSentAt: ago(15 * D), quoteCount: 1, sentQuoteCount: 1, freeLeft: 2, firstQuoteAt: ago(19 * D) };
   it("day7_inactive after 7 idle days", () => expect(dueMessages(state({ ...base, lastActivityAt: ago(8 * D) }), NOW)).toBe("day7_inactive"));
   it("not before 7 idle days", () => expect(dueMessages(state({ ...base, lastActivityAt: ago(6 * D) }), NOW)).toBeNull());
   it("win_back after 30 idle days", () => expect(dueMessages(state({ ...base, signupAt: ago(45 * D), lastActivityAt: ago(31 * D) }), NOW)).toBe("win_back"));
@@ -98,15 +92,16 @@ describe("inactivity", () => {
 });
 
 describe("caps and exclusions", () => {
+  it("sends nothing on sign-up day (the account welcome email covers it)", () => expect(dueMessages(state(), NOW)).toBeNull());
   it("at most one email per 24 h", () => {
-    expect(dueMessages(state({ lastSentAt: ago(23 * H) }), NOW)).toBeNull();
-    expect(dueMessages(state({ lastSentAt: ago(24 * H) }), NOW)).toBe("welcome");
+    expect(dueMessages(state({ signupAt: ago(30 * H), lastSentAt: ago(23 * H) }), NOW)).toBeNull();
+    expect(dueMessages(state({ signupAt: ago(30 * H), lastSentAt: ago(24 * H) }), NOW)).toBe("day1_no_quote");
   });
   it("returns a single key even when several are due", () => {
     const s = state({ signupAt: ago(26 * H) });
-    expect(dueMessages(s, NOW)).toBe("welcome");
+    expect(dueMessages(s, NOW)).toBe("day1_no_quote");
   });
-  it("each key at most once (dedupe)", () => expect(dueMessages(state({ sentKeys: ["welcome"], lastSentAt: ago(2 * D) }), NOW)).toBeNull());
+  it("each key at most once (dedupe)", () => expect(dueMessages(state({ signupAt: ago(30 * H), sentKeys: ["day1_no_quote"], lastSentAt: ago(2 * D) }), NOW)).toBeNull());
   it("an opted-out person gets nothing", () => expect(dueMessages(state({ optedOut: true }), NOW)).toBeNull());
   it("a test account gets nothing", () => expect(dueMessages(state({ testAccount: true }), NOW)).toBeNull());
 });

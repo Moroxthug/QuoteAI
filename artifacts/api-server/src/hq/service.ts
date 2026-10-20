@@ -14,9 +14,17 @@ import { expenseShareExact, type ExpenseLike } from "./expenses.js";
 import { buildCohortGrid, monthOf, addMonths, monthsBetween, type CohortCell } from "./cohorts.js";
 import { estimatedRevenueExact, listMonthlyCents, moneyTotals, mrrAt, mrrMovements, mrrStateAt, profitCents, runwayMonths, type EstimatedCustomer, type SubEvent } from "./money.js";
 import { arpuCents, buildFunnel, buildSources, cacCents, grossMarginPct, ltvCents, paybackMonths } from "./unit.js";
+import { TEST_EMAIL_SUFFIX, TEST_USER_PREFIXES } from "./testAccounts.js";
 import { addDays, bucketSpan, bucketStarts, torontoDate, torontoDayStart, type Bucket, type HqRange } from "./time.js";
 
 const TZ = sql.raw("'America/Toronto'");
+
+/** True for real companies: not a QA account (id prefix, or an @example.invalid sign-in). NULL ids pass (rows no company owns). `col` is a trusted column expression written in this file. */
+const nt = (col: string): SQL => {
+  const c = sql.raw(col);
+  const prefixes = TEST_USER_PREFIXES.map((p) => sql`${c} not like ${p.replace(/_/g, "\_") + "%"}`);
+  return sql`(${c} is null or (${sql.join(prefixes, sql` and `)} and not exists (select 1 from ${authUsersTable} tu where tu.id = ${c} and lower(tu.email) like ${"%" + TEST_EMAIL_SUFFIX})))`;
+};
 const iso = (d: Date): SQL => sql`${d.toISOString()}::timestamptz`;
 const SUB_TYPES = sql`('subscription_started','subscription_changed','subscription_canceled')`;
 
@@ -64,7 +72,7 @@ async function loadEstimated(): Promise<EstimatedProfile[]> {
   const r = await rows<{ user_id: string; plan: string | null; interval: string | null; created_at: Date }>(sql`
     select ${businessProfilesTable.userId} as user_id, ${businessProfilesTable.subscriptionPlan} as plan, ${businessProfilesTable.subscriptionInterval} as interval, ${businessProfilesTable.createdAt} as created_at
     from ${businessProfilesTable}
-    where ${profilePaying} and not ${hasBillingEvents}`);
+    where ${profilePaying} and not ${hasBillingEvents} and ${nt('"business_profiles"."user_id"')}`);
   return r.map((x) => ({ userId: x.user_id, plan: x.plan, createdAt: new Date(x.created_at), sinceYmd: torontoDate(new Date(x.created_at)), monthlyCents: planMonthlyCents(x.plan, x.interval) }));
 }
 
@@ -76,7 +84,7 @@ async function loadSubEvents(before: Date): Promise<EventKey> {
     select coalesce(be.user_id, bp.user_id, be.customer_id, be.id::text) as key, coalesce(be.user_id, bp.user_id) as uid, be.type, be.amount_cents, be."at"
     from ${billingEventsTable} be
     left join ${businessProfilesTable} bp on be.user_id is null and be.customer_id is not null and bp.stripe_customer_id = be.customer_id
-    where be.type in ${SUB_TYPES} and be."at" < ${iso(before)}
+    where be.type in ${SUB_TYPES} and be."at" < ${iso(before)} and ${nt('coalesce(be.user_id, bp.user_id)')}
     order by be."at"`);
   const userIdOf = new Map<string, string | null>();
   const events = r.map((x) => {
@@ -129,7 +137,7 @@ function expenseTotals(list: ExpenseRow[], from: string, to: string): { costs: C
 async function loadUsageCosts(from: string, to: string): Promise<{ ai: number; messaging: number; email: number; storage: number }> {
   const r = await rows<{ kind: string; cost: string }>(sql`
     select kind, coalesce(sum(cost_cents), 0) as cost from ${usageDailySummaryTable}
-    where "date" >= ${from} and "date" <= ${to} group by kind`);
+    where "date" >= ${from} and "date" <= ${to} and ${nt('user_id')} group by kind`);
   const out = { ai: 0, messaging: 0, email: 0, storage: 0 };
   for (const x of r) {
     const g = USAGE_GROUP[x.kind];
@@ -163,11 +171,11 @@ export async function overview(range: HqRange) {
   const { from, to, startAt, endAt } = range;
 
   const [
-    moneyRows, usage, expenses, spendRows, estimated, sub, cash, custRow, foundingRow, funnelRow, visitsRow, sourceRows, sourceRev, productRow, activeRow, bounceRow, ops, firstBilling,
+    moneyRows, usage, expenses, spendRows, estimated, sub, cash, custRow, foundingRow, funnelRow, visitsRow, sourceRows, sourceRev, productRow, activeRow, bounceRow, ops, excludedRow, firstBilling,
   ] = await Promise.all([
     rows<{ type: "payment" | "refund" | "dispute"; amount: string; tax: string; fee: string }>(sql`
       select type, coalesce(sum(amount_cents), 0) as amount, coalesce(sum(tax_cents), 0) as tax, coalesce(sum(fee_cents), 0) as fee
-      from ${billingEventsTable} where type in ('payment','refund','dispute') and "at" >= ${iso(startAt)} and "at" < ${iso(endAt)} group by type`),
+      from ${billingEventsTable} where type in ('payment','refund','dispute') and "at" >= ${iso(startAt)} and "at" < ${iso(endAt)} and ${nt('user_id')} group by type`),
     loadUsageCosts(from, to),
     loadExpensesOverlapping(from, to),
     rows<{ channel: string; spent: string }>(sql`
@@ -181,11 +189,11 @@ export async function overview(range: HqRange) {
         count(*) filter (where ${profilePaying}) as paying,
         count(*) filter (where ${businessProfilesTable.subscriptionStatus} = 'trialing') as trialing,
         count(*) filter (where ${businessProfilesTable.createdAt} >= ${iso(startAt)} and ${businessProfilesTable.createdAt} < ${iso(endAt)}) as new_in_range
-      from ${businessProfilesTable}`),
+      from ${businessProfilesTable} where ${nt('"business_profiles"."user_id"')}`),
     rows<{ founding: string }>(sql`
       select count(distinct bp.user_id) as founding from ${billingEventsTable} be
       join ${businessProfilesTable} bp on bp.user_id = be.user_id or (be.user_id is null and bp.stripe_customer_id = be.customer_id)
-      where be.founding = 1 and bp.subscription_status = 'active'`),
+      where be.founding = 1 and bp.subscription_status = 'active' and ${nt('bp.user_id')}`),
     rows<{ signups: string; created_quote: string; sent_quote: string; accepted: string; paying: string }>(sql`
       select count(*) as signups,
         count(*) filter (where exists (select 1 from ${quotesTable} q where q.user_id = ${businessProfilesTable.userId})) as created_quote,
@@ -193,40 +201,41 @@ export async function overview(range: HqRange) {
         count(*) filter (where exists (select 1 from ${quotesTable} q where q.user_id = ${businessProfilesTable.userId} and q.accepted_at is not null)) as accepted,
         count(*) filter (where ${profilePaying} or exists (select 1 from ${billingEventsTable} be where be.type = 'payment' and (be.user_id = ${businessProfilesTable.userId} or (${businessProfilesTable.stripeCustomerId} is not null and be.customer_id = ${businessProfilesTable.stripeCustomerId})))) as paying
       from ${businessProfilesTable}
-      where ${businessProfilesTable.createdAt} >= ${iso(startAt)} and ${businessProfilesTable.createdAt} < ${iso(endAt)}`),
+      where ${businessProfilesTable.createdAt} >= ${iso(startAt)} and ${businessProfilesTable.createdAt} < ${iso(endAt)} and ${nt('"business_profiles"."user_id"')}`),
     rows<{ visits: string }>(sql`
       select count(distinct coalesce(anon_id, user_id)) as visits from ${growthEventsTable}
-      where event = 'landing_view' and "at" >= ${iso(startAt)} and "at" < ${iso(endAt)}`),
+      where event = 'landing_view' and "at" >= ${iso(startAt)} and "at" < ${iso(endAt)} and ${nt('user_id')}`),
     rows<{ source: string; signups: string; paying: string }>(sql`
       select coalesce(sa.source, 'unknown') as source, count(*) as signups,
         count(*) filter (where ${profilePaying} or exists (select 1 from ${billingEventsTable} be where be.type = 'payment' and (be.user_id = ${businessProfilesTable.userId} or (${businessProfilesTable.stripeCustomerId} is not null and be.customer_id = ${businessProfilesTable.stripeCustomerId})))) as paying
       from ${businessProfilesTable} left join ${signupAttributionTable} sa on sa.user_id = ${businessProfilesTable.userId}
-      where ${businessProfilesTable.createdAt} >= ${iso(startAt)} and ${businessProfilesTable.createdAt} < ${iso(endAt)} group by 1`),
+      where ${businessProfilesTable.createdAt} >= ${iso(startAt)} and ${businessProfilesTable.createdAt} < ${iso(endAt)} and ${nt('"business_profiles"."user_id"')} group by 1`),
     rows<{ source: string; revenue: string }>(sql`
       select coalesce(sa.source, 'unknown') as source,
         coalesce(sum(case when be.type = 'payment' then be.amount_cents - be.tax_cents when be.type = 'refund' then -be.amount_cents else 0 end), 0) as revenue
       from ${billingEventsTable} be
       left join ${businessProfilesTable} bp on bp.user_id = be.user_id or (be.user_id is null and bp.stripe_customer_id = be.customer_id)
       left join ${signupAttributionTable} sa on sa.user_id = bp.user_id
-      where be.type in ('payment','refund') and be."at" >= ${iso(startAt)} and be."at" < ${iso(endAt)} group by 1`),
+      where be.type in ('payment','refund') and be."at" >= ${iso(startAt)} and be."at" < ${iso(endAt)} and ${nt('coalesce(be.user_id, bp.user_id)')} group by 1`),
     rows<{ created: string; sent: string; accepted: string }>(sql`
       select count(*) filter (where created_at >= ${iso(startAt)} and created_at < ${iso(endAt)}) as created,
         count(*) filter (where sent_at >= ${iso(startAt)} and sent_at < ${iso(endAt)}) as sent,
         count(*) filter (where accepted_at >= ${iso(startAt)} and accepted_at < ${iso(endAt)}) as accepted
       from ${quotesTable}
-      where (created_at >= ${iso(startAt)} and created_at < ${iso(endAt)}) or (sent_at >= ${iso(startAt)} and sent_at < ${iso(endAt)}) or (accepted_at >= ${iso(startAt)} and accepted_at < ${iso(endAt)})`),
+      where ${nt('user_id')} and ((created_at >= ${iso(startAt)} and created_at < ${iso(endAt)}) or (sent_at >= ${iso(startAt)} and sent_at < ${iso(endAt)}) or (accepted_at >= ${iso(startAt)} and accepted_at < ${iso(endAt)}))`),
     rows<{ wau: string; mau: string }>(sql`
       select count(distinct user_id) filter (where d >= ${iso(new Date(endAt.getTime() - 7 * 86_400_000))}) as wau, count(distinct user_id) as mau
       from (
         select user_id, created_at as d from ${quotesTable} where created_at >= ${iso(new Date(endAt.getTime() - 30 * 86_400_000))} and created_at < ${iso(endAt)}
         union all select user_id, created_at from ${invoicesTable} where created_at >= ${iso(new Date(endAt.getTime() - 30 * 86_400_000))} and created_at < ${iso(endAt)}
         union all select user_id, "at" from ${growthEventsTable} where user_id is not null and "at" >= ${iso(new Date(endAt.getTime() - 30 * 86_400_000))} and "at" < ${iso(endAt)}
-      ) x`),
+      ) x where ${nt('user_id')}`),
     rows<{ bounced: string; total: string }>(sql`
       select count(*) filter (where type = 'email.bounced') as bounced,
         count(*) filter (where type in ('email.delivered','email.bounced','email.complained')) as total
       from ${emailEventsTable} where created_at >= ${iso(startAt)} and created_at < ${iso(endAt)}`),
     opsHealth().catch(() => null),
+    rows<{ excluded: string }>(sql`select count(*) as excluded from ${businessProfilesTable} where not ${nt('"business_profiles"."user_id"')}`),
     rows<{ first_at: Date | null }>(sql`select min("at") as first_at from ${billingEventsTable}`),
   ]);
 
@@ -270,7 +279,7 @@ export async function overview(range: HqRange) {
     { stage: "first_quote", count: n(f?.created_quote) },
     { stage: "quote_sent", count: n(f?.sent_quote) },
     { stage: "quote_accepted", count: n(f?.accepted) },
-    { stage: "paying", count: n(f?.paying) },
+    { stage: "paying", count: n(f?.paying), rateOf: "signups" },
   ]);
 
   // Sources (acquisition)
@@ -303,12 +312,15 @@ export async function overview(range: HqRange) {
 
   // Notes: say what is estimated, missing or excluded.
   notes.push("Revenue and profit are shown without sales tax. GST/HST collected is owed to the CRA and is reported separately as taxCollectedCents.");
+  const excluded = n(excludedRow[0]?.excluded);
+  if (excluded > 0) notes.push(`${excluded} test account(s) (QA ids and @example.invalid sign-ins) are excluded from every HQ number.`);
   notes.push("Google Play revenue and fees are not connected yet: only Stripe payments are counted.");
   if (estimatedAtEnd.length > 0 || estRevenue > 0) {
     const withPrice = estimatedAtEnd.filter((e) => e.monthlyCents > 0).length;
     notes.push(`Estimated, not measured: ${estimatedAtEnd.length} paying subscriber(s) have no recorded Stripe events yet (billing events only started recently), so ${withPrice} of them count in MRR and revenue at the plan list price (${(mrrEstimated / 100).toFixed(2)} CAD/month in MRR, ${(estRevenue / 100).toFixed(2)} CAD in revenue for this period).`);
     notes.push("New, expansion and churned MRR come only from recorded subscription events; estimated subscribers are not in them.");
-    if (estimatedAtEnd.some((e) => e.monthlyCents === 0)) notes.push("Subscribers on plans with no list price (for example Elite) count in the customer total but add 0 to estimated MRR.");
+    const unpriced = estimatedAtEnd.filter((e) => e.monthlyCents === 0).length;
+    if (unpriced > 0) notes.push(`${unpriced} Elite/custom customer(s) are not in MRR: their price is set per customer.`);
   }
   const anyBilling = firstBilling[0]?.first_at ? new Date(firstBilling[0].first_at) : null;
   if (!anyBilling) notes.push("No billing events are recorded yet, so all money figures are estimates until Stripe events (or hq:backfill-stripe) fill the ledger.");
@@ -321,6 +333,7 @@ export async function overview(range: HqRange) {
   if (cash.cashCents === null) notes.push("Cash in the bank is not set, so cash and runway are unknown. Enter it in HQ settings.");
   else if (runwayMonths(cash.cashCents, profit, range.days) === null) notes.push("Runway is not shown: this period did not burn cash (or cash is zero).");
   if (ltv === null) notes.push(`LTV is not shown until there are at least 10 recorded paying customers at the start of a period of 28+ days and some churn (now ${measuredAtStart} recorded, ${mv.churnedCustomers} churned).`);
+  notes.push("Funnel: the stages after signups count companies that signed up in this period; paying is a share of signups, not of accepted quotes. Rates are capped at 100%.");
   if (visits === 0) notes.push("No landing-page visits are recorded in this period, so the funnel starts at signups in practice.");
   else if (visits < n(f?.signups)) notes.push("Visit tracking recorded fewer visitors than signups (tracking is new or blocked), so the visits-to-signup rate is not reliable.");
   if (sources.some((s) => s.source === "unknown")) notes.push("Signups listed as 'unknown' have no recorded source (they signed up before attribution existed).");
@@ -361,7 +374,7 @@ async function countSeries(table: "business_profiles" | "quotes", range: HqRange
   const t = table === "quotes" ? quotesTable : businessProfilesTable;
   const r = await rows<{ b: string; c: string }>(sql`
     select to_char(date_trunc(${bucketSql(bucket)}, ${t.createdAt} at time zone ${TZ}), 'YYYY-MM-DD') as b, count(*) as c
-    from ${t} where ${t.createdAt} >= ${iso(range.startAt)} and ${t.createdAt} < ${iso(range.endAt)} group by 1`);
+    from ${t} where ${t.createdAt} >= ${iso(range.startAt)} and ${t.createdAt} < ${iso(range.endAt)} and ${nt('user_id')} group by 1`);
   return new Map(r.map((x) => [x.b, n(x.c)]));
 }
 
@@ -390,10 +403,10 @@ export async function series(metric: SeriesMetric, bucket: Bucket, range: HqRang
         coalesce(sum(case when type = 'payment' then amount_cents - tax_cents else 0 end), 0) as revenue,
         coalesce(sum(case when type = 'refund' then amount_cents else 0 end), 0) as refunds,
         coalesce(sum(fee_cents), 0) as fees
-      from ${billingEventsTable} where type in ('payment','refund','dispute') and "at" >= ${iso(range.startAt)} and "at" < ${iso(range.endAt)} group by 1`),
+      from ${billingEventsTable} where type in ('payment','refund','dispute') and "at" >= ${iso(range.startAt)} and "at" < ${iso(range.endAt)} and ${nt('user_id')} group by 1`),
     rows<{ b: string; cost: string }>(sql`
       select to_char(date_trunc(${bucketSql(bucket)}, "date"::date::timestamp), 'YYYY-MM-DD') as b, coalesce(sum(cost_cents), 0) as cost
-      from ${usageDailySummaryTable} where "date" >= ${range.from} and "date" <= ${range.to} group by 1`),
+      from ${usageDailySummaryTable} where "date" >= ${range.from} and "date" <= ${range.to} and ${nt('user_id')} group by 1`),
     rows<{ b: string; spent: string }>(sql`
       select to_char(date_trunc(${bucketSql(bucket)}, spent_on::timestamp), 'YYYY-MM-DD') as b, coalesce(sum(amount_cents), 0) as spent
       from ${marketingSpendTable} where spent_on >= ${range.from}::date and spent_on <= ${range.to}::date group by 1`),
@@ -427,10 +440,10 @@ export async function cohorts(months: number) {
   const [signupRows, activeRows, sub, estimated, firstBilling] = await Promise.all([
     rows<{ month: string; c: string }>(sql`
       select to_char(created_at at time zone ${TZ}, 'YYYY-MM') as month, count(*) as c from ${businessProfilesTable}
-      where created_at >= ${iso(firstAt)} group by 1`),
+      where created_at >= ${iso(firstAt)} and ${nt('user_id')} group by 1`),
     rows<{ cohort: string; mo: number; users: string }>(sql`
-      with c as (select user_id, created_at at time zone ${TZ} as lc from ${businessProfilesTable} where created_at >= ${iso(firstAt)}),
-           ql as (select user_id, created_at at time zone ${TZ} as m from ${quotesTable} where created_at >= ${iso(firstAt)})
+      with c as (select user_id, created_at at time zone ${TZ} as lc from ${businessProfilesTable} where created_at >= ${iso(firstAt)} and ${nt('user_id')}),
+           ql as (select user_id, created_at at time zone ${TZ} as m from ${quotesTable} where created_at >= ${iso(firstAt)} and ${nt('user_id')})
       select to_char(c.lc, 'YYYY-MM') as cohort,
         ((extract(year from ql.m) * 12 + extract(month from ql.m)) - (extract(year from c.lc) * 12 + extract(month from c.lc)))::int as mo,
         count(distinct c.user_id) as users
@@ -526,8 +539,8 @@ export async function customers(opts: { sort: CustomerSort; dir: "asc" | "desc";
   const priceCase = listPriceCase(sql`${bp.subscriptionPlan}`, sql`${bp.subscriptionInterval}`);
   const needle = opts.q ? `%${likeEscape(opts.q.slice(0, 80))}%` : null;
   const where = needle
-    ? sql`where (${bp.companyName} ilike ${needle} escape '\\' or au.email ilike ${needle} escape '\\' or ${bp.userId} = ${opts.q})`
-    : sql``;
+    ? sql`where ${nt('"business_profiles"."user_id"')} and (${bp.companyName} ilike ${needle} escape '\\' or au.email ilike ${needle} escape '\\' or ${bp.userId} = ${opts.q})`
+    : sql`where ${nt('"business_profiles"."user_id"')}`;
 
   const mtdRevExpr = sql`(case when ${hasBillingEvents} then coalesce(mrev.rev, 0) when ${profilePaying} then ${priceCase} else 0 end)`;
   const orderCol: Record<CustomerSort, SQL> = {
@@ -662,7 +675,7 @@ export async function revenueExportRows(range: HqRange) {
     select to_char(be."at" at time zone ${TZ}, 'YYYY-MM-DD') as day, be.type, bp.company_name as company, be.customer_id, be.user_id, be.plan, be.interval,
       be.amount_cents, be.tax_cents, be.fee_cents, be.currency, be.provider, be.provider_event_id as ref
     from ${billingEventsTable} be left join ${businessProfilesTable} bp on bp.user_id = be.user_id or (be.user_id is null and bp.stripe_customer_id = be.customer_id)
-    where be.type in ('payment','refund','dispute') and be."at" >= ${iso(range.startAt)} and be."at" < ${iso(range.endAt)}
+    where be.type in ('payment','refund','dispute') and be."at" >= ${iso(range.startAt)} and be."at" < ${iso(range.endAt)} and ${nt('coalesce(be.user_id, bp.user_id)')}
     order by be."at" limit ${EXPORT_LIMIT}`);
 }
 

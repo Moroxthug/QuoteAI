@@ -14,9 +14,9 @@ export function grossMarginPct(revenueCents: number, costOfServiceCents: number)
   return round1(((revenueCents - costOfServiceCents) / revenueCents) * 100);
 }
 
-/** Marketing spend per paying customer won. Null when none were won. */
+/** Marketing spend per paying customer won. Null when none were won, or when no spend is recorded (cost unknown, never 0). */
 export function cacCents(spendCents: number, payingCustomersAcquired: number): number | null {
-  if (payingCustomersAcquired <= 0) return null;
+  if (payingCustomersAcquired <= 0 || spendCents <= 0) return null;
   return Math.round(spendCents / payingCustomersAcquired);
 }
 
@@ -49,11 +49,15 @@ export function paybackMonths(cac: number | null, arpu: number, grossMarginPctVa
 
 export type FunnelStage = { stage: string; count: number; rateFromPrevious: number | null };
 
-/** Each stage's rate is its count over the previous stage's (a fraction, 4 decimals). Null for the first stage and after an empty stage. */
-export function buildFunnel(stages: Array<{ stage: string; count: number }>): FunnelStage[] {
+/**
+ * Each stage's rate is its count over the previous stage's (or over the stage named in `rateOf`), as a fraction with 4 decimals,
+ * kept within 0..1. Null for the first stage and whenever the base count is 0.
+ */
+export function buildFunnel(stages: Array<{ stage: string; count: number; rateOf?: string }>): FunnelStage[] {
   return stages.map((s, i) => {
-    const prev = i === 0 ? null : stages[i - 1].count;
-    return { stage: s.stage, count: s.count, rateFromPrevious: prev === null || prev <= 0 ? null : Math.round((s.count / prev) * 10000) / 10000 };
+    const base = i === 0 ? null : s.rateOf ? (stages.find((x) => x.stage === s.rateOf)?.count ?? null) : stages[i - 1].count;
+    const rate = base === null || base <= 0 ? null : Math.min(1, Math.max(0, Math.round((s.count / base) * 10000) / 10000));
+    return { stage: s.stage, count: s.count, rateFromPrevious: rate };
   });
 }
 

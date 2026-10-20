@@ -14,7 +14,7 @@ describe("unit economics", () => {
   });
   it("CAC is null when no customer was won", () => {
     expect(cacCents(5000, 0)).toBeNull();
-    expect(cacCents(0, 3)).toBe(0);
+    expect(cacCents(0, 3)).toBeNull(); // no recorded spend is unknown, not free
     expect(cacCents(5000, 4)).toBe(1250);
   });
   it("monthly churn scales the period to a month", () => {
@@ -49,6 +49,10 @@ describe("funnel", () => {
     const f = buildFunnel([{ stage: "visits", count: 1000 }, { stage: "signups", count: 50 }, { stage: "first_quote", count: 20 }, { stage: "paying", count: 0 }]);
     expect(f.map((s) => s.rateFromPrevious)).toEqual([null, 0.05, 0.4, 0]);
   });
+  it("a rate never exceeds 1 and can be taken from a named stage", () => {
+    const f = buildFunnel([{ stage: "signups", count: 10 }, { stage: "accepted", count: 2 }, { stage: "paying", count: 3, rateOf: "signups" }, { stage: "visits_odd", count: 50, rateOf: "signups" }]);
+    expect(f.map((s) => s.rateFromPrevious)).toEqual([null, 0.2, 0.3, 1]);
+  });
   it("is null after an empty stage instead of dividing by zero", () => {
     const f = buildFunnel([{ stage: "a", count: 0 }, { stage: "b", count: 3 }, { stage: "c", count: 0 }, { stage: "d", count: 0 }]);
     expect(f.map((s) => s.rateFromPrevious)).toEqual([null, null, 0, null]);
@@ -62,6 +66,6 @@ describe("sources", () => {
       { source: "google", signups: 100, paying: 0, revenueCents: 0, spendCents: 9000 },
       { source: "direct", signups: 10, paying: 2, revenueCents: 3800, spendCents: 0 },
     ]);
-    expect(rows.map((r) => [r.source, r.cacCents])).toEqual([["google", null], ["facebook", 5000], ["direct", 0]]);
+    expect(rows.map((r) => [r.source, r.cacCents])).toEqual([["google", null], ["facebook", 5000], ["direct", null]]);
   });
 });

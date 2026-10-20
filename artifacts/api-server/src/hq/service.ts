@@ -12,7 +12,7 @@ import { yearlyPriceFor } from "../lib/billing.js";
 import { opsHealth } from "../lib/ops.js";
 import { expenseShareExact, type ExpenseLike } from "./expenses.js";
 import { buildCohortGrid, monthOf, addMonths, monthsBetween, type CohortCell } from "./cohorts.js";
-import { estimatedRevenueExact, listMonthlyCents, moneyTotals, mrrAt, mrrMovements, mrrStateAt, profitCents, runwayMonths, type EstimatedCustomer, type SubEvent } from "./money.js";
+import { PLAY_REVENUE_NOTE, estimatedRevenueExact, listMonthlyCents, moneyTotals, mrrAt, mrrMovements, mrrStateAt, profitCents, runwayMonths, type EstimatedCustomer, type SubEvent } from "./money.js";
 import { arpuCents, buildFunnel, buildSources, cacCents, grossMarginPct, ltvCents, paybackMonths } from "./unit.js";
 import { TEST_EMAIL_SUFFIX, TEST_USER_PREFIXES } from "./testAccounts.js";
 import { addDays, bucketSpan, bucketStarts, torontoDate, torontoDayStart, type Bucket, type HqRange } from "./time.js";
@@ -314,7 +314,7 @@ export async function overview(range: HqRange) {
   notes.push("Revenue and profit are shown without sales tax. GST/HST collected is owed to the CRA and is reported separately as taxCollectedCents.");
   const excluded = n(excludedRow[0]?.excluded);
   if (excluded > 0) notes.push(`${excluded} test account(s) (QA ids and @example.invalid sign-ins) are excluded from every HQ number.`);
-  notes.push("Google Play revenue and fees are not connected yet: only Stripe payments are counted.");
+  notes.push(PLAY_REVENUE_NOTE);
   if (estimatedAtEnd.length > 0 || estRevenue > 0) {
     const withPrice = estimatedAtEnd.filter((e) => e.monthlyCents > 0).length;
     notes.push(`Estimated, not measured: ${estimatedAtEnd.length} paying subscriber(s) have no recorded Stripe events yet (billing events only started recently), so ${withPrice} of them count in MRR and revenue at the plan list price (${(mrrEstimated / 100).toFixed(2)} CAD/month in MRR, ${(estRevenue / 100).toFixed(2)} CAD in revenue for this period).`);

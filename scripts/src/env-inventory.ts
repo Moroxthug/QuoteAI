@@ -65,6 +65,8 @@ const MANIFEST: Record<string, Entry> = {
   WEATHERKIT_KEY_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Key ID of the WeatherKit .p8 key" },
   WEATHERKIT_PRIVATE_KEY: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The text of the .p8 file (newlines may be written as \n)" },
   STRIPE_PRICE_STARTER_LAUNCH: { kind: "feature", feature: "Launch price", note: "Phase 133: the $19 Starter launch price id (metadata quoteai_launch=1); unset = no launch offer, Starter stays $29" },
+  GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: { kind: "feature", feature: "Google Play Billing", note: "Phase 135: the service account key JSON (raw or base64) with Play Console access (View financial data, Manage orders and subscriptions); unset = the app's purchases answer PLAY_NOT_CONFIGURED" },
+  GOOGLE_PLAY_PACKAGE_NAME: { kind: "feature", feature: "Google Play Billing", note: "Phase 135: the Android package name; default ca.quoteai.app" },
   FREE_QUOTES_ENFORCED: { kind: "feature", feature: "Free quotes", note: "Phase 133: set to 1 to block new quotes after the free ones (switch on the day Play Billing exists); unset = counting only" },
   FREE_QUOTES_LIMIT: { kind: "feature", feature: "Free quotes", note: "Phase 133: free quotes per company on no paid plan (default 3)" },
   LIFECYCLE_EMAILS_ENABLED: { kind: "feature", feature: "Lifecycle emails", note: "Phase 134: set to 1 to send the sign-up nurture sequence (welcome, first quote, free quotes, inactivity, win-back) from the cron tick; unset = nothing is sent. Run LIFECYCLE_DRY_RUN=1 first. Needs migration 0077 applied" },

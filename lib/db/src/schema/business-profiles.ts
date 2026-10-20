@@ -142,6 +142,11 @@ export const businessProfilesTable = pgTable("business_profiles", {
   complianceSettings: jsonb("compliance_settings").$type<ComplianceSettings>().notNull().default({}),
   // ── Phase 89: pay periods, overtime and holiday rules, allowance rates, export format ──
   paySettings: jsonb("pay_settings").$type<PaySettings>().notNull().default({}),
+  /** Phase 135: who bills this subscription: null (none or granted), 'stripe' or 'play' (Google Play Billing; the Stripe webhook never touches a 'play' company). */
+  subscriptionProvider: text("subscription_provider", { enum: ["stripe", "play"] }),
+  playPurchaseToken: text("play_purchase_token"),
+  playProductId: text("play_product_id"),
+  playAutoRenewing: boolean("play_auto_renewing"),
   /** Phase 91: paid seats beyond the plan's included ones — follows the subscription's extra-seat item. */
   extraSeats: integer("extra_seats").notNull().default(0),
   /** Phase 91: what the company told us at sign-up. */

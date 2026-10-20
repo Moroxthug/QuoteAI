@@ -128,3 +128,6 @@ export function listMonthlyCents(priceCad: number | null | undefined, interval: 
   if (interval === "year") return Math.round(((yearlyPriceCad ?? priceCad * 12) * 100) / 12);
   return Math.round(priceCad * 100);
 }
+
+/** Phase 135: Google Play rows (provider 'play') are counted in revenue and MRR like Stripe rows, at the price the customer pays. Google's cut is not stored. */
+export const PLAY_REVENUE_NOTE = "Google Play revenue is gross; Google keeps about 15% (estimated, not measured).";

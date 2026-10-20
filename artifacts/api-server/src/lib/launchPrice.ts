@@ -1,9 +1,9 @@
-import { and, count, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull, or } from "drizzle-orm";
 import { db, businessProfilesTable } from "@workspace/db";
 import { launchStarterPriceId } from "./billing.js";
 
 // Launch pricing (docs/GROWTH-PLAN.md, Phase 133): Starter costs $19/month until the business has 100 paying customers, then $29/month for new customers.
-// People who subscribe at $19 keep it (their Stripe subscription is never repriced). "Paying" = an active subscription with a Stripe customer, so plans the owner grants for free do not count.
+// People who subscribe at $19 keep it (their Stripe subscription is never repriced). "Paying" = an active subscription with a Stripe customer or billed by Google Play (Phase 135), so plans the owner grants for free do not count.
 
 export const LAUNCH_PRICE_CENTS = 1900;
 export const STANDARD_PRICE_CENTS = 2900;
@@ -38,7 +38,7 @@ export async function payingCustomerCount(nowMs = Date.now()): Promise<number> {
   const [row] = await db
     .select({ n: count() })
     .from(businessProfilesTable)
-    .where(and(eq(businessProfilesTable.subscriptionStatus, "active"), isNotNull(businessProfilesTable.stripeCustomerId), inArray(businessProfilesTable.subscriptionPlan, ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"])));
+    .where(and(eq(businessProfilesTable.subscriptionStatus, "active"), or(isNotNull(businessProfilesTable.stripeCustomerId), eq(businessProfilesTable.subscriptionProvider, "play")), inArray(businessProfilesTable.subscriptionPlan, ["monthly_starter", "monthly_pro", "monthly_business", "monthly_elite"])));
   cached = { at: nowMs, n: Number(row?.n ?? 0) };
   return cached.n;
 }

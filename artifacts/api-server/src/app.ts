@@ -12,6 +12,7 @@ import { nativeAppCors, isNativeAppOrigin } from "./lib/nativeApp";
 import { PLANS } from "./routes/payments.js";
 import { addonQuantityOf, isBillingInterval, planItemOf, resolvePrice, yearlyPriceFor } from "./lib/billing.js";
 import { subscriptionChanged } from "./groups/service.js";
+import { playManagedCustomer, playManagedUser } from "./play/entitlement.js";
 import { sendSubscriptionEmail } from "./lib/email";
 import router from "./routes";
 import "./automations";
@@ -232,6 +233,12 @@ app.post(
         return null;
       }
 
+      // Phase 135: a company billed by Google Play keeps its Play plan; an old Stripe subscription cannot overwrite it.
+      if (await playManagedUser(userId)) {
+        logger.info({ userId, customerId }, "Stripe subscription event skipped: the company is billed by Google Play");
+        return null;
+      }
+
       await db
         .insert(businessProfilesTable)
         .values({
@@ -282,7 +289,9 @@ app.post(
           logger.info({ quoteId, planType }, "Quote unlocked via webhook");
         }
 
-        if (userId && session.customer && session.mode === "subscription" && planType) {
+        if (userId && session.customer && session.mode === "subscription" && planType && (await playManagedUser(userId))) {
+          logger.info({ userId }, "Stripe checkout skipped: the company is billed by Google Play");
+        } else if (userId && session.customer && session.mode === "subscription" && planType) {
           const customerId = session.customer as string;
           const interval = isBillingInterval(session.metadata?.interval) ? session.metadata.interval : "month";
           await db
@@ -345,14 +354,16 @@ app.post(
         const status = sub.status ?? "";
         if (customerId) {
           await syncSubscription(customerId, price, status);
-          // Phase 91: extra seats follow the subscription's seat item (changed in the portal or here).
-          await db.update(businessProfilesTable).set({ extraSeats: addonQuantityOf(sub.items?.data ?? [], "extra_seat") }).where(eq(businessProfilesTable.stripeCustomerId, customerId));
+          // Phase 91: extra seats follow the subscription's seat item (changed in the portal or here). Phase 135: not for a company billed by Google Play.
+          if (!(await playManagedCustomer(customerId))) await db.update(businessProfilesTable).set({ extraSeats: addonQuantityOf(sub.items?.data ?? [], "extra_seat") }).where(eq(businessProfilesTable.stripeCustomerId, customerId));
         }
       }
 
       if (event.type === "customer.subscription.deleted") {
         const sub = event.data.object;
-        if (sub.customer) {
+        if (sub.customer && (await playManagedCustomer(sub.customer as string))) {
+          logger.info({ customer: sub.customer }, "Stripe cancellation skipped: the company is billed by Google Play");
+        } else if (sub.customer) {
           await db
             .update(businessProfilesTable)
             .set({ subscriptionStatus: "cancelled", subscriptionPlan: null, subscriptionInterval: null, extraSeats: 0, foundingPrice: false })

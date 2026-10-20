@@ -1,8 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { estimatedRevenueExact, listMonthlyCents, moneyTotals, mrrAt, mrrMovements, mrrStateAt, profitCents, runwayMonths, type SubEvent } from "./money";
+import { PLAY_REVENUE_NOTE, estimatedRevenueExact, listMonthlyCents, moneyTotals, mrrAt, mrrMovements, mrrStateAt, profitCents, runwayMonths, type SubEvent } from "./money";
 
 const at = (s: string) => new Date(`${s}T12:00:00Z`);
 const ev = (key: string, type: SubEvent["type"], amountCents: number, day: string): SubEvent => ({ key, type, amountCents, at: at(day) });
+
+describe("Google Play in the books (Phase 135)", () => {
+  it("the HQ says Play revenue is gross and the 15% is an estimate", () => {
+    expect(PLAY_REVENUE_NOTE).toBe("Google Play revenue is gross; Google keeps about 15% (estimated, not measured).");
+  });
+  it("a Play subscription event counts in MRR like a Stripe one", () => {
+    const m = mrrMovements([ev("play-user", "subscription_started", 7900, "2026-10-05")], at("2026-10-01"), at("2026-10-31"));
+    expect(m).toMatchObject({ newCents: 7900, newCustomers: 1 });
+  });
+});
 
 describe("MRR movements", () => {
   const events: SubEvent[] = [

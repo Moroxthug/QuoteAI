@@ -25,6 +25,7 @@ import { pruneIdempotencyKeys } from "../lib/idempotency.js";
 import { pruneChangeLog } from "./changes.js";
 import { runMorningBriefs } from "../today/brief.js";
 import { runLifecycleIfDue } from "../lifecycle/service.js";
+import { runPlaySync } from "../play/sync.js";
 
 const router = Router();
 
@@ -75,7 +76,12 @@ router.get("/cron/tick", async (req, res) => {
       req.log.error({ err }, "Lifecycle step failed");
       return { ran: false, failed: 1 };
     });
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned, lifecycle };
+    // Phase 135: re-read every Google Play subscription (renewals, cancellations, expiries). Its own guard: a failure here cannot stop the work around it, and it does nothing until the Play key is set.
+    const playSync = await runPlaySync().catch((err: unknown) => {
+      req.log.error({ err }, "Play sync step failed");
+      return { ran: false, checked: 0, updated: 0, ended: 0, acknowledged: 0, errors: 1 };
+    });
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned, lifecycle, playSync };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));

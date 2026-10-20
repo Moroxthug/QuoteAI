@@ -16,6 +16,14 @@ import { logger } from "../lib/logger";
 import { currentLaunchOffer } from "../lib/launchPrice";
 import { addonPriceIdFor, annualBillingAvailable, launchStarterPriceId, isSelfServeTier, planItemOf, planPriceIdFor, isPilotPromoCode, pilotPromoCode, resolvePrice, yearlyPriceFor, yearlyPriceIdFor, type BillingInterval } from "../lib/billing";
 import { sendSubscriptionEmail } from "../lib/email";
+import { isPlayManaged } from "../play/provider";
+
+// Phase 135: a company billed by Google Play manages its subscription in Google Play, not here.
+const PLAY_MANAGED = { error: "MANAGED_BY_PLAY", code: "MANAGED_BY_PLAY", message: "This subscription is managed in Google Play" };
+async function managedByPlay(userId: string): Promise<boolean> {
+  const [p] = await db.select({ subscriptionProvider: businessProfilesTable.subscriptionProvider }).from(businessProfilesTable).where(eq(businessProfilesTable.userId, userId));
+  return isPlayManaged(p);
+}
 
 const TRIAL_DAYS = 7;
 const TRIAL_DOWNLOAD_LIMIT = 3;
@@ -224,6 +232,7 @@ router.get("/payments/trial-status", requireAuth, async (req, res) => {
 router.post("/payments/checkout", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    if (await managedByPlay(userId)) { res.status(409).json(PLAY_MANAGED); return; }
     const parsed = CheckoutBodySchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: "Invalid request", details: parsed.error });
@@ -382,6 +391,8 @@ router.get("/payments/subscription", requireAuth, async (req, res) => {
       interval: isActive ? (profile?.subscriptionInterval ?? "month") : null,
       annualAvailable: annualBillingAvailable(),
       periodEnd: profile?.subscriptionPeriodEnd?.toISOString() ?? null,
+      // Phase 135: who bills it (the web billing page shows "managed in Google Play" for play).
+      provider: profile?.subscriptionProvider ?? (profile?.stripeCustomerId && isActive ? "stripe" : null),
       isActive,
       quotaUsed,
       quotaLimit,
@@ -452,6 +463,7 @@ router.post("/payments/unlock-quote", requireAuth, requirePermission("quotes", "
 router.post("/payments/portal", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    if (await managedByPlay(userId)) { res.status(409).json(PLAY_MANAGED); return; }
     const [profile] = await db
       .select()
       .from(businessProfilesTable)
@@ -480,6 +492,7 @@ router.post("/payments/portal", requireAuth, requirePermission("settings", "full
 router.post("/payments/sync-subscription", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    if (await managedByPlay(userId)) { res.status(409).json(PLAY_MANAGED); return; }
     const stripe = await getUncachableStripeClient();
 
     const [profile] = await db
@@ -593,6 +606,7 @@ router.post("/payments/sync-subscription", requireAuth, requirePermission("setti
 router.post("/payments/change-plan", requireAuth, requirePermission("settings", "full"), async (req, res) => {
   try {
     const userId = getUserId(res);
+    if (await managedByPlay(userId)) { res.status(409).json(PLAY_MANAGED); return; }
     const parsed = ChangePlanBodySchema.safeParse(req.body ?? {});
     if (!parsed.success) {
       res.status(400).json({ error: "Invalid plan type", details: parsed.error });

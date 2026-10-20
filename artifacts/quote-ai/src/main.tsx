@@ -5,6 +5,7 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import { initAnalytics } from "./lib/analytics.ts";
+import { captureLanding } from "./lib/growth.ts";
 import { initErrorTracking } from "./lib/error-tracking.ts";
 import { initPwa } from "./lib/pwa.ts";
 import { detectInitialLang } from "./i18n/detect.ts";
@@ -13,6 +14,7 @@ import { isNativeApp } from "./lib/native/env.ts";
 
 initErrorTracking();
 initAnalytics();
+captureLanding();
 // Phase 77: service worker + install prompt capture (before React, so the
 // early beforeinstallprompt event is not missed). The outbox starts with the App.
 initPwa();

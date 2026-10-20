@@ -3,6 +3,8 @@
 // (same policy as the Google tag in index.html) instead of being statically
 // imported by main.tsx. identify/reset queue behind the load; nothing runs
 // at all when VITE_POSTHOG_KEY is unset.
+import { reportAttributionOnce } from "./growth.ts";
+
 type PostHog = typeof import("posthog-js").default;
 
 let loading: Promise<PostHog | null> | null = null;
@@ -34,6 +36,8 @@ export function initAnalytics(): void {
 }
 
 export function identifyUser(id: string, props: Record<string, unknown>): void {
+  // Phase 131: a signed-in browser tells our server where this company came from (once).
+  reportAttributionOnce(id);
   loading?.then((ph) => ph?.identify(id, props)).catch(() => undefined);
 }
 

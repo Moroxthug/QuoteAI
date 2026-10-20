@@ -28,6 +28,7 @@
     "ops:owner-check": "tsx scripts/owner-check.ts",
     "ops:rehearse": "tsx scripts/rehearse.ts",
     "ops:legal-packet": "tsx scripts/legal-packet.ts",
+    "hq:backfill-stripe": "tsx scripts/hq-backfill-stripe.ts",
     "store:shots": "tsx src/e2e/store-shots.ts",
     "store:art": "tsx src/e2e/store-art.ts"
   },

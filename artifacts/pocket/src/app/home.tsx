@@ -6,6 +6,7 @@ import { Redirect, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getListQuotesQueryKey, useListClients, type Client } from "@workspace/api-client-react";
+import { refreshAllowance } from "@/lib/useAllowance";
 import { firstQuoteApi, type FullQuote } from "@/lib/firstQuoteApi";
 import { headerDate, money, shortDate, time, type Locale } from "@/lib/format";
 import { greetingFor, needsCard, telHref, type NeedsCard, type NeedsYouItem } from "@/lib/home";
@@ -85,6 +86,7 @@ export default function SmartHome() {
     const r = await firstQuoteApi.create(input.text, profile.data ?? null, { clientData, budget: input.budget });
     if (!r.ok) return { ok: false, problem: r.problem };
     void client.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+    refreshAllowance(client);
     const q = r.data as FullQuote & { capitoli?: { titolo: string; subtotale: number }[] };
     return { ok: true, quote: { id: q.id, number: q.numeroPreventivoData ?? undefined, client: input.client?.name ?? "", lines: previewLines(q as never), total: q.totale ?? 0 } };
   };

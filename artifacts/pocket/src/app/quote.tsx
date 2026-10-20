@@ -9,6 +9,7 @@ import * as Clipboard from "expo-clipboard";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { refreshAllowance } from "@/lib/useAllowance";
 import { getListQuotesQueryKey, useListClients, type Client } from "@workspace/api-client-react";
 import { ApiFailure } from "@/lib/api";
 import { API_ORIGIN } from "@/lib/session";
@@ -258,7 +259,7 @@ export default function Quote() {
           <MenuRow icon={<Icon name="link" tone="sky" size={28} />} title={t("quote.actions.copyLink")} chevron={false} onPress={() => { setMoreOpen(false); void (Platform.OS === "web" && navigator.clipboard ? navigator.clipboard.writeText(link) : Clipboard.setStringAsync(link)).then(() => toast({ message: t("quote.actions.linkCopied") })); }} />
           <MenuRow icon={<Icon name="ruler" tone="amber" size={28} />} title={t("quote.actions.priceCheck")} onPress={() => { setMoreOpen(false); router.push(screenHref("PriceCheck", t("quote.actions.priceCheck"), { id: quote.id })); }} />
           {state !== "draft" && state !== "accepted" ? <MenuRow icon={<Icon name="check" tone="sage" size={28} />} title={t("quote.actions.markWon")} chevron={false} onPress={() => { setMoreOpen(false); setWonOpen(true); }} /> : null}
-          <MenuRow icon={<Icon name="doc" tone="slate" size={28} />} title={t("quote.actions.duplicate")} chevron={false} onPress={() => { setMoreOpen(false); void quoteApi.duplicate(quote.id).then((d) => { toast({ message: t("quote.toast.duplicated") }); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); router.replace(screenHref("Quote", t("quote.actions.editor"), { id: d.id })); }).catch(() => toast({ message: t("quote.toast.saveFailed") })); }} />
+          <MenuRow icon={<Icon name="doc" tone="slate" size={28} />} title={t("quote.actions.duplicate")} chevron={false} onPress={() => { setMoreOpen(false); void quoteApi.duplicate(quote.id).then((d) => { toast({ message: t("quote.toast.duplicated") }); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); refreshAllowance(client); router.replace(screenHref("Quote", t("quote.actions.editor"), { id: d.id })); }).catch(() => toast({ message: t("quote.toast.saveFailed") })); }} />
           <MenuRow icon={<Icon name="box" tone="stone" size={28} />} title={t("quote.actions.archive")} chevron={false} onPress={() => { setMoreOpen(false); void quoteApi.archive(quote.id).then(() => { toast({ message: t("quote.toast.archived") }); void client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); back(); }).catch(() => toast({ message: t("quote.toast.saveFailed") })); }} />
         </MenuList>
         <Stack pt={12} />

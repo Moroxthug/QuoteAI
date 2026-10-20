@@ -23,6 +23,8 @@ import { screenHref } from "@/lib/nav";
 import { quoteApi } from "@/lib/quoteApi";
 import { initialsFor } from "@/lib/quoteBar";
 import { useSession } from "@/lib/useSession";
+import { refreshAllowance } from "@/lib/useAllowance";
+import { FreeQuotesBanner } from "@/ui/FreeQuotes";
 import { Banner, Empty, Skeleton } from "@/ui/Feedback";
 import { Button } from "@/ui/Button";
 import { Card, Hairline } from "@/ui/Card";
@@ -154,7 +156,7 @@ export default function NewQuote() {
     const r = await firstQuoteApi.create(text.trim(), profile.data ?? null, { clientData, budget: parseTarget(target), templateId: templateIdOf(LAYOUTS[layout]!), files: photos });
     if (timer.current) { clearInterval(timer.current); timer.current = null; }
     if (!r.ok) { setPhase("form"); setW(0); setProblem(r.problem); return; }
-    void qc.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+    void qc.invalidateQueries({ queryKey: getListQuotesQueryKey() }); refreshAllowance(qc);
     setBuilt({ id: r.data.id, ...summaryOf(r.data) });
     setW(DONE);
     setPhase("done");
@@ -199,7 +201,7 @@ export default function NewQuote() {
     const r = await newQuoteApi.createManual(body);
     setSaving(false);
     if (!r.ok) { setProblem(r.problem); return; }
-    void qc.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+    void qc.invalidateQueries({ queryKey: getListQuotesQueryKey() }); refreshAllowance(qc);
     if (newOn && remember && canAddNewClient(form)) { try { await clientsApi.add(newClientBody(form)); void qc.invalidateQueries({ queryKey: ["/api/clients"] }); } catch { /* the quote still carries the details */ } }
     openQuote(r.data.id);
   };
@@ -234,7 +236,7 @@ export default function NewQuote() {
         <Section pt={10} px={16}>
           <Segmented options={[t("nq.modes.ai"), t("nq.modes.manual"), t("nq.modes.priceList")]} value={mode} onChange={switchMode} label={t("nq.modeLabel")} />
         </Section>
-        {banner ? <Section pt={14} px={16}>{banner}</Section> : null}
+        {banner ? <Section pt={14} px={16}>{banner}</Section> : <FreeQuotesBanner pt={14} />}
 
         {mode === 0 && phase === "form" ? (
           <>

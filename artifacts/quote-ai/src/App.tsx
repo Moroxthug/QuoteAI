@@ -21,6 +21,7 @@ import { AppShellSkeleton, PageSkeleton } from "@/components/layout/app-shell-sk
 const Home = lazy(() => import("@/pages/home"));
 // The toast viewport (Radix Toast) is only needed once there is a toast; one
 // raised before it arrives waits in the use-toast store and shows on mount.
+const FreeQuotesUsedDialog = lazy(() => import("@/components/free-quotes").then((m) => ({ default: m.FreeQuotesUsedDialog })));
 const Toaster = lazy(() => import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })));
 const NotFound = lazy(() => import("@/pages/not-found"));
 const PublicLayoutLazy = lazy(() => import("@/components/layout/public-layout").then((m) => ({ default: m.PublicLayout })));
@@ -369,6 +370,7 @@ function App({ ssr }: { ssr?: { path: string; lang: Lang } } = {}) {
               <Router />
             </ErrorBoundary>
             <Suspense fallback={null}><Toaster /></Suspense>
+            <Suspense fallback={null}><FreeQuotesUsedDialog /></Suspense>
             <RouteAnnouncer />
             <ScrollManager />
           </TooltipProvider>

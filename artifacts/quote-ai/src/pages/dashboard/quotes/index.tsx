@@ -15,6 +15,7 @@ import { ListRow } from "@/components/mobile/list-row";
 import { BottomSheet } from "@/components/mobile/bottom-sheet";
 import { Search, MoreVertical, FileText, Trash2, Eye, Copy, Loader2, Plus, ChevronRight, Archive, ListFilter, X, Check } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { reportFreeQuotesUsed, refreshAllowance } from "@/lib/free-quotes";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { formatCad, moneyLocale } from "@/lib/money";
@@ -88,10 +89,11 @@ export default function QuotesList() {
     duplicateQuote.mutate({ id }, {
       onSuccess: (newQuote) => {
         queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+        refreshAllowance(queryClient);
         toast({ title: t("dashboard.quotesList.duplicatedToast") });
         navigate(`/dashboard/quotes/${newQuote.id}`);
       },
-      onError: () => toast({ title: t("dashboard.quotesList.duplicateErrorToast"), variant: "destructive" }),
+      onError: (err: unknown) => { if (!reportFreeQuotesUsed(err, queryClient)) toast({ title: t("dashboard.quotesList.duplicateErrorToast"), variant: "destructive" }); },
       onSettled: () => setDuplicatingId(null),
     });
   };

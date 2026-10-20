@@ -16,6 +16,7 @@ import { ThemeProvider } from "@/ui/theme";
 import { ToastHost } from "@/ui/Feedback";
 import { CardOpenProvider } from "@/ui/CardOpen";
 import { GlobalTabBar } from "@/ui/GlobalTabBar";
+import { FreeQuotesGate } from "@/ui/FreeQuotes";
 import { board } from "@/theme/board";
 
 void SplashScreen.preventAutoHideAsync();
@@ -54,6 +55,7 @@ function RootLayout() {
                       <Stack screenOptions={{ headerShown: false, animation: "fade", contentStyle: { backgroundColor: "transparent" } }} />
                     </NavThemeProvider>
                     <GlobalTabBar />
+                    <FreeQuotesGate />
                   </View>
                 </CardOpenProvider>
               </ToastHost>

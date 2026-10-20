@@ -13,6 +13,8 @@ import {
   backStep, elapsedSince, openedKey, parseSent, parseStage, pricedLines, pricedTaxes, qtyDigits, quoteKey, quoteTitle,
   resumeStep, sentKey, stageForStep, stageKey, stepStates, type FirstQuoteStep, type Sent,
 } from "@/lib/firstQuote";
+import { useQueryClient } from "@tanstack/react-query";
+import { refreshAllowance } from "@/lib/useAllowance";
 import { firstQuoteApi, type FirstQuoteProblem, type FullQuote, type PriceCheck, type Profile } from "@/lib/firstQuoteApi";
 import { askForNotifications } from "@/lib/firstQuoteNotify";
 import { captureJob } from "@/lib/firstQuoteVoice";
@@ -46,6 +48,7 @@ type Client = { name: string; email: string };
 
 export default function FirstQuote() {
   const { t, i18n } = useTranslation();
+  const qc = useQueryClient();
   const locale: Locale = i18n.language === "fr" ? "fr-CA" : "en-CA";
   const toast = useToast();
   const { user } = useSession();
@@ -116,6 +119,7 @@ export default function FirstQuote() {
     setWriting(false);
     if (!r.ok) { setNotice(r.problem); return; }
     setQuote(r.data);
+    refreshAllowance(qc);
     setCheck(null);
     if (userId) void kvSet(quoteKey(userId), r.data.id);
     go("check");

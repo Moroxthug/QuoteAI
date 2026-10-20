@@ -9,6 +9,8 @@
 //    native-app CORS and two-step cookie tunnel (api-server lib/nativeApp.ts) answer to), and the
 //    language the emails follow (x-quoteai-lang).
 import { Platform } from "react-native";
+import { isFreeQuotesUsed, usedInfo } from "./allowance";
+import { announceFreeQuotesUsed } from "./freeQuotesGate";
 import { kvGet, kvSet } from "./kv";
 import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 
@@ -98,6 +100,13 @@ function installFetch(): void {
     if (nextToken) await setToken(nextToken);
     const nextOrg = res.headers.get("x-active-org");
     if (nextOrg !== null) await setActiveOrg(nextOrg || null);
+    if (res.status === 402 && path.startsWith("/api/quotes")) {
+      // Blocking is on and the free quotes are gone: whoever asked, the app opens the one "free quotes used" sheet.
+      try {
+        const body = await res.clone().json();
+        if (isFreeQuotesUsed(402, body?.code)) announceFreeQuotesUsed(usedInfo(body));
+      } catch { /* not JSON */ }
+    }
     if (isAuth) {
       const cookie = res.headers.get("x-auth-cookie");
       if (cookie !== null) twoStepCookie = cookie.split(/;\s*/).filter((p) => TUNNELED.test(p)).join("; ") || null;

@@ -10,6 +10,9 @@ import ManualQuoteBuilder from "@/components/manual-quote-builder";
 import { PriceCatalogSection } from "@/components/price-catalog-section";
 import { MicButton } from "@/components/mic-button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { FreeQuotesLine } from "@/components/free-quotes";
+import { reportFreeQuotesUsed, refreshAllowance } from "@/lib/free-quotes";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCan } from "@/hooks/use-role";
 import { ScrollTabs } from "@/components/mobile/scroll-tabs";
 import { StickyActionBar } from "@/components/mobile/sticky-action-bar";
@@ -209,6 +212,7 @@ export default function NewQuote() {
   const [targetTotalEur, setTargetTotalEur] = useState<string>("");
   const [, setLocation] = useLocation();
   const createQuote = useCreateQuote();
+  const queryClient = useQueryClient();
   const { data: profile } = useGetBusinessProfile();
   // Phase 91/121: the business-profile answer carries the sign-up answers and the province beyond the generated type.
   const extra = profile as { companySetup?: { trades?: string[] }; province?: string | null } | undefined;
@@ -362,12 +366,14 @@ export default function NewQuote() {
       },
       {
         onSuccess: (quote) => {
+          refreshAllowance(queryClient);
           // Phase 121: the guide follows the quote to its page (step 2: check it, send it to yourself).
           if (guide) setFirstQuoteStage(userId, "review");
           setLocation(`/dashboard/quotes/${quote.id}`);
         },
         onError: (err: unknown) => {
           const e = err as { status?: number; data?: { error?: string; code?: string } };
+          if (reportFreeQuotesUsed(err, queryClient)) return;
           if (e.status === 429) {
             toast({ title: t("dashboard.new.toast.quotaReachedTitle"), description: t("dashboard.new.toast.quotaReachedDesc"), variant: "destructive" });
           } else if ((e.status === 422 || e.status === 400) && e.data?.error) {
@@ -426,6 +432,7 @@ export default function NewQuote() {
           <div>
             <h1>{t("dashboard.new.title")}</h1>
             <p className="sub">{t("dashboard.new.subtitle")}</p>
+          <FreeQuotesLine />
           </div>
         </div>
         <div className="card" style={{ padding: 32, textAlign: "center" }}>

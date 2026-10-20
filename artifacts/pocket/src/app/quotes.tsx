@@ -20,6 +20,8 @@ import { Card } from "@/ui/Card";
 import { Chip, ChipStrip } from "@/ui/Chip";
 import { ExpandCard, ExpandScrollView, XcActions, XcButton, XcCaption, XcDivider, XcRow, useExpandOpen } from "@/ui/Expand";
 import { Banner, Empty, Skeleton, useToast } from "@/ui/Feedback";
+import { refreshAllowance } from "@/lib/useAllowance";
+import { FreeQuotesBanner } from "@/ui/FreeQuotes";
 import { IconButton, TabHeader } from "@/ui/Header";
 import { Glyph } from "@/ui/Icon";
 import { Section } from "@/ui/Layout";
@@ -73,7 +75,7 @@ export default function Quotes() {
   const m = (v: number, cents = true) => money(v, locale, { cents });
   const open = (id: string) => router.push(screenHref("Quote", t("quotes.actions.openQuote"), { id }));
   const newQuote = () => router.push(screenHref("NewQuote", t("quotes.newQuote")));
-  const refresh = () => client.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+  const refresh = () => { refreshAllowance(client); return client.invalidateQueries({ queryKey: getListQuotesQueryKey() }); };
   const fail = () => toast({ message: t("quotes.done.failed") });
 
   const actionsFor = (q: QuoteSummary, s: QuoteState): SwipeAction[] => {
@@ -159,6 +161,7 @@ export default function Quotes() {
         ) : (
           <>
             {quotes.isError ? <Section pt={12} px={16}><Banner tone="info" icon="warn" iconTone="amber" lead={t("quotes.offline")} /></Section> : null}
+            <FreeQuotesBanner pt={12} />
             <Section delay={50} pt={16} px={16}>
               <ExpandCard id="kpi" label={t("quotes.glance")}
                 head={<Figures items={[

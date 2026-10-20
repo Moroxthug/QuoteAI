@@ -25,6 +25,7 @@ import { format } from "date-fns";
 import { enCA, frCA } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { reportFreeQuotesUsed, refreshAllowance } from "@/lib/free-quotes";
 import { cn } from "@/lib/utils";
 import { DoneCheck, useDone } from "@/hooks/use-done";
 import { taxLineLabel } from "@/lib/tax-display";
@@ -666,10 +667,11 @@ const can = useCan();
     duplicateQuote.mutate({ id }, {
       onSuccess: (newQuote) => {
         queryClient.invalidateQueries({ queryKey: getListQuotesQueryKey() });
+        refreshAllowance(queryClient);
         toast({ title: t("dashboard.quoteDetail.quoteDuplicated"), description: t("dashboard.quoteDetail.quoteDuplicatedDesc") });
         navigate(`/dashboard/quotes/${newQuote.id}`);
       },
-      onError: () => toast({ title: t("dashboard.quoteDetail.errorDuplicate"), variant: "destructive" }),
+      onError: (err: unknown) => { if (!reportFreeQuotesUsed(err, queryClient)) toast({ title: t("dashboard.quoteDetail.errorDuplicate"), variant: "destructive" }); },
     });
   };
 

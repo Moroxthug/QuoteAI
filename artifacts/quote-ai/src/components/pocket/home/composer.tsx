@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
+import { reportFreeQuotesUsed, refreshAllowance } from "@/lib/free-quotes";
 import { useCreateQuote, useDeleteQuote, useGetSubscription, useListClients, type Quote } from "@workspace/api-client-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -82,6 +83,7 @@ export function Composer({ city }: { city: string | null }) {
           timers.current.forEach(clearTimeout);
           setStep(3);
           void queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+          refreshAllowance(queryClient);
           window.setTimeout(() => {
             setQuote(q);
             setPhase("ready");
@@ -98,6 +100,7 @@ export function Composer({ city }: { city: string | null }) {
         onError: (err: unknown) => {
           timers.current.forEach(clearTimeout);
           setPhase("idle");
+          if (reportFreeQuotesUsed(err, queryClient)) return;
           const e = err as { status?: number; data?: { error?: string } };
           if (e.status === 429) toast({ title: t("dashboard.new.toast.quotaReachedTitle"), description: t("dashboard.new.toast.quotaReachedDesc"), variant: "destructive" });
           else if ((e.status === 422 || e.status === 400) && e.data?.error) toast({ title: t("dashboard.new.toast.cannotGenerateTitle"), description: e.data.error, variant: "destructive" });

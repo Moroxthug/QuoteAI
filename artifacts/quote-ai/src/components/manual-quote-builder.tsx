@@ -14,6 +14,8 @@ import { profileSummary, previewTaxLines, taxLineLabel } from "@/lib/tax-display
 import type { CreateManualQuoteBody } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
+import { reportFreeQuotesUsed, refreshAllowance } from "@/lib/free-quotes";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { formatAmount } from "@/lib/money";
 
@@ -172,6 +174,7 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const createManualQuote = useCreateManualQuote();
+  const queryClient = useQueryClient();
   const { data: catalogItems = [] } = useListCatalogItems();
   const [activeVoceId, setActiveVoceId] = useState<string | null>(null);
   // Phase 105: on a phone a line is a row; tapping it opens the line in a sheet.
@@ -299,8 +302,9 @@ export default function ManualQuoteBuilder({ clientData, profileData, onBeforeSu
     createManualQuote.mutate(
       { data: body },
       {
-        onSuccess: (quote) => setLocation(`/dashboard/quotes/${quote.id}`),
+        onSuccess: (quote) => { refreshAllowance(queryClient); setLocation(`/dashboard/quotes/${quote.id}`); },
         onError: (err: unknown) => {
+          if (reportFreeQuotesUsed(err, queryClient)) return;
           const status = (err as { status?: number })?.status;
           if (status === 429) {
             toast({ title: t("manualQuote.toast.quotaTitle"), description: t("manualQuote.toast.quotaDesc"), variant: "destructive" });

@@ -1,7 +1,6 @@
-// Typed client for the owner HQ API (Phase 132). Mirrors the contract at the
-// bottom of docs/GROWTH-PLAN.md. All money is integer cents (CAD).
-// Shapes the contract leaves open (cohorts, customers, ledger rows, series) are
-// normalised below so a small difference in field names does not break the page.
+// Typed client for the owner HQ API (Phase 132), matching the as-built backend
+// (artifacts/api-server/src/routes/admin-hq.ts, src/hq/). Money is integer cents.
+// Usage costs are metered in US cents by the backend (not converted).
 import { demoClient } from "@/lib/hq-fixtures";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -9,64 +8,93 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 export type HqRange = { from: string; to: string };
 
 export type HqCosts = {
-  ai: number | null; messaging: number | null; email: number | null;
-  storage: number | null; infra: number | null; other: number | null;
+  ai: number; messaging: number; email: number; storage: number; infra: number; other: number;
 };
+
+export type HqFunnelStage = "visits" | "signups" | "first_quote" | "quote_sent" | "quote_accepted" | "paying";
 
 export type HqOverview = {
   range: HqRange;
   money: {
-    mrrCents: number | null; arrCents: number | null; newMrrCents: number | null;
-    expansionMrrCents: number | null; churnedMrrCents: number | null;
-    revenueCents: number | null; refundsCents: number | null;
-    taxCollectedCents: number | null; feesCents: number | null;
-    costsCents: HqCosts; marketingSpendCents: number | null;
-    profitCents: number | null; cashCents: number | null; runwayMonths: number | null;
+    mrrCents: number; arrCents: number; newMrrCents: number; expansionMrrCents: number;
+    contractionMrrCents: number; churnedMrrCents: number;
+    revenueCents: number; refundsCents: number; taxCollectedCents: number; feesCents: number;
+    costsCents: HqCosts; marketingSpendCents: number; profitCents: number;
+    cashCents: number | null; runwayMonths: number | null;
   };
   customers: {
     total: number; paying: number; trialing: number; free: number;
     newInRange: number; churnedInRange: number; foundingCount: number;
+    /** Not sent by the backend today; the page falls back to 100 when absent. */
+    foundingLimit?: number;
   };
-  funnel: { stage: string; count: number; rateFromPrevious: number | null }[];
+  funnel: { stage: HqFunnelStage; count: number; rateFromPrevious: number | null }[];
   sources: {
-    source: string; signups: number; paying: number; revenueCents: number | null;
-    spendCents: number | null; cacCents: number | null;
+    source: string; signups: number; paying: number; revenueCents: number;
+    spendCents: number; cacCents: number | null;
   }[];
   unit: {
-    arpuCents: number | null; ltvCents: number | null;
-    paybackMonths: number | null; grossMarginPct: number | null;
+    arpuCents: number; ltvCents: number | null; paybackMonths: number | null; grossMarginPct: number | null;
   };
-  product: {
-    quotesCreated: number; quotesSent: number; quotesAccepted: number;
-    wau: number | null; mau: number | null;
-  };
+  product: { quotesCreated: number; quotesSent: number; quotesAccepted: number; wau: number; mau: number };
   ops: { cronOk: boolean | null; deadRuns: number | null; emailBounceRate: number | null };
   notes: string[];
 };
 
-export type HqPoint = { at: string; value: number | null };
+export type HqPoint = { at: string; value: number };
 export type HqSeriesMetric = "mrr" | "signups" | "revenue" | "costs" | "profit" | "quotes";
 export type HqBucket = "day" | "week" | "month";
 
-export type HqCohort = { cohort: string; size: number; retention: (number | null)[] };
-
-export type HqCustomer = {
-  id: string; name: string; plan: string | null; since: string | null;
-  mtdRevenueCents: number | null; aiCostCents: number | null; marginCents: number | null;
-  lastActiveAt: string | null; source: string | null;
+export type HqCohorts = {
+  months: number;
+  cohorts: { month: string; signups: number; active: (number | null)[]; paying: (number | null)[] }[];
+  notes: string[];
 };
+
+export type HqCustomerSort = "since" | "company" | "plan" | "revenue" | "aiCost" | "margin";
+export type HqCustomer = {
+  userId: string; companyName: string | null; email: string | null; plan: string | null;
+  status: string | null; interval: string | null; since: string | null; source: string | null;
+  founding: boolean; mtdRevenueCents: number; estimated: boolean;
+  aiCostCents: number; costCents: number; marginCents: number; lastActiveAt: string | null;
+};
+export type HqCustomers = {
+  customers: HqCustomer[]; total: number; limit: number; offset: number; month: string; notes: string[];
+};
+export type HqCustomerQuery = { sort: HqCustomerSort; dir: "asc" | "desc"; q: string; limit: number; offset: number };
+
+export const EXPENSE_CATEGORIES = [
+  "infrastructure", "ai", "messaging", "email", "software", "marketing", "payment_fees",
+  "legal_accounting", "payroll", "tax", "other",
+] as const;
+export const EXPENSE_CADENCES = ["one_off", "monthly", "yearly"] as const;
+export type HqCadence = (typeof EXPENSE_CADENCES)[number];
 
 export type HqExpense = {
-  id: string; date: string; category: string; description: string;
-  amountCents: number; recurring: boolean;
+  id: string; name: string; category: string; amountCents: number; currency: string;
+  cadence: HqCadence; startsOn: string; endsOn: string | null; note: string | null;
+  createdAt: string; countedCentsInRange: number;
 };
+export type HqExpenses = { range: HqRange; items: HqExpense[]; totalInRangeCents: number };
 export type HqExpenseInput = {
-  date: string; category: string; description: string; amountCents: number; recurring?: boolean;
+  name: string; category: string; amountCents: number; cadence: HqCadence;
+  startsOn: string; endsOn?: string | null; note?: string | null;
 };
-export type HqSpend = { id: string; date: string; source: string; note: string; amountCents: number };
-export type HqSpendInput = { date: string; source: string; note: string; amountCents: number };
 
-export const EXPENSE_CATEGORIES = ["ai", "messaging", "email", "storage", "infra", "other"] as const;
+export type HqSpend = {
+  id: string; channel: string; campaign: string | null; spentOn: string; amountCents: number;
+  currency: string; note: string | null; createdAt: string;
+};
+export type HqSpendList = {
+  range: HqRange; items: HqSpend[]; totalCents: number;
+  byChannel: { channel: string; amountCents: number }[]; truncated: boolean;
+};
+export type HqSpendInput = {
+  channel: string; campaign?: string | null; spentOn: string; amountCents: number; note?: string | null;
+};
+
+export type HqCash = { cashCents: number | null; updatedAt: string | null };
+
 export const EXPORT_KINDS = ["revenue", "expenses", "customers"] as const;
 export type HqExportKind = (typeof EXPORT_KINDS)[number];
 
@@ -95,108 +123,47 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   }
   const ct = r.headers.get("content-type") ?? "";
   if (!r.ok || !ct.includes("json")) {
-    const body = await r.json().catch(() => ({}));
-    throw new HqUnavailableError(r.status, (body as { error?: string }).error ?? `HTTP ${r.status}`);
+    const body = (await r.json().catch(() => ({}))) as { error?: string; issues?: { path: string; message: string }[] };
+    const detail = body.issues?.length ? `: ${body.issues.map((i) => `${i.path} ${i.message}`).join("; ")}` : "";
+    throw new HqUnavailableError(r.status, `${body.error ?? `HTTP ${r.status}`}${detail}`);
   }
   return r.json() as Promise<T>;
 }
 
-const qs = (p: Record<string, string | undefined>) => {
+const qs = (p: Record<string, string | number | undefined>) => {
   const u = new URLSearchParams();
-  for (const [k, v] of Object.entries(p)) if (v) u.set(k, v);
+  for (const [k, v] of Object.entries(p)) if (v !== undefined && v !== "") u.set(k, String(v));
   const s = u.toString();
   return s ? `?${s}` : "";
 };
 
-// ---- normalisers ----------------------------------------------------------
-type Row = Record<string, unknown>;
-const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
-const str = (v: unknown): string | null => (typeof v === "string" && v ? v : null);
-const rows = (v: unknown): Row[] => {
-  if (Array.isArray(v)) return v as Row[];
-  if (v && typeof v === "object") {
-    const o = v as Row;
-    for (const k of ["rows", "items", "data", "customers", "cohorts", "expenses", "spend"]) {
-      if (Array.isArray(o[k])) return o[k] as Row[];
-    }
-  }
-  return [];
-};
-
-export function normaliseCohorts(raw: unknown): HqCohort[] {
-  return rows(raw)
-    .map((r) => {
-      const ret = r.retention ?? r.values ?? r.months ?? r.rates ?? [];
-      return {
-        cohort: str(r.cohort) ?? str(r.month) ?? str(r.signupMonth) ?? "",
-        size: num(r.size) ?? num(r.signups) ?? num(r.customers) ?? 0,
-        retention: Array.isArray(ret) ? ret.map(num) : [],
-      };
-    })
-    .filter((c) => c.cohort);
-}
-
-export function normaliseCustomers(raw: unknown): HqCustomer[] {
-  return rows(raw).map((r, i) => ({
-    id: str(r.id) ?? str(r.companyId) ?? str(r.userId) ?? String(i),
-    name: str(r.name) ?? str(r.companyName) ?? str(r.company) ?? str(r.email) ?? "Unnamed",
-    plan: str(r.plan),
-    since: str(r.since) ?? str(r.createdAt),
-    mtdRevenueCents: num(r.mtdRevenueCents) ?? num(r.revenueCents) ?? num(r.mtdRevenue),
-    aiCostCents: num(r.aiCostCents) ?? num(r.aiCost),
-    marginCents: num(r.marginCents) ?? num(r.margin),
-    lastActiveAt: str(r.lastActiveAt) ?? str(r.lastActive),
-    source: str(r.source),
-  }));
-}
-
-const normExpense = (r: Row, i: number): HqExpense => ({
-  id: str(r.id) ?? String(i),
-  date: str(r.date) ?? str(r.incurredOn) ?? "",
-  category: str(r.category) ?? "other",
-  description: str(r.description) ?? str(r.vendor) ?? str(r.note) ?? "",
-  amountCents: num(r.amountCents) ?? 0,
-  recurring: r.recurring === true || (typeof r.recurring === "string" && r.recurring !== "none"),
-});
-const normSpend = (r: Row, i: number): HqSpend => ({
-  id: str(r.id) ?? String(i),
-  date: str(r.date) ?? str(r.spentOn) ?? "",
-  source: str(r.source) ?? str(r.channel) ?? "other",
-  note: str(r.note) ?? str(r.description) ?? "",
-  amountCents: num(r.amountCents) ?? 0,
-});
-
-// ---- client ---------------------------------------------------------------
 export type HqClient = {
   overview(r: HqRange): Promise<HqOverview>;
   series(metric: HqSeriesMetric, bucket: HqBucket, r: HqRange): Promise<HqPoint[]>;
-  cohorts(): Promise<HqCohort[]>;
-  customers(sort: string, q: string): Promise<HqCustomer[]>;
-  expenses(r: HqRange): Promise<HqExpense[]>;
+  cohorts(months?: number): Promise<HqCohorts>;
+  customers(q: HqCustomerQuery): Promise<HqCustomers>;
+  expenses(r: HqRange): Promise<HqExpenses>;
   addExpense(i: HqExpenseInput): Promise<void>;
   deleteExpense(id: string): Promise<void>;
-  spend(r: HqRange): Promise<HqSpend[]>;
+  spend(r: HqRange): Promise<HqSpendList>;
   addSpend(i: HqSpendInput): Promise<void>;
   deleteSpend(id: string): Promise<void>;
-  setCash(cents: number | null): Promise<void>;
+  setCash(cents: number | null): Promise<HqCash>;
   exportUrl(kind: HqExportKind, r: HqRange): string;
 };
 
 export const liveClient: HqClient = {
   overview: (r) => call<HqOverview>(`/overview${qs(r)}`),
-  series: async (metric, bucket, r) => {
-    const raw = await call<unknown>(`/series${qs({ metric, bucket, ...r })}`);
-    return rows(raw).map((p) => ({ at: str(p.at) ?? "", value: num(p.value) }));
-  },
-  cohorts: async () => normaliseCohorts(await call<unknown>("/cohorts")),
-  customers: async (sort, q) => normaliseCustomers(await call<unknown>(`/customers${qs({ sort, q })}`)),
-  expenses: async (r) => rows(await call<unknown>(`/expenses${qs(r)}`)).map(normExpense),
+  series: (metric, bucket, r) => call<HqPoint[]>(`/series${qs({ metric, bucket, ...r })}`),
+  cohorts: (months = 12) => call<HqCohorts>(`/cohorts${qs({ months })}`),
+  customers: (q) => call<HqCustomers>(`/customers${qs(q)}`),
+  expenses: (r) => call<HqExpenses>(`/expenses${qs(r)}`),
   addExpense: async (i) => { await call("/expenses", { method: "POST", body: JSON.stringify(i) }); },
   deleteExpense: async (id) => { await call(`/expenses/${encodeURIComponent(id)}`, { method: "DELETE" }); },
-  spend: async (r) => rows(await call<unknown>(`/marketing-spend${qs(r)}`)).map(normSpend),
+  spend: (r) => call<HqSpendList>(`/marketing-spend${qs(r)}`),
   addSpend: async (i) => { await call("/marketing-spend", { method: "POST", body: JSON.stringify(i) }); },
   deleteSpend: async (id) => { await call(`/marketing-spend/${encodeURIComponent(id)}`, { method: "DELETE" }); },
-  setCash: async (cents) => { await call("/settings/cash", { method: "PUT", body: JSON.stringify({ cashCents: cents }) }); },
+  setCash: (cashCents) => call<HqCash>("/settings/cash", { method: "PUT", body: JSON.stringify({ cashCents }) }),
   exportUrl: (kind, r) => `${BASE}/api/admin/hq/export.csv${qs({ kind, ...r })}`,
 };
 

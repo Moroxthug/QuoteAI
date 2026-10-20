@@ -1,21 +1,27 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, ArrowUpDown, CheckCircle2, AlertTriangle, Info } from "lucide-react";
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
 import type {
-  HqBucket, HqClient, HqCohort, HqCustomer, HqOverview, HqPoint, HqRange,
+  HqBucket, HqClient, HqCohorts, HqCustomer, HqCustomerSort, HqCustomers, HqOverview, HqPoint, HqRange,
 } from "@/lib/hq-api";
 import {
   Card, Empty, Section, Skeleton, Stat, count, inputCls, money, months, percent, shortDate,
   NOT_CONNECTED, NOT_ENOUGH,
 } from "./ui";
 
-const FOUNDING_LIMIT = 100;
+const DEFAULT_FOUNDING_LIMIT = 100; // used until the overview exposes customers.foundingLimit
+const label = (v: string) => v.replace(/_/g, " ");
+const FUNNEL_LABELS: Record<string, string> = {
+  visits: "Visited the site", signups: "Signed up", first_quote: "Created a first quote",
+  quote_sent: "Sent a quote", quote_accepted: "Had a quote accepted", paying: "Paying",
+};
 
 // ---- (1) top strip ----------------------------------------------------------
 export function TopStrip({ o }: { o: HqOverview }) {
   const m = o.money;
+  const FOUNDING_LIMIT = o.customers.foundingLimit ?? DEFAULT_FOUNDING_LIMIT;
   const found = Math.min(o.customers.foundingCount, FOUNDING_LIMIT);
   const profitTone = m.profitCents == null ? undefined : m.profitCents >= 0 ? "good" : "bad";
   return (
@@ -167,6 +173,8 @@ export function MoneySection({ o, client }: { o: HqOverview; client: HqClient })
             <Row k="Marketing spend" v={money(o.money.marketingSpendCents)} missing={o.money.marketingSpendCents == null} />
             <Row k="Payment processor fees" v={money(o.money.feesCents)} missing={o.money.feesCents == null} />
             <Row k="Refunds" v={money(o.money.refundsCents)} missing={o.money.refundsCents == null} />
+            <Row k="MRR: new / expansion" v={`${money(o.money.newMrrCents)} / ${money(o.money.expansionMrrCents)}`} />
+            <Row k="MRR: contraction / churned" v={`${money(o.money.contractionMrrCents)} / ${money(o.money.churnedMrrCents)}`} />
           </dl>
         </Card>
 
@@ -193,60 +201,44 @@ function Row({ k, v, missing }: { k: string; v: string; missing?: boolean }) {
 }
 
 // ---- (3) customers ----------------------------------------------------------
-type SortKey = "name" | "plan" | "since" | "revenue" | "ai" | "margin" | "active" | "source";
-const SORTS: { key: SortKey; label: string }[] = [
-  { key: "name", label: "Company" }, { key: "plan", label: "Plan" }, { key: "since", label: "Since" },
-  { key: "revenue", label: "Revenue this month" }, { key: "ai", label: "AI cost" },
-  { key: "margin", label: "Margin" }, { key: "active", label: "Last active" }, { key: "source", label: "Source" },
+const PAGE = 50;
+const SORTS: { key: HqCustomerSort; label: string; defDir: "asc" | "desc" }[] = [
+  { key: "company", label: "Company", defDir: "asc" }, { key: "plan", label: "Plan", defDir: "asc" },
+  { key: "since", label: "Since", defDir: "desc" }, { key: "revenue", label: "Revenue this month", defDir: "desc" },
+  { key: "aiCost", label: "AI cost", defDir: "desc" }, { key: "margin", label: "Margin", defDir: "asc" },
 ];
-const sortVal = (c: HqCustomer, k: SortKey): string | number | null => {
-  switch (k) {
-    case "name": return c.name.toLowerCase();
-    case "plan": return c.plan?.toLowerCase() ?? null;
-    case "since": return c.since;
-    case "revenue": return c.mtdRevenueCents;
-    case "ai": return c.aiCostCents;
-    case "margin": return c.marginCents;
-    case "active": return c.lastActiveAt;
-    case "source": return c.source?.toLowerCase() ?? null;
-  }
-};
 
 export function CustomersSection({ o, client }: { o: HqOverview; client: HqClient }) {
   const [q, setQ] = useState("");
   const [dq, setDq] = useState("");
-  const [sort, setSort] = useState<SortKey>("revenue");
-  const [dir, setDir] = useState<1 | -1>(-1);
-  const [rows, setRows] = useState<HqCustomer[] | null>(null);
+  const [sort, setSort] = useState<HqCustomerSort>("since");
+  const [dir, setDir] = useState<"asc" | "desc">("desc");
+  const [offset, setOffset] = useState(0);
+  const [data, setData] = useState<HqCustomers | null>(null);
   const [err, setErr] = useState(false);
   const [tick, setTick] = useState(0);
 
-  useEffect(() => { const t = setTimeout(() => setDq(q), 250); return () => clearTimeout(t); }, [q]);
+  useEffect(() => { const t = setTimeout(() => { setDq(q); setOffset(0); }, 250); return () => clearTimeout(t); }, [q]);
   useEffect(() => {
     let live = true;
     setErr(false);
-    client.customers(sort, dq).then((r) => live && setRows(r)).catch(() => live && setErr(true));
+    client.customers({ sort, dir, q: dq, limit: PAGE, offset }).then((r) => live && setData(r)).catch(() => live && setErr(true));
     return () => { live = false; };
-  }, [client, dq, tick]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const sorted = useMemo(() => {
-    if (!rows) return null;
-    const needle = dq.trim().toLowerCase();
-    const list = needle ? rows.filter((c) => [c.name, c.plan, c.source].some((s) => s?.toLowerCase().includes(needle))) : rows;
-    return [...list].sort((a, b) => {
-      const x = sortVal(a, sort), y = sortVal(b, sort);
-      if (x == null && y == null) return 0;
-      if (x == null) return 1; // missing always last
-      if (y == null) return -1;
-      return (x < y ? -1 : x > y ? 1 : 0) * dir;
-    });
-  }, [rows, sort, dir, dq]);
+  }, [client, sort, dir, dq, offset, tick]);
 
   const c = o.customers;
-  const toggle = (k: SortKey) => { if (k === sort) setDir((d) => (d === 1 ? -1 : 1)); else { setSort(k); setDir(k === "name" || k === "plan" || k === "source" ? 1 : -1); } };
+  const rows = data?.customers ?? null;
+  const toggle = (k: HqCustomerSort) => {
+    setOffset(0);
+    if (k === sort) setDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSort(k); setDir(SORTS.find((s) => s.key === k)?.defDir ?? "desc"); }
+  };
+  const planLabel = (r: HqCustomer) => (r.plan ? label(r.plan.replace(/^monthly_/, "")) : "no plan") + (r.founding ? " (founding)" : "");
+  const rev = (r: HqCustomer) => money(r.mtdRevenueCents) + (r.estimated ? " (est.)" : "");
+  const nameOf = (r: HqCustomer) => r.companyName ?? r.email ?? "Unnamed";
 
   return (
-    <Section id="customers" title="Customers">
+    <Section id="customers" title="Customers" hint="Revenue is this month so far, ex tax. Usage costs are metered in US cents. (est.) means the plan list price, because there are no billing events yet.">
       <dl className="grid grid-cols-2 lg:grid-cols-6 gap-3">
         <Stat label="Total" value={count(c.total)} />
         <Stat label="Paying" value={count(c.paying)} />
@@ -260,79 +252,94 @@ export function CustomersSection({ o, client }: { o: HqOverview; client: HqClien
           <label className="relative flex-1">
             <span className="sr-only">Search customers</span>
             <Search aria-hidden className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search company, plan or source" className={`${inputCls} pl-9`} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search company or email" className={`${inputCls} pl-9`} />
           </label>
-          <label className="flex items-center gap-2 text-sm text-slate-700 md:hidden">
-            <span>Sort by</span>
-            <select value={sort} onChange={(e) => toggle(e.target.value as SortKey)} className={inputCls}>
-              {SORTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
-            </select>
-          </label>
+          <div className="flex items-center gap-2 text-sm text-slate-700 md:hidden">
+            <label className="flex flex-1 items-center gap-2"><span className="shrink-0">Sort by</span>
+              <select value={sort} onChange={(e) => { setSort(e.target.value as HqCustomerSort); setOffset(0); }} className={inputCls}>
+                {SORTS.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+              </select></label>
+            <button type="button" className="h-10 px-3 rounded-lg border border-slate-300 bg-white text-sm font-semibold" onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}>
+              {dir === "asc" ? "Ascending" : "Descending"}
+            </button>
+          </div>
         </div>
 
         {err ? (
           <div className="mt-3 flex items-center gap-3"><Empty>The customer list is not available yet.</Empty>
             <button type="button" className="text-sm font-semibold text-navy-700 underline" onClick={() => setTick((n) => n + 1)}>Retry</button></div>
-        ) : !sorted ? (
+        ) : !rows ? (
           <div className="mt-3 space-y-2"><Skeleton className="h-10" /><Skeleton className="h-10" /><Skeleton className="h-10" /></div>
-        ) : sorted.length === 0 ? (
+        ) : rows.length === 0 ? (
           <div className="mt-3"><Empty>No customers match.</Empty></div>
         ) : (
           <>
-            {/* desktop table */}
             <div className="hidden md:block mt-3 overflow-x-auto">
               <table className="w-full text-sm">
                 <caption className="sr-only">Customers, one row per company</caption>
                 <thead>
                   <tr className="text-left text-xs text-slate-600">
-                    {SORTS.map((s) => (
-                      <th key={s.key} scope="col" aria-sort={sort === s.key ? (dir === 1 ? "ascending" : "descending") : "none"} className="py-2 pr-3 font-semibold">
-                        <button type="button" onClick={() => toggle(s.key)} className="inline-flex items-center gap-1 hover:text-slate-900">
-                          {s.label}<ArrowUpDown aria-hidden className="h-3 w-3" />
-                        </button>
-                      </th>
-                    ))}
+                    {SORTS.map((s) => <SortTh key={s.key} s={s} sort={sort} dir={dir} onClick={toggle} />)}
+                    <th scope="col" className="py-2 pr-3 font-semibold">Last active</th>
+                    <th scope="col" className="py-2 font-semibold">Source</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sorted.map((r) => (
-                    <tr key={r.id} className="border-t border-slate-100">
-                      <th scope="row" className="py-2 pr-3 text-left font-medium text-slate-900">{r.name}</th>
-                      <td className="pr-3">{r.plan ?? "-"}</td>
+                  {rows.map((r) => (
+                    <tr key={r.userId} className="border-t border-slate-100">
+                      <th scope="row" className="py-2 pr-3 text-left font-medium text-slate-900">{nameOf(r)}</th>
+                      <td className="pr-3">{planLabel(r)}</td>
                       <td className="pr-3 whitespace-nowrap">{shortDate(r.since)}</td>
-                      <td className="pr-3 tabular-nums">{money(r.mtdRevenueCents)}</td>
-                      <td className="pr-3 tabular-nums">{money(r.aiCostCents)}</td>
-                      <td className={`pr-3 tabular-nums ${r.marginCents != null && r.marginCents < 0 ? "text-red-700 font-semibold" : ""}`}>{money(r.marginCents)}</td>
+                      <td className="pr-3 tabular-nums">{rev(r)}</td>
+                      <td className="pr-3 tabular-nums">{money(r.aiCostCents, { exact: true })}</td>
+                      <td className={`pr-3 tabular-nums ${r.marginCents < 0 ? "text-red-700 font-semibold" : ""}`}>{money(r.marginCents)}</td>
                       <td className="pr-3 whitespace-nowrap">{shortDate(r.lastActiveAt)}</td>
-                      <td>{r.source ?? "unknown"}</td>
+                      <td>{r.source ? label(r.source) : "unknown"}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {/* phone: stacked cards */}
             <ul className="md:hidden mt-3 space-y-2">
-              {sorted.map((r) => (
-                <li key={r.id} className="rounded-xl border border-slate-200 p-3">
+              {rows.map((r) => (
+                <li key={r.userId} className="rounded-xl border border-slate-200 p-3">
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="font-semibold text-slate-900 break-words min-w-0">{r.name}</p>
-                    <span className="shrink-0 text-xs rounded bg-slate-100 px-2 py-0.5 text-slate-700">{r.plan ?? "no plan"}</span>
+                    <p className="font-semibold text-slate-900 break-words min-w-0">{nameOf(r)}</p>
+                    <span className="shrink-0 text-xs rounded bg-slate-100 px-2 py-0.5 text-slate-700">{planLabel(r)}</span>
                   </div>
                   <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                     <Kv k="Since" v={shortDate(r.since)} />
                     <Kv k="Last active" v={shortDate(r.lastActiveAt)} />
-                    <Kv k="Revenue this month" v={money(r.mtdRevenueCents)} />
-                    <Kv k="AI cost" v={money(r.aiCostCents)} />
+                    <Kv k="Revenue this month" v={rev(r)} />
+                    <Kv k="AI cost" v={money(r.aiCostCents, { exact: true })} />
                     <Kv k="Margin" v={money(r.marginCents)} />
-                    <Kv k="Source" v={r.source ?? "unknown"} />
+                    <Kv k="Source" v={r.source ? label(r.source) : "unknown"} />
                   </dl>
                 </li>
               ))}
             </ul>
+            <div className="mt-3 flex items-center justify-between gap-2 text-xs text-slate-600">
+              <span className="tabular-nums">{offset + 1} to {offset + rows.length} of {count(data?.total)}</span>
+              <span className="flex gap-2">
+                <button type="button" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE))} className="h-10 px-3 rounded-lg border border-slate-300 bg-white font-semibold disabled:opacity-40">Previous</button>
+                <button type="button" disabled={offset + rows.length >= (data?.total ?? 0)} onClick={() => setOffset(offset + PAGE)} className="h-10 px-3 rounded-lg border border-slate-300 bg-white font-semibold disabled:opacity-40">Next</button>
+              </span>
+            </div>
+            {data?.notes.length ? <ul className="mt-2 list-disc pl-5 text-xs text-slate-600">{data.notes.map((n, i) => <li key={i}>{n}</li>)}</ul> : null}
           </>
         )}
       </Card>
     </Section>
+  );
+}
+
+function SortTh({ s, sort, dir, onClick }: { s: { key: HqCustomerSort; label: string }; sort: HqCustomerSort; dir: "asc" | "desc"; onClick: (k: HqCustomerSort) => void }) {
+  return (
+    <th scope="col" aria-sort={sort === s.key ? (dir === "asc" ? "ascending" : "descending") : "none"} className="py-2 pr-3 font-semibold">
+      <button type="button" onClick={() => onClick(s.key)} className="inline-flex items-center gap-1 hover:text-slate-900">
+        {s.label}<ArrowUpDown aria-hidden className="h-3 w-3" />
+      </button>
+    </th>
   );
 }
 
@@ -351,7 +358,7 @@ export function FunnelSection({ o }: { o: HqOverview }) {
             {o.funnel.map((f, i) => (
               <li key={f.stage}>
                 <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm">
-                  <span className="font-medium text-slate-900">{i + 1}. {f.stage}</span>
+                  <span className="font-medium text-slate-900">{i + 1}. {FUNNEL_LABELS[f.stage] ?? label(f.stage)}</span>
                   <span className="tabular-nums text-slate-700">
                     <strong className="text-slate-900">{count(f.count)}</strong>
                     {i > 0 && <span className="ml-2 text-xs">{f.rateFromPrevious == null ? `conversion: ${NOT_ENOUGH}` : `${percent(f.rateFromPrevious)} of previous stage`}</span>}
@@ -385,7 +392,7 @@ export function SourcesSection({ o }: { o: HqOverview }) {
                 <tbody>
                   {o.sources.map((s) => (
                     <tr key={s.source} className="border-t border-slate-100">
-                      <th scope="row" className="py-2 pr-3 text-left font-medium text-slate-900">{s.source}</th>
+                      <th scope="row" className="py-2 pr-3 text-left font-medium text-slate-900">{label(s.source)}</th>
                       <td className="pr-3 tabular-nums">{count(s.signups)}</td>
                       <td className="pr-3 tabular-nums">{count(s.paying)}</td>
                       <td className="pr-3 tabular-nums">{money(s.revenueCents)}</td>
@@ -399,7 +406,7 @@ export function SourcesSection({ o }: { o: HqOverview }) {
             <ul className="md:hidden space-y-2">
               {o.sources.map((s) => (
                 <li key={s.source} className="rounded-xl border border-slate-200 p-3">
-                  <p className="font-semibold text-slate-900">{s.source}</p>
+                  <p className="font-semibold text-slate-900">{label(s.source)}</p>
                   <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
                     <Kv k="Signups" v={count(s.signups)} />
                     <Kv k="Paying" v={count(s.paying)} />
@@ -417,7 +424,7 @@ export function SourcesSection({ o }: { o: HqOverview }) {
         <Stat label="ARPU" value={money(o.unit.arpuCents, { fallback: NOT_ENOUGH })} missing={o.unit.arpuCents == null} />
         <Stat label="LTV" value={money(o.unit.ltvCents, { fallback: NOT_ENOUGH })} missing={o.unit.ltvCents == null} />
         <Stat label="CAC payback" value={months(o.unit.paybackMonths)} missing={o.unit.paybackMonths == null} />
-        <Stat label="Gross margin" value={percent(o.unit.grossMarginPct)} missing={o.unit.grossMarginPct == null} />
+        <Stat label="Gross margin" value={percent(o.unit.grossMarginPct == null ? null : o.unit.grossMarginPct / 100)} missing={o.unit.grossMarginPct == null} />
       </dl>
     </Section>
   );
@@ -425,42 +432,51 @@ export function SourcesSection({ o }: { o: HqOverview }) {
 
 // ---- (6) retention ----------------------------------------------------------
 export function RetentionSection({ client }: { client: HqClient }) {
-  const [rows, setRows] = useState<HqCohort[] | null>(null);
+  const [data, setData] = useState<HqCohorts | null>(null);
   const [err, setErr] = useState(false);
+  const [kind, setKind] = useState<"active" | "paying">("active");
   useEffect(() => {
     let live = true;
-    client.cohorts().then((r) => live && setRows(r)).catch(() => live && setErr(true));
+    client.cohorts(12).then((r) => live && setData(r)).catch(() => live && setErr(true));
     return () => { live = false; };
   }, [client]);
-  const width = rows ? Math.max(0, ...rows.map((r) => r.retention.length)) : 0;
+  const rows = data?.cohorts ?? null;
+  const width = rows ? Math.max(0, ...rows.map((r) => r[kind].length)) : 0;
 
   return (
-    <Section id="retention" title="Retention" hint="Share of each signup month still active, by months since signup. Blank cells have not happened yet.">
+    <Section id="retention" title="Retention" hint="Share of each signup month, by months since signup. Blank cells have not happened yet or have no billing history.">
       <Card>
+        <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label="Retention measure">
+          {([["active", "Active (created a quote)"], ["paying", "Paying"]] as const).map(([k, l]) => (
+            <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}
+              className={`h-10 px-3 rounded-lg text-sm font-semibold border ${kind === k ? "bg-navy-600 text-white border-navy-600" : "bg-white text-slate-800 border-slate-300"}`}>{l}</button>
+          ))}
+        </div>
         {err ? <Empty>Cohort data is not available yet.</Empty>
           : !rows ? <Skeleton className="h-40" />
           : rows.length === 0 ? <Empty>{NOT_ENOUGH}</Empty>
           : (
             <div className="overflow-x-auto">
               <table className="text-xs tabular-nums border-separate border-spacing-1 min-w-full">
-                <caption className="sr-only">Retention by signup month</caption>
+                <caption className="sr-only">Retention by signup month: {kind}</caption>
                 <thead><tr className="text-slate-600">
                   <th scope="col" className="text-left font-semibold pr-2">Cohort</th>
-                  <th scope="col" className="text-right font-semibold pr-2">Size</th>
+                  <th scope="col" className="text-right font-semibold pr-2">Signups</th>
                   {Array.from({ length: width }, (_, i) => <th key={i} scope="col" className="font-semibold w-12 min-w-[3rem]">M{i}</th>)}
                 </tr></thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.cohort}>
-                      <th scope="row" className="text-left font-medium text-slate-900 pr-2 whitespace-nowrap">{r.cohort}</th>
-                      <td className="text-right pr-2 text-slate-700">{count(r.size)}</td>
+                    <tr key={r.month}>
+                      <th scope="row" className="text-left font-medium text-slate-900 pr-2 whitespace-nowrap">{r.month}</th>
+                      <td className="text-right pr-2 text-slate-700">{count(r.signups)}</td>
                       {Array.from({ length: width }, (_, i) => {
-                        const v = r.retention[i];
-                        if (v == null) return <td key={i} className="rounded bg-slate-50 text-center text-slate-400 h-8" aria-label="no data yet">-</td>;
+                        const v = r[kind][i];
+                        if (v == null) return <td key={i} className="rounded bg-slate-50 text-center text-slate-500 h-8" aria-label="no data yet">-</td>;
+                        const f = Math.min(Math.max(v / 100, 0), 1);
                         return (
                           <td key={i} className="rounded text-center h-8 font-medium"
-                            style={{ background: `rgba(4,120,87,${0.08 + v * 0.8})`, color: v > 0.55 ? "#fff" : "#0f172a" }}>
-                            {Math.round(v * 100)}%
+                            style={{ background: `rgba(4,120,87,${0.08 + f * 0.8})`, color: f > 0.55 ? "#fff" : "#0f172a" }}>
+                            {Math.round(v)}%
                           </td>
                         );
                       })}
@@ -470,6 +486,7 @@ export function RetentionSection({ client }: { client: HqClient }) {
               </table>
             </div>
           )}
+        {data?.notes.length ? <ul className="mt-2 list-disc pl-5 text-xs text-slate-600">{data.notes.map((n, i) => <li key={i}>{n}</li>)}</ul> : null}
       </Card>
     </Section>
   );

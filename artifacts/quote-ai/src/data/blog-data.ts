@@ -472,6 +472,255 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Why review volume compounds</h2>
 <p>Beyond trust-building, review count and recency are factors in local search visibility — profiles with a steady stream of recent reviews tend to be favoured over ones with a handful of old reviews, even if the older reviews are excellent. Treating review collection as an ongoing part of your workflow (rather than a one-time push) pays off steadily over time, especially when paired with fast, professional quoting that gets clients to "yes" in the first place — see tools built for <a href="/quotes/freelance/">independent tradespeople and freelancers</a>.</p>
 `,
+  "free-quote-template-for-contractors-canada": `
+<p>If you search for a "free quote template" you'll find hundreds of generic US documents with no mention of GST, HST or QST. A Canadian contractor quote has to do more: show the right tax for your province, protect you on scope, and be clear enough that the client can say yes without calling you three times. Here is the structure that works, section by section.</p>
+
+<h2>What every contractor quote should include</h2>
+<ul>
+  <li><strong>Your business details</strong>: legal or trade name, phone, email, address, and your GST/HST number (plus QST number if you operate in Quebec). Once you are registered, tax numbers on documents are expected.</li>
+  <li><strong>Client details and job address</strong>: the billing party and the site, which are often different.</li>
+  <li><strong>Quote number and date</strong>: so you and the client can both refer to it later.</li>
+  <li><strong>Scope of work</strong>: what is included and, just as important, what is not.</li>
+  <li><strong>Line items</strong>: labour, materials, equipment, subcontractors, permits, disposal.</li>
+  <li><strong>Taxes</strong>: shown as a separate line, not buried in the price.</li>
+  <li><strong>Payment terms</strong>: deposit, progress payments, balance due.</li>
+  <li><strong>Validity period</strong>: how long the price holds (30 days is common; shorten it when material prices are moving).</li>
+  <li><strong>Acceptance</strong>: a signature or electronic acceptance line.</li>
+</ul>
+
+<h2>Getting Canadian taxes right</h2>
+<p>Tax depends on where the work is performed. In general: Alberta, Saskatchewan (GST plus PST rules), Manitoba and BC have different structures from the HST provinces, and Quebec charges GST plus QST. A few examples of the combined rates in force at the time of writing:</p>
+<ul>
+  <li><strong>Ontario</strong>: 13% HST</li>
+  <li><strong>Quebec</strong>: 5% GST + 9.975% QST</li>
+  <li><strong>Alberta</strong>: 5% GST only</li>
+  <li><strong>BC</strong>: 5% GST, with PST applying to some goods</li>
+  <li><strong>Atlantic provinces</strong>: 15% HST</li>
+</ul>
+<p>Rates and rules change, so confirm with the Canada Revenue Agency or Revenu Québec, or your accountant, before you fix a template. The point is that a template with one hard-coded tax rate will be wrong the moment you work across a provincial border.</p>
+
+<h2>Scope of work: where most disputes start</h2>
+<p>Most quote disputes are not about price, they are about what the price covered. Write the scope as a short list of outcomes ("Supply and install 3 interior doors, including trim and paint-ready finish") and add an explicit exclusions list ("Drywall repair, painting and electrical are not included"). One extra sentence on how changes are handled ("Work outside this scope will be quoted separately and approved before it starts") saves many arguments.</p>
+
+<h2>Deposits and payment schedule</h2>
+<p>For anything beyond a small repair, ask for a deposit before ordering materials or booking your crew. Common patterns are 10–30% on acceptance, a progress payment at a milestone, and the balance on completion. Whatever you choose, put it on the quote in plain numbers, not a vague "deposit required". Check provincial consumer protection rules, because some provinces cap deposits on home renovation contracts.</p>
+
+<h2>Where a static template falls short</h2>
+<p>A Word or Excel template looks free, but you pay for it in time: retyping client details, recalculating taxes, fixing formatting, exporting to PDF, then chasing the client. Mistakes creep in, and the quote reaches the client hours or days after the visit, when other contractors may have already replied.</p>
+<p>That is the gap <a href="/quotes/free-quote/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see how it stacks up against the <a href="/quotes/excel-template/">Excel template</a> and the <a href="/quotes/word-template/">Word template</a>, or read the full guide on <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+`,
+  "cost-to-install-a-heat-pump-canada": `
+<p>Heat pumps have moved from a niche product to one of the most requested HVAC upgrades in Canada. Homeowners want to know the price before they call, and contractors need to quote it without leaving money on the table. These are typical 2026 ranges. Actual quotes vary with the home, the region and the equipment brand.</p>
+
+<h2>Typical installed cost by system type</h2>
+<ul>
+  <li><strong>Ductless mini-split, single zone</strong>: about $3,500–$6,500 installed</li>
+  <li><strong>Ductless multi-zone (2–4 heads)</strong>: about $7,000–$16,000</li>
+  <li><strong>Central air-source heat pump</strong> (replacing an air conditioner, using existing ducts): about $7,000–$16,000</li>
+  <li><strong>Cold-climate central system</strong> or high-capacity unit for colder regions: about $10,000–$20,000+</li>
+  <li><strong>Ground-source (geothermal)</strong>: commonly $25,000–$50,000+ because of the loop installation</li>
+</ul>
+
+<h2>What drives the price</h2>
+<h3>Cold-climate rating</h3>
+<p>Standard heat pumps lose capacity in deep cold. Units rated to operate efficiently at very low outdoor temperatures cost more, but in most of Canada they are the right choice, and a quote should state the rated capacity at a low temperature, not just the nominal tonnage.</p>
+<h3>Electrical capacity</h3>
+<p>Older homes with a 60 or 100 amp panel may need an upgrade before a heat pump can be added. A panel upgrade is a separate line on the quote, often $2,500–$5,000 or more, and a common source of surprises if it is not flagged at the site visit.</p>
+<h3>Ductwork condition</h3>
+<p>Existing ducts sized for a gas furnace do not always suit a heat pump's airflow. Sealing, resizing or adding returns can change the total significantly.</p>
+<h3>Backup heat and controls</h3>
+<p>Many installs keep a furnace or electric backup for the coldest days. Controls that switch between sources add cost but protect comfort and operating cost.</p>
+
+<h2>Rebates and incentives</h2>
+<p>Federal, provincial and utility programs have supported heat pump installs, but amounts, eligibility and funding status change often. Check each program's current rules before you promise anything, and see our <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">guide to Canadian rebates for contractors</a> for how to mention them in a quote without overpromising.</p>
+
+<h2>How to quote a heat pump job</h2>
+<p>Break the quote into equipment (model and capacity), installation labour, electrical work, line sets and pad or brackets, commissioning, permits, and old-equipment removal. State the warranty on parts and labour, and list the exclusions: panel upgrades, drywall repair, ductwork changes. HVAC contractors using <a href="/quotes/hvac-technician/">quoting software built for the trade</a> can produce a clean, itemized estimate on site, which matters when the homeowner is also getting two other quotes that week.</p>
+`,
+  "how-to-get-more-plumbing-jobs-canada": `
+<p>Plumbing is a trade where demand is steady but competition for the good jobs is real. Emergency calls go to whoever picks up first, and renovation work goes to whoever looks most credible and replies fastest. These nine steps do not need a big marketing budget.</p>
+
+<h2>1. Own your Google Business Profile</h2>
+<p>For "plumber near me" searches, your profile is often more important than your website. Pick the right categories, list specific services (drain cleaning, water heater replacement, rough-in plumbing), and add job photos regularly. Our <a href="/blog/google-business-profile-guide-for-tradespeople/">Google Business Profile guide</a> walks through it.</p>
+
+<h2>2. Answer fast, every time</h2>
+<p>Homeowners usually contact two or three plumbers and hire whoever replies first with a clear next step. A missed call that goes to voicemail is often a lost job. Use a missed-call text-back or a short voicemail that promises a callback time.</p>
+
+<h2>3. Send quotes the same day</h2>
+<p>A quote that arrives a week later competes against someone who sent theirs from the driveway. Itemized, PDF-ready estimates built with <a href="/quotes/plumber/">quoting software for plumbers</a> let you send it before you start the truck.</p>
+
+<h2>4. Collect reviews on purpose</h2>
+<p>Reviews influence both trust and local ranking. Ask at completion, send the direct link by text, and reply to every review. See <a href="/blog/how-to-get-more-reviews-as-a-contractor/">how to get more reviews</a>.</p>
+
+<h2>5. Build a page for each service and city</h2>
+<p>One page that says "plumbing services" ranks for little. A page for "water heater replacement in [your city]" with real prices, photos and a clear call to action ranks for what customers actually type.</p>
+
+<h2>6. Offer fixed-price options on common jobs</h2>
+<p>Customers fear open-ended hourly billing. Fixed prices on repeat jobs (faucet replacement, toilet install, drain clearing) reduce friction and make quoting nearly instant.</p>
+
+<h2>7. Partner with trades that refer you</h2>
+<p>Property managers, realtors, general contractors, electricians and HVAC companies all meet plumbing needs. A short, reliable relationship with two or three of them can fill your calendar.</p>
+
+<h2>8. Follow up on every quote</h2>
+<p>Many quotes are lost not because of price, but silence. A friendly follow-up after two or three days, and again at a week, recovers jobs most plumbers never knew they were still in.</p>
+
+<h2>9. Turn one-time clients into maintenance clients</h2>
+<p>Water heater flushes, annual inspections and backflow checks create recurring revenue and make you the first call when something breaks.</p>
+
+<h2>Where to start</h2>
+<p>If you only do two things this week, fix your Google profile and shorten the time between site visit and quote. Both cost almost nothing and compound. For help with the second, see <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+`,
+  "how-to-get-more-electrical-jobs-canada": `
+<p>Electrical work has strong demand: panel upgrades, EV charger installs, renovations, and service calls. The electricians who grow fastest are rarely the cheapest. They are the ones who look reliable, respond quickly and explain the price clearly.</p>
+
+<h2>Start with the jobs customers are searching for</h2>
+<p>Right now, high-intent searches in Canada include panel upgrades, EV charger installation, knob-and-tube replacement, and pot light installs. Build a service page for each, with a typical price range, what is included, and how long it takes. Pages that answer the price question tend to earn the click.</p>
+
+<h2>Be visible in your service area</h2>
+<ul>
+  <li>Complete your Google Business Profile with accurate categories and your real service area. See our <a href="/blog/google-business-profile-guide-for-tradespeople/">guide for tradespeople</a>.</li>
+  <li>Post job photos (clean panels, tidy runs) monthly.</li>
+  <li>Keep your name, address and phone consistent everywhere you are listed.</li>
+</ul>
+
+<h2>Show your credentials</h2>
+<p>Licence, insurance and WSIB or provincial coverage are real decision factors for electrical work. Mention them on your site and on every quote. Homeowners fear unlicensed work, so being clearly licensed is a selling point.</p>
+
+<h2>Quote like a professional</h2>
+<p>A vague "$3,500 panel upgrade" invites price comparison. A quote that lists panel size, breakers, permit and ESA or inspection fees, utility coordination and what happens to drywall patching communicates competence. For a deeper look at pricing a big job, read the <a href="/blog/cost-to-rewire-a-house-canada/">cost to rewire a house in Canada</a>. Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send this level of detail the same day.</p>
+
+<h2>Offer packages, not just hourly rates</h2>
+<p>Bundles such as "EV charger install, supplied and installed" or "Panel upgrade with permit" are simpler to buy, simpler to compare, and easier for you to price consistently.</p>
+
+<h2>Build referral partnerships</h2>
+<p>General contractors, HVAC companies, home inspectors and realtors regularly need an electrician they can trust. Be the one who shows up, communicates and finishes cleanly.</p>
+
+<h2>Follow up</h2>
+<p>If a quote has not been answered in three days, follow up. Many customers need a reminder, not a discount.</p>
+`,
+  "how-to-price-a-job-labour-materials-markup-canada-guide": `
+<p>One of the most common reasons good contractors stay barely profitable is simple arithmetic: they add a "20% markup" and believe they earn a 20% margin. They do not. Here is the difference, and how to use it.</p>
+
+<h2>The definitions</h2>
+<ul>
+  <li><strong>Markup</strong> is the percentage you add to your cost. Selling price = cost × (1 + markup).</li>
+  <li><strong>Margin</strong> is the percentage of the selling price that is profit. Margin = (price − cost) ÷ price.</li>
+</ul>
+
+<h2>A worked example</h2>
+<p>Your cost on a job is $10,000. You apply a 25% markup, so you charge $12,500. Your profit is $2,500, but that is only 20% of $12,500. So a 25% markup is a 20% margin.</p>
+
+<h2>Conversion table</h2>
+<ul>
+  <li>10% markup → 9.1% margin</li>
+  <li>20% markup → 16.7% margin</li>
+  <li>25% markup → 20% margin</li>
+  <li>33% markup → 25% margin</li>
+  <li>50% markup → 33% margin</li>
+  <li>100% markup → 50% margin</li>
+</ul>
+
+<h2>Which should you use?</h2>
+<p>Use <strong>margin</strong> to decide what you need: your overhead (truck, insurance, tools, admin, software, your own unpaid hours) is a percentage of revenue, so your target should be a margin. Use <strong>markup</strong> as the quick tool to apply on each line, once you know which margin you need.</p>
+<p>Example: if overhead plus desired profit adds up to 30% of revenue, you need a 30% margin, which means a markup of 43% on cost (0.30 ÷ 0.70).</p>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li><strong>Forgetting overhead</strong>: markup is not profit. It must also pay for everything that is not on the job.</li>
+  <li><strong>Not marking up materials</strong>: you handle ordering, delivery, returns, storage and the risk of price changes.</li>
+  <li><strong>Charging the same markup on every job</strong>: risky or small jobs deserve more.</li>
+  <li><strong>Ignoring change orders</strong>: extras should carry the same margin as the original job.</li>
+</ul>
+
+<h2>Putting it into your quotes</h2>
+<p>Decide your target margin once, set your markup from it, and apply it consistently, not by gut feel job to job. For the full method of building a price from labour and materials, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>, and see how <a href="/quotes/general-contractor/">quoting software for general contractors</a> applies markup automatically to every line.</p>
+`,
+  "how-to-collect-payment-from-clients-contractor-canada": `
+<p>Doing the work is only half the job. Waiting 45 days for the last 30% of a project drains cash and wastes your evenings. Most late payment is preventable with better terms set before the job starts.</p>
+
+<h2>Set payment terms in the quote</h2>
+<p>Put the deposit, the schedule and the due date on the quote, so the client agrees to them when they accept. A line such as "20% deposit on acceptance, 40% at rough-in completion, 40% on completion; invoices due on receipt" removes ambiguity.</p>
+
+<h2>Always take a deposit</h2>
+<p>A deposit covers materials, books your crew and shows commitment. For small repairs it can be modest. For custom or special-order work it should cover the order. Check your province's rules on deposits for home renovation contracts.</p>
+
+<h2>Bill in stages on larger jobs</h2>
+<p>Progress billing ties payments to visible milestones (demolition done, rough-in inspected, drywall complete). It keeps your cash flow healthy and gives the client a clear sense of progress.</p>
+
+<h2>Send the invoice the same day</h2>
+<p>Invoices sent late get paid late. Send the invoice at the moment the work is accepted, with the amount, taxes, due date and ways to pay. Make paying easy: e-transfer, card or bank payment with a link they can tap.</p>
+
+<h2>Follow up politely and on schedule</h2>
+<ul>
+  <li><strong>Day before due</strong>: a friendly reminder.</li>
+  <li><strong>Day after due</strong>: a short text or email with the invoice attached.</li>
+  <li><strong>Seven days late</strong>: a call.</li>
+  <li><strong>Beyond that</strong>: a written notice, then your formal options.</li>
+</ul>
+
+<h2>Know your lien rights</h2>
+<p>Construction lien rules differ by province, with strict deadlines that vary (for example Ontario's Construction Act and Quebec's legal hypothec regime). If a client stops paying, check your province's deadlines quickly and consider legal advice, because missing the window can cost you the right.</p>
+
+<h2>Make it routine</h2>
+<p>Contractors who get paid on time do the same steps every time. Tools such as <a href="/quotes/general-contractor/">quoting and invoicing software built for contractors</a> keep the quote, the invoice and the follow-up in one place, so nothing relies on memory. If you are starting from scratch, see <a href="/quotes/how-to-quote/">how to write a professional quote</a> with payment terms included.</p>
+`,
+  "contractor-insurance-canada-what-you-need": `
+<p>This is general information, not insurance or legal advice. Requirements differ by province, trade and client, so confirm details with a licensed broker. But every Canadian contractor should understand the main types of coverage, because clients, general contractors and property managers increasingly ask for proof of insurance before you start.</p>
+
+<h2>Commercial general liability (CGL)</h2>
+<p>CGL covers third-party injury and property damage caused by your work, such as a water leak damaging a client's floor. Many clients and general contractors require limits of $2 million, and commonly ask to be named as an additional insured. It is the baseline policy for most trades.</p>
+
+<h2>Tools and equipment coverage</h2>
+<p>Tools are expensive and are a frequent theft target. Standard CGL does not cover them. Tools and equipment coverage handles theft, damage and loss, including from vehicles and job sites.</p>
+
+<h2>Commercial vehicle insurance</h2>
+<p>Using a personal auto policy for business driving can create a denied claim. If you drive to job sites with tools and materials, ask your broker whether you need commercial coverage.</p>
+
+<h2>Workers' compensation (WSIB, WorkSafeBC, CNESST and others)</h2>
+<p>Provincial workers' compensation boards cover workplace injuries, and in many provinces it is mandatory for construction firms with employees, and sometimes for subcontractors. Penalties and unexpected assessments for being unregistered can be steep. Check your provincial board.</p>
+
+<h2>Professional liability / errors and omissions</h2>
+<p>If you design, inspect or advise, such as building consultants and some renovation firms, professional liability covers claims that your advice or design caused a loss.</p>
+
+<h2>Builder's risk, surety bonds and others</h2>
+<p>Larger projects may require builder's risk, performance bonds or bid bonds. Ask early when bidding on commercial or public work.</p>
+
+<h2>Show proof on your quotes</h2>
+<p>Including "Fully insured and licensed" along with your licence number and insurer on a quote reassures homeowners and speeds up approval on commercial jobs. It also helps justify a price above the cheapest bid. See <a href="/quotes/how-to-quote/">how to write a professional quote</a> for where credentials fit.</p>
+
+<h2>Budget it as overhead</h2>
+<p>Insurance, vehicle costs and tools are part of your overhead and must be recovered in your pricing. If you are unsure how, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
+`,
+  "cost-to-install-windows-and-doors-canada": `
+<p>Windows and doors are a major energy and comfort upgrade in Canadian homes, and a major cost. Prices vary widely with frame material, glass package and installation conditions. These are typical 2026 ranges. Always get on-site measurements before finalizing a price.</p>
+
+<h2>Typical installed price ranges</h2>
+<ul>
+  <li><strong>Standard vinyl window</strong>: about $600–$1,400 installed each</li>
+  <li><strong>Fibreglass or wood-clad window</strong>: about $1,000–$2,500 installed each</li>
+  <li><strong>Large picture or bay window</strong>: about $1,800–$5,000+</li>
+  <li><strong>Sliding patio door</strong>: about $1,800–$4,500</li>
+  <li><strong>Steel or fibreglass entry door</strong>: about $1,500–$4,000, higher with sidelights and custom glass</li>
+  <li><strong>Garage door</strong>: about $1,200–$3,500 depending on insulation and opener</li>
+</ul>
+<p>A whole-house window replacement for a typical home with 10–15 windows commonly lands between $8,000 and $25,000, depending on the choices above.</p>
+
+<h2>What drives the price</h2>
+<h3>Frame material and glass package</h3>
+<p>Vinyl is the budget choice, fibreglass and wood cost more. Triple glazing and low-E coatings improve performance in Canadian winters and add to the cost. Look for ENERGY STAR ratings suitable to your climate zone.</p>
+<h3>Installation type</h3>
+<p>An insert replacement inside the existing frame costs less than a full-frame replacement, which involves exterior trim, siding or brick-mould repair and often reveals rot behind the frame.</p>
+<h3>Access and height</h3>
+<p>Second and third storey windows may need scaffolding or lifts, and heritage or masonry buildings take longer.</p>
+<h3>Lead time</h3>
+<p>Custom windows can take weeks to arrive. A quote should state expected delivery, which matters when prices shift.</p>
+
+<h2>Rebates</h2>
+<p>Programs for energy-efficient windows and doors come and go. Check current eligibility before mentioning them, and see our <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">contractor's guide to rebates</a>.</p>
+
+<h2>How to quote it</h2>
+<p>List each opening with size, type, glass package and price, then removal and disposal, interior and exterior finishing, and warranty. Separate the cost of unexpected repairs (rot, damaged framing) as an allowance or a change-order clause. Installers using <a href="/quotes/window-door-installer/">quoting software for window and door installers</a> can build this opening-by-opening list on site and send it the same day.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

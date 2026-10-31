@@ -29,7 +29,7 @@ const _PUBLIC_ROUTES = [
   { name: "PRICING",    path: "/pricing",    priority: "0.9", changefreq: "monthly", lastmod: "2026-09-22" },
   { name: "PILOT",      path: "/pilot",      priority: "0.8", changefreq: "monthly", lastmod: "2026-09-22" },
   { name: "WHATSAPP",   path: "/whatsapp",   priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
-  { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly",  lastmod: "2026-09-20" },
+  { name: "BLOG",       path: "/blog",       priority: "0.8", changefreq: "weekly",  lastmod: "2026-10-31" },
   { name: "HELP",       path: "/help",       priority: "0.8", changefreq: "monthly", lastmod: "2026-09-21" },
   { name: "CHI_SIAMO",  path: "/about",  priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },
   { name: "CONTATTI",   path: "/contact",   priority: "0.7", changefreq: "yearly",  lastmod: "2026-09-20" },

@@ -721,6 +721,218 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>How to quote it</h2>
 <p>List each opening with size, type, glass package and price, then removal and disposal, interior and exterior finishing, and warranty. Separate the cost of unexpected repairs (rot, damaged framing) as an allowance or a change-order clause. Installers using <a href="/quotes/window-door-installer/">quoting software for window and door installers</a> can build this opening-by-opening list on site and send it the same day.</p>
 `,
+  "kitchen-renovation-cost-canada-2026": `
+<p>The kitchen is the most requested and most misquoted renovation in Canada. Homeowners often set a budget from a TV show, then meet reality at the first quote. These are typical 2026 ranges. Your market, the size of the room and the finishes will move them.</p>
+
+<h2>Typical total cost by level</h2>
+<ul>
+  <li><strong>Refresh</strong> (paint, new hardware, backsplash, faucet, some appliances): about $5,000–$15,000</li>
+  <li><strong>Mid-range remodel</strong> (new cabinets and counters, same layout): about $25,000–$60,000</li>
+  <li><strong>High-end or layout change</strong> (custom cabinets, stone counters, moved plumbing and gas): about $60,000–$120,000+</li>
+</ul>
+
+<h2>Where the money goes</h2>
+<ul>
+  <li><strong>Cabinets</strong>: 25–35% of the total. Stock, semi-custom and custom prices differ by several times.</li>
+  <li><strong>Labour and installation</strong>: 20–35%</li>
+  <li><strong>Countertops</strong>: laminate is cheapest, quartz and granite sit mid to high, and natural stone costs most. Installed prices of roughly $50–$200+ per square foot are common.</li>
+  <li><strong>Appliances</strong>: from a few thousand to well over $15,000 for a premium package</li>
+  <li><strong>Flooring, lighting and backsplash</strong>: often forgotten at the first budget</li>
+  <li><strong>Plumbing and electrical</strong>: code updates, new circuits and venting add up, especially in older homes</li>
+</ul>
+
+<h2>What makes a kitchen budget blow up</h2>
+<h3>Moving things</h3>
+<p>Keeping the sink, stove and fridge in place saves a lot. Relocating plumbing, gas lines or ductwork adds labour, permits and drywall and floor repairs.</p>
+<h3>Surprises behind the walls</h3>
+<p>Old wiring, asbestos-containing materials in older homes, out-of-level floors and hidden water damage are common. A contingency of 10–15% is realistic.</p>
+<h3>Lead times</h3>
+<p>Custom cabinets and special-order appliances can take many weeks. Delays mean extended time without a kitchen, a cost clients rarely plan for.</p>
+
+<h2>How contractors should quote a kitchen</h2>
+<p>Split the quote into demolition, structural, plumbing, electrical, cabinets supply and install, counters, backsplash, flooring, painting, permits and disposal. State what the client supplies, which allowances apply to finishes they have not yet chosen, and how change orders work. Renovators using <a href="/quotes/renovation-contractor/">quoting software for renovation contractors</a> can assemble this list from a site visit in minutes, and cabinetmakers can do the same with <a href="/quotes/carpenter-cabinetmaker/">tools built for carpentry</a>. For other big-ticket jobs, see the <a href="/blog/basement-finishing-cost-canada/">cost to finish a basement</a>.</p>
+`,
+  "fence-installation-cost-canada-2026": `
+<p>Fences look simple, but the quote depends on material, length, terrain and our climate. Frost heave is the main reason a cheap install fails in Canada. Here are typical 2026 installed ranges.</p>
+
+<h2>Cost per linear foot, installed</h2>
+<ul>
+  <li><strong>Chain link</strong>: about $20–$45</li>
+  <li><strong>Pressure-treated wood</strong> (privacy, 6 ft): about $35–$70</li>
+  <li><strong>Cedar</strong>: about $50–$100</li>
+  <li><strong>Vinyl</strong>: about $45–$90</li>
+  <li><strong>Aluminum or wrought-iron style</strong>: about $50–$120</li>
+</ul>
+<p>A typical 150 linear foot backyard in pressure-treated wood often lands between $5,000 and $10,000 including a gate.</p>
+
+<h2>Gates</h2>
+<p>A walk gate usually adds $300–$900 depending on material and hardware. Wide drive gates and automated gates cost significantly more.</p>
+
+<h2>What changes the price</h2>
+<ul>
+  <li><strong>Frost depth</strong>: posts must go below the frost line in most of Canada, often 4 feet or more, which means deeper holes and more concrete.</li>
+  <li><strong>Terrain and soil</strong>: slopes, rock and roots slow down digging.</li>
+  <li><strong>Removal of an old fence</strong>: often $5–$15 per linear foot extra.</li>
+  <li><strong>Access</strong>: tight backyards without equipment access mean hand work.</li>
+  <li><strong>Permits and property lines</strong>: many municipalities set maximum heights and require permits or a survey. Confirm before quoting.</li>
+</ul>
+
+<h2>Quoting a fence job</h2>
+<p>State total footage, height, material and grade, post size and depth, number and type of gates, removal, and a warranty. Note the client is responsible for confirming property lines and locating utilities (call before you dig). Landscapers using <a href="/quotes/landscaper/">quoting software for landscapers</a> can measure on site and send the quote within the hour. For help with price structure, see <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
+`,
+  "furnace-replacement-cost-canada-2026": `
+<p>When a furnace dies in January, a homeowner needs a price fast. Installers who respond with a clear, itemized quote the same day win these jobs. Here are typical 2026 ranges for homeowners and the quote structure for contractors.</p>
+
+<h2>Typical installed cost</h2>
+<ul>
+  <li><strong>Mid-efficiency gas furnace</strong>: about $3,500–$5,500</li>
+  <li><strong>High-efficiency gas furnace</strong> (condensing, 95%+ AFUE): about $4,500–$8,000</li>
+  <li><strong>Electric furnace</strong>: about $3,000–$6,000</li>
+  <li><strong>Dual-fuel (heat pump plus gas furnace)</strong>: about $10,000–$20,000</li>
+</ul>
+
+<h2>What affects the price</h2>
+<h3>Efficiency and staging</h3>
+<p>Two-stage and variable-speed models cost more but run quieter and use less energy. Modern condensing furnaces also need PVC venting and a condensate drain, which adds labour when converting from an old chimney vent.</p>
+<h3>Size</h3>
+<p>Correct sizing needs a proper heat-loss calculation, not simply matching the old unit. Oversized furnaces cycle often and wear out.</p>
+<h3>Chimney and venting</h3>
+<p>Switching to a high-efficiency unit often means lining or capping an unused chimney, which can add several hundred dollars or more.</p>
+<h3>Ductwork and accessories</h3>
+<p>Thermostats, humidifiers, air cleaners and duct repairs are common add-ons that should be separate lines.</p>
+
+<h2>Rental vs buying</h2>
+<p>In some markets homeowners rent equipment. Rentals have low upfront cost but can cost far more over time. Show the comparison clearly when quoting.</p>
+
+<h2>How to quote</h2>
+<p>Offer a good-better-best option set, each with brand, model, efficiency rating, installation details, permit, disposal and warranty. Giving three options increases the average sale and lowers price shopping. HVAC contractors can build these options quickly with <a href="/quotes/hvac-technician/">quoting software for HVAC</a>. If the home is also a candidate for a heat pump, point to our <a href="/blog/cost-to-install-a-heat-pump-canada/">heat pump cost guide</a>.</p>
+`,
+  "flooring-installation-cost-canada-2026": `
+<p>Flooring prices vary widely because the material and the prep are separate costs. Here are typical 2026 installed ranges, then the extras that move a quote.</p>
+
+<h2>Installed cost per square foot</h2>
+<ul>
+  <li><strong>Laminate</strong>: about $3–$8</li>
+  <li><strong>Vinyl plank (luxury vinyl)</strong>: about $4–$10</li>
+  <li><strong>Engineered hardwood</strong>: about $8–$18</li>
+  <li><strong>Solid hardwood</strong>: about $10–$25</li>
+  <li><strong>Porcelain or ceramic tile</strong>: about $10–$25, more for large formats or patterns</li>
+  <li><strong>Carpet</strong>: about $3–$8</li>
+</ul>
+<p>A 1,000 square foot main floor with mid-range engineered hardwood often lands around $10,000–$18,000 once removal, underlay and trim are included.</p>
+
+<h2>Extras that change the total</h2>
+<ul>
+  <li><strong>Old flooring removal and disposal</strong>: about $1–$3 per square foot</li>
+  <li><strong>Subfloor repair and levelling</strong>: can be minor, or several thousand dollars on uneven floors</li>
+  <li><strong>Baseboards and transitions</strong>: often forgotten</li>
+  <li><strong>Stairs</strong>: priced per step, usually far higher than flat floor</li>
+  <li><strong>Furniture moving</strong>: sometimes included, sometimes extra</li>
+</ul>
+
+<h2>Moisture and basements</h2>
+<p>Below-grade floors need moisture-aware choices (vinyl plank or engineered products rated for it, with a proper vapour barrier). Tell clients when a moisture issue should be solved first. See <a href="/blog/basement-waterproofing-guide-canadian-homes/">our basement waterproofing guide</a>.</p>
+
+<h2>Acclimation and timing</h2>
+<p>Hardwood needs time to acclimate to the home's humidity, especially in our dry winters. Build that into the schedule you quote.</p>
+
+<h2>Quoting flooring jobs</h2>
+<p>Measure each room, add a waste factor (usually 5–10%, more for diagonal or patterned layouts), and list material, labour, underlay, removal, trim and levelling as separate lines. Installers using <a href="/quotes/flooring-installer/">quoting software for flooring installers</a> can do the square-footage maths and taxes automatically.</p>
+`,
+  "how-to-write-a-contractor-contract-canada": `
+<p>This is general information, not legal advice. Contract rules differ by province, and home renovation contracts are regulated in some provinces, so ask a lawyer to review your template. Still, most disputes come from the same handful of missing clauses.</p>
+
+<h2>Quote or contract?</h2>
+<p>A quote is a price offer. Once accepted it can function as a contract, but a written contract adds the detail that protects both sides. Small jobs may only need a clear, signed quote; larger renovation jobs deserve a full contract.</p>
+
+<h2>Clauses to include</h2>
+<ul>
+  <li><strong>Parties and site</strong>: legal names, addresses, the property.</li>
+  <li><strong>Scope of work</strong>: detailed, with exclusions.</li>
+  <li><strong>Price and taxes</strong>: total, GST/HST/QST, and what is fixed vs allowance.</li>
+  <li><strong>Payment schedule</strong>: deposit, milestones, due dates and late-payment interest. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</li>
+  <li><strong>Start and completion dates</strong>: with allowance for weather and material delays.</li>
+  <li><strong>Change orders</strong>: no extra work without written approval and price.</li>
+  <li><strong>Permits and inspections</strong>: who obtains and pays.</li>
+  <li><strong>Insurance and licensing</strong>: see our <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</li>
+  <li><strong>Warranty</strong>: duration and what is not covered.</li>
+  <li><strong>Cancellation</strong>: some provinces give consumers cooling-off rights for home contracts, so check yours.</li>
+  <li><strong>Dispute resolution</strong>: a process before court, such as mediation.</li>
+  <li><strong>Site access, cleanup, and hidden conditions</strong>: who is responsible for what.</li>
+</ul>
+
+<h2>Common mistakes</h2>
+<ul>
+  <li>Verbal agreements on extras</li>
+  <li>Fixed price with no clause for hidden conditions</li>
+  <li>No end date or no consequences for delays</li>
+  <li>No signature, or a signature from only one spouse or owner</li>
+</ul>
+
+<h2>Make it part of your process</h2>
+<p>A quote that includes terms and an electronic acceptance, produced with <a href="/quotes/general-contractor/">quoting software for general contractors</a>, gives you a consistent, signed record every time. For the quote itself, read <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+`,
+  "how-to-handle-change-orders-contractors": `
+<p>Scope creep is one of the biggest quiet profit killers in contracting. "Can you just also..." turns into two days of unpaid work. A change order process fixes it without making you sound difficult.</p>
+
+<h2>What is a change order?</h2>
+<p>A change order is a short written agreement that changes the scope, price or schedule of an accepted job. It records what changed, what it costs and how it affects the end date.</p>
+
+<h2>Why extras go unpaid</h2>
+<ul>
+  <li>The request was verbal and memories differ later.</li>
+  <li>You did not want to bring up money in the moment.</li>
+  <li>The original scope was vague, so nobody agrees what counts as extra.</li>
+  <li>The price was only calculated at the end.</li>
+</ul>
+
+<h2>A simple process</h2>
+<ol>
+  <li><strong>Pause</strong>: "Happy to do that, let me send you a quick price."</li>
+  <li><strong>Price it</strong>: labour, materials, markup and any schedule impact.</li>
+  <li><strong>Send it in writing</strong>: text, email or PDF with a clear description and total including tax.</li>
+  <li><strong>Get approval</strong>: a reply, signature or electronic acceptance.</li>
+  <li><strong>Do the work, then invoice it</strong>: as its own line or on the next progress invoice.</li>
+</ol>
+
+<h2>Sample wording</h2>
+<p><em>"Change order #2: Add two pot lights in the hallway, including drywall patching and paint touch-up. Additional cost: $640 plus tax. Adds one day to the schedule. Approved by: ______ Date: ______"</em></p>
+
+<h2>Price extras properly</h2>
+<p>Extras are often interrupted work with setup time, so apply at least the same markup as the original job, and often more. For the arithmetic, see <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a> and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
+
+<h2>Put the rule in your contract and quote</h2>
+<p>One sentence handles most arguments: "Work outside the scope described will be quoted separately and approved in writing before it begins." Painters, renovators and electricians can generate change quotes in seconds using <a href="/quotes/painter/">quoting software for painters</a> and similar tools, then keep everything in one history. See also <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a>.</p>
+`,
+  "how-to-hire-and-pay-subcontractors-canada": `
+<p>This is general information, not legal or tax advice. Rules on employment status, workers' compensation and holdbacks vary by province, so confirm with your accountant and your provincial board. Here are the practical basics for contractors who bring in other trades.</p>
+
+<h2>Subcontractor or employee?</h2>
+<p>The Canada Revenue Agency looks at the real working relationship: who controls how and when the work is done, who supplies tools, whether the person can hire helpers, and whether they take financial risk. Calling someone a subcontractor does not make them one. Misclassification can lead to back payroll deductions, EI and CPP assessments and penalties.</p>
+
+<h2>Before you hire</h2>
+<ul>
+  <li><strong>Proof of liability insurance</strong>: ask for a certificate and be named as additional insured where possible.</li>
+  <li><strong>Workers' compensation clearance</strong>: in many provinces you can be liable if a sub is not registered. Ask for a clearance certificate.</li>
+  <li><strong>Licences and certifications</strong>: especially for electrical, gas and plumbing work.</li>
+  <li><strong>GST/HST registration</strong>: so you can claim input tax credits where eligible.</li>
+  <li><strong>References and past work</strong>: call two previous customers.</li>
+</ul>
+
+<h2>Put it in writing</h2>
+<p>A subcontract should cover scope, price, schedule, payment terms, change orders, insurance, warranty on their work and how defects are fixed. It does not need to be long, but it must exist. Use the same change-order discipline you use with clients: <a href="/blog/how-to-handle-change-orders-contractors/">our change order guide</a> explains how.</p>
+
+<h2>Paying subs</h2>
+<ul>
+  <li>Pay on the agreed schedule. Reliable payment is how you keep good subs.</li>
+  <li>Check holdback rules in your province, since some require withholding a percentage until completion.</li>
+  <li>Track payments by job so you know your true margin.</li>
+  <li>Issue year-end slips where required, such as T5018 for construction subcontractor payments in many cases.</li>
+</ul>
+
+<h2>Price subs into your quote</h2>
+<p>Sub costs should carry markup for coordination, risk and your warranty on the whole job. Include them as clear line items in the quote, which quoting software for <a href="/quotes/general-contractor/">general contractors</a> handles together with materials and labour. See also <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

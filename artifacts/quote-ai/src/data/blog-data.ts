@@ -1174,6 +1174,242 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Try it on a real job</h2>
 <p>Whichever tool you consider, test it on a real quote, not a demo. quoteai is built for Canadian trades: see <a href="/quotes/free-quote/">free quoting</a>, or compare with the <a href="/quotes/excel-template/">Excel template</a> and <a href="/quotes/word-template/">Word template</a> approach.</p>
 `,
+  "contractor-cash-flow-management-canada": `
+<p>A job can be profitable on paper and still leave you short on payday. Contractors pay for materials and crews up front and get paid later. That gap is cash flow, and it is the most common reason otherwise good trade businesses fail.</p>
+
+<h2>Why cash runs short</h2>
+<ul>
+  <li>Materials and payroll go out before the client pays</li>
+  <li>Final payments and holdbacks are delayed</li>
+  <li>Taxes (GST/HST/QST remittances, payroll deductions) arrive in lumps</li>
+  <li>Seasonal slowdowns reduce income while fixed costs continue</li>
+</ul>
+
+<h2>1. Forecast 13 weeks ahead</h2>
+<p>A simple spreadsheet is enough: expected payments in, known bills out, week by week. It shows a shortfall weeks before it hurts.</p>
+
+<h2>2. Get paid sooner</h2>
+<p>Take deposits, bill in stages and invoice the same day. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to get paid on time</a>.</p>
+
+<h2>3. Set tax money aside</h2>
+<p>GST/HST and QST collected is not your money. Move it to a separate account when each payment arrives, along with an estimate for income tax and payroll remittances. Confirm filing frequency and deadlines with your accountant and the CRA or Revenu Québec.</p>
+
+<h2>4. Understand holdbacks</h2>
+<p>On many construction contracts a percentage is held back until a statutory period passes. Plan for that money to arrive late and check your province's rules.</p>
+
+<h2>5. Negotiate supplier terms</h2>
+<p>Net-30 terms on contractor accounts let you buy materials and get paid before the bill is due. Pay on time to keep the privilege.</p>
+
+<h2>6. Watch your quote validity and pricing</h2>
+<p>Underpriced jobs drain cash faster than anything else. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+
+<h2>7. Build a buffer</h2>
+<p>Aim for one to three months of fixed costs in reserve, built gradually from a small percentage of every invoice.</p>
+
+<h2>8. Track jobs, not just the bank balance</h2>
+<p>Knowing which jobs are tying up cash helps you chase the right invoices: <a href="/blog/how-to-track-job-costs-contractors/">job cost tracking</a>.</p>
+
+<h2>Keep invoicing automatic</h2>
+<p>Software that turns an accepted quote into a deposit request and invoice removes delays. See quoteai for <a href="/quotes/general-contractor/">general contractors</a>.</p>
+`,
+  "how-to-survive-slow-season-contractors-canada": `
+<p>Landscapers, roofers, painters and exterior trades feel winter hard; interior and HVAC trades may see summer dips. The contractors who stay steady plan the slow months long before they arrive.</p>
+
+<h2>1. Sell off-season work in the busy season</h2>
+<p>Offer a discount or priority slot for jobs booked for the slow period. Interior painting, bathroom renovations and basement finishing all suit winter. See the <a href="/blog/basement-finishing-cost-canada/">basement finishing cost guide</a>.</p>
+
+<h2>2. Launch maintenance or service plans</h2>
+<p>Annual inspections, tune-ups, gutter cleaning and snow-related services create recurring income. Homeowners like predictable service, and you like predictable revenue.</p>
+
+<h2>3. Add a complementary service</h2>
+<p>Landscapers add snow removal; roofers add eavestrough and winterization; painters add drywall repair. See <a href="/blog/winterizing-your-home-contractor-checklist/">winterizing checklist</a> and <a href="/blog/snow-load-roofing-eavestrough-considerations-canada/">snow load and eavestroughs</a>.</p>
+
+<h2>4. Market ahead of the season</h2>
+<p>Search demand rises weeks before people book. Update your Google profile and photos, ask recent clients for reviews and post seasonal offers: <a href="/blog/google-business-profile-guide-for-tradespeople/">Google profile guide</a>.</p>
+
+<h2>5. Follow up old quotes</h2>
+<p>A quote sent in spring that was never accepted may still be a lead. A short, friendly message can restart the conversation.</p>
+
+<h2>6. Use slow time on the business</h2>
+<p>Update your price list, review job costs, fix your quoting process, service equipment and train your crew.</p>
+
+<h2>7. Plan cash for it</h2>
+<p>Save during busy months so slow months do not become emergencies: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</p>
+
+<h2>Quote the off-season quickly</h2>
+<p>When demand is low, speed matters even more. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending a quote in 5 minutes</a>.</p>
+`,
+  "how-to-quote-a-painting-job": `
+<p>Underpriced painting jobs usually fail for one reason: prep takes longer than expected. Here is a repeatable way to quote painting work so you earn what the job is worth.</p>
+
+<h2>Step 1: Measure</h2>
+<p>Measure wall area, ceiling area, trim length and the number of doors and windows. Rule of thumb: floor area times about 3 gives approximate wall area for a typical room, but measuring is better.</p>
+
+<h2>Step 2: Assess prep</h2>
+<p>Note holes, cracks, water stains, wallpaper, glossy surfaces, mould, lead paint risk in older homes and furniture to move. Prep is often 30–50% of the time.</p>
+
+<h2>Step 3: Decide coats and products</h2>
+<p>Primer if colour changes are drastic or surfaces are bare; two finish coats on most walls. Choose paint tier and note it on the quote.</p>
+
+<h2>Step 4: Estimate labour</h2>
+<p>Use your own production rates, such as square feet per hour for cutting in, rolling and trim, and adjust for ceiling height and access. Multiply by your hourly rate including overhead.</p>
+
+<h2>Step 5: Add materials</h2>
+<p>Paint (coverage divided into total coats), primer, tape, drop sheets, filler, sundries. Mark up materials.</p>
+
+<h2>Worked example</h2>
+<ul>
+  <li>Labour: 28 hours at $65 = $1,820</li>
+  <li>Paint and primer: $310</li>
+  <li>Supplies: $90</li>
+  <li>Materials markup 15%: about $60</li>
+  <li>Subtotal: about $2,280</li>
+  <li>Tax at 13% (Ontario example): about $296</li>
+  <li><strong>Total: about $2,576</strong></li>
+</ul>
+<p>Your rates will differ. The structure is the point.</p>
+
+<h2>Step 6: Write the scope</h2>
+<p>List rooms, surfaces, coats, products, colours, exclusions and the payment terms. For market prices, see <a href="/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026/">how much it costs to paint an apartment in Canada</a>.</p>
+
+<h2>Speed it up</h2>
+<p>Painters using <a href="/quotes/painter/">quoting software for painters</a> can reuse rates, apply taxes and send a PDF on site. See also <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a> for extra requests mid-job.</p>
+`,
+  "how-to-quote-a-roofing-job": `
+<p>Roofing is priced by the "square" (100 square feet), but a good quote accounts for far more than shingles. Here is a way to build one that protects your margin.</p>
+
+<h2>Measure the roof</h2>
+<p>Calculate area for each plane, multiply by the pitch factor, and add waste (commonly 10–15%, more for complex roofs). Count hips, valleys, skylights, chimneys and vents. Aerial measurement reports or drone photos save time and ladder risk.</p>
+
+<h2>Line items to include</h2>
+<ul>
+  <li>Tear-off and disposal (number of layers matters)</li>
+  <li>Deck inspection and allowance for plywood replacement</li>
+  <li>Ice and water shield at eaves and valleys, important in Canadian winters</li>
+  <li>Underlayment</li>
+  <li>Shingles or metal panels, starter and ridge cap</li>
+  <li>Flashing, vents, pipe boots</li>
+  <li>Eavestroughs, fascia and soffit if included</li>
+  <li>Permit where required</li>
+</ul>
+
+<h2>Safety and access costs</h2>
+<p>Steep pitches, tall buildings, fall-arrest equipment, scaffolding and dumpsters all cost money. Price them. Also check provincial fall protection rules.</p>
+
+<h2>Allowances for the unknown</h2>
+<p>Rotten decking is only visible once shingles come off. Quote a per-sheet price for replacement so the client approves it before work. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+
+<h2>Weather</h2>
+<p>State how weather delays are handled and what temperature limits apply to shingle installation.</p>
+
+<h2>Compare against market prices</h2>
+<p>Clients will compare your number to typical ranges. See <a href="/blog/cost-to-reroof-a-home-canada/">cost to re-roof a home in Canada</a> and <a href="/blog/snow-load-roofing-eavestrough-considerations-canada/">snow load considerations</a>.</p>
+
+<h2>Send it fast</h2>
+<p>Roofing leads often call several companies at once. <a href="/quotes/roofer/">Quoting software for roofers</a> lets you measure, price and send a detailed PDF the same day.</p>
+`,
+  "how-to-quote-an-electrical-job": `
+<p>Electrical quotes mix fixed-price packages and time-and-material work. Getting the mix right protects you from open-ended jobs while keeping your price competitive.</p>
+
+<h2>Know your job types</h2>
+<ul>
+  <li><strong>Service calls</strong>: diagnostic fee plus hourly rate, or flat-rate for common repairs.</li>
+  <li><strong>Standard installs</strong>: pot lights, receptacles, EV chargers, ceiling fans, usually priced per unit.</li>
+  <li><strong>Renovation wiring</strong>: price by circuit or by area.</li>
+  <li><strong>Large projects</strong>: panel upgrades and rewires, quoted after a site visit. See <a href="/blog/cost-to-rewire-a-house-canada/">cost to rewire a house</a>.</li>
+</ul>
+
+<h2>Build the price</h2>
+<ol>
+  <li>Count devices and circuits, and measure cable runs.</li>
+  <li>Estimate labour hours, adding time for fishing wire in finished walls.</li>
+  <li>Add materials: cable, boxes, breakers, devices, fittings, panels.</li>
+  <li>Add permit, inspection and utility coordination fees.</li>
+  <li>Apply overhead and margin: see <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</li>
+</ol>
+
+<h2>Common exclusions to write down</h2>
+<ul>
+  <li>Drywall patching and painting</li>
+  <li>Asbestos or knob-and-tube surprises</li>
+  <li>Upgrades required by the inspector beyond scope</li>
+  <li>Client-supplied fixtures not warrantied</li>
+</ul>
+
+<h2>Show your credentials</h2>
+<p>Licence number, insurance and warranty on every quote: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
+
+<h2>Upsell without pressure</h2>
+<p>Offer options such as surge protection, EV-ready conduit or a larger panel. Clients appreciate choices and your ticket rises.</p>
+
+<h2>Be fast</h2>
+<p>Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send itemized quotes after the visit. For lead generation, read <a href="/blog/how-to-get-more-electrical-jobs-canada/">how electricians get more jobs</a>.</p>
+`,
+  "how-to-quote-a-plumbing-job": `
+<p>Plumbing customers want certainty, and plumbers want to be paid for hidden problems. Choosing the right pricing model for each type of job solves both.</p>
+
+<h2>Flat-rate vs hourly</h2>
+<ul>
+  <li><strong>Flat-rate</strong>: one price for a defined task (toilet install, faucet replacement, water heater swap). Customers like it, efficient plumbers profit from it.</li>
+  <li><strong>Hourly (time and materials)</strong>: suits diagnostics, emergencies and unknown conditions. Needs a clear hourly rate, minimum call-out and materials markup.</li>
+  <li><strong>Hybrid</strong>: flat diagnostic fee, then a fixed quote for the repair.</li>
+</ul>
+
+<h2>Build a flat-rate price book</h2>
+<p>For each common job, record average time, parts, travel and disposal, then add overhead and margin. Review prices every few months as costs move: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+
+<h2>Quoting renovation plumbing</h2>
+<p>Separate rough-in, fixtures, finish plumbing, permits, drywall access and disposal. See <a href="/blog/bathroom-renovation-cost-toronto-2026/">bathroom renovation costs</a> for market context.</p>
+
+<h2>Emergency work</h2>
+<p>State after-hours rates upfront and get approval before starting. Document what you found with photos.</p>
+
+<h2>Exclusions and unknowns</h2>
+<ul>
+  <li>Hidden pipe condition (galvanized, polybutylene, lead service lines)</li>
+  <li>Access repair of walls and ceilings</li>
+  <li>Code upgrades required when opening walls</li>
+</ul>
+<p>Add a clause for discovered conditions and handle extras through <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+
+<h2>Present options</h2>
+<p>For water heaters, give standard, high-efficiency and tankless options with clear differences in price and operating cost.</p>
+
+<h2>Speed and professionalism</h2>
+<p>Plumbers using <a href="/quotes/plumber/">quoting software for plumbers</a> can present itemized options on a tablet at the door and get acceptance on the spot. For more leads, see <a href="/blog/how-to-get-more-plumbing-jobs-canada/">how to get more plumbing jobs</a>.</p>
+`,
+  "quote-vs-estimate-vs-invoice-difference": `
+<p>Clients and contractors use these words loosely, and the confusion causes real disputes. Here is a plain guide.</p>
+
+<h2>Estimate</h2>
+<p>An approximate price based on available information. It may change, and it is usually not binding. Good for early conversations when the scope is unclear.</p>
+
+<h2>Quote</h2>
+<p>A fixed price for a defined scope, valid for a set period. Once accepted it is typically binding on both sides, which is why scope and exclusions must be exact.</p>
+
+<h2>Bid</h2>
+<p>A formal price offer submitted in competition, often for commercial or public projects, following the client's documents and deadlines.</p>
+
+<h2>Proposal</h2>
+<p>A fuller document combining price with a description of the approach, schedule, credentials and terms.</p>
+
+<h2>Invoice</h2>
+<p>A request for payment for work done or a deposit due. It shows amounts, taxes, due date and payment methods, and it is the document the CRA expects to see for GST/HST purposes.</p>
+
+<h2>Which should you send?</h2>
+<ul>
+  <li>Unknown conditions: <strong>estimate</strong> with a range and a note on what could change it</li>
+  <li>Defined work: <strong>quote</strong></li>
+  <li>Competitive or large project: <strong>bid or proposal</strong></li>
+  <li>When work is accepted or complete: <strong>invoice</strong></li>
+</ul>
+
+<h2>Protecting yourself</h2>
+<p>If you give an estimate, say it is an estimate. If you give a fixed quote, list exclusions and handle changes in writing: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Add terms from a <a href="/blog/how-to-write-a-contractor-contract-canada/">contract</a> when the job is big.</p>
+
+<h2>One flow, not four documents</h2>
+<p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/quotes/how-to-quote/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/quotes/free-quote/">free quoting</a>.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

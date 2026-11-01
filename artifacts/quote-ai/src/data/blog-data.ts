@@ -1410,6 +1410,237 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>One flow, not four documents</h2>
 <p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/quotes/how-to-quote/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/quotes/free-quote/">free quoting</a>.</p>
 `,
+  "concrete-driveway-cost-canada-2026": `
+<p>A driveway is one of the biggest exterior investments in a home, and Canadian winters punish bad installs. Prices below are typical 2026 installed ranges. Your region, access and base conditions will move them.</p>
+
+<h2>Installed cost per square foot</h2>
+<ul>
+  <li><strong>Gravel</strong>: about $2–$6</li>
+  <li><strong>Asphalt</strong>: about $4–$9</li>
+  <li><strong>Poured concrete</strong>: about $8–$18, more for stamped or coloured finishes</li>
+  <li><strong>Interlocking pavers</strong>: about $15–$35</li>
+</ul>
+<p>A two-car driveway of about 600 square feet therefore ranges from roughly $2,500 in asphalt to $9,000 or more in concrete and over $15,000 in interlock.</p>
+
+<h2>What drives the price</h2>
+<h3>Base preparation</h3>
+<p>A properly compacted granular base, sized for frost, is what keeps a driveway flat. Skipping it is the number one cause of cracking and heaving.</p>
+<h3>Excavation and removal</h3>
+<p>Tearing out and disposing of an old driveway commonly adds $1–$4 per square foot.</p>
+<h3>Drainage and slope</h3>
+<p>Water must flow away from the house. Regrading, culverts or drains add cost but prevent basement problems: see <a href="/blog/basement-waterproofing-guide-canadian-homes/">basement waterproofing</a>.</p>
+<h3>Thickness and reinforcement</h3>
+<p>Concrete is commonly 4 to 5 inches with wire mesh or rebar and control joints. Heavier vehicles need more.</p>
+<h3>Season</h3>
+<p>Asphalt and concrete have temperature limits. Quote the likely installation window.</p>
+
+<h2>Municipal rules</h2>
+<p>Many municipalities regulate driveway width, curb cuts and permeable surface area. Check before quoting.</p>
+
+<h2>How to quote it</h2>
+<p>List area, thickness, base depth, material, removal, grading, finishes, sealing, permits and warranty. Masons using <a href="/quotes/mason/">quoting software for masons and concrete contractors</a> can measure area and price in one visit. For general price structure, read <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+`,
+  "siding-replacement-cost-canada-2026": `
+<p>New siding changes how a house looks, performs and sells. It also costs enough that homeowners compare quotes carefully. Typical 2026 installed ranges:</p>
+
+<h2>Cost per square foot of wall, installed</h2>
+<ul>
+  <li><strong>Vinyl</strong>: about $6–$12</li>
+  <li><strong>Engineered wood</strong>: about $8–$15</li>
+  <li><strong>Fibre cement (such as Hardie-style boards)</strong>: about $10–$20</li>
+  <li><strong>Aluminum or steel</strong>: about $9–$18</li>
+  <li><strong>Cedar</strong>: about $12–$25+</li>
+</ul>
+<p>A typical detached home with 1,800 square feet of wall area often totals roughly $12,000 to $35,000 depending on the material and complexity.</p>
+
+<h2>What affects the price</h2>
+<ul>
+  <li><strong>Removal</strong> of old siding and disposal; asbestos-containing products in older homes need special handling.</li>
+  <li><strong>Sheathing and house wrap</strong>: damaged sheathing is replaced; modern wrap and flashing improve moisture control.</li>
+  <li><strong>Insulation</strong>: adding rigid exterior insulation improves comfort and may qualify for programs. See <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebates guide</a>.</li>
+  <li><strong>Trim, soffit, fascia and corners</strong></li>
+  <li><strong>Windows and doors</strong>: flashing around them is critical: <a href="/blog/cost-to-install-windows-and-doors-canada/">window and door costs</a>.</li>
+  <li><strong>Height and access</strong>: scaffolding on multi-storey homes.</li>
+</ul>
+
+<h2>Quote like a pro</h2>
+<p>Measure wall area minus openings, add waste, and list removal, wrap, insulation, siding, trim, flashing and clean-up separately. Add an allowance for hidden rot with a per-sheet price. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Renovators can build these quotes quickly with <a href="/quotes/renovation-contractor/">quoting software for renovation contractors</a>.</p>
+`,
+  "attic-insulation-cost-canada-2026": `
+<p>Attic insulation is one of the best-value upgrades in a cold climate, and one that homeowners ask about every winter. Typical 2026 installed ranges:</p>
+
+<h2>Installed cost</h2>
+<ul>
+  <li><strong>Blown-in fibreglass or cellulose</strong>: about $1.50–$4 per square foot</li>
+  <li><strong>Fibreglass batts</strong>: about $2–$5 per square foot</li>
+  <li><strong>Spray foam (closed-cell)</strong>: about $4–$9+ per square foot depending on thickness</li>
+</ul>
+<p>A typical 1,000 square foot attic often costs roughly $2,000–$6,000 for blown-in, and considerably more for spray foam. Costs rise with removal and air sealing.</p>
+
+<h2>R-value targets</h2>
+<p>Recommended attic R-values in Canada depend on climate zone and building code, commonly in the R-50 to R-60 range for colder regions. Confirm the current requirement for your province and municipality.</p>
+
+<h2>Air sealing comes first</h2>
+<p>Insulation over leaky ceilings underperforms. Sealing penetrations around pot lights, plumbing stacks, wiring and the attic hatch is typically part of a good job and often worth a separate line item.</p>
+
+<h2>Other cost factors</h2>
+<ul>
+  <li>Removing old or contaminated insulation (vermiculite requires testing for asbestos before disturbance)</li>
+  <li>Baffles and ventilation, to keep soffit airflow open</li>
+  <li>Access: tight attics take more labour</li>
+  <li>Moisture or mould repairs first</li>
+</ul>
+
+<h2>Rebates</h2>
+<p>Many programs have supported insulation upgrades, usually requiring a pre-retrofit energy evaluation. Verify current rules: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebate guide for contractors</a>.</p>
+
+<h2>Quoting insulation</h2>
+<p>Include area, depth and R-value achieved, material, air sealing, baffles, removal and a clear statement about the exclusion of hidden moisture problems. Contractors using <a href="/quotes/renovation-contractor/">quoting software</a> can attach photos and send the quote the same day. For a related winter job, see the <a href="/blog/winterizing-your-home-contractor-checklist/">winterizing checklist</a>.</p>
+`,
+  "how-to-quote-a-landscaping-job": `
+<p>Landscaping quotes cover two very different businesses: one-time projects like patios and planting, and recurring work like lawn care and snow removal. Each needs its own pricing logic.</p>
+
+<h2>Recurring maintenance</h2>
+<ul>
+  <li>Measure lawn area and note obstacles, slopes and gates.</li>
+  <li>Estimate time per visit based on crew size and equipment.</li>
+  <li>Add travel, fuel, equipment wear, disposal and overhead.</li>
+  <li>Set a minimum per-visit price so small lots are still worth the trip.</li>
+  <li>Offer seasonal contracts with monthly payments to smooth cash flow: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</li>
+</ul>
+
+<h2>One-time projects</h2>
+<p>Break them into labour, materials, equipment rental, delivery, disposal and a contingency for soil and ground surprises. Common materials such as aggregate, soil, sod, pavers and plants should be itemized with quantities.</p>
+
+<h2>Hardscape specifics</h2>
+<p>Excavation depth, base compaction, drainage, edge restraint and frost considerations separate a lasting patio from a heaving one. See <a href="/blog/concrete-driveway-cost-canada-2026/">driveway cost guide</a> and <a href="/blog/fence-installation-cost-canada-2026/">fence cost guide</a>.</p>
+
+<h2>Winter work</h2>
+<p>Snow removal contracts need clear terms: trigger depth, service times, liability and salting. Check insurance coverage: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
+
+<h2>Common pricing mistakes</h2>
+<ul>
+  <li>Underestimating haul and disposal</li>
+  <li>Forgetting machine time and fuel</li>
+  <li>No weather clause</li>
+  <li>Not marking up plants and materials: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a></li>
+</ul>
+
+<h2>Send quotes quickly</h2>
+<p>Landscape clients usually request several quotes at once. <a href="/quotes/landscaper/">Quoting software for landscapers</a> lets you measure, price and send from the property.</p>
+`,
+  "how-to-quote-an-hvac-job": `
+<p>HVAC customers are often making a big decision under pressure. The contractor who explains options clearly and quotes quickly tends to win, even when not the cheapest.</p>
+
+<h2>Start with the right measurements</h2>
+<p>Do a proper heat-loss and heat-gain calculation rather than copying the old unit size. Record the home's size, insulation, windows, existing ductwork and electrical capacity.</p>
+
+<h2>Offer three options</h2>
+<ul>
+  <li><strong>Good</strong>: reliable standard-efficiency equipment</li>
+  <li><strong>Better</strong>: higher efficiency, two-stage, better warranty</li>
+  <li><strong>Best</strong>: top efficiency, variable-speed, smart controls, extended warranty</li>
+</ul>
+<p>Show purchase price, expected operating cost and warranty for each. Reference market ranges: <a href="/blog/furnace-replacement-cost-canada-2026/">furnace replacement costs</a> and <a href="/blog/cost-to-install-a-heat-pump-canada/">heat pump costs</a>.</p>
+
+<h2>Line items to include</h2>
+<ul>
+  <li>Equipment (brand, model, capacity, efficiency)</li>
+  <li>Labour and commissioning</li>
+  <li>Venting, line sets, pads, condensate and electrical work</li>
+  <li>Ductwork modifications</li>
+  <li>Thermostat and accessories</li>
+  <li>Permits, gas and electrical inspections</li>
+  <li>Removal and disposal, including refrigerant recovery</li>
+</ul>
+
+<h2>Rebates and financing</h2>
+<p>Mention applicable programs without promising amounts: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebate guide</a>. Offering financing or payment plans can move clients from the cheapest to the best option.</p>
+
+<h2>Service agreements</h2>
+<p>Annual maintenance plans bring recurring revenue and prime you for the replacement sale when the system ages.</p>
+
+<h2>Be fast and professional</h2>
+<p>Many HVAC calls are emergencies. <a href="/quotes/hvac-technician/">Quoting software for HVAC technicians</a> lets you present options on a tablet and get acceptance on the spot. Extra tips in <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+`,
+  "how-to-quote-a-tiling-job": `
+<p>Tile pricing is less about the tile and more about everything under it. A flat floor on a solid subfloor and a custom shower on bare studs are completely different jobs.</p>
+
+<h2>Measure and add waste</h2>
+<p>Calculate area and add waste: about 10% for straight lay, 15% or more for diagonal, herringbone or large-format tile with cuts. Note the tile size, because large formats need flatter surfaces.</p>
+
+<h2>Assess the substrate</h2>
+<ul>
+  <li>Levelness and deflection of the subfloor</li>
+  <li>Need for backer board or an uncoupling membrane</li>
+  <li>Heated floor installation</li>
+  <li>Waterproofing in showers and wet areas</li>
+</ul>
+
+<h2>Price labour by complexity</h2>
+<p>Use rates per square foot for standard layouts and higher for mosaics, patterns, niches, benches and curved walls. Setting a minimum job price protects small jobs like backsplashes.</p>
+
+<h2>Line items</h2>
+<ul>
+  <li>Demolition and disposal</li>
+  <li>Substrate prep and levelling</li>
+  <li>Waterproofing</li>
+  <li>Thinset, grout, sealer, trim and edge profiles</li>
+  <li>Tile supply (or client-supplied, without warranty)</li>
+  <li>Labour for floor, wall and details</li>
+</ul>
+
+<h2>Know the market</h2>
+<p>Installed tile costs commonly fall around $10–$25 per square foot for floors, and more for complex work. For a full-room context see <a href="/blog/bathroom-renovation-cost-toronto-2026/">bathroom renovation costs</a> and <a href="/blog/flooring-installation-cost-canada-2026/">flooring costs</a>.</p>
+
+<h2>Clauses that save money</h2>
+<p>Include cure and grout times, who supplies extra tiles, and how hidden subfloor problems are priced: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+
+<h2>Speed</h2>
+<p>Tile installers can use <a href="/quotes/tile-installer/">quoting software for tile installers</a> to measure, add waste and itemize in one visit.</p>
+`,
+  "quoteai-vs-spreadsheet-quotes-contractors": `
+<p>Almost every contractor starts with a spreadsheet or a Word template. It is free, familiar and flexible, and for a while it works. Then the business grows and the cracks appear.</p>
+
+<h2>Where spreadsheets work</h2>
+<ul>
+  <li>Very low quote volume</li>
+  <li>Simple, repeatable jobs</li>
+  <li>You are always at a computer</li>
+</ul>
+
+<h2>Signs it has stopped working</h2>
+<ol>
+  <li><strong>Quotes take too long</strong>: you build them at night, not on site.</li>
+  <li><strong>Formula errors</strong>: one broken cell and your margin vanishes.</li>
+  <li><strong>Tax mistakes</strong>: wrong GST/HST/QST on a job in another province.</li>
+  <li><strong>Version chaos</strong>: "final_v3_REAL.xlsx".</li>
+  <li><strong>No tracking</strong>: you cannot tell which quotes were accepted or are waiting for follow-up.</li>
+  <li><strong>Retyping</strong>: the same client and job details go into quotes, invoices and calendars.</li>
+  <li><strong>Unprofessional look</strong>: formatting varies and PDFs break.</li>
+</ol>
+
+<h2>What software adds</h2>
+<ul>
+  <li>Speed: build and send from your phone: <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">5-minute quotes</a></li>
+  <li>Automatic Canadian taxes</li>
+  <li>Saved prices and templates</li>
+  <li>Client records and quote history</li>
+  <li>Follow-up reminders and online acceptance</li>
+  <li>Conversion to invoice: <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">get paid faster</a></li>
+</ul>
+
+<h2>How to switch without pain</h2>
+<ol>
+  <li>Export your current price list and common line items.</li>
+  <li>Start with new quotes only, not old files.</li>
+  <li>Test on a real job and compare time spent.</li>
+  <li>Keep the old spreadsheet for a month as a backup.</li>
+</ol>
+
+<h2>See the comparison</h2>
+<p>Read our direct comparisons: <a href="/quotes/excel-template/">alternative to Excel templates</a> and <a href="/quotes/word-template/">alternative to Word templates</a>, or try <a href="/quotes/free-quote/">free quoting</a>. For picking a tool, see <a href="/blog/best-quoting-software-for-contractors-canada/">what to look for in quoting software</a>.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

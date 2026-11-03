@@ -1641,6 +1641,239 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>See the comparison</h2>
 <p>Read our direct comparisons: <a href="/quotes/excel-template/">alternative to Excel templates</a> and <a href="/quotes/word-template/">alternative to Word templates</a>, or try <a href="/quotes/free-quote/">free quoting</a>. For picking a tool, see <a href="/blog/best-quoting-software-for-contractors-canada/">what to look for in quoting software</a>.</p>
 `,
+  "how-to-raise-your-prices-contractors-without-losing-clients": `
+<p>Material, fuel, insurance and wages go up, but many contractors keep their rates frozen for years because they fear losing work. The result is shrinking margin and burnout. A planned price increase is usually less risky than it feels.</p>
+
+<h2>Signs it is time</h2>
+<ul>
+  <li>You win almost every quote you send</li>
+  <li>You are booked weeks ahead</li>
+  <li>Your costs rose and your rates did not</li>
+  <li>Your profit per job is shrinking: <a href="/blog/how-to-track-job-costs-contractors/">job cost tracking</a></li>
+</ul>
+<p>If nobody ever says "that's expensive", you are probably too cheap.</p>
+
+<h2>Work out the number</h2>
+<p>Start from your real costs and target margin, not from competitors. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>. A common approach is a modest increase, often 5–10%, once or twice a year, rather than a big jump after years of nothing.</p>
+
+<h2>Raise prices on new quotes first</h2>
+<p>New leads have no reference price, so the increase is invisible. Update your price list and quoting software so every new quote uses current rates.</p>
+
+<h2>Tell existing clients properly</h2>
+<ul>
+  <li>Give notice, often 30 days, before the change.</li>
+  <li>Explain briefly: "Material and insurance costs have increased, so rates go up on [date]."</li>
+  <li>Thank them and offer to book before the change if they have pending work.</li>
+</ul>
+
+<h2>Protect quotes in progress</h2>
+<p>Keep a validity period on quotes and honour it. For long jobs, add clauses for major supplier increases: <a href="/blog/reduce-material-costs-contractors-canada/">material cost guide</a>.</p>
+
+<h2>Justify with value, not apology</h2>
+<p>Better communication, reliable scheduling, clean sites and a clear warranty support higher prices. See <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+
+<h2>Expect some pushback</h2>
+<p>You may lose a few price-sensitive clients, and that is normal. If you lose them and keep the rest, your income usually rises while your workload falls.</p>
+`,
+  "how-to-hire-your-first-employee-contractor-canada": `
+<p>This is general information, not legal or tax advice. Employment rules vary by province, so confirm details with your accountant and provincial authorities. Hiring is the step that turns a self-employed tradesperson into a business owner, and it comes with obligations you cannot skip.</p>
+
+<h2>Employee or subcontractor?</h2>
+<p>If you control when, where and how the person works, they are likely an employee regardless of what you call them. See <a href="/blog/how-to-hire-and-pay-subcontractors-canada/">hiring subcontractors</a> for the difference.</p>
+
+<h2>Set-up checklist</h2>
+<ul>
+  <li><strong>Payroll account with the CRA</strong> for source deductions (income tax, CPP, EI). In Quebec you also deal with Revenu Québec and the QPP, QPIP and related programs.</li>
+  <li><strong>Workers' compensation registration</strong> (WSIB, WorkSafeBC, CNESST and others)</li>
+  <li><strong>Employment agreement</strong> covering pay, hours, probation, duties and termination</li>
+  <li><strong>Minimum standards</strong>: overtime, vacation pay, statutory holidays and breaks per your province</li>
+  <li><strong>Health and safety</strong>: orientation, required training and records</li>
+  <li><strong>Insurance</strong> updates: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a></li>
+  <li><strong>Record of employment (ROE)</strong> and year-end slips (T4)</li>
+</ul>
+
+<h2>Know the true cost</h2>
+<p>An employee costs more than their hourly wage: employer CPP/EI contributions, vacation pay, workers' compensation premiums, tools, vehicle, training and unproductive time. Many contractors estimate 20–30% on top of wages. Build it into your hourly rate and quotes.</p>
+
+<h2>Make sure there is work</h2>
+<p>Before hiring, confirm you have enough booked jobs and healthy cash flow: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</p>
+
+<h2>Train and delegate</h2>
+<p>Write down how you do the job (checklists, photos, standards) so the new hire does not rely on your memory. See <a href="/blog/construction-project-management-small-contractors/">job site management</a>.</p>
+
+<h2>Where it fits in growth</h2>
+<p>Hiring is one step of a bigger plan: <a href="/blog/how-to-scale-a-contracting-business-canada/">how to scale a contracting business</a>.</p>
+`,
+  "how-to-follow-up-on-quotes-contractors": `
+<p>A surprising share of lost quotes are simply forgotten. The client was busy, got three quotes, and the one who followed up won. Following up is not pushy, it is service.</p>
+
+<h2>The timing</h2>
+<ul>
+  <li><strong>Same day</strong>: confirm the quote was received.</li>
+  <li><strong>Day 2–3</strong>: a short check-in.</li>
+  <li><strong>Day 7</strong>: a second follow-up with value (an option, a date, a question).</li>
+  <li><strong>Day 14–30</strong>: a final message before the quote expires.</li>
+</ul>
+
+<h2>Templates</h2>
+<h3>Day 1 (text)</h3>
+<p><em>"Hi [Name], it's [You] from [Company]. I just sent your quote for [job]. Let me know if anything is unclear."</em></p>
+<h3>Day 3 (text or email)</h3>
+<p><em>"Hi [Name], just checking you received the quote for [job] and whether you have questions. Happy to adjust the scope if needed."</em></p>
+<h3>Day 7 (email)</h3>
+<p><em>"Hi [Name], I have an opening on [date] and can hold it for you until [date]. If budget is a concern, I can suggest a few ways to adjust the scope."</em></p>
+<h3>Final (text)</h3>
+<p><em>"Hi [Name], your quote for [job] is valid until [date]. After that I would need to re-price it as material costs change. Would you like to go ahead or should I close this file?"</em></p>
+
+<h2>What not to do</h2>
+<ul>
+  <li>Do not discount at the first sign of silence.</li>
+  <li>Do not send daily messages.</li>
+  <li>Do not blame the client for not replying.</li>
+</ul>
+
+<h2>Learn from the answers</h2>
+<p>"Too expensive", "went with someone else", and "not now" each tell you something. Track them: <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+
+<h2>Automate it</h2>
+<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending quotes in 5 minutes</a> and <a href="/quotes/free-quote/">free quoting</a>.</p>
+`,
+  "how-to-quote-a-carpentry-job": `
+<p>Custom woodwork is hard to price because every job is different and the client often changes their mind. A consistent method helps you stay profitable without scaring people away.</p>
+
+<h2>Separate shop work from site work</h2>
+<p>Shop time (cutting, assembly, finishing) and installation time carry different costs and rates. Track each separately so you learn where hours go.</p>
+
+<h2>Material takeoff</h2>
+<ul>
+  <li>Sheet goods and solid lumber with waste (often 10–20%)</li>
+  <li>Hardware: hinges, slides, pulls, fasteners</li>
+  <li>Finishing materials: stain, paint, lacquer</li>
+  <li>Countertops and outsourced parts</li>
+  <li>Delivery and consumables</li>
+</ul>
+
+<h2>Labour</h2>
+<p>Estimate hours per component (a cabinet box, a door, a drawer, a trim run) based on your past jobs. Add time for design, drawings, client meetings and sourcing.</p>
+
+<h2>Overhead and margin</h2>
+<p>Shop rent, tools, machine wear, insurance and software need to be recovered: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+
+<h2>Protect yourself</h2>
+<ul>
+  <li><strong>Deposit</strong> large enough to cover materials and special orders</li>
+  <li><strong>Approved drawings</strong> before cutting</li>
+  <li><strong>Change policy</strong> after approval: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a></li>
+  <li><strong>Lead time</strong> stated clearly</li>
+</ul>
+
+<h2>Compare with the market</h2>
+<p>Clients benchmark against typical project budgets. See <a href="/blog/kitchen-renovation-cost-canada-2026/">kitchen renovation costs</a> and <a href="/blog/deck-installation-cost-canada-2026/">deck installation costs</a>.</p>
+
+<h2>Quote efficiently</h2>
+<p>Carpenters and cabinetmakers can use <a href="/quotes/carpenter-cabinetmaker/">quoting software built for the trade</a> to reuse component prices and send clear PDFs.</p>
+`,
+  "how-to-quote-a-welding-or-metal-fabrication-job": `
+<p>Welding and fabrication pricing combines material, shop time, consumables and finishing. Underquoting is common because the small things (grinding, setup, handling) add up quickly.</p>
+
+<h2>Material</h2>
+<p>Price steel, stainless or aluminum by weight or length, with waste and cutting allowances. Material prices change often, so state quote validity and consider a supplier-increase clause: <a href="/blog/reduce-material-costs-contractors-canada/">material cost guide</a>.</p>
+
+<h2>Labour</h2>
+<p>Break time into layout, cutting, fit-up, welding, grinding and finishing, plus assembly and installation if on site. Include time for drawings, programming or engineering where needed.</p>
+
+<h2>Consumables and equipment</h2>
+<p>Wire, gas, discs, electrodes, PPE and machine wear. A flat consumables percentage on labour is a common shortcut.</p>
+
+<h2>Finishing and outside services</h2>
+<ul>
+  <li>Powder coating, galvanizing or painting</li>
+  <li>Machining or laser cutting</li>
+  <li>Inspection or certification where required</li>
+</ul>
+
+<h2>Delivery and installation</h2>
+<p>Transport, crane or lift rental and site access can change the price dramatically.</p>
+
+<h2>Repair vs new fabrication</h2>
+<p>Repairs have unknowns. Offer a diagnostic or hourly rate with a not-to-exceed amount, and approve extras before starting: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+
+<h2>Set minimums</h2>
+<p>A minimum charge covers setup and travel for small jobs.</p>
+
+<h2>Margin and speed</h2>
+<p>Apply overhead and margin consistently: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>. Welders and fabricators can build itemized quotes quickly with <a href="/quotes/welder-fabricator/">quoting software for welders and metal fabricators</a>.</p>
+`,
+  "how-to-quote-a-masonry-job": `
+<p>Masonry is physical, weather-dependent and unforgiving of mistakes. A good quote reflects the real labour, the material waste and the access conditions.</p>
+
+<h2>Measure and count</h2>
+<p>For brick and block, calculate area minus openings and convert to units, adding waste (commonly 5–10%). For concrete, calculate volume, add a small allowance for over-excavation and spillage. For stone, account for irregular sizes and cutting.</p>
+
+<h2>Materials</h2>
+<ul>
+  <li>Units (brick, block, stone) and mortar or concrete</li>
+  <li>Rebar, ties, flashing and weep holes</li>
+  <li>Forms and formwork materials</li>
+  <li>Sealers and admixtures for cold weather</li>
+</ul>
+
+<h2>Labour and access</h2>
+<p>Production rates depend on the unit type and wall complexity. Scaffolding, hoists and tight sites add time and cost.</p>
+
+<h2>Weather and season</h2>
+<p>Cold weather needs blankets, heaters or admixtures. State the window you can work and what happens if weather delays occur.</p>
+
+<h2>Repairs and restoration</h2>
+<p>Repointing and chimney work have unknown conditions. Quote by section with a clear allowance and exclusions. See <a href="/blog/cost-to-reroof-a-home-canada/">roofing costs</a> when chimneys and flashing overlap.</p>
+
+<h2>Compare with the market</h2>
+<p>Clients will check ranges: <a href="/blog/concrete-driveway-cost-canada-2026/">driveway cost guide</a>.</p>
+
+<h2>Contract and payment</h2>
+<p>Take a deposit, bill at milestones (footing, walls, finish) and handle extras in writing: <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">get paid on time</a>.</p>
+
+<h2>Quote it fast</h2>
+<p>Masons can use <a href="/quotes/mason/">quoting software for masons and concrete contractors</a> to price measured areas and send professional quotes.</p>
+`,
+  "how-to-quote-a-window-or-door-installation-job": `
+<p>Window and door quotes go wrong when measurements are off, the product is not specified or hidden rot appears. Use a checklist so every opening is captured.</p>
+
+<h2>On-site checklist</h2>
+<ul>
+  <li>Opening width and height, measured in more than one place</li>
+  <li>Operation type (casement, slider, fixed, awning) and egress requirements</li>
+  <li>Frame material, colour and glass package</li>
+  <li>Existing frame, trim and siding or brick condition</li>
+  <li>Floor level and access for ladders or scaffolds</li>
+  <li>Photos of each opening</li>
+</ul>
+
+<h2>Insert or full-frame?</h2>
+<p>Insert replacement keeps the existing frame and costs less. Full-frame removes everything down to the studs and lets you fix flashing and rot. Quote both when the condition is uncertain.</p>
+
+<h2>Line items</h2>
+<ul>
+  <li>Product per opening</li>
+  <li>Installation labour</li>
+  <li>Insulation, flashing, sealant</li>
+  <li>Interior trim and exterior capping or brick-mould</li>
+  <li>Removal and disposal</li>
+  <li>Permits where required</li>
+</ul>
+
+<h2>Lead times and deposits</h2>
+<p>Custom products are non-returnable. Take a deposit on order, state the lead time and what happens if the manufacturer delays. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">getting paid on time</a>.</p>
+
+<h2>Hidden conditions</h2>
+<p>Add a per-opening allowance for rot repair and handle extras through <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+
+<h2>Market context</h2>
+<p>Clients compare to typical costs: <a href="/blog/cost-to-install-windows-and-doors-canada/">window and door cost guide</a>. Mention energy programs carefully: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebates</a>.</p>
+
+<h2>Quote on the spot</h2>
+<p>Installers can use <a href="/quotes/window-door-installer/">quoting software for window and door installers</a> to list each opening with size and price and send it before leaving the site.</p>
+`,
 };
 
 export const BLOG_ARTICLES: BlogArticle[] = BLOG_INDEX.map((meta) => {

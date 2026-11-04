@@ -33,6 +33,8 @@ import { SwipeRow, type SwipeAction } from "@/ui/SwipeRow";
 import { TAB_BAR_SPACE } from "@/ui/TabBar";
 import { TabScreen } from "@/ui/TabShell";
 import { SyncStates } from "@/ui/Sync";
+import { useWide } from "@/ui/Rail";
+import { PickRow, QuotePane, Split } from "@/ui/TabletQuotes";
 import { Num, Text } from "@/ui/Text";
 
 const STATUS: Record<QuoteState, { tone: StatusTone; shape: StatusShape }> = {
@@ -60,6 +62,9 @@ export default function Quotes() {
   const [term, setTerm] = useState("");
   const [filter, setFilter] = useState<QuoteFilter>("all");
   const [swiped, setSwiped] = useState<string | null>(null);
+  // Tablet.dc.html: at tablet width a row picks the quote shown beside the list.
+  const wide = useWide();
+  const [picked, setPicked] = useState<string | null>(null);
   const now = useMemo(() => new Date(), [quotes.dataUpdatedAt]);
   const all = (quotes.data ?? []) as QuoteSummary[];
 
@@ -143,11 +148,12 @@ export default function Quotes() {
     return [s === "draft" ? "" : when, jobLine(q), numOf(q)].filter(Boolean).join(" · ");
   };
 
+  const shownId = picked && shown.some((r) => r.q.id === picked) ? picked : groups[0]?.items[0]?.q.id ?? null;
   const loading = quotes.isPending && !quotes.data;
   const failed = quotes.isError && !quotes.data;
 
-  return (
-    <TabScreen active="quotes">
+  const list = (
+    <>
       <TabHeader title={t("quotes.title")}>
         <Button size="sm" label={t("quotes.newQuote")} icon={<Glyph name="plus" size={14} weight={2.4} color="on-inv" />} onPress={newQuote} />
         <IconButton glyph="more" label={t("quotes.more")} />
@@ -193,7 +199,10 @@ export default function Quotes() {
                 <SectionHeader title={t(`quotes.groups.${grp.key}`)} link={m(grp.total)} />
                 <Card style={{ overflow: "visible" }}>
                   <RowList>
-                    {grp.items.map(({ q, state }, i) => (
+                    {grp.items.map(({ q, state }, i) => wide ? (
+                      <PickRow key={q.id} first={i === 0} initials={initialsOf(q.clientData.nome)} tint={TINTS[i % TINTS.length]!} client={q.clientData.nome} sub={meta(q, state)} amount={m(q.totale)} on={q.id === shownId} onPress={() => setPicked(q.id)}
+                        status={<Status tone={STATUS[state].tone} shape={STATUS[state].shape}>{state === "expiring" ? t("quotes.status.expiring", { day: weekdayShort(validUntil(q.sentAt!, q.validDays), locale) }) : t(`quotes.status.${state}`)}</Status>} />
+                    ) : (
                       <QuoteRow key={q.id} id={q.id} swiped={swiped === q.id} onSwipe={(o) => setSwiped(o ? q.id : null)} actions={actionsFor(q, state)}
                         label={`${q.clientData.nome}${numOf(q) ? `, ${numOf(q)}` : ""}`}
                         head={<RowBody leading={<Avatar initials={initialsOf(q.clientData.nome)} tint={TINTS[i % TINTS.length]} />} title={q.clientData.nome} meta={meta(q, state)}
@@ -206,7 +215,7 @@ export default function Quotes() {
                     ))}
                   </RowList>
                 </Card>
-                {gi === 0 ? <SwipeHint>{t("quotes.swipeHint")}</SwipeHint> : null}
+                {gi === 0 && !wide ? <SwipeHint>{t("quotes.swipeHint")}</SwipeHint> : null}
               </Section>
             ))}
             {groups.length === 0 ? (
@@ -217,8 +226,9 @@ export default function Quotes() {
           </>
         )}
       </ExpandScrollView>
-    </TabScreen>
+    </>
   );
+  return <TabScreen active="quotes">{wide ? <Split list={list} detail={<QuotePane id={shownId} />} /> : list}</TabScreen>;
 }
 
 /** A quote row: the expandable card inside a swipe row, which stays still while the card is open. */

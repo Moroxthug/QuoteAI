@@ -440,6 +440,14 @@ Built from SystemStates.dc.html, "Offline and sync". The board's "Plans, roles, 
 - **UI**: `ui/AppLock.tsx` (LockScreen, AskBody, SheetFrame, AppLockHost in the root layout), strings `i18n/screens/lock.ts` (namespace `lock`, EN and FR from the boards). The sandbox page shows the lock screen, the offer and the four sheets.
 - **Verified**: `npm test` 552 pass, `tsc` clean, `lint:tokens` clean, EN/FR parity; the sandbox page in night at 390. NOT checked on a phone (the web has no Face ID): the lock after 5 minutes, the system Face ID / fingerprint prompt, the sheets before the real camera, mic and location prompts.
 
+### 129.8 Tablet: the rail and Quotes beside the quote (2026-11-04)
+- **Rule**: from 1024 wide (a tablet held sideways; the board is 1366) the app uses the tablet layout; below it, the phone layout. `useWide()` in `ui/Rail.tsx`.
+- **Rail** (`ui/Rail.tsx`, in the root layout left of the screens): Home, Quotes, Jobs, Clients, Invoices, Schedule, then Menu and the avatar (Profile), shown wherever the tab bar would be; the floating tab bar is not drawn at that width. The active item on the sunk ground in ink 600, the others grey at 55 %.
+- **Quotes** (`ui/TabletQuotes.tsx`): the list keeps 440 wide with plain rows that pick a quote (accent ground, bar at the left); the quote shows beside it as on the board: number, Duplicate, PDF, More; status and line; the title; scope (Edit opens the editor) and the line items with subtotal, tax and total on the left; the client (Call, Message), the deposit and valid-until, and the activity on the right; the glass bar with the client, the total and the two actions for the state. The actions are the phone list's for each state (Send and Follow up open the quote; Mark won, Archive and Revive act in place).
+- **Not on the board**: "Pick a quote" when nothing is picked; the activity is built from the quote's dates (created, sent, viewed, accepted, declined, expired), the board's richer lines ("Assistant wrote 5 lines from your notes") have no source.
+- **Not done**: the other lists (Jobs, Clients, Invoices) don't split yet; at tablet width they show their phone layout beside the rail. The board draws Quotes only.
+- **Verified**: `tsc`, `npm test` 552, `lint:tokens`, EN/FR parity (namespace `tb`); in the browser pane at 1366 × 1024 on the local API: the rail, Quotes beside the quote, Home with the rail. NOT checked on a real tablet.
+
 ## Phase 133 screens: free-quote counter and locked state (2026-10-19)
 
 Server side is the growth plan's Phase 133 (`GET /api/me/allowance`, 402 `FREE_QUOTES_USED` when `FREE_QUOTES_ENFORCED=1`; off today).

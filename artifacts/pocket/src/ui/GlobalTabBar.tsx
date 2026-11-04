@@ -14,6 +14,7 @@ import { useSession } from "@/lib/useSession";
 import Animated from "react-native-reanimated";
 import { useBarSlide } from "./CardOpen";
 import { TabBar } from "./TabBar";
+import { useWide } from "./Rail";
 
 export function GlobalTabBar() {
   const slide = useBarSlide();
@@ -22,13 +23,15 @@ export function GlobalTabBar() {
   const { status } = useSession();
   const crew = useCrewSession();
   const { me, tabs } = useJobRole();
+  const wide = useWide();
   const [typing, setTyping] = useState(false);
   useEffect(() => {
     const a = Keyboard.addListener("keyboardDidShow", () => setTyping(true));
     const b = Keyboard.addListener("keyboardDidHide", () => setTyping(false));
     return () => { a.remove(); b.remove(); };
   }, []);
-  const show = (status === "in" || status === "offline") && !crew.token && !barHiddenOn(path) && !typing;
+  // At tablet width the rail on the left takes its place (Tablet.dc.html).
+  const show = !wide && (status === "in" || status === "offline") && !crew.token && !barHiddenOn(path) && !typing;
   useEffect(() => { setBarVisible(show); return () => setBarVisible(false); }, [show]);
   if (!show) return null;
 

@@ -18,6 +18,7 @@ import { ThemeProvider } from "@/ui/theme";
 import { ToastHost } from "@/ui/Feedback";
 import { CardOpenProvider } from "@/ui/CardOpen";
 import { GlobalTabBar } from "@/ui/GlobalTabBar";
+import { RailSlot } from "@/ui/Rail";
 import { FreeQuotesGate } from "@/ui/FreeQuotes";
 import { AppLockHost } from "@/ui/AppLock";
 import { usePlayBillingBoot } from "@/lib/usePlayBilling";
@@ -64,9 +65,14 @@ function RootLayout() {
               <ToastHost>
                 <CardOpenProvider>
                   <View style={{ flex: 1, backgroundColor: board.cardOpen.backdrop }}>
-                    <NavThemeProvider value={NAV_THEME}>
-                      <Stack screenOptions={{ headerShown: false, animation: "fade", contentStyle: { backgroundColor: "transparent" } }} />
-                    </NavThemeProvider>
+                    <View style={{ flex: 1, flexDirection: "row" }}>
+                      <RailSlot />
+                      <View style={{ flex: 1 }}>
+                        <NavThemeProvider value={NAV_THEME}>
+                          <Stack screenOptions={{ headerShown: false, animation: "fade", contentStyle: { backgroundColor: "transparent" } }} />
+                        </NavThemeProvider>
+                      </View>
+                    </View>
                     <GlobalTabBar />
                     <FreeQuotesGate />
                     <PlayBillingBoot />

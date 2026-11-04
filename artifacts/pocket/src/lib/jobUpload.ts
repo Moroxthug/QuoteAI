@@ -2,7 +2,7 @@
 import { Platform } from "react-native";
 import { API_ORIGIN } from "./session";
 
-export type UploadFile = { uri: string; name: string; type: string };
+export type UploadFile = { uri: string; name: string; type: string; /** Bytes, when the picker knows (photos waiting for Wi-Fi show the total). */ size?: number };
 export type UploadResult<T> = { ok: true; data: T } | { ok: false; status: number; message?: string };
 
 export async function uploadFile<T>(path: string, field: string, file: UploadFile, fields: Record<string, string> = {}): Promise<UploadResult<T>> {

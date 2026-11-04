@@ -6,11 +6,11 @@ import type { UploadFile } from "./jobUpload";
 
 export type PickResult = { ok: true; files: UploadFile[] } | { ok: false; problem: "unavailable" | "denied" | "failed" };
 
-function toFiles(assets: { uri: string; mimeType?: string | null; fileName?: string | null }[], stem: string): UploadFile[] {
+function toFiles(assets: { uri: string; mimeType?: string | null; fileName?: string | null; fileSize?: number | null }[], stem: string): UploadFile[] {
   return assets.map((x, i) => {
     const type = x.mimeType && x.mimeType.startsWith("image/") ? x.mimeType : "image/jpeg";
     const ext = type.split("/")[1] === "jpeg" ? "jpg" : type.split("/")[1] ?? "jpg";
-    return { uri: x.uri, name: x.fileName && /\.\w+$/.test(x.fileName) ? x.fileName : `${stem}-${i + 1}.${ext}`, type };
+    return { uri: x.uri, name: x.fileName && /\.\w+$/.test(x.fileName) ? x.fileName : `${stem}-${i + 1}.${ext}`, type, ...(x.fileSize ? { size: x.fileSize } : null) };
   });
 }
 

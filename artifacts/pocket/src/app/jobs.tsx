@@ -29,6 +29,7 @@ import { RowList, SectionHeader } from "@/ui/Row";
 import { Status, type StatusShape, type StatusTone } from "@/ui/Status";
 import { TAB_BAR_SPACE } from "@/ui/TabBar";
 import { TabScreen } from "@/ui/TabShell";
+import { SyncStates } from "@/ui/Sync";
 import { Num, Text } from "@/ui/Text";
 
 const STATUS: Record<JobState, { tone: StatusTone; shape: StatusShape }> = {
@@ -153,6 +154,7 @@ export default function Jobs() {
         ) : (
           <>
             {jobsQ.isError ? <Section pt={12} px={16}><Banner tone="info" icon="warn" iconTone="amber" lead={t("jobs.offline")} /></Section> : null}
+            <SyncStates />
             <Section delay={50} pt={16} px={16}>
               <ExpandCard id="kpi" compact label={t("jobs.glance")}
                 head={<Figures items={[

@@ -8,6 +8,7 @@ import { ApiFailure } from "@/lib/api";
 import { shortDate, type Locale } from "@/lib/format";
 import { jobsApi, type JobPhoto } from "@/lib/jobsApi";
 import { addJobPhoto } from "@/lib/jobPhotos";
+import { jobRef } from "@/lib/outbox";
 import { API_ORIGIN } from "@/lib/session";
 import { AuthImage } from "@/ui/AuthImage";
 import { Button } from "@/ui/Button";
@@ -35,9 +36,10 @@ export function Photos({ id, locale }: { id: string; locale: Locale }) {
 
   const take = async () => {
     setBusy("add");
-    const r = await addJobPhoto(id);
+    const r = await addJobPhoto(id, jobRef(id));
     setBusy(null);
     if (r === "ok") refresh();
+    else if (r === "queued") toast({ message: t("sync.photoWaits"), done: true });
     else if (r !== "cancelled") toast({ message: r === "denied" ? j("quick.denied") : r === "unavailable" ? j("quick.unavailable") : j("quick.photoFailed") });
   };
 

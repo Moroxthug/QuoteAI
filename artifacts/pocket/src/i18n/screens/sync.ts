@@ -1,0 +1,115 @@
+// SystemStates.dc.html, "Offline and sync": the offline banner, Sending, synced at, photos waiting for Wi-Fi, rejected by the server, conflict, new version,
+// server unreachable, saved offline. French from SystemStatesFR.dc.html; lines the board doesn't show are marked "not on the board".
+export const en = {
+  offline: { lead: "You’re offline.", body: "Anything you save is kept on this phone.", waiting_one: "{{count}} waiting to send.", waiting_other: "{{count}} waiting to send." },
+  sending: { title: "Sending {{count}}…", label: "Sending" },
+  what: {
+    quote_one: "a quote edit", quote_other: "{{count}} quote edits",
+    note_one: "a job note", note_other: "{{count}} job notes",
+    and: "{{a}} and {{b}}",
+  },
+  synced: "Showing what was synced at {{time}}", updating: ", updating",
+  photos: {
+    waiting_one: "{{count}} photo waiting for Wi-Fi", waiting_other: "{{count}} photos waiting for Wi-Fi",
+    sub: "{{size}} · {{job}}", busy: "Sending {{size}} on mobile data…",
+    done_one: "Photo sent", done_other: "Photos sent", doneSub: "Added to {{job}} · just now",
+    send: "Send now", sent: "Sent",
+  },
+  rejected: {
+    title_one: "{{count}} change couldn’t be sent", title_other: "{{count}} changes couldn’t be sent",
+    sub: "Tap Retry, or Discard to keep what the server has.",
+    noneTitle: "Nothing waiting", noneSub: "Everything on this phone is up to date.",
+    retry: "Retry", discard: "Discard",
+    retried: "Sent on retry at {{time}}.",
+    // not on the board: the board's line names the old price ("The quote keeps $860.00."); the app doesn't keep it
+    discarded: "Change discarded. {{ref}} keeps what the server has.",
+    quote: "{{field}} on {{ref}}", note: "Note on {{ref}}",
+    why: {
+      sent: "The quote was sent before this edit arrived.",
+      role: "Your role can’t change this any more.",
+      gone: "It was deleted on another device.",
+      locked: "It can’t be changed any more.",
+      plan: "This needs a plan that includes it.",
+      invalid: "The server didn’t accept these values.",
+      other: "The server didn’t accept this change.",
+    },
+  },
+  field: { lines: "Lines and prices", schedule: "Deposit", title: "Title", notes: "Notes", exclusions: "Exclusions", discount: "Discount", template: "Template", client: "Client", terms: "Payment terms", summary: "Description" },
+  conflict: {
+    lead_one: "{{count}} change needs you", lead_other: "{{count}} changes need you",
+    sub: "{{ref}} was also changed on another device",
+    mine: "Yours · this phone, {{time}}", theirs: "Now · {{who}}, {{time}}",
+    // not on the board: the server doesn't say who made the other change (the board's "Luca")
+    who: "another device",
+    keepMine: "Keep mine", keepTheirs: "Keep theirs",
+    more_one: "Choose {{count}} more", more_other: "Choose {{count}} more", save: "Save my choices",
+    exclusions_one: "{{count}} exclusion", exclusions_other: "{{count}} exclusions", none: "None",
+  },
+  version: { lead: "A new version is ready.", reload: "Reload" },
+  unreachable: { title: "Can’t reach quoteAI right now", body: "Your work is safe on this phone. We’ll keep trying in the background.", retry: "Try again" },
+  savedOffline: "Saved on this phone. It will be sent when you’re back online.",
+  // not on the board: a photo taken on mobile data
+  photoWaits: "Photo saved on this phone. It will be sent on Wi-Fi.",
+  // The sandbox page /sandbox/system-states (the board's own sample data)
+  board: {
+    title: "System states", intro: "Offline and sync, plans and roles, app lock and permissions. Shown the way they appear inside screens.",
+    offlineSync: "Offline and sync", offline: "Offline banner", sending: "Sending", photos: "Photos waiting for Wi-Fi", rejected: "Rejected by the server",
+    conflict: "Conflict", version: "New version ready", unreachable: "Server unreachable", saved: "Saved offline",
+    job: "Hart basement, drywall phase", jobShort: "Hart basement", ref: "Q-2026-119", who: "Luca",
+  },
+};
+
+export const fr: typeof en = {
+  offline: { lead: "Vous êtes hors ligne.", body: "Tout ce que vous enregistrez reste sur ce téléphone.", waiting_one: "{{count}} en attente d’envoi.", waiting_other: "{{count}} en attente d’envoi." },
+  sending: { title: "Envoi de {{count}}…", label: "Envoi" },
+  what: {
+    quote_one: "une modif de soumission", quote_other: "{{count}} modifs de soumission",
+    note_one: "une note de chantier", note_other: "{{count}} notes de chantier",
+    and: "{{a}} et {{b}}",
+  },
+  synced: "Données synchronisées à {{time}}", updating: ", mise à jour en cours",
+  photos: {
+    waiting_one: "{{count}} photo en attente du Wi-Fi", waiting_other: "{{count}} photos en attente du Wi-Fi",
+    sub: "{{size}} · {{job}}", busy: "Envoi de {{size}} sur données mobiles…",
+    done_one: "Photo envoyée", done_other: "Photos envoyées", doneSub: "Ajoutées à {{job}} · à l’instant",
+    send: "Envoyer", sent: "Envoyées",
+  },
+  rejected: {
+    title_one: "{{count}} modification non envoyée", title_other: "{{count}} modifications non envoyées",
+    sub: "Touchez Réessayer, ou Annuler pour garder la version du serveur.",
+    noneTitle: "Rien en attente", noneSub: "Tout est à jour sur ce téléphone.",
+    retry: "Réessayer", discard: "Annuler",
+    retried: "Envoyée au nouvel essai à {{time}}.",
+    discarded: "Modification annulée. {{ref}} garde la version du serveur.",
+    quote: "{{field}} sur {{ref}}", note: "Note sur {{ref}}",
+    why: {
+      sent: "La soumission a été envoyée avant l’arrivée de cette modif.",
+      role: "Votre rôle ne permet plus de modifier ceci.",
+      gone: "Elle a été supprimée sur un autre appareil.",
+      locked: "Elle ne peut plus être modifiée.",
+      plan: "Il faut un forfait qui l’inclut.",
+      invalid: "Le serveur n’a pas accepté ces valeurs.",
+      other: "Le serveur n’a pas accepté cette modification.",
+    },
+  },
+  field: { lines: "Lignes et prix", schedule: "Dépôt", title: "Titre", notes: "Notes", exclusions: "Exclusions", discount: "Rabais", template: "Modèle", client: "Client", terms: "Conditions de paiement", summary: "Description" },
+  conflict: {
+    lead_one: "{{count}} modification à trancher", lead_other: "{{count}} modifications à trancher",
+    sub: "{{ref}} a aussi été modifiée sur un autre appareil",
+    mine: "Vous · ce téléphone, {{time}}", theirs: "Actuelle · {{who}}, {{time}}",
+    who: "autre appareil",
+    keepMine: "Garder la mienne", keepTheirs: "Garder la leur",
+    more_one: "Encore {{count}} à choisir", more_other: "Encore {{count}} à choisir", save: "Enregistrer mes choix",
+    exclusions_one: "{{count}} exclusion", exclusions_other: "{{count}} exclusions", none: "Aucune",
+  },
+  version: { lead: "Une nouvelle version est prête.", reload: "Recharger" },
+  unreachable: { title: "quoteAI est injoignable pour le moment", body: "Votre travail est en sécurité sur ce téléphone. Nous réessayons en arrière-plan.", retry: "Réessayer" },
+  savedOffline: "Enregistré sur ce téléphone. L’envoi se fera au retour du réseau.",
+  photoWaits: "Photo enregistrée sur ce téléphone. L’envoi se fera sur le Wi-Fi.",
+  board: {
+    title: "États du système", intro: "Hors ligne et synchro, forfaits et rôles, verrouillage et autorisations. Présentés tels qu’ils apparaissent dans les écrans.",
+    offlineSync: "Hors ligne et synchro", offline: "Bandeau hors ligne", sending: "Envoi", photos: "Photos en attente du Wi-Fi", rejected: "Refusé par le serveur",
+    conflict: "Conflit", version: "Nouvelle version prête", unreachable: "Serveur injoignable", saved: "Enregistré hors ligne",
+    job: "Sous-sol Hart, étape du gypse", jobShort: "sous-sol Hart", ref: "Q-2026-119", who: "Luca",
+  },
+};

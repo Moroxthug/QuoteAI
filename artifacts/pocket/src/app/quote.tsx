@@ -42,6 +42,7 @@ import { Text } from "@/ui/Text";
 import { Icon } from "@/ui/Icon";
 import { Press } from "@/ui/motion";
 import { RowBody, RowList, SectionHeader } from "@/ui/Row";
+import { SyncStates } from "@/ui/Sync";
 import { Card } from "@/ui/Card";
 
 const STATUS: Record<QuoteState, { tone: StatusTone; shape: StatusShape }> = {
@@ -184,6 +185,7 @@ export default function Quote() {
         onSecondary={() => void Linking.openURL(`${link}?preview=1`)} onMore={() => setMoreOpen(true)} />}>
       {header(number)}
       <ScrollPage bottom={ACTION_BAR_SPACE}>
+        <SyncStates pt={4} pb={12} />
         {quote.revisionOpen ? <Section pt={4} pb={12} px={16}><Banner tone="acc" icon="sync" iconTone="violet" lead={t("qe.banner.version", { n: quote.version ?? 2 })}>{t("qe.banner.versionBody", { name: quote.clientData.nome?.split(" ")[0] ?? "" })}</Banner></Section> : null}
         <Section>
           <QuoteHead status={<Status plain tone={st.tone} shape={st.shape}>{t(`quote.status.${state}`)}</Status>} valid={accepted ? t("quote.acceptedOn", { date: shortDate(new Date(quote.acceptedAt ?? now), locale) }) : t("quote.validUntil", { date: validDate })}

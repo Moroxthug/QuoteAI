@@ -12,6 +12,7 @@ import { Platform } from "react-native";
 import { isFreeQuotesUsed, usedInfo } from "./allowance";
 import { announceFreeQuotesUsed } from "./freeQuotesGate";
 import { kvGet, kvSet } from "./kv";
+import { noteAnswer, noteNoAnswer } from "./net";
 import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 
 const TOKEN_KEY = "quoteai_session-token";
@@ -95,7 +96,14 @@ function installFetch(): void {
       headers.set("origin", APP_ORIGIN);
       if (twoStepCookie) headers.set("x-auth-cookie", twoStepCookie);
     }
-    const res = await original(raw, { ...init, headers, credentials: "omit" });
+    let res: Response;
+    try {
+      res = await original(raw, { ...init, headers, credentials: "omit" });
+    } catch (e) {
+      noteNoAnswer();
+      throw e;
+    }
+    noteAnswer(init?.method ?? "GET", res.status);
     const nextToken = res.headers.get("set-auth-token");
     if (nextToken) await setToken(nextToken);
     const nextOrg = res.headers.get("x-active-org");

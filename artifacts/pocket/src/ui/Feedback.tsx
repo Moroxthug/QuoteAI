@@ -33,18 +33,19 @@ function bannerColors(tone: BannerTone, colors: Colors): { bg: string; fg: Color
   }
 }
 
-export function Banner({ tone, icon, iconTone, lead, children, link, onLink }: { tone: BannerTone; icon: IconName; iconTone: Tone; /** The key phrase, in 600. */ lead: string; children?: string; /** An underlined 600 link at the end of the text ("Enter the code"). */ link?: string; onLink?: () => void }) {
+export function Banner({ tone, icon, iconTone, lead, children, link, onLink, button, onButton }: { tone: BannerTone; icon: IconName; iconTone: Tone; /** The key phrase, in 600. */ lead: string; children?: string; /** An underlined 600 link at the end of the text ("Enter the code"). */ link?: string; onLink?: () => void; /** A small accent button at the end, the banner centred (SystemStates "New version ready": Reload). */ button?: string; onButton?: () => void }) {
   const { colors } = useTheme();
   const c = bannerColors(tone, colors);
   return (
     <View accessibilityRole={tone === "bad" || tone === "warn" ? "alert" : "summary"}
-      style={{ flexDirection: "row", alignItems: "flex-start", gap: 11, paddingVertical: 12, paddingHorizontal: 14, borderRadius: tokens.radius.banner, backgroundColor: c.bg }}>
+      style={{ flexDirection: "row", alignItems: button ? "center" : "flex-start", gap: 11, paddingVertical: 12, paddingHorizontal: 14, borderRadius: tokens.radius.banner, backgroundColor: c.bg }}>
       <Icon name={icon} tone={iconTone} size={24} />
       <Text size={13.5} leading={1.4} color={c.fg} style={{ flexShrink: 1, flexGrow: 1 }}>
         <Text size={13.5} leading={1.4} weight={600} color={c.fg}>{lead}</Text>
         {children ? ` ${children}` : null}
         {link ? <Text size={13.5} leading={1.4} weight={600} color={c.fg} accessibilityRole="link" onPress={onLink} style={{ textDecorationLine: "underline" }}>{` ${link}`}</Text> : null}
       </Text>
+      {button ? <Button label={button} kind="accent" size="sm" onPress={onButton} /> : null}
     </View>
   );
 }
@@ -98,7 +99,7 @@ export function Skeleton({ width = "100%", height, radius = 6 }: { width?: Dimen
 }
 
 /** The toast pill itself (also used inline on the board). */
-export function Toast({ message, lead, action, onAction, countdown }: { message: string; /** The bold start of the message ("Approved."). */ lead?: string; action?: string; onAction?: () => void; /** A 2 pt line along the bottom that runs out over this many ms (the assistant's 10 s window to undo). */ countdown?: number }) {
+export function Toast({ message, lead, action, onAction, countdown, done }: { message: string; /** The bold start of the message ("Approved."). */ lead?: string; action?: string; onAction?: () => void; /** A 2 pt line along the bottom that runs out over this many ms (the assistant's 10 s window to undo). */ countdown?: number; /** The green check in front (SystemStates "Saved offline"). */ done?: boolean }) {
   const { colors } = useTheme();
   const reduced = useReducedMotion();
   const run = useSharedValue(1);
@@ -113,6 +114,11 @@ export function Toast({ message, lead, action, onAction, countdown }: { message:
         flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44, borderRadius: 18, paddingVertical: 8, paddingRight: 8, paddingLeft: 16,
         backgroundColor: colors.inv, overflow: "hidden", boxShadow: cssShadow("0 14px 34px -12px var(--shadow)", colors),
       }}>
+      {done ? (
+        <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors["ok-dot"], alignItems: "center", justifyContent: "center", marginRight: -1 }}>
+          <Glyph name="check" size={12} tint={board.white} weight={3.2} />
+        </View>
+      ) : null}
       <Text size={14.5} color="on-inv" style={{ flexGrow: 1, flexShrink: 1 }}>
         {lead ? <Text size={14.5} weight={600} color="on-inv">{`${lead} `}</Text> : null}
         {message}
@@ -131,7 +137,7 @@ export function Toast({ message, lead, action, onAction, countdown }: { message:
   );
 }
 
-type ToastMsg = { message: string; lead?: string; action?: string; onAction?: () => void; /** How long it stays, in ms (3 s). */ duration?: number; /** Shows the line that runs out over `duration`. */ countdown?: boolean };
+type ToastMsg = { message: string; lead?: string; action?: string; onAction?: () => void; done?: boolean; /** How long it stays, in ms (3 s). */ duration?: number; /** Shows the line that runs out over `duration`. */ countdown?: boolean };
 const ToastCtx = createContext<(t: ToastMsg) => void>(() => {});
 
 /** Show a toast: `const toast = useToast(); toast({ message, action: t("undo"), onAction })`. */
@@ -164,7 +170,7 @@ export function ToastHost({ children }: { children: ReactNode }) {
       {children}
       {msg ? (
         <Animated.View pointerEvents="box-none" style={[{ position: "absolute", left: 16, right: 16, bottom: 104 }, style]}>
-          <Toast message={msg.message} lead={msg.lead} action={msg.action} onAction={() => { msg.onAction?.(); hide(); }} countdown={msg.countdown ? msg.duration ?? 3000 : undefined} />
+          <Toast message={msg.message} lead={msg.lead} done={msg.done} action={msg.action} onAction={() => { msg.onAction?.(); hide(); }} countdown={msg.countdown ? msg.duration ?? 3000 : undefined} />
         </Animated.View>
       ) : null}
     </ToastCtx.Provider>

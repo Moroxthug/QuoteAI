@@ -14,6 +14,7 @@ import { initialsOf } from "@/lib/invites";
 import type { JobDetail } from "@/lib/jobDetail";
 import { budgetBars, upNext } from "@/lib/jobPage";
 import { jobsApi, type FieldReport as Report, type Permit } from "@/lib/jobsApi";
+import { addJobNote, jobRef } from "@/lib/outbox";
 import { screenHref } from "@/lib/nav";
 import { Avatar } from "@/ui/Avatar";
 import { Button } from "@/ui/Button";
@@ -103,10 +104,10 @@ export function Overview({ d, id, locale, onRecord }: Props) {
   const addNote = async () => {
     setBusy("note");
     try {
-      await jobsApi.addNote(id, noteText.trim());
-      void client.invalidateQueries({ queryKey: ["job-notes", id] });
+      const n = await addJobNote(id, jobRef(id), noteText.trim());
+      if (!n.queued) void client.invalidateQueries({ queryKey: ["job-notes", id] });
       setNoteOpen(false); setNoteText("");
-      toast({ message: j("notes.saved") });
+      toast(n.queued ? { message: t("sync.savedOffline"), done: true } : { message: j("notes.saved") });
     } catch {
       toast({ message: j("failed") });
     } finally {

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQueryClient } from "@tanstack/react-query";
-import { jobsApi } from "@/lib/jobsApi";
+import { addJobNote, jobRef } from "@/lib/outbox";
 import { Button } from "@/ui/Button";
 import { useToast } from "@/ui/Feedback";
 import { TextField } from "@/ui/Field";
@@ -19,11 +19,11 @@ export function RecordSheet({ id, open, onClose }: { id: string; open: boolean; 
   const save = async () => {
     setBusy(true);
     try {
-      await jobsApi.addNote(id, text.trim());
-      void client.invalidateQueries({ queryKey: ["job-notes", id] });
+      const n = await addJobNote(id, jobRef(id), text.trim());
+      if (!n.queued) void client.invalidateQueries({ queryKey: ["job-notes", id] });
       setText("");
       onClose();
-      toast({ message: j("notes.saved") });
+      toast(n.queued ? { message: t("sync.savedOffline"), done: true } : { message: j("notes.saved") });
     } catch {
       toast({ message: j("failed") });
     } finally {

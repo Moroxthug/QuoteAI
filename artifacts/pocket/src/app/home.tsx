@@ -34,6 +34,7 @@ import { Button } from "@/ui/Button";
 import { Sheet, SheetTitle } from "@/ui/Sheet";
 import { TAB_BAR_SPACE } from "@/ui/TabBar";
 import { TabScreen } from "@/ui/TabShell";
+import { SyncStates } from "@/ui/Sync";
 import { PushBack, useCardOpenActive } from "@/ui/CardOpen";
 
 export default function SmartHome() {
@@ -111,6 +112,7 @@ export default function SmartHome() {
             quickLabel={t("home.quickAdd")} onQuick={() => setQuickOpen(true)} menuLabel={t("home.openMenu")} onMenu={() => router.push(screenHref("Menu", t("home.openMenu")))}
             initials={user ? initialsOf(user.name) : ""} unread={(unread.data?.unread ?? 0) > 0} unreadLabel={t("home.notifications")} />
         </Section>
+        <SyncStates pt={14} />
         <Section delay={70} pt={18} px={16}>
           <QuoteBar open={barOpen} onOpenChange={setBarOpen} clients={clientOpts} locale={locale} text={text} onText={setText} onBuild={build}
             onReview={(id) => { setBarOpen(false); setText(""); router.push(screenHref("Quote", t("quotes.actions.openQuote"), { id })); }}

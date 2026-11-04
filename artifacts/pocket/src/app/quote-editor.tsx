@@ -15,6 +15,7 @@ import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
 import { tintFor } from "@/lib/clients";
 import { API_ORIGIN } from "@/lib/session";
+import { saveQuoteEdit, useOutbox, withWaiting } from "@/lib/outbox";
 import { quoteApi, type QuoteFull, type Variant } from "@/lib/quoteApi";
 import { addLine, canSend, editLine, flagKey, flagsOf, lineCount, moveLineUp, newLine, normalizeSchedule, parseAmount, scheduleView, segments, SEGMENT_COLOURS, stepTerm, toggleHoldback } from "@/lib/quoteEditor";
 import { recompute, type Chapter } from "@/lib/quoteMath";
@@ -39,6 +40,7 @@ import { Sheet, SheetTitle } from "@/ui/Sheet";
 import { Status } from "@/ui/Status";
 import { Stepper } from "@/ui/Stepper";
 import { Switch } from "@/ui/Switch";
+import { SyncStates } from "@/ui/Sync";
 import { Num, Text } from "@/ui/Text";
 
 const SAVE_MS = 700;
@@ -55,7 +57,8 @@ export default function QuoteEditor() {
   const vq = useQuery({ queryKey: ["quote-variants", id], queryFn: () => quoteApi.variants(id!), enabled: signedIn && !!id, retry: false, staleTime: 15_000 });
   const pc = useQuery({ queryKey: ["quote-price-check", id], queryFn: () => quoteApi.priceCheck(id!), enabled: signedIn && !!id, retry: false, staleTime: 30_000 });
   const book = useQuery({ queryKey: ["catalog"], queryFn: quoteApi.catalog, enabled: signedIn, retry: false, staleTime: 5 * 60_000 });
-  const quote = q.data;
+  useOutbox(); // edits waiting on the phone are laid over the quote
+  const quote = q.data ? withWaiting(q.data, `/api/quotes/${encodeURIComponent(q.data.id)}`) : undefined;
   const variants = vq.data?.variants ?? [];
   const editingVariant = variants.find((v) => v.id === variantId) ?? null;
 
@@ -122,12 +125,11 @@ export default function QuoteEditor() {
       if (p.lines) {
         const r = recompute(p.lines, rate, discount);
         if (editingVariant) { const v = await quoteApi.updateVariant(quote.id, editingVariant.id, { capitoli: r.capitoli, subtotale: r.subtotale, ivaValore: r.ivaValore, totale: r.totale, sconto: r.sconto }); void client.setQueryData(["quote-variants", id], { variants: variants.map((x) => (x.id === v.id ? v : x)) }); }
-        else { const u = await quoteApi.update(quote.id, { capitoli: r.capitoli, subtotale: r.subtotale, ivaValore: r.ivaValore, totale: r.totale, sconto: r.sconto, ...(quote.paymentSchedule ? { paymentSchedule: normalizeSchedule(quote.paymentSchedule) } : null) }); client.setQueryData(["quote", id], u); }
+        else { await editQuote({ capitoli: r.capitoli, subtotale: r.subtotale, ivaValore: r.ivaValore, totale: r.totale, sconto: r.sconto, ...(quote.paymentSchedule ? { paymentSchedule: normalizeSchedule(quote.paymentSchedule) } : null) }); }
         void client.invalidateQueries({ queryKey: ["quote-price-check", id] });
       }
       if (p.title !== undefined || p.notes !== undefined) {
-        const u = await quoteApi.update(quote.id, { ...(p.title !== undefined ? { titoloPreventivoRiga1: p.title.trim() || null } : null), ...(p.notes !== undefined ? { note: p.notes } : null) });
-        client.setQueryData(["quote", id], u);
+        await editQuote({ ...(p.title !== undefined ? { titoloPreventivoRiga1: p.title.trim() || null } : null), ...(p.notes !== undefined ? { note: p.notes } : null) });
       }
       void client.invalidateQueries({ queryKey: getListQuotesQueryKey() });
     } catch (e) { failToast(e); }
@@ -136,7 +138,14 @@ export default function QuoteEditor() {
   const changeLines = (next: Chapter[]) => { setCaps(next); pending.current.lines = next; later(); };
   const changeTitle = (v: string) => { setTitle(v); pending.current.title = v; later(); };
   const changeNotes = (v: string) => { setNotes(v); pending.current.notes = v; later(); };
-  const saveQuote = (data: Parameters<typeof quoteApi.update>[1]) => quoteApi.update(quote.id, data).then((u) => { client.setQueryData(["quote", id], u); return u; }).catch((e) => { failToast(e); throw e; });
+  // With no signal the edit waits on the phone (SystemStates "Saved offline"); the quote shows it meanwhile.
+  const editQuote = async (data: Parameters<typeof quoteApi.update>[1]): Promise<QuoteFull> => {
+    const r = await saveQuoteEdit(q.data!, data as Record<string, unknown>, quote.numeroPreventivoData?.trim() ?? "");
+    if (r.queued) toast({ message: t("sync.savedOffline"), done: true });
+    else client.setQueryData(["quote", id], r.value);
+    return r.value;
+  };
+  const saveQuote = (data: Parameters<typeof quoteApi.update>[1]) => editQuote(data).catch((e) => { failToast(e); throw e; });
 
   const exclusions = quote.exclusions ?? [];
   const addExclusion = () => { const v = exDraft.trim(); if (!v) return; setExDraft(""); void saveQuote({ exclusions: [...exclusions, v] }); };
@@ -169,6 +178,7 @@ export default function QuoteEditor() {
             changeLabel={!readOnly && !editingVariant ? t("qe.change") : undefined} onChange={() => router.push(screenHref("Quote", t("quote.actions.openQuote"), { id: quote.id }))} />
         </Section>
         {readOnly ? <Section delay={20} pt={14} px={16}><Banner tone="info" icon="lock" iconTone="slate" lead={t("qe.banner.locked")}>{t("qe.banner.lockedBody")}</Banner></Section> : (seen || quote.revisionOpen) ? <Section delay={40} pt={14} px={16}>{quote.revisionOpen ? <Banner tone="acc" icon="sync" iconTone="violet" lead={t("qe.banner.version", { n: quote.version ?? 2 })}>{t("qe.banner.versionBody", { name: firstName })}</Banner> : <Banner tone="acc" icon="sync" iconTone="violet" lead={t("qe.banner.seen", { name: firstName })}>{t("qe.banner.seenBody", { next: (quote.version ?? 1) + 1 })}</Banner>}</Section> : null}
+        <SyncStates pt={14} />
         <Section delay={60} pt={12} px={16}>
           <NavCard title={t("qe.priceCheck.title")} sub={pc.data ? (nFlags ? t("qe.priceCheck.against") : pc.data.references ? t("qe.priceCheck.inRange") : t("qe.priceCheck.none")) : t("qe.priceCheck.against")}
             status={pc.data ? (nFlags ? <Status tone="warn" shape="alert">{t("qe.priceCheck.toCheck", { count: nFlags })}</Status> : <Status tone="ok" shape="check">{t("qe.priceCheck.ok")}</Status>) : <Text size={12.5} color="muted">…</Text>}

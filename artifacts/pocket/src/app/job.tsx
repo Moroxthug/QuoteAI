@@ -16,6 +16,7 @@ import { dateOnly } from "@/lib/jobs";
 import { figures, jobWindow, milestoneCounts, segments, TAB_ORDER, type JobTab } from "@/lib/jobPage";
 import { jobsApi } from "@/lib/jobsApi";
 import { addJobPhoto } from "@/lib/jobPhotos";
+import { addJobNote } from "@/lib/outbox";
 import { useDictation } from "@/lib/newQuoteInput";
 import { screenHref } from "@/lib/nav";
 import { useRememberOpened } from "@/lib/recents";
@@ -46,6 +47,7 @@ import { MenuList, MenuRow } from "@/ui/Row";
 import { Screen } from "@/ui/Screen";
 import { Sheet, SheetTitle } from "@/ui/Sheet";
 import type { StatusShape, StatusTone } from "@/ui/Status";
+import { SyncStates } from "@/ui/Sync";
 import { Text } from "@/ui/Text";
 
 const LOOK: Record<string, { tone: StatusTone; shape: StatusShape }> = {
@@ -123,8 +125,9 @@ export default function Job() {
   };
 
   const addPhoto = async () => {
-    const r = await addJobPhoto(job.id);
+    const r = await addJobPhoto(job.id, job.name);
     if (r === "ok") { void client.invalidateQueries({ queryKey: ["job-photos", job.id] }); setTab("photos"); toast({ message: j("quick.photoAdded") }); }
+    else if (r === "queued") toast({ message: t("sync.photoWaits"), done: true });
     else if (r !== "cancelled") toast({ message: r === "denied" ? j("quick.denied") : r === "unavailable" ? j("quick.unavailable") : j("quick.photoFailed") });
   };
   const voice = async () => {
@@ -132,7 +135,7 @@ export default function Job() {
     if (!r) return;
     if (!r.ok) { toast({ message: r.problem === "denied" ? j("quick.denied") : r.problem === "unavailable" ? j("quick.unavailable") : j("quick.voiceFailed") }); return; }
     if (!r.text.trim()) { toast({ message: j("quick.voiceFailed") }); return; }
-    try { await jobsApi.addNote(job.id, r.text.trim()); void client.invalidateQueries({ queryKey: ["job-notes", job.id] }); toast({ message: j("quick.voiceSaved") }); } catch { toast({ message: j("failed") }); }
+    try { const n = await addJobNote(job.id, job.name, r.text.trim()); if (n.queued) toast({ message: t("sync.savedOffline"), done: true }); else { void client.invalidateQueries({ queryKey: ["job-notes", job.id] }); toast({ message: j("quick.voiceSaved") }); } } catch { toast({ message: j("failed") }); }
   };
 
   const setStatus = async (s: "active" | "suspended" | "completed") => {
@@ -177,6 +180,7 @@ export default function Job() {
               action={job.address ? j("map") : undefined} onAction={() => void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`)} />
           </Section>
           <Section delay={50} pt={18} px={16}>
+            <SyncStates pt={0} pb={12} px={0} />
             <ProgressCard left={counts.total ? j("milestonesDone", { done: counts.done, total: counts.total }) : j("noMilestones")} pct={pct(job.progressPercent)} segments={counts.total ? segments(d.milestones) : [{ state: "todo", fill: 0 }]} cells={cells} />
           </Section>
           <Section delay={90} pt={12} pb={20} px={16}>

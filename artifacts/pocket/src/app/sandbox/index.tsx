@@ -46,6 +46,7 @@ export default function Sandbox() {
         <Link href="/sandbox/foundations" asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.foundations")} →`} /></Pressable></Link>
         {/* Typed routes pick up new screens on the next Metro start. */}
         <Link href={"/sandbox/motion" as Href} asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sandbox.motionLink")} →`} /></Pressable></Link>
+        <Link href={"/sandbox/system-states" as Href} asChild><Pressable accessibilityRole="link"><BoardGroup label={`${t("sync.board.title")} →`} /></Pressable></Link>
         {sentryOn ? <Pressable accessibilityRole="button" onPress={openFeedback}><BoardGroup label={`${t("sandbox.feedback")} →`} /></Pressable> : null}
         {shown.map(([name, Section]) => <Section key={name} />)}
         <Text> </Text>

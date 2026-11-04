@@ -9,7 +9,9 @@ import { useFonts } from "expo-font";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { setToken } from "@/lib/session";
+import { API_ORIGIN, setToken } from "@/lib/session";
+import { startNet } from "@/lib/net";
+import { startOutbox } from "@/lib/outbox";
 import { SessionProvider } from "@/lib/useSession";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
@@ -35,6 +37,9 @@ function RootLayout() {
   const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1 } } }));
   const [fontsLoaded, fontError] = useFonts(fontFiles);
   const url = Linking.useLinkingURL();
+
+  // SystemStates: the connection, and what waits on the phone to be sent when it is back.
+  useEffect(() => { startNet(API_ORIGIN); startOutbox(client); }, [client]);
 
   // Development only: `quoteai:///?devToken=…` stores a local test token (a shortcut; the real sign-in is /sign-in).
   useEffect(() => {

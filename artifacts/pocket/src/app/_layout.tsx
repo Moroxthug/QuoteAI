@@ -12,6 +12,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { API_ORIGIN, setToken } from "@/lib/session";
 import { startNet } from "@/lib/net";
 import { startOutbox } from "@/lib/outbox";
+import { startUpdates } from "@/lib/appUpdates";
+import { fitOrientation } from "@/lib/orientation";
 import { SessionProvider } from "@/lib/useSession";
 import { fontFiles } from "@/ui/fonts";
 import { ThemeProvider } from "@/ui/theme";
@@ -41,7 +43,7 @@ function RootLayout() {
   const url = Linking.useLinkingURL();
 
   // SystemStates: the connection, and what waits on the phone to be sent when it is back.
-  useEffect(() => { startNet(API_ORIGIN); startOutbox(client); }, [client]);
+  useEffect(() => { startNet(API_ORIGIN); startOutbox(client); startUpdates(); void fitOrientation(); }, [client]);
 
   // Development only: `quoteai:///?devToken=…` stores a local test token (a shortcut; the real sign-in is /sign-in).
   useEffect(() => {

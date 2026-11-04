@@ -1,12 +1,13 @@
 // SystemStates.dc.html, "Offline and sync", the way the states appear inside screens: the offline banner, Sending and "Showing what was synced at",
 // photos waiting for Wi-Fi, rejected by the server (Retry / Discard), conflict (Keep mine / Keep theirs per field, then Save my choices), new version
-// ready (Reload) and server unreachable (Try again). `SyncStates` reads the outbox and the connection and shows whichever apply; the parts are
+// ready (Reload, from lib/appUpdates) and server unreachable (Try again). `SyncStates` reads the outbox and the connection and shows whichever apply; the parts are
 // exported for the sandbox.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useIsFetching } from "@tanstack/react-query";
 import { money, number, percent, sentence, time, type Locale } from "@/lib/format";
+import { reloadNow, useUpdateReady } from "@/lib/appUpdates";
 import { getNet, tryServer, useNet } from "@/lib/net";
 import { clearCleared, clearPhotoDone, discard, flushPhotos, pick, retry, saveChoices, useOutbox, type Cleared, type PhotoState } from "@/lib/outbox";
 import { allPicked, counts, groupOf, photoTotals, whyRejected, type FieldGroup, type Op } from "@/lib/sync";
@@ -231,6 +232,7 @@ export function SyncStates({ pt = 12, pb = 0, px = 16 }: { /** Space around, onl
   const net = useNet();
   const box = useOutbox();
   const fetching = useIsFetching() > 0;
+  const update = useUpdateReady();
   const [trying, setTrying] = useState(false);
   const [wasDown, setWasDown] = useState(!net.online || !net.reachable);
   const down = !net.online || !net.reachable;
@@ -254,6 +256,7 @@ export function SyncStates({ pt = 12, pb = 0, px = 16 }: { /** Space around, onl
     photos.count || box.photoState === "done" ? <PhotosCard key="ph" state={box.photoState} count={photos.count} bytes={photos.bytes} job={photoJob} doneCount={box.photoDone?.count ?? 0} onSend={() => void flushPhotos(getNet().online)} /> : null,
     rejected.length || box.cleared ? <RejectedCard key="rj" ops={rejected} cleared={box.cleared} onRetry={(id) => void retry(id)} onDiscard={discard} /> : null,
     ...conflicts.map((op) => <ConflictCard key={op.id} op={op} onPick={(g, s) => pick(op.id, g, s)} onSave={() => void saveChoices(op.id)} />),
+    update ? <NewVersionBanner key="nv" onReload={() => void reloadNow()} /> : null,
   ].filter(Boolean);
   if (!parts.length) return null;
   return <View style={{ gap: 10, paddingTop: pt, paddingBottom: pb, paddingHorizontal: px }}>{parts}</View>;

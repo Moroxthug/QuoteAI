@@ -448,6 +448,22 @@ Built from SystemStates.dc.html, "Offline and sync". The board's "Plans, roles, 
 - **Not done**: the other lists (Jobs, Clients, Invoices) don't split yet; at tablet width they show their phone layout beside the rail. The board draws Quotes only.
 - **Verified**: `tsc`, `npm test` 552, `lint:tokens`, EN/FR parity (namespace `tb`); in the browser pane at 1366 × 1024 on the local API: the rail, Quotes beside the quote, Home with the rail. NOT checked on a real tablet.
 
+### 129.9 Release prep (2026-11-04)
+- **Orientation**: `app.json` was locked to portrait, so no tablet could reach the 1024-wide layout. Now every orientation is allowed and `lib/orientation.ts` (expo-screen-orientation, new dependency) locks phones (short side under 600) back to portrait at start; tablets turn.
+- **Over-the-air updates (D-6)**: expo-updates (new dependency) and `runtimeVersion: { policy: "appVersion" }`. `lib/appUpdates.ts` checks at start and each time the app comes to the front, downloads a newer bundle of the same runtime, and then SystemStates' "A new version is ready. Reload" shows in `SyncStates`. Off until the Expo project exists (no update URL yet), and never in dev or on the web.
+- **EAS**: `eas.json` with `preview` (internal APK / iOS device build) and `production` (app bundle, iOS build) profiles and a `production` submit profile (Play track production, as a draft). Android releases still go through `npm run release:android` with the upload key; EAS is for iOS (no Mac) and for publishing updates.
+- **Store listing**: `docs/POCKET-STORE-LISTING.md`, EN and Québec FR, within Play's limits (name 26 / 29, short 65 / 71). Draft for the owner; not entered anywhere. Screenshots, the feature graphic and the Data safety form are listed there as still to make.
+- **New native modules since the last bundle** (420733): expo-network, expo-local-authentication, expo-updates, expo-screen-orientation. The next `release:android` bundle carries them; the web preview can't exercise them.
+
+### Phase 129 status (2026-11-04)
+Built: 129.0 to 129.9 (cards open full screen, weather, phone fixes, the ops alert, the Québec French review, the largest-text sweep, SystemStates offline and sync, app lock and the permission sheets, the tablet layout, release prep). Not pushed to the stores.
+**Owner, to finish the phase:**
+1. Make the Expo account, then in `artifacts/pocket`: `npx eas-cli@latest init` (writes the project id and the update URL into app.json; commit that). From then on, `eas update --channel production` ships a JS-only fix without a store review.
+2. The Apple developer account; then `eas build -p ios --profile production` and `eas submit -p ios` (EAS asks for the Apple sign-in and makes the certificates).
+3. A new Android bundle (`npm run release:android`) to the closed test, then on a phone: offline edits and the conflict card, photos on mobile data vs Wi-Fi, app lock after 5 minutes, the camera / mic / clock-in sheets, a tablet sideways. Then Play production with a staged rollout.
+4. Review and paste the store listing (EN, FR); the screenshots and feature graphic; the Data safety form.
+**Open, can be done here**: Jobs, Clients and Invoices beside their detail at tablet width (only Quotes splits today).
+
 ## Phase 133 screens: free-quote counter and locked state (2026-10-19)
 
 Server side is the growth plan's Phase 133 (`GET /api/me/allowance`, 402 `FREE_QUOTES_USED` when `FREE_QUOTES_ENFORCED=1`; off today).

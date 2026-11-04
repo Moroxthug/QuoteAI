@@ -2,7 +2,7 @@
 // one by one or all), what they did lately, "Export my data" and "Delete account" (a password, the word, a code when the second step is on; the account closes in 30 days).
 // States: default, two-step off, view only, loading and can't load.
 // Not true to the board: "Last changed" for the password (the server doesn't keep it), "Send codes by Text / Authenticator" (the server's second step is the authenticator app
-// only), turning two-step on or off and the backup codes (their screens aren't built: Coming soon), Face ID (not in this build), the city and phone name of a device
+// only), turning two-step on or off and the backup codes (their screens aren't built: Coming soon), the city and phone name of a device
 // (the server keeps the browser and system only), and "Cancel deletion" here (the owner is signed out when it is asked; the email link cancels it).
 import { useState } from "react";
 import { Redirect, router } from "expo-router";
@@ -14,6 +14,8 @@ import { auth } from "@/lib/auth";
 import { dateWithYear, number as num, shortDate, type Locale } from "@/lib/format";
 import { comingSoonHref, screenHref } from "@/lib/nav";
 import { activityOf, agentParts, deleteReady, othersFirst, type Device } from "@/lib/security";
+import { setAppLock, useAppLock } from "@/lib/appLock";
+import { sentence } from "@/lib/format";
 import { useRole } from "@/lib/useRole";
 import { useSession } from "@/lib/useSession";
 import { Button } from "@/ui/Button";
@@ -36,10 +38,18 @@ type AuditEvent = { id: string; action: string; actorId: string | null; userAgen
 export default function SetSecurity() {
   const { t: tr, i18n } = useTranslation();
   const t = (k: string, o?: Record<string, unknown>) => tr(`sy.${k}`, o) as string;
+  // App lock (SystemStates): the board names Face ID; a phone with a fingerprint reader shows that word instead.
+  const lock = useAppLock();
+  const lockLabel = lock.method === "faceId" ? t("sign.face.label") : sentence(tr(`lock.method.${lock.method}`));
   const locale: Locale = i18n.language === "fr" ? "fr-CA" : "en-CA";
   const { status, user, signOut } = useSession();
   const signedIn = status === "in" || status === "offline";
   const toast = useToast();
+  const toggleLock = async () => {
+    if (!lock.enabled && !lock.available) { toast({ message: t("sign.face.unavailable") }); return; }
+    const ok = await setAppLock(!lock.enabled, tr("lock.screen.prompt"), tr("lock.screen.cancel"));
+    if (!ok) toast({ message: t("sign.face.failed") });
+  };
   const client = useQueryClient();
   const { isOwner, role } = useRole();
   const devicesQ = useQuery({ queryKey: ["auth-devices"], queryFn: async () => { const r = await auth.devices(); if (!r.ok) throw new Error(r.problem); return r.data; }, enabled: signedIn, retry: 1, staleTime: 15_000 });
@@ -146,7 +156,7 @@ export default function SetSecurity() {
             <Section delay={60}>
               <SetGroup title={t("sign.title")}>
                 <SetRow first icon="key" tone="violet" label={t("sign.password.label")} sub={t("sign.password.sub")} control={<SetValue value={t("sign.password.value")} chevron />} onPress={() => router.push({ pathname: "/forgot-password", params: { email: user?.email ?? "" } })} />
-                <SetRow icon="face" tone="slate" label={t("sign.face.label")} sub={t("sign.face.sub")} control={<Switch value={false} onChange={() => toast({ message: t("sign.face.soon") })} label={t("sign.face.label")} />} />
+                <SetRow icon="face" tone="slate" label={lockLabel} sub={t("sign.face.sub")} control={<Switch value={lock.enabled} onChange={toggleLock} label={lockLabel} />} />
                 <SetRow icon="shield" tone="indigo" label={t("sign.two.label")} sub={twoStep ? t("sign.two.on") : t("sign.two.off")} control={<RowStatus tone={twoStep ? "ok" : "warn"} shape={twoStep ? "check" : "alert"}>{twoStep ? t("sign.two.onWord") : t("sign.two.offWord")}</RowStatus>} />
                 {twoStep
                   ? <SetRow icon="list" tone="stone" label={t("sign.backup.label")} sub={t("sign.backup.sub")} control={<SetValue value="" chevron />} onPress={() => router.push(screenHref("SetTwoStep", t("sign.backup.label")))} />

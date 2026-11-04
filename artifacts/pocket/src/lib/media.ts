@@ -2,6 +2,7 @@
 // not have yet, so each is loaded on its own and the screen gets a plain "unavailable" instead of a crash. On the web there is no
 // camera permission, so the camera falls back to the file chooser.
 import { Platform } from "react-native";
+import { primeFor } from "./askFirst";
 import type { UploadFile } from "./jobUpload";
 
 export type PickResult = { ok: true; files: UploadFile[] } | { ok: false; problem: "unavailable" | "denied" | "failed" };
@@ -26,6 +27,7 @@ export async function takePhoto(stem = "photo"): Promise<PickResult> {
       const r = await p.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.8 });
       return r.canceled ? { ok: true, files: [] } : { ok: true, files: toFiles(r.assets, stem) };
     }
+    if (!(await primeFor("camera", () => p.getCameraPermissionsAsync()))) return { ok: true, files: [] };
     const perm = await p.requestCameraPermissionsAsync();
     if (!perm.granted) return { ok: false, problem: "denied" };
     const r = await p.launchCameraAsync({ mediaTypes: ["images"], quality: 0.8 });

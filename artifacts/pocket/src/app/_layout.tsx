@@ -19,6 +19,7 @@ import { ToastHost } from "@/ui/Feedback";
 import { CardOpenProvider } from "@/ui/CardOpen";
 import { GlobalTabBar } from "@/ui/GlobalTabBar";
 import { FreeQuotesGate } from "@/ui/FreeQuotes";
+import { AppLockHost } from "@/ui/AppLock";
 import { usePlayBillingBoot } from "@/lib/usePlayBilling";
 import { board } from "@/theme/board";
 
@@ -69,6 +70,7 @@ function RootLayout() {
                     <GlobalTabBar />
                     <FreeQuotesGate />
                     <PlayBillingBoot />
+                    <AppLockHost />
                   </View>
                 </CardOpenProvider>
               </ToastHost>

@@ -110,6 +110,7 @@ export default function Assistant() {
     if (busy) return;
     if (!listening) {
       const r = await voice.start();
+      if (r === "cancelled") return;
       if (r !== "ok") { setCaption(t(r === "denied" ? "ai.micDenied" : "ai.micFailed")); return; }
       setCaption("");
       setListening(true);

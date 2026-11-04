@@ -18,7 +18,7 @@ export const en = {
   sign: {
     title: "Sign in",
     password: { label: "Password", sub: "A link comes by email", value: "Change" },
-    face: { label: "Face ID", sub: "Sign in and unlock after 5 minutes away", soon: "Face ID isn’t in this build yet." },
+    face: { label: "Face ID", sub: "Sign in and unlock after 5 minutes away", unavailable: "Set up Face ID or a fingerprint on this phone first.", failed: "It didn’t recognize you. App lock stays off." },
     two: { label: "Two-step verification", on: "A code from your authenticator app", off: "Off. A code on top of your password", onWord: "On", offWord: "Off" },
     backup: { label: "Backup codes", sub: "For when you lose your phone" },
     setup: { label: "Set up two-step", sub: "Takes about a minute" },
@@ -66,7 +66,7 @@ export const fr: typeof en = {
   sign: {
     title: "Connexion",
     password: { label: "Mot de passe", sub: "Un lien arrive par courriel", value: "Modifier" },
-    face: { label: "Face ID", sub: "Déverrouillage après 5 min d’absence", soon: "Face ID n’est pas encore dans cette version." },
+    face: { label: "Face ID", sub: "Déverrouillage après 5 min d’absence", unavailable: "Configurez d’abord Face ID ou une empreinte sur ce téléphone.", failed: "Vous n’avez pas été reconnu. Le verrouillage reste désactivé." },
     two: { label: "Vérification en deux étapes", on: "Un code de votre application d’authentification", off: "Désactivée. Un code en plus du mot de passe", onWord: "Activée", offWord: "Désactivée" },
     backup: { label: "Codes de secours", sub: "Si vous perdez votre téléphone" },
     setup: { label: "Activer les deux étapes", sub: "Environ une minute" },

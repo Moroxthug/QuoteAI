@@ -2,12 +2,14 @@
 // use"; nothing runs in the background. expo-location is a native module the installed dev client may not have yet, so it is loaded on its own and the
 // screen gets a plain "unavailable" instead of a crash. On the web the browser's own geolocation is used.
 import { Platform } from "react-native";
+import { primeFor } from "./askFirst";
 import { kvGet, kvSet } from "./kv";
 
 export type Fix = { lat: number; lng: number };
-export type FixResult = { ok: true; fix: Fix } | { ok: false; problem: "denied" | "unavailable" | "failed" };
+export type FixResult = { ok: true; fix: Fix } | { ok: false; problem: "denied" | "unavailable" | "failed" | "cancelled" };
 
-export async function currentFix(timeoutMs = 8000): Promise<FixResult> {
+/** `askFirst`: the "Allow location at clock-in" sheet comes before the phone's own prompt (SystemStates). */
+export async function currentFix(timeoutMs = 8000, askFirst = false): Promise<FixResult> {
   if (Platform.OS === "web") {
     const g = (globalThis as { navigator?: Navigator }).navigator?.geolocation;
     if (!g) return { ok: false, problem: "unavailable" };
@@ -26,6 +28,7 @@ export async function currentFix(timeoutMs = 8000): Promise<FixResult> {
     return { ok: false, problem: "unavailable" };
   }
   try {
+    if (askFirst && !(await primeFor("location", () => loc.getForegroundPermissionsAsync()))) return { ok: false, problem: "cancelled" };
     const perm = await loc.requestForegroundPermissionsAsync();
     if (!perm.granted) return { ok: false, problem: "denied" };
     const p = await loc.getCurrentPositionAsync({ accuracy: loc.Accuracy.Balanced });

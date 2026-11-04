@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import type { AttachFile } from "./firstQuoteApi";
+import { primeFor } from "./askFirst";
 import { newQuoteApi } from "./newQuoteApi";
 
 type AudioModule = typeof import("expo-audio");
@@ -34,6 +35,7 @@ function useNative(): Dictation {
     if (state === "busy") return null;
     try {
       if (state === "idle") {
+        if (!(await primeFor("mic", () => a.getRecordingPermissionsAsync()))) return null;
         const perm = await a.requestRecordingPermissionsAsync();
         if (!perm.granted) return { ok: false, problem: "denied" };
         await a.setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true });

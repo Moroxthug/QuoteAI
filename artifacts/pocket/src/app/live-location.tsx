@@ -47,7 +47,7 @@ export default function LiveLocation() {
     setBusy(true);
     setProblem(null);
     const f = await currentFix();
-    if (!f.ok) { setBusy(false); setProblem(f.problem); return; }
+    if (!f.ok) { setBusy(false); if (f.problem !== "cancelled") setProblem(f.problem); return; }
     await setSharing("on");
     setMode("on");
     if (view.activeEntry) void crewApi.location(crew.path!, f.fix.lat, f.fix.lng).catch(() => undefined);

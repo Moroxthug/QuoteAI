@@ -5,6 +5,7 @@ import { ScrollView, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import type { FieldGroup, Op } from "@/lib/sync";
 import type { Cleared, PhotoState } from "@/lib/outbox";
+import { AskBody, ASK_ICON, LockScreen, SheetFrame, useMethodName } from "../AppLock";
 import { Toast } from "../Feedback";
 import { Screen } from "../Screen";
 import { ConflictCard, NewVersionBanner, OfflineBanner, PhotosCard, RejectedCard, summary, SyncCard, Unreachable } from "../Sync";
@@ -17,6 +18,8 @@ export function SystemStatesBoard() {
   const b = (k: string) => t(`sync.board.${k}`) as string;
   const s = (k: string, o?: Record<string, unknown>) => t(`sync.${k}`, o) as string;
   const ref = b("ref");
+  const l = (k: string, o?: Record<string, unknown>) => t(`lock.${k}`, o) as string;
+  const faceId = useMethodName("faceId");
 
   const [ph, setPh] = useState<PhotoState>("idle");
   const sendPhotos = () => { setPh("busy"); setTimeout(() => setPh("done"), 2300); };
@@ -54,6 +57,17 @@ export function SystemStatesBoard() {
         <BoardPad><Unreachable onRetry={() => {}} /></BoardPad>
         <BoardGroup label={b("saved")} />
         <BoardPad><View><Toast done message={s("savedOffline")} /></View></BoardPad>
+        <BoardSection title={l("board.section")} />
+        <BoardGroup label={l("board.lock")} />
+        <BoardPad><LockScreen framed company={l("board.company")} email={l("board.email")} method="faceId" onUnlock={() => {}} onSignOut={() => {}} /></BoardPad>
+        <BoardGroup label={l("board.offer")} />
+        <BoardPad><SheetFrame><AskBody icon="face" tone="violet" title={l("offer.title", { method: faceId })} body={l("offer.body")} later={l("offer.later")} go={l("offer.on")} onLater={() => {}} onGo={() => {}} /></SheetFrame></BoardPad>
+        <BoardGroup label={l("board.ask")} />
+        <BoardPad style={{ gap: 12 }}>
+          {(["camera", "mic", "location", "notifications"] as const).map((k) => (
+            <SheetFrame key={k}><AskBody {...ASK_ICON[k]} title={l(`ask.${k}.title`)} body={l(`ask.${k}.body`)} later={l("ask.later")} go={l("ask.go")} onLater={() => {}} onGo={() => {}} /></SheetFrame>
+          ))}
+        </BoardPad>
       </ScrollView>
     </Screen>
   );

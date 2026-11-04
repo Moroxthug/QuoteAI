@@ -130,7 +130,7 @@ export default function CrewNow() {
     if (phase.kind !== "idle") return;
     if (!clockedIn && !chosen) { toast({ message: c("clock.noJob") }); return; }
     setPhase({ kind: "locating" });
-    const f = await currentFix();
+    const f = await currentFix(8000, true);
     const pos = f.ok ? { lat: f.fix.lat, lng: f.fix.lng } : {};
     const at = new Date();
     try {

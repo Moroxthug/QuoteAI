@@ -9,12 +9,16 @@ export type AuthProblem =
   | "wrong"        // the email or password (or code) is wrong
   | "unverified"   // the address was never confirmed: a code is needed
   | "cancelled"    // the account is scheduled for deletion
+  | "twoStep"      // Google or Apple on an account with two-step: it signs in with its password
+  | "notLinked"    // Google or Apple on an address that was never confirmed
   | "emailTaken"
   | "weakPassword"
   | "closed"       // registration is closed
   | "locked"       // too many wrong codes
   | "expired"      // the code or link ran out
   | "failed";      // anything else
+
+export type SocialMethods = { google: string | null; apple: boolean };
 
 export type AuthResult<T = null> = { ok: true; data: T } | { ok: false; problem: AuthProblem; message?: string };
 
@@ -44,6 +48,8 @@ export function classify(raw: Raw): AuthProblem {
   const code = String(raw.body.code ?? "").toUpperCase();
   const msg = String(raw.body.message ?? "").toLowerCase();
   if (code === "ACCOUNT_DELETION_PENDING") return "cancelled";
+  if (code === "TWO_STEP_USES_PASSWORD") return "twoStep";
+  if (msg.includes("not linked")) return "notLinked";
   if (code === "EMAIL_NOT_VERIFIED" || msg.includes("not verified")) return "unverified";
   if (code.includes("TOO_MANY") || msg.includes("too many") || raw.status === 429) return "locked";
   if (code.includes("EXPIRED") || msg.includes("expired")) return "expired";
@@ -80,6 +86,24 @@ export const auth = {
     result(await call("/sign-up/email", { name, email, password }), nothing),
 
   /** `twoStep: true` when the password was right and a code from the authenticator app is next. */
+  /** Which of Google and Apple the server has turned on. Nothing, when it can't be reached. */
+  async socialMethods(): Promise<SocialMethods> {
+    try {
+      const res = await fetch(`${API_ORIGIN}/api/settings/registration`);
+      const body = (await res.json()) as { social?: Partial<SocialMethods> };
+      return { google: body.social?.google ?? null, apple: body.social?.apple === true };
+    } catch {
+      return { google: null, apple: false };
+    }
+  },
+
+  /** An ID token from Google's or Apple's own sheet (lib/socialSignIn.ts). */
+  socialSignIn: async (provider: "google" | "apple", idToken: { token: string; nonce?: string; user?: unknown }) => result(await call("/sign-in/social", { provider, idToken }), nothing),
+
+  /** A 6-digit code instead of the password. Nothing is sent to an unknown address or an account with two-step. */
+  sendSignInCode: async (email: string) => result(await call("/email-otp/send-verification-otp", { email, type: "sign-in" }), nothing),
+  signInWithCode: async (email: string, otp: string) => result(await call("/sign-in/email-otp", { email, otp }), nothing),
+
   async signIn(email: string, password: string): Promise<AuthResult<{ twoStep: boolean }>> {
     const raw = await call("/sign-in/email", { email, password });
     return result(raw, (b) => ({ twoStep: b.twoFactorRedirect === true }));

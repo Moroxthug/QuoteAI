@@ -7,9 +7,9 @@
 //    bearer token (the app's session) and confirms the address;
 //  - a sign-up from the website still gets the link, as before;
 //  - a sign-in from the app with an unconfirmed address sends no link either;
-//  - codes only ever confirm an unconfirmed address: for a confirmed one
-//    nothing is sent and no code is accepted (it would be a way in with the
-//    inbox alone — no password, no second factor);
+//  - a confirming code only works on an unconfirmed address: for a confirmed one
+//    nothing is sent and no code is accepted (sign-in codes have their own type,
+//    see phase129.e2e.test.ts);
 //  - the other email-code endpoints of the plugin are not served.
 import { describe, test, expect, beforeAll, afterAll } from "vitest";
 import { randomUUID } from "node:crypto";
@@ -151,7 +151,7 @@ describe("confirming a new address in the phone app", () => {
   });
 
   test("the plugin's other endpoints are not served", async () => {
-    for (const path of ["/api/auth/sign-in/email-otp", "/api/auth/forget-password/email-otp", "/api/auth/email-otp/reset-password", "/api/auth/email-otp/check-verification-otp", "/api/auth/email-otp/request-password-reset", "/api/auth/email-otp/change-email", "/api/auth/email-otp/request-email-change"]) {
+    for (const path of ["/api/auth/forget-password/email-otp", "/api/auth/email-otp/reset-password", "/api/auth/email-otp/check-verification-otp", "/api/auth/email-otp/request-password-reset", "/api/auth/email-otp/change-email", "/api/auth/email-otp/request-email-change"]) {
       const r = await call(path, { origin: APP, body: { email: "x@example.invalid", otp: "000000", type: "sign-in" } });
       expect(r.status, path).toBe(404);
     }

@@ -8,7 +8,8 @@ import i18n, { type Lang } from "@/i18n";
 import { setRequestLanguage } from "@/lib/session";
 import { IconButton } from "./Header";
 import { Glyph, Icon, type GlyphName, type IconName, type Tone } from "./Icon";
-import { Press } from "./motion";
+import { Logo } from "./Logo";
+import { Press, Rise } from "./motion";
 import { Segmented } from "./Segmented";
 import { Text } from "./Text";
 import { useTheme, type ColorName } from "./theme";
@@ -26,6 +27,21 @@ export function LangSwitch({ width = 92 }: { width?: number }) {
     <View style={{ width }}>
       <Segmented options={["EN", "FR"]} value={index} onChange={pick} label={t("auth.language")} />
     </View>
+  );
+}
+
+/** The start screen's header row: the logo left, EN / FR right, 44 tall. */
+export function WelcomeHeader() {
+  const insets = useSafeAreaInsets();
+  return (
+    <Rise>
+      <View style={{ paddingTop: 14 + insets.top }}>
+        <View style={{ height: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingTop: 6, paddingHorizontal: 20 }}>
+          <Logo width={104} />
+          <LangSwitch width={104} />
+        </View>
+      </View>
+    </Rise>
   );
 }
 

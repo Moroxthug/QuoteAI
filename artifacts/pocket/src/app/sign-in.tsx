@@ -8,16 +8,17 @@ import { auth, type AuthProblem } from "@/lib/auth";
 import { useSession } from "@/lib/useSession";
 import { AuthBody, AuthHeader, FieldButton, OrDivider, PillLink, TextLink } from "@/ui/Auth";
 import { Button } from "@/ui/Button";
-import { Banner, useToast, type BannerTone } from "@/ui/Feedback";
+import { Banner, type BannerTone } from "@/ui/Feedback";
 import { FormCard, FormRow } from "@/ui/FormCard";
 import { Icon } from "@/ui/Icon";
 import { PageTitle } from "@/ui/Header";
 import type { IconName, Tone } from "@/ui/Icon";
 import { Section, Spacer, Stack } from "@/ui/Layout";
 import { Screen } from "@/ui/Screen";
+import { SocialButtons } from "@/ui/SocialButtons";
 import { Text } from "@/ui/Text";
 
-type Notice = "wrong" | "unverified" | "offline" | "expired" | "cancelled" | "pending" | "failed";
+type Notice = "wrong" | "unverified" | "offline" | "expired" | "cancelled" | "pending" | "failed" | "needEmail";
 const BANNER: Record<Notice, { tone: BannerTone; icon: IconName; iconTone: Tone }> = {
   wrong: { tone: "bad", icon: "warn", iconTone: "rose" },
   unverified: { tone: "info", icon: "mail", iconTone: "sky" },
@@ -26,6 +27,7 @@ const BANNER: Record<Notice, { tone: BannerTone; icon: IconName; iconTone: Tone 
   cancelled: { tone: "ok", icon: "check", iconTone: "sage" },
   pending: { tone: "warn", icon: "clock", iconTone: "amber" },
   failed: { tone: "warn", icon: "warn", iconTone: "amber" },
+  needEmail: { tone: "info", icon: "mail", iconTone: "sky" },
 };
 
 function noticeFor(problem: AuthProblem): Notice {
@@ -40,7 +42,6 @@ function noticeFor(problem: AuthProblem): Notice {
 
 export default function SignIn() {
   const { t } = useTranslation();
-  const toast = useToast();
   const { refresh } = useSession();
   const params = useLocalSearchParams<{ notice?: string; email?: string }>();
   const [email, setEmail] = useState(params.email ?? "");
@@ -51,6 +52,10 @@ export default function SignIn() {
 
   const back = () => (router.canGoBack() ? router.back() : router.replace("/welcome"));
   const toCode = () => router.push({ pathname: "/verify", params: { email: email.trim() } });
+  const emailCode = () => {
+    if (!email.includes("@")) { setNotice("needEmail"); return; }
+    router.push({ pathname: "/verify", params: { email: email.trim(), mode: "signIn" } });
+  };
 
   async function submit() {
     if (busy) return;
@@ -106,8 +111,8 @@ export default function SignIn() {
         <Section delay={100} px={16} pt={20} gap={14}>
           <Button size="lg" label={t("signIn.signIn")} busy={busy ? t("signIn.signing") : false} block onPress={() => void submit()} />
           <OrDivider label={t("auth.or")} />
-          <Button size="lg" kind="secondary" label={t("signIn.faceId")} block onPress={() => toast({ message: t("signIn.faceIdOff") })}
-            icon={<Icon name="face" tone="slate" size={24} />} />
+          <SocialButtons />
+          <Button size="lg" kind="secondary" label={t("signIn.emailCode")} block onPress={emailCode} icon={<Icon name="mail" tone="sky" size={24} />} />
         </Section>
         <Spacer />
         <Section pt={24} gap={12} align="center">

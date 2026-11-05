@@ -100,6 +100,8 @@ const MANIFEST: Record<string, Entry> = {
   QUICKBOOKS_CLIENT_SECRET: { kind: "feature", feature: "QuickBooks", note: "" },
   QUICKBOOKS_REDIRECT_URI: { kind: "feature", feature: "QuickBooks", note: "" },
   QUICKBOOKS_ENVIRONMENT: { kind: "feature", feature: "QuickBooks", note: "sandbox | production" },
+  GOOGLE_SIGN_IN_CLIENT_ID: { kind: "feature", feature: "Google sign-in", note: "Phase 129.10: the Web OAuth client id; unset = the app shows no Google button" },
+  APPLE_BUNDLE_ID: { kind: "feature", feature: "Sign in with Apple", note: "Phase 129.10: ca.quoteai.app once the Apple capability is on; unset = no Apple button" },
   GOOGLE_CALENDAR_CLIENT_ID: { kind: "feature", feature: "Google Calendar", note: "Phase 12" },
   GOOGLE_CALENDAR_CLIENT_SECRET: { kind: "feature", feature: "Google Calendar", note: "" },
   GOOGLE_CALENDAR_REDIRECT_URI: { kind: "feature", feature: "Google Calendar", note: "" },

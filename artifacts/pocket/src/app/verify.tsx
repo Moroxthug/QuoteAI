@@ -1,7 +1,8 @@
 // Verify.dc.html: the states are empty, typing, wrong, locked, verified (plus "checking" between
 // the sixth digit and the answer). The phone confirms the address with a 6-digit code, not a link:
 // the first code is sent when this screen opens (the API sends no email for the app on sign-up),
-// and the server signs the person in when the code is right.
+// and the server signs the person in when the code is right. With mode=signIn it is the sign-in code
+// from Sign in ("Email me a code"): the same screen, straight into the app when the code is right.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -27,8 +28,10 @@ export default function Verify() {
   const { t } = useTranslation();
   const toast = useToast();
   const { refresh } = useSession();
-  const params = useLocalSearchParams<{ email?: string }>();
+  const params = useLocalSearchParams<{ email?: string; mode?: string }>();
   const email = (params.email ?? "").trim();
+  const signIn = params.mode === "signIn";
+  const send = useCallback((to: string) => (signIn ? auth.sendSignInCode(to) : auth.sendCode(to)), [signIn]);
 
   const [code, setCode] = useState("");
   const [state, setState] = useState<VerifyCodeState>("typing");
@@ -52,8 +55,8 @@ export default function Verify() {
     if (!email) { router.replace("/sign-up"); return; }
     if (sentFirst.current) return;
     sentFirst.current = true;
-    void auth.sendCode(email);
-  }, [email]);
+    void send(email);
+  }, [email, send]);
 
   useEffect(() => {
     if (sec <= 0) return;
@@ -64,10 +67,11 @@ export default function Verify() {
   async function check(otp: string) {
     setState("checking");
     setLine(null);
-    const r = await auth.verifyEmail(email, otp);
+    const r = await (signIn ? auth.signInWithCode(email, otp) : auth.verifyEmail(email, otp));
     if (r.ok) {
       setState("ok");
       await refresh();
+      if (signIn) { toApp(true); return; }
       const ok = !!(await getToken());
       setSignedIn(ok);
       setTimeout(() => toApp(ok), 1400);
@@ -104,7 +108,7 @@ export default function Verify() {
     setSec(RESEND_SECONDS);
     setCode("");
     setLine(null);
-    const r = await auth.sendCode(email);
+    const r = await send(email);
     if (!r.ok && r.problem === "offline") { setLine("offline"); setSec(0); return; }
     setWrongCount(0);
     setState("typing");
@@ -153,7 +157,7 @@ export default function Verify() {
         {!verified ? (
           <Section delay={120} pt={6} align="center">
             {sec > 0 ? <VerifyWait label={t("verify.wait", { sec })} /> : <VerifyLink strong color="ink" label={t("verify.resend")} onPress={() => void resend()} />}
-            <VerifyLink role="link" label={t("verify.different")} onPress={() => router.replace("/welcome")} />
+            <VerifyLink role="link" label={t("verify.different")} onPress={() => (signIn ? back() : router.replace("/welcome"))} />
           </Section>
         ) : null}
         <Spacer />

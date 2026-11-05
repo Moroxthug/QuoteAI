@@ -6,8 +6,7 @@ export const en = {
   forgot: "Forgot password?",
   signIn: "Sign in",
   signing: "Signing in…",
-  faceId: "Sign in with Face ID",
-  faceIdOff: "Turn on Face ID in Settings once you're signed in.",
+  emailCode: "Email me a code",
   newTo: "New to quoteAI?",
   create: "Create an account",
   crew: "On a crew? Join your team",
@@ -19,6 +18,7 @@ export const en = {
     cancelled: { lead: "Account deletion cancelled.", text: "Everything is just as you left it." },
     pending: { lead: "This account is scheduled for deletion.", text: "To cancel, use the link in the confirmation email." },
     failed: { lead: "Something went wrong.", text: "Try again in a moment." },
+    needEmail: { lead: "Enter your email first.", text: "We’ll send a 6-digit code to sign you in." },
   },
 };
 export const fr: typeof en = {
@@ -29,8 +29,7 @@ export const fr: typeof en = {
   forgot: "Mot de passe oublié ?",
   signIn: "Se connecter",
   signing: "Connexion…",
-  faceId: "Se connecter avec Face ID",
-  faceIdOff: "Activez Face ID dans les réglages une fois connecté.",
+  emailCode: "Recevoir un code par courriel",
   newTo: "Nouveau sur quoteAI ?",
   create: "Créer un compte",
   crew: "Dans une équipe ? Rejoignez-la",
@@ -42,5 +41,6 @@ export const fr: typeof en = {
     cancelled: { lead: "Suppression du compte annulée.", text: "Tout est comme vous l’avez laissé." },
     pending: { lead: "La suppression de ce compte est planifiée.", text: "Pour l’annuler, utilisez le lien du courriel de confirmation." },
     failed: { lead: "Une erreur s’est produite.", text: "Réessayez dans un instant." },
+    needEmail: { lead: "Entrez d’abord votre courriel.", text: "Nous enverrons un code à 6 chiffres pour vous connecter." },
   },
 };

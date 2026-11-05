@@ -18,6 +18,7 @@ import type { IconName, Tone } from "@/ui/Icon";
 import { Section, Spacer, Stack } from "@/ui/Layout";
 import { Screen } from "@/ui/Screen";
 import { SignUpMeter, SignUpTerms } from "@/ui/SignUpMeter";
+import { SocialButtons } from "@/ui/SocialButtons";
 import { Text } from "@/ui/Text";
 
 type Notice = "taken" | "closed" | "offline" | "failed";
@@ -93,6 +94,11 @@ export default function SignUp() {
               onLink={notice === "taken" ? () => router.replace({ pathname: "/sign-in", params: { email: email.trim() } }) : () => void Linking.openURL(ACCESS_REQUEST)}>
               {t(`signUp.banner.${notice}.text`)}
             </Banner>
+          </Section>
+        ) : null}
+        {!closed ? (
+          <Section delay={40} px={16} pt={18}>
+            <SocialButtons orBelow />
           </Section>
         ) : null}
         <Section delay={60} px={16} pt={18}>

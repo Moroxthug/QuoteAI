@@ -2,11 +2,11 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, twoFactor, emailOTP } from "better-auth/plugins";
 import { createAuthMiddleware, APIError } from "better-auth/api";
-import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable, accountDeletionsTable } from "@workspace/db";
+import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificationsTable, authTwoFactorTable, businessProfilesTable, organizationMembersTable, accountDeletionsTable, settingsTable } from "@workspace/db";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
-import { requestLang, verificationEmail, verificationCodeEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
+import { requestLang, verificationEmail, verificationCodeEmail, signInCodeEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
 import { recordSecurityAuditEvent } from "./auditLog";
 
 // Minimal, duplicate-of-`resolveActingOrg` org lookup — kept local rather than
@@ -95,15 +95,17 @@ const fromNativeApp = (request: Request | undefined): boolean => {
 /**
  * Phase 121: the phone app confirms a new address with a 6-digit code typed in
  * the app, not a link — a link opens the browser, signs the person in there and
- * leaves the app signed out. Only the two endpoints that confirm an address are
- * served, and only for an account whose address is not confirmed yet: for a
- * confirmed one a code would be a way in with the inbox alone (no password, no
- * second factor), so nothing is sent and nothing is accepted.
+ * leaves the app signed out. Confirming a code is served only for an account
+ * whose address is not confirmed yet.
+ *
+ * Phase 129.10: a confirmed account may also sign in with an emailed code, which
+ * is no weaker than the reset link the same inbox already receives. An account
+ * with two-step on never can: a code would skip the second factor, so nothing is
+ * sent and nothing is accepted. It never creates an account (disableSignUp).
  */
-const EMAIL_OTP_PATHS = ["/email-otp/send-verification-otp", "/email-otp/verify-email"];
+const EMAIL_OTP_PATHS = ["/email-otp/send-verification-otp", "/email-otp/verify-email", "/sign-in/email-otp"];
 const EMAIL_OTP_DISABLED = [
   "/email-otp/check-verification-otp",
-  "/sign-in/email-otp",
   "/email-otp/request-password-reset",
   "/forget-password/email-otp",
   "/email-otp/reset-password",
@@ -121,6 +123,32 @@ async function unverifiedUser(email: unknown): Promise<boolean> {
   return !!row && !row.emailVerified;
 }
 
+async function codeSignInAllowed(email: unknown): Promise<boolean> {
+  if (typeof email !== "string" || !email) return false;
+  const [row] = await db
+    .select({ emailVerified: authUsersTable.emailVerified, twoFactorEnabled: authUsersTable.twoFactorEnabled })
+    .from(authUsersTable)
+    .where(eq(authUsersTable.email, email.toLowerCase()))
+    .limit(1);
+  return !!row && row.emailVerified && !row.twoFactorEnabled;
+}
+
+/**
+ * Phase 129.10: Google and Apple sign-in for the phone app. The phone gets an ID
+ * token from the provider's own sheet and posts it to /sign-in/social, so only
+ * the token check runs here and no client secret is needed: the redirect branch
+ * of that route is refused in the before hook. Each provider is off until its env
+ * var is set, and the app only shows the buttons the server reports (socialSignIn).
+ */
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_SIGN_IN_CLIENT_ID?.trim() || null;
+const APPLE_BUNDLE_ID = process.env.APPLE_BUNDLE_ID?.trim() || null;
+export const socialSignIn = { google: GOOGLE_CLIENT_ID, apple: !!APPLE_BUNDLE_ID };
+
+async function registrationClosed(): Promise<boolean> {
+  const [row] = await db.select().from(settingsTable).where(eq(settingsTable.key, "registration_open")).limit(1);
+  return row?.value === "false";
+}
+
 export const auth = betterAuth({
   secret,
   baseURL: getBaseURL(),
@@ -136,6 +164,10 @@ export const auth = betterAuth({
       twoFactor: authTwoFactorTable,
     },
   }),
+  socialProviders: {
+    ...(GOOGLE_CLIENT_ID ? { google: { clientId: GOOGLE_CLIENT_ID, clientSecret: "" } } : {}),
+    ...(APPLE_BUNDLE_ID ? { apple: { clientId: APPLE_BUNDLE_ID, clientSecret: "", appBundleIdentifier: APPLE_BUNDLE_ID } } : {}),
+  },
   plugins: [
     bearer(),
     twoFactor({ issuer: "QuoteAI" }),
@@ -146,7 +178,7 @@ export const auth = betterAuth({
       storeOTP: "hashed",
       disableSignUp: true,
       async sendVerificationOTP({ email, otp, type }, ctx) {
-        if (type !== "email-verification") return;
+        if (type !== "email-verification" && type !== "sign-in") return;
         if (!resend) {
           logger.warn("RESEND_API_KEY not set — skipping verification code email");
           return;
@@ -156,7 +188,7 @@ export const auth = betterAuth({
           await resend.emails.send({
             from: "QuoteAI <no-reply@quoteai.ca>",
             to: [email],
-            ...verificationCodeEmail(requestLang(ctx?.request?.headers), user?.name ?? "", otp),
+            ...(type === "sign-in" ? signInCodeEmail : verificationCodeEmail)(requestLang(ctx?.request?.headers), user?.name ?? "", otp),
           });
         } catch (err) {
           logger.error({ err }, "Failed to send verification code email");
@@ -166,12 +198,19 @@ export const auth = betterAuth({
   ],
   disabledPaths: EMAIL_OTP_DISABLED,
   hooks: {
-    // Phase 121: codes only confirm an address that is not confirmed yet (see EMAIL_OTP_PATHS).
+    // Phase 121: which codes are sent and accepted (see EMAIL_OTP_PATHS).
     before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-in/social" && !(ctx.body as { idToken?: unknown } | undefined)?.idToken) {
+        throw new APIError("BAD_REQUEST", { code: "ID_TOKEN_REQUIRED", message: "Sign in from the app." });
+      }
       if (!ctx.path || !EMAIL_OTP_PATHS.includes(ctx.path)) return undefined;
       const body = (ctx.body ?? {}) as { email?: unknown; type?: unknown };
       if (ctx.path === "/email-otp/send-verification-otp") {
-        if (body.type !== "email-verification" || !(await unverifiedUser(body.email))) return ctx.json({ success: true });
+        const allowed = body.type === "sign-in" ? await codeSignInAllowed(body.email) : body.type === "email-verification" && (await unverifiedUser(body.email));
+        return allowed ? undefined : ctx.json({ success: true });
+      }
+      if (ctx.path === "/sign-in/email-otp") {
+        if (!(await codeSignInAllowed(body.email))) throw new APIError("BAD_REQUEST", { code: "INVALID_OTP", message: "Invalid OTP" });
         return undefined;
       }
       if (!(await unverifiedUser(body.email))) throw new APIError("BAD_REQUEST", { code: "INVALID_OTP", message: "Invalid OTP" });
@@ -205,8 +244,16 @@ export const auth = betterAuth({
           });
         }
       }
+      // Phase 129.10: better-auth's two-step only guards the password route, so a
+      // provider's token would skip it. Two-step accounts sign in with their password.
+      if (newSession && ctx.path === "/sign-in/social" && newSession.user.twoFactorEnabled) {
+        await db.delete(authSessionsTable).where(eq(authSessionsTable.token, newSession.session.token)).catch(() => undefined);
+        ctx.context.responseHeaders?.delete("set-cookie");
+        ctx.context.responseHeaders?.delete("set-auth-token");
+        throw new APIError("FORBIDDEN", { code: "TWO_STEP_USES_PASSWORD", message: "This account uses two-step. Sign in with your password." });
+      }
       try {
-        if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
+        if (newSession && (ctx.path === "/sign-in/email" || ctx.path === "/sign-in/social" || ctx.path === "/sign-in/email-otp" || ctx.path === "/sign-up/email" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code")) {
           const orgId = await resolveOrgForAudit(newSession.user.id);
           await recordSecurityAuditEvent({
             orgId,
@@ -282,6 +329,12 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
+        // Phase 129.10: the admin's registration switch also closes sign-up through Google and Apple.
+        before: async (_user, ctx) => {
+          if (ctx?.path === "/sign-in/social" && (await registrationClosed())) {
+            throw new APIError("FORBIDDEN", { code: "SIGNUP_DISABLED", message: "Registration is closed." });
+          }
+        },
         // Phase 93: the welcome is for someone starting a company. A person
         // signing up to join one (from /join or an invite link, or whose
         // address already has an invitation waiting) is not told to set up a

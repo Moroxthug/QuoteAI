@@ -77,6 +77,16 @@ export function verificationCodeEmail(lang: AccountEmailLang, name: string, code
   return { subject, html: shell(lang, subject, body, `&copy; ${year()} QuoteAI`) };
 }
 
+export function signInCodeEmail(lang: AccountEmailLang, name: string, code: string): { subject: string; html: string } {
+  const fr = lang === "fr";
+  const subject = fr ? `${code} est votre code de connexion QuoteAI` : `${code} is your QuoteAI sign-in code`;
+  const body = `<h1 style="margin:0 0 14px;font-size:21px;font-weight:700;color:${NAVY}">${fr ? "Votre code de connexion" : "Your sign-in code"}</h1>
+<p style="margin:0">${hello(lang, name)}<br/>${fr ? "Entrez ce code dans l'application QuoteAI pour vous connecter :" : "Enter this code in the QuoteAI app to sign in:"}</p>
+<p style="margin:22px 0;font-size:32px;font-weight:800;letter-spacing:8px;color:${NAVY};font-variant-numeric:tabular-nums">${escapeHtml(code)}</p>
+<p style="margin:0;font-size:13px;color:${MUTED}">${fr ? "Le code est valide pendant 15 minutes. Ce n'est pas vous? Ignorez ce courriel : personne n'entrera sans ce code." : "The code works for 15 minutes. Wasn't you? Ignore this email: nobody gets in without this code."}</p>`;
+  return { subject, html: shell(lang, subject, body, `&copy; ${year()} QuoteAI`) };
+}
+
 export function resetPasswordEmail(lang: AccountEmailLang, name: string, url: string): { subject: string; html: string } {
   const fr = lang === "fr";
   const subject = fr ? "Réinitialisez votre mot de passe – QuoteAI" : "Reset your password – QuoteAI";

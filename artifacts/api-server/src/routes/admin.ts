@@ -1,6 +1,6 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "../lib/auth";
+import { auth, socialSignIn } from "../lib/auth";
 import { db, quotesTable, businessProfilesTable, settingsTable, authUsersTable, emailEventsTable, usageDailySummaryTable, incentivesCatalogTable, insertIncentivesCatalogSchema, cronTicksTable, automationRunsTable } from "@workspace/db";
 import { eq, sql, desc, count, inArray } from "drizzle-orm";
 import { logger } from "../lib/logger";
@@ -51,9 +51,9 @@ router.get("/settings/registration", async (_req, res) => {
       .from(settingsTable)
       .where(eq(settingsTable.key, "registration_open"));
     const isOpen = row ? row.value !== "false" : true;
-    res.json({ open: isOpen });
+    res.json({ open: isOpen, social: socialSignIn });
   } catch {
-    res.json({ open: true });
+    res.json({ open: true, social: socialSignIn });
   }
 });
 

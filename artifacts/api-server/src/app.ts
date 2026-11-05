@@ -60,6 +60,8 @@ const emailSendingRateLimiter = ipRateLimiter({
 // the frontend calls the new name, so the old key alone protected nothing.
 const AUTH_RATE_LIMITERS: Record<string, ReturnType<typeof ipRateLimiter>> = {
   "/api/auth/sign-in/email": signInRateLimiter,
+  "/api/auth/sign-in/social": signInRateLimiter,
+  "/api/auth/sign-in/email-otp": signInRateLimiter,
   "/api/auth/sign-up/email": emailSendingRateLimiter,
   "/api/auth/send-verification-email": emailSendingRateLimiter,
   "/api/auth/two-factor/send-otp": emailSendingRateLimiter,

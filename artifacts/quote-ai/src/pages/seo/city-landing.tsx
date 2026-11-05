@@ -26,6 +26,7 @@ import {
 import { SeoHead } from "@/components/seo-head";
 import { isFrenchPath } from "@/i18n/LanguageContext";
 import { useLanguage } from "@/i18n/LanguageContext";
+import NotFound from "@/pages/not-found";
 
 const FI_COLORS = ["g", "t", "p"] as const;
 
@@ -101,6 +102,9 @@ export default function SeoCityLanding() {
       });
     }
   }, [s, city, intro, faqItems, cta.button]);
+
+  // An unknown trade or city is a 404, not a generated page: the shell answers 200 for any URL.
+  if (!SECTORS[sectorSlug] || !city) return <NotFound bare />;
 
   const sBenefits = (
     <section className="sec soft" key="benefits">

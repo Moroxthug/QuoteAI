@@ -7,6 +7,7 @@ import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import { getOgImagePath, getSectorFrContent, getSectorDeepDive, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
 import { useLanguage, isFrenchPath } from "@/i18n/LanguageContext";
+import NotFound from "@/pages/not-found";
 
 // Highlighted cities on the sector hub page — must stay within ACTIVE_CITIES,
 // the only cities actually prerendered/sitemapped right now (see seo-data.ts).
@@ -250,6 +251,7 @@ export default function SeoLanding() {
   const params = useParams();
   const rawSlug = (params as { type?: string }).type ?? "contractor";
   const slug = isFr ? (SECTOR_KEY_BY_FR_SLUG[rawSlug] ?? rawSlug) : rawSlug;
+  if (!SECTORS[slug]) return <NotFound bare />;
   const s = SECTORS[slug] ?? DEFAULT_SECTOR;
   const sSlugForLang = isFr ? s.frSlug : s.slug;
 

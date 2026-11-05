@@ -50,7 +50,7 @@ export default function ProvinceLandingPage() {
   const [, navigate] = useLocation();
 
   const province = PROVINCE_BY_SLUG[params.slug ?? ""];
-  if (!province) return <NotFound />;
+  if (!province) return <NotFound bare />;
 
   const name = provinceName(province, lang);
   const components = provinceTaxComponents(province);

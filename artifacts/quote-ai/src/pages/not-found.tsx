@@ -1,13 +1,16 @@
+import { Fragment } from "react";
 import { Link } from "wouter";
 import { SearchX, ArrowRight } from "lucide-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-export default function NotFound() {
+/** `bare` is for a page already inside PublicLayout, so the header and footer are not drawn twice. */
+export default function NotFound({ bare = false }: { bare?: boolean }) {
   const { t } = useLanguage();
+  const Frame = bare ? Fragment : PublicLayout;
   return (
-    <PublicLayout>
+    <Frame>
       <SeoHead
         title={t("notFound.title")}
         description={t("notFound.description")}
@@ -38,6 +41,6 @@ export default function NotFound() {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
-    </PublicLayout>
+    </Frame>
   );
 }

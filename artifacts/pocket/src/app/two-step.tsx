@@ -120,7 +120,7 @@ export default function TwoStep() {
         {isBackup ? (
           <Section px={16} pt={28}>
             <FormCard error={status === "wrong"}>
-              <FormRow first icon="key" tone="violet" label={t("twoStep.backupLabel")} value={backup} numeric invalid={status === "wrong"}
+              <FormRow first label={t("twoStep.backupLabel")} value={backup} numeric invalid={status === "wrong"}
                 onChangeText={(v) => { setBackup(formatBackup(v)); if (status === "wrong") setStatus("typing"); setProblem(null); }}
                 placeholder={t("twoStep.backupPlaceholder")} autoCapitalize="none" autoCorrect={false} autoComplete="off" disabled={busy || ok}
                 onSubmitEditing={() => { if (backupComplete(backup)) void verify("backup", backup); }} returnKeyType="go" />

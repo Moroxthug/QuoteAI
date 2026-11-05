@@ -9,7 +9,6 @@ export const en = {
   emailCode: "Email me a code",
   newTo: "New to quoteAI?",
   create: "Create an account",
-  crew: "On a crew? Join your team",
   banner: {
     wrong: { lead: "That email and password don’t match.", text: "Check them or reset your password." },
     unverified: { lead: "Confirm your email first.", text: "We sent a 6-digit code to {{email}}.", link: "Enter the code" },
@@ -32,7 +31,6 @@ export const fr: typeof en = {
   emailCode: "Recevoir un code par courriel",
   newTo: "Nouveau sur quoteAI ?",
   create: "Créer un compte",
-  crew: "Dans une équipe ? Rejoignez-la",
   banner: {
     wrong: { lead: "Courriel ou mot de passe incorrect.", text: "Vérifiez-les ou réinitialisez votre mot de passe." },
     unverified: { lead: "Confirmez d’abord votre courriel.", text: "Nous avons envoyé un code à 6 chiffres à {{email}}.", link: "Entrer le code" },

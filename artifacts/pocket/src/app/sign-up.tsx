@@ -103,18 +103,18 @@ export default function SignUp() {
         ) : null}
         <Section delay={60} px={16} pt={18}>
           <FormCard>
-            <FormRow first icon="user" tone="violet" label={t("signUp.name")} value={name} onChangeText={setName}
+            <FormRow first label={t("signUp.name")} value={name} onChangeText={setName}
               placeholder={t("signUp.namePlaceholder")} autoCapitalize="words" autoComplete="name" textContentType="name" returnKeyType="next" onSubmitEditing={() => emailRef.current?.focus()} />
-            <FormRow ref={emailRef} icon="mail" tone="sky" label={taken ? t("signUp.emailTaken") : t("signUp.email")} invalid={taken} value={email}
+            <FormRow ref={emailRef} label={taken ? t("signUp.emailTaken") : t("signUp.email")} invalid={taken} value={email}
               onChangeText={(v) => { setEmail(v); if (problem === "emailTaken") setProblem(null); }}
               placeholder={t("auth.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress"
               returnKeyType="next" onSubmitEditing={() => passRef.current?.focus()} />
-            <FormRow ref={passRef} icon="key" tone="violet" label={t("signUp.password")} invalid={weak} value={password}
+            <FormRow ref={passRef} label={t("signUp.password")} invalid={weak} value={password}
               onChangeText={(v) => { setPassword(v); if (problem === "weakPassword") setProblem(null); }}
               placeholder={t("auth.passwordPlaceholder")} secureTextEntry={!shown} autoCapitalize="none" autoCorrect={false} autoComplete="new-password" textContentType="newPassword"
               returnKeyType="next" onSubmitEditing={() => companyRef.current?.focus()}
               trailing={<FieldButton glyph={shown ? "eyeOff" : "eye"} label={shown ? t("auth.hide") : t("auth.show")} selected={shown} onPress={() => setShown(!shown)} />} />
-            <FormRow ref={companyRef} icon="building" tone="indigo" label={t("signUp.company")} value={company} onChangeText={setCompany}
+            <FormRow ref={companyRef} label={t("signUp.company")} value={company} onChangeText={setCompany}
               placeholder={t("signUp.companyPlaceholder")} autoComplete="organization" textContentType="organizationName" returnKeyType="go" onSubmitEditing={() => void submit()} />
           </FormCard>
           <SignUpMeter level={level} word={t(`signUp.strength.${level}.word`)} note={t(`signUp.strength.${level}.note`)} />

@@ -32,6 +32,7 @@ Expo + TypeScript, expo-router, react-native-reanimated, react-native-svg, expo-
 
 ## Owner ruling (2026-11-05)
 - The first screen is the plain start screen in src/app/welcome.tsx, not Welcome.dc.html's slides. Sign in and Sign up also carry Google, Apple and an emailed code, which their boards don't show. Don't rebuild the slides or remove these.
+- The sign-in family of forms (Sign in, Sign up, Forgot password, Two-step, Onboarding) has no icons in its fields or buttons, whatever the boards show. Only the Google and Apple marks stay.
 
 ## How to verify a screen
 Open the matching .dc.html board next to the running app (light, night, FR). Build every state listed for it in SCREENS.md. Check every link against navigation.json. Tick the checklist at the end of BUILD-PLAN.md.

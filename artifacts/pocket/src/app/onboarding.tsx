@@ -206,11 +206,11 @@ export default function Onboarding() {
             </Section>
             <Section delay={60} px={16} pt={20}>
               <FormCard error={needName && !company.trim()}>
-                <FormRow first icon="building" tone="violet" label={t("onboarding.company.name")} value={company} onChangeText={(v) => { setCompany(v); setNeedName(false); }}
+                <FormRow first label={t("onboarding.company.name")} value={company} onChangeText={(v) => { setCompany(v); setNeedName(false); }}
                   placeholder={t("onboarding.company.namePlaceholder")} autoComplete="organization" autoCapitalize="words" returnKeyType="next" />
-                <FormRow icon="phone" tone="teal" label={t("onboarding.company.phone")} value={phone} onChangeText={setPhone} numeric
+                <FormRow label={t("onboarding.company.phone")} value={phone} onChangeText={setPhone} numeric
                   placeholder={t("onboarding.company.phonePlaceholder")} keyboardType="phone-pad" autoComplete="tel" textContentType="telephoneNumber" />
-                <FormRow icon="mail" tone="sky" label={t("onboarding.company.email")} value={email} onChangeText={setEmail}
+                <FormRow label={t("onboarding.company.email")} value={email} onChangeText={setEmail}
                   placeholder={t("onboarding.company.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" />
               </FormCard>
             </Section>
@@ -220,13 +220,13 @@ export default function Onboarding() {
                 <Section>
                   <FormCard>
                     <FormAction first icon="camera" tone="lilac" label={t("onboarding.company.logo")} value={t("onboarding.company.logoAdd")} onPress={() => void logo()} />
-                    <FormRow icon="doc" tone="indigo" label={t("onboarding.company.bn")} value={bn} onChangeText={setBn} numeric
+                    <FormRow label={t("onboarding.company.bn")} value={bn} onChangeText={setBn} numeric
                       placeholder={t("onboarding.company.bnPlaceholder")} autoCapitalize="characters" autoCorrect={false} />
-                    <FormRow icon="shield" tone="sage" label={province === "QC" ? t("onboarding.company.licenceQc") : t("onboarding.company.licence")} value={licence} onChangeText={setLicence}
+                    <FormRow label={province === "QC" ? t("onboarding.company.licenceQc") : t("onboarding.company.licence")} value={licence} onChangeText={setLicence}
                       placeholder={t("onboarding.company.optional")} autoCapitalize="characters" autoCorrect={false} />
-                    <FormRow icon="pin" tone="rose" label={t("onboarding.company.address")} value={address} onChangeText={setAddress}
+                    <FormRow label={t("onboarding.company.address")} value={address} onChangeText={setAddress}
                       placeholder={t("onboarding.company.addressPlaceholder")} autoComplete="street-address" />
-                    <FormRow icon="bank" tone="gold" label={t("onboarding.company.etransfer")} value={etransfer} onChangeText={setEtransfer}
+                    <FormRow label={t("onboarding.company.etransfer")} value={etransfer} onChangeText={setEtransfer}
                       placeholder={t("onboarding.company.etransferPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />
                   </FormCard>
                 </Section>

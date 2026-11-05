@@ -25,8 +25,8 @@ export function FormCard({ children, error }: { children: ReactNode; error?: boo
 export { Hairline as FormDivider };
 
 type RowProps = Omit<TextInputProps, "style" | "placeholderTextColor" | "editable"> & {
-  icon: IconName;
-  tone: Tone;
+  icon?: IconName;
+  tone?: Tone;
   label: string;
   /** A trailing control (the show / hide button); 40 wide. */
   trailing?: ReactNode;
@@ -45,7 +45,7 @@ export const FormRow = forwardRef<TextInput, RowProps>(function FormRow({ icon, 
     <View>
       {first ? null : <Hairline inset={0} />}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 13, minHeight: 62, paddingVertical: 10, paddingLeft: 16, paddingRight: 14, backgroundColor: focused ? colors.soft : "transparent", opacity: disabled ? 0.5 : 1 }}>
-        <Icon name={icon} tone={tone} size={24} />
+        {icon && tone ? <Icon name={icon} tone={tone} size={24} /> : null}
         <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
           <Text size={12.5} color={invalid ? "bad" : "muted"} importantForAccessibility="no">{label}</Text>
           <TextInput

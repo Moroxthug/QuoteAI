@@ -68,18 +68,6 @@ export function AuthBody({ children, bottom = 32 }: { children: ReactNode; botto
   );
 }
 
-/** The board's small round link pill under a form ("On a crew? Join your team"): 36 tall, `sunk`, an icon and 13.5/500. */
-export function PillLink({ icon, tone = "amber", label, onPress }: { icon: IconName; tone?: Tone; label: string; onPress: () => void }) {
-  const { colors } = useTheme();
-  return (
-    <Press onPress={onPress} accessibilityRole="link" accessibilityLabel={label}
-      style={{ flexDirection: "row", alignItems: "center", gap: 8, height: 36, paddingHorizontal: 14, borderRadius: 999, backgroundColor: colors.sunk }}>
-      <Icon name={icon} tone={tone} size={20} />
-      <Text size={13.5} weight={500}>{label}</Text>
-    </Press>
-  );
-}
-
 /** The sign-in screens' header (.hdr with the language pill instead of a title): back left, EN / FR right. */
 export function AuthHeader({ onBack, backLabel, langWidth = 92 }: { onBack?: () => void; backLabel: string; langWidth?: number }) {
   const insets = useSafeAreaInsets();

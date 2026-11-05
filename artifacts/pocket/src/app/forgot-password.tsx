@@ -115,7 +115,7 @@ export default function ForgotPassword() {
             ) : null}
             <Section delay={60} px={16} pt={18}>
               <FormCard>
-                <FormRow first icon="mail" tone="sky" label={t("forgot.request.email")} value={email} onChangeText={(v) => { setEmail(v); setProblem(null); }}
+                <FormRow first label={t("forgot.request.email")} value={email} onChangeText={(v) => { setEmail(v); setProblem(null); }}
                   placeholder={t("auth.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress"
                   returnKeyType="send" onSubmitEditing={() => void send(false)} />
               </FormCard>
@@ -184,10 +184,10 @@ export default function ForgotPassword() {
             ) : null}
             <Section delay={60} px={16} pt={18}>
               <FormCard>
-                <FormRow first icon="key" tone="violet" label={t("forgot.newPassword.password")} value={p1} onChangeText={(v) => { setP1(v); setProblem(null); }}
+                <FormRow first label={t("forgot.newPassword.password")} value={p1} onChangeText={(v) => { setP1(v); setProblem(null); }}
                   placeholder={t("forgot.newPassword.passwordPlaceholder")} secureTextEntry={!shown} autoCapitalize="none" autoCorrect={false} autoComplete="new-password" textContentType="newPassword"
                   trailing={<FieldButton glyph={shown ? "eyeOff" : "eye"} label={shown ? t("forgot.newPassword.hide") : t("forgot.newPassword.show")} selected={shown} onPress={() => setShown(!shown)} />} />
-                <FormRow icon="lock" tone="indigo" label={bad ? t("forgot.newPassword.confirmMismatch") : t("forgot.newPassword.confirm")} invalid={bad} value={p2} onChangeText={(v) => { setP2(v); setProblem(null); }}
+                <FormRow label={bad ? t("forgot.newPassword.confirmMismatch") : t("forgot.newPassword.confirm")} invalid={bad} value={p2} onChangeText={(v) => { setP2(v); setProblem(null); }}
                   placeholder={t("forgot.newPassword.confirmPlaceholder")} secureTextEntry={!shown} autoCapitalize="none" autoCorrect={false} autoComplete="new-password" textContentType="newPassword"
                   returnKeyType="go" onSubmitEditing={() => void save()} />
               </FormCard>

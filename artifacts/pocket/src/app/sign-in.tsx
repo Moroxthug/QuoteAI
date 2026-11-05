@@ -6,11 +6,10 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { auth, type AuthProblem } from "@/lib/auth";
 import { useSession } from "@/lib/useSession";
-import { AuthBody, AuthHeader, FieldButton, OrDivider, PillLink, TextLink } from "@/ui/Auth";
+import { AuthBody, AuthHeader, FieldButton, OrDivider, TextLink } from "@/ui/Auth";
 import { Button } from "@/ui/Button";
 import { Banner, type BannerTone } from "@/ui/Feedback";
 import { FormCard, FormRow } from "@/ui/FormCard";
-import { Icon } from "@/ui/Icon";
 import { PageTitle } from "@/ui/Header";
 import type { IconName, Tone } from "@/ui/Icon";
 import { Section, Spacer, Stack } from "@/ui/Layout";
@@ -97,9 +96,9 @@ export default function SignIn() {
         ) : null}
         <Section delay={60} px={16} pt={18}>
           <FormCard error={notice === "wrong"}>
-            <FormRow first icon="mail" tone="sky" label={t("signIn.email")} value={email} onChangeText={(v) => { setEmail(v); setNotice(null); }}
+            <FormRow first label={t("signIn.email")} value={email} onChangeText={(v) => { setEmail(v); setNotice(null); }}
               placeholder={t("auth.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" textContentType="emailAddress" />
-            <FormRow icon="key" tone="violet" label={t("signIn.password")} value={password} onChangeText={(v) => { setPassword(v); setNotice(null); }}
+            <FormRow label={t("signIn.password")} value={password} onChangeText={(v) => { setPassword(v); setNotice(null); }}
               placeholder={t("auth.passwordPlaceholder")} secureTextEntry={!shown} autoCapitalize="none" autoCorrect={false} autoComplete="current-password" textContentType="password"
               onSubmitEditing={() => void submit()} returnKeyType="go"
               trailing={<FieldButton glyph={shown ? "eyeOff" : "eye"} label={shown ? t("auth.hide") : t("auth.show")} selected={shown} onPress={() => setShown(!shown)} />} />
@@ -112,7 +111,7 @@ export default function SignIn() {
           <Button size="lg" label={t("signIn.signIn")} busy={busy ? t("signIn.signing") : false} block onPress={() => void submit()} />
           <OrDivider label={t("auth.or")} />
           <SocialButtons />
-          <Button size="lg" kind="secondary" label={t("signIn.emailCode")} block onPress={emailCode} icon={<Icon name="mail" tone="sky" size={24} />} />
+          <Button size="lg" kind="secondary" label={t("signIn.emailCode")} block onPress={emailCode} />
         </Section>
         <Spacer />
         <Section pt={24} gap={12} align="center">
@@ -120,7 +119,10 @@ export default function SignIn() {
             <Text size={14.5} color="muted">{t("signIn.newTo")}</Text>
             <TextLink label={t("signIn.create")} size={14.5} weight={600} color="ink" onPress={() => router.replace("/sign-up")} />
           </Stack>
-          <PillLink icon="cone" label={t("signIn.crew")} onPress={() => router.push("/join-code")} />
+          <Stack row gap={4} align="center">
+            <Text size={14.5} color="muted">{t("welcome.crewQ")}</Text>
+            <TextLink label={t("welcome.crewA")} size={14.5} weight={600} color="ink" onPress={() => router.push("/join-code")} />
+          </Stack>
         </Section>
       </AuthBody>
     </Screen>

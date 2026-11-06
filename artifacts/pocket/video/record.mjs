@@ -1,6 +1,8 @@
 // Records one video from the production web build (never the dev server: its tools show on screen). First, in artifacts/pocket:
 //   EXPO_PUBLIC_API_ORIGIN=http://localhost:8092 npx expo export -p web --output-dir video/out/web
-// then `node record.mjs quotes en`. No API needed. Writes out/<id>-<lang>/frames/*.jpg and timeline.json (each frame's time, each beat's start and caption).
+// then `node record.mjs quotes en`. No API needed. Writes out/<id>-<lang>/frames/*.jpg and timeline.json.
+// The app's clock is stepped one frame at a time and each frame is a real screenshot: Chrome's screencast only gives 390 px wide frames,
+// whatever the device scale. So every frame is 1170 x 2532, and a slow machine can't drop any.
 import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, extname, join, normalize } from "node:path";
@@ -12,9 +14,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const CHROME = "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const PORT = 8092;
 const ORIGIN = `http://localhost:${PORT}`;
-const W = 390, H = 844, SCALE = 1080 / 390;
+const W = 390, H = 844, SCALE = 3, FPS = 60;
 const CLEAR = 130; // the tab bar and the orb cover this much of the bottom of the screen
-const WRITE_MS = 3200; // how long "the AI" takes, so the writing screen is seen
+const WRITE_SECS = 3.6; // how long "the AI" takes, so the writing screen is seen
 
 const [id, lang = "en"] = process.argv.slice(2);
 const script = (await import(`./scripts/${id}.mjs`)).default;
@@ -33,94 +35,99 @@ const server = createServer((req, res) => {
   res.end(readFileSync(file));
 }).listen(PORT);
 
-const browser = await chromium.launch({ executablePath: CHROME, headless: true });
-const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE, locale: lang === "fr" ? "fr-CA" : "en-CA", timezoneId: "America/Toronto", colorScheme: "light", hasTouch: false });
-await ctx.addInitScript(() => {
-  localStorage.setItem("quoteai_session-token", "video-fixture");
-  // The tap ring: drawn in the page so it is in the frames. Recording only; the app has no such thing.
-  window.__tap = (x, y) => {
-    const d = document.createElement("div");
-    d.style.cssText = `position:fixed;left:${x - 26}px;top:${y - 26}px;width:52px;height:52px;border-radius:26px;background:rgba(106,47,191,.22);border:2px solid rgba(106,47,191,.75);pointer-events:none;z-index:2147483647;transition:transform .45s ease-out,opacity .45s ease-out`;
-    document.body.appendChild(d);
-    requestAnimationFrame(() => { d.style.transform = "scale(1.35)"; d.style.opacity = "0"; });
-    setTimeout(() => d.remove(), 500);
-  };
-});
+// No hinting and no LCD colour fringes: letters sit where the font puts them, as on a phone.
+const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--font-render-hinting=none", "--disable-lcd-text", "--enable-font-subpixel-positioning", "--force-color-profile=srgb"] });
+const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE, locale: lang === "fr" ? "fr-CA" : "en-CA", timezoneId: "America/Toronto", colorScheme: "light" });
+await ctx.addInitScript(() => localStorage.setItem("quoteai_session-token", "video-fixture"));
 const page = await ctx.newPage();
-await page.clock.setFixedTime(new Date(NOW));
+await page.clock.install({ time: new Date(NOW) });
 
+let count = 0;
+const waiting = []; // answers held back until enough frames have passed
 const missing = new Set();
 await page.route("**/api/**", async (route) => {
   const req = route.request();
   const path = new URL(req.url()).pathname;
   const hit = fixtures(req.method(), path, lang);
   if (hit === undefined) missing.add(`${req.method()} ${path}`);
-  if (req.method() === "POST" && path === "/api/quotes") await new Promise((res) => setTimeout(res, WRITE_MS));
+  if (req.method() === "POST" && path === "/api/quotes") await new Promise((res) => waiting.push({ at: count + WRITE_SECS * FPS, res }));
   return route.fulfill({ status: hit === undefined ? 404 : 200, contentType: "application/json", body: JSON.stringify(hit ?? { error: "no fixture" }) });
 });
 
 await page.goto(ORIGIN + script.start, { waitUntil: "load", timeout: 120_000 });
 await page.waitForLoadState("networkidle").catch(() => {});
 await page.waitForTimeout(2500);
+await page.clock.pauseAt(new Date(Date.parse(NOW) + 60_000));
 
-const cdp = await ctx.newCDPSession(page);
-const frames = [];
-cdp.on("Page.screencastFrame", ({ data, metadata, sessionId }) => {
-  const file = `${String(frames.length).padStart(6, "0")}.jpg`;
-  writeFileSync(join(out, "frames", file), Buffer.from(data, "base64"));
-  frames.push({ file, at: metadata.timestamp });
-  void cdp.send("Page.screencastFrameAck", { sessionId }).catch(() => {});
-});
-await cdp.send("Page.startScreencast", { format: "jpeg", quality: 92, maxWidth: 1080, maxHeight: 2340, everyNthFrame: 1 });
+const frame = async () => {
+  await page.clock.runFor(1000 / FPS);
+  await page.screenshot({ path: join(out, "frames", `${String(count).padStart(6, "0")}.jpg`), type: "jpeg", quality: 97, caret: "initial" });
+  count++;
+  for (const w of waiting.filter((x) => count >= x.at)) { waiting.splice(waiting.indexOf(w), 1); w.res(); }
+};
+const hold = async (secs) => { for (let i = 0, n = Math.round(secs * FPS); i < n; i++) await frame(); };
+const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
 
+const taps = [];
 const r = {
   lang,
   // Only what is on screen: the screens under this one stay mounted in the stack, with the same words.
   t: (en, fr) => page.getByText(lang === "fr" ? fr : en).locator("visible=true").first(),
   exact: (s) => page.getByText(s, { exact: true }).locator("visible=true").first(),
-  hold: (ms) => page.waitForTimeout(ms),
-  tap: async (loc) => {
-    await loc.waitFor({ timeout: 15_000 });
-    // Scroll as a thumb would, and stop clear of the tab bar (a jump would look wrong in the video).
-    let b = await loc.boundingBox();
-    for (let i = 0; i < 6 && b.y + b.height > H - CLEAR; i++) {
-      await r.scroll(Math.min(320, b.y + b.height - (H - CLEAR) + 40));
-      await page.waitForTimeout(250);
-      b = await loc.boundingBox();
+  hold,
+  /** A thumb's scroll: eases in and out over `secs`. */
+  scroll: async (dy, secs = 0.7) => {
+    await page.mouse.move(W / 2, H / 2);
+    const n = Math.round(secs * FPS);
+    for (let i = 1, done = 0; i <= n; i++) {
+      const to = dy * ease(i / n);
+      await page.mouse.wheel(0, to - done);
+      done = to;
+      await frame();
     }
-    await page.waitForTimeout(250);
-    await page.evaluate(([x, y]) => window.__tap(x, y), [b.x + b.width / 2, b.y + b.height / 2]);
-    await page.waitForTimeout(220);
-    await loc.click();
   },
+  /** The ring for a tap, with no click: for a button whose real action leaves the app. */
+  mark: async (loc) => {
+    const b = await reveal(loc);
+    taps.push({ frame: count, x: (b.x + b.width / 2) / W, y: (b.y + b.height / 2) / H });
+    await hold(0.3);
+  },
+  tap: async (loc) => { await r.mark(loc); await loc.click(); await hold(0.15); },
   type: async (text) => {
     const box = page.locator("textarea").locator("visible=true").first();
     await box.evaluate((e) => { e.spellcheck = false; }); // the recording browser's red underlines aren't the app's
     await box.click();
-    await page.keyboard.type(text, { delay: 26 });
+    await hold(0.2);
+    for (const ch of text) { await page.keyboard.insertText(ch); await frame(); await frame(); }
   },
-  done: () => r.t("Open the quote", "Ouvrir la soumission").waitFor({ timeout: 20_000 }),
-  scroll: async (dy) => { await page.mouse.move(W / 2, H / 2); for (let i = 0; i < 14; i++) { await page.mouse.wheel(0, dy / 14); await page.waitForTimeout(30); } },
+  /** Runs frames until this is on screen. */
+  until: async (loc) => { for (let i = 0; i < 30 * FPS; i++) { await frame(); if (i % 6 === 0 && await loc.isVisible()) return; } throw new Error("never appeared"); },
 };
+async function reveal(loc) {
+  await loc.waitFor({ timeout: 15_000 });
+  let b = await loc.boundingBox();
+  for (let i = 0; i < 6 && b.y + b.height > H - CLEAR; i++) {
+    await r.scroll(Math.min(340, b.y + b.height - (H - CLEAR) + 40));
+    await hold(0.1);
+    b = await loc.boundingBox();
+  }
+  return b;
+}
 
 const beats = [];
-const clock0 = Date.now() / 1000;
 try {
   for (const [i, beat] of script.beats.entries()) {
-    beats.push({ at: Date.now() / 1000, caption: beat.caption[lang] });
+    beats.push({ frame: count, caption: beat.caption[lang], zoom: beat.zoom ?? 1, focus: beat.focus ?? 0.5 });
     await beat.run(r);
-    console.log(`beat ${i + 1}/${script.beats.length} ok`);
+    console.log(`beat ${i + 1}/${script.beats.length} ok, ${count} frames`);
   }
 } catch (e) {
   await page.screenshot({ path: join(out, "failed.png") });
   console.log("page said:", (await page.locator("body").innerText()).slice(0, 600).replace(/\n+/g, " | "));
   throw e;
 } finally {
-  await cdp.send("Page.stopScreencast").catch(() => {});
   if (missing.size) console.log("no fixture for:", [...missing].join(", "));
-  const end = Date.now() / 1000;
-  writeFileSync(join(out, "timeline.json"), JSON.stringify({ id, lang, start: clock0, end, beats, frames }, null, 1));
-  console.log(`${frames.length} frames, ${(end - clock0).toFixed(1)} s`);
+  writeFileSync(join(out, "timeline.json"), JSON.stringify({ id, lang, fps: FPS, frames: count, beats, taps, after: (script.after ?? []).map((s) => ({ ...s, caption: s.caption?.[lang], line: s.line?.[lang] })) }, null, 1));
   await browser.close();
   server.close();
   server.closeAllConnections();

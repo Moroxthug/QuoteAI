@@ -4,11 +4,14 @@
   "type": "module",
   "description": "Phase 130: records the real Pocket web build with fixed data and renders the videos.",
   "scripts": {
+    "assets": "node make-assets.mjs",
+    "pages": "node pdf-pages.mjs",
     "record": "node record.mjs",
-    "build": "node build.mjs"
+    "compose": "node compose.mjs"
   },
   "devDependencies": {
     "ffmpeg-static": "^5.2.0",
+    "pdfjs-dist": "^4.10.38",
     "playwright-core": "^1.63.0"
   }
 }

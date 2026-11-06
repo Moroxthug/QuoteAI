@@ -60,6 +60,12 @@ export function fixtures(method, path, lang = "en") {
   return undefined;
 }
 
+/** The quote and company the real PDF generator is given (make-pdf.ts). */
+export const pdfInput = (lang) => {
+  const w = WORLD[lang];
+  return { quote: fullQuote(w, "q-new"), profile: { userId: "u1", companyName: w.company, address: w.address, phone: w.phone, email: "alex@example.invalid", province: w.province }, language: lang };
+};
+
 /** The text typed into New quote. */
 export const typedText = (lang) => WORLD[lang].text;
 /** The client picked on New quote. */

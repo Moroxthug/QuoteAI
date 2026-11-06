@@ -481,11 +481,20 @@ Scope is the one line in the table above: tutorials, store previews, homepage lo
 
 ### 130.1 The pipeline and one sample (2026-11-06)
 `artifacts/pocket/video/` is its own small package (own `npm install`; the app's lockfile and builds are untouched).
-- `record.mjs` drives the production web export at phone size in Chrome and captures frames at 1080 wide. `scripts/<id>.mjs` holds a video's beats, each with its EN and FR caption.
+- `record.mjs` drives the production web export at phone size in Chrome. `scripts/<id>.mjs` holds a video's beats, each with its EN and FR caption. (Rebuilt in 130.2: this first version's frames were only 390 wide.)
 - `fixtures.mjs` answers every `/api` call: a made-up Ontario company in English, a Québec one in French, with a frozen clock. **No server and no database**: the local API reads `.env.staging`, which may be the live database, so nothing here seeds it.
-- `build.mjs` draws the ground, phone frame and captions with the app's fonts and tokens, and ffmpeg lays them over the frames: MP4, VTT and poster, vertical 1080×1920 or horizontal 1920×1080.
 - Record from the export, never the dev server: Expo's dev button shows on screen. The commands are at the top of `record.mjs`.
-- Sample: `quotes`, 23 s, EN and FR, both shapes, about 2 MB each, in `video/out/final/` (not committed). Checked on sampled frames, not watched through; web build, not a phone.
+
+### 130.2 Rebuilt after the owner's first look (2026-11-06)
+The owner rejected the first sample: no PDF with the logo, poor font and picture quality.
+- **Why it looked bad:** Chrome's headless screencast gives 390×844 frames whatever the device scale, so the video was upscaled. Measure the frames; don't trust the setting.
+- **Capture:** the app's clock is stepped one frame at a time at 60 fps and each frame is a real screenshot, 1170×2532. No hinting or LCD fringes. A slow machine can't drop a frame. The POST that "writes" the quote is answered after a set number of frames.
+- **`compose.mjs`** (replaces `build.mjs`): Chrome draws every output frame (a device, a camera that moves over a large screen, tap rings, captions that fade in, the PDF, a closing card) and ffmpeg only encodes, at crf 15. `--still=<seconds>` draws one frame to check the look.
+- **The real PDF:** `make-pdf.ts` calls the server's own `generateQuotePdfBuffer` with an inline logo (no database), with the date frozen; `pdf-pages.mjs` turns it into sharp images. The video shows the logo and company, the whole page, then the total. `make-assets.mjs` draws the made-up company's logo.
+- Order: `make-assets.mjs`, `make-pdf.ts` (command at its top), `pdf-pages.mjs`, `record.mjs`, `compose.mjs`.
+- Files land in `video/out/final/` (not committed).
+
+**Found, not fixed (PDF):** in the French quote PDF, page 2's "Signature de l'entrepreneur" line runs off the right edge of the page. The French header also reads `Date:` and `Tél.:` without the space French needs before the colon.
 
 **Found, not fixed (app bug):** on Quotes at 390 wide the Waiting figure breaks mid-number with a five-digit total (`$18,42` / `1`); the board shows `$15,396` on one line. Seen on web only. The sample uses a four-digit amount to stay clear of it, so re-check when it is fixed.
 

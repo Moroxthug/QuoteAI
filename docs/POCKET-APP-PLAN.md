@@ -475,6 +475,27 @@ Built: 129.0 to 129.10 (cards open full screen, weather, phone fixes, the ops al
 4. Review and paste the store listing (EN, FR); the screenshots and feature graphic; the Data safety form.
 **Open, can be done here**: Jobs, Clients and Invoices beside their detail at tablet width (only Quotes splits today).
 
+## Phase 130: Videos from the finished app
+
+Scope is the one line in the table above: tutorials, store previews, homepage loop. `docs/APP-PLAN.md`'s Track C is superseded, so it is background only: the library is the six videos Help lists (`src/lib/videos.ts`), not its sixteen.
+
+### 130.1 The pipeline and one sample (2026-11-06)
+`artifacts/pocket/video/` is its own small package (own `npm install`; the app's lockfile and builds are untouched).
+- `record.mjs` drives the production web export at phone size in Chrome and captures frames at 1080 wide. `scripts/<id>.mjs` holds a video's beats, each with its EN and FR caption.
+- `fixtures.mjs` answers every `/api` call: a made-up Ontario company in English, a Québec one in French, with a frozen clock. **No server and no database**: the local API reads `.env.staging`, which may be the live database, so nothing here seeds it.
+- `build.mjs` draws the ground, phone frame and captions with the app's fonts and tokens, and ffmpeg lays them over the frames: MP4, VTT and poster, vertical 1080×1920 or horizontal 1920×1080.
+- Record from the export, never the dev server: Expo's dev button shows on screen. The commands are at the top of `record.mjs`.
+- Sample: `quotes`, 23 s, EN and FR, both shapes, about 2 MB each, in `video/out/final/` (not committed). Checked on sampled frames, not watched through; web build, not a phone.
+
+**Found, not fixed (app bug):** on Quotes at 390 wide the Waiting figure breaks mid-number with a five-digit total (`$18,42` / `1`); the board shows `$15,396` on one line. Seen on web only. The sample uses a four-digit amount to stay clear of it, so re-check when it is fixed.
+
+**Owner, before the rest is rendered:**
+1. Approve the look of the sample.
+2. Voice: none yet, the sample reads on captions alone. Groq's Orpheus voice (already in the API) is English only, so there is no fr-CA voice.
+3. The in-app player: it draws scenes on a timer as its board shows and cannot play a file. Showing real videos in the app needs `expo-video`, so a new bundle, and a ruling because the board draws scenes.
+
+**Left:** the other videos (`overview`, `jobs`, `crew`, `etransfer`, `qbo`, with their fixtures), store previews, the homepage loop.
+
 ## Phase 133 screens: free-quote counter and locked state (2026-10-19)
 
 Server side is the growth plan's Phase 133 (`GET /api/me/allowance`, 402 `FREE_QUOTES_USED` when `FREE_QUOTES_ENFORCED=1`; off today).

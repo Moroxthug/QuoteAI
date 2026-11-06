@@ -1,0 +1,14 @@
+{
+  "name": "pocket-video",
+  "private": true,
+  "type": "module",
+  "description": "Phase 130: records the real Pocket web build with fixed data and renders the videos.",
+  "scripts": {
+    "record": "node record.mjs",
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "playwright-core": "^1.63.0"
+  }
+}

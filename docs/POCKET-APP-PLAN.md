@@ -473,6 +473,7 @@ Built: 129.0 to 129.10 (cards open full screen, weather, phone fixes, the ops al
 2. The Apple developer account; then `eas build -p ios --profile production` and `eas submit -p ios` (EAS asks for the Apple sign-in and makes the certificates).
 3. A new Android bundle (`npm run release:android`) to the closed test, then on a phone: offline edits and the conflict card, photos on mobile data vs Wi-Fi, app lock after 5 minutes, the camera / mic / clock-in sheets, a tablet sideways. Then Play production with a staged rollout.
 4. Review and paste the store listing (EN, FR); the screenshots and feature graphic; the Data safety form.
+**Bundle built (2026-11-07)**: version code 447710 (0.1.0.447710), signed with the upload key, carries everything since 420733 (129.6 to 130.5 and the figures fix). Not uploaded: the owner uploads it to the closed test. The first `release:android` run stopped after `expo prebuild`; `-- --no-prebuild` then built it (30 min).
 **Open, needs the owner**: Jobs, Clients and Invoices beside their detail at tablet width. The Tablet board draws Quotes only, so a split for the others would be a new design: it needs a board or a ruling first.
 
 ## Phase 130: Videos from the finished app

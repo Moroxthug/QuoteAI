@@ -85,7 +85,7 @@ export default function JobSetup() {
 
   const back = () => (router.canGoBack() ? router.back() : router.replace(screenHref("Jobs", t("tabs.jobs"))));
   const m = (cents: number, withCents = true) => money(cents / 100, locale, { cents: withCents });
-  const pctText = (n: number) => (locale === "fr-CA" ? `${n} %` : `${n}%`);
+  const pctText = (n: number) => { const v = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(n); return locale === "fr-CA" ? `${v} %` : `${v}%`; };
   const header = (more?: () => void) => <Header title={s("title")} backLabel={s("back")} onBack={back} moreLabel={s("more")} onMore={more} />;
 
   if (makeFailed) {

@@ -19,7 +19,7 @@ import { screenHref } from "@/lib/nav";
 import { canToggleDeposit, defaultChannel, depositAmount, depositTerm, DEFAULT_DEPOSIT_PERCENT, isFixed, maskEmail, maskPhone, recompute, setLineQuantity, stepOf, stepQuantity, toggleDeposit, validEmail, validPhone, type Chapter, type Channel } from "@/lib/quoteMath";
 import { quoteApi, type QuoteFull } from "@/lib/quoteApi";
 import { jobLine, quoteState, validUntil as validUntilOf, type QuoteState } from "@/lib/quotes";
-import { taxName } from "@/lib/quoteBar";
+import { taxName, taxWords } from "@/lib/quoteBar";
 import { tintFor } from "@/lib/clients";
 import { useRememberOpened } from "@/lib/recents";
 import { useSession } from "@/lib/useSession";
@@ -165,8 +165,8 @@ export default function Quote() {
   }));
   const legacy: QuoteLine[] = caps.length === 0 ? (quote.items ?? []).map((it, i) => ({ key: `i${i}`, name: it.descrizione, detail: `${it.quantita} ${it.unita}`, amount: m(it.totale) })) : [];
 
-  const taxLabel = quote.taxLines?.length ? quote.taxLines.map((l) => l.label ?? l.code).join(" + ") : taxName(quote.province) ?? t("quote.tax");
-  const rate = Math.round(Number(quote.ivaPercentuale) * 1000) / 1000;
+  const taxLabel = quote.taxLines?.length ? quote.taxLines.map((l) => l.label ?? l.code).join(" + ") : taxWords(taxName(quote.province) ?? t("quote.tax"), i18n.language);
+  const rate = new Intl.NumberFormat(locale, { maximumFractionDigits: 3 }).format(Number(quote.ivaPercentuale));
   const [whole, cents] = (() => { const s = m(live.totale); const i = s.search(/[.,]\d\d(?: \$)?$/); return i > 0 ? [s.slice(0, i), s.slice(i)] : [s, ""]; })();
   const link = `${API_ORIGIN}/p/${quote.id}`;
   const options = CHANNELS.map((k) => ({

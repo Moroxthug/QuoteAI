@@ -13,7 +13,7 @@ import { greetingFor, needsCard, telHref, type NeedsCard, type NeedsYouItem } fr
 import { homeApi } from "@/lib/homeApi";
 import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
-import { previewLines, taxName } from "@/lib/quoteBar";
+import { previewLines, taxName, taxWords } from "@/lib/quoteBar";
 import { useSession } from "@/lib/useSession";
 import { checkWhatsNew } from "@/lib/whatsNewSync";
 import { useCollectedWidget, useFollowupsWidget, useOwedWidget, useQuotesWidget, useTasksWidget, type WidgetEntry } from "@/home/widgets";
@@ -116,7 +116,7 @@ export default function SmartHome() {
         <Section delay={70} pt={18} px={16}>
           <QuoteBar open={barOpen} onOpenChange={setBarOpen} clients={clientOpts} locale={locale} text={text} onText={setText} onBuild={build}
             onReview={(id) => { setBarOpen(false); setText(""); router.push(screenHref("Quote", t("quotes.actions.openQuote"), { id })); }}
-            defaultTax={taxName(profile.data?.province) ?? undefined} />
+            defaultTax={taxName(profile.data?.province) ? taxWords(taxName(profile.data?.province)!, i18n.language) : undefined} />
         </Section>
         <View style={{ opacity: barOpen ? 0.3 : 1 }}>
           {roleHome ? (

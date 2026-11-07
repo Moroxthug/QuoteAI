@@ -45,6 +45,7 @@ export default function Schedule() {
   const { t, i18n } = useTranslation();
   const c = (k: string, o?: Record<string, unknown>) => t(`sch.${k}`, o) as string;
   const locale: Locale = i18n.language === "fr" ? "fr-CA" : "en-CA";
+  const hm = (h: number) => hhmm(h, locale);
   const { status } = useSession();
   const signedIn = status === "in" || status === "offline";
   const toast = useToast();
@@ -130,11 +131,11 @@ export default function Schedule() {
     const what = b.milestoneTitle || b.title || undefined;
     return (
       <ExpandCard key={`${b.id}-${p.from}`} id={`${b.id}-${p.from}`} variant="row" list="sched" label={titleText}
-        head={<BlockHead color={jobColor(b.projectId)} title={titleText} time={`${hhmm(p.from)} – ${hhmm(p.to)}`} sub={what} clash={other ? <Status tone="bad" shape="alert">{c("clashLabel", { hours: money(ov) })}</Status> : undefined} />}>
+        head={<BlockHead color={jobColor(b.projectId)} title={titleText} time={`${hm(p.from)} – ${hm(p.to)}`} sub={what} clash={other ? <Status tone="bad" shape="alert">{c("clashLabel", { hours: money(ov) })}</Status> : undefined} />}>
         <XcDivider />
         <XcCaption>{[job?.name ?? b.projectName, what].filter(Boolean).join(" · ")}</XcCaption>
         {job?.address ? <XcRow first title={job.address} right={<XcButton label={c("open.directions")} onPress={() => void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address)}`)} />} /> : null}
-        <XcRow title={w?.name ?? b.collaboratorName ?? c("sheet.noWorker")} sub={`${hhmm(p.from)} – ${hhmm(p.to)}`}
+        <XcRow title={w?.name ?? b.collaboratorName ?? c("sheet.noWorker")} sub={`${hm(p.from)} – ${hm(p.to)}`}
           right={<>{other ? <Status plain tone="bad" shape="alert">{c("open.clashes", { job: other.block.projectName ?? "" })}</Status> : null}<XcButton label={c("open.move")} onPress={() => setDraft(edit(b, p))} /></>} />
         {b.notes ? <XcRow title={c("open.bring")} sub={b.notes} /> : null}
         <XcActions link={c("open.move")} onLink={() => setDraft(edit(b, p))} main={c("open.openJob")} onMain={() => b.projectId && router.push(screenHref("Job", job?.name ?? "", { id: b.projectId }))} />
@@ -184,7 +185,7 @@ export default function Schedule() {
         ) : (
           <>
             {q.isError ? <Section pt={12} px={16}><Banner tone="info" icon="warn" iconTone="amber" lead={c("offline")} /></Section> : null}
-            <Section row justify="space-between" pt={16} px={20}><Text size={11.5} color="faint">7:00</Text><Text size={11.5} color="faint">12:30</Text><Text size={11.5} color="faint">18:00</Text></Section>
+            <Section row justify="space-between" pt={16} px={20}><Text size={11.5} color="faint">{hm(7)}</Text><Text size={11.5} color="faint">{hm(12.5)}</Text><Text size={11.5} color="faint">{hm(18)}</Text></Section>
             {laneList.map((lane) => {
               const w = lane.kind === "person" ? personById(lane.id) : undefined;
               const job = lane.kind === "job" ? jobById(lane.id) : undefined;
@@ -195,7 +196,7 @@ export default function Schedule() {
                     title={lane.title || c("sheet.noWorker")} sub={lane.kind === "person" ? (w?.role || undefined) : (job?.address || undefined)} hours={hrs ? hoursText(hrs) : undefined} segs={segsOf(lane.pieces, todays)}>
                     {lane.pieces.map((p) => blockRow(p, todays, lane.kind === "job"))}
                     {lane.free.map(([a, z]) => (
-                      <FreeRow key={`${a}-${z}`} label={c("free")} time={`${hhmm(a)} – ${hhmm(z)}`} action={c("book")} onPress={() => setDraft(blank(lane.id, a, Math.min(z, a + 4)))} />
+                      <FreeRow key={`${a}-${z}`} label={c("free")} time={`${hm(a)} – ${hm(z)}`} action={c("book")} onPress={() => setDraft(blank(lane.id, a, Math.min(z, a + 4)))} />
                     ))}
                     {!lane.pieces.length && weekend ? <Stack pt={4} pb={10}><Text size={13.5} color="muted">{c("nothingBooked")}</Text></Stack> : null}
                   </LaneCard>
@@ -243,12 +244,12 @@ export default function Schedule() {
               </Stack>
               {!d.allDay ? (
                 <Stack row gap={10}>
-                  <Stack grow><TimeStepper label={c("sheet.start")} value={hhmm(d.from)} decLabel={c("sheet.startEarlier")} incLabel={c("sheet.startLater")} onDec={() => patch({ from: Math.max(6, d.from - 0.5) })} onInc={() => d.from + 0.5 < d.to && patch({ from: d.from + 0.5 })} /></Stack>
-                  <Stack grow><TimeStepper label={c("sheet.end")} value={hhmm(d.to)} decLabel={c("sheet.endEarlier")} incLabel={c("sheet.endLater")} onDec={() => d.to - 0.5 > d.from && patch({ to: d.to - 0.5 })} onInc={() => patch({ to: Math.min(18, d.to + 0.5) })} /></Stack>
+                  <Stack grow><TimeStepper label={c("sheet.start")} value={hm(d.from)} decLabel={c("sheet.startEarlier")} incLabel={c("sheet.startLater")} onDec={() => patch({ from: Math.max(6, d.from - 0.5) })} onInc={() => d.from + 0.5 < d.to && patch({ from: d.from + 0.5 })} /></Stack>
+                  <Stack grow><TimeStepper label={c("sheet.end")} value={hm(d.to)} decLabel={c("sheet.endEarlier")} incLabel={c("sheet.endLater")} onDec={() => d.to - 0.5 > d.from && patch({ to: d.to - 0.5 })} onInc={() => patch({ to: Math.min(18, d.to + 0.5) })} /></Stack>
                 </Stack>
               ) : null}
               {dConflict && !d.allDay ? (
-                <Banner tone="bad" icon="warn" iconTone="rose" lead={c("sheet.clashLead", { job: dConflict.block.projectName ?? "" })} link={c("sheet.fix", { time: hhmm(dConflict.to) })} onLink={() => patch({ from: dConflict.to, to: Math.min(18, dConflict.to + (d.to - d.from)) })}>{c("sheet.clashTime", { from: hhmm(dConflict.from), to: hhmm(dConflict.to) })}</Banner>
+                <Banner tone="bad" icon="warn" iconTone="rose" lead={c("sheet.clashLead", { job: dConflict.block.projectName ?? "" })} link={c("sheet.fix", { time: hm(dConflict.to) })} onLink={() => patch({ from: dConflict.to, to: Math.min(18, dConflict.to + (d.to - d.from)) })}>{c("sheet.clashTime", { from: hm(dConflict.from), to: hm(dConflict.to) })}</Banner>
               ) : d.workerId ? <Banner tone="ok" icon="check" iconTone="sage" lead={c("sheet.free", { name: (dWorker?.name ?? "").split(" ")[0] ?? "" })} /> : null}
               <TextField label={c("sheet.notes")} value={d.notes} onChangeText={(v) => patch({ notes: v })} placeholder={c("sheet.notesPlaceholder")} multiline />
               <Stack row align="center" gap={8}>

@@ -111,8 +111,8 @@ export function BalanceCard({ label, whole, cents, status, paidValue, bar, cells
   const { colors } = useTheme();
   return (
     <Card>
-      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12, paddingTop: 16, paddingHorizontal: 16, paddingBottom: 14 }}>
-        <View style={{ gap: 5, flexShrink: 1 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 12, paddingTop: 16, paddingHorizontal: 16, paddingBottom: 14 }}>
+        <View style={{ gap: 5, flexShrink: 0 }}>
           <Text size={12.5} color="muted">{label}</Text>
           <Num size={32} weight={600} tracking={-0.04} leading={1} accessibilityLabel={`${label} ${whole}${cents}`}>{whole}<Num size={19} weight={600} color="faint" tracking={-0.01}>{cents}</Num></Num>
         </View>

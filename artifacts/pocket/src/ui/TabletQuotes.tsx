@@ -12,7 +12,7 @@ import { tintFor } from "@/lib/clients";
 import { money, percent, shortDate, type Locale } from "@/lib/format";
 import { initialsOf } from "@/lib/invites";
 import { screenHref } from "@/lib/nav";
-import { taxName } from "@/lib/quoteBar";
+import { taxName, taxWords } from "@/lib/quoteBar";
 import { depositAmount, depositTerm } from "@/lib/quoteMath";
 import { quoteApi, type QuoteFull } from "@/lib/quoteApi";
 import { jobLine, quoteState, validUntil, type QuoteState } from "@/lib/quotes";
@@ -110,7 +110,7 @@ export function QuotePane({ id }: { id: string | null }) {
     const qty = Number(v.quantita), price = Number(v.prezzoUnitario);
     return { name: v.descrizione.split("\n")[0]!, amt: m(Math.round(qty * price * 100) / 100), detail: [v.um ? `${m(price)} / ${v.um}` : m(price), v.um ? `${new Intl.NumberFormat(locale).format(qty)} ${v.um}` : "", v.descrizione.split("\n")[1] ?? ""].filter(Boolean).join(" · ") };
   }));
-  const taxLabel = `${quote.taxLines?.length ? quote.taxLines.map((l) => l.label ?? l.code).join(" + ") : taxName(quote.province) ?? t("quote.tax")} ${percent(Number(quote.ivaPercentuale) / 100, locale, Number(quote.ivaPercentuale) % 1 ? 3 : 0)}`;
+  const taxLabel = `${quote.taxLines?.length ? quote.taxLines.map((l) => l.label ?? l.code).join(" + ") : taxWords(taxName(quote.province) ?? t("quote.tax"), locale === "fr-CA" ? "fr" : "en")} ${percent(Number(quote.ivaPercentuale) / 100, locale, Number(quote.ivaPercentuale) % 1 ? 3 : 0)}`;
   const total = m(quote.totale);
   const cut = total.search(/[.,]\d\d(?: \$)?$/);
   const [whole, cents] = cut > 0 ? [total.slice(0, cut), total.slice(cut)] : [total, ""];

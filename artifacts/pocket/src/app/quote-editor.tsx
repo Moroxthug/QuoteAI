@@ -213,7 +213,7 @@ export default function QuoteEditor() {
           </LineEditCard>
         </Section>
         <Section delay={100} pt={12} px={16}>
-          <TotalsCard rows={[{ label: t("qe.subtotal"), value: m(live.subtotale) }, ...(live.sconto ? [{ label: t("qe.discount", { pct: live.sconto.percentuale }), value: `−${m(live.subtotale - live.imponibile)}` }] : []), { label: `${quote.taxLines?.map((l) => l.label ?? l.code).join(" + ") || t("qe.tax")} ${Math.round(rate * 1000) / 1000}%`, value: m(live.ivaValore) }]} totalLabel={t("qe.total")}
+          <TotalsCard rows={[{ label: t("qe.subtotal"), value: m(live.subtotale) }, ...(live.sconto ? [{ label: t("qe.discount", { pct: live.sconto.percentuale }), value: `−${m(live.subtotale - live.imponibile)}` }] : []), { label: `${quote.taxLines?.map((l) => l.label ?? l.code).join(" + ") || t("qe.tax")} ${fmt(rate)}${locale === "fr-CA" ? " %" : "%"}`, value: m(live.ivaValore) }]} totalLabel={t("qe.total")}
             whole={m(total).replace(/[.,]\d\d(?: \$)?$/, "")} cents={(m(total).match(/[.,]\d\d(?: \$)?$/) ?? [""])[0]} />
         </Section>
         {!editingVariant ? (

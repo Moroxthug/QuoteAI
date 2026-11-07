@@ -49,7 +49,12 @@ export function clashOf(p: Piece, all: Piece[]): Piece | null {
 export const trackPct = (h: number): number => Math.max(0, Math.min(100, ((h - TRACK_FROM) / (TRACK_TO - TRACK_FROM)) * 100));
 
 /** "7:30" style, hours as a decimal in. */
-export function hhmm(h: number): string {
+export function hhmm(h: number, locale?: string): string {
+  const s = clockOf(h);
+  return locale === "fr-CA" ? s.replace(":", " h ") : s;
+}
+
+function clockOf(h: number): string {
   const whole = Math.floor(h + 1e-9);
   const m = Math.round((h - whole) * 60);
   return m === 60 ? `${whole + 1}:00` : `${whole}:${m < 10 ? "0" : ""}${m}`;

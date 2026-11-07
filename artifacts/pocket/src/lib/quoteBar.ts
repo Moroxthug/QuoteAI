@@ -59,6 +59,12 @@ export function previewLines(q: { capitoli?: { titolo: string; subtotale: number
   return (q.items ?? []).map((i) => ({ name: i.descrizione, amount: i.totale }));
 }
 
+/** A tax name from taxName as a French reader knows it ("GST + QST" is "TPS + TVQ"). */
+export function taxWords(name: string, language: string): string {
+  if (language !== "fr") return name;
+  return name.replace("HST", "TVH").replace("GST", "TPS").replace("QST", "TVQ").replace("PST", "TVP").replace("RST", "TVD");
+}
+
 /** The tax a province charges, as the total line names it ("Total incl. HST"). */
 export function taxName(province: string | null | undefined): string | null {
   switch ((province ?? "").toUpperCase()) {

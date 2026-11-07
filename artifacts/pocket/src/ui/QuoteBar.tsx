@@ -350,7 +350,7 @@ export function QuoteBar({ open, clients, locale, text, onText, onBuild, onRevie
                 ) : null}
               </View>
               <View style={{ marginTop: 4, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.line2, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-                <Text size={12.5} color="muted">{t("home.bar.totalIncl", { tax: defaultTax ?? t("home.bar.tax") })}</Text>
+                <Text size={12.5} color="muted">{t(defaultTax?.includes("+") ? "home.bar.totalInclMany" : "home.bar.totalIncl", { tax: defaultTax ?? t("home.bar.tax") })}</Text>
                 <Num size={28} weight={600} tracking={-0.035}>{whole}<Num size={16} color="faint" tracking={-0.01}>{cents ?? ""}</Num></Num>
               </View>
               {fit ? (

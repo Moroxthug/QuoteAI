@@ -156,7 +156,7 @@ export default function Invoices() {
     if (a) return { text: a.word, tone: a.tone, shape: a.shape };
     const s = stateOf(i, now);
     const sched = scheduledAt(i, now);
-    const text = s.word === "late" ? (s.late > 0 ? t("status.late", { count: s.late }) : t("status.overdue")) : s.word === "scheduled" ? t("status.scheduled", { date: sched ? shortDate(sched, locale) : "" }) : t(`status.${s.word}`);
+    const text = s.word === "late" ? (s.late > 0 ? t("status.late", { count: s.late }) : t("status.overdue")) : s.word === "scheduled" ? t("status.scheduled", { date: sched ? shortDate(sched, locale) : "" }) : s.word === "pending_confirmation" ? t("status.pendingShort") : t(`status.${s.word}`);
     return { text, tone: s.look.tone, shape: s.look.shape };
   };
   const typeLabel = (i: InvoiceDto) => (i.type === "progress" && i.paymentTermLabel ? i.paymentTermLabel : t(`type.${typeKey(i.type)}`));

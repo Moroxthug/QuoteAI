@@ -31,6 +31,9 @@ function formatDescriptionPdf(descrizione: string, bg: string | null): any {
 }
 
 
+/** French puts a non-breaking space before a colon. */
+const colon = (lang: string) => (lang === "fr" ? "\u00a0:" : ":");
+
 export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: ProfileRow): Promise<Buffer> {
   const lang = await quoteLanguageFor(quote);
   const province = normalizeProvince(quote.province) ?? normalizeProvince(((quote.clientData ?? {}) as QuoteClientData).province) ?? normalizeProvince(profile?.province) ?? null;
@@ -71,9 +74,9 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
   const companyInfoStack: Content[] = [
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
-  if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}: ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}${colon(lang)} ${companyVat}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
-  if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}: ${companyPhone}`, fontSize: 8, color: "#555555" });
+  if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}${colon(lang)} ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });
 
   // Header left cell: logo + company info
@@ -234,21 +237,21 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
           width: "*",
           stack: [
             { text: qt("dateAndLocation", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 160, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
         {
           width: "*",
           stack: [
             { text: qt("clientSignature", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 200, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
         {
           width: "*",
           stack: [
             { text: qt("contractorSignature", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 160, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
       ],
@@ -297,7 +300,7 @@ export async function generateCapitolatoPdfBuffer(quote: QuoteRow, profile: Prof
               stack: [
                 { text: qt("specTitle", lang), fontSize: 7, bold: true, color: "#7c3aed", alignment: "right", characterSpacing: 1 },
                 { text: numeroData, fontSize: 10, bold: true, color: DARK, alignment: "right" },
-                { text: `${qt("date", lang)}: ${fmtQuoteDate(new Date(), lang)}`, fontSize: 8, color: "#555555", alignment: "right" },
+                { text: `${qt("date", lang)}${colon(lang)} ${fmtQuoteDate(new Date(), lang)}`, fontSize: 8, color: "#555555", alignment: "right" },
                 { text: `${qt("page", lang)} ${currentPage}/${pageCount}`, fontSize: 7, color: GRAY, alignment: "right", margin: [0, 2, 0, 0] },
               ],
               border: [false, false, false, true],
@@ -471,9 +474,9 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
   const companyInfoStack: Content[] = [
     { text: companyName, fontSize: 13, bold: true, color: DARK, margin: [0, 4, 0, 2] },
   ];
-  if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}: ${companyVat}`, fontSize: 8, color: "#555555" });
+  if (companyVat) companyInfoStack.push({ text: `${qt("gstNo", lang)}${colon(lang)} ${companyVat}`, fontSize: 8, color: "#555555" });
   if (companyAddress) companyInfoStack.push({ text: companyAddress, fontSize: 8, color: "#555555" });
-  if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}: ${companyPhone}`, fontSize: 8, color: "#555555" });
+  if (companyPhone) companyInfoStack.push({ text: `${qt("tel", lang)}${colon(lang)} ${companyPhone}`, fontSize: 8, color: "#555555" });
   if (companyEmail) companyInfoStack.push({ text: companyEmail, fontSize: 8, color: "#555555" });
 
   const headerLeftContent: Content = logoDataUri
@@ -628,21 +631,21 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
           width: "*",
           stack: [
             { text: qt("dateAndLocation", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 160, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
         {
           width: "*",
           stack: [
             { text: qt("clientSignature", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 200, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
         {
           width: "*",
           stack: [
             { text: qt("contractorSignature", lang), fontSize: 8, color: GRAY },
-            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 160, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
+            { canvas: [{ type: "line", x1: 0, y1: 10, x2: 150, y2: 10, lineWidth: 0.5, lineColor: "#aaaaaa" }] },
           ],
         },
       ],
@@ -687,7 +690,7 @@ export async function generateQuotePdfBuffer(quote: QuoteRow, profile: ProfileRo
             {
               stack: [
                 { text: numeroData, fontSize: 10, bold: true, color: DARK, alignment: "right" },
-                { text: `${qt("date", lang)}: ${fmtQuoteDate(new Date(), lang)}`, fontSize: 8, color: "#555555", alignment: "right" },
+                { text: `${qt("date", lang)}${colon(lang)} ${fmtQuoteDate(new Date(), lang)}`, fontSize: 8, color: "#555555", alignment: "right" },
                 { text: `${qt("page", lang)} ${currentPage}/${pageCount}`, fontSize: 7, color: GRAY, alignment: "right", margin: [0, 2, 0, 0] },
               ],
               border: [false, false, false, true],

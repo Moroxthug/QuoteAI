@@ -73,7 +73,7 @@ export const fr: typeof en = {
     shiftSub: "{{label}}, {{when}}", taskSub: "{{title}} · {{job}}", answerSub: "{{answer}}", someone: "Le bureau" },
   clock: {
     onTheClock: "Au travail", offTheClock: "Hors quart", today: "Aujourd’hui", timerOn: "Depuis {{time}} · sur place", timerOff: "Départ pointé à {{time}} · {{dur}} aujourd’hui", timerNone: "Pas pointé aujourd’hui",
-    clockIn: "Pointer l’arrivée", clockOut: "Pointer le départ", clockInSub: "Au {{job}}", clockOutSub: "Appuyez en quittant le chantier", locating: "Localisation…", locatingSub: "On vérifie que vous êtes au {{place}}",
+    clockIn: "Pointer l’arrivée", clockOut: "Pointer le départ", clockInSub: "Chantier : {{job}}", clockOutSub: "Appuyez en quittant le chantier", locating: "Localisation…", locatingSub: "On vérifie votre position : {{place}}",
     clockedIn: "Arrivée pointée", clockedOut: "Départ pointé", matched: "{{time}} · position confirmée", noFix: "{{time}} · position non vérifiée", offSite: "{{time}} · hors du rayon du chantier", queued: "{{time}} · gardé sur votre téléphone", // owner (last three)
     locationNote: "La position est vérifiée seulement à l’arrivée et au départ", noJob: "Pas encore de chantier où pointer", alreadyIn: "Vous êtes déjà pointé", failed: "Impossible de le faire. Réessayez.", noSignal: "Pas de réseau. C’est gardé sur votre téléphone et part plus tard.", // owner
     gate: "Code de la barrière", gateSub: "Touchez pour afficher", phase: "Étape", change: "Changer", directions: "Itinéraire", call: "Appeler {{name}}", siteLead: "Chef de chantier", noPhone: "Pas de numéro",
@@ -121,7 +121,7 @@ export const fr: typeof en = {
     invalid: { title: "Ce lien ne fonctionne pas", sub: "Il manque peut-être une partie. Rouvrez-le ou demandez-en un nouveau à {{who}}." },
     offline: { title: "Pas de connexion", sub: "Votre lien est bon. La page a besoin de réseau pour charger le travail du jour." },
     tryAgain: "Réessayer", trying: "Nouvel essai…", ask: "Demander un nouveau lien à {{who}}", asking: "Envoi…", asked: "{{who}} a votre demande", askedSub: "Le nouveau lien vient avec un nouveau code.", askSub: "Il reçoit une note avec votre nom", // owner (askedSub, askSub)
-    or: "ou entrer avec un code", codeHint: "Code de 6 caractères de {{who}}", codeBad: "Ce code n’a pas fonctionné. Vérifiez avec {{who}}, il a peut-être changé.", codeExpired: "Ce code a expiré. Demandez-en un nouveau à {{who}}.", join: "Entrer", joining: "Connexion…",
+    or: "ou entrer avec un code", codeHint: "Code de 6 caractères du bureau", codeBad: "Ce code n’a pas fonctionné. Vérifiez avec {{who}}, il a peut-être changé.", codeExpired: "Ce code a expiré. Demandez-en un nouveau au bureau.", join: "Entrer", joining: "Connexion…",
     call: "Appeler {{who}}", saved: "Vos heures, photos et rapports sont gardés par l’entreprise. Rien n’est perdu.", theOffice: "le bureau", yourCompany: "votre entreprise", unknownCompany: "votre entreprise",
   },
   pair: { title: "Rejoignez votre équipe", sub: "Entrez le code que votre patron vous a donné. Il sert une fois et dure une semaine.", found: "Bonjour {{name}}", foundSub: "Vous rejoignez {{company}}.", joinAs: "Rejoindre {{company}}", noAccount: "Pas de mot de passe. Ce téléphone reste connecté.", other: "Ce n’est pas vous ?", back: "Retour", // owner (all)

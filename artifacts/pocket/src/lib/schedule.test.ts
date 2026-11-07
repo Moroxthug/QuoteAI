@@ -59,6 +59,8 @@ test("track positions, clock text, hours, and the instants a block is saved with
   assert.equal(trackPct(20), 100);
   assert.equal(hhmm(7.5), "7:30");
   assert.equal(hhmm(16), "16:00");
+  assert.equal(hhmm(8, "fr-CA"), "8 h 00");
+  assert.equal(hhmm(7.5, "fr-CA"), "7 h 30");
   assert.equal(hhmm(10.99999), "11:00");
   assert.equal(hoursOf(piecesOn([blk("a", "x", "j", 1, 8, 12), blk("b", "x", "j", 1, 13, 14.5)], day(1))), 5.5);
   const i = instants(day(1), 8, 12.5);

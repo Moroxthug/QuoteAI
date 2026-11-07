@@ -473,7 +473,7 @@ Built: 129.0 to 129.10 (cards open full screen, weather, phone fixes, the ops al
 2. The Apple developer account; then `eas build -p ios --profile production` and `eas submit -p ios` (EAS asks for the Apple sign-in and makes the certificates).
 3. A new Android bundle (`npm run release:android`) to the closed test, then on a phone: offline edits and the conflict card, photos on mobile data vs Wi-Fi, app lock after 5 minutes, the camera / mic / clock-in sheets, a tablet sideways. Then Play production with a staged rollout.
 4. Review and paste the store listing (EN, FR); the screenshots and feature graphic; the Data safety form.
-**Open, can be done here**: Jobs, Clients and Invoices beside their detail at tablet width (only Quotes splits today).
+**Open, needs the owner**: Jobs, Clients and Invoices beside their detail at tablet width. The Tablet board draws Quotes only, so a split for the others would be a new design: it needs a board or a ruling first.
 
 ## Phase 130: Videos from the finished app
 
@@ -507,7 +507,7 @@ The owner asked for these fixed, then the videos they touched were re-rendered (
 - **Layout:** the Invoices list says `To confirm` / `À confirmer` (`status.pendingShort`) so the row keeps its name and number; the Invoice balance stays on one line and the pill drops under it when there's no room.
 - **Quote PDF (server):** signature lines now fit their columns, in both languages (they overran the page); French puts a non-breaking space before a colon (`Date :`, `Tél. :`).
 
-**Found, not fixed (app bug):** on Quotes at 390 wide the Waiting figure breaks mid-number with a five-digit total (`$18,42` / `1`); the board shows `$15,396` on one line. Seen on web only. The sample uses a four-digit amount to stay clear of it, so re-check when it is fixed.
+**Fixed (2026-11-07):** a five-digit figure on Quotes' glance broke mid-number at 390 wide (`$18,42` / `1`). `Figures` now keeps a value on one line: a long amount steps down a size (19, 17, 15 from the token scale, `valueSize` in `ui/Numbers.tsx`) and phones also shrink it to fit. Checked on the web build in EN and FR with `$18,421` (the fixtures' `state.big`).
 
 ### 130.4 The other five videos, the store cut and the homepage loop (2026-11-07)
 The owner approved the 130.3 style.

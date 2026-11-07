@@ -13,13 +13,19 @@ import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay
 import { tokens } from "@/theme/tokens";
 import { Card, Hairline } from "./Card";
 import { easing } from "./motion";
-import { Num, Text } from "./Text";
+import { Num, Text, type Size } from "./Text";
 import { useTheme, type ColorName } from "./theme";
 
 export type Figure = { label: string; value: string; sub?: string; subTone?: Extract<ColorName, "muted" | "ok" | "bad" | "warn"> };
 
+/** Text size for a figure in a third of the screen: a long amount ("$18,421", "18 421 $") steps down so it never breaks in two. */
+export function valueSize(text: string): Size {
+  return text.length <= 6 ? 19 : text.length <= 8 ? 17 : 15;
+}
+
 function Value({ children }: { children: string }) {
-  return <Num size={19} weight={600} tracking={-0.03}>{children}</Num>;
+  // One line always: on a phone, the font also shrinks if the column is narrower still.
+  return <Num size={valueSize(children)} weight={600} tracking={-0.03} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{children}</Num>;
 }
 
 /** The figures of a StatStrip without the card, for a head that sits inside another card (an expandable one). */

@@ -68,5 +68,7 @@ export const pdfInput = (lang) => {
 
 /** The text typed into New quote. */
 export const typedText = (lang) => WORLD[lang].text;
+/** The street on that client's row. */
+export const clientStreet = (lang) => WORLD[lang].clients[0][1];
 /** The client picked on New quote. */
 export const clientName = (lang) => WORLD[lang].clients[0][0];

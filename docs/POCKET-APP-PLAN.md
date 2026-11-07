@@ -494,6 +494,12 @@ The owner rejected the first sample: no PDF with the logo, poor font and picture
 - Order: `make-assets.mjs`, `make-pdf.ts` (command at its top), `pdf-pages.mjs`, `record.mjs`, `compose.mjs`.
 - Files land in `video/out/final/` (not committed).
 
+### 130.3 Cut as a film, not a screen recording (2026-11-07)
+The owner asked for transitions and scrolling that feel like marketing.
+- **Shots, not a take:** `scripts/<id>.mjs` is now a list of shots. `prep` moves the app along with nothing filmed (taps, new pages, scrolling), `run` is filmed. Nobody sees a tap ring or the app scrolling.
+- **`compose.mjs` is the editor:** whip cuts with directional blur stand in for scrolling and page changes; a colour wipe (ink, then the brand violet) marks the big changes and swaps the ground; the phone sits at a 3D angle and drifts; `r.spot` marks a part of the screen that lifts out of the phone, live; captions build word by word; `speed` shortens a shot.
+- About 21 s, against 34. No glow or parallax: the motion comes from the cuts.
+
 **Found, not fixed (PDF):** in the French quote PDF, page 2's "Signature de l'entrepreneur" line runs off the right edge of the page. The French header also reads `Date:` and `Tél.:` without the space French needs before the colon.
 
 **Found, not fixed (app bug):** on Quotes at 390 wide the Waiting figure breaks mid-number with a five-digit total (`$18,42` / `1`); the board shows `$15,396` on one line. Seen on web only. The sample uses a four-digit amount to stay clear of it, so re-check when it is fixed.

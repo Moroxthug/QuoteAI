@@ -6,6 +6,7 @@ import { db, authUsersTable, authSessionsTable, authAccountsTable, authVerificat
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
+import { notifyHub } from "./hub";
 import { requestLang, verificationEmail, verificationCodeEmail, signInCodeEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
 import { recordSecurityAuditEvent } from "./auditLog";
 
@@ -340,6 +341,7 @@ export const auth = betterAuth({
         // address already has an invitation waiting) is not told to set up a
         // business and pick a plan.
         after: async (user, ctx) => {
+          await notifyHub("signup", "New signup", user.email);
           if (!resend) return;
           try {
             const callbackURL = String((ctx?.body as { callbackURL?: unknown } | undefined)?.callbackURL ?? "");

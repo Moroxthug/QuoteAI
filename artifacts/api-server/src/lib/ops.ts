@@ -6,6 +6,7 @@ import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { brandedResend } from "./emailUtils.js";
 import { logger } from "./logger";
 import { captureMessage } from "./errorTracking";
+import { notifyHub } from "./hub";
 
 /**
  * How long without a successful tick before the scheduler counts as stale.
@@ -101,6 +102,7 @@ export async function sendOpsAlert(subject: string, lines: string[]): Promise<vo
   const text = lines.join("\n");
   logger.warn({ subject, lines }, "Ops alert");
   await captureMessage(`${subject}\n${text}`, { level: "warning", logger: "ops", tags: { ops_alert: subject.slice(0, 60) } });
+  await notifyHub("alert", subject, text);
   const apiKey = process.env.RESEND_API_KEY;
   if (!to || !apiKey) {
     logger.warn("Ops alert not emailed — OPS_ALERT_EMAIL/ADMIN_EMAIL or RESEND_API_KEY missing");

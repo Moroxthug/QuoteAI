@@ -1,6 +1,9 @@
 // The made-up company every video shows. The recorder answers /api from here, so a run needs no server and writes to no database.
 // English is an Ontario company (HST); French is a Québec one (TPS and TVQ). All names and addresses are invented.
-export const NOW = "2026-11-03T14:30:00-05:00";
+import { NOW } from "./clock.mjs";
+import * as more from "./world.mjs";
+
+export { NOW };
 
 const round = (n) => Math.round(n * 100) / 100;
 
@@ -27,7 +30,7 @@ const WORLD = {
   },
 };
 
-function fullQuote(w, id) {
+function fullQuote(w, id, status = "draft") {
   const capitoli = w.chapters.map(([titolo, rows], i) => {
     const voci = rows.map(([descrizione, um, quantita, prezzoUnitario]) => ({ descrizione, um, quantita, prezzoUnitario, totale: round(quantita * prezzoUnitario) }));
     return { lettera: String.fromCharCode(65 + i), titolo, voci, subtotale: round(voci.reduce((s, v) => s + v.totale, 0)) };
@@ -39,24 +42,72 @@ function fullQuote(w, id) {
   return {
     id, userId: "u1", clientData: { nome, indirizzo, city, province: w.province }, descrizioneGenerale: w.intro, items: [], capitoli, condizioniPagamento: w.terms,
     titoloPreventivoRiga1: w.title, numeroPreventivoData: "Q-2026-124", subtotale, ivaPercentuale: w.taxes.reduce((s, t) => s + t.rate, 0), ivaValore, taxLines, totale: round(subtotale + ivaValore),
-    note: w.note, status: "draft", rawInput: w.text, capitolatoPro: false, templateId: "standard", attachments: [], variants: [], createdAt: NOW, updatedAt: NOW,
+    note: w.note, status, rawInput: w.text, capitolatoPro: false, templateId: "standard", attachments: [], variants: [], createdAt: NOW, updatedAt: NOW,
   };
 }
 
 /** What the API answers for a call in this language; undefined when there is no fixture. */
-export function fixtures(method, path, lang = "en") {
+export function fixtures(method, path, lang = "en", state = {}) {
   const w = WORLD[lang];
   if (path === "/api/auth/get-session") return { session: { id: "s1", token: "video-fixture", userId: "u1", expiresAt: "2030-01-01T00:00:00.000Z" }, user: { id: "u1", name: w.user, email: "alex@example.invalid", emailVerified: true, image: null } };
   if (path === "/api/me/job-role") return { included: true, jobRole: "owner", access: "admin", sensitive: { payRates: true, margins: true, approveTime: true, sendInvoices: true }, mayChangeHome: true };
   if (path === "/api/me/preferences") return { preferences: {} };
   if (path === "/api/me/allowance") return { freeQuotes: { paid: true, used: 0, limit: null, left: null, enforced: false } };
-  if (path === "/api/business-profile") return { userId: "u1", companyName: w.company, address: w.address, phone: w.phone, email: "alex@example.invalid", logoUrl: null, province: w.province };
+  if (path === "/api/business-profile") return { userId: "u1", companyName: w.company, address: w.address, phone: w.phone, email: "alex@example.invalid", logoUrl: null, province: w.province, automationSettings: { invoiceReminders: true, smsReminders: false } };
   if (path === "/api/clients") return w.clients.map(([clientName, indirizzo, city], i) => ({ id: `c${i + 1}`, clientName, indirizzo, city, province: w.province, quoteCount: 1, unlockedCount: 1, totalValue: 0, unlockedValue: 0, lastQuoteDate: NOW }));
   if (path === "/api/sms/status") return { available: true, fromNumberHint: null, smsEnabled: false, smsReminders: false, scheduleReminders: false, usage: { used: 0, allowance: 0 } };
   if (path === "/api/quotes" && method === "GET") return w.list.map(([nome, title, totale, status], i) => ({ id: `q${i + 1}`, clientData: { nome, indirizzo: "" }, descrizioneGenerale: title, title, numeroPreventivoData: `Q-2026-12${3 - i}`, lineItemCount: 5, subtotale: totale, ivaValore: 0, totale, status, capitolatoPro: false, templateId: "standard", province: w.province, sentAt: status === "draft" ? null : NOW, acceptedAt: status === "accepted" ? NOW : null, createdAt: NOW, updatedAt: NOW }));
   if (path === "/api/quotes" && method === "POST") return fullQuote(w, "q-new");
   const one = /^\/api\/quotes\/([^/]+)$/.exec(path);
-  if (one) return fullQuote(w, one[1]);
+  if (one) return { ...fullQuote(w, one[1], state.quoteStatus ?? "draft"), jobId: state.job ? "j1" : null };
+  return later(method, path, lang, w, state);
+}
+
+function later(method, path, lang, w, state) {
+  const total = fullQuote(w, "q-new").totale;
+  const job = () => more.jobDetail(lang, w, total, state);
+  // Today
+  if (path === "/api/today/needs-you") return more.needsYou(lang, w, state);
+  if (path === "/api/today/business") return more.today.business();
+  if (path === "/api/today/checklist") return more.today.checklist();
+  if (path === "/api/v1/weather/today") return more.today.weather(lang);
+  if (path === "/api/notifications") return { items: [], unread: 0 };
+  // Jobs
+  if (path === "/api/jobs" && method === "GET") return more.jobsList(lang, w, total, state);
+  if (path === "/api/jobs" && method === "POST") return { job: { id: "j1", setupStatus: "pending_review" }, created: true };
+  if (/^\/api\/jobs\/j\d\/setup\/confirm$/.test(path)) { state.job = "started"; return job(); }
+  if (/^\/api\/jobs\/j\d(\/setup)?$/.test(path)) return job();
+  if (path.endsWith("/field-reports")) return { reports: [] };
+  if (path.endsWith("/permits")) return { permits: [], province: w.province };
+  if (path.endsWith("/notes")) return { notes: [] };
+  if (path.endsWith("/photos")) return { photos: [] };
+  if (path === "/api/schedule") return more.schedule(lang, state);
+  if (path === "/api/crew/today") return more.crewToday(lang);
+  // Crew
+  if (path === "/api/team/workers") return more.workers(lang);
+  if (path === "/api/team/time-entries" && method === "GET") return more.timeEntries(lang, state);
+  if (path === "/api/team/time-entries/approve") { state.approved = true; return { approved: 3 }; }
+  if (path === "/api/team/equipment") return { items: [] };
+  if (path === "/api/team/members") return { items: [], seats: { used: 1, limit: 5 } };
+  if (/^\/api\/team\/workers\/[^/]+\/pairing-code$/.test(path)) return { code: "K7M2PX", expiresAt: "2026-11-10T14:30:00-05:00" };
+  if (path === "/api/crew/pair" && method === "POST") return { token: "video-crew", workerName: more.workers(lang).items[0].name, companyName: w.company };
+  if (path.startsWith("/api/crew/pair/")) return { workerName: more.workers(lang).items[0].name, companyName: w.company };
+  if (path.endsWith("/clock-in")) { state.clocked = state.clockAt ?? NOW; return { entry: more.crewView(lang, w, state).activeEntry }; }
+  const task = /^\/api\/t\/[^/]+\/tasks\/(.+)$/.exec(path);
+  if (task) { state.tasksDone = (state.tasksDone ?? 0) + 1; return { task: { id: task[1], status: "done" } }; }
+  if (/^\/api\/t\/[^/]+$/.test(path)) return more.crewView(lang, w, state);
+  // Invoices
+  if (path === "/api/invoices") return more.invoices(lang, w, state);
+  if (path.endsWith("/confirm-etransfer")) { state.paid = true; return {}; }
+  if (/^\/api\/invoices\/[^/]+$/.test(path)) return more.invoiceDetail(lang, w, state);
+  // Connected apps
+  if (path === "/api/team/orgs") return { items: [{ orgId: "o1", companyName: w.company, role: "owner", isOwn: true }], activeOrgId: "o1" };
+  if (path === "/api/plan/overview") return { plan: "monthly_business", features: ["quickbooks_sync", "wave_sync", "invoice_card_payments", "calendar_sync"] };
+  if (path === "/api/quickbooks/status") return more.quickbooks(lang, state);
+  if (path === "/api/quickbooks/sync-log") return more.syncLog();
+  if (path === "/api/quickbooks/accounts") return more.accounts(lang);
+  if (["/api/wave/status", "/api/invoice-payments/connect/status", "/api/whatsapp/status", "/api/google-lsa/status"].includes(path)) return { connected: false, available: true };
+  if (path === "/api/calendar/status") return { available: { google: true, outlook: true }, connections: [] };
   return undefined;
 }
 

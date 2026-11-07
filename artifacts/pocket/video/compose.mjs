@@ -24,7 +24,9 @@ const FORMATS = {
 const args = process.argv.slice(2);
 const still = args.find((a) => a.startsWith("--still="))?.slice(8);
 const [id, lang = "en", format = "vertical"] = args.filter((a) => !a.startsWith("--"));
+const loop = args.includes("--loop"); // the homepage loop: the lifted shots only, no words, no PDF, no closing card
 const f = FORMATS[format];
+if (loop) f.sides = [{ cx: f.w / 2, cap: "" }]; // no words beside it, so the phone sits in the middle
 const src = join(HERE, "out", `${id}-${lang}`);
 const finals = join(HERE, "out", "final");
 mkdirSync(finals, { recursive: true });
@@ -35,7 +37,8 @@ const VIOLET = color.acc;
 // One running order: the filmed shots, then the `after` scenes.
 // Sides alternate, but shots that share a caption stay together, and the PDF always sits on the first side.
 let cursor = 0, side = 0, caption = null;
-const order = [...tl.shots.map((s) => ({ ...s, type: "app", secs: (s.to - s.from) / tl.fps / (s.speed ?? 1) })), ...tl.after].map((s, i) => {
+const scenes = [...tl.shots.map((s) => (s.type ? s : { ...s, type: "app", secs: (s.to - s.from) / tl.fps / (s.speed ?? 1) })), ...tl.after];
+const order = (loop ? scenes.filter((s) => s.type === "app" && s.lift != null).map((s, i) => ({ ...s, caption: undefined, bg: "light", cut: i ? "left" : undefined })) : scenes).map((s, i) => {
   const at = cursor;
   cursor += s.secs;
   if (s.type === "pdf") side = 0;
@@ -45,13 +48,14 @@ const order = [...tl.shots.map((s) => ({ ...s, type: "app", secs: (s.to - s.from
 });
 const total = cursor;
 
-// The same caption on two shots in a row stays up.
+// The same caption on two shots in a row stays up, unless the ground changes under it and it has to change colour.
 const cues = [];
 for (const s of order) {
   if (!s.caption) continue;
   const last = cues.at(-1);
-  if (last?.text === s.caption) last.to = s.at + s.secs;
-  else cues.push({ text: s.caption, from: s.at, to: s.at + s.secs, side: s.side, white: s.bg === "violet" });
+  const white = s.bg === "violet";
+  if (last?.text === s.caption && last.white === white) last.to = s.at + s.secs;
+  else cues.push({ text: s.caption, from: s.at, to: s.at + s.secs, side: s.side, white });
 }
 
 const font = (family, file) => pathToFileURL(join(FONTS, family, file)).href;
@@ -213,6 +217,20 @@ await page.evaluate(({ f, fps, order, cues, base, ratio, vertical }) => {
   };
 }, { f, fps: tl.fps, order, cues, base: pathToFileURL(join(src, "frames")).href, ratio: RATIO, vertical: format === "vertical" });
 
+// `--sheet`: one picture of every shot, side by side, to check a whole video at a glance.
+if (args.includes("--sheet")) {
+  const pics = [];
+  for (const s of order) {
+    await page.evaluate((t) => window.draw(t), s.at + s.secs * 0.72);
+    pics.push((await page.screenshot({ type: "jpeg", quality: 80 })).toString("base64"));
+  }
+  const grid = await browser.newPage({ viewport: { width: 2000, height: 800 } });
+  await grid.setContent(`<body style="margin:0;display:flex;flex-wrap:wrap;gap:6px;background:#222">${pics.map((p) => `<img style="height:${format === "vertical" ? 780 : 380}px" src="data:image/jpeg;base64,${p}">`).join("")}`);
+  await grid.screenshot({ path: join(finals, `sheet-${id}-${lang}-${format}.jpg`), type: "jpeg", quality: 85, fullPage: true });
+  await browser.close();
+  process.exit(0);
+}
+
 if (still) {
   await page.evaluate((t) => window.draw(t), Number(still));
   await page.screenshot({ path: join(finals, "still.png") });
@@ -220,9 +238,9 @@ if (still) {
   process.exit(0);
 }
 
-const name = `${id}-${lang}-${format}`;
+const name = loop ? `loop-${lang}-${format}` : `${id}-${lang}-${format}`;
 const mp4 = join(finals, `${name}.mp4`);
-const enc = spawn(ffmpeg, ["-y", "-f", "image2pipe", "-framerate", String(tl.fps), "-c:v", "mjpeg", "-i", "-", "-vf", "scale=out_color_matrix=bt709:out_range=tv,format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "15", "-profile:v", "high", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-movflags", "+faststart", mp4], { stdio: ["pipe", "ignore", "inherit"] });
+const enc = spawn(ffmpeg, ["-y", "-f", "image2pipe", "-framerate", String(tl.fps), "-c:v", "mjpeg", "-i", "-", "-vf", `${loop ? "fps=30,scale=-2:720:" : "scale="}out_color_matrix=bt709:out_range=tv,format=yuv420p`, "-c:v", "libx264", "-preset", "slow", "-crf", loop ? "24" : "15", "-profile:v", "high", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-movflags", "+faststart", mp4], { stdio: ["pipe", "ignore", "inherit"] });
 const count = Math.round(total * tl.fps);
 for (let i = 0; i < count; i++) {
   await page.evaluate((t) => window.draw(t), i / tl.fps);
@@ -234,7 +252,7 @@ enc.stdin.end();
 await new Promise((res) => enc.on("close", res));
 await browser.close();
 
-const pdfAt = order.find((s) => s.type === "pdf")?.at ?? 0;
+const pdfAt = order.find((s) => s.type === "pdf")?.at ?? order.find((s) => s.lift != null)?.at ?? 0; // the poster: the PDF, else the first card lifted out
 spawnSync(ffmpeg, ["-y", "-v", "error", "-ss", (pdfAt + 1.2).toFixed(2), "-i", mp4, "-frames:v", "1", "-q:v", "2", join(finals, `${name}.jpg`)]);
 const stamp = (s) => new Date(s * 1000).toISOString().slice(11, 23);
 writeFileSync(join(finals, `${name}.vtt`), `WEBVTT\n\n${cues.map((c) => `${stamp(c.from)} --> ${stamp(c.to)}\n${c.text}`).join("\n\n")}\n`);

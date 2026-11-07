@@ -504,12 +504,21 @@ The owner asked for transitions and scrolling that feel like marketing.
 
 **Found, not fixed (app bug):** on Quotes at 390 wide the Waiting figure breaks mid-number with a five-digit total (`$18,42` / `1`); the board shows `$15,396` on one line. Seen on web only. The sample uses a four-digit amount to stay clear of it, so re-check when it is fixed.
 
-**Owner, before the rest is rendered:**
-1. Approve the look of the sample.
-2. Voice: none yet, the sample reads on captions alone. Groq's Orpheus voice (already in the API) is English only, so there is no fr-CA voice.
-3. The in-app player: it draws scenes on a timer as its board shows and cannot play a file. Showing real videos in the app needs `expo-video`, so a new bundle, and a ruling because the board draws scenes.
+### 130.4 The other five videos, the store cut and the homepage loop (2026-11-07)
+The owner approved the 130.3 style.
+- **One made-up company across all six:** `world.mjs` holds its job, crew, invoices and books. The quote from "Your first quote" becomes the job in "Start a job"; `state` in the fixtures is what the video has done so far (started the job, clocked in, confirmed the payment), so the screens read as they would after the real tap.
+- **`scripts/`:** `overview`, `jobs`, `crew`, `etransfer`, `qbo`, 15 to 22 s each. `overview` uses the player's own captions (`i18n/screens/video.ts`). `crew` runs at its own time of day (`now`). `qbo` doesn't show Intuit's sign-in page: it is theirs.
+- **New tools:** `probe.mjs` opens routes and says which `/api` calls have no fixture; `compose.mjs --sheet` draws one picture of every shot, to check a whole video at a glance; `--loop` makes the homepage loop (lifted shots only, no words, 720p, small). `r.go` opens a screen off camera, `r.to` scrolls to something, `r.set` changes the fixture state.
+- **Store:** Play's promo video is a YouTube link, so the store cut is `overview-<lang>-horizontal.mp4`. Apple's App Preview waits for iOS: its rules allow only footage captured from the app, so the PDF scene would have to go.
 
-**Left:** the other videos (`overview`, `jobs`, `crew`, `etransfer`, `qbo`, with their fixtures), store previews, the homepage loop.
+**Found, not fixed (French in the app):** `TPS + TVQ 14.975 %` uses a point (quote total; needs a comma); Home's composer reads `Total GST + QST incluse`; the crew's code field reads `Code de 6 caractères de le bureau`; the clock button reads `Au Peinture du rez-de-chaussée` (`Au` + a job name); Schedule shows `8:00 – 16:00` where the rule is `8 h 00`; Teammate's "not found" title reads `Personne trouvée`, which says the opposite; QuickBooks' first card mentions `TVH` to a Québec company; Job setup's margin reads `46.9 %`, with a point.
+
+**Found, not fixed (layout):** on Invoices at 390 wide, the long `Awaiting confirmation` pill squeezes the row to `Priya …` / `INV-202…`. On Invoice in French, beside the same pill, the balance wraps with the `$` alone on a second line (`3 264,99` / `$`).
+
+**Owner, still open:**
+1. Voice and music: none yet, the videos read on captions alone. Groq's Orpheus voice (already in the API) is English only, so there is no fr-CA voice.
+2. The in-app player: it draws scenes on a timer as its board shows and cannot play a file. Showing real videos in the app needs `expo-video`, so a new bundle, and a ruling because the board draws scenes. `src/lib/videos.ts` also still lists 60 to 94 s lengths; the real files run 15 to 22 s.
+3. Where the files live and where the loop goes on the homepage: nothing is uploaded or placed yet (`video/out/final/`, not committed).
 
 ## Phase 133 screens: free-quote counter and locked state (2026-10-19)
 

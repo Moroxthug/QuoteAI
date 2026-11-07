@@ -40,16 +40,20 @@ const server = createServer((req, res) => {
 const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--font-render-hinting=none", "--disable-lcd-text", "--enable-font-subpixel-positioning", "--force-color-profile=srgb"] });
 const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE, locale: lang === "fr" ? "fr-CA" : "en-CA", timezoneId: "America/Toronto", colorScheme: "light" });
 await ctx.addInitScript(() => localStorage.setItem("quoteai_session-token", "video-fixture"));
+await ctx.grantPermissions(["geolocation"], { origin: ORIGIN });
+await ctx.setGeolocation({ latitude: 45.42, longitude: -75.69 });
 const page = await ctx.newPage();
-await page.clock.install({ time: new Date(NOW) });
+const NOW_HERE = script.now ?? NOW; // a video can happen at its own time of day
+await page.clock.install({ time: new Date(NOW_HERE) });
 
+const state = { ...script.state }; // what the video has done so far: the fixtures read it
 let count = 0;
 const waiting = []; // answers held back until enough frames have passed
 const missing = new Set();
 await page.route("**/api/**", async (route) => {
   const req = route.request();
   const path = new URL(req.url()).pathname;
-  const hit = fixtures(req.method(), path, lang);
+  const hit = fixtures(req.method(), path, lang, state);
   if (hit === undefined) missing.add(`${req.method()} ${path}`);
   if (req.method() === "POST" && path === "/api/quotes") await new Promise((res) => waiting.push({ at: count + WRITE_SECS * FPS, res }));
   return route.fulfill({ status: hit === undefined ? 404 : 200, contentType: "application/json", body: JSON.stringify(hit ?? { error: "no fixture" }) });
@@ -58,7 +62,7 @@ await page.route("**/api/**", async (route) => {
 await page.goto(ORIGIN + script.start, { waitUntil: "load", timeout: 120_000 });
 await page.waitForLoadState("networkidle").catch(() => {});
 await page.waitForTimeout(2500);
-await page.clock.pauseAt(new Date(Date.parse(NOW) + 60_000));
+await page.clock.pauseAt(new Date(Date.parse(NOW_HERE) + 60_000));
 
 const frame = async () => {
   await page.clock.runFor(1000 / FPS);
@@ -77,23 +81,45 @@ const r = {
   // Only what is on screen: the screens under this one stay mounted in the stack, with the same words.
   t: (en, fr) => page.getByText(lang === "fr" ? fr : en).locator("visible=true").first(),
   exact: (s) => page.getByText(s, { exact: true }).locator("visible=true").first(),
+  /** The nth match on screen, from 0. */
+  nth: (en, fr, n) => page.getByText(lang === "fr" ? fr : en).locator("visible=true").nth(n),
   field: () => page.locator("textarea").locator("visible=true").first(),
   hold,
+  /** Changes what the made-up company has done, for the next screen that loads. */
+  set: (patch) => Object.assign(state, patch),
+  /** The app's own clock, right now. */
+  now: () => page.evaluate(() => new Date().toISOString()),
+  /** Opens a screen directly, off camera. The clock stays stopped, so it is stepped until the app has started. */
+  go: async (path) => {
+    await page.goto(ORIGIN + path, { waitUntil: "load", timeout: 60_000 });
+    for (let i = 0; i < 40; i++) { await page.clock.runFor(100); await page.waitForTimeout(40); }
+  },
   /** Scrolls the page while nothing is being filmed. */
   jump: async (dy) => { await page.mouse.move(W / 2, H / 2); await page.mouse.wheel(0, dy); await hold(0.4); },
-  tap: async (loc) => { await reveal(loc); await loc.click(); await hold(0.15); },
+  tap: async (loc) => { await reveal(loc); await hold(0.4); await loc.click({ force: true }); await hold(0.15); }, // force: the stopped clock can keep a card from ever reading as "stable"
   /** The part of the screen this shot lifts out: from the top of `a` to the bottom of `b`, across the card's width. */
-  spot: async (a, b = a, pad = 14) => {
+  spot: async (a, b = a, pad = 14, right = 16) => {
     const [p, q] = [await box(a), await box(b)];
-    const y = p.y - pad, h = q.y + q.height + pad - y;
-    shot.spot = { x: 16 / W, y: y / H, w: (W - 32) / W, h: h / H };
+    const [above, below] = Array.isArray(pad) ? pad : [pad, pad];
+    const y = p.y - above, h = q.y + q.height + below - y;
+    shot.spot = { x: 16 / W, y: y / H, w: (W - 16 - right) / W, h: h / H };
   },
-  type: async (text) => {
-    const box = page.locator("textarea").locator("visible=true").first();
+  /** Types into the field, a letter every `every` frames. */
+  type: async (text, { field = "textarea", every = 1 } = {}) => {
+    const box = page.locator(field).locator("visible=true").first();
     await box.evaluate((e) => { e.spellcheck = false; }); // the recording browser's red underlines aren't the app's
     await box.click();
     await hold(0.2);
-    for (const ch of text) { await page.keyboard.insertText(ch); await frame(); }
+    for (const ch of text) { await page.keyboard.insertText(ch); for (let i = 0; i < every; i++) await frame(); }
+  },
+  /** Scrolls, off camera, until this sits `y` from the top of the screen. */
+  to: async (loc, y = 110) => {
+    await loc.waitFor({ timeout: 15_000 });
+    for (let i = 0; i < 6; i++) {
+      const b = await loc.boundingBox();
+      if (Math.abs(b.y - y) < 6) return;
+      await r.jump(b.y - y);
+    }
   },
   /** Runs frames until this is on screen. */
   until: async (loc) => { for (let i = 0; i < 30 * FPS; i++) { await frame(); if (i % 6 === 0 && await loc.isVisible()) return; } throw new Error("never appeared"); },
@@ -109,6 +135,7 @@ async function reveal(loc) {
 const shots = [];
 try {
   for (const [i, s] of script.shots.entries()) {
+    if (s.type) { shots.push({ ...s, caption: s.caption?.[lang] }); continue; } // a scene the editor draws, such as the PDF
     const { prep, run, caption, ...look } = s;
     shot = { ...look, caption: caption[lang], from: count };
     filming = false;

@@ -66,7 +66,10 @@ async function buildAll() {
       "@swc/core",
       "@aws-sdk/*",
       "@azure/*",
-      "@opentelemetry/*",
+      // "@opentelemetry/*" is NOT external: @better-auth/core (bundled) imports
+      // @opentelemetry/semantic-conventions, which is not a dependency of this
+      // package, so an external import cannot be resolved inside the Vercel
+      // function (pnpm does not hoist it). Bundling it is a few KB of constants.
       "@google-cloud/*",
       "@google/*",
       "googleapis",

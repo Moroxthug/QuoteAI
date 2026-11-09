@@ -82,13 +82,17 @@
     <!-- Google tag (gtag.js) — loaded on the first user interaction or after
          5 s, whichever comes first, so the 170 kB tag never competes with the
          page's own JS on mobile (Phase 68). Events queued in dataLayer before
-         then are delivered once it loads. -->
+         then are delivered once it loads.
+         QuoteAI has its own GA4 property (G-99DLD3ZCX9) since 9/11/2026;
+         before that it reported into PrevAI's. Only quoteai.ca and
+         www.quoteai.ca send hits; local, staging and preview builds never do. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-D2B39E0ELW');
       (function () {
+        if (!/^(www\.)?quoteai\.ca$/.test(location.hostname)) return;
+        gtag('js', new Date());
+        gtag('config', 'G-99DLD3ZCX9');
         var done = false;
         var events = ["pointerdown", "keydown", "touchstart", "scroll"];
         var load = function () {
@@ -97,7 +101,7 @@
           for (var i = 0; i < events.length; i++) window.removeEventListener(events[i], load);
           var s = document.createElement("script");
           s.async = true;
-          s.src = "https://www.googletagmanager.com/gtag/js?id=G-D2B39E0ELW";
+          s.src = "https://www.googletagmanager.com/gtag/js?id=G-99DLD3ZCX9";
           document.head.appendChild(s);
         };
         for (var j = 0; j < events.length; j++) window.addEventListener(events[j], load, { once: true, passive: true });

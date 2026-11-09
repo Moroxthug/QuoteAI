@@ -1,11 +1,17 @@
 import rateLimit from "express-rate-limit";
 import type { Request, Response } from "express";
+import { PostgresRateLimitStore } from "./rateLimitStore.js";
 
 // Requires `app.set("trust proxy", ...)` upstream so req.ip reflects the
 // real client IP behind Vercel's proxy instead of colliding on one IP.
 
-export function ipRateLimiter(opts: { windowMs: number; max: number; message: string }) {
+/**
+ * `shared` names a budget counted in Postgres across every instance (audit
+ * B2); use it for anything guarding credentials or sending email.
+ */
+export function ipRateLimiter(opts: { windowMs: number; max: number; message: string; shared?: string }) {
   return rateLimit({
+    ...(opts.shared ? { store: new PostgresRateLimitStore(opts.shared) } : {}),
     windowMs: opts.windowMs,
     limit: opts.max,
     standardHeaders: true,

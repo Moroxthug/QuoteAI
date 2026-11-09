@@ -677,7 +677,7 @@ router.post("/payments/change-plan", requireAuth, requirePermission("settings", 
         subscriptionPeriodEnd: periodEndSec ? new Date(periodEndSec * 1000) : profile?.subscriptionPeriodEnd ?? null,
       })
       .where(eq(businessProfilesTable.userId, userId));
-    logger.info({ userId, planType, interval, from: current.priceId }, "Subscription plan changed with proration");
+    logger.info({ userId, planType, interval, fromPriceId: current.priceId }, "Subscription plan changed with proration");
 
     try {
       const [authUser] = await db.select({ email: authUsersTable.email, name: authUsersTable.name }).from(authUsersTable).where(eq(authUsersTable.id, userId));

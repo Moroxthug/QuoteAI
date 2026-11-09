@@ -270,10 +270,10 @@ export async function buildQuoteFromAI({
   // Capitolato context: include for Elegante/Professionale templates
   const useCapitolato = templateId === "arosio" || templateId === "mariagrazia";
 
-  // If client data is pre-filled, prepend it to the user message
-  const clientPrefix = clientData?.nome
-    ? `Cliente: ${clientData.nome}${clientData.indirizzo ? `, ${clientData.indirizzo}` : ""}.\n\n`
-    : "";
+  // Audit B11: a client the contractor already picked is never sent to the AI
+  // provider — the model doesn't need a name or home address to price the
+  // work, and the picked client is put back on the result below.
+  const clientPrefix = "";
 
   const hasImages = imageDataUrls && imageDataUrls.length > 0;
 

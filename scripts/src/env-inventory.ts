@@ -59,6 +59,7 @@ const MANIFEST: Record<string, Entry> = {
   STRIPE_CONNECT_FEE_BPS: { kind: "build", note: "Phase 73: platform fee on Connect card payments in basis points; default 50 (0.5 %), capped at 500; 0 disables" },
   PILOT_PROMO_CODE: { kind: "feature", feature: "Pilot programme", note: "Phase 81: the customer-facing Stripe promotion code for the BC/ON/QC pilot (e.g. PILOT2026). Create the coupon + promotion code in the Stripe dashboard first. Set = /pilot shows the code and Checkout applies it automatically; unset = /pilot honestly says no code is running and Checkout falls back to Stripe's own promo box" },
   ADMIN_EMAIL: { kind: "required", note: "comma list; /api/admin/* access and default recipient of ops alerts" },
+  ADMIN_ALLOW_NO_2FA: { kind: "feature", feature: "Admin without two-step (emergency only)", note: "emergency only: \"true\" lets an ADMIN_EMAIL account into /api/admin without two-step (audit B1); logged on every use" },
   GROQ_API_KEY: { kind: "required", note: "the AI provider in production (OpenAI-compatible); without any AI key every AI feature takes its fallback" },
   WEATHERKIT_TEAM_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "Pocket 129: your Apple Developer Team ID. With the next three, Home weather comes from Apple WeatherKit; without them it comes from Environment and Climate Change Canada (free, no key)" },
   WEATHERKIT_SERVICE_ID: { kind: "feature", feature: "Weather (Apple WeatherKit)", note: "The Services ID registered for WeatherKit (e.g. ca.quoteai.weather)" },

@@ -29,6 +29,9 @@ const COLUMNS: { table: string; pk: string[]; columns: string[] }[] = [
   { table: "flinks_connections", pk: ["user_id"], columns: ["login_id_enc"] },
   { table: "meta_lead_ads_connections", pk: ["user_id"], columns: ["page_access_token_enc"] },
   { table: "google_lsa_connections", pk: ["user_id"], columns: ["refresh_token_enc"] },
+  // Audit B9: webhook signing secrets. Rows from before encryption hold the
+  // plain "whsec_…" value; the rotation encrypts them with the new key.
+  { table: "webhook_endpoints", pk: ["id"], columns: ["secret"] },
 ];
 
 function key(name: string): Buffer {
@@ -95,7 +98,7 @@ async function main(): Promise<void> {
             alreadyNew++;
             continue;
           }
-          const plain = decrypt(value, oldKey);
+          const plain = value.startsWith("whsec_") ? value : decrypt(value, oldKey);
           if (plain === null) {
             undecryptable.push(`${table}.${column} ${pk.map((k) => `${k}=${String(row[k])}`).join(" ")}`);
             continue;

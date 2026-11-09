@@ -26,6 +26,7 @@ import { pruneChangeLog } from "./changes.js";
 import { runMorningBriefs } from "../today/brief.js";
 import { runLifecycleIfDue } from "../lifecycle/service.js";
 import { runPlaySync } from "../play/sync.js";
+import { runRetentionPurges } from "../lib/retention.js";
 
 const router = Router();
 
@@ -81,7 +82,9 @@ router.get("/cron/tick", async (req, res) => {
       req.log.error({ err }, "Play sync step failed");
       return { ran: false, checked: 0, updated: 0, ended: 0, acknowledged: 0, errors: 1 };
     });
-    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned, lifecycle, playSync };
+    // Audit B12: the retention schedule for logs (lib/retention.ts). Never throws.
+    const retention = await runRetentionPurges();
+    const result = { automations, contracts, invoices, leads, reviewRequests, incentives, priceTrends, quoteFollowups, flinksSync, googleLsaPoll, accountDeletions, accountExports, scheduleReminders, budgetAlerts, calendarInbound, calendarPruned, compliance, quickbooksPull, usage, syncPruned, lifecycle, playSync, retention };
     const tookMs = Date.now() - startedAt;
     if (tick) await db.update(cronTicksTable).set({ finishedAt: new Date(), ok: true, result, tookMs }).where(eq(cronTicksTable.id, tick.id));
     await db.delete(cronTicksTable).where(lt(cronTicksTable.startedAt, new Date(Date.now() - 90 * 24 * 3_600_000)));

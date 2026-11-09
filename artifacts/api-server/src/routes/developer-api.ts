@@ -6,6 +6,7 @@ import { requireAuth, getUserId, getActorUserId, getActorRole } from "../middlew
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { createApiKey, listApiKeys, revokeApiKey } from "../lib/apiKeys.js";
 import { createWebhook, listWebhooks, deleteWebhook, setWebhookEnabled } from "../lib/webhooks.js";
+import { UnsafeUrlError } from "../lib/safeFetch.js";
 
 const router = Router();
 
@@ -97,6 +98,7 @@ router.post("/developer/webhooks", requireAuth, requirePermission("integrations"
     const { webhook, secret } = await createWebhook(userId, body.data.url, body.data.events);
     res.status(201).json({ webhook: serializeWebhook(webhook), secret });
   } catch (err) {
+    if (err instanceof UnsafeUrlError) { res.status(400).json({ error: "UNSAFE_URL", code: err.code, message: "Webhooks must use a public https address." }); return; }
     req.log.error({ err }, "Error creating webhook");
     res.status(500).json({ error: "Internal server error" });
   }

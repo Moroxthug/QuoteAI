@@ -14,12 +14,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 147 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 392 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 462 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
-| 514 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 556 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 598 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
+| 154 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 399 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 469 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
+| 521 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 563 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 605 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
 
 ## artifacts/api-server/src/routes/account.ts
 
@@ -61,31 +61,31 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 47 | GET | `/api/settings/registration` | none | — | — | none | — | n/a | — | — | — |
-| 62 | GET | `/api/admin/metrics` | admin | — | — | none | — | n/a | — | — | — |
-| 133 | GET | `/api/admin/users` | admin | — | — | none | — | n/a | — | — | — |
-| 197 | GET | `/api/admin/users/:userId/quotes` | admin | — | — | none | — | n/a | — | — | — |
-| 228 | POST | `/api/admin/users/:userId/apikey` | admin | — | — | zod | — | n/a | — | — | — |
-| 260 | GET | `/api/admin/settings` | admin | — | — | none | — | n/a | — | — | — |
-| 272 | POST | `/api/admin/settings` | admin | — | — | zod | — | n/a | — | — | — |
-| 291 | POST | `/api/admin/grant-plan` | admin | — | — | zod | — | n/a | — | — | — |
-| 334 | POST | `/api/admin/sync-subscription` | admin | — | — | zod | — | n/a | — | — | — |
-| 410 | POST | `/api/admin/sync-by-customer` | admin | — | — | zod | — | n/a | — | — | — |
-| 475 | GET | `/api/admin/quote-stats` | admin | — | — | none | — | n/a | — | — | — |
-| 597 | GET | `/api/admin/seo-audit` | admin | — | — | none | — | n/a | — | — | — |
-| 691 | GET | `/api/admin/search-console` | admin | — | — | zod | — | n/a | — | — | — |
-| 872 | GET | `/api/admin/widget/stats` | admin | — | — | none | — | n/a | — | — | — |
-| 945 | POST | `/api/admin/widget/create-client` | admin | — | — | zod | — | n/a | — | — | — |
-| 986 | GET | `/api/admin/margin` | admin | — | — | none | — | n/a | — | — | — |
-| 1048 | GET | `/api/admin/email-events` | admin | — | — | none | — | n/a | — | — | — |
-| 1066 | GET | `/api/admin/incentives` | admin | — | — | none | — | n/a | — | — | — |
-| 1079 | POST | `/api/admin/incentives` | admin | — | — | zod | — | n/a | — | — | — |
-| 1094 | PUT | `/api/admin/incentives/:id` | admin | — | — | zod | — | n/a | — | — | — |
-| 1117 | DELETE | `/api/admin/incentives/:id` | admin | — | — | none | — | n/a | — | — | — |
-| 1142 | GET | `/api/admin/ops` | admin | — | — | none | — | n/a | — | — | — |
-| 1153 | GET | `/api/admin/automations` | admin | — | — | none | — | n/a | — | — | — |
-| 1173 | POST | `/api/admin/automations/:id/retry` | admin | — | — | none | — | n/a | — | — | — |
-| 1191 | GET | `/api/admin/lifecycle/summary` | admin | — | — | none | — | n/a | — | — | — |
+| 87 | GET | `/api/settings/registration` | none | — | — | none | — | n/a | — | — | — |
+| 102 | GET | `/api/admin/metrics` | admin | — | — | none | — | n/a | — | — | — |
+| 173 | GET | `/api/admin/users` | admin | — | — | none | — | n/a | — | — | — |
+| 237 | GET | `/api/admin/users/:userId/quotes` | admin | — | — | none | — | n/a | — | — | — |
+| 268 | POST | `/api/admin/users/:userId/apikey` | admin | — | — | zod | — | n/a | — | — | — |
+| 300 | GET | `/api/admin/settings` | admin | — | — | none | — | n/a | — | — | — |
+| 312 | POST | `/api/admin/settings` | admin | — | — | zod | — | n/a | — | — | — |
+| 331 | POST | `/api/admin/grant-plan` | admin | — | — | zod | — | n/a | — | — | — |
+| 374 | POST | `/api/admin/sync-subscription` | admin | — | — | zod | — | n/a | — | — | — |
+| 450 | POST | `/api/admin/sync-by-customer` | admin | — | — | zod | — | n/a | — | — | — |
+| 515 | GET | `/api/admin/quote-stats` | admin | — | — | none | — | n/a | — | — | — |
+| 637 | GET | `/api/admin/seo-audit` | admin | — | — | none | — | n/a | — | — | — |
+| 731 | GET | `/api/admin/search-console` | admin | — | — | zod | — | n/a | — | — | — |
+| 912 | GET | `/api/admin/widget/stats` | admin | — | — | none | — | n/a | — | — | — |
+| 985 | POST | `/api/admin/widget/create-client` | admin | — | — | zod | — | n/a | — | — | — |
+| 1026 | GET | `/api/admin/margin` | admin | — | — | none | — | n/a | — | — | — |
+| 1088 | GET | `/api/admin/email-events` | admin | — | — | none | — | n/a | — | — | — |
+| 1106 | GET | `/api/admin/incentives` | admin | — | — | none | — | n/a | — | — | — |
+| 1119 | POST | `/api/admin/incentives` | admin | — | — | zod | — | n/a | — | — | — |
+| 1134 | PUT | `/api/admin/incentives/:id` | admin | — | — | zod | — | n/a | — | — | — |
+| 1157 | DELETE | `/api/admin/incentives/:id` | admin | — | — | none | — | n/a | — | — | — |
+| 1182 | GET | `/api/admin/ops` | admin | — | — | none | — | n/a | — | — | — |
+| 1193 | GET | `/api/admin/automations` | admin | — | — | none | — | n/a | — | — | — |
+| 1213 | POST | `/api/admin/automations/:id/retry` | admin | — | — | none | — | n/a | — | — | — |
+| 1231 | GET | `/api/admin/lifecycle/summary` | admin | — | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/analytics.ts
 
@@ -172,24 +172,24 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 64 | GET | `/api/calendar/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 88 | GET | `/api/calendar/:provider/connect` | session | integrations:full | — | zod | hasFeature(calendar_sync) | predicate | — | — | — |
-| 112 | GET | `/api/calendar/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
-| 133 | DELETE | `/api/calendar/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 146 | PATCH | `/api/calendar/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 169 | GET | `/api/calendar/:provider/calendars` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 198 | PUT | `/api/calendar/:provider/calendar` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 221 | GET | `/api/calendar/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 256 | GET | `/api/calendar/agenda` | session | jobs:view | — | zod | hasFeature(jobs) | n/a | — | — | — |
-| 292 | POST | `/api/calendar/refresh` | session | integrations:view | — | none | hasFeature(calendar_sync) | n/a | — | — | — |
-| 344 | GET | `/api/calendar/feeds` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 368 | POST | `/api/calendar/feeds` | session | integrations:full | — | zod | hasFeature(calendar_sync) | n/a | — | — | — |
-| 414 | PATCH | `/api/calendar/feeds/:id` | session | integrations:full | — | zod | — | predicate | — | — | — |
-| 439 | DELETE | `/api/calendar/feeds/:id` | session | integrations:full | — | none | — | predicate | — | — | — |
-| 460 | GET | `/api/calendar/publish` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 481 | POST | `/api/calendar/publish` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 498 | DELETE | `/api/calendar/publish` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 512 | GET | `/api/calendar/feed/:token.ics` | none | — | feedLimiter | none | — | n/a | — | hash-lookup | — |
+| 65 | GET | `/api/calendar/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 89 | GET | `/api/calendar/:provider/connect` | session | integrations:full | — | zod | hasFeature(calendar_sync) | predicate | — | — | — |
+| 113 | GET | `/api/calendar/:provider/callback` | session | — | — | zod | — | helper | — | — | — |
+| 134 | DELETE | `/api/calendar/:provider/disconnect` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 147 | PATCH | `/api/calendar/:provider/toggle` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 170 | GET | `/api/calendar/:provider/calendars` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 199 | PUT | `/api/calendar/:provider/calendar` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 222 | GET | `/api/calendar/sync-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 257 | GET | `/api/calendar/agenda` | session | jobs:view | — | zod | hasFeature(jobs) | n/a | — | — | — |
+| 293 | POST | `/api/calendar/refresh` | session | integrations:view | — | none | hasFeature(calendar_sync) | n/a | — | — | — |
+| 341 | GET | `/api/calendar/feeds` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 365 | POST | `/api/calendar/feeds` | session | integrations:full | — | zod | hasFeature(calendar_sync) | n/a | — | — | — |
+| 411 | PATCH | `/api/calendar/feeds/:id` | session | integrations:full | — | zod | — | predicate | — | — | — |
+| 436 | DELETE | `/api/calendar/feeds/:id` | session | integrations:full | — | none | — | predicate | — | — | — |
+| 457 | GET | `/api/calendar/publish` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 478 | POST | `/api/calendar/publish` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 495 | DELETE | `/api/calendar/publish` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 509 | GET | `/api/calendar/feed/:token.ics` | none | — | feedLimiter | none | — | n/a | — | hash-lookup | — |
 
 ## artifacts/api-server/src/routes/catalog.ts
 
@@ -312,22 +312,22 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 33 | GET | `/api/cron/tick` | none | — | — | none | — | n/a | — | — | — |
-| 126 | GET | `/api/cron/evening` | none | — | — | none | — | n/a | — | — | — |
-| 142 | GET | `/api/cron/lifecycle` | none | — | — | none | — | n/a | — | — | — |
-| 156 | GET | `/api/cron/morning` | none | — | — | none | — | n/a | — | — | — |
+| 34 | GET | `/api/cron/tick` | none | — | — | none | — | n/a | — | — | — |
+| 129 | GET | `/api/cron/evening` | none | — | — | none | — | n/a | — | — | — |
+| 145 | GET | `/api/cron/lifecycle` | none | — | — | none | — | n/a | — | — | — |
+| 159 | GET | `/api/cron/morning` | none | — | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/developer-api.ts
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 35 | GET | `/api/developer/api-keys` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 47 | POST | `/api/developer/api-keys` | session | integrations:full | — | zod | hasFeature(public_api) | n/a | — | — | — |
-| 63 | DELETE | `/api/developer/api-keys/:id` | session | integrations:full | — | none | — | helper | — | — | — |
-| 76 | GET | `/api/developer/webhooks` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 90 | POST | `/api/developer/webhooks` | session | integrations:full | — | zod | hasFeature(public_api) | n/a | — | — | — |
-| 106 | PATCH | `/api/developer/webhooks/:id` | session | integrations:full | — | zod | — | helper | — | — | — |
-| 121 | DELETE | `/api/developer/webhooks/:id` | session | integrations:full | — | none | — | helper | — | — | — |
+| 36 | GET | `/api/developer/api-keys` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 48 | POST | `/api/developer/api-keys` | session | integrations:full | — | zod | hasFeature(public_api) | n/a | — | — | — |
+| 64 | DELETE | `/api/developer/api-keys/:id` | session | integrations:full | — | none | — | helper | — | — | — |
+| 77 | GET | `/api/developer/webhooks` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 91 | POST | `/api/developer/webhooks` | session | integrations:full | — | zod | hasFeature(public_api) | n/a | — | — | — |
+| 108 | PATCH | `/api/developer/webhooks/:id` | session | integrations:full | — | zod | — | helper | — | — | — |
+| 123 | DELETE | `/api/developer/webhooks/:id` | session | integrations:full | — | none | — | helper | — | — | — |
 
 ## artifacts/api-server/src/routes/documents.ts
 
@@ -604,14 +604,14 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 30 | GET | `/api/me` | session | — | — | none | — | n/a | — | — | — |
-| 56 | PUT | `/api/me` | session | — | — | zod | — | n/a | — | — | — |
-| 82 | POST | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
-| 111 | DELETE | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
-| 122 | GET | `/api/me/stats` | session | — | — | none | — | n/a | — | — | — |
-| 131 | GET | `/api/me/activity` | session | — | — | none | — | n/a | — | — | — |
-| 141 | GET | `/api/team/people/:userId` | session | team:view | — | none | — | helper | — | — | — |
-| 173 | GET | `/api/team/leaderboard` | session | team:full | — | none | — | n/a | — | — | — |
+| 41 | GET | `/api/me` | session | — | — | none | — | n/a | — | — | — |
+| 67 | PUT | `/api/me` | session | — | — | zod | — | n/a | — | — | — |
+| 93 | POST | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
+| 123 | DELETE | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
+| 136 | GET | `/api/me/stats` | session | — | — | none | — | n/a | — | — | — |
+| 145 | GET | `/api/me/activity` | session | — | — | none | — | n/a | — | — | — |
+| 155 | GET | `/api/team/people/:userId` | session | team:view | — | none | — | helper | — | — | — |
+| 187 | GET | `/api/team/leaderboard` | session | team:full | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/plan-overview.ts
 

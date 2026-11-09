@@ -25,6 +25,7 @@ import { listGoogleEvents } from "../lib/googleCalendarClient.js";
 import { listOutlookEvents } from "../lib/outlookCalendarClient.js";
 import { parseIcs } from "./ics.js";
 import { logger } from "../lib/logger.js";
+import { safeFetch, UnsafeUrlError, type SafeResponse } from "../lib/safeFetch.js";
 
 const INBOUND_WINDOW_BACK_DAYS = 14;
 const INBOUND_WINDOW_FORWARD_DAYS = 92;
@@ -198,16 +199,22 @@ export async function syncFeed(feedId: string, now = new Date()): Promise<{ even
   if (!feed.isEnabled) return { events: 0, error: null };
 
   try {
-    const res = await fetch(feed.url, {
-      redirect: "follow",
-      headers: { Accept: "text/calendar, text/plain;q=0.9, */*;q=0.8", "User-Agent": "QuoteAI-Calendar/1.0 (+https://quoteai.ca)" },
-      signal: AbortSignal.timeout(FEED_TIMEOUT_MS),
-    });
+    // Audit B5: the URL is the customer's; every hop is checked for private addresses.
+    let res: SafeResponse;
+    try {
+      res = await safeFetch(feed.url, {
+        headers: { Accept: "text/calendar, text/plain;q=0.9, */*;q=0.8", "User-Agent": "QuoteAI-Calendar/1.0 (+https://quoteai.ca)" },
+        timeoutMs: FEED_TIMEOUT_MS,
+        maxBytes: MAX_ICS_BYTES,
+        maxRedirects: 3,
+      });
+    } catch (err) {
+      if (err instanceof UnsafeUrlError) return finish(0, "That address can't be reached from QuoteAI");
+      if (err instanceof Error && err.message === "RESPONSE_TOO_LARGE") return finish(0, "The feed is too large to read");
+      throw err;
+    }
     if (!res.ok) return finish(0, `The feed answered ${res.status}`);
-    const length = Number(res.headers.get("content-length") ?? 0);
-    if (length > MAX_ICS_BYTES) return finish(0, "The feed is too large to read");
-    const text = await res.text();
-    if (text.length > MAX_ICS_BYTES) return finish(0, "The feed is too large to read");
+    const text = res.text;
     if (!text.includes("BEGIN:VCALENDAR")) return finish(0, "That URL is not an iCalendar feed");
 
     const parsed = parseIcs(text, from, to);

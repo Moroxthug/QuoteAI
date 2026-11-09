@@ -43,6 +43,7 @@ import {
   tombstoneUserId,
   type AccountDeletion,
   type AccountExport,
+  auditLogTable,
 } from "@workspace/db";
 import { and, desc, eq, gt, inArray, isNull, lte, or } from "drizzle-orm";
 import { getTableColumns, getTableName, is } from "drizzle-orm";
@@ -59,11 +60,13 @@ import { disconnectMetaLeadAds } from "../metaLeadAds/service.js";
 import { disconnectFlinks } from "../flinks/service.js";
 import { disconnectFinanceit } from "../financeit/service.js";
 import { sendAccountExportReadyEmail, sendAccountDeletionScheduledEmail } from "./emails.js";
-import { recordSecurityAuditEvent } from "../lib/auditLog.js";
+import { recordSecurityAuditEvent, withAuditMaintenance } from "../lib/auditLog.js";
 
 const storage = new ObjectStorageService();
 
 /** Every private-bucket prefix a tenant's files live under (see the `subPath` builders across routes/). */
+/** Public-bucket prefixes keyed by the user id (audit B8): company logo and profile photo. */
+const PUBLIC_STORAGE_KINDS = ["logos", "avatars"] as const;
 const TENANT_STORAGE_KINDS = ["contracts", "invoices", "quote-pdfs", "capitolato-pdfs", "quote_attachments", "documents", "receipts", "job-photos", "imports", "logos"] as const;
 
 // ── Table discovery ──────────────────────────────────────────────────────────
@@ -178,6 +181,13 @@ export async function buildAccountExport(exportId: string): Promise<{ tables: nu
         // Drop the userId segment from the path inside the archive.
         const rel = obj.path.replace(`${kind}/${userId}/`, `${kind}/`);
         entries[`files/${rel}`] = [new Uint8Array(buf), { level: 0 }];
+        files++;
+      }
+    }
+    for (const kind of PUBLIC_STORAGE_KINDS) {
+      for (const obj of await storage.listPublicObjects(`${kind}/${userId}`)) {
+        const buf = await storage.downloadPublicObjectBuffer(obj.path);
+        entries[`files/${obj.path.replace(`${kind}/${userId}/`, `${kind}/`)}`] = [new Uint8Array(buf), { level: 0 }];
         files++;
       }
     }
@@ -385,14 +395,28 @@ async function purgeAccount(deletion: AccountDeletion): Promise<{ retainedContra
     await storage.removePrivateObjects(paths);
     filesRemoved += paths.length;
   }
+  for (const kind of PUBLIC_STORAGE_KINDS) {
+    const paths = (await storage.listPublicObjects(`${kind}/${userId}`)).map((o) => o.path);
+    await storage.removePublicObjects(paths);
+    filesRemoved += paths.length;
+  }
 
   // 3. Rows. Tenant tables first (children cascade), then memberships in both
   //    directions, then the auth user (sessions/accounts/2FA cascade from it).
   //    Retained contracts/invoices/payments already carry the tombstone id, so
   //    the plain user_id match here only removes the drafts and voids.
-  for (const { table, column } of tenantTables()) {
+  //    Audit B10: the audit log is append-only. Security events (sign-ins,
+  //    two-step, sessions, exports, the deletion itself) are kept under the
+  //    tombstone id for the retention period; the rest of the log goes.
+  await withAuditMaintenance(async (tx) => {
+    await tx.update(auditLogTable).set({ userId: tomb, actorId: null, ip: null, userAgent: null }).where(and(eq(auditLogTable.userId, userId), eq(auditLogTable.entityType, "security")));
+    await tx.delete(auditLogTable).where(eq(auditLogTable.userId, userId));
+  });
+  for (const { table, column, name } of tenantTables()) {
+    if (name === "audit_log") continue;
     await db.delete(table).where(eq(col(table, column), userId));
   }
+  await recordSecurityAuditEvent({ orgId: tomb, actorUserId: null, action: "account.purged", entityId: deletion.id });
   await db.delete(organizationMembersTable).where(or(eq(organizationMembersTable.ownerId, userId), eq(organizationMembersTable.userId, userId)));
   await db.delete(authUsersTable).where(eq(authUsersTable.id, userId));
 
@@ -410,6 +434,7 @@ async function purgeRetainedRecords(deletion: AccountDeletion): Promise<{ contra
   const contracts = await db.delete(contractsTable).where(eq(contractsTable.userId, tomb)).returning({ id: contractsTable.id });
   const invoices = await db.delete(invoicesTable).where(eq(invoicesTable.userId, tomb)).returning({ id: invoicesTable.id });
   await db.delete(invoicePaymentsTable).where(eq(invoicePaymentsTable.userId, tomb));
+  await withAuditMaintenance((tx) => tx.delete(auditLogTable).where(eq(auditLogTable.userId, tomb)));
   let files = 0;
   for (const kind of ["contracts", "invoices"]) {
     const paths = (await storage.listPrivateObjects(`${kind}/${userId}`)).map((o) => o.path);

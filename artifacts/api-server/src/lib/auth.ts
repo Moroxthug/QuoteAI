@@ -9,6 +9,7 @@ import { logger } from "./logger";
 import { notifyHub } from "./hub";
 import { requestLang, verificationEmail, verificationCodeEmail, signInCodeEmail, resetPasswordEmail, welcomeEmail } from "./accountEmails";
 import { recordSecurityAuditEvent } from "./auditLog";
+import { consumeBudget } from "./rateLimitStore.js";
 
 // Minimal, duplicate-of-`resolveActingOrg` org lookup — kept local rather than
 // imported from ../middlewares/authMiddleware to avoid that module's circular
@@ -105,6 +106,15 @@ const fromNativeApp = (request: Request | undefined): boolean => {
  * sent and nothing is accepted. It never creates an account (disableSignUp).
  */
 const EMAIL_OTP_PATHS = ["/email-otp/send-verification-otp", "/email-otp/verify-email", "/sign-in/email-otp"];
+/** Per-email budgets (audit B3). Sign-in attempts and codes sent, per address. */
+const EMAIL_BUDGETS: Record<string, { name: string; windowMs: number; max: number }> = {
+  "/sign-in/email": { name: "email-signin", windowMs: 15 * 60_000, max: 10 },
+  "/sign-in/email-otp": { name: "email-signin", windowMs: 15 * 60_000, max: 10 },
+  "/email-otp/verify-email": { name: "email-signin", windowMs: 15 * 60_000, max: 10 },
+  "/email-otp/send-verification-otp": { name: "email-send", windowMs: 60 * 60_000, max: 6 },
+  "/request-password-reset": { name: "email-send", windowMs: 60 * 60_000, max: 6 },
+  "/sign-up/email": { name: "email-send", windowMs: 60 * 60_000, max: 6 },
+};
 const EMAIL_OTP_DISABLED = [
   "/email-otp/check-verification-otp",
   "/email-otp/request-password-reset",
@@ -165,6 +175,10 @@ export const auth = betterAuth({
       twoFactor: authTwoFactorTable,
     },
   }),
+  // Audit B9: Google/Apple tokens kept on the account row are encrypted with
+  // the auth secret, like every other provider token. Rows from before stay
+  // readable and are re-written encrypted at the next sign-in.
+  account: { encryptOAuthTokens: true },
   socialProviders: {
     ...(GOOGLE_CLIENT_ID ? { google: { clientId: GOOGLE_CLIENT_ID, clientSecret: "" } } : {}),
     ...(APPLE_BUNDLE_ID ? { apple: { clientId: APPLE_BUNDLE_ID, clientSecret: "", appBundleIdentifier: APPLE_BUNDLE_ID } } : {}),
@@ -203,6 +217,17 @@ export const auth = betterAuth({
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-in/social" && !(ctx.body as { idToken?: unknown } | undefined)?.idToken) {
         throw new APIError("BAD_REQUEST", { code: "ID_TOKEN_REQUIRED", message: "Sign in from the app." });
+      }
+      // Audit B3: a budget per email address on top of the per-IP limits, so
+      // guessing one account's password or code from many IPs, or flooding
+      // one inbox with codes, stops at the same number. Counted in Postgres.
+      const budget = ctx.path ? EMAIL_BUDGETS[ctx.path] : undefined;
+      const budgetEmail = (ctx.body as { email?: unknown } | undefined)?.email;
+      if (budget && typeof budgetEmail === "string" && budgetEmail) {
+        const ok = await consumeBudget(budget.name, budgetEmail.trim().toLowerCase(), budget);
+        if (!ok) {
+          throw new APIError("TOO_MANY_REQUESTS", { code: "RATE_LIMITED", message: "Too many attempts for this account. Please wait and try again." });
+        }
       }
       if (!ctx.path || !EMAIL_OTP_PATHS.includes(ctx.path)) return undefined;
       const body = (ctx.body ?? {}) as { email?: unknown; type?: unknown };
@@ -265,9 +290,33 @@ export const auth = betterAuth({
           });
           return;
         }
+        // Audit B10: failed sign-ins on a real account are recorded against it.
+        const failed = ctx.context.returned instanceof APIError;
+        if (failed && (ctx.path === "/sign-in/email" || ctx.path === "/sign-in/email-otp" || ctx.path === "/two-factor/verify-totp" || ctx.path === "/two-factor/verify-backup-code" || ctx.path === "/two-factor/verify-otp")) {
+          const email = (ctx.body as { email?: unknown } | undefined)?.email;
+          const [user] = typeof email === "string"
+            ? await db.select({ id: authUsersTable.id }).from(authUsersTable).where(eq(authUsersTable.email, email.trim().toLowerCase())).limit(1)
+            : [];
+          if (user) {
+            const req = ctx.request;
+            await recordSecurityAuditEvent({
+              orgId: await resolveOrgForAudit(user.id),
+              actorUserId: user.id,
+              action: ctx.path.startsWith("/two-factor") ? "two_factor.failed" : "login.failed",
+              ipAddress: req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+              userAgent: req?.headers.get("user-agent") ?? null,
+            });
+          }
+          return;
+        }
+        if (failed) return;
         const session = ctx.context.session;
         if (!session) return;
-        if (ctx.path === "/two-factor/enable") {
+        if (ctx.path === "/change-password") {
+          await recordSecurityAuditEvent({ orgId: await resolveOrgForAudit(session.user.id), actorUserId: session.user.id, action: "password.changed" });
+        } else if (ctx.path === "/change-email") {
+          await recordSecurityAuditEvent({ orgId: await resolveOrgForAudit(session.user.id), actorUserId: session.user.id, action: "email.change_requested" });
+        } else if (ctx.path === "/two-factor/enable") {
           const orgId = await resolveOrgForAudit(session.user.id);
           await recordSecurityAuditEvent({ orgId, actorUserId: session.user.id, action: "two_factor.enabled" });
         } else if (ctx.path === "/two-factor/disable") {
@@ -292,6 +341,10 @@ export const auth = betterAuth({
     // that existed before it (including an attacker's) must die with it.
     // better-auth defaults this to false.
     revokeSessionsOnPasswordReset: true,
+    // Audit B10: a reset is a security event on the account.
+    async onPasswordReset({ user }) {
+      await recordSecurityAuditEvent({ orgId: await resolveOrgForAudit(user.id).catch(() => user.id), actorUserId: user.id, action: "password.reset" });
+    },
     async sendResetPassword({ user, url }, request) {
       if (!resend) {
         logger.warn("RESEND_API_KEY not set — skipping password reset email");

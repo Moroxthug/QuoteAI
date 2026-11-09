@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { db, businessProfilesTable, hasFeature, minimumPlanFor } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { findActiveApiKeyByRawKey } from "../lib/apiKeys.js";
+import { findActiveApiKeyByRawKey, creatorStillEntitled } from "../lib/apiKeys.js";
 import { userRateLimiter } from "../lib/rateLimit.js";
 
 // Keys by res.locals.userId, which requireApiKey sets — must run AFTER it in
@@ -25,7 +25,7 @@ export async function requireApiKey(req: Request, res: Response, next: NextFunct
   }
 
   const key = await findActiveApiKeyByRawKey(rawKey);
-  if (!key) {
+  if (!key || !(await creatorStillEntitled(key))) {
     res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid or revoked API key" });
     return;
   }

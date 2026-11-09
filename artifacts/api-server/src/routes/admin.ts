@@ -14,32 +14,72 @@ import { PLANS } from "./payments.js";
 import { opsHealth } from "../lib/ops.js";
 import { retryAutomationNow } from "../lib/automation.js";
 import { z } from "zod";
+import { recordSecurityAuditEvent } from "../lib/auditLog.js";
 
 const router = Router();
 
-export async function isAdmin<P = Record<string, string>>(req: Request<P>): Promise<boolean> {
+type AdminCheck = { ok: true; userId: string } | { ok: false; reason: "not_admin" | "two_step_required" };
+
+/**
+ * The platform admin is an email allowlist (ADMIN_EMAIL). Audit B1: the
+ * allowlisted account must also have two-step turned on — an admin session
+ * can grant plans and read every company's data, so a stolen password or
+ * inbox alone must not be enough. Emergency escape hatch:
+ * ADMIN_ALLOW_NO_2FA=true (logged on every use).
+ */
+export async function checkAdmin<P = Record<string, string>>(req: Request<P>): Promise<AdminCheck> {
   const adminEmail = process.env.ADMIN_EMAIL || process.env.admin_email;
-  if (!adminEmail) return false;
+  if (!adminEmail) return { ok: false, reason: "not_admin" };
   try {
     const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
-    if (!session) return false;
+    if (!session) return { ok: false, reason: "not_admin" };
     const cleanEmailStr = adminEmail.replace(/['"]/g, "");
     const emails = cleanEmailStr.split(",").map(e => e.trim().toLowerCase());
-    return emails.includes(session.user.email.toLowerCase());
+    if (!emails.includes(session.user.email.toLowerCase())) return { ok: false, reason: "not_admin" };
+    if (!session.user.twoFactorEnabled) {
+      if (process.env.ADMIN_ALLOW_NO_2FA !== "true") return { ok: false, reason: "two_step_required" };
+      logger.warn({ userId: session.user.id }, "Admin access without two-step (ADMIN_ALLOW_NO_2FA=true)");
+    }
+    return { ok: true, userId: session.user.id };
   } catch (err) {
     logger.error({ err }, "isAdmin check failed with exception");
-    return false;
+    return { ok: false, reason: "not_admin" };
   }
+}
+
+export async function isAdmin<P = Record<string, string>>(req: Request<P>): Promise<boolean> {
+  return (await checkAdmin(req)).ok;
 }
 
 // Generic over P so req.params doesn't collapse to string | string[] on
 // routes that use requireAdmin as middleware before the real handler
 // (see the analogous comment on requireAuth in middlewares/authMiddleware.ts).
 export async function requireAdmin<P = Record<string, string>>(req: Request<P>, res: Response, next: NextFunction): Promise<void> {
-  const ok = await isAdmin(req);
-  if (!ok) {
+  const check = await checkAdmin(req);
+  if (!check.ok) {
+    if (check.reason === "two_step_required") {
+      res.status(403).json({ error: "TWO_STEP_REQUIRED", message: "Turn on two-step sign-in in Settings → Security to use the admin." });
+      return;
+    }
     res.status(403).json({ error: "Forbidden" });
     return;
+  }
+  // Audit B10: every change made with platform-admin rights is recorded,
+  // under the "platform" tenant so it survives any company's deletion.
+  if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && !res.locals.adminAuditHooked) {
+    res.locals.adminAuditHooked = true;
+    const path = req.originalUrl.split("?")[0] ?? req.path;
+    res.on("finish", () => {
+      void recordSecurityAuditEvent({
+        orgId: "platform",
+        actorUserId: check.userId,
+        action: `admin.${req.method.toLowerCase()} ${path} -> ${res.statusCode}`,
+        entityType: "platform_admin",
+        entityId: path,
+        ipAddress: req.ip ?? null,
+        userAgent: req.get("user-agent") ?? null,
+      });
+    });
   }
   next();
 }

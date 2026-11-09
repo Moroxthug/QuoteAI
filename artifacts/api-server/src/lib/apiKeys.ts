@@ -1,5 +1,5 @@
 import { randomBytes, createHash } from "crypto";
-import { db, apiKeysTable, type ApiKey, type TeamMemberRole } from "@workspace/db";
+import { db, apiKeysTable, organizationMembersTable, type ApiKey, type TeamMemberRole } from "@workspace/db";
 import { and, desc, eq, isNull } from "drizzle-orm";
 
 // Same recipe as contracts/invoices tokenHash: high-entropy random value,
@@ -52,4 +52,22 @@ export async function findActiveApiKeyByRawKey(rawKey: string): Promise<ApiKey |
   // Fire-and-forget — never block the request on this write.
   db.update(apiKeysTable).set({ lastUsedAt: new Date() }).where(eq(apiKeysTable.id, key.id)).catch(() => {});
   return key;
+}
+
+/**
+ * Audit B4: a key acts with its creator's authority, so it lives only as long
+ * as that authority. A key made by a teammate stops working — and is revoked
+ * for good — once they leave the company or their role changes. The owner's
+ * own keys are tied to the company itself.
+ */
+export async function creatorStillEntitled(key: ApiKey): Promise<boolean> {
+  if (key.createdByUserId === key.userId) return true;
+  const [member] = await db
+    .select({ role: organizationMembersTable.role })
+    .from(organizationMembersTable)
+    .where(and(eq(organizationMembersTable.ownerId, key.userId), eq(organizationMembersTable.userId, key.createdByUserId), eq(organizationMembersTable.status, "active")))
+    .limit(1);
+  if (member && member.role === key.role) return true;
+  await db.update(apiKeysTable).set({ revokedAt: new Date() }).where(and(eq(apiKeysTable.id, key.id), isNull(apiKeysTable.revokedAt)));
+  return false;
 }

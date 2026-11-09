@@ -1,5 +1,5 @@
 import { db, auditLogTable, authUsersTable } from "@workspace/db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { writeAudit } from "./notifications";
 import { logger } from "./logger";
 
@@ -51,4 +51,18 @@ export async function listSecurityAuditEvents(orgId: string, opts: { limit?: num
     .where(and(eq(auditLogTable.userId, orgId), eq(auditLogTable.entityType, "security")))
     .orderBy(desc(auditLogTable.createdAt))
     .limit(opts.limit ?? 100);
+}
+
+/**
+ * Audit B10: audit_log is append-only — a trigger (migration 0079) refuses
+ * UPDATE, DELETE and TRUNCATE. The only sanctioned exceptions (the account
+ * purge moving security events to the tombstone id, retention purges, test
+ * cleanup) run inside this transaction, which sets the one flag the trigger
+ * lets through. The flag is transaction-local.
+ */
+export async function withAuditMaintenance<T>(fn: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select set_config('quoteai.audit_maintenance', 'on', true)`);
+    return fn(tx);
+  });
 }

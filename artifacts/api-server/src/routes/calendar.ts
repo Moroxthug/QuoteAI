@@ -15,6 +15,7 @@ import { syncAllInbound, syncFeed } from "../calendar/inbound.js";
 import { buildAgenda, publishableSchedule } from "../calendar/agenda.js";
 import { buildIcs } from "../calendar/ics.js";
 import { ipRateLimiter } from "../lib/rateLimit.js";
+import { assertPublicHttpsUrl, UnsafeUrlError } from "../lib/safeFetch.js";
 
 const router = Router();
 
@@ -327,16 +328,12 @@ function normaliseFeedUrl(raw: string): { url: string } | { error: string } {
   } catch {
     return { error: "INVALID_URL" };
   }
-  if (parsed.protocol !== "https:") return { error: "HTTPS_REQUIRED" };
-  if (parsed.username || parsed.password) return { error: "NO_CREDENTIALS" };
-  const host = parsed.hostname.toLowerCase();
-  const isPrivate =
-    host === "localhost" ||
-    host.endsWith(".localhost") ||
-    host.endsWith(".internal") ||
-    /^(127\.|10\.|169\.254\.|192\.168\.|::1$|\[::1\]$)/.test(host) ||
-    /^172\.(1[6-9]|2\d|3[01])\./.test(host);
-  if (isPrivate) return { error: "PRIVATE_HOST" };
+  try {
+    assertPublicHttpsUrl(parsed.toString());
+  } catch (err) {
+    if (err instanceof UnsafeUrlError) return { error: err.code === "BAD_PORT" ? "PRIVATE_HOST" : err.code };
+    throw err;
+  }
   return { url: parsed.toString() };
 }
 

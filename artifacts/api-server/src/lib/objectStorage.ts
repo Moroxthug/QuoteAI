@@ -103,13 +103,13 @@ export class ObjectStorageService {
   // Phase 72: whole-tenant listing and removal for the data export and the
   // account purge. Supabase list() is one level deep, so walk folders; every
   // tenant file lives under `<kind>/<userId>/…`, so a prefix per kind covers it.
-  async listPrivateObjects(prefix: string): Promise<{ path: string; size: number }[]> {
+  async listPrivateObjects(prefix: string, bucket: string = PRIVATE_BUCKET): Promise<{ path: string; size: number }[]> {
     const supabase = getSupabaseClient();
     const out: { path: string; size: number }[] = [];
     const walk = async (folder: string): Promise<void> => {
       let offset = 0;
       for (;;) {
-        const { data, error } = await supabase.storage.from(PRIVATE_BUCKET).list(folder, { limit: 1000, offset });
+        const { data, error } = await supabase.storage.from(bucket).list(folder, { limit: 1000, offset });
         if (error) throw new Error(`List failed for ${folder}: ${error.message}`);
         if (!data || data.length === 0) return;
         for (const entry of data) {
@@ -126,18 +126,18 @@ export class ObjectStorageService {
     return out;
   }
 
-  async removePrivateObjects(paths: string[]): Promise<void> {
+  async removePrivateObjects(paths: string[], bucket: string = PRIVATE_BUCKET): Promise<void> {
     if (paths.length === 0) return;
     const supabase = getSupabaseClient();
     for (let i = 0; i < paths.length; i += 100) {
-      const { error } = await supabase.storage.from(PRIVATE_BUCKET).remove(paths.slice(i, i + 100));
+      const { error } = await supabase.storage.from(bucket).remove(paths.slice(i, i + 100));
       if (error) throw new Error(`Remove failed: ${error.message}`);
     }
   }
 
-  async downloadPrivateObjectBuffer(subPath: string): Promise<Buffer> {
+  async downloadPrivateObjectBuffer(subPath: string, bucket: string = PRIVATE_BUCKET): Promise<Buffer> {
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase.storage.from(PRIVATE_BUCKET).download(subPath);
+    const { data, error } = await supabase.storage.from(bucket).download(subPath);
     if (error || !data) throw new ObjectNotFoundError();
     return Buffer.from(await data.arrayBuffer());
   }
@@ -166,6 +166,20 @@ export class ObjectStorageService {
       .upload(subPath, buffer, { contentType, upsert: true });
     if (error) throw new Error(`Public upload failed: ${error.message}`);
     return subPath;
+  }
+
+  // Audit B8: logos and avatars live in the public bucket; the export and the
+  // account purge must reach them too.
+  listPublicObjects(prefix: string): Promise<{ path: string; size: number }[]> {
+    return this.listPrivateObjects(prefix, PUBLIC_BUCKET);
+  }
+
+  removePublicObjects(paths: string[]): Promise<void> {
+    return this.removePrivateObjects(paths, PUBLIC_BUCKET);
+  }
+
+  downloadPublicObjectBuffer(subPath: string): Promise<Buffer> {
+    return this.downloadPrivateObjectBuffer(subPath, PUBLIC_BUCKET);
   }
 
   getPublicUrl(subPath: string): string {

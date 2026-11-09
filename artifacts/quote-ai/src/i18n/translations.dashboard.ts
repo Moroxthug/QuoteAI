@@ -2569,6 +2569,8 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
 
     "admin.accessRestricted": "Access Restricted",
     "admin.accessRestrictedDesc": "Only system administrators can access this admin console.",
+    "admin.twoStepRequiredDesc": "The admin console needs two-step sign-in. Turn it on in Security, then come back.",
+    "admin.turnOnTwoStep": "Turn on two-step",
     "admin.actions": "Actions",
     "admin.active": "Active",
     "admin.activeApiKey": "Active API Key",
@@ -6972,6 +6974,8 @@ export const dashboardTranslations: Record<Lang, Record<string, string>> = {
 
     "admin.accessRestricted": "Accès restreint",
     "admin.accessRestrictedDesc": "Seuls les administrateurs système peuvent accéder à cette console d'administration.",
+    "admin.twoStepRequiredDesc": "La console d'administration exige la connexion en deux étapes. Activez-la dans Sécurité, puis revenez.",
+    "admin.turnOnTwoStep": "Activer les deux étapes",
     "admin.actions": "Actions",
     "admin.active": "Actif",
     "admin.activeApiKey": "Clé API active",

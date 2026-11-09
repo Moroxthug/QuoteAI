@@ -31,6 +31,33 @@ It is **not** ready to be marketed as "ironclad" or "SOC 2 compliant", for three
 
 ## B. Fix before any security claim (Medium)
 
+**Status 2026-11-09 — batch B code done (B1–B5, B8–B13).** Migration `lib/db/drizzle/0079_security_batch_b.sql` is **NOT applied yet**. The code is safe without it: the rate limiter falls back to per-instance counters and the audit flag does nothing. B2 and the B10 trigger only take effect once it is applied.
+- **B1 (partly):** `/api/admin/*`, HQ, and the admin side of support need two-step on the ADMIN_EMAIL account (`checkAdmin` in `routes/admin.ts`). The admin page sends you to Security when two-step is off. Emergency override: `ADMIN_ALLOW_NO_2FA=true`, logged on every use. **Still open:** a per-company "require two-step for everyone" setting, which needs its own UI on web and Pocket.
+- **B2:** all four auth limiters count in Postgres (`lib/rateLimitStore.ts`, table `rate_limit_hits`). Other limiters stay per-instance.
+- **B3:** the emailed-code send and verify paths now have per-IP limits. Per-email budgets live in the better-auth `before` hook: sign-in, code sign-in and verify are capped at 10 per 15 min per address; codes sent, reset requests and sign-ups at 6 per hour per address.
+- **B4:** on every use, a key made by a teammate is checked against that person's current active membership and role. If either changed, the key is revoked for good (`creatorStillEntitled`). **Still open:** optional key expiry, which needs a column.
+- **B5:** `lib/safeFetch.ts` handles the calendar feed import (up to 3 redirects, each re-checked) and webhook delivery (no redirects):
+  - https only, port 443, no credentials in the URL.
+  - Every resolved address is checked inside the socket's own DNS lookup, so there is no rebinding window.
+  - Blocked ranges: private, loopback, link-local/metadata, CGNAT, multicast, reserved, IPv4-mapped.
+  - The response body is capped.
+  - Webhook creation refuses an unsafe URL with a 400.
+- **B8:** the export and the account purge now include `logos/<id>` and `avatars/<id>` in the public bucket. A replaced or removed profile photo is deleted from storage.
+- **B9:** better-auth `account.encryptOAuthTokens` is on; existing rows are re-encrypted at their next sign-in. Webhook signing secrets are stored with `encryptSecret`; older `whsec_` rows still read. `rotate-token-key` now covers them and encrypts any left in plaintext. The widget key is a public embed id, not a secret, so it is left as is.
+- **B10:**
+  - The 0079 trigger refuses UPDATE, DELETE and TRUNCATE on `audit_log` unless the transaction sets `quoteai.audit_maintenance` (`withAuditMaintenance`). This guards against the app; it is not a defence against a database superuser.
+  - Newly recorded: `login.failed`, `two_factor.failed`, `password.changed`, `password.reset`, `email.change_requested`, and every non-GET platform-admin call (tenant `platform`). The purge itself is recorded as `account.purged`.
+  - On purge, security events move to the tombstone id with the IP and user agent removed. They are deleted with the retained records after 7 years, or at the 2-year security retention, whichever comes first.
+- **B11:** a client the contractor picked (name, address) is no longer put in the AI prompt. **Still open:** written ZDR/DPA confirmation from Groq and OpenAI (owner).
+- **B12:** `lib/retention.ts` runs in the daily cron tick:
+  - Email events, webhook deliveries and finished automation runs: 90 days.
+  - Notifications: 180 days.
+  - Crew schedule history: 1 year.
+  - Security and admin events: 2 years.
+  - Expired rate-limit counters.
+  - Business records are left alone: they are the customer's.
+- **B13:** pino redacts `to`, `toEmail`, `email`, `clientEmail`, `clientName`, `phone`, `from` and `recipient`, at the top level and one level down.
+
 **Access and authentication**
 - **B1 MFA not enforced anywhere** — not for owners, not for the platform super-admin, which is just an email allowlist (`routes/admin.ts:20-33`) able to grant plans and read every user's quotes; an admin without 2-step can sign in with an emailed code alone. Require 2-step in `requireAdmin`; add a per-company "require 2-step" setting.
 - **B2 Rate limiters are in-memory** (`lib/rateLimit.ts`, better-auth default) — on Vercel every instance has its own counters, so every brute-force budget is weaker than written. Move to a shared store (Postgres/Upstash); better-auth `rateLimit.storage: "database"`.

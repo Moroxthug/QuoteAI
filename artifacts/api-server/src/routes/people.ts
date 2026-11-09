@@ -9,6 +9,7 @@ import { requireAuth, getUserId, getActorUserId, getActorRole } from "../middlew
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { sniffRasterImage, RASTER_EXT } from "../lib/imageSniff.js";
+import { logger } from "../lib/logger.js";
 import { loadPerson, personActivity, personCompanies, personStats, roleInCompany, teamLeaderboard } from "../people/service.js";
 
 // ── Phase 91: every person's own page ────────────────────────────────────────
@@ -19,6 +20,16 @@ import { loadPerson, personActivity, personCompanies, personStats, roleInCompany
 
 const router = Router();
 const storage = new ObjectStorageService();
+
+/** A removed or replaced profile photo is deleted, not left public (audit B8). */
+async function removeOldAvatars(actorId: string, keep: string | null): Promise<void> {
+  try {
+    const paths = (await storage.listPublicObjects(`avatars/${actorId}`)).map((o) => o.path).filter((p) => p !== keep);
+    await storage.removePublicObjects(paths);
+  } catch (err) {
+    logger.warn({ err, actorId }, "Could not remove old profile photos");
+  }
+}
 const avatarUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 3 * 1024 * 1024, files: 1 } }).single("avatar");
 
 const monthsOf = (q: unknown) => {
@@ -100,6 +111,7 @@ router.post("/me/avatar", requireAuth, (req, res, next) => avatarUpload(req, res
     const publicSubPath = await storage.uploadPublicObjectBuffer({ subPath, buffer: file.buffer, contentType: mime });
     const image = `/api/storage/public-objects/${publicSubPath}`;
     await db.update(authUsersTable).set({ image }).where(eq(authUsersTable.id, actorId));
+    await removeOldAvatars(actorId, publicSubPath);
     res.json({ image });
   } catch (err) {
     req.log.error({ err }, "Error uploading avatar");
@@ -110,7 +122,9 @@ router.post("/me/avatar", requireAuth, (req, res, next) => avatarUpload(req, res
 // DELETE /api/me/avatar
 router.delete("/me/avatar", requireAuth, async (req, res) => {
   try {
-    await db.update(authUsersTable).set({ image: null }).where(eq(authUsersTable.id, getActorUserId(res)));
+    const actorId = getActorUserId(res);
+    await db.update(authUsersTable).set({ image: null }).where(eq(authUsersTable.id, actorId));
+    await removeOldAvatars(actorId, null);
     res.json({ image: null });
   } catch (err) {
     req.log.error({ err }, "Error removing avatar");

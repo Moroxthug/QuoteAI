@@ -2,10 +2,21 @@ import { randomBytes, createHmac } from "crypto";
 import { db, webhookEndpointsTable, webhookDeliveriesTable, type WebhookEndpoint, type AutomationEvent } from "@workspace/db";
 import { and, desc, eq } from "drizzle-orm";
 import { logger } from "./logger.js";
+import { safeFetch, assertPublicHttpsUrl } from "./safeFetch.js";
+import { encryptSecret, decryptSecret } from "./crypto.js";
+
+/**
+ * The signing secret is stored AES-GCM encrypted (audit B9). Rows written
+ * before that still hold the plain `whsec_…` value and are read as is.
+ */
+export function readWebhookSecret(stored: string): string {
+  return stored.startsWith("whsec_") ? stored : decryptSecret(stored);
+}
 
 export async function createWebhook(userId: string, url: string, events: AutomationEvent[]): Promise<{ webhook: WebhookEndpoint; secret: string }> {
+  assertPublicHttpsUrl(url);
   const secret = `whsec_${randomBytes(24).toString("hex")}`;
-  const [webhook] = await db.insert(webhookEndpointsTable).values({ userId, url, events, secret }).returning();
+  const [webhook] = await db.insert(webhookEndpointsTable).values({ userId, url, events, secret: encryptSecret(secret) }).returning();
   return { webhook: webhook!, secret };
 }
 
@@ -56,15 +67,17 @@ export async function dispatchWebhooks(userId: string, event: AutomationEvent, e
     let success = false;
     let error: string | null = null;
     try {
-      const res = await fetch(endpoint.url, {
+      // Audit B5: private/loopback/metadata addresses refused, redirects not followed.
+      const res = await safeFetch(endpoint.url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-QuoteAI-Signature": signPayload(endpoint.secret, body),
+          "X-QuoteAI-Signature": signPayload(readWebhookSecret(endpoint.secret), body),
           "X-QuoteAI-Event": event,
         },
         body,
-        signal: AbortSignal.timeout(10_000),
+        timeoutMs: 10_000,
+        maxBytes: 64_000,
       });
       responseStatus = res.status;
       success = res.ok;

@@ -11,6 +11,7 @@ import { eq, sql } from "drizzle-orm";
 import { createClient } from "@supabase/supabase-js";
 import app from "../app.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
+import { withAuditMaintenance } from "../lib/auditLog.js";
 
 // ── Server ───────────────────────────────────────────────────────────────────
 
@@ -225,7 +226,12 @@ export async function cleanupUsers(userIds: string[]): Promise<void> {
   for (let pass = 0; pass < 6 && pending.size; pass++) {
     for (const table of [...pending]) {
       try {
-        await db.execute(sql`delete from ${sql.identifier(table)} where user_id in ${ids}`);
+        if (table === "audit_log") {
+          // Append-only table (audit B10): test cleanup goes through the maintenance flag.
+          await withAuditMaintenance((tx) => tx.execute(sql`delete from audit_log where user_id in ${ids}`));
+        } else {
+          await db.execute(sql`delete from ${sql.identifier(table)} where user_id in ${ids}`);
+        }
         pending.delete(table);
       } catch (err) {
         // FK ordering — retry on the next pass.

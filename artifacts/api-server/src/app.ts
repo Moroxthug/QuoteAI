@@ -32,16 +32,19 @@ installProcessHandlers();
 // "invalid credentials" or "error sending" on the frontend instead of a clear
 // rate-limit message.
 const signInRateLimiter = ipRateLimiter({
+  shared: "auth-signin",
   windowMs: 15 * 60 * 1000,
   max: 30,
   message: "Too many sign-in attempts. Please wait a few minutes and try again.",
 });
 const twoFactorRateLimiter = ipRateLimiter({
+  shared: "auth-2fa",
   windowMs: 15 * 60 * 1000,
   max: 30,
   message: "Too many verification attempts. Please wait a few minutes and try again.",
 });
 const passwordResetRateLimiter = ipRateLimiter({
+  shared: "auth-reset",
   windowMs: 15 * 60 * 1000,
   max: 10,
   message: "Too many password reset requests. Please wait a few minutes and try again.",
@@ -50,6 +53,7 @@ const passwordResetRateLimiter = ipRateLimiter({
 // re-send verification, 2FA email OTP) is an email-bombing vector as well as
 // an enumeration one, so it gets the same tight budget as password reset.
 const emailSendingRateLimiter = ipRateLimiter({
+  shared: "auth-send",
   windowMs: 15 * 60 * 1000,
   max: 10,
   message: "Too many requests. Please wait a few minutes and try again.",
@@ -62,6 +66,9 @@ const AUTH_RATE_LIMITERS: Record<string, ReturnType<typeof ipRateLimiter>> = {
   "/api/auth/sign-in/email": signInRateLimiter,
   "/api/auth/sign-in/social": signInRateLimiter,
   "/api/auth/sign-in/email-otp": signInRateLimiter,
+  // Audit B3: the emailed sign-in / verification code had no send limit.
+  "/api/auth/email-otp/send-verification-otp": emailSendingRateLimiter,
+  "/api/auth/email-otp/verify-email": twoFactorRateLimiter,
   "/api/auth/sign-up/email": emailSendingRateLimiter,
   "/api/auth/send-verification-email": emailSendingRateLimiter,
   "/api/auth/two-factor/send-otp": emailSendingRateLimiter,

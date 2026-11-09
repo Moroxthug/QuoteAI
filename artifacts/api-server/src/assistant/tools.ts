@@ -177,7 +177,7 @@ export async function runReadTool(name: string, rawArgs: unknown, ctx: ToolConte
       const [ms, tasks, client, an] = await Promise.all([
         db.select().from(milestonesTable).where(eq(milestonesTable.projectId, p.id)).orderBy(asc(milestonesTable.sortOrder)),
         db.select().from(projectTasksTable).where(eq(projectTasksTable.projectId, p.id)),
-        p.clientId ? db.select({ name: clientsTable.name, email: clientsTable.email }).from(clientsTable).where(eq(clientsTable.id, p.clientId)).then((r) => r[0] ?? null) : Promise.resolve(null),
+        p.clientId ? db.select({ name: clientsTable.name, email: clientsTable.email }).from(clientsTable).where(and(eq(clientsTable.id, p.clientId), eq(clientsTable.userId, p.userId))).then((r) => r[0] ?? null) : Promise.resolve(null),
         jobAnalytics(p, ctx.now),
       ]);
       return {

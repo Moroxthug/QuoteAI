@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { UpdateBusinessProfileBody } from "@workspace/api-zod";
 import { ObjectStorageService } from "../lib/objectStorage.js";
 import { randomBytes } from "crypto";
+import { sniffRasterImage, RASTER_EXT } from "../lib/imageSniff.js";
 
 const router = Router();
 const objectStorageService = new ObjectStorageService();
@@ -22,7 +23,6 @@ const uploadLogo = upload.fields([
   { name: "file", maxCount: 1 },
 ]);
 
-const ALLOWED_LOGO_MIMES = ["image/svg+xml", "image/png", "image/jpeg"];
 
 // Phase 0 fields (Canadian identity, automation prefs, entitlements) are
 // appended to the legacy shape so existing clients keep working.
@@ -287,10 +287,13 @@ router.post(
         return;
       }
 
-      const { mimetype, size, originalname, buffer } = uploadedFile;
+      const { size, buffer } = uploadedFile;
 
-      if (!ALLOWED_LOGO_MIMES.includes(mimetype)) {
-        res.status(400).json({ error: "Invalid file type. Allowed types: SVG, PNG, JPEG" });
+      // Read the type from the bytes, never from the client. SVG is refused:
+      // it can carry script, and the PDFs can only draw PNG and JPEG anyway.
+      const mime = sniffRasterImage(buffer);
+      if (mime !== "image/png" && mime !== "image/jpeg") {
+        res.status(400).json({ error: "Invalid file type. Allowed types: PNG, JPEG" });
         return;
       }
 
@@ -299,14 +302,12 @@ router.post(
         return;
       }
 
-      const ext = originalname.split(".").pop()?.toLowerCase() ?? "bin";
-      const safeExt = ["svg", "png", "jpg", "jpeg"].includes(ext) ? ext : "png";
-      const subPath = `logos/${userId}/logo.${safeExt}`;
+      const subPath = `logos/${userId}/logo.${RASTER_EXT[mime]}`;
 
       const publicSubPath = await objectStorageService.uploadPublicObjectBuffer({
         subPath,
         buffer,
-        contentType: mimetype,
+        contentType: mime,
       });
 
       const logoUrl = `/api/storage/public-objects/${publicSubPath}`;

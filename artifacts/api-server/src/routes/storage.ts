@@ -6,6 +6,7 @@ import {
   RequestUploadUrlResponse,
 } from "@workspace/api-zod";
 import { ObjectStorageService, ObjectNotFoundError } from "../lib/objectStorage.js";
+import { STORED_FILE_HEADERS } from "../lib/imageSniff.js";
 
 const router: IRouter = Router();
 const objectStorageService = new ObjectStorageService();
@@ -50,6 +51,9 @@ router.get("/storage/public-objects/*filePath", async (req: Request, res: Respon
 
     res.status(response.status);
     response.headers.forEach((value, key) => res.setHeader(key, value));
+    // Served from our own origin: whatever was stored (an old SVG logo, say),
+    // it must never run script here.
+    for (const [key, value] of Object.entries(STORED_FILE_HEADERS)) res.setHeader(key, value);
 
     if (response.body) {
       // The global ReadableStream (DOM lib/undici) doesn't expose the values()/
@@ -85,6 +89,7 @@ router.get("/storage/objects/*objectPath", requireAuth, async (req: Request, res
 
     res.status(objectData.status);
     objectData.headers.forEach((value: string, key: string) => res.setHeader(key, value));
+    for (const [key, value] of Object.entries(STORED_FILE_HEADERS)) res.setHeader(key, value);
 
     if (objectData.body) {
       const nodeStream = Readable.fromWeb(objectData.body as unknown as import("node:stream/web").ReadableStream<Uint8Array>);

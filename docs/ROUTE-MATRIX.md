@@ -14,12 +14,12 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 145 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 390 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
-| 460 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
-| 512 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 554 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
-| 596 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
+| 147 | POST | `/api/payments/webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 392 | POST | `/api/payments/connect-webhook` | none | — | — | manual | — | n/a | — | — | constructEvent |
+| 462 | POST | `/api/webhooks/financeit` | none | — | — | manual | — | n/a | — | — | timingSafeEqual |
+| 514 | POST | `/api/whatsapp/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 556 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, x-hub-signature |
+| 598 | POST | `/api/webhooks/resend` | none | — | — | manual | — | n/a | — | — | timingSafeEqual, createHmac, svix |
 
 ## artifacts/api-server/src/routes/account.ts
 
@@ -166,7 +166,7 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 124 | GET | `/api/business-profile` | session | — | — | none | — | n/a | — | — | — |
 | 163 | PUT | `/api/business-profile` | session | settings:edit | — | zod | — | n/a | — | — | — |
 | 273 | POST | `/api/business-profile/logo` | session | settings:edit | — | none | — | n/a | — | — | — |
-| 338 | POST | `/api/business-profile/apikey` | session | settings:edit | — | none | — | n/a | — | — | — |
+| 339 | POST | `/api/business-profile/apikey` | session | settings:edit | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/calendar.ts
 
@@ -505,34 +505,34 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 159 | GET | `/api/jobs` | session | jobs:view | — | none | — | n/a | projects:ok | — | — |
 | 211 | POST | `/api/jobs` | session | jobs:edit | — | zod | hasFeature(jobs) | n/a | — | — | — |
-| 368 | GET | `/api/jobs/:id` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 383 | PUT | `/api/jobs/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 448 | DELETE | `/api/jobs/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 471 | POST | `/api/jobs/:id/archive` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 489 | POST | `/api/jobs/:id/restore` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 618 | PUT | `/api/jobs/:id/setup` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 640 | POST | `/api/jobs/:id/setup/confirm` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 666 | POST | `/api/jobs/:id/setup/regenerate` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 713 | POST | `/api/jobs/:id/milestones` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 750 | PUT | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 793 | DELETE | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 814 | POST | `/api/jobs/:id/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 835 | PATCH | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 871 | DELETE | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 889 | PUT | `/api/jobs/:id/budget` | session | jobs:full | — | zod | — | predicate | — | — | — |
-| 929 | POST | `/api/jobs/:id/change-orders` | session | jobs:full | — | zod | hasFeature(jobs) | predicate | — | — | — |
-| 953 | PUT | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | zod | — | predicate | — | — | — |
-| 978 | DELETE | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | none | — | predicate | — | — | — |
-| 1016 | GET | `/api/jobs/:id/photos` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 1032 | POST | `/api/jobs/:id/photos` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1086 | GET | `/api/jobs/:id/photos/:photoId/file` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 1115 | PUT | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1149 | DELETE | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 1174 | POST | `/api/jobs/:id/photos/share` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1237 | GET | `/api/jobs/:id/notes` | session | jobs:view | — | none | — | predicate | — | — | — |
-| 1254 | POST | `/api/jobs/:id/notes` | session | jobs:edit | — | zod | — | predicate | — | — | — |
-| 1282 | DELETE | `/api/jobs/:id/notes/:noteId` | session | jobs:edit | — | none | — | predicate | — | — | — |
-| 1308 | POST | `/api/jobs/:id/sms/on-my-way` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 376 | GET | `/api/jobs/:id` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 391 | PUT | `/api/jobs/:id` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 456 | DELETE | `/api/jobs/:id` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 479 | POST | `/api/jobs/:id/archive` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 497 | POST | `/api/jobs/:id/restore` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 626 | PUT | `/api/jobs/:id/setup` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 648 | POST | `/api/jobs/:id/setup/confirm` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 674 | POST | `/api/jobs/:id/setup/regenerate` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 721 | POST | `/api/jobs/:id/milestones` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 758 | PUT | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 801 | DELETE | `/api/jobs/:id/milestones/:mid` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 822 | POST | `/api/jobs/:id/tasks` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 843 | PATCH | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 879 | DELETE | `/api/jobs/:id/tasks/:tid` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 897 | PUT | `/api/jobs/:id/budget` | session | jobs:full | — | zod | — | predicate | — | — | — |
+| 937 | POST | `/api/jobs/:id/change-orders` | session | jobs:full | — | zod | hasFeature(jobs) | predicate | — | — | — |
+| 961 | PUT | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | zod | — | predicate | — | — | — |
+| 986 | DELETE | `/api/jobs/:id/change-orders/:coId` | session | jobs:full | — | none | — | predicate | — | — | — |
+| 1024 | GET | `/api/jobs/:id/photos` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 1040 | POST | `/api/jobs/:id/photos` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1094 | GET | `/api/jobs/:id/photos/:photoId/file` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 1123 | PUT | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1157 | DELETE | `/api/jobs/:id/photos/:photoId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 1182 | POST | `/api/jobs/:id/photos/share` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1245 | GET | `/api/jobs/:id/notes` | session | jobs:view | — | none | — | predicate | — | — | — |
+| 1262 | POST | `/api/jobs/:id/notes` | session | jobs:edit | — | zod | — | predicate | — | — | — |
+| 1290 | DELETE | `/api/jobs/:id/notes/:noteId` | session | jobs:edit | — | none | — | predicate | — | — | — |
+| 1316 | POST | `/api/jobs/:id/sms/on-my-way` | session | jobs:edit | — | zod | — | predicate | — | — | — |
 
 ## artifacts/api-server/src/routes/leads.ts
 
@@ -556,14 +556,14 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 70 | GET | `/api/meta-lead-ads/status` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 94 | GET | `/api/meta-lead-ads/connect` | session | integrations:full | — | none | hasFeature(meta_lead_ads) | n/a | — | — | — |
-| 114 | GET | `/api/meta-lead-ads/callback` | session | — | — | none | — | n/a | — | — | — |
-| 134 | DELETE | `/api/meta-lead-ads/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 146 | PATCH | `/api/meta-lead-ads/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 164 | GET | `/api/meta-lead-ads/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
-| 190 | GET | `/api/meta-lead-ads/webhook` | none | — | — | none | — | n/a | — | — | — |
-| 221 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | NONE |
+| 71 | GET | `/api/meta-lead-ads/status` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 95 | GET | `/api/meta-lead-ads/connect` | session | integrations:full | — | none | hasFeature(meta_lead_ads) | n/a | — | — | — |
+| 115 | GET | `/api/meta-lead-ads/callback` | session | — | — | none | — | n/a | — | — | — |
+| 135 | DELETE | `/api/meta-lead-ads/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 147 | PATCH | `/api/meta-lead-ads/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 165 | GET | `/api/meta-lead-ads/import-log` | session | integrations:view | — | none | — | n/a | — | — | — |
+| 191 | GET | `/api/meta-lead-ads/webhook` | none | — | — | none | — | n/a | — | — | — |
+| 220 | POST | `/api/meta-lead-ads/webhook` | none | — | — | manual | — | n/a | — | — | NONE |
 
 ## artifacts/api-server/src/routes/notifications.ts
 
@@ -607,11 +607,11 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 | 30 | GET | `/api/me` | session | — | — | none | — | n/a | — | — | — |
 | 56 | PUT | `/api/me` | session | — | — | zod | — | n/a | — | — | — |
 | 82 | POST | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
-| 110 | DELETE | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
-| 121 | GET | `/api/me/stats` | session | — | — | none | — | n/a | — | — | — |
-| 130 | GET | `/api/me/activity` | session | — | — | none | — | n/a | — | — | — |
-| 140 | GET | `/api/team/people/:userId` | session | team:view | — | none | — | helper | — | — | — |
-| 172 | GET | `/api/team/leaderboard` | session | team:full | — | none | — | n/a | — | — | — |
+| 111 | DELETE | `/api/me/avatar` | session | — | — | none | — | n/a | — | — | — |
+| 122 | GET | `/api/me/stats` | session | — | — | none | — | n/a | — | — | — |
+| 131 | GET | `/api/me/activity` | session | — | — | none | — | n/a | — | — | — |
+| 141 | GET | `/api/team/people/:userId` | session | team:view | — | none | — | helper | — | — | — |
+| 173 | GET | `/api/team/leaderboard` | session | team:full | — | none | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/plan-overview.ts
 
@@ -842,9 +842,9 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 13 | POST | `/api/storage/uploads/request-url` | session | — | — | zod | — | n/a | — | — | — |
-| 39 | GET | `/api/storage/public-objects/*filePath` | none | — | — | none | — | n/a | — | — | — |
-| 70 | GET | `/api/storage/objects/*objectPath` | session | — | — | none | — | post-check | — | — | — |
+| 14 | POST | `/api/storage/uploads/request-url` | session | — | — | zod | — | n/a | — | — | — |
+| 40 | GET | `/api/storage/public-objects/*filePath` | none | — | — | none | — | n/a | — | — | — |
+| 74 | GET | `/api/storage/objects/*objectPath` | session | — | — | none | — | post-check | — | — | — |
 
 ## artifacts/api-server/src/routes/suppliers.ts
 
@@ -968,15 +968,15 @@ Columns — **Auth**: session (`requireAuth`), apiKey (`requireApiKey`), admin (
 
 | Line | Method | Path | Auth | Perm | RL | Val | Gate | Scope | Archived | Token | Webhook |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 1185 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
-| 1199 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
-| 1370 | GET | `/api/whatsapp/available` | none | — | — | none | — | n/a | — | — | — |
-| 1375 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
-| 1387 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
-| 1412 | POST | `/api/whatsapp/connect` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 1448 | POST | `/api/whatsapp/verify` | session | integrations:full | — | zod | — | n/a | — | — | — |
-| 1477 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
-| 1488 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1186 | GET | `/api/whatsapp/webhook` | none | — | — | none | — | n/a | — | — | — |
+| 1198 | POST | `/api/whatsapp/webhook` | none | — | — | manual | plan-check | n/a | — | — | NONE |
+| 1369 | GET | `/api/whatsapp/available` | none | — | — | none | — | n/a | — | — | — |
+| 1374 | GET | `/api/whatsapp/status` | session | — | — | none | — | n/a | — | — | — |
+| 1386 | GET | `/api/whatsapp/usage` | session | — | — | none | — | n/a | — | — | — |
+| 1411 | POST | `/api/whatsapp/connect` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1447 | POST | `/api/whatsapp/verify` | session | integrations:full | — | zod | — | n/a | — | — | — |
+| 1476 | DELETE | `/api/whatsapp/disconnect` | session | integrations:full | — | none | — | n/a | — | — | — |
+| 1487 | PATCH | `/api/whatsapp/toggle` | session | integrations:full | — | zod | — | n/a | — | — | — |
 
 ## artifacts/api-server/src/routes/worker-time.ts
 

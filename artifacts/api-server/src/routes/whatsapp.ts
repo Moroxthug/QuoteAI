@@ -25,6 +25,7 @@ import { ObjectStorageService } from "../lib/objectStorage.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { randomUUID } from "crypto";
 import { withWhatsappUsageContext, recordWhatsappUsageFromContext } from "../lib/usage.js";
+import { metaChallengeResponse } from "../lib/metaVerify.js";
 
 const objectStorage = new ObjectStorageService();
 const router = Router();
@@ -1183,12 +1184,10 @@ async function finalizeQuote(
 // ── GET /api/whatsapp/webhook — Meta webhook verification ──────────────────────
 
 router.get("/whatsapp/webhook", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
-  if (mode === "subscribe" && token === WA_VERIFY_TOKEN) {
+  const challenge = metaChallengeResponse(req.query, WA_VERIFY_TOKEN);
+  if (challenge) {
     logger.info("WhatsApp webhook verified");
-    res.status(200).send(challenge);
+    res.status(200).type("text/plain").send(challenge);
   } else {
     res.status(403).json({ error: "Forbidden" });
   }

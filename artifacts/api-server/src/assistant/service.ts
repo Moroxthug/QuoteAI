@@ -61,7 +61,7 @@ async function buildSystemPrompt(params: { userId: string; projectId: string | n
     const [p] = await db.select().from(projectsTable).where(and(eq(projectsTable.id, params.projectId), eq(projectsTable.userId, params.userId)));
     if (p) {
       province = p.province ?? province;
-      const client = p.clientId ? (await db.select({ name: clientsTable.name }).from(clientsTable).where(eq(clientsTable.id, p.clientId)))[0] : null;
+      const client = p.clientId ? (await db.select({ name: clientsTable.name }).from(clientsTable).where(and(eq(clientsTable.id, p.clientId), eq(clientsTable.userId, p.userId))))[0] : null;
       jobBlock = `\nCurrent job (tools default to it): id ${p.id} — "${p.name}"${client ? ` for ${client.name}` : ""}, status ${p.status}, ${p.progressPercent}% complete, ${toIsoDate(p.plannedStart ?? p.startDate) ?? "?"} → ${toIsoDate(p.plannedEnd ?? p.endDate) ?? "?"}, value ${((p.contractValueCents + p.changeOrdersCents) / 100).toFixed(2)} CAD incl. tax.`;
     }
   }

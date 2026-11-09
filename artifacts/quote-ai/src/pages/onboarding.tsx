@@ -28,7 +28,7 @@ import { ApiImg } from "@/components/api-img";
 import { isNativeApp } from "@/lib/native/env";
 import { setFirstQuoteStage, signedOutPath } from "@/lib/first-run";
 
-const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
 const TOTAL_STEPS = 3;
 
@@ -315,7 +315,7 @@ export default function OnboardingPage() {
                       </b>
                       <span className="text-xs" style={{ color: "var(--faint)" }}>SVG, PNG, JPG · max 2 MB</span>
                     </div>
-                    <input ref={fileInputRef} type="file" accept=".svg,.png,.jpg,.jpeg" className="hidden" onChange={handleLogoUpload} disabled={isUploadingLogo} />
+                    <input ref={fileInputRef} type="file" accept=".png,.jpg,.jpeg" className="hidden" onChange={handleLogoUpload} disabled={isUploadingLogo} />
                     {logoPreview && (
                       <button type="button" className="btn btn-outline-navy btn-sm" style={{ color: "var(--red)", borderColor: "var(--red)" }} onClick={() => setLogoPreview(null)}>
                         <X className="h-4 w-4" /> {t("onboarding.remove")}

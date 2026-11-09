@@ -1,5 +1,5 @@
 import { db, projectsTable, clientsTable, businessProfilesTable, whatsappConnectionsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { registerAutomation } from "../lib/automation.js";
 import { sendJobReviewRequest } from "../lib/jobMessaging.js";
 import { writeAudit } from "../lib/notifications.js";
@@ -20,7 +20,7 @@ registerAutomation("job.review_request_due", async (run) => {
   if (!profile) throw new Error(`Business profile ${run.userId} not found`);
   if (!profile.sendReviewRequests || !profile.googleReviewUrl) return { skipped: "review requests disabled or no review link set" };
 
-  const [client] = await db.select().from(clientsTable).where(eq(clientsTable.id, project.clientId));
+  const [client] = await db.select().from(clientsTable).where(and(eq(clientsTable.id, project.clientId), eq(clientsTable.userId, project.userId)));
   if (!client) return { skipped: "client not found" };
   if (client.marketingUnsubscribedAt) return { skipped: "client unsubscribed" };
 

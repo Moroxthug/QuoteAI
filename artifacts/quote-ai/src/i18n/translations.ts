@@ -670,7 +670,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "sitemap.quoteFor": "Quote for",
 
     "onboarding.unsupportedFormat": "Unsupported format",
-    "onboarding.useFormats": "Use SVG, PNG, or JPG",
+    "onboarding.useFormats": "Use PNG or JPG",
     "onboarding.fileTooLarge": "File too large",
     "onboarding.maxSize": "Maximum",
     "onboarding.logoUploaded": "Logo uploaded",
@@ -2130,7 +2130,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "sitemap.quoteFor": "Soumission pour",
 
     "onboarding.unsupportedFormat": "Format non pris en charge",
-    "onboarding.useFormats": "Utilisez SVG, PNG ou JPG",
+    "onboarding.useFormats": "Utilisez PNG ou JPG",
     "onboarding.fileTooLarge": "Fichier trop volumineux",
     "onboarding.maxSize": "Maximum",
     "onboarding.logoUploaded": "Logo téléversé",

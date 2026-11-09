@@ -10,7 +10,7 @@ import { EMAIL_RE, changed, orNull, useBusinessProfile, useSaveBusinessProfile }
 import { isNativeApp } from "@/lib/native/env";
 import { ApiImg } from "@/components/api-img";
 
-const ALLOWED_TYPES = ["image/svg+xml", "image/png", "image/jpeg", "image/jpg"];
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg"];
 const MAX_SIZE_MB = 2;
 
 type CompanyDraft = { companyName: string; vatNumber: string; phone: string; email: string; address: string; licenceNumber: string };
@@ -166,7 +166,7 @@ function LogoGroup({ logoUrl }: { logoUrl: string | null }) {
             )}
           </div>
           <div className="slogo-actions">
-            <input ref={fileInputRef} type="file" accept=".svg,.png,.jpg,.jpeg" className="hidden" onChange={upload} disabled={uploading} aria-label={t("dashboard.profile.logo.uploadButton")} tabIndex={-1} />
+            <input ref={fileInputRef} type="file" accept=".png,.jpg,.jpeg" className="hidden" onChange={upload} disabled={uploading} aria-label={t("dashboard.profile.logo.uploadButton")} tabIndex={-1} />
             <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading} className="btn btn-outline-navy btn-sm gap-2">
               {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
               {uploading ? t("dashboard.profile.logo.uploading") : t("dashboard.profile.logo.uploadButton")}

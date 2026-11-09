@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { requireAuth, getUserId, getActorUserId, getActorRole } from "../middlewares/authMiddleware.js";
 import { requirePermission } from "../middlewares/requirePermission.js";
 import { ObjectStorageService } from "../lib/objectStorage.js";
+import { sniffRasterImage, RASTER_EXT } from "../lib/imageSniff.js";
 import { loadPerson, personActivity, personCompanies, personStats, roleInCompany, teamLeaderboard } from "../people/service.js";
 
 // ── Phase 91: every person's own page ────────────────────────────────────────
@@ -18,7 +19,6 @@ import { loadPerson, personActivity, personCompanies, personStats, roleInCompany
 
 const router = Router();
 const storage = new ObjectStorageService();
-const AVATAR_MIMES: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
 const avatarUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 3 * 1024 * 1024, files: 1 } }).single("avatar");
 
 const monthsOf = (q: unknown) => {
@@ -89,14 +89,15 @@ router.post("/me/avatar", requireAuth, (req, res, next) => avatarUpload(req, res
   try {
     const actorId = getActorUserId(res);
     const file = req.file;
-    const ext = file ? AVATAR_MIMES[file.mimetype] : undefined;
-    if (!file || !ext) {
+    // The type comes from the bytes, not from what the client declared.
+    const mime = file ? sniffRasterImage(file.buffer) : null;
+    if (!file || !mime) {
       res.status(400).json({ error: "INVALID_FILE", message: "Send a PNG, JPEG or WebP photo in the 'avatar' field." });
       return;
     }
     // A new name each time so browsers and the CDN never show the old photo.
-    const subPath = `avatars/${actorId}/${randomBytes(8).toString("hex")}.${ext}`;
-    const publicSubPath = await storage.uploadPublicObjectBuffer({ subPath, buffer: file.buffer, contentType: file.mimetype });
+    const subPath = `avatars/${actorId}/${randomBytes(8).toString("hex")}.${RASTER_EXT[mime]}`;
+    const publicSubPath = await storage.uploadPublicObjectBuffer({ subPath, buffer: file.buffer, contentType: mime });
     const image = `/api/storage/public-objects/${publicSubPath}`;
     await db.update(authUsersTable).set({ image }).where(eq(authUsersTable.id, actorId));
     res.json({ image });

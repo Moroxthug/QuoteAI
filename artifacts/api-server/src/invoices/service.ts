@@ -130,9 +130,11 @@ export async function buildInvoiceContext(params: { userId: string; projectId?: 
   const [profile] = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.userId, params.userId));
   const project = params.projectId ? ((await db.select().from(projectsTable).where(and(eq(projectsTable.id, params.projectId), eq(projectsTable.userId, params.userId))))[0] ?? null) : null;
   const contractId = params.contractId ?? project?.contractId ?? null;
-  const contract = contractId ? ((await db.select().from(contractsTable).where(eq(contractsTable.id, contractId)))[0] ?? null) : null;
+  // Every id here may come straight from a request body: each lookup is
+  // scoped to the company, so a foreign id reads as "not found".
+  const contract = contractId ? ((await db.select().from(contractsTable).where(and(eq(contractsTable.id, contractId), eq(contractsTable.userId, params.userId))))[0] ?? null) : null;
   const clientId = params.clientId ?? project?.clientId ?? contract?.clientId ?? null;
-  const client = clientId ? ((await db.select().from(clientsTable).where(eq(clientsTable.id, clientId)))[0] ?? null) : null;
+  const client = clientId ? ((await db.select().from(clientsTable).where(and(eq(clientsTable.id, clientId), eq(clientsTable.userId, params.userId))))[0] ?? null) : null;
 
   const v = contract?.variables ?? null;
   const province = normalizeProvince(params.province) ?? normalizeProvince(contract?.province) ?? normalizeProvince(project?.province) ?? normalizeProvince(client?.province) ?? normalizeProvince(profile?.province) ?? "ON";

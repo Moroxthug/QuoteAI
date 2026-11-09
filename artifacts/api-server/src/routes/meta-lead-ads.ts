@@ -9,6 +9,7 @@ import { isIntegrationConfigured, refuseIfNotConfigured } from "../lib/integrati
 import { logger } from "../lib/logger.js";
 import { getBaseUrl } from "../lib/baseUrl.js";
 import { buildAuthUrl } from "../lib/metaLeadAdsClient.js";
+import { metaChallengeResponse } from "../lib/metaVerify.js";
 import {
   getMetaLeadAdsConnection,
   connectMetaLeadAds,
@@ -188,12 +189,10 @@ router.get("/meta-lead-ads/import-log", requireAuth, requirePermission("integrat
 
 // ── GET /api/meta-lead-ads/webhook — Meta webhook verification (same hub.challenge handshake as WhatsApp's) ──
 router.get("/meta-lead-ads/webhook", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
-  if (mode === "subscribe" && token === META_LEADGEN_VERIFY_TOKEN) {
+  const challenge = metaChallengeResponse(req.query, META_LEADGEN_VERIFY_TOKEN);
+  if (challenge) {
     logger.info("Meta Lead Ads webhook verified");
-    res.status(200).send(challenge);
+    res.status(200).type("text/plain").send(challenge);
   } else {
     res.status(403).json({ error: "Forbidden" });
   }

@@ -21,9 +21,10 @@ import {
   CITY_SECTORS,
   SECTORS,
   localizeCity,
+  FRENCH_PRIMARY_CITY_SLUGS,
 } from "./seo-data.js";
-import { CITY_INTELLIGENCE, DEMAND_TEXT } from "./seo-intelligence.js";
-import type { CityIntelligence } from "./seo-intelligence.js";
+import { CITY_INTELLIGENCE } from "./seo-intelligence.js";
+import { getCityTradeFacts, getTradeQuoteLines } from "./city-trade-facts.js";
 
 export type { SectorData, CityData };
 
@@ -94,7 +95,7 @@ export function getCityIntro(sector: SectorData, city: CityData, lang: Lang = "e
           `Dans une ville comme ${city.name}, la concurrence entre ${labelPlural} est féroce. Celui qui envoie sa soumission en premier a un réel avantage. Avec quoteai, vous le faites en 30 secondes, encore devant le client — directement depuis votre téléphone.`,
           `Travailler comme ${labelL} à ${city.name} veut dire jongler avec plusieurs clients aux besoins différents. quoteai s'occupe de l'administratif : décrivez le travail, l'IA génère la soumission complète, et vous vous concentrez sur votre métier.`,
         ];
-    return variantsFr[strHash(city.slug) % variantsFr.length];
+    return variantsFr[strHash(city.slug + sector.slug) % variantsFr.length];
   }
   const variants = isService
     ? [
@@ -109,7 +110,7 @@ export function getCityIntro(sector: SectorData, city: CityData, lang: Lang = "e
         `In a city like ${city.name}, competition among ${sector.labelPlural} is fierce. Whoever sends the quote first has a real edge. With quoteai you do it in 30 seconds, still standing in front of the customer — right from your phone.`,
         `Working as a ${sector.label.toLowerCase()} in ${city.name} means juggling many customers with different needs. quoteai handles the admin side: describe the job, the AI generates the full quote, and you focus on the trade.`,
       ];
-  return variants[strHash(city.slug) % variants.length];
+  return variants[strHash(city.slug + sector.slug) % variants.length];
 }
 
 // ─── FAQ items — 4 dynamic items, unified between visible HTML and JSON-LD ─
@@ -119,95 +120,31 @@ export interface CityFaqItem {
   a: string;
 }
 
-const DEMAND_TEXT_FR: Record<CityIntelligence["demandLevel"], string> = {
-  LOW: "modérée",
-  MEDIUM: "moyenne",
-  HIGH: "élevée",
-  CRITICAL: "très élevée",
-};
-
 export function getCityFaqItems(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityFaqItem[] {
   // Phase 81: French pages show the city's and province's French names.
+  const citySlug = city.slug;
   city = localizeCity(city, lang);
-  const intel = CITY_INTELLIGENCE[city.slug];
-  const pricePct = intel ? Math.round(Math.abs(intel.priceIndex - 1.0) * 100) : 0;
+  // 2026-11-12: the price and response-time answers came from editorial
+  // estimates (a price index, a lead time). The last two answers are now the
+  // licence/permit and tax facts for this trade in this city.
+  const facts = getCityTradeFacts(sector, citySlug, city.name, lang)?.faq ?? [];
 
   if (lang === "fr-CA") {
-    const { label, labelPlural } = sectorLabel(sector, lang);
-    const labelL = label.toLowerCase();
-    const priceAnswerFr = intel
-      ? intel.priceIndex > 1.05
-        ? `Les prix des services de ${labelL} à ${city.name} sont environ ${pricePct}% au-dessus de la moyenne canadienne. Présenter une soumission professionnelle et détaillée est essentiel pour justifier le prix et gagner la confiance du client.`
-        : intel.priceIndex < 0.95
-          ? `À ${city.name}, les prix pour les ${labelPlural} sont environ ${pricePct}% sous la moyenne canadienne. Dans un marché aussi compétitif, répondre rapidement avec une soumission professionnelle est le meilleur moyen de se démarquer.`
-          : `Les prix pour les ${labelPlural} à ${city.name} sont dans la moyenne canadienne. La rapidité de réponse et la qualité de la soumission font la différence pour remporter le contrat.`
-      : `Les prix varient selon la complexité du travail et l'emplacement. Avec quoteai, vous pouvez générer des soumissions professionnelles en 30 secondes et démontrer votre compétitivité immédiatement.`;
-
-    const leadTimeAnswerFr = intel
-      ? intel.demandLevel === "CRITICAL"
-        ? `La demande à ${city.name} est très élevée : les délais de réponse habituels sont d'environ ${intel.avgLeadTime}. Envoyer la soumission quelques minutes après la visite — comme le permet quoteai — améliore considérablement vos chances de remporter le contrat.`
-        : intel.demandLevel === "HIGH"
-          ? `Avec une demande ${DEMAND_TEXT_FR[intel.demandLevel]} à ${city.name}, les professionnels répondent habituellement en ${intel.avgLeadTime}. Envoyer une soumission professionnelle rapidement reste le meilleur moyen de décrocher le contrat.`
-          : intel.demandLevel === "MEDIUM"
-            ? `Les délais de réponse habituels pour les ${labelPlural} à ${city.name} sont d'environ ${intel.avgLeadTime}. Une soumission professionnelle envoyée le jour même peut faire la différence face à la concurrence.`
-            : `Le marché de ${city.name} affiche une demande ${DEMAND_TEXT_FR[intel.demandLevel]} pour ce type de service, avec des délais de réponse d'environ ${intel.avgLeadTime}. Le professionnalisme et la rapidité demeurent des atouts importants.`
-      : `Les délais de réponse dépendent de la disponibilité locale. Avec quoteai, vous pouvez répondre aux nouvelles demandes en 30 secondes et améliorer vos chances sur chaque contrat.`;
-
     return [
       {
         q: `Comment obtenir une soumission professionnelle à ${city.name}?`,
         a: `Avec quoteai, ça prend 30 secondes. Décrivez le travail en langage naturel dans le champ de texte, et le moteur d'IA génère automatiquement le document avec les postes de coûts, quantités, prix unitaires et taxes. Téléchargez le PDF et envoyez-le directement à votre client à ${city.name}.`,
       },
-      {
-        q: `quoteai fonctionne-t-il pour les ${labelPlural} à ${city.name} et dans tout le ${city.region}?`,
-        a: `Oui. quoteai est une application web accessible depuis n'importe quel appareil avec une connexion internet. Il n'y a aucune restriction géographique : ça fonctionne à ${city.name} tout comme ailleurs au Canada.`,
-      },
-      {
-        q: `Combien coûtent les services de ${labelL} à ${city.name}?`,
-        a: priceAnswerFr,
-      },
-      {
-        q: `Quel est le délai de réponse moyen pour les ${labelPlural} à ${city.name}?`,
-        a: leadTimeAnswerFr,
-      },
+      ...facts,
     ];
   }
-
-  const priceAnswer = intel
-    ? intel.priceIndex > 1.05
-      ? `Prices for ${sector.label.toLowerCase()} services in ${city.name} run about ${pricePct}% above the Canadian average. Presenting a professional, detailed quote is essential to justify the price and earn the customer's trust.`
-      : intel.priceIndex < 0.95
-        ? `In ${city.name}, prices for ${sector.labelPlural} run about ${pricePct}% below the Canadian average. In a competitive market like this, responding quickly with a professional quote is the most effective way to stand out.`
-        : `Prices for ${sector.labelPlural} in ${city.name} are in line with the Canadian average. Response speed and quote quality are what make the difference in winning the job.`
-    : `Prices vary based on job complexity and location. With quoteai you can generate professional quotes in 30 seconds and show your competitiveness right away.`;
-
-  const leadTimeAnswer = intel
-    ? intel.demandLevel === "CRITICAL"
-      ? `Demand in ${city.name} is very high: typical response times run about ${intel.avgLeadTime}. Sending the quote within minutes of the walkthrough — as quoteai lets you do — significantly improves your odds of winning the job.`
-      : intel.demandLevel === "HIGH"
-        ? `With ${DEMAND_TEXT[intel.demandLevel]} demand in ${city.name}, professionals typically respond within ${intel.avgLeadTime}. Sending a professional quote right away is the best way to lock in the job.`
-        : intel.demandLevel === "MEDIUM"
-          ? `Standard response times for ${sector.labelPlural} in ${city.name} run about ${intel.avgLeadTime}. A professional quote sent the same day can make the difference versus the competition.`
-          : `The ${city.name} market sees ${DEMAND_TEXT[intel.demandLevel]} demand for this type of service, with response times of about ${intel.avgLeadTime}. Professionalism and speed remain important differentiators.`
-    : `Response times depend on local availability. With quoteai you can respond to new requests in 30 seconds and improve your odds on every job.`;
 
   return [
     {
       q: `How do I get a professional quote in ${city.name}?`,
       a: `With quoteai it takes 30 seconds. Describe the job in plain English in the text field, and the AI engine automatically generates the document with cost line items, quantities, unit prices, and tax. Download it as a PDF and send it straight to your customer in ${city.name}.`,
     },
-    {
-      q: `Does quoteai work for ${sector.labelPlural} in ${city.name} and across ${city.region}?`,
-      a: `Yes. quoteai is a web app accessible from any device with an internet connection. There are no geographic restrictions: it works in ${city.name} just as well as anywhere else in Canada.`,
-    },
-    {
-      q: `How much do ${sector.label.toLowerCase()} services cost in ${city.name}?`,
-      a: priceAnswer,
-    },
-    {
-      q: `What's the average response time for ${sector.labelPlural} in ${city.name}?`,
-      a: leadTimeAnswer,
-    },
+    ...facts,
   ];
 }
 
@@ -219,8 +156,18 @@ export interface HowItWorksStep {
   desc: string;
 }
 
-export function getCityHowItWorksSteps(cityName: string, lang: Lang = "en-CA"): HowItWorksStep[] {
+export function getCityHowItWorksSteps(cityName: string, lang: Lang = "en-CA", sector?: SectorData, citySlug?: string): HowItWorksStep[] {
+  // 2026-11-12: steps 1 and 2 name this trade's own line items and the
+  // province's tax, so the steps differ from one trade and city to the next.
+  const q = sector && citySlug ? getTradeQuoteLines(sector.slug, citySlug, lang) : null;
   if (lang === "fr-CA") {
+    if (q) {
+      return [
+        { n: "1", title: "Décrivez le travail", desc: `Depuis votre téléphone à ${cityName}, décrivez le travail dans vos mots : ${q.lines[0]}, ${q.lines[1]}.` },
+        { n: "2", title: "L'IA génère la soumission", desc: `quoteai en fait des postes chiffrés, ajoute ${q.lines[2]} et calcule les taxes (${q.tax}) sur des lignes distinctes.` },
+        { n: "3", title: "Envoyez-la au client", desc: `Un PDF professionnel en 30 secondes, envoyé par texto ou courriel à votre client à ${cityName} avant même d'avoir quitté le chantier.` },
+      ];
+    }
     return [
       {
         n: "1",
@@ -237,6 +184,13 @@ export function getCityHowItWorksSteps(cityName: string, lang: Lang = "en-CA"): 
         title: "Envoyez-la au client",
         desc: `Un PDF professionnel en 30 secondes. Envoyez-le par texto ou courriel à votre client à ${cityName} avant même d'avoir quitté le chantier.`,
       },
+    ];
+  }
+  if (q) {
+    return [
+      { n: "1", title: "Describe the job", desc: `From your phone in ${cityName}, describe the job in your own words: ${q.lines[0]}, ${q.lines[1]}.` },
+      { n: "2", title: "AI generates the quote", desc: `quoteai turns it into priced line items, adds ${q.lines[2]}, and calculates the tax (${q.tax}) on separate lines.` },
+      { n: "3", title: "Send it to the customer", desc: `A professional PDF in 30 seconds, sent by text or email to your customer in ${cityName} before you've left the job site.` },
     ];
   }
   return [
@@ -338,6 +292,8 @@ export function getNearbyAnchors(sector: SectorData, city: CityData, lang: Lang 
       // Don't link toward cities outside the active set — those pages
       // aren't prerendered/indexable right now (see ACTIVE_CITY_SLUGS).
       if (!ACTIVE_CITY_SLUGS.has(nearbyCity.slug)) return null;
+      // French city pages exist only for the French-primary Québec cities.
+      if (lang === "fr-CA" && !FRENCH_PRIMARY_CITY_SLUGS.includes(nearbyCity.slug)) return null;
       const nearbyIntel = CITY_INTELLIGENCE[slug];
       const anchorText =
         lang === "fr-CA"
@@ -363,48 +319,16 @@ export function getNearbyAnchors(sector: SectorData, city: CityData, lang: Lang 
 // ─── Osservatorio widget data ─────────────────────────────────────────────
 
 export interface OsservatorioData {
-  priceLabel: string;
-  priceColorClass: string;
-  demandLabel: string;
-  demandColorClass: string;
-  avgLeadTime: string;
   topServices: [string, string, string];
   localInsight: string;
 }
 
-export function getOsservatorioData(citySlug: string): OsservatorioData | null {
+/** The city card's hand-written services and local note (French where written). */
+export function getOsservatorioData(citySlug: string, lang: Lang = "en-CA"): OsservatorioData | null {
   const intel = CITY_INTELLIGENCE[citySlug];
   if (!intel) return null;
-  const pct = Math.round(Math.abs(intel.priceIndex - 1.0) * 100);
-  const priceLabel =
-    intel.priceIndex > 1.0 ? `+${pct}%` : intel.priceIndex < 1.0 ? `−${pct}%` : `±0%`;
-  const priceColorClass =
-    intel.priceIndex > 1.05
-      ? "text-amber-600"
-      : intel.priceIndex < 0.95
-        ? "text-green-600"
-        : "text-gray-800";
-  const demandLabels: Record<CityIntelligence["demandLevel"], string> = {
-    LOW: "Moderate",
-    MEDIUM: "Average",
-    HIGH: "High",
-    CRITICAL: "Very high",
-  };
-  const demandColorClasses: Record<CityIntelligence["demandLevel"], string> = {
-    LOW: "text-green-600",
-    MEDIUM: "text-blue-600",
-    HIGH: "text-amber-600",
-    CRITICAL: "text-red-600",
-  };
-  return {
-    priceLabel,
-    priceColorClass,
-    demandLabel: demandLabels[intel.demandLevel],
-    demandColorClass: demandColorClasses[intel.demandLevel],
-    avgLeadTime: intel.avgLeadTime,
-    topServices: intel.topServices,
-    localInsight: intel.localInsight,
-  };
+  const fr = lang === "fr-CA" ? intel.fr : undefined;
+  return { topServices: fr?.topServices ?? intel.topServices, localInsight: fr?.localInsight ?? intel.localInsight };
 }
 
 // ─── City context text ────────────────────────────────────────────────────
@@ -719,65 +643,5 @@ export function getSectorDeepDive(sector: SectorData, lang: Lang = "en-CA"): Dee
       { kind: "p", text: `A well-made quote isn't just a pricing document — it's a sales tool. Clean formatting, clear line items, your logo and contact information tell the customer they're dealing with a serious professional. Every quote generated with quoteai includes a custom header, sections by phase of work, a technical description for each line item, unit prices and subtotals, tax shown clearly, a final total, and payment terms and validity dates. The customer gets a tidy PDF — one page where possible — that holds up next to quotes from other ${labelPL} they're comparing, and in most cases the job goes to whoever presented the more professional estimate, even at a similar price.` },
       { kind: "p", text: `Getting started is free: no credit card, no complicated setup. Create an account in thirty seconds, generate your first quote for free, and only decide afterward whether a subscription plan (for anyone quoting daily) or a one-off quote makes more sense. Contractors, tradespeople and small businesses across Canada already use quoteai every week. Try it and see why nobody goes back to the old spreadsheet.` },
     ],
-  };
-}
-
-export interface CityCostCopy {
-  heading: string;
-  subtitle: string;
-  paragraphs: string[];
-  footnote: string;
-}
-
-/**
- * The city page's "What does a painter cost in Toronto" section. It reads
- * the same hand-authored price index / demand level as the observatory card.
- * The static body this replaces also listed four per-job price ranges that
- * were derived from a string hash, not from data — those are gone.
- */
-export function getCityCostCopy(sector: SectorData, city: CityData, lang: Lang = "en-CA"): CityCostCopy {
-  // Phase 81: French pages show the city's and province's French names.
-  city = localizeCity(city, lang);
-  const intel = CITY_INTELLIGENCE[city.slug];
-  const pricePct = intel ? Math.round((intel.priceIndex - 1.0) * 100) : 0;
-  const cityName = city.name;
-  const regionName = city.region;
-  if (lang === "fr-CA") {
-    const sectorLabel = sector.fr.label.toLowerCase();
-    const priceNote = !intel
-      ? "conforme à la moyenne nationale"
-      : pricePct > 5
-        ? `en moyenne ${pricePct} % plus élevé que la moyenne nationale`
-        : pricePct < -5
-          ? `en moyenne ${Math.abs(pricePct)} % plus bas que la moyenne nationale`
-          : "conforme à la moyenne nationale (variation limitée à ±5 %)";
-    const demandText = intel ? DEMAND_TEXT_FR[intel.demandLevel].toLowerCase() : "stable";
-    return {
-      heading: `Combien coûte un ${sectorLabel} à ${cityName}`,
-      subtitle: "Ce qui fait varier le prix d'une soumission",
-      paragraphs: [
-        `À ${cityName}, le coût moyen pour des travaux de ${sectorLabel} est ${priceNote}. La demande au ${regionName} est actuellement ${demandText}, ce qui influence la rapidité de réponse des entrepreneurs et la marge de négociation sur le prix final.`,
-        `Chaque soumission dépend de facteurs propres au travail : l'ampleur exacte des travaux, la qualité des matériaux demandés, l'accessibilité du site, l'urgence et les conditions particulières convenues avec le client. C'est pourquoi nous recommandons toujours une visite ou une description détaillée : avec quoteai, vous pouvez le faire en 30 secondes en décrivant le travail en langage naturel, et obtenir un document professionnel et modifiable, prêt à envoyer au client par WhatsApp ou courriel.`,
-      ],
-      footnote: `Indice de prix et niveau de demande : estimations rédigées pour ${cityName}. Taxes non incluses. Les prix réels varient selon les particularités du travail.`,
-    };
-  }
-  const sectorLabel = sector.label.toLowerCase();
-  const priceNote = !intel
-    ? "in line with the national average"
-    : pricePct > 5
-      ? `on average ${pricePct}% higher than the national average`
-      : pricePct < -5
-        ? `on average ${Math.abs(pricePct)}% lower than the national average`
-        : "in line with the national average (a modest variation within ±5%)";
-  const demandText = intel ? DEMAND_TEXT[intel.demandLevel] : "steady";
-  return {
-    heading: `What does a ${sectorLabel} cost in ${cityName}`,
-    subtitle: "What moves the price of a quote",
-    paragraphs: [
-      `In ${cityName}, the average cost for ${sectorLabel} work is ${priceNote}. Demand in ${regionName} is currently ${demandText}, which affects how quickly contractors respond and how much room there is to negotiate the final price.`,
-      `Every quote depends on job-specific factors: the exact scope of work, the quality of materials requested, site accessibility, how urgent the job is, and any custom terms agreed with the client. That's why we always recommend a proper walkthrough or a detailed description: with quoteai you can do that in 30 seconds by describing the job in plain language, and get a professional, editable document ready to send to the client by WhatsApp or email.`,
-    ],
-    footnote: `Price index and demand level are editorial estimates for ${cityName}. Taxes not included. Real prices vary with the specifics of the job.`,
   };
 }

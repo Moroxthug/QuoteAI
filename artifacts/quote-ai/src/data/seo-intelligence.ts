@@ -7,6 +7,8 @@ export interface CityIntelligence {
   topServices: [string, string, string];
   localInsight: string;
   avgLeadTime: string;
+  /** French versions, for the cities that have French pages (Montréal). */
+  fr?: { topServices: [string, string, string]; localInsight: string };
 }
 
 // NOTE: with only 15 curated launch cities (see CITIES in seo-data.ts) every
@@ -116,6 +118,11 @@ export const CITY_INTELLIGENCE: Record<string, CityIntelligence> = {
     avgLeadTime: "2–4 days",
     localInsight:
       "Montreal's building stock is dominated by older triplexes and duplexes with exterior staircases, especially in the Plateau and Rosemont, meaning quotes often need to account for older wiring, plaster walls, and party-wall considerations. Demand is strong for kitchen/bathroom remodels and energy-efficiency retrofits, and French is the primary language of business for most residential clients.",
+    fr: {
+      topServices: ["Rénovation de cuisine et de salle de bain", "Mise à niveau électrique et plomberie", "Rénovation écoénergétique"],
+      localInsight:
+        "Le parc immobilier de Montréal est dominé par des triplex et duplex anciens aux escaliers extérieurs, surtout sur le Plateau et dans Rosemont : les soumissions doivent souvent tenir compte du filage ancien, des murs de plâtre et des murs mitoyens. La demande est forte pour les cuisines, les salles de bain et les rénovations écoénergétiques, et le français est la langue des affaires pour la plupart des clients résidentiels.",
+    },
   },
   "quebec-city": {
     priceIndex: 0.88,

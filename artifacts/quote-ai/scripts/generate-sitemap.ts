@@ -54,7 +54,7 @@ for (const province of PILOT_PROVINCES) {
 // lastmod for the templated pages = the day their template or data last
 // changed (seo-render-engine.ts / seo-data.ts). Bump it when those change so
 // the date tells Google something true instead of a fixed placeholder.
-const SEO_TEMPLATE_UPDATED = "2026-09-27";
+const SEO_TEMPLATE_UPDATED = "2026-11-12";
 
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {

@@ -3,6 +3,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
 import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, ACTIVE_CITY_SLUGS, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc, localizeCity } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
+import { getCityTradeFacts } from "@/data/city-trade-facts";
 import {
   getCityIntro,
   getCityFaqItems,
@@ -12,8 +13,6 @@ import {
   getCityCtaTexts,
   getNearbyAnchors,
   getOsservatorioData,
-  getCityContextText,
-  getCityCostCopy,
   getCityRelatedSectors,
   getSameCityOtherSectors,
   buildCityJsonLd,
@@ -77,14 +76,15 @@ export default function SeoCityLanding() {
 
   const intro = city ? getCityIntro(s, city, engineLang) : "";
   const faqItems = city ? getCityFaqItems(s, city, engineLang) : [];
-  const howItWorksSteps = getCityHowItWorksSteps(cityName, engineLang);
+  const howItWorksSteps = getCityHowItWorksSteps(cityName, engineLang, s, citySlug);
   const layout = city ? getCityLayout(s, city) : 0;
   const ctaVariant = city ? getCityCtaVariant(s, city) : 0;
   const cta = getCityCtaTexts(ctaVariant, cityName, engineLang);
   const nearbyAnchors = city ? getNearbyAnchors(s, city, engineLang) : [];
-  const osservatorio = city ? getOsservatorioData(city.slug) : null;
-  const contextText = city ? getCityContextText(city.slug, engineLang) : null;
-  const cost = city ? getCityCostCopy(s, city, engineLang) : null;
+  const osservatorio = city ? getOsservatorioData(city.slug, engineLang) : null;
+  // 2026-11-12: real trade × city facts (licence, permits, tax, climate)
+  // replace the editorial price index, demand level and lead time.
+  const facts = city ? getCityTradeFacts(s, city.slug, cityName, engineLang) : null;
   const relatedSectorKeys = getCityRelatedSectors(s.slug);
   const relatedSectors = relatedSectorKeys.map((r) => ({
     slug: r.slug,
@@ -249,31 +249,36 @@ export default function SeoCityLanding() {
 
       {/* ── Price & demand observatory ────────────────────────── */}
       {osservatorio && (
-        <section className="sec" style={{ paddingBlock: "clamp(28px, 3vw, 44px)" }} aria-label={`${t("seo.city.observatoryAria")} ${cityName}`}>
+        <section className="sec" style={{ paddingBlock: "clamp(28px, 3vw, 44px)" }} aria-label={t("seo.city.factsHeading").replace("{city}", cityName)}>
           <div className="wrap" style={{ maxWidth: 960 }}>
             <div className="card" style={{ padding: "clamp(22px, 3vw, 32px)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
                 <span className="fi t"><BarChart2 className="h-4 w-4" /></span>
                 <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)" }}>
-                  {t("seo.city.observatoryHeading")} {cityName}
+                  {t("seo.city.factsHeading").replace("{city}", cityName)}
                 </h2>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 18 }}>
-                <div className="card" style={{ padding: 16, textAlign: "center" }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 4 }}>{t("seo.city.priceIndex")}</div>
-                  <div style={{ fontSize: 22, fontWeight: 800, color: "var(--navy)" }}>{osservatorio.priceLabel}</div>
-                  <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>{t("seo.city.vsNationalAvg")}</div>
+              {facts && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 12 }}>
+                  <div className="card" style={{ padding: 16 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 6 }}>{t("seo.city.factTax")}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--navy)", lineHeight: 1.35 }}>{facts.tiles.tax}</div>
+                  </div>
+                  <div className="card" style={{ padding: 16 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 6 }}>{t("seo.city.factPermits")}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--navy)", lineHeight: 1.35 }}>{facts.tiles.permits}</div>
+                  </div>
+                  <div className="card" style={{ padding: 16 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 6 }}>{t("seo.city.factRegulator")}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--navy)", lineHeight: 1.35 }}>{facts.tiles.regulator}</div>
+                  </div>
+                  <div className="card" style={{ padding: 16 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 6 }}>{t("seo.city.factClimate")}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--navy)", lineHeight: 1.35 }}>{facts.tiles.climate}</div>
+                  </div>
                 </div>
-                <div className="card" style={{ padding: 16, textAlign: "center" }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 4 }}>{t("seo.city.demand")}</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--navy)" }}>{osservatorio.demandLabel}</div>
-                  <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>{regionName}</div>
-                </div>
-                <div className="card" style={{ padding: 16, textAlign: "center" }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 4 }}>{t("seo.city.leadTime")}</div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: "var(--navy)" }}>{osservatorio.avgLeadTime}</div>
-                  <div style={{ fontSize: 11, color: "var(--faint)", marginTop: 4 }}>{t("seo.city.estimatedResponse")}</div>
-                </div>
+              )}
+              <div className="grid gap-3" style={{ marginBottom: 18 }}>
                 <div className="card" style={{ padding: 16 }}>
                   <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--faint)", marginBottom: 8 }}>{t("seo.city.topServices")}</div>
                   <ul style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -297,35 +302,20 @@ export default function SeoCityLanding() {
       {/* ── Main sections (layout-variant order) ─────────────── */}
       {mainSections}
 
-      {/* ── What it costs (Phase 80: from the retired static bodies) ── */}
-      {cost && (
-        <section className="sec" aria-label={cost.heading}>
+      {/* ── What a quote here must include (2026-11-12: trade × city facts) ── */}
+      {facts && (
+        <section className="sec" aria-label={facts.heading}>
           <div className="wrap" style={{ maxWidth: 760 }}>
             <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
-              <h2 className="h2" style={{ fontSize: 26 }}>{cost.heading}</h2>
-              <p className="lead" style={{ margin: "0 auto" }}>{cost.subtitle}</p>
+              <h2 className="h2" style={{ fontSize: 26 }}>{facts.heading}</h2>
             </div>
             <div className="prose blog-prose max-w-none">
-              {cost.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
+              <p><strong>{facts.definition}</strong></p>
+              <ul>
+                {facts.items.map((item) => <li key={item}>{item}</li>)}
+              </ul>
             </div>
-            <p style={{ fontSize: 12.5, color: "var(--faint)", marginTop: 18, textAlign: "center" }}>{cost.footnote}</p>
-          </div>
-        </section>
-      )}
-
-      {/* ── City context ─────────────────────────────────────── */}
-      {contextText && (
-        <section className="sec soft" style={{ paddingBlock: "clamp(28px, 3vw, 44px)" }}>
-          <div className="wrap" style={{ maxWidth: 760 }}>
-            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-              <span className="fi t" style={{ flexShrink: 0 }}><MapPin className="h-4 w-4" /></span>
-              <div>
-                <h2 style={{ fontSize: 14, fontWeight: 700, color: "var(--navy)", marginBottom: 6 }}>
-                  {t("seo.city.contextHeading").replace("{trade}", sectorLabel).replace("{city}", cityName)}
-                </h2>
-                <p style={{ fontSize: 14, color: "var(--muted-mk)", lineHeight: 1.6 }}>{contextText}</p>
-              </div>
-            </div>
+            <p style={{ fontSize: 12.5, color: "var(--faint)", marginTop: 18, textAlign: "center" }}>{facts.footnote}</p>
           </div>
         </section>
       )}

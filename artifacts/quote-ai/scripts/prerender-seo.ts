@@ -246,5 +246,12 @@ const appHtml = injectAppPreload(template)
   .replace("</head>", layoutChunk ? `  <link rel="modulepreload" crossorigin href="/${layoutChunk}">\n  </head>` : "</head>");
 if (!appHtml.includes('aria-busy="true"')) throw new Error("app.html: the app frame did not render into #root");
 writeFileSync(join(distDir, "app.html"), await inlineCriticalCss(appHtml), "utf-8");
-writeFileSync(join(distDir, "spa.html"), injectAppPreload(template), "utf-8");
+// spa.html answers every URL that has no prerendered file: the app's private
+// routes and any unknown path. It must not be indexable, or a typo URL (or an
+// old Italian /seo/… link) is served as a 200 copy of the homepage that
+// canonicalises to itself: a soft 404 that Google counts against the site.
+const spaHtml = injectAppPreload(template)
+  .replace(/<meta name="robots" content="[^"]*" \/>/, '<meta name="robots" content="noindex, follow" />');
+if (!spaHtml.includes('content="noindex, follow"')) throw new Error("spa.html: the robots meta was not found in the template");
+writeFileSync(join(distDir, "spa.html"), spaHtml, "utf-8");
 console.log("Wrote app.html (the app frame) and spa.html (bare shell).");

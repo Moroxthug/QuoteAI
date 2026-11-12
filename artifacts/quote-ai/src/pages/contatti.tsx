@@ -15,7 +15,8 @@ export default function ContattiPage() {
       description: "Contact the QuoteAI team for support, product questions, or sales information.",
       mainEntity: {
         "@type": "Organization",
-        name: "QuoteAI",
+        "@id": "https://quoteai.ca/#org",
+        name: "quoteai",
         url: "https://quoteai.ca/",
         email: "info@quoteai.ca",
         contactPoint: [

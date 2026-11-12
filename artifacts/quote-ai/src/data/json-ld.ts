@@ -90,12 +90,22 @@ export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
     description: fr
       ? "Logiciel IA pour soumissions professionnelles en 30 secondes. Conçu pour les entrepreneurs, petites entreprises et travailleurs autonomes canadiens."
       : "AI-powered software for professional quotes in 30 seconds. Built for Canadian contractors, small businesses, and freelancers.",
-    inLanguage: lang,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: fr ? `${BASE_URL}/fr/soumissions/{search_term_string}` : `${BASE_URL}/quotes/{search_term_string}` },
-      "query-input": "required name=search_term_string",
-    },
+    inLanguage: fr ? "fr-CA" : "en-CA",
+    publisher: { "@id": `${BASE_URL}/#org` },
+    // No SearchAction: the site has no search endpoint, and a template that
+    // points at /quotes/{term} promises Google a results page that 404s.
+  };
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${BASE_URL}/#org`,
+    name: "quoteai",
+    alternateName: ["QuoteAI", "quoteAI", "quoteai.ca"],
+    url: `${BASE_URL}/`,
+    logo: `${BASE_URL}/icon-512.png`,
+    email: "info@quoteai.ca",
+    areaServed: { "@type": "Country", name: "Canada" },
+    knowsLanguage: ["en-CA", "fr-CA"],
   };
   const software = {
     "@context": "https://schema.org",
@@ -113,7 +123,7 @@ export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
       audienceType: fr ? "Entrepreneurs, petites entreprises, artisans, travailleurs autonomes" : "Contractors, Small Businesses, Tradespeople, Freelancers",
     },
     inLanguage: lang,
-    provider: { "@type": "Organization", name: "quoteai", url: BASE_URL },
+    provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: AGGREGATE_RATING.ratingValue,
@@ -123,11 +133,12 @@ export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
     },
     review: TESTIMONIALS.map((t) => ({
       "@type": "Review",
-      author: { "@type": "Person", name: t.name },
+      // The reviewers are contracting businesses, not people.
+      author: { "@type": "Organization", name: t.name },
       reviewRating: { "@type": "Rating", ratingValue: String(t.rating), bestRating: "5", worstRating: "1" },
       // Phase 115: the page's language is loaded before it renders (registry.ts); lookup falls back to English.
       reviewBody: lookup(lang, `testimonials.${t.key}.text`),
     })),
   };
-  return [website, software];
+  return [organization, website, software];
 }

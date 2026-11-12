@@ -152,6 +152,38 @@ export default function MappaSitoPage() {
 
           </div>
 
+          {/* Every guide, one fold per category — the cards above only show the
+              newest five, which left most articles without a crawlable link
+              from a hub page. */}
+          <div className="card" style={{ marginTop: 24, padding: 32 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28, paddingBottom: 18, borderBottom: "1px solid var(--soft)" }}>
+              <span className="fi g"><BookOpen className="h-5 w-5" /></span>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.blogGuidesTitle")}</h2>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {BLOG_CATEGORIES.map((cat) => {
+                const articles = BLOG_INDEX.filter((a) => a.category === cat.name || a.category === cat.slug);
+                if (articles.length === 0) return null;
+                return (
+                  <details key={cat.slug} className="sm-region" style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 12 }}>
+                    <summary style={{ display: "flex", alignItems: "center", minHeight: 44, cursor: "pointer" }}>
+                      <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)" }}>{cat.name} <span style={{ fontWeight: 600, color: "var(--faint)" }}>({articles.length})</span></h3>
+                    </summary>
+                    <ul style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", rowGap: 10, columnGap: 16, fontSize: 13 }}>
+                      {articles.map((art) => (
+                        <li key={art.slug}>
+                          <Link href={`/blog/${art.slug}/`} style={{ color: "var(--muted-mk)" }}>
+                            {art.title}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Programmatic Cities Directory */}
           <div className="card" style={{ marginTop: 24, padding: 32 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28, paddingBottom: 18, borderBottom: "1px solid var(--soft)" }}>

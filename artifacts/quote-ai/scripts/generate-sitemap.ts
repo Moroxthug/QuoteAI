@@ -51,10 +51,15 @@ for (const province of PILOT_PROVINCES) {
   entries.push(url(`${BASE_URL}/fr/provinces/${province.frSlug}/`, "0.8", "monthly", "2026-09-22"));
 }
 
+// lastmod for the templated pages = the day their template or data last
+// changed (seo-render-engine.ts / seo-data.ts). Bump it when those change so
+// the date tells Google something true instead of a fixed placeholder.
+const SEO_TEMPLATE_UPDATED = "2026-09-27";
+
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
-  entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/`, "0.8", "monthly", "2026-05-01"));
-  entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/`, "0.8", "monthly", "2026-05-01"));
+  entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
+  entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
 }
 
 // SEO city×sector pages — restricted to ACTIVE_CITIES (see seo-data.ts) to
@@ -65,9 +70,9 @@ for (const sectorSlug of CITY_SECTORS) {
   const sector = SECTORS[sectorSlug];
   for (const city of ACTIVE_CITIES) {
     const priority = TIER1_CITY_SLUGS.has(city.slug) ? "0.7" : "0.6";
-    entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/${city.slug}/`, priority, "monthly", "2026-05-01"));
+    entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/${city.slug}/`, priority, "monthly", SEO_TEMPLATE_UPDATED));
     if (FRENCH_PRIMARY_CITY_SLUGS.includes(city.slug)) {
-      entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/${city.slug}/`, priority, "monthly", "2026-05-01"));
+      entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/${city.slug}/`, priority, "monthly", SEO_TEMPLATE_UPDATED));
     }
   }
 }
@@ -77,12 +82,15 @@ for (const article of HELP_ARTICLES) {
   entries.push(url(`${BASE_URL}/help/${article.slug}/`, "0.7", "monthly", article.updatedAt));
 }
 
-// Blog — categories get a stable aggregate date; articles use their real publishedAt
+// Blog — a category changes when its newest article does; articles use their
+// last update (or publish) date.
+const articleDate = (a: { publishedAt: string; updatedAt?: string }) => a.updatedAt ?? a.publishedAt;
 for (const cat of BLOG_CATEGORIES) {
-  entries.push(url(`${BASE_URL}/blog/categoria/${cat.slug}/`, "0.7", "weekly", "2026-05-01"));
+  const dates = BLOG_ARTICLES.filter((a) => a.category === cat.name || a.category === cat.slug).map(articleDate).sort();
+  entries.push(url(`${BASE_URL}/blog/categoria/${cat.slug}/`, "0.7", "weekly", dates[dates.length - 1] ?? SEO_TEMPLATE_UPDATED));
 }
 for (const article of BLOG_ARTICLES) {
-  entries.push(url(`${BASE_URL}/blog/${article.slug}/`, "0.7", "monthly", article.publishedAt));
+  entries.push(url(`${BASE_URL}/blog/${article.slug}/`, "0.7", "monthly", articleDate(article)));
 }
 
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -104,24 +112,34 @@ console.log(`Sitemap written: ${outPath} (${entries.length} URLs)`);
 const activeSlugSet = new Set(ACTIVE_CITIES.map((c) => c.slug));
 const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlugSet.has(slug));
 
+const privateRules = [
+  "/dashboard", "/dashboard/", "/sign-in", "/sign-up", "/onboarding", "/admin", "/api",
+  "/p/", "/i/", "/sign/", "/t/", "/team-invite/",
+].map((path) => `Disallow: ${path}`);
+const cityRules = inactiveCitySlugs.map((slug) => `Disallow: /quotes/*/${slug}/`);
+const rules = [
+  ...privateRules,
+  ...(cityRules.length ? ["# City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)", ...cityRules] : []),
+].join("\n");
+
+// AI search and answer engines are welcome on the public pages (GEO). A
+// crawler that finds a group naming it ignores the `*` group, so each group
+// repeats the private rules.
+const AI_CRAWLERS = [
+  "GPTBot", "OAI-SearchBot", "ChatGPT-User",
+  "ClaudeBot", "Claude-SearchBot", "Claude-User",
+  "PerplexityBot", "Perplexity-User",
+  "Google-Extended", "Applebot-Extended", "Bingbot", "CCBot",
+];
+
 const robotsTxt = `User-agent: *
 Allow: /
+${rules}
 
-Disallow: /dashboard
-Disallow: /dashboard/
-Disallow: /sign-in
-Disallow: /sign-up
-Disallow: /onboarding
-Disallow: /admin
-Disallow: /api
-Disallow: /p/
-Disallow: /i/
-Disallow: /sign/
-Disallow: /t/
-Disallow: /team-invite/
-
-# City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)
-${inactiveCitySlugs.map((slug) => `Disallow: /quotes/*/${slug}/`).join("\n")}
+# AI search and assistants
+${AI_CRAWLERS.map((bot) => `User-agent: ${bot}`).join("\n")}
+Allow: /
+${rules}
 
 Sitemap: https://quoteai.ca/sitemap.xml
 `;

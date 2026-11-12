@@ -15,6 +15,10 @@
     { "source": "/chi-siamo{/}?", "destination": "/about/", "permanent": true },
     { "source": "/contatti{/}?", "destination": "/contact/", "permanent": true },
     { "source": "/mappa-sito{/}?", "destination": "/site-map/", "permanent": true },
+    { "source": "/seo{/}?", "destination": "/", "permanent": true },
+    { "source": "/seo/:path*", "destination": "/", "permanent": true },
+    { "source": "/privacy{/}?", "destination": "/privacy-policy/", "permanent": true },
+    { "source": "/termini{/}?", "destination": "/terms/", "permanent": true },
     {
       "source": "/((?!api/)(?!.*\\.)[^/]+(?:/[^/]+)*)",
       "destination": "/$1/",

@@ -70,10 +70,11 @@ export default function BlogArticlePage() {
       mainEntityOfPage: { "@type": "WebPage" as const, "@id": canonical },
       datePublished: article.publishedAt,
       dateModified: article.updatedAt ?? article.publishedAt,
-      inLanguage: "en",
-      author: { "@type": "Organization" as const, name: "quoteai", url: BASE_URL },
+      inLanguage: "en-CA",
+      author: { "@type": "Organization" as const, "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
       publisher: {
         "@type": "Organization" as const,
+        "@id": `${BASE_URL}/#org`,
         name: "quoteai",
         url: BASE_URL,
         logo: { "@type": "ImageObject" as const, url: `${BASE_URL}/icon-192.png`, width: 192, height: 192 },
@@ -84,7 +85,7 @@ export default function BlogArticlePage() {
       "@type": "BreadcrumbList" as const,
       itemListElement: [
         { "@type": "ListItem" as const, position: 1, name: "Home", item: BASE_URL },
-        { "@type": "ListItem" as const, position: 2, name: "Blog", item: `${BASE_URL}/blog` },
+        { "@type": "ListItem" as const, position: 2, name: "Blog", item: `${BASE_URL}/blog/` },
         { "@type": "ListItem" as const, position: 3, name: article.title, item: canonical },
       ],
     },

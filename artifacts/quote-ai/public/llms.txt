@@ -1,50 +1,145 @@
 # quoteai
 
-> quoteai è un software italiano di preventivazione con intelligenza artificiale per artigiani, PMI e professionisti. Descrivi il lavoro in linguaggio naturale e ottieni in 30 secondi un preventivo professionale in PDF con voci di costo, quantità, prezzi unitari e IVA.
+> quoteai (quoteai.ca) is quoting and job-management software for Canadian trade contractors and small service businesses. A contractor describes a job in plain words, by text or voice, and quoteai drafts a professional quote in about 30 seconds: line items, quantities, unit prices and the correct Canadian sales tax for the customer's province. The same numbers then flow into the contract, e-signature, deposit, job, invoice and payment. It works in English and French (Canada), on the web and as an Android app.
 
-quoteai (https://quoteai.ca) è pensato per il mercato italiano: terminologia tecnica di settore, prezzi di riferimento per area geografica, fatturazione conforme alla normativa nazionale e integrazione con WhatsApp Business per l'invio dei preventivi ai clienti.
+Key facts:
+- Who it is for: independent tradespeople and small contracting firms in Canada (painters, electricians, plumbers, roofers, HVAC technicians, general contractors, landscapers, cleaners and more).
+- Market: Canada only. Launching first in British Columbia, Ontario and Québec (the pilot provinces).
+- Languages: English (en-CA) and French (fr-CA); quotes can be written in either language for the customer.
+- Taxes: GST, HST, PST and QST are shown as separate lines, as the CRA and provincial ministries expect, never one blended rate.
+- Payments: customers pay by Interac e-Transfer, cheque or card; card payments go to the contractor's own Stripe account.
+- Trial: 7 days free, no credit card. A single quote can also be bought without a plan.
+- Prices are in Canadian dollars, before tax.
+- Company: quoteai, Canada. Contact: info@quoteai.ca.
 
-## Prodotto
+## Plans
 
-- [Home](https://quoteai.ca/): panoramica del prodotto, benefici, prezzi e demo di un preventivo generato dall'AI.
-- [Blog & Approfondimenti](https://quoteai.ca/blog/): guide pratiche su preventivazione, prezzi di mercato e gestione cantieri.
-- [Chi siamo](https://quoteai.ca/about/): missione, team e filosofia di prodotto.
-- [Contatti](https://quoteai.ca/contact/): canali di supporto e collaborazioni.
-- [WhatsApp](https://quoteai.ca/whatsapp/): genera preventivi direttamente dalla chat WhatsApp Business.
+- Starter: CA$29/month, 15 AI quotes a month
+- Pro: CA$79/month, 60 AI quotes a month
+- Business: CA$249/month, unlimited quotes
+- Elite: custom price
 
-## Settori coperti
+Annual billing charges ten months for a year. Details: [Pricing](https://quoteai.ca/pricing/).
 
-- [Imbianchini](https://quoteai.ca/seo/imbianchino/): tinteggiature, rasature, finiture decorative.
-- [Pittori](https://quoteai.ca/seo/pittore/): verniciature interne ed esterne, smalti, decorazioni.
-- [Elettricisti](https://quoteai.ca/seo/elettricista/): impianti civili e industriali, quadri, cablaggi.
-- [Idraulici](https://quoteai.ca/seo/idraulico/): impianti idrici, sanitari, riparazioni.
-- [Termoidraulici](https://quoteai.ca/seo/termoidraulico/): caldaie, riscaldamento, impianti termici.
-- [Muratori](https://quoteai.ca/seo/muratore/): opere murarie, fondazioni, ripristini.
-- [Imprese edili](https://quoteai.ca/seo/edilizia/): cantieri completi, computi metrici, costruzioni.
-- [Ristrutturazioni](https://quoteai.ca/seo/ristrutturazione/): interventi multi-categoria, bonus edilizi.
-- [Carpentieri e fabbri](https://quoteai.ca/seo/carpentiere/): strutture metalliche, cancelli, recinzioni.
-- [Falegnami](https://quoteai.ca/seo/falegname/): mobili su misura, serramenti in legno, restauri.
-- [Geometri](https://quoteai.ca/seo/geometra/): rilievi, pratiche edilizie, computi.
-- [Freelance](https://quoteai.ca/seo/freelance/): preventivi per servizi professionali.
-- [Giardinieri](https://quoteai.ca/seo/giardiniere/): manutenzione del verde, potature, irrigazione.
-- [Piastrellisti](https://quoteai.ca/seo/piastrellista/): pavimenti e rivestimenti, posa gres e ceramica.
-- [Pavimentisti](https://quoteai.ca/seo/pavimentista/): parquet, resine, levigature.
-- [Serramentisti](https://quoteai.ca/seo/serramentista/): infissi, porte, vetrate.
-- [Coperture e tetti](https://quoteai.ca/seo/tetto/): rifacimento, manutenzione, lattoneria.
-- [Condizionatori](https://quoteai.ca/seo/condizionatori/): installazione e manutenzione climatizzatori.
+## Product
 
-## Risorse pratiche
+- [Home](https://quoteai.ca/): what quoteai does, a sample AI quote, plans.
+- [Pricing](https://quoteai.ca/pricing/): plans, free trial, single-quote purchase, FAQ.
+- [Pilot](https://quoteai.ca/pilot/): the BC, Ontario and Québec launch.
+- [WhatsApp quotes](https://quoteai.ca/whatsapp/): create and send quotes from WhatsApp.
+- [About](https://quoteai.ca/about/): who builds quoteai and why.
+- [Contact](https://quoteai.ca/contact/)
+- [Help centre](https://quoteai.ca/help/): how-to articles for every part of the product.
+- [Blog](https://quoteai.ca/blog/): Canadian cost guides and how-to-quote guides for trades.
 
-- [Come fare un preventivo](https://quoteai.ca/seo/come-fare-preventivo/): guida passo-passo per creare un preventivo professionale.
-- [Modello Excel](https://quoteai.ca/seo/modello-excel/): template scaricabile in formato Excel.
-- [Modello Word](https://quoteai.ca/seo/modello-word/): template scaricabile in formato Word.
-- [Preventivi gratis](https://quoteai.ca/seo/preventivi-gratis/): come ottenere preventivi gratuiti.
+## Provinces
 
-## Legale
+- [British Columbia](https://quoteai.ca/provinces/british-columbia/): sales tax on quotes and invoices shown as GST 5 % + PST 7 %.
+- [Ontario](https://quoteai.ca/provinces/ontario/): sales tax on quotes and invoices shown as HST 13 %.
+- [Quebec](https://quoteai.ca/provinces/quebec/): sales tax on quotes and invoices shown as GST 5 % + QST 9.975 %.
 
-- [Privacy Policy](https://quoteai.ca/privacy/): trattamento dei dati personali.
-- [Termini di servizio](https://quoteai.ca/termini/): condizioni d'uso del servizio.
+## Quoting software by trade
 
-## Indice completo
+- [Painters](https://quoteai.ca/quotes/painter/): Create quotes for interior and exterior painting jobs in 30 seconds with AI. Quoting software built for Canadian painters. Free to try.
+- [Electricians](https://quoteai.ca/quotes/electrician/): Quoting software for electricians: create quotes for wiring, panel upgrades, and rewiring in 30 seconds. AI built for Canadian electricians. Free.
+- [Plumbers](https://quoteai.ca/quotes/plumber/): Create quotes for plumbing and heating jobs in 30 seconds. AI quoting software for Canadian plumbers. No spreadsheets. Free.
+- [General contractors](https://quoteai.ca/quotes/general-contractor/): Quoting software for general contractors: framing, foundations, finishing. AI-built itemized quotes in 30 seconds. For Canadian small businesses.
+- [Renovation contractors](https://quoteai.ca/quotes/renovation-contractor/): Quotes for full renovations in 30 seconds. AI for renovation contractors and tradespeople across Canada.
+- [Welders and metal fabricators](https://quoteai.ca/quotes/welder-fabricator/): Quotes for metal fabrication and welding in 30 seconds. AI quoting software for Canadian welders and fabricators. Free.
+- [Carpenters and cabinetmakers](https://quoteai.ca/quotes/carpenter-cabinetmaker/): Create quotes for custom cabinetry, millwork and finish carpentry in 30 seconds. AI quoting software for Canadian carpenters. Free.
+- [HVAC and heating technicians](https://quoteai.ca/quotes/hvac-technician/): Quoting software for HVAC and heating technicians: furnaces, heat pumps, in-floor heat. AI in 30 seconds for Canadian trades.
+- [Freelancers and consultants](https://quoteai.ca/quotes/freelance/): Create professional quotes for consulting, marketing, design and IT work in 30 seconds. AI quoting software for Canadian freelancers. Free.
+- [Building consultants and home inspectors](https://quoteai.ca/quotes/building-consultant/): Quoting software for building consultants and home inspectors: inspections, permit drawings, project oversight. AI in 30 seconds.
+- [Masons and concrete contractors](https://quoteai.ca/quotes/mason/): Create quotes for masonry, foundations, and concrete work in 30 seconds. AI quoting software for Canadian masons. Try it free.
+- [Landscapers](https://quoteai.ca/quotes/landscaper/): Create quotes for lawn care, landscaping, and yard maintenance in 30 seconds. AI quoting software for Canadian landscapers. Try it free.
+- [Tile installers](https://quoteai.ca/quotes/tile-installer/): Create quotes for tile, porcelain, and mosaic installation in 30 seconds. AI quoting software for Canadian tile installers. Try it free.
+- [Window and door installers](https://quoteai.ca/quotes/window-door-installer/): Create quotes for windows, doors, and exterior openings in vinyl, fibreglass, and wood in 30 seconds. AI quoting software for Canadian installers.
+- [Roofing companies](https://quoteai.ca/quotes/roofer/): Create quotes for roof replacement, shingles, and flashing in 30 seconds. AI quoting software for Canadian roofers. Try it free.
+- [Air conditioning and HVAC installers](https://quoteai.ca/quotes/air-conditioning-installer/): Create quotes for AC, ductless heat pumps, and ventilation installs in 30 seconds. AI quoting software for Canadian installers. Free.
+- [Painters and decorative finishers](https://quoteai.ca/quotes/decorative-painter/): Create quotes for painting, decorative finishes, and exterior coatings in 30 seconds. AI quoting software for Canadian painters. Free.
+- [Flooring installers](https://quoteai.ca/quotes/flooring-installer/): Create quotes for hardwood, laminate, epoxy, and carpet installation in 30 seconds. AI quoting software for Canadian flooring installers. Try it free.
+- [Excel users](https://quoteai.ca/quotes/excel-template/): Looking for a free Excel quote template? quoteai is better: generate professional quotes in 30 seconds with AI, no formulas, no mistakes. Try it free.
+- [Word users](https://quoteai.ca/quotes/word-template/): Looking for a Word quote template to download? quoteai generates professional quotes in 30 seconds with AI. No Word template, no manual formatting.
+- [Contractors](https://quoteai.ca/quotes/how-to-quote/): Learn how to write a professional quote for your business in 30 seconds. A practical guide for Canadian tradespeople and small businesses. No Excel, no mistakes.
+- [Contractors and small businesses](https://quoteai.ca/quotes/free-quote/): Create quotes online for free with quoteai. Free quoting software for Canadian contractors and small businesses. Get started with no credit card.
 
-- [Sitemap XML](https://quoteai.ca/sitemap.xml): elenco completo di tutte le pagine indicizzabili (oltre 1000 URL fra settori, città e articoli del blog).
+## Help centre
+
+- [Set up your business in 10 minutes](https://quoteai.ca/help/getting-started/): Create your account, fill in the business profile that appears on every quote, contract and invoice, and pick a plan.
+- [Create a quote from a description, a voice memo or photos](https://quoteai.ca/help/create-a-quote/): Describe the job in plain language and get an itemized, taxed quote in about 30 seconds. Then edit it, offer Good/Better/Best options and pick a PDF template.
+- [Send a quote and get it accepted online](https://quoteai.ca/help/send-a-quote-and-get-it-accepted/): Email the quote or share its link. The customer reviews and accepts on a secure page; automatic follow-ups nudge them on days 2, 5 and 10 until they answer.
+- [Contracts and e-signature](https://quoteai.ca/help/contracts-and-e-signature/): An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.
+- [Jobs: setup review, milestones and change orders](https://quoteai.ca/help/jobs-milestones-and-change-orders/): Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.
+- [Invoices, e-Transfer and card payments](https://quoteai.ca/help/invoices-and-getting-paid/): Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.
+- [Track costs, scan receipts and log time](https://quoteai.ca/help/costs-receipts-and-time/): Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.
+- [Invite your team and set roles](https://quoteai.ca/help/team-accounts-and-roles/): Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.
+- [Leads, follow-ups and review requests](https://quoteai.ca/help/leads-and-follow-ups/): Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.
+- [Integrations and importing your old quotes](https://quoteai.ca/help/integrations-and-imports/): Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.
+- [Delete your account and data](https://quoteai.ca/help/delete-your-account/): How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.
+
+## Guides (newest first)
+
+- [Attic Insulation Cost in Canada in 2026 (Blown-In, Spray Foam and Batt)](https://quoteai.ca/blog/attic-insulation-cost-canada-2026/): 2026 CAD cost to insulate or top up an attic in Canada: blown-in cellulose and fibreglass, spray foam, air sealing, R-value targets and rebates.
+- [How to Quote a Landscaping Job: Pricing Lawn, Hardscape and Seasonal Contracts](https://quoteai.ca/blog/how-to-quote-a-landscaping-job/): How landscapers can price one-time projects and recurring maintenance contracts: measuring, labour rates, equipment, materials and a clear quote.
+- [How to Quote an HVAC Job: Installation, Replacement and Service Agreements](https://quoteai.ca/blog/how-to-quote-an-hvac-job/): How HVAC contractors can quote furnace, AC and heat pump jobs: load calculations, good-better-best options, line items, rebates and service plans.
+- [How to Quote a Tiling Job: Square Footage, Prep, Waste and Labour Rates](https://quoteai.ca/blog/how-to-quote-a-tiling-job/): How tile installers can price floors, showers and backsplashes: prep, waterproofing, waste factors, pattern complexity and a sample quote structure.
+- [Spreadsheet Quotes vs Quoting Software: When Excel Stops Working for Contractors](https://quoteai.ca/blog/quoteai-vs-spreadsheet-quotes-contractors/): Excel and Word are fine until they are not. Signs your spreadsheet quotes are costing you jobs and what to look for when switching to software.
+- [How to Raise Your Prices as a Contractor Without Losing Clients](https://quoteai.ca/blog/how-to-raise-your-prices-contractors-without-losing-clients/): Costs rise every year. How trade businesses can raise rates confidently: when to do it, how to tell existing and new clients, and what to say.
+- [Hiring Your First Employee as a Contractor in Canada: What to Know](https://quoteai.ca/blog/how-to-hire-your-first-employee-contractor-canada/): What a Canadian contractor must set up before hiring a first employee: payroll account, deductions, workers' compensation, safety, pay rates and training.
+- [How to Follow Up on a Quote Without Being Pushy (Templates Included)](https://quoteai.ca/blog/how-to-follow-up-on-quotes-contractors/): Most quotes are not rejected, they are ignored. When and how to follow up by text and email, with ready-to-use templates for contractors.
+- [How to Quote a Carpentry or Cabinetmaking Job: Pricing Custom Work Properly](https://quoteai.ca/blog/how-to-quote-a-carpentry-job/): How carpenters and cabinetmakers can price custom work: material takeoffs, shop time, finishing, installation, deposits and design changes.
+- [How to Quote a Welding or Metal Fabrication Job in Canada](https://quoteai.ca/blog/how-to-quote-a-welding-or-metal-fabrication-job/): How welders and fabricators can price jobs: material weights, labour rates, consumables, shop overhead, finishing and delivery for custom and repair work.
+- [How to Quote a Masonry or Concrete Job: Brick, Block, Stone and Foundations](https://quoteai.ca/blog/how-to-quote-a-masonry-job/): How masons and concrete contractors can price brick, block, stone and concrete work: measuring, materials, scaffolding, labour and weather risks.
+- [How to Quote a Window or Door Installation Job (With Checklist)](https://quoteai.ca/blog/how-to-quote-a-window-or-door-installation-job/): How window and door installers can quote accurately: measuring, product options, full-frame vs insert, trim, disposal and lead times.
+- [Concrete and Asphalt Driveway Cost in Canada in 2026](https://quoteai.ca/blog/concrete-driveway-cost-canada-2026/): 2026 CAD price per square foot for concrete, asphalt, interlock and gravel driveways in Canada, with frost, drainage and removal costs that change the total.
+- [Siding Replacement Cost in Canada in 2026 (Vinyl, Fibre Cement, Wood and Metal)](https://quoteai.ca/blog/siding-replacement-cost-canada-2026/): 2026 CAD cost to replace siding on a Canadian home by material, including insulation, house wrap, removal and what drives the price.
+- [Contractor Cash Flow: How to Stop Running Out of Money Between Jobs](https://quoteai.ca/blog/contractor-cash-flow-management-canada/): Profitable contractors still run out of cash. How to forecast, bill faster, handle GST/HST remittances and holdbacks, and build a buffer for slow months.
+- [How Canadian Contractors Can Fill the Slow Season (Winter and Summer)](https://quoteai.ca/blog/how-to-survive-slow-season-contractors-canada/): Seasonal work drops in many trades. Ways to keep crews busy and revenue steady: off-season services, maintenance plans, early booking and marketing.
+- [How to Quote a Painting Job: Pricing Method, Line Items and Example](https://quoteai.ca/blog/how-to-quote-a-painting-job/): A step-by-step method for pricing a painting job: measuring, prep, coats, labour, materials, markup and a worked example for Canadian painters.
+- [How to Quote a Roofing Job in Canada: Measurements, Materials and Safety Costs](https://quoteai.ca/blog/how-to-quote-a-roofing-job/): How roofers can price a re-roof: measuring squares, tear-off, underlayment, ice and water shield, disposal, safety and a clear quote structure.
+- [How to Quote an Electrical Job: Pricing Service Calls, Renovations and Panel Upgrades](https://quoteai.ca/blog/how-to-quote-an-electrical-job/): A method for Canadian electricians to price service calls, circuits, pot lights and panel upgrades, including permits, inspection and exclusions.
+- [How to Quote a Plumbing Job: Flat-Rate vs Hourly Pricing for Canadian Plumbers](https://quoteai.ca/blog/how-to-quote-a-plumbing-job/): Flat-rate or hourly? How plumbers can price repairs, water heaters, renovations and emergencies, with line items, markup and a clear client quote.
+- [Quote vs Estimate vs Invoice: What's the Difference for Contractors?](https://quoteai.ca/blog/quote-vs-estimate-vs-invoice-difference/): Quote, estimate, bid, proposal, invoice: what each means, when to use them, and how the wrong one can cost a contractor money.
+- [10 Ways Canadian Contractors Can Reduce Material Costs Without Cutting Quality](https://quoteai.ca/blog/reduce-material-costs-contractors-canada/): Practical ways to lower material costs on every job: supplier accounts, bulk buying, waste control, price-lock clauses and accurate takeoffs.
+- [Job Site Management for Small Contractors: A Simple System That Works](https://quoteai.ca/blog/construction-project-management-small-contractors/): How small trade businesses can run job sites better: scheduling, daily logs, photos, communication and punch lists, without heavy construction software.
+- [How to Win More Bids as a Contractor: 10 Things That Beat a Lower Price](https://quoteai.ca/blog/how-to-win-more-bids-contractors-canada/): Why contractors lose bids and how to win more: response speed, clear scope, options, credentials, follow-up and presentation, without racing to the bottom.
+- [Best Quoting Software for Contractors in Canada: What to Look For](https://quoteai.ca/blog/best-quoting-software-for-contractors-canada/): What matters when choosing quoting and estimating software as a Canadian contractor: taxes, mobile use, speed, French support, invoicing and price.
+
+All 59 guides: [Blog](https://quoteai.ca/blog/). Full text of the help centre: [llms-full.txt](https://quoteai.ca/llms-full.txt).
+
+## En français
+
+quoteai est un logiciel de soumissions et de gestion de chantiers pour les entrepreneurs et gens de métier au Canada. Décrivez le travail en quelques mots et obtenez en 30 secondes une soumission professionnelle avec les bonnes taxes (TPS, TVH, TVP, TVQ) pour la province du client, puis le contrat, la signature, l'acompte, la facture et le paiement. Essai gratuit de 7 jours, sans carte de crédit.
+
+- [Accueil](https://quoteai.ca/fr/)
+- [Tarifs](https://quoteai.ca/fr/tarifs/)
+- [Projet pilote](https://quoteai.ca/fr/pilote/)
+
+Provinces :
+- [Colombie-Britannique](https://quoteai.ca/fr/provinces/colombie-britannique/)
+- [Ontario](https://quoteai.ca/fr/provinces/ontario/)
+- [Québec](https://quoteai.ca/fr/provinces/quebec/)
+
+Soumissions par métier :
+- [Peintres](https://quoteai.ca/fr/soumissions/peintre/)
+- [Électriciens](https://quoteai.ca/fr/soumissions/electricien/)
+- [Plombiers](https://quoteai.ca/fr/soumissions/plombier/)
+- [Entrepreneurs généraux](https://quoteai.ca/fr/soumissions/entrepreneur-general/)
+- [Entrepreneurs en rénovation](https://quoteai.ca/fr/soumissions/entrepreneur-renovation/)
+- [Soudeurs-métalliers](https://quoteai.ca/fr/soumissions/soudeur-metallier/)
+- [Menuisiers-ébénistes](https://quoteai.ca/fr/soumissions/menuisier-ebeniste/)
+- [Techniciens CVC](https://quoteai.ca/fr/soumissions/technicien-cvc/)
+- [Travailleurs autonomes](https://quoteai.ca/fr/soumissions/travailleur-autonome/)
+- [Experts en bâtiment](https://quoteai.ca/fr/soumissions/expert-batiment/)
+- [Maçons](https://quoteai.ca/fr/soumissions/macon/)
+- [Paysagistes](https://quoteai.ca/fr/soumissions/paysagiste/)
+- [Poseurs de céramique](https://quoteai.ca/fr/soumissions/poseur-de-ceramique/)
+- [Poseurs de portes et fenêtres](https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/)
+- [Couvreurs](https://quoteai.ca/fr/soumissions/couvreur/)
+- [Installateurs de climatisation](https://quoteai.ca/fr/soumissions/installateur-climatisation/)
+- [Peintres-décorateurs](https://quoteai.ca/fr/soumissions/peintre-decorateur/)
+- [Poseurs de revêtements de sol](https://quoteai.ca/fr/soumissions/poseur-de-plancher/)
+- [Modèles Excel](https://quoteai.ca/fr/soumissions/modele-soumission-excel/)
+- [Modèles Word](https://quoteai.ca/fr/soumissions/modele-soumission-word/)
+- [Guides de soumission](https://quoteai.ca/fr/soumissions/comment-faire-une-soumission/)
+- [Soumissions gratuites](https://quoteai.ca/fr/soumissions/soumission-gratuite/)

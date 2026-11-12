@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-
 Disallow: /dashboard
 Disallow: /dashboard/
 Disallow: /sign-in
@@ -14,7 +13,31 @@ Disallow: /sign/
 Disallow: /t/
 Disallow: /team-invite/
 
-# City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)
-
+# AI search and assistants
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: CCBot
+Allow: /
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /onboarding
+Disallow: /admin
+Disallow: /api
+Disallow: /p/
+Disallow: /i/
+Disallow: /sign/
+Disallow: /t/
+Disallow: /team-invite/
 
 Sitemap: https://quoteai.ca/sitemap.xml

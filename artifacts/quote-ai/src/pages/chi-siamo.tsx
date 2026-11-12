@@ -16,9 +16,14 @@ export default function ChiSiamoPage() {
     {
       "@context": "https://schema.org",
       "@type": "Organization",
-      name: "QuoteAI",
+      // One entity across the site: every Organization block shares this @id.
+      "@id": "https://quoteai.ca/#org",
+      name: "quoteai",
+      alternateName: ["QuoteAI", "quoteAI", "quoteai.ca"],
       url: "https://quoteai.ca/",
-      logo: "https://quoteai.ca/icon-192.png",
+      logo: "https://quoteai.ca/icon-512.png",
+      areaServed: { "@type": "Country", name: "Canada" },
+      knowsLanguage: ["en-CA", "fr-CA"],
       description:
         "QuoteAI is the AI quoting software for Canadian tradespeople and independent professionals. Generate professional quotes in 30 seconds by describing the job in plain language.",
       foundingDate: "2026",

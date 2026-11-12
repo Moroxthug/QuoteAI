@@ -1,0 +1,505 @@
+# quoteai
+
+> quoteai (quoteai.ca) is quoting and job-management software for Canadian trade contractors and small service businesses. A contractor describes a job in plain words, by text or voice, and quoteai drafts a professional quote in about 30 seconds: line items, quantities, unit prices and the correct Canadian sales tax for the customer's province. The same numbers then flow into the contract, e-signature, deposit, job, invoice and payment. It works in English and French (Canada), on the web and as an Android app.
+
+Key facts:
+- Who it is for: independent tradespeople and small contracting firms in Canada (painters, electricians, plumbers, roofers, HVAC technicians, general contractors, landscapers, cleaners and more).
+- Market: Canada only. Launching first in British Columbia, Ontario and Québec (the pilot provinces).
+- Languages: English (en-CA) and French (fr-CA); quotes can be written in either language for the customer.
+- Taxes: GST, HST, PST and QST are shown as separate lines, as the CRA and provincial ministries expect, never one blended rate.
+- Payments: customers pay by Interac e-Transfer, cheque or card; card payments go to the contractor's own Stripe account.
+- Trial: 7 days free, no credit card. A single quote can also be bought without a plan.
+- Prices are in Canadian dollars, before tax.
+- Company: quoteai, Canada. Contact: info@quoteai.ca.
+
+## Plans
+
+- Starter: CA$29/month, 15 AI quotes a month
+- Pro: CA$79/month, 60 AI quotes a month
+- Business: CA$249/month, unlimited quotes
+- Elite: custom price
+
+Annual billing charges ten months for a year. Details: [Pricing](https://quoteai.ca/pricing/).
+
+## Product
+
+- [Home](https://quoteai.ca/): what quoteai does, a sample AI quote, plans.
+- [Pricing](https://quoteai.ca/pricing/): plans, free trial, single-quote purchase, FAQ.
+- [Pilot](https://quoteai.ca/pilot/): the BC, Ontario and Québec launch.
+- [WhatsApp quotes](https://quoteai.ca/whatsapp/): create and send quotes from WhatsApp.
+- [About](https://quoteai.ca/about/): who builds quoteai and why.
+- [Contact](https://quoteai.ca/contact/)
+- [Help centre](https://quoteai.ca/help/): how-to articles for every part of the product.
+- [Blog](https://quoteai.ca/blog/): Canadian cost guides and how-to-quote guides for trades.
+
+## Provinces
+
+- [British Columbia](https://quoteai.ca/provinces/british-columbia/): sales tax on quotes and invoices shown as GST 5 % + PST 7 %.
+- [Ontario](https://quoteai.ca/provinces/ontario/): sales tax on quotes and invoices shown as HST 13 %.
+- [Quebec](https://quoteai.ca/provinces/quebec/): sales tax on quotes and invoices shown as GST 5 % + QST 9.975 %.
+
+## Quoting software by trade
+
+- [Painters](https://quoteai.ca/quotes/painter/): Create quotes for interior and exterior painting jobs in 30 seconds with AI. Quoting software built for Canadian painters. Free to try.
+- [Electricians](https://quoteai.ca/quotes/electrician/): Quoting software for electricians: create quotes for wiring, panel upgrades, and rewiring in 30 seconds. AI built for Canadian electricians. Free.
+- [Plumbers](https://quoteai.ca/quotes/plumber/): Create quotes for plumbing and heating jobs in 30 seconds. AI quoting software for Canadian plumbers. No spreadsheets. Free.
+- [General contractors](https://quoteai.ca/quotes/general-contractor/): Quoting software for general contractors: framing, foundations, finishing. AI-built itemized quotes in 30 seconds. For Canadian small businesses.
+- [Renovation contractors](https://quoteai.ca/quotes/renovation-contractor/): Quotes for full renovations in 30 seconds. AI for renovation contractors and tradespeople across Canada.
+- [Welders and metal fabricators](https://quoteai.ca/quotes/welder-fabricator/): Quotes for metal fabrication and welding in 30 seconds. AI quoting software for Canadian welders and fabricators. Free.
+- [Carpenters and cabinetmakers](https://quoteai.ca/quotes/carpenter-cabinetmaker/): Create quotes for custom cabinetry, millwork and finish carpentry in 30 seconds. AI quoting software for Canadian carpenters. Free.
+- [HVAC and heating technicians](https://quoteai.ca/quotes/hvac-technician/): Quoting software for HVAC and heating technicians: furnaces, heat pumps, in-floor heat. AI in 30 seconds for Canadian trades.
+- [Freelancers and consultants](https://quoteai.ca/quotes/freelance/): Create professional quotes for consulting, marketing, design and IT work in 30 seconds. AI quoting software for Canadian freelancers. Free.
+- [Building consultants and home inspectors](https://quoteai.ca/quotes/building-consultant/): Quoting software for building consultants and home inspectors: inspections, permit drawings, project oversight. AI in 30 seconds.
+- [Masons and concrete contractors](https://quoteai.ca/quotes/mason/): Create quotes for masonry, foundations, and concrete work in 30 seconds. AI quoting software for Canadian masons. Try it free.
+- [Landscapers](https://quoteai.ca/quotes/landscaper/): Create quotes for lawn care, landscaping, and yard maintenance in 30 seconds. AI quoting software for Canadian landscapers. Try it free.
+- [Tile installers](https://quoteai.ca/quotes/tile-installer/): Create quotes for tile, porcelain, and mosaic installation in 30 seconds. AI quoting software for Canadian tile installers. Try it free.
+- [Window and door installers](https://quoteai.ca/quotes/window-door-installer/): Create quotes for windows, doors, and exterior openings in vinyl, fibreglass, and wood in 30 seconds. AI quoting software for Canadian installers.
+- [Roofing companies](https://quoteai.ca/quotes/roofer/): Create quotes for roof replacement, shingles, and flashing in 30 seconds. AI quoting software for Canadian roofers. Try it free.
+- [Air conditioning and HVAC installers](https://quoteai.ca/quotes/air-conditioning-installer/): Create quotes for AC, ductless heat pumps, and ventilation installs in 30 seconds. AI quoting software for Canadian installers. Free.
+- [Painters and decorative finishers](https://quoteai.ca/quotes/decorative-painter/): Create quotes for painting, decorative finishes, and exterior coatings in 30 seconds. AI quoting software for Canadian painters. Free.
+- [Flooring installers](https://quoteai.ca/quotes/flooring-installer/): Create quotes for hardwood, laminate, epoxy, and carpet installation in 30 seconds. AI quoting software for Canadian flooring installers. Try it free.
+- [Excel users](https://quoteai.ca/quotes/excel-template/): Looking for a free Excel quote template? quoteai is better: generate professional quotes in 30 seconds with AI, no formulas, no mistakes. Try it free.
+- [Word users](https://quoteai.ca/quotes/word-template/): Looking for a Word quote template to download? quoteai generates professional quotes in 30 seconds with AI. No Word template, no manual formatting.
+- [Contractors](https://quoteai.ca/quotes/how-to-quote/): Learn how to write a professional quote for your business in 30 seconds. A practical guide for Canadian tradespeople and small businesses. No Excel, no mistakes.
+- [Contractors and small businesses](https://quoteai.ca/quotes/free-quote/): Create quotes online for free with quoteai. Free quoting software for Canadian contractors and small businesses. Get started with no credit card.
+
+## Help centre
+
+- [Set up your business in 10 minutes](https://quoteai.ca/help/getting-started/): Create your account, fill in the business profile that appears on every quote, contract and invoice, and pick a plan.
+- [Create a quote from a description, a voice memo or photos](https://quoteai.ca/help/create-a-quote/): Describe the job in plain language and get an itemized, taxed quote in about 30 seconds. Then edit it, offer Good/Better/Best options and pick a PDF template.
+- [Send a quote and get it accepted online](https://quoteai.ca/help/send-a-quote-and-get-it-accepted/): Email the quote or share its link. The customer reviews and accepts on a secure page; automatic follow-ups nudge them on days 2, 5 and 10 until they answer.
+- [Contracts and e-signature](https://quoteai.ca/help/contracts-and-e-signature/): An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.
+- [Jobs: setup review, milestones and change orders](https://quoteai.ca/help/jobs-milestones-and-change-orders/): Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.
+- [Invoices, e-Transfer and card payments](https://quoteai.ca/help/invoices-and-getting-paid/): Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.
+- [Track costs, scan receipts and log time](https://quoteai.ca/help/costs-receipts-and-time/): Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.
+- [Invite your team and set roles](https://quoteai.ca/help/team-accounts-and-roles/): Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.
+- [Leads, follow-ups and review requests](https://quoteai.ca/help/leads-and-follow-ups/): Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.
+- [Integrations and importing your old quotes](https://quoteai.ca/help/integrations-and-imports/): Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.
+- [Delete your account and data](https://quoteai.ca/help/delete-your-account/): How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.
+
+# Help centre, in full
+## Set up your business in 10 minutes
+
+Source: https://quoteai.ca/help/getting-started/ (Getting started, updated 2026-09-21)
+
+Create your account, fill in the business profile that appears on every quote, contract and invoice, and pick a plan.
+
+Everything QuoteAI produces — quotes, contracts, invoices, customer emails — is built from your business profile. Ten minutes here saves you retyping the same details on every document.
+
+### 1. Create your account
+
+1. Go to Sign up, enter your name, email and a password.
+2. The onboarding wizard asks for your company name, trade, province and language. Pick the province where you do most of your work — it sets your default sales taxes and the contract template you get later.
+3. You land on the dashboard with a free plan. Nothing is charged until you upgrade.
+
+### 2. Complete the business profile
+
+Open Settings → Company details, then Taxes & province. The fields that matter most:
+
+- Legal name, address and phone — printed on every document and required on invoices by the CRA.
+- GST/HST (and QST) registration number — must appear on any invoice of $30 or more.
+- Licence number — for example your RBQ number in Québec; it is inserted into the contract where the law requires it.
+- Interac e-Transfer email — shown on invoices so customers know where to send payment. Most Canadian customers pay contractors this way.
+- Logo — appears on PDFs and on the customer-facing quote, signing and invoice pages.
+- Default payment terms and deposit — the payment schedule proposed on each new quote (you can change it per quote).
+
+### 3. Choose a plan
+
+Settings → Plan & billing. Starter covers quotes, emailing them and acceptance notifications. Pro adds the price catalog, contracts and e-signature, jobs, costs, invoicing and team accounts (2 seats included). Elite adds worker time tracking, the AI assistant, advanced analytics and 5 seats. Billing is handled by Stripe; you can cancel any time and keep access until the end of the period you paid for.
+
+Note: Usage (quotes generated, photos analysed, WhatsApp messages) resets on the 1st of each month and is visible under Settings → Plan & billing. Going over your allowance never blocks you — it is there to tell you when to upgrade.
+
+## Create a quote from a description, a voice memo or photos
+
+Source: https://quoteai.ca/help/create-a-quote/ (Quotes, updated 2026-09-21)
+
+Describe the job in plain language and get an itemized, taxed quote in about 30 seconds. Then edit it, offer Good/Better/Best options and pick a PDF template.
+
+### Describe the job
+
+1. Click New quote in the sidebar.
+2. Type what you would tell a colleague: "Repaint a 3-bedroom bungalow in Oakville, two coats, ceilings included, minor drywall repair in the hallway." The more measurements, materials and constraints you give, the better the line items.
+3. Prefer talking? Press the microphone button and dictate. The transcription appears in the box and you can correct it before generating.
+4. Attach photos of the site or documents (PDF, Excel, Word) with the paperclip. The AI reads them for quantities and scope. Starter allows 1 photo per quote, Pro 3, Elite 5.
+5. Click Generate. The quote opens with chapters, line items, quantities, unit prices, subtotals and the taxes for your province.
+
+### Edit the result
+
+Click any field to edit it — descriptions, quantities, prices, the client's details, the payment terms. Add or remove lines and chapters. Totals and taxes recalculate as you type. Items you price often belong in the Catalog (Pro and up): the AI reuses your catalog prices instead of estimating, and you can import your price list from an existing quote, a photo or a PDF.
+
+### Good / Better / Best
+
+In the quote's Good / Better / Best panel, add up to three pricing options with their own description and total. The customer picks one on the acceptance page, and the chosen option becomes the contract value.
+
+### Pick a PDF template
+
+Three layouts are available — Standard (itemized with a signature block), Professional (numbered specification with chapter subtotals) and Elegant (numbered list with an offer header). The preview updates live and the emailed PDF mirrors it. The PDF is bilingual-aware: a client whose language is French gets French labels and tax names.
+
+Note: The AI is a starting point, not a pricing authority. Check quantities against your own take-off before sending — you are responsible for the price you commit to.
+
+## Send a quote and get it accepted online
+
+Source: https://quoteai.ca/help/send-a-quote-and-get-it-accepted/ (Quotes, updated 2026-09-21)
+
+Email the quote or share its link. The customer reviews and accepts on a secure page; automatic follow-ups nudge them on days 2, 5 and 10 until they answer.
+
+### Two ways to send
+
+- Send by email — enter the client's address; the PDF is attached and the email carries a button to the online quote. If you connected Gmail (Settings → Email sender), it goes out from your own inbox and replies land there.
+- Copy link — paste it into WhatsApp, a text message or your own email. The link opens the same page.
+
+### What the customer sees
+
+A page with your logo, the full quote, the payment schedule and — if you added them — the Good / Better / Best options. To accept, they type their name and confirm. QuoteAI records the name, time and IP address of the acceptance, marks the quote Accepted and notifies you by email and in the notification bell. If the customer has questions, the page shows your contact details.
+
+### Automatic follow-ups
+
+When you email a quote, a reminder sequence starts: a polite nudge 2 days later, another after 5 days, a last one after 10. The sequence stops on its own the moment the quote is accepted or declined, or if the customer clicks the unsubscribe link every reminder carries. You never have to remember to chase.
+
+### After acceptance
+
+On Pro and Elite, an accepted quote automatically drafts a contract from the province template (see the contracts article). On Starter, the acceptance is your signed-off go-ahead — you can still download the PDF and start work.
+
+Note: Sent quotes are locked so the customer always sees the version they accepted. To change a price after sending, duplicate the quote and send the new one.
+
+## Contracts and e-signature
+
+Source: https://quoteai.ca/help/contracts-and-e-signature/ (Contracts & e-signature, updated 2026-09-21)
+
+An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.
+
+### How the contract is built
+
+QuoteAI ships one residential/small-commercial services agreement with province-specific clauses for Ontario, British Columbia, Alberta and Québec, plus a generic Canadian version for everywhere else. The template is merged with your quote: scope from the line items, price and payment schedule, your business details and licence number, the customer's name and address. Clauses that depend on the province — the statutory cancellation notice for contracts signed at the customer's home, the construction-lien holdback, workers'-compensation coverage — are inserted automatically. In Québec the contract is issued in French; English only if the customer expressly asks for it, which QuoteAI records.
+
+You can also upload your own template with {{variables}} such as {{clientName}} or {{total}} if you already have wording your lawyer approved.
+
+### Review and send
+
+1. Open Contracts. A draft appears the moment a quote is accepted (or click New contract from an accepted quote).
+2. Read every section. Edit the scope, dates, schedule or any clause. Toggle the holdback on or off and set its percentage — the clause text adapts.
+3. Click Send for signature. The customer receives an email with a personal signing link. If the quote had no email on file, you will be asked for one and it is saved to the client record.
+4. Reminders go out automatically after 3, 7 and 14 days while the contract is unsigned.
+
+### How the customer signs
+
+1. They open the link and read the contract in full.
+2. They request a 6-digit code, which is emailed to the address you sent the contract to — this is how QuoteAI verifies who is signing.
+3. They type their full name, tick the consent statement and sign. They can also decline with a reason, which you see immediately.
+4. You countersign from the contract page. Once both signatures are in, the final PDF and an audit certificate (names, emails, timestamps, IP addresses, SHA-256 hashes of the unsigned and signed documents) are generated, stored and emailed to both parties.
+
+### What happens next
+
+A signed contract automatically sets up the job (milestones, schedule, cost budget) and drafts the deposit invoice. You get one notification — "Review job setup" — and confirm everything with a click. Signed contracts are never deleted: archiving a job keeps them, because they are financial records you must keep for seven years.
+
+Note: The templates are informed by the consumer-protection and construction-lien statutes of each province, but they are not legal advice and QuoteAI is not a law firm. Have your lawyer read the template once before you rely on it, and again when your business changes.
+
+## Jobs: setup review, milestones and change orders
+
+Source: https://quoteai.ca/help/jobs-milestones-and-change-orders/ (Jobs, updated 2026-09-21)
+
+Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.
+
+### The setup review
+
+You never fill a form to create a job. When a contract is signed, QuoteAI reads the scope and proposes milestones (for a kitchen: demolition, rough-in, cabinets, finishing), a schedule with an end date, and a cost budget split into labour, materials, subcontractors and equipment. The Review job setup page shows all of it. Rename, reorder, add or delete milestones, drag dates, adjust the budget, then click Confirm — the job goes Active and the deposit invoice is ready.
+
+### Working the job
+
+- The job page shows the timeline, the budget against actual costs, time logged, documents and every invoice on the job.
+- Mark a milestone complete when the work is done. If the payment schedule ties a payment to that milestone, the progress invoice is generated (with the holdback deducted when it is on) and sent, or left as a draft — your choice in Settings → Invoices & payments → Invoice automation.
+- Connect Google Calendar or Outlook (Settings → Connected apps) and milestones appear in your calendar; moving a date in QuoteAI moves the event.
+- Set the job-site location on the Team tab so workers' clock-ins are checked against it.
+
+### Change orders
+
+1. On the job page, click Change order and describe the extra (or the credit). Add line items the same way as on a quote.
+2. Send it. The customer signs it online exactly like the contract.
+3. Once signed, the contract value, the payment schedule and the budget update automatically, and the change order is attached to the contract record.
+
+### Finishing
+
+Mark the job complete to generate the final invoice. If a holdback applies, QuoteAI schedules its release invoice after the lien period of your province (for example 60 days after substantial performance in Ontario, 55 days in British Columbia) and reminds you when it is due. Completed jobs move to the Archive, where everything stays searchable.
+
+## Invoices, e-Transfer and card payments
+
+Source: https://quoteai.ca/help/invoices-and-getting-paid/ (Invoices & payments, updated 2026-09-21)
+
+Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.
+
+### Where invoices come from
+
+The payment schedule you set on the quote (for example 30% deposit, 40% after rough-in, 30% on completion) is copied to the contract, and each line becomes an invoice at the right moment: the deposit when the contract is signed, progress invoices when their milestone is completed, the final invoice when the job is marked complete. You can also create a manual invoice from the Invoices page for anything outside a job.
+
+Every invoice carries a sequential number that is never reused, your GST/HST number, the customer's name, taxes shown separately and the due date — what the CRA requires. Voiding an invoice keeps its number in the sequence and lets you reissue a corrected one.
+
+### Send and get paid
+
+Under Settings → Invoices & payments → Invoice automation, choose whether invoices are sent automatically (after a delay you set) or left as drafts for you to send. The customer receives an email with the PDF and a link to their invoice page, which shows the balance due and how to pay:
+
+- Interac e-Transfer to the email from your profile, with the invoice number as the reference. The customer clicks "I sent it" and you get a notification to confirm once the money lands.
+- Card payment, if you connected Stripe (Settings → Connected apps → Stripe). The money goes straight to your own bank account; QuoteAI never holds it. The invoice is marked paid automatically.
+- Cheque, with your mailing address.
+
+### Recording payments and reminders
+
+Click Record payment on the invoice to log an amount, date, method and reference, and optionally email a receipt. Partial payments are fine — the balance updates. While an invoice is past due, reminders go out automatically 3, 7 and 14 days after the due date (turn this off in Automation). The dashboard's accounts-receivable card shows who owes what.
+
+### Holdback
+
+When the contract has a holdback, each progress invoice shows the amount retained and the release invoice is created for you after the statutory lien period. The reminder tells you when you can bill it.
+
+Note: Paid invoices sync to QuickBooks Online or Wave if you connected one (Business and Elite). Nothing is posted twice: each sync is logged in the app's panel under Settings → Connected apps, with a Retry button if your accounting software was unreachable.
+
+## Track costs, scan receipts and log time
+
+Source: https://quoteai.ca/help/costs-receipts-and-time/ (Jobs, updated 2026-09-21)
+
+Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.
+
+### Receipts and costs
+
+1. On the job page, open Costs and click Add receipt. Take a photo or upload the PDF from the supplier.
+2. The AI reads the vendor, date, line items, taxes and total, and proposes a category (materials, equipment, subcontractor, other). Check it, fix anything, save.
+3. Enter costs without a receipt by hand — a subcontractor's invoice, a dump fee, a rental.
+
+Each cost is charged against the budget line from the setup review, so the job page shows budget vs. actual per category and the projected margin. Confirmed costs sync to QuickBooks or Wave when connected.
+
+### Worker time (Elite)
+
+1. Open Team and add a worker with their hourly cost. Click Time-entry link: a personal link is emailed to them, or copy it and send it by text.
+2. The worker opens the link on their phone, picks the job and taps Clock in. No account, no app to install. The link is valid for 6 months; issue a new one to replace it or revoke it from the worker's row.
+3. If the job has a site location, the clock-in records how far from the site the worker was, so you can spot entries made from home. Nothing is tracked between clock-in and clock-out.
+4. Time entries appear on the job as labour cost at the worker's rate. You can add or correct entries yourself.
+
+### Payroll export
+
+Team → Export gives you a CSV of hours per worker per period for your payroll provider. QuoteAI does not run payroll itself.
+
+## Invite your team and set roles
+
+Source: https://quoteai.ca/help/team-accounts-and-roles/ (Team, updated 2026-09-21)
+
+Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.
+
+### Two kinds of people
+
+- Team members log in to QuoteAI with their own email and password and see the parts of the account their role allows. They use a seat.
+- Workers only clock time from a personal link (see the costs and time article). They never log in and do not use a seat.
+
+### Roles
+
+- Admin — full access except billing.
+- Office — quotes, clients, contracts, jobs and invoicing.
+- Foreman — jobs and time entries; read-only everywhere else.
+- Viewer — read-only everywhere. Good for an accountant or a partner.
+
+Only the owner sees the plan in Plan & billing and can change the company's legal details.
+
+### Inviting someone
+
+1. Go to Team → Members and click Invite member. Enter their email and pick a role.
+2. They receive an email with a link to set up their own login. If the email does not arrive, copy the invite link from the member row and send it yourself.
+3. Change a role at any time. Suspend someone to block access without losing their history; Remove them when they leave.
+
+Note: Pro includes 2 seats and Elite 5 (the owner counts as one). When every seat is used, the invite button tells you; add seats from Settings → Plan & billing.
+
+## Leads, follow-ups and review requests
+
+Source: https://quoteai.ca/help/leads-and-follow-ups/ (Leads & integrations, updated 2026-09-21)
+
+Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.
+
+### Where leads come from
+
+- Website widget — Settings → Website widget gives you a snippet for your site; visitors describe their job and become a lead with a draft quote.
+- WhatsApp — connect your WhatsApp Business number (Settings → WhatsApp) and customers can send a text, voice memo or photo; the bot answers with a quote and creates the lead.
+- Meta Lead Ads and Google Local Services Ads — connect them under Settings → Connected apps and new leads are imported automatically, with the source recorded.
+- By hand — New lead on the Leads page, or from a phone call.
+
+### Working the pipeline
+
+Leads move through New → Contacted → Quoted → Won or Lost. Each lead shows its next follow-up date; the dashboard's Follow-ups due card lists today's. Send now sends the next message immediately. When you email a quote from a lead, the quote's own reminder sequence (days 2, 5, 10) takes over, and the lead is marked Won when the quote is accepted.
+
+### Staying inside CASL
+
+Canada's anti-spam law lets you message someone who asked you for a quote (implied consent) or an existing customer. QuoteAI records how consent was obtained on every lead, includes your legal name, address and an unsubscribe link in every automated message, and stops all sequences the instant someone unsubscribes. A lead that replies is marked Contacted and its sequence pauses so you never talk over a customer who already answered. You remain responsible for what you send by hand.
+
+### Review requests
+
+Settings → Quotes & follow-ups → Reviews: paste your Google review link and leave the toggle on. Three days after a job is marked complete, the customer gets one message asking for a review — once per job, never to a client who has unsubscribed, and only if the link is set.
+
+## Integrations and importing your old quotes
+
+Source: https://quoteai.ca/help/integrations-and-imports/ (Leads & integrations, updated 2026-09-21)
+
+Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.
+
+All integrations live under Settings → Connected apps. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Tap an app to see what it does and what it shares; disconnect at any time from the same place.
+
+### Email from your own inbox
+
+Connect Gmail and quotes, contracts and invoices go out from your address instead of no-reply@quoteai.ca — replies land in your inbox, and the message sits in your Sent folder. If a send fails (for example after you change your Google password) the Integrations page tells you to reconnect. Outlook sending is planned; Outlook calendar already works.
+
+### Calendars
+
+Connect Google Calendar or Outlook and every job milestone becomes an event. Move the date in QuoteAI and the event moves; complete the milestone and the event is marked done.
+
+### Accounting: QuickBooks Online and Wave (Elite)
+
+1. Click Connect QuickBooks (or Connect Wave) and approve access.
+2. In Account mapping, pick which income account invoices post to, which account expenses are paid from, and an expense account per cost category. Save.
+3. From then on, every paid invoice and every confirmed job cost is posted automatically. Recent syncs lists each one with a Retry button if the provider was down.
+
+### Card payments with Stripe
+
+Connect Stripe and a Pay by card button appears on your customers' invoice pages. Payouts go to your own bank account on Stripe's schedule; QuoteAI never holds the money. Stripe's card fee applies; e-Transfer stays free.
+
+### Import your history
+
+1. Open Imports. Choose Spreadsheet (a CSV or Excel export from your previous tool, one quote per row — download the template to see the columns) or Old PDFs (up to 20 at a time; the AI reads each one).
+2. Every row or PDF lands in the Review queue with the client, date, total and status it found, and whether it matches an existing client.
+3. Confirm the ones that look right (or Confirm all in this batch) and reject the rest. Nothing becomes a real quote or client until you confirm it.
+
+### Public API and Zapier
+
+Settings → Connected apps → API & webhooks creates a key for the QuoteAI REST API (quotes, clients, leads, invoices, plus webhooks for the events that matter to you). Use it directly or through Zapier and Make to connect tools we do not integrate natively.
+
+## Delete your account and data
+
+Source: https://quoteai.ca/help/delete-your-account/ (Getting started, updated 2026-09-28)
+
+How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.
+
+### Delete it yourself
+
+1. Sign in — in the QuoteAI app, or at quoteai.ca on any browser (you don't need the app).
+2. Open Settings → Sign-in & security, then Delete account at the bottom.
+3. Type DELETE and your password to confirm. You are signed out everywhere right away.
+
+Note: Want a copy first? Settings → Sign-in & security → Export my data emails you a ZIP with every quote, client, contract, job, invoice, photo and document.
+
+### What happens
+
+- You have 7 days to change your mind: the confirmation email has a cancel link. After that, deletion is final.
+- If the account owns a company: the subscription is cancelled, connected services (calendar, accounting, WhatsApp, bank) are disconnected, and every quote, client, job, photo and document is erased. Team members lose access the same day.
+- If you are a team member: your login is removed and you are taken off every team. The companies' own data is not affected.
+- The legal exception: signed contracts and issued invoices are kept for 7 years, unlinked from your profile, because the CRA and Revenu Québec require it — then deleted.
+
+### Can't sign in?
+
+Email privacy@quoteai.ca from the address on the account and ask for it to be deleted. We confirm it is you, then delete it the same way.
+
+# All guides
+
+### Trades
+
+- [Winterization Work: A Contractor's Checklist for Canadian Homes](https://quoteai.ca/blog/winterizing-your-home-contractor-checklist/): A practical winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.
+- [Snow Load Roofing and Eavestrough Considerations for Canadian Homes](https://quoteai.ca/blog/snow-load-roofing-eavestrough-considerations-canada/): What Canadian roofers and homeowners need to know about snow load ratings, ice damming, and eavestrough design for roofs built to handle a real Canadian winter.
+- [Basement Waterproofing: A Complete Guide for Canadian Homes](https://quoteai.ca/blog/basement-waterproofing-guide-canadian-homes/): Interior vs. exterior basement waterproofing methods, costs, and warning signs for Canadian homes — and why it matters before finishing a basement.
+
+### Pricing
+
+- [How Much Does It Cost to Paint an Apartment in Canada in 2026?](https://quoteai.ca/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026/): Updated 2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.
+- [How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?](https://quoteai.ca/blog/bathroom-renovation-cost-toronto-2026/): Real 2026 CAD price ranges for a bathroom renovation in Toronto: full gut renovations, mid-range refreshes, plumbing and tiling costs, and how Toronto compares to the rest of Ontario.
+- [Cost to Rewire a House in Canada: 2026 Electrical Pricing Guide](https://quoteai.ca/blog/cost-to-rewire-a-house-canada/): What it costs to rewire a house in Canada in 2026: full rewiring, panel upgrades, cost per square foot, knob-and-tube removal, and regional price differences.
+- [Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)](https://quoteai.ca/blog/cost-to-reroof-a-home-canada/): 2026 CAD pricing to re-roof a home in Canada, including asphalt shingle and metal roofing costs, per-square pricing, and how snow load requirements affect price in colder regions.
+- [Deck Installation Cost in Canada: 2026 Price Guide by Material](https://quoteai.ca/blog/deck-installation-cost-canada-2026/): 2026 CAD pricing for building a deck in Canada: pressure-treated wood vs. composite decking, cost per square foot, permits, and regional price differences.
+- [Basement Finishing Cost in Canada: 2026 Pricing and What to Expect](https://quoteai.ca/blog/basement-finishing-cost-canada/): What it costs to finish a basement in Canada in 2026: framing, insulation, electrical, drywall, flooring, and why waterproofing should be budgeted first.
+- [Cost to Install a Heat Pump in Canada in 2026 (Ductless, Central and Cold-Climate)](https://quoteai.ca/blog/cost-to-install-a-heat-pump-canada/): 2026 CAD price ranges for ductless mini-splits, central air-source and cold-climate heat pumps in Canada, what drives the cost, and how to quote the job.
+- [Cost to Replace Windows and Doors in Canada in 2026](https://quoteai.ca/blog/cost-to-install-windows-and-doors-canada/): 2026 CAD price ranges to replace windows, patio doors and entry doors in Canada, what affects the price, and how installers should quote it.
+- [Kitchen Renovation Cost in Canada in 2026: Budget, Mid-Range and High-End](https://quoteai.ca/blog/kitchen-renovation-cost-canada-2026/): 2026 CAD price ranges for a kitchen renovation in Canada: cabinets, countertops, labour, plumbing and electrical, plus where budgets blow up.
+- [Cost to Install a Fence in Canada in 2026 (Wood, Vinyl, Chain Link, Aluminum)](https://quoteai.ca/blog/fence-installation-cost-canada-2026/): 2026 CAD cost per linear foot to install a fence in Canada by material, plus gates, frost depth, permits and how to quote fence jobs.
+- [Furnace Replacement Cost in Canada in 2026 (Gas, Electric and Dual-Fuel)](https://quoteai.ca/blog/furnace-replacement-cost-canada-2026/): What it costs to replace a furnace in Canada in 2026 by type and efficiency, what drives installed price, and how HVAC contractors should quote it.
+- [Flooring Installation Cost in Canada in 2026: Hardwood, Vinyl Plank, Laminate and Tile](https://quoteai.ca/blog/flooring-installation-cost-canada-2026/): 2026 CAD cost per square foot for hardwood, engineered, vinyl plank, laminate and tile flooring installed in Canada, plus prep and removal costs.
+- [Concrete and Asphalt Driveway Cost in Canada in 2026](https://quoteai.ca/blog/concrete-driveway-cost-canada-2026/): 2026 CAD price per square foot for concrete, asphalt, interlock and gravel driveways in Canada, with frost, drainage and removal costs that change the total.
+- [Siding Replacement Cost in Canada in 2026 (Vinyl, Fibre Cement, Wood and Metal)](https://quoteai.ca/blog/siding-replacement-cost-canada-2026/): 2026 CAD cost to replace siding on a Canadian home by material, including insulation, house wrap, removal and what drives the price.
+- [Attic Insulation Cost in Canada in 2026 (Blown-In, Spray Foam and Batt)](https://quoteai.ca/blog/attic-insulation-cost-canada-2026/): 2026 CAD cost to insulate or top up an attic in Canada: blown-in cellulose and fibreglass, spray foam, air sealing, R-value targets and rebates.
+
+### Advice
+
+- [How to Write a Professional Quote That Actually Wins Jobs](https://quoteai.ca/blog/how-to-write-a-professional-quote-that-wins-jobs/): A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than most tradespeople think.
+- [7 Quoting Mistakes That Are Costing Canadian Contractors Jobs](https://quoteai.ca/blog/common-quoting-mistakes-contractors-make/): The most common quoting mistakes Canadian tradespeople make — from vague pricing to slow turnaround — and how to fix each one to win more work.
+- [How to Price a Job: Labour, Materials, and Markup Explained](https://quoteai.ca/blog/how-to-price-a-job-labour-materials-markup/): A practical breakdown of how Canadian tradespeople should price jobs — labour rates, material markup, overhead, and profit — so quotes are profitable, not just competitive.
+- [Markup vs Margin for Contractors: Which One to Use (With Examples)](https://quoteai.ca/blog/how-to-price-a-job-labour-materials-markup-canada-guide/): Markup and margin are not the same, and mixing them up costs contractors real money. Clear formulas, a conversion table and worked Canadian examples.
+- [How to Write a Contractor Contract in Canada: Clauses Every Job Needs](https://quoteai.ca/blog/how-to-write-a-contractor-contract-canada/): The clauses a Canadian contractor's contract should include: scope, price, payments, changes, delays, warranty and disputes. Not legal advice; a practical checklist.
+- [Change Orders for Contractors: How to Handle Extras and Get Paid for Them](https://quoteai.ca/blog/how-to-handle-change-orders-contractors/): A simple change order process for contractors: why extras go unpaid, what to put in writing, how to price them, and a template wording.
+- [How to Win More Bids as a Contractor: 10 Things That Beat a Lower Price](https://quoteai.ca/blog/how-to-win-more-bids-contractors-canada/): Why contractors lose bids and how to win more: response speed, clear scope, options, credentials, follow-up and presentation, without racing to the bottom.
+- [How to Quote a Painting Job: Pricing Method, Line Items and Example](https://quoteai.ca/blog/how-to-quote-a-painting-job/): A step-by-step method for pricing a painting job: measuring, prep, coats, labour, materials, markup and a worked example for Canadian painters.
+- [How to Quote a Roofing Job in Canada: Measurements, Materials and Safety Costs](https://quoteai.ca/blog/how-to-quote-a-roofing-job/): How roofers can price a re-roof: measuring squares, tear-off, underlayment, ice and water shield, disposal, safety and a clear quote structure.
+- [How to Quote an Electrical Job: Pricing Service Calls, Renovations and Panel Upgrades](https://quoteai.ca/blog/how-to-quote-an-electrical-job/): A method for Canadian electricians to price service calls, circuits, pot lights and panel upgrades, including permits, inspection and exclusions.
+- [How to Quote a Plumbing Job: Flat-Rate vs Hourly Pricing for Canadian Plumbers](https://quoteai.ca/blog/how-to-quote-a-plumbing-job/): Flat-rate or hourly? How plumbers can price repairs, water heaters, renovations and emergencies, with line items, markup and a clear client quote.
+- [Quote vs Estimate vs Invoice: What's the Difference for Contractors?](https://quoteai.ca/blog/quote-vs-estimate-vs-invoice-difference/): Quote, estimate, bid, proposal, invoice: what each means, when to use them, and how the wrong one can cost a contractor money.
+- [How to Quote a Landscaping Job: Pricing Lawn, Hardscape and Seasonal Contracts](https://quoteai.ca/blog/how-to-quote-a-landscaping-job/): How landscapers can price one-time projects and recurring maintenance contracts: measuring, labour rates, equipment, materials and a clear quote.
+- [How to Quote an HVAC Job: Installation, Replacement and Service Agreements](https://quoteai.ca/blog/how-to-quote-an-hvac-job/): How HVAC contractors can quote furnace, AC and heat pump jobs: load calculations, good-better-best options, line items, rebates and service plans.
+- [How to Quote a Tiling Job: Square Footage, Prep, Waste and Labour Rates](https://quoteai.ca/blog/how-to-quote-a-tiling-job/): How tile installers can price floors, showers and backsplashes: prep, waterproofing, waste factors, pattern complexity and a sample quote structure.
+- [How to Follow Up on a Quote Without Being Pushy (Templates Included)](https://quoteai.ca/blog/how-to-follow-up-on-quotes-contractors/): Most quotes are not rejected, they are ignored. When and how to follow up by text and email, with ready-to-use templates for contractors.
+- [How to Quote a Carpentry or Cabinetmaking Job: Pricing Custom Work Properly](https://quoteai.ca/blog/how-to-quote-a-carpentry-job/): How carpenters and cabinetmakers can price custom work: material takeoffs, shop time, finishing, installation, deposits and design changes.
+- [How to Quote a Welding or Metal Fabrication Job in Canada](https://quoteai.ca/blog/how-to-quote-a-welding-or-metal-fabrication-job/): How welders and fabricators can price jobs: material weights, labour rates, consumables, shop overhead, finishing and delivery for custom and repair work.
+- [How to Quote a Masonry or Concrete Job: Brick, Block, Stone and Foundations](https://quoteai.ca/blog/how-to-quote-a-masonry-job/): How masons and concrete contractors can price brick, block, stone and concrete work: measuring, materials, scaffolding, labour and weather risks.
+- [How to Quote a Window or Door Installation Job (With Checklist)](https://quoteai.ca/blog/how-to-quote-a-window-or-door-installation-job/): How window and door installers can quote accurately: measuring, product options, full-frame vs insert, trim, disposal and lead times.
+
+### Tools
+
+- [Mobile Quoting: How to Send Professional Quotes From the Job Site](https://quoteai.ca/blog/mobile-quoting-on-the-go-for-contractors/): Why sending a quote from your phone before you leave the job site wins more work, and what to look for in mobile quoting tools built for Canadian tradespeople.
+- [Free Quote Template for Contractors in Canada (GST/HST/QST Included)](https://quoteai.ca/blog/free-quote-template-for-contractors-canada/): What a Canadian contractor quote must include: scope, line items, GST/HST/QST, deposit, validity and signature. Copy the structure, then see how to automate it.
+- [How to Send a Contractor Quote in 5 Minutes (From the Job Site)](https://quoteai.ca/blog/how-to-send-a-quote-in-5-minutes-contractors/): Speed wins jobs. A step-by-step system for building and sending an accurate, itemized quote from your phone before you leave the job site.
+- [Best Quoting Software for Contractors in Canada: What to Look For](https://quoteai.ca/blog/best-quoting-software-for-contractors-canada/): What matters when choosing quoting and estimating software as a Canadian contractor: taxes, mobile use, speed, French support, invoicing and price.
+- [Spreadsheet Quotes vs Quoting Software: When Excel Stops Working for Contractors](https://quoteai.ca/blog/quoteai-vs-spreadsheet-quotes-contractors/): Excel and Word are fine until they are not. Signs your spreadsheet quotes are costing you jobs and what to look for when switching to software.
+
+### Business
+
+- [Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide](https://quoteai.ca/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/): An overview of Canadian federal and provincial rebate programs for energy-efficient renovations — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, and Enbridge programs — for contractors to reference when quoting jobs.
+- [Google Business Profile for Tradespeople: A Complete Setup Guide](https://quoteai.ca/blog/google-business-profile-guide-for-tradespeople/): How Canadian tradespeople can set up and optimize a Google Business Profile to show up in local search results and win more calls from nearby customers.
+- [How to Get More Reviews as a Contractor (Without Being Pushy)](https://quoteai.ca/blog/how-to-get-more-reviews-as-a-contractor/): Practical, non-awkward ways for Canadian tradespeople to get more Google reviews from happy clients — and why review volume directly affects how much work you win.
+- [How to Get More Plumbing Jobs in Canada: 9 Ways That Actually Work](https://quoteai.ca/blog/how-to-get-more-plumbing-jobs-canada/): Practical ways for Canadian plumbers to get more jobs: Google Business Profile, fast quotes, reviews, service pages, referrals and repeat work.
+- [How Electricians Can Get More Jobs in Canada (Without Paying for Leads)](https://quoteai.ca/blog/how-to-get-more-electrical-jobs-canada/): A practical marketing and quoting playbook for Canadian electricians: local search, reviews, quick estimates, panel upgrade offers and referral partners.
+- [How to Get Paid on Time as a Contractor in Canada (Deposits, Invoices, Late Payment)](https://quoteai.ca/blog/how-to-collect-payment-from-clients-contractor-canada/): Deposits, progress billing, clear invoices and friendly follow-ups: how Canadian contractors stop chasing money and get paid faster.
+- [Contractor Insurance in Canada: What Coverage You Actually Need](https://quoteai.ca/blog/contractor-insurance-canada-what-you-need/): General liability, tools and equipment, commercial vehicle, workers' compensation and more: a plain-language guide to insurance for Canadian contractors.
+- [How to Hire and Pay Subcontractors in Canada: Contracts, Insurance and Tax Basics](https://quoteai.ca/blog/how-to-hire-and-pay-subcontractors-canada/): How Canadian contractors can hire subcontractors safely: contractor vs employee, insurance, WCB clearance, written agreements and paying on time.
+- [How to Scale a Contracting Business in Canada: From Solo to a Crew](https://quoteai.ca/blog/how-to-scale-a-contracting-business-canada/): A practical roadmap for growing a trade business in Canada: pricing, systems, hiring, cash flow and when to say no, from solo operator to a profitable crew.
+- [How to Track Job Costs as a Contractor (and Find Out Which Jobs Actually Make Money)](https://quoteai.ca/blog/how-to-track-job-costs-contractors/): Learn how to track labour, materials and overhead per job, compare estimates to actuals, and discover which work is truly profitable.
+- [10 Ways Canadian Contractors Can Reduce Material Costs Without Cutting Quality](https://quoteai.ca/blog/reduce-material-costs-contractors-canada/): Practical ways to lower material costs on every job: supplier accounts, bulk buying, waste control, price-lock clauses and accurate takeoffs.
+- [Job Site Management for Small Contractors: A Simple System That Works](https://quoteai.ca/blog/construction-project-management-small-contractors/): How small trade businesses can run job sites better: scheduling, daily logs, photos, communication and punch lists, without heavy construction software.
+- [Contractor Cash Flow: How to Stop Running Out of Money Between Jobs](https://quoteai.ca/blog/contractor-cash-flow-management-canada/): Profitable contractors still run out of cash. How to forecast, bill faster, handle GST/HST remittances and holdbacks, and build a buffer for slow months.
+- [How Canadian Contractors Can Fill the Slow Season (Winter and Summer)](https://quoteai.ca/blog/how-to-survive-slow-season-contractors-canada/): Seasonal work drops in many trades. Ways to keep crews busy and revenue steady: off-season services, maintenance plans, early booking and marketing.
+- [How to Raise Your Prices as a Contractor Without Losing Clients](https://quoteai.ca/blog/how-to-raise-your-prices-contractors-without-losing-clients/): Costs rise every year. How trade businesses can raise rates confidently: when to do it, how to tell existing and new clients, and what to say.
+- [Hiring Your First Employee as a Contractor in Canada: What to Know](https://quoteai.ca/blog/how-to-hire-your-first-employee-contractor-canada/): What a Canadian contractor must set up before hiring a first employee: payroll account, deductions, workers' compensation, safety, pay rates and training.
+
+
+## En français
+
+quoteai est un logiciel de soumissions et de gestion de chantiers pour les entrepreneurs et gens de métier au Canada. Décrivez le travail en quelques mots et obtenez en 30 secondes une soumission professionnelle avec les bonnes taxes (TPS, TVH, TVP, TVQ) pour la province du client, puis le contrat, la signature, l'acompte, la facture et le paiement. Essai gratuit de 7 jours, sans carte de crédit.
+
+- [Accueil](https://quoteai.ca/fr/)
+- [Tarifs](https://quoteai.ca/fr/tarifs/)
+- [Projet pilote](https://quoteai.ca/fr/pilote/)
+
+Provinces :
+- [Colombie-Britannique](https://quoteai.ca/fr/provinces/colombie-britannique/)
+- [Ontario](https://quoteai.ca/fr/provinces/ontario/)
+- [Québec](https://quoteai.ca/fr/provinces/quebec/)
+
+Soumissions par métier :
+- [Peintres](https://quoteai.ca/fr/soumissions/peintre/)
+- [Électriciens](https://quoteai.ca/fr/soumissions/electricien/)
+- [Plombiers](https://quoteai.ca/fr/soumissions/plombier/)
+- [Entrepreneurs généraux](https://quoteai.ca/fr/soumissions/entrepreneur-general/)
+- [Entrepreneurs en rénovation](https://quoteai.ca/fr/soumissions/entrepreneur-renovation/)
+- [Soudeurs-métalliers](https://quoteai.ca/fr/soumissions/soudeur-metallier/)
+- [Menuisiers-ébénistes](https://quoteai.ca/fr/soumissions/menuisier-ebeniste/)
+- [Techniciens CVC](https://quoteai.ca/fr/soumissions/technicien-cvc/)
+- [Travailleurs autonomes](https://quoteai.ca/fr/soumissions/travailleur-autonome/)
+- [Experts en bâtiment](https://quoteai.ca/fr/soumissions/expert-batiment/)
+- [Maçons](https://quoteai.ca/fr/soumissions/macon/)
+- [Paysagistes](https://quoteai.ca/fr/soumissions/paysagiste/)
+- [Poseurs de céramique](https://quoteai.ca/fr/soumissions/poseur-de-ceramique/)
+- [Poseurs de portes et fenêtres](https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/)
+- [Couvreurs](https://quoteai.ca/fr/soumissions/couvreur/)
+- [Installateurs de climatisation](https://quoteai.ca/fr/soumissions/installateur-climatisation/)
+- [Peintres-décorateurs](https://quoteai.ca/fr/soumissions/peintre-decorateur/)
+- [Poseurs de revêtements de sol](https://quoteai.ca/fr/soumissions/poseur-de-plancher/)
+- [Modèles Excel](https://quoteai.ca/fr/soumissions/modele-soumission-excel/)
+- [Modèles Word](https://quoteai.ca/fr/soumissions/modele-soumission-word/)
+- [Guides de soumission](https://quoteai.ca/fr/soumissions/comment-faire-une-soumission/)
+- [Soumissions gratuites](https://quoteai.ca/fr/soumissions/soumission-gratuite/)

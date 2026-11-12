@@ -480,7 +480,7 @@ export function buildCityJsonLd(sector: SectorData, city: CityData, lang: Lang =
         name: `Soumissions ${label} à ${city.name}`,
         description: `Logiciel de soumission par IA pour les ${labelPlural} à ${city.name}`,
         serviceType: `Soumission ${label}`,
-        provider: { "@type": "Organization", name: "quoteai", url: BASE_URL },
+        provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
         areaServed: [
           { "@type": "City", name: city.name },
           { "@type": "State", name: city.region },
@@ -532,7 +532,7 @@ export function buildCityJsonLd(sector: SectorData, city: CityData, lang: Lang =
       name: `${sector.label} Quotes in ${city.name}`,
       description: `AI quoting software for ${sector.labelPlural} in ${city.name}`,
       serviceType: `${sector.label} Quoting`,
-      provider: { "@type": "Organization", name: "quoteai", url: BASE_URL },
+      provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
       areaServed: [
         { "@type": "City", name: city.name },
         { "@type": "State", name: city.region },

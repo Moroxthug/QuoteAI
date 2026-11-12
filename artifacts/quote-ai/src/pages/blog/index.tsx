@@ -61,9 +61,10 @@ export default function BlogPage() {
             name: BLOG_LIST_TITLE,
             description: BLOG_LIST_DESCRIPTION,
             url: `${BASE_URL}/blog/`,
-            inLanguage: "en",
+            inLanguage: "en-CA",
             publisher: {
               "@type": "Organization",
+              "@id": `${BASE_URL}/#org`,
               name: "quoteai",
               url: BASE_URL,
               logo: { "@type": "ImageObject", url: `${BASE_URL}/icon-192.png`, width: 192, height: 192 },

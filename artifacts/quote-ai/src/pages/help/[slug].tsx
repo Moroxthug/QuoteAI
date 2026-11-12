@@ -70,8 +70,8 @@ export default function HelpArticlePage() {
       url: canonical,
       dateModified: article.updatedAt,
       inLanguage: lang,
-      author: { "@type": "Organization" as const, name: "quoteai", url: BASE_URL },
-      publisher: { "@type": "Organization" as const, name: "quoteai", url: BASE_URL, logo: { "@type": "ImageObject" as const, url: `${BASE_URL}/icon-192.png`, width: 192, height: 192 } },
+      author: { "@type": "Organization" as const, "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
+      publisher: { "@type": "Organization" as const, "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL, logo: { "@type": "ImageObject" as const, url: `${BASE_URL}/icon-192.png`, width: 192, height: 192 } },
     },
     {
       "@context": "https://schema.org" as const,

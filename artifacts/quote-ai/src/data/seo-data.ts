@@ -1684,7 +1684,15 @@ export const CITY_SECTORS: readonly string[] = Object.keys(SECTORS).filter(
  * is added later, gating sitemap/prerender/internal-links generation is a
  * one-line change here, matching the pattern the Italian build used.
  */
-export const ACTIVE_CITY_SLUGS: ReadonlySet<string> = new Set(CITIES.map((c) => c.slug));
+//
+// 2026-11-11 (owner ruling): pruned to the six largest metros. The city pages
+// were near-duplicates (61–75 % shared text between cities and trades) and
+// Google demoted them in October 2026; fewer, stronger pages instead. The
+// dropped cities' URLs 301 to their trade page (vercel.json) and the province
+// pages only link the cities kept here. Keep vercel.json's city list in step.
+export const ACTIVE_CITY_SLUGS: ReadonlySet<string> = new Set([
+  "toronto", "ottawa", "vancouver", "calgary", "edmonton", "montreal",
+]);
 
 export const ACTIVE_CITIES: CityData[] = CITIES.filter((c) => ACTIVE_CITY_SLUGS.has(c.slug));
 

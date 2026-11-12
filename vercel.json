@@ -19,6 +19,8 @@
     { "source": "/seo/(.*)", "destination": "/", "permanent": true },
     { "source": "/privacy{/}?", "destination": "/privacy-policy/", "permanent": true },
     { "source": "/termini{/}?", "destination": "/terms/", "permanent": true },
+    { "source": "/quotes/([^/]+)/(mississauga|hamilton|surrey|victoria|winnipeg|quebec-city|gatineau|laval|halifax)/(.*)", "destination": "/quotes/$1/", "permanent": true },
+    { "source": "/fr/soumissions/([^/]+)/(quebec-city|gatineau|laval)/(.*)", "destination": "/fr/soumissions/$1/", "permanent": true },
     {
       "source": "/((?!api/)(?!.*\\.)[^/]+(?:/[^/]+)*)",
       "destination": "/$1/",

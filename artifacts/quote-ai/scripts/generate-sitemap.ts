@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -104,23 +104,30 @@ mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, sitemap, "utf-8");
 console.log(`Sitemap written: ${outPath} (${entries.length} URLs)`);
 
-// ─── robots.txt ──────────────────────────────────────────────────────────────
-// Disallow crawling of city pages outside ACTIVE_CITIES so Googlebot doesn't
-// keep spending crawl budget on the ~960 pages we no longer prerender or list
-// in the sitemap (they still resolve to the generic SPA shell if visited
-// directly, but carry no unique SEO content worth indexing right now).
+// ─── City pages outside ACTIVE_CITIES ────────────────────────────────────────
+// They were indexed once, so they 301 to their trade page (vercel.json) rather
+// than being blocked in robots.txt: a disallowed URL is never fetched, so
+// Google would never see the redirect and the old copies would linger.
+// Fail the build if vercel.json and ACTIVE_CITY_SLUGS drift apart.
 const activeSlugSet = new Set(ACTIVE_CITIES.map((c) => c.slug));
 const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlugSet.has(slug));
+{
+  const vercel = JSON.parse(readFileSync(join(__dirname, "../../../vercel.json"), "utf-8")) as { redirects: { source: string }[] };
+  const cityRedirects = vercel.redirects.map((r) => r.source).filter((s) => s.startsWith("/quotes/([^/]+)/("));
+  const covered = new Set(cityRedirects.flatMap((s) => s.split("(")[2]?.split(")")[0]?.split("|") ?? []));
+  const missing = inactiveCitySlugs.filter((slug) => !covered.has(slug));
+  const stale = [...covered].filter((slug) => activeSlugSet.has(slug));
+  if (missing.length || stale.length) {
+    throw new Error(`vercel.json city redirects out of step with ACTIVE_CITY_SLUGS — missing: ${missing.join(", ") || "none"}; redirecting active cities: ${stale.join(", ") || "none"}`);
+  }
+}
 
+// ─── robots.txt ──────────────────────────────────────────────────────────────
 const privateRules = [
   "/dashboard", "/dashboard/", "/sign-in", "/sign-up", "/onboarding", "/admin", "/api",
   "/p/", "/i/", "/sign/", "/t/", "/team-invite/",
 ].map((path) => `Disallow: ${path}`);
-const cityRules = inactiveCitySlugs.map((slug) => `Disallow: /quotes/*/${slug}/`);
-const rules = [
-  ...privateRules,
-  ...(cityRules.length ? ["# City pages outside the active region (see ACTIVE_CITIES in seo-data.ts)", ...cityRules] : []),
-].join("\n");
+const rules = privateRules.join("\n");
 
 // AI search and answer engines are welcome on the public pages (GEO). A
 // crawler that finds a group naming it ignores the `*` group, so each group
@@ -146,4 +153,4 @@ Sitemap: https://quoteai.ca/sitemap.xml
 
 const robotsOutPath = join(__dirname, "../public/robots.txt");
 writeFileSync(robotsOutPath, robotsTxt, "utf-8");
-console.log(`robots.txt written: ${robotsOutPath} (${inactiveCitySlugs.length} city patterns disallowed)`);
+console.log(`robots.txt written: ${robotsOutPath} (${inactiveCitySlugs.length} inactive cities redirect via vercel.json)`);

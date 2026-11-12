@@ -15,7 +15,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { breadcrumbJsonLd, webPageJsonLd } from "@/data/json-ld";
-import { CITIES_BY_SLUG, cityDisplayName } from "@/data/seo-data";
+import { CITIES_BY_SLUG, ACTIVE_CITY_SLUGS, FRENCH_PRIMARY_CITY_SLUGS, cityDisplayName } from "@/data/seo-data";
 import { SECTOR_SLUGS, sectorLabel } from "@/data/seo-slugs";
 import { taxComponentLabel, formatRate } from "@/lib/tax-profiles";
 import {
@@ -68,8 +68,12 @@ export default function ProvinceLandingPage() {
 
   const sectorHref = (slug: string) =>
     lang === "fr" ? `/fr/soumissions/${SECTOR_SLUGS[slug]!.frSlug}/` : `/quotes/${slug}/`;
+  // French city pages exist only for the French-primary Quebec cities; any
+  // other city links to its English page, even from the French province page.
   const cityHref = (sector: string, city: string) =>
-    lang === "fr" ? `/fr/soumissions/${SECTOR_SLUGS[sector]!.frSlug}/${city}/` : `/quotes/${sector}/${city}/`;
+    lang === "fr" && FRENCH_PRIMARY_CITY_SLUGS.includes(city)
+      ? `/fr/soumissions/${SECTOR_SLUGS[sector]!.frSlug}/${city}/`
+      : `/quotes/${sector}/${city}/`;
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -200,7 +204,7 @@ export default function ProvinceLandingPage() {
           <div className="news-grid">
             {province.citySlugs.map((citySlug) => {
               const city = CITIES_BY_SLUG[citySlug];
-              if (!city) return null;
+              if (!city || !ACTIVE_CITY_SLUGS.has(citySlug)) return null;
               return (
                 <div key={citySlug} className="card dd-card">
                   <div className="price-name" style={{ marginBottom: 10 }}>

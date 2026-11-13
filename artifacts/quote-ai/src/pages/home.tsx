@@ -14,6 +14,17 @@ import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { homepageJsonLd } from "@/data/json-ld";
 import { MARKETING_PLANS, type MarketingPlan } from "@/data/pricing";
 import { FaqList } from "@/components/faq-list";
+import { COMPETITORS, QUOTEAI_CELLS, ROW_LABELS, type RowId } from "@/data/compare-pages";
+import { comparePath } from "@/data/seo-slugs";
+
+const HOME_COMPARE_ROWS = ["quoteBuilding", "tax", "currency", "singleQuote", "trial"] as const satisfies readonly RowId[];
+const SPREADSHEET_CELLS: Record<(typeof HOME_COMPARE_ROWS)[number], { en: string; fr: string }> = {
+  quoteBuilding: { en: "Typed by hand, often 30–60 min", fr: "Tapée à la main, souvent 30 à 60 min" },
+  tax: { en: "Your own formulas", fr: "Vos propres formules" },
+  currency: { en: "—", fr: "—" },
+  singleQuote: { en: "Free, but by hand", fr: "Gratuit, mais à la main" },
+  trial: { en: "—", fr: "—" },
+};
 
 /** Phase 112: the questions the homepage answers (the full list is on /pricing). */
 const HOME_FAQ_KEYS = ["trial", "oneshot", "cancel", "pilot"] as const;
@@ -364,36 +375,26 @@ export default function Home() {
                 <tr>
                   <th>{lang === "fr" ? "Fonctionnalité" : "Feature"}</th>
                   <th className="q">quoteai</th>
-                  <th>Jobber / Housecall Pro</th>
+                  <th>Jobber</th>
                   <th>Excel & Word</th>
                 </tr>
               </thead>
               <tbody>
-                {(lang === "fr" ? [
-                  { f: "Soumission depuis une description en langage courant", q: "~30 secondes", j: "Non offert", e: "Manuel, 30–60 min" },
-                  { f: "TPS/TVH canadienne par province", q: "Automatique", j: "Configuration manuelle", e: "Formules manuelles" },
-                  { f: "Soumission par WhatsApp", q: "Inclus", j: "Non offert", e: "Impossible" },
-                  { f: "Bilingue FR / EN", q: "Oui", j: "Limité", e: "Manuel" },
-                  { f: "Prospect → soumission → chantier → facture → payé", q: "Une seule plateforme", j: "Modules et paliers payants", e: "Fichiers séparés" },
-                  { f: "Temps jusqu'à la première soumission", q: "30 secondes", j: "Heures d'intégration", e: "Heures par document" },
-                ] : [
-                  { f: "Quote from a plain-language description", q: "~30 seconds", j: "Not offered", e: "Manual, 30–60 min" },
-                  { f: "Canadian GST/HST by province", q: "Automatic", j: "Manual tax setup", e: "Manual formulas" },
-                  { f: "Quoting over WhatsApp", q: "Built in", j: "Not offered", e: "Not possible" },
-                  { f: "Bilingual FR / EN", q: "Yes", j: "Limited", e: "Manual" },
-                  { f: "Lead → quote → job → invoice → paid", q: "One platform", j: "Modules & plan gates", e: "Separate files" },
-                  { f: "Time to first quote", q: "30 seconds", j: "Hours of onboarding", e: "Hours per document" },
-                ]).map((row) => (
-                  <tr key={row.f}>
-                    <td>{row.f}</td>
-                    <td className="q">{row.q}</td>
-                    <td>{row.j}</td>
-                    <td>{row.e}</td>
+                {/* Same verified cells as the /compare pages (data/compare-pages.ts), so the two never disagree. */}
+                {HOME_COMPARE_ROWS.map((r) => (
+                  <tr key={r}>
+                    <td>{ROW_LABELS[r][lang]}</td>
+                    <td className="q">{QUOTEAI_CELLS[r][lang]}</td>
+                    <td>{COMPETITORS.jobber.cells[r][lang]}</td>
+                    <td>{SPREADSHEET_CELLS[r][lang]}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          <p className="prov-fine">
+            <Link href={comparePath(lang)}>{lang === "fr" ? "Comparaisons complètes avec Jobber, Joist et Housecall Pro, prix et sources compris" : "Full comparisons with Jobber, Joist and Housecall Pro, with prices and sources"}</Link>
+          </p>
           <div className="cmp-cta">
             <button onClick={() => navigate(isSignedIn ? "/dashboard/new" : "/sign-up")} className="btn btn-navy">
               {lang === "fr" ? "Essayer quoteai gratuitement" : "Try quoteai for free"}

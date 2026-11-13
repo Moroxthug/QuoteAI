@@ -9,6 +9,8 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES } from "../src/data/province-data.js";
+import { TOOL_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { TOOL_PAGES } from "../src/data/tool-pages.js";
 
 const BASE_URL = "https://quoteai.ca";
 
@@ -49,6 +51,15 @@ entries.push(url(`${BASE_URL}/fr/conditions/`, frOf("/terms").priority, frOf("/t
 for (const province of PILOT_PROVINCES) {
   entries.push(url(`${BASE_URL}/provinces/${province.slug}/`, "0.8", "monthly", "2026-09-22"));
   entries.push(url(`${BASE_URL}/fr/provinces/${province.frSlug}/`, "0.8", "monthly", "2026-09-22"));
+}
+
+// Free calculators: the hub and each tool, both languages.
+const toolsUpdated = Object.values(TOOL_PAGES).map((p) => p.updatedAt).sort().at(-1)!;
+entries.push(url(`${BASE_URL}/tools/`, "0.8", "monthly", toolsUpdated));
+entries.push(url(`${BASE_URL}/fr/outils/`, "0.8", "monthly", toolsUpdated));
+for (const t of TOOL_SLUG_PAIRS) {
+  entries.push(url(`${BASE_URL}/tools/${t.en}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
+  entries.push(url(`${BASE_URL}/fr/outils/${t.fr}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
 }
 
 // lastmod for the templated pages = the day their template or data last

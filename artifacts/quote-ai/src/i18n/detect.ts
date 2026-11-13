@@ -21,6 +21,7 @@ export function isEnglishLocalePath(pathname: string): boolean {
     pathname === "/" ||
     pathname.startsWith("/quotes/") ||
     pathname.startsWith("/provinces/") ||
+    pathname === "/tools" || pathname.startsWith("/tools/") ||
     pathname === "/pricing" || pathname === "/pricing/" ||
     pathname === "/pilot" || pathname === "/pilot/" ||
     pathname === "/privacy-policy" || pathname === "/privacy-policy/" ||

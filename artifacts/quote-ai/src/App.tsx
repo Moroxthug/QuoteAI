@@ -56,6 +56,8 @@ const ContattiPage = lazy(() => import("@/pages/contatti"));
 const MappaSitoPage = lazy(() => import("@/pages/mappa-sito"));
 const HelpIndexPage = lazy(() => import("@/pages/help/index"));
 const HelpArticlePage = lazy(() => import("@/pages/help/[slug]"));
+const ToolsIndexPage = lazy(() => import("@/pages/tools/index"));
+const ToolPage = lazy(() => import("@/pages/tools/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
@@ -264,6 +266,11 @@ function Router() {
       <Route path="/privacy" component={() => <Redirect to={PATHS.PRIVACY} />} />
       <Route path="/termini" component={() => <Redirect to={PATHS.TERMS} />} />
       <Route path={PATHS.MAPPA_SITO} component={() => <Suspense fallback={null}><MappaSitoPage /></Suspense>} />
+      {/* Free calculators, both languages (pages/tools) */}
+      <Route path="/tools" component={() => <PublicLayout><Suspense fallback={null}><ToolsIndexPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/outils" component={() => <PublicLayout><Suspense fallback={null}><ToolsIndexPage /></Suspense></PublicLayout>} />
+      <Route path="/tools/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/outils/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       {/* Help centre — Phase 70; articles from HELP_ARTICLES */}
       <Route path="/help/:slug" component={() => <PublicLayout><Suspense fallback={null}><HelpArticlePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.HELP} component={() => <PublicLayout><Suspense fallback={null}><HelpIndexPage /></Suspense></PublicLayout>} />

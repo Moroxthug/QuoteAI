@@ -18,6 +18,8 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { HELP_ARTICLES, HELP_CATEGORIES, type HelpBlock } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } from "../src/data/province-data.js";
 import { MARKETING_PLANS } from "../src/data/pricing.js";
+import { toolPath } from "../src/data/seo-slugs.js";
+import { TOOL_PAGES, TOOL_ORDER } from "../src/data/tool-pages.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const BASE = "https://quoteai.ca";
@@ -46,6 +48,9 @@ const provinceLinks = PILOT_PROVINCES.map(
 const provinceLinksFr = PILOT_PROVINCES.map(
   (p) => `- [${provinceName(p, "fr")}](${BASE}${provincePath(p, "fr")})`,
 ).join("\n");
+
+const toolLinks = (lang: "en" | "fr") =>
+  TOOL_ORDER.map((id) => `- [${TOOL_PAGES[id].h1[lang].replace(/[.?]$/, "")}](${BASE}${toolPath(lang, id)}): ${TOOL_PAGES[id].short[lang]}`).join("\n");
 
 const helpLinks = HELP_ARTICLES.map((a) => `- [${a.title.en}](${BASE}/help/${a.slug}/): ${a.summary.en}`).join("\n");
 
@@ -84,6 +89,12 @@ Annual billing charges ten months for a year. Details: [Pricing](${BASE}/pricing
 - [Help centre](${BASE}/help/): how-to articles for every part of the product.
 - [Blog](${BASE}/blog/): Canadian cost guides and how-to-quote guides for trades.
 
+## Free calculators
+
+Free, no sign-up, in English and French: [all calculators](${BASE}/tools/).
+
+${toolLinks("en")}
+
 ## Provinces
 
 ${provinceLinks}
@@ -105,6 +116,9 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 - [Accueil](${BASE}/fr/)
 - [Tarifs](${BASE}/fr/tarifs/)
 - [Projet pilote](${BASE}/fr/pilote/)
+
+Calculateurs gratuits ([tous](${BASE}/fr/outils/)) :
+${toolLinks("fr")}
 
 Provinces :
 ${provinceLinksFr}

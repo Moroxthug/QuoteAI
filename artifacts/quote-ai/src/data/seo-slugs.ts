@@ -49,12 +49,32 @@ export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
  * the one file the public entry bundle can afford to load eagerly: the header,
  * the footer and the language toggle all read it.
  */
+/** Free calculator pages: English slug under /tools/ ↔ French slug under /fr/outils/. */
+export const TOOL_SLUG_PAIRS = [
+  { id: "salesTax", en: "sales-tax-calculator", fr: "calculateur-taxes-de-vente" },
+  { id: "holdback", en: "holdback-calculator", fr: "calculateur-retenue" },
+  { id: "markup", en: "markup-margin-calculator", fr: "calculateur-majoration-marge" },
+  { id: "labourRate", en: "labour-rate-calculator", fr: "calculateur-taux-horaire" },
+] as const;
+export type ToolId = (typeof TOOL_SLUG_PAIRS)[number]["id"];
+
+/** /tools/<slug>/ or /fr/outils/<slug>/ for a tool (the hub when id is omitted). */
+export function toolPath(lang: "en" | "fr", id?: ToolId): string {
+  const base = lang === "fr" ? "/fr/outils/" : "/tools/";
+  if (!id) return base;
+  const pair = TOOL_SLUG_PAIRS.find((p) => p.id === id)!;
+  return `${base}${pair[lang]}/`;
+}
+
 const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
   { en: "/pricing", fr: "/fr/tarifs" },
   { en: "/pilot", fr: "/fr/pilote" },
   // Phase 95: the legal pages.
   { en: "/privacy-policy", fr: "/fr/confidentialite" },
   { en: "/terms", fr: "/fr/conditions" },
+  // Free calculators: the hub and every tool page.
+  { en: "/tools", fr: "/fr/outils" },
+  ...TOOL_SLUG_PAIRS.map((p) => ({ en: `/tools/${p.en}`, fr: `/fr/outils/${p.fr}` })),
 ];
 
 /** Phase 81 — province landing pages: English slug ↔ French slug. */

@@ -4,6 +4,8 @@ import { Link } from "wouter";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
 import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
 import { HELP_ARTICLES } from "@/data/help-articles";
+import { toolPath } from "@/data/seo-slugs";
+import { TOOL_PAGES, TOOL_ORDER } from "@/data/tool-pages";
 import { MapPin, Globe, BookOpen, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -107,6 +109,18 @@ export default function MappaSitoPage() {
                   <li key={cat.slug} style={{ paddingLeft: 8 }}>
                     <Link href={`/blog/categoria/${cat.slug}/`} style={{ color: "var(--muted-mk)" }}>
                       {t("sitemap.category")}: {cat.name}
+                    </Link>
+                  </li>
+                ))}
+                <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)" }}>
+                  <Link href={toolPath(lang)} className="cta-link" style={{ fontSize: "inherit" }}>
+                    {t("footer.freeCalculators")}
+                  </Link>
+                </li>
+                {TOOL_ORDER.map((id) => (
+                  <li key={id} style={{ paddingLeft: 8 }}>
+                    <Link href={toolPath(lang, id)} style={{ color: "var(--muted-mk)", fontSize: 12.5 }}>
+                      {TOOL_PAGES[id].h1[lang].replace(/[.?]$/, "")}
                     </Link>
                   </li>
                 ))}

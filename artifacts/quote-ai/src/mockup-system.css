@@ -3448,3 +3448,36 @@ html.edge-dragging #main { box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
   .text-link::after, .cta-link::after, .auth-link::after, a.chip::after, .crew-job-addr::after, .crew-job-name::after { content: ""; position: absolute; inset: -13px -4px; }
   .auth-pw-toggle::after { content: ""; position: absolute; inset: -14px; }
 }
+
+/* ==========================================================
+   FREE CALCULATORS (/tools, /fr/outils)
+   ========================================================== */
+.tool-hero { align-items: start; }
+.tool-card .dm-body { display: grid; gap: 18px; }
+.tool-inputs { display: grid; gap: 14px; }
+.tool-field select { min-height: 44px; }
+.tool-input { position: relative; }
+.tool-input input { min-height: 44px; padding-right: 40px; font-variant-numeric: tabular-nums; }
+.tool-suffix { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; font-weight: 700; color: var(--muted-mk); pointer-events: none; }
+.tool-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tool-modes .pill { min-height: 44px; }
+.tool-result { border-top: 1px solid var(--line); padding-top: 6px; }
+.tool-sub { margin-top: 18px; font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-mk); }
+.tool-prose { max-width: 760px; }
+.tool-block + .tool-block { margin-top: clamp(32px, 4vw, 48px); }
+.tool-h2 { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin-bottom: 14px; }
+.tool-prose p { font-size: 16.5px; line-height: 1.7; color: var(--ink); }
+.tool-prose p + p { margin-top: 14px; }
+.tool-cta { max-width: 760px; text-align: center; margin-inline: auto; }
+.tool-cta .lead { margin: 14px auto 26px; }
+.tool-grid { grid-template-columns: 1fr 1fr; }
+.tool-tile { display: flex; flex-direction: column; gap: 12px; color: inherit; transition: box-shadow .25s, transform .25s var(--ease-mk); }
+.tool-tile:hover { box-shadow: var(--shadow-card); transform: translateY(-2px); }
+.tool-tile .fi { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; }
+.tool-tile h2 { font-size: 19px; font-weight: 800; color: var(--navy); }
+.tool-tile .cta-link { margin-top: auto; }
+@media (max-width: 980px) { .tool-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .tool-pair { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .tool-tile, .tool-tile:hover { transition: none; transform: none; } }
+.tool-card .dm-grand { gap: 4px 12px; flex-wrap: wrap; }
+.tool-card .dm-grand b { white-space: nowrap; margin-left: auto; }

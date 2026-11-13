@@ -7,6 +7,7 @@ import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from 
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
 import { PILOT_PROVINCES } from "./province-data";
+import { TOOL_SLUG_PAIRS } from "./seo-slugs";
 
 interface PrerenderRoute {
   /** Route path without the trailing slash ("/" for the homepage). */
@@ -26,6 +27,13 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     ...PILOT_PROVINCES.flatMap((p) => [
       { path: `/provinces/${p.slug}`, lang: "en" as const },
       { path: `/fr/provinces/${p.frSlug}`, lang: "fr" as const },
+    ]),
+    // Free calculators, both languages.
+    { path: "/tools", lang: "en" },
+    { path: "/fr/outils", lang: "fr" },
+    ...TOOL_SLUG_PAIRS.flatMap((t) => [
+      { path: `/tools/${t.en}`, lang: "en" as const },
+      { path: `/fr/outils/${t.fr}`, lang: "fr" as const },
     ]),
     { path: "/whatsapp", lang: "en" },
     { path: "/about", lang: "en" },

@@ -16,7 +16,7 @@ import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { breadcrumbJsonLd, webPageJsonLd } from "@/data/json-ld";
 import { CITIES_BY_SLUG, ACTIVE_CITY_SLUGS, FRENCH_PRIMARY_CITY_SLUGS, cityDisplayName } from "@/data/seo-data";
-import { SECTOR_SLUGS, sectorLabel } from "@/data/seo-slugs";
+import { SECTOR_SLUGS, sectorLabel, toolPath } from "@/data/seo-slugs";
 import { taxComponentLabel, formatRate } from "@/lib/tax-profiles";
 import {
   PROVINCE_BY_SLUG,
@@ -259,6 +259,7 @@ export default function ProvinceLandingPage() {
               <Link key={p.code} href={provincePath(p, lang)} className="wm">{provinceName(p, lang)}</Link>
             ))}
             <Link href={lang === "fr" ? "/fr/pilote/" : "/pilot/"} className="wm">{t("province.pilotLink")}</Link>
+            <Link href={toolPath(lang, "salesTax")} className="wm">{t("footer.freeCalculators")}</Link>
           </div>
         </div>
       </ScrollSection>

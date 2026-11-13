@@ -32,6 +32,15 @@ Annual billing charges ten months for a year. Details: [Pricing](https://quoteai
 - [Help centre](https://quoteai.ca/help/): how-to articles for every part of the product.
 - [Blog](https://quoteai.ca/blog/): Canadian cost guides and how-to-quote guides for trades.
 
+## Free calculators
+
+Free, no sign-up, in English and French: [all calculators](https://quoteai.ca/tools/).
+
+- [GST, HST, PST and QST calculator for contractors](https://quoteai.ca/tools/sales-tax-calculator/): Add or remove GST, HST, PST and QST for any province, each tax on its own line.
+- [Construction holdback calculator](https://quoteai.ca/tools/holdback-calculator/): The 10 % holdback on a progress bill, what is payable now, and the tax when it is released.
+- [Markup vs margin calculator](https://quoteai.ca/tools/markup-margin-calculator/): Cost to price with a markup or a target margin, and why 25 % markup is only 20 % margin.
+- [What should I charge per hour](https://quoteai.ca/tools/labour-rate-calculator/): The hourly rate that covers your pay, your overhead and a profit, from the hours you can really bill.
+
 ## Provinces
 
 - [British Columbia](https://quoteai.ca/provinces/british-columbia/): sales tax on quotes and invoices shown as GST 5 % + PST 7 %.
@@ -114,6 +123,12 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 - [Accueil](https://quoteai.ca/fr/)
 - [Tarifs](https://quoteai.ca/fr/tarifs/)
 - [Projet pilote](https://quoteai.ca/fr/pilote/)
+
+Calculateurs gratuits ([tous](https://quoteai.ca/fr/outils/)) :
+- [Calculateur de TPS, TVH, TVP et TVQ pour entrepreneurs](https://quoteai.ca/fr/outils/calculateur-taxes-de-vente/): Ajoutez ou retirez la TPS, la TVH, la TVP et la TVQ pour toute province, chaque taxe sur sa ligne.
+- [Calculateur de retenue de construction](https://quoteai.ca/fr/outils/calculateur-retenue/): La retenue de 10 % sur une facture progressive, le montant payable maintenant et les taxes à la libération.
+- [Calculateur majoration ou marge](https://quoteai.ca/fr/outils/calculateur-majoration-marge/): Du coût au prix avec une majoration ou une marge visée, et pourquoi 25 % de majoration ne font que 20 % de marge.
+- [Combien facturer de l'heure](https://quoteai.ca/fr/outils/calculateur-taux-horaire/): Le taux horaire qui couvre votre salaire, vos frais généraux et un profit, selon vos heures vraiment facturables.
 
 Provinces :
 - [Colombie-Britannique](https://quoteai.ca/fr/provinces/colombie-britannique/)

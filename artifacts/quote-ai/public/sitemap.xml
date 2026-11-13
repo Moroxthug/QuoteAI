@@ -241,6 +241,30 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/fr/guides/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/tps-tvq-soumissions-factures-entrepreneur/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/numero-licence-rbq-soumission-contrat/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/guides/soumission-contrat-en-francais-charte/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/painter/</loc>
     <lastmod>2026-11-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -1327,37 +1351,37 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/trades/</loc>
+    <loc>https://quoteai.ca/blog/category/trades/</loc>
     <lastmod>2026-09-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/pricing/</loc>
+    <loc>https://quoteai.ca/blog/category/pricing/</loc>
     <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/advice/</loc>
+    <loc>https://quoteai.ca/blog/category/advice/</loc>
     <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/tools/</loc>
+    <loc>https://quoteai.ca/blog/category/tools/</loc>
     <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/innovation/</loc>
+    <loc>https://quoteai.ca/blog/category/innovation/</loc>
     <lastmod>2026-11-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://quoteai.ca/blog/categoria/business/</loc>
+    <loc>https://quoteai.ca/blog/category/business/</loc>
     <lastmod>2026-11-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

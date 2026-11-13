@@ -20,6 +20,7 @@ import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } fr
 import { MARKETING_PLANS } from "../src/data/pricing.js";
 import { toolPath, comparePath } from "../src/data/seo-slugs.js";
 import { COMPETITORS, COMPARE_ORDER, CHECKED_AT } from "../src/data/compare-pages.js";
+import { FR_GUIDES } from "../src/data/fr-guides.js";
 import { TOOL_PAGES, TOOL_ORDER } from "../src/data/tool-pages.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -129,6 +130,9 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 
 Calculateurs gratuits ([tous](${BASE}/fr/outils/)) :
 ${toolLinks("fr")}
+
+Guides pour les entrepreneurs du Québec ([tous](${BASE}/fr/guides/)) :
+${FR_GUIDES.map((g) => `- [${g.h1.replace(/\.$/, "")}](${BASE}/fr/guides/${g.slug}/) : ${g.short}`).join("\n")}
 
 Comparaisons ([toutes](${BASE}/fr/comparer/)) :
 ${compareLinks("fr")}

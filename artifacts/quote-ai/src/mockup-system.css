@@ -3495,3 +3495,9 @@ html.edge-dragging #main { box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
 .cmp-facts { table-layout: fixed; width: 100%; }
 .cmp-facts thead th:first-child { width: 24%; }
 .cmp-wide thead th:first-child { width: 16%; }
+
+/* French guides (/fr/guides) */
+.guide-list { margin: 14px 0 0; padding-left: 22px; list-style: disc; display: grid; gap: 10px; }
+.guide-list li { font-size: 16.5px; line-height: 1.65; color: var(--ink); }
+.guide-list a { text-decoration: underline; color: var(--navy); }
+.guide-example { margin-top: 22px; max-width: 460px; }

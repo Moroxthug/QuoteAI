@@ -11,6 +11,7 @@ import { HELP_ARTICLES } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES } from "../src/data/province-data.js";
 import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "../src/data/seo-slugs.js";
 import { CHECKED_AT } from "../src/data/compare-pages.js";
+import { FR_GUIDES } from "../src/data/fr-guides.js";
 import { TOOL_PAGES } from "../src/data/tool-pages.js";
 
 const BASE_URL = "https://quoteai.ca";
@@ -71,6 +72,10 @@ for (const c of COMPARE_SLUG_PAIRS) {
   entries.push(url(`${BASE_URL}/fr/comparer/${c.fr}/`, "0.8", "monthly", CHECKED_AT));
 }
 
+// French-only guides.
+entries.push(url(`${BASE_URL}/fr/guides/`, "0.8", "monthly", FR_GUIDES.map((g) => g.updatedAt).sort().at(-1)!));
+for (const g of FR_GUIDES) entries.push(url(`${BASE_URL}/fr/guides/${g.slug}/`, "0.8", "monthly", g.updatedAt));
+
 // lastmod for the templated pages = the day their template or data last
 // changed (seo-render-engine.ts / seo-data.ts). Bump it when those change so
 // the date tells Google something true instead of a fixed placeholder.
@@ -107,7 +112,7 @@ for (const article of HELP_ARTICLES) {
 const articleDate = (a: { publishedAt: string; updatedAt?: string }) => a.updatedAt ?? a.publishedAt;
 for (const cat of BLOG_CATEGORIES) {
   const dates = BLOG_ARTICLES.filter((a) => a.category === cat.name || a.category === cat.slug).map(articleDate).sort();
-  entries.push(url(`${BASE_URL}/blog/categoria/${cat.slug}/`, "0.7", "weekly", dates[dates.length - 1] ?? SEO_TEMPLATE_UPDATED));
+  entries.push(url(`${BASE_URL}/blog/category/${cat.slug}/`, "0.7", "weekly", dates[dates.length - 1] ?? SEO_TEMPLATE_UPDATED));
 }
 for (const article of BLOG_ARTICLES) {
   entries.push(url(`${BASE_URL}/blog/${article.slug}/`, "0.7", "monthly", articleDate(article)));

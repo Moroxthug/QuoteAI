@@ -60,6 +60,8 @@ const ToolsIndexPage = lazy(() => import("@/pages/tools/index"));
 const ToolPage = lazy(() => import("@/pages/tools/[slug]"));
 const CompareIndexPage = lazy(() => import("@/pages/compare/index"));
 const ComparePage = lazy(() => import("@/pages/compare/[slug]"));
+const FrGuidesIndexPage = lazy(() => import("@/pages/fr-guides/index"));
+const FrGuidePage = lazy(() => import("@/pages/fr-guides/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
@@ -113,7 +115,7 @@ const ContractDetailPage = lazy(pageLoaders.contract);
 const SignPage = lazy(() => import("@/pages/sign/[token]"));
 const PortalPage = lazy(() => import("@/pages/portal/[token]"));
 const BlogArticlePage = lazy(() => import("@/pages/blog/[slug]"));
-const BlogCategoryPage = lazy(() => import("@/pages/blog/categoria/[slug]"));
+const BlogCategoryPage = lazy(() => import("@/pages/blog/category/[slug]"));
 
 import { ErrorBoundary } from "@/components/error-boundary";
 import { LanguageProvider } from "@/i18n/LanguageContext";
@@ -278,6 +280,9 @@ function Router() {
       <Route path="/fr/comparer" component={() => <PublicLayout><Suspense fallback={null}><CompareIndexPage /></Suspense></PublicLayout>} />
       <Route path="/compare/:slug" component={() => <PublicLayout><Suspense fallback={null}><ComparePage /></Suspense></PublicLayout>} />
       <Route path="/fr/comparer/:slug" component={() => <PublicLayout><Suspense fallback={null}><ComparePage /></Suspense></PublicLayout>} />
+      {/* French-only guides for Québec contractors (pages/fr-guides) */}
+      <Route path="/fr/guides" component={() => <PublicLayout><Suspense fallback={null}><FrGuidesIndexPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/guides/:slug" component={() => <PublicLayout><Suspense fallback={null}><FrGuidePage /></Suspense></PublicLayout>} />
       {/* Help centre — Phase 70; articles from HELP_ARTICLES */}
       <Route path="/help/:slug" component={() => <PublicLayout><Suspense fallback={null}><HelpArticlePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.HELP} component={() => <PublicLayout><Suspense fallback={null}><HelpIndexPage /></Suspense></PublicLayout>} />
@@ -339,7 +344,8 @@ function Router() {
       <Route path="/fr/soumissions/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
 
       {/* Blog — dynamic, driven by BLOG_ARTICLES / BLOG_CATEGORIES data */}
-      <Route path="/blog/categoria/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogCategoryPage /></Suspense></PublicLayout>} />
+      <Route path="/blog/category/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogCategoryPage /></Suspense></PublicLayout>} />
+      <Route path="/blog/categoria/:slug">{(p) => <Redirect to={`/blog/category/${p.slug}/`} />}</Route>
       <Route path="/blog/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogArticlePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.BLOG} component={() => <PublicLayout><Suspense fallback={null}><BlogPage /></Suspense></PublicLayout>} />
 

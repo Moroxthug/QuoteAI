@@ -44,7 +44,7 @@ export default function BlogCategoryPage() {
   }
 
   const articles = getArticlesByCategory(category.name);
-  const canonical = `${BASE_URL}/blog/categoria/${category.slug}/`;
+  const canonical = `${BASE_URL}/blog/category/${category.slug}/`;
 
   const jsonLd = [
     {
@@ -150,7 +150,7 @@ export default function BlogCategoryPage() {
             <h2 className="eyebrow grey" style={{ marginBottom: 18 }}>{t("blog.otherCategories")}</h2>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               {otherCategories.map((cat) => (
-                <Link key={cat.slug} href={`/blog/categoria/${cat.slug}/`} className={`chip ${CATEGORY_CHIPS[cat.name] ?? "chip-grey"}`}>
+                <Link key={cat.slug} href={`/blog/category/${cat.slug}/`} className={`chip ${CATEGORY_CHIPS[cat.name] ?? "chip-grey"}`}>
                   {cat.name}
                 </Link>
               ))}

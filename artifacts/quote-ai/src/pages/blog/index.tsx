@@ -99,7 +99,7 @@ export default function BlogPage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
             <span className="eyebrow grey" style={{ marginRight: 4 }}>{t("blog.categoriesLabel")}</span>
             {BLOG_CATEGORIES.map((cat) => (
-              <Link key={cat.slug} href={`/blog/categoria/${cat.slug}/`} className={`chip ${CATEGORY_CHIPS[cat.name] ?? "chip-grey"}`}>
+              <Link key={cat.slug} href={`/blog/category/${cat.slug}/`} className={`chip ${CATEGORY_CHIPS[cat.name] ?? "chip-grey"}`}>
                 {cat.name}
               </Link>
             ))}

@@ -260,6 +260,7 @@ export default function ProvinceLandingPage() {
             ))}
             <Link href={lang === "fr" ? "/fr/pilote/" : "/pilot/"} className="wm">{t("province.pilotLink")}</Link>
             <Link href={toolPath(lang, "salesTax")} className="wm">{t("footer.freeCalculators")}</Link>
+            {lang === "fr" && <Link href="/fr/guides/" className="wm">Guides pour le Québec</Link>}
           </div>
         </div>
       </ScrollSection>

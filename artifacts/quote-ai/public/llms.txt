@@ -138,6 +138,11 @@ Calculateurs gratuits ([tous](https://quoteai.ca/fr/outils/)) :
 - [Calculateur majoration ou marge](https://quoteai.ca/fr/outils/calculateur-majoration-marge/): Du coût au prix avec une majoration ou une marge visée, et pourquoi 25 % de majoration ne font que 20 % de marge.
 - [Combien facturer de l'heure](https://quoteai.ca/fr/outils/calculateur-taux-horaire/): Le taux horaire qui couvre votre salaire, vos frais généraux et un profit, selon vos heures vraiment facturables.
 
+Guides pour les entrepreneurs du Québec ([tous](https://quoteai.ca/fr/guides/)) :
+- [TPS et TVQ sur vos soumissions et factures](https://quoteai.ca/fr/guides/tps-tvq-soumissions-factures-entrepreneur/) : Taux, inscription, calcul de la TVQ et mentions obligatoires sur une facture selon son montant.
+- [Votre numéro de licence RBQ : où l'inscrire](https://quoteai.ca/fr/guides/numero-licence-rbq-soumission-contrat/) : Les documents, publicités et véhicules où votre numéro RBQ doit figurer, le format et les exceptions.
+- [Soumissions, contrats et factures en français](https://quoteai.ca/fr/guides/soumission-contrat-en-francais-charte/) : Ce que la Charte de la langue française exige pour vos factures et contrats types, et quand l'anglais est permis.
+
 Comparaisons ([toutes](https://quoteai.ca/fr/comparer/)) :
 - [quoteai ou Jobber](https://quoteai.ca/fr/comparer/quoteai-ou-jobber/)
 - [quoteai ou Joist](https://quoteai.ca/fr/comparer/quoteai-ou-joist/)

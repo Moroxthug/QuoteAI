@@ -8,6 +8,7 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
 import { PILOT_PROVINCES } from "./province-data";
 import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "./seo-slugs";
+import { FR_GUIDES } from "./fr-guides";
 
 interface PrerenderRoute {
   /** Route path without the trailing slash ("/" for the homepage). */
@@ -42,6 +43,9 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
       { path: `/compare/${c.en}`, lang: "en" as const },
       { path: `/fr/comparer/${c.fr}`, lang: "fr" as const },
     ]),
+    // French-only guides for Québec contractors.
+    { path: "/fr/guides", lang: "fr" },
+    ...FR_GUIDES.map((g) => ({ path: `/fr/guides/${g.slug}`, lang: "fr" as const })),
     { path: "/whatsapp", lang: "en" },
     { path: "/about", lang: "en" },
     { path: "/contact", lang: "en" },
@@ -55,7 +59,7 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     ...HELP_ARTICLES.map((a) => ({ path: `/help/${a.slug}`, lang: "en" as const })),
     // Blog: list, categories, articles (EN only).
     { path: "/blog", lang: "en" },
-    ...BLOG_CATEGORIES.map((c) => ({ path: `/blog/categoria/${c.slug}`, lang: "en" as const })),
+    ...BLOG_CATEGORIES.map((c) => ({ path: `/blog/category/${c.slug}`, lang: "en" as const })),
     ...BLOG_ARTICLES.map((a) => ({ path: `/blog/${a.slug}`, lang: "en" as const })),
   ];
   // Sector pages: every sector in both languages; city pages for the

@@ -6,6 +6,7 @@ import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
 import { HELP_ARTICLES } from "@/data/help-articles";
 import { toolPath, comparePath } from "@/data/seo-slugs";
 import { COMPETITORS, COMPARE_ORDER } from "@/data/compare-pages";
+import { FR_GUIDES } from "@/data/fr-guides";
 import { TOOL_PAGES, TOOL_ORDER } from "@/data/tool-pages";
 import { MapPin, Globe, BookOpen, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -108,7 +109,7 @@ export default function MappaSitoPage() {
                 </li>
                 {BLOG_CATEGORIES.map((cat) => (
                   <li key={cat.slug} style={{ paddingLeft: 8 }}>
-                    <Link href={`/blog/categoria/${cat.slug}/`} style={{ color: "var(--muted-mk)" }}>
+                    <Link href={`/blog/category/${cat.slug}/`} style={{ color: "var(--muted-mk)" }}>
                       {t("sitemap.category")}: {cat.name}
                     </Link>
                   </li>
@@ -134,6 +135,18 @@ export default function MappaSitoPage() {
                   <li key={id} style={{ paddingLeft: 8 }}>
                     <Link href={comparePath(lang, id)} style={{ color: "var(--muted-mk)", fontSize: 12.5 }}>
                       quoteai {lang === "fr" ? "ou" : "vs"} {COMPETITORS[id].name}
+                    </Link>
+                  </li>
+                ))}
+                <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)" }}>
+                  <Link href="/fr/guides/" className="cta-link" style={{ fontSize: "inherit" }} lang="fr-CA">
+                    Guides pour les entrepreneurs du Québec
+                  </Link>
+                </li>
+                {FR_GUIDES.map((g) => (
+                  <li key={g.slug} style={{ paddingLeft: 8 }}>
+                    <Link href={`/fr/guides/${g.slug}/`} style={{ color: "var(--muted-mk)", fontSize: 12.5 }} lang="fr-CA">
+                      {g.h1.replace(/\.$/, "")}
                     </Link>
                   </li>
                 ))}

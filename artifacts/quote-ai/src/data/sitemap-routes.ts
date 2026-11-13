@@ -21,7 +21,7 @@ export interface PublicRoute {
  *
  * DO NOT add here:
  *   - Dashboard / auth / admin / onboarding routes (private, not indexable)
- *   - Dynamic routes for /seo/:type, /seo/:type/:city, /blog/:slug, /blog/categoria/:slug
+ *   - Dynamic routes for /seo/:type, /seo/:type/:city, /blog/:slug, /blog/category/:slug
  *     (those are generated from SECTORS, CITIES, BLOG_ARTICLES, BLOG_CATEGORIES data files)
  */
 const _PUBLIC_ROUTES = [

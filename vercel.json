@@ -16,6 +16,7 @@
     { "source": "/contatti{/}?", "destination": "/contact/", "permanent": true },
     { "source": "/mappa-sito{/}?", "destination": "/site-map/", "permanent": true },
     { "source": "/seo{/}?", "destination": "/", "permanent": true },
+    { "source": "/blog/categoria/(.*)", "destination": "/blog/category/$1", "permanent": true },
     { "source": "/seo/(.*)", "destination": "/", "permanent": true },
     { "source": "/privacy{/}?", "destination": "/privacy-policy/", "permanent": true },
     { "source": "/termini{/}?", "destination": "/terms/", "permanent": true },

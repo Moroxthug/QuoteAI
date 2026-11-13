@@ -322,6 +322,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <Link href="/blog/">{t("footer.blog")}</Link>
             <Link href={lang === "fr" ? "/fr/outils/" : "/tools/"}>{t("footer.freeCalculators")}</Link>
             <Link href={lang === "fr" ? "/fr/comparer/" : "/compare/"}>{t("footer.compare")}</Link>
+            {lang === "fr" && <Link href="/fr/guides/">Guides pour le Québec</Link>}
             <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
             <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
             <Link href={localizedPath("/quotes/how-to-quote/", lang)}>{t("footer.howToQuote")}</Link>

@@ -7,7 +7,7 @@ import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from 
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
 import { PILOT_PROVINCES } from "./province-data";
-import { TOOL_SLUG_PAIRS } from "./seo-slugs";
+import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "./seo-slugs";
 
 interface PrerenderRoute {
   /** Route path without the trailing slash ("/" for the homepage). */
@@ -34,6 +34,13 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     ...TOOL_SLUG_PAIRS.flatMap((t) => [
       { path: `/tools/${t.en}`, lang: "en" as const },
       { path: `/fr/outils/${t.fr}`, lang: "fr" as const },
+    ]),
+    // Comparison pages, both languages.
+    { path: "/compare", lang: "en" },
+    { path: "/fr/comparer", lang: "fr" },
+    ...COMPARE_SLUG_PAIRS.flatMap((c) => [
+      { path: `/compare/${c.en}`, lang: "en" as const },
+      { path: `/fr/comparer/${c.fr}`, lang: "fr" as const },
     ]),
     { path: "/whatsapp", lang: "en" },
     { path: "/about", lang: "en" },

@@ -4,7 +4,8 @@ import { Link } from "wouter";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
 import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
 import { HELP_ARTICLES } from "@/data/help-articles";
-import { toolPath } from "@/data/seo-slugs";
+import { toolPath, comparePath } from "@/data/seo-slugs";
+import { COMPETITORS, COMPARE_ORDER } from "@/data/compare-pages";
 import { TOOL_PAGES, TOOL_ORDER } from "@/data/tool-pages";
 import { MapPin, Globe, BookOpen, Layers } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -121,6 +122,18 @@ export default function MappaSitoPage() {
                   <li key={id} style={{ paddingLeft: 8 }}>
                     <Link href={toolPath(lang, id)} style={{ color: "var(--muted-mk)", fontSize: 12.5 }}>
                       {TOOL_PAGES[id].h1[lang].replace(/[.?]$/, "")}
+                    </Link>
+                  </li>
+                ))}
+                <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)" }}>
+                  <Link href={comparePath(lang)} className="cta-link" style={{ fontSize: "inherit" }}>
+                    {t("footer.compare")}
+                  </Link>
+                </li>
+                {COMPARE_ORDER.map((id) => (
+                  <li key={id} style={{ paddingLeft: 8 }}>
+                    <Link href={comparePath(lang, id)} style={{ color: "var(--muted-mk)", fontSize: 12.5 }}>
+                      quoteai {lang === "fr" ? "ou" : "vs"} {COMPETITORS[id].name}
                     </Link>
                   </li>
                 ))}

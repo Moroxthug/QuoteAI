@@ -321,6 +321,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
           <FooterCol title={t("footer.guides")} folded={phone}>
             <Link href="/blog/">{t("footer.blog")}</Link>
             <Link href={lang === "fr" ? "/fr/outils/" : "/tools/"}>{t("footer.freeCalculators")}</Link>
+            <Link href={lang === "fr" ? "/fr/comparer/" : "/compare/"}>{t("footer.compare")}</Link>
             <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
             <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
             <Link href={localizedPath("/quotes/how-to-quote/", lang)}>{t("footer.howToQuote")}</Link>

@@ -9,7 +9,8 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES } from "../src/data/province-data.js";
-import { TOOL_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { TOOL_SLUG_PAIRS, COMPARE_SLUG_PAIRS } from "../src/data/seo-slugs.js";
+import { CHECKED_AT } from "../src/data/compare-pages.js";
 import { TOOL_PAGES } from "../src/data/tool-pages.js";
 
 const BASE_URL = "https://quoteai.ca";
@@ -60,6 +61,14 @@ entries.push(url(`${BASE_URL}/fr/outils/`, "0.8", "monthly", toolsUpdated));
 for (const t of TOOL_SLUG_PAIRS) {
   entries.push(url(`${BASE_URL}/tools/${t.en}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
   entries.push(url(`${BASE_URL}/fr/outils/${t.fr}/`, "0.8", "monthly", TOOL_PAGES[t.id].updatedAt));
+}
+
+// Comparison pages: lastmod = the day competitor prices were last checked.
+entries.push(url(`${BASE_URL}/compare/`, "0.8", "monthly", CHECKED_AT));
+entries.push(url(`${BASE_URL}/fr/comparer/`, "0.8", "monthly", CHECKED_AT));
+for (const c of COMPARE_SLUG_PAIRS) {
+  entries.push(url(`${BASE_URL}/compare/${c.en}/`, "0.8", "monthly", CHECKED_AT));
+  entries.push(url(`${BASE_URL}/fr/comparer/${c.fr}/`, "0.8", "monthly", CHECKED_AT));
 }
 
 // lastmod for the templated pages = the day their template or data last

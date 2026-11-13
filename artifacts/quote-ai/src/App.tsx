@@ -58,6 +58,8 @@ const HelpIndexPage = lazy(() => import("@/pages/help/index"));
 const HelpArticlePage = lazy(() => import("@/pages/help/[slug]"));
 const ToolsIndexPage = lazy(() => import("@/pages/tools/index"));
 const ToolPage = lazy(() => import("@/pages/tools/[slug]"));
+const CompareIndexPage = lazy(() => import("@/pages/compare/index"));
+const ComparePage = lazy(() => import("@/pages/compare/[slug]"));
 
 import { PATHS } from "@/data/sitemap-routes";
 
@@ -271,6 +273,11 @@ function Router() {
       <Route path="/fr/outils" component={() => <PublicLayout><Suspense fallback={null}><ToolsIndexPage /></Suspense></PublicLayout>} />
       <Route path="/tools/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
       <Route path="/fr/outils/:slug" component={() => <PublicLayout><Suspense fallback={null}><ToolPage /></Suspense></PublicLayout>} />
+      {/* Comparison pages, both languages (pages/compare) */}
+      <Route path="/compare" component={() => <PublicLayout><Suspense fallback={null}><CompareIndexPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/comparer" component={() => <PublicLayout><Suspense fallback={null}><CompareIndexPage /></Suspense></PublicLayout>} />
+      <Route path="/compare/:slug" component={() => <PublicLayout><Suspense fallback={null}><ComparePage /></Suspense></PublicLayout>} />
+      <Route path="/fr/comparer/:slug" component={() => <PublicLayout><Suspense fallback={null}><ComparePage /></Suspense></PublicLayout>} />
       {/* Help centre — Phase 70; articles from HELP_ARTICLES */}
       <Route path="/help/:slug" component={() => <PublicLayout><Suspense fallback={null}><HelpArticlePage /></Suspense></PublicLayout>} />
       <Route path={PATHS.HELP} component={() => <PublicLayout><Suspense fallback={null}><HelpIndexPage /></Suspense></PublicLayout>} />

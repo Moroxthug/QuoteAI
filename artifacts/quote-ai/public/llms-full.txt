@@ -41,6 +41,14 @@ Free, no sign-up, in English and French: [all calculators](https://quoteai.ca/to
 - [Markup vs margin calculator](https://quoteai.ca/tools/markup-margin-calculator/): Cost to price with a markup or a target margin, and why 25 % markup is only 20 % margin.
 - [What should I charge per hour](https://quoteai.ca/tools/labour-rate-calculator/): The hourly rate that covers your pay, your overhead and a profit, from the hours you can really bill.
 
+## Comparisons
+
+quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with each company's published prices (checked 2026-11-13) and when each is the better pick: [all comparisons](https://quoteai.ca/compare/).
+
+- [quoteai vs Jobber](https://quoteai.ca/compare/quoteai-vs-jobber/)
+- [quoteai vs Joist](https://quoteai.ca/compare/quoteai-vs-joist/)
+- [quoteai vs Housecall Pro](https://quoteai.ca/compare/quoteai-vs-housecall-pro/)
+
 ## Provinces
 
 - [British Columbia](https://quoteai.ca/provinces/british-columbia/): sales tax on quotes and invoices shown as GST 5 % + PST 7 %.
@@ -489,6 +497,11 @@ Calculateurs gratuits ([tous](https://quoteai.ca/fr/outils/)) :
 - [Calculateur de retenue de construction](https://quoteai.ca/fr/outils/calculateur-retenue/): La retenue de 10 % sur une facture progressive, le montant payable maintenant et les taxes à la libération.
 - [Calculateur majoration ou marge](https://quoteai.ca/fr/outils/calculateur-majoration-marge/): Du coût au prix avec une majoration ou une marge visée, et pourquoi 25 % de majoration ne font que 20 % de marge.
 - [Combien facturer de l'heure](https://quoteai.ca/fr/outils/calculateur-taux-horaire/): Le taux horaire qui couvre votre salaire, vos frais généraux et un profit, selon vos heures vraiment facturables.
+
+Comparaisons ([toutes](https://quoteai.ca/fr/comparer/)) :
+- [quoteai ou Jobber](https://quoteai.ca/fr/comparer/quoteai-ou-jobber/)
+- [quoteai ou Joist](https://quoteai.ca/fr/comparer/quoteai-ou-joist/)
+- [quoteai ou Housecall Pro](https://quoteai.ca/fr/comparer/quoteai-ou-housecall-pro/)
 
 Provinces :
 - [Colombie-Britannique](https://quoteai.ca/fr/provinces/colombie-britannique/)

@@ -66,6 +66,22 @@ export function toolPath(lang: "en" | "fr", id?: ToolId): string {
   return `${base}${pair[lang]}/`;
 }
 
+/** Comparison pages: /compare/<slug>/ ↔ /fr/comparer/<slug>/. */
+export const COMPARE_SLUG_PAIRS = [
+  { id: "jobber", en: "quoteai-vs-jobber", fr: "quoteai-ou-jobber" },
+  { id: "joist", en: "quoteai-vs-joist", fr: "quoteai-ou-joist" },
+  { id: "housecallPro", en: "quoteai-vs-housecall-pro", fr: "quoteai-ou-housecall-pro" },
+] as const;
+export type CompetitorId = (typeof COMPARE_SLUG_PAIRS)[number]["id"];
+
+/** /compare/<slug>/ or /fr/comparer/<slug>/ (the hub when id is omitted). */
+export function comparePath(lang: "en" | "fr", id?: CompetitorId): string {
+  const base = lang === "fr" ? "/fr/comparer/" : "/compare/";
+  if (!id) return base;
+  const pair = COMPARE_SLUG_PAIRS.find((p) => p.id === id)!;
+  return `${base}${pair[lang]}/`;
+}
+
 const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
   { en: "/pricing", fr: "/fr/tarifs" },
   { en: "/pilot", fr: "/fr/pilote" },
@@ -75,6 +91,8 @@ const LOCALE_PAGE_PAIRS: ReadonlyArray<{ en: string; fr: string }> = [
   // Free calculators: the hub and every tool page.
   { en: "/tools", fr: "/fr/outils" },
   ...TOOL_SLUG_PAIRS.map((p) => ({ en: `/tools/${p.en}`, fr: `/fr/outils/${p.fr}` })),
+  { en: "/compare", fr: "/fr/comparer" },
+  ...COMPARE_SLUG_PAIRS.map((p) => ({ en: `/compare/${p.en}`, fr: `/fr/comparer/${p.fr}` })),
 ];
 
 /** Phase 81 — province landing pages: English slug ↔ French slug. */

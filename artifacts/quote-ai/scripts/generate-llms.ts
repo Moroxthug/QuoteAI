@@ -18,7 +18,8 @@ import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { HELP_ARTICLES, HELP_CATEGORIES, type HelpBlock } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } from "../src/data/province-data.js";
 import { MARKETING_PLANS } from "../src/data/pricing.js";
-import { toolPath } from "../src/data/seo-slugs.js";
+import { toolPath, comparePath } from "../src/data/seo-slugs.js";
+import { COMPETITORS, COMPARE_ORDER, CHECKED_AT } from "../src/data/compare-pages.js";
 import { TOOL_PAGES, TOOL_ORDER } from "../src/data/tool-pages.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -51,6 +52,9 @@ const provinceLinksFr = PILOT_PROVINCES.map(
 
 const toolLinks = (lang: "en" | "fr") =>
   TOOL_ORDER.map((id) => `- [${TOOL_PAGES[id].h1[lang].replace(/[.?]$/, "")}](${BASE}${toolPath(lang, id)}): ${TOOL_PAGES[id].short[lang]}`).join("\n");
+
+const compareLinks = (lang: "en" | "fr") =>
+  COMPARE_ORDER.map((id) => `- [quoteai ${lang === "fr" ? "ou" : "vs"} ${COMPETITORS[id].name}](${BASE}${comparePath(lang, id)})`).join("\n");
 
 const helpLinks = HELP_ARTICLES.map((a) => `- [${a.title.en}](${BASE}/help/${a.slug}/): ${a.summary.en}`).join("\n");
 
@@ -95,6 +99,12 @@ Free, no sign-up, in English and French: [all calculators](${BASE}/tools/).
 
 ${toolLinks("en")}
 
+## Comparisons
+
+quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with each company's published prices (checked ${CHECKED_AT}) and when each is the better pick: [all comparisons](${BASE}/compare/).
+
+${compareLinks("en")}
+
 ## Provinces
 
 ${provinceLinks}
@@ -119,6 +129,9 @@ quoteai est un logiciel de soumissions et de gestion de chantiers pour les entre
 
 Calculateurs gratuits ([tous](${BASE}/fr/outils/)) :
 ${toolLinks("fr")}
+
+Comparaisons ([toutes](${BASE}/fr/comparer/)) :
+${compareLinks("fr")}
 
 Provinces :
 ${provinceLinksFr}

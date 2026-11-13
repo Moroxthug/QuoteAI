@@ -1171,6 +1171,9 @@ const BLOG_CONTENT: Record<string, string> = {
   <li>Is there a free trial or plan?</li>
 </ul>
 
+<h2>Side-by-side comparisons</h2>
+<p>For prices, currency, Canadian tax and French support next to each other, see <a href="/compare/">quoting software for Canadian contractors, compared</a>, or the one-to-one pages: <a href="/compare/quoteai-vs-jobber/">quoteai vs Jobber</a>, <a href="/compare/quoteai-vs-joist/">quoteai vs Joist</a> and <a href="/compare/quoteai-vs-housecall-pro/">quoteai vs Housecall Pro</a>.</p>
+
 <h2>Try it on a real job</h2>
 <p>Whichever tool you consider, test it on a real quote, not a demo. quoteai is built for Canadian trades: see <a href="/quotes/free-quote/">free quoting</a>, or compare with the <a href="/quotes/excel-template/">Excel template</a> and <a href="/quotes/word-template/">Word template</a> approach.</p>
 `,

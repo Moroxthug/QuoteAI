@@ -3481,3 +3481,17 @@ html.edge-dragging #main { box-shadow: -10px 0 28px rgba(16, 16, 49, .12); }
 @media (prefers-reduced-motion: reduce) { .tool-tile, .tool-tile:hover { transition: none; transform: none; } }
 .tool-card .dm-grand { gap: 4px 12px; flex-wrap: wrap; }
 .tool-card .dm-grand b { white-space: nowrap; margin-left: auto; }
+
+/* ==========================================================
+   COMPARISON PAGES (/compare, /fr/comparer)
+   ========================================================== */
+.cmp-h3 { font-size: 18px; font-weight: 800; color: var(--navy); margin-bottom: 12px; }
+.cmp-facts th[scope="row"] { text-align: left; padding: 14px 20px; border-top: 1px solid var(--soft); color: var(--navy); font-weight: 700; font-size: 14px; vertical-align: top; min-width: 170px; }
+.cmp-facts td { vertical-align: top; font-size: 14px; line-height: 1.5; }
+.cmp-facts td:first-child { color: var(--green-dark); }
+.cmp-wide { min-width: 880px; }
+.cmp-facts { min-width: 560px; }
+.prov-fine a { text-decoration: underline; }
+.cmp-facts { table-layout: fixed; width: 100%; }
+.cmp-facts thead th:first-child { width: 24%; }
+.cmp-wide thead th:first-child { width: 16%; }

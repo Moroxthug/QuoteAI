@@ -12,6 +12,7 @@
     }
   },
   "redirects": [
+    { "source": "/((?!api/).*)", "has": [{ "type": "host", "value": "quote-ai-chi.vercel.app" }], "destination": "https://quoteai.ca/$1", "permanent": true },
     { "source": "/chi-siamo{/}?", "destination": "/about/", "permanent": true },
     { "source": "/contatti{/}?", "destination": "/contact/", "permanent": true },
     { "source": "/mappa-sito{/}?", "destination": "/site-map/", "permanent": true },

@@ -6,5 +6,10 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     groups:
+      # Only minor and patch bumps are grouped. Major bumps (e.g. recharts 2->3,
+      # typescript 5->7) arrive as their own PRs so each can be reviewed alone.
       dev-dependencies:
         dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"

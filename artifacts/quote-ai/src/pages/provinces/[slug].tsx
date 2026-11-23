@@ -233,7 +233,7 @@ export default function ProvinceLandingPage() {
               <span className="eyebrow grey">{t("province.tradesEyebrow")}</span>
               <h2 className="h2">{t("province.tradesTitle")}</h2>
             </div>
-            <Link href={lang === "fr" ? "/fr#trades" : "/#trades"} className="cta-link">
+            <Link href={lang === "fr" ? "/fr/#trades" : "/#trades"} className="cta-link">
               {t("province.allTrades")} <ArrowRight className="chev h-4 w-4" />
             </Link>
           </div>

@@ -22,7 +22,7 @@ const ChevRight = () => (
 );
 
 function ProductsMegaMenu() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -38,10 +38,10 @@ function ProductsMegaMenu() {
   }, [open]);
 
   const tiles = [
-    { href: "/#story-quotes", cls: "mc-green", title: t("nav.products.quotes.title"), desc: t("nav.products.quotes.desc") },
-    { href: "/#story-jobs", cls: "mc-purple", title: t("nav.products.crm.title"), desc: t("nav.products.crm.desc") },
-    { href: "/#story-invoicing", cls: "mc-teal", title: t("nav.products.invoicing.title"), desc: t("nav.products.invoicing.desc") },
-    { href: "/#products", cls: "mc-yellow", title: t("nav.products.team.title"), desc: t("nav.products.team.desc") },
+    { href: localizedPath("/#story-quotes", lang), cls: "mc-green", title: t("nav.products.quotes.title"), desc: t("nav.products.quotes.desc") },
+    { href: localizedPath("/#story-jobs", lang), cls: "mc-purple", title: t("nav.products.crm.title"), desc: t("nav.products.crm.desc") },
+    { href: localizedPath("/#story-invoicing", lang), cls: "mc-teal", title: t("nav.products.invoicing.title"), desc: t("nav.products.invoicing.desc") },
+    { href: localizedPath("/#products", lang), cls: "mc-yellow", title: t("nav.products.team.title"), desc: t("nav.products.team.desc") },
   ];
 
   return (
@@ -66,7 +66,7 @@ function ProductsMegaMenu() {
 }
 
 function AnnouncementBar() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   // Phase 100: the bar announces WhatsApp quoting — say nothing until it is live.
   const whatsappLive = useWhatsappAvailable();
   const [dismissed, setDismissed] = useState(() => {
@@ -82,7 +82,7 @@ function AnnouncementBar() {
   return (
     <div className="annc">
       {t("annc.text")}
-      <Link href="/#whatsapp">{t("annc.cta")}</Link>
+      <Link href={localizedPath("/#whatsapp", lang)}>{t("annc.cta")}</Link>
       <button
         className="annc-x"
         aria-label={t("annc.dismiss")}
@@ -119,17 +119,19 @@ function LanguageToggle({ variant = "pill" }: { variant?: "pill" | "dark" }) {
   };
 
   const label = lang === "en" ? "FR" : "EN";
+  const className = variant === "dark" ? "locale" : "hd-fr";
+  const counterpart = getLanguageCounterpartPath(pathname);
 
-  if (variant === "dark") {
+  if (counterpart) {
     return (
-      <button onClick={handleClick} className="locale" aria-label={t("lang.switchTo")}>
+      <Link href={counterpart} className={className} aria-label={t("lang.switchTo")} hrefLang={lang === "en" ? "fr-CA" : "en-CA"}>
         {label}
-      </button>
+      </Link>
     );
   }
 
   return (
-    <button onClick={handleClick} className="hd-fr" aria-label={t("lang.switchTo")}>
+    <button onClick={handleClick} className={className} aria-label={t("lang.switchTo")}>
       {label}
     </button>
   );
@@ -204,18 +206,18 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
       <AnnouncementBar />
       <header className={cn("site-head", scrolled && "scrolled")}>
         <div className="wrap hd">
-          <Link href="/" className="flex items-center">
+          <Link href={localizedPath("/", lang)} className="flex items-center">
             <Logo />
           </Link>
           <nav aria-label={t("a11y.primaryNav")} className="nav">
             <ProductsMegaMenu />
             <Link href={localizedPath("/pricing/", lang)} className="nav-link" aria-current={isHere(localizedPath("/pricing/", lang)) ? "page" : undefined}>{t("nav.pricing")}</Link>
             <Link href={localizedPath("/#trades", lang)} className="nav-link">{t("nav.trades")}</Link>
-            <Link href="/#whatsapp" className="nav-link">
+            <Link href={localizedPath("/#whatsapp", lang)} className="nav-link">
               {t("nav.whatsapp")}
               <span className="chip chip-new">{t("nav.new")}</span>
             </Link>
-            <Link href="/#guides" className="nav-link">{t("nav.guides")}</Link>
+            <Link href={localizedPath("/#guides", lang)} className="nav-link">{t("nav.guides")}</Link>
           </nav>
           <div className="hd-r">
             <LanguageToggle />
@@ -299,7 +301,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
       <footer className="footer">
         <div className="wrap ft-grid">
           <div className="ft-brand">
-            <Link href="/" className="flex items-center mb-1">
+            <Link href={localizedPath("/", lang)} className="flex items-center mb-1">
               <Logo className="logo-invert" />
             </Link>
             <p>{t("footer.tagline")}</p>
@@ -312,11 +314,11 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
           </FooterCol>
           <FooterCol title={t("footer.features")} folded={phone}>
             <Link href="/whatsapp/">{t("nav.whatsapp")}<span className="chip-new chip">{t("nav.new")}</span></Link>
-            <Link href="/#story-jobs">{t("footer.jobSites")}</Link>
-            <Link href="/#story-invoicing">{t("footer.contracts")}</Link>
-            <Link href="/#products">{t("footer.analytics")}</Link>
-            <Link href="/#products">{t("footer.aiAssistant")}</Link>
-            <Link href="/#products">{t("footer.imports")}</Link>
+            <Link href={localizedPath("/#story-jobs", lang)}>{t("footer.jobSites")}</Link>
+            <Link href={localizedPath("/#story-invoicing", lang)}>{t("footer.contracts")}</Link>
+            <Link href={localizedPath("/#products", lang)}>{t("footer.analytics")}</Link>
+            <Link href={localizedPath("/#products", lang)}>{t("footer.aiAssistant")}</Link>
+            <Link href={localizedPath("/#products", lang)}>{t("footer.imports")}</Link>
           </FooterCol>
           <FooterCol title={t("footer.guides")} folded={phone}>
             <Link href="/blog/">{t("footer.blog")}</Link>
@@ -343,7 +345,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <Link href="/about/">{t("footer.aboutUs")}</Link>
             <Link href="/contact/">{t("footer.contact")}</Link>
             <Link href="/blog/">{t("footer.newsroom")}</Link>
-            <Link href="/#reviews">{t("footer.reviews")}</Link>
+            <Link href={localizedPath("/#reviews", lang)}>{t("footer.reviews")}</Link>
           </FooterCol>
           <FooterCol title={t("footer.support")} folded={phone}>
             <Link href="/help/">{t("footer.helpCenter")}</Link>

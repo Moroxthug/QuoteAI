@@ -57,6 +57,7 @@ const MappaSitoPage = lazy(() => import("@/pages/mappa-sito"));
 const HelpIndexPage = lazy(() => import("@/pages/help/index"));
 const HelpArticlePage = lazy(() => import("@/pages/help/[slug]"));
 const ToolsIndexPage = lazy(() => import("@/pages/tools/index"));
+const SeoHubPage = lazy(() => import("@/pages/seo/hub"));
 const ToolPage = lazy(() => import("@/pages/tools/[slug]"));
 const CompareIndexPage = lazy(() => import("@/pages/compare/index"));
 const ComparePage = lazy(() => import("@/pages/compare/[slug]"));
@@ -337,6 +338,8 @@ function Router() {
       <Route path="/p/:id" component={() => <Suspense fallback={null}><PublicQuotePage /></Suspense>} />
 
       {/* SEO landing pages — dynamic, driven by SECTORS / CITIES data */}
+      <Route path="/quotes" component={() => <PublicLayout><Suspense fallback={null}><SeoHubPage /></Suspense></PublicLayout>} />
+      <Route path="/fr/soumissions" component={() => <PublicLayout><Suspense fallback={null}><SeoHubPage /></Suspense></PublicLayout>} />
       <Route path="/quotes/:type/:city" component={() => <PublicLayout><Suspense fallback={null}><SeoCityLanding /></Suspense></PublicLayout>} />
       <Route path="/quotes/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
       {/* French SEO landing pages — same components, detect lang from the /fr prefix */}

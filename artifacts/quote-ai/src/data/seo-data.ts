@@ -313,7 +313,7 @@ export const SECTORS: Record<string, SectorData> = {
     fr: {
       label: "Entrepreneur en rénovation",
       labelPlural: "entrepreneurs en rénovation",
-      titleTag: "Soumissions entrepreneur en rénovation en ligne | quoteai – IA en 30s",
+      titleTag: "Soumissions entrepreneur en rénovation en ligne | quoteai",
       metaDescription: "Créez des soumissions professionnelles en 30 secondes avec l'IA. Logiciel de soumission pour les entrepreneurs en rénovation canadiens. Essayez gratuitement.",
       jsonLdDescription: "Logiciel de soumission par IA pour les entrepreneurs en rénovation canadiens.",
       useCases: [

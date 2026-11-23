@@ -18,8 +18,10 @@ export function freeQuotesState(a: Allowance | null | undefined): { kind: "none"
   return { kind: left === 0 && f.enforced ? "used" : "counting", left, limit: f.limit };
 }
 
-export function useAllowance() {
+/** enabled: false skips the request (the app-wide dialog asks only once it opens, so public pages never call it). */
+export function useAllowance(enabled = true) {
   const q = useQuery({
+    enabled,
     queryKey: ALLOWANCE_KEY,
     queryFn: async (): Promise<Allowance> => {
       const res = await fetch("/api/me/allowance", { credentials: "include", headers: { accept: "application/json" } });

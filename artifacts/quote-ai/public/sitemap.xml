@@ -265,6 +265,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://quoteai.ca/quotes/</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://quoteai.ca/fr/soumissions/</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://quoteai.ca/quotes/painter/</loc>
     <lastmod>2026-11-22</lastmod>
     <changefreq>monthly</changefreq>
@@ -465,12 +477,6 @@
   <url>
     <loc>https://quoteai.ca/blog/category/tools/</loc>
     <lastmod>2026-11-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://quoteai.ca/blog/category/innovation/</loc>
-    <lastmod>2026-11-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

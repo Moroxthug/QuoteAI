@@ -213,7 +213,7 @@ export default function SeoCityLanding() {
       {/* ── Breadcrumb ───────────────────────────────────────── */}
       <div className="wrap">
         <nav aria-label={t("seo.city.breadcrumbAria")} className="crumbs">
-          <Link href={isFr ? "/fr" : "/"}>{t("blog.breadcrumbHome")}</Link>
+          <Link href={isFr ? "/fr/" : "/"}>{t("blog.breadcrumbHome")}</Link>
           <span className="crumb-sep" aria-hidden="true">/</span>
           <Link href={`${base}/${sSlugForLang}/`}>{sectorLabel}</Link>
           <span className="crumb-sep" aria-hidden="true">/</span>

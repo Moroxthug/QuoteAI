@@ -154,13 +154,30 @@ Done when: a crawl shows no Italian strings and no AggregateRating; 126 city pag
    - Long cache on `/fonts/`.
    - Fold the two-hop redirects into one (T8).
    - Trim titles over 60 characters and descriptions over 160 on the pages that stay indexed (T7).
-7. Add a crawl check to CI (`scripts/seo-crawl-check.ts`) that fails on:
+7. Add a crawl check to the build (built as `scripts/seo-check.ts`) that fails on:
    - a soft 404
    - an internal link through a redirect
    - a sitemap URL that isn't 200 or isn't self-canonical
    - Italian strings
    - AggregateRating
    - a title over 65 or a description over 165 characters
+
+**S2 status (2026-11-23): built.** Sitemap 140 URLs; 266 pages built, plus `404.html`.
+- **404s:** `vercel.json` sends only the app routes (sign-in/up, onboarding, welcome, admin, crm, sign, portal, i, t, team-invite, join, p) to `spa.html` and `/dashboard` to `app.html`. Every other unknown URL gets the prerendered `404.html` with status 404.
+- **Hubs:** new `/quotes/` and `/fr/soumissions/` pages (`src/pages/seo/hub.tsx`).
+- **French trade pages:** link only to the Montréal city page; the all-cities block is gone.
+- **Internal links:** go to final URLs (`/fr/`, `/sign-up/`); French header, footer and anchors stay French.
+- **Language switch:** a real link when the page has a counterpart.
+- **Housekeeping:**
+  - empty blog categories are hidden
+  - `/index.html` 301s to `/`
+  - the dev canonical script is stripped from built pages
+  - blog dates are formatted in UTC (the hydration mismatch)
+  - `/api/me/allowance` is only called when the free-quotes dialog opens
+  - `/fonts/` cached for 30 days
+- **Titles and descriptions:** 48 pages shortened to 65 / 165 characters. On blog and help pages the description is also the lead paragraph, so that text is shorter too.
+- **Build gate:** `scripts/seo-check.ts` (`npm run qa:seo`) runs in `build` and fails the deploy on any of the checks listed in item 7.
+- **Not done:** the two-hop redirects (`http://www.`, a city URL without its trailing slash), which are rare and harmless.
 
 ### S3: Consolidate and rewrite the content (2–3 weeks; ship in weekly batches)
 Every page that stays indexed must meet this bar: at least 900 words of main content, a named author with a bio, a sourced price or rule for every number, at least one real product screenshot or worked example, a real `updatedAt`, and one clear contractor intent.

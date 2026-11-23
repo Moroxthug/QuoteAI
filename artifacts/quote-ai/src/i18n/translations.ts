@@ -648,7 +648,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "sitemap.termsOfService": "Terms of Service",
     "sitemap.helpCenter": "Help centre",
     "help.seoTitle": "Help Centre | quoteai — How to Use QuoteAI",
-    "help.seoDescription": "Step-by-step guides for every part of QuoteAI: setting up your business, creating and sending quotes, contracts and e-signature, jobs, invoices and payments, team, leads and integrations.",
+    "help.seoDescription": "Step-by-step guides for QuoteAI: setting up your business, sending quotes, contracts and e-signature, jobs, invoices and payments, team, leads and integrations.",
     "help.breadcrumb": "Help centre",
     "help.eyebrow": "Help centre",
     "help.heading": "How to use QuoteAI",
@@ -1310,7 +1310,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "billing.picker.promoApplied": "Pilot code {code} will be applied on the checkout page.",
 
     "pricing.seoTitle": "Pricing — quoteai | Plans for Canadian contractors from $29/month",
-    "pricing.seoDescription": "Monthly or annual plans for Canadian contractors, or pay $5–$13 per quote with no subscription. Starter $29, Pro $79, Business $249, Elite custom — in Canadian dollars, cancel any time.",
+    "pricing.seoDescription": "Monthly or annual plans for Canadian contractors, or $5–$13 a quote, no subscription. Starter $29, Pro $79, Business $249, Elite custom. CAD, cancel any time.",
     "pricing.breadcrumb": "Pricing",
     "pricing.eyebrow": "Plans and pricing",
     "pricing.h1": "Pick the plan that matches how often you quote.",
@@ -1390,7 +1390,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pricing.ctaFine": "7-day free trial · No credit card required · Bilingual FR / EN",
 
     "province.seoTitle": "Quoting software for contractors in {province} | quoteai",
-    "province.seoDescription": "Quotes, contracts and invoices for {province} contractors, with {tax} applied automatically on every document. Bilingual, e-signature included, built for Canadian trades.",
+    "province.seoDescription": "Quotes, contracts and invoices for {province} contractors, with {tax} applied automatically. Bilingual, with e-signature included.",
     "province.eyebrow": "Pilot province",
     "province.h1": "{province}: quoting software built for Canadian contractors.",
     "province.startFree": "Start for free",
@@ -2788,8 +2788,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "footer.pilotProgram": "Programme pilote",
     "billing.picker.promoApplied": "Le code pilote {code} sera appliqué à la page de paiement.",
 
-    "pricing.seoTitle": "Tarifs — quoteai | Forfaits pour entrepreneurs canadiens dès 29 $/mois",
-    "pricing.seoDescription": "Forfaits mensuels ou annuels pour les entrepreneurs canadiens, ou paiement à la soumission de 5 $ à 13 $ sans abonnement. Starter 29 $, Pro 79 $, Business 249 $, Elite sur mesure — en dollars canadiens, annulable en tout temps.",
+    "pricing.seoTitle": "Tarifs — quoteai | Forfaits pour entrepreneurs dès 29 $/mois",
+    "pricing.seoDescription": "Forfaits mensuels ou annuels pour entrepreneurs canadiens, ou 5 $ à 13 $ par soumission sans abonnement. Starter 29 $, Pro 79 $, Business 249 $, Elite sur mesure.",
     "pricing.breadcrumb": "Tarifs",
     "pricing.eyebrow": "Forfaits et tarifs",
     "pricing.h1": "Choisissez le forfait qui suit votre rythme de soumissions.",
@@ -2868,8 +2868,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     "pricing.ctaPilot": "À propos du pilote",
     "pricing.ctaFine": "Essai gratuit de 7 jours · Sans carte de crédit · Bilingue FR / EN",
 
-    "province.seoTitle": "{province} : logiciel de soumission pour entrepreneurs | quoteai",
-    "province.seoDescription": "Soumissions, contrats et factures pour les entrepreneurs — {province} — avec {tax} appliqué automatiquement sur chaque document. Bilingue, signature électronique incluse.",
+    "province.seoTitle": "{province} : logiciel de soumission | quoteai",
+    "province.seoDescription": "Soumissions, contrats et factures bilingues pour entrepreneurs — {province} — avec {tax} appliqué d'office. Signature électronique incluse.",
     "province.eyebrow": "Province pilote",
     "province.h1": "{province} : un logiciel de soumission conçu pour les entrepreneurs canadiens.",
     "province.startFree": "Commencer gratuitement",
@@ -2901,7 +2901,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     "province.pilotLink": "À propos du pilote",
 
     "pilot.seoTitle": "Le projet pilote quoteai — C.-B., Ontario et Québec | quoteai",
-    "pilot.seoDescription": "quoteai ouvre d'abord aux entrepreneurs de la Colombie-Britannique, de l'Ontario et du Québec. Ce que comprend le pilote, ce que nous demandons en retour, et comment y participer.",
+    "pilot.seoDescription": "quoteai ouvre d'abord aux entrepreneurs de la C.-B., de l'Ontario et du Québec. Ce que comprend le pilote, ce que nous demandons en retour et comment y participer.",
     "pilot.breadcrumb": "Programme pilote",
     "pilot.eyebrow": "Programme pilote",
     "pilot.h1": "Nous ouvrons d'abord dans trois provinces.",

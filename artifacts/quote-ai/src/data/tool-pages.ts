@@ -30,7 +30,7 @@ export const TOOLS_HUB = {
   },
   description: {
     en: "Free calculators for Canadian trades: GST/HST/PST/QST sales tax by province, construction holdback, markup vs margin and your hourly labour rate. No sign-up.",
-    fr: "Calculateurs gratuits pour les gens de métier au Canada : taxes de vente TPS/TVH/TVP/TVQ par province, retenue de construction, majoration ou marge et taux horaire. Sans inscription.",
+    fr: "Calculateurs gratuits pour gens de métier au Canada : TPS/TVH/TVP/TVQ par province, retenue de construction, majoration ou marge, taux horaire. Sans inscription.",
   },
   eyebrow: { en: "Free tools", fr: "Outils gratuits" },
   h1: { en: "Free calculators for Canadian contractors.", fr: "Calculateurs gratuits pour les entrepreneurs canadiens." },
@@ -109,11 +109,11 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
     updatedAt: "2026-11-13",
     title: {
       en: "GST/HST, PST & QST calculator for contractors (2026) | quoteai",
-      fr: "Calculateur TPS/TVH, TVP et TVQ pour entrepreneurs (2026) | quoteai",
+      fr: "Calculateur TPS/TVH, TVP et TVQ pour entrepreneurs | quoteai",
     },
     description: {
       en: "Add or remove Canadian sales tax for any province: GST, HST, PST and QST as separate lines, the way your quote and invoice should show them. 2026 rates, free.",
-      fr: "Ajoutez ou retirez les taxes de vente canadiennes pour toute province : TPS, TVH, TVP et TVQ en lignes distinctes, comme sur vos soumissions et factures. Taux 2026, gratuit.",
+      fr: "Ajoutez ou retirez les taxes de vente de toute province : TPS, TVH, TVP et TVQ en lignes distinctes, comme sur vos soumissions et factures. Taux 2026, gratuit.",
     },
     eyebrow: { en: "Free sales tax calculator", fr: "Calculateur de taxes gratuit" },
     h1: { en: "GST, HST, PST and QST calculator for contractors.", fr: "Calculateur de TPS, TVH, TVP et TVQ pour entrepreneurs." },
@@ -195,11 +195,11 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
     updatedAt: "2026-11-13",
     title: {
       en: "Construction holdback calculator (10 %), with HST | quoteai",
-      fr: "Calculateur de retenue de construction (10 %), avec taxes | quoteai",
+      fr: "Calculateur de retenue de construction (10 %) | quoteai",
     },
     description: {
-      en: "Work out the 10 % holdback on a progress invoice, what is payable now, and the GST/HST due when the holdback is released. For Ontario, BC, Alberta and other provinces.",
-      fr: "Calculez la retenue de 10 % sur une facture progressive, le montant à payer maintenant et les taxes dues à la libération de la retenue. Ontario, C.-B., Alberta et autres provinces.",
+      en: "Work out the 10 % holdback on a progress invoice, what is payable now, and the GST/HST due on its release. For Ontario, BC, Alberta and other provinces.",
+      fr: "Calculez la retenue de 10 % d'une facture progressive, le montant payable maintenant et les taxes dues à sa libération. Ontario, C.-B., Alberta et plus.",
     },
     eyebrow: { en: "Free holdback calculator", fr: "Calculateur de retenue gratuit" },
     h1: { en: "Construction holdback calculator.", fr: "Calculateur de retenue de construction." },
@@ -277,8 +277,8 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
       fr: "Calculateur majoration ou marge pour entrepreneurs | quoteai",
     },
     description: {
-      en: "Turn your cost into a price: enter a markup or the margin you want and see the price, the profit and the other percentage. With a markup-to-margin table for contractors.",
-      fr: "Passez du coût au prix : entrez une majoration ou la marge visée et voyez le prix, le profit et l'autre pourcentage. Avec un tableau majoration-marge pour entrepreneurs.",
+      en: "Turn your cost into a price: enter a markup or the margin you want and see the price, the profit and the other percentage. With a markup-to-margin table.",
+      fr: "Passez du coût au prix : entrez une majoration ou la marge visée et voyez le prix, le profit et l'autre pourcentage. Avec un tableau majoration-marge.",
     },
     eyebrow: { en: "Free markup calculator", fr: "Calculateur de majoration gratuit" },
     h1: { en: "Markup vs margin calculator.", fr: "Calculateur majoration ou marge." },
@@ -343,12 +343,12 @@ export const TOOL_PAGES: Record<ToolId, ToolPage> = {
     id: "labourRate",
     updatedAt: "2026-11-13",
     title: {
-      en: "Contractor hourly rate calculator: what to charge per hour | quoteai",
-      fr: "Calculateur de taux horaire pour entrepreneurs : combien facturer | quoteai",
+      en: "Contractor hourly rate calculator: what to charge | quoteai",
+      fr: "Calculateur de taux horaire pour entrepreneurs | quoteai",
     },
     description: {
       en: "Work out the hourly rate a self-employed tradesperson needs to charge in Canada: your pay, your overhead, the hours you can really bill, and a profit margin. Free.",
-      fr: "Calculez le taux horaire qu'un travailleur autonome des métiers doit facturer au Canada : votre salaire, vos frais généraux, les heures vraiment facturables et une marge de profit. Gratuit.",
+      fr: "Calculez le taux horaire qu'un travailleur autonome des métiers doit facturer au Canada : salaire, frais généraux, heures facturables et marge de profit. Gratuit.",
     },
     eyebrow: { en: "Free hourly rate calculator", fr: "Calculateur de taux horaire gratuit" },
     h1: { en: "What should I charge per hour?", fr: "Combien facturer de l'heure?" },

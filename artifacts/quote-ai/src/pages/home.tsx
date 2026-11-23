@@ -86,13 +86,13 @@ export default function Home() {
       <SeoHead
         title={
           lang === "fr"
-            ? "quoteai – Soumissions instantanées pour entrepreneurs canadiens | IA en 30s"
+            ? "quoteai – Soumissions instantanées pour entrepreneurs canadiens"
             : "quoteai – Instant Quotes for Canadian Contractors | AI in 30s"
         }
         description={
           lang === "fr"
-            ? "quoteai transforme une description en langage courant en une soumission chiffrée, personnalisée et taxée en 30 secondes — puis gère prospects, chantiers, contrats et factures jusqu'au paiement. Conçu pour les métiers canadiens."
-            : "quoteai turns a plain-language job description into a priced, branded, tax-calculated quote in 30 seconds — then runs leads, job sites, contracts and invoices until you're paid. Built for Canadian trades."
+            ? "quoteai transforme une description du travail en soumission chiffrée et taxée en 30 secondes, puis gère prospects, chantiers et factures jusqu'au paiement."
+            : "quoteai turns a job description into a priced, taxed quote in 30 seconds, then runs leads, contracts and invoices until you're paid. Built for Canadian trades."
         }
         canonical={lang === "fr" ? "https://quoteai.ca/fr/" : "https://quoteai.ca/"}
         lang={lang === "fr" ? "fr-CA" : "en-CA"}
@@ -289,7 +289,7 @@ export default function Home() {
                   ? "Ouvrez le chantier directement depuis la soumission signée — client, montant et postes déjà liés. Suivez les tâches, assignez votre équipe, notez les fournisseurs et surveillez le budget réel vs prévu."
                   : "Open the job straight from the signed quote — client, amount and line items already linked. Track tasks, assign your team, log suppliers and watch budget vs actual as costs land."}
               </p>
-              <Link href="/dashboard/jobs" className="cta-link">
+              <Link href="/sign-up/" className="cta-link">
                 {lang === "fr" ? "Explorer les chantiers" : "Explore job sites"} <ArrowRight className="chev h-4 w-4" />
               </Link>
             </div>
@@ -306,7 +306,7 @@ export default function Home() {
                   ? "Générées depuis la soumission ou le chantier accepté, envoyées avec une vue client publique, rappelées poliment selon l'échéancier, et réconciliées une fois payées. Les contrats viennent de la même source de vérité."
                   : "Generated from the accepted quote or job, sent with a public client view, reminded politely on schedule, and reconciled when paid. Contracts come from the same source of truth."}
               </p>
-              <Link href="/dashboard/invoices" className="cta-link">
+              <Link href="/sign-up/" className="cta-link">
                 {lang === "fr" ? "Explorer la facturation" : "Explore invoicing"} <ArrowRight className="chev h-4 w-4" />
               </Link>
             </div>
@@ -424,7 +424,7 @@ export default function Home() {
                 </div>
                 <div className="news-body">
                   <p className="news-meta">
-                    {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric" })}
+                    {article.category} · {new Date(article.publishedAt).toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}
                   </p>
                   <h3>{article.title}</h3>
                   <span className="cta-link">{lang === "fr" ? "Lire l'article" : "Read more"} <ArrowRight className="chev h-4 w-4" /></span>

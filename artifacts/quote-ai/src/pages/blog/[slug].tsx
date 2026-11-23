@@ -10,7 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 function formatDate(iso: string, lang: "en" | "fr"): string {
   const d = new Date(iso);
-  return d.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString(lang === "fr" ? "fr-CA" : "en-CA", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 }
 
 const CATEGORY_CHIPS: Record<string, string> = {

@@ -139,7 +139,7 @@ export function localizedPath(path: string, lang: "en" | "fr"): string {
 
 /** /quotes/… ↔ /fr/soumissions/… counterpart of a sector or city landing URL (null when there is none). */
 export function getLanguageCounterpartPath(pathname: string): string | null {
-  if (pathname === "/") return "/fr";
+  if (pathname === "/") return "/fr/";
   if (pathname === "/fr" || pathname === "/fr/") return "/";
 
   // Phase 81 — the static pages with a French twin.
@@ -159,10 +159,16 @@ export function getLanguageCounterpartPath(pathname: string): string | null {
     if (pair) return `/provinces/${pair.en}/`;
   }
 
+  // Trade hubs.
+  if (bare === "/quotes") return "/fr/soumissions/";
+  if (bare === "/fr/soumissions") return "/quotes/";
+
+  // French city pages exist only for Montréal (the other French-primary
+  // cities redirect to the trade page): elsewhere the counterpart is the trade.
   const enCity = pathname.match(/^\/quotes\/([a-z0-9-]+)\/([a-z0-9-]+)\/?$/);
   if (enCity) {
     const sector = SECTOR_SLUGS[enCity[1]!];
-    if (sector) return `/fr/soumissions/${sector.frSlug}/${enCity[2]}/`;
+    if (sector) return enCity[2] === "montreal" ? `/fr/soumissions/${sector.frSlug}/montreal/` : `/fr/soumissions/${sector.frSlug}/`;
   }
   const enSector = pathname.match(/^\/quotes\/([a-z0-9-]+)\/?$/);
   if (enSector) {
@@ -177,7 +183,8 @@ export function getLanguageCounterpartPath(pathname: string): string | null {
   const frSector = pathname.match(/^\/fr\/soumissions\/([a-z0-9-]+)\/?$/);
   if (frSector) {
     const key = SECTOR_KEY_BY_FR_SLUG[frSector[1]!];
-    if (key) return `/quotes/${key}/`;
+    // A retired English trade (e.g. word-template) has no counterpart.
+    if (key && !RETIRED_SECTOR_SLUGS.has(key)) return `/quotes/${key}/`;
   }
   return null;
 }

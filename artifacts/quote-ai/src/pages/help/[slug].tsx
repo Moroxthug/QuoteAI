@@ -86,7 +86,8 @@ export default function HelpArticlePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <SeoHead title={`${article.title[lang]} | quoteai`} description={article.summary[lang]} canonical={canonical} ogType="article" jsonLd={jsonLd} />
+      {/* The brand suffix is dropped when it would push the title past 65 characters. */}
+      <SeoHead title={article.title[lang].length > 55 ? article.title[lang] : `${article.title[lang]} | quoteai`} description={article.summary[lang]} canonical={canonical} ogType="article" jsonLd={jsonLd} />
 
       <div className="wrap">
         <nav aria-label={t("seo.city.breadcrumbAria")} className="crumbs">

@@ -26,7 +26,7 @@ export function FreeQuotesUsedDialog() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const open = useFreeQuotesUsedOpen();
-  const s = useAllowance();
+  const s = useAllowance(open);
   const limit = s.kind === "none" ? null : s.limit;
   return (
     <AlertDialog open={open} onOpenChange={(v) => { if (!v) closeFreeQuotesUsed(); }}>

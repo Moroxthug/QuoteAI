@@ -175,7 +175,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "contracts",
     title: { en: "Contracts and e-signature", fr: "Contrats et signature électronique" },
     summary: {
-      en: "An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.",
+      en: "An accepted quote becomes a contract on your province's template. The customer signs online with an email code; you both get the signed PDF and audit certificate.",
       fr: "Une soumission acceptée devient un contrat bâti sur le modèle de votre province. Le client signe en ligne avec un code de vérification par courriel; vous recevez tous deux le PDF signé et son certificat d'audit.",
     },
     updatedAt: "2026-09-21",
@@ -220,7 +220,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "jobs",
     title: { en: "Jobs: setup review, milestones and change orders", fr: "Chantiers : révision de la configuration, jalons et avenants" },
     summary: {
-      en: "Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.",
+      en: "Each signed contract becomes a job with AI-proposed milestones, schedule and budget. Confirm in one click and handle extras with change orders the customer signs.",
       fr: "Chaque contrat signé devient un chantier avec des jalons, un calendrier et un budget proposés par l'IA. Confirmez-le en un clic, suivez l'avancement et gérez les extras avec des avenants que le client signe.",
     },
     updatedAt: "2026-09-21",
@@ -256,7 +256,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "money",
     title: { en: "Invoices, e-Transfer and card payments", fr: "Factures, Virement Interac et paiements par carte" },
     summary: {
-      en: "Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.",
+      en: "Deposit, progress and final invoices follow the contract's payment schedule. Customers pay by Interac e-Transfer or card, with reminders 3, 7 and 14 days overdue.",
       fr: "Les factures de dépôt, d'étape et finale sont générées à partir de l'échéancier du contrat. Les clients paient par Virement Interac ou par carte; des rappels partent 3, 7 et 14 jours après l'échéance.",
     },
     updatedAt: "2026-09-21",
@@ -302,7 +302,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "jobs",
     title: { en: "Track costs, scan receipts and log time", fr: "Suivre les coûts, numériser les reçus et enregistrer le temps" },
     summary: {
-      en: "Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.",
+      en: "Photograph a receipt and the AI files it to the job. Workers clock in and out from a personal link, no app or login, and the job's margin updates in real time.",
       fr: "Photographiez un reçu et l'IA le classe dans le chantier. Les travailleurs pointent depuis un lien personnel — sans application ni connexion — et la marge du chantier se met à jour en temps réel.",
     },
     updatedAt: "2026-09-21",
@@ -376,7 +376,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "growth",
     title: { en: "Leads, follow-ups and review requests", fr: "Prospects, relances et demandes d'avis" },
     summary: {
-      en: "Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.",
+      en: "Quote requests from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads land in Leads. Follow up within Canada's anti-spam rules.",
       fr: "Chaque demande de soumission arrive dans le pipeline Prospects — depuis votre widget de site web, WhatsApp, Meta Lead Ads ou Google Local Services Ads. Relancez jusqu'à ce qu'elle soit gagnée ou perdue, dans le respect de la loi anti-pourriel canadienne.",
     },
     updatedAt: "2026-09-21",
@@ -411,7 +411,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "growth",
     title: { en: "Integrations and importing your old quotes", fr: "Intégrations et importation de vos anciennes soumissions" },
     summary: {
-      en: "Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.",
+      en: "Send from Gmail, sync Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take cards via Stripe, and import past quotes from spreadsheets or PDFs.",
       fr: "Envoyez depuis votre propre Gmail, synchronisez les jalons avec Google Agenda ou Outlook, comptabilisez les factures payées dans QuickBooks ou Wave, acceptez les paiements par carte avec Stripe, et importez des années de soumissions depuis un tableur ou d'anciens PDF.",
     },
     updatedAt: "2026-09-21",

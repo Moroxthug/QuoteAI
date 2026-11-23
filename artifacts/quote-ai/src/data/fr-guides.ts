@@ -33,8 +33,8 @@ export interface FrGuide {
 export const FR_GUIDES: readonly FrGuide[] = [
   {
     slug: "tps-tvq-soumissions-factures-entrepreneur",
-    title: "TPS et TVQ sur vos soumissions et factures : guide de l'entrepreneur | quoteai",
-    description: "Taux de TPS et de TVQ, seuil d'inscription de 30 000 $, calcul de la TVQ, et ce qui doit figurer sur une facture selon son montant (100 $ et 500 $). Guide pour les entrepreneurs du Québec.",
+    title: "TPS et TVQ sur vos soumissions et factures | quoteai",
+    description: "Taux de TPS et de TVQ, seuil d'inscription de 30 000 $, calcul de la TVQ, et ce qui doit figurer sur une facture selon son montant (100 $ et 500 $).",
     h1: "TPS et TVQ sur vos soumissions et factures.",
     lead: "Les taux, le moment où vous devez vous inscrire, la bonne façon de calculer la TVQ et les renseignements qu'une facture doit contenir pour que votre client puisse récupérer ses taxes.",
     short: "Taux, inscription, calcul de la TVQ et mentions obligatoires sur une facture selon son montant.",
@@ -119,8 +119,8 @@ export const FR_GUIDES: readonly FrGuide[] = [
 
   {
     slug: "numero-licence-rbq-soumission-contrat",
-    title: "Numéro de licence RBQ : où l'inscrire sur vos soumissions et contrats | quoteai",
-    description: "Où la Loi sur le bâtiment vous oblige à afficher votre numéro de licence RBQ (soumissions, contrats, factures, publicité, site Web, véhicules), dans quel format, et les exceptions.",
+    title: "Numéro de licence RBQ sur vos soumissions et contrats | quoteai",
+    description: "Où la Loi sur le bâtiment exige votre numéro de licence RBQ (soumissions, contrats, factures, publicité, site Web, véhicules), dans quel format, et les exceptions.",
     h1: "Votre numéro de licence RBQ : où l'inscrire.",
     lead: "Soumissions, contrats, factures, publicité, site Web, réseaux sociaux, véhicules : la liste des endroits où votre numéro de licence de la Régie du bâtiment du Québec doit apparaître, et le format exigé.",
     short: "Les documents, publicités et véhicules où votre numéro RBQ doit figurer, le format et les exceptions.",
@@ -192,8 +192,8 @@ export const FR_GUIDES: readonly FrGuide[] = [
 
   {
     slug: "soumission-contrat-en-francais-charte",
-    title: "Soumissions, contrats et factures en français : ce que la Charte exige | quoteai",
-    description: "Factures, bons de commande et contrats d'adhésion en français : ce que la Charte de la langue française, modifiée par la loi 96, exige des entrepreneurs depuis 2023, et comment offrir une version anglaise.",
+    title: "Soumissions et contrats en français : la Charte | quoteai",
+    description: "Factures, bons de commande, contrats d'adhésion : ce que la Charte (loi 96) exige des entrepreneurs depuis 2023, et comment offrir une version anglaise.",
     h1: "Soumissions, contrats et factures en français.",
     lead: "Depuis la réforme de la Charte de la langue française (loi 96), les règles sont plus strictes pour les contrats types. Ce que cela change pour vos factures, vos soumissions et vos contrats de rénovation.",
     short: "Ce que la Charte de la langue française exige pour vos factures et contrats types, et quand l'anglais est permis.",
@@ -256,8 +256,8 @@ export const FR_GUIDES: readonly FrGuide[] = [
 ];
 
 export const FR_GUIDES_HUB = {
-  title: "Guides pour les entrepreneurs du Québec : taxes, RBQ, contrats en français | quoteai",
-  description: "Guides pratiques en français pour les entrepreneurs et gens de métier du Québec : TPS et TVQ sur les factures, numéro de licence RBQ, soumissions et contrats en français.",
+  title: "Guides pour entrepreneurs du Québec : taxes, RBQ | quoteai",
+  description: "Guides pratiques pour les entrepreneurs et gens de métier du Québec : TPS et TVQ sur les factures, numéro de licence RBQ, soumissions et contrats en français.",
   h1: "Guides pour les entrepreneurs du Québec.",
   lead: "Les règles qui touchent chaque soumission et chaque facture au Québec, expliquées simplement, avec les sources officielles.",
   eyebrow: "Guides",

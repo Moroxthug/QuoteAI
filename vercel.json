@@ -13,6 +13,7 @@
   },
   "redirects": [
     { "source": "/((?!api/).*)", "has": [{ "type": "host", "value": "quote-ai-chi.vercel.app" }], "destination": "https://quoteai.ca/$1", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true },
     { "source": "/chi-siamo{/}?", "destination": "/about/", "permanent": true },
     { "source": "/contatti{/}?", "destination": "/contact/", "permanent": true },
     { "source": "/mappa-sito{/}?", "destination": "/site-map/", "permanent": true },
@@ -64,10 +65,32 @@
       "source": "/dashboard/(.*)",
       "destination": "/app.html"
     },
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/spa.html"
-    }
+    { "source": "/sign-in", "destination": "/spa.html" },
+    { "source": "/sign-in/(.*)", "destination": "/spa.html" },
+    { "source": "/sign-up", "destination": "/spa.html" },
+    { "source": "/sign-up/(.*)", "destination": "/spa.html" },
+    { "source": "/onboarding", "destination": "/spa.html" },
+    { "source": "/onboarding/(.*)", "destination": "/spa.html" },
+    { "source": "/welcome", "destination": "/spa.html" },
+    { "source": "/welcome/(.*)", "destination": "/spa.html" },
+    { "source": "/admin", "destination": "/spa.html" },
+    { "source": "/admin/(.*)", "destination": "/spa.html" },
+    { "source": "/crm", "destination": "/spa.html" },
+    { "source": "/crm/(.*)", "destination": "/spa.html" },
+    { "source": "/sign", "destination": "/spa.html" },
+    { "source": "/sign/(.*)", "destination": "/spa.html" },
+    { "source": "/portal", "destination": "/spa.html" },
+    { "source": "/portal/(.*)", "destination": "/spa.html" },
+    { "source": "/i", "destination": "/spa.html" },
+    { "source": "/i/(.*)", "destination": "/spa.html" },
+    { "source": "/t", "destination": "/spa.html" },
+    { "source": "/t/(.*)", "destination": "/spa.html" },
+    { "source": "/team-invite", "destination": "/spa.html" },
+    { "source": "/team-invite/(.*)", "destination": "/spa.html" },
+    { "source": "/join", "destination": "/spa.html" },
+    { "source": "/join/(.*)", "destination": "/spa.html" },
+    { "source": "/p", "destination": "/spa.html" },
+    { "source": "/p/(.*)", "destination": "/spa.html" }
   ],
   "headers": [
     {
@@ -96,6 +119,15 @@
         {
           "key": "Permissions-Policy",
           "value": "camera=(self), microphone=(self), geolocation=(self), payment=()"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
         }
       ]
     },

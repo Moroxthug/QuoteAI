@@ -81,6 +81,10 @@ for (const g of FR_GUIDES) entries.push(url(`${BASE_URL}/fr/guides/${g.slug}/`, 
 // the date tells Google something true instead of a fixed placeholder.
 const SEO_TEMPLATE_UPDATED = "2026-11-22";
 
+// Trade hubs.
+entries.push(url(`${BASE_URL}/quotes/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
+entries.push(url(`${BASE_URL}/fr/soumissions/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
+
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
   // Only indexable pages: retired trades redirect, most French trade pages are noindex (SEO-RECOVERY-PLAN S1).

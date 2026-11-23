@@ -292,10 +292,10 @@ export const COMPETITORS: Record<CompetitorId, Competitor> = {
 export const COMPARE_ORDER: readonly CompetitorId[] = ["jobber", "joist", "housecallPro"];
 
 export const COMPARE_UI = {
-  hubTitle: { en: "Quoting software for Canadian contractors, compared (2026) | quoteai", fr: "Logiciels de soumission pour entrepreneurs canadiens, comparés (2026) | quoteai" },
+  hubTitle: { en: "Quoting software for Canadian contractors (2026) | quoteai", fr: "Logiciels de soumission comparés (2026) | quoteai" },
   hubDescription: {
     en: "quoteai, Jobber, Joist and Housecall Pro side by side for Canadian trades: prices and currency, free trials, Canadian sales tax, French, and how each builds a quote.",
-    fr: "quoteai, Jobber, Joist et Housecall Pro côte à côte pour les métiers au Canada : prix et devise, essais gratuits, taxes canadiennes, français et préparation des soumissions.",
+    fr: "quoteai, Jobber, Joist et Housecall Pro côte à côte pour les métiers au Canada : prix, essais gratuits, taxes canadiennes, français et préparation des soumissions.",
   },
   hubEyebrow: { en: "Compare", fr: "Comparer" },
   hubH1: { en: "Quoting software for Canadian contractors, compared.", fr: "Logiciels de soumission pour entrepreneurs canadiens, comparés." },
@@ -303,10 +303,10 @@ export const COMPARE_UI = {
     en: "Four tools Canadian trades ask us about, side by side, with each company's own published prices. Where one of them is the better pick, we say so.",
     fr: "Quatre outils dont les gens de métier canadiens nous parlent, côte à côte, avec les prix publiés par chaque entreprise. Quand l'un d'eux est le meilleur choix, nous le disons.",
   },
-  pageTitle: { en: "quoteai vs {name} for Canadian contractors (2026) | quoteai", fr: "quoteai ou {name} pour les entrepreneurs canadiens (2026) | quoteai" },
+  pageTitle: { en: "quoteai vs {name} for Canadian contractors (2026)", fr: "quoteai ou {name} pour entrepreneurs canadiens (2026)" },
   pageDescription: {
-    en: "quoteai and {name} compared for Canadian trades: prices and currency, free trial, GST/HST/PST/QST, French, and when {name} is the better choice. Prices checked {date}.",
-    fr: "quoteai et {name} comparés pour les métiers au Canada : prix et devise, essai gratuit, TPS/TVH/TVP/TVQ, français, et quand {name} est le meilleur choix. Prix vérifiés le {date}.",
+    en: "quoteai vs {name} for Canadian trades: prices, free trial, sales tax, French, and when {name} is the better pick. Prices checked {date}.",
+    fr: "quoteai ou {name} au Canada : prix, essai gratuit, taxes, français, et quand {name} est le meilleur choix. Prix vérifiés le {date}.",
   },
   pageEyebrow: { en: "{name} alternative for Canada", fr: "Option à {name} au Canada" },
   pageH1: { en: "quoteai vs {name} for Canadian contractors.", fr: "quoteai ou {name} pour les entrepreneurs canadiens." },

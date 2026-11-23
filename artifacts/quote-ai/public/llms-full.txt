@@ -79,13 +79,13 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 - [Set up your business in 10 minutes](https://quoteai.ca/help/getting-started/): Create your account, fill in the business profile that appears on every quote, contract and invoice, and pick a plan.
 - [Create a quote from a description, a voice memo or photos](https://quoteai.ca/help/create-a-quote/): Describe the job in plain language and get an itemized, taxed quote in about 30 seconds. Then edit it, offer Good/Better/Best options and pick a PDF template.
 - [Send a quote and get it accepted online](https://quoteai.ca/help/send-a-quote-and-get-it-accepted/): Email the quote or share its link. The customer reviews and accepts on a secure page; automatic follow-ups nudge them on days 2, 5 and 10 until they answer.
-- [Contracts and e-signature](https://quoteai.ca/help/contracts-and-e-signature/): An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.
-- [Jobs: setup review, milestones and change orders](https://quoteai.ca/help/jobs-milestones-and-change-orders/): Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.
-- [Invoices, e-Transfer and card payments](https://quoteai.ca/help/invoices-and-getting-paid/): Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.
-- [Track costs, scan receipts and log time](https://quoteai.ca/help/costs-receipts-and-time/): Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.
+- [Contracts and e-signature](https://quoteai.ca/help/contracts-and-e-signature/): An accepted quote becomes a contract on your province's template. The customer signs online with an email code; you both get the signed PDF and audit certificate.
+- [Jobs: setup review, milestones and change orders](https://quoteai.ca/help/jobs-milestones-and-change-orders/): Each signed contract becomes a job with AI-proposed milestones, schedule and budget. Confirm in one click and handle extras with change orders the customer signs.
+- [Invoices, e-Transfer and card payments](https://quoteai.ca/help/invoices-and-getting-paid/): Deposit, progress and final invoices follow the contract's payment schedule. Customers pay by Interac e-Transfer or card, with reminders 3, 7 and 14 days overdue.
+- [Track costs, scan receipts and log time](https://quoteai.ca/help/costs-receipts-and-time/): Photograph a receipt and the AI files it to the job. Workers clock in and out from a personal link, no app or login, and the job's margin updates in real time.
 - [Invite your team and set roles](https://quoteai.ca/help/team-accounts-and-roles/): Give office staff, foremen or your accountant their own login with a role that limits what they can see and do. Pro includes 2 seats, Elite 5.
-- [Leads, follow-ups and review requests](https://quoteai.ca/help/leads-and-follow-ups/): Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.
-- [Integrations and importing your old quotes](https://quoteai.ca/help/integrations-and-imports/): Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.
+- [Leads, follow-ups and review requests](https://quoteai.ca/help/leads-and-follow-ups/): Quote requests from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads land in Leads. Follow up within Canada's anti-spam rules.
+- [Integrations and importing your old quotes](https://quoteai.ca/help/integrations-and-imports/): Send from Gmail, sync Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take cards via Stripe, and import past quotes from spreadsheets or PDFs.
 - [Delete your account and data](https://quoteai.ca/help/delete-your-account/): How to delete your QuoteAI account from the app or the website, what is erased, what the law makes us keep, and how to change your mind within 7 days.
 
 # Help centre, in full
@@ -177,7 +177,7 @@ Note: Sent quotes are locked so the customer always sees the version they accept
 
 Source: https://quoteai.ca/help/contracts-and-e-signature/ (Contracts & e-signature, updated 2026-09-21)
 
-An accepted quote becomes a contract built on your province's template. The customer signs online with an email verification code; both of you get the signed PDF and its audit certificate.
+An accepted quote becomes a contract on your province's template. The customer signs online with an email code; you both get the signed PDF and audit certificate.
 
 ### How the contract is built
 
@@ -209,7 +209,7 @@ Note: The templates are informed by the consumer-protection and construction-lie
 
 Source: https://quoteai.ca/help/jobs-milestones-and-change-orders/ (Jobs, updated 2026-09-21)
 
-Every signed contract becomes a job with milestones, a schedule and a budget proposed by the AI. Confirm it in one click, track progress, and handle extras with change orders the customer signs.
+Each signed contract becomes a job with AI-proposed milestones, schedule and budget. Confirm in one click and handle extras with change orders the customer signs.
 
 ### The setup review
 
@@ -236,7 +236,7 @@ Mark the job complete to generate the final invoice. If a holdback applies, Quot
 
 Source: https://quoteai.ca/help/invoices-and-getting-paid/ (Invoices & payments, updated 2026-09-21)
 
-Deposit, progress and final invoices are generated from the contract's payment schedule. Customers pay by Interac e-Transfer or by card; reminders go out at 3, 7 and 14 days past due.
+Deposit, progress and final invoices follow the contract's payment schedule. Customers pay by Interac e-Transfer or card, with reminders 3, 7 and 14 days overdue.
 
 ### Where invoices come from
 
@@ -266,7 +266,7 @@ Note: Paid invoices sync to QuickBooks Online or Wave if you connected one (Busi
 
 Source: https://quoteai.ca/help/costs-receipts-and-time/ (Jobs, updated 2026-09-21)
 
-Photograph a receipt and the AI files it against the job. Workers clock in and out from a personal link — no app, no login — and the job's margin updates in real time.
+Photograph a receipt and the AI files it to the job. Workers clock in and out from a personal link, no app or login, and the job's margin updates in real time.
 
 ### Receipts and costs
 
@@ -319,7 +319,7 @@ Note: Pro includes 2 seats and Elite 5 (the owner counts as one). When every sea
 
 Source: https://quoteai.ca/help/leads-and-follow-ups/ (Leads & integrations, updated 2026-09-21)
 
-Every quote request lands in the Leads pipeline — from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads. Follow up until it is won or lost, within Canada's anti-spam rules.
+Quote requests from your website widget, WhatsApp, Meta Lead Ads or Google Local Services Ads land in Leads. Follow up within Canada's anti-spam rules.
 
 ### Where leads come from
 
@@ -344,7 +344,7 @@ Settings → Quotes & follow-ups → Reviews: paste your Google review link and 
 
 Source: https://quoteai.ca/help/integrations-and-imports/ (Leads & integrations, updated 2026-09-21)
 
-Send from your own Gmail, sync milestones to Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take card payments with Stripe, and import years of past quotes from a spreadsheet or old PDFs.
+Send from Gmail, sync Google Calendar or Outlook, post paid invoices to QuickBooks or Wave, take cards via Stripe, and import past quotes from spreadsheets or PDFs.
 
 All integrations live under Settings → Connected apps. Each one is connected with a Connect button that sends you to the provider to approve access; QuoteAI stores the resulting token encrypted and never sees your password. Tap an app to see what it does and what it shares; disconnect at any time from the same place.
 
@@ -405,16 +405,16 @@ Email privacy@quoteai.ca from the address on the account and ask for it to be de
 
 ### Trades
 
-- [Winterization Work: A Contractor's Checklist for Canadian Homes](https://quoteai.ca/blog/winterizing-your-home-contractor-checklist/): A practical winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.
+- [Winterization Work: A Contractor's Checklist for Canadian Homes](https://quoteai.ca/blog/winterizing-your-home-contractor-checklist/): A winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.
 - [Snow Load Roofing and Eavestrough Considerations for Canadian Homes](https://quoteai.ca/blog/snow-load-roofing-eavestrough-considerations-canada/): What Canadian roofers and homeowners need to know about snow load ratings, ice damming, and eavestrough design for roofs built to handle a real Canadian winter.
 - [Basement Waterproofing: A Complete Guide for Canadian Homes](https://quoteai.ca/blog/basement-waterproofing-guide-canadian-homes/): Interior vs. exterior basement waterproofing methods, costs, and warning signs for Canadian homes — and why it matters before finishing a basement.
 
 ### Pricing
 
-- [How Much Does It Cost to Paint an Apartment in Canada in 2026?](https://quoteai.ca/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026/): Updated 2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.
-- [How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?](https://quoteai.ca/blog/bathroom-renovation-cost-toronto-2026/): Real 2026 CAD price ranges for a bathroom renovation in Toronto: full gut renovations, mid-range refreshes, plumbing and tiling costs, and how Toronto compares to the rest of Ontario.
+- [How Much Does It Cost to Paint an Apartment in Canada in 2026?](https://quoteai.ca/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026/): 2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.
+- [How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?](https://quoteai.ca/blog/bathroom-renovation-cost-toronto-2026/): 2026 CAD price ranges for a Toronto bathroom renovation: full gut jobs, mid-range refreshes, plumbing and tiling, and how Toronto compares to the rest of Ontario.
 - [Cost to Rewire a House in Canada: 2026 Electrical Pricing Guide](https://quoteai.ca/blog/cost-to-rewire-a-house-canada/): What it costs to rewire a house in Canada in 2026: full rewiring, panel upgrades, cost per square foot, knob-and-tube removal, and regional price differences.
-- [Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)](https://quoteai.ca/blog/cost-to-reroof-a-home-canada/): 2026 CAD pricing to re-roof a home in Canada, including asphalt shingle and metal roofing costs, per-square pricing, and how snow load requirements affect price in colder regions.
+- [Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)](https://quoteai.ca/blog/cost-to-reroof-a-home-canada/): 2026 CAD pricing to re-roof a home in Canada: asphalt shingle and metal roofing costs, per-square pricing, and how snow load affects price in colder regions.
 - [Deck Installation Cost in Canada: 2026 Price Guide by Material](https://quoteai.ca/blog/deck-installation-cost-canada-2026/): 2026 CAD pricing for building a deck in Canada: pressure-treated wood vs. composite decking, cost per square foot, permits, and regional price differences.
 - [Basement Finishing Cost in Canada: 2026 Pricing and What to Expect](https://quoteai.ca/blog/basement-finishing-cost-canada/): What it costs to finish a basement in Canada in 2026: framing, insulation, electrical, drywall, flooring, and why waterproofing should be budgeted first.
 - [Cost to Install a Heat Pump in Canada in 2026 (Ductless, Central and Cold-Climate)](https://quoteai.ca/blog/cost-to-install-a-heat-pump-canada/): 2026 CAD price ranges for ductless mini-splits, central air-source and cold-climate heat pumps in Canada, what drives the cost, and how to quote the job.
@@ -429,9 +429,9 @@ Email privacy@quoteai.ca from the address on the account and ask for it to be de
 
 ### Advice
 
-- [How to Write a Professional Quote That Actually Wins Jobs](https://quoteai.ca/blog/how-to-write-a-professional-quote-that-wins-jobs/): A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than most tradespeople think.
+- [How to Write a Professional Quote That Actually Wins Jobs](https://quoteai.ca/blog/how-to-write-a-professional-quote-that-wins-jobs/): A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than you think.
 - [7 Quoting Mistakes That Are Costing Canadian Contractors Jobs](https://quoteai.ca/blog/common-quoting-mistakes-contractors-make/): The most common quoting mistakes Canadian tradespeople make — from vague pricing to slow turnaround — and how to fix each one to win more work.
-- [How to Price a Job: Labour, Materials, and Markup Explained](https://quoteai.ca/blog/how-to-price-a-job-labour-materials-markup/): A practical breakdown of how Canadian tradespeople should price jobs — labour rates, material markup, overhead, and profit — so quotes are profitable, not just competitive.
+- [How to Price a Job: Labour, Materials, and Markup Explained](https://quoteai.ca/blog/how-to-price-a-job-labour-materials-markup/): How Canadian tradespeople should price jobs — labour rates, material markup, overhead and profit — so quotes are profitable, not just competitive.
 - [Markup vs Margin for Contractors: Which One to Use (With Examples)](https://quoteai.ca/blog/how-to-price-a-job-labour-materials-markup-canada-guide/): Markup and margin are not the same, and mixing them up costs contractors real money. Clear formulas, a conversion table and worked Canadian examples.
 - [How to Write a Contractor Contract in Canada: Clauses Every Job Needs](https://quoteai.ca/blog/how-to-write-a-contractor-contract-canada/): The clauses a Canadian contractor's contract should include: scope, price, payments, changes, delays, warranty and disputes. Not legal advice; a practical checklist.
 - [Change Orders for Contractors: How to Handle Extras and Get Paid for Them](https://quoteai.ca/blog/how-to-handle-change-orders-contractors/): A simple change order process for contractors: why extras go unpaid, what to put in writing, how to price them, and a template wording.
@@ -460,7 +460,7 @@ Email privacy@quoteai.ca from the address on the account and ask for it to be de
 
 ### Business
 
-- [Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide](https://quoteai.ca/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/): An overview of Canadian federal and provincial rebate programs for energy-efficient renovations — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, and Enbridge programs — for contractors to reference when quoting jobs.
+- [Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide](https://quoteai.ca/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/): Canada's federal and provincial energy-efficiency rebates — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, Enbridge — for contractors quoting jobs.
 - [Google Business Profile for Tradespeople: A Complete Setup Guide](https://quoteai.ca/blog/google-business-profile-guide-for-tradespeople/): How Canadian tradespeople can set up and optimize a Google Business Profile to show up in local search results and win more calls from nearby customers.
 - [How to Get More Reviews as a Contractor (Without Being Pushy)](https://quoteai.ca/blog/how-to-get-more-reviews-as-a-contractor/): Practical, non-awkward ways for Canadian tradespeople to get more Google reviews from happy clients — and why review volume directly affects how much work you win.
 - [How to Get More Plumbing Jobs in Canada: 9 Ways That Actually Work](https://quoteai.ca/blog/how-to-get-more-plumbing-jobs-canada/): Practical ways for Canadian plumbers to get more jobs: Google Business Profile, fast quotes, reviews, service pages, referrals and repeat work.

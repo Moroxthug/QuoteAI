@@ -2,7 +2,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Building2, BookOpen, X, MapPin } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
-import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES, enSectorLive, frSectorLive, frSectorIndexed } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorLive, frSectorIndexed } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import { getOgImagePath, getSectorFrContent, getSectorDeepDive, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
@@ -13,18 +13,6 @@ import NotFound from "@/pages/not-found";
 // the only cities actually prerendered/sitemapped right now (see seo-data.ts).
 const TIER1_CITIES = ACTIVE_CITIES;
 
-// All cities grouped by region, sorted alphabetically by region then city.
-// Ensures every city page gets at least one internal link from the sector
-// hub (otherwise it stays orphaned and Google never discovers/indexes it).
-// Scoped to ACTIVE_CITIES so this hub never links toward un-prerendered pages.
-const CITIES_BY_REGION = ACTIVE_CITIES.reduce<Record<string, typeof ACTIVE_CITIES>>((acc, city) => {
-  (acc[city.region] ??= []).push(city);
-  return acc;
-}, {});
-const REGION_NAMES_SORTED = Object.keys(CITIES_BY_REGION).sort((a, b) => a.localeCompare(b, "en-CA"));
-for (const region of REGION_NAMES_SORTED) {
-  CITIES_BY_REGION[region].sort((a, b) => a.name.localeCompare(b.name, "en-CA"));
-}
 
 const FI_COLORS = ["g", "t", "p"] as const;
 
@@ -322,7 +310,7 @@ export default function SeoLanding() {
 
       <div className="wrap">
         <nav aria-label={t("seo.city.breadcrumbAria")} className="crumbs">
-          <Link href={isFr ? "/fr" : "/"}>{t("blog.breadcrumbHome")}</Link>
+          <Link href={isFr ? "/fr/" : "/"}>{t("blog.breadcrumbHome")}</Link>
           <span className="crumb-sep" aria-hidden="true">/</span>
           <span className="crumb-current" aria-current="page">{h1Highlight}</span>
         </nav>
@@ -494,6 +482,7 @@ export default function SeoLanding() {
       </section>
 
       {/* ── Quotes in major cities ─────────────────────────── */}
+      {/* City pages are noindex; French ones exist only for the French-primary cities. */}
       {CITY_SECTORS.includes(slug) && TIER1_CITIES.length > 0 && (
         <section className="sec">
           <div className="wrap" style={{ maxWidth: 980 }}>
@@ -504,7 +493,7 @@ export default function SeoLanding() {
               <p className="lead" style={{ margin: "0 auto" }}>{t("seo.cityHub.subtitle")}</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {TIER1_CITIES.map((city) => (
+              {TIER1_CITIES.filter((city) => !isFr || FRENCH_PRIMARY_CITY_SLUGS.includes(city.slug)).map((city) => (
                 <Link
                   key={city.slug}
                   href={`${base}/${sSlugForLang}/${city.slug}/`}
@@ -514,40 +503,6 @@ export default function SeoLanding() {
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: "var(--navy)" }} />
                   <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{city.name}</span>
                 </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ── All cities (internal links for indexing) ──────── */}
-      {CITY_SECTORS.includes(slug) && (
-        <section className="sec soft">
-          <div className="wrap" style={{ maxWidth: 1080 }}>
-            <div className="sec-head" style={{ display: "block", textAlign: "center" }}>
-              <h2 className="h2" style={{ fontSize: 22 }}>
-                {t("seo.allCities.heading").replace("{trade}", labelPlural)}
-              </h2>
-              <p className="lead" style={{ margin: "0 auto" }}>{t("seo.allCities.subtitle")}</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {REGION_NAMES_SORTED.map((region) => (
-                <div key={region}>
-                  <h3 style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--navy)", marginBottom: 10 }}>
-                    {region}
-                  </h3>
-                  <div className="blog-links" style={{ flexDirection: "column", gap: 6, alignItems: "flex-start" }}>
-                    {CITIES_BY_REGION[region].map((city) => (
-                      <Link
-                        key={city.slug}
-                        href={`${base}/${sSlugForLang}/${city.slug}/`}
-                        style={{ fontSize: 14, color: "var(--muted-mk)" }}
-                      >
-                        {label} {city.name}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
               ))}
             </div>
           </div>

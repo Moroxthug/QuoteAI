@@ -62,6 +62,8 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
     ...BLOG_CATEGORIES.map((c) => ({ path: `/blog/category/${c.slug}`, lang: "en" as const })),
     ...BLOG_ARTICLES.map((a) => ({ path: `/blog/${a.slug}`, lang: "en" as const })),
   ];
+  // Trade hubs (S2): /quotes/ and /fr/soumissions/.
+  routes.push({ path: "/quotes", lang: "en" }, { path: "/fr/soumissions", lang: "fr" });
   // Sector pages: every sector in both languages; city pages for the
   // CITY_SECTORS × ACTIVE_CITIES grid, French only for the French-primary
   // Québec cities (the hreflang tags follow the same rule, see city-landing.tsx).

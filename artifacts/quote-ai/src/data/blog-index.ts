@@ -21,7 +21,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "how-much-does-it-cost-to-paint-an-apartment-in-canada-2026",
     title: "How Much Does It Cost to Paint an Apartment in Canada in 2026?",
     seoTitle: "Cost to Paint an Apartment in Canada (2026)",
-    metaDescription: "Updated 2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.",
+    metaDescription: "2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.",
     category: "Pricing",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -31,7 +31,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "bathroom-renovation-cost-toronto-2026",
     title: "How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?",
     seoTitle: "Bathroom Renovation Cost in Toronto (2026)",
-    metaDescription: "Real 2026 CAD price ranges for a bathroom renovation in Toronto: full gut renovations, mid-range refreshes, plumbing and tiling costs, and how Toronto compares to the rest of Ontario.",
+    metaDescription: "2026 CAD price ranges for a Toronto bathroom renovation: full gut jobs, mid-range refreshes, plumbing and tiling, and how Toronto compares to the rest of Ontario.",
     category: "Pricing",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -51,7 +51,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "cost-to-reroof-a-home-canada",
     title: "Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)",
     seoTitle: "Cost to Re-Roof a Home in Canada (2026)",
-    metaDescription: "2026 CAD pricing to re-roof a home in Canada, including asphalt shingle and metal roofing costs, per-square pricing, and how snow load requirements affect price in colder regions.",
+    metaDescription: "2026 CAD pricing to re-roof a home in Canada: asphalt shingle and metal roofing costs, per-square pricing, and how snow load affects price in colder regions.",
     category: "Pricing",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -81,7 +81,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "how-to-write-a-professional-quote-that-wins-jobs",
     title: "How to Write a Professional Quote That Actually Wins Jobs",
     seoTitle: "How to Write a Quote That Wins Jobs",
-    metaDescription: "A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than most tradespeople think.",
+    metaDescription: "A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than you think.",
     category: "Advice",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -101,7 +101,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "how-to-price-a-job-labour-materials-markup",
     title: "How to Price a Job: Labour, Materials, and Markup Explained",
     seoTitle: "How to Price a Job as a Contractor",
-    metaDescription: "A practical breakdown of how Canadian tradespeople should price jobs — labour rates, material markup, overhead, and profit — so quotes are profitable, not just competitive.",
+    metaDescription: "How Canadian tradespeople should price jobs — labour rates, material markup, overhead and profit — so quotes are profitable, not just competitive.",
     category: "Advice",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -121,7 +121,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "winterizing-your-home-contractor-checklist",
     title: "Winterization Work: A Contractor's Checklist for Canadian Homes",
     seoTitle: "Winterization Checklist for Contractors",
-    metaDescription: "A practical winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.",
+    metaDescription: "A winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.",
     category: "Trades",
     publishedAt: "2026-09-21",
     readingTimeMin: 1,
@@ -151,7 +151,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     slug: "canada-greener-homes-grant-rebates-contractors-guide-2026",
     title: "Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide",
     seoTitle: "Canadian Energy Rebates for Contractors (2026)",
-    metaDescription: "An overview of Canadian federal and provincial rebate programs for energy-efficient renovations — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, and Enbridge programs — for contractors to reference when quoting jobs.",
+    metaDescription: "Canada's federal and provincial energy-efficiency rebates — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, Enbridge — for contractors quoting jobs.",
     category: "Business",
     publishedAt: "2026-09-21",
     readingTimeMin: 2,
@@ -658,7 +658,7 @@ export interface BlogCategory {
   color: string;
 }
 
-export const BLOG_CATEGORIES: BlogCategory[] = [
+const ALL_BLOG_CATEGORIES: BlogCategory[] = [
   {
     slug: "trades",
     name: "Trades",
@@ -696,6 +696,12 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
     color: "bg-rose-50 text-rose-700 border-rose-200 hover:border-rose-400",
   },
 ];
+
+// Only categories with at least one article get a page, a link or a sitemap entry
+// (an empty "Innovation" page was in the sitemap: SEO-RECOVERY-PLAN S2).
+export const BLOG_CATEGORIES: BlogCategory[] = ALL_BLOG_CATEGORIES.filter((c) =>
+  BLOG_INDEX.some((a) => a.category.toLowerCase() === c.name.toLowerCase() || a.category === c.slug),
+);
 
 export function getCategoryBySlug(slug: string): BlogCategory | undefined {
   return BLOG_CATEGORIES.find((c) => c.slug === slug);

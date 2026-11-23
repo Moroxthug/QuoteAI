@@ -66,6 +66,12 @@ function injectHead(template: string, page: RenderedPage): string {
   html = html.replace(/<meta\s+name="twitter:[^"]*"[^>]*\/?>/gi, "");
   html = html.replace(/<meta\s+name="keywords"[^>]*\/?>/gi, "");
   if (/<meta name="robots"/.test(page.head)) html = html.replace(/<meta\s+name="robots"[^>]*\/?>/i, "");
+  // The dev-preview canonical script (index.html) rewrites the canonical to
+  // location.pathname. A prerendered page carries its own: drop the script
+  // (and its comment) so it can never override a deliberate canonical.
+  const devCanonical = /(?:\s*<!--\s*Production: the prerender pipeline[\s\S]*?-->)?\s*<script>\s*\(function \(\) \{\s*try \{\s*var origin = "https:\/\/quoteai\.ca";[\s\S]*?<\/script>/;
+  if (!devCanonical.test(html)) throw new Error("prerender: the dev canonical script was not found in index.html");
+  html = html.replace(devCanonical, "");
   html = html.replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi, "");
   // After <meta charset> + viewport: the charset declaration must stay within
   // the first 1024 bytes of the document, and a <title> with an en dash was
@@ -228,6 +234,20 @@ for (const route of routes) {
   if (count % 50 === 0) console.log(`  … ${count}/${routes.length}`);
 }
 console.log(`Prerendered ${count} pages in ${((Date.now() - t0) / 1000).toFixed(1)} s.`);
+
+// 404.html (SEO-RECOVERY-PLAN S2): Vercel serves it, with status 404, for any
+// URL that is neither a built file nor one of the app routes rewritten in
+// vercel.json. It is the app's own not-found route; data-ssr names a path no
+// visitor has, so the browser renders instead of hydrating.
+{
+  const notFoundPath = "/__not-found__";
+  const page = await renderPage(notFoundPath, "en");
+  const html = await inlineCriticalCss(injectAppPreload(injectBody(injectHead(template, page), notFoundPath, page.body)));
+  if (!/<meta name="robots" content="noindex/.test(html)) throw new Error("404.html: expected a noindex robots meta");
+  if (!html.includes(">404<")) throw new Error("404.html: the not-found page did not render");
+  writeFileSync(join(distDir, "404.html"), html, "utf-8");
+  console.log("Wrote 404.html.");
+}
 
 // ─── Shells for the routes that are not prerendered (Phase 115) ───────────
 //

@@ -39,10 +39,10 @@ const CATEGORY_CHIPS: Record<string, string> = {
 };
 
 const GUIDE_ICONS: Record<string, typeof ClipboardList> = {
-  "how-to-quote": ClipboardList,
-  "free-quote": Gift,
-  "excel-template": BarChart3,
-  "word-template": FileText,
+  "quote-guide": ClipboardList,
+  pricing: Gift,
+  calculators: BarChart3,
+  compare: FileText,
 };
 
 export default function BlogPage() {

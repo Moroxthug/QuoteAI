@@ -241,7 +241,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Speed matters more than most tradespeople realize. Jobs are frequently awarded to whichever contractor sends a complete, professional quote first — sometimes within hours of the site visit. A quote that takes a week to arrive is competing against nothing; a quote sent the same day is often the only one the client seriously considers.</p>
 
 <h2>Format matters</h2>
-<p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/quotes/how-to-quote/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
+<p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/pricing/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
 `,
   "common-quoting-mistakes-contractors-make": `
 <p>Most contractors lose jobs not because their pricing is too high, but because of how the quote itself is put together and delivered. Here are the mistakes that show up most often — and what to do instead.</p>
@@ -268,7 +268,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Most jobs aren't booked from the first quote alone. A short follow-up message two or three days later ("just checking if you had any questions about the estimate") closes a meaningful share of jobs that would otherwise go quiet.</p>
 
 <h2>The fix: build a repeatable process</h2>
-<p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/quotes/free-quote/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
+<p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/pricing/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
 `,
   "how-to-price-a-job-labour-materials-markup": `
 <p>A lot of tradespeople price jobs by gut feel, or by matching whatever a competitor seems to charge. That approach works fine until a busy season quietly turns into a break-even one. Here's a straightforward way to price a job so the number on the quote actually protects your margin.</p>
@@ -321,7 +321,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>The newer generation of quoting tools use AI to turn a plain-language job description — spoken or typed on-site — directly into a structured, priced quote. Instead of manually building a spreadsheet formula for every job type, a contractor can describe the scope in normal language and get a properly formatted estimate back in under a minute.</p>
 
 <h2>What this replaces</h2>
-<p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/quotes/free-quote/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
+<p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/pricing/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
 `,
   "winterizing-your-home-contractor-checklist": `
 <p>Winterization work is a category almost unique to climates like Canada's — and it's a genuine seasonal revenue stream for contractors who offer it proactively rather than waiting for a burst pipe call in January. Here's what belongs on a proper winterization checklist, and roughly what each job costs.</p>
@@ -507,7 +507,7 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Where a static template falls short</h2>
 <p>A Word or Excel template looks free, but you pay for it in time: retyping client details, recalculating taxes, fixing formatting, exporting to PDF, then chasing the client. Mistakes creep in, and the quote reaches the client hours or days after the visit, when other contractors may have already replied.</p>
-<p>That is the gap <a href="/quotes/free-quote/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see how it stacks up against the <a href="/quotes/excel-template/">Excel template</a> and the <a href="/quotes/word-template/">Word template</a>, or read the full guide on <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+<p>That is the gap <a href="/pricing/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see <a href="/compare/">how quoteai compares with other quoting software</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
   "cost-to-install-a-heat-pump-canada": `
 <p>Heat pumps have moved from a niche product to one of the most requested HVAC upgrades in Canada. Homeowners want to know the price before they call, and contractors need to quote it without leaving money on the table. These are typical 2026 ranges. Actual quotes vary with the home, the region and the equipment brand.</p>
@@ -568,7 +568,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Water heater flushes, annual inspections and backflow checks create recurring revenue and make you the first call when something breaks.</p>
 
 <h2>Where to start</h2>
-<p>If you only do two things this week, fix your Google profile and shorten the time between site visit and quote. Both cost almost nothing and compound. For help with the second, see <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+<p>If you only do two things this week, fix your Google profile and shorten the time between site visit and quote. Both cost almost nothing and compound. For help with the second, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
   "how-to-get-more-electrical-jobs-canada": `
 <p>Electrical work has strong demand: panel upgrades, EV charger installs, renovations, and service calls. The electricians who grow fastest are rarely the cheapest. They are the ones who look reliable, respond quickly and explain the price clearly.</p>
@@ -662,7 +662,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Construction lien rules differ by province, with strict deadlines that vary (for example Ontario's Construction Act and Quebec's legal hypothec regime). If a client stops paying, check your province's deadlines quickly and consider legal advice, because missing the window can cost you the right.</p>
 
 <h2>Make it routine</h2>
-<p>Contractors who get paid on time do the same steps every time. Tools such as <a href="/quotes/general-contractor/">quoting and invoicing software built for contractors</a> keep the quote, the invoice and the follow-up in one place, so nothing relies on memory. If you are starting from scratch, see <a href="/quotes/how-to-quote/">how to write a professional quote</a> with payment terms included.</p>
+<p>Contractors who get paid on time do the same steps every time. Tools such as <a href="/quotes/general-contractor/">quoting and invoicing software built for contractors</a> keep the quote, the invoice and the follow-up in one place, so nothing relies on memory. If you are starting from scratch, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> with payment terms included.</p>
 `,
   "contractor-insurance-canada-what-you-need": `
 <p>This is general information, not insurance or legal advice. Requirements differ by province, trade and client, so confirm details with a licensed broker. But every Canadian contractor should understand the main types of coverage, because clients, general contractors and property managers increasingly ask for proof of insurance before you start.</p>
@@ -686,7 +686,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Larger projects may require builder's risk, performance bonds or bid bonds. Ask early when bidding on commercial or public work.</p>
 
 <h2>Show proof on your quotes</h2>
-<p>Including "Fully insured and licensed" along with your licence number and insurer on a quote reassures homeowners and speeds up approval on commercial jobs. It also helps justify a price above the cheapest bid. See <a href="/quotes/how-to-quote/">how to write a professional quote</a> for where credentials fit.</p>
+<p>Including "Fully insured and licensed" along with your licence number and insurer on a quote reassures homeowners and speeds up approval on commercial jobs. It also helps justify a price above the cheapest bid. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> for where credentials fit.</p>
 
 <h2>Budget it as overhead</h2>
 <p>Insurance, vehicle costs and tools are part of your overhead and must be recovered in your pricing. If you are unsure how, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
@@ -870,7 +870,7 @@ const BLOG_CONTENT: Record<string, string> = {
 </ul>
 
 <h2>Make it part of your process</h2>
-<p>A quote that includes terms and an electronic acceptance, produced with <a href="/quotes/general-contractor/">quoting software for general contractors</a>, gives you a consistent, signed record every time. For the quote itself, read <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+<p>A quote that includes terms and an electronic acceptance, produced with <a href="/quotes/general-contractor/">quoting software for general contractors</a>, gives you a consistent, signed record every time. For the quote itself, read <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
   "how-to-handle-change-orders-contractors": `
 <p>Scope creep is one of the biggest quiet profit killers in contracting. "Can you just also..." turns into two days of unpaid work. A change order process fixes it without making you sound difficult.</p>
@@ -962,7 +962,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Send a short message after 48 hours: "Hi, just checking you received the quote, happy to answer any questions." It recovers more jobs than lowering the price.</p>
 
 <h2>Tools make the difference</h2>
-<p>A phone-based tool that builds the itemized estimate for you turns this from a goal into a habit. See <a href="/blog/mobile-quoting-on-the-go-for-contractors/">mobile quoting for contractors</a>, try <a href="/quotes/free-quote/">free quoting</a>, or read the full guide on <a href="/quotes/how-to-quote/">how to write a professional quote</a>.</p>
+<p>A phone-based tool that builds the itemized estimate for you turns this from a goal into a habit. See <a href="/blog/mobile-quoting-on-the-go-for-contractors/">mobile quoting for contractors</a>, try <a href="/pricing/">free quoting</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
   "how-to-scale-a-contracting-business-canada": `
 <p>Many contractors reach a ceiling: more work than they can do alone, but hiring feels risky. Scaling is not about working more hours. It is about building a business that makes money when you are not holding the tool. Here is a realistic path.</p>
@@ -1069,7 +1069,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Track estimated vs actual material costs per job to correct your price list. See <a href="/blog/how-to-track-job-costs-contractors/">job cost tracking</a>.</p>
 
 <h2>Keep your price list current</h2>
-<p>Outdated unit prices quietly erode margin. Tools like <a href="/quotes/free-quote/">quoteai</a> let you update your rates once and have every new quote use them.</p>
+<p>Outdated unit prices quietly erode margin. Tools like <a href="/pricing/">quoteai</a> let you update your rates once and have every new quote use them.</p>
 `,
   "construction-project-management-small-contractors": `
 <p>Big construction firms have project managers and expensive software. Small contractors have a phone and a truck. You do not need enterprise tools, but you do need a simple system, because most delays and disputes come from missing information, not bad work.</p>
@@ -1175,7 +1175,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>For prices, currency, Canadian tax and French support next to each other, see <a href="/compare/">quoting software for Canadian contractors, compared</a>, or the one-to-one pages: <a href="/compare/quoteai-vs-jobber/">quoteai vs Jobber</a>, <a href="/compare/quoteai-vs-joist/">quoteai vs Joist</a> and <a href="/compare/quoteai-vs-housecall-pro/">quoteai vs Housecall Pro</a>.</p>
 
 <h2>Try it on a real job</h2>
-<p>Whichever tool you consider, test it on a real quote, not a demo. quoteai is built for Canadian trades: see <a href="/quotes/free-quote/">free quoting</a>, or compare with the <a href="/quotes/excel-template/">Excel template</a> and <a href="/quotes/word-template/">Word template</a> approach.</p>
+<p>Whichever tool you consider, test it on a real quote, not a demo. quoteai is built for Canadian trades: see <a href="/pricing/">free quoting</a>, or see <a href="/compare/">how quoteai compares</a>.</p>
 `,
   "contractor-cash-flow-management-canada": `
 <p>A job can be profitable on paper and still leave you short on payday. Contractors pay for materials and crews up front and get paid later. That gap is cash flow, and it is the most common reason otherwise good trade businesses fail.</p>
@@ -1411,7 +1411,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>If you give an estimate, say it is an estimate. If you give a fixed quote, list exclusions and handle changes in writing: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Add terms from a <a href="/blog/how-to-write-a-contractor-contract-canada/">contract</a> when the job is big.</p>
 
 <h2>One flow, not four documents</h2>
-<p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/quotes/how-to-quote/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/quotes/free-quote/">free quoting</a>.</p>
+<p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/pricing/">free quoting</a>.</p>
 `,
   "concrete-driveway-cost-canada-2026": `
 <p>A driveway is one of the biggest exterior investments in a home, and Canadian winters punish bad installs. Prices below are typical 2026 installed ranges. Your region, access and base conditions will move them.</p>
@@ -1642,7 +1642,7 @@ const BLOG_CONTENT: Record<string, string> = {
 </ol>
 
 <h2>See the comparison</h2>
-<p>Read our direct comparisons: <a href="/quotes/excel-template/">alternative to Excel templates</a> and <a href="/quotes/word-template/">alternative to Word templates</a>, or try <a href="/quotes/free-quote/">free quoting</a>. For picking a tool, see <a href="/blog/best-quoting-software-for-contractors-canada/">what to look for in quoting software</a>.</p>
+<p>Read our <a href="/compare/">direct comparisons</a>, use the <a href="/tools/">free contractor calculators</a>, or try <a href="/pricing/">free quoting</a>. For picking a tool, see <a href="/blog/best-quoting-software-for-contractors-canada/">what to look for in quoting software</a>.</p>
 `,
   "how-to-raise-your-prices-contractors-without-losing-clients": `
 <p>Material, fuel, insurance and wages go up, but many contractors keep their rates frozen for years because they fear losing work. The result is shrinking margin and burnout. A planned price increase is usually less risky than it feels.</p>
@@ -1739,7 +1739,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>"Too expensive", "went with someone else", and "not now" each tell you something. Track them: <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
 
 <h2>Automate it</h2>
-<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending quotes in 5 minutes</a> and <a href="/quotes/free-quote/">free quoting</a>.</p>
+<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending quotes in 5 minutes</a> and <a href="/pricing/">free quoting</a>.</p>
 `,
   "how-to-quote-a-carpentry-job": `
 <p>Custom woodwork is hard to price because every job is different and the client often changes their mind. A consistent method helps you stay profitable without scaring people away.</p>

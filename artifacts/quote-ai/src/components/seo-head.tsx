@@ -18,6 +18,8 @@ interface SeoHeadProps {
   twitterCard?: "summary" | "summary_large_image" | "app" | "player";
   jsonLd?: JsonLdSchema[];
   noIndex?: boolean;
+  /** noindex but follow: the page stays out of the index, its links still count. */
+  noIndexFollow?: boolean;
   /** Locale of THIS page's content, e.g. "en-CA" (default) or "fr-CA". */
   lang?: "en-CA" | "fr-CA";
   /**
@@ -41,6 +43,7 @@ export function SeoHead({
   canonical,
   ogImage = "https://quoteai.ca/opengraph.jpg?v=2", // ?v= busts the platforms' preview caches when the card changes
   noIndex = false,
+  noIndexFollow = false,
   ogTitle,
   ogDescription,
   ogUrl,
@@ -65,6 +68,7 @@ export function SeoHead({
       <meta name="description" content={description} />
       {canonical && <link rel="canonical" href={canonical} />}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
+      {!noIndex && noIndexFollow && <meta name="robots" content="noindex, follow" />}
 
       {enUrl && <link rel="alternate" hrefLang="en-CA" href={enUrl} />}
       {frUrl && <link rel="alternate" hrefLang="fr-CA" href={frUrl} />}

@@ -1,7 +1,7 @@
 import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
-import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
+import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, enSectorLive } from "@/data/seo-data";
 import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
 import { HELP_ARTICLES } from "@/data/help-articles";
 import { toolPath, comparePath } from "@/data/seo-slugs";
@@ -180,7 +180,7 @@ export default function MappaSitoPage() {
                 <h2 style={{ fontSize: 16, fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.professionsTitle")}</h2>
               </div>
               <ul style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 13.5 }}>
-                {Object.entries(SECTORS).map(([slug, sector]) => (
+                {Object.entries(SECTORS).filter(([slug]) => enSectorLive(slug)).map(([slug, sector]) => (
                   <li key={slug}>
                     <Link href={`/quotes/${slug}/`} className="cta-link" style={{ fontSize: "inherit", fontWeight: 500 }}>
                       {sector.label}

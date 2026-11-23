@@ -9,7 +9,7 @@ import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { BLOG_INDEX } from "@/data/blog-index";
-import { sectorLabel, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
+import { sectorLabel, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { homepageJsonLd } from "@/data/json-ld";
 import { MARKETING_PLANS, type MarketingPlan } from "@/data/pricing";
@@ -64,13 +64,13 @@ function ScrollSection({
   );
 }
 
-/** The 18 real trade verticals, in the order they appear on their SEO pages. */
+/** The trade verticals with a live page, in the order they appear on their SEO pages. */
 const TRADE_SLUGS = [
   "painter", "electrician", "plumber", "general-contractor", "renovation-contractor",
   "welder-fabricator", "carpenter-cabinetmaker", "hvac-technician", "freelance",
   "building-consultant", "mason", "landscaper", "tile-installer", "window-door-installer",
   "roofer", "air-conditioning-installer", "decorative-painter", "flooring-installer",
-];
+].filter((slug) => !RETIRED_SECTOR_SLUGS.has(slug));
 
 export default function Home() {
   const { isSignedIn } = useAuth();
@@ -503,15 +503,15 @@ export default function Home() {
           </div>
           <div className="news-grid">
             {(lang === "fr" ? [
-              { slug: "excel-template", chip: "chip-green", badge: "vs Excel", title: "Alternative à une soumission Excel", desc: "Pas de formules. Pas d'erreurs. Juste des résultats.", seed: "quoteai-guide-excel" },
-              { slug: "word-template", chip: "chip-teal", badge: "vs Word", title: "Alternative à un modèle Word", desc: "PDF professionnel en un clic, sans mise en page manuelle.", seed: "quoteai-guide-word" },
-              { slug: "how-to-quote", chip: "chip-purple", badge: "Guide", title: "Comment rédiger une soumission", desc: "Un guide pratique pour les entrepreneurs et petites entreprises canadiennes.", seed: "quoteai-guide-howto" },
+              { href: "/fr/soumissions/modele-soumission-word/", chip: "chip-green", badge: "vs Word", title: "Alternative à un modèle Word", desc: "PDF professionnel en un clic, sans mise en page manuelle.", seed: "quoteai-guide-word" },
+              { href: "/fr/outils/", chip: "chip-teal", badge: "Outils gratuits", title: "Calculateurs gratuits pour entrepreneurs", desc: "TPS et TVQ, retenue, marge et taux horaire.", seed: "quoteai-guide-excel" },
+              { href: "/fr/guides/", chip: "chip-purple", badge: "Guide", title: "Guides pour les entrepreneurs du Québec", desc: "TPS et TVQ, licence RBQ et langue française, avec les sources officielles.", seed: "quoteai-guide-howto" },
             ] : [
-              { slug: "excel-template", chip: "chip-green", badge: "vs Excel", title: "Alternative to an Excel quote", desc: "No formulas. No errors. Just results.", seed: "quoteai-guide-excel" },
-              { slug: "word-template", chip: "chip-teal", badge: "vs Word", title: "Alternative to a Word template", desc: "Professional PDF in one click, no manual formatting.", seed: "quoteai-guide-word" },
-              { slug: "how-to-quote", chip: "chip-purple", badge: "Guide", title: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", seed: "quoteai-guide-howto" },
+              { href: "/compare/", chip: "chip-green", badge: "Compare", title: "Compare quoting software", desc: "quoteai beside Jobber, Joist and Housecall Pro, from their own published prices.", seed: "quoteai-guide-excel" },
+              { href: "/tools/", chip: "chip-teal", badge: "Free tools", title: "Free contractor calculators", desc: "GST/HST and QST, holdback, markup and labour rate.", seed: "quoteai-guide-word" },
+              { href: "/blog/how-to-write-a-professional-quote-that-wins-jobs/", chip: "chip-purple", badge: "Guide", title: "How to write a quote", desc: "A practical guide for Canadian contractors and small businesses.", seed: "quoteai-guide-howto" },
             ]).map((g) => (
-              <Link key={g.slug} href={localizedPath(`/quotes/${g.slug}/`, lang)} className="card news-card">
+              <Link key={g.href} href={g.href} className="card news-card">
                 <div className="news-media">
                   <MarketingImage slot="guide-card" seed={g.seed} />
                 </div>

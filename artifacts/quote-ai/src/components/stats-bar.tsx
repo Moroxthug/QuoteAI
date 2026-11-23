@@ -1,10 +1,12 @@
 import { useCountUp } from "@/hooks/use-count-up";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { AGGREGATE_RATING } from "@/components/testimonials-section";
+import { CANADIAN_PROVINCES } from "@/lib/tax-profiles";
+import { RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
 
-const TRADES_COUNT = Object.keys(TRADE_LABELS.en).length;
-const RATING = parseFloat(AGGREGATE_RATING.ratingValue);
+const TRADES_COUNT = Object.keys(TRADE_LABELS.en).filter((slug) => !RETIRED_SECTOR_SLUGS.has(slug)).length;
+// Every province and territory has a tax profile (src/lib/tax-profiles.ts).
+const JURISDICTIONS = CANADIAN_PROVINCES.length;
 
 function StatTile({
   target,
@@ -72,11 +74,9 @@ export function StatsBar({ className = "" }: { className?: string }) {
             label={lang === "fr" ? "métiers avec pages et vocabulaire dédiés" : "trade verticals with dedicated pages and vocabulary"}
           />
           <StatTile
-            target={RATING}
-            decimals={1}
-            suffix="/5"
+            target={JURISDICTIONS}
             em
-            label={lang === "fr" ? "note moyenne vérifiée des entrepreneurs canadiens" : "average verified rating from Canadian contractors"}
+            label={lang === "fr" ? "provinces et territoires dont les taxes de vente sont intégrées" : "provinces and territories with their sales taxes built in"}
           />
         </div>
       </div>

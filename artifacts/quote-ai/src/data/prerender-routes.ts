@@ -3,7 +3,7 @@
 // the browser hydrates. Keep this in step with scripts/generate-sitemap.ts
 // (the sitemap lists exactly these URLs).
 import type { Lang } from "@/i18n/translations";
-import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from "./seo-data";
+import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorLive } from "./seo-data";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "./blog-data";
 import { HELP_ARTICLES } from "./help-articles";
 import { PILOT_PROVINCES } from "./province-data";
@@ -66,7 +66,9 @@ export function listPrerenderRoutes(): PrerenderRoute[] {
   // CITY_SECTORS × ACTIVE_CITIES grid, French only for the French-primary
   // Québec cities (the hreflang tags follow the same rule, see city-landing.tsx).
   for (const [slug, sector] of Object.entries(SECTORS)) {
-    routes.push({ path: `/quotes/${slug}`, lang: "en" }, { path: `/fr/soumissions/${sector.frSlug}`, lang: "fr" });
+    // Retired trades 301 in vercel.json and are not built (seo-data.ts RETIRED_SECTOR_REDIRECTS).
+    if (enSectorLive(slug)) routes.push({ path: `/quotes/${slug}`, lang: "en" });
+    if (frSectorLive(slug)) routes.push({ path: `/fr/soumissions/${sector.frSlug}`, lang: "fr" });
     if (!CITY_SECTORS.includes(slug)) continue;
     for (const city of ACTIVE_CITIES) {
       routes.push({ path: `/quotes/${slug}/${city.slug}`, lang: "en" });

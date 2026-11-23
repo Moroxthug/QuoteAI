@@ -13,7 +13,7 @@ import { SkipLink } from "@/components/a11y";
 import SupportBot, { openSupportChat } from "@/components/support-bot";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TRADE_LABELS } from "@/i18n/translations";
-import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS } from "@/data/seo-slugs";
+import { getLanguageCounterpartPath, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { legalIdentityLines } from "@workspace/legal-entity";
 
@@ -305,7 +305,7 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <p>{t("footer.tagline")}</p>
           </div>
           <FooterCol title={t("footer.trades")} folded={phone}>
-            {Object.entries(TRADE_LABELS[lang]).slice(0, 7).map(([slug, label]) => (
+            {Object.entries(TRADE_LABELS[lang]).filter(([slug]) => !RETIRED_SECTOR_SLUGS.has(slug)).slice(0, 7).map(([slug, label]) => (
               <Link key={slug} href={localizedPath(`/quotes/${slug}/`, lang)}>{label}</Link>
             ))}
             <Link href={localizedPath("/#trades", lang)}>{t("footer.allTrades")}</Link>
@@ -323,10 +323,11 @@ function SiteLayout({ children }: { children: React.ReactNode }) {
             <Link href={lang === "fr" ? "/fr/outils/" : "/tools/"}>{t("footer.freeCalculators")}</Link>
             <Link href={lang === "fr" ? "/fr/comparer/" : "/compare/"}>{t("footer.compare")}</Link>
             {lang === "fr" && <Link href="/fr/guides/">Guides pour le Québec</Link>}
-            <Link href={localizedPath("/quotes/excel-template/", lang)}>{t("footer.excelTemplate")}</Link>
-            <Link href={localizedPath("/quotes/word-template/", lang)}>{t("footer.wordTemplate")}</Link>
-            <Link href={localizedPath("/quotes/how-to-quote/", lang)}>{t("footer.howToQuote")}</Link>
-            <Link href={localizedPath("/quotes/free-quote/", lang)}>{t("footer.freeQuotes")}</Link>
+            {lang === "fr" ? (
+              <Link href="/fr/soumissions/modele-soumission-word/">{t("footer.wordTemplate")}</Link>
+            ) : (
+              <Link href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">{t("footer.howToQuote")}</Link>
+            )}
           </FooterCol>
           <FooterCol title={t("footer.pilotProgram")} folded={phone}>
             {/* Phase 81 — the pilot marketing pages, both languages */}

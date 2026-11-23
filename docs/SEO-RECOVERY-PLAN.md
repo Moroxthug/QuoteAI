@@ -126,6 +126,17 @@ Principle: **act now on everything Google can see, measure against clicks and si
 
 Done when: a crawl shows no Italian strings and no AggregateRating; 126 city pages and the noindexed FR trade pages are out of the sitemap with `noindex`; the redirects return a single 301; `validate-sitemap` and `validate-prerender` pass.
 
+**S1 status (2026-11-22): built.** Sitemap 290 → 139 URLs; 265 pages prerendered (139 indexable, 126 `noindex, follow`); no Italian text, rating markup or links to retired pages in the build.
+- Index rules live in one place: `src/data/seo-data.ts` (`RETIRED_SECTOR_REDIRECTS`, `frSectorIndexed`, `CITY_PAGES_INDEXED`), with the light list `RETIRED_SECTOR_SLUGS` in `seo-slugs.ts`. `generate-sitemap.ts` fails the build if `vercel.json` lacks a retired page's 301.
+- **Changes from the plan above:**
+  - `renovation-contractor` and `air-conditioning-installer` were **not** merged. They are real trades with their own searches, and the French renovation page ranks around position 5. Only the Italian categories (`decorative-painter`, `building-consultant`) were merged.
+  - French trade pages kept indexed: `travailleur-autonome`, `modele-soumission-word`, `entrepreneur-renovation`, the three that earn clicks.
+  - `/quotes/free-quote/` → `/pricing/`; `/fr/soumissions/comment-faire-une-soumission/` → `/fr/guides/`.
+  - The home page's verified-rating tile became "13 provinces and territories with their sales taxes built in" (true: `src/lib/tax-profiles.ts`). The testimonials themselves stay until the owner confirms them (§4).
+  - SoftwareApplication shows the Starter price from `src/data/pricing.ts` ($29). Change it there if the launch price ships.
+  - Blog `publishedAt` is now the day each post first appeared in git; reading time is computed from its word count (1–3 min today).
+- The template's default `index, follow` robots tag is dropped when a page sets its own (`prerender-seo.ts` `injectHead`).
+
 ### S2: Technical cleanup (1 day; ship with S1)
 1. **Real 404s (T1):**
    - Rewrite to spa.html only the private SPA prefixes (`/sign-in`, `/sign-up`, `/dashboard`, `/p/`, `/i/`, `/portal/`, `/welcome`, `/join`, …).

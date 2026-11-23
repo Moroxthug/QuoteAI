@@ -382,105 +382,19 @@ export function buildCityJsonLd(sector: SectorData, city: CityData, lang: Lang =
   const sSlug = sectorPathSlug(sector, lang);
   const canonical = `${BASE_URL}${base}/${sSlug}/${city.slug}/`;
   const sectorPageUrl = `${BASE_URL}${base}/${sSlug}/`;
-  const faqItems = getCityFaqItems(sector, city, lang);
-  const { label, labelPlural } = sectorLabel(sector, lang);
-
-  if (lang === "fr-CA") {
-    return [
-      {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        name: "quoteai",
-        description: `Logiciel de soumission par IA pour les ${labelPlural} à ${city.name} (${city.region}).`,
-        url: canonical,
-        applicationCategory: "BusinessApplication",
-        operatingSystem: "Web",
-        inLanguage: "fr",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", availability: "https://schema.org/InStock" },
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        name: `Soumissions ${label} à ${city.name}`,
-        description: `Logiciel de soumission par IA pour les ${labelPlural} à ${city.name}`,
-        serviceType: `Soumission ${label}`,
-        provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
-        areaServed: [
-          { "@type": "City", name: city.name },
-          { "@type": "State", name: city.region },
-          { "@type": "Country", name: "Canada" },
-        ],
-        url: canonical,
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: `${BASE_URL}/fr/` },
-          { "@type": "ListItem", position: 2, name: label, item: sectorPageUrl },
-          { "@type": "ListItem", position: 3, name: city.name, item: canonical },
-        ],
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: faqItems.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      },
-    ];
-  }
-
+  const { label } = sectorLabel(sector, lang);
+  // City pages are noindex (seo-data.ts CITY_PAGES_INDEXED): breadcrumb only,
+  // no SoftwareApplication, Service or FAQPage claims per city.
+  const fr = lang === "fr-CA";
   return [
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      name: "quoteai",
-      description: `AI quoting software for ${sector.labelPlural} in ${city.name} (${city.region}).`,
-      url: canonical,
-      applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      inLanguage: "en",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "CAD",
-        availability: "https://schema.org/InStock",
-      },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      name: `${sector.label} Quotes in ${city.name}`,
-      description: `AI quoting software for ${sector.labelPlural} in ${city.name}`,
-      serviceType: `${sector.label} Quoting`,
-      provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
-      areaServed: [
-        { "@type": "City", name: city.name },
-        { "@type": "State", name: city.region },
-        { "@type": "Country", name: "Canada" },
-      ],
-      url: canonical,
-    },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${BASE_URL}/` },
-        { "@type": "ListItem", position: 2, name: sector.label, item: sectorPageUrl },
+        { "@type": "ListItem", position: 1, name: fr ? "Accueil" : "Home", item: fr ? `${BASE_URL}/fr/` : `${BASE_URL}/` },
+        { "@type": "ListItem", position: 2, name: fr ? label : sector.label, item: sectorPageUrl },
         { "@type": "ListItem", position: 3, name: city.name, item: canonical },
       ],
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((f) => ({
-        "@type": "Question",
-        name: f.q,
-        acceptedAnswer: { "@type": "Answer", text: f.a },
-      })),
     },
   ];
 }

@@ -1,4 +1,4 @@
-import { SECTOR_SLUGS } from "./seo-slugs.js";
+import { SECTOR_SLUGS, RETIRED_SECTOR_SLUGS } from "./seo-slugs.js";
 
 interface SectorDataFr {
   label: string;
@@ -1666,7 +1666,46 @@ const NON_LOCAL_SECTOR_SLUGS = new Set([
   "free-quote",
 ]);
 
-export const CITY_SECTORS: readonly string[] = Object.keys(SECTORS).filter(
+// ─── Index policy (docs/SEO-RECOVERY-PLAN.md, S1, 2026-11-22) ───────────────
+// Trade pages left over from the Italian original, and "trade" pages that were
+// really template/guide doorways, are retired: each one 301s (vercel.json) to
+// the page that serves its intent. fr: null keeps the French page live.
+export const RETIRED_SECTOR_REDIRECTS: Record<string, { en: string; fr: string | null }> = {
+  "excel-template": { en: "/tools/", fr: "/fr/outils/" },
+  // The French "modèle de soumission Word" page ranks; only the English one goes.
+  "word-template": { en: "/tools/", fr: null },
+  "free-quote": { en: "/pricing/", fr: "/fr/tarifs/" },
+  "how-to-quote": { en: "/blog/how-to-write-a-professional-quote-that-wins-jobs/", fr: "/fr/guides/" },
+  "decorative-painter": { en: "/quotes/painter/", fr: "/fr/soumissions/peintre/" },
+  "building-consultant": { en: "/quotes/general-contractor/", fr: "/fr/soumissions/entrepreneur-general/" },
+};
+
+{
+  const a = Object.keys(RETIRED_SECTOR_REDIRECTS).sort().join(",");
+  const b = [...RETIRED_SECTOR_SLUGS].sort().join(",");
+  if (a !== b) throw new Error(`RETIRED_SECTOR_REDIRECTS (${a}) and seo-slugs RETIRED_SECTOR_SLUGS (${b}) disagree`);
+}
+
+/** The English page /quotes/<slug>/ exists. */
+export const enSectorLive = (slug: string): boolean => !RETIRED_SECTOR_SLUGS.has(slug);
+/** The French page /fr/soumissions/<frSlug>/ exists. */
+export const frSectorLive = (slug: string): boolean =>
+  !(slug in RETIRED_SECTOR_REDIRECTS) || RETIRED_SECTOR_REDIRECTS[slug].fr === null;
+
+// The French trade pages are one template with the trade name swapped in, so
+// they stay live but noindex until each is written by hand (plan S3). These
+// already earn clicks and stay indexed.
+const INDEXED_FR_SECTOR_SLUGS = new Set(["freelance", "word-template", "renovation-contractor"]);
+export const frSectorIndexed = (slug: string): boolean => frSectorLive(slug) && INDEXED_FR_SECTOR_SLUGS.has(slug);
+
+// The trade × city grid is templated text with little unique to each page:
+// live (links and visitors keep working) but noindex and out of the sitemap.
+export const CITY_PAGES_INDEXED = false;
+
+/** English trade slugs with a live page, in SECTORS order. */
+export const LIVE_SECTOR_SLUGS: readonly string[] = Object.keys(SECTORS).filter(enSectorLive);
+
+export const CITY_SECTORS: readonly string[] = LIVE_SECTOR_SLUGS.filter(
   (slug) => !NON_LOCAL_SECTOR_SLUGS.has(slug),
 );
 
@@ -1759,7 +1798,7 @@ export function getCityDesc(sector: SectorData, cityName: string, citySlug: stri
   return formula(sector.label, sector.labelPlural, cityName, region);
 }
 
-export const RELATED_SECTORS: Record<string, { slug: string; label: string }[]> = {
+const RELATED_SECTORS_ALL: Record<string, { slug: string; label: string }[]> = {
   painter: [
     { slug: "decorative-painter", label: "Painters & Finishers" },
     { slug: "renovation-contractor", label: "Renovations" },
@@ -1937,6 +1976,13 @@ export const RELATED_SECTORS: Record<string, { slug: string; label: string }[]> 
     { slug: "plumber", label: "Plumbers" },
   ],
 };
+
+// Related links never point at a retired page.
+export const RELATED_SECTORS: Record<string, { slug: string; label: string }[]> = Object.fromEntries(
+  Object.entries(RELATED_SECTORS_ALL)
+    .filter(([slug]) => enSectorLive(slug))
+    .map(([slug, list]) => [slug, list.filter((r) => enSectorLive(r.slug))]),
+);
 
 /**
  * Hand-written "local market" copy per city. Shape is lang-aware ({ en, fr }).

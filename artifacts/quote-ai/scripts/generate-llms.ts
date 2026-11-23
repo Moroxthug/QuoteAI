@@ -13,7 +13,7 @@ import { writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { SECTORS } from "../src/data/seo-data.js";
+import { SECTORS, enSectorLive, frSectorIndexed } from "../src/data/seo-data.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { HELP_ARTICLES, HELP_CATEGORIES, type HelpBlock } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } from "../src/data/province-data.js";
@@ -36,10 +36,13 @@ const plans = MARKETING_PLANS.map((p) => {
 }).join("\n");
 
 const sectorLinks = Object.entries(SECTORS)
+  .filter(([slug]) => enSectorLive(slug))
   .map(([slug, s]) => `- [${s.labelPlural.replace(/^./, (c) => c.toUpperCase())}](${BASE}/quotes/${slug}/): ${s.metaDescription}`)
   .join("\n");
 
-const sectorLinksFr = Object.values(SECTORS)
+const sectorLinksFr = Object.entries(SECTORS)
+  .filter(([slug]) => frSectorIndexed(slug))
+  .map(([, s]) => s)
   .map((s) => `- [${s.fr.labelPlural.replace(/^./, (c) => c.toUpperCase())}](${BASE}/fr/soumissions/${s.frSlug}/)`)
   .join("\n");
 

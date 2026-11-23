@@ -2,9 +2,10 @@
 // scripts/prerender-seo.ts. Every public page now owns its head through
 // <SeoHead> — the build-time render (entry-server.tsx) serialises exactly what
 // the hydrated page renders, so crawler and browser always agree.
-import { TESTIMONIALS, AGGREGATE_RATING } from "@/components/testimonials-section";
 import { PUBLISHED_PLANS, ONE_SHOT_OPTIONS } from "@/data/pricing";
-import { lookup } from "@/i18n/registry";
+
+/** The entry price shown on /pricing/ (Starter), used in the one SoftwareApplication block. */
+const STARTER_MONTHLY = Math.min(...PUBLISHED_PLANS.map((p) => p.monthly));
 
 export const BASE_URL = "https://quoteai.ca";
 
@@ -117,28 +118,18 @@ export function homepageJsonLd(lang: "en" | "fr"): JsonLdSchema[] {
     url: fr ? `${BASE_URL}/fr/` : `${BASE_URL}/`,
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", description: fr ? "Essai gratuit disponible" : "Free trial available" },
+    offers: {
+      "@type": "Offer",
+      price: String(STARTER_MONTHLY),
+      priceCurrency: "CAD",
+      description: fr ? "Forfait Starter, par mois. Premières soumissions gratuites." : "Starter plan, per month. First quotes free.",
+    },
     audience: {
       "@type": "BusinessAudience",
       audienceType: fr ? "Entrepreneurs, petites entreprises, artisans, travailleurs autonomes" : "Contractors, Small Businesses, Tradespeople, Freelancers",
     },
     inLanguage: lang,
     provider: { "@type": "Organization", "@id": `${BASE_URL}/#org`, name: "quoteai", url: BASE_URL },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: AGGREGATE_RATING.ratingValue,
-      reviewCount: String(AGGREGATE_RATING.reviewCount),
-      bestRating: "5",
-      worstRating: "1",
-    },
-    review: TESTIMONIALS.map((t) => ({
-      "@type": "Review",
-      // The reviewers are contracting businesses, not people.
-      author: { "@type": "Organization", name: t.name },
-      reviewRating: { "@type": "Rating", ratingValue: String(t.rating), bestRating: "5", worstRating: "1" },
-      // Phase 115: the page's language is loaded before it renders (registry.ts); lookup falls back to English.
-      reviewBody: lookup(lang, `testimonials.${t.key}.text`),
-    })),
   };
   return [organization, website, software];
 }

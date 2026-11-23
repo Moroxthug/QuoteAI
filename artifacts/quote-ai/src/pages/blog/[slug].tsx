@@ -2,7 +2,7 @@ import { useParams, Link } from "wouter";
 import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight } from "lucide-react";
 import { BLOG_ARTICLES } from "@/data/blog-data";
-import { SECTORS, ACTIVE_CITIES, CITY_SECTORS } from "@/data/seo-data";
+import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, enSectorLive } from "@/data/seo-data";
 import { extractToc, injectHeadingIds } from "@/data/blog-toc";
 import { SeoHead } from "@/components/seo-head";
 import { BASE_URL } from "@/data/json-ld";
@@ -53,6 +53,7 @@ export default function BlogArticlePage() {
   ).slice(0, 3);
 
   const relatedSectorObjects = article.relatedSectors
+    .filter(enSectorLive)
     .map((s) => SECTORS[s])
     .filter(Boolean);
 

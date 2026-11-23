@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS } from "../src/data/seo-data.js";
+import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorIndexed, CITY_PAGES_INDEXED, RETIRED_SECTOR_REDIRECTS } from "../src/data/seo-data.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
@@ -79,19 +79,21 @@ for (const g of FR_GUIDES) entries.push(url(`${BASE_URL}/fr/guides/${g.slug}/`, 
 // lastmod for the templated pages = the day their template or data last
 // changed (seo-render-engine.ts / seo-data.ts). Bump it when those change so
 // the date tells Google something true instead of a fixed placeholder.
-const SEO_TEMPLATE_UPDATED = "2026-11-12";
+const SEO_TEMPLATE_UPDATED = "2026-11-22";
 
 // SEO sector landing pages (English + French — every sector has a French page)
 for (const [sectorSlug, sector] of Object.entries(SECTORS)) {
-  entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
-  entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
+  // Only indexable pages: retired trades redirect, most French trade pages are noindex (SEO-RECOVERY-PLAN S1).
+  if (enSectorLive(sectorSlug)) entries.push(url(`${BASE_URL}/quotes/${sectorSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
+  if (frSectorIndexed(sectorSlug)) entries.push(url(`${BASE_URL}/fr/soumissions/${sector.frSlug}/`, "0.8", "monthly", SEO_TEMPLATE_UPDATED));
 }
 
 // SEO city×sector pages — restricted to ACTIVE_CITIES (see seo-data.ts) to
 // concentrate crawl budget instead of spreading it across 1000+ URLs. French
 // city pages only exist for the French-primary Quebec cities (see
 // FRENCH_PRIMARY_CITY_SLUGS) — everything else stays English-only for now.
-for (const sectorSlug of CITY_SECTORS) {
+// City pages are live but noindex while CITY_PAGES_INDEXED is false: kept out.
+for (const sectorSlug of CITY_PAGES_INDEXED ? CITY_SECTORS : []) {
   const sector = SECTORS[sectorSlug];
   for (const city of ACTIVE_CITIES) {
     const priority = TIER1_CITY_SLUGS.has(city.slug) ? "0.7" : "0.6";
@@ -145,6 +147,18 @@ const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlug
   if (missing.length || stale.length) {
     throw new Error(`vercel.json city redirects out of step with ACTIVE_CITY_SLUGS — missing: ${missing.join(", ") || "none"}; redirecting active cities: ${stale.join(", ") || "none"}`);
   }
+}
+
+// Retired trades (seo-data.ts RETIRED_SECTOR_REDIRECTS) must each 301 in vercel.json.
+{
+  const vercel = JSON.parse(readFileSync(join(__dirname, "../../../vercel.json"), "utf-8")) as { redirects: { source: string; destination: string }[] };
+  const has = (source: string, destination: string) => vercel.redirects.some((r) => r.source === source && r.destination === destination);
+  const missing: string[] = [];
+  for (const [slug, to] of Object.entries(RETIRED_SECTOR_REDIRECTS)) {
+    if (!has(`/quotes/${slug}{/}?`, to.en)) missing.push(`/quotes/${slug}/ -> ${to.en}`);
+    if (to.fr && !has(`/fr/soumissions/${SECTORS[slug].frSlug}{/}?`, to.fr)) missing.push(`/fr/soumissions/${SECTORS[slug].frSlug}/ -> ${to.fr}`);
+  }
+  if (missing.length) throw new Error(`vercel.json is missing redirects for retired trades: ${missing.join("; ")}`);
 }
 
 // ─── robots.txt ──────────────────────────────────────────────────────────────

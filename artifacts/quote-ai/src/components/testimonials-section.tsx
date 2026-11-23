@@ -39,9 +39,6 @@ export function TestimonialsSection() {
             <span className="eyebrow">{t("testimonials.verifiedReviews")}</span>
             <h2 className="h2">{t("testimonials.whatPeopleSay")} {t("testimonials.aboutUs")}</h2>
           </div>
-          <span className="chip chip-green" style={{ alignSelf: "center" }}>
-            {AGGREGATE_RATING.ratingValue}/5 &middot; {AGGREGATE_RATING.reviewCount} {t("testimonials.reviews")}
-          </span>
         </div>
 
         <div className="rev-grid">

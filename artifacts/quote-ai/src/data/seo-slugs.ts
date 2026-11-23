@@ -40,6 +40,15 @@ export const SECTOR_KEY_BY_FR_SLUG: Record<string, string> = Object.fromEntries(
 );
 
 /**
+ * Trades whose English page is retired and 301s (docs/SEO-RECOVERY-PLAN.md S1).
+ * Kept here so the header, footer and homepage can skip them without loading
+ * seo-data.ts, which holds the redirect targets and asserts the two agree.
+ */
+export const RETIRED_SECTOR_SLUGS: ReadonlySet<string> = new Set([
+  "excel-template", "word-template", "free-quote", "how-to-quote", "decorative-painter", "building-consultant",
+]);
+
+/**
  * Phase 81 — static public pages that have a real French URL (a prerendered
  * page of their own, in the sitemap, claimed by hreflang). Everything not
  * listed here — the blog, the help centre, /whatsapp — is

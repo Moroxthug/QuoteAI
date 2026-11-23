@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { ArrowRight, CheckCircle2, MapPin, BarChart2, BookOpen } from "lucide-react";
-import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, ACTIVE_CITY_SLUGS, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc, localizeCity } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, CITIES_BY_SLUG, ACTIVE_CITY_SLUGS, SECTOR_KEY_BY_FR_SLUG, FRENCH_PRIMARY_CITY_SLUGS, getCityTitle, getCityDesc, localizeCity, CITY_PAGES_INDEXED, CITY_SECTORS } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import { getCityTradeFacts } from "@/data/city-trade-facts";
 import {
@@ -106,7 +106,7 @@ export default function SeoCityLanding() {
   // An unknown trade or city is a 404, not a generated page: the shell answers 200 for any URL.
   // So is a city outside ACTIVE_CITY_SLUGS (vercel.json 301s those to the
   // trade page; this covers the dev server and any path the redirect misses).
-  if (!SECTORS[sectorSlug] || !city || !ACTIVE_CITY_SLUGS.has(citySlug)) return <NotFound bare />;
+  if (!SECTORS[sectorSlug] || !CITY_SECTORS.includes(sectorSlug) || !city || !ACTIVE_CITY_SLUGS.has(citySlug)) return <NotFound bare />;
 
   const sBenefits = (
     <section className="sec soft" key="benefits">
@@ -207,6 +207,7 @@ export default function SeoCityLanding() {
         ogImage={getOgImagePath(s.slug)}
         lang={engineLang}
         altCanonical={altCanonical}
+        noIndexFollow={!CITY_PAGES_INDEXED}
       />
 
       {/* ── Breadcrumb ───────────────────────────────────────── */}

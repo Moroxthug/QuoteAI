@@ -2,7 +2,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight, CheckCircle2, Clock, FileText, Shield, TrendingUp, Star, Building2, BookOpen, X, MapPin } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
-import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES } from "@/data/seo-data";
+import { SECTORS, DEFAULT_SECTOR, RELATED_SECTORS, SECTOR_KEY_BY_FR_SLUG, CITY_SECTORS, ACTIVE_CITIES, enSectorLive, frSectorLive, frSectorIndexed } from "@/data/seo-data";
 import { BLOG_INDEX, SECTOR_ARTICLES } from "@/data/blog-index";
 import { getOgImagePath, getSectorFrContent, getSectorDeepDive, cityBasePath, type Lang as EngineLang } from "@/data/seo-render-engine";
 import { QuotePreviewMockup } from "@/components/quote-preview-mockup";
@@ -251,7 +251,7 @@ export default function SeoLanding() {
   const params = useParams();
   const rawSlug = (params as { type?: string }).type ?? "contractor";
   const slug = isFr ? (SECTOR_KEY_BY_FR_SLUG[rawSlug] ?? rawSlug) : rawSlug;
-  if (!SECTORS[slug]) return <NotFound bare />;
+  if (!SECTORS[slug] || !(isFr ? frSectorLive(slug) : enSectorLive(slug))) return <NotFound bare />;
   const s = SECTORS[slug] ?? DEFAULT_SECTOR;
   const sSlugForLang = isFr ? s.frSlug : s.slug;
 
@@ -261,7 +261,6 @@ export default function SeoLanding() {
   const frContent = isFr ? getSectorFrContent(s) : null;
   const titleTag = isFr ? s.fr.titleTag : s.titleTag;
   const metaDescription = isFr ? s.fr.metaDescription : s.metaDescription;
-  const jsonLdDescription = isFr ? s.fr.jsonLdDescription : s.jsonLdDescription;
   const h1 = frContent?.h1 ?? s.h1;
   const h1Highlight = frContent?.h1Highlight ?? s.h1Highlight;
   const intro = frContent?.intro ?? s.intro;
@@ -278,20 +277,13 @@ export default function SeoLanding() {
   const deepDive = getSectorDeepDive(s, engineLang);
 
   const canonical = `https://quoteai.ca${base}/${sSlugForLang}/`;
-  // Every sector has a page in both languages.
-  const altCanonical = isFr ? `https://quoteai.ca/quotes/${s.slug}/` : `https://quoteai.ca/fr/soumissions/${s.frSlug}/`;
+  // Only an indexable twin is advertised as the other language.
+  const noIndexFollow = isFr && !frSectorIndexed(slug);
+  const altCanonical = isFr
+    ? enSectorLive(slug) && !noIndexFollow ? `https://quoteai.ca/quotes/${s.slug}/` : undefined
+    : frSectorIndexed(slug) ? `https://quoteai.ca/fr/soumissions/${s.frSlug}/` : undefined;
+  // One SoftwareApplication lives on / and /pricing/; a trade page is not an app.
   const jsonLd = [
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication" as const,
-      name: "quoteai",
-      description: jsonLdDescription,
-      url: canonical,
-      applicationCategory: "BusinessApplication",
-      operatingSystem: "Web",
-      inLanguage: isFr ? "fr" : "en",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "CAD", availability: "https://schema.org/InStock" },
-    },
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList" as const,
@@ -325,6 +317,7 @@ export default function SeoLanding() {
         ogImage={getOgImagePath(s.slug)}
         lang={engineLang}
         altCanonical={altCanonical}
+        noIndexFollow={noIndexFollow}
       />
 
       <div className="wrap">
@@ -359,7 +352,7 @@ export default function SeoLanding() {
             <p className="hero-note">{t("seo.heroCaption")}</p>
           </div>
           <div className="hidden lg:block">
-            <QuotePreviewMockup sector={s} />
+            <QuotePreviewMockup sector={s} lang={isFr ? "fr" : "en"} />
           </div>
         </div>
       </section>

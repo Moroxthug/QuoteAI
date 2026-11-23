@@ -66,19 +66,13 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 - [Carpenters and cabinetmakers](https://quoteai.ca/quotes/carpenter-cabinetmaker/): Create quotes for custom cabinetry, millwork and finish carpentry in 30 seconds. AI quoting software for Canadian carpenters. Free.
 - [HVAC and heating technicians](https://quoteai.ca/quotes/hvac-technician/): Quoting software for HVAC and heating technicians: furnaces, heat pumps, in-floor heat. AI in 30 seconds for Canadian trades.
 - [Freelancers and consultants](https://quoteai.ca/quotes/freelance/): Create professional quotes for consulting, marketing, design and IT work in 30 seconds. AI quoting software for Canadian freelancers. Free.
-- [Building consultants and home inspectors](https://quoteai.ca/quotes/building-consultant/): Quoting software for building consultants and home inspectors: inspections, permit drawings, project oversight. AI in 30 seconds.
 - [Masons and concrete contractors](https://quoteai.ca/quotes/mason/): Create quotes for masonry, foundations, and concrete work in 30 seconds. AI quoting software for Canadian masons. Try it free.
 - [Landscapers](https://quoteai.ca/quotes/landscaper/): Create quotes for lawn care, landscaping, and yard maintenance in 30 seconds. AI quoting software for Canadian landscapers. Try it free.
 - [Tile installers](https://quoteai.ca/quotes/tile-installer/): Create quotes for tile, porcelain, and mosaic installation in 30 seconds. AI quoting software for Canadian tile installers. Try it free.
 - [Window and door installers](https://quoteai.ca/quotes/window-door-installer/): Create quotes for windows, doors, and exterior openings in vinyl, fibreglass, and wood in 30 seconds. AI quoting software for Canadian installers.
 - [Roofing companies](https://quoteai.ca/quotes/roofer/): Create quotes for roof replacement, shingles, and flashing in 30 seconds. AI quoting software for Canadian roofers. Try it free.
 - [Air conditioning and HVAC installers](https://quoteai.ca/quotes/air-conditioning-installer/): Create quotes for AC, ductless heat pumps, and ventilation installs in 30 seconds. AI quoting software for Canadian installers. Free.
-- [Painters and decorative finishers](https://quoteai.ca/quotes/decorative-painter/): Create quotes for painting, decorative finishes, and exterior coatings in 30 seconds. AI quoting software for Canadian painters. Free.
 - [Flooring installers](https://quoteai.ca/quotes/flooring-installer/): Create quotes for hardwood, laminate, epoxy, and carpet installation in 30 seconds. AI quoting software for Canadian flooring installers. Try it free.
-- [Excel users](https://quoteai.ca/quotes/excel-template/): Looking for a free Excel quote template? quoteai is better: generate professional quotes in 30 seconds with AI, no formulas, no mistakes. Try it free.
-- [Word users](https://quoteai.ca/quotes/word-template/): Looking for a Word quote template to download? quoteai generates professional quotes in 30 seconds with AI. No Word template, no manual formatting.
-- [Contractors](https://quoteai.ca/quotes/how-to-quote/): Learn how to write a professional quote for your business in 30 seconds. A practical guide for Canadian tradespeople and small businesses. No Excel, no mistakes.
-- [Contractors and small businesses](https://quoteai.ca/quotes/free-quote/): Create quotes online for free with quoteai. Free quoting software for Canadian contractors and small businesses. Get started with no credit card.
 
 ## Help centre
 
@@ -117,10 +111,10 @@ quoteai next to Jobber, Joist and Housecall Pro for Canadian contractors, with e
 - [How to Quote an Electrical Job: Pricing Service Calls, Renovations and Panel Upgrades](https://quoteai.ca/blog/how-to-quote-an-electrical-job/): A method for Canadian electricians to price service calls, circuits, pot lights and panel upgrades, including permits, inspection and exclusions.
 - [How to Quote a Plumbing Job: Flat-Rate vs Hourly Pricing for Canadian Plumbers](https://quoteai.ca/blog/how-to-quote-a-plumbing-job/): Flat-rate or hourly? How plumbers can price repairs, water heaters, renovations and emergencies, with line items, markup and a clear client quote.
 - [Quote vs Estimate vs Invoice: What's the Difference for Contractors?](https://quoteai.ca/blog/quote-vs-estimate-vs-invoice-difference/): Quote, estimate, bid, proposal, invoice: what each means, when to use them, and how the wrong one can cost a contractor money.
-- [10 Ways Canadian Contractors Can Reduce Material Costs Without Cutting Quality](https://quoteai.ca/blog/reduce-material-costs-contractors-canada/): Practical ways to lower material costs on every job: supplier accounts, bulk buying, waste control, price-lock clauses and accurate takeoffs.
-- [Job Site Management for Small Contractors: A Simple System That Works](https://quoteai.ca/blog/construction-project-management-small-contractors/): How small trade businesses can run job sites better: scheduling, daily logs, photos, communication and punch lists, without heavy construction software.
-- [How to Win More Bids as a Contractor: 10 Things That Beat a Lower Price](https://quoteai.ca/blog/how-to-win-more-bids-contractors-canada/): Why contractors lose bids and how to win more: response speed, clear scope, options, credentials, follow-up and presentation, without racing to the bottom.
-- [Best Quoting Software for Contractors in Canada: What to Look For](https://quoteai.ca/blog/best-quoting-software-for-contractors-canada/): What matters when choosing quoting and estimating software as a Canadian contractor: taxes, mobile use, speed, French support, invoicing and price.
+- [Free Quote Template for Contractors in Canada (GST/HST/QST Included)](https://quoteai.ca/blog/free-quote-template-for-contractors-canada/): What a Canadian contractor quote must include: scope, line items, GST/HST/QST, deposit, validity and signature. Copy the structure, then see how to automate it.
+- [Cost to Install a Heat Pump in Canada in 2026 (Ductless, Central and Cold-Climate)](https://quoteai.ca/blog/cost-to-install-a-heat-pump-canada/): 2026 CAD price ranges for ductless mini-splits, central air-source and cold-climate heat pumps in Canada, what drives the cost, and how to quote the job.
+- [How to Get More Plumbing Jobs in Canada: 9 Ways That Actually Work](https://quoteai.ca/blog/how-to-get-more-plumbing-jobs-canada/): Practical ways for Canadian plumbers to get more jobs: Google Business Profile, fast quotes, reviews, service pages, referrals and repeat work.
+- [How Electricians Can Get More Jobs in Canada (Without Paying for Leads)](https://quoteai.ca/blog/how-to-get-more-electrical-jobs-canada/): A practical marketing and quoting playbook for Canadian electricians: local search, reviews, quick estimates, panel upgrade offers and referral partners.
 
 All 59 guides: [Blog](https://quoteai.ca/blog/). Full text of the help centre: [llms-full.txt](https://quoteai.ca/llms-full.txt).
 
@@ -154,25 +148,6 @@ Provinces :
 - [Québec](https://quoteai.ca/fr/provinces/quebec/)
 
 Soumissions par métier :
-- [Peintres](https://quoteai.ca/fr/soumissions/peintre/)
-- [Électriciens](https://quoteai.ca/fr/soumissions/electricien/)
-- [Plombiers](https://quoteai.ca/fr/soumissions/plombier/)
-- [Entrepreneurs généraux](https://quoteai.ca/fr/soumissions/entrepreneur-general/)
 - [Entrepreneurs en rénovation](https://quoteai.ca/fr/soumissions/entrepreneur-renovation/)
-- [Soudeurs-métalliers](https://quoteai.ca/fr/soumissions/soudeur-metallier/)
-- [Menuisiers-ébénistes](https://quoteai.ca/fr/soumissions/menuisier-ebeniste/)
-- [Techniciens CVC](https://quoteai.ca/fr/soumissions/technicien-cvc/)
 - [Travailleurs autonomes](https://quoteai.ca/fr/soumissions/travailleur-autonome/)
-- [Experts en bâtiment](https://quoteai.ca/fr/soumissions/expert-batiment/)
-- [Maçons](https://quoteai.ca/fr/soumissions/macon/)
-- [Paysagistes](https://quoteai.ca/fr/soumissions/paysagiste/)
-- [Poseurs de céramique](https://quoteai.ca/fr/soumissions/poseur-de-ceramique/)
-- [Poseurs de portes et fenêtres](https://quoteai.ca/fr/soumissions/poseur-portes-fenetres/)
-- [Couvreurs](https://quoteai.ca/fr/soumissions/couvreur/)
-- [Installateurs de climatisation](https://quoteai.ca/fr/soumissions/installateur-climatisation/)
-- [Peintres-décorateurs](https://quoteai.ca/fr/soumissions/peintre-decorateur/)
-- [Poseurs de revêtements de sol](https://quoteai.ca/fr/soumissions/poseur-de-plancher/)
-- [Modèles Excel](https://quoteai.ca/fr/soumissions/modele-soumission-excel/)
 - [Modèles Word](https://quoteai.ca/fr/soumissions/modele-soumission-word/)
-- [Guides de soumission](https://quoteai.ca/fr/soumissions/comment-faire-une-soumission/)
-- [Soumissions gratuites](https://quoteai.ca/fr/soumissions/soumission-gratuite/)

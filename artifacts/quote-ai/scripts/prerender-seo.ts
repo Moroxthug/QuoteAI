@@ -65,6 +65,7 @@ function injectHead(template: string, page: RenderedPage): string {
   html = html.replace(/<meta\s+property="og:[^"]*"[^>]*\/?>/gi, "");
   html = html.replace(/<meta\s+name="twitter:[^"]*"[^>]*\/?>/gi, "");
   html = html.replace(/<meta\s+name="keywords"[^>]*\/?>/gi, "");
+  if (/<meta name="robots"/.test(page.head)) html = html.replace(/<meta\s+name="robots"[^>]*\/?>/i, "");
   html = html.replace(/<script\s+type="application\/ld\+json">[\s\S]*?<\/script>/gi, "");
   // After <meta charset> + viewport: the charset declaration must stay within
   // the first 1024 bytes of the document, and a <title> with an en dash was

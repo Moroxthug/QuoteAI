@@ -14,11 +14,14 @@ export interface BlogArticleMeta {
   updatedAt?: string;
   readingTimeMin: number;
   relatedSectors: string[];
+  /** Homeowner-only post kept live but out of the index and the lists (SEO-RECOVERY-PLAN S3.1). */
+  noindex?: boolean;
 }
 
 export const BLOG_INDEX: BlogArticleMeta[] = [
   {
     slug: "how-much-does-it-cost-to-paint-an-apartment-in-canada-2026",
+    noindex: true,
     title: "How Much Does It Cost to Paint an Apartment in Canada in 2026?",
     seoTitle: "Cost to Paint an Apartment in Canada (2026)",
     metaDescription: "2026 CAD pricing to paint an apartment in Canada: cost per square foot, per room, labour vs. materials, and how Toronto and Vancouver compare to smaller markets.",
@@ -29,6 +32,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "bathroom-renovation-cost-toronto-2026",
+    noindex: true,
     title: "How Much Does It Cost to Renovate a Bathroom in Toronto in 2026?",
     seoTitle: "Bathroom Renovation Cost in Toronto (2026)",
     metaDescription: "2026 CAD price ranges for a Toronto bathroom renovation: full gut jobs, mid-range refreshes, plumbing and tiling, and how Toronto compares to the rest of Ontario.",
@@ -38,27 +42,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["plumber", "tile-installer", "renovation-contractor"],
   },
   {
-    slug: "cost-to-rewire-a-house-canada",
-    title: "Cost to Rewire a House in Canada: 2026 Electrical Pricing Guide",
-    seoTitle: "Cost to Rewire a House in Canada (2026)",
-    metaDescription: "What it costs to rewire a house in Canada in 2026: full rewiring, panel upgrades, cost per square foot, knob-and-tube removal, and regional price differences.",
-    category: "Pricing",
-    publishedAt: "2026-09-21",
-    readingTimeMin: 2,
-    relatedSectors: ["electrician", "hvac-technician"],
-  },
-  {
-    slug: "cost-to-reroof-a-home-canada",
-    title: "Cost to Re-Roof a Home in Canada in 2026 (With Snow Load Considerations)",
-    seoTitle: "Cost to Re-Roof a Home in Canada (2026)",
-    metaDescription: "2026 CAD pricing to re-roof a home in Canada: asphalt shingle and metal roofing costs, per-square pricing, and how snow load affects price in colder regions.",
-    category: "Pricing",
-    publishedAt: "2026-09-21",
-    readingTimeMin: 2,
-    relatedSectors: ["roofer", "mason"],
-  },
-  {
     slug: "deck-installation-cost-canada-2026",
+    noindex: true,
     title: "Deck Installation Cost in Canada: 2026 Price Guide by Material",
     seoTitle: "Deck Installation Cost in Canada (2026)",
     metaDescription: "2026 CAD pricing for building a deck in Canada: pressure-treated wood vs. composite decking, cost per square foot, permits, and regional price differences.",
@@ -69,6 +54,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "basement-finishing-cost-canada",
+    noindex: true,
     title: "Basement Finishing Cost in Canada: 2026 Pricing and What to Expect",
     seoTitle: "Basement Finishing Cost in Canada (2026)",
     metaDescription: "What it costs to finish a basement in Canada in 2026: framing, insulation, electrical, drywall, flooring, and why waterproofing should be budgeted first.",
@@ -79,23 +65,14 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "how-to-write-a-professional-quote-that-wins-jobs",
-    title: "How to Write a Professional Quote That Actually Wins Jobs",
-    seoTitle: "How to Write a Quote That Wins Jobs",
-    metaDescription: "A practical guide for Canadian contractors on writing quotes that convert: what to include, how to structure pricing, and why speed matters more than you think.",
+    title: "How to Write a Professional Quote That Wins Jobs",
+    seoTitle: "How to Write a Contractor Quote That Wins Jobs",
+    metaDescription: "What a Canadian contractor quote needs: GST/HST and licence numbers, scope and exclusions, taxes, deposit, cooling-off rules, plus a sample Ontario quote.",
     category: "Advice",
     publishedAt: "2026-09-21",
-    readingTimeMin: 2,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 7,
     relatedSectors: ["freelance", "how-to-quote"],
-  },
-  {
-    slug: "common-quoting-mistakes-contractors-make",
-    title: "7 Quoting Mistakes That Are Costing Canadian Contractors Jobs",
-    seoTitle: "7 Quoting Mistakes Costing You Jobs",
-    metaDescription: "The most common quoting mistakes Canadian tradespeople make — from vague pricing to slow turnaround — and how to fix each one to win more work.",
-    category: "Advice",
-    publishedAt: "2026-09-21",
-    readingTimeMin: 1,
-    relatedSectors: ["how-to-quote", "freelance"],
   },
   {
     slug: "how-to-price-a-job-labour-materials-markup",
@@ -108,17 +85,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["freelance", "general-contractor"],
   },
   {
-    slug: "mobile-quoting-on-the-go-for-contractors",
-    title: "Mobile Quoting: How to Send Professional Quotes From the Job Site",
-    seoTitle: "Mobile Quoting for Contractors",
-    metaDescription: "Why sending a quote from your phone before you leave the job site wins more work, and what to look for in mobile quoting tools built for Canadian tradespeople.",
-    category: "Tools",
-    publishedAt: "2026-09-21",
-    readingTimeMin: 1,
-    relatedSectors: ["free-quote", "how-to-quote"],
-  },
-  {
     slug: "winterizing-your-home-contractor-checklist",
+    noindex: true,
     title: "Winterization Work: A Contractor's Checklist for Canadian Homes",
     seoTitle: "Winterization Checklist for Contractors",
     metaDescription: "A winterization checklist for Canadian contractors and homeowners: insulation, weatherstripping, pipe protection, and the jobs that prevent costly winter damage.",
@@ -128,17 +96,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "hvac-technician"],
   },
   {
-    slug: "snow-load-roofing-eavestrough-considerations-canada",
-    title: "Snow Load Roofing and Eavestrough Considerations for Canadian Homes",
-    seoTitle: "Snow Load Roofing Considerations in Canada",
-    metaDescription: "What Canadian roofers and homeowners need to know about snow load ratings, ice damming, and eavestrough design for roofs built to handle a real Canadian winter.",
-    category: "Trades",
-    publishedAt: "2026-09-21",
-    readingTimeMin: 2,
-    relatedSectors: ["roofer", "mason"],
-  },
-  {
     slug: "basement-waterproofing-guide-canadian-homes",
+    noindex: true,
     title: "Basement Waterproofing: A Complete Guide for Canadian Homes",
     seoTitle: "Basement Waterproofing Guide for Canada",
     metaDescription: "Interior vs. exterior basement waterproofing methods, costs, and warning signs for Canadian homes — and why it matters before finishing a basement.",
@@ -149,12 +108,13 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "canada-greener-homes-grant-rebates-contractors-guide-2026",
-    title: "Canadian Energy-Efficiency Rebates for Contractors: A 2026 Guide",
-    seoTitle: "Canadian Energy Rebates for Contractors (2026)",
-    metaDescription: "Canada's federal and provincial energy-efficiency rebates — Greener Homes, Hydro-Québec Rénoclimat, BC Hydro, FortisBC, Enbridge — for contractors quoting jobs.",
+    title: "Home Energy Rebates in Canada: A Contractor's Guide to Current Programs",
+    seoTitle: "Home Energy Rebates in Canada: Contractor's Guide",
+    metaDescription: "Which home energy rebates are open in Ontario, BC and Quebec (checked November 2026), what closed federally, and what contractors must put on the invoice.",
     category: "Business",
     publishedAt: "2026-09-21",
-    readingTimeMin: 2,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 6,
     relatedSectors: ["hvac-technician", "general-contractor", "renovation-contractor"],
   },
   {
@@ -188,16 +148,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "renovation-contractor", "freelance"],
   },
   {
-    slug: "cost-to-install-a-heat-pump-canada",
-    title: "Cost to Install a Heat Pump in Canada in 2026 (Ductless, Central and Cold-Climate)",
-    seoTitle: "Heat Pump Installation Cost in Canada (2026)",
-    metaDescription: "2026 CAD price ranges for ductless mini-splits, central air-source and cold-climate heat pumps in Canada, what drives the cost, and how to quote the job.",
-    category: "Pricing",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 2,
-    relatedSectors: ["hvac-technician", "air-conditioning-installer", "electrician"],
-  },
-  {
     slug: "how-to-get-more-plumbing-jobs-canada",
     title: "How to Get More Plumbing Jobs in Canada: 9 Ways That Actually Work",
     seoTitle: "How to Get More Plumbing Jobs in Canada",
@@ -216,16 +166,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     publishedAt: "2026-10-31",
     readingTimeMin: 1,
     relatedSectors: ["electrician"],
-  },
-  {
-    slug: "how-to-price-a-job-labour-materials-markup-canada-guide",
-    title: "Markup vs Margin for Contractors: Which One to Use (With Examples)",
-    seoTitle: "Markup vs Margin for Contractors Explained",
-    metaDescription: "Markup and margin are not the same, and mixing them up costs contractors real money. Clear formulas, a conversion table and worked Canadian examples.",
-    category: "Advice",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 2,
-    relatedSectors: ["general-contractor", "renovation-contractor", "carpenter-cabinetmaker"],
   },
   {
     slug: "how-to-collect-payment-from-clients-contractor-canada",
@@ -248,17 +188,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "electrician", "plumber"],
   },
   {
-    slug: "cost-to-install-windows-and-doors-canada",
-    title: "Cost to Replace Windows and Doors in Canada in 2026",
-    seoTitle: "Cost to Replace Windows and Doors in Canada (2026)",
-    metaDescription: "2026 CAD price ranges to replace windows, patio doors and entry doors in Canada, what affects the price, and how installers should quote it.",
-    category: "Pricing",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 1,
-    relatedSectors: ["window-door-installer", "carpenter-cabinetmaker", "renovation-contractor"],
-  },
-  {
     slug: "kitchen-renovation-cost-canada-2026",
+    noindex: true,
     title: "Kitchen Renovation Cost in Canada in 2026: Budget, Mid-Range and High-End",
     seoTitle: "Kitchen Renovation Cost in Canada (2026)",
     metaDescription: "2026 CAD price ranges for a kitchen renovation in Canada: cabinets, countertops, labour, plumbing and electrical, plus where budgets blow up.",
@@ -269,6 +200,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "fence-installation-cost-canada-2026",
+    noindex: true,
     title: "Cost to Install a Fence in Canada in 2026 (Wood, Vinyl, Chain Link, Aluminum)",
     seoTitle: "Fence Installation Cost in Canada (2026)",
     metaDescription: "2026 CAD cost per linear foot to install a fence in Canada by material, plus gates, frost depth, permits and how to quote fence jobs.",
@@ -278,17 +210,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["landscaper", "carpenter-cabinetmaker", "mason"],
   },
   {
-    slug: "furnace-replacement-cost-canada-2026",
-    title: "Furnace Replacement Cost in Canada in 2026 (Gas, Electric and Dual-Fuel)",
-    seoTitle: "Furnace Replacement Cost in Canada (2026)",
-    metaDescription: "What it costs to replace a furnace in Canada in 2026 by type and efficiency, what drives installed price, and how HVAC contractors should quote it.",
-    category: "Pricing",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 1,
-    relatedSectors: ["hvac-technician", "air-conditioning-installer"],
-  },
-  {
     slug: "flooring-installation-cost-canada-2026",
+    noindex: true,
     title: "Flooring Installation Cost in Canada in 2026: Hardwood, Vinyl Plank, Laminate and Tile",
     seoTitle: "Flooring Installation Cost in Canada (2026)",
     metaDescription: "2026 CAD cost per square foot for hardwood, engineered, vinyl plank, laminate and tile flooring installed in Canada, plus prep and removal costs.",
@@ -328,16 +251,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "renovation-contractor", "building-consultant"],
   },
   {
-    slug: "how-to-send-a-quote-in-5-minutes-contractors",
-    title: "How to Send a Contractor Quote in 5 Minutes (From the Job Site)",
-    seoTitle: "Send a Contractor Quote in 5 Minutes",
-    metaDescription: "Speed wins jobs. A step-by-step system for building and sending an accurate, itemized quote from your phone before you leave the job site.",
-    category: "Tools",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 1,
-    relatedSectors: ["general-contractor", "renovation-contractor", "painter"],
-  },
-  {
     slug: "how-to-scale-a-contracting-business-canada",
     title: "How to Scale a Contracting Business in Canada: From Solo to a Crew",
     seoTitle: "How to Scale a Contracting Business in Canada",
@@ -359,6 +272,7 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "reduce-material-costs-contractors-canada",
+    noindex: true,
     title: "10 Ways Canadian Contractors Can Reduce Material Costs Without Cutting Quality",
     seoTitle: "Reduce Material Costs as a Contractor (10 Ways)",
     metaDescription: "Practical ways to lower material costs on every job: supplier accounts, bulk buying, waste control, price-lock clauses and accurate takeoffs.",
@@ -378,26 +292,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "renovation-contractor", "building-consultant"],
   },
   {
-    slug: "how-to-win-more-bids-contractors-canada",
-    title: "How to Win More Bids as a Contractor: 10 Things That Beat a Lower Price",
-    seoTitle: "How to Win More Bids as a Contractor",
-    metaDescription: "Why contractors lose bids and how to win more: response speed, clear scope, options, credentials, follow-up and presentation, without racing to the bottom.",
-    category: "Advice",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 1,
-    relatedSectors: ["general-contractor", "renovation-contractor", "painter", "electrician"],
-  },
-  {
-    slug: "best-quoting-software-for-contractors-canada",
-    title: "Best Quoting Software for Contractors in Canada: What to Look For",
-    seoTitle: "Best Quoting Software for Canadian Contractors",
-    metaDescription: "What matters when choosing quoting and estimating software as a Canadian contractor: taxes, mobile use, speed, French support, invoicing and price.",
-    category: "Tools",
-    publishedAt: "2026-10-31",
-    readingTimeMin: 2,
-    relatedSectors: ["general-contractor", "renovation-contractor", "freelance"],
-  },
-  {
     slug: "contractor-cash-flow-management-canada",
     title: "Contractor Cash Flow: How to Stop Running Out of Money Between Jobs",
     seoTitle: "Contractor Cash Flow Management in Canada",
@@ -406,16 +300,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     publishedAt: "2026-11-01",
     readingTimeMin: 1,
     relatedSectors: ["general-contractor", "renovation-contractor", "plumber", "electrician"],
-  },
-  {
-    slug: "how-to-survive-slow-season-contractors-canada",
-    title: "How Canadian Contractors Can Fill the Slow Season (Winter and Summer)",
-    seoTitle: "How Contractors Fill the Slow Season in Canada",
-    metaDescription: "Seasonal work drops in many trades. Ways to keep crews busy and revenue steady: off-season services, maintenance plans, early booking and marketing.",
-    category: "Business",
-    publishedAt: "2026-11-01",
-    readingTimeMin: 1,
-    relatedSectors: ["painter", "landscaper", "roofer", "general-contractor"],
   },
   {
     slug: "how-to-quote-a-painting-job",
@@ -429,22 +313,24 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "how-to-quote-a-roofing-job",
-    title: "How to Quote a Roofing Job in Canada: Measurements, Materials and Safety Costs",
+    title: "How to Quote a Roofing Job in Canada: Squares, Decking, Eave Protection and Fall Protection",
     seoTitle: "How to Quote a Roofing Job in Canada",
-    metaDescription: "How roofers can price a re-roof: measuring squares, tear-off, underlayment, ice and water shield, disposal, safety and a clear quote structure.",
+    metaDescription: "Price a reroof from squares, pitch and waste, with a per-sheet decking rate, code eave protection, permits and fall protection, plus an Ontario sample quote.",
     category: "Advice",
     publishedAt: "2026-11-01",
-    readingTimeMin: 1,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 6,
     relatedSectors: ["roofer", "mason"],
   },
   {
     slug: "how-to-quote-an-electrical-job",
-    title: "How to Quote an Electrical Job: Pricing Service Calls, Renovations and Panel Upgrades",
-    seoTitle: "How to Quote an Electrical Job",
-    metaDescription: "A method for Canadian electricians to price service calls, circuits, pot lights and panel upgrades, including permits, inspection and exclusions.",
+    title: "How to Quote an Electrical Job in Canada: Service Calls, Rewires and Panel Upgrades",
+    seoTitle: "How to Quote an Electrical Job in Canada",
+    metaDescription: "How Canadian electricians price service calls, rewires and 200A panel upgrades: licensing, ESA and Technical Safety BC permits, cost drivers and a sample quote.",
     category: "Advice",
     publishedAt: "2026-11-01",
-    readingTimeMin: 1,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 6,
     relatedSectors: ["electrician", "hvac-technician"],
   },
   {
@@ -468,17 +354,8 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     relatedSectors: ["general-contractor", "freelance", "renovation-contractor"],
   },
   {
-    slug: "concrete-driveway-cost-canada-2026",
-    title: "Concrete and Asphalt Driveway Cost in Canada in 2026",
-    seoTitle: "Driveway Cost in Canada: Concrete vs Asphalt (2026)",
-    metaDescription: "2026 CAD price per square foot for concrete, asphalt, interlock and gravel driveways in Canada, with frost, drainage and removal costs that change the total.",
-    category: "Pricing",
-    publishedAt: "2026-11-02",
-    readingTimeMin: 1,
-    relatedSectors: ["mason", "landscaper"],
-  },
-  {
     slug: "siding-replacement-cost-canada-2026",
+    noindex: true,
     title: "Siding Replacement Cost in Canada in 2026 (Vinyl, Fibre Cement, Wood and Metal)",
     seoTitle: "Siding Replacement Cost in Canada (2026)",
     metaDescription: "2026 CAD cost to replace siding on a Canadian home by material, including insulation, house wrap, removal and what drives the price.",
@@ -486,16 +363,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     publishedAt: "2026-11-02",
     readingTimeMin: 1,
     relatedSectors: ["renovation-contractor", "carpenter-cabinetmaker", "general-contractor"],
-  },
-  {
-    slug: "attic-insulation-cost-canada-2026",
-    title: "Attic Insulation Cost in Canada in 2026 (Blown-In, Spray Foam and Batt)",
-    seoTitle: "Attic Insulation Cost in Canada (2026)",
-    metaDescription: "2026 CAD cost to insulate or top up an attic in Canada: blown-in cellulose and fibreglass, spray foam, air sealing, R-value targets and rebates.",
-    category: "Pricing",
-    publishedAt: "2026-11-03",
-    readingTimeMin: 1,
-    relatedSectors: ["renovation-contractor", "hvac-technician", "general-contractor"],
   },
   {
     slug: "how-to-quote-a-landscaping-job",
@@ -509,12 +376,13 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "how-to-quote-an-hvac-job",
-    title: "How to Quote an HVAC Job: Installation, Replacement and Service Agreements",
-    seoTitle: "How to Quote an HVAC Job",
-    metaDescription: "How HVAC contractors can quote furnace, AC and heat pump jobs: load calculations, good-better-best options, line items, rebates and service plans.",
+    title: "How to Quote an HVAC Job in Canada: Sizing, Licensing and Line Items",
+    seoTitle: "How to Quote an HVAC Job in Canada",
+    metaDescription: "Quote heat pump and furnace jobs that hold up: CSA F280 sizing, separate equipment and labour lines, refrigerant and gas licensing, permits and rebate notes.",
     category: "Advice",
     publishedAt: "2026-11-03",
-    readingTimeMin: 1,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 7,
     relatedSectors: ["hvac-technician", "air-conditioning-installer"],
   },
   {
@@ -526,16 +394,6 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
     publishedAt: "2026-11-03",
     readingTimeMin: 1,
     relatedSectors: ["tile-installer", "renovation-contractor"],
-  },
-  {
-    slug: "quoteai-vs-spreadsheet-quotes-contractors",
-    title: "Spreadsheet Quotes vs Quoting Software: When Excel Stops Working for Contractors",
-    seoTitle: "Spreadsheet Quotes vs Quoting Software",
-    metaDescription: "Excel and Word are fine until they are not. Signs your spreadsheet quotes are costing you jobs and what to look for when switching to software.",
-    category: "Tools",
-    publishedAt: "2026-11-03",
-    readingTimeMin: 1,
-    relatedSectors: ["general-contractor", "freelance", "renovation-contractor"],
   },
   {
     slug: "how-to-raise-your-prices-contractors-without-losing-clients",
@@ -589,25 +447,54 @@ export const BLOG_INDEX: BlogArticleMeta[] = [
   },
   {
     slug: "how-to-quote-a-masonry-job",
-    title: "How to Quote a Masonry or Concrete Job: Brick, Block, Stone and Foundations",
-    seoTitle: "How to Quote a Masonry or Concrete Job",
-    metaDescription: "How masons and concrete contractors can price brick, block, stone and concrete work: measuring, materials, scaffolding, labour and weather risks.",
+    title: "How to Quote a Masonry or Concrete Job in Canada",
+    seoTitle: "How to Quote a Masonry or Concrete Job in Canada",
+    metaDescription: "Quote repointing, veneer, chimney, driveway and interlock work: the right units, freeze-thaw specs, locates, permits, BC PST rules and a sample driveway quote.",
     category: "Advice",
     publishedAt: "2026-11-03",
-    readingTimeMin: 1,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 7,
     relatedSectors: ["mason"],
   },
   {
     slug: "how-to-quote-a-window-or-door-installation-job",
-    title: "How to Quote a Window or Door Installation Job (With Checklist)",
-    seoTitle: "How to Quote a Window or Door Installation",
-    metaDescription: "How window and door installers can quote accurately: measuring, product options, full-frame vs insert, trim, disposal and lead times.",
+    title: "How to Quote a Window or Door Installation Job",
+    seoTitle: "How to Quote Window and Door Installation Jobs",
+    metaDescription: "Measuring, retrofit vs full-frame, egress, ENERGY STAR, deposits on custom units, capping, rot and warranty, plus a Québec sample quote with GST and QST.",
     category: "Advice",
     publishedAt: "2026-11-03",
-    readingTimeMin: 1,
+    updatedAt: "2026-11-24",
+    readingTimeMin: 6,
     relatedSectors: ["window-door-installer"],
   },
 ];
+
+/**
+ * Posts merged into a stronger page (SEO-RECOVERY-PLAN S3.2): each 301s in
+ * vercel.json (generate-sitemap.ts fails the build if one is missing) and its
+ * body is gone from blog-data.ts.
+ */
+export const BLOG_REDIRECTS: Record<string, string> = {
+  "cost-to-rewire-a-house-canada": "/blog/how-to-quote-an-electrical-job/",
+  "cost-to-reroof-a-home-canada": "/blog/how-to-quote-a-roofing-job/",
+  "snow-load-roofing-eavestrough-considerations-canada": "/blog/how-to-quote-a-roofing-job/",
+  "cost-to-install-a-heat-pump-canada": "/blog/how-to-quote-an-hvac-job/",
+  "furnace-replacement-cost-canada-2026": "/blog/how-to-quote-an-hvac-job/",
+  "cost-to-install-windows-and-doors-canada": "/blog/how-to-quote-a-window-or-door-installation-job/",
+  "concrete-driveway-cost-canada-2026": "/blog/how-to-quote-a-masonry-job/",
+  "attic-insulation-cost-canada-2026": "/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/",
+  "common-quoting-mistakes-contractors-make": "/blog/how-to-write-a-professional-quote-that-wins-jobs/",
+  "how-to-win-more-bids-contractors-canada": "/blog/how-to-write-a-professional-quote-that-wins-jobs/",
+  "how-to-send-a-quote-in-5-minutes-contractors": "/blog/how-to-write-a-professional-quote-that-wins-jobs/",
+  "mobile-quoting-on-the-go-for-contractors": "/blog/how-to-write-a-professional-quote-that-wins-jobs/",
+  "how-to-price-a-job-labour-materials-markup-canada-guide": "/tools/markup-margin-calculator/",
+  "best-quoting-software-for-contractors-canada": "/compare/",
+  "quoteai-vs-spreadsheet-quotes-contractors": "/compare/",
+  "how-to-survive-slow-season-contractors-canada": "/blog/how-to-scale-a-contracting-business-canada/"
+};
+
+/** Articles shown in lists, related links and the sitemap: everything indexable. */
+export const BLOG_LISTED: BlogArticleMeta[] = BLOG_INDEX.filter((a) => !a.noindex);
 
 export interface GuideCard {
   slug: string;
@@ -700,7 +587,7 @@ const ALL_BLOG_CATEGORIES: BlogCategory[] = [
 // Only categories with at least one article get a page, a link or a sitemap entry
 // (an empty "Innovation" page was in the sitemap: SEO-RECOVERY-PLAN S2).
 export const BLOG_CATEGORIES: BlogCategory[] = ALL_BLOG_CATEGORIES.filter((c) =>
-  BLOG_INDEX.some((a) => a.category.toLowerCase() === c.name.toLowerCase() || a.category === c.slug),
+  BLOG_LISTED.some((a) => a.category.toLowerCase() === c.name.toLowerCase() || a.category === c.slug),
 );
 
 export function getCategoryBySlug(slug: string): BlogCategory | undefined {
@@ -708,30 +595,25 @@ export function getCategoryBySlug(slug: string): BlogCategory | undefined {
 }
 
 export function getArticlesByCategory(categoryName: string): BlogArticleMeta[] {
-  return BLOG_INDEX.filter((a) => a.category.toLowerCase() === categoryName.toLowerCase());
+  return BLOG_LISTED.filter((a) => a.category.toLowerCase() === categoryName.toLowerCase());
 }
 
 export const SECTOR_ARTICLES: Record<string, string[]> = {
-  painter: ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  "decorative-painter": ["how-much-does-it-cost-to-paint-an-apartment-in-canada-2026", "how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-get-more-reviews-as-a-contractor"],
-  electrician: ["cost-to-rewire-a-house-canada", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople"],
-  plumber: ["bathroom-renovation-cost-toronto-2026", "basement-waterproofing-guide-canadian-homes", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-get-more-reviews-as-a-contractor"],
-  "hvac-technician": ["cost-to-rewire-a-house-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  mason: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "basement-finishing-cost-canada", "how-to-price-a-job-labour-materials-markup"],
-  "general-contractor": ["basement-finishing-cost-canada", "winterizing-your-home-contractor-checklist", "canada-greener-homes-grant-rebates-contractors-guide-2026", "google-business-profile-guide-for-tradespeople", "how-to-price-a-job-labour-materials-markup"],
-  "renovation-contractor": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "basement-waterproofing-guide-canadian-homes", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  "carpenter-cabinetmaker": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "welder-fabricator": ["deck-installation-cost-canada-2026", "how-to-price-a-job-labour-materials-markup", "common-quoting-mistakes-contractors-make"],
-  "tile-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  landscaper: ["deck-installation-cost-canada-2026", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
-  freelance: ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "how-to-price-a-job-labour-materials-markup", "mobile-quoting-on-the-go-for-contractors", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
-  "building-consultant": ["basement-finishing-cost-canada", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  "window-door-installer": ["cost-to-reroof-a-home-canada", "how-to-price-a-job-labour-materials-markup", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
-  roofer: ["cost-to-reroof-a-home-canada", "snow-load-roofing-eavestrough-considerations-canada", "winterizing-your-home-contractor-checklist"],
-  "air-conditioning-installer": ["canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
-  "flooring-installer": ["bathroom-renovation-cost-toronto-2026", "basement-finishing-cost-canada", "common-quoting-mistakes-contractors-make"],
-  "excel-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "word-template": ["mobile-quoting-on-the-go-for-contractors", "common-quoting-mistakes-contractors-make", "how-to-write-a-professional-quote-that-wins-jobs"],
-  "how-to-quote": ["how-to-write-a-professional-quote-that-wins-jobs", "common-quoting-mistakes-contractors-make", "mobile-quoting-on-the-go-for-contractors"],
-  "free-quote": ["mobile-quoting-on-the-go-for-contractors", "how-to-write-a-professional-quote-that-wins-jobs"],
+  painter: ["how-to-quote-a-painting-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "how-to-get-more-reviews-as-a-contractor"],
+  electrician: ["how-to-quote-an-electrical-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "google-business-profile-guide-for-tradespeople"],
+  plumber: ["how-to-quote-a-plumbing-job", "how-to-get-more-plumbing-jobs-canada", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "hvac-technician": ["how-to-quote-an-hvac-job", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "air-conditioning-installer": ["how-to-quote-an-hvac-job", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-price-a-job-labour-materials-markup"],
+  mason: ["how-to-quote-a-masonry-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-contractor-contract-canada"],
+  roofer: ["how-to-quote-a-roofing-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "how-to-write-a-contractor-contract-canada"],
+  "window-door-installer": ["how-to-quote-a-window-or-door-installation-job", "canada-greener-homes-grant-rebates-contractors-guide-2026", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "general-contractor": ["how-to-write-a-professional-quote-that-wins-jobs", "how-to-write-a-contractor-contract-canada", "how-to-handle-change-orders-contractors", "how-to-hire-and-pay-subcontractors-canada"],
+  "renovation-contractor": ["how-to-write-a-professional-quote-that-wins-jobs", "how-to-write-a-contractor-contract-canada", "how-to-handle-change-orders-contractors", "canada-greener-homes-grant-rebates-contractors-guide-2026"],
+  "carpenter-cabinetmaker": ["how-to-quote-a-carpentry-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "welder-fabricator": ["how-to-quote-a-welding-or-metal-fabrication-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "tile-installer": ["how-to-quote-a-tiling-job", "how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup"],
+  "flooring-installer": ["how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "how-to-handle-change-orders-contractors"],
+  landscaper: ["how-to-quote-a-landscaping-job", "google-business-profile-guide-for-tradespeople", "how-to-get-more-reviews-as-a-contractor"],
+  freelance: ["how-to-write-a-professional-quote-that-wins-jobs", "how-to-price-a-job-labour-materials-markup", "how-to-collect-payment-from-clients-contractor-canada", "google-business-profile-guide-for-tradespeople"],
+  "word-template": ["how-to-write-a-professional-quote-that-wins-jobs", "quote-vs-estimate-vs-invoice-difference", "how-to-price-a-job-labour-materials-markup"],
 };

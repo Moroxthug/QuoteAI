@@ -5,7 +5,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorIndexed, CITY_PAGES_INDEXED, RETIRED_SECTOR_REDIRECTS } from "../src/data/seo-data.js";
-import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
+import { BLOG_ARTICLES, BLOG_CATEGORIES, BLOG_REDIRECTS } from "../src/data/blog-data.js";
+// Homeowner posts kept live but noindexed (SEO-RECOVERY-PLAN S3.1) stay out.
+const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
 import { PUBLIC_ROUTES } from "../src/data/sitemap-routes.js";
 import { HELP_ARTICLES } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES } from "../src/data/province-data.js";
@@ -117,10 +119,10 @@ for (const article of HELP_ARTICLES) {
 // last update (or publish) date.
 const articleDate = (a: { publishedAt: string; updatedAt?: string }) => a.updatedAt ?? a.publishedAt;
 for (const cat of BLOG_CATEGORIES) {
-  const dates = BLOG_ARTICLES.filter((a) => a.category === cat.name || a.category === cat.slug).map(articleDate).sort();
+  const dates = LISTED_ARTICLES.filter((a) => a.category === cat.name || a.category === cat.slug).map(articleDate).sort();
   entries.push(url(`${BASE_URL}/blog/category/${cat.slug}/`, "0.7", "weekly", dates[dates.length - 1] ?? SEO_TEMPLATE_UPDATED));
 }
-for (const article of BLOG_ARTICLES) {
+for (const article of LISTED_ARTICLES) {
   entries.push(url(`${BASE_URL}/blog/${article.slug}/`, "0.7", "monthly", articleDate(article)));
 }
 
@@ -163,6 +165,15 @@ const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlug
     if (to.fr && !has(`/fr/soumissions/${SECTORS[slug].frSlug}{/}?`, to.fr)) missing.push(`/fr/soumissions/${SECTORS[slug].frSlug}/ -> ${to.fr}`);
   }
   if (missing.length) throw new Error(`vercel.json is missing redirects for retired trades: ${missing.join("; ")}`);
+
+  // Merged blog posts (blog-index.ts BLOG_REDIRECTS) must 301 too, and a
+  // merged slug must not still be a live article.
+  const blogMissing = Object.entries(BLOG_REDIRECTS)
+    .filter(([slug, to]) => !has(`/blog/${slug}{/}?`, to))
+    .map(([slug, to]) => `/blog/${slug}/ -> ${to}`);
+  if (blogMissing.length) throw new Error(`vercel.json is missing redirects for merged blog posts: ${blogMissing.join("; ")}`);
+  const stillLive = BLOG_ARTICLES.filter((a) => a.slug in BLOG_REDIRECTS).map((a) => a.slug);
+  if (stillLive.length) throw new Error(`merged blog posts are still articles: ${stillLive.join(", ")}`);
 }
 
 // ─── robots.txt ──────────────────────────────────────────────────────────────

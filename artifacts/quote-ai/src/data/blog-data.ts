@@ -95,67 +95,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>How to compare quotes properly</h2>
 <p>A trustworthy bathroom renovation quote should break out plumbing, tiling, electrical, fixtures, and labour as separate line items — not one lump sum. It should also state whether permits are included and who is responsible for pulling them. Contractors using <a href="/quotes/plumber/">AI quoting tools built for tradespeople</a> can generate this level of detail directly from a site visit, which makes comparing multiple quotes far easier for homeowners.</p>
 `,
-  "cost-to-rewire-a-house-canada": `
-<p>Rewiring a house is one of the more disruptive — and expensive — renovation jobs, but it's often non-negotiable for older homes with outdated or unsafe wiring. Here's what it realistically costs across Canada in 2026.</p>
-
-<h2>Full house rewiring costs</h2>
-<ul>
-  <li><strong>Small home</strong> (under 1,200 sq ft): $9,000–$16,000</li>
-  <li><strong>Mid-size home</strong> (1,200–2,200 sq ft): $16,000–$28,000</li>
-  <li><strong>Large home</strong> (2,200+ sq ft): $28,000–$45,000+</li>
-</ul>
-<p>Most electricians price full rewiring at <strong>$8–$14 per square foot</strong>, which includes new wiring throughout, updated outlets and switches, and a panel upgrade.</p>
-
-<h2>Common electrical jobs and their price ranges</h2>
-<ul>
-  <li><strong>Panel upgrade</strong> (100A to 200A service): $2,500–$5,500</li>
-  <li><strong>Knob-and-tube or aluminum wiring removal</strong> (per circuit): $150–$400</li>
-  <li><strong>New outlet or switch installation</strong>: $120–$250 each</li>
-  <li><strong>Whole-home smoke/CO detector interconnection</strong>: $600–$1,500</li>
-  <li><strong>EV charger circuit installation</strong>: $800–$2,200 depending on panel capacity and distance from the panel</li>
-</ul>
-
-<h2>Why older homes cost more</h2>
-<p>Homes built before the 1970s often have knob-and-tube or aluminum wiring, which many insurance companies now flag or refuse to cover. Removing and replacing this wiring is more labour-intensive than a straightforward rewire because walls and plaster need to be opened and patched. This can add 20–40% to the total cost compared to rewiring a home with modern drywall construction.</p>
-
-<h2>Regional pricing differences</h2>
-<p>Electrical labour rates in Toronto and Vancouver typically run 15–30% higher than the national average. Calgary and Edmonton sit closer to average, while Quebec markets tend to run somewhat lower — partly due to lower average labour rates and partly due to differences in typical housing stock. Rural and northern regions can see higher costs due to travel time and materials logistics, even where hourly labour rates are lower.</p>
-
-<h2>Permits and inspections</h2>
-<p>Electrical work in Canada almost always requires a permit and inspection through the provincial electrical safety authority (e.g., ESA in Ontario, Technical Safety BC, or equivalent). Permit fees typically run $150–$600 depending on scope, and a licensed electrician should always include this in the quote — unpermitted electrical work can void home insurance and complicate a future sale.</p>
-
-<h2>Getting an accurate electrical quote</h2>
-<p>A proper rewiring quote should specify the number of circuits, panel size, wiring type being removed, and whether drywall patching is included after the work (most electricians do not include drywall repair — confirm this upfront). Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can produce a detailed, circuit-by-circuit estimate on the spot rather than a vague lump-sum number.</p>
-`,
-  "cost-to-reroof-a-home-canada": `
-<p>A roof is one of the biggest single expenses a homeowner faces, and Canada's climate — heavy snow loads, freeze-thaw cycles, and ice damming — makes roofing specs a bit different than in milder climates. Here's what re-roofing costs across Canada in 2026.</p>
-
-<h2>Re-roofing costs by material</h2>
-<p>Roofers typically price by the "square" (100 sq ft of roof area):</p>
-<ul>
-  <li><strong>Asphalt shingles (standard 3-tab or architectural)</strong>: $400–$650/square installed</li>
-  <li><strong>Premium architectural/designer shingles</strong>: $650–$950/square installed</li>
-  <li><strong>Standing seam metal roofing</strong>: $1,000–$1,800/square installed</li>
-  <li><strong>Cedar shake</strong>: $1,200–$2,000/square installed</li>
-</ul>
-<p>For a typical 2,000 sq ft roof (20 squares), that's roughly <strong>$8,000–$13,000</strong> for a standard asphalt shingle re-roof, or $20,000+ for standing seam metal.</p>
-
-<h2>What adds to roofing costs in Canada specifically</h2>
-<h3>Ice and water shield</h3>
-<p>Most Canadian building codes require ice and water membrane along eaves, valleys, and around penetrations to prevent ice damming — a much bigger concern here than in warmer climates. This typically adds $500–$1,500 to the total depending on roof complexity.</p>
-<h3>Snow load and structural requirements</h3>
-<p>In regions with heavy snow loads (much of the Prairies, Quebec, and parts of Ontario and Atlantic Canada), roofs need to meet higher structural load ratings under the National Building Code. If an inspection reveals the existing structure doesn't meet current snow load requirements, additional framing or sheathing reinforcement can add $2,000–$6,000 to a project.</p>
-<h3>Eavestrough and downspout upgrades</h3>
-<p>Many homeowners upgrade eavestroughs at the same time as a re-roof, especially in areas prone to ice damming, since a roof replacement is the easiest time to install heated cable channels or larger-capacity gutters. Standard eavestrough replacement runs $8–$14 per linear foot; heated gutter cable adds $6–$10 per linear foot.</p>
-<h3>Tear-off and disposal</h3>
-<p>Removing one layer of old shingles typically costs $100–$150/square; removing two or more layers (common on older homes) can add another $50–$100/square for disposal and extra labour.</p>
-
-<h2>Regional pricing</h2>
-<p>Roofing labour in Toronto and Vancouver tends to run 15–25% above the national average. Calgary and Edmonton pricing is generally close to the national midpoint, while Atlantic Canada and Quebec can run somewhat lower — though harsher winter climates in Quebec and the Prairies often mean higher-spec materials are standard, which can offset lower labour costs.</p>
-
-<h2>What a proper roofing quote should include</h2>
-<p>A complete roofing estimate should specify shingle brand/line, ice and water shield coverage area, ventilation (ridge vents, soffit vents), flashing replacement, and disposal. Roofers using <a href="/quotes/roofer/">AI-powered quoting tools</a> can generate this level of line-item detail immediately after a roof measurement, which makes it much easier for homeowners to compare bids apples-to-apples.</p>
-`,
   "deck-installation-cost-canada-2026": `
 <p>Decks are one of the most requested outdoor projects across Canada, especially as homeowners look to extend their living space through the warmer months. Costs vary significantly based on material choice and deck complexity.</p>
 
@@ -216,59 +155,90 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>A thorough basement finishing quote should separate framing, electrical, plumbing (if applicable), drywall, flooring, and any egress window work as individual line items, along with a note on whether waterproofing was assessed. Contractors using <a href="/quotes/renovation-contractor/">AI-assisted quoting tools</a> can build this structure quickly from a walkthrough, which gives homeowners a much clearer picture of where their money is going.</p>
 `,
   "how-to-write-a-professional-quote-that-wins-jobs": `
-<p>A well-built quote is often the difference between a client who signs on the spot and one who quietly goes with a competitor. For tradespeople, the quote is usually the first real "document" a client sees from you — it needs to communicate professionalism and value, not just a number.</p>
+<p>A client reading your quote is asking three questions: what exactly am I getting, what will it cost me all-in, and what happens if I say yes. A quote that answers all three on one page, without a phone call, is the one that gets signed.</p>
 
-<h2>What a professional quote needs to include</h2>
+<h2>The header: who you are, in a way the client can check</h2>
+<p>The top of the quote is where a careful client decides whether you are a real business. Put these there, every time:</p>
 <ul>
-  <li><strong>Business header</strong> — company name, licence/insurance info if applicable, contact details</li>
-  <li><strong>Client and job details</strong> — name, property address, and a short description of the job</li>
-  <li><strong>Itemized scope of work</strong> — broken down by area or task, not lumped into one line</li>
-  <li><strong>Materials specified</strong> — brand or grade where relevant, not just "materials"</li>
-  <li><strong>Labour and materials shown separately</strong> — builds trust and makes the price easier to justify</li>
-  <li><strong>Taxes clearly shown</strong> — GST/HST (and PST or QST where applicable) broken out, not buried in the total</li>
-  <li><strong>Terms and validity</strong> — payment schedule, estimated timeline, and how long the quote is valid</li>
+  <li><strong>Legal business name and operating name</strong>, a street address (not only a phone number), phone and email.</li>
+  <li><strong>Your GST/HST number once you are registered.</strong> You must register once your taxable sales pass $30,000 in a single calendar quarter or over four consecutive quarters; below that you are a small supplier and registration is optional (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/when-register-charge" rel="noopener">CRA: when to register and start charging the GST/HST</a>). If you are not registered, do not show a tax line at all.</li>
+  <li><strong>Licence numbers where your trade or province expects them.</strong> In Québec, the RBQ tells homeowners that a renovation contract should show the contractor's RBQ licence number, Québec enterprise number (NEQ), and GST and QST numbers (<a href="https://www.rbq.gouv.qc.ca/en/vous-etes/citoyen/travaux-de-renovation/signing-a-renovation-contract/" rel="noopener">RBQ: signing a renovation contract</a>). In Ontario, the province tells homeowners hiring an electrical contractor to get a written estimate that includes the ESA/ECRA licence number and ESA permit fees (<a href="https://www.ontario.ca/page/your-rights-when-starting-home-renovations-or-repairs" rel="noopener">Ontario: your rights when starting home renovations or repairs</a>). Clients are being told to look for these numbers, so a quote without them reads as a warning sign.</li>
+  <li><strong>Client name, job address, quote number and date.</strong></li>
 </ul>
 
-<h2>How to price the job so the numbers hold up</h2>
-<p>Vague line items ("bathroom renovation — $18,000") don't give a client anything to evaluate — they can only compare it to the total number on someone else's quote. Break the job into the actual tasks involved (demo, rough-in, tiling, fixtures, paint) so the client can see exactly what they're paying for, and so you have a clear paper trail if the scope changes mid-job.</p>
+<h2>Scope and exclusions: the part that wins or loses the comparison</h2>
+<p>When a client lays your quote next to someone else's, they compare what is written. If yours says "Paint main floor, $3,600" and a competitor's says the same at a lower number, you lose, even if the cheaper one skips primer and trim.</p>
+<p>Write scope by area or task, with the method and the product named:</p>
+<ul>
+  <li><strong>Where:</strong> living room, hallway, two bedrooms; or "ensuite only, tub surround and floor".</li>
+  <li><strong>What gets done:</strong> fill, sand, spot-prime, two finish coats. "Two coats" is a commitment the client can see you keep.</li>
+  <li><strong>With what:</strong> brand and line, or at least the grade and sheen. "Premium acrylic eggshell" tells the client more than "paint".</li>
+  <li><strong>Exclusions, in their own list:</strong> things a client might reasonably assume are included. Moving heavy furniture, repairing plaster beyond small patches, rot behind trim, permit fees, disposal of old fixtures, anything behind a wall you have not opened.</li>
+</ul>
+<p>The exclusions list is not small print. It is what stops a dispute three weeks in, and it is what turns an unexpected find into a priced change order instead of an argument. Our guide to <a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a> covers the paperwork for when that happens.</p>
 
-<h2>Common mistakes that cost jobs</h2>
-<h3>Vague scope</h3>
-<p>If a client can't tell what's included just from reading the quote, they'll assume the cheapest-looking competitor's quote covers the same thing — even if it doesn't.</p>
-<h3>No expiry date</h3>
-<p>Always include a validity period (typically 30 days). It protects you from material price swings and creates a gentle sense of urgency for the client to decide.</p>
-<h3>Slow turnaround</h3>
-<p>Speed matters more than most tradespeople realize. Jobs are frequently awarded to whichever contractor sends a complete, professional quote first — sometimes within hours of the site visit. A quote that takes a week to arrive is competing against nothing; a quote sent the same day is often the only one the client seriously considers.</p>
+<h2>Labour and materials on separate lines</h2>
+<p>Show labour as hours or units times a rate, and materials as quantities times a price. Separate lines let the client see that the number is built from something, and they let you adjust one part (a cheaper paint line, one fewer room) without re-quoting from scratch. For how to build the rate and the markup behind those lines, see <a href="/blog/how-to-price-a-job-labour-materials-markup/">pricing a job: labour, materials and markup</a>.</p>
 
-<h2>Format matters</h2>
-<p>Always send quotes as a PDF, never an editable Word or Excel file. It's harder to accidentally alter, looks more professional on a phone screen, and signals that you run your business like, well, a business. Tools built for <a href="/pricing/">generating professional quotes</a> can produce a polished PDF with your branding automatically, right from a job site visit.</p>
-`,
-  "common-quoting-mistakes-contractors-make": `
-<p>Most contractors lose jobs not because their pricing is too high, but because of how the quote itself is put together and delivered. Here are the mistakes that show up most often — and what to do instead.</p>
+<h2>Taxes by province</h2>
+<p>Show the subtotal, each tax on its own line, then the total. The rate depends on where the work is done: HST provinces charge one combined rate, while British Columbia, Manitoba, Saskatchewan and Québec charge the 5% GST plus a separate provincial tax. Ontario's HST is 13%. Check the current rates on the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA's GST/HST rates page</a> rather than relying on memory, since rates do change (Nova Scotia's HST dropped to 14% on April 1, 2025). The <a href="/tools/sales-tax-calculator/">sales tax calculator</a> does the arithmetic for any province.</p>
 
-<h2>1. Sending a single lump-sum number</h2>
-<p>A one-line total gives the client nothing to evaluate except "is this more or less than the other guy." Break the job into line items so they can see the value in what they're paying for.</p>
+<h2>Worked example: interior repaint in Ontario</h2>
+<p>Example only: the hours, rate and paint prices below are assumptions for illustration, not market figures. Job: repaint living room, hallway and two bedrooms in an occupied house in Ontario. Walls two coats, ceilings one coat, baseboards and five doors.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Labour: protect floors and furniture, fill holes and cracks, sand, caulk trim</td><td>6</td><td>hr</td><td>$65.00</td><td>$390.00</td></tr>
+    <tr><td>Labour: spot-prime patches and stains</td><td>2</td><td>hr</td><td>$65.00</td><td>$130.00</td></tr>
+    <tr><td>Labour: walls, two finish coats, 4 areas</td><td>16</td><td>hr</td><td>$65.00</td><td>$1,040.00</td></tr>
+    <tr><td>Labour: ceilings, one coat, 3 rooms</td><td>6</td><td>hr</td><td>$65.00</td><td>$390.00</td></tr>
+    <tr><td>Labour: baseboards, 5 doors and frames, semi-gloss</td><td>8</td><td>hr</td><td>$65.00</td><td>$520.00</td></tr>
+    <tr><td>Wall paint, premium acrylic eggshell</td><td>6</td><td>can (3.78 L)</td><td>$72.00</td><td>$432.00</td></tr>
+    <tr><td>Ceiling paint, flat white</td><td>2</td><td>can (3.78 L)</td><td>$55.00</td><td>$110.00</td></tr>
+    <tr><td>Trim and door paint, semi-gloss</td><td>1</td><td>can (3.78 L)</td><td>$78.00</td><td>$78.00</td></tr>
+    <tr><td>Primer, filler, caulk, tape, plastic</td><td>1</td><td>lot</td><td>$95.00</td><td>$95.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$3,185.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$414.05</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$3,599.05</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
+<ul>
+  <li>Prep gets its own line because it is the work a cheaper quote skips. When a client asks why you are higher, you point at it.</li>
+  <li>Walls, ceilings and trim are split because clients often drop one of them to hit a budget, and you can remove a line without redoing the quote.</li>
+  <li>Paint is named by grade and sheen, so a competitor using contractor-grade flat is visibly not the same job.</li>
+  <li>Below the table: valid 30 days; deposit $350 on signing, balance on completion; excludes plaster repair beyond small patches and moving pianos or built-ins.</li>
+</ul>
+<p>For trade-specific line items, see <a href="/blog/how-to-quote-a-painting-job/">how to quote a painting job</a>.</p>
 
-<h2>2. Leaving out materials specs</h2>
-<p>Writing "flooring — $2,400" tells the client nothing. Naming the product or at least the grade ("engineered hardwood, 3/4in, oak") signals expertise and justifies the price.</p>
+<h2>Validity, deposit and payment terms</h2>
+<p><strong>Validity.</strong> Put an expiry date on every quote. Material prices and your schedule both move; a client who comes back months later should get a fresh price, and the date makes that a non-conversation. Pick a window you can honour for the materials in the job.</p>
+<p><strong>Deposit.</strong> State the amount, when it is due, and what it covers. Ontario recommends to contractors that deposits be no more than 10% of the total project cost (<a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">Ontario: a guide for home renovation and roofing businesses</a>), which is why the example asks for $350 on a $3,599.05 job.</p>
+<p><strong>Payment.</strong> List the milestones, the methods you accept, and when the final payment is due. If you have to chase money later, clear terms written into the signed quote are your starting point.</p>
 
-<h2>3. No payment terms</h2>
-<p>Every quote should state the deposit required, payment milestones, and accepted payment methods upfront. Ambiguity here creates awkward conversations later — or worse, payment disputes.</p>
+<h2>When the quote becomes a contract</h2>
+<p>Once a client signs, the quote is a contract, and provincial consumer law applies to it.</p>
+<p><strong>Ontario.</strong> A contract worth more than $50 must be in writing. If an estimate is part of the contract, you cannot charge more than 10% above it unless the client asked for added or different work and signed a change. If the client signs at their home, they have a 10-day cooling-off period to cancel for any reason, and you must refund any deposit within 15 days of their notice. If you started work during that period because they asked you to, you are entitled to reasonable payment for work and materials already provided that cannot be returned. All of this is in the province's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a>.</p>
+<p><strong>Québec.</strong> A contractor who sells, installs or repairs doors and windows, thermal insulation, or roofing and exterior wall covering is treated as an itinerant merchant, even when the homeowner invited them. The client can cancel within 10 days of receiving a signed copy of the contract (<a href="https://www.opc.gouv.qc.ca/en/consumer/topic/itinerant-sale/cancelling/doing-business-renovation-contractor" rel="noopener">OPC: doing business with a renovation contractor</a>), and any payment must be refunded within 15 days of their cancellation notice (<a href="https://www.opc.gouv.qc.ca/en/consumer/good-service/housing-renovation/home-renovations/renovation-work/cancelling-contract/in-person-contract" rel="noopener">OPC: cancelling a contract concluded in person</a>).</p>
+<p>The practical point: plan your start date and material orders around the cooling-off window for jobs signed at the kitchen table. For the full contract checklist, read <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract in Canada</a>.</p>
 
-<h2>4. Taking too long to send it</h2>
-<p>The contractor who sends a complete, professional quote within hours of the site visit wins a disproportionate share of jobs — clients tend to book with whoever responds first with something credible, especially for smaller residential jobs.</p>
+<h2>Mistakes that cost signatures</h2>
+<ul>
+  <li><strong>One lump-sum line.</strong> It gives the client nothing to compare except the total.</li>
+  <li><strong>"Materials" with no spec.</strong> Name the product or grade, or the client will assume yours is the same as the cheapest bid.</li>
+  <li><strong>No exclusions.</strong> Whatever you did not exclude, the client will believe was included.</li>
+  <li><strong>Tax buried in the total.</strong> Or worse, a tax line on a quote from an unregistered business.</li>
+  <li><strong>No deposit or payment terms.</strong> Money conversations are easier before the job than during it.</li>
+  <li><strong>No expiry date.</strong> You end up honouring an old price on a new materials bill.</li>
+  <li><strong>An editable file.</strong> Send a PDF. Word and spreadsheet files look unfinished and can be changed after they leave you.</li>
+  <li><strong>No clear next step.</strong> Say how to accept: sign and return, pay the deposit, pick a start date.</li>
+</ul>
 
-<h2>5. Sending an editable file</h2>
-<p>Word docs and spreadsheets look unfinished and can be accidentally (or not-so-accidentally) altered. Always send a PDF.</p>
-
-<h2>6. No expiry date on the quote</h2>
-<p>Without a validity window, clients can sit on a quote indefinitely — and then expect the original price months later after material costs have shifted. Thirty days is standard.</p>
-
-<h2>7. Not following up</h2>
-<p>Most jobs aren't booked from the first quote alone. A short follow-up message two or three days later ("just checking if you had any questions about the estimate") closes a meaningful share of jobs that would otherwise go quiet.</p>
-
-<h2>The fix: build a repeatable process</h2>
-<p>The contractors who win the most work aren't necessarily the cheapest — they're the ones with a consistent, fast, professional quoting process. Tools like <a href="/pricing/">AI-assisted quote generators</a> help standardize this so every quote goes out itemized, priced correctly, and fast, regardless of how busy the week gets.</p>
+<h2>Send it quickly, then follow up</h2>
+<p>The client's interest is highest right after the walkthrough, while they still remember what you pointed out. The fastest way to keep it is to finish the quote before you leave the driveway: measure and photograph during the visit, keep your standard rates and common line items saved so you never start from a blank page, and check scope, exclusions and totals before sending. Fast never means skipping a section above. quoteai is built for this step: you describe the job, it writes an itemized quote with the province's taxes and sends it as a PDF from your phone.</p>
+<p>Then follow up. A short, polite check-in a couple of days later, asking if the client has questions, gives them an easy way to say yes or tell you what is holding them back. Our guide to <a href="/blog/how-to-follow-up-on-quotes-contractors/">following up on quotes</a> has timing and wording you can reuse.</p>
 `,
   "how-to-price-a-job-labour-materials-markup": `
 <p>A lot of tradespeople price jobs by gut feel, or by matching whatever a competitor seems to charge. That approach works fine until a busy season quietly turns into a break-even one. Here's a straightforward way to price a job so the number on the quote actually protects your margin.</p>
@@ -302,27 +272,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Putting it into a quote</h2>
 <p>None of this needs to be visible to the client line-by-line — most quotes just show labour and materials totals per task. But pricing it this way internally, rather than guessing, is what keeps a full calendar profitable instead of just busy. Quoting software built for tradespeople can apply consistent markup and overhead rules automatically, so every job gets priced the same disciplined way — see how it works for <a href="/quotes/general-contractor/">general contractors and builders</a>.</p>
 `,
-  "mobile-quoting-on-the-go-for-contractors": `
-<p>For a lot of trades, the biggest bottleneck isn't finding work — it's the hours spent every week turning site visits into finished quotes. Mobile quoting tools are changing that math, and contractors who adopt them tend to close more jobs simply by being first to respond.</p>
-
-<h2>Why speed wins jobs</h2>
-<p>Homeowners and property managers typically request quotes from two or three contractors for the same job. Whoever sends a complete, professional, itemized quote first has a real edge — not because they're necessarily cheaper, but because they've removed the friction of waiting. A quote sent from the driveway, minutes after the walkthrough, beats one that arrives three days later almost every time.</p>
-
-<h2>What to look for in a mobile quoting tool</h2>
-<ul>
-  <li><strong>Works from a phone or tablet</strong> — no need to be back at a desk or laptop</li>
-  <li><strong>Generates itemized line items automatically</strong> — not just a blank template you have to fill in manually</li>
-  <li><strong>Applies the correct tax automatically</strong> — GST/HST, and PST or QST where applicable, calculated without manual lookup</li>
-  <li><strong>Outputs a clean PDF</strong> — with your logo and business details already formatted</li>
-  <li><strong>Keeps a searchable history</strong> — so past quotes and pricing are easy to reference for similar future jobs</li>
-</ul>
-
-<h2>How AI-assisted quoting fits in</h2>
-<p>The newer generation of quoting tools use AI to turn a plain-language job description — spoken or typed on-site — directly into a structured, priced quote. Instead of manually building a spreadsheet formula for every job type, a contractor can describe the scope in normal language and get a properly formatted estimate back in under a minute.</p>
-
-<h2>What this replaces</h2>
-<p>Most tradespeople still quoting from Excel or Word spend 45–90 minutes per quote once formatting, tax calculation, and PDF conversion are factored in. At even 10 quotes a month, that's close to a full working day spent on paperwork instead of billable work. Moving that process to a mobile-first, AI-assisted tool — like the <a href="/pricing/">quote generator built for tradespeople</a> — typically cuts that down to a couple of minutes per quote.</p>
-`,
   "winterizing-your-home-contractor-checklist": `
 <p>Winterization work is a category almost unique to climates like Canada's — and it's a genuine seasonal revenue stream for contractors who offer it proactively rather than waiting for a burst pipe call in January. Here's what belongs on a proper winterization checklist, and roughly what each job costs.</p>
 
@@ -347,33 +296,6 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Building winterization into your service offering</h2>
 <p>Contractors who run winterization as a standalone seasonal package — rather than a one-off ad hoc request — tend to see strong repeat business, since it's a natural annual touchpoint with past clients. Bundling a few of the checklist items above into a fixed-price fall package (e.g., "Winter-Ready Home Check") gives clients a simple, low-commitment way to book, and gives contractors a predictable quoting template to reuse every season. Tools built for <a href="/quotes/general-contractor/">general contractors</a> make it easy to save a standard winterization package as a reusable quote template.</p>
-`,
-  "snow-load-roofing-eavestrough-considerations-canada": `
-<p>Roofing in Canada isn't just about shingles and flashing — snow load and ice management are structural and design considerations that don't come up the same way in most other markets. Here's what matters.</p>
-
-<h2>Understanding snow load ratings</h2>
-<p>The National Building Code of Canada sets minimum ground snow load values by region, which local building codes use to determine the structural snow load a roof must be engineered to support. These values vary significantly across the country — parts of the Prairies, Quebec, and Atlantic Canada see substantially higher design snow loads than milder coastal regions like southern Vancouver Island. Any roof replacement or structural roof work should confirm the home's framing still meets current local requirements, especially on older homes where the original design predates current code values.</p>
-
-<h2>Signs a roof structure may be under-built for its snow load</h2>
-<ul>
-  <li>Visible sagging in the roofline, especially after a heavy snow event</li>
-  <li>Doors and windows sticking on upper floors after winter</li>
-  <li>Cracking sounds during or after significant snowfall</li>
-  <li>Water stains suggesting the roof deck is flexing enough to compromise the membrane</li>
-</ul>
-<p>If any of these show up, a structural assessment before re-roofing is worth the $300–$800 cost — reinforcing framing during a re-roof is far cheaper than an emergency repair after a collapse or partial failure.</p>
-
-<h2>Ice damming and eavestrough design</h2>
-<p>Ice damming happens when heat escaping through the roof melts snow, which then refreezes at the colder eaves, backing water up under shingles. This is one of the most common sources of winter water damage in Canadian homes. The fixes that actually address the cause (rather than just the symptom) include:</p>
-<ul>
-  <li><strong>Ice and water shield membrane</strong> at eaves and valleys — now standard in most Canadian roofing codes</li>
-  <li><strong>Adequate attic ventilation and insulation</strong> — keeps the roof deck cold and uniform, which prevents uneven melting</li>
-  <li><strong>Properly sized eavestroughs and downspouts</strong> — undersized systems back up and contribute to ice buildup at the fascia</li>
-  <li><strong>Heated cable systems</strong> in chronic problem areas — a targeted fix rather than a full solution, best used alongside proper ventilation</li>
-</ul>
-
-<h2>What this means for a roofing quote</h2>
-<p>A roofing quote for a Canadian home should account for ice and water shield coverage, confirm whether ventilation upgrades are included, and flag if eavestrough capacity needs to be increased. Roofers using <a href="/quotes/roofer/">quoting tools built for the trade</a> can include these Canada-specific line items automatically rather than relying on generic templates.</p>
 `,
   "basement-waterproofing-guide-canadian-homes": `
 <p>Because the vast majority of Canadian homes have full basements, waterproofing is one of the most consistently requested services in the country — and one of the most misunderstood by homeowners comparing quotes.</p>
@@ -408,27 +330,69 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>A trustworthy waterproofing quote should specify whether the approach is interior, exterior, or a hybrid, the linear footage being treated, sump pump specs, and warranty terms — waterproofing warranties vary widely between contractors and are worth comparing directly. Contractors using <a href="/quotes/plumber/">quoting software for tradespeople</a> can document this scope clearly so homeowners know exactly what they're paying for.</p>
 `,
   "canada-greener-homes-grant-rebates-contractors-guide-2026": `
-<p><strong>Editorial note:</strong> Rebate programs, amounts, and eligibility rules change frequently — sometimes year to year, and sometimes mid-year as program funding is renewed or exhausted. Always verify current amounts and eligibility directly with the relevant program before quoting a client, and treat the figures below as a general orientation rather than guaranteed numbers.</p>
+<p>Every program below was checked on its official page in November 2026; open the linked page again before you put a program name on a quote. The rule does not change: a rebate goes on your quote as a note with the details the program needs, never as a deduction from your price.</p>
 
-<h2>Why this matters for contractors</h2>
-<p>Being able to speak knowledgeably about available rebates — even in general terms — is a genuine differentiator when quoting energy-efficiency-related work like insulation, heat pumps, windows, or high-efficiency furnaces. Clients often decide whether to proceed with upgraded (and pricier) equipment based on whether a rebate offsets part of the cost, so contractors who can point clients in the right direction tend to close more of these upgraded-scope jobs.</p>
+<h2>What has closed</h2>
+<p>Clients still ask about the Canada Greener Homes Grant. It is closed. The federal government announced on February 5, 2024 that it would stop accepting new applications within two weeks (<a href="https://www.canada.ca/en/natural-resources-canada/news/2024/02/government-of-canada-to-establish-next-phase-of-canada-greener-homes-initiative-to-help-more-canadians-save-on-their-energy-bills.html" rel="noopener">Government of Canada</a>), and December 31, 2025 was the last day for existing participants to submit documents (<a href="https://www.canada.ca/en/environment-climate-change/services/energy-efficiency/home-energy-efficiency/canada-greener-homes-initiative.html" rel="noopener">Canada Greener Homes Initiative</a>).</p>
+<ul>
+<li><strong>Canada Greener Homes Loan</strong>: closed; funding is fully committed and new applications cannot be approved, though approved loans remain available (<a href="https://www.canada.ca/en/environment-climate-change/services/energy-efficiency/home-energy-efficiency/canada-greener-homes-initiative/canada-greener-homes-loan.html" rel="noopener">Government of Canada</a>). CMHC dates the portal closure to October 2, 2025 (<a href="https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/funding-programs/all-funding-programs/canada-greener-homes?lang=en" rel="noopener">CMHC</a>).</li>
+<li><strong>Oil to Heat Pump Affordability</strong>: closed to new applications on July 31, 2026 for Alberta, Manitoba, the Northwest Territories, Quebec and Saskatchewan. Clients already in the program must upload final receipts and a contractor-signed attestation form by January 31, 2027, with all work completed and paid by then (<a href="https://www.canada.ca/en/environment-climate-change/services/energy-efficiency/home-energy-efficiency/canada-greener-homes-initiative/oil-heat-pump-affordability-program.html" rel="noopener">Government of Canada</a>). If you have one of these jobs on the schedule, that date is your deadline too.</li>
+</ul>
 
-<h2>Federal programs</h2>
-<p>The <strong>Canada Greener Homes</strong> initiative (which has included both grant and loan components at various points) has historically supported upgrades such as home insulation, air sealing, heat pumps, and window/door replacements, usually requiring an EnerGuide energy evaluation before and after the work. Program structure, funding availability, and specific eligible upgrades have shifted over time, so contractors should check the current federal program status before referencing specific dollar amounts to a client.</p>
+<h2>Federal: what is open or coming</h2>
+<p><strong>Canada Greener Homes Affordability Program.</strong> This is a no-cost, direct-install program for low- to median-income homeowners and tenants, delivered by provincial partners: BC Hydro or FortisBC in British Columbia, plus Manitoba, Newfoundland and Labrador, Nova Scotia, Prince Edward Island and Quebec. The federal government does not take applications from households (<a href="https://www.canada.ca/en/environment-climate-change/services/energy-efficiency/home-energy-efficiency/canada-greener-homes-initiative/canada-greener-homes-affordability-program.html" rel="noopener">Government of Canada</a>). You don't quote into it; work comes through the delivery organization.</p>
+<p><strong>National Heat Pump Rebate.</strong> Announced October 8, 2026: up to $10,000 for households below the median income and $2,000 for other eligible homeowners, one rebate per person, for cold-climate air-source heat pumps on an Eligible Products List. The client applies online for pre-approval, then submits receipts after installation; no energy audit is required (<a href="https://www.canada.ca/en/environment-climate-change/news/2026/10/prime-minister-carney-announces-landmark-investment-to-retrofit-one-million-homes-cutting-energy-costs-and-emissions.html" rel="noopener">Government of Canada</a>). Hydro-Québec reports that this funding begins in 2027 and that details are not yet known (<a href="https://www.hydroquebec.com/residential/energy-wise/financial-assistance/logisvert/residential.html" rel="noopener">Hydro-Québec</a>). Until the portal opens, do not promise it on a quote.</p>
 
-<h2>Provincial and utility programs</h2>
-<h3>Quebec — Hydro-Québec Rénoclimat</h3>
-<p>Quebec's Rénoclimat program has offered rebates tied to an energy evaluation, covering upgrades like insulation, air sealing, and heating system replacements. As with federal programs, specific rebate amounts and eligible measures are updated periodically.</p>
-<h3>British Columbia — BC Hydro and FortisBC</h3>
-<p>BC Hydro and FortisBC have both run rebate programs for homeowners upgrading insulation, heat pumps, and efficient water heating, sometimes layered with federal programs for a larger combined rebate. Program specifics differ between the two utilities and by fuel type (electric vs. natural gas), so it's worth checking both if a home has access to either.</p>
-<h3>Ontario — Enbridge Gas programs</h3>
-<p>Enbridge Gas has offered home efficiency programs in Ontario covering insulation, smart thermostats, and high-efficiency furnace or water heater upgrades for eligible customers. Eligibility and rebate amounts vary by program year.</p>
+<h2>Ontario: Home Renovation Savings Program</h2>
+<p>Delivered jointly by Save on Energy and Enbridge Gas. There are two paths: single upgrades with no assessment, and a bundle that starts with a home energy assessment (rebated at $600) followed by two or more upgrades, with insulation in the bundle worth up to $7,700. Heat pumps must be on NRCan's qualified products list; windows, doors and heat pump water heaters must be ENERGY STAR certified (<a href="https://saveonenergy.ca/homerenovationsavings" rel="noopener">Save on Energy</a>).</p>
+<p>For heat pumps, the rebate is per ton of rated heating capacity at 8.3°C: $1,250 per ton up to $7,500 for homes heated with electricity, oil, propane or wood, or $500 per ton up to $2,000 for Enbridge Gas customers heating with gas. A participating HVAC contractor submits the pre-installation and post-installation applications, and installations done before approval are not eligible (<a href="https://www.homerenovationsavings.ca/without-assessment/heat-pumps" rel="noopener">Home Renovation Savings</a>). The full quoting approach for that job is in <a href="/blog/how-to-quote-an-hvac-job/">how to quote an HVAC job</a>.</p>
 
-<h2>How to use this in a quote without overpromising</h2>
-<p>Rather than quoting a specific rebate dollar amount directly on an invoice (which can create liability if the program has changed), it's safer to reference the program by name and direct the client to confirm current details and apply directly. A line like "this upgrade may qualify for [program name] — client to confirm current eligibility and amount" keeps the quote accurate without the contractor being on the hook for a rebate figure that changes.</p>
+<h2>British Columbia: CleanBC Better Homes</h2>
+<p>For invoices dated on or after October 15, 2026, the Home Renovation Rebate program requires a licensed contractor with a GST number and a B.C. business licence; heat pump and insulation work must be done by a Home Performance Contractor Network member, and self-installs are not eligible. The invoice must itemize equipment and labour separately and show a zero balance owing, and most applications are due within six months of the invoice date. Selected amounts: $4,000 for a whole-home air-source heat pump converting from electric heat, and insulation paid on the R-value added, capped at $900 for attics. A bonus of $20 per percentage point of EnerGuide improvement (minimum $750, maximum $2,000) requires pre- and post-upgrade evaluations by a program-qualified energy advisor and at least three bonus-eligible upgrades (<a href="https://betterhomesbc.ca/learn-about-programs/home-renovation-rebate-program/home-renovation-rebate-program-requirements/" rel="noopener">CleanBC Better Homes</a>).</p>
 
-<h2>Building this into your quoting process</h2>
-<p>For contractors who frequently quote insulation, heat pump, or high-efficiency HVAC work, it's worth keeping a running note of which programs are currently active in your service area and reviewing it seasonally, since these programs are one of the more effective ways to help a client justify a higher-efficiency (and higher-margin) upgrade. Tools built for <a href="/quotes/hvac-technician/">HVAC and heating contractors</a> make it easy to add a standard rebate-reference note to any quote involving eligible upgrades.</p>
+<h2>Quebec: Rénoclimat and LogisVert</h2>
+<p><strong>Rénoclimat</strong> is run by the Quebec government's environment ministry, not Hydro-Québec (<a href="https://www.quebec.ca/habitation-territoire/chauffage-consommation-energie/aide-financiere-renovation-ecoenergetique/renoclimat/a-propos" rel="noopener">Québec.ca</a>). New rules took effect October 1, 2026: the pre-work energy evaluation is no longer mandatory but is recommended (with up to $500 of aid for it), renovations must be done after October 1, 2026, and the work must be done by a contractor holding the RBQ licences for that type of work. The application will need an attestation form completed and signed by the contractor, plus invoices; the online portal is still in development, so clients should keep their documents (<a href="https://www.quebec.ca/habitation-territoire/chauffage-consommation-energie/aide-financiere-renovation-ecoenergetique/renoclimat/nouveautes-adaptation-inondations" rel="noopener">Québec.ca, Rénoclimat changes</a>). Homes evaluated under the old rules have until March 31, 2027 to finish under them (<a href="https://www.quebec.ca/habitation-territoire/chauffage-consommation-energie/aide-financiere-renovation-ecoenergetique/renoclimat/conditions" rel="noopener">Québec.ca, eligibility</a>).</p>
+<p><strong>LogisVert</strong> is Hydro-Québec's own program, still open, with heat pump grants of up to $6,700 calculated per 1,000 BTU/h of capacity at -8°C. Its invoice requirements are the most specific of any program here: invoice number and date, installation date, client name and installation address, company name, GST and QST numbers, RBQ licence number, product and work description, AHRI or ENERGY STAR number, and cost. Requests are due within nine months of installation (<a href="https://www.hydroquebec.com/residential/energy-wise/financial-assistance/logisvert/residential.html" rel="noopener">Hydro-Québec</a>).</p>
+
+<h2>What your quote and invoice must carry</h2>
+<p>Across these programs, the same details decide whether a client's claim goes through:</p>
+<ul>
+<li><strong>Model and certification numbers</strong> (AHRI, ENERGY STAR, or the listing on NRCan's qualified products list) for every piece of equipment.</li>
+<li><strong>Your registrations</strong>: GST/HST (and QST) numbers, RBQ licence number in Quebec, HPCN membership in B.C., participating-contractor status in Ontario.</li>
+<li><strong>Equipment and labour as separate lines</strong>, and for insulation, the area, starting R-value and final R-value.</li>
+<li><strong>Dates</strong>: installation date on the invoice, and pre-approval obtained before work where the program requires it.</li>
+<li><strong>A paid-in-full invoice</strong>, since B.C. requires a zero balance owing.</li>
+</ul>
+<p>Tax is charged on your full price. The rebate is paid to the homeowner by the program, so it does not reduce your taxable amount; the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> handles the provincial rates.</p>
+
+<h2>Attic insulation: targets and what qualifies</h2>
+<p>Ontario's single-upgrade attic rebate requires reaching R-50, and pays $1,250 when starting at R-12 or less, $1,000 from above R-12 to R-25, and $800 from above R-25 to R-35. The whole roof assembly must be insulated, the client must own the home, and the work must be done by a participating contractor; the program notes that contractor registration for this stream is closed (<a href="https://www.homerenovationsavings.ca/without-assessment/attic" rel="noopener">Home Renovation Savings</a>). If you are not on the list, tell the client before they sign. Quebec recommends attic insulation of R-50 or more and pairing insulation with adequate ventilation to prevent condensation (<a href="https://www.quebec.ca/en/housing-territory/heating-energy-consumption/reducing-energy-consumption-at-home/building-insulation-management/insulation" rel="noopener">Québec.ca</a>).</p>
+<p>Two site conditions change the scope. Vermiculite may contain asbestos and must not be disturbed (<a href="https://www.canada.ca/en/employment-social-development/services/health-safety/prevention/vermiculite.html" rel="noopener">Government of Canada</a>), so exclude it from your quote until it is dealt with. In B.C., pest infestations in the insulation area must be resolved or the application will not be processed (<a href="https://betterhomesbc.ca/learn-about-programs/home-renovation-rebate-program/home-renovation-rebate-program-requirements/" rel="noopener">CleanBC Better Homes</a>).</p>
+
+<h2>Worked example: attic insulation quote, Ontario</h2>
+<p>Example: a 1,200 sq ft attic in a gas-heated detached house, measured at roughly R-12 of old fibreglass, brought to R-50 by a participating contractor. Prices are assumptions for illustration. Ontario HST is 13% (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA</a>).</p>
+<table>
+<thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr></thead>
+<tbody>
+<tr><td>Pre-work inspection: measure existing depth and R-value, dated photos</td><td>1</td><td>job</td><td>$150.00</td><td>$150.00</td></tr>
+<tr><td>Air sealing: top plates, plumbing stack, wiring and fixture penetrations</td><td>1</td><td>job</td><td>$650.00</td><td>$650.00</td></tr>
+<tr><td>Rafter baffles at soffits to keep ventilation open</td><td>40</td><td>ea</td><td>$9.00</td><td>$360.00</td></tr>
+<tr><td>Attic hatch: insulation dam, weatherstripping, rigid insulation on hatch</td><td>1</td><td>ea</td><td>$180.00</td><td>$180.00</td></tr>
+<tr><td>Blown fibreglass loose-fill added to reach R-50, full attic area</td><td>1,200</td><td>sq ft</td><td>$1.85</td><td>$2,220.00</td></tr>
+<tr><td>Depth markers and attic insulation certificate card</td><td>1</td><td>set</td><td>$40.00</td><td>$40.00</td></tr>
+<tr><td>Cleanup and post-install photos for the rebate file</td><td>1</td><td>job</td><td>$100.00</td><td>$100.00</td></tr>
+<tr><td colspan="4"><strong>Subtotal</strong></td><td><strong>$3,700.00</strong></td></tr>
+<tr><td colspan="4">HST (13%)</td><td>$481.00</td></tr>
+<tr><td colspan="4"><strong>Total</strong></td><td><strong>$4,181.00</strong></td></tr>
+</tbody>
+</table>
+<p><strong>Note on the quote:</strong> "Starting R-value measured at R-12; final R-value R-50 over 100% of the attic area. You may qualify for the Home Renovation Savings attic rebate (up to $1,250 at this starting level). We will submit the application as a participating contractor. The rebate is paid to you by the program and is not deducted above. Excludes vermiculite and any mould or moisture repair."</p>
+<ul>
+<li>Starting and final R-values appear twice, in the line items and the note, because they set the rebate tier.</li>
+<li>Air sealing and baffles are separate lines so the client sees why this quote is higher than a blow-in-only price.</li>
+<li>Dated before-and-after photos are priced as work because they are the evidence if the program asks.</li>
+</ul>
+<p>quoteai writes an itemized quote like this with Ontario HST applied and sends it as a PDF, keeping the rebate as a note. For the wider structure of a winning quote, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>, and for heat pump jobs, <a href="/quotes/hvac-technician/">HVAC quote templates</a>.</p>
 `,
   "google-business-profile-guide-for-tradespeople": `
 <p>For local trades — electricians, plumbers, painters, landscapers — a well-optimized Google Business Profile is often the single highest-return marketing asset available, and it's free. Here's how to set one up properly.</p>
@@ -509,34 +473,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>A Word or Excel template looks free, but you pay for it in time: retyping client details, recalculating taxes, fixing formatting, exporting to PDF, then chasing the client. Mistakes creep in, and the quote reaches the client hours or days after the visit, when other contractors may have already replied.</p>
 <p>That is the gap <a href="/pricing/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see <a href="/compare/">how quoteai compares with other quoting software</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
 `,
-  "cost-to-install-a-heat-pump-canada": `
-<p>Heat pumps have moved from a niche product to one of the most requested HVAC upgrades in Canada. Homeowners want to know the price before they call, and contractors need to quote it without leaving money on the table. These are typical 2026 ranges. Actual quotes vary with the home, the region and the equipment brand.</p>
-
-<h2>Typical installed cost by system type</h2>
-<ul>
-  <li><strong>Ductless mini-split, single zone</strong>: about $3,500–$6,500 installed</li>
-  <li><strong>Ductless multi-zone (2–4 heads)</strong>: about $7,000–$16,000</li>
-  <li><strong>Central air-source heat pump</strong> (replacing an air conditioner, using existing ducts): about $7,000–$16,000</li>
-  <li><strong>Cold-climate central system</strong> or high-capacity unit for colder regions: about $10,000–$20,000+</li>
-  <li><strong>Ground-source (geothermal)</strong>: commonly $25,000–$50,000+ because of the loop installation</li>
-</ul>
-
-<h2>What drives the price</h2>
-<h3>Cold-climate rating</h3>
-<p>Standard heat pumps lose capacity in deep cold. Units rated to operate efficiently at very low outdoor temperatures cost more, but in most of Canada they are the right choice, and a quote should state the rated capacity at a low temperature, not just the nominal tonnage.</p>
-<h3>Electrical capacity</h3>
-<p>Older homes with a 60 or 100 amp panel may need an upgrade before a heat pump can be added. A panel upgrade is a separate line on the quote, often $2,500–$5,000 or more, and a common source of surprises if it is not flagged at the site visit.</p>
-<h3>Ductwork condition</h3>
-<p>Existing ducts sized for a gas furnace do not always suit a heat pump's airflow. Sealing, resizing or adding returns can change the total significantly.</p>
-<h3>Backup heat and controls</h3>
-<p>Many installs keep a furnace or electric backup for the coldest days. Controls that switch between sources add cost but protect comfort and operating cost.</p>
-
-<h2>Rebates and incentives</h2>
-<p>Federal, provincial and utility programs have supported heat pump installs, but amounts, eligibility and funding status change often. Check each program's current rules before you promise anything, and see our <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">guide to Canadian rebates for contractors</a> for how to mention them in a quote without overpromising.</p>
-
-<h2>How to quote a heat pump job</h2>
-<p>Break the quote into equipment (model and capacity), installation labour, electrical work, line sets and pad or brackets, commissioning, permits, and old-equipment removal. State the warranty on parts and labour, and list the exclusions: panel upgrades, drywall repair, ductwork changes. HVAC contractors using <a href="/quotes/hvac-technician/">quoting software built for the trade</a> can produce a clean, itemized estimate on site, which matters when the homeowner is also getting two other quotes that week.</p>
-`,
   "how-to-get-more-plumbing-jobs-canada": `
 <p>Plumbing is a trade where demand is steady but competition for the good jobs is real. Emergency calls go to whoever picks up first, and renovation work goes to whoever looks most credible and replies fastest. These nine steps do not need a big marketing budget.</p>
 
@@ -587,7 +523,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Licence, insurance and WSIB or provincial coverage are real decision factors for electrical work. Mention them on your site and on every quote. Homeowners fear unlicensed work, so being clearly licensed is a selling point.</p>
 
 <h2>Quote like a professional</h2>
-<p>A vague "$3,500 panel upgrade" invites price comparison. A quote that lists panel size, breakers, permit and ESA or inspection fees, utility coordination and what happens to drywall patching communicates competence. For a deeper look at pricing a big job, read the <a href="/blog/cost-to-rewire-a-house-canada/">cost to rewire a house in Canada</a>. Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send this level of detail the same day.</p>
+<p>A vague "$3,500 panel upgrade" invites price comparison. A quote that lists panel size, breakers, permit and ESA or inspection fees, utility coordination and what happens to drywall patching communicates competence. For a deeper look at pricing a big job, read the <a href="/blog/how-to-quote-an-electrical-job/">cost to rewire a house in Canada</a>. Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send this level of detail the same day.</p>
 
 <h2>Offer packages, not just hourly rates</h2>
 <p>Bundles such as "EV charger install, supplied and installed" or "Panel upgrade with permit" are simpler to buy, simpler to compare, and easier for you to price consistently.</p>
@@ -597,43 +533,6 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Follow up</h2>
 <p>If a quote has not been answered in three days, follow up. Many customers need a reminder, not a discount.</p>
-`,
-  "how-to-price-a-job-labour-materials-markup-canada-guide": `
-<p>One of the most common reasons good contractors stay barely profitable is simple arithmetic: they add a "20% markup" and believe they earn a 20% margin. They do not. Here is the difference, and how to use it.</p>
-
-<h2>The definitions</h2>
-<ul>
-  <li><strong>Markup</strong> is the percentage you add to your cost. Selling price = cost × (1 + markup).</li>
-  <li><strong>Margin</strong> is the percentage of the selling price that is profit. Margin = (price − cost) ÷ price.</li>
-</ul>
-
-<h2>A worked example</h2>
-<p>Your cost on a job is $10,000. You apply a 25% markup, so you charge $12,500. Your profit is $2,500, but that is only 20% of $12,500. So a 25% markup is a 20% margin.</p>
-
-<h2>Conversion table</h2>
-<ul>
-  <li>10% markup → 9.1% margin</li>
-  <li>20% markup → 16.7% margin</li>
-  <li>25% markup → 20% margin</li>
-  <li>33% markup → 25% margin</li>
-  <li>50% markup → 33% margin</li>
-  <li>100% markup → 50% margin</li>
-</ul>
-
-<h2>Which should you use?</h2>
-<p>Use <strong>margin</strong> to decide what you need: your overhead (truck, insurance, tools, admin, software, your own unpaid hours) is a percentage of revenue, so your target should be a margin. Use <strong>markup</strong> as the quick tool to apply on each line, once you know which margin you need.</p>
-<p>Example: if overhead plus desired profit adds up to 30% of revenue, you need a 30% margin, which means a markup of 43% on cost (0.30 ÷ 0.70).</p>
-
-<h2>Common mistakes</h2>
-<ul>
-  <li><strong>Forgetting overhead</strong>: markup is not profit. It must also pay for everything that is not on the job.</li>
-  <li><strong>Not marking up materials</strong>: you handle ordering, delivery, returns, storage and the risk of price changes.</li>
-  <li><strong>Charging the same markup on every job</strong>: risky or small jobs deserve more.</li>
-  <li><strong>Ignoring change orders</strong>: extras should carry the same margin as the original job.</li>
-</ul>
-
-<h2>Putting it into your quotes</h2>
-<p>Decide your target margin once, set your markup from it, and apply it consistently, not by gut feel job to job. For the full method of building a price from labour and materials, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>, and see how <a href="/quotes/general-contractor/">quoting software for general contractors</a> applies markup automatically to every line.</p>
 `,
   "how-to-collect-payment-from-clients-contractor-canada": `
 <p>Doing the work is only half the job. Waiting 45 days for the last 30% of a project drains cash and wastes your evenings. Most late payment is preventable with better terms set before the job starts.</p>
@@ -690,36 +589,6 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Budget it as overhead</h2>
 <p>Insurance, vehicle costs and tools are part of your overhead and must be recovered in your pricing. If you are unsure how, read <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
-`,
-  "cost-to-install-windows-and-doors-canada": `
-<p>Windows and doors are a major energy and comfort upgrade in Canadian homes, and a major cost. Prices vary widely with frame material, glass package and installation conditions. These are typical 2026 ranges. Always get on-site measurements before finalizing a price.</p>
-
-<h2>Typical installed price ranges</h2>
-<ul>
-  <li><strong>Standard vinyl window</strong>: about $600–$1,400 installed each</li>
-  <li><strong>Fibreglass or wood-clad window</strong>: about $1,000–$2,500 installed each</li>
-  <li><strong>Large picture or bay window</strong>: about $1,800–$5,000+</li>
-  <li><strong>Sliding patio door</strong>: about $1,800–$4,500</li>
-  <li><strong>Steel or fibreglass entry door</strong>: about $1,500–$4,000, higher with sidelights and custom glass</li>
-  <li><strong>Garage door</strong>: about $1,200–$3,500 depending on insulation and opener</li>
-</ul>
-<p>A whole-house window replacement for a typical home with 10–15 windows commonly lands between $8,000 and $25,000, depending on the choices above.</p>
-
-<h2>What drives the price</h2>
-<h3>Frame material and glass package</h3>
-<p>Vinyl is the budget choice, fibreglass and wood cost more. Triple glazing and low-E coatings improve performance in Canadian winters and add to the cost. Look for ENERGY STAR ratings suitable to your climate zone.</p>
-<h3>Installation type</h3>
-<p>An insert replacement inside the existing frame costs less than a full-frame replacement, which involves exterior trim, siding or brick-mould repair and often reveals rot behind the frame.</p>
-<h3>Access and height</h3>
-<p>Second and third storey windows may need scaffolding or lifts, and heritage or masonry buildings take longer.</p>
-<h3>Lead time</h3>
-<p>Custom windows can take weeks to arrive. A quote should state expected delivery, which matters when prices shift.</p>
-
-<h2>Rebates</h2>
-<p>Programs for energy-efficient windows and doors come and go. Check current eligibility before mentioning them, and see our <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">contractor's guide to rebates</a>.</p>
-
-<h2>How to quote it</h2>
-<p>List each opening with size, type, glass package and price, then removal and disposal, interior and exterior finishing, and warranty. Separate the cost of unexpected repairs (rot, damaged framing) as an allowance or a change-order clause. Installers using <a href="/quotes/window-door-installer/">quoting software for window and door installers</a> can build this opening-by-opening list on site and send it the same day.</p>
 `,
   "kitchen-renovation-cost-canada-2026": `
 <p>The kitchen is the most requested and most misquoted renovation in Canada. Homeowners often set a budget from a TV show, then meet reality at the first quote. These are typical 2026 ranges. Your market, the size of the room and the finishes will move them.</p>
@@ -779,33 +648,6 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Quoting a fence job</h2>
 <p>State total footage, height, material and grade, post size and depth, number and type of gates, removal, and a warranty. Note the client is responsible for confirming property lines and locating utilities (call before you dig). Landscapers using <a href="/quotes/landscaper/">quoting software for landscapers</a> can measure on site and send the quote within the hour. For help with price structure, see <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
-`,
-  "furnace-replacement-cost-canada-2026": `
-<p>When a furnace dies in January, a homeowner needs a price fast. Installers who respond with a clear, itemized quote the same day win these jobs. Here are typical 2026 ranges for homeowners and the quote structure for contractors.</p>
-
-<h2>Typical installed cost</h2>
-<ul>
-  <li><strong>Mid-efficiency gas furnace</strong>: about $3,500–$5,500</li>
-  <li><strong>High-efficiency gas furnace</strong> (condensing, 95%+ AFUE): about $4,500–$8,000</li>
-  <li><strong>Electric furnace</strong>: about $3,000–$6,000</li>
-  <li><strong>Dual-fuel (heat pump plus gas furnace)</strong>: about $10,000–$20,000</li>
-</ul>
-
-<h2>What affects the price</h2>
-<h3>Efficiency and staging</h3>
-<p>Two-stage and variable-speed models cost more but run quieter and use less energy. Modern condensing furnaces also need PVC venting and a condensate drain, which adds labour when converting from an old chimney vent.</p>
-<h3>Size</h3>
-<p>Correct sizing needs a proper heat-loss calculation, not simply matching the old unit. Oversized furnaces cycle often and wear out.</p>
-<h3>Chimney and venting</h3>
-<p>Switching to a high-efficiency unit often means lining or capping an unused chimney, which can add several hundred dollars or more.</p>
-<h3>Ductwork and accessories</h3>
-<p>Thermostats, humidifiers, air cleaners and duct repairs are common add-ons that should be separate lines.</p>
-
-<h2>Rental vs buying</h2>
-<p>In some markets homeowners rent equipment. Rentals have low upfront cost but can cost far more over time. Show the comparison clearly when quoting.</p>
-
-<h2>How to quote</h2>
-<p>Offer a good-better-best option set, each with brand, model, efficiency rating, installation details, permit, disposal and warranty. Giving three options increases the average sale and lowers price shopping. HVAC contractors can build these options quickly with <a href="/quotes/hvac-technician/">quoting software for HVAC</a>. If the home is also a candidate for a heat pump, point to our <a href="/blog/cost-to-install-a-heat-pump-canada/">heat pump cost guide</a>.</p>
 `,
   "flooring-installation-cost-canada-2026": `
 <p>Flooring prices vary widely because the material and the prep are separate costs. Here are typical 2026 installed ranges, then the extras that move a quote.</p>
@@ -899,7 +741,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p><em>"Change order #2: Add two pot lights in the hallway, including drywall patching and paint touch-up. Additional cost: $640 plus tax. Adds one day to the schedule. Approved by: ______ Date: ______"</em></p>
 
 <h2>Price extras properly</h2>
-<p>Extras are often interrupted work with setup time, so apply at least the same markup as the original job, and often more. For the arithmetic, see <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a> and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
+<p>Extras are often interrupted work with setup time, so apply at least the same markup as the original job, and often more. For the arithmetic, see <a href="/tools/markup-margin-calculator/">markup vs margin</a> and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a>.</p>
 
 <h2>Put the rule in your contract and quote</h2>
 <p>One sentence handles most arguments: "Work outside the scope described will be quoted separately and approved in writing before it begins." Painters, renovators and electricians can generate change quotes in seconds using <a href="/quotes/painter/">quoting software for painters</a> and similar tools, then keep everything in one history. See also <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract</a>.</p>
@@ -931,49 +773,18 @@ const BLOG_CONTENT: Record<string, string> = {
 </ul>
 
 <h2>Price subs into your quote</h2>
-<p>Sub costs should carry markup for coordination, risk and your warranty on the whole job. Include them as clear line items in the quote, which quoting software for <a href="/quotes/general-contractor/">general contractors</a> handles together with materials and labour. See also <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
-`,
-  "how-to-send-a-quote-in-5-minutes-contractors": `
-<p>Most homeowners hire one of the first two contractors who send a clear price. The rest never get a call back. If your quotes take a day or two, you are competing against people who sent theirs before they left the driveway. Here is a system to get to a professional quote in about five minutes.</p>
-
-<h2>Why speed matters</h2>
-<p>A homeowner who just walked a contractor through the house is at peak intent. Every hour that passes, they talk to someone else, get distracted or lose urgency. Fast, clear quotes beat slightly cheaper slow ones more often than most contractors expect.</p>
-
-<h2>The 5-minute method</h2>
-<ol>
-  <li><strong>Measure and photograph during the walkthrough</strong> (1 minute of effort, saves ten later). Take wide shots and close-ups of problem areas.</li>
-  <li><strong>Use saved prices</strong>. Keep your standard rates and common line items (labour per hour, per square foot, common materials) so you are never starting from a blank page.</li>
-  <li><strong>Describe the job in plain language</strong>. Voice notes or a short summary are faster than typing line items.</li>
-  <li><strong>Let the tool itemize and add taxes</strong>. GST, HST or QST should be applied automatically for the job's province.</li>
-  <li><strong>Review, adjust and send</strong>. Check the total, scope and exclusions, then send a PDF by text or email with a clear acceptance step.</li>
-</ol>
-
-<h2>What a fast quote still needs</h2>
-<ul>
-  <li>Scope with exclusions</li>
-  <li>Itemized labour and materials</li>
-  <li>Taxes shown separately</li>
-  <li>Deposit and payment terms</li>
-  <li>Validity period</li>
-</ul>
-<p>Speed should never mean vagueness. See <a href="/blog/common-quoting-mistakes-contractors-make/">common quoting mistakes</a> for what to avoid.</p>
-
-<h2>Follow up</h2>
-<p>Send a short message after 48 hours: "Hi, just checking you received the quote, happy to answer any questions." It recovers more jobs than lowering the price.</p>
-
-<h2>Tools make the difference</h2>
-<p>A phone-based tool that builds the itemized estimate for you turns this from a goal into a habit. See <a href="/blog/mobile-quoting-on-the-go-for-contractors/">mobile quoting for contractors</a>, try <a href="/pricing/">free quoting</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
+<p>Sub costs should carry markup for coordination, risk and your warranty on the whole job. Include them as clear line items in the quote, which quoting software for <a href="/quotes/general-contractor/">general contractors</a> handles together with materials and labour. See also <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
 `,
   "how-to-scale-a-contracting-business-canada": `
 <p>Many contractors reach a ceiling: more work than they can do alone, but hiring feels risky. Scaling is not about working more hours. It is about building a business that makes money when you are not holding the tool. Here is a realistic path.</p>
 
 <h2>1. Fix your pricing first</h2>
-<p>Growing an unprofitable business just creates a larger unprofitable business. Know your true hourly cost including overhead, apply a margin, and stop underpricing. See <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> and <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+<p>Growing an unprofitable business just creates a larger unprofitable business. Know your true hourly cost including overhead, apply a margin, and stop underpricing. See <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job</a> and <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
 
 <h2>2. Systemize the office work</h2>
 <p>If you are the only one who can quote, invoice, schedule and chase payments, you cannot step away. Standardize:</p>
 <ul>
-  <li>A repeatable quoting process (see <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending quotes in 5 minutes</a>)</li>
+  <li>A repeatable quoting process (see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">sending quotes in 5 minutes</a>)</li>
   <li>Invoice and deposit rules</li>
   <li>Job checklists and photo requirements</li>
   <li>A single place for client and job information</li>
@@ -1033,7 +844,7 @@ const BLOG_CONTENT: Record<string, string> = {
 </ul>
 
 <h2>Use the results</h2>
-<p>Update your price list and markup using real data. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>. Software that links the quote to the job and invoice, like quoteai for <a href="/quotes/general-contractor/">general contractors</a>, makes the comparison automatic instead of a weekend project.</p>
+<p>Update your price list and markup using real data. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>. Software that links the quote to the job and invoice, like quoteai for <a href="/quotes/general-contractor/">general contractors</a>, makes the comparison automatic instead of a weekend project.</p>
 `,
   "reduce-material-costs-contractors-canada": `
 <p>Materials commonly make up a third to half of a job's cost, and their prices move. Small improvements here go straight to profit. These ten habits help without compromising the finished work.</p>
@@ -1106,77 +917,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Keep it in one place</h2>
 <p>The more your quotes, jobs, crew schedule and invoices are connected, the less you retype and forget. See <a href="/quotes/general-contractor/">quoteai for general contractors</a> and <a href="/quotes/renovation-contractor/">for renovation contractors</a>.</p>
 `,
-  "how-to-win-more-bids-contractors-canada": `
-<p>When you lose a job, the winner is often not the cheapest. Clients choose the contractor who feels most reliable, clear and responsive. Here is what to improve before you cut your price.</p>
-
-<h2>1. Respond first</h2>
-<p>Returning calls the same day and quoting quickly puts you ahead of most competitors. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending a quote in 5 minutes</a>.</p>
-
-<h2>2. Be specific</h2>
-<p>"Interior painting, $4,200" looks the same as every other bid. An itemized quote with scope, exclusions and materials shows professionalism and makes comparison fair.</p>
-
-<h2>3. Offer options</h2>
-<p>Good, better, best gives clients a choice between you and yourself rather than you and a competitor, and raises your average sale.</p>
-
-<h2>4. Show credentials</h2>
-<p>Licence, insurance, warranty, years in business and photos of completed work. Put them on the quote itself.</p>
-
-<h2>5. Use reviews as proof</h2>
-<p>A few recent, specific reviews beat any slogan. See <a href="/blog/how-to-get-more-reviews-as-a-contractor/">getting more reviews</a>.</p>
-
-<h2>6. Explain, do not just list</h2>
-<p>Two sentences on why a step matters (such as proper prep before painting or why a panel upgrade is needed) turn a cost into value.</p>
-
-<h2>7. Make acceptance easy</h2>
-<p>A clear next step: sign electronically, pay the deposit and pick a start date. Every extra step loses clients.</p>
-
-<h2>8. Follow up</h2>
-<p>Two polite follow-ups, at two days and a week, win jobs that otherwise vanish.</p>
-
-<h2>9. Price with confidence</h2>
-<p>Know your margin and do not apologize for it. Cutting price to win a job often means working for free. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
-
-<h2>10. Learn from losses</h2>
-<p>Ask, politely, why you lost. Even one answer in five teaches you something about price, timing or trust.</p>
-
-<h2>Start with the basics</h2>
-<p>Review <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a> and avoid the <a href="/blog/common-quoting-mistakes-contractors-make/">common quoting mistakes</a>.</p>
-`,
-  "best-quoting-software-for-contractors-canada": `
-<p>There are dozens of estimating and quoting apps, most built for the US market. Before you commit to one, check how it handles the things that matter to a Canadian trade business.</p>
-
-<h2>Checklist for Canadian contractors</h2>
-<h3>Canadian taxes built in</h3>
-<p>GST, HST, PST and QST differ by province. Software that makes you set taxes by hand will produce wrong quotes sooner or later. Look for automatic tax by job location and room for your GST/HST and QST numbers on documents.</p>
-<h3>Works on a phone</h3>
-<p>You quote on site, not at a desk. The mobile experience should be fast, not a cut-down version of the desktop one. See <a href="/blog/mobile-quoting-on-the-go-for-contractors/">mobile quoting</a>.</p>
-<h3>Speed to a finished quote</h3>
-<p>If building an estimate takes 45 minutes, you will go back to a spreadsheet. The target is minutes: see <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">the 5-minute method</a>.</p>
-<h3>English and French</h3>
-<p>If you work in Quebec or serve French-speaking clients, quotes and client pages in French (Canada) are essential, including proper number and date formats.</p>
-<h3>From quote to invoice</h3>
-<p>The best tools carry data from quote to job to invoice so you do not retype. Look for deposits, progress invoices and payment tracking: <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">getting paid on time</a>.</p>
-<h3>Professional client experience</h3>
-<p>Clean PDFs, online acceptance or signature, and automatic follow-up reminders raise your close rate.</p>
-<h3>Pricing that fits a small business</h3>
-<p>Beware of per-user fees that punish growth, long contracts, and hidden charges for core features. A free plan to test is a good sign.</p>
-<h3>Support for your trade</h3>
-<p>Painting, plumbing, electrical and roofing have different line items and units. Trade-aware templates save setup time.</p>
-
-<h2>Questions to ask before choosing</h2>
-<ul>
-  <li>Can I build and send a real quote in under ten minutes?</li>
-  <li>Does it handle the taxes where I work?</li>
-  <li>Can I export my data if I leave?</li>
-  <li>Is there a free trial or plan?</li>
-</ul>
-
-<h2>Side-by-side comparisons</h2>
-<p>For prices, currency, Canadian tax and French support next to each other, see <a href="/compare/">quoting software for Canadian contractors, compared</a>, or the one-to-one pages: <a href="/compare/quoteai-vs-jobber/">quoteai vs Jobber</a>, <a href="/compare/quoteai-vs-joist/">quoteai vs Joist</a> and <a href="/compare/quoteai-vs-housecall-pro/">quoteai vs Housecall Pro</a>.</p>
-
-<h2>Try it on a real job</h2>
-<p>Whichever tool you consider, test it on a real quote, not a demo. quoteai is built for Canadian trades: see <a href="/pricing/">free quoting</a>, or see <a href="/compare/">how quoteai compares</a>.</p>
-`,
   "contractor-cash-flow-management-canada": `
 <p>A job can be profitable on paper and still leave you short on payday. Contractors pay for materials and crews up front and get paid later. That gap is cash flow, and it is the most common reason otherwise good trade businesses fail.</p>
 
@@ -1204,7 +944,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Net-30 terms on contractor accounts let you buy materials and get paid before the bill is due. Pay on time to keep the privilege.</p>
 
 <h2>6. Watch your quote validity and pricing</h2>
-<p>Underpriced jobs drain cash faster than anything else. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+<p>Underpriced jobs drain cash faster than anything else. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
 
 <h2>7. Build a buffer</h2>
 <p>Aim for one to three months of fixed costs in reserve, built gradually from a small percentage of every invoice.</p>
@@ -1214,33 +954,6 @@ const BLOG_CONTENT: Record<string, string> = {
 
 <h2>Keep invoicing automatic</h2>
 <p>Software that turns an accepted quote into a deposit request and invoice removes delays. See quoteai for <a href="/quotes/general-contractor/">general contractors</a>.</p>
-`,
-  "how-to-survive-slow-season-contractors-canada": `
-<p>Landscapers, roofers, painters and exterior trades feel winter hard; interior and HVAC trades may see summer dips. The contractors who stay steady plan the slow months long before they arrive.</p>
-
-<h2>1. Sell off-season work in the busy season</h2>
-<p>Offer a discount or priority slot for jobs booked for the slow period. Interior painting, bathroom renovations and basement finishing all suit winter. See the <a href="/blog/basement-finishing-cost-canada/">basement finishing cost guide</a>.</p>
-
-<h2>2. Launch maintenance or service plans</h2>
-<p>Annual inspections, tune-ups, gutter cleaning and snow-related services create recurring income. Homeowners like predictable service, and you like predictable revenue.</p>
-
-<h2>3. Add a complementary service</h2>
-<p>Landscapers add snow removal; roofers add eavestrough and winterization; painters add drywall repair. See <a href="/blog/winterizing-your-home-contractor-checklist/">winterizing checklist</a> and <a href="/blog/snow-load-roofing-eavestrough-considerations-canada/">snow load and eavestroughs</a>.</p>
-
-<h2>4. Market ahead of the season</h2>
-<p>Search demand rises weeks before people book. Update your Google profile and photos, ask recent clients for reviews and post seasonal offers: <a href="/blog/google-business-profile-guide-for-tradespeople/">Google profile guide</a>.</p>
-
-<h2>5. Follow up old quotes</h2>
-<p>A quote sent in spring that was never accepted may still be a lead. A short, friendly message can restart the conversation.</p>
-
-<h2>6. Use slow time on the business</h2>
-<p>Update your price list, review job costs, fix your quoting process, service equipment and train your crew.</p>
-
-<h2>7. Plan cash for it</h2>
-<p>Save during busy months so slow months do not become emergencies: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</p>
-
-<h2>Quote the off-season quickly</h2>
-<p>When demand is low, speed matters even more. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending a quote in 5 minutes</a>.</p>
 `,
   "how-to-quote-a-painting-job": `
 <p>Underpriced painting jobs usually fail for one reason: prep takes longer than expected. Here is a repeatable way to quote painting work so you earn what the job is worth.</p>
@@ -1279,74 +992,141 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Painters using <a href="/quotes/painter/">quoting software for painters</a> can reuse rates, apply taxes and send a PDF on site. See also <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a> for extra requests mid-job.</p>
 `,
   "how-to-quote-a-roofing-job": `
-<p>Roofing is priced by the "square" (100 square feet), but a good quote accounts for far more than shingles. Here is a way to build one that protects your margin.</p>
+<p>Roofing quotes usually go wrong in three places: the area is off because pitch or waste was guessed, the deck turns out to be rotten with no agreed price for fixing it, or the crew loses days to weather and access nobody priced. Deal with each before the client signs.</p>
 
-<h2>Measure the roof</h2>
-<p>Calculate area for each plane, multiply by the pitch factor, and add waste (commonly 10–15%, more for complex roofs). Count hips, valleys, skylights, chimneys and vents. Aerial measurement reports or drone photos save time and ladder risk.</p>
+<h2>Measure in squares, then correct for pitch and waste</h2>
+<p>A square is 100 sq ft of roof surface. Take the plan area (footprint including overhangs, from a site measurement, drawings or an aerial report) and multiply by the pitch factor. For a rise of R inches per 12 of run, the factor is the square root of (1 + (R/12)²): 1.054 at 4/12, 1.118 at 6/12, 1.202 at 8/12, 1.414 at 12/12. Work plane by plane if pitches differ.</p>
+<p>Waste depends on the roof: a simple gable loses little, while hips, valleys and dormers lose a piece of shingle at every cut. Set the allowance from your own reorder history on similar roofs and put it on the material line only. Labour is paid on the measured area.</p>
+<p>Take linear measurements too: eaves and rakes (drip edge, starter), hips and ridges (cap, ridge vent), valleys, and every wall and chimney intersection (step and counter flashing). Each becomes its own line item.</p>
 
-<h2>Line items to include</h2>
+<h2>Tear-off: count the layers</h2>
+<p>Lift a shingle at the eave and at a rake and count the layers. Each extra layer adds weight to the bin and time for the crew, so price tear-off per square, state the number of layers you found, and say that any extra layer is billed at a stated rate. Disposal is its own line: bin rental and landfill or transfer-station fees, priced from your actual hauler.</p>
+
+<h2>Decking: a unit price, not a surprise</h2>
+<p>Rotten or delaminated sheathing usually shows only once the shingles are off. Quote it as a per-sheet unit price (remove, supply and install one 4x8 sheet of a stated thickness, with fasteners and disposal), include a small allowance in the total, and state that the actual count is billed at that rate.</p>
+<p>In Ontario there is a legal reason as well. The province's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a> says that if an estimate is included in a contract, you cannot charge more than 10% above it unless the customer requires additional or different goods or services and you have signed a change to the contract. When the count runs past the allowance, photograph the bad sheets, write up the extra quantity at the agreed unit price and get it signed before closing the deck. The <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a> covers the paperwork.</p>
+
+<h2>Eave protection: what the code asks for</h2>
+<p>Ontario's building code, <a href="https://www.ontario.ca/laws/regulation/r24163" rel="noopener">O. Reg. 163/24</a>, adopts the <a href="https://publications.gc.ca/site/eng/9.897526/publication.html" rel="noopener">National Building Code of Canada 2020</a> with Ontario amendments. In the NBC text, Article 9.26.5.1 requires eave protection on shingle, shake or tile roofs, extending at least 900 mm up the slope from the edge to a line at least 300 mm inside the inner face of the exterior wall. It is not required over unheated garages, carports and porches, where the overhang exceeds 900 mm along the slope, on low-slope asphalt shingle roofs installed under Subsection 9.26.8, on slopes of 1 in 1.5 or steeper, or in regions with 3,500 or fewer degree-days. Article 9.26.5.2 lists accepted materials, including self-sealing modified bitumen membranes laid beneath the starter strip.</p>
+<p>For the quote: measure the overhang, not just the eave length, because a deep overhang can need two courses to reach 300 mm past the wall line. Membrane in valleys and around penetrations goes beyond that article, so if you include it, say so; it is your specification, and clients comparing bids should see it. Check local amendments and the location's degree-days in the code's climatic tables.</p>
+
+<h2>Snow load is a structural question</h2>
+<p>Under NBC Article 9.4.2.2, house roof framing is sized for a specified snow load based on the location's 1-in-50-year ground snow load and rain load, and Subsection 9.4.2 covers only light-frame roofs within set limits, such as members no more than 600 mm on centre and clear spans no more than 12.2 m.</p>
+<p>Price an engineer's review, or exclude structural work in writing and recommend one, when you see a sagging ridge or rafters, cracked or notched framing, old fire or water damage, a switch to a heavier covering than the roof was built for, or a request to alter framing (skylights, dormers, a new slope). Structural work also changes the permit answer.</p>
+
+<h2>Permits: ask the municipality</h2>
+<p>Reroofing permits are a local rule. The City of Toronto, for example, lists <a href="https://www.toronto.ca/services-payments/building-construction/apply-for-a-building-permit/when-do-i-need-a-building-permit/" rel="noopener">replacing existing roofing material provided no structural work is required</a> among work that does not need a building permit; add framing repairs and that exemption is gone. Ontario's guide says permits are the customer's responsibility, that many contractors handle them, and that who does it belongs in the contract. Put the answer in the quote either way.</p>
+
+<h2>Fall protection and access are real costs</h2>
+<p>On Ontario construction projects, the fall protection rules in <a href="https://www.ontario.ca/laws/regulation/910213" rel="noopener">O. Reg. 213/91</a> apply where a worker could fall more than 3 metres. Guardrails come first; where they are not practicable, the regulation ranks travel restraint, fall restricting, fall arrest, then safety nets. Workers using fall protection need <a href="https://www.ontario.ca/laws/regulation/130297" rel="noopener">working at heights training</a> from an approved provider, valid for three years. In British Columbia, <a href="https://www.worksafebc.com/en/law-policy/occupational-health-safety/searchable-ohs-regulation/ohs-regulation/part-11-fall-protection" rel="noopener">Part 11 of the WorkSafeBC OHS Regulation</a> requires a fall protection system from 3 m (10 ft) and a written fall protection plan where workers without permanent guardrails could fall 7.5 m (25 ft) or more.</p>
+<p>Anchors, roof brackets, guardrail kits, setup and teardown time, and a steep-roof labour premium belong on a visible line. Leaving them out moves them into your margin; the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> shows what is left.</p>
+
+<h2>Weather and warranty terms</h2>
+<p>State that the start date moves for rain, high wind or cold below the manufacturer's application limits, that an open roof is dried in each night, and that delays do not change the price. Name the shingle brand and line so the client can look up the manufacturer's warranty, and read its conditions yourself, since they can include installation and ventilation requirements. State your workmanship warranty separately, with its length and coverage; Ontario's guide lists a clear description of warranties on goods and labour among what a contract must include.</p>
+
+<h2>Sample quote: asphalt reroof in Toronto, Ontario</h2>
+<p>Example only. The quantities and prices below are illustrative assumptions for a gable-and-hip house with a 6/12 pitch, a plan area of 1,810 sq ft (2,024 sq ft of roof, or 20.2 squares after the 1.118 pitch factor), two existing layers and one chimney. Ontario HST is 13% according to the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a>.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Tear-off, 2 layers asphalt, to deck</td><td>20.2</td><td>SQ</td><td>$95.00</td><td>$1,919.00</td></tr>
+    <tr><td>Bin rental and landfill fees</td><td>1</td><td>each</td><td>$650.00</td><td>$650.00</td></tr>
+    <tr><td>Decking allowance: replace 7/16 in. OSB, per sheet (actual count billed at this rate)</td><td>6</td><td>sheet</td><td>$95.00</td><td>$570.00</td></tr>
+    <tr><td>Eave protection membrane at eaves (code) and valleys</td><td>6</td><td>roll</td><td>$135.00</td><td>$810.00</td></tr>
+    <tr><td>Synthetic underlayment, field</td><td>2</td><td>roll</td><td>$210.00</td><td>$420.00</td></tr>
+    <tr><td>Architectural shingles, supply (20.2 SQ plus 10% waste)</td><td>22.3</td><td>SQ</td><td>$150.00</td><td>$3,345.00</td></tr>
+    <tr><td>Shingle installation labour</td><td>20.2</td><td>SQ</td><td>$140.00</td><td>$2,828.00</td></tr>
+    <tr><td>Starter strip and hip/ridge cap</td><td>140</td><td>LF</td><td>$4.50</td><td>$630.00</td></tr>
+    <tr><td>Drip edge, eaves and rakes</td><td>160</td><td>LF</td><td>$3.25</td><td>$520.00</td></tr>
+    <tr><td>Chimney step and counter flashing</td><td>1</td><td>each</td><td>$450.00</td><td>$450.00</td></tr>
+    <tr><td>Ridge vent</td><td>40</td><td>LF</td><td>$12.00</td><td>$480.00</td></tr>
+    <tr><td>Pipe boots</td><td>3</td><td>each</td><td>$65.00</td><td>$195.00</td></tr>
+    <tr><td>Fall protection setup and teardown</td><td>1</td><td>lot</td><td>$600.00</td><td>$600.00</td></tr>
+    <tr><td>Building permit: not required (like-for-like, no structural work)</td><td>1</td><td>each</td><td>$0.00</td><td>$0.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$13,417.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$1,744.21</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$15,161.21</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
 <ul>
-  <li>Tear-off and disposal (number of layers matters)</li>
-  <li>Deck inspection and allowance for plywood replacement</li>
-  <li>Ice and water shield at eaves and valleys, important in Canadian winters</li>
-  <li>Underlayment</li>
-  <li>Shingles or metal panels, starter and ridge cap</li>
-  <li>Flashing, vents, pipe boots</li>
-  <li>Eavestroughs, fascia and soffit if included</li>
-  <li>Permit where required</li>
+  <li>Tear-off and labour use the measured 20.2 squares; only shingle supply carries waste, so nobody can say the area was padded.</li>
+  <li>Decking is a unit price with an allowance. If 11 sheets are bad, the extra 5 go on a signed change at $95.00 each, inside Ontario's estimate rule.</li>
+  <li>"Eaves (code) and valleys" tells the client which membrane is required and which is your standard.</li>
+  <li>The permit line records the answer, and it changes if structural repairs are added.</li>
 </ul>
+<p>Check the tax line with the <a href="/tools/sales-tax-calculator/">sales tax calculator</a>, and see the <a href="/provinces/ontario/">Ontario page</a> for more on quoting there. If you would rather not build the table by hand, <a href="/quotes/roofer/">quoteai for roofers</a> writes an itemized quote with the province's taxes and sends it as a PDF.</p>
 
-<h2>Safety and access costs</h2>
-<p>Steep pitches, tall buildings, fall-arrest equipment, scaffolding and dumpsters all cost money. Price them. Also check provincial fall protection rules.</p>
-
-<h2>Allowances for the unknown</h2>
-<p>Rotten decking is only visible once shingles come off. Quote a per-sheet price for replacement so the client approves it before work. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
-
-<h2>Weather</h2>
-<p>State how weather delays are handled and what temperature limits apply to shingle installation.</p>
-
-<h2>Compare against market prices</h2>
-<p>Clients will compare your number to typical ranges. See <a href="/blog/cost-to-reroof-a-home-canada/">cost to re-roof a home in Canada</a> and <a href="/blog/snow-load-roofing-eavestrough-considerations-canada/">snow load considerations</a>.</p>
-
-<h2>Send it fast</h2>
-<p>Roofing leads often call several companies at once. <a href="/quotes/roofer/">Quoting software for roofers</a> lets you measure, price and send a detailed PDF the same day.</p>
+<h2>What clients expect to pay</h2>
+<p>We have not found a government or industry-association source that publishes current Canadian reroofing prices, so this guide gives no range. What moves your number is in the quote above: true area after pitch, layers coming off, complexity and waste, membrane coverage, deck condition, access and fall protection, local disposal fees and the shingle line. When a client holds up a lower bid, compare it line by line against yours; an itemized quote makes any missing line easy to point out.</p>
 `,
   "how-to-quote-an-electrical-job": `
-<p>Electrical quotes mix fixed-price packages and time-and-material work. Getting the mix right protects you from open-ended jobs while keeping your price competitive.</p>
+<p>Most electrical quoting trouble starts before any numbers go down: the job gets priced in the wrong format. A receptacle swap priced like a renovation looks expensive, and a service upgrade priced like a receptacle swap leaves you paying for the utility delay, the extra inspection visit and the plaster you had to open. Sort the call first, then price it.</p>
 
-<h2>Know your job types</h2>
+<h2>Sort the call before you price it</h2>
 <ul>
-  <li><strong>Service calls</strong>: diagnostic fee plus hourly rate, or flat-rate for common repairs.</li>
-  <li><strong>Standard installs</strong>: pot lights, receptacles, EV chargers, ceiling fans, usually priced per unit.</li>
-  <li><strong>Renovation wiring</strong>: price by circuit or by area.</li>
-  <li><strong>Large projects</strong>: panel upgrades and rewires, quoted after a site visit. See <a href="/blog/cost-to-rewire-a-house-canada/">cost to rewire a house</a>.</li>
+  <li><strong>Service calls and troubleshooting.</strong> You can't see the fault until you're there, so quote a call-out or diagnostic charge plus an hourly rate, and give a firm price for the repair once you've found it.</li>
+  <li><strong>Unit installs.</strong> Pot lights, receptacles, fans, EV charger circuits. Price per unit with a stated condition: open ceiling or finished, distance from the panel, attic access. When the condition changes, the price changes, and the quote says so.</li>
+  <li><strong>Circuit and renovation work.</strong> Price by circuit or by room after you've counted devices and walked the cable routes. Fishing cable through finished walls belongs in the labour hours, not in a contingency you hope covers it.</li>
+  <li><strong>Service upgrades and rewires.</strong> Always a site visit, a load assessment and an itemized quote with written exclusions. This is where most of the money and most of the disputes are, so the rest of this article focuses on it.</li>
+</ul>
+<p>Whatever the format, your labour figure has to carry your real overhead: truck, insurance, licence fees, unbilled travel and estimating time. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> works out a billable hourly rate from those costs, and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job: labour, materials and markup</a> covers markup on parts.</p>
+
+<h2>Who can do the work, and who files the paperwork</h2>
+<p>Licensing decides who may quote electrical work for hire, and the notification or permit is part of the job you are pricing. It is not something the client sorts out on their own.</p>
+<h3>Ontario</h3>
+<p>The Electrical Safety Authority states that <a href="https://esasafe.com/contractors/" rel="noopener">only electrical contractors licensed by ESA may do electrical work for hire</a> in Ontario. The contractor licence requires a Master Electrician on staff, and a Master Electrician <a href="https://www.esasafe.com/contractors/get-your-me-licence/" rel="noopener">may not offer electrical services to the public without an Electrical Contractor licence</a>. Before the work starts, whoever does it files a notification with ESA. The installation has to be <a href="https://www.esasafe.com/compliance/what-you-need-to-know/" rel="noopener">inspected before it is concealed or buried</a>, and once it passes, ESA issues a Certificate of Acceptance to the person who filed. Put that certificate on your quote as a deliverable: ESA notes it matters to the homeowner for insurance and resale. ESA's fees are set out in guides on its <a href="https://www.esasafe.com/fees-and-forms/fees/" rel="noopener">fees page</a>, which went up 1.9% on April 1, 2026, so take the figure from the current guide rather than last year's job file.</p>
+<h3>British Columbia</h3>
+<p>Technical Safety BC issues electrical installation permits everywhere except Burnaby, Maple Ridge, North Vancouver, Surrey, Victoria, Vancouver and West Vancouver, where the <a href="https://www.technicalsafetybc.ca/electrical-permits" rel="noopener">municipality handles them</a>. Every application names a Field Safety Representative, who declares compliance and requests an inspection after each phase, with at least one request within 180 days of the permit being issued. On a long rewire, schedule those declarations into the job.</p>
+<h3>Québec</h3>
+<p>Electrical installation work requires a licence with <a href="https://www.rbq.gouv.qc.ca/domaines-dintervention/electricite/vos-obligations-envers-la-rbq/licence/" rel="noopener">subclass 16, Entrepreneur en électricité</a>. The RBQ sends contractors to the Corporation des maîtres électriciens du Québec for it, and the CMEQ states that <a href="https://www.cmeq.org/english/about-cmeq/mission-and-historic/" rel="noopener">master electricians in Québec are required to be members</a>. Show the licence number on every quote.</p>
+<h3>The code you are quoting to</h3>
+<p>Each province adopts the Canadian Electrical Code, Part I (CSA C22.1) with its own amendments. Ontario's current code, the 29th edition, is <a href="https://esasafe.com/role/oesc/" rel="noopener">the CEC Part I plus Ontario amendments, in force since May 1, 2025</a>. Québec's Chapter V, Électricité, is <a href="https://www.rbq.gouv.qc.ca/domaines-dintervention/electricite/la-rbq-et-lelectricite/reglementation/ce-qui-sapplique" rel="noopener">the 25th edition of the CEC with Québec amendments</a>, updated on March 26, 2026. A quote that says "all work to the current provincial electrical code" is a commitment you can be held to, so price what that code requires on the circuits you touch, not just what is there today.</p>
+
+<h2>What drives the price of a rewire or panel upgrade</h2>
+<p>Clients usually arrive with a number they found online. We don't publish price ranges, because no official source gives one that holds across provinces and housing stock. What you can do is show the client what moves the number, line by line, so the total makes sense to them.</p>
+<ul>
+  <li><strong>Existing wiring.</strong> Knob-and-tube changes the job. ESA notes that <a href="https://esasafe.com/home-renovation-buying-and-selling/knob-and-tube/" rel="noopener">many insurers won't cover or renew homes with knob-and-tube, and some require it replaced first</a>, so these clients often have a deadline. Plaster walls, blocked bays and no attic access slow every run. Count circuits during the visit and price the removal per circuit, or as a lump sum after a proper walk-through.</li>
+  <li><strong>Panel capacity.</strong> Going from 100A to 200A usually means a new panel, new service entrance conductors and often a new meter base and mast. Do the load calculation on site. If a heat pump, EV charger or electric range is coming later, size for it now and say so on the quote.</li>
+  <li><strong>Utility work.</strong> A service upgrade needs the local distribution company to disconnect and reconnect, and sometimes to change its own equipment. Its lead time sets your schedule. Find out from the utility what it charges and who pays, and quote it as a separate line or a named exclusion.</li>
+  <li><strong>Notification, permit and inspections.</strong> The fee, plus your time for each inspection visit. A rewire can need inspections at several stages, and every return trip costs you labour and travel.</li>
+  <li><strong>Opening and closing walls.</strong> Most electricians don't do drywall or plaster repair. Either price it with a trade you trust, or write "patching, drywall and paint by others" in plain words. Clients rarely assume holes are their problem.</li>
+  <li><strong>Things you can't see.</strong> Undersized grounding, aluminum branch wiring, asbestos-containing materials. Name them as conditions that trigger a change order, with your hourly rate stated, and handle them the way <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a> should be handled: priced and signed before the extra work starts.</li>
 </ul>
 
-<h2>Build the price</h2>
-<ol>
-  <li>Count devices and circuits, and measure cable runs.</li>
-  <li>Estimate labour hours, adding time for fishing wire in finished walls.</li>
-  <li>Add materials: cable, boxes, breakers, devices, fittings, panels.</li>
-  <li>Add permit, inspection and utility coordination fees.</li>
-  <li>Apply overhead and margin: see <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</li>
-</ol>
-
-<h2>Common exclusions to write down</h2>
+<h2>Sample quote: 200A service upgrade, detached house, Ontario</h2>
+<p>Example only: every price below is an assumption for illustration, not a market rate. The house has a 100A panel, overhead service and no knob-and-tube. Ontario charges <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">13% HST</a>, and the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> runs the same sum for other provinces.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Site assessment and load calculation</td><td>1</td><td>lot</td><td>$180.00</td><td>$180.00</td></tr>
+    <tr><td>Remove 100A panel; supply and install 200A meter base, mast and service entrance conductors</td><td>1</td><td>lot</td><td>$1,450.00</td><td>$1,450.00</td></tr>
+    <tr><td>Supply 200A main-breaker panel, 40 spaces</td><td>1</td><td>each</td><td>$620.00</td><td>$620.00</td></tr>
+    <tr><td>Replacement breakers where existing ones don't fit the new panel</td><td>6</td><td>each</td><td>$95.00</td><td>$570.00</td></tr>
+    <tr><td>Grounding and bonding upgrade to current code</td><td>1</td><td>lot</td><td>$340.00</td><td>$340.00</td></tr>
+    <tr><td>Labour: transfer and label existing circuits, install and test</td><td>14</td><td>hour</td><td>$115.00</td><td>$1,610.00</td></tr>
+    <tr><td>ESA notification fee (allowance, billed at actual cost)</td><td>1</td><td>lot</td><td>$350.00</td><td>$350.00</td></tr>
+    <tr><td>Utility disconnect and reconnect coordination</td><td>1</td><td>lot</td><td>$150.00</td><td>$150.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$5,270.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$685.10</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$5,955.10</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
 <ul>
-  <li>Drywall patching and painting</li>
-  <li>Asbestos or knob-and-tube surprises</li>
-  <li>Upgrades required by the inspector beyond scope</li>
-  <li>Client-supplied fixtures not warrantied</li>
+  <li>The assessment is its own line, so a client who doesn't go ahead still understands what the visit covered.</li>
+  <li>The ESA fee is an allowance billed at cost, not a figure baked into labour. Replace it with the amount from ESA's current fee guide when you file. This example charges HST on the whole subtotal; confirm the treatment of pass-through fees with your accountant.</li>
+  <li>Breakers are counted, not lumped. If the panel opens up and needs more, the unit price is already agreed.</li>
+  <li>The quote leaves out utility charges, drywall and paint, and any work on existing branch circuits. Each sits under "Not included" in plain words, with the Certificate of Acceptance listed as a deliverable.</li>
 </ul>
 
-<h2>Show your credentials</h2>
-<p>Licence number, insurance and warranty on every quote: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
-
-<h2>Upsell without pressure</h2>
-<p>Offer options such as surge protection, EV-ready conduit or a larger panel. Clients appreciate choices and your ticket rises.</p>
-
-<h2>Be fast</h2>
-<p>Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send itemized quotes after the visit. For lead generation, read <a href="/blog/how-to-get-more-electrical-jobs-canada/">how electricians get more jobs</a>.</p>
+<h2>Offer options, not pressure</h2>
+<p>A service upgrade is a good moment to offer extras the client may want anyway: a whole-home surge protector, a conduit or spare breaker space for a future EV charger, a sub-panel for a garage. Put each one on the quote as an optional line with its own price, so the client can tick it without reopening the conversation. quoteai can build that kind of itemized quote with optional lines and the province's tax, and send it as a PDF before you leave the driveway. See <a href="/quotes/electrician/">quoting for electricians</a> for how it handles panel and rewire jobs.</p>
+<p>Finally, put your licence number, insurance and warranty terms on every quote, along with how long the price holds. Copper and equipment prices move, and a 200A quote that sits unsigned for three months shouldn't bind you to old material costs.</p>
 `,
   "how-to-quote-a-plumbing-job": `
 <p>Plumbing customers want certainty, and plumbers want to be paid for hidden problems. Choosing the right pricing model for each type of job solves both.</p>
@@ -1359,7 +1139,7 @@ const BLOG_CONTENT: Record<string, string> = {
 </ul>
 
 <h2>Build a flat-rate price book</h2>
-<p>For each common job, record average time, parts, travel and disposal, then add overhead and margin. Review prices every few months as costs move: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+<p>For each common job, record average time, parts, travel and disposal, then add overhead and margin. Review prices every few months as costs move: <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
 
 <h2>Quoting renovation plumbing</h2>
 <p>Separate rough-in, fixtures, finish plumbing, permits, drywall access and disposal. See <a href="/blog/bathroom-renovation-cost-toronto-2026/">bathroom renovation costs</a> for market context.</p>
@@ -1413,36 +1193,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>One flow, not four documents</h2>
 <p>The cleanest approach is a single record that moves from quote to accepted job to invoice. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a> and <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a quote that wins jobs</a>, or try <a href="/pricing/">free quoting</a>.</p>
 `,
-  "concrete-driveway-cost-canada-2026": `
-<p>A driveway is one of the biggest exterior investments in a home, and Canadian winters punish bad installs. Prices below are typical 2026 installed ranges. Your region, access and base conditions will move them.</p>
-
-<h2>Installed cost per square foot</h2>
-<ul>
-  <li><strong>Gravel</strong>: about $2–$6</li>
-  <li><strong>Asphalt</strong>: about $4–$9</li>
-  <li><strong>Poured concrete</strong>: about $8–$18, more for stamped or coloured finishes</li>
-  <li><strong>Interlocking pavers</strong>: about $15–$35</li>
-</ul>
-<p>A two-car driveway of about 600 square feet therefore ranges from roughly $2,500 in asphalt to $9,000 or more in concrete and over $15,000 in interlock.</p>
-
-<h2>What drives the price</h2>
-<h3>Base preparation</h3>
-<p>A properly compacted granular base, sized for frost, is what keeps a driveway flat. Skipping it is the number one cause of cracking and heaving.</p>
-<h3>Excavation and removal</h3>
-<p>Tearing out and disposing of an old driveway commonly adds $1–$4 per square foot.</p>
-<h3>Drainage and slope</h3>
-<p>Water must flow away from the house. Regrading, culverts or drains add cost but prevent basement problems: see <a href="/blog/basement-waterproofing-guide-canadian-homes/">basement waterproofing</a>.</p>
-<h3>Thickness and reinforcement</h3>
-<p>Concrete is commonly 4 to 5 inches with wire mesh or rebar and control joints. Heavier vehicles need more.</p>
-<h3>Season</h3>
-<p>Asphalt and concrete have temperature limits. Quote the likely installation window.</p>
-
-<h2>Municipal rules</h2>
-<p>Many municipalities regulate driveway width, curb cuts and permeable surface area. Check before quoting.</p>
-
-<h2>How to quote it</h2>
-<p>List area, thickness, base depth, material, removal, grading, finishes, sealing, permits and warranty. Masons using <a href="/quotes/mason/">quoting software for masons and concrete contractors</a> can measure area and price in one visit. For general price structure, read <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
-`,
   "siding-replacement-cost-canada-2026": `
 <p>New siding changes how a house looks, performs and sells. It also costs enough that homeowners compare quotes carefully. Typical 2026 installed ranges:</p>
 
@@ -1462,43 +1212,12 @@ const BLOG_CONTENT: Record<string, string> = {
   <li><strong>Sheathing and house wrap</strong>: damaged sheathing is replaced; modern wrap and flashing improve moisture control.</li>
   <li><strong>Insulation</strong>: adding rigid exterior insulation improves comfort and may qualify for programs. See <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebates guide</a>.</li>
   <li><strong>Trim, soffit, fascia and corners</strong></li>
-  <li><strong>Windows and doors</strong>: flashing around them is critical: <a href="/blog/cost-to-install-windows-and-doors-canada/">window and door costs</a>.</li>
+  <li><strong>Windows and doors</strong>: flashing around them is critical: <a href="/blog/how-to-quote-a-window-or-door-installation-job/">window and door costs</a>.</li>
   <li><strong>Height and access</strong>: scaffolding on multi-storey homes.</li>
 </ul>
 
 <h2>Quote like a pro</h2>
 <p>Measure wall area minus openings, add waste, and list removal, wrap, insulation, siding, trim, flashing and clean-up separately. Add an allowance for hidden rot with a per-sheet price. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Renovators can build these quotes quickly with <a href="/quotes/renovation-contractor/">quoting software for renovation contractors</a>.</p>
-`,
-  "attic-insulation-cost-canada-2026": `
-<p>Attic insulation is one of the best-value upgrades in a cold climate, and one that homeowners ask about every winter. Typical 2026 installed ranges:</p>
-
-<h2>Installed cost</h2>
-<ul>
-  <li><strong>Blown-in fibreglass or cellulose</strong>: about $1.50–$4 per square foot</li>
-  <li><strong>Fibreglass batts</strong>: about $2–$5 per square foot</li>
-  <li><strong>Spray foam (closed-cell)</strong>: about $4–$9+ per square foot depending on thickness</li>
-</ul>
-<p>A typical 1,000 square foot attic often costs roughly $2,000–$6,000 for blown-in, and considerably more for spray foam. Costs rise with removal and air sealing.</p>
-
-<h2>R-value targets</h2>
-<p>Recommended attic R-values in Canada depend on climate zone and building code, commonly in the R-50 to R-60 range for colder regions. Confirm the current requirement for your province and municipality.</p>
-
-<h2>Air sealing comes first</h2>
-<p>Insulation over leaky ceilings underperforms. Sealing penetrations around pot lights, plumbing stacks, wiring and the attic hatch is typically part of a good job and often worth a separate line item.</p>
-
-<h2>Other cost factors</h2>
-<ul>
-  <li>Removing old or contaminated insulation (vermiculite requires testing for asbestos before disturbance)</li>
-  <li>Baffles and ventilation, to keep soffit airflow open</li>
-  <li>Access: tight attics take more labour</li>
-  <li>Moisture or mould repairs first</li>
-</ul>
-
-<h2>Rebates</h2>
-<p>Many programs have supported insulation upgrades, usually requiring a pre-retrofit energy evaluation. Verify current rules: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebate guide for contractors</a>.</p>
-
-<h2>Quoting insulation</h2>
-<p>Include area, depth and R-value achieved, material, air sealing, baffles, removal and a clear statement about the exclusion of hidden moisture problems. Contractors using <a href="/quotes/renovation-contractor/">quoting software</a> can attach photos and send the quote the same day. For a related winter job, see the <a href="/blog/winterizing-your-home-contractor-checklist/">winterizing checklist</a>.</p>
 `,
   "how-to-quote-a-landscaping-job": `
 <p>Landscaping quotes cover two very different businesses: one-time projects like patios and planting, and recurring work like lawn care and snow removal. Each needs its own pricing logic.</p>
@@ -1516,7 +1235,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Break them into labour, materials, equipment rental, delivery, disposal and a contingency for soil and ground surprises. Common materials such as aggregate, soil, sod, pavers and plants should be itemized with quantities.</p>
 
 <h2>Hardscape specifics</h2>
-<p>Excavation depth, base compaction, drainage, edge restraint and frost considerations separate a lasting patio from a heaving one. See <a href="/blog/concrete-driveway-cost-canada-2026/">driveway cost guide</a> and <a href="/blog/fence-installation-cost-canada-2026/">fence cost guide</a>.</p>
+<p>Excavation depth, base compaction, drainage, edge restraint and frost considerations separate a lasting patio from a heaving one. See <a href="/blog/how-to-quote-a-masonry-job/">driveway cost guide</a> and <a href="/blog/fence-installation-cost-canada-2026/">fence cost guide</a>.</p>
 
 <h2>Winter work</h2>
 <p>Snow removal contracts need clear terms: trigger depth, service times, liability and salting. Check insurance coverage: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
@@ -1526,45 +1245,81 @@ const BLOG_CONTENT: Record<string, string> = {
   <li>Underestimating haul and disposal</li>
   <li>Forgetting machine time and fuel</li>
   <li>No weather clause</li>
-  <li>Not marking up plants and materials: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a></li>
+  <li>Not marking up plants and materials: <a href="/tools/markup-margin-calculator/">markup vs margin</a></li>
 </ul>
 
 <h2>Send quotes quickly</h2>
 <p>Landscape clients usually request several quotes at once. <a href="/quotes/landscaper/">Quoting software for landscapers</a> lets you measure, price and send from the property.</p>
 `,
   "how-to-quote-an-hvac-job": `
-<p>HVAC customers are often making a big decision under pressure. The contractor who explains options clearly and quotes quickly tends to win, even when not the cheapest.</p>
+<p>On an HVAC job the sizing decides comfort for years, three regulators can have a say in one install, and the client has often read about a rebate before you arrive. A good quote settles each of those on paper, so the client can compare you line by line with the other quotes.</p>
 
-<h2>Start with the right measurements</h2>
-<p>Do a proper heat-loss and heat-gain calculation rather than copying the old unit size. Record the home's size, insulation, windows, existing ductwork and electrical capacity.</p>
+<h2>Size it before you price it</h2>
+<p>Do not copy the nameplate of the old unit. In Ontario, the Building Code requires that heating capacity be based on a calculated heating load, that cooling capacity be based on a calculated cooling load, and that oversizing and undersizing be judged against CSA F280, "Determining the required capacity of residential space heating and cooling appliances" (<a href="https://www.ontario.ca/document/2024-building-code-compendium/part-9-housing-and-small-buildings" rel="noopener">Ontario Building Code compendium, Article 9.33.5.1</a>). British Columbia's 2024 code also points to F280 for peak cooling loads, and the province's own bulletin notes that software verified under Section 8 of F280 may be used for the calculation (<a href="https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/bulletins/2024-code/b24-08_overheating.pdf" rel="noopener">BC Building Code bulletin B24-08</a>).</p>
+<p>Price the load calculation as its own line. It is real work (measuring windows, walls, ceilings and duct runs), and it is the document a building department may ask for. Toronto's application guide for a stand-alone HVAC permit lists heat loss and heat gain calculations and duct design calculations among the required drawings (<a href="https://www.toronto.ca/services-payments/building-construction/apply-for-a-building-permit/building-permit-application-guides/standalone-plumbing-mechanical-and-drains/standalone-mechanical-hvac/" rel="noopener">City of Toronto</a>).</p>
+<p>For a heat pump, write the unit's capacity at your design temperature, not just nominal tonnage, and say whether backup heat stays. Against a cheaper unit with less low-temperature capacity, the load numbers are your argument.</p>
 
-<h2>Offer three options</h2>
+<h2>Split equipment, labour and ductwork</h2>
+<p>Clients compare the equipment line first. Give the brand, model numbers for every matched component, capacity and efficiency ratings. Then separate:</p>
 <ul>
-  <li><strong>Good</strong>: reliable standard-efficiency equipment</li>
-  <li><strong>Better</strong>: higher efficiency, two-stage, better warranty</li>
-  <li><strong>Best</strong>: top efficiency, variable-speed, smart controls, extended warranty</li>
+<li><strong>Installation labour</strong>: crew size and hours, including brazing, pressure testing, evacuation and charging.</li>
+<li><strong>Materials</strong>: line set, pad or wall brackets, condensate drain, venting, thermostat and controls.</li>
+<li><strong>Ductwork</strong>: returns added, trunk sealing, transitions. Ducts sized for an old furnace may not move the airflow a heat pump needs, and this is where most cost surprises hide.</li>
+<li><strong>Electrical</strong>: new circuit and disconnect, and a panel review. If a service upgrade is needed, price it separately or exclude it in writing.</li>
+<li><strong>Removal</strong>: old equipment, refrigerant recovery and disposal.</li>
 </ul>
-<p>Show purchase price, expected operating cost and warranty for each. Reference market ranges: <a href="/blog/furnace-replacement-cost-canada-2026/">furnace replacement costs</a> and <a href="/blog/cost-to-install-a-heat-pump-canada/">heat pump costs</a>.</p>
+<p>Some rebate programs require this split. BC's Home Renovation Rebate program asks for an invoice that itemizes equipment and labour separately and shows a zero balance owing (<a href="https://betterhomesbc.ca/learn-about-programs/home-renovation-rebate-program/home-renovation-rebate-program-requirements/" rel="noopener">CleanBC Better Homes</a>). To set the hourly figure, see <a href="/blog/how-to-price-a-job-labour-materials-markup/">pricing labour, materials and markup</a>.</p>
 
-<h2>Line items to include</h2>
+<h2>Who is allowed to do each part</h2>
+<p>Refrigerant, gas and electrical work are regulated separately. Name the licence holders on the quote.</p>
+<h3>Refrigerant</h3>
+<p>In Ontario, buying and handling refrigerants requires an Ozone Depletion Prevention (ODP) certificate card, earned through a one-day approved course and valid for five years. The card alone does not let someone work on or fix refrigeration equipment: that needs a Certificate of Qualification in a trade such as refrigeration and air conditioning mechanic. Card holders must also keep records of refrigerant use for at least two years (<a href="https://www.ontario.ca/page/certificate-handle-refrigerants" rel="noopener">ontario.ca</a>). Your removal line should say the old system's refrigerant will be recovered, not vented.</p>
+<h3>Gas</h3>
 <ul>
-  <li>Equipment (brand, model, capacity, efficiency)</li>
-  <li>Labour and commissioning</li>
-  <li>Venting, line sets, pads, condensate and electrical work</li>
-  <li>Ductwork modifications</li>
-  <li>Thermostat and accessories</li>
-  <li>Permits, gas and electrical inspections</li>
-  <li>Removal and disposal, including refrigerant recovery</li>
+<li><strong>Ontario</strong>: most fuels regulations require contractors to be registered with TSSA, and natural gas is one of the fields covered; registered contractors must make sure the technicians they employ hold the right certificates (<a href="https://www.tssa.org/contractor-registration-and-certification" rel="noopener">TSSA</a>).</li>
+<li><strong>British Columbia</strong>: regulated gas work requires a Technical Safety BC licence or employment by a licensed contractor (<a href="https://www.technicalsafetybc.ca/gas-licences" rel="noopener">Technical Safety BC</a>), and licensed contractors take out gas installation permits; some cities, including Vancouver, issue their own (<a href="https://www.technicalsafetybc.ca/permits/gas-installation" rel="noopener">Technical Safety BC permits</a>).</li>
+<li><strong>Québec</strong>: gas appliance work requires a mandatory qualification certificate from the TAG series (<a href="https://www.quebec.ca/emploi/informer-metier-profession/profession-metier-reglemente/connaitre-certificats-qualification-obligatoire/technique-appareils-gaz-classe-1" rel="noopener">Québec.ca</a>), and the contractor needs the matching RBQ licence subclass. For a heat pump, Hydro-Québec's LogisVert program lists RBQ subclasses 15.1, 15.7 or 15.8 plus 15.9 or 15.10, and subclass 16 for the electrical work (<a href="https://www.hydroquebec.com/residential/energy-wise/financial-assistance/logisvert/residential.html" rel="noopener">Hydro-Québec</a>). Plumbing and heating licences can be checked with the CMMTQ (<a href="https://www.quebec.ca/habitation-territoire/chauffage-consommation-energie/aide-financiere-renovation-ecoenergetique/renoclimat/nouveautes-adaptation-inondations" rel="noopener">Rénoclimat changes page</a>).</li>
 </ul>
+<h3>Electrical and permits</h3>
+<p>In Ontario, almost all electrical work needs a notification of work filed with the Electrical Safety Authority before it starts, by whoever does the work, and it is separate from any building permit (<a href="https://esasafe.com/notifications-and-inspections/" rel="noopener">ESA</a>). If you sub the circuit to a licensed electrical contractor, say so on the quote; see <a href="/blog/how-to-quote-an-electrical-job/">how to quote an electrical job</a> for how they will price it. Building permits vary by municipality. Toronto, for example, lists replacing a furnace in a house as work that does not need a building permit, but installing or modifying a heating system does (<a href="https://www.toronto.ca/services-payments/building-construction/apply-for-a-building-permit/when-do-i-need-a-building-permit/" rel="noopener">City of Toronto</a>). Check the municipality and show the permit as its own line at cost.</p>
 
-<h2>Rebates and financing</h2>
-<p>Mention applicable programs without promising amounts: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebate guide</a>. Offering financing or payment plans can move clients from the cheapest to the best option.</p>
+<h2>Selling in the client's home in Ontario</h2>
+<p>Furnaces, air conditioners and any HVAC system are restricted products under Ontario's Consumer Protection Act rules. You can only sign a contract for them at the client's home if the client initiated the visit (or you have an existing contract and they agreed in advance to hear an offer). The contract needs the mandatory cover page, signed before work begins, and the client gets a 10-day cooling-off period from receiving a written copy. You must keep records showing who initiated the transaction for three years (<a href="https://www.ontario.ca/page/rules-businesses-entering-contracts-consumers-home" rel="noopener">ontario.ca</a>).</p>
 
-<h2>Service agreements</h2>
-<p>Annual maintenance plans bring recurring revenue and prime you for the replacement sale when the system ages.</p>
+<h2>What clients expect to pay</h2>
+<p>No government body publishes installed prices for heat pumps or furnaces, so the figures clients arrive with are usually rebate amounts. Ontario's Home Renovation Savings Program pays $1,250 per ton, up to $7,500, for a qualifying cold-climate heat pump in homes heated with electricity, oil, propane or wood, but $500 per ton, up to $2,000, for Enbridge Gas customers heating with gas. The work needs a participating contractor, the unit must be on NRCan's qualified products list, and installations done before approval are not eligible (<a href="https://www.homerenovationsavings.ca/without-assessment/heat-pumps" rel="noopener">Home Renovation Savings</a>). Federally, a national heat pump rebate announced on October 8, 2026 would pay up to $10,000 for households below the median income and $2,000 for other eligible homeowners, through an online portal with pre-approval and no energy audit (<a href="https://www.canada.ca/en/environment-climate-change/news/2026/10/prime-minister-carney-announces-landmark-investment-to-retrofit-one-million-homes-cutting-energy-costs-and-emissions.html" rel="noopener">Government of Canada</a>); Hydro-Québec says the funding begins in 2027 and details are not yet known (<a href="https://www.hydroquebec.com/residential/energy-wise/financial-assistance/logisvert/residential.html" rel="noopener">Hydro-Québec</a>). Our <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">guide to current home energy rebates</a> tracks the rest.</p>
+<p>Show the rebate as a note, never as a discount: you are not paying it, and the client may not qualify.</p>
 
-<h2>Be fast and professional</h2>
-<p>Many HVAC calls are emergencies. <a href="/quotes/hvac-technician/">Quoting software for HVAC technicians</a> lets you present options on a tablet and get acceptance on the spot. Extra tips in <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+<h2>Worked example: cold-climate heat pump with furnace backup, Ontario</h2>
+<p>Example: a two-storey house heated with gas, a 2019 furnace in good condition and a failing central air conditioner. The client wants a cold-climate ducted heat pump with the furnace kept as backup. All prices below are assumptions for illustration. Ontario charges 13% HST (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA</a>).</p>
+<table>
+<thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr></thead>
+<tbody>
+<tr><td>Room-by-room heat loss and gain calculation (CSA F280), duct check</td><td>1</td><td>job</td><td>$450.00</td><td>$450.00</td></tr>
+<tr><td>Cold-climate variable-speed heat pump, 3-ton outdoor unit (model no., on NRCan qualified list)</td><td>1</td><td>ea</td><td>$6,800.00</td><td>$6,800.00</td></tr>
+<tr><td>Matched cased indoor coil on existing furnace (model no.)</td><td>1</td><td>ea</td><td>$1,250.00</td><td>$1,250.00</td></tr>
+<tr><td>Insulated line set, 25 ft, wall penetration sealed</td><td>1</td><td>ea</td><td>$420.00</td><td>$420.00</td></tr>
+<tr><td>Wall brackets and vibration isolators</td><td>1</td><td>set</td><td>$260.00</td><td>$260.00</td></tr>
+<tr><td>Dual-fuel thermostat with outdoor sensor, switchover set at commissioning</td><td>1</td><td>ea</td><td>$480.00</td><td>$480.00</td></tr>
+<tr><td>Installation labour, 2-person crew (braze, pressure test, evacuate, charge)</td><td>16</td><td>hr</td><td>$125.00</td><td>$2,000.00</td></tr>
+<tr><td>Electrical: 240 V circuit and disconnect, by licensed electrical contractor, ESA notification</td><td>1</td><td>job</td><td>$950.00</td><td>$950.00</td></tr>
+<tr><td>Add one return-air run to upstairs bedrooms</td><td>1</td><td>job</td><td>$780.00</td><td>$780.00</td></tr>
+<tr><td>Remove old A/C, recover refrigerant by certified technician, dispose</td><td>1</td><td>job</td><td>$350.00</td><td>$350.00</td></tr>
+<tr><td>Municipal HVAC permit (at cost, if required)</td><td>1</td><td>ea</td><td>$250.00</td><td>$250.00</td></tr>
+<tr><td>Commissioning report and manufacturer warranty registration</td><td>1</td><td>job</td><td>$250.00</td><td>$250.00</td></tr>
+<tr><td colspan="4"><strong>Subtotal</strong></td><td><strong>$14,240.00</strong></td></tr>
+<tr><td colspan="4">HST (13%)</td><td>$1,851.20</td></tr>
+<tr><td colspan="4"><strong>Total</strong></td><td><strong>$16,091.20</strong></td></tr>
+</tbody>
+</table>
+<p><strong>Note on the quote:</strong> "As an Enbridge Gas customer heating with gas, you may qualify for the Home Renovation Savings Program cold-climate heat pump rebate ($500 per ton of rated heating capacity at 8.3°C, up to $2,000). Pre-approval is required before installation; we will submit it as a participating contractor. The rebate is paid to you by the program and is not deducted above."</p>
+<ul>
+<li>The load calculation comes first because it justifies the 3-ton size and the return-air line; without it, the return looks like an upsell.</li>
+<li>Model numbers on the outdoor unit and coil let the client and the rebate program check the matched system against the qualified list.</li>
+<li>HST is charged on the full subtotal because the rebate is a separate payment to the homeowner, not a price reduction you give. Run the figures through the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> if you quote across provinces.</li>
+<li>Warranty registration is a priced line because it is a real task; check the manufacturer's terms and register the day you commission.</li>
+</ul>
+<p>quoteai builds this kind of itemized quote with Ontario HST applied and sends it to the client as a PDF, with the rebate note kept as text rather than a deduction. For HVAC-specific templates, see <a href="/quotes/hvac-technician/">HVAC quotes</a>.</p>
 `,
   "how-to-quote-a-tiling-job": `
 <p>Tile pricing is less about the tile and more about everything under it. A flat floor on a solid subfloor and a custom shower on bare studs are completely different jobs.</p>
@@ -1602,48 +1357,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Speed</h2>
 <p>Tile installers can use <a href="/quotes/tile-installer/">quoting software for tile installers</a> to measure, add waste and itemize in one visit.</p>
 `,
-  "quoteai-vs-spreadsheet-quotes-contractors": `
-<p>Almost every contractor starts with a spreadsheet or a Word template. It is free, familiar and flexible, and for a while it works. Then the business grows and the cracks appear.</p>
-
-<h2>Where spreadsheets work</h2>
-<ul>
-  <li>Very low quote volume</li>
-  <li>Simple, repeatable jobs</li>
-  <li>You are always at a computer</li>
-</ul>
-
-<h2>Signs it has stopped working</h2>
-<ol>
-  <li><strong>Quotes take too long</strong>: you build them at night, not on site.</li>
-  <li><strong>Formula errors</strong>: one broken cell and your margin vanishes.</li>
-  <li><strong>Tax mistakes</strong>: wrong GST/HST/QST on a job in another province.</li>
-  <li><strong>Version chaos</strong>: "final_v3_REAL.xlsx".</li>
-  <li><strong>No tracking</strong>: you cannot tell which quotes were accepted or are waiting for follow-up.</li>
-  <li><strong>Retyping</strong>: the same client and job details go into quotes, invoices and calendars.</li>
-  <li><strong>Unprofessional look</strong>: formatting varies and PDFs break.</li>
-</ol>
-
-<h2>What software adds</h2>
-<ul>
-  <li>Speed: build and send from your phone: <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">5-minute quotes</a></li>
-  <li>Automatic Canadian taxes</li>
-  <li>Saved prices and templates</li>
-  <li>Client records and quote history</li>
-  <li>Follow-up reminders and online acceptance</li>
-  <li>Conversion to invoice: <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">get paid faster</a></li>
-</ul>
-
-<h2>How to switch without pain</h2>
-<ol>
-  <li>Export your current price list and common line items.</li>
-  <li>Start with new quotes only, not old files.</li>
-  <li>Test on a real job and compare time spent.</li>
-  <li>Keep the old spreadsheet for a month as a backup.</li>
-</ol>
-
-<h2>See the comparison</h2>
-<p>Read our <a href="/compare/">direct comparisons</a>, use the <a href="/tools/">free contractor calculators</a>, or try <a href="/pricing/">free quoting</a>. For picking a tool, see <a href="/blog/best-quoting-software-for-contractors-canada/">what to look for in quoting software</a>.</p>
-`,
   "how-to-raise-your-prices-contractors-without-losing-clients": `
 <p>Material, fuel, insurance and wages go up, but many contractors keep their rates frozen for years because they fear losing work. The result is shrinking margin and burnout. A planned price increase is usually less risky than it feels.</p>
 
@@ -1657,7 +1370,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>If nobody ever says "that's expensive", you are probably too cheap.</p>
 
 <h2>Work out the number</h2>
-<p>Start from your real costs and target margin, not from competitors. See <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>. A common approach is a modest increase, often 5–10%, once or twice a year, rather than a big jump after years of nothing.</p>
+<p>Start from your real costs and target margin, not from competitors. See <a href="/tools/markup-margin-calculator/">markup vs margin</a>. A common approach is a modest increase, often 5–10%, once or twice a year, rather than a big jump after years of nothing.</p>
 
 <h2>Raise prices on new quotes first</h2>
 <p>New leads have no reference price, so the increase is invisible. Update your price list and quoting software so every new quote uses current rates.</p>
@@ -1673,7 +1386,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Keep a validity period on quotes and honour it. For long jobs, add clauses for major supplier increases: <a href="/blog/reduce-material-costs-contractors-canada/">material cost guide</a>.</p>
 
 <h2>Justify with value, not apology</h2>
-<p>Better communication, reliable scheduling, clean sites and a clear warranty support higher prices. See <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+<p>Better communication, reliable scheduling, clean sites and a clear warranty support higher prices. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to win more bids</a>.</p>
 
 <h2>Expect some pushback</h2>
 <p>You may lose a few price-sensitive clients, and that is normal. If you lose them and keep the rest, your income usually rises while your workload falls.</p>
@@ -1736,10 +1449,10 @@ const BLOG_CONTENT: Record<string, string> = {
 </ul>
 
 <h2>Learn from the answers</h2>
-<p>"Too expensive", "went with someone else", and "not now" each tell you something. Track them: <a href="/blog/how-to-win-more-bids-contractors-canada/">how to win more bids</a>.</p>
+<p>"Too expensive", "went with someone else", and "not now" each tell you something. Track them: <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to win more bids</a>.</p>
 
 <h2>Automate it</h2>
-<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-send-a-quote-in-5-minutes-contractors/">sending quotes in 5 minutes</a> and <a href="/pricing/">free quoting</a>.</p>
+<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">sending quotes in 5 minutes</a> and <a href="/pricing/">free quoting</a>.</p>
 `,
   "how-to-quote-a-carpentry-job": `
 <p>Custom woodwork is hard to price because every job is different and the client often changes their mind. A consistent method helps you stay profitable without scaring people away.</p>
@@ -1760,7 +1473,7 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Estimate hours per component (a cabinet box, a door, a drawer, a trim run) based on your past jobs. Add time for design, drawings, client meetings and sourcing.</p>
 
 <h2>Overhead and margin</h2>
-<p>Shop rent, tools, machine wear, insurance and software need to be recovered: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>.</p>
+<p>Shop rent, tools, machine wear, insurance and software need to be recovered: <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
 
 <h2>Protect yourself</h2>
 <ul>
@@ -1805,77 +1518,163 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>A minimum charge covers setup and travel for small jobs.</p>
 
 <h2>Margin and speed</h2>
-<p>Apply overhead and margin consistently: <a href="/blog/how-to-price-a-job-labour-materials-markup-canada-guide/">markup vs margin</a>. Welders and fabricators can build itemized quotes quickly with <a href="/quotes/welder-fabricator/">quoting software for welders and metal fabricators</a>.</p>
+<p>Apply overhead and margin consistently: <a href="/tools/markup-margin-calculator/">markup vs margin</a>. Welders and fabricators can build itemized quotes quickly with <a href="/quotes/welder-fabricator/">quoting software for welders and metal fabricators</a>.</p>
 `,
   "how-to-quote-a-masonry-job": `
-<p>Masonry is physical, weather-dependent and unforgiving of mistakes. A good quote reflects the real labour, the material waste and the access conditions.</p>
+<p>Masonry and concrete quotes go wrong in two places: the part of the job you cannot see when you walk the site (rotten mortar behind a sound face, a soft subgrade under an old slab), and the calendar. A quote that names its unknowns, prices them separately and states when the work can physically be done protects your margin far better than a sharper unit price.</p>
 
-<h2>Measure and count</h2>
-<p>For brick and block, calculate area minus openings and convert to units, adding waste (commonly 5–10%). For concrete, calculate volume, add a small allowance for over-excavation and spillage. For stone, account for irregular sizes and cutting.</p>
-
-<h2>Materials</h2>
+<h2>Pick the unit that matches how the work is actually done</h2>
+<p>Use units the client can check and that track your real production:</p>
 <ul>
-  <li>Units (brick, block, stone) and mortar or concrete</li>
-  <li>Rebar, ties, flashing and weep holes</li>
-  <li>Forms and formwork materials</li>
-  <li>Sealers and admixtures for cold weather</li>
+  <li><strong>Repointing</strong>: square feet of wall face, split by elevation or height band. Joint width and depth matter more than area, so note them.</li>
+  <li><strong>Brick or stone veneer repair</strong>: per unit replaced (per brick, per stone) for spot repairs, square feet once you are rebuilding a section. Price sourcing matching units on its own line.</li>
+  <li><strong>Chimney work</strong>: by task rather than area: rebuild above the roofline (per course or lump sum), crown, cap, flashing. Access is often the biggest cost, so price staging or roof anchors on their own line.</li>
+  <li><strong>Concrete flatwork</strong> (driveways, walkways, pads): square feet for removal, base and finishing; cubic yards or cubic metres for ready-mix, since that is how the plant bills you; linear feet for forms, edges and saw cuts.</li>
+  <li><strong>Interlock</strong>: square feet of paving plus linear feet of edge restraint and cut borders. Patterns with many cuts deserve a higher rate than a straight running bond.</li>
+</ul>
+<p>Converting area to concrete volume is where small errors compound. Square feet times thickness in feet gives cubic feet; divide by 27 for cubic yards. Add an allowance for uneven subgrade and spillage, and round up. If your rates feel thin once you have counted everything, the <a href="/blog/how-to-price-a-job-labour-materials-markup/">guide to pricing labour, materials and markup</a> walks through building them from cost.</p>
+
+<h2>Repointing older homes: price the investigation and the mortar</h2>
+<p>On pre-war brick, the wrong mortar does more damage than no repair at all. The City of Hamilton's <a href="https://www.hamilton.ca/media/11051" rel="noopener">Masonry Restoration Guidelines</a> say repointing mortar should be softer or more permeable than the masonry units and no harder than the historic mortar, warn against modern formulations with ordinary Portland cement on historic walls, and recommend cutting joints out by hand to a depth of 2 to 2&frac12; times the joint width. Hand raking is slower than grinding, and your labour line has to reflect that.</p>
+<p>Practical consequences for the quote:</p>
+<ul>
+  <li>Include a line for a mortar test patch or sample, and say the colour and texture match is approved on that patch before full production.</li>
+  <li>If the home is designated or in a heritage district, say who is responsible for any municipal heritage approval and that the mortar specification may change if the municipality requires it.</li>
+  <li>Limit the scope to joints that are actually failing, and write down how you will handle joints that turn out to be loose once neighbouring mortar is removed: a per-square-foot rate for additional area is cleaner than an argument later.</li>
 </ul>
 
-<h2>Labour and access</h2>
-<p>Production rates depend on the unit type and wall complexity. Scaffolding, hoists and tight sites add time and cost.</p>
+<h2>Freeze-thaw: what to specify, not just what to charge</h2>
+<p>Exterior flatwork in most of Canada is wet, frozen, thawed and salted every winter. The National Research Council's Canadian Building Digest <a href="https://nrc-publications.canada.ca/eng/view/object/?id=080c21f9-9875-42e3-814e-64d1fd99561c" rel="noopener">Durability of Concrete under Winter Conditions</a> (CBD-116) identifies horizontal surfaces exposed to freezing while wet and to de-icing salts as the most severe exposure, and calls air entrainment the key defence. It is an older digest; the current mix requirements sit in CSA A23.1, which your ready-mix supplier works to. On the quote, the useful thing is to state the mix in words a client can hold you to: air-entrained exterior concrete ordered for freeze-thaw and de-icing salt exposure, and the slab thickness.</p>
+<p>Name the base as well. The granular base depth, compaction and slope away from the house are what keep a driveway flat through frost. Write the depth you are pricing and say that soft or wet subgrade found after removal will be dug out and replaced at a stated rate per cubic yard.</p>
+<p>Cold-weather placement needs blankets, heat or accelerating admixtures, and concrete must not freeze while it is gaining early strength. Price protection as its own line or allowance rather than hiding it in the concrete rate, so a client choosing a November pour can see what it costs.</p>
 
-<h2>Weather and season</h2>
-<p>Cold weather needs blankets, heaters or admixtures. State the window you can work and what happens if weather delays occur.</p>
+<h2>Before anyone digs: locates and permits</h2>
+<p>Every flatwork or interlock job involves excavation, so the locate request belongs in your process and on your schedule:</p>
+<ul>
+  <li><strong>Ontario</strong>: <a href="https://ontariodigauthority.ca/" rel="noopener">Ontario Dig Authority</a> (formerly Ontario One Call) says locate requests are free and required by law for any project that breaks ground, and asks for the request at least 5 business days before digging.</li>
+  <li><strong>British Columbia</strong>: <a href="https://www.bc1c.ca/" rel="noopener">BC 1 Call</a> takes free locate requests online or by phone; members respond within 3 business days of notification (5 for large projects).</li>
+  <li><strong>Quebec</strong>: <a href="https://www.info-ex.com/en/" rel="noopener">Info-Excavation</a> runs the free locate service for citizens, companies and municipalities.</li>
+</ul>
+<p>Widening a driveway or changing where it meets the street is usually a municipal matter, not just a private one. In Burnaby, for example, the City says <a href="https://burnaby.ca/services-and-payments/roads-and-traffic/traffic-requests/driveway-crossing" rel="noopener">you need a permit to build or widen a driveway</a>, property owners pay for new crossings, and the City charges for its own portion of the work and the final inspection. Check the specific city, and write into the quote who applies, who pays the fees and that boulevard work waits for approval.</p>
+<p>For chimneys and other work at height in BC, WorkSafeBC requires a fall protection system where a <a href="https://www.worksafebc.com/en/law-policy/occupational-health-safety/searchable-ohs-regulation/ohs-regulation/part-11-fall-protection" rel="noopener">fall of 3&nbsp;m or more may occur</a>. That setup time is real labour; quote it.</p>
 
-<h2>Repairs and restoration</h2>
-<p>Repointing and chimney work have unknown conditions. Quote by section with a clear allowance and exclusions. See <a href="/blog/cost-to-reroof-a-home-canada/">roofing costs</a> when chimneys and flashing overlap.</p>
+<h2>Season, validity and the unknowns clause</h2>
+<p>Ready-mix, aggregate and disposal prices move, and a spring quote accepted in October is a different job. Three terms cover most of it:</p>
+<ul>
+  <li><strong>Price validity</strong>: a fixed number of days, and a statement that the price assumes work within a named season. Work pushed into cold weather adds the protection allowance.</li>
+  <li><strong>Weather</strong>: you set the pour or repointing date, and reschedule without penalty for rain or temperatures outside what the materials allow.</li>
+  <li><strong>Concealed conditions</strong>: unit rates for extra base excavation, extra brick replacement and extra repointing area, applied through a signed change order. The <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a> covers the paperwork.</li>
+</ul>
+<p>On what clients expect to pay: we have not found a government or industry-association source that publishes current Canadian prices for driveways or repointing, so this guide gives none. Your price is driven by removal and disposal, access for the truck and pump, base depth, slab thickness, finish (broom, exposed, stamped), joint count and season.</p>
 
-<h2>Compare with the market</h2>
-<p>Clients will check ranges: <a href="/blog/concrete-driveway-cost-canada-2026/">driveway cost guide</a>.</p>
-
-<h2>Contract and payment</h2>
-<p>Take a deposit, bill at milestones (footing, walls, finish) and handle extras in writing: <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">get paid on time</a>.</p>
-
-<h2>Quote it fast</h2>
-<p>Masons can use <a href="/quotes/mason/">quoting software for masons and concrete contractors</a> to price measured areas and send professional quotes.</p>
+<h2>Worked example: concrete driveway replacement in British Columbia</h2>
+<p>Example only: all quantities and prices below are assumptions for illustration. The job is a 600 sq ft single-car-width driveway in Burnaby, removing the cracked slab and pouring a new 5 in slab on a 6 in compacted granular base, same footprint, no widening.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Utility locate request, layout and site protection</td><td>1</td><td>lot</td><td>$150.00</td><td>$150.00</td></tr>
+    <tr><td>Remove existing concrete, haul and disposal</td><td>600</td><td>sq ft</td><td>$3.25</td><td>$1,950.00</td></tr>
+    <tr><td>Excavate and grade subgrade, slope away from house</td><td>600</td><td>sq ft</td><td>$1.50</td><td>$900.00</td></tr>
+    <tr><td>Supply, place and compact 6 in crushed granular base</td><td>12</td><td>cu yd</td><td>$85.00</td><td>$1,020.00</td></tr>
+    <tr><td>Forms and edges</td><td>110</td><td>lin ft</td><td>$4.50</td><td>$495.00</td></tr>
+    <tr><td>Rebar grid on chairs</td><td>600</td><td>sq ft</td><td>$1.25</td><td>$750.00</td></tr>
+    <tr><td>Ready-mix, air-entrained exterior concrete, 5 in slab</td><td>10</td><td>cu yd</td><td>$260.00</td><td>$2,600.00</td></tr>
+    <tr><td>Place, broom finish, saw-cut control joints</td><td>600</td><td>sq ft</td><td>$4.00</td><td>$2,400.00</td></tr>
+    <tr><td>Curing compound and early-age protection</td><td>1</td><td>lot</td><td>$350.00</td><td>$350.00</td></tr>
+    <tr><td>Municipal permit and inspection fees (allowance, billed at cost)</td><td>1</td><td>allowance</td><td>$250.00</td><td>$250.00</td></tr>
+  </tbody>
+  <tbody>
+    <tr><td>Subtotal</td><td></td><td></td><td></td><td>$10,865.00</td></tr>
+    <tr><td>GST (5%)</td><td></td><td></td><td></td><td>$543.25</td></tr>
+    <tr><td>Total</td><td></td><td></td><td></td><td>$11,408.25</td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
+<ul>
+  <li><strong>Only GST appears.</strong> BC is a 5% GST province with a separate 7% PST, per the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a>. But a real property contractor <a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst/charge-collect/pst-real-property-contractors/contractors-paying-pst" rel="noopener">pays PST on the taxable goods it acquires</a> for the contract, whether lump sum or time and materials, and generally <a href="https://www2.gov.bc.ca/gov/content/taxes/sales-taxes/pst/charge-collect/pst-real-property-contractors/contractors-charging-pst" rel="noopener">does not charge PST</a> on goods that become part of real property. So PST paid on the base, rebar and forms is a cost already inside those unit prices, not a line on the client's bill. The <a href="/tools/sales-tax-calculator/">sales tax calculator</a> handles other provinces.</li>
+  <li><strong>Concrete is in cubic yards</strong> because the plant bills that way: 600 sq ft at 5 in is about 9.3 cu yd, rounded up to 10 for subgrade variation and waste.</li>
+  <li><strong>The mix and base are named</strong>, so a cheaper bid on a thinner slab or unstated base is visibly a different product.</li>
+  <li><strong>Fees are an allowance at cost</strong>, because the City sets them and they may not apply to a same-footprint replacement.</li>
+</ul>
+<p>BC's Builders Lien Act requires the owner to <a href="https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/97045_01" rel="noopener">retain a 10% holdback</a>, and the holdback period runs until 55 days after completion (or after a certificate of completion is issued), so plan your cash flow for it; the <a href="/tools/holdback-calculator/">holdback calculator</a> does the arithmetic, and the <a href="/provinces/british-columbia/">British Columbia page</a> collects the other provincial rules.</p>
+<p>quoteAI builds this kind of itemized quote, with the province's taxes applied, and sends it to the client as a PDF. Masons and concrete crews can start from the <a href="/quotes/mason/">masonry quote page</a>.</p>
 `,
   "how-to-quote-a-window-or-door-installation-job": `
-<p>Window and door quotes go wrong when measurements are off, the product is not specified or hidden rot appears. Use a checklist so every opening is captured.</p>
+<p>Most money lost on window and door jobs is lost before the first unit is ordered: a wrong measurement on a custom unit that cannot be returned, a quote that said "install" without saying retrofit or full-frame, or a rotten sill that nobody priced. The quote is where you close those gaps.</p>
 
-<h2>On-site checklist</h2>
+<h2>Measure for the order, not just the quote</h2>
+<p>A custom unit built to your numbers does not forgive a sloppy tape. Measure every opening as if the order goes in tomorrow, and number each one (W1, W2, D1) so the quote, the order form and the crew all use the same label.</p>
 <ul>
-  <li>Opening width and height, measured in more than one place</li>
-  <li>Operation type (casement, slider, fixed, awning) and egress requirements</li>
-  <li>Frame material, colour and glass package</li>
-  <li>Existing frame, trim and siding or brick condition</li>
-  <li>Floor level and access for ladders or scaffolds</li>
-  <li>Photos of each opening</li>
+  <li><strong>Retrofit (insert):</strong> measure the existing frame from jamb to jamb at the top, middle and bottom, and from head to sill at the left, centre and right. Use the smallest of each, then apply the deduction your manufacturer specifies. Check both diagonals: a frame that is out of square will not take a square insert without a gap you will have to hide.</li>
+  <li><strong>Full-frame:</strong> the number that matters is the rough opening in the wall. You often cannot see it until the interior casing comes off, so either pull one casing on site or quote the unit size as provisional until a check measure.</li>
+  <li><strong>Doors:</strong> note swing (inswing or outswing, left or right hand), sill height relative to the floor finish, and whether the existing threshold sits on rotten subfloor.</li>
+</ul>
+<p>Put it in writing: units are ordered from your final check measure. If the client insists on their own sizes, say so on the quote.</p>
+
+<h2>Retrofit or full-frame: quote the choice, not just the price</h2>
+<p>A retrofit leaves the old frame in the wall and sets a new unit inside it. It is faster and cheaper, but the glass area shrinks and any problem behind the old frame (missing flashing, wet sheathing, rot) stays there. Full-frame replacement strips the opening to the rough framing, so you can flash it properly and inspect the structure, at the cost of more labour and more interior and exterior finishing.</p>
+<p>When the condition of the existing frames is uncertain, write two options on the same quote: retrofit as the base price, full-frame as an alternate per opening. The client chooses with both numbers in front of them. If the choice changes after work starts, handle it as a <a href="/blog/how-to-handle-change-orders-contractors/">change order</a>, not a verbal adjustment.</p>
+
+<h2>Bedroom windows and egress</h2>
+<p>Replacing a bedroom window can shrink its clear opening below what the building code requires for escape. In Ontario, article 9.9.10.1 of the Building Code requires an egress window in a fully open position to give an unobstructed opening of at least 0.35 m² with no dimension less than 380 mm, openable from inside without tools, as set out in the <a href="https://documents.ottawa.ca/sites/default/files/egress_windows_advsory_en.pdf" rel="noopener">City of Ottawa's building code advisory on egress windows</a>. Other provinces adopt their own version of the code, so confirm with the municipality where the job is.</p>
+<p>In practice: check the manufacturer's clear-opening figure for the exact size and style you are quoting, and flag on the quote which openings serve bedrooms. Enlarging an opening to meet egress, common in basement conversions, is structural work and normally needs a permit; quote it as its own line, never as part of "installation".</p>
+
+<h2>Spell out the energy performance</h2>
+<p>Clients often ask whether a unit is "ENERGY STAR for our zone". Older brochures still describe Canadian climate zones, but the current ENERGY STAR Canada specification for windows, doors and skylights, Version 5.0, effective January 1, 2020, sets one requirement: a maximum U-factor of 1.22 W/m²·K, or alternatively a minimum Energy Rating of 34, plus air-leakage limits, according to <a href="https://canada.ca/en/environment-climate-change/services/energy-efficiency/windows-doors-skylights-energy-star-canada-technical-specification.html" rel="noopener">Natural Resources Canada's technical specification</a>. Put the certified U-factor or ER of each model on the quote; a rebate program or energy advisor will ask for it.</p>
+<p>Programs change often, so do not promise a rebate in the quote. Point the client to the current program and keep your paperwork ready; our guide to <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebates for energy upgrades</a> covers what contractors typically need to supply.</p>
+
+<h2>Custom units, lead time and a larger deposit</h2>
+<p>Custom windows and doors are made to your measurements and generally cannot be returned or resold. Your supplier usually wants payment when the order is placed, weeks before you install. That is why the deposit on a window job is larger than on most service work: it should at least cover the product you are committing to. State on the quote the expected lead time, that it is the manufacturer's estimate, what happens if the manufacturer is late, and that a cancelled order after it is placed is not refundable for the product portion. For the wider payment schedule, see <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">how to collect payment from clients</a>.</p>
+<p>One Québec caution: if you sign the contract at the client's home, you are likely an itinerant merchant under the Consumer Protection Act. The <a href="https://www.rbq.gouv.qc.ca/en/vous-etes/citoyen/travaux-de-renovation/signing-a-renovation-contract/" rel="noopener">RBQ's guide to renovation contracts</a> notes that the contract must then be in writing, the client has a 10-day cancellation period, and you cannot ask for a deposit during it. Build those 10 days into your ordering timeline.</p>
+
+<h2>The lines that get forgotten</h2>
+<ul>
+  <li><strong>Exterior capping:</strong> aluminum capping over the old frame and brickmould on a retrofit, or new brickmould and flashing on a full-frame. Price it per opening; it is real labour on a ladder.</li>
+  <li><strong>Interior finishing:</strong> new casing or extension jambs, caulking, and whether you leave it primed, painted or ready for the client's painter. Say which.</li>
+  <li><strong>Disposal:</strong> hauling old units and paying tipping fees is a real cost. Make it a line.</li>
+  <li><strong>Rot repair:</strong> price it as a unit rate (per linear foot of sill or jamb, or per opening), with zero quantity included and a note that it is billed only after you show the client the damage.</li>
+  <li><strong>Access:</strong> second-storey openings over a deck or a slope may need scaffolding or a lift. If so, it is a line, not a surprise.</li>
 </ul>
 
-<h2>Insert or full-frame?</h2>
-<p>Insert replacement keeps the existing frame and costs less. Full-frame removes everything down to the studs and lets you fix flashing and rot. Quote both when the condition is uncertain.</p>
+<h2>Warranty: say whose is whose</h2>
+<p>There are two warranties on every window job and clients rarely know the difference. The manufacturer covers the product: sealed glass units, frames, hardware, according to its own written terms, which you should attach or reference by name. You cover the installation: leaks at the perimeter, operation and adjustment, your trim and capping work. State your installation period on the quote, and what voids it. When a sealed unit fogs years later, this paragraph decides who answers the call.</p>
 
-<h2>Line items</h2>
+<h2>Québec specifics on the quote itself</h2>
+<p>In Québec, the <a href="https://www.rbq.gouv.qc.ca/en/frequently-asked-questions-faq/citizen/the-contractor-and-the-licence/" rel="noopener">Régie du bâtiment du Québec tells clients</a> that the contractor they hire for new construction or renovation should hold a contractor's licence, and the <a href="https://www.rbq.gouv.qc.ca/en/licence/fulfilling-your-obligations/displaying-your-licence/" rel="noopener">RBQ requires your licence number on estimates, bids, contracts, account statements and invoices</a>, in the form "RBQ licence: XXXX-XXXX-XX". Taxes are GST at 5% and QST at 9.975%, as listed on the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA's GST/HST rates page</a>, with <a href="https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/collecting-gst-and-qst/calculating-the-taxes/" rel="noopener">Revenu Québec</a> confirming that QST is calculated on the price before GST. More on the province is on our <a href="/provinces/quebec/">Québec page</a>.</p>
+
+<h2>Sample quote: 6 vinyl retrofit windows and 1 entry door, Québec</h2>
+<p>Example only: the prices below are illustrative assumptions for a two-storey house with brick cladding, not market rates.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Vinyl casement window, custom size, ENERGY STAR certified (U-factor on each label), openings W1 to W6</td><td>6</td><td>each</td><td>$850.00</td><td>$5,100.00</td></tr>
+    <tr><td>Insulated steel entry door, pre-hung, 36 x 80 in., opening D1</td><td>1</td><td>each</td><td>$1,650.00</td><td>$1,650.00</td></tr>
+    <tr><td>Retrofit installation: remove sashes and stops, set, shim and foam new unit</td><td>6</td><td>opening</td><td>$225.00</td><td>$1,350.00</td></tr>
+    <tr><td>Entry door removal and full-frame installation, new threshold flashing</td><td>1</td><td>opening</td><td>$650.00</td><td>$650.00</td></tr>
+    <tr><td>Exterior aluminum capping, windows</td><td>6</td><td>opening</td><td>$140.00</td><td>$840.00</td></tr>
+    <tr><td>Exterior aluminum capping and brickmould, door</td><td>1</td><td>opening</td><td>$160.00</td><td>$160.00</td></tr>
+    <tr><td>Interior casing, windows, caulked and ready for paint</td><td>6</td><td>opening</td><td>$95.00</td><td>$570.00</td></tr>
+    <tr><td>Exterior perimeter sealant and backer rod</td><td>1</td><td>lot</td><td>$180.00</td><td>$180.00</td></tr>
+    <tr><td>Removal and disposal of old units</td><td>1</td><td>lot</td><td>$250.00</td><td>$250.00</td></tr>
+    <tr><td>Rot repair to sill or jamb, if found, billed only on client approval</td><td>0</td><td>lin. ft.</td><td>$28.00</td><td>$0.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$10,750.00</strong></td></tr>
+    <tr><td>GST (5%)</td><td></td><td></td><td></td><td>$537.50</td></tr>
+    <tr><td>QST (9.975%)</td><td></td><td></td><td></td><td>$1,072.31</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$12,359.81</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
 <ul>
-  <li>Product per opening</li>
-  <li>Installation labour</li>
-  <li>Insulation, flashing, sealant</li>
-  <li>Interior trim and exterior capping or brick-mould</li>
-  <li>Removal and disposal</li>
-  <li>Permits where required</li>
+  <li>Product and labour are separate lines, so the deposit can be tied to the product total ($6,750 plus taxes in this example) and the client can see what is non-returnable.</li>
+  <li>The door is full-frame while the windows are retrofit; each line says which, so there is no argument about scope on installation day.</li>
+  <li>Rot repair sits at zero with a unit price, which tells the client the risk exists and what it costs without inflating the total.</li>
+  <li>Both taxes are calculated on the $10,750 subtotal, and the RBQ licence number goes in the quote header with your GST and QST numbers.</li>
 </ul>
-
-<h2>Lead times and deposits</h2>
-<p>Custom products are non-returnable. Take a deposit on order, state the lead time and what happens if the manufacturer delays. See <a href="/blog/how-to-collect-payment-from-clients-contractor-canada/">getting paid on time</a>.</p>
-
-<h2>Hidden conditions</h2>
-<p>Add a per-opening allowance for rot repair and handle extras through <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
-
-<h2>Market context</h2>
-<p>Clients compare to typical costs: <a href="/blog/cost-to-install-windows-and-doors-canada/">window and door cost guide</a>. Mention energy programs carefully: <a href="/blog/canada-greener-homes-grant-rebates-contractors-guide-2026/">rebates</a>.</p>
-
-<h2>Quote on the spot</h2>
-<p>Installers can use <a href="/quotes/window-door-installer/">quoting software for window and door installers</a> to list each opening with size and price and send it before leaving the site.</p>
+<p>quoteai builds this kind of opening-by-opening quote with the province's taxes and sends it as a PDF; the <a href="/quotes/window-door-installer/">window and door installer page</a> shows how. The <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">guide to writing a professional quote</a> covers scope, exclusions and terms.</p>
 `,
 };
 

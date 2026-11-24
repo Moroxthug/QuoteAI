@@ -2,7 +2,7 @@ import { useParams, Link } from "wouter";
 import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight } from "lucide-react";
 import { BLOG_ARTICLES } from "@/data/blog-data";
-import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, enSectorLive } from "@/data/seo-data";
+import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, CITY_PAGES_INDEXED, enSectorLive } from "@/data/seo-data";
 import { extractToc, injectHeadingIds } from "@/data/blog-toc";
 import { SeoHead } from "@/components/seo-head";
 import { BASE_URL } from "@/data/json-ld";
@@ -47,7 +47,7 @@ export default function BlogArticlePage() {
   const bodyHtml = injectHeadingIds(article.contentHtml);
 
   const relatedArticles = BLOG_ARTICLES.filter(
-    (a) => a.slug !== article.slug &&
+    (a) => a.slug !== article.slug && !a.noindex &&
       (a.relatedSectors.some((s) => article.relatedSectors.includes(s)) ||
         a.category === article.category)
   ).slice(0, 3);
@@ -57,7 +57,8 @@ export default function BlogArticlePage() {
     .map((s) => SECTORS[s])
     .filter(Boolean);
 
-  const geoSectorSlug = article.relatedSectors.find((s) => CITY_SECTORS.includes(s));
+  // City pages are noindexed while CITY_PAGES_INDEXED is false: don't link them.
+  const geoSectorSlug = CITY_PAGES_INDEXED ? article.relatedSectors.find((s) => CITY_SECTORS.includes(s)) : undefined;
   const geoSector = geoSectorSlug ? SECTORS[geoSectorSlug] : undefined;
 
   const jsonLd = [
@@ -100,6 +101,7 @@ export default function BlogArticlePage() {
         canonical={canonical}
         ogImage={ogImage}
         ogType="article"
+        noIndexFollow={article.noindex}
         jsonLd={jsonLd}
       />
 
@@ -121,6 +123,11 @@ export default function BlogArticlePage() {
             <time style={{ fontSize: 13, color: "var(--faint)" }} dateTime={article.publishedAt}>
               {formatDate(article.publishedAt, lang)}
             </time>
+            {article.updatedAt && article.updatedAt !== article.publishedAt && (
+              <span style={{ fontSize: 13, color: "var(--faint)" }}>
+                {t("blog.updatedPrefix")} <time dateTime={article.updatedAt}>{formatDate(article.updatedAt, lang)}</time>
+              </span>
+            )}
           </div>
           <h1 style={{ fontSize: "clamp(1.9rem, 3.4vw, 2.7rem)", fontWeight: 800, letterSpacing: "-.02em", color: "var(--navy)", lineHeight: 1.15, marginBottom: 16 }}>
             {article.title}

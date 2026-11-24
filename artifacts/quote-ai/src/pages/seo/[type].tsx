@@ -448,14 +448,6 @@ export default function SeoLanding() {
             {deepDive.paragraphs.map((p, i) =>
               p.kind === "h3" ? (
                 <h3 key={i}>{p.text}</h3>
-              ) : p.kind === "benefits" ? (
-                <p key={i}>
-                  {benefits.map((b) => (
-                    <span key={b.title}>
-                      <strong>{b.title}.</strong> {b.desc}{" "}
-                    </span>
-                  ))}
-                </p>
               ) : (
                 <p key={i}>{p.text}</p>
               ),

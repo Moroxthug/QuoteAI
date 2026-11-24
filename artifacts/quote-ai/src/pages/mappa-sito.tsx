@@ -2,7 +2,7 @@ import { PublicLayout } from "@/components/layout/public-layout";
 import { SeoHead } from "@/components/seo-head";
 import { Link } from "wouter";
 import { SECTORS, ACTIVE_CITIES, CITY_SECTORS, enSectorLive } from "@/data/seo-data";
-import { BLOG_INDEX, BLOG_CATEGORIES } from "@/data/blog-index";
+import { BLOG_LISTED, BLOG_CATEGORIES } from "@/data/blog-index";
 import { HELP_ARTICLES } from "@/data/help-articles";
 import { toolPath, comparePath } from "@/data/seo-slugs";
 import { COMPETITORS, COMPARE_ORDER } from "@/data/compare-pages";
@@ -163,7 +163,7 @@ export default function MappaSitoPage() {
                   </li>
                 ))}
                 <li style={{ paddingTop: 10, marginTop: 6, borderTop: "1px solid var(--soft)", fontWeight: 700, color: "var(--navy)" }}>{t("sitemap.latestArticles")}</li>
-                {BLOG_INDEX.slice(0, 5).map((art) => (
+                {BLOG_LISTED.slice(0, 5).map((art) => (
                   <li key={art.slug} style={{ paddingLeft: 8, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     <Link href={`/blog/${art.slug}/`} style={{ color: "var(--faint)", fontSize: 12.5 }}>
                       {art.title}
@@ -202,7 +202,7 @@ export default function MappaSitoPage() {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {BLOG_CATEGORIES.map((cat) => {
-                const articles = BLOG_INDEX.filter((a) => a.category === cat.name || a.category === cat.slug);
+                const articles = BLOG_LISTED.filter((a) => a.category === cat.name || a.category === cat.slug);
                 if (articles.length === 0) return null;
                 return (
                   <details key={cat.slug} className="sm-region" style={{ borderBottom: "1px solid var(--soft)", paddingBottom: 12 }}>

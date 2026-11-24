@@ -8,7 +8,7 @@ import { TestimonialsSection } from "@/components/testimonials-section";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
 import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { BLOG_INDEX } from "@/data/blog-index";
+import { BLOG_LISTED } from "@/data/blog-index";
 import { sectorLabel, localizedPath, PROVINCE_SLUG_PAIRS, RETIRED_SECTOR_SLUGS } from "@/data/seo-slugs";
 import { PROVINCE_NAMES } from "@/lib/tax-profiles";
 import { homepageJsonLd } from "@/data/json-ld";
@@ -417,7 +417,7 @@ export default function Home() {
             <Link href="/blog/" className="cta-link">{lang === "fr" ? "Voir tous les articles" : "View all news"} <ArrowRight className="chev h-4 w-4" /></Link>
           </div>
           <div className="news-grid">
-            {[...BLOG_INDEX].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
+            {[...BLOG_LISTED].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 3).map((article) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                 <div className="news-media">
                   <MarketingImage slot="news-card" seed={article.slug} />

@@ -15,6 +15,8 @@ import { fileURLToPath } from "node:url";
 
 import { SECTORS, enSectorLive, frSectorIndexed } from "../src/data/seo-data.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES } from "../src/data/blog-data.js";
+// Homeowner posts kept live but noindexed (SEO-RECOVERY-PLAN S3.1) stay out.
+const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
 import { HELP_ARTICLES, HELP_CATEGORIES, type HelpBlock } from "../src/data/help-articles.js";
 import { PILOT_PROVINCES, provinceName, provinceTaxComponents, provincePath } from "../src/data/province-data.js";
 import { MARKETING_PLANS } from "../src/data/pricing.js";
@@ -62,8 +64,8 @@ const compareLinks = (lang: "en" | "fr") =>
 
 const helpLinks = HELP_ARTICLES.map((a) => `- [${a.title.en}](${BASE}/help/${a.slug}/): ${a.summary.en}`).join("\n");
 
-const newest = [...BLOG_ARTICLES].sort((a, b) => (b.updatedAt ?? b.publishedAt).localeCompare(a.updatedAt ?? a.publishedAt));
-const blogLinks = (list: typeof BLOG_ARTICLES) =>
+const newest = [...LISTED_ARTICLES].sort((a, b) => (b.updatedAt ?? b.publishedAt).localeCompare(a.updatedAt ?? a.publishedAt));
+const blogLinks = (list: typeof LISTED_ARTICLES) =>
   list.map((a) => `- [${a.title}](${BASE}/blog/${a.slug}/): ${a.metaDescription}`).join("\n");
 
 const intro = `# quoteai
@@ -152,7 +154,7 @@ const short = `${intro}
 
 ${blogLinks(newest.slice(0, 25))}
 
-All ${BLOG_ARTICLES.length} guides: [Blog](${BASE}/blog/). Full text of the help centre: [llms-full.txt](${BASE}/llms-full.txt).
+All ${LISTED_ARTICLES.length} guides: [Blog](${BASE}/blog/). Full text of the help centre: [llms-full.txt](${BASE}/llms-full.txt).
 ${frSection}`;
 
 const blockText = (b: HelpBlock): string => {
@@ -177,7 +179,7 @@ ${a.blocks.map(blockText).join("\n\n")}
 ).join("\n");
 
 const guidesByCategory = BLOG_CATEGORIES.map((c) => {
-  const list = BLOG_ARTICLES.filter((a) => a.category === c.name || a.category === c.slug);
+  const list = LISTED_ARTICLES.filter((a) => a.category === c.name || a.category === c.slug);
   return list.length ? `### ${c.name}\n\n${blogLinks(list)}\n` : "";
 }).filter(Boolean).join("\n");
 

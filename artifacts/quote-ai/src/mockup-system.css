@@ -1031,6 +1031,9 @@ table.cmp { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width
   --tw-prose-td-borders: var(--soft-2);
 }
 
+/* Sample-quote tables in articles scroll inside the column on a phone. */
+.blog-prose table { display: block; max-width: 100%; overflow-x: auto; }
+
 .blog-links { display: flex; flex-wrap: wrap; gap: 10px; }
 .blog-link-pill { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 10px 18px; font-size: 13px; font-weight: 600; color: var(--ink); transition: border-color .2s, color .2s; }
 .blog-link-pill:hover { border-color: var(--navy); color: var(--navy); }

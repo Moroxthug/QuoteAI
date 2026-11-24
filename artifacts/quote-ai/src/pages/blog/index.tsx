@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { MarketingImage } from "@/components/marketing-image";
 import { ArrowRight, ClipboardList, Gift, BarChart3, FileText } from "lucide-react";
-import { BLOG_INDEX, BLOG_CATEGORIES, BLOG_LIST_TITLE, BLOG_LIST_DESCRIPTION, GUIDE_CARDS } from "@/data/blog-index";
+import { BLOG_LISTED, BLOG_CATEGORIES, BLOG_LIST_TITLE, BLOG_LIST_DESCRIPTION, GUIDE_CARDS } from "@/data/blog-index";
 import { SeoHead } from "@/components/seo-head";
 import { BASE_URL, breadcrumbJsonLd } from "@/data/json-ld";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -134,7 +134,7 @@ export default function BlogPage() {
       <ScrollSection className="sec" id="articles">
         <div className="wrap">
           <div className="news-grid">
-            {BLOG_INDEX.map((article) => (
+            {BLOG_LISTED.map((article) => (
               <Link key={article.slug} href={`/blog/${article.slug}/`} className="card news-card">
                 <div className="news-media">
                   <MarketingImage slot="blog-card" seed={article.slug} />

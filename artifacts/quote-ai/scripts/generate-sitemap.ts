@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorIndexed, CITY_PAGES_INDEXED, RETIRED_SECTOR_REDIRECTS } from "../src/data/seo-data.js";
+import { SECTORS, CITIES, ACTIVE_CITIES, CITY_SECTORS, FRENCH_PRIMARY_CITY_SLUGS, enSectorLive, frSectorIndexed, CITY_PAGES_INDEXED, RETIRED_SECTOR_REDIRECTS, FR_HANDWRITTEN_SECTOR_SLUGS } from "../src/data/seo-data.js";
+import { FR_TRADE_PAGES } from "../src/data/fr-trade-pages.js";
 import { BLOG_ARTICLES, BLOG_CATEGORIES, BLOG_REDIRECTS } from "../src/data/blog-data.js";
 // Homeowner posts kept live but noindexed (SEO-RECOVERY-PLAN S3.1) stay out.
 const LISTED_ARTICLES = BLOG_ARTICLES.filter((a) => !a.noindex);
@@ -165,6 +166,11 @@ const inactiveCitySlugs = CITIES.map((c) => c.slug).filter((slug) => !activeSlug
     if (to.fr && !has(`/fr/soumissions/${SECTORS[slug].frSlug}{/}?`, to.fr)) missing.push(`/fr/soumissions/${SECTORS[slug].frSlug}/ -> ${to.fr}`);
   }
   if (missing.length) throw new Error(`vercel.json is missing redirects for retired trades: ${missing.join("; ")}`);
+
+  // Hand-written French pages and the index list must name the same sectors.
+  const written = Object.keys(FR_TRADE_PAGES).sort().join(",");
+  const listed = [...FR_HANDWRITTEN_SECTOR_SLUGS].sort().join(",");
+  if (written !== listed) throw new Error(`fr-trade-pages.ts (${written}) and FR_HANDWRITTEN_SECTOR_SLUGS (${listed}) differ`);
 
   // Merged blog posts (blog-index.ts BLOG_REDIRECTS) must 301 too, and a
   // merged slug must not still be a live article.

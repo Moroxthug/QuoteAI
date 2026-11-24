@@ -101,7 +101,8 @@ const T = {
     sheet: "Quote", rates: "Tax rates", how: "How to use",
     title: "QUOTE",
     from: ["Business name", "Address", "Phone / email", "GST/HST number", "QST number (Québec only)", "Licence number (if required)"],
-    meta: ["Quote number", "Date", "Valid until", "Province of the work", "Charge PST/RST?"],
+    meta: ["Quote number", "Date", "Valid until", "Province of the work", "Charge PST/RST?", "Registered for GST/HST?"],
+    notRegistered: "Not registered: no sales tax charged",
     client: ["Client", "Job address", "Job description"],
     head: ["Description", "Qty", "Unit", "Unit price", "Amount"],
     subtotal: "Subtotal", total: "Total", deposit: "Deposit on signing",
@@ -115,7 +116,7 @@ const T = {
       "2. Pick the province where the work is done. The GST/HST line and, in Québec, the QST line fill in by themselves.",
       "3. PST (BC, SK) and RST (MB): whether it goes on the client's bill depends on the province and the type of contract. For example, BC real property contractors usually pay PST on their materials instead of charging it. Check your province's rules, then set 'Charge PST/RST?' to Yes only if you charge it.",
       "4. List the work one task or material per line: description, quantity, unit and unit price. Amounts and totals calculate themselves.",
-      "5. Only show a GST/HST line if you are registered. The CRA's small supplier threshold is $30,000 of taxable sales (canada.ca, 'When to register').",
+      "5. Not registered for GST/HST? Set 'Registered for GST/HST?' to No and no tax is charged. The CRA's small supplier threshold is $30,000 of taxable sales (canada.ca, 'When to register').",
       "6. Save as PDF before you send it, so the client can't edit it.",
       "General information, not tax or legal advice.",
     ],
@@ -125,7 +126,8 @@ const T = {
     sheet: "Soumission", rates: "Taux de taxes", how: "Mode d'emploi",
     title: "SOUMISSION",
     from: ["Nom de l'entreprise", "Adresse", "Téléphone / courriel", "Numéro de TPS/TVH", "Numéro de TVQ", "Licence RBQ / NEQ"],
-    meta: ["Numéro de soumission", "Date", "Valide jusqu'au", "Province des travaux", "Facturer la TVP/TVD?"],
+    meta: ["Numéro de soumission", "Date", "Valide jusqu'au", "Province des travaux", "Facturer la TVP/TVD?", "Inscrit à la TPS/TVQ?"],
+    notRegistered: "Non inscrit : aucune taxe facturée",
     client: ["Client", "Adresse des travaux", "Description des travaux"],
     head: ["Description", "Qté", "Unité", "Prix unitaire", "Montant"],
     subtotal: "Sous-total", total: "Total", deposit: "Acompte à la signature",
@@ -139,7 +141,7 @@ const T = {
       "2. Choisissez la province où les travaux ont lieu. Au Québec, la TPS (5 %) et la TVQ (9,975 %) s'affichent sur deux lignes.",
       "3. Au Québec, inscrivez votre numéro de licence RBQ sur la soumission, au format « Licence RBQ : XXXX-XXXX-XX » (rbq.gouv.qc.ca).",
       "4. Une ligne par tâche ou par matériau : description, quantité, unité et prix unitaire. Les montants et les totaux se calculent seuls.",
-      "5. N'affichez la TPS et la TVQ que si vous êtes inscrit. Le seuil de petit fournisseur est de 30 000 $ de ventes taxables (canada.ca).",
+      "5. Pas inscrit à la TPS et à la TVQ? Choisissez Non à « Inscrit à la TPS/TVQ? » et aucune taxe n'est facturée. Le seuil de petit fournisseur est de 30 000 $ de ventes taxables (canada.ca).",
       "6. Enregistrez en PDF avant d'envoyer, pour que le client ne puisse pas modifier le document.",
       "Renseignements généraux, pas un avis fiscal ou juridique.",
     ],
@@ -256,7 +258,7 @@ function quoteXlsx(lang: Lang): Buffer {
   });
   t.meta.forEach((l, i) => {
     q.set(`D${i + 3}`, { v: l, s: 2 });
-    q.set(`E${i + 3}`, { v: i === 3 ? (lang === "fr" ? "QC" : "ON") : i === 4 ? t.no : "", s: 10 });
+    q.set(`E${i + 3}`, { v: i === 3 ? (lang === "fr" ? "QC" : "ON") : i === 4 ? t.no : i === 5 ? t.yes : "", s: 10 });
   });
   t.client.forEach((l, i) => {
     q.set(`A${i + 10}`, { v: l, s: 2 });
@@ -276,11 +278,15 @@ function quoteXlsx(lang: Lang): Buffer {
   }
   const look = (col: number) => `VLOOKUP($E$6,${R},${col},FALSE)`;
   // Tax 2 is always charged when it is QST; PST/RST only when the user says so.
-  const rate2 = `IF(OR(${look(5)}="${label("QST")}",$E$7="${t.yes}"),${look(6)},0)`;
+  // No tax at all unless the business is registered (E8); tax 2 is always
+  // charged when it is QST, PST/RST only when the user says so (E7).
+  const reg = `$E$8="${t.yes}"`;
+  const rate1 = `IF(${reg},${look(4)},0)`;
+  const rate2 = `IF(AND(${reg},OR(${look(5)}="${label("QST")}",$E$7="${t.yes}")),${look(6)},0)`;
   q.set("D36", { v: t.subtotal, s: 2 });
   q.set("E36", { f: `SUM(E${first}:E${lastItem})`, s: 5 });
-  q.set("D37", { f: look(7), s: 2 });
-  q.set("E37", { f: `ROUND(E36*${look(4)},2)`, s: 5 });
+  q.set("D37", { f: `IF(${reg},${look(7)},"${t.notRegistered}")`, s: 2 });
+  q.set("E37", { f: `ROUND(E36*${rate1},2)`, s: 5 });
   q.set("D38", { f: `IF(${rate2}=0,"",${look(8)})`, s: 2 });
   q.set("E38", { f: `ROUND(E36*${rate2},2)`, s: 5 });
   q.set("D39", { v: t.total, s: 12 });
@@ -302,7 +308,7 @@ function quoteXlsx(lang: Lang): Buffer {
   q.set("E47", { v: "", s: 10 });
   q.set("A49", { v: t.note, s: 9 });
   q.merges.push("A49:E49");
-  const validation = `<dataValidations count="2"><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="E6"><formula1>'${esc(t.rates)}'!$A$2:$A$${last}</formula1></dataValidation><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="E7"><formula1>"${t.yes},${t.no}"</formula1></dataValidation></dataValidations>`;
+  const validation = `<dataValidations count="2"><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="E6"><formula1>'${esc(t.rates)}'!$A$2:$A$${last}</formula1></dataValidation><dataValidation type="list" allowBlank="0" showErrorMessage="1" sqref="E7 E8"><formula1>"${t.yes},${t.no}"</formula1></dataValidation></dataValidations>`;
 
   const how = new Sheet();
   how.set("A1", { v: t.how, s: 1 });

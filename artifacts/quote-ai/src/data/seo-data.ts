@@ -1697,7 +1697,28 @@ export const frSectorLive = (slug: string): boolean =>
 // they stay live but noindex until each is written by hand (plan S3). These
 // already earn clicks and stay indexed.
 const INDEXED_FR_SECTOR_SLUGS = new Set(["freelance", "word-template", "renovation-contractor"]);
-export const frSectorIndexed = (slug: string): boolean => frSectorLive(slug) && INDEXED_FR_SECTOR_SLUGS.has(slug);
+/** Sectors with a hand-written French page (fr-trade-pages.ts): indexed. */
+export const FR_HANDWRITTEN_SECTOR_SLUGS = new Set<string>([
+  "air-conditioning-installer",
+  "carpenter-cabinetmaker",
+  "electrician",
+  "flooring-installer",
+  "freelance",
+  "general-contractor",
+  "hvac-technician",
+  "landscaper",
+  "mason",
+  "painter",
+  "plumber",
+  "renovation-contractor",
+  "roofer",
+  "tile-installer",
+  "welder-fabricator",
+  "window-door-installer",
+  "word-template",
+]);
+export const frSectorIndexed = (slug: string): boolean =>
+  frSectorLive(slug) && (INDEXED_FR_SECTOR_SLUGS.has(slug) || FR_HANDWRITTEN_SECTOR_SLUGS.has(slug));
 
 // The trade × city grid is templated text with little unique to each page:
 // live (links and visitors keep working) but noindex and out of the sitemap.

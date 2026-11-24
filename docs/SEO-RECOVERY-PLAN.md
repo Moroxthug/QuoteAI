@@ -255,8 +255,21 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 - **Redirects:** the retired Excel/Word template pages now 301 to these pages, not `/tools/`.
 - **No French contract template:** Québec itinerant-merchant contracts need the OPC's own cancellation form, so this needs a lawyer.
 
+**S3 item 5 status (2026-11-24): built.** Sitemap 110 → 124 URLs.
+- **All 17 live French trade pages are hand-written** in `src/data/fr-trade-pages.ts`. On a page that has one, the hand-written copy replaces the generic benefits, "built for the market" and long-form blocks; the page is indexed through `FR_HANDWRITTEN_SECTOR_SLUGS`, and the sitemap build fails if that list and the data drift.
+- **Each page:**
+  - 1,000–1,300 words
+  - the RBQ subcategory named exactly
+  - CMEQ or CMMTQ where they apply
+  - the OPC itinerant-merchant rules where they apply (roofing, windows and doors, insulation; the 7 November 2024 heating-appliance ban)
+  - TPS/TVQ worked example
+  - 5–6 FAQ (FAQPage JSON-LD)
+  - 8–15 official sources, all opened
+- **Loading:** the French text loads only on French routes (`src/pages/seo/fr-type.tsx`); the English trade chunk stays at 24 kB.
+- **Excel templates:** now have a "Registered for GST/HST?" switch that zeroes the tax lines.
+- **Recheck:** the Rénoclimat amounts (new rules since 1 October 2026) once its online portal launches.
+
 **Remaining S3 work:**
-  - FR trade pages (item 5)
   - trade-page sample quotes (item 6)
   - bylines once the owner names an author (S5)
 

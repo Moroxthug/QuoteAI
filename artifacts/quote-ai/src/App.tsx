@@ -109,6 +109,7 @@ const MenuPage = lazy(pageLoaders.menu);
 const PublicQuotePage = lazy(() => import("@/pages/p/[id]"));
 
 const SeoLanding = lazy(() => import("@/pages/seo/[type]"));
+const SeoLandingFr = lazy(() => import("@/pages/seo/fr-type"));
 const SeoCityLanding = lazy(() => import("@/pages/seo/city-landing"));
 const BlogPage = lazy(() => import("@/pages/blog/index"));
 const ContractsListPage = lazy(pageLoaders.contracts);
@@ -344,7 +345,7 @@ function Router() {
       <Route path="/quotes/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
       {/* French SEO landing pages — same components, detect lang from the /fr prefix */}
       <Route path="/fr/soumissions/:type/:city" component={() => <PublicLayout><Suspense fallback={null}><SeoCityLanding /></Suspense></PublicLayout>} />
-      <Route path="/fr/soumissions/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLanding /></Suspense></PublicLayout>} />
+      <Route path="/fr/soumissions/:type" component={() => <PublicLayout><Suspense fallback={null}><SeoLandingFr /></Suspense></PublicLayout>} />
 
       {/* Blog — dynamic, driven by BLOG_ARTICLES / BLOG_CATEGORIES data */}
       <Route path="/blog/category/:slug" component={() => <PublicLayout><Suspense fallback={null}><BlogCategoryPage /></Suspense></PublicLayout>} />

@@ -213,16 +213,22 @@ Every page that stays indexed must meet this bar: at least 900 words of main con
 **S3 batch 1 status (2026-11-24): built.** Sitemap 140 → 111 URLs; 248 pages built.
 - **Homeowner posts (item 1):** the 11 posts carry `noindex: true` in `blog-index.ts`. They stay live as `noindex, follow` and are left out of the sitemap, llms.txt, the blog lists and related links (`BLOG_LISTED`). Re-check their clicks around 2027-01-05 and 410 any without clicks.
 - **Merged posts (item 2):** 16 posts are in `BLOG_REDIRECTS` and their bodies are deleted. Each 301s in `vercel.json`; `generate-sitemap.ts` fails the build if a redirect is missing or a merged slug is still an article. Links to them inside other articles now point at the target. The now-empty Trades and Pricing categories 301 to `/blog/`.
-  - **Deferred:** `more-electrical-jobs` waits for the generic "get more jobs" article (batch 2).
+  - **Batch 2:** `more-electrical-jobs` and `more-plumbing-jobs` 301 to the new `/blog/how-to-get-more-jobs-as-a-contractor-canada/`.
 - **Rewritten to the bar (item 3, partial):** the pillar, plus the electrical, roofing, HVAC, window/door and masonry quoting guides, and the rebates guide (now "Home Energy Rebates in Canada", programs checked November 2026, Rénoclimat credited to the Québec government).
   - Each is 1,400–1,600 words with an itemized sample quote and 7–18 official sources, all opened and checked.
   - Price ranges with no official source were dropped, not guessed; each guide explains the price drivers instead.
   - `updatedAt` is shown on the page and used in the JSON-LD.
 - **English trade pages (item 6, partial):** the repeated benefits block and the unsourced claims are cut from the shared long-form section ("jobs our users quote every day", "already use quoteai every week"). Trade-specific sample quotes are still to do.
-- **Remaining batches:**
-  - the other how-to-quote posts (painting, plumbing, landscaping, tiling, carpentry, welding)
-  - business articles: contract, insurance, subcontractors, first employee, payment, cash flow, job costing, change orders, raising prices, GBP, reviews
-  - "get more jobs as a contractor"
+**S3 batch 2 status (2026-11-24): built.** Sitemap 110 URLs; 247 pages built.
+- **Rewritten to the bar:**
+  - the six remaining quoting guides: painting, plumbing, landscaping, tiling, carpentry, welding
+  - the pricing guide: labour burden from the 2026 CPP/EI rates, overhead, markup vs margin
+  - the quote follow-up guide, including the CASL quote exemption in s. 6(6)(a)
+  - the new "get more jobs as a contractor" article
+- **Each article:** 1,400–1,500 words, 2–9 checked official sources, and a labelled worked example.
+
+**Remaining batches:**
+  - business articles: contract, insurance, subcontractors, first employee, payment, cash flow, job costing, change orders, raising prices, GBP, reviews, quote vs estimate, scaling, project management
   - template downloads (item 4)
   - FR trade pages (item 5)
   - trade-page sample quotes (item 6)

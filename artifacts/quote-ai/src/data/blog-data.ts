@@ -241,36 +241,96 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Then follow up. A short, polite check-in a couple of days later, asking if the client has questions, gives them an easy way to say yes or tell you what is holding them back. Our guide to <a href="/blog/how-to-follow-up-on-quotes-contractors/">following up on quotes</a> has timing and wording you can reuse.</p>
 `,
   "how-to-price-a-job-labour-materials-markup": `
-<p>A lot of tradespeople price jobs by gut feel, or by matching whatever a competitor seems to charge. That approach works fine until a busy season quietly turns into a break-even one. Here's a straightforward way to price a job so the number on the quote actually protects your margin.</p>
+<p>Every price you quote is built from four numbers: what an hour of labour really costs you, what the materials cost you to get on site, what it costs to keep the business open, and the profit you want left over. Get the first one wrong and nothing below it can save the job, so that is where to start.</p>
 
-<h2>Start with your true labour cost</h2>
-<p>Your hourly labour rate needs to cover more than just take-home pay. It should include:</p>
+<h2>Labour: the wage is only the first line</h2>
+<p>An employee paid $32 an hour costs you more than $32 for every hour on the payroll, and a good deal more for every hour you can actually bill. Add these to the wage:</p>
 <ul>
-  <li>Wages (yours and any crew)</li>
-  <li>CPP/EI contributions and any WSIB or provincial workers' compensation premiums</li>
-  <li>Vehicle and fuel costs</li>
-  <li>Tools, equipment depreciation, and insurance</li>
-  <li>Non-billable time (quoting, driving, admin)</li>
+  <li><strong>Vacation pay.</strong> In Ontario it must be at least 4% of gross wages for employees with less than five years of service, and 6% after five years (<a href="https://www.ontario.ca/document/your-guide-employment-standards-act-0/vacation" rel="noopener">Ontario: your guide to the Employment Standards Act, vacation</a>). The same guide lists special rules for some industries, construction included, so check which apply to your crew.</li>
+  <li><strong>CPP, employer share.</strong> For 2026 the employer matches the employee's 5.95% on pensionable earnings up to $74,600, after a $3,500 basic exemption (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/canada-pension-plan-cpp/cpp-contribution-rates-maximums-exemptions.html" rel="noopener">CRA: CPP contribution rates, maximums and exemptions</a>).</li>
+  <li><strong>EI, employer share.</strong> The 2026 employee rate outside Québec is 1.63% of insurable earnings up to $68,900, and the employer pays 1.4 times the employee premium, which works out to 2.282% (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/payroll/payroll-deductions-contributions/employment-insurance-ei/ei-premium-rates-maximums.html" rel="noopener">CRA: EI premium rates and maximums</a>). The same page lists a lower rate for Québec, where parental benefits are handled by the province.</li>
+  <li><strong>Workers' compensation.</strong> Premiums are charged per $100 of payroll, and the rate depends on the class your work falls in and, over time, on your own claims record. Look up yours rather than borrowing someone else's: <a href="https://www.wsib.ca/en/2026premiumrates" rel="noopener">WSIB 2026 premium rates</a> in Ontario, <a href="https://www.worksafebc.com/en/insurance/know-coverage-costs/industry-premium-rates/2026-rates" rel="noopener">WorkSafeBC 2026 rates</a> in British Columbia, and the <a href="https://www.cnesst.gouv.qc.ca/fr/demarches-formulaires/employeurs/assurance-sante-securite-travail/tarification/taux-prime" rel="noopener">CNESST taux de prime</a> in Québec. WSIB's 2026 construction class rates alone run from $1.54 to $3.55 per $100.</li>
 </ul>
-<p>Many tradespeople underestimate this by 20–30% because they only count wages, not the overhead sitting behind every billable hour.</p>
 
-<h2>Materials: mark them up, don't just pass them through</h2>
-<p>Charging clients exactly what materials cost you means you're financing the purchase, storage, and any waste or returns for free. A standard materials markup in most trades runs <strong>15–25%</strong> over your cost — higher for smaller specialty items, sometimes lower for large-ticket items like appliances or windows where the base cost is already high.</p>
+<h3>Billable hours, not paid hours</h3>
+<p>Nobody bills every hour they are paid. Driving between jobs, supply runs, loading the truck, quoting, rain days and statutory holidays are paid but not billable. Track a few months of timesheets and work out your real ratio of billable to paid hours. Then spread the full payroll cost over the billable hours only.</p>
 
-<h2>Overhead and profit — don't skip these</h2>
-<p>Overhead (insurance, vehicle, software, marketing, admin time) and profit margin should be built into every quote, not treated as whatever's left over. A common structure:</p>
+<h2>Overhead: what the business costs before any job starts</h2>
+<p>List a year of costs that are not tied to one job: truck payments, fuel and insurance, liability insurance, tools and their replacement, phone, software, accounting, advertising, shop or storage rent, licences and association fees, and the admin time nobody bills for. Divide the total by the billable hours the whole crew will sell in a year. That gives you an overhead cost per billable hour, and every hour you quote has to carry it.</p>
+
+<h2>Worked example: from wage to hourly rate</h2>
+<p>Example only: the wage, hours, overhead and profit target below are assumptions for a small Ontario carpentry outfit (owner plus one employee), not market figures. The WSIB figure uses the 2026 class rate for specialty trades construction (G5, $2.15 per $100); your class and rate may differ.</p>
+<table>
+  <thead>
+    <tr><th>Cost per paid hour (employee)</th><th>Basis</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Wage</td><td>assumed</td><td>$32.00</td></tr>
+    <tr><td>Vacation pay</td><td>4% of wage</td><td>$1.28</td></tr>
+    <tr><td>CPP, employer</td><td>5.95% of $33.28</td><td>$1.98</td></tr>
+    <tr><td>EI, employer</td><td>2.282% of $33.28</td><td>$0.76</td></tr>
+    <tr><td>WSIB</td><td>$2.15 per $100 of $33.28</td><td>$0.72</td></tr>
+    <tr><td><strong>Payroll cost per paid hour</strong></td><td></td><td><strong>$36.74</strong></td></tr>
+  </tbody>
+</table>
+<p>CPP comes out slightly lower in practice because of the basic exemption; rounding up keeps a small cushion. Then:</p>
+<ol>
+  <li><strong>Billable ratio.</strong> 2,000 paid hours a year, 1,500 billable. $36.74 &times; 2,000 &divide; 1,500 = <strong>$48.99</strong> per billable hour.</li>
+  <li><strong>Overhead.</strong> $60,000 a year spread over 2,900 crew billable hours (owner and employee) = <strong>$20.69</strong> per billable hour.</li>
+  <li><strong>Break-even rate.</strong> $48.99 + $20.69 = <strong>$69.68</strong>.</li>
+  <li><strong>Profit.</strong> For a 20% margin, divide by 0.80: $69.68 &divide; 0.80 = $87.10. Round to <strong>$88 an hour</strong>.</li>
+</ol>
+<p>Price the owner's hours the same way, using the wage you would have to pay someone to replace you. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> runs these steps with your own numbers.</p>
+
+<h2>Markup and margin are not the same percentage</h2>
+<p>Markup is what you add to cost; margin is the share of the selling price that is left after cost. Selling price = cost &times; (1 + markup). Margin = (price &minus; cost) &divide; price.</p>
+<p>If a job costs you $1,000 and you add 25%, you charge $1,250. Your $250 is 25% of cost but only 20% of the price. Confusing the two is how a contractor who "adds 20%" ends up with a 16.7% margin. Work backwards from the margin you need: a 30% margin takes a markup of 0.30 &divide; 0.70, or about 42.9%. In the example above, $88 on a $69.68 cost is a markup of about 26% and a margin of about 21%. The <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> converts either way.</p>
+
+<h2>Materials: price the handling, not just the receipt</h2>
+<p>Passing materials through at cost means you finance them, pick them up, store them, carry the offcuts and the returns and stand behind them if something is defective. Put a handling markup on materials and set it per job: higher on small orders where the trip is most of the cost, lower on a large single item where the dollar amount is already big. Check whatever percentage you choose against your margin target.</p>
+<p>Name the product and grade on the quote, so a cheaper bid built on a lower grade is visibly a different job.</p>
+
+<h2>Contingency and allowances</h2>
+<p>They solve different problems, and mixing them up causes arguments.</p>
 <ul>
-  <li><strong>Direct costs</strong> (labour + materials): the baseline</li>
-  <li><strong>Overhead</strong>: typically 10–20% added on top</li>
-  <li><strong>Profit margin</strong>: typically 10–20% added after overhead</li>
+  <li><strong>Contingency</strong> is your money for your risk: the extra hour that old houses always need, a bit of waste above the plan. It sits inside your prices. It is not a fund for work the client adds; that is a change order.</li>
+  <li><strong>An allowance</strong> is a stated amount for something the client has not chosen yet, such as a door or a light fixture. Write it as a line ("Allowance: entry door hardware, $250"), and say on the quote that the final price is adjusted up or down to what the client picks.</li>
 </ul>
-<p>Skipping the overhead and profit steps is the single most common reason contractors feel "busy but broke" — the jobs are covering costs but not actually generating a return.</p>
+<p>In Ontario this matters for another reason: if an estimate is part of a contract, you cannot charge more than 10% above it unless the customer asks for additional or different goods or services and you sign a change to the contract (<a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">Ontario: a guide for home renovation and roofing businesses</a>). Build contingency in up front and handle extras as written changes; our guide to <a href="/blog/how-to-handle-change-orders-contractors/">handling change orders</a> covers the paperwork.</p>
 
-<h2>Watch for scope creep</h2>
-<p>Verbal add-ons during a job ("while you're here, can you also...") are one of the fastest ways to erode margin. Any change to scope should generate a quick written change order with updated pricing — even a one-line text message confirmation is better than nothing.</p>
+<h2>Small jobs need a minimum charge</h2>
+<p>A one-hour repair still costs the drive, the setup, the supply run and the clean-up. Set a minimum charge that covers them, such as a set number of hours at your rate, and say so before you book the visit. In the example, a three-hour minimum at $88 is $264.</p>
 
-<h2>Putting it into a quote</h2>
-<p>None of this needs to be visible to the client line-by-line — most quotes just show labour and materials totals per task. But pricing it this way internally, rather than guessing, is what keeps a full calendar profitable instead of just busy. Quoting software built for tradespeople can apply consistent markup and overhead rules automatically, so every job gets priced the same disciplined way — see how it works for <a href="/quotes/general-contractor/">general contractors and builders</a>.</p>
+<h2>Worked example: pricing a small repair in Ontario</h2>
+<p>Example only: hours and material costs are assumptions. Job: replace a damaged interior door slab and the casing on one side in an Ontario house, using the $88 rate above and a 15% handling markup on materials.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Labour: remove old slab and casing, mortise hinges and bore lock on new slab</td><td>2</td><td>hr</td><td>$88.00</td><td>$176.00</td></tr>
+    <tr><td>Labour: hang and adjust door, transfer hardware, install casing</td><td>2</td><td>hr</td><td>$88.00</td><td>$176.00</td></tr>
+    <tr><td>Labour: material pickup, setup and clean-up</td><td>1</td><td>hr</td><td>$88.00</td><td>$88.00</td></tr>
+    <tr><td>Primed interior door slab, 30 x 80 in, to match existing</td><td>1</td><td>ea</td><td>$161.00</td><td>$161.00</td></tr>
+    <tr><td>Primed casing, 7 ft lengths</td><td>3</td><td>ea</td><td>$20.70</td><td>$62.10</td></tr>
+    <tr><td>Finishing nails, filler, caulk</td><td>1</td><td>lot</td><td>$17.25</td><td>$17.25</td></tr>
+    <tr><td>Disposal of old door and trim</td><td>1</td><td>lot</td><td>$25.00</td><td>$25.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$705.35</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$91.70</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$797.05</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
+<ul>
+  <li>The pickup and setup hour is on its own line: it is real time, and showing it is fairer than hiding it. Five hours of labour puts the job above the three-hour minimum.</li>
+  <li>Material prices already include the 15% handling markup (a $140.00 slab becomes $161.00). The client sees one price per item, not your supplier invoice.</li>
+  <li>Below the table, the quote excludes painting and any jamb repair if the frame is out of square, which would be priced as a change at the same rate.</li>
+  <li>Ontario's HST is 13% (<a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA: GST/HST rates by province</a>), shown on its own line after the subtotal.</li>
+</ul>
+<p>For trade-specific line items, see <a href="/blog/how-to-quote-a-carpentry-job/">how to quote a carpentry job</a>, and for how to lay out the whole document, the guide to <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">writing a professional quote</a>.</p>
+
+<h2>Keep the rate honest over time</h2>
+<p>Redo the calculation each January, when CPP and EI rates and your workers' compensation premium change, and whenever you add a truck, a crew member or a new insurance policy. Compare quoted with actual hours on finished jobs: if one kind of work keeps running over, fix the hour estimates, not the rate. Once the rate and markups are set, apply them the same way on every quote. quoteai writes an itemized quote with the province's taxes and sends it as a PDF, so the lines the client sees can carry the rate you worked out here.</p>
 `,
   "winterizing-your-home-contractor-checklist": `
 <p>Winterization work is a category almost unique to climates like Canada's — and it's a genuine seasonal revenue stream for contractors who offer it proactively rather than waiting for a burst pipe call in January. Here's what belongs on a proper winterization checklist, and roughly what each job costs.</p>
@@ -472,67 +532,6 @@ const BLOG_CONTENT: Record<string, string> = {
 <h2>Where a static template falls short</h2>
 <p>A Word or Excel template looks free, but you pay for it in time: retyping client details, recalculating taxes, fixing formatting, exporting to PDF, then chasing the client. Mistakes creep in, and the quote reaches the client hours or days after the visit, when other contractors may have already replied.</p>
 <p>That is the gap <a href="/pricing/">quoteai's free quoting</a> is built for: you describe the job, it builds the itemized quote with the right Canadian taxes, and you send a professional PDF from your phone. If you are comparing approaches, see <a href="/compare/">how quoteai compares with other quoting software</a>, or read the full guide on <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
-`,
-  "how-to-get-more-plumbing-jobs-canada": `
-<p>Plumbing is a trade where demand is steady but competition for the good jobs is real. Emergency calls go to whoever picks up first, and renovation work goes to whoever looks most credible and replies fastest. These nine steps do not need a big marketing budget.</p>
-
-<h2>1. Own your Google Business Profile</h2>
-<p>For "plumber near me" searches, your profile is often more important than your website. Pick the right categories, list specific services (drain cleaning, water heater replacement, rough-in plumbing), and add job photos regularly. Our <a href="/blog/google-business-profile-guide-for-tradespeople/">Google Business Profile guide</a> walks through it.</p>
-
-<h2>2. Answer fast, every time</h2>
-<p>Homeowners usually contact two or three plumbers and hire whoever replies first with a clear next step. A missed call that goes to voicemail is often a lost job. Use a missed-call text-back or a short voicemail that promises a callback time.</p>
-
-<h2>3. Send quotes the same day</h2>
-<p>A quote that arrives a week later competes against someone who sent theirs from the driveway. Itemized, PDF-ready estimates built with <a href="/quotes/plumber/">quoting software for plumbers</a> let you send it before you start the truck.</p>
-
-<h2>4. Collect reviews on purpose</h2>
-<p>Reviews influence both trust and local ranking. Ask at completion, send the direct link by text, and reply to every review. See <a href="/blog/how-to-get-more-reviews-as-a-contractor/">how to get more reviews</a>.</p>
-
-<h2>5. Build a page for each service and city</h2>
-<p>One page that says "plumbing services" ranks for little. A page for "water heater replacement in [your city]" with real prices, photos and a clear call to action ranks for what customers actually type.</p>
-
-<h2>6. Offer fixed-price options on common jobs</h2>
-<p>Customers fear open-ended hourly billing. Fixed prices on repeat jobs (faucet replacement, toilet install, drain clearing) reduce friction and make quoting nearly instant.</p>
-
-<h2>7. Partner with trades that refer you</h2>
-<p>Property managers, realtors, general contractors, electricians and HVAC companies all meet plumbing needs. A short, reliable relationship with two or three of them can fill your calendar.</p>
-
-<h2>8. Follow up on every quote</h2>
-<p>Many quotes are lost not because of price, but silence. A friendly follow-up after two or three days, and again at a week, recovers jobs most plumbers never knew they were still in.</p>
-
-<h2>9. Turn one-time clients into maintenance clients</h2>
-<p>Water heater flushes, annual inspections and backflow checks create recurring revenue and make you the first call when something breaks.</p>
-
-<h2>Where to start</h2>
-<p>If you only do two things this week, fix your Google profile and shorten the time between site visit and quote. Both cost almost nothing and compound. For help with the second, see <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote</a>.</p>
-`,
-  "how-to-get-more-electrical-jobs-canada": `
-<p>Electrical work has strong demand: panel upgrades, EV charger installs, renovations, and service calls. The electricians who grow fastest are rarely the cheapest. They are the ones who look reliable, respond quickly and explain the price clearly.</p>
-
-<h2>Start with the jobs customers are searching for</h2>
-<p>Right now, high-intent searches in Canada include panel upgrades, EV charger installation, knob-and-tube replacement, and pot light installs. Build a service page for each, with a typical price range, what is included, and how long it takes. Pages that answer the price question tend to earn the click.</p>
-
-<h2>Be visible in your service area</h2>
-<ul>
-  <li>Complete your Google Business Profile with accurate categories and your real service area. See our <a href="/blog/google-business-profile-guide-for-tradespeople/">guide for tradespeople</a>.</li>
-  <li>Post job photos (clean panels, tidy runs) monthly.</li>
-  <li>Keep your name, address and phone consistent everywhere you are listed.</li>
-</ul>
-
-<h2>Show your credentials</h2>
-<p>Licence, insurance and WSIB or provincial coverage are real decision factors for electrical work. Mention them on your site and on every quote. Homeowners fear unlicensed work, so being clearly licensed is a selling point.</p>
-
-<h2>Quote like a professional</h2>
-<p>A vague "$3,500 panel upgrade" invites price comparison. A quote that lists panel size, breakers, permit and ESA or inspection fees, utility coordination and what happens to drywall patching communicates competence. For a deeper look at pricing a big job, read the <a href="/blog/how-to-quote-an-electrical-job/">cost to rewire a house in Canada</a>. Electricians using <a href="/quotes/electrician/">quoting software built for the trade</a> can send this level of detail the same day.</p>
-
-<h2>Offer packages, not just hourly rates</h2>
-<p>Bundles such as "EV charger install, supplied and installed" or "Panel upgrade with permit" are simpler to buy, simpler to compare, and easier for you to price consistently.</p>
-
-<h2>Build referral partnerships</h2>
-<p>General contractors, HVAC companies, home inspectors and realtors regularly need an electrician they can trust. Be the one who shows up, communicates and finishes cleanly.</p>
-
-<h2>Follow up</h2>
-<p>If a quote has not been answered in three days, follow up. Many customers need a reminder, not a discount.</p>
 `,
   "how-to-collect-payment-from-clients-contractor-canada": `
 <p>Doing the work is only half the job. Waiting 45 days for the last 30% of a project drains cash and wastes your evenings. Most late payment is preventable with better terms set before the job starts.</p>
@@ -956,40 +955,72 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Software that turns an accepted quote into a deposit request and invoice removes delays. See quoteai for <a href="/quotes/general-contractor/">general contractors</a>.</p>
 `,
   "how-to-quote-a-painting-job": `
-<p>Underpriced painting jobs usually fail for one reason: prep takes longer than expected. Here is a repeatable way to quote painting work so you earn what the job is worth.</p>
+<p>A painting quote is mostly a labour estimate with a materials list attached. The labour is where jobs get lost: prep nobody looked at, a sheen that shows every roller mark, a building that only allows work after six. Price those openly and the paint itself is the easy part.</p>
 
-<h2>Step 1: Measure</h2>
-<p>Measure wall area, ceiling area, trim length and the number of doors and windows. Rule of thumb: floor area times about 3 gives approximate wall area for a typical room, but measuring is better.</p>
-
-<h2>Step 2: Assess prep</h2>
-<p>Note holes, cracks, water stains, wallpaper, glossy surfaces, mould, lead paint risk in older homes and furniture to move. Prep is often 30–50% of the time.</p>
-
-<h2>Step 3: Decide coats and products</h2>
-<p>Primer if colour changes are drastic or surfaces are bare; two finish coats on most walls. Choose paint tier and note it on the quote.</p>
-
-<h2>Step 4: Estimate labour</h2>
-<p>Use your own production rates, such as square feet per hour for cutting in, rolling and trim, and adjust for ceiling height and access. Multiply by your hourly rate including overhead.</p>
-
-<h2>Step 5: Add materials</h2>
-<p>Paint (coverage divided into total coats), primer, tape, drop sheets, filler, sundries. Mark up materials.</p>
-
-<h2>Worked example</h2>
+<h2>Area or rooms: choose a unit the client can check</h2>
+<p>Per-room pricing is fast and clients understand it, but rooms vary too much to price blind. A bedroom with a vaulted ceiling and four windows is not the same job as a square one. Use room prices only when you have measured enough similar rooms to trust them, and say what a "room" includes: walls only, or walls, ceiling, trim and door.</p>
+<p>For anything larger, measure wall area. Perimeter times height gives the gross area; subtract large openings such as garage doors, storefront glazing or walls of built-ins, and ignore ordinary doors and windows, which you will paint around anyway (doors and frames get their own line). Count separately:</p>
 <ul>
-  <li>Labour: 28 hours at $65 = $1,820</li>
-  <li>Paint and primer: $310</li>
-  <li>Supplies: $90</li>
-  <li>Materials markup 15%: about $60</li>
-  <li>Subtotal: about $2,280</li>
-  <li>Tax at 13% (Ontario example): about $296</li>
-  <li><strong>Total: about $2,576</strong></li>
+  <li>Ceilings, in square feet, with their height, because a 3.6 m ceiling needs different equipment than a 2.4 m one.</li>
+  <li>Trim, in linear feet: baseboard, casing, crown, chair rail.</li>
+  <li>Doors and frames, each, noting panel doors versus flat slabs.</li>
+  <li>Anything special: stairwells, radiators, exposed ductwork, accent walls with a separate colour.</li>
 </ul>
-<p>Your rates will differ. The structure is the point.</p>
+<p>Write the measured quantities on the quote. A client comparing three bids can then see whether the other painters measured the same building.</p>
 
-<h2>Step 6: Write the scope</h2>
-<p>List rooms, surfaces, coats, products, colours, exclusions and the payment terms. For market prices, see <a href="/blog/how-much-does-it-cost-to-paint-an-apartment-in-canada-2026/">how much it costs to paint an apartment in Canada</a>.</p>
+<h2>Prep is its own line</h2>
+<p>Prep is the part of the job that varies most and that clients see least. Walk every surface with a light and note what it needs: nail pops, drywall cracks, water stains that will bleed through, glossy enamel that needs scuff-sanding or a bonding primer, failing caulk, peeling or chalking exterior paint, mildew. Price it as hours or as a lot, separate from painting labour, and describe it in words: "patch and sand all holes and cracks, spot-prime repairs, stain-block water marks in boardroom."</p>
+<p>A separate prep line does two things. It shows the client why your number differs from the bid that skipped it, and it gives you a clean basis for a <a href="/blog/how-to-handle-change-orders-contractors/">change order</a> when the wallpaper comes off and the drywall underneath is torn.</p>
 
-<h2>Speed it up</h2>
-<p>Painters using <a href="/quotes/painter/">quoting software for painters</a> can reuse rates, apply taxes and send a PDF on site. See also <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a> for extra requests mid-job.</p>
+<h2>Coats and products: name them</h2>
+<p>"Two coats of paint" is not a specification. Name the product line, the sheen and the number of coats for each surface: for example, two coats of a commercial-grade eggshell on walls, semi-gloss on doors and frames, flat on ceilings. Add a primer coat where the surface needs one (new drywall, repairs, a strong colour change, stains, bare wood) and say where. If the client picks a premium line or a deep colour that needs extra coats, it is visible on the quote rather than a surprise on the invoice.</p>
+<p>Product choice also has a legal side. The federal <a href="https://laws-lois.justice.gc.ca/eng/regulations/SOR-2009-264/FullText.html" rel="noopener">VOC Concentration Limits for Architectural Coatings Regulations</a> prohibit manufacturing, importing, selling or offering for sale architectural coatings above set VOC limits, by category: 100 g/L for flat coatings, 150 g/L for non-flat coatings and 250 g/L for high-gloss coatings not listed elsewhere, with separate limits for primers, stains, floor coatings and specialty products. The limits fall on manufacturers, importers and sellers, but they explain why some solvent-based products are no longer on the shelf and why a "low-VOC" request from a client is usually easy to meet. Read the label and data sheet for the category.</p>
+
+<h2>Production rates: use your own</h2>
+<p>Labour hours come from production rates: how many square feet of wall your crew cuts and rolls per hour, how many doors per day, how many linear feet of baseboard per hour. There is no reliable public table of Canadian painting rates, and a rate from someone else's crew on someone else's walls will be wrong for yours. Build your own from timesheets on finished jobs, split by surface and by conditions: empty versus furnished rooms, standard versus tall ceilings, smooth versus textured walls, one colour versus several.</p>
+<p>Then cost the hours at a loaded rate that covers wages, payroll costs, vehicles, insurance and unbilled time. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> works it out, and the guide to <a href="/blog/how-to-price-a-job-labour-materials-markup/">pricing labour, materials and markup</a> covers the rest.</p>
+
+<h2>Older buildings: assume lead until tested</h2>
+<p>Health Canada's <a href="https://www.canada.ca/en/health-canada/services/home-safety/lead-based-paint.html" rel="noopener">lead-based paint guidance</a> says a home built before 1960 probably contains lead-based paint, and that the exterior of one built between 1960 and 1990 may too. It advises against sanders, heat guns and blowlamps for removing it, because they create dust and fumes with lead, suggests testing paint chips at a lab, and says to keep children and pregnant women away from the work area.</p>
+<p>For the quote: on any older building where you will sand or scrape, either price testing first or write the job around methods that do not create dust, with containment, cleanup and disposal as their own lines. If the client declines testing, record that on the quote.</p>
+
+<h2>Exterior work: weather and height</h2>
+<p>Exterior paint has minimum application and overnight temperatures, dew-point and rain-free windows set by each manufacturer on the product data sheet, and they differ between lines. Quote the product, then write the condition: work proceeds only within the manufacturer's application limits, and the schedule moves with the weather while the price does not. In shoulder seasons that clause protects both sides.</p>
+<p>Height changes the equipment line. On Ontario construction projects, <a href="https://www.ontario.ca/laws/regulation/910213" rel="noopener">O. Reg. 213/91</a> requires fall protection where a worker may fall more than 3 metres, with a guardrail system first and, where that is not practicable, travel restraint, a fall restricting system, fall arrest or a safety net, in that order. A two-storey wall or a stairwell over 3 m means scaffold, a lift or harness and anchors, and the setup time that goes with them. Price it as a line.</p>
+
+<h2>Commercial suites: hours, access and holdback</h2>
+<p>Commercial work adds conditions a house does not have: building rules on working hours, freight elevator bookings, protection for carpets and furniture that stay in place, certificates of insurance, and tenants who need some rooms usable every morning. Ask for the building rules before pricing, and put an after-hours premium on its own line if the work has to happen evenings or weekends.</p>
+<p>In Ontario, payment terms are set by the <a href="https://www.ontario.ca/laws/statute/90c30" rel="noopener">Construction Act</a>. The payer retains a holdback of 10 per cent of the value of work supplied, and an owner must pay a proper invoice within 28 days of receiving it unless it gives a notice of non-payment. Build that 10 per cent into your cash flow; the <a href="/tools/holdback-calculator/">holdback calculator</a> shows what each draw actually pays.</p>
+
+<h2>Sample quote: office suite repaint in Ontario</h2>
+<p>Example only. Quantities and prices are illustrative assumptions for a furnished office suite with 2.7 m ceilings (ceilings excluded), 5,600 sq ft of measured wall area, 18 doors with frames, and building rules that require noisy or smelly work after hours. Ontario HST is 13% according to the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a>.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Protection: move and cover furniture, mask floors and fixtures</td><td>1</td><td>lot</td><td>$480.00</td><td>$480.00</td></tr>
+    <tr><td>Prep: patch and sand holes and cracks, spot-prime repairs, stain-block water marks</td><td>14</td><td>hr</td><td>$68.00</td><td>$952.00</td></tr>
+    <tr><td>Walls, 2 coats eggshell, labour (measured area)</td><td>5,600</td><td>sq ft</td><td>$0.62</td><td>$3,472.00</td></tr>
+    <tr><td>Doors and frames, 2 coats semi-gloss, labour</td><td>18</td><td>each</td><td>$95.00</td><td>$1,710.00</td></tr>
+    <tr><td>Wall paint, commercial eggshell, low-VOC, 3.78 L</td><td>32</td><td>can</td><td>$62.00</td><td>$1,984.00</td></tr>
+    <tr><td>Door and frame paint, semi-gloss, 3.78 L</td><td>4</td><td>can</td><td>$68.00</td><td>$272.00</td></tr>
+    <tr><td>Primer, filler, tape, plastic, roller covers</td><td>1</td><td>lot</td><td>$340.00</td><td>$340.00</td></tr>
+    <tr><td>After-hours premium (building rules)</td><td>20</td><td>hr</td><td>$22.00</td><td>$440.00</td></tr>
+    <tr><td>Final clean, walkthrough and touch-ups</td><td>1</td><td>lot</td><td>$260.00</td><td>$260.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$9,910.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$1,288.30</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$11,198.30</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
+<ul>
+  <li>Prep is priced in hours and described, so torn drywall or wallpaper found later is clearly outside it.</li>
+  <li>Wall labour uses the measured area; the paint quantity (two coats over 5,600 sq ft at an assumed spread rate from the data sheet) is shown separately, so the client can see coats and product.</li>
+  <li>The after-hours premium is visible. If the property manager relaxes the rules, it comes off without reopening the whole price.</li>
+  <li>The payment terms under the table should state progress invoicing, the 10% holdback and its release, and that ceilings, wallcoverings and lead abatement are excluded.</li>
+</ul>
+<p>The same structure works for a house: drop the premium, add ceilings and trim lines, and quote a deposit and balance instead of progress draws. More on quoting in the province is on the <a href="/provinces/ontario/">Ontario page</a>. If you would rather not build the table by hand, <a href="/quotes/painter/">quoteai for painters</a> writes an itemized quote with the province's taxes and sends it as a PDF.</p>
 `,
   "how-to-quote-a-roofing-job": `
 <p>Roofing quotes usually go wrong in three places: the area is off because pitch or waste was guessed, the deck turns out to be rotten with no agreed price for fixing it, or the crew loses days to weather and access nobody priced. Deal with each before the client signs.</p>
@@ -1129,37 +1160,73 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Finally, put your licence number, insurance and warranty terms on every quote, along with how long the price holds. Copper and equipment prices move, and a 200A quote that sits unsigned for three months shouldn't bind you to old material costs.</p>
 `,
   "how-to-quote-a-plumbing-job": `
-<p>Plumbing customers want certainty, and plumbers want to be paid for hidden problems. Choosing the right pricing model for each type of job solves both.</p>
+<p>A plumbing quote goes wrong in one of two ways. Either a client sees a big number for a dripping tap because you priced it like a renovation, or you give a fixed price on a bathroom and then find cast iron rotted through behind the tile. Both come from the same mistake: the quote doesn't match the kind of work. Sort that out first and the numbers mostly follow.</p>
 
-<h2>Flat-rate vs hourly</h2>
+<h2>Service calls and project work are priced differently</h2>
+<p><strong>Service calls</strong> are leaks, clogs, no hot water, a running toilet. You don't know what you're facing until you're in the house, so a fixed price on the phone is a guess. The usual structure is a trip or diagnostic charge that covers getting there and finding the fault, then either a flat price for the repair or time and materials from that point on. Tell the client the trip charge before you book the visit, and say whether it gets credited against the repair if they go ahead.</p>
+<p><strong>Project work</strong> is a bathroom, a basement rough-in, a repipe, a water heater swap. You can see most of it before you price it, so the client gets an itemized quote with quantities, a stated scope and a list of what isn't included.</p>
+<p>Either way, the hourly rate behind your prices has to carry your truck, insurance, licence and registration fees, stock you carry, and the hours you spend driving and estimating without billing. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> turns those costs into a billable rate, and <a href="/blog/how-to-price-a-job-labour-materials-markup/">how to price a job: labour, materials and markup</a> covers markup on parts.</p>
+
+<h3>When flat-rate pays and when it doesn't</h3>
+<p>Flat-rate pricing works for jobs you have done enough times to know the spread: a toilet swap, a faucet replacement, a like-for-like water heater with the venting and connections already in place. Build each price from your real average time, the parts, a disposal charge and travel, and check it against job records every few months.</p>
+<p>It stops working when the job isn't repeatable. A faucet on a 1960s vanity with seized shut-off valves is not the same job as one on a vanity installed five years ago. Either write the conditions into the flat-rate ("price assumes working shut-off valves and accessible supply lines") or switch to time and materials and say so before you start.</p>
+
+<h2>Who supplies the fixtures, and who warrants them</h2>
+<p>Clients often buy their own toilet, faucet or vanity and ask you to install it. That's fine, as long as the quote says what it changes:</p>
 <ul>
-  <li><strong>Flat-rate</strong>: one price for a defined task (toilet install, faucet replacement, water heater swap). Customers like it, efficient plumbers profit from it.</li>
-  <li><strong>Hourly (time and materials)</strong>: suits diagnostics, emergencies and unknown conditions. Needs a clear hourly rate, minimum call-out and materials markup.</li>
-  <li><strong>Hybrid</strong>: flat diagnostic fee, then a fixed quote for the repair.</li>
+  <li><strong>Contractor-supplied fixtures</strong> carry your markup and your warranty on both the part and the labour.</li>
+  <li><strong>Client-supplied fixtures</strong> are installed for labour only. Write that your warranty covers your workmanship, not the product, and that a defective or missing part is a return trip at your service rate. Ask for the model number before the visit so you can check rough-in dimensions and valve compatibility.</li>
+</ul>
+<p>Put the model number of every fixture you supply on the quote.</p>
+
+<h2>Rough-in and finish are separate stages</h2>
+<p>On renovation and new-build work, split the price into rough-in (drain, waste and vent piping, supply lines, valve bodies, test) and finish (setting fixtures, trims, final connections). The two stages happen weeks apart, with other trades and an inspection in between. They also help the tile or drywall trade see what they're waiting on; the <a href="/blog/how-to-quote-a-tiling-job/">tiling guide</a> shows the same sequence from the other side.</p>
+
+<h2>Licences, gas work and permits</h2>
+<h3>Ontario</h3>
+<p>Plumber is a compulsory trade. Skilled Trades Ontario states that to <a href="https://www.skilledtradesontario.ca/trade-information/plumber/" rel="noopener">practise the trade legally a person must hold a Certificate of Qualification, a Provisional Certificate or a registered training agreement</a>, and appear on its public register. Gas work is a separate authorization. TSSA treats certification of the individual and registration of the company as two legal requirements, and it has prosecuted the owner of a plumbing company after <a href="https://tssa.org/individual-fined-6000-employing-unlicensed-worker-install-natural-gas-water-heater" rel="noopener">an uncertified employee was sent to install a natural gas water heater</a>. If you quote a gas water heater, the quote should show that the gas side is done by a TSSA-registered contractor with a certified gas technician, whether that is you or a sub.</p>
+<h3>British Columbia</h3>
+<p>Gasfitter Class A and Class B are on SkilledTradesBC's list of <a href="https://skilledtradesbc.ca/skilled-trades-certification" rel="noopener">compulsory trades</a>; plumber is not on that list. A certified plumber may do gas work within the scope of the plumbing trade, and beyond that a gasfitter certificate is needed. Technical Safety BC lists installing or replacing a water heater among the gas work that <a href="https://technicalsafetybc.ca/apply-for/permits/homeowner-permits/homeowner-gas-permits" rel="noopener">needs a permit, which the licensed contractor applies for</a>; depending on the address, the permit comes from Technical Safety BC or the municipality.</p>
+<h3>Québec</h3>
+<p>Plumbing work requires an RBQ licence, including <a href="https://www.rbq.gouv.qc.ca/en/areas-of-intervention/plumbing/your-obligations-toward-the-rbq/licence/" rel="noopener">subclass 15.5, Contractor - plumbing</a>. The Corporation des maîtres mécaniciens en tuyauterie du Québec (CMMTQ) issues plumbing and heating licences on the RBQ's behalf. Put the licence number on every quote.</p>
+<h3>Permits and backflow: a Toronto example</h3>
+<p>Permit rules are municipal, so check the city you're working in. In Toronto, the city's permit list says you need a building permit to <a href="https://www.toronto.ca/services-payments/building-construction/apply-for-a-building-permit/when-do-i-need-a-building-permit/" rel="noopener">install or modify plumbing systems, install a backwater valve or install a backflow prevention device</a>, while repairing and replacing plumbing fixtures does not. A bathroom where you move a drain needs a permit; swapping a toilet in place does not. Put the permit as its own line, state who applies, and allow time for each inspection visit.</p>
+<p>Backflow is mostly commercial work. Toronto's Water Supply By-law requires owners of industrial, commercial, institutional and Part 3 residential properties, and construction sites, to install devices and have them <a href="https://www.toronto.ca/services-payments/water-environment/how-to-use-less-water/backflow-prevention-program/" rel="noopener">tested at installation and at least once a year</a> by a certified Cross Connection Control Specialist. If you hold that certification, annual testing is recurring work worth quoting as a yearly agreement.</p>
+
+<h2>Sample quote: bathroom rough-in and fixture set, Toronto, Ontario</h2>
+<p>Example only: every price below is an assumption for illustration, not a market rate. The job moves the toilet and vanity drains in a gutted main-floor bathroom, adds a tub-shower valve and sets the fixtures after tile. The client is supplying their own vanity faucet. Ontario charges <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">13% HST</a>; the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> runs the same sum for other provinces.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Site visit, layout check against fixture specs</td><td>1</td><td>lot</td><td>$150.00</td><td>$150.00</td></tr>
+    <tr><td>Plumbing permit: application and city fee (allowance, billed at actual cost)</td><td>1</td><td>lot</td><td>$300.00</td><td>$300.00</td></tr>
+    <tr><td>Rough-in labour: drain, waste and vent, supply lines, pressure test</td><td>16</td><td>hour</td><td>$110.00</td><td>$1,760.00</td></tr>
+    <tr><td>Rough-in materials: ABS pipe and fittings, PEX, stops, hangers</td><td>1</td><td>lot</td><td>$780.00</td><td>$780.00</td></tr>
+    <tr><td>Pressure-balance tub-shower valve, supply and install at rough-in</td><td>1</td><td>each</td><td>$285.00</td><td>$285.00</td></tr>
+    <tr><td>Finish labour: set toilet, tub-shower trim, final connections, test</td><td>5</td><td>hour</td><td>$110.00</td><td>$550.00</td></tr>
+    <tr><td>Toilet, supplied (model number on quote)</td><td>1</td><td>each</td><td>$420.00</td><td>$420.00</td></tr>
+    <tr><td>Install client-supplied vanity faucet (labour only, workmanship warranty only)</td><td>1</td><td>each</td><td>$95.00</td><td>$95.00</td></tr>
+    <tr><td>Return visits for inspections</td><td>2</td><td>visit</td><td>$95.00</td><td>$190.00</td></tr>
+    <tr><td>Disposal of old fixtures and offcuts</td><td>1</td><td>lot</td><td>$80.00</td><td>$80.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$4,610.00</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$599.30</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$5,209.30</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
+<ul>
+  <li>Rough-in and finish are separate labour lines, so rough-in can be invoiced when it passes inspection, weeks before the fixtures go in.</li>
+  <li>The permit is an allowance at cost, replaced with the real fee once you apply. Inspections get their own line because each one is a trip.</li>
+  <li>The client's faucet is priced and worded so nobody expects you to warrant a part you didn't choose.</li>
+  <li>The "Not included" section names tile, drywall, the vanity itself, and any replacement of existing stack or main drain beyond the bathroom.</li>
 </ul>
 
-<h2>Build a flat-rate price book</h2>
-<p>For each common job, record average time, parts, travel and disposal, then add overhead and margin. Review prices every few months as costs move: <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
-
-<h2>Quoting renovation plumbing</h2>
-<p>Separate rough-in, fixtures, finish plumbing, permits, drywall access and disposal. See <a href="/blog/bathroom-renovation-cost-toronto-2026/">bathroom renovation costs</a> for market context.</p>
-
-<h2>Emergency work</h2>
-<p>State after-hours rates upfront and get approval before starting. Document what you found with photos.</p>
-
-<h2>Exclusions and unknowns</h2>
-<ul>
-  <li>Hidden pipe condition (galvanized, polybutylene, lead service lines)</li>
-  <li>Access repair of walls and ceilings</li>
-  <li>Code upgrades required when opening walls</li>
-</ul>
-<p>Add a clause for discovered conditions and handle extras through <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
-
-<h2>Present options</h2>
-<p>For water heaters, give standard, high-efficiency and tankless options with clear differences in price and operating cost.</p>
-
-<h2>Speed and professionalism</h2>
-<p>Plumbers using <a href="/quotes/plumber/">quoting software for plumbers</a> can present itemized options on a tablet at the door and get acceptance on the spot. For more leads, see <a href="/blog/how-to-get-more-plumbing-jobs-canada/">how to get more plumbing jobs</a>.</p>
+<h2>Concealed conditions and after-hours rates</h2>
+<p>Opening a floor in an older house can show galvanized supply, a cracked cast-iron stack or an old repair that won't pass. You can't price what you can't see, but you can price how you'll handle it. Name the likely conditions in the quote, state the hourly rate and the parts markup that apply to extra work, and say that nothing beyond the scope starts until the client signs a change. The <a href="/blog/how-to-handle-change-orders-contractors/">change orders guide</a> covers the paperwork. In Ontario this also protects you under the province's consumer rules: when an estimate is part of a home renovation contract, the <a href="https://www.ontario.ca/page/your-rights-when-starting-home-renovations-or-repairs" rel="noopener">final price can't exceed it by more than 10% unless the client agrees to new work or a new price</a>.</p>
+<p>Emergency work needs its rates agreed before you roll. Put your after-hours, weekend and holiday rates on your standard terms, state when each applies, and read the number to the client on the phone before you book.</p>
+<p>quoteai writes this kind of itemized quote, with separate rough-in and finish lines and the province's tax, and sends it as a PDF from the job. See <a href="/quotes/plumber/">quoting for plumbers</a> for how it handles service and renovation work. Whatever you use, finish every quote with your licence or certificate numbers, how long the price holds, and the warranty on parts and labour.</p>
 `,
   "quote-vs-estimate-vs-invoice-difference": `
 <p>Clients and contractors use these words loosely, and the confusion causes real disputes. Here is a plain guide.</p>
@@ -1220,36 +1287,81 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Measure wall area minus openings, add waste, and list removal, wrap, insulation, siding, trim, flashing and clean-up separately. Add an allowance for hidden rot with a per-sheet price. See <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>. Renovators can build these quotes quickly with <a href="/quotes/renovation-contractor/">quoting software for renovation contractors</a>.</p>
 `,
   "how-to-quote-a-landscaping-job": `
-<p>Landscaping quotes cover two very different businesses: one-time projects like patios and planting, and recurring work like lawn care and snow removal. Each needs its own pricing logic.</p>
+<p>Landscaping quotes lose money in the ground. The sod and the pavers are easy to count; the excavation, the haul-away, the base that has to go under a patio and the grade that has to carry water away from the house are where a low price comes from. A good quote measures those first and makes them visible to the client.</p>
 
-<h2>Recurring maintenance</h2>
+<h2>Split softscape from hardscape</h2>
+<p>Softscape is living or loose material: sod, seed, topsoil, mulch, plants. It is quick to install and the risk is mostly after you leave, when the client stops watering. Hardscape is built: interlock patios, walkways, retaining walls, steps, edging. It is slow, heavy, equipment-dependent, and the risk is in what goes under it.</p>
+<p>Price them as separate sections of the quote. The labour rates may differ (a hardscape crew with a plate compactor and a skid steer costs more per hour than a planting crew), the warranty terms differ, and clients often want to phase the work: patio this year, plantings next spring. Separate sections let them say yes to one without re-quoting the other. Work your crew-hour rate out from real costs, including trailer, equipment, fuel and insurance, with the <a href="/tools/labour-rate-calculator/">labour rate calculator</a>.</p>
+
+<h2>Measure in the units you buy in</h2>
+<p>Suppliers sell sod by the square foot or roll, soil, mulch and aggregate by the cubic yard, edging by the linear foot, and pavers by the square foot or pallet. Measure the site the same way so your takeoff turns straight into an order:</p>
 <ul>
-  <li>Measure lawn area and note obstacles, slopes and gates.</li>
-  <li>Estimate time per visit based on crew size and equipment.</li>
-  <li>Add travel, fuel, equipment wear, disposal and overhead.</li>
-  <li>Set a minimum per-visit price so small lots are still worth the trip.</li>
-  <li>Offer seasonal contracts with monthly payments to smooth cash flow: <a href="/blog/contractor-cash-flow-management-canada/">cash flow guide</a>.</li>
+  <li><strong>Area</strong> in square feet for sod, pavers, landscape fabric and bed preparation.</li>
+  <li><strong>Volume</strong> in cubic yards for excavation, base, topsoil and mulch. Area in square feet times depth in inches, divided by 324, gives cubic yards. A 200 sq ft patio dug 9 inches deep is about 5.6 cubic yards of material to remove.</li>
+  <li><strong>Length</strong> in linear feet for edging, edge restraint and drainage pipe.</li>
+</ul>
+<p>Add your own allowance for cuts, compaction and waste, from what your past jobs actually used, and show the quantity on the quote. A client who can see "6 cu yd excavation and disposal" understands why the patio costs more than the pavers.</p>
+
+<h2>Before anyone digs: locates</h2>
+<p>Every quote that includes digging should include the locate request as a step, and the schedule should allow for it.</p>
+<ul>
+  <li><strong>Ontario:</strong> Ontario One Call is now the <a href="https://ontariodigauthority.ca/" rel="noopener">Ontario Dig Authority</a>. Requests are free and required by law, and should go in at least 5 business days before you dig.</li>
+  <li><strong>British Columbia:</strong> <a href="https://www.bc1c.ca/" rel="noopener">BC 1 Call</a> takes free locate requests online or by phone. Its members respond within 3 business days of notification, or 5 for large projects.</li>
+  <li><strong>Québec:</strong> <a href="https://www.info-ex.com/en/" rel="noopener">Info-Excavation</a> processes locate requests free of charge for anyone planning to dig.</li>
+</ul>
+<p>Locates come from the members that own buried lines. Lines the property owner installed, such as a gas line to a barbecue, a cable to a garage or irrigation pipe, aren't theirs to mark, so ask the client about them and write the answer on the quote.</p>
+
+<h2>Grade and drainage around the house</h2>
+<p>Whatever you build next to a house has to move water away from the foundation, not toward it. A patio laid flat against a wall, or a garden bed built up above the siding, can send water into a basement, and the client will blame the last contractor who changed the grade.</p>
+<p>Check grade before you price. On newer homes there may be an approved grading plan: the City of Waterloo, for example, says subdivision grading plans are <a href="https://www.waterloo.ca/water-utilities/manage-drainage-and-stormwater/how-grading-and-drainage-work/" rel="noopener">designed by engineers and approved by the city, and the builder maintains the grading for 2 years</a>, during which homeowners shouldn't alter it. On older lots, settled soil may need to be built back up before anything goes on top. Price that regrading as its own line, and pitch hard surfaces away from the house in the quote's description.</p>
+
+<h2>Trees, walls and permits: a Toronto example</h2>
+<p>Municipal rules decide what you can cut, dig near or build, so check the city you're working in. In Toronto, a permit is needed for any activity that can injure or remove <a href="https://www.toronto.ca/services-payments/building-construction/tree-ravine-protection-permits/when-to-apply-for-a-tree-or-ravine-permit" rel="noopener">a private tree 30 cm or more in diameter, measured 1.4 metres above ground</a>, and street trees are protected at any size. Excavation and trenching count as injury, so a patio or a trench inside a protected tree's root zone can need a permit even if the tree stays. If a tree is in the way, the permit and any arborist report are conditions of the quote, not something to sort out on the day.</p>
+<p>Toronto's building permit list also requires a permit for a <a href="https://www.toronto.ca/services-payments/building-construction/apply-for-a-building-permit/when-do-i-need-a-building-permit/" rel="noopener">retaining wall more than one metre high</a> where it is on or next to public property, building entrances or private property the public can access. For any wall near that height, check the local rules before you quote a price, since design and drawings may become part of the job.</p>
+
+<h2>Sample quote: sod, interlock patio and garden bed, Ontario</h2>
+<p>Example only: every price below is an assumption for illustration, not a market rate. The backyard gets a 200 sq ft interlock patio off the back door, 600 sq ft of new sod and a 120 sq ft planted bed along the fence. Ontario charges <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">13% HST</a>; the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> works it out for other provinces.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Locate request, site layout and grade check</td><td>1</td><td>lot</td><td>$120.00</td><td>$120.00</td></tr>
+    <tr><td>Patio: excavate to 9 in and haul away</td><td>6</td><td>cu yd</td><td>$85.00</td><td>$510.00</td></tr>
+    <tr><td>Patio: granular base, 6 in compacted in lifts</td><td>5</td><td>cu yd</td><td>$65.00</td><td>$325.00</td></tr>
+    <tr><td>Patio: bedding layer, 1 in</td><td>1</td><td>cu yd</td><td>$75.00</td><td>$75.00</td></tr>
+    <tr><td>Interlock pavers, 200 sq ft plus 5% for cuts</td><td>210</td><td>sq ft</td><td>$6.50</td><td>$1,365.00</td></tr>
+    <tr><td>Edge restraint</td><td>60</td><td>lin ft</td><td>$4.00</td><td>$240.00</td></tr>
+    <tr><td>Patio labour: lay, cut, compact, joint sand, pitched away from house</td><td>24</td><td>hour</td><td>$75.00</td><td>$1,800.00</td></tr>
+    <tr><td>Lawn: remove old turf, grade, topsoil 4 in</td><td>8</td><td>cu yd</td><td>$55.00</td><td>$440.00</td></tr>
+    <tr><td>Sod, supply and lay</td><td>600</td><td>sq ft</td><td>$1.10</td><td>$660.00</td></tr>
+    <tr><td>Bed: planting mix, 6 in</td><td>2.5</td><td>cu yd</td><td>$60.00</td><td>$150.00</td></tr>
+    <tr><td>Bed: shredded mulch, 3 in</td><td>1.5</td><td>cu yd</td><td>$55.00</td><td>$82.50</td></tr>
+    <tr><td>Perennials, 1 gal (plant list attached)</td><td>15</td><td>each</td><td>$18.00</td><td>$270.00</td></tr>
+    <tr><td>Shrubs, 2 gal (plant list attached)</td><td>3</td><td>each</td><td>$65.00</td><td>$195.00</td></tr>
+    <tr><td>Steel bed edging</td><td>45</td><td>lin ft</td><td>$6.00</td><td>$270.00</td></tr>
+    <tr><td>Bed labour: prepare, plant, edge, mulch</td><td>8</td><td>hour</td><td>$75.00</td><td>$600.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$7,102.50</strong></td></tr>
+    <tr><td>HST (Ontario, 13%)</td><td></td><td></td><td></td><td>$923.33</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$8,025.83</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
+<ul>
+  <li>Excavation, base and bedding are separate lines with depths, so the client sees what they're paying for under the pavers and a cheaper quote that skips base is easy to compare.</li>
+  <li>Quantities are in the units the supplier sells, with the cut allowance shown, so the takeoff becomes the order.</li>
+  <li>Plants are counted and tied to an attached list with sizes, which is also what the plant warranty refers to.</li>
+  <li>The "Not included" section names irrigation, removal of protected trees, private utility relocation and any regrading beyond the work area.</li>
 </ul>
 
-<h2>One-time projects</h2>
-<p>Break them into labour, materials, equipment rental, delivery, disposal and a contingency for soil and ground surprises. Common materials such as aggregate, soil, sod, pavers and plants should be itemized with quantities.</p>
+<h2>Plant warranties need conditions</h2>
+<p>If you guarantee plants, write the terms down: how long, which plants (the attached list), replacement only or replacement and labour, and what voids it. Watering is the obvious one. Give the client written watering instructions for new sod and plantings, and state that the warranty doesn't cover drought, pests, animal damage, de-icing salt or plants the client moved. Nursery stock you didn't supply carries no warranty from you.</p>
 
-<h2>Hardscape specifics</h2>
-<p>Excavation depth, base compaction, drainage, edge restraint and frost considerations separate a lasting patio from a heaving one. See <a href="/blog/how-to-quote-a-masonry-job/">driveway cost guide</a> and <a href="/blog/fence-installation-cost-canada-2026/">fence cost guide</a>.</p>
-
-<h2>Winter work</h2>
-<p>Snow removal contracts need clear terms: trigger depth, service times, liability and salting. Check insurance coverage: <a href="/blog/contractor-insurance-canada-what-you-need/">insurance guide</a>.</p>
-
-<h2>Common pricing mistakes</h2>
-<ul>
-  <li>Underestimating haul and disposal</li>
-  <li>Forgetting machine time and fuel</li>
-  <li>No weather clause</li>
-  <li>Not marking up plants and materials: <a href="/tools/markup-margin-calculator/">markup vs margin</a></li>
-</ul>
-
-<h2>Send quotes quickly</h2>
-<p>Landscape clients usually request several quotes at once. <a href="/quotes/landscaper/">Quoting software for landscapers</a> lets you measure, price and send from the property.</p>
+<h2>Maintenance and snow are separate contracts</h2>
+<p>Recurring work needs its own agreement, not a line on the project quote. Price it per visit when the scope varies (spring clean-up, fall clean-up, one-off cuts) and per season when it's predictable (weekly cutting from a start week to an end week, a fixed number of visits). A per-season price should state the visit count or the date range it covers, and what happens with extra visits or a short season.</p>
+<p>Snow clearing is a different job with different risk: night work, equipment on call and slip-and-fall exposure. Quote it as its own contract with a trigger depth, response times, areas cleared, whether salting is included, and per-event or per-season pricing.</p>
+<p>If your client is an Ontario homeowner, read the province's guidance on home renovation and repair contracts. It says a home renovation or repair contract worth more than $50 <a href="https://www.ontario.ca/page/your-rights-when-starting-home-renovations-or-repairs" rel="noopener">must be in writing</a>, a contract of $50 or more signed in the client's home carries a 10-day cooling-off period, and the province recommends deposits of no more than 10%. The <a href="/blog/how-to-write-a-contractor-contract-canada/">contractor contract guide</a> covers the rest.</p>
+<p>quoteai writes an itemized quote like the one above, with the province's tax, and sends it as a PDF from the client's driveway; <a href="/quotes/landscaper/">quoting for landscapers</a> shows how it handles projects and seasonal work.</p>
 `,
   "how-to-quote-an-hvac-job": `
 <p>On an HVAC job the sizing decides comfort for years, three regulators can have a say in one install, and the client has often read about a rebate before you arrive. A good quote settles each of those on paper, so the client can compare you line by line with the other quotes.</p>
@@ -1322,40 +1434,77 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>quoteai builds this kind of itemized quote with Ontario HST applied and sends it to the client as a PDF, with the rebate note kept as text rather than a deduction. For HVAC-specific templates, see <a href="/quotes/hvac-technician/">HVAC quotes</a>.</p>
 `,
   "how-to-quote-a-tiling-job": `
-<p>Tile pricing is less about the tile and more about everything under it. A flat floor on a solid subfloor and a custom shower on bare studs are completely different jobs.</p>
+<p>The tile is the visible part of the job and the smallest part of the risk. What decides whether a tiling quote makes money is underneath: how flat and stiff the floor is, what the shower walls are built from, whether water is stopped behind the tile, and who supplied the boxes stacked in the garage.</p>
 
-<h2>Measure and add waste</h2>
-<p>Calculate area and add waste: about 10% for straight lay, 15% or more for diagonal, herringbone or large-format tile with cuts. Note the tile size, because large formats need flatter surfaces.</p>
+<h2>Area plus a waste factor you can defend</h2>
+<p>Measure each surface separately: floor, each shower wall to the height you are tiling, backsplash runs, niches and curbs. Floors are length times width less fixed cabinets; shower walls are width times height for each wall, plus returns. Keep them as separate lines, because a wall in a shower and a floor in a hallway take different labour, different setting materials and often different tile.</p>
+<p>Waste depends on the layout and tile size, and there is no published standard for it, so use your own records from finished jobs and write the assumption down. Example: "quantities include 10% for cuts on a straight lay." A diagonal, herringbone or offset pattern, small rooms with many cuts, and large tiles where one broken piece is a big share of a box all push it higher. Showing the factor stops the argument when the client compares your tile count to a store's calculator.</p>
 
-<h2>Assess the substrate</h2>
+<h2>The floor under the floor</h2>
+<p>Tile does not bend. Before you price anything else, check the substrate:</p>
 <ul>
-  <li>Levelness and deflection of the subfloor</li>
-  <li>Need for backer board or an uncoupling membrane</li>
-  <li>Heated floor installation</li>
-  <li>Waterproofing in showers and wet areas</li>
+  <li><strong>Joist spacing and subfloor.</strong> The <a href="https://publications.gc.ca/site/eng/9.897526/publication.html" rel="noopener">National Building Code of Canada 2020</a>, which provinces adopt with their own amendments, requires a panel-type underlay under ceramic tile applied with adhesive (Article 9.30.2.1), at least 6 mm thick where supports are up to 300 mm on centre and at least 11 mm where they are wider (Article 9.30.2.2). Panel subfloor under adhesive-set tile needs its edges supported (Article 9.30.6.1).</li>
+  <li><strong>Flatness.</strong> Check with a long straightedge. Humps get ground, dips get filled or the whole floor gets a self-levelling pour, and each of those is its own line with its own material.</li>
+  <li><strong>Stiffness.</strong> A bouncy floor cracks grout and tile no matter how well it is set. Deflection limits come from the tile and setting-material manufacturers and from the installation details in the TTMAC guide below; if the floor fails them, the fix is framing, and that belongs in the quote or in a written exclusion.</li>
+</ul>
+<p>Large-format tile makes all three stricter. Longer tiles show every high spot as lippage, so the levelling line grows with tile size.</p>
+
+<h2>Showers: the code sets the minimum, the system sets the method</h2>
+<p>The National Building Code's rule for showers is short. Article 9.29.2.1 requires a waterproof finish to at least 1.8 m above the floor in shower stalls and 1.2 m above the rim of a bathtub with a shower, and Article 9.29.2.2 lists ceramic tile among acceptable finishes. Tile and grout on their own, however, are not what keeps water out of the wall in practice. That is the job of the membrane behind them, whether a sheet or liquid membrane over backer board or a complete foam board system, and each comes with the manufacturer's installation instructions and warranty conditions.</p>
+<p>For the quote, name the system: "backer board with sheet membrane, seams and corners banded, membrane sealed to the drain and shower base per manufacturer's instructions." Then follow those instructions exactly, because a membrane warranty usually depends on it. Waterproofing is a separate line from tile setting; if the client's other bid has no such line, they can ask why.</p>
+<p>Plumbing stays with the plumber. Write that the drain connection, valve and trim are by others, and coordinate dates so the drain body is set before your pan goes in. The <a href="/blog/how-to-quote-a-plumbing-job/">plumbing quote guide</a> covers the plumber's side.</p>
+
+<h2>Use the Canadian installation details</h2>
+<p>The Terrazzo, Tile and Marble Association of Canada publishes the <a href="https://www.ttmac.com/en/technical/specifications" rel="noopener">Tile Installation Manual, Specifications Guide 09 30 00</a>, with numbered installation details, including 301MJ for movement joints, 313F for tile over a wood subfloor in dry areas, 314F for tile over heated floor systems, 319SR for shower receptors and 329LFT for large-format tile on interior floors. Writing the detail number on the quote ("floor per TTMAC 313F") tells the client and any inspector which method you priced, and it settles disputes about whether a step was included.</p>
+
+<h2>Heated floors need an electrician and an inspection</h2>
+<p>In Ontario, the Electrical Safety Authority's <a href="https://esasafe.com/assets/files/esasafe/pdf/Electrical_Safety_Products/Flash_Notices/25-08-FL.pdf" rel="noopener">Flash 25-08-FL</a> says a flooring contractor may install heating cables or mats up to the first junction box for the cold leads, without branch circuit wiring. A notification of work must be filed with ESA and the heating components inspected before they are covered, and the branch circuit wiring is to be done by a licensed electrical contractor. The flash also warns that the floor sensor must be installed and the supply voltage must match the mat.</p>
+<p>So the quote needs three things: your line for laying the mat and testing it, the electrician's work shown as by others or as a subcontract line, and a schedule that leaves a gap for the inspection before you pour or set. Elsewhere, check the electrical permit rules of the province. The <a href="/blog/how-to-quote-an-electrical-job/">electrical quote guide</a> shows how electricians price their part.</p>
+
+<h2>Demolition and disposal</h2>
+<p>Price tear-out by what is coming off, not by area alone: tile on mortar bed over lath is a different day from tile on drywall. Note what you expect behind it and say that rot, mould or failed framing found after demo is priced as a change at stated rates. Disposal is a separate line built from your actual bin or hauler costs. See the <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a> for the paperwork when the wall comes open.</p>
+
+<h2>Client-supplied tile: put the terms in writing</h2>
+<p>Many clients buy their own tile. That is fine if the quote says:</p>
+<ul>
+  <li>The exact quantity to buy, including your waste allowance, and that shortfalls stop work until more arrives.</li>
+  <li>That tile is inspected on delivery and you are not responsible for manufacturing defects, shade variation between lots, or breakage before it reaches you.</li>
+  <li>That lead time is the client's risk: if the tile is backordered, the schedule moves.</li>
+  <li>Who keeps the leftover boxes. Keeping a few for future repairs is worth recommending.</li>
 </ul>
 
-<h2>Price labour by complexity</h2>
-<p>Use rates per square foot for standard layouts and higher for mosaics, patterns, niches, benches and curved walls. Setting a minimum job price protects small jobs like backsplashes.</p>
-
-<h2>Line items</h2>
+<h2>Sample quote: shower and bathroom floor in Québec</h2>
+<p>Example only. Quantities and prices are illustrative assumptions for a tub replaced with a walk-in shower: 96 sq ft of shower walls in 12 x 24 in. porcelain to the ceiling, a 55 sq ft floor in 12 x 12 in. porcelain on a straight lay, no heated floor, tile supplied by the client. Québec applies GST at 5% and QST at 9.975%, according to the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a> and <a href="https://www.revenuquebec.ca/en/businesses/consumption-taxes/gsthst-and-qst/collecting-gst-and-qst/calculating-the-taxes/" rel="noopener">Revenu Québec</a>.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Demolition: tub surround and floor tile, haul and disposal</td><td>1</td><td>lot</td><td>$1,150.00</td><td>$1,150.00</td></tr>
+    <tr><td>Floor prep: level, install underlay and uncoupling membrane</td><td>55</td><td>sq ft</td><td>$6.50</td><td>$357.50</td></tr>
+    <tr><td>Shower walls: backer board and sheet membrane, seams and corners banded</td><td>96</td><td>sq ft</td><td>$9.00</td><td>$864.00</td></tr>
+    <tr><td>Shower base: sloped tray, membrane, drain flange (drain connection by plumber)</td><td>1</td><td>each</td><td>$1,450.00</td><td>$1,450.00</td></tr>
+    <tr><td>Wall tile setting, 12 x 24 in., stacked</td><td>96</td><td>sq ft</td><td>$14.00</td><td>$1,344.00</td></tr>
+    <tr><td>Recessed niche, 12 x 24 in., waterproofed and tiled</td><td>1</td><td>each</td><td>$325.00</td><td>$325.00</td></tr>
+    <tr><td>Floor tile setting, 12 x 12 in., straight lay</td><td>55</td><td>sq ft</td><td>$11.00</td><td>$605.00</td></tr>
+    <tr><td>Thinset, grout, edge and corner profiles</td><td>1</td><td>lot</td><td>$520.00</td><td>$520.00</td></tr>
+    <tr><td>Tile: client-supplied, 106 sq ft wall and 61 sq ft floor (10% waste included)</td><td>1</td><td>lot</td><td>$0.00</td><td>$0.00</td></tr>
+    <tr><td>Grout sealing and final clean</td><td>1</td><td>lot</td><td>$180.00</td><td>$180.00</td></tr>
+    <tr><td><strong>Subtotal</strong></td><td></td><td></td><td></td><td><strong>$6,795.50</strong></td></tr>
+    <tr><td>GST (5%)</td><td></td><td></td><td></td><td>$339.78</td></tr>
+    <tr><td>QST (9.975%)</td><td></td><td></td><td></td><td>$677.85</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td></td><td></td><td><strong>$7,813.13</strong></td></tr>
+  </tbody>
+</table>
+<p>Why it is written this way:</p>
 <ul>
-  <li>Demolition and disposal</li>
-  <li>Substrate prep and levelling</li>
-  <li>Waterproofing</li>
-  <li>Thinset, grout, sealer, trim and edge profiles</li>
-  <li>Tile supply (or client-supplied, without warranty)</li>
-  <li>Labour for floor, wall and details</li>
+  <li>Waterproofing and the shower base are separate from tile setting, so the client sees what keeps water out of the wall.</li>
+  <li>The tile line is at zero but still on the quote: it tells the client exactly how much to buy and where the waste figure came from.</li>
+  <li>Labour is priced on measured area; the waste is only in the purchase quantity.</li>
+  <li>Both tax lines are calculated on the subtotal, and the header carries your GST and QST registration numbers.</li>
 </ul>
-
-<h2>Know the market</h2>
-<p>Installed tile costs commonly fall around $10–$25 per square foot for floors, and more for complex work. For a full-room context see <a href="/blog/bathroom-renovation-cost-toronto-2026/">bathroom renovation costs</a> and <a href="/blog/flooring-installation-cost-canada-2026/">flooring costs</a>.</p>
-
-<h2>Clauses that save money</h2>
-<p>Include cure and grout times, who supplies extra tiles, and how hidden subfloor problems are priced: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
-
-<h2>Speed</h2>
-<p>Tile installers can use <a href="/quotes/tile-installer/">quoting software for tile installers</a> to measure, add waste and itemize in one visit.</p>
+<p>In Québec, the <a href="https://www.rbq.gouv.qc.ca/en/licence/fulfilling-your-obligations/displaying-your-licence/" rel="noopener">Régie du bâtiment</a> requires contractors to show their RBQ licence number on estimates, bids, contracts, account statements and invoices, written as "RBQ licence: XXXX-XXXX-XX". Put it in the quote header next to your registration numbers. On consumer contracts signed at the client's home, check the Office de la protection du consommateur's <a href="https://www.opc.gouv.qc.ca/en/consumer/topic/itinerant-sale/cancelling/doing-business-renovation-contractor" rel="noopener">itinerant merchant rules</a>: a renovation contractor invited to the home is treated as an itinerant merchant when the work is doors and windows, insulation, or roofing or exterior wall covering. A bathroom tile job is not on that list, but read the page if you sell door to door. The <a href="/provinces/quebec/">Québec page</a> has more on quoting there.</p>
+<p>Check the tax lines with the <a href="/tools/sales-tax-calculator/">sales tax calculator</a>. If you would rather not build the table by hand, <a href="/quotes/tile-installer/">quoteai for tile installers</a> writes an itemized quote with the province's taxes and sends it as a PDF.</p>
 `,
   "how-to-raise-your-prices-contractors-without-losing-clients": `
 <p>Material, fuel, insurance and wages go up, but many contractors keep their rates frozen for years because they fear losing work. The result is shrinking margin and burnout. A planned price increase is usually less risky than it feels.</p>
@@ -1421,104 +1570,225 @@ const BLOG_CONTENT: Record<string, string> = {
 <p>Hiring is one step of a bigger plan: <a href="/blog/how-to-scale-a-contracting-business-canada/">how to scale a contracting business</a>.</p>
 `,
   "how-to-follow-up-on-quotes-contractors": `
-<p>A surprising share of lost quotes are simply forgotten. The client was busy, got three quotes, and the one who followed up won. Following up is not pushy, it is service.</p>
+<p>Silence after a quote rarely means no. The client may be waiting on a second price, a spouse, a bank, or simply a free evening to read it properly. A follow-up gives them an easy moment to ask what they were going to ask anyway, and it tells you where the job really stands, so you can plan your schedule around facts instead of hope.</p>
 
-<h2>The timing</h2>
+<h2>Set up the follow-up before you send the quote</h2>
+<p>The best follow-up is planned into the quote itself. Three things make every later message easier:</p>
 <ul>
-  <li><strong>Same day</strong>: confirm the quote was received.</li>
-  <li><strong>Day 2–3</strong>: a short check-in.</li>
-  <li><strong>Day 7</strong>: a second follow-up with value (an option, a date, a question).</li>
-  <li><strong>Day 14–30</strong>: a final message before the quote expires.</li>
+  <li><strong>An expiry date.</strong> "Valid until 15 December" gives you an honest reason to get back in touch and protects you when material prices move. The guide to <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">writing a professional quote</a> covers what else belongs on the page.</li>
+  <li><strong>A clear next step.</strong> Say how to accept: sign and return, pay the deposit, pick a start date. A follow-up can then point to that step instead of asking a vague "any thoughts?"</li>
+  <li><strong>The client's preferred channel.</strong> Ask at the walkthrough whether they would rather get a text, an email or a call. Use what they say.</li>
 </ul>
 
-<h2>Templates</h2>
-<h3>Day 1 (text)</h3>
-<p><em>"Hi [Name], it's [You] from [Company]. I just sent your quote for [job]. Let me know if anything is unclear."</em></p>
-<h3>Day 3 (text or email)</h3>
-<p><em>"Hi [Name], just checking you received the quote for [job] and whether you have questions. Happy to adjust the scope if needed."</em></p>
-<h3>Day 7 (email)</h3>
-<p><em>"Hi [Name], I have an opening on [date] and can hold it for you until [date]. If budget is a concern, I can suggest a few ways to adjust the scope."</em></p>
-<h3>Final (text)</h3>
-<p><em>"Hi [Name], your quote for [job] is valid until [date]. After that I would need to re-price it as material costs change. Would you like to go ahead or should I close this file?"</em></p>
+<h2>A follow-up schedule you can reuse</h2>
+<p>Example only: adjust the days to the size of the job. A small repair can close in a few days; a kitchen or a roof may take weeks of decision-making, so space the messages out.</p>
+<table>
+  <thead>
+    <tr><th>Day</th><th>Channel</th><th>Message</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>0 (quote sent)</td><td>Email with PDF, plus a short text</td><td>Quote attached, the two or three things it includes that matter most to this client, and how to accept.</td></tr>
+    <tr><td>2</td><td>Text, or email if that is what they asked for</td><td>Confirm it arrived and offer to answer questions. One or two sentences.</td></tr>
+    <tr><td>6</td><td>Phone call</td><td>Ask what they are weighing. Offer to walk through the scope or show an option with one line removed.</td></tr>
+    <tr><td>12</td><td>Email</td><td>Something useful: an opening in your schedule, a product choice to confirm, or an answer to a question they raised.</td></tr>
+    <tr><td>3 to 5 days before expiry</td><td>Text or email</td><td>The quote's end date, and that after it you would re-price with current material costs.</td></tr>
+    <tr><td>After expiry</td><td>Email</td><td>Close the file politely and ask whether they would like you to check back later.</td></tr>
+  </tbody>
+</table>
+<p>That is five or six touches spread over a few weeks, each with a reason. Stop as soon as the client answers either way, and never send two messages in a row without a reply in between unless one of them is the expiry notice.</p>
 
-<h2>What not to do</h2>
+<h2>What to say at each step</h2>
+<p><strong>Day 0.</strong> Don't just attach the PDF. Name what you heard at the walkthrough ("two coats on the trim, as you wanted", "the old tank removed and disposed of"). It shows you listened and gives the client something to compare when the other quotes arrive.</p>
+<p><strong>Day 2.</strong> Keep it short and easy to answer. A question with a yes or no answer is the easiest kind to reply to.</p>
+<p><strong>The call.</strong> Ask, don't pitch: "What are you weighing?" or "Is there anything in the quote that doesn't fit what you had in mind?" Then listen. The answer is usually timing, budget, or a doubt about scope, and each has a different fix.</p>
+<p><strong>The useful email.</strong> Bring something new. A confirmed start date, a photo of the product you specified, or a note about a permit step is worth sending. "Just checking in again" is not.</p>
+<p><strong>The expiry notice.</strong> This is a fact, not a pressure tactic. Your price was built on today's material costs and your current schedule, and both change. Say so plainly and offer to re-quote if they need more time.</p>
+
+<h3>Two sample messages</h3>
+<p>Example only, adjust to your voice and the job.</p>
+<blockquote>Day 2 text: "Hi [client name], it's [your name] from [company]. Just making sure the deck repair quote came through. Happy to answer any questions about the boards or the stair treads. Reply STOP if you'd rather not get texts from us."</blockquote>
+<blockquote>Expiry email: "Hi [client name], a quick note that the deck repair quote we sent on [date] is valid until [date]. After that I'd need to re-check lumber prices before confirming the total. If you'd like to go ahead, reply here and I'll send the deposit details and two possible start dates. If now isn't the right time, just let me know and I'll close the file."</blockquote>
+
+<h2>When the answer is "too expensive"</h2>
+<p>Don't drop the price by reflex. A discount offered before you know the reason teaches the client that your first number was padded, and it comes straight out of your margin. Ask what they are comparing against. Sometimes the other quote is missing something: prep work, disposal, a better grade of material, or a permit. Go through it line by line.</p>
+<p>If the budget really is the limit, change the scope, not the rate: remove a room, switch a product line, split the work into two phases. Every line you take out should take its own cost with it. If you do lower a price, know first what it does to your margin; the guide to <a href="/blog/how-to-price-a-job-labour-materials-markup/">pricing a job</a> and the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> show how quickly a small discount eats a large share of the profit.</p>
+
+<h2>When they went with someone else</h2>
+<p>Reply once, briefly and graciously. Thank them, wish them a good job, and ask one question if they are willing to answer it: was it price, timing or something in the quote? Write the answer down. Then ask whether they would like to hear from you for future work. A clear yes is express consent, which matters for the next section. Clients who chose someone else sometimes come back when that contractor cannot start, and a polite last message leaves the door open.</p>
+
+<h2>CASL: the rules for follow-up emails and texts</h2>
+<p>Canada's Anti-Spam Legislation covers commercial electronic messages, and the federal guidance names both email and text messages (<a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">Government of Canada: getting consent to send email</a>). What it means for quote follow-ups:</p>
 <ul>
-  <li>Do not discount at the first sign of silence.</li>
-  <li>Do not send daily messages.</li>
-  <li>Do not blame the client for not replying.</li>
+  <li><strong>The quote itself.</strong> The Act exempts from the consent requirement a message that solely provides a quote or estimate the recipient asked for. It still has to identify you and include a way to unsubscribe (<a href="https://laws-lois.justice.gc.ca/eng/acts/E-1.6/page-1.html" rel="noopener">Canada's Anti-Spam Legislation, section 6</a>).</li>
+  <li><strong>An inquiry gives implied consent for six months.</strong> When someone contacts you about a job, the guidance says implied consent from an inquiry lasts six months; after a purchase it can last up to two years. A follow-up that goes beyond the quote, such as a seasonal offer or another service, needs that consent.</li>
+  <li><strong>Every message identifies you</strong> with your business name and a mailing address plus a phone number, email or website, and offers a working unsubscribe. Requests must be honoured within 10 business days, at no cost to the client.</li>
+  <li><strong>Keep records.</strong> The guidance tells senders to be ready to prove consent. Note the date of the first inquiry and any "yes, keep me posted".</li>
+  <li><strong>Phone calls</strong> are live two-way voice communication, which section 6 leaves out of these message rules.</li>
 </ul>
+<p>This is a summary, not legal advice; if you send marketing to past clients in bulk, read the full guidance. For one-to-one follow-ups on a quote someone asked for within the last few months, the practical rules are simple: say who you are, make it easy to opt out, and stop when asked.</p>
 
-<h2>Learn from the answers</h2>
-<p>"Too expensive", "went with someone else", and "not now" each tell you something. Track them: <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to win more bids</a>.</p>
-
-<h2>Automate it</h2>
-<p>Quoting software that shows when a client opened the quote and reminds you to follow up turns this into a habit. See <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">sending quotes in 5 minutes</a> and <a href="/pricing/">free quoting</a>.</p>
+<h2>Keep a note on every quote</h2>
+<p>A few lines per quote turn follow-up from memory work into a routine:</p>
+<ul>
+  <li>Date of the first inquiry (it starts the six-month consent clock) and the date the quote was sent.</li>
+  <li>Expiry date and the next planned follow-up.</li>
+  <li>Preferred channel and anyone else involved in the decision.</li>
+  <li>Questions or objections raised, and what you answered.</li>
+  <li>Outcome and reason: won, lost on price, lost on timing, postponed.</li>
+</ul>
+<p>After a season, read the outcomes together. If you lose on timing, your lead times may be the issue; if you lose on price against quotes that turn out to be missing scope, your exclusions need to be clearer. Won jobs also deserve a last message once the work is done: our guide to <a href="/blog/how-to-get-more-reviews-as-a-contractor/">getting more reviews</a> covers when and how to ask.</p>
+<p>A quote that arrives quickly and reads clearly makes every follow-up shorter. quoteai writes an itemized quote with the province's taxes and sends it as a PDF, so the first message on day 0 can go out the same afternoon as the walkthrough. When the client says yes, the next document is the contract; see <a href="/blog/how-to-write-a-contractor-contract-canada/">how to write a contractor contract in Canada</a>.</p>
 `,
   "how-to-quote-a-carpentry-job": `
-<p>Custom woodwork is hard to price because every job is different and the client often changes their mind. A consistent method helps you stay profitable without scaring people away.</p>
+<p>Carpentry covers two very different businesses under one name. Finish work (trim, doors, built-ins, cabinets) is judged by the eye and paid for in hours of careful fitting. Rough work (framing, decks) is judged by the inspector and paid for in material and production. A good quote keeps the two apart, states the assumptions behind every quantity, and is honest about when money for custom material has to change hands.</p>
 
-<h2>Separate shop work from site work</h2>
-<p>Shop time (cutting, assembly, finishing) and installation time carry different costs and rates. Track each separately so you learn where hours go.</p>
-
-<h2>Material takeoff</h2>
+<h2>Pick a unit the client can check</h2>
+<p>A unit price shows your thinking and makes "what if we add the hallway too" easy to answer. Units that track real production:</p>
 <ul>
-  <li>Sheet goods and solid lumber with waste (often 10–20%)</li>
-  <li>Hardware: hinges, slides, pulls, fasteners</li>
-  <li>Finishing materials: stain, paint, lacquer</li>
-  <li>Countertops and outsourced parts</li>
-  <li>Delivery and consumables</li>
+  <li><strong>Baseboard, casing and crown</strong>: linear feet, priced separately by profile. Crown and anything coped costs more per foot than square-cut base, and every outside corner, return and scribe to a wavy wall is time. Count corners as their own line if the room is busy.</li>
+  <li><strong>Interior doors</strong>: per door, split by type. Hanging a pre-hung slab, installing a slab in an existing jamb (mortising hinges, boring hardware), bifolds, pocket doors and barn doors are different jobs. Casing both sides is per door or folded into the trim footage, but say which.</li>
+  <li><strong>Cabinets and built-ins</strong>: per box for installation (base, upper, tall), plus linear feet of filler, scribe and crown. For units you build, price per box or per section from your own shop records, never a per-foot number borrowed from someone else.</li>
+  <li><strong>Solid stock</strong>: board feet for hardwood and thick stock, since that is how lumberyards sell it. One board foot is 1 in by 12 in by 12 in of rough lumber, so a 1 in by 6 in board 8 ft long is 4 board feet before milling losses.</li>
+  <li><strong>Framing and decks</strong>: square feet works for a quick budget, but the firm quote should break out footings (per pier), ledger (linear feet), framing and decking (square feet), guards (linear feet) and stairs (per flight). Those are the pieces clients change.</li>
 </ul>
 
-<h2>Labour</h2>
-<p>Estimate hours per component (a cabinet box, a door, a drawer, a trim run) based on your past jobs. Add time for design, drawings, client meetings and sourcing.</p>
-
-<h2>Overhead and margin</h2>
-<p>Shop rent, tools, machine wear, insurance and software need to be recovered: <a href="/tools/markup-margin-calculator/">markup vs margin</a>.</p>
-
-<h2>Protect yourself</h2>
+<h2>Write the takeoff assumptions on the quote</h2>
+<p>Waste is not a fixed percentage you look up; it depends on lengths available, layout and how picky the finish is. Whatever allowance you use, put it in writing so a client comparing bids can see that yours is a complete quantity, not a hopeful one. Examples of the kind of note that helps:</p>
 <ul>
-  <li><strong>Deposit</strong> large enough to cover materials and special orders</li>
-  <li><strong>Approved drawings</strong> before cutting</li>
-  <li><strong>Change policy</strong> after approval: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a></li>
-  <li><strong>Lead time</strong> stated clearly</li>
+  <li>"Trim quantity measured on site plus a 10% cutting allowance; paint-grade MDF, one profile throughout." (Our example figure. Stain-grade hardwood with matched grain needs more.)</li>
+  <li>"Decking at 192 sq ft plus a straight-lay waste allowance; a picture-frame border or diagonal pattern is priced separately."</li>
+  <li>"Sheet goods for built-ins nested from approved shop drawings; extra sheets due to design changes after approval are charged at cost plus handling."</li>
 </ul>
+<p>The last note matters. Once drawings are signed, every change touches material already cut. Price that through a written change order, as the <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a> describes.</p>
 
-<h2>Compare with the market</h2>
-<p>Clients benchmark against typical project budgets. See <a href="/blog/kitchen-renovation-cost-canada-2026/">kitchen renovation costs</a> and <a href="/blog/deck-installation-cost-canada-2026/">deck installation costs</a>.</p>
+<h2>Built-ins: shop hours and site hours are separate lines</h2>
+<p>A bookcase wall or a mudroom bench is really two jobs. In the shop you design, draw, cut, assemble, sand and finish, with your machines, your dust collection and no client watching. On site you protect floors, carry in, level, scribe to walls that are never flat, fasten, fill and touch up. The hourly cost of each is different (shop rent and machines on one side; travel, parking and slower working conditions on the other), so build the two rates separately. The <a href="/tools/labour-rate-calculator/">labour rate calculator</a> helps you work each one out from your own overhead.</p>
+<p>Keep the lines separate on the quote too: your job records then show where the hours actually went. Design and drawing time deserves its own line: it is real work, and if the client walks away after three revisions you want it to have been paid for.</p>
+<p>If you send doors out for finishing or buy them from a door shop, show that as a separate purchased line with its own lead time; finish drying time stretches the calendar even when the labour hours are modest.</p>
 
-<h2>Quote efficiently</h2>
-<p>Carpenters and cabinetmakers can use <a href="/quotes/carpenter-cabinetmaker/">quoting software built for the trade</a> to reuse component prices and send clear PDFs.</p>
+<h2>Deposits and custom-order material in Ontario</h2>
+<p>Ontario's <a href="https://www.ontario.ca/page/guide-home-renovation-and-roofing-businesses" rel="noopener">guide for home renovation and roofing businesses</a> lists what a home renovation contract must include, including a payment schedule with the deposit amount, and says the ministry recommends that deposits are not more than 10% of the total project cost. That is a recommendation, not a cap in law, but a custom millwork job with a large up-front payment can look wrong to a client who has read it.</p>
+<p>The honest way to fund custom material without a large deposit is to tie payments to milestones the client can see:</p>
+<ul>
+  <li>a deposit of no more than 10% on signing;</li>
+  <li>a progress payment when shop drawings are approved and the material order is placed, with the supplier's order confirmation shown to the client;</li>
+  <li>a payment on delivery of finished units to site, and the balance on completion.</li>
+</ul>
+<p>Two other rules from the same guide shape how you order. If the client signs at home, they have a 10-day cooling-off period and can cancel without a fee; if they asked you to start during that period and then cancel, you are entitled to reasonable payment for work and materials that cannot be returned. So don't place a non-returnable order in the first ten days unless the client has asked you, in writing, to proceed. And if your price is an estimate, the guide says you cannot charge more than 10% above it without a signed change. The <a href="/blog/how-to-write-a-contractor-contract-canada/">contractor contract guide</a> covers the rest of the paperwork.</p>
+
+<h2>Decks: permit, ledger, guards, inspections</h2>
+<p>Deck rules are municipal in application, so read the page for the city you are working in. Kingston, Ontario is a clear example. The City says you <a href="https://www.cityofkingston.ca/building-and-renovating/building-permits/deck-permits/" rel="noopener">need a permit if your deck is higher than 600 mm above ground level</a>, and its deck guidance sets out:</p>
+<ul>
+  <li>a ledger fastened with 12.7 mm lag bolts at most 800 mm apart, reaching the rim joist, and not relying on masonry veneer for support;</li>
+  <li>guards at least 900 mm high for decks less than 1.8 m above the ground, with pickets at a maximum 100 mm spacing;</li>
+  <li>three inspections: post holes before concrete, framing before deck boards and guards, and final, booked at least 24 hours ahead.</li>
+</ul>
+<p>Each of those is a quote item. A brick-veneer house means a freestanding beam or through-veneer connection to structure, not a ledger on the brick. Inspections mean return trips and a crew that may wait, so schedule them into the price. Say who prepares the drawings and applies for the permit, and carry the City's fee as an allowance at cost. The <a href="/provinces/ontario/">Ontario page</a> collects the province's other contracting rules.</p>
+
+<h2>Pressure-treated lumber: price the handling</h2>
+<p>Health Canada's guidance on <a href="https://www.canada.ca/en/health-canada/services/consumer-product-safety/reports-publications/pesticides-pest-management/fact-sheets-other-resources/staying-safe-around-treated-wood.html" rel="noopener">staying safe around treated wood</a> says to wear a dust mask, eye protection, gloves and long sleeves when sawing or sanding, to work with it outdoors, to clean up cut ends and sawdust, and never to burn treated wood. Offcuts go out with construction waste under local rules, not into a client's firepit. That means a cutting station outside, cleanup time at the end of each day and a disposal line on the quote.</p>
+
+<h2>Worked example: 12 x 16 ft deck in Kingston, Ontario</h2>
+<p>Example only: quantities and prices are assumptions for illustration. The job is a new 12 x 16 ft pressure-treated deck about 1.2 m above grade at the back of a house with vinyl siding over a wood-framed wall, one 4 ft stair to grade, guards on three sides.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Permit drawings (site plan, framing plan, guard details) and application</td><td>1</td><td>lot</td><td>$450.00</td><td>$450.00</td></tr>
+    <tr><td>Building permit fee (allowance, billed at cost)</td><td>1</td><td>allowance</td><td>$200.00</td><td>$200.00</td></tr>
+    <tr><td>Layout and utility locate request</td><td>1</td><td>lot</td><td>$150.00</td><td>$150.00</td></tr>
+    <tr><td>Pier footings, dug and poured, inspected before concrete</td><td>6</td><td>each</td><td>$275.00</td><td>$1,650.00</td></tr>
+    <tr><td>Ledger: remove siding strip, flash, lag-bolt to rim joist</td><td>16</td><td>lin ft</td><td>$38.00</td><td>$608.00</td></tr>
+    <tr><td>Posts, beam and joist framing, pressure-treated</td><td>192</td><td>sq ft</td><td>$14.00</td><td>$2,688.00</td></tr>
+    <tr><td>Pressure-treated 5/4 decking, straight lay</td><td>192</td><td>sq ft</td><td>$9.50</td><td>$1,824.00</td></tr>
+    <tr><td>Guards, 900 mm high, pickets at 100 mm max spacing</td><td>36</td><td>lin ft</td><td>$65.00</td><td>$2,340.00</td></tr>
+    <tr><td>Stair, 4 ft wide, with guards both sides</td><td>1</td><td>flight</td><td>$1,350.00</td><td>$1,350.00</td></tr>
+    <tr><td>Treated-wood offcut cleanup and disposal</td><td>1</td><td>lot</td><td>$250.00</td><td>$250.00</td></tr>
+  </tbody>
+  <tbody>
+    <tr><td>Subtotal</td><td></td><td></td><td></td><td>$11,510.00</td></tr>
+    <tr><td>HST (13%)</td><td></td><td></td><td></td><td>$1,496.30</td></tr>
+    <tr><td>Total</td><td></td><td></td><td></td><td>$13,006.30</td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
+<ul>
+  <li><strong>HST at 13%</strong> is Ontario's rate in the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a>; the <a href="/tools/sales-tax-calculator/">sales tax calculator</a> handles other provinces.</li>
+  <li><strong>The guard line names the height and picket spacing</strong>, so a cheaper bid with a lower rail is visibly a different product.</li>
+  <li><strong>Footings and framing are separate</strong> because they pass separate inspections; if the client adds a second level, only the affected lines move.</li>
+  <li><strong>Payments follow the job</strong>: about 10% on signing, then on passed footing inspection, framing inspection and final, with no large up-front payment.</li>
+</ul>
+<p>quoteAI builds this kind of itemized quote with the province's tax applied and sends it as a PDF. Carpenters and cabinetmakers can start from the <a href="/quotes/carpenter-cabinetmaker/">carpentry quote page</a>.</p>
 `,
   "how-to-quote-a-welding-or-metal-fabrication-job": `
-<p>Welding and fabrication pricing combines material, shop time, consumables and finishing. Underquoting is common because the small things (grinding, setup, handling) add up quickly.</p>
+<p>Fabrication quotes lose money in the gaps between the obvious lines: the hour spent squaring up a fixture, the grinding nobody counted, the extra trip because the powder coater ran late, the steel that went up between the quote and the order. The weld itself is rarely the problem. A quote that separates shop from field, names the steel price it relies on and treats finishing and installation as their own jobs closes most of those gaps.</p>
 
-<h2>Material</h2>
-<p>Price steel, stainless or aluminum by weight or length, with waste and cutting allowances. Material prices change often, so state quote validity and consider a supplier-increase clause: <a href="/blog/reduce-material-costs-contractors-canada/">material cost guide</a>.</p>
+<h2>Shop fabrication and field welding are different jobs</h2>
+<p>In the shop you control everything: fixtures, positioning, lighting, the right process for the joint, and the next job waiting on the table. In the field you are working out of position, on a client's schedule, with travel, setup, fire precautions and weather. The same weld costs more on site, so the two need separate hourly rates. Build each from your real costs (shop rent and equipment on one side; truck, generator or portable welder and travel time on the other); the <a href="/tools/labour-rate-calculator/">labour rate calculator</a> helps.</p>
+<p>The practical rule for quoting: do as much as possible in the shop and say so. A railing fabricated in sections and bolted or field-welded at a few connection points is cheaper and better than one built in place, and the quote should show the shop hours and the site hours as separate lines.</p>
 
-<h2>Labour</h2>
-<p>Break time into layout, cutting, fit-up, welding, grinding and finishing, plus assembly and installation if on site. Include time for drawings, programming or engineering where needed.</p>
-
-<h2>Consumables and equipment</h2>
-<p>Wire, gas, discs, electrodes, PPE and machine wear. A flat consumables percentage on labour is a common shortcut.</p>
-
-<h2>Finishing and outside services</h2>
+<h2>Choosing the unit: weight, length or hours</h2>
 <ul>
-  <li>Powder coating, galvanizing or painting</li>
-  <li>Machining or laser cutting</li>
-  <li>Inspection or certification where required</li>
+  <li><strong>Per pound or kilogram</strong> works for repetitive structural work and plate, where your history links weight to hours. Take weights from your supplier's catalogue for the exact section and wall thickness, add cut loss and drops, and keep the material and labour parts visible even if the client sees one rate.</li>
+  <li><strong>Per linear foot</strong> is what clients understand for railings and fences. It is a fine way to present a price, but build it bottom-up first: posts, corners, gates, returns and stair rakes all take more time per foot than a straight run.</li>
+  <li><strong>Hours plus materials</strong> suits repairs and one-off work. Repairs have unknowns (hidden cracks, previous bad welds, contaminated metal), so quote an hourly rate with a not-to-exceed amount and a stop to call the client before going over it.</li>
 </ul>
+<p>Consumables (wire, gas, rod, discs, blades) are real costs. Recover them as a percentage of labour hours or as a per-job line; either works if it is applied consistently. Set a minimum charge for small jobs so setup and travel are covered. The <a href="/blog/how-to-price-a-job-labour-materials-markup/">guide to pricing labour, materials and markup</a> covers building the rates, and the <a href="/tools/markup-margin-calculator/">markup and margin calculator</a> checks the result.</p>
 
-<h2>Delivery and installation</h2>
-<p>Transport, crane or lift rental and site access can change the price dramatically.</p>
+<h2>Steel prices: validity and an escalation clause</h2>
+<p>Steel and aluminum prices move, and a fabricator who quotes in spring and orders in autumn carries that risk unless the quote says otherwise. Three pieces of wording help:</p>
+<ul>
+  <li><strong>A short validity period</strong>, stated in days, for the whole quote.</li>
+  <li><strong>The basis of the material price</strong>: "Material priced from supplier quotation dated (date)."</li>
+  <li><strong>An escalation clause</strong> for longer jobs, for example: "If supplier pricing for the steel in this quote has increased when the order is placed, the material line will be adjusted to the supplier's invoiced cost, and the invoice will be shown to the client before work proceeds." That wording is an example, not a legal template; have your contract reviewed for your province.</li>
+</ul>
+<p>Ordering material as soon as the quote is signed, and timing the deposit to cover it, is the simplest protection. If the price changes because the client changes the design, that is a change order, not escalation: see the <a href="/blog/how-to-handle-change-orders-contractors/">change order guide</a>.</p>
 
-<h2>Repair vs new fabrication</h2>
-<p>Repairs have unknowns. Offer a diagnostic or hourly rate with a not-to-exceed amount, and approve extras before starting: <a href="/blog/how-to-handle-change-orders-contractors/">change orders</a>.</p>
+<h2>Drawings, engineering and CWB certification</h2>
+<p>For anything beyond a simple residential railing, decide early who produces the drawings and who is responsible for the design. Shop drawings that the client signs before cutting protect you on dimensions and details. Where structural work (beams, columns, connections, platforms, stairs carrying real loads) comes with drawings from the client's engineer, you price to those drawings, not to your own interpretation. If the client expects you to supply engineering, carry the engineer's fee as its own line.</p>
+<p>Structural specifications may require the fabricator to hold company certification under CSA W47.1, which the CWB Group administers. The <a href="https://www.cwbgroup.org/services/certification/company-certification/csa-w471-fusion-welding-of-steel" rel="noopener">CWB's page on CSA W47.1</a> explains that certified companies must qualify their welding supervisors and have their welders tested, and that certification comes in three divisions: Division 1 requires a professional engineer employed full time, Division 2 one retained part time, Division 3 none. Read the specification before you bid; if it calls for a division you don't hold, the job is not yours to quote alone.</p>
 
-<h2>Set minimums</h2>
-<p>A minimum charge covers setup and travel for small jobs.</p>
+<h2>Railings and guards: quote to the code</h2>
+<p>A residential railing is usually a guard under the building code, and an inspector can reject one that doesn't meet it. Municipal guidance is the clearest place to read the rules for your area. St. Albert, Alberta, for example, sets out in its <a href="https://stalbert.ca/city/approvals/development/decks/" rel="noopener">deck permit requirements</a> that a guard at least 900 mm high is required on decks, balconies and stairs where the drop exceeds 600 mm, a 42 in guard where it exceeds 1800 mm, that openings must prevent the passage of a 100 mm sphere, and that glass in guards must be laminated or tempered. Write the guard height and picket spacing on the quote, so the client can see that the cheaper bid with horizontal bars or wide gaps is a different product.</p>
 
-<h2>Margin and speed</h2>
-<p>Apply overhead and margin consistently: <a href="/tools/markup-margin-calculator/">markup vs margin</a>. Welders and fabricators can build itemized quotes quickly with <a href="/quotes/welder-fabricator/">quoting software for welders and metal fabricators</a>.</p>
+<h2>Finishing as its own line</h2>
+<p>Primer and paint can be done in-house; powder coating and hot-dip galvanizing are usually subcontracted. Show them as separate lines with the subcontractor's lead time, and add the trips to drop off and pick up. Say what preparation is included (sandblast, phosphate wash) and the colour. If the client wants powder coat over galvanizing, confirm with the coater that they accept galvanized parts and price both steps. Damage to finished parts during installation needs touch-up material on the truck.</p>
+
+<h2>Delivery, installation and hot work on occupied sites</h2>
+<p>Delivery is a line, and so is anything needed to get the piece in place: a second installer, a lift, a crane, a core drill for posts set in concrete. Field welding on an occupied building means fire precautions: clearing or covering combustibles, a fire extinguisher at hand and someone watching after the work stops. Commercial property managers and general contractors may require their own hot-work permit and fire watch; ask at the walk-through and price the watch time. In Alberta, the OHS Code's <a href="https://search-ohs-laws.alberta.ca/legislation/occupational-health-and-safety-code/part-10-fire-and-explosion-hazards/" rel="noopener">Part 10, section 169</a> requires a hot work permit before hot work begins in a hazardous location or where an explosive atmosphere may exist.</p>
+<p>Taking deposits for work on someone's home in Alberta has its own licensing rule. The province says a business that solicits or concludes contracts for improving private dwellings away from its own premises and accepts money before the work is done needs a <a href="https://www.alberta.ca/prepaid-contracting-licence" rel="noopener">prepaid contracting licence</a>; contracts between contractors and sub-trades, and commercial buildings, are exempt.</p>
+
+<h2>Worked example: exterior stair railing in St. Albert, Alberta</h2>
+<p>Example only: quantities and prices are assumptions for illustration. The job is a pair of steel guards for a concrete front stair and landing about 1 m above grade, roughly 26 lin ft in total, square-tube posts and rails with square pickets, powder-coated black, surface-mounted to the concrete.</p>
+<table>
+  <thead>
+    <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit price</th><th>Amount</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Site measure and shop drawing for client approval</td><td>1</td><td>lot</td><td>$350.00</td><td>$350.00</td></tr>
+    <tr><td>Steel tube, bar and base plates, incl. cut loss</td><td>260</td><td>lb</td><td>$1.85</td><td>$481.00</td></tr>
+    <tr><td>Shop fabrication: cut, fit, weld, grind</td><td>14</td><td>hr</td><td>$105.00</td><td>$1,470.00</td></tr>
+    <tr><td>Consumables (wire, gas, discs)</td><td>1</td><td>lot</td><td>$120.00</td><td>$120.00</td></tr>
+    <tr><td>Sandblast and powder coat, black (subcontracted)</td><td>1</td><td>lot</td><td>$680.00</td><td>$680.00</td></tr>
+    <tr><td>Delivery to site</td><td>1</td><td>trip</td><td>$150.00</td><td>$150.00</td></tr>
+    <tr><td>Installation, two installers, anchored to concrete</td><td>8</td><td>hr</td><td>$95.00</td><td>$760.00</td></tr>
+    <tr><td>Anchors, fasteners and touch-up paint</td><td>1</td><td>lot</td><td>$95.00</td><td>$95.00</td></tr>
+  </tbody>
+  <tbody>
+    <tr><td>Subtotal</td><td></td><td></td><td></td><td>$4,106.00</td></tr>
+    <tr><td>GST (5%)</td><td></td><td></td><td></td><td>$205.30</td></tr>
+    <tr><td>Total</td><td></td><td></td><td></td><td>$4,311.30</td></tr>
+  </tbody>
+</table>
+<p>Why it is built this way:</p>
+<ul>
+  <li><strong>Only GST appears</strong>: Alberta has 5% GST and no provincial sales tax, per the <a href="https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/gst-hst-businesses/charge-collect-which-rate/calculator.html" rel="noopener">CRA rate table</a>. The <a href="/tools/sales-tax-calculator/">sales tax calculator</a> handles HST provinces.</li>
+  <li><strong>Shop and site hours have different rates</strong>, and the per-foot equivalent (about $158 per lin ft before tax) is a check on the build-up, not the starting point.</li>
+  <li><strong>Material is by weight</strong> with the supplier quote date stated, so an escalation adjustment is traceable to an invoice.</li>
+  <li><strong>Powder coating is its own line</strong> because its lead time sets the install date.</li>
+</ul>
+<p>quoteAI writes this kind of itemized quote with the province's tax applied and sends it as a PDF. Welders and fabricators can start from the <a href="/quotes/welder-fabricator/">fabrication quote page</a>.</p>
 `,
   "how-to-quote-a-masonry-job": `
 <p>Masonry and concrete quotes go wrong in two places: the part of the job you cannot see when you walk the site (rotten mortar behind a sound face, a soft subgrade under an old slab), and the calendar. A quote that names its unknowns, prices them separately and states when the work can physically be done protects your margin far better than a sharper unit price.</p>
@@ -1675,6 +1945,72 @@ const BLOG_CONTENT: Record<string, string> = {
   <li>Both taxes are calculated on the $10,750 subtotal, and the RBQ licence number goes in the quote header with your GST and QST numbers.</li>
 </ul>
 <p>quoteai builds this kind of opening-by-opening quote with the province's taxes and sends it as a PDF; the <a href="/quotes/window-door-installer/">window and door installer page</a> shows how. The <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">guide to writing a professional quote</a> covers scope, exclusions and terms.</p>
+`,
+  "how-to-get-more-jobs-as-a-contractor-canada": `
+<p>More enquiries only help if they turn into work you want. A crew that doubles its leads but still sends quotes a week late has mostly doubled its unpaid estimating time. So start from the other end: decide which jobs you want, then fix the steps between a client finding you and saying yes.</p>
+
+<h2>Decide what a good job looks like</h2>
+<p>Write down the three or four job types that pay you best for the time they take, and the areas you can reach without losing half a day in traffic: panel upgrades and EV charger circuits for an electrician, water heater replacements for a plumber, interior repaints for a painter. Every channel below should point at that list. Knowing your real hourly cost makes this easier: the <a href="/blog/how-to-price-a-job-labour-materials-markup/">guide to pricing labour, materials and markup</a> shows how to work it out.</p>
+
+<h2>Google Business Profile: get the basics exactly right</h2>
+<p>For local trade searches, your Business Profile is often the first thing a client sees, so it should describe the jobs on your list in plain words, with photos of finished work. The full setup is in our <a href="/blog/google-business-profile-guide-for-tradespeople/">Google Business Profile guide for tradespeople</a>. Three rules from Google itself trip up contractors most often:</p>
+<ul>
+  <li><strong>Hide your home address.</strong> Google's guidelines say a service-area business <a href="https://support.google.com/business/answer/3038177" rel="noopener">should hide its business address from customers</a>. Show it only if the location is staffed and receives customers during your stated hours.</li>
+  <li><strong>Set service areas by place, not radius.</strong> Google lets you list <a href="https://support.google.com/business/answer/9157481" rel="noopener">up to 20 service areas by city, postal code or similar area</a>, not a distance around your shop, and the overall boundary should be within about two hours of driving from your base. List the places you want work in, not every town you could reach.</li>
+  <li><strong>Use your real business name.</strong> Adding "Best Plumber Toronto" to the name breaks the <a href="https://support.google.com/business/answer/3038177" rel="noopener">guideline that the name reflect your real-world business name</a>, as used on your signage, website and stationery.</li>
+</ul>
+
+<h2>Reviews: ask every client, the same way, without bribes</h2>
+<p>Reviews matter because the next client reads them before calling. The habit that works is boring: ask every client at handover, then text the direct review link the same day. Our post on <a href="/blog/how-to-get-more-reviews-as-a-contractor/">how to get more reviews as a contractor</a> has wording you can copy.</p>
+<p>Two lines you can't cross. First, Google's policy prohibits offering <a href="https://support.google.com/contributionpolicy/answer/7400114" rel="noopener">payment, discounts or free goods or services in exchange for a review</a>, and it also bars businesses from discouraging negative reviews or asking only happy clients. "Ten percent off your next service call for a five-star review" breaks both. Second, Canadian law applies on top of Google's rules. The Competition Bureau has warned that <a href="https://www.canada.ca/en/competition-bureau/news/2024/01/online-reviews-posted-by-employees-businesses-could-be-liable.html" rel="noopener">anyone who writes or permits reviews that give a false or misleading impression could be liable under the Competition Act</a>, and that employees who post about their employer must disclose the connection. That covers your apprentice's five stars, your spouse's account and any firm offering to "boost" your rating.</p>
+<p>Reply to reviews, good and bad. Google's own advice is to keep replies short and professional, <a href="https://support.google.com/business/answer/3474122" rel="noopener">not to use them for promotions, and never to share a reviewer's private information</a>.</p>
+
+<h2>Answer and quote faster than the next crew</h2>
+<p>The gap between a client's first call and your quote is where a small crew has the most control. A few fixes cost nothing:</p>
+<ul>
+  <li><strong>Make missed calls recoverable.</strong> A voicemail greeting that gives a callback window ("we return calls by 6 p.m. the same day") is better than silence. Then keep the promise.</li>
+  <li><strong>Qualify on the first call.</strong> Ask the address, the job, the timeline and how the client heard of you. If the job isn't on your list or is outside your areas, say so politely and refer it on.</li>
+  <li><strong>Quote while the visit is fresh.</strong> A clear itemized quote sent the same day or the next morning beats a lump sum sent a week later. The structure is in <a href="/blog/how-to-write-a-professional-quote-that-wins-jobs/">how to write a professional quote that wins jobs</a>. quoteai writes the itemized quote with your province's taxes and sends it as a PDF from your phone, which helps when the "office" is the truck.</li>
+  <li><strong>Follow up once or twice, then stop.</strong> A short message a few days after the quote, and one more a week later, recovers jobs that were simply forgotten. See <a href="/blog/how-to-follow-up-on-quotes-contractors/">how to follow up on quotes</a> for timing and wording.</li>
+</ul>
+
+<h2>Referrals and repeat clients</h2>
+<p>Past clients already trust you, so they are the cheapest source of the next job. Keep a list of every completed job with the date, address and what you did, and note what will need doing later: a deck due for re-staining, a furnace due for service, the second bathroom the client mentioned "for next year." At handover, say plainly that you'd be glad to help their neighbours and friends.</p>
+
+<h2>Trade clients: property managers, general contractors and builders</h2>
+<p>Homeowners are one-off buyers. Some of the steadiest work for a small crew comes from businesses that hire trades over and over:</p>
+<ul>
+  <li><strong>Property managers and condo boards</strong> need reliable people for turnovers, repairs and emergencies. Have your certificate of insurance and workers' compensation clearance ready before you introduce yourself.</li>
+  <li><strong>General contractors and renovation firms</strong> hire subtrades for every job. They value crews that show up on the scheduled day, price change orders in writing and leave the site clean for the next trade. Expect to work under their contract and payment terms, including holdback on larger jobs.</li>
+  <li><strong>Builders and developers</strong> buy in volume and negotiate hard. A builder can fill a season, but price it carefully and watch how much of your calendar depends on one client.</li>
+  <li><strong>Other trades</strong> meet your clients every day. Two or three you trust, sending work both ways, beat a directory listing.</li>
+</ul>
+
+<h2>Paid lead platforms: test before you commit</h2>
+<p>Lead-selling sites and paid search ads can fill gaps, but they cost money whether or not the lead becomes a job, and the same request may be sent to several contractors. Before signing up, check how the platform charges (per lead, per month or per booked job), whether you can dispute a bad lead, which areas and job types you can filter, and whether there is a minimum term. Then track every paid lead to a signed quote for a few months and work out what each booked job really cost.</p>
+
+<h2>Email and text follow-ups: what Canada's Anti-Spam Legislation requires</h2>
+<p>Quote follow-ups, seasonal reminders and newsletters sent by email or text can fall under Canada's Anti-Spam Legislation (CASL), which requires consent before sending a commercial electronic message. The federal anti-spam guidance explains the two kinds of consent: <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">express consent</a> (the client said yes, verbally or in writing, and it lasts until they withdraw it) and implied consent from an existing business relationship, which <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/getting-consent-send-email" rel="noopener">may be valid for up to 2 years, or just 6 months in the case of an inquiry</a>. The same page says each message must carry your business name, a mailing address and a phone, email or website, and an unsubscribe mechanism, and that unsubscribe requests must be actioned within 10 business days at no cost to the recipient.</p>
+<p>In practice: add a consent checkbox or a line on your quote ("May we send you seasonal maintenance reminders?"), record the date and how consent was given, and drop people who said no. The rules are <a href="https://ised-isde.canada.ca/site/canada-anti-spam-legislation/en/texting-good-client-relations" rel="noopener">technology neutral, so they apply to text messages too</a>, and a "STOP" reply has to be respected. This is general information, not legal advice; for detailed questions, the CRTC publishes the official CASL guidance.</p>
+
+<h2>Example: a weekly lead plan for a two-person crew</h2>
+<p>Example only. This assumes an owner who works on the tools with one helper and handles sales in the evenings. The times are planning assumptions; adjust them to your season and trade.</p>
+<table>
+  <thead>
+    <tr><th>Day</th><th>Task</th><th>Time</th><th>Tool</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Monday</td><td>Return weekend calls and messages; book site visits for the week</td><td>30 min</td><td>Phone, calendar</td></tr>
+    <tr><td>Monday</td><td>Send quotes from last week's visits still outstanding</td><td>45 min</td><td>Quoting app</td></tr>
+    <tr><td>Tuesday</td><td>Follow up on quotes sent 3 to 7 days ago (one message each)</td><td>20 min</td><td>Email or text</td></tr>
+    <tr><td>Wednesday</td><td>Send review link to clients whose jobs finished this week; reply to new reviews</td><td>15 min</td><td>Google Business Profile</td></tr>
+    <tr><td>Wednesday</td><td>Post 3 to 5 photos of a finished job with a one-line description</td><td>15 min</td><td>Google Business Profile</td></tr>
+    <tr><td>Thursday</td><td>Call or email one property manager, general contractor or trade partner</td><td>30 min</td><td>Phone, email with insurance and WSIB/WCB documents attached</td></tr>
+    <tr><td>Friday</td><td>Check past-client list for reminders due next month; message only those who consented</td><td>20 min</td><td>Client list or CRM</td></tr>
+    <tr><td>Friday</td><td>Log the week: new leads, source, quotes sent, jobs booked, cost of any paid leads</td><td>15 min</td><td>Spreadsheet or CRM</td></tr>
+  </tbody>
+</table>
+<p>The last row ends the guessing. After a few months, the log shows which sources bring the jobs on your list, so you can move time and money to them.</p>
 `,
 };
 

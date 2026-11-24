@@ -20,6 +20,8 @@
     { "source": "/seo{/}?", "destination": "/", "permanent": true },
     { "source": "/blog/categoria/(.*)", "destination": "/blog/category/$1", "permanent": true },
     { "source": "/blog/category/(trades|pricing){/}?", "destination": "/blog/", "permanent": true },
+    { "source": "/blog/how-to-get-more-electrical-jobs-canada{/}?", "destination": "/blog/how-to-get-more-jobs-as-a-contractor-canada/", "permanent": true },
+    { "source": "/blog/how-to-get-more-plumbing-jobs-canada{/}?", "destination": "/blog/how-to-get-more-jobs-as-a-contractor-canada/", "permanent": true },
     { "source": "/blog/cost-to-rewire-a-house-canada{/}?", "destination": "/blog/how-to-quote-an-electrical-job/", "permanent": true },
     { "source": "/blog/cost-to-reroof-a-home-canada{/}?", "destination": "/blog/how-to-quote-a-roofing-job/", "permanent": true },
     { "source": "/blog/snow-load-roofing-eavestrough-considerations-canada{/}?", "destination": "/blog/how-to-quote-a-roofing-job/", "permanent": true },
